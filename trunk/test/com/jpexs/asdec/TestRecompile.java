@@ -4,15 +4,12 @@ import com.jpexs.asdec.abc.NotSameException;
 import junit.framework.TestCase;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 
 public class TestRecompile extends TestCase {
     public static final String TESTDATADIR = "testdata";
 
-    private void testRecompile(String filename) {
+    private void testRecompileOne(String filename) {
         try {
             SWF swf = new SWF(new FileInputStream(TESTDATADIR + File.separator + filename));
             Main.DEBUG_COPY = true;
@@ -20,23 +17,21 @@ public class TestRecompile extends TestCase {
         } catch (IOException ex) {
             fail();
         } catch (NotSameException ex) {
-            //ex.printStackTrace();
             fail("File is different after recompiling: " + filename);
         }
     }
 
     @Test
-    public void testRecompile1() {
-        testRecompile("01.swf");
+    public void testRecompile() {
+        File dir=new File(TESTDATADIR);
+        File files[]=dir.listFiles(new FilenameFilter(){
+            public boolean accept(File dir, String name) {
+                return name.toLowerCase().endsWith(".swf");
+            }
+        });
+        for(File f:files){
+            testRecompileOne(f.getAbsolutePath());
+        }
     }
 
-    @Test
-    public void testRecompile2() {
-        testRecompile("02.swf");
-    }
-
-    @Test
-    public void testRecompile3() {
-        testRecompile("03.swf");
-    }
 }
