@@ -1,0 +1,90 @@
+Version 0.9.5 - Java Reflection Completions additions
+    * Configuration class overhaul.  Each kit now has its own COnfiguration file
+      which merges the superclass(es) Configurations.
+    * Usable Reflect Completions Dialog (Java with F1 or Menu)
+    * Java ENTER key responds properly to multi line comments
+    * Font can be changed for each Kit
+    * Kits for XHTML and Xpath added.  XHTML has a simple Preview Action.
+    * Added Execute Script to JacaScript (can also be used for Groovy if Groovy
+      Scripting support is installed properly).
+    * Hotkeys for actions are displayed in Popup Menus
+    * Word Completion action can also do CamelCase matches
+    * Smart Home Action (and Smart Home Extend Selection)
+    * Enhanced JavaScript support.  Issue 115
+    * Better Undo grouping
+    * Replace DIalog ENhancement.  Only for updatedable editors and added single replace.
+    * Added append method to SyntaxDocument
+    * Fixed Issue 130 - Compound Undo on multiple lines.
+Version 0.9.4 - IntelliSense additions
+    * Adding IntelliSense to Java with simple List of selectable keywords
+    * Added Toggle Comment Actions using Control SLASH
+    * Fixed Issue 47.
+    * Added Clojure, Scala, DOS Batch and 'nix bash support
+    * Added Configurable Popup menus with default Tango Desktop icons
+    * Added configurable format for the CaretMonitor class
+    * Toggle Comments Action selects the lines affected after being performed
+    * Added multi-line support in ActionUtils.insertMagicSTring method.
+    * GotoLine dialog responds to ESC key
+Version 0.9.3 - Start of scripts for the document:
+    * Added new methods getLine() to SyntaxDocument
+    * SyntaxDocument getIndexOf methods deprecated, use getMatchers instead
+    * Added Line Numbering to Java
+    * Added CaretMonitor Class
+    * Merged Find And Replace dialogs into one.
+    * Created SyntaxComponent interface and have all UI components implement
+      that interface.  DefaultSyntaxKit will use config.properties class to
+      dynamically install these components.
+    * Added Right Margin option and Single Color Selection Options
+    * Added Python, C and C++ Support
+    * Added Ruby Syntax Support
+    * Fixed Issue 37 (NPE for LineNumbersRuler)
+    * Fixed Issue 39 (Highlighting Tokens overrides selection highlights)
+    * Fixed some JavaDoc comments.
+    * Fixed Line Numbers being displayed for the height of the editor and now
+      just for the actual available lines.
+    * Fixed Margin typo in all project. Issue 43
+    * Changing Actions to be more configurable:
+      * SyntaxActions renamed to ActionUtils
+      * Removed all inner classes from SyntaxActions
+      * Will create new SyntaxAction interface that will allow dynamic addition
+        actions (in the addKeyActions of DefaultSyntaxKit
+    * Added Text AA property to SyntaxView
+Version 0.9.2:
+    * Fixing Java Indentation and Un-Indentattion Actions
+    * Added and used (in the Tester) clearUndoes on the SyntaxDocument
+    * Added Basic JFlex Syntax
+    * Added getContentTypes to DefaultSyntaxKit to get all registered
+      ContentTypes.  This is now also used in the SyntaxTester instead of
+      hardcoding the types.
+    * Cleanup and optimization of Lexers by removing duplicate Java Code
+      (replaced with Regex OR)
+    * Removed calls to deprecated calls in SyntaxView
+    * Modified the SyntaxDOcument to override the fireXXX methods and parse
+      the document at that time instead of overriding the inserUpdate method.
+      This fixes issue 24.
+    * Added Groovy GString expression highlights
+    * Removed getLanguages method from Lexer interface and implementations.
+    * Added WARNING and ERROR TokenTypes and added their default styles.
+    * Moved Keymaps and install methods to SyntaxKits instead of the Lexers
+    * Removed deprecated methods from SyntaxActions class
+    * Split SyntaxActions into new package and moved inner classes to the new
+      package
+    * Added Token HighLighter to Java
+    * Added Pairs Highlighter to Java
+    * Token class made immutable (all final fields)
+    * Added Find and Replace Dialogs and Action to Java (mapped to C-F and
+      C-H )
+    * Added pair matching to XML tags
+    * Added CDATA matching and pair highlights for XML
+    * Added Comment Pair Highlighting in XML
+    * Fixed highlighting with selections so the selection always appears
+    * Merged Find and Replace Dialogs into one
+    * Fixed issue 33 (undable to add new line after final closing brace for
+      Java)
+    * Added Groovy Multi-Line strings and fixed Comments as Regex issue.
+    * Fixes to empty find text field causing NPE
+Version 0.9.1
+    * Fixed empty strings in XML syntax  Issue 29
+    * Fixed TAL lexer using incorrect package name
+Version 0.9.0
+    * Initial version after major overhaul

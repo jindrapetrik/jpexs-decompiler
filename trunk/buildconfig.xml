@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="buildconfig" basedir=".">
+    <property name="PROJECTNAME" value="ASDec"/>
+    <property name="JARFILENAME" value="ASDec"/>
+
+    <property name="MAINCLASS" value="com.jpexs.asdec.Main"/>
+    <property name="SOURCEDIR" value="src"/>
+    <property name="TESTDIR" value="test"/>
+    <property name="TESTLIBDIR" value="testlib"/>
+    <property name="TESTRESULTSDIR" value="reports/tests"/>
+    <property name="COVERAGERESULTSDIR" value="reports/coverage"/>
+    <property name="DISTRIBUTIONDIR" value="dist"/>
+    <property name="COMPILEDIR" value="build/classes"/>
+    <property name="INSTRDIR" value="build/instr-classes"/>
+    <property name="COVERAGEDIR" value="coverage"/>
+    <property name="COMPILETESTSDIR" value="build/test"/>
+    <property name="LIBRARIESDIR" value="lib"/>
+
+    <property name="DISTLIBRARIESDIR" value="lib"/>
+    <property name="JAVADOCDIR" value="javadoc"/>
+
+</project>

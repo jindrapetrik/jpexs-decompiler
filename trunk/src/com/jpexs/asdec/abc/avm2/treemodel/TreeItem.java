@@ -1,0 +1,80 @@
+/*
+ * Copyright (c) 2010. JPEXS
+ */
+
+package com.jpexs.asdec.abc.avm2.treemodel;
+
+import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.asdec.helpers.Highlighting;
+
+
+public abstract class TreeItem {
+
+    public static final int PRECEDENCE_PRIMARY = 0;
+    public static final int PRECEDENCE_POSTFIX = 1;
+    public static final int PRECEDENCE_UNARY = 2;
+    public static final int PRECEDENCE_MULTIPLICATIVE = 3;
+    public static final int PRECEDENCE_ADDITIVE = 4;
+    public static final int PRECEDENCE_BITWISESHIFT = 5;
+    public static final int PRECEDENCE_RELATIONAL = 6;
+    public static final int PRECEDENCE_EQUALITY = 7;
+    public static final int PRECEDENCE_BITWISEAND = 8;
+    public static final int PRECEDENCE_BITWISEXOR = 9;
+    public static final int PRECEDENCE_BITWISEOR = 10;
+    public static final int PRECEDENCE_LOGICALAND = 11;
+    public static final int PRECEDENCE_LOGICALOR = 12;
+    public static final int PRECEDENCE_CONDITIONAL = 13;
+    public static final int PRECEDENCE_ASSIGMENT = 14;
+    public static final int PRECEDENCE_COMMA = 15;
+    public static final int NOPRECEDENCE = 16;
+
+
+    public int precedence = NOPRECEDENCE;
+    public AVM2Instruction instruction;
+
+    public TreeItem(AVM2Instruction instruction, int precedence) {
+        this.instruction = instruction;
+        this.precedence = precedence;
+    }
+
+
+    public abstract String toString(ConstantPool constants);
+
+
+    protected String hilight(String str) {
+        if (instruction == null)
+            return str;
+        return Highlighting.hilighOffset(str, instruction.offset);
+    }
+
+    public boolean isFalse() {
+        return false;
+    }
+
+    public boolean isTrue() {
+        return false;
+    }
+
+    protected String formatProperty(ConstantPool constants, TreeItem object, TreeItem propertyName) {
+        String obStr = object.toString(constants);
+        if (object.precedence > PRECEDENCE_PRIMARY) {
+            obStr = "(" + obStr + ")";
+        }
+        if (object instanceof LocalRegTreeItem) {
+            if (((LocalRegTreeItem) object).computedValue instanceof FindPropertyTreeItem)
+                obStr = "";
+        }
+        if (propertyName instanceof FullMultinameTreeItem) {
+
+            if (((FullMultinameTreeItem) propertyName).isRuntime()) {
+                return obStr + "[" + propertyName.toString(constants) + "]";
+            } else {
+                if (!obStr.equals("")) obStr += ".";
+                return obStr + ((FullMultinameTreeItem) propertyName).toString(constants);
+            }
+        } else {
+            return obStr + "[" + propertyName.toString(constants) + "]";
+        }
+    }
+}

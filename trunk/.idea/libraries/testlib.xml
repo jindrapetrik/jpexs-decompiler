@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="testlib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/testlib/junit-4.8.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/testlib/emma_ant.jar!/" />
+      <root url="jar://$PROJECT_DIR$/testlib/emma.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

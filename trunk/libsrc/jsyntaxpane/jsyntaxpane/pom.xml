@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>jsyntaxpane</groupId>
+  <artifactId>jsyntaxpane</artifactId>
+  <packaging>jar</packaging>
+  <version>0.9.5</version>
+  <name>jsyntaxpane</name>
+  <description>A very simple to use and extend JEditorKit that supports few languages. The main goal is to make it easy to have nice looking Java Swing Editors with support for Syntax Highlighting.</description>
+  <url>http://jsyntaxpane.googlecode.com/</url>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+    <url>http://jsyntaxpane.googlecode.com/svn/</url>
+  </scm>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>jflex</id>
+      <name>JFlex repository</name>
+      <url>http://jflex.sourceforge.net/repo/</url>
+    </pluginRepository>
+  </pluginRepositories>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>RELEASE</version>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/Thumbs.db</exclude>
+          </excludes>        
+          <archive>
+            <manifest>
+              <mainClass>jsyntaxpane.SyntaxTester</mainClass>
+              <packageName>jsyntaxpane</packageName>
+              <addClasspath>true</addClasspath>
+              <classpathPrefix />
+            </manifest>
+            <manifestEntries>
+              <mode>development</mode>
+              <url>${pom.url}</url>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>de.jflex</groupId>
+        <artifactId>maven-jflex-plugin</artifactId>
+        <!--version>0.2</version-->
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

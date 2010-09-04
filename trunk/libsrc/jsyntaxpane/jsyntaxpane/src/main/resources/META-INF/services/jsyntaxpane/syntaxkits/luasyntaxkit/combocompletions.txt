@@ -1,0 +1,30 @@
+and
+break
+do
+else
+else \n\t#{p:block}
+elseif
+elseif (#{p:exp}) then \n\t#{p:block}
+end
+false
+for
+for #{p:var}=#{p:num},#{p:max} do \n\t|block \nend
+for #{p:namelist} in #{p:explist} do \n\t#{p:block} \nend
+function
+function #{p:name} () \n\nend
+if
+if (#{p:exp}) then \n\t#{p:block} \nend
+in
+local
+local function #{p:name} () \n\nend
+nil
+not
+or
+repeat
+repeat \n\t#{p:block} \nuntil #{p:exp}
+return
+then
+true
+until
+while
+while (#{p:exp}) do \n\t#{p:block} \nend
