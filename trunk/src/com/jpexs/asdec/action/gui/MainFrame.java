@@ -10,6 +10,7 @@ import com.jpexs.asdec.tags.Tag;
 import jsyntaxpane.DefaultSyntaxKit;
 
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -30,6 +31,8 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
     public JSplitPane splitPane;
     public JSplitPane splitPane2;
     public JButton saveButton = new JButton("Save");
+    public JLabel asmLabel = new JLabel("P-code source (editable)");
+    public JLabel decLabel = new JLabel("ActionScript source");
 
     public MainFrame(List<Tag> list) {
         this.list = list;
@@ -45,15 +48,30 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
         treeRenderer.setLeafIcon(leafIcon);
         tagTree.setCellRenderer(treeRenderer);
 
-        JPanel centerPanel = new JPanel();
-        centerPanel.setLayout(new BorderLayout());
-        centerPanel.add(new JScrollPane(editor), BorderLayout.CENTER);
-        centerPanel.add(saveButton, BorderLayout.SOUTH);
+        JPanel panB = new JPanel();
+        panB.setLayout(new BorderLayout());
+        asmLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        asmLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        panB.add(asmLabel,BorderLayout.NORTH);
+        panB.add(new JScrollPane(editor), BorderLayout.CENTER);
+
+        JPanel buttonsPan = new JPanel();
+        buttonsPan.setLayout(new FlowLayout());
+        buttonsPan.add(saveButton);
+        panB.add(buttonsPan, BorderLayout.SOUTH);
 
         saveButton.addActionListener(this);
         saveButton.setActionCommand("SAVEACTION");
+
+        JPanel panA=new JPanel();
+        panA.setLayout(new BorderLayout());
+        panA.add(new JScrollPane(decompiledEditor),BorderLayout.CENTER);
+        panA.add(decLabel, BorderLayout.NORTH);
+        decLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        decLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        
         setLayout(new BorderLayout());
-        add(splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(tagTree), splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, centerPanel, new JScrollPane(decompiledEditor))), BorderLayout.CENTER);
+        add(splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(tagTree), splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panA, panB)), BorderLayout.CENTER);
         editor.setContentType("text/flasm");
         decompiledEditor.setContentType("text/actionscript");
         setSize(640, 480);
@@ -124,6 +142,7 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
     public void display() {
         setVisible(true);
         splitPane.setDividerLocation(0.5);
+        splitPane2.setDividerLocation(0.5);
     }
 
     public void actionPerformed(ActionEvent e) {

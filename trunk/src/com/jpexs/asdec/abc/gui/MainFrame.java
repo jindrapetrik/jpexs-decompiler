@@ -42,8 +42,8 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
     public JPanel statusPanel = new JPanel();
     public LoadingPanel loadingPanel = new LoadingPanel(20, 20);
     public JLabel statusLabel = new JLabel("");
-    public JLabel asmLabel = new JLabel("Disassembled code:");
-    public JLabel decLabel = new JLabel("Decompiled code:");
+    public JLabel asmLabel = new JLabel("P-code source (editable)");
+    public JLabel decLabel = new JLabel("ActionScript source");
 
     public void setStatus(String s) {
         if (s.equals("")) {
@@ -156,8 +156,6 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
         setSize(800, 600);
         this.abc = list.get(listIndex).abc;
         getContentPane().setLayout(new BorderLayout());
-        //codeView = new CodeViewPanel(abc);
-        //codeView
         sourceTextArea = new ASMSourceEditorPane();
 
         JPanel rightPanel = new JPanel();
@@ -175,7 +173,6 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
         saveButton.addActionListener(this);
 
 
-        //buttonsPan.add(verifyButton);
         buttonsPan.add(saveButton);
         rightPanel.add(buttonsPan, BorderLayout.SOUTH);
         decompiledTextArea = new DecompiledEditorPane();
@@ -186,6 +183,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
         panA.setLayout(new BorderLayout());
         panA.add(rightPanel, BorderLayout.CENTER);
         panA.add(asmLabel, BorderLayout.NORTH);
+
         asmLabel.setHorizontalAlignment(SwingConstants.CENTER);
         asmLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
         JPanel panB = new JPanel();
@@ -380,13 +378,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
 
     public void display() {
         setVisible(true);
-
-        splitPane2.setDividerLocation(0.5); //Traitlist-classtree
-
-        //splitPane3.setDividerLocation(0.1); //classtree|right
-
-        splitPane1.setDividerLocation(0.5); //disassembled|decompiled
-
-
+        splitPane2.setDividerLocation(0.5);
+        splitPane1.setDividerLocation(0.5); 
     }
 }
