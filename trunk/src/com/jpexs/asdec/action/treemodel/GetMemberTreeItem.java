@@ -14,6 +14,10 @@ public class GetMemberTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
+        if(!((functionName instanceof DirectValueTreeItem)&&(((DirectValueTreeItem)functionName).value instanceof String))){
+            //if(!(functionName instanceof GetVariableTreeItem))
+              return object.toString(constants) + "[" + stripQuotes(functionName)+"]";
+        }
         return object.toString(constants) + "." + stripQuotes(functionName);
     }
 }

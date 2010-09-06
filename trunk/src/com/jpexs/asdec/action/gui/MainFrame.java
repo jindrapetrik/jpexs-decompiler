@@ -103,7 +103,7 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
         miSaveAs.addActionListener(this);
         JMenuItem miExport = new JMenuItem("Export...");
         miExport.setActionCommand("EXPORT");
-        miExport.addActionListener(this);
+        //miExport.addActionListener(this);
         menuFile.add(miOpen);
         menuFile.add(miSave);
         menuFile.add(miSaveAs);

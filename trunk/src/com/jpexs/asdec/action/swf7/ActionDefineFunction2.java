@@ -80,6 +80,7 @@ public class ActionDefineFunction2 extends Action {
         code = ASMParser.parse(labels, address + getPreLen(version), lexer, constantPool, version);
     }
 
+    @Override
     public byte[] getBytes(int version) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         SWFOutputStream sos = new SWFOutputStream(baos, version);

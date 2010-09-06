@@ -182,10 +182,15 @@ public class ActionPush extends Action {
     }
 
     @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output) {
+    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
         for (Object o : values) {
             if (o instanceof ConstantIndex) {
                 o = constants.constants.get(((ConstantIndex) o).index);
+            }
+            if (o instanceof RegisterNumber) {
+                if(regNames.containsKey(((RegisterNumber)o).number)){
+                  ((RegisterNumber)o).name=regNames.get(((RegisterNumber)o).number);
+                }
             }
             stack.push(new DirectValueTreeItem(this, o, constants));
         }

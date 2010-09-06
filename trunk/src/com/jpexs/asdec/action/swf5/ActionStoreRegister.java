@@ -5,6 +5,7 @@ import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.parser.FlasmLexer;
 import com.jpexs.asdec.action.parser.ParseException;
+import com.jpexs.asdec.action.swf4.RegisterNumber;
 import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.StoreRegisterTreeItem;
 import com.jpexs.asdec.action.treemodel.TreeItem;
@@ -45,8 +46,12 @@ public class ActionStoreRegister extends Action {
     }
 
     @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output) {
+    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
         TreeItem item = stack.peek();
-        output.add(new StoreRegisterTreeItem(this, registerNumber, item));
+        RegisterNumber rn=new RegisterNumber(registerNumber);
+        if(regNames.containsKey(registerNumber)){
+            rn.name=regNames.get(registerNumber);
+        }
+        output.add(new StoreRegisterTreeItem(this, rn, item));
     }
 }

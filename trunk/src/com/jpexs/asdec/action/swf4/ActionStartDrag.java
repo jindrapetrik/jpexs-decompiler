@@ -21,7 +21,7 @@ public class ActionStartDrag extends Action {
     }
 
     @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output) {
+    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
         TreeItem target = stack.pop();
         TreeItem lockCenter = stack.pop();
         TreeItem constrain = stack.pop();

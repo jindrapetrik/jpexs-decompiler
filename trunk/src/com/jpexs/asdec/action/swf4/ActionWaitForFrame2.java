@@ -45,7 +45,7 @@ public class ActionWaitForFrame2 extends Action {
     }
 
     @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output) {
+    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
         TreeItem frame = stack.pop();
         output.add(new WaitForFrame2TreeItem(this, frame, skipCount));
     }

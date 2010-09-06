@@ -21,7 +21,7 @@ public class ActionNewMethod extends Action {
     }
 
     @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output) {
+    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
         TreeItem methodName = stack.pop();
         TreeItem scriptObject = stack.pop();
         long numArgs = popLong(stack);

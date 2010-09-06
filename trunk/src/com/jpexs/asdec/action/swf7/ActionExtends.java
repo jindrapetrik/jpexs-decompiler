@@ -21,7 +21,7 @@ public class ActionExtends extends Action {
 
     @Override
 
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output) {
+    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
         TreeItem superclass = stack.pop();
         TreeItem subclass = stack.pop();
         output.add(new ExtendsTreeItem(this, subclass, superclass));

@@ -20,7 +20,7 @@ public class ActionStringExtract extends Action {
     }
 
     @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output) {
+    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
         TreeItem count = stack.pop();
         TreeItem index = stack.pop();
         TreeItem value = stack.pop();

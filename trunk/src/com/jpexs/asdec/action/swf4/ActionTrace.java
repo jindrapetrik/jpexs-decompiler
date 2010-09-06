@@ -20,7 +20,7 @@ public class ActionTrace extends Action {
     }
 
     @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output) {
+    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
         TreeItem value = stack.pop();
         output.add(new TraceTreeItem(this, value));
     }

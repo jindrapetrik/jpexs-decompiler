@@ -19,7 +19,7 @@ public class ActionEnumerate2 extends Action {
     }
 
     @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output) {
+    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
         TreeItem object = stack.pop();
         stack.push(new EnumerateTreeItem(this, object));
     }

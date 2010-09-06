@@ -12,6 +12,6 @@ public class TypeOfTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return "TypeOf(" + value.toString(constants) + ")";
+        return "typeof(" + value.toString(constants) + ")";
     }
 }
