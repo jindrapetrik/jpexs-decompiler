@@ -34,7 +34,7 @@ public class Main {
     public static String file;
     public static String maskURL;
     public static SWF swf;
-    public static String version = "alpha7";
+    public static final String version = "alpha7";
     public static String applicationName = "JP ActionScript Decompiler v." + version;
     public static LoadingDialog loadingDialog = new LoadingDialog();
     public static ModeFrame modeFrame;
