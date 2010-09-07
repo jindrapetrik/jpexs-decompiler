@@ -47,13 +47,9 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
 
     public void setStatus(String s) {
         if (s.equals("")) {
-            //statusLabel.setOpaque(false);
             loadingPanel.setVisible(false);
         } else {
             loadingPanel.setVisible(true);
-            //statusLabel.setForeground(Color.white);
-            //statusLabel.setBackground(Color.red);
-            //statusLabel.setOpaque(true);
         }
         statusLabel.setText(s);
     }
@@ -296,6 +292,13 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
     }
 
     public void actionPerformed(ActionEvent e) {
+        if (e.getActionCommand().equals("EXIT")) {
+            setVisible(false);
+            if (Main.proxyFrame != null) {
+                if (Main.proxyFrame.isVisible()) return;
+            }
+            Main.exit();
+        }
         if (Main.isWorking()) return;
         if (e.getActionCommand().equals("SHOWPROXY")) {
             Main.showProxy();
@@ -349,14 +352,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
 
             }
 
-        }
-        if (e.getActionCommand().equals("EXIT")) {
-            setVisible(false);
-            if (Main.proxyFrame != null) {
-                if (Main.proxyFrame.isVisible()) return;
-            }
-            Main.exit();
-        }
+        }        
     }
 
     public void itemStateChanged(ItemEvent e) {

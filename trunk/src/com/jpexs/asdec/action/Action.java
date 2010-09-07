@@ -786,7 +786,7 @@ public class Action {
                 isFor = false;
                 isForIn = false;
                 continue;
-            } else if(action instanceof ActionEnumerate2){
+            } else if((action instanceof ActionEnumerate2)||(action instanceof ActionEnumerate)){
                loopStart=ip+1;
                isForIn=true;
                inItem=stack.pop();

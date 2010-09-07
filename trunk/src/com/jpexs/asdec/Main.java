@@ -115,12 +115,18 @@ public class Main {
 
     public static void startWork(String name) {
         working = true;
+        if(abcMainFrame!=null)
         abcMainFrame.setStatus(name);
+        if(actionMainFrame!=null)
+          actionMainFrame.setStatus(name);
     }
 
     public static void stopWork() {
         working = false;
-        abcMainFrame.setStatus("");
+        if(abcMainFrame!=null)
+          abcMainFrame.setStatus("");
+        if(actionMainFrame!=null)
+          actionMainFrame.setStatus("");
     }
 
     public static SWF parseSWF(String file) throws Exception {
