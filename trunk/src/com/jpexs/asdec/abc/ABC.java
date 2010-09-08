@@ -1,5 +1,19 @@
 /*
- * Copyright (c) 2010. JPEXS
+ *  Copyright (C) 2010 JPEXS
+ * 
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public License
+ *  as published by the Free Software Foundation; either version 2
+ *  of the License, or (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
 package com.jpexs.asdec.abc;
@@ -73,13 +87,6 @@ public class ABC {
             long pos = ais.getPosition();
             constants.constant_string[i] = ais.readString();
             stringOffsets[i] = pos;
-            /*
-            INVALID STRINGS
-
-            String invalidStr=",,if,else,finally,while,int,switch,return,case,do,";
-            if(invalidStr.contains(","+constants.constant_string[i]+",")){
-            //constants.constant_string[i]="s"+i+"/"+constants.constant_string[i];
-            }*/
         }
 
         //constant namespace
@@ -725,4 +732,6 @@ public class ABC {
             }
         }
     }
+
+    //public
 }

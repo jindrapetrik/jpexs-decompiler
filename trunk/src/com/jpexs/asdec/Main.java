@@ -1,3 +1,21 @@
+/*
+ *  Copyright (C) 2010 JPEXS
+ * 
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public License
+ *  as published by the Free Software Foundation; either version 2
+ *  of the License, or (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
 package com.jpexs.asdec;
 
 import com.jpexs.asdec.abc.NotSameException;
@@ -8,6 +26,8 @@ import com.jpexs.asdec.gui.proxy.ProxyFrame;
 import com.jpexs.asdec.tags.DoABCTag;
 import com.jpexs.asdec.tags.Tag;
 import com.jpexs.proxy.Replacement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -255,6 +275,58 @@ public class Main {
     public static void showModeFrame() {
         if (modeFrame == null) modeFrame = new ModeFrame();
         modeFrame.setVisible(true);
+    }
+
+
+    public static void updateLicenseInDir(File dir){
+        String license="/*\r\n *  Copyright (C) 2010 JPEXS\r\n * \r\n *  This program is free software; you can redistribute it and/or\r\n *  modify it under the terms of the GNU General Public License\r\n *  as published by the Free Software Foundation; either version 2\r\n *  of the License, or (at your option) any later version.\r\n * \r\n *  This program is distributed in the hope that it will be useful,\r\n *  but WITHOUT ANY WARRANTY; without even the implied warranty of\r\n *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\r\n *  GNU General Public License for more details.\r\n * \r\n *  You should have received a copy of the GNU General Public License\r\n *  along with this program; if not, write to the Free Software\r\n *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.\r\n */\r\n";
+
+        File files[]=dir.listFiles();
+        for(File f:files){
+            if(f.isDirectory()){
+               updateLicenseInDir(f);
+            }else{
+                if(f.getName().endsWith(".java")){
+                    ByteArrayOutputStream baos=new ByteArrayOutputStream();
+                    PrintWriter pw=null;
+                    try {
+                        pw = new PrintWriter(new OutputStreamWriter(baos, "utf8"));
+                    } catch (UnsupportedEncodingException ex) {
+
+                    }
+                    try {
+                        BufferedReader br=new BufferedReader(new FileReader(f));
+                        String s="";
+                        boolean packageFound=false;
+                        while((s=br.readLine())!=null){
+                            if(!packageFound){
+                                if(s.trim().startsWith("package")){
+                                    packageFound=true;
+                                    pw.println(license);
+                                }
+                            }
+                            if(packageFound){
+                              pw.println(s);
+                            }
+                        }
+                        br.close();
+                        pw.close();
+                    } catch (IOException ex) {
+
+                    }
+
+                    FileOutputStream fos;
+                    try {
+                        fos = new FileOutputStream(f);
+                        fos.write(baos.toByteArray());
+                        fos.close();
+                    } catch (IOException ex) {
+
+                    }
+                }
+            }
+        }
+
     }
 
     /**

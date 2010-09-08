@@ -16,16 +16,12 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package com.jpexs.asdec.abc.avm2.treemodel.operations;
+package com.jpexs.asdec.abc;
 
-import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
-
-
-public class AndTreeItem extends BinaryOpTreeItem {
-
-    public AndTreeItem(AVM2Instruction instruction, TreeItem leftSide, TreeItem rightSide) {
-        super(instruction, PRECEDENCE_LOGICALAND, leftSide, rightSide, "&&");
-    }
+/**
+ *
+ * @author JPEXS
+ */
+public class Usage {
 
 }
