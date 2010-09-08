@@ -15,7 +15,6 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-
 package com.jpexs.asdec.abc;
 
 import com.jpexs.asdec.Main;
@@ -35,7 +34,6 @@ import com.jpexs.asdec.helpers.Highlighting;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class ABC {
 
@@ -194,7 +192,7 @@ public class ABC {
             }
             bodies[i].traits = ais.readTraits();
             /*try {
-                bodies[i].code.clearCode(constants, bodies[i]);
+            bodies[i].code.clearCode(constants, bodies[i]);
             } catch (ConvertException ignored) {
             } */
         }
@@ -517,8 +515,9 @@ public class ABC {
 
         //class header
         String classHeader = instance_info[i].getClassHeaderStr(constants);
-        if (classHeader.startsWith("private "))
+        if (classHeader.startsWith("private ")) {
             classHeader = "public " + classHeader.substring("private ".length());
+        }
         out.println(IDENT_STRING + classHeader);
         out.println(IDENT_STRING + "{");
 
@@ -687,13 +686,12 @@ public class ABC {
             output.println("MethodBody[" + i + "]:"); //+ bodies[i].toString(this, constants, method_info));
         }
     }
-
     public static final String[] reservedWords = {
-            "as", "break", "case", "catch", "class", "const", "continue", /*"default",*/ "delete", "do", "each", "else",
-            "extends", "false", "finally", "for", "function", "if", "implements", "import", "in", "instanceof",
-            "interface", "internal", "is", "native", "new", "null", "package", "private", "protected", "public",
-            "return", "super", "switch", "this", "throw", "true", "try", "typeof", "use", "var", /*"void",*/ "while",
-            "with"};
+        "as", "break", "case", "catch", "class", "const", "continue", /*"default",*/ "delete", "do", "each", "else",
+        "extends", "false", "finally", "for", "function", "if", "implements", "import", "in", "instanceof",
+        "interface", "internal", "is", "native", "new", "null", "package", "private", "protected", "public",
+        "return", "super", "switch", "this", "throw", "true", "try", "typeof", "use", "var", /*"void",*/ "while",
+        "with"};
     public int unknownCount = 0;
 
     public void cleanOneName(int index) {
@@ -733,15 +731,104 @@ public class ABC {
         }
     }
 
-    public List<Integer> findMultinameUsage(int multinameIndex){
-        List<Integer> ret=new ArrayList<Integer>();
-        for(int i=0;i<bodies.length;i++){
-            loopbody:for(AVM2Instruction ins:bodies[i].code.code){
-                for(int op=0;op<ins.definition.operands.length;op++){
-                    if(ins.definition.operands[op]==AVM2Code.DAT_MULTINAME_INDEX){
-                        if(ins.operands[op]==multinameIndex){
-                            ret.add(i);
+    public List<Usage> findMultinameUsage(int multinameIndex) {
+        List<Usage> ret = new ArrayList<Usage>();
+        List<Integer> bodyIndices = new ArrayList<Integer>();
+        List<Integer> subTraitBodyIndices = new ArrayList<Integer>();
+        List<Integer> subTraitIndexIndices = new ArrayList<Integer>();
+        for (int i = 0; i < bodies.length; i++) {
+            for(int t=0;t<bodies[i].traits.traits.length;t++){
+                Trait tr=bodies[i].traits.traits[t];
+                if(tr.name_index==multinameIndex){
+                    subTraitBodyIndices.add(i);
+                    subTraitIndexIndices.add(t);
+                }
+            }
+            loopbody:
+            for (AVM2Instruction ins : bodies[i].code.code) {
+                for (int op = 0; op < ins.definition.operands.length; op++) {
+                    if (ins.definition.operands[op] == AVM2Code.DAT_MULTINAME_INDEX) {
+                        if (ins.operands[op] == multinameIndex) {
+                            bodyIndices.add(i);
                             break loopbody;
+                        }
+                    }
+                }
+            }
+        }
+
+
+        for (int c = 0; c < class_info.length; c++) {
+            if(instance_info[c].name_index==multinameIndex){
+                ret.add(new Usage(this,-1, c, -1,-1, false, Usage.TYPE_CLASS_NAME));
+            }
+            for (int t = 0; t < class_info[c].static_traits.traits.length; t++) {
+                Trait tr = class_info[c].static_traits.traits[t];
+                if (tr.name_index == multinameIndex) {
+                    ret.add(new Usage(this,-1, c, t,-1, true, Usage.TYPE_TRAIT_NAME));
+                }
+            }
+            for (int t = 0; t < instance_info[c].instance_traits.traits.length; t++) {
+                Trait tr = instance_info[c].instance_traits.traits[t];
+                if (tr.name_index == multinameIndex) {
+                    ret.add(new Usage(this,-1, c, t,-1, false, Usage.TYPE_TRAIT_NAME));
+                }
+            }
+        }
+        for (int bodyIndex : bodyIndices) {
+            for (int c = 0; c < class_info.length; c++) {
+                if (class_info[c].cinit_index == bodyIndex) {
+                    ret.add(new Usage(this, bodyIndex,c, -1,-1, true, Usage.TYPE_INITIALIZER));
+                }
+                if (instance_info[c].iinit_index == bodyIndex) {
+                    ret.add(new Usage(this, bodyIndex,c, -1,-1, false, Usage.TYPE_INITIALIZER));
+                }
+                for (int t = 0; t < class_info[c].static_traits.traits.length; t++) {
+                    Trait tr = class_info[c].static_traits.traits[t];
+                    if (tr instanceof TraitMethodGetterSetter) {
+                        TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) tr;
+                        if (tmgs.method_info == bodies[bodyIndex].method_info) {
+                            ret.add(new Usage(this,bodyIndex, c, t,-1, true, Usage.TYPE_TRAIT_BODY));
+                        }
+                    }
+                }
+                for (int t = 0; t < instance_info[c].instance_traits.traits.length; t++) {
+                    Trait tr = instance_info[c].instance_traits.traits[t];
+                    if (tr instanceof TraitMethodGetterSetter) {
+                        TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) tr;
+                        if (tmgs.method_info == bodies[bodyIndex].method_info) {
+                            ret.add(new Usage(this,bodyIndex, c, t,-1, false, Usage.TYPE_TRAIT_BODY));
+                        }
+                    }
+                }
+            }
+        }
+
+
+        for (int b=0;b<subTraitBodyIndices.size();b++) {
+            int bodyIndex=subTraitBodyIndices.get(b);
+            for (int c = 0; c < class_info.length; c++) {
+                if (class_info[c].cinit_index == bodyIndex) {
+                    ret.add(new Usage(this,bodyIndex, c, -1,subTraitIndexIndices.get(b), true, Usage.TYPE_INITIALIZER_SUBTRAIT_NAME));
+                }
+                if (instance_info[c].iinit_index == bodyIndex) {
+                    ret.add(new Usage(this,bodyIndex, c, -1,subTraitIndexIndices.get(b), false, Usage.TYPE_INITIALIZER_SUBTRAIT_NAME));
+                }
+                for (int t = 0; t < class_info[c].static_traits.traits.length; t++) {
+                    Trait tr = class_info[c].static_traits.traits[t];
+                    if (tr instanceof TraitMethodGetterSetter) {
+                        TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) tr;
+                        if (tmgs.method_info == bodies[bodyIndex].method_info) {
+                            ret.add(new Usage(this,bodyIndex, c, t,subTraitIndexIndices.get(b), true, Usage.TYPE_SUBTRAIT_NAME));
+                        }
+                    }
+                }
+                for (int t = 0; t < instance_info[c].instance_traits.traits.length; t++) {
+                    Trait tr = instance_info[c].instance_traits.traits[t];
+                    if (tr instanceof TraitMethodGetterSetter) {
+                        TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) tr;
+                        if (tmgs.method_info == bodies[bodyIndex].method_info) {
+                            ret.add(new Usage(this,bodyIndex, c, t,subTraitIndexIndices.get(b), false, Usage.TYPE_SUBTRAIT_NAME));
                         }
                     }
                 }

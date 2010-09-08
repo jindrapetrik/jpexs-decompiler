@@ -19,6 +19,7 @@
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.abc.ABC;
+import com.jpexs.asdec.abc.Usage;
 import com.jpexs.asdec.abc.types.traits.Trait;
 import com.jpexs.asdec.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.asdec.gui.View;
@@ -45,28 +46,9 @@ public class UsageFrame extends JFrame implements ActionListener {
     private JList usageList;
     private DefaultListModel usageListModel=new DefaultListModel();
     public UsageFrame(ABC abc,int multinameIndex){
-      List<Integer> usages=abc.findMultinameUsage(multinameIndex);
-      for(int bodyIndex:usages){
-          for(int c=0;c<abc.class_info.length;c++){
-             if(abc.class_info[c].cinit_index==bodyIndex) usageListModel.addElement(abc.instance_info[c].getName(abc.constants).getNameWithNamespace(abc.constants)+" (static initializer)");
-             if(abc.instance_info[c].iinit_index==bodyIndex) usageListModel.addElement(abc.instance_info[c].getName(abc.constants).getNameWithNamespace(abc.constants)+" (instance initializer)");
-             for(Trait t:abc.class_info[c].static_traits.traits){
-                 if(t instanceof TraitMethodGetterSetter){
-                     TraitMethodGetterSetter tmgs=(TraitMethodGetterSetter)t;
-                     if(tmgs.method_info==abc.bodies[bodyIndex].method_info){
-                         usageListModel.addElement("static "+abc.instance_info[c].getName(abc.constants).getNameWithNamespace(abc.constants)+"."+tmgs.getMethodName(abc.constants));
-                     }
-                 }
-             }
-             for(Trait t:abc.instance_info[c].instance_traits.traits){
-                 if(t instanceof TraitMethodGetterSetter){
-                     TraitMethodGetterSetter tmgs=(TraitMethodGetterSetter)t;
-                     if(tmgs.method_info==abc.bodies[bodyIndex].method_info){
-                         usageListModel.addElement(abc.instance_info[c].getName(abc.constants).getNameWithNamespace(abc.constants)+"."+tmgs.getMethodName(abc.constants));
-                     }
-                 }
-             }
-          }
+      List<Usage> usages=abc.findMultinameUsage(multinameIndex);
+      for(Usage u:usages){
+          usageListModel.addElement(u);
       }
       usageList=new JList(usageListModel);
       gotoButton.setActionCommand("GOTO");

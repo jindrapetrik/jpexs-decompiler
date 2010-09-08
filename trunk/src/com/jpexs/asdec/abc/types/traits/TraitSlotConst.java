@@ -72,4 +72,12 @@ public class TraitSlotConst extends Trait {
         return modifier + getNameValueStr(constants);
     }
 
+    public boolean isConst(){
+        return kindType == TRAIT_CONST;
+    }
+
+    public boolean isVar(){
+        return kindType == TRAIT_SLOT;
+    }
+
 }
