@@ -733,5 +733,20 @@ public class ABC {
         }
     }
 
-    //public
+    public List<Integer> findMultinameUsage(int multinameIndex){
+        List<Integer> ret=new ArrayList<Integer>();
+        for(int i=0;i<bodies.length;i++){
+            loopbody:for(AVM2Instruction ins:bodies[i].code.code){
+                for(int op=0;op<ins.definition.operands.length;op++){
+                    if(ins.definition.operands[op]==AVM2Code.DAT_MULTINAME_INDEX){
+                        if(ins.operands[op]==multinameIndex){
+                            ret.add(i);
+                            break loopbody;
+                        }
+                    }
+                }
+            }
+        }
+        return ret;
+    }
 }

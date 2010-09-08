@@ -297,6 +297,24 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
         constantTable = new JTable();
         autoResizeColWidth(constantTable, new UIntTableModel(abc));
         constantTable.setAutoCreateRowSorter(true);
+        constantTable.addMouseListener(new MouseAdapter(){
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(e.getClickCount()==2){
+                   if(constantTypeList.getSelectedIndex()==6){
+                       int rowIndex=constantTable.getSelectedRow();
+                       if(rowIndex==-1) return;
+                       int multinameIndex=constantTable.convertRowIndexToModel(rowIndex);
+                       if(multinameIndex>0){
+                           UsageFrame usageFrame=new UsageFrame(abc, multinameIndex);
+                           usageFrame.setVisible(true);
+                       }
+                   }
+                }
+            }
+
+        });
         constantTypeList.addItemListener(this);
         panConstants.add(constantTypeList, BorderLayout.NORTH);
         panConstants.add(new JScrollPane(constantTable), BorderLayout.CENTER);

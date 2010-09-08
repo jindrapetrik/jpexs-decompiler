@@ -141,6 +141,17 @@ public class Multiname {
         }
     }
 
+    public String getNameWithNamespace(ConstantPool constants){
+        String ret="";
+        Namespace ns=getNamespace(constants);
+        if(ns!=null){
+            String nsname=ns.getName(constants);
+            if(!nsname.equals("")) ret+=nsname+".";
+        }
+        ret+=getName(constants);
+        return ret;
+    }
+
     public Namespace getNamespace(ConstantPool constants) {
         if ((namespace_index == 0) || (namespace_index == -1)) {
             return null;

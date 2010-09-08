@@ -26,8 +26,6 @@ import com.jpexs.asdec.gui.proxy.ProxyFrame;
 import com.jpexs.asdec.tags.DoABCTag;
 import com.jpexs.asdec.tags.Tag;
 import com.jpexs.proxy.Replacement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
