@@ -182,7 +182,11 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
         saveButton.setActionCommand("SAVEBODY");
         saveButton.addActionListener(this);
 
+        JButton graphButton = new JButton("Graph");
+        graphButton.setActionCommand("GRAPH");
+        graphButton.addActionListener(this);
 
+        //buttonsPan.add(graphButton);
         buttonsPan.add(saveButton);
         rightPanel.add(buttonsPan, BorderLayout.SOUTH);
         decompiledTextArea = new DecompiledEditorPane();
@@ -332,6 +336,9 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
             Main.exit();
         }
         if (Main.isWorking()) return;
+        if (e.getActionCommand().equals("GRAPH")) {
+            sourceTextArea.graph();
+        }
         if (e.getActionCommand().equals("SHOWPROXY")) {
             Main.showProxy();
         }

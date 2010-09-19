@@ -691,7 +691,7 @@ public class ABC {
         "extends", "false", "finally", "for", "function", "if", "implements", "import", "in", "instanceof",
         "interface", "internal", "is", "native", "new", "null", "package", "private", "protected", "public",
         "return", "super", "switch", "this", "throw", "true", "try", "typeof", "use", "var", /*"void",*/ "while",
-        "with"};
+        "with","dynamic","default","final"};
     public int unknownCount = 0;
 
     public void cleanOneName(int index) {

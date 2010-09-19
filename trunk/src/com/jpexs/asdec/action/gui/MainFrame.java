@@ -181,7 +181,7 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
 
                     @Override
                     public void run() {
-                        editor.setText(asm.getASMSource(10)); //TODO: Ensure correct version here
+                        editor.setText(asm.getASMSource(10)); //TODO:Ensure correct version here
                         decompiledEditor.setText(Highlighting.stripHilights(com.jpexs.asdec.action.Action.actionsToSource(asm.getActions(), 10))); //TODO:Ensure correct version here
                         Main.stopWork();
                     }
