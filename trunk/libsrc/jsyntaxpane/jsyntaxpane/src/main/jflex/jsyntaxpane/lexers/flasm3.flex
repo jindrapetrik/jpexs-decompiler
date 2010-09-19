@@ -56,7 +56,8 @@ Label = {Identifier}:
 
 /* integer literals */
 NumberLiteral = 0 | -?[1-9][0-9]*
-   
+PositiveNumberLiteral = 0 | [1-9][0-9]*
+
 /* floating point literals */        
 FloatLiteral = -?({FLit1}|{FLit2}|{FLit3}) {Exponent}?
 
@@ -73,6 +74,10 @@ Comment = ";" {InputCharacter}* {LineTerminator}?
 /* string and character literals */
 StringCharacter = [^\r\n\"\\]
 
+ExceptionStart = "exceptionstart"{PositiveNumberLiteral}":"
+ExceptionEnd = "exceptionend "{PositiveNumberLiteral}":"
+ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
+
 %state STRING,PARAMETERS
 
 %%
@@ -82,6 +87,17 @@ StringCharacter = [^\r\n\"\\]
 
   /* whitespace */
   {WhiteSpace}                   {  }
+
+  {ExceptionStart}              {
+                                   return token(TokenType.KEYWORD);
+                                }
+  {ExceptionEnd}              {
+                                   return token(TokenType.KEYWORD);
+                                }
+  {ExceptionTarget}              {
+                                   return token(TokenType.KEYWORD);
+                                }
+
 
   {Label}                        {return token(TokenType.IDENTIFIER,yychar,yylength()-1); }
 

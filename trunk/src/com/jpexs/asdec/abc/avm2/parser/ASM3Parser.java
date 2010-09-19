@@ -22,6 +22,8 @@ import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.asdec.abc.types.ABCException;
+import com.jpexs.asdec.abc.types.MethodBody;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,15 +64,17 @@ public class ASM3Parser {
         }
     }
 
-    public static AVM2Code parse(InputStream is, ConstantPool constants) throws IOException, ParseException {
-        return parse(is, constants, null);
+    public static AVM2Code parse(InputStream is, ConstantPool constants,MethodBody body) throws IOException, ParseException {
+        return parse(is, constants, null,body);
     }
 
-    public static AVM2Code parse(InputStream is, ConstantPool constants, MissingSymbolHandler missingHandler) throws IOException, ParseException {
+    public static AVM2Code parse(InputStream is, ConstantPool constants, MissingSymbolHandler missingHandler,MethodBody body) throws IOException, ParseException {
         AVM2Code code = new AVM2Code();
 
         List<OffsetItem> offsetItems = new ArrayList<OffsetItem>();
         List<LabelItem> labelItems = new ArrayList<LabelItem>();
+        List<ABCException> exceptions=new ArrayList<ABCException>();
+        List<Integer> exceptionIndices=new ArrayList<Integer>();
         int offset = 0;
 
         Flasm3Lexer lexer = new Flasm3Lexer(is);
@@ -79,6 +83,33 @@ public class ASM3Parser {
         AVM2Instruction lastIns = null;
         do {
             symb = lexer.yylex();
+            if (symb.type == ParsedSymbol.TYPE_EXCEPTION_START){
+                int exIndex=(Integer)symb.value;
+                int listIndex=exceptionIndices.indexOf(exIndex);
+                if(listIndex==-1){
+                    throw new ParseException("Undefinex exception index", lexer.yyline());
+                }
+                exceptions.get(listIndex).start=offset;
+                continue;
+            }
+            if (symb.type == ParsedSymbol.TYPE_EXCEPTION_END){
+                int exIndex=(Integer)symb.value;
+                int listIndex=exceptionIndices.indexOf(exIndex);
+                if(listIndex==-1){
+                    throw new ParseException("Undefinex exception index", lexer.yyline());
+                }
+                exceptions.get(listIndex).end=offset;
+                continue;
+            }
+            if (symb.type == ParsedSymbol.TYPE_EXCEPTION_TARGET){
+                int exIndex=(Integer)symb.value;
+                int listIndex=exceptionIndices.indexOf(exIndex);
+                if(listIndex==-1){
+                    throw new ParseException("Undefinex exception index", lexer.yyline());
+                }
+                exceptions.get(listIndex).target=offset;
+                continue;
+            }
             if (symb.type == ParsedSymbol.TYPE_EOF) break;
             if (symb.type == ParsedSymbol.TYPE_COMMENT) {
                 if (lastIns != null) {
@@ -87,6 +118,26 @@ public class ASM3Parser {
                 continue;
             }
             if (symb.type == ParsedSymbol.TYPE_INSTRUCTION_NAME) {
+                if(((String)symb.value).toLowerCase().equals("exception")){
+                    ParsedSymbol exIndex = lexer.yylex();
+                    if (exIndex.type != ParsedSymbol.TYPE_INTEGER) {
+                       throw new ParseException("Index expected", lexer.yyline());
+                    }
+                    ParsedSymbol exName = lexer.yylex();
+                    if (exName.type != ParsedSymbol.TYPE_MULTINAME) {
+                       throw new ParseException("Multiname expected", lexer.yyline());
+                    }
+                    ParsedSymbol exType = lexer.yylex();
+                    if (exType.type != ParsedSymbol.TYPE_MULTINAME) {
+                       throw new ParseException("Multiname expected", lexer.yyline());
+                    }
+                    ABCException ex=new ABCException();
+                    ex.name_index=(int) (long) (Long)exName.value;
+                    ex.type_index=(int) (long) (Long)exType.value;
+                    exceptions.add(ex);
+                    exceptionIndices.add((int)(long)(Long)exIndex.value);
+                    continue;
+                }
                 boolean insFound = false;
                 for (InstructionDefinition def : AVM2Code.instructionSet) {
                     if (def.instructionName.equals((String) symb.value)) {
@@ -251,207 +302,10 @@ public class ASM3Parser {
                 }
             }
         }
-
-        /* BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        String s = "";
-        Pattern patInsName = Pattern.compile("^([a-z0-9_]+) ");
-        Pattern patLabelName = Pattern.compile("^([a-zA-Z_0-9]+): ");
-        Pattern patInt = Pattern.compile("^([+-]?[0-9]+) ");
-        Pattern patDouble = Pattern.compile("^([+-]?[0-9e.]+) ");
-        Pattern patMultiname = Pattern.compile("^m\\[([0-9]+)\\]\"[^\"]*\" ");
-        Pattern patString = Pattern.compile("\"([^\"]*)\" ");
-        Pattern patofs = Pattern.compile("^([a-zA-Z_0-9]+) ");
-
-
-        long line = 0;
-        
-        while ((s = br.readLine()) != null) {
-            line++;
-            s += " ";
-            Matcher m = patInsName.matcher(s);
-            if (m.find()) {
-                String insName = m.group(1);
-                boolean insFound = false;
-                for (InstructionDefinition def : AVM2Code.instructionSet) {
-                    if (def.instructionName.equals(insName)) {
-                        insFound = true;
-                        s = s.substring(insName.length() + 1);
-                        List<Integer> operandsList = new ArrayList<Integer>();
-
-                        for (int i = 0; i < def.operands.length; i++) {
-                            switch (def.operands[i]) {
-                                case AVM2Code.DAT_MULTINAME_INDEX:
-                                    m = patMultiname.matcher(s);
-                                    if (m.find()) {
-                                        operandsList.add(Integer.parseInt(m.group(1)));
-                                        s = s.substring(m.group(0).length());
-                                    } else {
-                                        throw new ParseException("Invalid multiname", line);
-                                    }
-                                    break;
-                                case AVM2Code.DAT_STRING_INDEX:
-                                    m = patString.matcher(s);
-                                    if (m.find()) {
-                                        String str = m.group(1);
-                                        int sid = constants.getStringId(str);
-                                        if (sid == 0) {
-                                            if((missingHandler!=null)&&(missingHandler.missingString(str))){
-                                                sid=constants.addString(str);
-                                            }else{
-                                                throw new ParseException("Unknown String", line);
-                                            }
-                                        }
-                                        operandsList.add(sid);
-                                        s = s.substring(m.group(0).length());
-                                    } else {
-                                        throw new ParseException("Invalid String", line);
-                                    }
-                                    break;
-                                case AVM2Code.DAT_INT_INDEX:
-                                    m = patInt.matcher(s);
-                                    if (m.find()) {
-                                        long intVal=Integer.parseInt(m.group(1));
-                                        int iid = constants.getIntId(intVal);
-                                        if (iid == 0) {
-                                            if((missingHandler!=null)&&(missingHandler.missingInt(intVal))){
-                                                iid=constants.addInt(intVal);
-                                            }else{
-                                                throw new ParseException("Unknown int", line);
-                                            }
-                                        }
-                                        operandsList.add(iid);
-                                        s = s.substring(m.group(0).length());
-                                    } else {
-                                        throw new ParseException("Invalid int value", line);
-                                    }
-                                    break;
-                                case AVM2Code.DAT_UINT_INDEX:
-                                    m = patInt.matcher(s);
-                                    if (m.find()) {
-                                        long intVal=Integer.parseInt(m.group(1));
-                                        int iid = constants.getUIntId(intVal);
-                                        if (iid == 0) {
-                                            if((missingHandler!=null)&&(missingHandler.missingUInt(intVal))){
-                                                iid=constants.addUInt(intVal);
-                                            }else{
-                                            throw new ParseException("Unknown uint", line);
-                                            }
-                                        }
-                                        operandsList.add(iid);
-                                        s = s.substring(m.group(0).length());
-                                    } else {
-                                        throw new ParseException("Invalid uint value", line);
-                                    }
-                                    break;
-                                case AVM2Code.DAT_DOUBLE_INDEX:
-                                    m = patDouble.matcher(s);
-                                    if (m.find()) {
-                                        double doubleVal=Double.parseDouble(m.group(1));
-                                        int did = constants.getDoubleId(doubleVal);
-                                        if (did == 0) {
-                                            if((missingHandler!=null)&&(missingHandler.missingDouble(doubleVal))){
-                                                did=constants.addDouble(doubleVal);
-                                            }else{
-                                                throw new ParseException("Unknown double", line);
-                                            }
-                                        }
-                                        operandsList.add(did);
-                                        s = s.substring(m.group(0).length());
-                                    } else {
-                                        throw new ParseException("Invalid double value", line);
-                                    }
-                                    break;
-                                case AVM2Code.DAT_OFFSET:
-                                    m = patofs.matcher(s);
-                                    if (m.find()) {
-                                        offsetItems.add(new OffsetItem(m.group(1), code.code.size(), i));
-                                        operandsList.add(0);
-                                        s = s.substring(m.group(0).length());
-                                    } else {
-                                        throw new ParseException("Invalid offset value", line);
-                                    }
-                                    break;
-                                case AVM2Code.DAT_CASE_BASEOFFSET:
-                                    m = patofs.matcher(s);
-                                    if (m.find()) {
-                                        offsetItems.add(new CaseOffsetItem(m.group(1), code.code.size(), i));
-                                        operandsList.add(0);
-                                        s = s.substring(m.group(0).length());
-                                    } else {
-                                        throw new ParseException("Invalid offset value", line);
-                                    }
-                                    break;
-                                case AVM2Code.OPT_CASE_OFFSETS:
-                                    m = patInt.matcher(s);
-                                    if (m.find()) {
-                                        int patCount = Integer.parseInt(m.group(1));
-                                        operandsList.add(patCount);
-                                        s = s.substring(m.group(0).length());
-                                        m = patofs.matcher(s);
-                                        int k = 1;
-                                        for (int c = 0; c <= patCount; c++) {
-                                            if (m.find()) {
-                                                offsetItems.add(new CaseOffsetItem(m.group(1), code.code.size(), i + k));
-                                                operandsList.add(0);
-                                                s = s.substring(m.group(0).length());
-                                                m = patofs.matcher(s);
-                                                k++;
-                                            } else {
-                                                throw new ParseException("Invalid case count", line);
-                                            }
-                                        }
-                                    } else {
-                                        throw new ParseException("Invalid case count", line);
-                                    }
-                                    break;
-                                default:
-                                    m = patInt.matcher(s);
-                                    if (m.find()) {
-                                        operandsList.add(Integer.parseInt(m.group(1)));
-                                        s = s.substring(m.group(0).length());
-                                    } else {
-                                        throw new ParseException("Invalid value", line);
-                                    }
-                            }
-                        }
-
-                        int operands[] = new int[operandsList.size()];
-                        for (int i = 0; i < operandsList.size(); i++) {
-                            operands[i] = operandsList.get(i);
-                        }
-                        AVM2Instruction ins = new AVM2Instruction(offset, def, operands, new byte[0]);
-                        code.code.add(ins);
-                        offset += ins.getBytes().length;
-                        break;
-                    }
-                }
-                if (!insFound) {
-                    throw new ParseException("Invalid instruction name:" + insName, line);
-                }
-            } else {
-                m = patLabelName.matcher(s);
-                if (m.find()) {
-                    labelItems.add(new LabelItem(m.group(1), offset));
-                } else {
-                    throw new ParseException("Invalid instruction name", line);
-                }
-            }
+        body.exceptions=new ABCException[exceptions.size()];
+        for(int e=0;e<exceptions.size();e++){
+            body.exceptions[e]=exceptions.get(e);
         }
-
-        for (OffsetItem oi : offsetItems) {
-            for (LabelItem li : labelItems) {
-                if (oi.label.equals(li.label)) {
-                    AVM2Instruction ins = code.code.get((int) oi.insPosition);
-                    int relOffset = 0;
-                    if (oi instanceof CaseOffsetItem) {
-                        relOffset = li.offset - (int) ins.offset;
-                    } else {
-                        relOffset = li.offset - ((int) ins.offset + ins.getBytes().length);
-                    }
-                    ins.operands[oi.insOperandIndex] = relOffset;
-                }
-            }
-        }*/
         return code;
     }
 }

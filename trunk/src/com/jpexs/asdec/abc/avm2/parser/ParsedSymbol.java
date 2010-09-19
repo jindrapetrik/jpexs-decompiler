@@ -32,6 +32,9 @@ public class ParsedSymbol {
     public static final int TYPE_EOF = 7;
     public static final int TYPE_LABEL = 8;
     public static final int TYPE_COMMENT = 9;
+    public static final int TYPE_EXCEPTION_START=10;
+    public static final int TYPE_EXCEPTION_END=11;
+    public static final int TYPE_EXCEPTION_TARGET=12;
 
     public ParsedSymbol(int type, Object value) {
         this.type = type;

@@ -44,7 +44,7 @@ public class ASMSourceEditorPane extends JEditorPane {
     public void setBodyIndex(int bodyIndex, ABC abc) {
         this.bodyIndex = bodyIndex;
         this.abc = abc;
-        setText(abc.bodies[bodyIndex].code.toASMSource(abc.constants));
+        setText(abc.bodies[bodyIndex].code.toASMSource(abc.constants,abc.bodies[bodyIndex]));
     }
 
     public void graph(){
@@ -53,7 +53,7 @@ public class ASMSourceEditorPane extends JEditorPane {
 
     public void save(ConstantPool constants) {
         try {
-            AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(getText().getBytes()), constants, new DialogMissingSymbolHandler());
+            AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(getText().getBytes()), constants, new DialogMissingSymbolHandler(),abc.bodies[bodyIndex]);
             abc.bodies[bodyIndex].code = acode;
             Main.abcMainFrame.decompiledTextArea.reloadClass();
             Main.abcMainFrame.decompiledTextArea.gotoLastTrait();
@@ -68,14 +68,13 @@ public class ASMSourceEditorPane extends JEditorPane {
 
     public void verify(ConstantPool constants, ABC abc) {
         try {
-            AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(getText().getBytes()), constants, new DialogMissingSymbolHandler());
-            acode.clearSecureSWF(abc.constants, abc.bodies[bodyIndex]);
-            setText(acode.toASMSource(constants));
+            AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(getText().getBytes()), constants, new DialogMissingSymbolHandler(),abc.bodies[bodyIndex]);
+            //acode.clearSecureSWF(abc.constants, abc.bodies[bodyIndex]);
+            setText(acode.toASMSource(constants,abc.bodies[bodyIndex]));
 
 
             //Main.mainFrame.decompiledTextArea.setBody(mb, abc);
         } catch (IOException ex) {
-        } catch (ConvertException ex) {
         } catch (ParseException ex) {
             JOptionPane.showMessageDialog(this, (ex.text + " on line " + ex.line));
             selectLine((int) ex.line);

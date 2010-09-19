@@ -61,6 +61,8 @@ Label = {Identifier}:
 
 /* integer literals */
 NumberLiteral = 0 | -?[1-9][0-9]*
+
+PositiveNumberLiteral = 0 | [1-9][0-9]*
    
 /* floating point literals */        
 FloatLiteral =  -?({FLit1}|{FLit2}|{FLit3}) {Exponent}?
@@ -75,6 +77,10 @@ OctDigit          = [0-7]
 /* string and character literals */
 StringCharacter = [^\r\n\"\\]
 
+ExceptionStart = "exceptionstart "{PositiveNumberLiteral}":"
+ExceptionEnd = "exceptionend "{PositiveNumberLiteral}":"
+ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
+
 %state STRING,PARAMETERS
 
 %%
@@ -85,6 +91,18 @@ StringCharacter = [^\r\n\"\\]
   /* whitespace */
   {WhiteSpace}                   {  }
 
+  {ExceptionStart}              {
+                                   String s=yytext();
+                                   return new ParsedSymbol(ParsedSymbol.TYPE_EXCEPTION_START,Integer.parseInt(s.substring(15,s.length()-1)));
+                                }
+  {ExceptionEnd}              {
+                                   String s=yytext();
+                                   return new ParsedSymbol(ParsedSymbol.TYPE_EXCEPTION_END,Integer.parseInt(s.substring(13,s.length()-1)));
+                                }
+  {ExceptionTarget}              {
+                                   String s=yytext();
+                                   return new ParsedSymbol(ParsedSymbol.TYPE_EXCEPTION_TARGET,Integer.parseInt(s.substring(16,s.length()-1)));
+                                }
   {Label}                        {
                                     String s=yytext();
                                     return new ParsedSymbol(ParsedSymbol.TYPE_LABEL,s.substring(0,s.length()-1));

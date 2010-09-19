@@ -337,8 +337,12 @@ public class AVM2Code {
         return null;
     }
 
-    public String toASMSource(ConstantPool constants) {
+    public String toASMSource(ConstantPool constants,MethodBody body) {
         String ret = "";
+        for(int e=0;e<body.exceptions.length;e++){
+            ret+="exception "+e+" m["+body.exceptions[e].name_index+"]\""+Helper.escapeString(body.exceptions[e].getVarName(constants))+"\" "+
+                            "m["+body.exceptions[e].type_index+"]\""+Helper.escapeString(body.exceptions[e].getTypeName(constants))+"\"\n";
+        }
         List<Long> offsets = new ArrayList<Long>();
         for (AVM2Instruction ins : code) {
             offsets.addAll(ins.getOffsets());
@@ -347,6 +351,17 @@ public class AVM2Code {
         for (AVM2Instruction ins : code) {
             if (offsets.contains(ofs)) {
                 ret += "ofs" + Helper.formatAddress(ofs) + ":";
+            }
+            for(int e=0;e<body.exceptions.length;e++){
+                if(body.exceptions[e].start==ofs){
+                    ret+="exceptionstart "+e+":";
+                }
+                if(body.exceptions[e].end==ofs){
+                    ret+="exceptionend "+e+":";
+                }
+                if(body.exceptions[e].target==ofs){
+                    ret+="exceptiontarget "+e+":";
+                }
             }
             ret += ins.toStringNoAddress(constants) + "\n";
             ofs += ins.getBytes().length;
