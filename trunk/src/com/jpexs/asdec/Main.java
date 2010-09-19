@@ -52,7 +52,7 @@ public class Main {
     public static String file;
     public static String maskURL;
     public static SWF swf;
-    public static final String version = "alpha7";
+    public static final String version = "alpha8";
     public static String applicationName = "JP ActionScript Decompiler v." + version;
     public static LoadingDialog loadingDialog = new LoadingDialog();
     public static ModeFrame modeFrame;
@@ -89,15 +89,20 @@ public class Main {
      * Saves replacements to file for future use
      */
     public static void saveReplacements() {
-        try {
-            File f = new File(getASDecHome());
-            if (!f.exists()) f.mkdir();
-            PrintWriter pw = new PrintWriter(new FileWriter(getReplacementsFile()));
-            for (Replacement r : replacements) {
-                pw.println(r.urlPattern);
-                pw.println(r.targetFile);
+        try {            
+            if(replacements.isEmpty()){
+                File rf=new File(getReplacementsFile());
+                if(rf.exists()) rf.delete();
+            }else{
+                File f = new File(getASDecHome());
+                if (!f.exists()) f.mkdir();
+                PrintWriter pw = new PrintWriter(new FileWriter(getReplacementsFile()));
+                for (Replacement r : replacements) {
+                    pw.println(r.urlPattern);
+                    pw.println(r.targetFile);
+                }
+                pw.close();
             }
-            pw.close();
         } catch (IOException e) {
 
         }
