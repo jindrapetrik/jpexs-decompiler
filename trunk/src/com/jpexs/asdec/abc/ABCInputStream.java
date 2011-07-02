@@ -176,6 +176,7 @@ public class ABCInputStream extends InputStream {
         int namespace_index = -1;
         int name_index = -1;
         int namespace_set_index = -1;
+        int qname_index=-1;
         List<Integer> params=new ArrayList<Integer>();
 
         if ((kind == 7) || (kind == 0xd)) { // CONSTANT_QName and CONSTANT_QNameA.
@@ -202,10 +203,10 @@ public class ABCInputStream extends InputStream {
         else if(kind==0x1D)
         {
            //Constant_TypeName
-           name_index=readU30();
+           qname_index=readU30(); //Multiname index!!!
            int paramsLength=readU30();
            for(int i=0;i<paramsLength;i++){
-              params.add(readU30());
+              params.add(readU30()); //multiname indices!
            }           
         }
         else{
@@ -213,7 +214,7 @@ public class ABCInputStream extends InputStream {
            System.exit(1);
         }
         
-        return new Multiname(kind, name_index, namespace_index, namespace_set_index,params);
+        return new Multiname(kind, name_index, namespace_index, namespace_set_index,qname_index,params);
     }
 
     public MethodInfo readMethodInfo() throws IOException {

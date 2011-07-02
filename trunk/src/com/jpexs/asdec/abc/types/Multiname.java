@@ -43,14 +43,16 @@ public class Multiname {
     public int name_index = -1;
     public int namespace_index = -1;
     public int namespace_set_index = -1;
-    public List<Integer> params;
+    public int qname_index = -1; //for TypeName
+    public List<Integer> params; //for TypeName
 
 
-    public Multiname(int kind, int name_index, int namespace_index, int namespace_set_index,List<Integer> params) {
+    public Multiname(int kind, int name_index, int namespace_index, int namespace_set_index,int qname_index,List<Integer> params) {
         this.kind = kind;
         this.name_index = name_index;
         this.namespace_index = namespace_index;
         this.namespace_set_index = namespace_set_index;
+        this.qname_index = qname_index;
         this.params=params;
     }
 
@@ -101,7 +103,7 @@ public class Multiname {
     @Override
     public String toString() {
         String kindStr = getKindStr();
-        return "kind=" + kindStr + " name_index=" + name_index + " namespace_index=" + namespace_index + " namespace_set_index=" + namespace_set_index;
+        return "kind=" + kindStr + " name_index=" + name_index + " namespace_index=" + namespace_index + " namespace_set_index=" + namespace_set_index+" qname_index="+qname_index+" params_size:"+params.size();
 
     }
 
@@ -133,8 +135,23 @@ public class Multiname {
         if (namespace_set_index > 0) {
             namespaceSetStr = " <NS:" + constants.constant_namespace_set[namespace_set_index].toString(constants) + ">";
         }
-        //kindStr+" "+
-        return namespaceStr + nameStr + namespaceSetStr;
+        String typeNameStr="";
+        if(kind==TYPENAME){
+            typeNameStr="Type: "+constants.constant_multiname[qname_index].toString(constants);
+            if(!params.isEmpty()){
+               typeNameStr+="<";
+               for(int i=0;i<params.size();i++)
+               {
+                  if(i>0){
+                     typeNameStr+=",";
+                  }
+                  typeNameStr+=constants.constant_multiname[params.get(i)].toString(constants);
+               }
+               typeNameStr+=">";
+            }
+        }
+
+        return namespaceStr + nameStr + namespaceSetStr + typeNameStr;
 
     }
 

@@ -184,7 +184,7 @@ public class ABCOutputStream extends OutputStream {
         }
         if(m.kind==0x1D)
         {
-           writeU30(m.name_index);
+           writeU30(m.qname_index);
            writeU30(m.params.size());
            for(int i=0;i<m.params.size();i++)
            {
