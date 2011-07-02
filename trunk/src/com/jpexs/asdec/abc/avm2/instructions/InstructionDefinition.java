@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -76,6 +76,7 @@ public class InstructionDefinition {
     }
 
     public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        throw new UnsupportedOperationException("Instruction "+instructionName+" not implemented");
     }
 
     public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc) {

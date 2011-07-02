@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -23,7 +23,7 @@ public class UnknownInstructionCode extends RuntimeException {
     public int code;
 
     public UnknownInstructionCode(int code) {
-        super("Unknown instruction code:" + Integer.toHexString(code));
+        super("Unknown instruction code: 0x" + Integer.toHexString(code));
         this.code = code;
     }
 }

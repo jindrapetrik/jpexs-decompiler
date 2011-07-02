@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -186,8 +186,13 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
         graphButton.setActionCommand("GRAPH");
         graphButton.addActionListener(this);
 
+        JButton execButton = new JButton("Execute");
+        execButton.setActionCommand("EXEC");
+        execButton.addActionListener(this);
+
         //buttonsPan.add(graphButton);
         buttonsPan.add(saveButton);
+       // buttonsPan.add(execButton);
         rightPanel.add(buttonsPan, BorderLayout.SOUTH);
         decompiledTextArea = new DecompiledEditorPane();
 
@@ -270,13 +275,18 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
         JMenuItem miSaveAs = new JMenuItem("Save as...");
         miSaveAs.setActionCommand("SAVEAS");
         miSaveAs.addActionListener(this);
-        JMenuItem miExport = new JMenuItem("Export...");
+        JMenuItem miExport = new JMenuItem("Export as ActionScript...");
         miExport.setActionCommand("EXPORT");
         miExport.addActionListener(this);
+
+        JMenuItem miExportPCode = new JMenuItem("Export as PCode...");
+        miExportPCode.setActionCommand("EXPORTPCODE");
+        miExportPCode.addActionListener(this);
         menuFile.add(miOpen);
         menuFile.add(miSave);
         menuFile.add(miSaveAs);
         menuFile.add(miExport);
+        menuFile.add(miExportPCode);
         menuFile.addSeparator();
         JMenuItem miClose = new JMenuItem("Exit");
         miClose.setActionCommand("EXIT");
@@ -339,6 +349,11 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
         if (e.getActionCommand().equals("GRAPH")) {
             sourceTextArea.graph();
         }
+
+        if (e.getActionCommand().equals("EXEC")) {
+            sourceTextArea.exec();
+        }
+
         if (e.getActionCommand().equals("SHOWPROXY")) {
             Main.showProxy();
         }
@@ -365,7 +380,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
 
         }
 
-        if (e.getActionCommand().equals("EXPORT")) {
+        if (e.getActionCommand().equals("EXPORT")||e.getActionCommand().equals("EXPORTPCODE")) {
             JFileChooser chooser = new JFileChooser();
             chooser.setCurrentDirectory(new java.io.File("."));
             chooser.setDialogTitle("Select directory to export");
@@ -374,13 +389,14 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
             if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                 Main.startWork("Exporting...");
                 final String selFile = chooser.getSelectedFile().getAbsolutePath();
+                final boolean isPcode=e.getActionCommand().equals("EXPORTPCODE");
                 (new Thread() {
 
                     @Override
                     public void run() {
                         try {
                             for (DoABCTag tag : list) {
-                                tag.abc.export(selFile);
+                                tag.abc.export(selFile,isPcode);
                             }
                         } catch (IOException ignored) {
                             JOptionPane.showMessageDialog(null, "Cannot write to the file");

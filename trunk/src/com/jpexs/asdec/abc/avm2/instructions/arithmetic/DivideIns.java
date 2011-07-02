@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -38,8 +38,8 @@ public class DivideIns extends InstructionDefinition {
 
     @Override
     public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-        Object o1 = lda.operandStack.pop();
         Object o2 = lda.operandStack.pop();
+        Object o1 = lda.operandStack.pop();
         if ((o1 instanceof Long) && ((o2 instanceof Long))) {
             Long ret = new Long(((Long) o1).longValue() / ((Long) o2).longValue());
             lda.operandStack.push(ret);

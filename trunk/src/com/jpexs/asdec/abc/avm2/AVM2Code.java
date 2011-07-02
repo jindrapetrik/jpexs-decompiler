@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,6 +20,7 @@ package com.jpexs.asdec.abc.avm2;
 
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.ABCInputStream;
+import com.jpexs.asdec.abc.CopyOutputStream;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
@@ -61,6 +62,7 @@ import java.util.regex.Pattern;
 public class AVM2Code {
 
     public List<AVM2Instruction> code = new LinkedList<AVM2Instruction>();
+    public static boolean DEBUG_REWRITE=false;
     public static final int OPT_U30 = 0x100;
     public static final int OPT_U8 = 0x200;
     public static final int OPT_S24 = 0x300;
@@ -85,25 +87,37 @@ public class AVM2Code {
     public static final int DAT_CASE_BASEOFFSET = OPT_S24 + 0x11;
     public static InstructionDefinition instructionSet[] = new InstructionDefinition[]{
             new AddIns(),
+            new InstructionDefinition(0x9b,"add_d",new int[]{}),
             new AddIIns(),
+            new InstructionDefinition(0x53,"applytype",new int[]{AVM2Code.OPT_U30}),
             new AsTypeIns(),
             new AsTypeLateIns(),
             new BitAndIns(),
             new BitNotIns(),
             new BitOrIns(),
             new BitXorIns(),
+            new InstructionDefinition(0x01,"bkpt",new int[]{}),
+            new InstructionDefinition(0xf2,"bkptline",new int[]{AVM2Code.OPT_U30}),
             new CallIns(),
+            new InstructionDefinition(0x4d,"callinterface",new int[]{AVM2Code.OPT_U30}),
             new CallMethodIns(),
             new CallPropertyIns(),
             new CallPropLexIns(),
             new CallPropVoidIns(),
             new CallStaticIns(),
             new CallSuperIns(),
+            new InstructionDefinition(0x4b,"callsuperid",new int[]{}),
             new CallSuperVoidIns(),
             new CheckFilterIns(),
             new CoerceIns(),
             new CoerceAIns(),
+            new InstructionDefinition(0x81,"coerce_b",new int[]{}),
+            new InstructionDefinition(0x84,"coerce_d",new int[]{}),
+            new InstructionDefinition(0x83,"coerce_i",new int[]{}),
+            new InstructionDefinition(0x89,"coerce_o",new int[]{}),
             new CoerceSIns(),
+            new InstructionDefinition(0x88,"coerce_u",new int[]{}),
+            new InstructionDefinition(0x9a,"concat",new int[]{}),
             new ConstructIns(),
             new ConstructPropIns(),
             new ConstructSuperIns(),
@@ -121,6 +135,7 @@ public class AVM2Code {
             new DecrementIns(),
             new DecrementIIns(),
             new DeletePropertyIns(),
+            new InstructionDefinition(0x6b,"deletepropertylate",new int[]{}),
             new DivideIns(),
             new DupIns(),
             new DXNSIns(),
@@ -128,6 +143,9 @@ public class AVM2Code {
             new EqualsIns(),
             new EscXAttrIns(),
             new EscXElemIns(),
+            new InstructionDefinition(0x5f,"finddef",new int[]{AVM2Code.DAT_MULTINAME_INDEX}),
+            new InstructionDefinition(0x5b,"findpropglobalstrict",new int[]{AVM2Code.DAT_MULTINAME_INDEX}),
+            new InstructionDefinition(0x5c,"findpropglobal",new int[]{AVM2Code.DAT_MULTINAME_INDEX}),
             new FindPropertyIns(),
             new FindPropertyStrictIns(),
             new GetDescendantsIns(),
@@ -139,6 +157,7 @@ public class AVM2Code {
             new GetLocal1Ins(),
             new GetLocal2Ins(),
             new GetLocal3Ins(),
+            new InstructionDefinition(0x67,"getouterscope",new int[]{AVM2Code.DAT_MULTINAME_INDEX}),
             new GetPropertyIns(),
             new GetScopeObjectIns(),
             new GetSlotIns(),
@@ -195,6 +214,7 @@ public class AVM2Code {
             new PopIns(),
             new PopScopeIns(),
             new PushByteIns(),
+            new InstructionDefinition(0x22,"pushconstant",new int[]{AVM2Code.DAT_STRING_INDEX}),
             new PushDoubleIns(),
             new PushFalseIns(),
             new PushIntIns(),
@@ -218,6 +238,7 @@ public class AVM2Code {
             new SetLocal3Ins(),
             new SetGlobalSlotIns(),
             new SetPropertyIns(),
+            new InstructionDefinition(0x69,"setpropertylate",new int[]{}),
             new SetSlotIns(),
             new SetSuperIns(),
             new StrictEqualsIns(),
@@ -226,7 +247,22 @@ public class AVM2Code {
             new SwapIns(),
             new ThrowIns(),
             new TypeOfIns(),
-            new URShiftIns()};
+            new URShiftIns(),
+            new InstructionDefinition(0x35,"li8",new int[]{}),
+            new InstructionDefinition(0x36,"li16",new int[]{}),
+            new InstructionDefinition(0x37,"li32",new int[]{}),
+            new InstructionDefinition(0x38,"lf32",new int[]{}),
+            new InstructionDefinition(0x39,"lf64",new int[]{}),
+            new InstructionDefinition(0x3A,"si8",new int[]{}),
+            new InstructionDefinition(0x3B,"si16",new int[]{}),
+            new InstructionDefinition(0x3C,"si32",new int[]{}),
+            new InstructionDefinition(0x3D,"sf32",new int[]{}),
+            new InstructionDefinition(0x3E,"sf64",new int[]{}),
+            new InstructionDefinition(0x50,"sxi1",new int[]{}),
+            new InstructionDefinition(0x51,"sxi8",new int[]{}),
+            new InstructionDefinition(0x52,"sxi16",new int[]{})
+            
+    };
     //endoflist
     public static final String IDENTOPEN = "/*IDENTOPEN*/";
     public static final String IDENTCLOSE = "/*IDENTCLOSE*/";
@@ -243,6 +279,50 @@ public class AVM2Code {
     }
 
     public AVM2Code() {
+    }
+
+    public Object execute(HashMap arguments,ConstantPool constants){
+        int pos=0;
+        LocalDataArea lda=new LocalDataArea();
+        lda.localRegisters=arguments;
+        try{
+        while(true){
+            AVM2Instruction ins=code.get(pos);
+            if(ins.definition instanceof JumpIns){
+                pos=adr2pos((Long)ins.getParamsAsList(constants).get(0));
+                continue;
+            }
+            if(ins.definition instanceof IfFalseIns){
+                Boolean b=(Boolean)lda.operandStack.pop();
+                if(b==false){
+                    pos=adr2pos((Long)ins.getParamsAsList(constants).get(0));
+                }else{
+                    pos++;
+                }
+                continue;
+            }
+            if(ins.definition instanceof IfTrueIns){
+                Boolean b=(Boolean)lda.operandStack.pop();
+                if(b==true){
+                    pos=adr2pos((Long)ins.getParamsAsList(constants).get(0));
+                }else{
+                    pos++;
+                }
+                continue;
+            }
+            if(ins.definition instanceof ReturnValueIns){
+                return lda.operandStack.pop();
+            }
+            if(ins.definition instanceof ReturnVoidIns){
+                return null;
+            }
+            ins.definition.execute(lda, constants, ins.getParamsAsList(constants));
+            pos++;
+        }
+        }catch(ConvertException e){
+
+        }
+        return null;
     }
 
     public AVM2Code(InputStream is) throws IOException {
@@ -297,10 +377,22 @@ public class AVM2Code {
     }
 
     public byte[] getBytes() {
+       return getBytes(null);
+    }
+    public byte[] getBytes(byte origBytes[]) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
+       
+        OutputStream cos;
+        if((origBytes!=null)&&(DEBUG_REWRITE))
+        {
+        ByteArrayInputStream origis=new ByteArrayInputStream(origBytes);
+        cos=new CopyOutputStream(bos,origis);
+       }else{
+           cos=bos;
+       }
         try {
             for (AVM2Instruction instruction : code) {
-                bos.write(instruction.getBytes());
+                cos.write(instruction.getBytes());
             }
         } catch (IOException ex) {
         }

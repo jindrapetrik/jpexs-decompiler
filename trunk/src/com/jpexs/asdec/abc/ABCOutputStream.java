@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -167,7 +167,7 @@ public class ABCOutputStream extends OutputStream {
     }
 
     public void writeMultiname(Multiname m) throws IOException {
-        write(m.kind);
+        writeU8(m.kind);
         if ((m.kind == 7) || (m.kind == 0xd)) { // CONSTANT_QName and CONSTANT_QNameA.
             writeU30(m.namespace_index);
             writeU30(m.name_index);
@@ -181,6 +181,15 @@ public class ABCOutputStream extends OutputStream {
         }
         if ((m.kind == 0x1B) || (m.kind == 0x1C)) { //CONSTANT_MultinameL and CONSTANT_MultinameLA
             writeU30(m.namespace_set_index);
+        }
+        if(m.kind==0x1D)
+        {
+           writeU30(m.name_index);
+           writeU30(m.params.size());
+           for(int i=0;i<m.params.size();i++)
+           {
+              writeU30(m.params.get(i));
+           }
         }
         //kind==0x11,0x12 nothing CONSTANT_RTQNameL and CONSTANT_RTQNameLA.
     }

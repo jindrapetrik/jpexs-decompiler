@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +19,7 @@
 package com.jpexs.asdec.abc.avm2.instructions.arithmetic;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
@@ -33,6 +34,19 @@ public class ModuloIns extends InstructionDefinition {
 
     public ModuloIns() {
         super(0xa4, "modulo", new int[]{});
+    }
+
+    @Override
+    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        Object o1 = lda.operandStack.pop();
+        Object o2 = lda.operandStack.pop();
+
+        if ((o1 instanceof Long) && ((o2 instanceof Long))) {
+            Long ret = new Long(((Long) o2).longValue() % ((Long) o1).longValue());
+            lda.operandStack.push(ret);
+        } else {
+            throw new RuntimeException("Cannot modulo");
+        }
     }
 
     @Override

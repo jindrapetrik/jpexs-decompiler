@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -18,15 +18,17 @@
 
 package com.jpexs.asdec.action.swf4;
 
+import com.jpexs.asdec.Main;
 import com.jpexs.asdec.helpers.Helper;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ConstantIndex {
+
     public int index;
     public List<String> constantPool;
-
+    
 
     public ConstantIndex(int index) {
         this.index = index;
@@ -40,9 +42,11 @@ public class ConstantIndex {
 
     @Override
     public String toString() {
-        if (constantPool != null) {
-            if (index < constantPool.size()) {
-                return "\"" + Helper.escapeString(constantPool.get(index)) + "\"";
+        if (Main.RESOLVE_CONSTANTS) {
+            if (constantPool != null) {
+                if (index < constantPool.size()) {
+                    return "\"" + Helper.escapeString(constantPool.get(index)) + "\"";
+                }
             }
         }
         return "constant" + index;

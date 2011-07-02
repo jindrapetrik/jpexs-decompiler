@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -36,20 +36,12 @@ public class DoInitActionTag extends Tag implements ASMSource {
     /**
      * List of actions to perform
      */
-    public List<Action> actions = new ArrayList<Action>();
+    //public List<Action> actions = new ArrayList<Action>();
+    public byte[] actionBytes;
     /**
      * List of ExportAssetsTag used for converting to String
      */
     public List<ExportAssetsTag> exportAssetsTags = new ArrayList<ExportAssetsTag>();
-
-    /**
-     * Sets actions associated with this object
-     *
-     * @param actions Action list
-     */
-    public void setActions(List<Action> actions) {
-        this.actions = actions;
-    }
 
 
     /**
@@ -65,7 +57,8 @@ public class DoInitActionTag extends Tag implements ASMSource {
             ByteArrayInputStream bais = new ByteArrayInputStream(data);
             SWFInputStream sis = new SWFInputStream(bais, version);
             spriteId = sis.readUI16();
-            actions = sis.readActionList();
+            //actions = sis.readActionList();
+            actionBytes=sis.readBytes(sis.available());
         } catch (IOException e) {
 
         }
@@ -83,7 +76,8 @@ public class DoInitActionTag extends Tag implements ASMSource {
         SWFOutputStream sos = new SWFOutputStream(baos, version);
         try {
             sos.writeUI16(spriteId);
-            sos.write(Action.actionsToBytes(actions, true, version));
+            sos.write(actionBytes);
+            //sos.write(Action.actionsToBytes(actions, true, version));
             sos.close();
         } catch (IOException e) {
 
@@ -91,15 +85,7 @@ public class DoInitActionTag extends Tag implements ASMSource {
         return baos.toByteArray();
     }
 
-    /**
-     * Converts actions to ASM source
-     *
-     * @param version SWF version
-     * @return ASM source
-     */
-    public String getASMSource(int version) {
-        return Action.actionsToString(actions, null, version);
-    }
+
 
     /**
      * Returns string representation of the object
@@ -125,13 +111,39 @@ public class DoInitActionTag extends Tag implements ASMSource {
     public boolean containsSource() {
         return true;
     }
-
-    /**
-     * Returns actions associated with this object
+/**
+     * Converts actions to ASM source
      *
-     * @return List of actions
+     * @param version SWF version
+     * @return ASM source
      */
-    public List<Action> getActions() {
-        return actions;
+    public String getASMSource(int version) {
+        List<Action> actions=new ArrayList<Action>();
+        try {
+            actions = (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
+        } catch (IOException ex) {
+
+        }
+        return Action.actionsToString(actions, null, version);
+    }
+
+    public List<Action> getActions(int version) {
+        try {
+            return (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
+        } catch (IOException ex) {
+            return new ArrayList<Action>();
+        }
+    }
+
+    public void setActions(List<Action> actions, int version) {
+        actionBytes=Action.actionsToBytes(actions, true, version);
+    }
+
+    public byte[] getActionBytes() {
+        return actionBytes;
+    }
+
+    public void setActionBytes(byte[] actionBytes) {
+        this.actionBytes=actionBytes;
     }
 }

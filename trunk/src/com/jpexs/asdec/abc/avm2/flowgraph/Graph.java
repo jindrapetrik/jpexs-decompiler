@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -15,6 +15,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.jpexs.asdec.abc.avm2.flowgraph;
 
 import com.jpexs.asdec.abc.avm2.AVM2Code;
@@ -44,17 +45,14 @@ import java.util.logging.Logger;
  */
 public class Graph {
 
-    public List<GraphPart> parts;
+    public GraphPart head;
     public List<Integer> ignored = new ArrayList<Integer>();
     private int trueReg = -1;
     private int falseReg = -1;
 
     public Graph(AVM2Code code) {
-        parts = new ArrayList<GraphPart>();
         int start = checkSWFSecureStart(code);
-        makeGraph(new Stack<Boolean>(),code, start, parts, new ArrayList<GraphBlock>());
-        do {
-        } while (optimizeDecisions(parts) > 0);
+        head=makeGraph(new Stack<Boolean>(), code, start, new ArrayList<GraphPart>());
     }
 
     private int checkSWFSecureStart(AVM2Code code) {
@@ -67,7 +65,6 @@ public class Graph {
         if (!((code.code.get(1).definition instanceof PushFalseIns) || (code.code.get(1).definition instanceof PushTrueIns))) {
             return 0;
         }
-        System.out.println("A");
         int pos = 2;
         Stack<Boolean> myStack = new Stack<Boolean>();
         int ip = 0;
@@ -105,164 +102,38 @@ public class Graph {
         }
         return 0;
     }
+   
 
-    private int optimizeDecisions(List<GraphPart> parts) {
-        for (int p = 0; p < parts.size(); p++) {
-            GraphPart part = parts.get(p);
-            if (part instanceof GraphDecision) {
-                /**
-                 * if
-                 *  onTrue:  nop
-                 *           nop
-                 *           link A
-                 *  onFalse: nop
-                 *           A
-                 *           B
-                 *
-                 *  ==>
-                 *
-                 * if onTrue:  nop
-                 *             nop
-                 *    onFalse: nop
-                 * A
-                 * B
-                 */
-                if (((GraphDecision) part).onTrue.size() > 0) {
-                    GraphPart lastTruePart = ((GraphDecision) part).onTrue.get(((GraphDecision) part).onTrue.size() - 1);
-                    if (lastTruePart instanceof GraphLink) {
-                        for (int f = 0; f < ((GraphDecision) part).onFalse.size(); f++) {
-                            if (((GraphDecision) part).onFalse.get(f).start == ((GraphLink) lastTruePart).ip) {
-                                ((GraphDecision) part).onFalse.get(f).linkCount--;
-                                ((GraphDecision) part).onTrue.remove(((GraphDecision) part).onTrue.size() - 1);
-                                for (int k = f; k < ((GraphDecision) part).onFalse.size(); k++) {
-                                    parts.add(p + 1, ((GraphDecision) part).onFalse.remove(k));
-                                }
-                                return optimizeDecisions(parts) + 1;
-                            }
-                        }
-                    }
-                }
-
-                /**
-                 * if
-                 *  onTrue:  nop
-                 *           nop
-                 *           A
-                 *           B
-                 *  onFalse: nop
-                 *           link A
-                 *
-                 *  ==>
-                 *
-                 * if onTrue:  nop
-                 *             nop
-                 *    onFalse: nop
-                 * A
-                 * B
-                 */
-                if (((GraphDecision) part).onFalse.size() > 0) {
-                    GraphPart lastFalsePart = ((GraphDecision) part).onFalse.get(((GraphDecision) part).onFalse.size() - 1);
-                    if (lastFalsePart instanceof GraphLink) {
-                        for (int t = 0; t < ((GraphDecision) part).onTrue.size(); t++) {
-                            if (((GraphDecision) part).onTrue.get(t).start == ((GraphLink) lastFalsePart).ip) {
-                                ((GraphDecision) part).onTrue.get(t).linkCount--;
-                                ((GraphDecision) part).onFalse.remove(((GraphDecision) part).onFalse.size() - 1);
-                                for (int k = t; k < ((GraphDecision) part).onTrue.size(); k++) {
-                                    parts.add(p + 1, ((GraphDecision) part).onTrue.remove(k));
-                                }
-                                return optimizeDecisions(parts) + 1;
-                            }
-                        }
-                    }
-                }
-
-                /*
-                 * if
-                 *  onTrue:  nop
-                 *           link A
-                 *  onFalse: nop
-                 *           link A
-                 *
-                 * ==>
-                 *  if
-                 *   onTrue: nop
-                 *   onFalse: nop
-                 *  link A
-                 *
-                 */
-                if ((((GraphDecision) part).onTrue.size() > 0)&&(((GraphDecision) part).onFalse.size() > 0)) {
-                    GraphPart lastFalsePart = ((GraphDecision) part).onFalse.get(((GraphDecision) part).onFalse.size() - 1);
-                    GraphPart lastTruePart = ((GraphDecision) part).onTrue.get(((GraphDecision) part).onTrue.size() - 1);
-                    if((lastFalsePart instanceof GraphLink)&&(lastTruePart instanceof GraphLink)){
-                        if(((GraphLink)lastFalsePart).ip==((GraphLink)lastTruePart).ip){
-                            ((GraphDecision) part).onFalse.remove(((GraphDecision) part).onFalse.size()-1);
-                            ((GraphDecision) part).onTrue.remove(((GraphDecision) part).onTrue.size()-1);
-                            parts.add(p+1,lastTruePart);
-                            return optimizeDecisions(parts) + 1;
-                        }
-                    }
-                }
-            }
-        }
-
-        int optcount = 0;
-        for (int p = 0; p < parts.size(); p++) {
-            GraphPart part = parts.get(p);
-            if (part instanceof GraphDecision) {
-                optcount += optimizeDecisions(((GraphDecision) part).onTrue);
-                optcount += optimizeDecisions(((GraphDecision) part).onFalse);
-            }
-        }
-        return optcount;
-    }
-
-    private GraphBlock splitBlock(GraphBlock block, int ip, List<GraphBlock> allBlocks) {
-        return processSplit(block, parts, ip, allBlocks);
-    }
-
-    private GraphBlock processSplit(GraphBlock block, List<GraphPart> parts, int ip, List<GraphBlock> allBlocks) {
-        for (int i = 0; i < parts.size(); i++) {
-            if (parts.get(i) == block) {
-                parts.remove(i);
-                GraphBlock gr1 = new GraphBlock(block.start, ip - 1);
-                parts.add(i, gr1);
-                gr1.linkCount=block.linkCount;
-                GraphBlock gr2 = new GraphBlock(ip, block.end);
-                parts.add(i + 1, gr2);
-                allBlocks.remove(block);
-                allBlocks.add(gr1);
-                allBlocks.add(gr2);
-                return (GraphBlock) parts.get(i + 1);
-            } else if (parts.get(i) instanceof GraphDecision) {
-                GraphBlock gr = processSplit(block, ((GraphDecision) parts.get(i)).onTrue, ip, allBlocks);
-                if (gr != null) {
-                    return gr;
-                }
-                gr = processSplit(block, ((GraphDecision) parts.get(i)).onFalse, ip, allBlocks);
-                if (gr != null) {
-                    return gr;
-                }
-            }
-        }
-        return null;
-    }
-
-    private void makeGraph(Stack<Boolean> myStack,AVM2Code code, int start, List<GraphPart> parts, List<GraphBlock> allBlocks) {
+    private GraphPart makeGraph(Stack<Boolean> myStack,AVM2Code code, int start, List<GraphPart> allBlocks) {
+        GraphPart ret=new GraphPart(start,-1);
+        ret.instanceCount=1;
+        allBlocks.add(ret);
+        GraphPart actual=ret;
         try {
             int ip = start;
             while (ip < code.code.size()) {
-                for (GraphBlock block : allBlocks) {
-                    if (block.contains(ip)) {
-                        if (block.start < ip) {
-                            block = splitBlock(block, ip, allBlocks);
+                for (GraphPart block : allBlocks) {
+                    if (block.containsIP(ip)) {
+                        if(block.start<ip){
+                            int oldEnd=block.end;
+                            block.end=ip-1;
+                            GraphPart newBlock=new GraphPart(ip,oldEnd);
+                            newBlock.nextParts.addAll(block.nextParts);
+                            newBlock.instanceCount=1;
+                            block.nextParts.clear();
+                            block.nextParts.add(newBlock);
+                            allBlocks.add(newBlock);
+                            block=newBlock;                            
                         }
-                        if (ip - 1 >= start) {
-                            GraphBlock bl = new GraphBlock(start, ip - 1);
-                            parts.add(bl);
-                            allBlocks.add(bl);
+                        block.instanceCount++;
+                        if(start<ip){
+                          actual.end=ip-1;
+                          actual.nextParts.add(block);
+                          return ret;
+                        }else{
+                            return block;
                         }
-                        parts.add(new GraphLink(block));
-                        return;
+                        
                     }
                 }
                 boolean forceJump = false;
@@ -316,43 +187,37 @@ public class Graph {
                         ignored.add(ip);
                     }
                 } else if ((code.code.get(ip).definition instanceof JumpIns) || forceJump) {
-                    if (ip - 1 >= start) {
-                        GraphBlock bl = new GraphBlock(start, ip - 1);
-                        parts.add(bl);
-                        allBlocks.add(bl);
-                    }
+
                     int jumpIp = code.adr2pos(code.pos2adr(ip + 1) + code.code.get(ip).operands[0]);
-                    makeGraph(myStack,code, jumpIp, parts, allBlocks);
-                    return;
+                    actual.end=ip;
+                    GraphPart newActual=makeGraph(myStack,code,jumpIp,allBlocks);
+                    actual.nextParts.add(newActual);
+                    return ret;
                 } else if (code.code.get(ip).definition instanceof IfTypeIns) {
                     if (forceSkip) {
                         ip++;
                         continue;
                     }
 
-                    if (ip - 1 >= start) {
-                        GraphBlock bl = new GraphBlock(start, ip - 1);
-                        parts.add(bl);
-                        allBlocks.add(bl);
-                    }
+                    actual.end=ip;
                     int jumpIp = code.adr2pos(code.pos2adr(ip + 1) + code.code.get(ip).operands[0]);
-                    GraphDecision dec = new GraphDecision();
-                    parts.add(dec);
-                    dec.start = ip;
-                    makeGraph(myStack,code, jumpIp, dec.onTrue, allBlocks);
-                    makeGraph(myStack,code, ip + 1, dec.onFalse, allBlocks);
-                    return;
+                    GraphPart onTrue=makeGraph(myStack,code, jumpIp, allBlocks);
+                    actual.nextParts.add(onTrue);
+                    GraphPart onFalse=makeGraph(myStack,code, ip + 1, allBlocks);                    
+                    actual.nextParts.add(onFalse);                    
+                    return ret;
                 } else if ((code.code.get(ip).definition instanceof ReturnValueIns) || (code.code.get(ip).definition instanceof ReturnVoidIns)) {
                     ip++;
                     break;
                 }
                 ip++;
             }
-            GraphFinalBlock bl = new GraphFinalBlock(start, ip - 1);
-            parts.add(bl);
-            allBlocks.add(bl);
+            actual.end=ip-1;
+            return ret;
         } catch (ConvertException ex) {
             Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return null;
     }
+    
 }

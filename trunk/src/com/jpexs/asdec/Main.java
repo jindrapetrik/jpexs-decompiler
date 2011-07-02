@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -52,16 +52,23 @@ public class Main {
     public static String file;
     public static String maskURL;
     public static SWF swf;
-    public static final String version = "alpha8";
+    public static final String version = "alpha9";
     public static String applicationName = "JP ActionScript Decompiler v." + version;
     public static LoadingDialog loadingDialog = new LoadingDialog();
     public static ModeFrame modeFrame;
     private static boolean working = false;
     private static TrayIcon trayIcon;
     private static MenuItem stopMenuItem;
+
     public static boolean DEBUG_COPY = false;
+    /** Debug mode = throwing an error when comparing original file and recompiled */
     public static boolean DEBUG_MODE = false;
+    /** Turn off reading unsafe tags (tags which can cause problems with recompiling)*/
     public static boolean DISABLE_DANGEROUS = false;
+    /** Turn off resolving constants in ActionScript 2 */
+    public static final boolean RESOLVE_CONSTANTS = true;
+    /** Turn off decompiling if needed */
+    public static final boolean DO_DECOMPILE=true;
 
     public static String getFileTitle() {
         if (maskURL != null) return maskURL;
@@ -282,7 +289,7 @@ public class Main {
 
 
     public static void updateLicenseInDir(File dir){
-        String license="/*\r\n *  Copyright (C) 2010 JPEXS\r\n * \r\n *  This program is free software; you can redistribute it and/or\r\n *  modify it under the terms of the GNU General Public License\r\n *  as published by the Free Software Foundation; either version 2\r\n *  of the License, or (at your option) any later version.\r\n * \r\n *  This program is distributed in the hope that it will be useful,\r\n *  but WITHOUT ANY WARRANTY; without even the implied warranty of\r\n *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\r\n *  GNU General Public License for more details.\r\n * \r\n *  You should have received a copy of the GNU General Public License\r\n *  along with this program; if not, write to the Free Software\r\n *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.\r\n */\r\n";
+        String license="/*\r\n *  Copyright (C) 2010-2011 JPEXS\r\n * \r\n *  This program is free software; you can redistribute it and/or\r\n *  modify it under the terms of the GNU General Public License\r\n *  as published by the Free Software Foundation; either version 2\r\n *  of the License, or (at your option) any later version.\r\n * \r\n *  This program is distributed in the hope that it will be useful,\r\n *  but WITHOUT ANY WARRANTY; without even the implied warranty of\r\n *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\r\n *  GNU General Public License for more details.\r\n * \r\n *  You should have received a copy of the GNU General Public License\r\n *  along with this program; if not, write to the Free Software\r\n *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.\r\n */\r\n";
 
         File files[]=dir.listFiles();
         for(File f:files){
@@ -336,6 +343,8 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
+        updateLicenseInDir(new File("src"));
+        System.exit(0);
         View.setWinLookAndFeel();
         loadReplacements();
         if (args.length < 1) {

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@ import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.GetURLTreeItem;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 import com.jpexs.asdec.helpers.Helper;
+import java.io.ByteArrayInputStream;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -37,8 +38,10 @@ public class ActionGetURL extends Action {
     public String urlString;
     public String targetString;
 
-    public ActionGetURL(int actionLength, SWFInputStream sis) throws IOException {
+    public ActionGetURL(int actionLength, SWFInputStream sis,int version) throws IOException {
         super(0x83, actionLength);
+        byte data[]=sis.readBytes(actionLength);
+        sis=new SWFInputStream(new ByteArrayInputStream(data),version);
         urlString = sis.readString();
         targetString = sis.readString();
     }

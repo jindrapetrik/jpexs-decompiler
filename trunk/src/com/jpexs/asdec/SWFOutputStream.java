@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -601,7 +601,8 @@ public class SWFOutputStream extends OutputStream {
         if (value.eventFlags.clipEventKeyPress) {
             sos.writeUI8(value.keyCode);
         }
-        sos.write(Action.actionsToBytes(value.actions, true, version));
+        sos.write(value.actionBytes);
+        //sos.write(Action.actionsToBytes(value.actions, true, version));
         sos.close();
         byte data[] = baos.toByteArray();
         writeUI32(data.length);     //actionRecordSize
@@ -923,7 +924,8 @@ public class SWFOutputStream extends OutputStream {
         sos.writeUB(1, value.condIdleToOverUp ? 1 : 0);
         sos.writeUB(7, value.condKeyPress);
         sos.writeUB(1, value.condOverDownToIddle ? 1 : 0);
-        sos.write(Action.actionsToBytes(value.actions, true, version));
+        sos.write(value.actionBytes);
+        //sos.write(Action.actionsToBytes(value.actions, true, version));
         sos.close();
         byte data[] = baos.toByteArray();
         if (isLast) {

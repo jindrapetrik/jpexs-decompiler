@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -18,8 +18,12 @@
 
 package com.jpexs.asdec.types;
 
+import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.tags.ASMSource;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import java.util.List;
 
@@ -40,7 +44,8 @@ public class CLIPACTIONRECORD implements ASMSource {
     /**
      * Actions to perform
      */
-    public List<Action> actions;
+    //public List<Action> actions;
+    public byte[] actionBytes;
 
     /**
      * Returns a string representation of the object
@@ -52,14 +57,6 @@ public class CLIPACTIONRECORD implements ASMSource {
         return "CLIPACTIONRECORD";
     }
 
-    /**
-     * Sets actions associated with this object
-     *
-     * @param actions Action list
-     */
-    public void setActions(List<Action> actions) {
-        this.actions = actions;
-    }
 
     /**
      * Returns header with events converted to string
@@ -82,6 +79,12 @@ public class CLIPACTIONRECORD implements ASMSource {
      * @return ASM source
      */
     public String getASMSource(int version) {
+        List<Action> actions=new ArrayList<Action>();
+        try {
+            actions = (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
+        } catch (IOException ex) {
+
+        }
         return Action.actionsToString(actions, null, version);
     }
 
@@ -94,12 +97,24 @@ public class CLIPACTIONRECORD implements ASMSource {
         return true;
     }
 
-    /**
-     * Returns actions associated with this object
-     *
-     * @return List of actions
-     */
-    public List<Action> getActions() {
-        return actions;
+
+    public List<Action> getActions(int version) {
+        try {
+            return (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
+        } catch (IOException ex) {
+            return new ArrayList<Action>();
+        }
+    }
+
+    public void setActions(List<Action> actions, int version) {
+        actionBytes=Action.actionsToBytes(actions, true, version);
+    }
+
+    public byte[] getActionBytes() {
+        return actionBytes;
+    }
+
+    public void setActionBytes(byte[] actionBytes) {
+        this.actionBytes=actionBytes;
     }
 }

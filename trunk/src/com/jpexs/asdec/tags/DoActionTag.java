@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -34,17 +34,10 @@ public class DoActionTag extends Tag implements ASMSource {
     /**
      * List of actions to perform
      */
-    public List<Action> actions = new ArrayList<Action>();
+    //public List<Action> actions = new ArrayList<Action>();
+    public byte[] actionBytes;
 
 
-    /**
-     * Sets actions associated with this object
-     *
-     * @param actions Action list
-     */
-    public void setActions(List<Action> actions) {
-        this.actions = actions;
-    }
 
     /**
      * Constructor
@@ -58,7 +51,8 @@ public class DoActionTag extends Tag implements ASMSource {
         try {
             ByteArrayInputStream bais = new ByteArrayInputStream(data);
             SWFInputStream sis = new SWFInputStream(bais, version);
-            actions = sis.readActionList();
+            //actions = sis.readActionList();
+            actionBytes=sis.readBytes(sis.available());
         } catch (IOException e) {
 
         }
@@ -72,7 +66,7 @@ public class DoActionTag extends Tag implements ASMSource {
      */
     @Override
     public byte[] getData(int version) {
-        return Action.actionsToBytes(actions, true, version);
+        return actionBytes;//Action.actionsToBytes(actions, true, version);
     }
 
     /**
@@ -82,6 +76,12 @@ public class DoActionTag extends Tag implements ASMSource {
      * @return ASM source
      */
     public String getASMSource(int version) {
+        List<Action> actions=new ArrayList<Action>();
+        try {
+            actions = (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
+        } catch (IOException ex) {
+
+        }
         return Action.actionsToString(actions, null, version);
     }
 
@@ -104,12 +104,24 @@ public class DoActionTag extends Tag implements ASMSource {
         return "DoActionTag";
     }
 
-    /**
-     * Returns actions associated with this object
-     *
-     * @return List of actions
-     */
-    public List<Action> getActions() {
-        return actions;
+
+    public List<Action> getActions(int version) {
+        try {
+            return (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
+        } catch (IOException ex) {
+            return new ArrayList<Action>();
+        }
+    }
+
+    public void setActions(List<Action> actions, int version) {
+        actionBytes=Action.actionsToBytes(actions, true, version);
+    }
+
+    public byte[] getActionBytes() {
+        return actionBytes;
+    }
+
+    public void setActionBytes(byte[] actionBytes) {
+        this.actionBytes=actionBytes;
     }
 }

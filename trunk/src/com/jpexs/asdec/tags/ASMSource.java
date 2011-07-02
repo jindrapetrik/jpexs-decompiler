@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -46,14 +46,18 @@ public interface ASMSource {
     /**
      * Returns actions associated with this object
      *
+     * @param version Version
      * @return List of actions
      */
-    public List<Action> getActions();
+    public List<Action> getActions(int version);
 
     /**
      * Sets actions associated with this object
-     *
+     * @param version Version
      * @param actions Action list
      */
-    public void setActions(List<Action> actions);
+    public void setActions(List<Action> actions,int version);
+
+    public byte[] getActionBytes();
+    public void setActionBytes(byte actionBytes[]);
 }

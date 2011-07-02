@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -15,6 +15,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.jpexs.asdec.abc;
 
 import com.jpexs.asdec.Main;
@@ -49,8 +50,7 @@ public class ABC {
     public long stringOffsets[];
     public static String IDENT_STRING = "   ";
 
-    public ABC(InputStream is) throws IOException {
-
+   public ABC(InputStream is) throws IOException {
         ABCInputStream ais = new ABCInputStream(is);
         major_version = ais.readU16();
         minor_version = ais.readU16();
@@ -83,7 +83,7 @@ public class ABC {
         constants.constant_string[0] = "";
         for (int i = 1; i < constant_string_pool_count; i++) { //index 0 not used. Values 1..n-1
             long pos = ais.getPosition();
-            constants.constant_string[i] = ais.readString();
+            constants.constant_string[i] = ais.readString();            
             stringOffsets[i] = pos;
         }
 
@@ -92,7 +92,7 @@ public class ABC {
         constants.constant_namespace = new Namespace[constant_namespace_pool_count];
         for (int i = 1; i < constant_namespace_pool_count; i++) { //index 0 not used. Values 1..n-1
             constants.constant_namespace[i] = ais.readNamespace();
-            cleanOneName(constants.constant_namespace[i].name_index);
+            //cleanOneName(constants.constant_namespace[i].name_index);
         }
 
         //constant namespace set
@@ -110,10 +110,12 @@ public class ABC {
 
         //constant multiname
         int constant_multiname_pool_count = ais.readU30();
+        //System.out.println("Reading "+constant_multiname_pool_count+" multinames");
         constants.constant_multiname = new Multiname[constant_multiname_pool_count];
         for (int i = 1; i < constant_multiname_pool_count; i++) { //index 0 not used. Values 1..n-1
             constants.constant_multiname[i] = ais.readMultiname();
-            cleanNamespace(constants.constant_multiname[i].name_index);
+            //System.out.println("Multiname read:"+constants.constant_multiname[i]);
+            //cleanNamespace(constants.constant_multiname[i].name_index);
         }
 
 
@@ -146,7 +148,7 @@ public class ABC {
         for (int i = 0; i < class_count; i++) {
             instance_info[i] = ais.readInstanceInfo();
         }
-        class_info = new ClassInfo[class_count];
+        class_info = new ClassInfo[class_count];        
         for (int i = 0; i < class_count; i++) {
             class_info[i] = new ClassInfo();
             class_info[i].cinit_index = ais.readU30();
@@ -195,7 +197,7 @@ public class ABC {
             bodies[i].code.clearCode(constants, bodies[i]);
             } catch (ConvertException ignored) {
             } */
-        }
+        }        
     }
 
     public void saveToStream(OutputStream os) throws IOException {
@@ -205,12 +207,7 @@ public class ABC {
 
         aos.writeU30(constants.constant_int.length);
         for (int i = 1; i < constants.constant_int.length; i++) {
-            try {
-                aos.writeS32(constants.constant_int[i]);
-            } catch (NotSameException nex) {
-                System.out.println("written:" + constants.constant_int[i]);
-                throw nex;
-            }
+            aos.writeS32(constants.constant_int[i]);
         }
         aos.writeU30(constants.constant_uint.length);
         for (int i = 1; i < constants.constant_uint.length; i++) {
@@ -241,6 +238,7 @@ public class ABC {
         }
 
         aos.writeU30(constants.constant_multiname.length);
+        //System.out.println("Writing "+constants.constant_multiname.length+" multinames");
         for (int i = 1; i < constants.constant_multiname.length; i++) {
             aos.writeMultiname(constants.constant_multiname[i]);
         }
@@ -459,6 +457,7 @@ public class ABC {
 
     private String addTabs(String s, int tabs) {
         String parts[] = s.split("\r\n");
+        if(!s.contains("\r\n")) parts = s.split("\n");
         String ret = "";
         for (int i = 0; i < parts.length; i++) {
             for (int t = 0; t < tabs; t++) {
@@ -498,7 +497,7 @@ public class ABC {
         }
     }
 
-    public String classToString(int i, boolean highlight) {
+    public String classToString(int i, boolean highlight,boolean pcode) {
         String ret = "";
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(baos);
@@ -580,7 +579,7 @@ public class ABC {
             String bodyStr = "";
             int bodyIndex = findBodyIndex(instance_info[i].iinit_index);
             if (bodyIndex != -1) {
-                bodyStr = addTabs(bodies[bodyIndex].toString(false, i, this, constants, method_info, highlight), 3);
+                bodyStr = addTabs(bodies[bodyIndex].toString(pcode,false, i, this, constants, method_info, highlight), 3);
             }
             String toPrint = IDENT_STRING + IDENT_STRING + modifier + "function " + constants.constant_multiname[instance_info[i].name_index].getName(constants) + "(" + constructorParams + ") {\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}";
             if (highlight) {
@@ -598,7 +597,7 @@ public class ABC {
                 String bodyStr = "";
                 int bodyIndex = findBodyIndex(tm.method_info);
                 if (bodyIndex != -1) {
-                    bodyStr = addTabs(bodies[bodyIndex].toString(true, i, this, constants, method_info, highlight), 3);
+                    bodyStr = addTabs(bodies[bodyIndex].toString(pcode,true, i, this, constants, method_info, highlight), 3);
                 }
                 toPrint = IDENT_STRING + IDENT_STRING + tm.convert(constants, method_info, true) + " {\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}";
             }
@@ -627,7 +626,7 @@ public class ABC {
                 String bodyStr = "";
                 int bodyIndex = findBodyIndex(tm.method_info);
                 if (bodyIndex != -1) {
-                    bodyStr = addTabs(bodies[bodyIndex].toString(false, i, this, constants, method_info, highlight), 3);
+                    bodyStr = addTabs(bodies[bodyIndex].toString(pcode,false, i, this, constants, method_info, highlight), 3);
                 }
                 toPrint = IDENT_STRING + IDENT_STRING + tm.convert(constants, method_info, false) + " {\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}";
             }
@@ -647,7 +646,7 @@ public class ABC {
         return baos.toString();
     }
 
-    public void export(String directory) throws IOException {
+    public void export(String directory,boolean pcode) throws IOException {
         for (int i = 0; i < instance_info.length; i++) {
             String packageName = instance_info[i].getName(constants).getNamespace(constants).getName(constants);
             String className = instance_info[i].getName(constants).getName(constants);
@@ -658,7 +657,7 @@ public class ABC {
             }
             String fileName = outDir.toString() + File.separator + className + ".as";
             FileOutputStream fos = new FileOutputStream(fileName);
-            fos.write(classToString(i, false).getBytes());
+            fos.write(classToString(i, false,pcode).getBytes());
             fos.close();
         }
 

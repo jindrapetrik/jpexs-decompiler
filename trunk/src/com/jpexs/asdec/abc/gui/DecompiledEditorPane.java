@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -91,7 +91,7 @@ public class DecompiledEditorPane extends JEditorPane implements MouseListener {
 
         String hilightedCode = "";
         if (!bufferedClasses.containsKey(index)) {
-            hilightedCode = abc.classToString(index, true);
+            hilightedCode = abc.classToString(index, true,false);
             highlights = Highlighting.getInstrHighlights(hilightedCode);
             traitHighlights = Highlighting.getTraitHighlights(hilightedCode);
             hilightedCode = Highlighting.stripHilights(hilightedCode);

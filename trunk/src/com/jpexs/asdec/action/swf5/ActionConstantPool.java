@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@ import com.jpexs.asdec.action.parser.ParsedSymbol;
 import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 import com.jpexs.asdec.helpers.Helper;
+import java.io.ByteArrayInputStream;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -37,8 +38,9 @@ import java.util.Stack;
 public class ActionConstantPool extends Action {
     public List<String> constantPool = new ArrayList<String>();
 
-    public ActionConstantPool(int actionLength, SWFInputStream sis) throws IOException {
+    public ActionConstantPool(int actionLength, SWFInputStream sis, int version) throws IOException {
         super(0x88, actionLength);
+        sis = new SWFInputStream(new ByteArrayInputStream(sis.readBytes(actionLength)), version);
         int count = sis.readUI16();
         for (int i = 0; i < count; i++) {
             constantPool.add(sis.readString());

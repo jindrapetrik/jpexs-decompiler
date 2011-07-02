@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,123 +19,108 @@
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.abc.avm2.flowgraph.Graph;
-import com.jpexs.asdec.abc.avm2.flowgraph.GraphDecision;
+import com.jpexs.asdec.abc.avm2.flowgraph.GraphPart;
+import com.jpexs.asdec.gui.View;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JFrame;
-import javax.swing.JTree;
-import javax.swing.event.TreeModelListener;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 /**
  *
  * @author JPEXS
  */
 public class GraphFrame extends JFrame {
-    public JTree graphTree;
 
+    private class GraphPanel extends JPanel {
 
-    private class DecisionItem{
-        public GraphDecision decision;
-        public boolean isTrue;
+        private static final int SPACE_VERTICAL=10;
+        private static final int SPACE_HORIZONTAL=10;
+        private static final int BLOCK_WIDTH=100;
+        private static final int BLOCK_HEIGHT=20;
 
-        public DecisionItem(GraphDecision decision, boolean isTrue) {
-            this.decision = decision;
-            this.isTrue = isTrue;
+        private Graph graph;
+
+        public GraphPanel(Graph graph) {
+            this.graph = graph;
+            setPreferredSize(new Dimension((BLOCK_WIDTH+SPACE_HORIZONTAL)*getPartWidth(graph.head, new ArrayList<GraphPart>()), (BLOCK_HEIGHT+SPACE_VERTICAL)*getPartHeight(graph.head, new ArrayList<GraphPart>())));
         }
 
         @Override
-        public String toString() {
-            if(isTrue){
-                return "onTrue";
-            }else{
-                return "onFalse";
-            }
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            g.setColor(Color.black);
+            paintPart(g,graph.head,0,getPartWidth(graph.head,new ArrayList<GraphPart>())*(BLOCK_WIDTH+SPACE_HORIZONTAL)/2,new ArrayList<GraphPart>());
         }
 
+        private void paintPart(Graphics g,GraphPart part,int y,int x,List<GraphPart> used){            
+            List<GraphPart> l=new ArrayList<GraphPart>();
+            l.addAll(used);
+            int totalWidthParts=getPartWidth(part,l);
+            int totalWidth=totalWidthParts*(BLOCK_WIDTH+SPACE_HORIZONTAL);
+            g.drawRect(x-BLOCK_WIDTH/2-SPACE_HORIZONTAL/2, y, BLOCK_WIDTH, BLOCK_HEIGHT);
+            g.drawString(part.toString(), x-BLOCK_WIDTH/2, y+BLOCK_HEIGHT);
+            if(used.contains(part)) return;
+            used.add(part);
+            if(part.nextParts.size()>0){
+                int cx=x-totalWidth/2;
+                for(int p=0;p<part.nextParts.size();p++){
+                    l=new ArrayList<GraphPart>();
+                    l.addAll(used);
+                    int cellWidth=getPartWidth(part.nextParts.get(p),l)*(BLOCK_WIDTH+SPACE_HORIZONTAL);
+                    g.setColor(Color.black);
+                    g.drawLine(x, y+BLOCK_HEIGHT, cx+cellWidth/2, y+BLOCK_HEIGHT+SPACE_VERTICAL);
+                    paintPart(g,part.nextParts.get(p),y+BLOCK_HEIGHT+SPACE_VERTICAL,cx+cellWidth/2,used);
+                    cx+=cellWidth;
 
+                }
+            }
+
+        }
+
+        private int getPartHeight(GraphPart part,List<GraphPart> used){
+           if (used.contains(part)) {
+               return 1;
+           }
+           used.add(part);
+           int maxH=0;
+           for(int p=0;p<part.nextParts.size();p++){
+               int h=getPartHeight(part.nextParts.get(p),used);
+               if(h>maxH) maxH=h;
+           }
+           return 1+maxH;
+        }
+
+        private int getPartWidth(GraphPart part, List<GraphPart> used) {
+            
+            if (used.contains(part)) {
+                 return 1;
+            }
+            used.add(part);
+            if (part.nextParts.size() == 0) {
+                return 1;
+            }
+            int w = 0;
+            for (GraphPart subpart : part.nextParts) {
+                w += getPartWidth(subpart, used);
+            }            
+            return w;
+        }
     }
 
-    public GraphFrame(final Graph graph){
-        setSize(400,400);
-        graphTree=new JTree(new TreeModel(){
-            private String root="root";
-            public Object getRoot() {
-                return root;
-            }
-
-            public Object getChild(Object parent, int index) {
-                if(parent==root){
-                    return graph.parts.get(index);
-                }else{
-                    if(parent instanceof GraphDecision){
-                        if(index==0) return new DecisionItem((GraphDecision)parent,true);
-                        return new DecisionItem((GraphDecision)parent,false);
-                    }
-                    if(parent instanceof DecisionItem){
-                       DecisionItem di=(DecisionItem)parent;
-                       if(di.isTrue) return di.decision.onTrue.get(index);
-                       return di.decision.onFalse.get(index);
-                    }
-                }
-                return null;
-            }
-
-            public int getChildCount(Object parent) {
-                if(parent==root){
-                    return graph.parts.size();
-                }
-                if(parent instanceof GraphDecision){
-                    return 2;
-                }
-                if(parent instanceof DecisionItem){
-                       DecisionItem di=(DecisionItem)parent;
-                       if(di.isTrue) return di.decision.onTrue.size();
-                       return di.decision.onFalse.size();
-                    }
-                return 0;
-            }
-
-            public boolean isLeaf(Object node) {
-                return getChildCount(node)==0;
-            }
-
-            public void valueForPathChanged(TreePath path, Object newValue) {
-
-            }
-
-            public int getIndexOfChild(Object parent, Object child) {
-                if(parent==root){
-                    return graph.parts.indexOf(child);
-                }else{
-                    if(parent instanceof GraphDecision){
-                        if(child instanceof DecisionItem){
-                            DecisionItem di=(DecisionItem)child;
-                            if(di.isTrue) return 0;
-                            return 1;
-                        }
-                    }
-                    if(parent instanceof DecisionItem){
-                       DecisionItem di=(DecisionItem)parent;
-                       if(di.isTrue) return di.decision.onTrue.indexOf(child);
-                       return di.decision.onFalse.indexOf(child);
-                    }
-                }
-                return -1;
-            }
-
-            public void addTreeModelListener(TreeModelListener l) {
-
-            }
-
-            public void removeTreeModelListener(TreeModelListener l) {
-
-            }
-        });
-
-        Container cnt=getContentPane();
+    public GraphFrame(Graph graph,String name) {
+        setSize(500, 500);
+        Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
-        cnt.add(graphTree,BorderLayout.CENTER);
+        cnt.add(new JScrollPane(new GraphPanel(graph)));
+        setTitle("Graph "+name);
+        View.setWindowIcon(this);
+        View.centerScreen(this);
     }
 }

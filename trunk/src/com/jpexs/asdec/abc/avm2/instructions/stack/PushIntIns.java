@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,6 +20,7 @@ package com.jpexs.asdec.abc.avm2.instructions.stack;
 
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.avm2.treemodel.IntegerValueTreeItem;
@@ -34,6 +35,11 @@ public class PushIntIns extends InstructionDefinition {
 
     public PushIntIns() {
         super(0x2d, "pushint", new int[]{AVM2Code.DAT_INT_INDEX});
+    }
+
+    @Override
+    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        lda.operandStack.push(arguments.get(0));
     }
 
     @Override

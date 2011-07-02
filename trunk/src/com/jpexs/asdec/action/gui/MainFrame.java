@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -26,6 +26,9 @@ import com.jpexs.asdec.gui.View;
 import com.jpexs.asdec.helpers.Highlighting;
 import com.jpexs.asdec.tags.ASMSource;
 import com.jpexs.asdec.tags.Tag;
+import java.io.FileNotFoundException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import jsyntaxpane.DefaultSyntaxKit;
 
 import javax.swing.*;
@@ -39,6 +42,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -51,6 +56,8 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
     public JSplitPane splitPane;
     public JSplitPane splitPane2;
     public JButton saveButton = new JButton("Save");
+    public JButton saveHexButton = new JButton("Save hex");
+    public JButton loadHexButton = new JButton("Load hex");
     public JLabel asmLabel = new JLabel("P-code source (editable)");
     public JLabel decLabel = new JLabel("ActionScript source");
     public JPanel statusPanel = new JPanel();
@@ -81,8 +88,14 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
         JPanel buttonsPan = new JPanel();
         buttonsPan.setLayout(new FlowLayout());
         buttonsPan.add(saveButton);
+        //buttonsPan.add(saveHexButton);
+        //buttonsPan.add(loadHexButton);
         panB.add(buttonsPan, BorderLayout.SOUTH);
 
+        saveHexButton.addActionListener(this);
+        saveHexButton.setActionCommand("SAVEHEXACTION");
+        loadHexButton.addActionListener(this);
+        loadHexButton.setActionCommand("LOADHEXACTION");
         saveButton.addActionListener(this);
         saveButton.setActionCommand("SAVEACTION");
 
@@ -182,7 +195,8 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
                     @Override
                     public void run() {
                         editor.setText(asm.getASMSource(10)); //TODO:Ensure correct version here
-                        decompiledEditor.setText(Highlighting.stripHilights(com.jpexs.asdec.action.Action.actionsToSource(asm.getActions(), 10))); //TODO:Ensure correct version here
+                        if(Main.DO_DECOMPILE)
+                          decompiledEditor.setText(Highlighting.stripHilights(com.jpexs.asdec.action.Action.actionsToSource(asm.getActions(10), 10))); //TODO:Ensure correct version here
                         Main.stopWork();
                     }
                 }).start();
@@ -204,12 +218,48 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
             Main.showProxy();
         }
         if (Main.isWorking()) return;
+
+        if(e.getActionCommand().equals("SAVEHEXACTION")){
+            TagTreeItem ti = (TagTreeItem) tagTree.getLastSelectedPathComponent();
+            if (ti.tag instanceof ASMSource) {
+                ASMSource dat = (ASMSource) ti.tag;
+                FileOutputStream fos;
+                try {
+                    fos = new FileOutputStream("out.hex");
+                    fos.write(dat.getActionBytes());
+                    fos.close();
+                } catch (IOException ex) {
+
+                }
+
+            }
+        }
+
+        if(e.getActionCommand().equals("LOADHEXACTION")){
+            TagTreeItem ti = (TagTreeItem) tagTree.getLastSelectedPathComponent();
+            if (ti.tag instanceof ASMSource) {
+                ASMSource dat = (ASMSource) ti.tag;
+                FileInputStream fis;
+                try {
+                    fis = new FileInputStream("out.hex");
+                    byte data[]=new byte[fis.available()];
+                    dat.setActionBytes(data);
+                    fis.read(data);
+                    fis.close();
+                    editor.setText(dat.getASMSource(10));
+                } catch (IOException ex) {
+
+                }
+
+            }
+        }
+
         if (e.getActionCommand().equals("SAVEACTION")) {
             TagTreeItem ti = (TagTreeItem) tagTree.getLastSelectedPathComponent();
             if (ti.tag instanceof ASMSource) {
                 ASMSource dat = (ASMSource) ti.tag;
                 try {
-                    dat.setActions(ASMParser.parse(new ByteArrayInputStream(editor.getText().getBytes()), 10)); //TODO:Ensure correct version here
+                    dat.setActions(ASMParser.parse(new ByteArrayInputStream(editor.getText().getBytes()), 10),10); //TODO:Ensure correct version here
                 } catch (IOException ex) {
                 } catch (ParseException ex) {
                     JOptionPane.showMessageDialog(this, "" + ex.text + " on line " + ex.line, "Error", JOptionPane.ERROR_MESSAGE);

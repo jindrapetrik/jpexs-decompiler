@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -109,6 +109,45 @@ public class AVM2Instruction {
 
         }
         return ret;
+    }
+
+    public List getParamsAsList(ConstantPool constants){
+        List s = new ArrayList();
+        for (int i = 0; i < definition.operands.length; i++) {
+            switch (definition.operands[i]) {
+                case AVM2Code.DAT_MULTINAME_INDEX:
+                    s.add(constants.constant_multiname[operands[i]]);
+                    break;
+                case AVM2Code.DAT_STRING_INDEX:
+                    s.add(constants.constant_string[operands[i]]);
+                    break;
+                case AVM2Code.DAT_INT_INDEX:
+                    s.add(new Long(constants.constant_int[operands[i]]));
+                    break;
+                case AVM2Code.DAT_UINT_INDEX:
+                    s.add(new Long(constants.constant_uint[operands[i]]));
+                    break;
+                case AVM2Code.DAT_DOUBLE_INDEX:
+                    s.add(new Double(constants.constant_double[operands[i]]));
+                    break;
+                case AVM2Code.DAT_OFFSET:
+                    s.add(new Long(offset + operands[i] + getBytes().length));
+                    break;
+                case AVM2Code.DAT_CASE_BASEOFFSET:
+                    s.add(new Long(offset + operands[i]));
+                    break;
+                case AVM2Code.OPT_CASE_OFFSETS:
+                    s.add(new Long(operands[i]));
+                    for (int j = i + 1; j < operands.length; j++) {
+                        s.add(new Long(offset + operands[j]));
+                    }
+                    break;
+                default:
+                    s.add(new Long(operands[i]));
+            }
+
+        }
+        return s;
     }
 
     public String getParams(ConstantPool constants) {

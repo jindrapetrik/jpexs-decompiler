@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -43,7 +43,7 @@ public class NewFunctionIns extends InstructionDefinition {
         MethodBody mybody = abc.findBody(methodIndex);
         String bodyStr = "";
         if (mybody != null) {
-            bodyStr = mybody.toString(isStatic, classIndex, abc, constants, method_info, false);
+            bodyStr = mybody.toString(false,isStatic, classIndex, abc, constants, method_info, false);
         }
         stack.push(new NewFunctionTreeItem(ins, method_info[methodIndex].getParamStr(constants), method_info[methodIndex].getReturnTypeStr(constants), bodyStr));
     }

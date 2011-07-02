@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -22,7 +22,6 @@ import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
-import com.jpexs.asdec.abc.avm2.ConvertException;
 import com.jpexs.asdec.abc.avm2.flowgraph.Graph;
 import com.jpexs.asdec.abc.avm2.parser.ASM3Parser;
 import com.jpexs.asdec.abc.avm2.parser.ParseException;
@@ -30,6 +29,7 @@ import com.jpexs.asdec.abc.avm2.parser.ParseException;
 import javax.swing.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 
 
 public class ASMSourceEditorPane extends JEditorPane {
@@ -48,12 +48,23 @@ public class ASMSourceEditorPane extends JEditorPane {
     }
 
     public void graph(){
-        (new GraphFrame(new Graph(abc.bodies[bodyIndex].code))).setVisible(true);
+        Graph gr=new Graph(abc.bodies[bodyIndex].code);
+        //(new GraphTreeFrame(gr)).setVisible(true);
+        (new GraphFrame(gr,"")).setVisible(true);
+    }
+
+    public void exec(){
+       HashMap args=new HashMap();
+       args.put(0, new Object()); //object "this"
+       args.put(1, new Long(466561)); //param1
+       Object o=abc.bodies[bodyIndex].code.execute(args,abc.constants);
+       JOptionPane.showMessageDialog(this, "Returned object:"+o.toString());
     }
 
     public void save(ConstantPool constants) {
         try {
             AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(getText().getBytes()), constants, new DialogMissingSymbolHandler(),abc.bodies[bodyIndex]);
+            acode.getBytes(abc.bodies[bodyIndex].codeBytes);
             abc.bodies[bodyIndex].code = acode;
             Main.abcMainFrame.decompiledTextArea.reloadClass();
             Main.abcMainFrame.decompiledTextArea.gotoLastTrait();

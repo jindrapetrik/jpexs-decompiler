@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,6 +19,7 @@
 package com.jpexs.asdec.abc.avm2.instructions.localregs;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.avm2.treemodel.ClassTreeItem;
@@ -34,6 +35,11 @@ public class GetLocal0Ins extends InstructionDefinition implements GetLocalTypeI
 
     public GetLocal0Ins() {
         super(0xd0, "getlocal_0", new int[]{});
+    }
+
+    @Override
+    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        lda.operandStack.push(lda.localRegisters.get(0));
     }
 
     @Override

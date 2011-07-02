@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -52,21 +52,24 @@ public class MethodBody implements Cloneable {
         return code;
     }
 
-    public String toString(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[]) {
-        return toString(isStatic, classIndex, abc, constants, method_info, false);
+    public String toString(boolean pcode,boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[]) {
+        return toString(pcode,isStatic, classIndex, abc, constants, method_info, false);
     }
 
-    public String toString(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], boolean hilight) {
+    public String toString(boolean pcode,boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], boolean hilight) {
         String s = "";
 
         //s+="method_info="+method_info+" max_stack="+max_stack+" max_regs="+max_regs+" scope_depth="+scope_depth+" max_scope="+max_scope;
         //s+="\r\nCode:\r\n"+
-
+        if(pcode){
+         s+=code.toASMSource(constants, this);
+        }else{
         try {
             s += code.toSource(isStatic, classIndex, abc, constants, method_info, this, hilight);
             s = replaceParams(s, method_info);
         } catch (Exception ex) {
             s = "//error:" + ex.toString();
+        }
         }
         //s+="----------- ORIGINAL ------------\r\n";
         //s+=code.toString(constants);

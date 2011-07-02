@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -18,14 +18,13 @@
 
 package com.jpexs.asdec.abc.avm2;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Stack;
 
 
 public class LocalDataArea {
     public Stack operandStack = new Stack();
     public Stack scopeStack = new Stack();
-    public List localRegisters = new ArrayList<Object>();
+    public HashMap localRegisters = new HashMap<Integer,Object>();
 
 }

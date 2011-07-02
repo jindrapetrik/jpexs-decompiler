@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -29,6 +29,7 @@ import com.jpexs.asdec.action.parser.ParseException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ActionWith extends Action {
@@ -38,6 +39,7 @@ public class ActionWith extends Action {
     public ActionWith(SWFInputStream sis, int version) throws IOException {
         super(0x94, 2);
         size = sis.readUI16();
+        //actions = new ArrayList<Action>();
         actions = (new SWFInputStream(new ByteArrayInputStream(sis.readBytes(size)), version)).readActionList();
     }
 

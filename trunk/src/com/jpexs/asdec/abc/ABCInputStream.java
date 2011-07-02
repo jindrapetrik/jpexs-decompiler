@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -24,6 +24,8 @@ import com.jpexs.asdec.abc.types.traits.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ABCInputStream extends InputStream {
@@ -31,6 +33,7 @@ public class ABCInputStream extends InputStream {
     private InputStream is;
     private long bytesRead = 0;
     private ByteArrayOutputStream bufferOs = null;
+    public static boolean DEBUG_READ=false;
 
     public void startBuffer() {
         bufferOs = new ByteArrayOutputStream();
@@ -51,6 +54,10 @@ public class ABCInputStream extends InputStream {
     public int read() throws IOException {
         bytesRead++;
         int i = is.read();
+        if(DEBUG_READ)
+        {
+           System.out.println("Read:0x"+Integer.toHexString(i));
+        }
         if (bufferOs != null) {
             if (i != -1)
                 bufferOs.write(i);
@@ -165,27 +172,48 @@ public class ABCInputStream extends InputStream {
     }
 
     public Multiname readMultiname() throws IOException {
-        int kind = read();
+        int kind = readU8();
         int namespace_index = -1;
         int name_index = -1;
         int namespace_set_index = -1;
+        List<Integer> params=new ArrayList<Integer>();
 
         if ((kind == 7) || (kind == 0xd)) { // CONSTANT_QName and CONSTANT_QNameA.
             namespace_index = readU30();
             name_index = readU30();
         }
+        else
+        if ((kind == 0xf) || (kind == 0x10)) { //CONSTANT_RTQName and CONSTANT_RTQNameA
+            name_index = readU30();
+        }else
+        if((kind==0x11)||(kind==0x12))//kind==0x11,0x12 nothing CONSTANT_RTQNameL and CONSTANT_RTQNameLA.
+        {
+
+        }
+        else
         if ((kind == 9) || (kind == 0xe)) { // CONSTANT_Multiname and CONSTANT_MultinameA.
             name_index = readU30();
             namespace_set_index = readU30();
         }
-        if ((kind == 0xf) || (kind == 0x10)) { //CONSTANT_RTQName and CONSTANT_RTQNameA
-            name_index = readU30();
-        }
+        else
         if ((kind == 0x1B) || (kind == 0x1C)) { //CONSTANT_MultinameL and CONSTANT_MultinameLA
             namespace_set_index = readU30();
         }
-        //kind==0x11,0x12 nothing CONSTANT_RTQNameL and CONSTANT_RTQNameLA.
-        return new Multiname(kind, name_index, namespace_index, namespace_set_index);
+        else if(kind==0x1D)
+        {
+           //Constant_TypeName
+           name_index=readU30();
+           int paramsLength=readU30();
+           for(int i=0;i<paramsLength;i++){
+              params.add(readU30());
+           }           
+        }
+        else{
+           System.err.println("Unknown kind of Multiname:0x"+Integer.toHexString(kind));
+           System.exit(1);
+        }
+        
+        return new Multiname(kind, name_index, namespace_index, namespace_set_index,params);
     }
 
     public MethodInfo readMethodInfo() throws IOException {

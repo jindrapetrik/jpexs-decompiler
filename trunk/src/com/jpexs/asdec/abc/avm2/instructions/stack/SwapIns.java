@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -20,6 +20,7 @@ package com.jpexs.asdec.abc.avm2.instructions.stack;
 
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
@@ -34,6 +35,14 @@ public class SwapIns extends InstructionDefinition {
 
     public SwapIns() {
         super(0x2b, "swap", new int[]{});
+    }
+
+    @Override
+    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        Object obj1 = lda.operandStack.pop();
+        Object obj2 = lda.operandStack.pop();
+        lda.operandStack.push(obj1);
+        lda.operandStack.push(obj2);
     }
 
     @Override

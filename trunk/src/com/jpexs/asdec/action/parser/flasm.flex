@@ -86,6 +86,7 @@ OctDigit          = [0-7]
 StringCharacter = [^\r\n\"\\]
 
 Register= register{NumberLiteral}
+Constant= constant{NumberLiteral}
 
 %state STRING,PARAMETERS
 
@@ -129,6 +130,8 @@ Register= register{NumberLiteral}
   {Undefined}                {return new ParsedSymbol(ParsedSymbol.TYPE_UNDEFINED,new Undefined());}
 
   {Register}              { return new ParsedSymbol(ParsedSymbol.TYPE_REGISTER,new RegisterNumber(Integer.parseInt(yytext().substring(8))));  }
+  {Constant}              { return new ParsedSymbol(ParsedSymbol.TYPE_CONSTANT,new ConstantIndex(Integer.parseInt(yytext().substring(8))));  }
+
   {Identifier}            { return new ParsedSymbol(ParsedSymbol.TYPE_IDENTIFIER,yytext());  }
       
 }

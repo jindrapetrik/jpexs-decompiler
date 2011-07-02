@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -239,6 +239,7 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
             catchedContentTypes.add("application/x-shockwave-flash");
             catchedContentTypes.add("application/x-javascript");
             catchedContentTypes.add("text/javascript");
+            catchedContentTypes.add("application/json");
             catchedContentTypes.add("text/xml");
             catchedContentTypes.add("application/xml");
             Server.startServer(port, Main.replacements, catchedContentTypes, this, this);
@@ -310,7 +311,7 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
     public void catched(String contentType, String url, InputStream data) {
         if (contentType.contains(";")) contentType = contentType.substring(0, contentType.indexOf(";"));
         if ((!sniffSWFCheckBox.isSelected()) && (contentType.equals("application/x-shockwave-flash"))) return;
-        if ((!sniffJSCheckBox.isSelected()) && (contentType.equals("application/x-javascript") || contentType.equals("text/javascript")))
+        if ((!sniffJSCheckBox.isSelected()) && (contentType.equals("application/x-javascript") || contentType.equals("text/javascript")|| contentType.equals("application/json")))
             return;
         if ((!sniffXMLCheckBox.isSelected()) && (contentType.equals("application/xml") || contentType.equals("text/xml")))
             return;

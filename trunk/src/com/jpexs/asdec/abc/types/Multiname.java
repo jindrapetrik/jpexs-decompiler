@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,34 +19,39 @@
 package com.jpexs.asdec.abc.types;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
+import java.util.List;
 
 
 public class Multiname {
 
     public static final int QNAME = 7;
-    public static final int QNAMEA = 13;
-    public static final int MULTINAME = 9;
-    public static final int MULTINAMEA = 14;
-    public static final int RTQNAME = 15;
-    public static final int RTQNAMEA = 16;
-    public static final int MULTINAMEL = 27;
-    public static final int RTQNAMEL = 17;
-    public static final int RTQNAMELA = 18;
-    private static final int multinameKinds[] = new int[]{QNAME, QNAMEA, MULTINAME, MULTINAMEA, RTQNAME, RTQNAMEA, MULTINAMEL, RTQNAMEL, RTQNAMELA};
-    private static final String multinameKindNames[] = new String[]{"Qname", "QnameA", "Multiname", "MultinameA", "RTQname", "RTQnameA", "MultinameL", "RTQnameL", "RTQnameLA"};
+    public static final int QNAMEA = 0x0d;
+    public static final int RTQNAME = 0x0f;
+    public static final int RTQNAMEA = 0x10;
+    public static final int RTQNAMEL = 0x11;
+    public static final int RTQNAMELA = 0x12;
+    public static final int MULTINAME = 0x09;
+    public static final int MULTINAMEA = 0x0e;
+    public static final int MULTINAMEL = 0x1b;
+    public static final int MULTINAMELA = 0x1c;
+    public static final int TYPENAME = 0x1d;
+    private static final int multinameKinds[] = new int[]{QNAME, QNAMEA, MULTINAME, MULTINAMEA, RTQNAME, RTQNAMEA, MULTINAMEL, RTQNAMEL, RTQNAMELA,MULTINAMELA,TYPENAME};
+    private static final String multinameKindNames[] = new String[]{"Qname", "QnameA", "Multiname", "MultinameA", "RTQname", "RTQnameA", "MultinameL", "RTQnameL", "RTQnameLA","MultinameLA","TypeName"};
 
 
     public int kind = -1;
     public int name_index = -1;
     public int namespace_index = -1;
     public int namespace_set_index = -1;
+    public List<Integer> params;
 
 
-    public Multiname(int kind, int name_index, int namespace_index, int namespace_set_index) {
+    public Multiname(int kind, int name_index, int namespace_index, int namespace_set_index,List<Integer> params) {
         this.kind = kind;
         this.name_index = name_index;
         this.namespace_index = namespace_index;
         this.namespace_set_index = namespace_set_index;
+        this.params=params;
     }
 
     public boolean isAttribute() {
@@ -54,6 +59,7 @@ public class Multiname {
         if (kind == MULTINAMEA) return true;
         if (kind == RTQNAMEA) return true;
         if (kind == RTQNAMELA) return true;
+        if (kind == MULTINAMELA) return true;
         return false;
     }
 
@@ -61,6 +67,7 @@ public class Multiname {
         if (kind == RTQNAME) return true;
         if (kind == RTQNAMEA) return true;
         if (kind == MULTINAMEL) return true;
+        if (kind == MULTINAMELA) return true;
         return false;
     }
 
@@ -68,6 +75,7 @@ public class Multiname {
         if (kind == RTQNAMEL) return true;
         if (kind == RTQNAMELA) return true;
         if (kind == MULTINAMEL) return true;
+        if (kind == MULTINAMELA) return true;
         return false;
     }
 

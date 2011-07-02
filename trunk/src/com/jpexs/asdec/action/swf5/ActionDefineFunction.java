@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -41,12 +41,15 @@ public class ActionDefineFunction extends Action {
 
     public ActionDefineFunction(int actionLength, SWFInputStream sis, int version) throws IOException {
         super(0x9B, actionLength);
+        //byte data[]=sis.readBytes(actionLength);
+        //sis=new SWFInputStream(new ByteArrayInputStream(data),version);
         functionName = sis.readString();
         int numParams = sis.readUI16();
         for (int i = 0; i < numParams; i++) {
             paramNames.add(sis.readString());
         }
         codeSize = sis.readUI16();
+        //code = new ArrayList<Action>();
         code = (new SWFInputStream(new ByteArrayInputStream(sis.readBytes(codeSize)), version)).readActionList();
     }
 

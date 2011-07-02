@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@ import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.GotoLabelTreeItem;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 import com.jpexs.asdec.helpers.Helper;
+import java.io.ByteArrayInputStream;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,8 +37,10 @@ import java.util.Stack;
 public class ActionGoToLabel extends Action {
     public String label;
 
-    public ActionGoToLabel(int actionLength, SWFInputStream sis) throws IOException {
+    public ActionGoToLabel(int actionLength, SWFInputStream sis,int version) throws IOException {
         super(0x8C, actionLength);
+        byte data[]=sis.readBytes(actionLength);
+        sis=new SWFInputStream(new ByteArrayInputStream(data),version);
         label = sis.readString();
     }
 

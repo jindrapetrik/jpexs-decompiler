@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -110,7 +110,7 @@ public class SWFInputStream extends InputStream {
         int r = 0;
         while (true) {
             r = read();
-            if (r == 0) return new String(baos.toByteArray(), "utf8");
+            if (r <= 0) return new String(baos.toByteArray(), "utf8");
             baos.write(r);
         }
     }
@@ -268,6 +268,7 @@ public class SWFInputStream extends InputStream {
      * @throws IOException
      */
     public byte[] readBytes(long count) throws IOException {
+        if(count<=0) return new byte[0];
         byte ret[] = new byte[(int) count];
         for (int i = 0; i < count; i++) {
             ret[i] = (byte) read();
@@ -496,7 +497,7 @@ public class SWFInputStream extends InputStream {
                 case 0x81:
                     return new ActionGotoFrame(this);
                 case 0x83:
-                    return new ActionGetURL(actionLength, this);
+                    return new ActionGetURL(actionLength, this,version);
                 case 0x04:
                     return new ActionNextFrame();
                 case 0x05:
@@ -512,9 +513,9 @@ public class SWFInputStream extends InputStream {
                 case 0x8A:
                     return new ActionWaitForFrame(this);
                 case 0x8B:
-                    return new ActionSetTarget(actionLength, this);
+                    return new ActionSetTarget(actionLength, this,version);
                 case 0x8C:
-                    return new ActionGoToLabel(actionLength, this);
+                    return new ActionGoToLabel(actionLength, this,version);
                 //SWF4 Actions
                 case 0x96:
                     return new ActionPush(actionLength, this, version);
@@ -604,7 +605,7 @@ public class SWFInputStream extends InputStream {
                 case 0x52:
                     return new ActionCallMethod();
                 case 0x88:
-                    return new ActionConstantPool(actionLength, this);
+                    return new ActionConstantPool(actionLength, this,version);
                 case 0x9B:
                     return new ActionDefineFunction(actionLength, this, version);
                 case 0x3C:
@@ -811,7 +812,8 @@ public class SWFInputStream extends InputStream {
             ret.keyCode = readUI8();
             actionRecordSize--;
         }
-        ret.actions = (new SWFInputStream(new ByteArrayInputStream(readBytes(actionRecordSize)), version)).readActionList();
+        ret.actionBytes=readBytes(actionRecordSize);
+        //ret.actions = (new SWFInputStream(new ByteArrayInputStream(readBytes(actionRecordSize)), version)).readActionList();
         return ret;
     }
 
@@ -1154,7 +1156,7 @@ public class SWFInputStream extends InputStream {
     public BUTTONCONDACTION readBUTTONCONDACTION() throws IOException {
         BUTTONCONDACTION ret = new BUTTONCONDACTION();
         int condActionSize = readUI16();
-        ret.isLast = condActionSize == 0;
+        ret.isLast = condActionSize <= 0;
         ret.condIdleToOverDown = readUB(1) == 1;
         ret.condOutDownToIdle = readUB(1) == 1;
         ret.condOutDownToOverDown = readUB(1) == 1;
@@ -1165,7 +1167,20 @@ public class SWFInputStream extends InputStream {
         ret.condIdleToOverUp = readUB(1) == 1;
         ret.condKeyPress = (int) readUB(7);
         ret.condOverDownToIddle = readUB(1) == 1;
-        ret.actions = readActionList();
+        if(condActionSize<=0){
+            ret.actionBytes=readBytes(available());
+        }else{
+            ret.actionBytes=readBytes(condActionSize-4);
+        }
+        //ret.actions = readActionList();
         return ret;
     }
+
+    @Override
+    public int available() throws IOException {
+        return is.available();
+    }
+
+
+
 }

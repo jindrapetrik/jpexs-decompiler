@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -68,13 +68,14 @@ public class DoABCTag extends Tag {
      * @throws IOException
      */
     public DoABCTag(byte[] data, int version) {
-        super(82, data);
+        super(82, data);       
         try {
             InputStream is = new ByteArrayInputStream(data);
             SWFInputStream sis = new SWFInputStream(is, version);
             flags = sis.readUI32();
             name = sis.readString();
             abc = new ABC(is);
+
         } catch (IOException e) {
 
         }

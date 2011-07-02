@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -43,14 +43,14 @@ public class DecLocalIIns extends InstructionDefinition {
         Object obj = lda.localRegisters.get(locRegIndex);
         if (obj instanceof Long) {
             Long obj2 = ((Long) obj).longValue() - 1;
-            lda.localRegisters.set(locRegIndex, obj2);
+            lda.localRegisters.put(locRegIndex, obj2);
         } else if (obj instanceof Double) {
             Double obj2 = ((Double) obj).doubleValue() - 1;
-            lda.localRegisters.set(locRegIndex, obj2);
+            lda.localRegisters.put(locRegIndex, obj2);
         }
         if (obj instanceof String) {
             Double obj2 = Double.parseDouble((String) obj) - 1;
-            lda.localRegisters.set(locRegIndex, obj2);
+            lda.localRegisters.put(locRegIndex, obj2);
         } else {
             throw new RuntimeException("Cannot decrement local register");
         }
