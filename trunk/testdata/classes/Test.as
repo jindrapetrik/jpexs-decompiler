@@ -309,5 +309,24 @@ public class Test {
          var e=(a==b)?((c==d)?1:7):3;
          trace("e="+e);         
       }
+	  
+	  public function testInnerIf(){
+		  var a=5;
+		  var b=4;
+		  if(a==5){
+			  if(b==6){
+				  trace("b==6");
+			  }else{
+				  trace("b!=6");
+			  }
+		  }else{
+			  if(b==7){
+				  trace("b==7");
+			  }else{
+				  trace("b!=7");
+			  } 
+		  }
+		  trace("end");
+	  }
    }
 }
