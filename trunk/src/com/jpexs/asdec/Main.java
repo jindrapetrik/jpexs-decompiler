@@ -343,8 +343,6 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
-        updateLicenseInDir(new File("src"));
-        System.exit(0);
         View.setWinLookAndFeel();
         loadReplacements();
         if (args.length < 1) {
