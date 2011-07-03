@@ -22,6 +22,11 @@ import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.asdec.abc.avm2.treemodel.CallMethodTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.CallPropertyTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.CallStaticTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.CallSuperTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.CallTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.MethodInfo;
 
@@ -43,6 +48,30 @@ public class PopIns extends InstructionDefinition {
     @Override
     public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc) {
         if (stack.size() > 0)
-            stack.pop();
+        {
+            TreeItem top=stack.pop();
+            if(top instanceof CallPropertyTreeItem)
+            {
+               output.add(top);
+            }else
+            if(top instanceof CallSuperTreeItem)
+            {
+               output.add(top);
+            }else
+            if(top instanceof CallStaticTreeItem)
+            {
+               output.add(top);
+            }
+            else
+            if(top instanceof CallMethodTreeItem)
+            {
+               output.add(top);
+            }
+            else
+            if(top instanceof CallTreeItem)
+            {
+               output.add(top);
+            }
+        }
     }
 }

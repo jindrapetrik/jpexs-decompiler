@@ -207,7 +207,7 @@ public class ABCInputStream extends InputStream {
            int paramsLength=readU30();
            for(int i=0;i<paramsLength;i++){
               params.add(readU30()); //multiname indices!
-           }           
+           }
         }
         else{
            System.err.println("Unknown kind of Multiname:0x"+Integer.toHexString(kind));

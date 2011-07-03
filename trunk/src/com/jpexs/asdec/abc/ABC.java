@@ -113,7 +113,7 @@ public class ABC {
         //System.out.println("Reading "+constant_multiname_pool_count+" multinames");
         constants.constant_multiname = new Multiname[constant_multiname_pool_count];
         for (int i = 1; i < constant_multiname_pool_count; i++) { //index 0 not used. Values 1..n-1
-            constants.constant_multiname[i] = ais.readMultiname();
+            constants.constant_multiname[i] = ais.readMultiname();            
             //System.out.println("Multiname read:"+constants.constant_multiname[i]);
             //cleanNamespace(constants.constant_multiname[i].name_index);
         }

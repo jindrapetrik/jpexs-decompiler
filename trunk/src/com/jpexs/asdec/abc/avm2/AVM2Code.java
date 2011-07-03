@@ -89,7 +89,7 @@ public class AVM2Code {
             new AddIns(),
             new InstructionDefinition(0x9b,"add_d",new int[]{}),
             new AddIIns(),
-            new InstructionDefinition(0x53,"applytype",new int[]{AVM2Code.OPT_U30}),
+            new ApplyTypeIns(),
             new AsTypeIns(),
             new AsTypeLateIns(),
             new BitAndIns(),
@@ -1301,7 +1301,7 @@ public class AVM2Code {
                 throw (UnknownJumpException) ex;
             }
             throw new ConvertException(ex.toString(), ip);
-        }
+    }
     }
 
     public String tabString(int len) {

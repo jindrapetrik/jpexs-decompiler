@@ -137,25 +137,34 @@ public class Multiname {
         }
         String typeNameStr="";
         if(kind==TYPENAME){
-            typeNameStr="Type: "+constants.constant_multiname[qname_index].toString(constants);
-            if(!params.isEmpty()){
-               typeNameStr+="<";
-               for(int i=0;i<params.size();i++)
-               {
-                  if(i>0){
-                     typeNameStr+=",";
-                  }
-                  typeNameStr+=constants.constant_multiname[params.get(i)].toString(constants);
-               }
-               typeNameStr+=">";
-            }
+            typeNameStr=typeNameToStr(constants);
         }
 
         return namespaceStr + nameStr + namespaceSetStr + typeNameStr;
 
     }
 
+    private String typeNameToStr(ConstantPool constants){
+         String typeNameStr=constants.constant_multiname[qname_index].getName(constants);
+         if(!params.isEmpty()){
+            typeNameStr+=".<";
+            for(int i=0;i<params.size();i++)
+            {
+               if(i>0){
+                  typeNameStr+=",";
+               }
+               typeNameStr+=constants.constant_multiname[params.get(i)].getName(constants);
+            }
+            typeNameStr+=">";
+         }
+         return typeNameStr;
+    }
+
     public String getName(ConstantPool constants) {
+        if(kind==TYPENAME)
+        {
+           return typeNameToStr(constants);
+        }
         if (name_index == -1) {
             return "";
         }
