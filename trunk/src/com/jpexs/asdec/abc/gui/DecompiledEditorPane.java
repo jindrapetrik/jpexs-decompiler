@@ -38,6 +38,17 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
    private int classIndex;
    public int lastTraitIndex = 0;
 
+   public void setNoTrait()
+   {
+      Main.abcMainFrame.sourceTextArea.setText("");
+               Main.abcMainFrame.methodBodyPanel.loadFromBody(null);
+               Main.abcMainFrame.methodBodyLabel.setText("Uneditable trait");
+               Main.abcMainFrame.methodBodyPanel.setVisible(false);
+               Main.abcMainFrame.sourceTextArea.setVisible(false);
+               Main.abcMainFrame.buttonsPanel.setVisible(false);
+               Main.abcMainFrame.sourceTextArea.bodyIndex=-1;
+   }
+
    public void caretUpdate(CaretEvent e) {
       getCaret().setVisible(true);
       int pos = getCaretPosition();
@@ -45,10 +56,13 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
          if ((pos >= th.startPos) && (pos < th.startPos + th.len)) {
 
             int bi = abc.findBodyIndex(abc.findMethodIdByTraitId(classIndex, (int) th.offset));
-            if (bi == -1) {
-               Main.abcMainFrame.sourceTextArea.setText("");
+            if ((bi == -1)||(bi==0)) {
+               setNoTrait();
                break;
             }
+            Main.abcMainFrame.methodBodyPanel.setVisible(true);
+            Main.abcMainFrame.sourceTextArea.setVisible(true);
+            Main.abcMainFrame.buttonsPanel.setVisible(true);
             lastTraitIndex = (int) th.offset;
             if (Main.abcMainFrame.sourceTextArea.bodyIndex != bi) {
                /*try {
@@ -57,6 +71,8 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
                Logger.getLogger(DecompiledEditorPane.class.getName()).log(Level.SEVERE, null, ex);
                }*/
                Main.abcMainFrame.sourceTextArea.setBodyIndex(bi, abc);
+               Main.abcMainFrame.methodBodyPanel.loadFromBody(abc.bodies[bi]);
+               Main.abcMainFrame.methodBodyLabel.setText("Method body #"+bi);
             }
             for (Highlighting h : highlights) {
                if ((pos >= h.startPos) && (pos < h.startPos + h.len)) {
@@ -68,8 +84,10 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
                   break;
                }
             }
-         }
+            return;
+         }         
       }
+      setNoTrait();
    }
 
    private class BufferedClass {
@@ -91,22 +109,19 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
    }
 
    public void gotoTrait(int traitId) {
+      if(traitId==-1)
+      {
+         setCaretPosition(0);
+         return;
+      }
       for (Highlighting th : traitHighlights) {
          if (th.offset == traitId) {
             setCaretPosition(th.startPos + th.len - 1);
             setCaretPosition(th.startPos);
-            break;
+            return;
          }
       }
-      int mi = abc.findMethodIdByTraitId(classIndex, traitId);
-      int bi = abc.findBodyIndex(mi);
-      if (bi == -1) {
-         Main.abcMainFrame.sourceTextArea.setText("");
-         return;
-      }
-      if (Main.abcMainFrame.sourceTextArea.bodyIndex != bi) {
-         Main.abcMainFrame.sourceTextArea.setBodyIndex(bi, abc);
-      }
+      setCaretPosition(0);
    }
 
    public DecompiledEditorPane() {
@@ -142,6 +157,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
          bufferedClasses.remove(classIndex);
       }
       setClassIndex(classIndex, abc);
+      setNoTrait();
    }
 
    public void setABC(ABC abc) {

@@ -61,20 +61,19 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane {
        JOptionPane.showMessageDialog(this, "Returned object:"+o.toString());
     }
 
-    public void save(ConstantPool constants) {
+    public boolean save(ConstantPool constants) {
         try {
             AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(getText().getBytes()), constants, new DialogMissingSymbolHandler(),abc.bodies[bodyIndex]);
             acode.getBytes(abc.bodies[bodyIndex].codeBytes);
-            abc.bodies[bodyIndex].code = acode;
-            Main.abcMainFrame.decompiledTextArea.reloadClass();
-            Main.abcMainFrame.decompiledTextArea.gotoLastTrait();
+            abc.bodies[bodyIndex].code = acode;            
         } catch (IOException ex) {
         } catch (ParseException ex) {
             JOptionPane.showMessageDialog(this, (ex.text + " on line " + ex.line));
             selectLine((int) ex.line);
-            return;
+            return false;
         }
         JOptionPane.showMessageDialog(this, ("Code Saved"));
+        return true;
     }
 
     public void verify(ConstantPool constants, ABC abc) {

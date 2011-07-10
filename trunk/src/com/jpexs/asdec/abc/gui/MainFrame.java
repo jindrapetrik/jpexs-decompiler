@@ -61,6 +61,10 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
     public JLabel statusLabel = new JLabel("");
     public JLabel asmLabel = new JLabel("P-code source (editable)");
     public JLabel decLabel = new JLabel("ActionScript source");
+    public MethodBodyPanel methodBodyPanel;
+    public JLabel methodBodyLabel;
+    public  JPanel detailPanel;
+    public JPanel buttonsPanel;
 
     public void setStatus(String s) {
         if (s.equals("")) {
@@ -166,7 +170,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
         DefaultSyntaxKit.initKit();
 
         this.list = list;
-        setSize(800, 600);
+        setSize(1024, 600);
         this.abc = list.get(listIndex).abc;
         getContentPane().setLayout(new BorderLayout());
         sourceTextArea = new ASMSourceEditorPane();
@@ -175,8 +179,8 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
         rightPanel.setLayout(new BorderLayout());
         rightPanel.add(new JScrollPane(sourceTextArea), BorderLayout.CENTER);
         sourceTextArea.setContentType("text/flasm3");               
-        JPanel buttonsPan = new JPanel();
-        buttonsPan.setLayout(new FlowLayout());
+        buttonsPanel = new JPanel();
+        buttonsPanel.setLayout(new FlowLayout());
         JButton verifyButton = new JButton("Verify");
         verifyButton.setActionCommand("VERIFYBODY");
         verifyButton.addActionListener(this);
@@ -194,20 +198,35 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
         execButton.addActionListener(this);
 
         //buttonsPan.add(graphButton);
-        buttonsPan.add(saveButton);
+        buttonsPanel.add(saveButton);
        // buttonsPan.add(execButton);
-        rightPanel.add(buttonsPan, BorderLayout.SOUTH);
+        rightPanel.add(buttonsPanel, BorderLayout.SOUTH);
         decompiledTextArea = new DecompiledEditorPane();
 
         decompiledScrollPane = new JScrollPane(decompiledTextArea);
 
-        JPanel panA = new JPanel();
-        panA.setLayout(new BorderLayout());
-        panA.add(rightPanel, BorderLayout.CENTER);
-        panA.add(asmLabel, BorderLayout.NORTH);
+        detailPanel=new JPanel();
+        detailPanel.setLayout(new BorderLayout());
+        methodBodyPanel=new MethodBodyPanel();
+        JPanel methodBodyPanel1=new JPanel();
+        methodBodyPanel1.setLayout(new BorderLayout());
+        methodBodyPanel1.add(methodBodyPanel,BorderLayout.CENTER);
 
-        asmLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        asmLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        methodBodyLabel=new JLabel("Method body");
+        methodBodyLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        methodBodyLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        methodBodyPanel1.add(methodBodyLabel,BorderLayout.NORTH);
+
+        detailPanel.add(methodBodyPanel1,BorderLayout.NORTH);
+
+        JPanel pcodePanel = new JPanel();
+        pcodePanel.setLayout(new BorderLayout());
+        pcodePanel.add(rightPanel, BorderLayout.CENTER);
+        //pcodePanel.add(asmLabel, BorderLayout.NORTH);
+
+        detailPanel.add(pcodePanel,BorderLayout.CENTER);
+        //asmLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        //asmLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
         JPanel panB = new JPanel();
         panB.setLayout(new BorderLayout());
         panB.add(decompiledScrollPane, BorderLayout.CENTER);
@@ -215,9 +234,9 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
         decLabel.setHorizontalAlignment(SwingConstants.CENTER);
         decLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
         splitPane1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                panB, panA);
+                panB, detailPanel);
         decompiledTextArea.setContentType("text/actionscript");
-
+        
         JPanel pan2 = new JPanel();
         pan2.setLayout(new BorderLayout());
         pan2.add((abcComboBox = new JComboBox(new ABCComboBoxModel(list))), BorderLayout.NORTH);
@@ -364,7 +383,13 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
             sourceTextArea.verify(abc.constants, abc);
         }
         if (e.getActionCommand().equals("SAVEBODY")) {
-            sourceTextArea.save(abc.constants);
+            if(sourceTextArea.save(abc.constants))
+            {
+                  methodBodyPanel.save();
+                  int lasttrait=decompiledTextArea.lastTraitIndex;
+                  Main.abcMainFrame.decompiledTextArea.reloadClass();
+                  Main.abcMainFrame.decompiledTextArea.gotoTrait(lasttrait);
+            }
         }
         if (e.getActionCommand().equals("SAVE")) {
             try {
