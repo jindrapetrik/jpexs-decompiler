@@ -103,17 +103,20 @@ public class ASMSourceEditorPane extends JEditorPane {
         int dot = -2;
         for (int i = 0; i < text.length(); i++) {
             if (text.charAt(i) == '\n') {
-                if (!((i > 0) && (text.charAt(i - 1) == ':')))
-                    instrCount++;
+                
                 lineCnt++;
-                if (instrCount == pos) {
-                    lineStart = i;
-                    dot = lineCnt;
+                lineEnd=i;
+                String ins=text.substring(lineStart,lineEnd).trim();
+                if (!((i > 0) && (text.charAt(i - 1) == ':')))
+                {
+                    if(!ins.startsWith("exception ")){
+                       instrCount++;
+                    }
                 }
-                if (lineCnt == dot + 1) {
-                    lineEnd = i;
+                if (instrCount == pos+1) {
                     break;
                 }
+                lineStart = i;
             }
         }
         if (lineCnt == -1) {
