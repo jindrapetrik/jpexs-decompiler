@@ -3,6 +3,7 @@
 public class Test {
 	private var testPriv:int=5;
 	protected var testProt:int=9;
+	public var vec:Vector.<String>=new Vector.<String>();
 	
 	
 	public function testHello(){
@@ -327,6 +328,26 @@ public class Test {
 			  } 
 		  }
 		  trace("end");
+	  }
+	  
+	  public function testVector(){
+		  var v:Vector.<String> = new Vector.<String>();
+		  v.push("ahoj");
+		  v[0]="nazdar";
+		  v[5*8-39]="nazdar2";		  
+		  trace(v[0]);
+		  
+		  vec.push("atribute ahoj");
+		  vec[2*6-11]="atribute cau";
+	  }
+	  
+	  public function testProperty(){
+		  var d=new TestClass1();
+		  var k=7+8;
+		  if(k==15)
+		  {
+		  	d.metoda(d.attrib*5);
+		  }
 	  }
    }
 }
