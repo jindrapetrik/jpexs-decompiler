@@ -46,7 +46,7 @@ public class ConstructSuperTreeItem extends TreeItem {
         }
         String calee = object.toString(constants) + ".";
         if (Highlighting.stripHilights(calee).equals("this.")) calee = "";
-        return calee + hilight("super(") + argStr + hilight(")");
+        return calee + hilight("super(") + argStr + hilight(");");
 
     }
 

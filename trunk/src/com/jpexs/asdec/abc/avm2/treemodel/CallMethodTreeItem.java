@@ -45,7 +45,7 @@ public class CallMethodTreeItem extends TreeItem {
             }
             args = args + arguments.get(a).toString(constants);
         }
-        return receiver.toString(constants) + "." + methodName + hilight("(") + args + hilight(")");
+        return receiver.toString(constants) + hilight(".") + methodName + hilight("(") + args + hilight(")");
     }
 
 

@@ -43,11 +43,11 @@ public class CallPropertyTreeItem extends TreeItem {
         String args = "";
         for (int a = 0; a < arguments.size(); a++) {
             if (a > 0) {
-                args = args + ",";
+                args = args + hilight(",");
             }
             args = args + arguments.get(a).toString(constants);
         }
-        return formatProperty(constants, receiver, propertyName) + "(" + args + ")" + (isVoid ? ";" : "");
+        return formatProperty(constants, receiver, propertyName) + hilight("(") + args + hilight(")") + (isVoid ? ";" : "");
     }
 
 
