@@ -174,12 +174,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
         JPanel rightPanel = new JPanel();
         rightPanel.setLayout(new BorderLayout());
         rightPanel.add(new JScrollPane(sourceTextArea), BorderLayout.CENTER);
-        sourceTextArea.setContentType("text/flasm3");       
-        ActionMap am=sourceTextArea.getActionMap();
-        ComboCompletionAction cca=(ComboCompletionAction)am.get("combo-completion");
-        List<String> items=new ArrayList<String>();
-        items.add("ahoj");
-        cca.setItems(items);
+        sourceTextArea.setContentType("text/flasm3");               
         JPanel buttonsPan = new JPanel();
         buttonsPan.setLayout(new FlowLayout());
         JButton verifyButton = new JButton("Verify");

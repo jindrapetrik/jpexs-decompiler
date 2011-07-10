@@ -30,8 +30,8 @@ public class MethodBody implements Cloneable {
     public int method_info;
     public int max_stack;
     public int max_regs;
-    public int scope_depth;
-    public int max_scope;
+    public int init_scope_depth;
+    public int max_scope_depth;
     public byte codeBytes[];
     public AVM2Code code;
     public ABCException exceptions[] = new ABCException[0];
@@ -40,7 +40,7 @@ public class MethodBody implements Cloneable {
     @Override
     public String toString() {
         String s = "";
-        s += "method_info=" + method_info + " max_stack=" + max_stack + " max_regs=" + max_regs + " scope_depth=" + scope_depth + " max_scope=" + max_scope;
+        s += "method_info=" + method_info + " max_stack=" + max_stack + " max_regs=" + max_regs + " scope_depth=" + init_scope_depth + " max_scope=" + max_scope_depth;
         s += "\r\nCode:\r\n" + code.toString();
         return s;
     }
@@ -87,10 +87,10 @@ public class MethodBody implements Cloneable {
         ret.codeBytes = codeBytes;
         ret.exceptions = exceptions;
         ret.max_regs = max_regs;
-        ret.max_scope = max_scope;
+        ret.max_scope_depth = max_scope_depth;
         ret.max_stack = max_stack;
         ret.method_info = method_info;
-        ret.scope_depth = scope_depth;
+        ret.init_scope_depth = init_scope_depth;
         ret.traits = traits; //maybe deep clone
         return ret;
     }

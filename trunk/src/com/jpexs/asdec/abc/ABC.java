@@ -169,8 +169,8 @@ public class ABC {
             bodies[i].method_info = ais.readU30();
             bodies[i].max_stack = ais.readU30();
             bodies[i].max_regs = ais.readU30();
-            bodies[i].scope_depth = ais.readU30();
-            bodies[i].max_scope = ais.readU30();
+            bodies[i].init_scope_depth = ais.readU30();
+            bodies[i].max_scope_depth = ais.readU30();
             int code_length = ais.readU30();
             bodies[i].codeBytes = new byte[code_length];
             for (int j = 0; j < code_length; j++) {
@@ -279,8 +279,8 @@ public class ABC {
             aos.writeU30(bodies[i].method_info);
             aos.writeU30(bodies[i].max_stack);
             aos.writeU30(bodies[i].max_regs);
-            aos.writeU30(bodies[i].scope_depth);
-            aos.writeU30(bodies[i].max_scope);
+            aos.writeU30(bodies[i].init_scope_depth);
+            aos.writeU30(bodies[i].max_scope_depth);
             byte codeBytes[] = bodies[i].code.getBytes();
             aos.writeU30(codeBytes.length);
             try {
