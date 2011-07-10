@@ -32,7 +32,10 @@ import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import jsyntaxpane.actions.ComboCompletionAction;
+import jsyntaxpane.syntaxkits.Flasm3SyntaxKit;
 
 
 public class MainFrame extends JFrame implements ActionListener, ItemListener {
@@ -171,7 +174,12 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
         JPanel rightPanel = new JPanel();
         rightPanel.setLayout(new BorderLayout());
         rightPanel.add(new JScrollPane(sourceTextArea), BorderLayout.CENTER);
-        sourceTextArea.setContentType("text/flasm3");
+        sourceTextArea.setContentType("text/flasm3");       
+        ActionMap am=sourceTextArea.getActionMap();
+        ComboCompletionAction cca=(ComboCompletionAction)am.get("combo-completion");
+        List<String> items=new ArrayList<String>();
+        items.add("ahoj");
+        cca.setItems(items);
         JPanel buttonsPan = new JPanel();
         buttonsPan.setLayout(new FlowLayout());
         JButton verifyButton = new JButton("Verify");

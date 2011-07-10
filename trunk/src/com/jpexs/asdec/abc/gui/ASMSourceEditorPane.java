@@ -32,13 +32,13 @@ import java.io.IOException;
 import java.util.HashMap;
 
 
-public class ASMSourceEditorPane extends JEditorPane {
+public class ASMSourceEditorPane extends LineMarkedEditorPane {
 
     public ABC abc;
     public int bodyIndex;
 
     public ASMSourceEditorPane() {
-
+         
     }
 
     public void setBodyIndex(int bodyIndex, ABC abc) {
@@ -116,14 +116,15 @@ public class ASMSourceEditorPane extends JEditorPane {
                 if (instrCount == pos+1) {
                     break;
                 }
-                lineStart = i;
+                lineStart = i+1;
             }
         }
         if (lineCnt == -1) {
             lineEnd = text.length() - 1;
         }
-        select(lineStart, lineEnd);
-        requestFocus();
+        //select(lineStart, lineEnd);
+        setCaretPosition(lineStart);
+        //requestFocus();
     }
 
     public void selectLine(int line) {
