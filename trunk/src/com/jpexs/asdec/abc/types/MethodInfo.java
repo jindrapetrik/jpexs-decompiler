@@ -32,6 +32,42 @@ public class MethodInfo {
     public ValueKind optional[];
     public int paramNames[];
 
+    public void setFlagNeed_rest()
+    {
+       flags|=4;
+    }
+
+    public void unsetFlagNeed_rest()
+    {
+       if(flagNeed_rest()){
+          flags-=4;
+       }
+    }
+
+    public void setFlagHas_optional()
+    {
+       flags|=8;
+    }
+
+    public void unsetFlagHas_optional()
+    {
+       if(flagHas_optional()){
+          flags-=8;
+       }
+    }
+
+    public void setFlagHas_paramnames()
+    {
+       flags|=128;
+    }
+
+    public void unsetFlagHas_paramnames()
+    {
+       if(flagHas_paramnames()){
+          flags-=128;
+       }
+    }
+
     public boolean flagNeed_arguments() {
         return (flags & 1) == 1;
     }

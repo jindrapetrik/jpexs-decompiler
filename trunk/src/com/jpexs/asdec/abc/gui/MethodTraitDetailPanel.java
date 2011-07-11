@@ -29,23 +29,34 @@ public class MethodTraitDetailPanel extends JTabbedPane implements TraitDetail {
 
    public MethodCodePanel methodCodePanel;
    public MethodBodyParamsPanel methodBodyParamsPanel;
+   public MethodInfoPanel methodInfoPanel;
 
    public MethodTraitDetailPanel() {
       methodCodePanel = new MethodCodePanel();
       methodBodyParamsPanel = new MethodBodyParamsPanel();
+      methodInfoPanel=new MethodInfoPanel();
+      addTab("MethodInfo",methodInfoPanel);
       addTab("MethodBody Code", methodCodePanel);
-      addTab("MethodBody params", new JScrollPane(methodBodyParamsPanel));
-
+      addTab("MethodBody params", new JScrollPane(methodBodyParamsPanel));      
    }
 
    public boolean save() {
-      if (methodCodePanel.sourceTextArea.save(Main.abcMainFrame.abc.constants)) {
-         methodBodyParamsPanel.save();
-         int lasttrait = Main.abcMainFrame.decompiledTextArea.lastTraitIndex;
-         Main.abcMainFrame.decompiledTextArea.reloadClass();
-         Main.abcMainFrame.decompiledTextArea.gotoTrait(lasttrait);
-         return true;
+      if(!methodInfoPanel.save())
+      {
+         return false;
       }
-      return false;
+      if (!methodCodePanel.sourceTextArea.save(Main.abcMainFrame.abc.constants))
+      {
+         return false;
+      }
+      if(!methodBodyParamsPanel.save())
+      {
+         return false;
+      }
+
+      int lasttrait = Main.abcMainFrame.decompiledTextArea.lastTraitIndex;
+      Main.abcMainFrame.decompiledTextArea.reloadClass();
+      Main.abcMainFrame.decompiledTextArea.gotoTrait(lasttrait);
+      return true;
    }
 }

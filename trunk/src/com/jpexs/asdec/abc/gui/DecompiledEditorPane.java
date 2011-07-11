@@ -59,6 +59,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
             if (Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.bodyIndex != bi) {
                Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.setBodyIndex(bi, abc);
                Main.abcMainFrame.detailPanel.methodTraitPanel.methodBodyParamsPanel.loadFromBody(abc.bodies[bi]);
+               Main.abcMainFrame.detailPanel.methodTraitPanel.methodInfoPanel.load(abc.bodies[bi].method_info, abc);
             }
             for (Highlighting h : highlights) {
                if ((pos >= h.startPos) && (pos < h.startPos + h.len)) {

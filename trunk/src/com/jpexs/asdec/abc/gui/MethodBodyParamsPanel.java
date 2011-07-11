@@ -84,12 +84,14 @@ public class MethodBodyParamsPanel extends JPanel {
       maxScopeDepthField.setText("" + body.max_scope_depth);
    }
 
-   public void save() {
+   public boolean save() {
       if (body != null) {
          body.max_stack = Integer.parseInt(maxStackField.getText());
          body.max_regs = Integer.parseInt(localCountField.getText());
          body.init_scope_depth = Integer.parseInt(initScopeDepthField.getText());
          body.max_scope_depth = Integer.parseInt(maxScopeDepthField.getText());
+         return true;
       }
+      return false;
    }
 }

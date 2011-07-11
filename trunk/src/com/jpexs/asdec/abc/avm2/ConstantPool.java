@@ -105,6 +105,38 @@ public class ConstantPool {
         return 0;
     }
 
+    public int forceGetStringId(String val){
+       int id=getStringId(val);
+       if(id==0){
+          id=addString(val);
+       }
+       return id;
+    }
+
+    public int forceGetIntId(long val){
+       int id=getIntId(val);
+       if(id==0){
+          id=addInt(val);
+       }
+       return id;
+    }
+
+    public int forceGetUIntId(long val){
+       int id=getUIntId(val);
+       if(id==0){
+          id=addUInt(val);
+       }
+       return id;
+    }
+
+    public int forceGetDoubleId(double val){
+       int id=getDoubleId(val);
+       if(id==0){
+          id=addDouble(val);
+       }
+       return id;
+    }
+
     public void dump(OutputStream os) {
         PrintStream output = new PrintStream(os);
         String s = "";

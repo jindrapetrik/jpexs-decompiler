@@ -82,34 +82,34 @@ public class ValueKind {
                 ret = "\"" + constants.constant_string[value_index] + "\"";
                 break;
             case CONSTANT_True:
-                ret = "True";
+                ret = "true";
                 break;
             case CONSTANT_False:
-                ret = "False";
+                ret = "false";
                 break;
             case CONSTANT_Null:
-                ret = "Null";
+                ret = "null";
                 break;
             case CONSTANT_Undefined:
-                ret = "Undefined";
+                ret = "undefined";
                 break;
             case CONSTANT_Namespace:
-                ret = "" + constants.constant_namespace[value_index].getName(constants);
+                ret = "ns[" +value_index+"]";
                 break;
             case CONSTANT_PackageInternalNs:
-                ret = "" + constants.constant_namespace[value_index].getName(constants);
+                ret = "package internal ns[" +value_index+"]";
                 break;
             case CONSTANT_ProtectedNamespace:
-                ret = "protected " + constants.constant_namespace[value_index].getName(constants);
+                ret = "protected ns[" +value_index+"]";
                 break;
             case CONSTANT_ExplicitNamespace:
-                ret = "explicit " + constants.constant_namespace[value_index].getName(constants);
+                ret = "explicit ns[" +value_index+"]";
                 break;
             case CONSTANT_StaticProtectedNs:
-                ret = "static protected " + constants.constant_namespace[value_index].getName(constants);
+                ret = "static protected ns[" +value_index+"]";
                 break;
             case CONSTANT_PrivateNs:
-                ret = "private " + constants.constant_namespace[value_index].getName(constants);
+                ret = "private ns[" +value_index+"]";
                 break;
         }
         return ret;
