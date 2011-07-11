@@ -71,8 +71,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane {
             JOptionPane.showMessageDialog(this, (ex.text + " on line " + ex.line));
             selectLine((int) ex.line);
             return false;
-        }
-        JOptionPane.showMessageDialog(this, ("Code Saved"));
+        }        
         return true;
     }
 

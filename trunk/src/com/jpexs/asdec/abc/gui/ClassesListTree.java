@@ -59,7 +59,7 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
                     public void run() {
                         Main.abcMainFrame.navigator.setClassIndex(tp.classIndex);
                         Main.abcMainFrame.decompiledTextArea.setClassIndex(tp.classIndex, abc);
-                        Main.abcMainFrame.sourceTextArea.setText("");
+                        Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.setText("");
                         Main.stopWork();
                     }
                 }).start();

@@ -40,7 +40,7 @@ import jsyntaxpane.syntaxkits.Flasm3SyntaxKit;
 
 public class MainFrame extends JFrame implements ActionListener, ItemListener {
 
-    public ASMSourceEditorPane sourceTextArea;
+    
     public TraitsList navigator;
     public ClassesListTree classTree;
     public ABC abc;
@@ -60,11 +60,9 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
     public LoadingPanel loadingPanel = new LoadingPanel(20, 20);
     public JLabel statusLabel = new JLabel("");
     public JLabel asmLabel = new JLabel("P-code source (editable)");
-    public JLabel decLabel = new JLabel("ActionScript source");
-    public MethodBodyPanel methodBodyPanel;
-    public JLabel methodBodyLabel;
-    public  JPanel detailPanel;
-    public JPanel buttonsPanel;
+    public JLabel decLabel = new JLabel("ActionScript source");       
+    public DetailPanel detailPanel;
+
 
     public void setStatus(String s) {
         if (s.equals("")) {
@@ -173,60 +171,18 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
         setSize(1024, 600);
         this.abc = list.get(listIndex).abc;
         getContentPane().setLayout(new BorderLayout());
-        sourceTextArea = new ASMSourceEditorPane();
+        
 
-        JPanel rightPanel = new JPanel();
-        rightPanel.setLayout(new BorderLayout());
-        rightPanel.add(new JScrollPane(sourceTextArea), BorderLayout.CENTER);
-        sourceTextArea.setContentType("text/flasm3");               
-        buttonsPanel = new JPanel();
-        buttonsPanel.setLayout(new FlowLayout());
-        JButton verifyButton = new JButton("Verify");
-        verifyButton.setActionCommand("VERIFYBODY");
-        verifyButton.addActionListener(this);
+        
+        
 
-        JButton saveButton = new JButton("Save");
-        saveButton.setActionCommand("SAVEBODY");
-        saveButton.addActionListener(this);
-
-        JButton graphButton = new JButton("Graph");
-        graphButton.setActionCommand("GRAPH");
-        graphButton.addActionListener(this);
-
-        JButton execButton = new JButton("Execute");
-        execButton.setActionCommand("EXEC");
-        execButton.addActionListener(this);
-
-        //buttonsPan.add(graphButton);
-        buttonsPanel.add(saveButton);
-       // buttonsPan.add(execButton);
-        rightPanel.add(buttonsPanel, BorderLayout.SOUTH);
+       
+        
         decompiledTextArea = new DecompiledEditorPane();
 
         decompiledScrollPane = new JScrollPane(decompiledTextArea);
 
-        detailPanel=new JPanel();
-        detailPanel.setLayout(new BorderLayout());
-        methodBodyPanel=new MethodBodyPanel();
-        JPanel methodBodyPanel1=new JPanel();
-        methodBodyPanel1.setLayout(new BorderLayout());
-        methodBodyPanel1.add(methodBodyPanel,BorderLayout.CENTER);
-
-        methodBodyLabel=new JLabel("Method body");
-        methodBodyLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        methodBodyLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
-        methodBodyPanel1.add(methodBodyLabel,BorderLayout.NORTH);
-
-        detailPanel.add(methodBodyPanel1,BorderLayout.NORTH);
-
-        JPanel pcodePanel = new JPanel();
-        pcodePanel.setLayout(new BorderLayout());
-        pcodePanel.add(rightPanel, BorderLayout.CENTER);
-        //pcodePanel.add(asmLabel, BorderLayout.NORTH);
-
-        detailPanel.add(pcodePanel,BorderLayout.CENTER);
-        //asmLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        //asmLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        detailPanel=new DetailPanel();       
         JPanel panB = new JPanel();
         panB.setLayout(new BorderLayout());
         panB.add(decompiledScrollPane, BorderLayout.CENTER);
@@ -368,29 +324,11 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
             Main.exit();
         }
         if (Main.isWorking()) return;
-        if (e.getActionCommand().equals("GRAPH")) {
-            sourceTextArea.graph();
-        }
-
-        if (e.getActionCommand().equals("EXEC")) {
-            sourceTextArea.exec();
-        }
+       
 
         if (e.getActionCommand().equals("SHOWPROXY")) {
             Main.showProxy();
-        }
-        if (e.getActionCommand().equals("VERIFYBODY")) {
-            sourceTextArea.verify(abc.constants, abc);
-        }
-        if (e.getActionCommand().equals("SAVEBODY")) {
-            if(sourceTextArea.save(abc.constants))
-            {
-                  methodBodyPanel.save();
-                  int lasttrait=decompiledTextArea.lastTraitIndex;
-                  Main.abcMainFrame.decompiledTextArea.reloadClass();
-                  Main.abcMainFrame.decompiledTextArea.gotoTrait(lasttrait);
-            }
-        }
+        }        
         if (e.getActionCommand().equals("SAVE")) {
             try {
                 Main.saveFile(Main.file);

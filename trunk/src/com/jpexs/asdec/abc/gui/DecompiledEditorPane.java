@@ -40,13 +40,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
 
    public void setNoTrait()
    {
-      Main.abcMainFrame.sourceTextArea.setText("");
-               Main.abcMainFrame.methodBodyPanel.loadFromBody(null);
-               Main.abcMainFrame.methodBodyLabel.setText("Uneditable trait");
-               Main.abcMainFrame.methodBodyPanel.setVisible(false);
-               Main.abcMainFrame.sourceTextArea.setVisible(false);
-               Main.abcMainFrame.buttonsPanel.setVisible(false);
-               Main.abcMainFrame.sourceTextArea.bodyIndex=-1;
+      Main.abcMainFrame.detailPanel.showCard(DetailPanel.UNSUPPORTED_TRAIT_CARD);
    }
 
    public void caretUpdate(CaretEvent e) {
@@ -60,24 +54,16 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
                setNoTrait();
                break;
             }
-            Main.abcMainFrame.methodBodyPanel.setVisible(true);
-            Main.abcMainFrame.sourceTextArea.setVisible(true);
-            Main.abcMainFrame.buttonsPanel.setVisible(true);
+            Main.abcMainFrame.detailPanel.showCard(DetailPanel.METHOD_TRAIT_CARD);
             lastTraitIndex = (int) th.offset;
-            if (Main.abcMainFrame.sourceTextArea.bodyIndex != bi) {
-               /*try {
-               abc.bodies[bi].code.clearCode(abc.constants, abc.bodies[bi]);
-               } catch (ConvertException ex) {
-               Logger.getLogger(DecompiledEditorPane.class.getName()).log(Level.SEVERE, null, ex);
-               }*/
-               Main.abcMainFrame.sourceTextArea.setBodyIndex(bi, abc);
-               Main.abcMainFrame.methodBodyPanel.loadFromBody(abc.bodies[bi]);
-               Main.abcMainFrame.methodBodyLabel.setText("Method body #"+bi);
+            if (Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.bodyIndex != bi) {
+               Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.setBodyIndex(bi, abc);
+               Main.abcMainFrame.detailPanel.methodTraitPanel.methodBodyParamsPanel.loadFromBody(abc.bodies[bi]);
             }
             for (Highlighting h : highlights) {
                if ((pos >= h.startPos) && (pos < h.startPos + h.len)) {
                   try {
-                     Main.abcMainFrame.sourceTextArea.selectInstruction(abc.bodies[bi].code.adr2pos(h.offset));
+                     Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.selectInstruction(abc.bodies[bi].code.adr2pos(h.offset));
 
                   } catch (ConvertException ex) {
                   }
