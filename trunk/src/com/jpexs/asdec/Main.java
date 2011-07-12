@@ -70,6 +70,9 @@ public class Main {
     /** Turn off decompiling if needed */
     public static final boolean DO_DECOMPILE=true;
 
+    //using parameter names in decompiling may cause problems because oficial programs like Flash CS 5.5 inserts wrong parameter names indices
+    public static final boolean PARAM_NAMES_ENABLE=false;
+
     public static String getFileTitle() {
         if (maskURL != null) return maskURL;
         return file;

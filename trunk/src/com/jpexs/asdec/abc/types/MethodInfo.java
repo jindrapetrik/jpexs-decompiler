@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.types;
 
+import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.helpers.Helper;
 
@@ -178,7 +179,7 @@ public class MethodInfo {
             if (i > 0) {
                 paramStr += ", ";
             }
-            if ((paramNames.length > i) && (paramNames[i] != 0)) {
+            if ((paramNames.length > i) && (paramNames[i] != 0) && Main.PARAM_NAMES_ENABLE) {
                 paramStr += constants.constant_string[paramNames[i]];
             } else {
                 paramStr += "param" + (i + 1);
@@ -191,11 +192,12 @@ public class MethodInfo {
             }
             if (optional != null) {
                 if (i >= param_types.length - optional.length) {
-                    //System.out.println("param_types.length:"+param_types.length);
-                    //System.out.println("optional.lengt:"+optional.length);
                     paramStr += "=" + optional[i - (param_types.length - optional.length)].toString(constants);
                 }
             }
+        }
+        if(flagNeed_rest()){
+           paramStr+=", ... rest";
         }
         return paramStr;
     }

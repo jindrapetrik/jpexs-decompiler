@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.gui;
 
+import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.methodinfo_parser.MethodInfoParser;
 import com.jpexs.asdec.abc.methodinfo_parser.ParseException;
@@ -66,7 +67,7 @@ public class MethodInfoPanel extends JPanel {
          if(p>0){
             ret+=",\n";
          }
-         if(methodInfo.flagHas_paramnames())
+         if(methodInfo.flagHas_paramnames()&&Main.PARAM_NAMES_ENABLE)
          {
             ret=ret+abc.constants.constant_string[methodInfo.paramNames[p]];
          }else{

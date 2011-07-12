@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.types;
 
+import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
@@ -48,10 +49,14 @@ public class MethodBody implements Cloneable {
      private String replaceParams(String code, ABC abc) {
         for (int i = 1; i <= abc.method_info[this.method_info].param_types.length; i++) {
             String paramName="param"+i;
-            if(abc.method_info[this.method_info].flagHas_paramnames()){
+            if(abc.method_info[this.method_info].flagHas_paramnames()&&Main.PARAM_NAMES_ENABLE){
                paramName=abc.constants.constant_string[abc.method_info[this.method_info].paramNames[i-1]];
             }
             code = code.replace(InstructionDefinition.localRegName(i), paramName);
+        }
+        if(abc.method_info[this.method_info].flagNeed_rest())
+        {
+           code = code.replace(InstructionDefinition.localRegName(abc.method_info[this.method_info].param_types.length+1), "rest");
         }
         return code;
     }

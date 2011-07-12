@@ -17,6 +17,7 @@
  */
 package com.jpexs.asdec.abc.methodinfo_parser;
 
+import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.types.MethodInfo;
 import com.jpexs.asdec.abc.types.ValueKind;
@@ -201,6 +202,9 @@ public class MethodInfoParser {
          {
             useParamNames=true;
          }
+      }
+      if(!Main.PARAM_NAMES_ENABLE){
+         useParamNames=false;
       }
       if(useParamNames){
          update.setFlagHas_paramnames();
