@@ -45,9 +45,13 @@ public class MethodBody implements Cloneable {
         return s;
     }
 
-    private String replaceParams(String code, MethodInfo method_info[]) {
-        for (int i = 1; i <= method_info[this.method_info].param_types.length; i++) {
-            code = code.replace(InstructionDefinition.localRegName(i), "param" + i);
+     private String replaceParams(String code, ABC abc) {
+        for (int i = 1; i <= abc.method_info[this.method_info].param_types.length; i++) {
+            String paramName="param"+i;
+            if(abc.method_info[this.method_info].flagHas_paramnames()){
+               paramName=abc.constants.constant_string[abc.method_info[this.method_info].paramNames[i-1]];
+            }
+            code = code.replace(InstructionDefinition.localRegName(i), paramName);
         }
         return code;
     }
@@ -66,7 +70,7 @@ public class MethodBody implements Cloneable {
         }else{
         try {
             s += code.toSource(isStatic, classIndex, abc, constants, method_info, this, hilight);
-            s = replaceParams(s, method_info);
+            s = replaceParams(s, abc);
         } catch (Exception ex) {
             s = "//error:" + ex.toString();
         }
