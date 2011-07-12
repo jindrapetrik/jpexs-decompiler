@@ -31,10 +31,11 @@ public class ConstantsListModel implements ListModel {
     public static final int TYPE_UINT = 0;
     public static final int TYPE_INT = 1;
     public static final int TYPE_DOUBLE = 2;
-    public static final int TYPE_STRING = 3;
-    public static final int TYPE_NAMESPACE = 4;
-    public static final int TYPE_NAMESPACESET = 5;
-    public static final int TYPE_MULTINAME = 6;
+    public static final int TYPE_DECIMAL = 3;
+    public static final int TYPE_STRING = 4;
+    public static final int TYPE_NAMESPACE = 5;
+    public static final int TYPE_NAMESPACESET = 6;
+    public static final int TYPE_MULTINAME = 7;
     private int type = TYPE_INT;
 
     public ConstantsListModel(ConstantPool constants, int type) {
@@ -56,6 +57,8 @@ public class ConstantsListModel implements ListModel {
                 return makeUp(constants.constant_int.length - 1);
             case TYPE_DOUBLE:
                 return makeUp(constants.constant_double.length - 1);
+            case TYPE_DECIMAL:
+                return makeUp(constants.constant_decimal.length - 1);
             case TYPE_STRING:
                 return makeUp(constants.constant_string.length - 1);
             case TYPE_NAMESPACE:
@@ -76,6 +79,8 @@ public class ConstantsListModel implements ListModel {
                 return "" + (index + 1) + ":" + constants.constant_int[index + 1];
             case TYPE_DOUBLE:
                 return "" + (index + 1) + ":" + constants.constant_double[index + 1];
+            case TYPE_DECIMAL:
+                return "" + (index + 1) + ":" + constants.constant_decimal[index + 1];
             case TYPE_STRING:
                 return "" + (index + 1) + ":" + Helper.escapeString(constants.constant_string[index + 1]);
             case TYPE_NAMESPACE:

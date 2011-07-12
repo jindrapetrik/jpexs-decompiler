@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc;
 
+import com.jpexs.asdec.abc.types.Decimal;
 import com.jpexs.asdec.abc.types.InstanceInfo;
 import com.jpexs.asdec.abc.types.MethodInfo;
 import com.jpexs.asdec.abc.types.Multiname;
@@ -272,5 +273,9 @@ public class ABCOutputStream extends OutputStream {
         }
         writeU30(ii.iinit_index);
         writeTraits(ii.instance_traits);
+    }
+
+    public void writeDecimal(Decimal value) throws IOException{
+         write(value.data);
     }
 }

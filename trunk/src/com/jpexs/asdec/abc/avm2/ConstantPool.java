@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.avm2;
 
+import com.jpexs.asdec.abc.types.Decimal;
 import com.jpexs.asdec.abc.types.Multiname;
 import com.jpexs.asdec.abc.types.Namespace;
 import com.jpexs.asdec.abc.types.NamespaceSet;
@@ -31,6 +32,8 @@ public class ConstantPool {
     public long constant_int[];
     public long constant_uint[];
     public double constant_double[];
+    /* Only for some minor versions */
+    public Decimal constant_decimal[];
     public String constant_string[];
     public Namespace constant_namespace[];
     public NamespaceSet constant_namespace_set[];

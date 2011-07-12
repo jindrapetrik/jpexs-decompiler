@@ -50,10 +50,12 @@ public class ABC {
     public long stringOffsets[];
     public static String IDENT_STRING = "   ";
 
+    public static final int MINORwithDECIMAL = 17;
+
    public ABC(InputStream is) throws IOException {
         ABCInputStream ais = new ABCInputStream(is);
-        major_version = ais.readU16();
         minor_version = ais.readU16();
+        major_version = ais.readU16();
         constants = new ConstantPool();
         //constant integers
         int constant_int_pool_count = ais.readU30();
@@ -74,6 +76,19 @@ public class ABC {
         constants.constant_double = new double[constant_double_pool_count];
         for (int i = 1; i < constant_double_pool_count; i++) { //index 0 not used. Values 1..n-1
             constants.constant_double[i] = ais.readDouble();
+        }
+
+
+        //constant decimal
+        if(minor_version >= MINORwithDECIMAL)
+        {           
+            int constant_decimal_pool_count = ais.readU30();
+            constants.constant_decimal = new Decimal[constant_decimal_pool_count];
+            for (int i = 1; i < constant_decimal_pool_count; i++) { //index 0 not used. Values 1..n-1
+               constants.constant_decimal[i] = ais.readDecimal();
+            }
+        }else{
+           constants.constant_decimal=new Decimal[0];
         }
 
         //constant string
@@ -202,8 +217,8 @@ public class ABC {
 
     public void saveToStream(OutputStream os) throws IOException {
         ABCOutputStream aos = new ABCOutputStream(os);
-        aos.writeU16(major_version);
         aos.writeU16(minor_version);
+        aos.writeU16(major_version);        
 
         aos.writeU30(constants.constant_int.length);
         for (int i = 1; i < constants.constant_int.length; i++) {
@@ -217,6 +232,13 @@ public class ABC {
         aos.writeU30(constants.constant_double.length);
         for (int i = 1; i < constants.constant_double.length; i++) {
             aos.writeDouble(constants.constant_double[i]);
+        }
+
+        if(minor_version>=MINORwithDECIMAL){
+           aos.writeU30(constants.constant_decimal.length);
+           for (int i = 1; i < constants.constant_decimal.length; i++) {
+               aos.writeDecimal(constants.constant_decimal[i]);
+           }
         }
 
         aos.writeU30(constants.constant_string.length);

@@ -313,6 +313,20 @@ public class ABCInputStream extends InputStream {
         return traits;
     }
 
+    public byte[] readBytes(int count) throws IOException{
+       byte ret[]=new byte[count];
+       for(int i=0;i<count;i++){
+          ret[i]=(byte)read();
+       }
+       return ret;
+    }
+
+    public Decimal readDecimal() throws IOException
+    {
+       byte data[]=readBytes(16);
+       return new Decimal(data);
+    }
+
     public InstanceInfo readInstanceInfo() throws IOException {
         InstanceInfo ret = new InstanceInfo();
         ret.name_index = readU30();

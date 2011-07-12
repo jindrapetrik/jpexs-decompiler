@@ -133,15 +133,18 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
                 autoResizeColWidth(constantTable, new DoubleTableModel(abc));
                 break;
             case 3:
-                autoResizeColWidth(constantTable, new StringTableModel(abc));
+                autoResizeColWidth(constantTable, new DecimalTableModel(abc));
                 break;
             case 4:
-                autoResizeColWidth(constantTable, new NamespaceTableModel(abc));
+                autoResizeColWidth(constantTable, new StringTableModel(abc));
                 break;
             case 5:
-                autoResizeColWidth(constantTable, new NamespaceSetTableModel(abc));
+                autoResizeColWidth(constantTable, new NamespaceTableModel(abc));
                 break;
             case 6:
+                autoResizeColWidth(constantTable, new NamespaceSetTableModel(abc));
+                break;
+            case 7:
                 autoResizeColWidth(constantTable, new MultinameTableModel(abc));
                 break;
         }
@@ -285,7 +288,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
         /* Constants */
         JPanel panConstants = new JPanel();
         panConstants.setLayout(new BorderLayout());
-        constantTypeList = new JComboBox(new String[]{"UINT", "INT", "DOUBLE", "STRING", "NAMESPACE", "NAMESPACESET", "MULTINAME"});
+        constantTypeList = new JComboBox(new String[]{"UINT", "INT", "DOUBLE","DECIMAL", "STRING", "NAMESPACE", "NAMESPACESET", "MULTINAME"});
         constantTable = new JTable();
         autoResizeColWidth(constantTable, new UIntTableModel(abc));
         constantTable.setAutoCreateRowSorter(true);
@@ -294,7 +297,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if(e.getClickCount()==2){
-                   if(constantTypeList.getSelectedIndex()==6){
+                   if(constantTypeList.getSelectedIndex()==7){ //MULTINAME
                        int rowIndex=constantTable.getSelectedRow();
                        if(rowIndex==-1) return;
                        int multinameIndex=constantTable.convertRowIndexToModel(rowIndex);
