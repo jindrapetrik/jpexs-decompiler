@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.types;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.types.traits.Traits;
 import com.jpexs.asdec.helpers.Helper;
@@ -73,8 +74,8 @@ public class InstanceInfo {
         return modifiers + objType + constants.constant_multiname[name_index].getName(constants) + supIndexStr;
     }
 
-    public String getInstanceVarsStr(ConstantPool constants) {
-        return instance_traits.convert(constants, "\t");
+    public String getInstanceVarsStr(ConstantPool constants,ABC abc) {
+        return instance_traits.convert(constants, "\t",abc);
     }
 
     public Multiname getName(ConstantPool constants) {

@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.types;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.types.traits.Traits;
 
@@ -37,7 +38,7 @@ public class ClassInfo {
         return "method_index=" + cinit_index + "\r\n" + static_traits.toString(constants);
     }
 
-    public String getStaticVarsStr(ConstantPool constants) {
-        return static_traits.convert(constants, "\tstatic ");
+    public String getStaticVarsStr(ConstantPool constants,ABC abc) {
+        return static_traits.convert(constants, "\tstatic ",abc);
     }
 }

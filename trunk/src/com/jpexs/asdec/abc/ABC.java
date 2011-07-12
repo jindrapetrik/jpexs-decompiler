@@ -597,11 +597,15 @@ public class ABC {
                     }
                 }
             }
-            String constructorParams = method_info[instance_info[i].iinit_index].getParamStr(constants);
+            String constructorParams = "";
+
             String bodyStr = "";
             int bodyIndex = findBodyIndex(instance_info[i].iinit_index);
             if (bodyIndex != -1) {
                 bodyStr = addTabs(bodies[bodyIndex].toString(pcode,false, i, this, constants, method_info, highlight), 3);
+                constructorParams=method_info[instance_info[i].iinit_index].getParamStr(constants,bodies[bodyIndex],this);
+            }else{
+                constructorParams=method_info[instance_info[i].iinit_index].getParamStr(constants,null,this);
             }
             String toPrint = IDENT_STRING + IDENT_STRING + modifier + "function " + constants.constant_multiname[instance_info[i].name_index].getName(constants) + "(" + constructorParams + ") {\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}";
             if (highlight) {
@@ -621,12 +625,12 @@ public class ABC {
                 if (bodyIndex != -1) {
                     bodyStr = addTabs(bodies[bodyIndex].toString(pcode,true, i, this, constants, method_info, highlight), 3);
                 }
-                toPrint = IDENT_STRING + IDENT_STRING + tm.convert(constants, method_info, true) + " {\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}";
+                toPrint = IDENT_STRING + IDENT_STRING + tm.convert(constants, method_info, this,true) + " {\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}";
             }
             if (t instanceof TraitSlotConst) {
                 TraitSlotConst ts = (TraitSlotConst) t;
 
-                toPrint = IDENT_STRING + IDENT_STRING + ts.convert(constants, method_info, true) + ";";
+                toPrint = IDENT_STRING + IDENT_STRING + ts.convert(constants, method_info, this,true) + ";";
             }
             if (highlight) {
                 toPrint = Highlighting.hilighTrait(toPrint, ti);
@@ -640,7 +644,7 @@ public class ABC {
             String toPrint = "";
             if (t instanceof TraitSlotConst) {
                 TraitSlotConst ts = (TraitSlotConst) t;
-                toPrint = IDENT_STRING + IDENT_STRING + ts.convert(constants, method_info, false) + ";";
+                toPrint = IDENT_STRING + IDENT_STRING + ts.convert(constants, method_info, this,false) + ";";
             }
 
             if (t instanceof TraitMethodGetterSetter) {
@@ -650,7 +654,7 @@ public class ABC {
                 if (bodyIndex != -1) {
                     bodyStr = addTabs(bodies[bodyIndex].toString(pcode,false, i, this, constants, method_info, highlight), 3);
                 }
-                toPrint = IDENT_STRING + IDENT_STRING + tm.convert(constants, method_info, false) + " {\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}";
+                toPrint = IDENT_STRING + IDENT_STRING + tm.convert(constants, method_info,this, false) + " {\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}";
             }
             if (highlight) {
                 toPrint = Highlighting.hilighTrait(toPrint, class_info[i].static_traits.traits.length + ti);

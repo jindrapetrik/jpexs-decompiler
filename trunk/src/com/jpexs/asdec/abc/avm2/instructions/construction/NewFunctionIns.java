@@ -45,6 +45,6 @@ public class NewFunctionIns extends InstructionDefinition {
         if (mybody != null) {
             bodyStr = mybody.toString(false,isStatic, classIndex, abc, constants, method_info, false);
         }
-        stack.push(new NewFunctionTreeItem(ins, method_info[methodIndex].getParamStr(constants), method_info[methodIndex].getReturnTypeStr(constants), bodyStr));
+        stack.push(new NewFunctionTreeItem(ins, method_info[methodIndex].getParamStr(constants,body,abc), method_info[methodIndex].getReturnTypeStr(constants), bodyStr));
     }
 }

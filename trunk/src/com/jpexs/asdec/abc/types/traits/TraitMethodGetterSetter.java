@@ -18,7 +18,9 @@
 
 package com.jpexs.asdec.abc.types.traits;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.types.MethodBody;
 import com.jpexs.asdec.abc.types.MethodInfo;
 import com.jpexs.asdec.helpers.Helper;
 
@@ -34,13 +36,14 @@ public class TraitMethodGetterSetter extends Trait {
     }
 
     @Override
-    public String convert(ConstantPool constants, MethodInfo[] methodInfo, boolean isStatic) {
+    public String convert(ConstantPool constants, MethodInfo[] methodInfo,ABC abc, boolean isStatic) {
         String modifier = getModifiers(constants, isStatic) + " ";
         if (modifier.equals(" ")) modifier = "";
         String addKind = "";
         if (kindType == TRAIT_GETTER) addKind = "get ";
         if (kindType == TRAIT_SETTER) addKind = "set ";
-        return modifier + "function " + addKind + getMethodName(constants) + "(" + methodInfo[method_info].getParamStr(constants) + ") : " + methodInfo[method_info].getReturnTypeStr(constants);
+        MethodBody body=abc.findBody(method_info);
+        return modifier + "function " + addKind + getMethodName(constants) + "(" + methodInfo[method_info].getParamStr(constants,body,abc) + ") : " + methodInfo[method_info].getReturnTypeStr(constants);
     }
 
 

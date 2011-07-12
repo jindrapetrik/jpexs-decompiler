@@ -19,8 +19,10 @@
 package com.jpexs.asdec.abc.types;
 
 import com.jpexs.asdec.Main;
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.helpers.Helper;
+import java.util.HashMap;
 
 
 public class MethodInfo {
@@ -173,13 +175,21 @@ public class MethodInfo {
         return constants.constant_string[name_index];
     }
 
-    public String getParamStr(ConstantPool constants) {
+    public String getParamStr(ConstantPool constants,MethodBody body,ABC abc) {
+        HashMap<Integer,String> localRegNames=new HashMap<Integer,String>();
+        if(body!=null)
+        {
+           localRegNames=body.code.getLocalRegNamesFromDebug(abc);
+        }
         String paramStr = "";
         for (int i = 0; i < param_types.length; i++) {
             if (i > 0) {
                 paramStr += ", ";
             }
-            if ((paramNames.length > i) && (paramNames[i] != 0) && Main.PARAM_NAMES_ENABLE) {
+            if(!localRegNames.isEmpty())
+            {
+               paramStr+=localRegNames.get(i+1);
+            }else if ((paramNames.length > i) && (paramNames[i] != 0) && Main.PARAM_NAMES_ENABLE) {
                 paramStr += constants.constant_string[paramNames[i]];
             } else {
                 paramStr += "param" + (i + 1);
@@ -197,7 +207,14 @@ public class MethodInfo {
             }
         }
         if(flagNeed_rest()){
-           paramStr+=", ... rest";
+           paramStr+=", ... ";
+           if(!localRegNames.isEmpty())
+            {
+               paramStr+=localRegNames.get(param_types.length+1);
+            }else{
+               paramStr+="rest";
+            }
+
         }
         return paramStr;
     }

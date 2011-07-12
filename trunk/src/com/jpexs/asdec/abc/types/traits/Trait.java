@@ -18,7 +18,9 @@
 
 package com.jpexs.asdec.abc.types.traits;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.types.MethodBody;
 import com.jpexs.asdec.abc.types.MethodInfo;
 import com.jpexs.asdec.abc.types.Multiname;
 import com.jpexs.asdec.abc.types.Namespace;
@@ -77,11 +79,11 @@ public class Trait {
         return constants.constant_multiname[name_index].toString(constants) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
     }
 
-    public String convert(ConstantPool constants, MethodInfo[] methodInfo) {
-        return convert(constants, methodInfo, false);
+    public String convert(ConstantPool constants, MethodInfo[] methodInfo, ABC abc) {
+        return convert(constants, methodInfo,  abc,false);
     }
 
-    public String convert(ConstantPool constants, MethodInfo[] methodInfo, boolean isStatic) {
+    public String convert(ConstantPool constants, MethodInfo[] methodInfo, ABC abc,boolean isStatic) {
         return constants.constant_multiname[name_index].toString(constants) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
     }
 

@@ -24,6 +24,7 @@ import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.types.traits.Traits;
+import java.util.HashMap;
 
 
 public class MethodBody implements Cloneable {
@@ -46,6 +47,14 @@ public class MethodBody implements Cloneable {
         return s;
     }
 
+     private String replaceDebugRegNames(String code,HashMap<Integer,String> debugRegNames)
+     {
+         for(Integer key:debugRegNames.keySet())
+         {
+            code = code.replace(InstructionDefinition.localRegName(key), debugRegNames.get(key));
+         }
+         return code;
+     }
      private String replaceParams(String code, ABC abc) {
         for (int i = 1; i <= abc.method_info[this.method_info].param_types.length; i++) {
             String paramName="param"+i;
@@ -74,8 +83,14 @@ public class MethodBody implements Cloneable {
          s+=code.toASMSource(constants, this);
         }else{
         try {
+            HashMap<Integer,String> localRegNames=code.getLocalRegNamesFromDebug(abc);
             s += code.toSource(isStatic, classIndex, abc, constants, method_info, this, hilight);
-            s = replaceParams(s, abc);
+            if(!localRegNames.isEmpty())
+            {
+               s=replaceDebugRegNames(s,localRegNames);
+            }else{
+               s = replaceParams(s, abc);
+            }
         } catch (Exception ex) {
             s = "//error:" + ex.toString();
         }

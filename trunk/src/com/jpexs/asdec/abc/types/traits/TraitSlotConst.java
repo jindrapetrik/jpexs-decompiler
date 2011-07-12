@@ -18,8 +18,10 @@
 
 package com.jpexs.asdec.abc.types.traits;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
+import com.jpexs.asdec.abc.types.MethodBody;
 import com.jpexs.asdec.abc.types.MethodInfo;
 import com.jpexs.asdec.abc.types.ValueKind;
 import com.jpexs.asdec.helpers.Helper;
@@ -66,7 +68,7 @@ public class TraitSlotConst extends Trait {
     }
 
     @Override
-    public String convert(ConstantPool constants, MethodInfo[] methodInfo, boolean isStatic) {
+    public String convert(ConstantPool constants, MethodInfo[] methodInfo,ABC abc, boolean isStatic) {
         String modifier = getModifiers(constants, isStatic) + " ";
         if (modifier.equals(" ")) modifier = "";
         return modifier + getNameValueStr(constants);

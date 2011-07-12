@@ -650,6 +650,19 @@ public class AVM2Code {
 
     private int toSourceCount = 0;
 
+public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
+       HashMap<Integer,String> localRegNames= new HashMap<Integer,String>();
+       for(AVM2Instruction ins:code)
+       {
+          if (ins.definition instanceof DebugIns) {
+                   if(ins.operands[0]==1){
+                      localRegNames.put(ins.operands[2]+1, abc.constants.constant_string[ins.operands[1]]);
+                   }
+                }
+       }
+       return localRegNames;
+    }
+
     private ConvertOutput toSource(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, int start, int end) throws ConvertException {
         boolean debugMode = false;
         if (debugMode)
@@ -1369,7 +1382,7 @@ public class AVM2Code {
         String sub = "";
         int level = 0;
         for (int t = 0; t < body.traits.traits.length; t++) {
-            sub += body.traits.traits[t].convert(constants, method_info) + ";\r\n";
+            sub += body.traits.traits[t].convert(constants, method_info,abc) + ";\r\n";
         }
         try {
             Stack<String> loopStack = new Stack<String>();
