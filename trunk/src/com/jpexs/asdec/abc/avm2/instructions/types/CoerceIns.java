@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Stack;
 
 
-public class CoerceIns extends InstructionDefinition {
+public class CoerceIns extends InstructionDefinition implements CoerceOrConvertTypeIns {
 
     public CoerceIns() {
         super(0x80, "coerce", new int[]{AVM2Code.DAT_MULTINAME_INDEX});

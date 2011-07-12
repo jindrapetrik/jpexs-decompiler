@@ -650,6 +650,41 @@ public class AVM2Code {
 
     private int toSourceCount = 0;
 
+
+private int ipOfType(int from,boolean up,Class search,Class skipped,int start,int end)
+{
+   if(up)
+   {
+      System.out.println("Searching up from "+from);
+      for(int i=from;i>=start;i--){
+         if(search.isInstance(code.get(i).definition)){
+            return i;
+         }else if((skipped!=null)&&skipped.isInstance(code.get(i).definition))
+         {
+            //skipped
+         }else{
+            return -1;
+         }
+      }
+   }else
+   {
+      System.out.println("Searching down from "+from);
+      for(int i=from;i<=end;i++){
+         if(search.isInstance(code.get(i).definition)){
+            return i;
+         }else if((skipped!=null)&&skipped.isInstance(code.get(i).definition))
+         {
+            //skipped
+         }else{
+            return -1;
+         }
+      }
+
+   }
+   System.out.println("NotfoundAtAll "+search);
+   return -1;
+}
+
 public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
        HashMap<Integer,String> localRegNames= new HashMap<Integer,String>();
        for(AVM2Instruction ins:code)
@@ -661,6 +696,19 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                 }
        }
        return localRegNames;
+    }
+
+    private void clearKilledAssigments(List<TreeItem> output){
+       for(int i=0;i<output.size();i++){
+          if(output.get(i) instanceof SetLocalTreeItem)
+          {
+             if(isKilled(((SetLocalTreeItem)output.get(i)).regIndex, 0, code.size()-1))
+             {
+                output.remove(i);
+                i--;
+             }
+          }
+       }
     }
 
     private ConvertOutput toSource(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, int start, int end) throws ConvertException {
@@ -1082,11 +1130,14 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                             //stack.add("(" + stack.pop() + ")||");
                             isAnd = false;
                         } else if ((insAfter.definition instanceof IncrementIIns) || ((insAfter.definition instanceof IncrementIns))) {
-                            if (((ip - 1 >= start) && (ip + 2 <= end)) && ((code.get(ip + 2).definition instanceof SetLocalTypeIns) && (code.get(ip - 1).definition instanceof GetLocalTypeIns))) {
-                                stack.add(new PostIncrementTreeItem(insAfter, stack.pop()));
-                                ip += 3;
-                                addr = pos2adr(ip);
-                                break;
+                            int np=-1;
+                            if(((np=ipOfType(ip+2, false, SetLocalTypeIns.class, CoerceOrConvertTypeIns.class, start, end))>-1)
+                             &&(ipOfType(ip-1, true, GetLocalTypeIns.class, CoerceOrConvertTypeIns.class, start, end)>-1))
+                            {
+                                 stack.add(new PostIncrementTreeItem(insAfter, stack.pop()));
+                                 ip = np+1;
+                                 addr = pos2adr(ip);
+                                 break;
                             }
                             if (((ip - 1 >= start) && (ip + 2 <= end))
                                     && (code.get(ip + 2).definition instanceof SetLocalTypeIns)
@@ -1114,11 +1165,14 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                             addr = pos2adr(ip);
                             break;
                         } else if ((insAfter.definition instanceof DecrementIIns) || ((insAfter.definition instanceof DecrementIns))) {
-                            if (((ip - 1 >= start) && (ip + 2 <= end)) && ((code.get(ip + 2).definition instanceof SetLocalTypeIns) && (code.get(ip - 1).definition instanceof GetLocalTypeIns))) {
-                                stack.add(new PostDecrementTreeItem(insAfter, stack.pop()));
-                                ip += 3;
-                                addr = pos2adr(ip);
-                                break;
+                            int np=-1;
+                            if(((np=ipOfType(ip+2, false, SetLocalTypeIns.class, CoerceOrConvertTypeIns.class, start, end))>-1)
+                             &&(ipOfType(ip-1, true, GetLocalTypeIns.class, CoerceOrConvertTypeIns.class, start, end)>-1))
+                            {
+                                 stack.add(new PostDecrementTreeItem(insAfter, stack.pop()));
+                                 ip = np+1;
+                                 addr = pos2adr(ip);
+                                 break;
                             }
                             if (((ip - 1 >= start) && (ip + 2 <= end))
                                     && (code.get(ip + 2).definition instanceof SetLocalTypeIns)
@@ -1146,7 +1200,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                             addr = pos2adr(ip);
                             break;
                         } else if ((insBefore.definition instanceof IncrementIIns) || ((insBefore.definition instanceof IncrementIns))) {
-                            if (((ip - 2 >= start) && (ip + 2 <= end)) && (code.get(ip + 1).definition instanceof ConvertIIns) && (code.get(ip + 2).definition instanceof SetLocalTypeIns) && (code.get(ip - 2).definition instanceof GetLocalTypeIns)) {
+                            if (((ip - 2 >= start) && (ip + 2 <= end)) && (code.get(ip + 1).definition instanceof CoerceOrConvertTypeIns) && (code.get(ip + 2).definition instanceof SetLocalTypeIns) && (code.get(ip - 2).definition instanceof GetLocalTypeIns)) {
                                 stack.pop();
                                 int regId = ((SetLocalTypeIns) code.get(ip + 2).definition).getRegisterId(code.get(ip + 2));
                                 stack.add(new PreIncrementTreeItem(insBefore, new LocalRegTreeItem(code.get(ip + 2), regId, localRegs.get(regId))));
@@ -1183,7 +1237,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                             addr = pos2adr(ip);
                             break;
                         } else if ((insBefore.definition instanceof DecrementIIns) || ((insBefore.definition instanceof DecrementIns))) {
-                            if (((ip - 2 >= start) && (ip + 2 <= end)) && (code.get(ip + 1).definition instanceof ConvertIIns) && (code.get(ip + 2).definition instanceof SetLocalTypeIns) && (code.get(ip - 2).definition instanceof GetLocalTypeIns)) {
+                            if (((ip - 2 >= start) && (ip + 2 <= end)) && (code.get(ip + 1).definition instanceof CoerceOrConvertTypeIns) && (code.get(ip + 2).definition instanceof SetLocalTypeIns) && (code.get(ip - 2).definition instanceof GetLocalTypeIns)) {
                                 stack.pop();
                                 int regId = ((SetLocalTypeIns) code.get(ip + 2).definition).getRegisterId(code.get(ip + 2));
                                 stack.add(new PreDecrementTreeItem(insBefore, new LocalRegTreeItem(code.get(ip + 2), regId, localRegs.get(regId))));
@@ -1322,7 +1376,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
             }
             if (debugMode)
                 System.out.println("CLOSE SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
-
+            clearKilledAssigments(output);
             return new ConvertOutput(stack, output);
         } catch (ConvertException cex) {
             throw cex;
@@ -1360,6 +1414,27 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
         }
     }
 
+    public int getRegisterCount(){
+       int maxRegister=-1;
+       for(AVM2Instruction ins:code)
+       {
+          int regId=-1;
+          if(ins.definition instanceof SetLocalTypeIns)
+          {
+             regId=((SetLocalTypeIns)ins.definition).getRegisterId(ins);
+          }
+          if(ins.definition instanceof GetLocalTypeIns)
+          {
+             regId=((GetLocalTypeIns)ins.definition).getRegisterId(ins);
+          }
+          if(regId>maxRegister)
+          {
+             maxRegister=regId;
+          }
+       }
+       return maxRegister+1;
+    }
+
     public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted) {
         toSourceCount = 0;
         loopList = new ArrayList<Loop>();
@@ -1378,11 +1453,28 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
             return s;
         }
 
+
         String parts[] = s.split("\r\n");
         String sub = "";
         int level = 0;
         for (int t = 0; t < body.traits.traits.length; t++) {
             sub += body.traits.traits[t].convert(constants, method_info,abc) + ";\r\n";
+        }
+        int regCount=getRegisterCount();
+        int paramCount=0;
+        if(body.method_info!=-1)
+        {
+           MethodInfo mi=method_info[body.method_info];
+           paramCount=mi.param_types.length;
+           if(mi.flagNeed_rest()){
+              paramCount++;
+           }
+        }
+        for(int i=paramCount+1;i<regCount;i++)
+        {
+            if(!isKilled(i, 0, code.size()-1)){
+               sub+="var "+InstructionDefinition.localRegName(i)+";\r\n";
+            }
         }
         try {
             Stack<String> loopStack = new Stack<String>();

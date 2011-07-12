@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Stack;
 
 
-public class CoerceAIns extends InstructionDefinition {
+public class CoerceAIns extends InstructionDefinition implements CoerceOrConvertTypeIns{
 
     public CoerceAIns() {
         super(0x82, "coerce_a", new int[]{});

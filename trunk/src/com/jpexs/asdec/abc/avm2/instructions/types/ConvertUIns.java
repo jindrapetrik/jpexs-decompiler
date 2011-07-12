@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Stack;
 
 
-public class ConvertUIns extends InstructionDefinition {
+public class ConvertUIns extends InstructionDefinition implements CoerceOrConvertTypeIns {
 
     public ConvertUIns() {
         super(0x74, "convert_u", new int[]{});
