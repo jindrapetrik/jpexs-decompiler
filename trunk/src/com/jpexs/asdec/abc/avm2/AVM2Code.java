@@ -655,7 +655,6 @@ private int ipOfType(int from,boolean up,Class search,Class skipped,int start,in
 {
    if(up)
    {
-      System.out.println("Searching up from "+from);
       for(int i=from;i>=start;i--){
          if(search.isInstance(code.get(i).definition)){
             return i;
@@ -668,7 +667,6 @@ private int ipOfType(int from,boolean up,Class search,Class skipped,int start,in
       }
    }else
    {
-      System.out.println("Searching down from "+from);
       for(int i=from;i<=end;i++){
          if(search.isInstance(code.get(i).definition)){
             return i;
@@ -681,7 +679,6 @@ private int ipOfType(int from,boolean up,Class search,Class skipped,int start,in
       }
 
    }
-   System.out.println("NotfoundAtAll "+search);
    return -1;
 }
 
