@@ -110,7 +110,7 @@ public class Test {
          trace("single quotes: \'hello!\'");
 		 trace("new line \r\n hello!");         
       }
-      public function tryContinueLevels() {
+      public function testContinueLevels() {
          var a=5;
          loop123:
          switch(a)
@@ -307,7 +307,11 @@ public class Test {
          var b=4;
          var c=4;
          var d=78;
-         var e=(a==b)?((c==d)?1:7):3;
+         var e=(a==b)
+		 ?((c==d)?1
+					   :7
+					   ):
+					   3;
          trace("e="+e);         
       }
 	  
@@ -332,13 +336,13 @@ public class Test {
 	  
 	  public function testVector(){
 		  var v:Vector.<String> = new Vector.<String>();
-		  v.push("ahoj");
-		  v[0]="nazdar";
-		  v[5*8-39]="nazdar2";		  
+		  v.push("hello");
+		  v[0]="hi";
+		  v[5*8-39]="hi2";		  
 		  trace(v[0]);
 		  
-		  vec.push("atribute ahoj");
-		  vec[2*6-11]="atribute cau";
+		  vec.push("atributte hello");
+		  vec[2*6-11]="atributte hi";
 	  }
 	  
 	  public function testProperty(){
@@ -349,5 +353,51 @@ public class Test {
 		  	d.metoda(d.attrib*5);
 		  }
 	  }
+	  
+	  public function testRest(firstp:int,...restval):int{
+		  trace("firstRest:"+restval[0]);
+		  return firstp;
+	  }
+	  
+	  public function testParamNames(firstp:int,secondp:int,thirdp:int):int{
+		  return firstp+secondp+thirdp;
+	  }
+	  
+	  public function testForEach(){
+		  var list:Array;
+		  list=new Array();
+		  list[0]="first";
+		  list[1]="second";
+		  list[2]="third";
+		  for each(var item in list){
+			  trace("item #"+item);
+		  }
+	  }
+	  
+	  public function testForEachObjectArray(){
+		  var list:Array;
+		  list=new Array();
+		  list[0]="first";
+		  list[1]="second";
+		  list[2]="third";
+		  var test:Array;
+		  test=new Array();
+		  test[0]=0;
+		  for each(test[0] in list){
+			  trace("item #"+test[0]);
+		  }
+	  }
+	  
+	  public function testForEachObjectAttribute(){
+		  var list:Array;
+		  list=new Array();
+		  list[0]="first";
+		  list[1]="second";
+		  list[2]="third";
+		  for each(testPriv in list){
+			  trace("item #"+testPriv);
+		  }
+	  }
+	  
    }
 }
