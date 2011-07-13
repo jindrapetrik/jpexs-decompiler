@@ -38,4 +38,10 @@ public class CoerceTreeItem extends TreeItem {
         return value.toString(constants);
     }
 
+   @Override
+   public TreeItem getNotCoerced() {
+      return value;
+   }
+
+
 }

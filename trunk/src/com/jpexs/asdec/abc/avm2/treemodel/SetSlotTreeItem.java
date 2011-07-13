@@ -23,7 +23,7 @@ import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.types.Multiname;
 
 
-public class SetSlotTreeItem extends TreeItem {
+public class SetSlotTreeItem extends TreeItem implements SetTypeTreeItem {
     public Multiname slotName;
     public TreeItem value;
     public TreeItem scope;
@@ -51,5 +51,13 @@ public class SetSlotTreeItem extends TreeItem {
         }
         return ret + hilight(slotName.getName(constants)) + hilight("=") + value.toString(constants) + ";";
     }
+
+   public TreeItem getObject() {
+      return new GetSlotTreeItem(instruction, scope, slotName);
+   }
+
+   public TreeItem getValue() {
+      return value;
+   }
 
 }

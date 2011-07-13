@@ -22,6 +22,9 @@ import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.ContinueTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.EachTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.LocalRegTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.SetLocalTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.SetTypeTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 
 import java.util.ArrayList;
@@ -35,6 +38,20 @@ public class ForEachTreeItem extends LoopTreeItem implements Block {
 
     public ForEachTreeItem(AVM2Instruction instruction, int loopBreak, int loopContinue, EachTreeItem expression, List<TreeItem> commands) {
         super(instruction, loopBreak, loopContinue);
+        TreeItem firstAssign=commands.get(0);
+        if(firstAssign instanceof SetTypeTreeItem){
+           if(expression.object instanceof LocalRegTreeItem){
+              if(((SetTypeTreeItem)firstAssign).getValue().getNotCoerced() instanceof LocalRegTreeItem)
+              {
+                 if(((LocalRegTreeItem)((SetTypeTreeItem)firstAssign).getValue().getNotCoerced()).regIndex==((LocalRegTreeItem)expression.object).regIndex){
+                   commands.remove(0);
+                   expression.object=((SetTypeTreeItem)firstAssign).getObject();
+                 }
+              }
+             
+           }
+           //locAssign.
+        }
         this.expression = expression;
         this.commands = commands;
     }

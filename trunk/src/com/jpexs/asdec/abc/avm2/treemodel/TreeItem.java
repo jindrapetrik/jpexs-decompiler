@@ -91,4 +91,7 @@ public abstract class TreeItem {
             return obStr + "[" + propertyName.toString(constants) + "]";
         }
     }
+    public TreeItem getNotCoerced(){
+       return this;
+    }
 }

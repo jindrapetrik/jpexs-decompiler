@@ -23,7 +23,7 @@ import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 
 
-public class SetLocalTreeItem extends TreeItem {
+public class SetLocalTreeItem extends TreeItem implements SetTypeTreeItem {
     public int regIndex;
     public TreeItem value;
 
@@ -37,6 +37,14 @@ public class SetLocalTreeItem extends TreeItem {
     public String toString(ConstantPool constants) {
         return hilight(InstructionDefinition.localRegName(regIndex) + "=") + value.toString(constants) + ";";
     }
+
+   public TreeItem getObject() {
+      return new LocalRegTreeItem(instruction, regIndex, null);
+   }
+
+   public TreeItem getValue() {
+      return value;
+   }
 
 
 }

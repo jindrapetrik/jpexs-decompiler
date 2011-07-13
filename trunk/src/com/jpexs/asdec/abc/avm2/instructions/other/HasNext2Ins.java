@@ -42,6 +42,6 @@ public class HasNext2Ins extends InstructionDefinition {
         int objectReg = ins.operands[0];
         int indexReg = ins.operands[1];
         //stack.push("_loc_" + objectReg + ".hasNext(cnt=_loc_" + indexReg + ")");
-        stack.push(new EachTreeItem(ins, new LocalRegTreeItem(ins, indexReg, localRegs.get(indexReg)), new LocalRegTreeItem(ins, objectReg, localRegs.get(objectReg))));
+        stack.push(new EachTreeItem(ins, new LocalRegTreeItem(ins, indexReg, localRegs.get(indexReg)), localRegs.get(objectReg)));
     }
 }

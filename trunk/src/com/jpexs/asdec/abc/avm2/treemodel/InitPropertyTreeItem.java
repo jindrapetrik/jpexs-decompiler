@@ -22,7 +22,7 @@ import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 
 
-public class InitPropertyTreeItem extends TreeItem {
+public class InitPropertyTreeItem extends TreeItem implements SetTypeTreeItem{
     public TreeItem object;
     public FullMultinameTreeItem propertyName;
     public TreeItem value;
@@ -38,6 +38,14 @@ public class InitPropertyTreeItem extends TreeItem {
     public String toString(ConstantPool constants) {
         return formatProperty(constants, object, propertyName) + hilight("=") + value.toString(constants) + ";";
     }
+
+   public TreeItem getObject() {
+      return new GetPropertyTreeItem(instruction, object, propertyName);
+   }
+
+   public TreeItem getValue() {
+      return value;
+   }
 
 
 }
