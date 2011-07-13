@@ -37,7 +37,8 @@ public class MethodTraitDetailPanel extends JTabbedPane implements TraitDetail {
       methodInfoPanel=new MethodInfoPanel();
       addTab("MethodInfo",methodInfoPanel);
       addTab("MethodBody Code", methodCodePanel);
-      addTab("MethodBody params", new JScrollPane(methodBodyParamsPanel));      
+      addTab("MethodBody params", new JScrollPane(methodBodyParamsPanel));
+      setSelectedIndex(1);
    }
 
    public boolean save() {

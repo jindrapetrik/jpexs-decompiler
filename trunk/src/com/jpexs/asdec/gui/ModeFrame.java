@@ -62,7 +62,7 @@ public class ModeFrame extends JFrame implements ActionListener {
         cont.add(exitButton);
         View.centerScreen(this);
         View.setWindowIcon(this);
-        setTitle(Main.applicationName);
+        setTitle(Main.shortApplicationName);
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {

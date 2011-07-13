@@ -52,8 +52,9 @@ public class Main {
     public static String file;
     public static String maskURL;
     public static SWF swf;
-    public static final String version = "alpha9";
+    public static final String version = "alpha10";
     public static String applicationName = "JP ActionScript Decompiler v." + version;
+    public static String shortApplicationName = "JPAD v."+version;
     public static LoadingDialog loadingDialog = new LoadingDialog();
     public static ModeFrame modeFrame;
     private static boolean working = false;
@@ -195,7 +196,10 @@ public class Main {
                 DEBUG_COPY = false;
                 //DEBUG_COPY=true;
             } catch (Exception ex) {
-                ex.printStackTrace();
+                  if(DEBUG_MODE)
+                  {
+                   ex.printStackTrace();
+                  }
                 JOptionPane.showMessageDialog(null, "Cannot load SWF file.");
                 loadingDialog.setVisible(false);
                 return false;
