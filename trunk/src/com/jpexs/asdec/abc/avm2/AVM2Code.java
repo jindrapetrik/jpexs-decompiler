@@ -1401,7 +1401,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
             if (ex instanceof UnknownJumpException) {
                 throw (UnknownJumpException) ex;
             }
-            throw new ConvertException(ex.toString(), ip);
+            throw new ConvertException(ex.getClass().getSimpleName(), ip);
     }
     }
 
@@ -1453,12 +1453,6 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
     }
 
     public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted) {
-        /*for(int i=0;i<code.size();i++){
-           if(code.get(i).definition instanceof DebugLineIns){
-              removeInstruction(i, body);
-              i--;
-           }
-        }*/
         toSourceCount = 0;
         loopList = new ArrayList<Loop>();
         unknownJumps = new ArrayList<Integer>();
@@ -1470,9 +1464,8 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
         try {            
             list = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), new Stack<TreeItem>(), abc, constants, method_info, body, 0, code.size() - 1).output;
             s = listToString(list, constants);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            s = "Convert error - " + ex.toString();
+        } catch (Exception ex) {            
+            s = "/*\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error Message: " + ex.getMessage()+"\r\n */";
             return s;
         }
 

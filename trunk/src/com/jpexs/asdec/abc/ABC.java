@@ -35,6 +35,7 @@ import com.jpexs.asdec.helpers.Highlighting;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JOptionPane;
 
 public class ABC {
 
@@ -51,6 +52,38 @@ public class ABC {
     public static String IDENT_STRING = "   ";
 
     public static final int MINORwithDECIMAL = 17;
+
+    private int fixNamesStrategy=0;
+    private final int STRATEGY_FIX_NAMES=1;
+    private final int STRATEGY_IGNORE=2;
+
+    private void fixNameWithStrategy(int index){
+       if(fixNamesStrategy==0){
+               if(!isValidName(index,false)){
+                  int val=JOptionPane.showOptionDialog(null, "Decompiler found unusual name '"+constants.constant_string[index]+"' for a variable/class which can cause problems when decompiling.\r\nDo you want the decompiler to fix it?", "Decompilation", 0, JOptionPane.INFORMATION_MESSAGE, null, new String[]{"Yes","Yes to all","No","No to all"}, "Yes to all");
+                  if(val==JOptionPane.CLOSED_OPTION){
+                     val=2; //NO
+                  }
+                  if((val==0)||(val==1)) //YES,YES TO ALL
+                  {
+                     isValidName(index,true);
+                  }
+                  if(val==1) //YES TO ALL
+                  {
+                     fixNamesStrategy=STRATEGY_FIX_NAMES;
+                  }
+                  if(val==3){ //NO TO ALL
+                     fixNamesStrategy=STRATEGY_IGNORE;
+                  }
+               }
+            }else
+            if(fixNamesStrategy==STRATEGY_FIX_NAMES)
+            {
+               isValidName(index,true);
+            }else if(fixNamesStrategy==STRATEGY_IGNORE){
+
+            }
+    }
 
    public ABC(InputStream is) throws IOException {
         ABCInputStream ais = new ABCInputStream(is);
@@ -107,7 +140,7 @@ public class ABC {
         constants.constant_namespace = new Namespace[constant_namespace_pool_count];
         for (int i = 1; i < constant_namespace_pool_count; i++) { //index 0 not used. Values 1..n-1
             constants.constant_namespace[i] = ais.readNamespace();
-            //cleanOneName(constants.constant_namespace[i].name_index);
+            fixNameWithStrategy(constants.constant_namespace[i].name_index);
         }
 
         //constant namespace set
@@ -123,14 +156,16 @@ public class ABC {
         }
 
 
+
+        
+
         //constant multiname
         int constant_multiname_pool_count = ais.readU30();
         //System.out.println("Reading "+constant_multiname_pool_count+" multinames");
         constants.constant_multiname = new Multiname[constant_multiname_pool_count];
         for (int i = 1; i < constant_multiname_pool_count; i++) { //index 0 not used. Values 1..n-1
-            constants.constant_multiname[i] = ais.readMultiname();            
-            //System.out.println("Multiname read:"+constants.constant_multiname[i]);
-            //cleanNamespace(constants.constant_multiname[i].name_index);
+            constants.constant_multiname[i] = ais.readMultiname();
+            fixNameWithStrategy(constants.constant_multiname[i].name_index);
         }
 
 
@@ -712,20 +747,17 @@ public class ABC {
         }
     }
     public static final String[] reservedWords = {
-        "as", "break", "case", "catch", "class", "const", "continue", /*"default",*/ "delete", "do", "each", "else",
+        "as", "break", "case", "catch", "class", "const", "continue", "default","delete", "do", "each", "else",
         "extends", "false", "finally", "for", "function", "if", "implements", "import", "in", "instanceof",
         "interface", "internal", "is", "native", "new", "null", "package", "private", "protected", "public",
         "return", "super", "switch", "this", "throw", "true", "try", "typeof", "use", "var", /*"void",*/ "while",
-        "with","dynamic","default","final"};
+        "with","dynamic","default","final","in"};
     public int unknownCount = 0;
 
-    public void cleanOneName(int index) {
-        cleanNamespace(index);
-    }
 
-    public void cleanNamespace(int index) {
+    public boolean isValidName(int index,boolean autoFix) {
         if (index <= 0) {
-            return;
+            return true;
         }
         String s = constants.constant_string[index];
         boolean isValid = true;
@@ -747,13 +779,17 @@ public class ABC {
         }
 
         if (!isValid) {
-            if (isReserved) {
-                constants.constant_string[index] = "name_" + s.replace(" ", "_");
-            } else {
-                unknownCount++;
-                constants.constant_string[index] = "_name" + unknownCount;
+            if(autoFix)
+            {
+               if (isReserved) {
+                   constants.constant_string[index] = "name_" + s.replace(" ", "_");
+               } else {
+                   unknownCount++;
+                   constants.constant_string[index] = "_name" + unknownCount;
+               }
             }
         }
+        return isValid;
     }
 
     public List<Usage> findMultinameUsage(int multinameIndex) {
