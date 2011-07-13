@@ -708,6 +708,18 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
        }
     }
 
+    private int fixIPAfterDebugLine(int ip){
+       if(ip>=code.size()) return code.size()-1;
+       if(code.get(ip).definition instanceof DebugLineIns){
+          return ip+1;
+       }
+       return ip;
+    }
+
+    private int fixAddrAfterDebugLine(int addr) throws ConvertException{
+       return pos2adr(fixIPAfterDebugLine(adr2pos(addr)));
+    }
+
     private ConvertOutput toSource(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, int start, int end) throws ConvertException {
         boolean debugMode = false;
         if (debugMode)
@@ -726,24 +738,28 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
             while (ip <= end) {
 
                 addr = pos2adr(ip);
+                int ipfix=fixIPAfterDebugLine(ip);
+                int addrfix=pos2adr(ipfix);
                 int maxend = -1;
                 List<ABCException> catchedExceptions = new ArrayList<ABCException>();
                 for (int e = 0; e < body.exceptions.length; e++) {
-                    if (addr == body.exceptions[e].start) {
+                    if (addrfix == fixAddrAfterDebugLine(body.exceptions[e].start)) {
                         if (!body.exceptions[e].isFinally()) {
-                            if ((body.exceptions[e].end > maxend) && (!parsedExceptions.contains(body.exceptions[e]))) {
+                            if ((fixAddrAfterDebugLine(body.exceptions[e].end) > maxend) && (!parsedExceptions.contains(body.exceptions[e]))) {
                                 catchedExceptions.clear();
-                                maxend = body.exceptions[e].end;
+                                maxend = fixAddrAfterDebugLine(body.exceptions[e].end);
                                 catchedExceptions.add(body.exceptions[e]);
-                            } else if (body.exceptions[e].end == maxend) {
+                            } else if (fixAddrAfterDebugLine(body.exceptions[e].end) == maxend) {
                                 catchedExceptions.add(body.exceptions[e]);
                             }
                         }
                     }
                 }
                 if (catchedExceptions.size() > 0) {
+                    ip=ipfix;
+                    addr=addrfix;
                     parsedExceptions.addAll(catchedExceptions);
-                    int endpos = adr2pos(catchedExceptions.get(0).end);
+                    int endpos = adr2pos(fixAddrAfterDebugLine(catchedExceptions.get(0).end));
 
 
                     List<List<TreeItem>> catchedCommands = new ArrayList<List<TreeItem>>();
@@ -753,7 +769,11 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                         Collections.sort(catchedExceptions, new Comparator<ABCException>() {
 
                             public int compare(ABCException o1, ABCException o2) {
-                                return o1.target - o2.target;
+                              try {
+                                 return fixAddrAfterDebugLine(o1.target) - fixAddrAfterDebugLine(o2.target);
+                              } catch (ConvertException ex) {
+                                 return 0;
+                              }
                             }
                         });
 
@@ -762,11 +782,11 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                         int returnPos = afterCatchPos;
                         for (int e = 0; e < body.exceptions.length; e++) {
                             if (body.exceptions[e].isFinally()) {
-                                if (addr == body.exceptions[e].start) {
-                                    if (afterCatchPos + 1 == adr2pos(body.exceptions[e].end)) {
-                                        AVM2Instruction jmpIns = code.get(adr2pos(body.exceptions[e].end));
+                                if (addr == fixAddrAfterDebugLine(body.exceptions[e].start)) {
+                                    if (afterCatchPos + 1 == adr2pos(fixAddrAfterDebugLine(body.exceptions[e].end))) {
+                                        AVM2Instruction jmpIns = code.get(adr2pos(fixAddrAfterDebugLine(body.exceptions[e].end)));
                                         if (jmpIns.definition instanceof JumpIns) {
-                                            int finStart = adr2pos(body.exceptions[e].end + jmpIns.getBytes().length + jmpIns.operands[0]);
+                                            int finStart = adr2pos(fixAddrAfterDebugLine(body.exceptions[e].end) + jmpIns.getBytes().length + jmpIns.operands[0]);
                                             finallyJumps.add(finStart);
                                             if (unknownJumps.contains(finStart)) {
                                                 unknownJumps.remove((Integer) finStart);
@@ -796,13 +816,13 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                         for (int e = 0; e < catchedExceptions.size(); e++) {
                             int eendpos = 0;
                             if (e < catchedExceptions.size() - 1) {
-                                eendpos = adr2pos(catchedExceptions.get(e + 1).target) - 2;
+                                eendpos = adr2pos(fixAddrAfterDebugLine(catchedExceptions.get(e + 1).target)) - 2;
                             } else {
                                 eendpos = afterCatchPos - 1;
                             }
                             Stack<TreeItem> substack = new Stack<TreeItem>();
                             substack.add(new ExceptionTreeItem(catchedExceptions.get(e)));
-                            catchedCommands.add(toSource(isStatic, classIndex, localRegs, substack, new Stack<TreeItem>(), abc, constants, method_info, body, adr2pos(catchedExceptions.get(e).target), eendpos).output);
+                            catchedCommands.add(toSource(isStatic, classIndex, localRegs, substack, new Stack<TreeItem>(), abc, constants, method_info, body, adr2pos(fixAddrAfterDebugLine(catchedExceptions.get(e).target)), eendpos).output);
                         }
 
                         List<TreeItem> tryCommands = toSource(isStatic, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, ip, endpos - 1).output;
@@ -1433,6 +1453,12 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
     }
 
     public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted) {
+        /*for(int i=0;i<code.size();i++){
+           if(code.get(i).definition instanceof DebugLineIns){
+              removeInstruction(i, body);
+              i--;
+           }
+        }*/
         toSourceCount = 0;
         loopList = new ArrayList<Loop>();
         unknownJumps = new ArrayList<Integer>();
@@ -1440,8 +1466,8 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
         parsedExceptions = new ArrayList<ABCException>();
         List<TreeItem> list;
         String s = "";
-        try {
-            HashMap<Integer, TreeItem> localRegs = new HashMap<Integer, TreeItem>();
+        HashMap<Integer, TreeItem> localRegs = new HashMap<Integer, TreeItem>();
+        try {            
             list = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), new Stack<TreeItem>(), abc, constants, method_info, body, 0, code.size() - 1).output;
             s = listToString(list, constants);
         } catch (Exception ex) {
@@ -1469,7 +1495,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
         }
         for(int i=paramCount+1;i<regCount;i++)
         {
-            if(!isKilled(i, 0, code.size()-1)){
+            if((!(localRegs.get(i) instanceof NewActivationTreeItem))&&(!isKilled(i, 0, code.size()-1))){
                sub+="var "+InstructionDefinition.localRegName(i)+";\r\n";
             }
         }
@@ -1598,10 +1624,10 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                 ex.start -= byteCount;
             }
             if (ex.end > remOffset) {
-                ex.start -= byteCount;
+                ex.end -= byteCount;
             }
             if (ex.target > remOffset) {
-                ex.start -= byteCount;
+                ex.target -= byteCount;
             }
         }
 
