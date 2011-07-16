@@ -1,42 +1,32 @@
 package com.jpexs.proxy;
 
-import java.io.IOException;
-import java.net.ServerSocket;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.net.ServerSocket;
+import java.io.IOException;
+import java.io.DataOutputStream;
 import java.util.List;
 
-/**
- * Proxy server
- *
- * @author JPEXS
- */
-public class Server extends Thread {
-    private ServerSocket ssocket = null;
-    private boolean stoppped = false;
-    private List<Replacement> replacements;
-    private static Server server;
+public class Server implements Runnable
+{
+    ServerSocket server = null;
+    boolean running = false;
+
     private List<String> catchedContentTypes;
     private CatchedListener catchedListener;
-    private int port;
     private ReplacedListener replacedListener;
+    private List<Replacement> replacements;
 
-    private Server(int port, List<Replacement> replacements, List<String> catchedContentTypes, CatchedListener catchedListener, ReplacedListener replacedListener) {
-        this.replacements = replacements;
-        this.catchedContentTypes = catchedContentTypes;
-        this.catchedListener = catchedListener;
-        this.replacedListener = replacedListener;
-        this.port = port;
-    }
+     static ThreadPool pool;
 
-    private void stopRun() {
-        stoppped = true;
-        if (ssocket != null) {
-            try {
-                ssocket.close();
-            } catch (IOException e) {
+    static Server myServer;
+    static boolean serverRunning=false;
 
-            }
-        }
+    static boolean stopping=false;
+
+    public static ReusableThread getThread()
+    {
+       return pool.get();
     }
 
     /**
@@ -47,42 +37,125 @@ public class Server extends Thread {
      * @param catchedContentTypes Content types to sniff
      * @param catchedListener     Catched listener
      */
-    public static void startServer(int port, List<Replacement> replacements, List<String> catchedContentTypes, CatchedListener catchedListener, ReplacedListener replacedListener) {
+    public static boolean startServer(int port, List<Replacement> replacements, List<String> catchedContentTypes, CatchedListener catchedListener, ReplacedListener replacedListener) {
         stopServer();
-        server = new Server(port, replacements, catchedContentTypes, catchedListener, replacedListener);
-        //WorkerThread.assignThread(server, "Proxy server");
-        server.start();
+      try {
+         myServer = new Server(port, replacements, catchedContentTypes, catchedListener, replacedListener);
+      } catch (IOException ex) {
+         return false;
+      }
+        pool = new ThreadPool(ProxyConfig.appName+" Threads");
+        /* Startup the Janitor */
+         Janitor j = new Janitor();
+         j.add(pool);
+         getThread().setRunnable(j);
+         serverRunning=true;
+         getThread().setRunnable(myServer);
+         return true;
     }
 
-    /**
-     * Stops proxy server
-     */
-    public static void stopServer() {
-        if (server != null) server.stopRun();
-        server = null;
+
+    public static void stopServer()
+    {
+      if(serverRunning){
+         serverRunning=false;
+         try {
+            myServer.server.close();
+         } catch (IOException ex) {
+
+         }
+         pool.clean();
+      }
+    }
+    Server(int port,List<Replacement> replacements, List<String> catchedContentTypes, CatchedListener catchedListener, ReplacedListener replacedListener) throws IOException
+    {
+
+       this.replacements = replacements;
+       this.catchedContentTypes = catchedContentTypes;
+        this.catchedListener = catchedListener;
+        this.replacedListener = replacedListener;
+	
+	try
+	{
+	    String bindaddr = ProxyConfig.bindAddress;
+	    if (bindaddr != null && bindaddr.length() > 0)
+	    {
+		server = new ServerSocket(port, 512,
+					  InetAddress.getByName(bindaddr));
+	    }
+	    else
+	    {
+		server = new ServerSocket(port, 512);
+	    }
+	}
+	catch (IOException e)
+	{
+	    throw e;
+	}
+
+	/* Initialize internal Httpd */
     }
 
-    /**
-     * Runs the server
-     */
-    public void run() {
+    synchronized void suspend()
+    {
+	running = false;
+    }
 
-        try {
-            ssocket = new ServerSocket(port);
-        } catch (IOException e) {
-            System.err.println("Cannot bind to port");
-            return;
-        }
-        for (; ;) {
-            try {
-                Socket sock = ssocket.accept();
-                Handler handler = new Handler(sock, replacements, catchedContentTypes, catchedListener, replacedListener);
-                WorkerThread.assignThread(handler, "Proxy handler");
-            } catch (IOException e) {
+    synchronized void resume()
+    {
+	running = true;
+    }
 
-            }
-            if (stoppped)
-                break;
-        }
+
+    public void run()
+    {
+	Thread.currentThread().setName(ProxyConfig.appName+" Server");
+	running = true;
+	for (;;)
+	{
+	    Socket socket;
+
+	    try
+	    {
+		socket = server.accept();
+	    }
+	    catch (IOException e)
+	    {
+       if(stopping){
+          break;
+       }
+		continue;
+	    }
+
+       if(stopping){
+          break;
+       }
+
+	    if (running)
+	    {
+		Handler h = new Handler(socket,replacements,catchedContentTypes,catchedListener,replacedListener);
+		ReusableThread rt = getThread();
+		rt.setRunnable(h);
+	    }
+	    else
+	    {
+		error(socket, 503, ProxyConfig.appName+" proxy service is suspended.");
+	    }
+	}
+    }
+
+    void error(Socket socket, int code, String message)
+    {
+	try
+	{
+	    DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+	    out.writeBytes((new HttpError(code, message)).toString());
+	    out.close();
+	    socket.close();
+	}
+	catch (IOException e)
+	{
+	    e.printStackTrace();
+	}
     }
 }

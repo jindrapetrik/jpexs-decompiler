@@ -3,11 +3,6 @@ package com.jpexs.proxy;
 import java.io.IOException;
 import java.io.OutputStream;
 
-/**
- * Class used to represent an array of bytes as an Object.
- *
- * @author Mark Boyns
- */
 public class ByteArray {
     public byte bytes[];
     public int offset = 0;

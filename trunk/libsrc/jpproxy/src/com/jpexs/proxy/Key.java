@@ -1,12 +1,5 @@
 package com.jpexs.proxy;
 
-/**
- * A wrapper around java.lang.String to have case-insensitive
- * hashCode and equals methods.
- *
- * @author Mark Boyns
- * @see String
- */
 class Key {
     private String name = null;
 
