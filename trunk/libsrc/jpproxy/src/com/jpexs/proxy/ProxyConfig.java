@@ -1,5 +1,8 @@
 package com.jpexs.proxy;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author JPEXS
@@ -7,8 +10,6 @@ package com.jpexs.proxy;
 public class ProxyConfig {
 
    public static boolean dontLogFilters=false;
-   public static long maxLogFileSize=1024*5;
-   public static int maxLogFileHistory=500;
 
    public static String appVersion="1.1";
    public static String appName="JPProxy";
@@ -18,6 +19,14 @@ public class ProxyConfig {
    public static int readTimeout=50000;
    public static boolean proxyKeepAlive=false;
    public static boolean dontUncompress=false;
+
+   public static final int HTTPS_PASSTHRU=0;
+   public static final int HTTPS_FILTER=1;
+   public static final int HTTPS_FILTERLIST=2;
+
+   public static int httpsMode=HTTPS_PASSTHRU;
+
+   public static List<String> enabledHttpsServers=new ArrayList<String>();
 
    public static boolean useHTTPSProxy=false;
    public static String httpsProxyHost="";

@@ -24,7 +24,7 @@ class Janitor implements Runnable
 	    }
 	    catch (Exception e)
 	    {
-		e.printStackTrace();
+		
 	    }
 
 	    for (Enumeration e = cleanable.elements();

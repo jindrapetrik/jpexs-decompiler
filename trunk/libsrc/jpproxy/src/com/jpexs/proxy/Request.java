@@ -18,6 +18,7 @@ public class Request extends Message
     private Client client = null;
     private Hashtable log;
     private Vector logHeaders;
+    public boolean hadKeepalive=false;
 
 
     Request(Client c)
@@ -64,7 +65,7 @@ public class Request extends Message
 	    }
 	    catch (NumberFormatException e)
 	    {
-		System.out.println("Malformed or missing " + command + " Content-length");
+		
 	    }
 	}
     }
@@ -115,6 +116,10 @@ public class Request extends Message
 	this.protocol = protocol;
     }
 
+    public void addSecureHostToURL(String host){
+       url="https://"+host+url;
+    }
+
     public String getHost()
     {
 	String url = getURL();
@@ -123,6 +128,10 @@ public class Request extends Message
 	if (url.startsWith("http://"))
 	{
 	    s = url.substring(7, url.indexOf('/', 7));
+	}
+	else if (url.startsWith("https://"))
+	{
+	    s = url.substring(8, url.indexOf('/', 8));
 	}
 	else
 	{
@@ -153,6 +162,11 @@ public class Request extends Message
 	{
 	    s = url.substring(7, url.indexOf('/', 7));
 	}
+	else if (url.startsWith("https://"))
+	{
+	    s = url.substring(8, url.indexOf('/', 8));
+       port=443;
+	}
 	else
 	{
 	    s = url;
@@ -172,7 +186,7 @@ public class Request extends Message
 	    }
 	    catch (NumberFormatException e)
 	    {
-		System.out.println("Invalid port in " + url);
+		
 	    }
 	}
 	return port;
@@ -262,4 +276,6 @@ public class Request extends Message
     {
 	return log != null ? ((Vector)log.get(header)).elements() : null;
     }
+
+
 }

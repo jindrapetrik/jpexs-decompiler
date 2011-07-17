@@ -1,6 +1,8 @@
 package com.jpexs.proxy;
 
 import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.*;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -10,6 +12,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import javax.net.ssl.SSLHandshakeException;
 
 class Handler implements Runnable
 {
@@ -30,11 +33,16 @@ class Handler implements Runnable
     List<String> catchedContentTypes;
     ReplacedListener replacedListener;
 
+    static int curId=0;
+    int id;
+
     /**
      * Create a Handler.
      */
     Handler(Socket socket,List<Replacement> replacements, List<String> catchedContentTypes, CatchedListener catchedListener, ReplacedListener replacedListener)
     {
+        curId++;
+        id=curId;
         this.socket = socket;
         this.replacements = replacements;
         this.catchedListener = catchedListener;
@@ -72,7 +80,7 @@ class Handler implements Runnable
 	    }
 	    catch (IOException e)
 	    {
-		e.printStackTrace();
+
 	    }
 	}
     }
@@ -93,13 +101,16 @@ class Handler implements Runnable
 	}
 	catch (IOException e)
 	{
-	    e.printStackTrace();
+
+
 	    return;
 	}
 
 	try
 	{
-
+      boolean secure=false;
+      int securePort=443;
+      String secureServer="";
 	    do
 	    {
 		request = null;
@@ -109,18 +120,46 @@ class Handler implements Runnable
 		try
 		{
 		    request = client.read();
+          if(secure){
+             request.addSecureHostToURL(secureServer);
+          }
 		}
+      catch(SSLHandshakeException she)
+      {
+         client.close();
+         break;
+      }
 		catch (IOException e)
 		{
-		    e.printStackTrace();
+
 		    break;
 		}
+
+      
+      if(request.getCommand().equals("CONNECT")){         
+         secureServer=request.getHost();
+         securePort=request.getPort();
+         if((ProxyConfig.httpsMode==ProxyConfig.HTTPS_FILTER)||((ProxyConfig.httpsMode==ProxyConfig.HTTPS_FILTERLIST)&&(ProxyConfig.enabledHttpsServers.contains(secureServer)))){
+            secure=true;
+            reply=new Reply();
+            reply.statusLine = "HTTP/1.0 200 Connection established";
+            reply.setHeaderField("Proxy-agent", ProxyConfig.appName);
+            try {
+               client.write(reply);
+            } catch (IOException ex) {
+
+            }
+            client.promoteToServerSSL();
+            keepAlive=true;
+            continue;
+         }
+      }
 
 		idle = 0;
 
 		try
 		{
-		    keepAlive = processRequest();
+		    keepAlive = processRequest(secure,secureServer,securePort);
 		}
 		catch (IOException ioe)
 		{
@@ -154,19 +193,18 @@ class Handler implements Runnable
 		error(client.getOutputStream(), reason, request);
 	    }
 
-	    //reason.printStackTrace();
 	}
 	
 	close();
     }
 
-    boolean processRequest() throws IOException
+    boolean processRequest(boolean secure,String secureHost,int securePort) throws IOException
     {
 	boolean keepAlive = false;
 	
 	while (reply == null)
 	{
-	    boolean secure = false;
+	    //boolean secure = false;
 	    boolean uncompress = false;
 
 
@@ -178,14 +216,13 @@ class Handler implements Runnable
 	    {
 		
 	    }
-	    else if (request.getURL().startsWith("https://"))
+	    else if (request.getURL().startsWith("https://")&&(secure))
 	    {
-		System.out.println("Netscape keep-alive bug: " + request.getURL());
-		return false;
+
 	    }
 	    else if (! request.getURL().startsWith("http://"))
 	    {
-		System.out.println("Unknown URL: " + request.getURL());
+
 		return false;
 	    }
 
@@ -193,7 +230,7 @@ class Handler implements Runnable
 	    if (ProxyConfig.proxyKeepAlive)
 	    {
 		keepAlive = (request.containsHeaderField("Proxy-Connection")
-			     && request.getHeaderField("Proxy-Connection").equals("Keep-Alive"));
+			     && request.getHeaderField("Proxy-Connection").equals("Keep-Alive"));      
 	    }
 
 	    /* Filter the request. */
@@ -202,7 +239,7 @@ class Handler implements Runnable
 		/* None found.  Use http or https relay. */
 		if (secure)
 		{
-		    http = createHttpsRelay();
+		    http = createHttpsRelay(secureHost,securePort);
 		}
 		else
 		{
@@ -210,7 +247,7 @@ class Handler implements Runnable
 		}
 	    try
 	    {
-		http.sendRequest(request);
+     http.sendRequest(request);
 		if (http instanceof Http)
 		{
 		    ((Http)http).setTimeout(ProxyConfig.readTimeout);
@@ -257,6 +294,11 @@ class Handler implements Runnable
 		//filter(reply);
 	    }
 
+
+       if(request.containsHeaderField("Connection")&&(request.getHeaderField("Connection").toLowerCase().equals("keep-alive"))&& reply.containsHeaderField("Connection")
+			     && reply.getHeaderField("Connection").equals("Keep-Alive")){
+         keepAlive=true;
+      }
 	    reply.removeHeaderField("Proxy-Connection");
 	    if (keepAlive && reply.containsHeaderField("Content-length"))
 	    {
@@ -279,9 +321,9 @@ class Handler implements Runnable
 
 
 
-	    if (secure)
+	    if (http instanceof HttpsThrough)
 	    {
-		Https https = (Https) http;
+		HttpsThrough https = (HttpsThrough) http;
 		int timeout = ProxyConfig.readTimeout;
 		
 		client.write(reply);
@@ -344,20 +386,40 @@ class Handler implements Runnable
 	return keepAlive;
     }
 
-    HttpRelay createHttpsRelay() throws IOException
+    HttpRelay createHttpsRelay(String secureHost,int securePort) throws IOException
     {
 	HttpRelay http;
 
-	if (ProxyConfig.useHTTPSProxy)
-	{
-	    http = new Https(ProxyConfig.httpsProxyHost,
-			      ProxyConfig.httpsProxyPort,
-			      true);
-	}
-	else
-	{
-	    http = new Https(request.getHost(), request.getPort());
-	}
+   if((ProxyConfig.httpsMode==ProxyConfig.HTTPS_FILTER)||((ProxyConfig.httpsMode==ProxyConfig.HTTPS_FILTERLIST)&&(ProxyConfig.enabledHttpsServers.contains(secureHost))))
+      {
+          http=Https.open(secureHost,securePort,ProxyConfig.useHTTPSProxy);
+          /*http = new Http(request.getHost(),request.getPort(),ProxyConfig.useHTTPSProxy);
+          if(ProxyConfig.useHTTPSProxy){
+             Request connectReq=new Request(client);
+             connectReq.setCommand("CONNECT");
+             connectReq.setURL(secureHost+":"+securePort);
+             connectReq.setProtocol("HTTP/1.1");
+            try {
+               http.sendRequest(connectReq);
+               http.recvReply(connectReq);
+            } catch (RetryRequestException ex) {
+
+            }
+          }
+          ((Http)http).promoteToClientSSL();*/
+      }else{
+         if(ProxyConfig.useHTTPSProxy)
+         {
+            http = new HttpsThrough(ProxyConfig.httpsProxyHost,
+                  ProxyConfig.httpsProxyPort,
+                  true);
+         }else{
+            http = new HttpsThrough(secureHost,securePort);
+         }
+      }
+
+	    
+	
 
 	return http;
     }
@@ -439,7 +501,7 @@ void processContent(boolean uncompress) throws IOException
 
 	if (in == null)
 	{
-	    System.out.println("No inputstream");
+
 	    return;
 	}
 	else if (uncompress)
@@ -617,13 +679,6 @@ void processContent(boolean uncompress) throws IOException
 
 	out.flush();
 
-	if (DEBUG)
-	{
-	    System.out.println(currentLength + " bytes processed in "
-			       + ((System.currentTimeMillis() - start)
-				  / 1000.0) + " seconds "
-				+ ((int)bytesPerSecond / 1024) + " kB/s");
-	}
     }
 
     /**
@@ -679,12 +734,6 @@ void processContent(boolean uncompress) throws IOException
 	}
 	out.flush();
 
-	if (DEBUG)
-	{
-	    System.out.println(currentLength + " bytes processed in "
-				+ ((System.currentTimeMillis() - start) / 1000.0) + " seconds "
-				+ ((int)bytesPerSecond / 1024) + " kB/s");
-	}
     }
 
 

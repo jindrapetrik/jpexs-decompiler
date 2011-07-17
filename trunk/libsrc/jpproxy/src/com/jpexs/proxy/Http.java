@@ -8,7 +8,6 @@ import java.util.Vector;
 
 class Http extends HttpConnection
 {
-    static final boolean DEBUG = false; /* enable lots of debug output */
 
     /* XXX - more than 1 should work now. */
     static final int MAX_PENDING_REQUESTS = 1;
@@ -25,12 +24,12 @@ class Http extends HttpConnection
     long idle = 0;
     Vector queue = new Vector();
 
-    Http(String host, int port) throws IOException
+    public Http(String host, int port) throws IOException
     {
 	this(host, port, false);
     }
     
-    Http(String host, int port, boolean isProxy) throws IOException
+    public Http(String host, int port, boolean isProxy) throws IOException
     {
 	super(host, port);
 	this.host = host;
@@ -38,7 +37,7 @@ class Http extends HttpConnection
 	this.proxy = isProxy;
     }
 
-    Http(String host, int port, boolean isProxy,Socket sock) throws IOException
+    public Http(String host, int port, boolean isProxy,Socket sock) throws IOException
     {
 	super(sock);
 	this.host = host;
@@ -53,14 +52,13 @@ class Http extends HttpConnection
 	
 	try
 	{
-	    send(request);
+       send(request);
 	}
 	catch (IOException e)
 	{
 	    if (persistent)
 	    {
 		persistent = false;
-		if (DEBUG) System.out.println("RETRY SEND " + request.getURL());
 		throw new RetryRequestException();
 	    }
 	    throw e;
@@ -83,7 +81,6 @@ class Http extends HttpConnection
 
 	if (closed)
 	{
-	    if (DEBUG) System.out.println("RETRY CLOSED " + request.getURL());
 	    throw new RetryRequestException();
 	}
 
@@ -96,7 +93,6 @@ class Http extends HttpConnection
 	    if (persistent)
 	    {
 		persistent = false;
-		if (DEBUG) System.out.println("RETRY RECV " + request.getURL());
 		throw new RetryRequestException();
 	    }
 	    throw e;
@@ -106,8 +102,6 @@ class Http extends HttpConnection
     public void reallyClose()
     {
 	persistent = false;
-	if (DEBUG)
-	    System.out.println("REALLY CLOSE " + this);
 	close();
     }
 
@@ -127,24 +121,21 @@ class Http extends HttpConnection
 	if (queue.size() > 0)
 	{
 	    queue.removeElementAt(0);
-	    if (DEBUG)
-	    {
-		if (persistent)
-		    System.out.println("DONE " + this);
-		else
-		    System.out.println("CLOSE " + this);
-	    }
+	    
 	    notify();
 	}
     }
 
     private void send(Request request) throws IOException
     {
-	if (DEBUG) System.out.println("SEND " + request.getURL());
-
+	
 	/* Prepare HTTP/1.1 request */
 	request.removeHeaderField("Proxy-Connection");
-	request.setHeaderField("Connection", "open");
+   if(request.containsHeaderField("Connection")&&(request.getHeaderField("Connection").toLowerCase().equals("keep-alive"))){
+      //request.removeHeaderField("Connection");
+   }else{
+      request.setHeaderField("Connection", "open");
+   }
 	if (!request.containsHeaderField("Host"))
 	{
 	    request.setHeaderField("Host", request.getHost());
@@ -180,8 +171,7 @@ class Http extends HttpConnection
 
 	String conn = reply.getHeaderField("Connection");
 
-	if (DEBUG) System.out.println("RECV " + reply.statusLine);
-
+	
 	if (reply.containsHeaderField("Connection")
 	    && reply.getHeaderField("Connection").equals("close"))
 	{
@@ -205,12 +195,12 @@ class Http extends HttpConnection
 	return reply;
     }
 
-    private boolean isBusy()
+    protected boolean isBusy()
     {
 	return queue.size() >= MAX_PENDING_REQUESTS;
     }
 
-    private boolean isPersistent()
+    protected boolean isPersistent()
     {
 	return persistent;
     }
@@ -269,7 +259,6 @@ class Http extends HttpConnection
 		Http http = (Http) v.elementAt(i);
 		if (http.idle > 0 && now - http.idle > 30000) /* 30 seconds */
 		{
-		    if (DEBUG) System.out.println("IDLE " + http);
 		    http.persistent = false;
 		    http.close();
 		}
@@ -301,18 +290,15 @@ class Http extends HttpConnection
 
 		if (http != null)
 		{
-		    http.idle = 0;
-		    if (DEBUG) System.out.println("REUSE " + http);
+		    http.idle = 0;		   
 		}
 	    }
 	}
 	
 	if (http == null)
 	{
-	    if (DEBUG) System.out.println("OPENING " + host + ":" + port);
 	    http = new Http(host, port, isProxy);
-	    if (DEBUG) System.out.println("OPENED " + http);
- 	    cacheInsert(host, port, http);
+	    cacheInsert(host, port, http);
 	}
 	
 	return http;

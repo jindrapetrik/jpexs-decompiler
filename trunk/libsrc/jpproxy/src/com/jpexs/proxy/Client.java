@@ -5,6 +5,15 @@ import java.net.Socket;
 
 public class Client extends Connection
 {
+
+   @Override
+   public void promoteToServerSSL() {
+      super.promoteToServerSSL();
+      in = new BufferedInputStream(in);
+      out = new BufferedOutputStream(out);
+   }
+
+
     /**
      * Create a Client from a Socket.
      */
@@ -26,7 +35,7 @@ public class Client extends Connection
     Request read() throws IOException
     {
 	Request request = new Request(this);
-	request.read(getInputStream());
+	request.read(getInputStream());   
 	return request;
     }
 

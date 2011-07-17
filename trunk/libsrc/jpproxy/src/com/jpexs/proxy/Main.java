@@ -16,8 +16,6 @@ public class Main
 
     public static void main(String argv[])
     {	
-	
-
 	List<Replacement> replacements = new ArrayList<Replacement>();
         if ((new File(REPLACEMENTSFILE)).exists()) {
             try {

@@ -1,5 +1,6 @@
 package com.jpexs.proxy;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -8,13 +9,59 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 
 class Connection
 {
     Socket socket = null;
     InputStream in = null;
     OutputStream out = null;
-    
+
+    public void promoteToClientSSL(){
+       SSLSocketFactory f = (SSLSocketFactory) SSLSocketFactory.getDefault();
+      try {
+         socket = (SSLSocket) f.createSocket(socket,null,socket.getPort(),false);
+         in = socket.getInputStream();
+         out = socket.getOutputStream();
+      } catch (IOException ex) {
+
+      }
+
+    }
+
+    public void promoteToServerSSL(){
+       String ksName = "server.jks";
+      char ksPass[] = "ServerJKS".toCharArray();
+      char ctPass[] = "ServerKey".toCharArray();
+      try{
+         KeyStore ks = KeyStore.getInstance("JKS");
+         ks.load(new FileInputStream(ksName), ksPass);
+         KeyManagerFactory kmf =
+         KeyManagerFactory.getInstance("SunX509");
+         kmf.init(ks, ctPass);
+         SSLContext sc = SSLContext.getInstance("TLS");
+         sc.init(kmf.getKeyManagers(), null, null);
+         SSLSocketFactory sf=sc.getSocketFactory();
+         socket=sf.createSocket(socket,null,socket.getPort(),false);
+         ((SSLSocket)socket).setUseClientMode(false);
+       }catch(Exception ex){
+
+       }
+      try {
+         in = socket.getInputStream();
+         out = socket.getOutputStream();
+      } catch (IOException ex) {
+
+      }
+
+    }
+
     /**
      * Create a Connection from a Socket.
      *
@@ -81,7 +128,7 @@ class Connection
 	    }
 	    catch (IOException e)
 	    {
-		System.out.println("Connection: " + e);
+
 	    }
 	}
     }
