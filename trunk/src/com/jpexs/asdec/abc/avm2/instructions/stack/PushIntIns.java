@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.stack;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
@@ -46,4 +47,9 @@ public class PushIntIns extends InstructionDefinition {
     public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc) {
         stack.push(new IntegerValueTreeItem(ins, constants.constant_int[ins.operands[0]]));
     }
+
+    @Override
+   public int getStackDelta(AVM2Instruction ins, ABC abc) {
+      return 1;
+   }
 }

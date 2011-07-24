@@ -67,6 +67,8 @@ public class DefineSpriteTag extends Tag implements Container {
         subTags = sis.readTagList();
     }
 
+
+    static int c=0;
     /**
      * Gets data bytes
      *

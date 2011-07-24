@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.other;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
@@ -45,4 +46,11 @@ public class SetGlobalSlotIns extends InstructionDefinition implements SetTypeIn
     public String getObject(Stack<TreeItem> stack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body) {
         return "globalslot" + ins.operands[0];
     }
+
+   @Override
+   public int getStackDelta(AVM2Instruction ins, ABC abc) {
+      return -1;
+   }
+
+
 }

@@ -75,8 +75,8 @@ public class Trait {
         return "name_index=" + name_index + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
     }
 
-    public String toString(ConstantPool constants) {
-        return constants.constant_multiname[name_index].toString(constants) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
+    public String toString(ABC abc) {
+        return abc.constants.constant_multiname[name_index].toString(abc.constants) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
     }
 
     public String convert(ConstantPool constants, MethodInfo[] methodInfo, ABC abc) {

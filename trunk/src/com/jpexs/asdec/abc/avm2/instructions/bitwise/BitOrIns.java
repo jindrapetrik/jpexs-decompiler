@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.bitwise;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
@@ -50,4 +51,9 @@ public class BitOrIns extends InstructionDefinition {
         TreeItem v1 = (TreeItem) stack.pop();
         stack.push(new BitOrTreeItem(ins, v1, v2));
     }
+
+    @Override
+   public int getStackDelta(AVM2Instruction ins, ABC abc) {
+      return -2+1;
+   }
 }

@@ -50,8 +50,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
          if ((pos >= th.startPos) && (pos < th.startPos + th.len)) {
 
             int bi = abc.findBodyIndex(abc.findMethodIdByTraitId(classIndex, (int) th.offset));
-            if ((bi == -1)||(bi==0)) {
-               setNoTrait();
+            if (bi == -1) {
                break;
             }
             Main.abcMainFrame.detailPanel.showCard(DetailPanel.METHOD_TRAIT_CARD);

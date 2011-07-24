@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.construction;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
@@ -47,4 +48,11 @@ public class NewFunctionIns extends InstructionDefinition {
         }
         stack.push(new NewFunctionTreeItem(ins, method_info[methodIndex].getParamStr(constants,body,abc), method_info[methodIndex].getReturnTypeStr(constants), bodyStr));
     }
+
+   @Override
+   public int getStackDelta(AVM2Instruction ins, ABC abc) {
+      return 1;
+   }
+
+
 }

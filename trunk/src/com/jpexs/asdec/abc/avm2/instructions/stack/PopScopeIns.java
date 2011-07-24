@@ -69,5 +69,10 @@ public class PopScopeIns extends InstructionDefinition {
         }
     }
 
+   @Override
+   public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
+      return -1;
+   }
+
 
 }

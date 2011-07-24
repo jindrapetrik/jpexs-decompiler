@@ -35,7 +35,7 @@ import java.util.HashMap;
 public class ASMSourceEditorPane extends LineMarkedEditorPane {
 
     public ABC abc;
-    public int bodyIndex;
+    public int bodyIndex=-1;
 
     public ASMSourceEditorPane() {
          

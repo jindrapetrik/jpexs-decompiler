@@ -42,5 +42,10 @@ public class ThrowIns extends InstructionDefinition {
         output.add(new ThrowTreeItem(ins, (TreeItem) stack.pop()));
     }
 
+   @Override
+   public int getStackDelta(AVM2Instruction ins, ABC abc) {
+      return -1;
+   }
+
 
 }

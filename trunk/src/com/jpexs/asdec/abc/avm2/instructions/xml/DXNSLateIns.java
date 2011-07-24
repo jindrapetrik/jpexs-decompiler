@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.xml;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
@@ -47,4 +48,9 @@ public class DXNSLateIns extends InstructionDefinition {
         TreeItem xmlns = stack.pop();
         stack.push(new UnparsedTreeItem(ins, "XMLNS:" + xmlns.toString(constants)));
     }
+
+    @Override
+   public int getStackDelta(AVM2Instruction ins, ABC abc) {
+      return -1;
+   }
 }

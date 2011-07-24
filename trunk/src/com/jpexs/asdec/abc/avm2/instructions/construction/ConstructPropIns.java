@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.construction;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
@@ -68,4 +69,17 @@ public class ConstructPropIns extends InstructionDefinition {
 
         stack.push(new ConstructPropTreeItem(ins, obj, multiname, args));
     }
+
+    @Override
+   public int getStackDelta(AVM2Instruction ins, ABC abc) {
+      int ret=-ins.operands[1]-1+1;
+      int multinameIndex = ins.operands[0];
+      if(abc.constants.constant_multiname[multinameIndex].needsName()){
+         ret--;
+      }
+      if(abc.constants.constant_multiname[multinameIndex].needsNs()){
+         ret--;
+      }
+      return ret;
+   }
 }

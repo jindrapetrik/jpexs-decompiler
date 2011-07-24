@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.types;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
@@ -54,4 +55,11 @@ public class AsTypeIns extends InstructionDefinition {
 
         stack.push(new AsTypeTreeItem(ins, val, new FullMultinameTreeItem(ins, ins.operands[0])));
     }
+
+   @Override
+   public int getStackDelta(AVM2Instruction ins, ABC abc) {
+      return -1+1;
+   }
+
+
 }

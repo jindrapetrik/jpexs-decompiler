@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.construction;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
@@ -41,4 +42,11 @@ public class NewCatchIns extends InstructionDefinition {
         int exInfo = ins.operands[0];
         stack.push(new ExceptionTreeItem(body.exceptions[exInfo]));
     }
+
+   @Override
+   public int getStackDelta(AVM2Instruction ins, ABC abc) {
+      return 1;
+   }
+
+
 }

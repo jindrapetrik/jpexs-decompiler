@@ -342,20 +342,12 @@ public class SWFInputStream extends InputStream {
      * @throws IOException
      */
     public long readSB(int nBits) throws IOException {
-        long uval = readUB(nBits);
+        int uval = (int)readUB(nBits);
 
-        if ((uval & (1 << (nBits - 1))) > 0) uval |= (0xffffffff << nBits);
+        int shift = 32-nBits;
+        // sign extension
+        uval = (uval << shift) >> shift;
         return uval;
-        /*int sign = (int) (uval >> (nBits - 1));
-        if (sign == 1) {
-            long mask = 0;
-            for (int k = 0; k < nBits; k++) {
-                mask = mask + (1 << k);
-            }
-            return -(((~uval) & mask) + 1);
-        } else {
-            return uval;
-        } */
     }
 
 
@@ -728,8 +720,8 @@ public class SWFInputStream extends InputStream {
         }
         int NTranslateBits = (int) readUB(5);
         ret.translateNBits = NTranslateBits;
-        ret.translateX = readSB(NTranslateBits);
-        ret.translateY = readSB(NTranslateBits);
+        ret.translateX = (int)readSB(NTranslateBits);
+        ret.translateY = (int)readSB(NTranslateBits);
         alignByte();
         return ret;
     }

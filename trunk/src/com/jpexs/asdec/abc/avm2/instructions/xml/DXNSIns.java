@@ -39,4 +39,5 @@ public class DXNSIns extends InstructionDefinition {
         System.out.println("Set default XML space " + s);
 
     }
+
 }

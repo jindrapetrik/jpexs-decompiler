@@ -31,8 +31,8 @@ public class TraitMethodGetterSetter extends Trait {
     public int method_info;
 
     @Override
-    public String toString(ConstantPool constants) {
-        return "0x" + Helper.formatAddress(fileOffset) + " " + Helper.byteArrToString(bytes) + " MethodGetterSetter " + constants.constant_multiname[name_index].toString(constants) + " disp_id=" + disp_id + " method_info=" + method_info + " metadata=" + Helper.intArrToString(metadata);
+    public String toString(ABC abc) {
+        return "0x" + Helper.formatAddress(fileOffset) + " " + Helper.byteArrToString(bytes) + " MethodGetterSetter " + abc.constants.constant_multiname[name_index].toString(abc.constants) + " disp_id=" + disp_id + " method_info=" + method_info + " metadata=" + Helper.intArrToString(metadata);
     }
 
     @Override

@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.types;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
@@ -43,4 +44,9 @@ public class IsTypeIns extends InstructionDefinition {
         TreeItem value = (TreeItem) stack.pop();
         stack.push(new IsTypeTreeItem(ins, value, new FullMultinameTreeItem(ins, multinameIndex)));
     }
+
+    @Override
+   public int getStackDelta(AVM2Instruction ins, ABC abc) {
+      return -1+1; //may not be runtime multiname
+   }
 }

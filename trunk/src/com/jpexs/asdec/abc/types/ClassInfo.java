@@ -34,8 +34,8 @@ public class ClassInfo {
     }
 
 
-    public String toString(ConstantPool constants) {
-        return "method_index=" + cinit_index + "\r\n" + static_traits.toString(constants);
+    public String toString(ABC abc) {
+        return "method_index=" + cinit_index + "\r\n" + static_traits.toString(abc);
     }
 
     public String getStaticVarsStr(ConstantPool constants,ABC abc) {

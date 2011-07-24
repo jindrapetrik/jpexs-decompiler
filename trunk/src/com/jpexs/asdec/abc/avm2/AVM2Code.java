@@ -88,7 +88,14 @@ public class AVM2Code {
     public static final int DAT_CASE_BASEOFFSET = OPT_S24 + 0x12;
     public static InstructionDefinition instructionSet[] = new InstructionDefinition[]{
             new AddIns(),
-            new InstructionDefinition(0x9b,"add_d",new int[]{}),
+            new InstructionDefinition(0x9b,"add_d",new int[]{}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  return -2+1; //?
+               }
+
+            },
             new AddIIns(),
             new InstructionDefinition(0xb5,"add_p",new int[]{AVM2Code.OPT_U30}),
             new ApplyTypeIns(),
@@ -113,13 +120,20 @@ public class AVM2Code {
             new CheckFilterIns(),
             new CoerceIns(),
             new CoerceAIns(),
-            new InstructionDefinition(0x81,"coerce_b",new int[]{}),
-            new InstructionDefinition(0x84,"coerce_d",new int[]{}),
-            new InstructionDefinition(0x83,"coerce_i",new int[]{}),
-            new InstructionDefinition(0x89,"coerce_o",new int[]{}),
+            new InstructionDefinition(0x81,"coerce_b",new int[]{}), //stack:-1+1
+            new InstructionDefinition(0x84,"coerce_d",new int[]{}), //stack:-1+1
+            new InstructionDefinition(0x83,"coerce_i",new int[]{}), //stack:-1+1
+            new InstructionDefinition(0x89,"coerce_o",new int[]{}), //stack:-1+1
             new CoerceSIns(),
-            new InstructionDefinition(0x88,"coerce_u",new int[]{}),
-            new InstructionDefinition(0x9a,"concat",new int[]{}),
+            new InstructionDefinition(0x88,"coerce_u",new int[]{}), //stack:-1+1
+            new InstructionDefinition(0x9a,"concat",new int[]{}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  return -2+1; //?
+               }
+
+            },
             new ConstructIns(),
             new ConstructPropIns(),
             new ConstructSuperIns(),
@@ -129,8 +143,15 @@ public class AVM2Code {
             new ConvertOIns(),
             new ConvertUIns(),
             new ConvertSIns(),
-            new InstructionDefinition(0x79,"convert_m",new int[]{}),
-            new InstructionDefinition(0x7a,"convert_m_p",new int[]{AVM2Code.OPT_U30 /*param (?)*/}),
+            new InstructionDefinition(0x79,"convert_m",new int[]{}), //-1 +1
+            new InstructionDefinition(0x7a,"convert_m_p",new int[]{AVM2Code.OPT_U30 /*param (?)*/}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+            },
             new DebugIns(),
             new DebugFileIns(),
             new DebugLineIns(),
@@ -138,11 +159,32 @@ public class AVM2Code {
             new DecLocalIIns(),
             new DecrementIns(),
             new DecrementIIns(),
-            new InstructionDefinition(0x5b,"deldescendants",new int[]{}),
+            new InstructionDefinition(0x5b,"deldescendants",new int[]{}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+            },
             new DeletePropertyIns(),
-            new InstructionDefinition(0x6b,"deletepropertylate",new int[]{}),
+            new InstructionDefinition(0x6b,"deletepropertylate",new int[]{}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+            },
             new DivideIns(),
-            new InstructionDefinition(0xb8,"divide_p",new int[]{AVM2Code.OPT_U30}),
+            new InstructionDefinition(0xb8,"divide_p",new int[]{AVM2Code.OPT_U30}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  return -2+1; //?
+               }
+
+            },
             new DupIns(),
             new DXNSIns(),
             new DXNSLateIns(),
@@ -150,8 +192,32 @@ public class AVM2Code {
             new EscXAttrIns(),
             new EscXElemIns(),
             new InstructionDefinition(0x5f,"finddef",new int[]{AVM2Code.DAT_MULTINAME_INDEX}),
-            new InstructionDefinition(0x5b,"findpropglobalstrict",new int[]{AVM2Code.DAT_MULTINAME_INDEX}),
-            new InstructionDefinition(0x5c,"findpropglobal",new int[]{AVM2Code.DAT_MULTINAME_INDEX}),
+            new InstructionDefinition(0x5b,"findpropglobalstrict",new int[]{AVM2Code.DAT_MULTINAME_INDEX}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+               @Override
+               public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+            },
+            new InstructionDefinition(0x5c,"findpropglobal",new int[]{AVM2Code.DAT_MULTINAME_INDEX}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+               @Override
+               public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+            },
             new FindPropertyIns(),
             new FindPropertyStrictIns(),
             new GetDescendantsIns(),
@@ -163,7 +229,19 @@ public class AVM2Code {
             new GetLocal1Ins(),
             new GetLocal2Ins(),
             new GetLocal3Ins(),
-            new InstructionDefinition(0x67,"getouterscope",new int[]{AVM2Code.DAT_MULTINAME_INDEX}),
+            new InstructionDefinition(0x67,"getouterscope",new int[]{AVM2Code.DAT_MULTINAME_INDEX}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+               @Override
+               public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+            },
             new GetPropertyIns(),
             new GetScopeObjectIns(),
             new GetSlotIns(),
@@ -207,13 +285,39 @@ public class AVM2Code {
             new LookupSwitchIns(),
             new LShiftIns(),
             new ModuloIns(),
-            new InstructionDefinition(0xb9,"modulo_p",new int[]{AVM2Code.OPT_U30}),
+            new InstructionDefinition(0xb9,"modulo_p",new int[]{AVM2Code.OPT_U30}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  return -2+1; //?
+               }
+
+            },
             new MultiplyIns(),
             new MultiplyIIns(),
-            new InstructionDefinition(0xb7,"multiply_p",new int[]{AVM2Code.OPT_U30}),
+            new InstructionDefinition(0xb7,"multiply_p",new int[]{AVM2Code.OPT_U30}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  return -2+1; //?
+               }
+
+            },
             new NegateIns(),
             new NegateIIns(),
-            new InstructionDefinition(0x8f,"negate_p",new int[]{AVM2Code.OPT_U30 /* param */}),
+            new InstructionDefinition(0x8f,"negate_p",new int[]{AVM2Code.OPT_U30 /* param */}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+               @Override
+               public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+            },
             new NewActivationIns(),
             new NewArrayIns(),
             new NewCatchIns(),
@@ -227,9 +331,30 @@ public class AVM2Code {
             new PopIns(),
             new PopScopeIns(),
             new PushByteIns(),
-            new InstructionDefinition(0x22,"pushconstant",new int[]{AVM2Code.DAT_STRING_INDEX}),
-            new InstructionDefinition(0x33,"pushdecimal",new int[]{AVM2Code.DAT_DECIMAL_INDEX}),
-            new InstructionDefinition(0x34,"pushdnan",new int[]{}),
+            new InstructionDefinition(0x22,"pushconstant",new int[]{AVM2Code.DAT_STRING_INDEX}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  return 1; //?
+               }
+
+            },
+            new InstructionDefinition(0x33,"pushdecimal",new int[]{AVM2Code.DAT_DECIMAL_INDEX}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  return 1; //?
+               }
+
+            },
+            new InstructionDefinition(0x34,"pushdnan",new int[]{}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  return 1; //?
+               }
+
+            },
             new PushDoubleIns(),
             new PushFalseIns(),
             new PushIntIns(),
@@ -253,31 +378,211 @@ public class AVM2Code {
             new SetLocal3Ins(),
             new SetGlobalSlotIns(),
             new SetPropertyIns(),
-            new InstructionDefinition(0x69,"setpropertylate",new int[]{}),
+            new InstructionDefinition(0x69,"setpropertylate",new int[]{}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+               @Override
+               public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+            },
             new SetSlotIns(),
             new SetSuperIns(),
             new StrictEqualsIns(),
             new SubtractIns(),
             new SubtractIIns(),
-            new InstructionDefinition(0xb6,"subtract_p",new int[]{AVM2Code.OPT_U30}),
+            new InstructionDefinition(0xb6,"subtract_p",new int[]{AVM2Code.OPT_U30}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+               @Override
+               public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+            },
             new SwapIns(),
             new ThrowIns(),
             new InstructionDefinition(0xf3,"timestamp",new int[]{}),
             new TypeOfIns(),
             new URShiftIns(),
-            new InstructionDefinition(0x35,"li8",new int[]{}),
-            new InstructionDefinition(0x36,"li16",new int[]{}),
-            new InstructionDefinition(0x37,"li32",new int[]{}),
-            new InstructionDefinition(0x38,"lf32",new int[]{}),
-            new InstructionDefinition(0x39,"lf64",new int[]{}),
-            new InstructionDefinition(0x3A,"si8",new int[]{}),
-            new InstructionDefinition(0x3B,"si16",new int[]{}),
-            new InstructionDefinition(0x3C,"si32",new int[]{}),
-            new InstructionDefinition(0x3D,"sf32",new int[]{}),
-            new InstructionDefinition(0x3E,"sf64",new int[]{}),
-            new InstructionDefinition(0x50,"sxi1",new int[]{}),
-            new InstructionDefinition(0x51,"sxi8",new int[]{}),
-            new InstructionDefinition(0x52,"sxi16",new int[]{})
+            new InstructionDefinition(0x35,"li8",new int[]{}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+               @Override
+               public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+            },
+            new InstructionDefinition(0x36,"li16",new int[]{}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+               @Override
+               public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+            },
+            new InstructionDefinition(0x37,"li32",new int[]{}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+               @Override
+               public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+            },
+            new InstructionDefinition(0x38,"lf32",new int[]{}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+               @Override
+               public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+            },
+            new InstructionDefinition(0x39,"lf64",new int[]{}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+               @Override
+               public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+            },
+            new InstructionDefinition(0x3A,"si8",new int[]{}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+               @Override
+               public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+            },
+            new InstructionDefinition(0x3B,"si16",new int[]{}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+               @Override
+               public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+            },
+            new InstructionDefinition(0x3C,"si32",new int[]{}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+               @Override
+               public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+            },
+            new InstructionDefinition(0x3D,"sf32",new int[]{}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+               @Override
+               public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+            },
+            new InstructionDefinition(0x3E,"sf64",new int[]{}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+               @Override
+               public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+            },
+            new InstructionDefinition(0x50,"sxi1",new int[]{}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+               @Override
+               public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+            },
+            new InstructionDefinition(0x51,"sxi8",new int[]{}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+               @Override
+               public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+            },
+            new InstructionDefinition(0x52,"sxi16",new int[]{}){
+
+               @Override
+               public int getStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+               @Override
+               public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
+                  throw new UnsupportedOperationException();
+               }
+
+            }
             
     };
     //endoflist
@@ -1936,5 +2241,90 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
         //clearSecureSWF(constants, body);
 
 
+    }
+
+    private void handleRegister(CodeStats stats,int reg){
+       if(reg+1>stats.maxlocal){
+          stats.maxlocal=reg+1;
+       }
+    }
+
+    private boolean walkCode(CodeStats stats,int pos,int stack,int scope,ABC abc) {
+       while(pos<code.size()){
+          if(stats.instructionStats[pos].seen){
+             //check stack mismatch here
+             return true;
+          }
+          stats.instructionStats[pos].seen=true;
+          stats.instructionStats[pos].stackpos=stack;
+          stats.instructionStats[pos].scopepos=scope;
+          AVM2Instruction ins=code.get(pos);
+          stack+=ins.definition.getStackDelta(ins, abc);
+          scope+=ins.definition.getScopeStackDelta(ins, abc);
+          if(stack>stats.maxstack) stats.maxstack=stack;
+          if(scope>stats.maxscope) stats.maxscope=scope;
+          if((ins.definition instanceof DXNSIns)||(ins.definition instanceof DXNSLateIns)){
+             stats.has_set_dxns=true;
+          }
+          if(ins.definition instanceof NewActivationIns){
+             stats.has_activation=true;
+          }
+          if(ins.definition instanceof SetLocalTypeIns){
+            handleRegister(stats,((SetLocalTypeIns)ins.definition).getRegisterId(ins));
+          }else{
+             for(int i=0;i<ins.definition.operands.length;i++){
+                if(ins.definition.operands[i]==DAT_REGISTER_INDEX){
+                   handleRegister(stats,ins.operands[i]);
+                }
+             }
+          }
+          if(ins.definition instanceof ReturnValueIns){
+             //check stack=1
+             return true;
+          }
+          if(ins.definition instanceof ReturnVoidIns){
+             //check stack=0
+             return true;
+          }
+          if(ins.definition instanceof JumpIns){
+            try {
+               pos = adr2pos(pos2adr(pos) + ins.getBytes().length + ins.operands[0]);
+               continue;
+            } catch (ConvertException ex) {
+               return false;
+            }
+          }else
+          if(ins.definition instanceof IfTypeIns){
+             try {
+               int newpos = adr2pos(pos2adr(pos) + ins.getBytes().length + ins.operands[0]);
+               walkCode(stats, newpos, stack, scope, abc);
+               } catch (ConvertException ex) {
+                  return false;
+               }
+          }
+          if(ins.definition instanceof LookupSwitchIns){
+             for(int i=0;i<ins.operands.length;i++){
+             try {
+               int newpos = adr2pos(pos2adr(pos) + ins.operands[i]);
+               if(!walkCode(stats, newpos, stack, scope, abc)){
+                  return false;
+               }
+               } catch (ConvertException ex) {
+                  return false;
+               }
+            }
+          }
+          pos++;
+       }
+       return true;
+    }
+
+    public CodeStats getStats(ABC abc)
+    {
+       CodeStats stats=new CodeStats(this);
+       if(!walkCode(stats,0,0,0,abc)){
+          return null;
+       }
+       return stats;
     }
 }

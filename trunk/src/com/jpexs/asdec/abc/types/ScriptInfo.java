@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.types;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.types.traits.Traits;
 
@@ -33,8 +34,8 @@ public class ScriptInfo {
     }
 
 
-    public String toString(ConstantPool constants) {
-        return "method_index=" + init_index + "\r\n" + traits.toString(constants);
+    public String toString(ABC abc) {
+        return "method_index=" + init_index + "\r\n" + traits.toString(abc);
     }
 
 

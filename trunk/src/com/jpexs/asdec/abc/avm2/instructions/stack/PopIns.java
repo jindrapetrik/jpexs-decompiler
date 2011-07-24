@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.stack;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
@@ -74,4 +75,11 @@ public class PopIns extends InstructionDefinition {
             }
         }
     }
+
+   @Override
+   public int getStackDelta(AVM2Instruction ins, ABC abc) {
+      return -1;
+   }
+
+
 }

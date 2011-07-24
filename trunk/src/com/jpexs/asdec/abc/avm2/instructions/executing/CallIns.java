@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.executing;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
@@ -62,4 +63,11 @@ public class CallIns extends InstructionDefinition {
         TreeItem function = (TreeItem) stack.pop();
         stack.push(new CallTreeItem(ins, receiver, function, args));
     }
+
+   @Override
+   public int getStackDelta(AVM2Instruction ins, ABC abc) {
+      return -2+1-ins.operands[0];
+   }
+
+
 }

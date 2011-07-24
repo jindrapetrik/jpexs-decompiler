@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.other;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
@@ -53,4 +54,19 @@ public class FindPropertyIns extends InstructionDefinition {
         FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
         stack.push(new FindPropertyTreeItem(ins, multiname)); //resolve right object
     }
+
+   @Override
+   public int getStackDelta(AVM2Instruction ins, ABC abc) {
+      int ret=1;
+      int multinameIndex = ins.operands[0];
+      if(abc.constants.constant_multiname[multinameIndex].needsName()){
+         ret--;
+      }
+      if(abc.constants.constant_multiname[multinameIndex].needsNs()){
+         ret--;
+      }
+      return ret;
+   }
+
+
 }

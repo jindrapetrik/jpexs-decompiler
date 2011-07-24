@@ -51,11 +51,11 @@ public class MATRIX {
     /**
      * X translate value in twips
      */
-    public long translateX;
+    public int translateX;
     /**
      * Y translate value in twips
      */
-    public long translateY;
+    public int translateY;
 
     /**
      * Nbits used for store translate values

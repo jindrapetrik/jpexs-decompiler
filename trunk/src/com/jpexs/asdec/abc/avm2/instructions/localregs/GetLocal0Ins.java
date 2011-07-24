@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.localregs;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
@@ -54,4 +55,9 @@ public class GetLocal0Ins extends InstructionDefinition implements GetLocalTypeI
     public int getRegisterId(AVM2Instruction par0) {
         return 0;
     }
+
+    @Override
+   public int getStackDelta(AVM2Instruction ins, ABC abc) {
+      return 1;
+   }
 }

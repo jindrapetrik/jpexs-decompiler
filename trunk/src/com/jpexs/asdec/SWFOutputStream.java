@@ -369,27 +369,40 @@ public class SWFOutputStream extends OutputStream {
         write(data);
     }
 
+
+    /**
+     * Get needed bits
+     * @param number
+     * @param bits 1 for signed,0 if unsigned
+     * @return
+     */
+    public static int getNeededBits(int number, int bits)
+	{
+        number=Math.abs(number);
+        int val = 1;
+        for (int x = 1; val <= number && !(bits > 32); x <<= 1)
+        {
+            val = val | x;
+            bits++;
+        }
+
+        if (bits > 32)
+		{
+			assert false : ("minBits " + bits + " must not exceed 32");
+		}
+        return bits;
+    }
+
+
     /**
      * Calculates number of bits needed for representing unsigned value
      *
      * @param v Unsigned value
      * @return Number of bits
      */
-    public static int getNeededBitsU(long v) {
+    public static int getNeededBitsU(int v) {
 
-        int n = 32;
-        long m = 0x80000000;
-        if (v == 0x00000000) n = 0;
-        else
-            while (!((v & m) > 0)) {
-                n--;
-                m >>= 1;
-            }
-        return n;
-        /*if (value == 0) {
-           return 1;
-       }
-       return Long.toBinaryString(value).length();*/
+       return getNeededBits(v,0);
     }
 
     /**
@@ -398,42 +411,8 @@ public class SWFOutputStream extends OutputStream {
      * @param v Signed value
      * @return Number of bits
      */
-    public static int getNeededBitsS(long v) {
-        int n = 33;
-        long m = 0x80000000;
-        if ((v & m) == m) {
-            if (v == 0xffffffff) n = 1;
-            else
-                while ((v & m) == m) {
-                    n--;
-                    m >>= 1;
-                }
-        } else {
-            if (v == 0x00000000) n = 1;
-            else
-                while ((v & m) == 0) {
-                    n--;
-                    m >>= 1;
-                }
-        }
-        return n;
-        /*if (value == 0) {
-            return 1;
-        }
-        if (value == -1) {
-            return 2;
-        }
-        if (value < 0) {
-            String str = Long.toBinaryString(value);
-            for (int i = 0; i < str.length(); i++) {
-                if (str.charAt(i) == '0') {
-                    return str.length() - 1 - i + 2;
-                }
-            }
-            return 1;
-        } else {
-            return Long.toBinaryString(value).length() + 1;
-        } */
+    public static int getNeededBitsS(int v) {
+        return getNeededBits(v,1);
     }
 
 
@@ -455,17 +434,17 @@ public class SWFOutputStream extends OutputStream {
      */
     public static int getNeededBitsF(double value) {
         if (value == -1) return 18;
-        long val = (long) (value * (1 << 16));
+        int val = (int) (value * (1 << 16));
         return getNeededBitsS(val);
     }
 
-    private int enlargeBitCountU(int currentBitCount, long value) {
+    private int enlargeBitCountU(int currentBitCount, int value) {
         int neededNew = getNeededBitsU(value);
         if (neededNew > currentBitCount) return neededNew;
         return currentBitCount;
     }
 
-    private int enlargeBitCountS(int currentBitCount, long value) {
+    private int enlargeBitCountS(int currentBitCount, int value) {
         int neededNew = getNeededBitsS(value);
         if (neededNew > currentBitCount) return neededNew;
         return currentBitCount;
@@ -545,7 +524,7 @@ public class SWFOutputStream extends OutputStream {
             writeSB(Nbits, value.greenMultTerm);
             writeSB(Nbits, value.blueMultTerm);
             writeSB(Nbits, value.alphaMultTerm);
-        }
+        }        
         if (value.hasAddTerms) {
             writeSB(Nbits, value.redAddTerm);
             writeSB(Nbits, value.greenAddTerm);

@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.avm2.instructions;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
@@ -120,5 +121,13 @@ public class InstructionDefinition {
             name = hilighOffset(constants.constant_multiname[multinameIndex].getName(constants), ins.offset);
         }
         return name + ns;
+    }
+
+    public int getStackDelta(AVM2Instruction ins,ABC abc){
+       return 0;
+    }
+
+    public int getScopeStackDelta(AVM2Instruction ins,ABC abc){
+       return 0;
     }
 }

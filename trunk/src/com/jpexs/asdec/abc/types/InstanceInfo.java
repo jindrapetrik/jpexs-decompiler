@@ -45,11 +45,11 @@ public class InstanceInfo {
     }
 
 
-    public String toString(ConstantPool constants) {
+    public String toString(ABC abc) {
         String supIndexStr = "[nothing]";
         if (super_index > 0)
-            constants.constant_multiname[super_index].toString(constants);
-        return "name_index=" + constants.constant_multiname[name_index].toString(constants) + " super_index=" + supIndexStr + " flags=" + flags + " protectedNS=" + protectedNS + " interfaces=" + Helper.intArrToString(interfaces) + " method_index=" + iinit_index + "\r\n" + instance_traits.toString(constants);
+            abc.constants.constant_multiname[super_index].toString(abc.constants);
+        return "name_index=" + abc.constants.constant_multiname[name_index].toString(abc.constants) + " super_index=" + supIndexStr + " flags=" + flags + " protectedNS=" + protectedNS + " interfaces=" + Helper.intArrToString(interfaces) + " method_index=" + iinit_index + "\r\n" + instance_traits.toString(abc);
     }
 
     public String getClassHeaderStr(ConstantPool constants) {

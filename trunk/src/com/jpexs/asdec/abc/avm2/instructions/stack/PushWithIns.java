@@ -44,5 +44,15 @@ public class PushWithIns extends InstructionDefinition {
         output.add(new WithTreeItem(ins, w));
     }
 
+@Override
+   public int getStackDelta(AVM2Instruction ins, ABC abc) {
+      return -1;
+   }
+
+   @Override
+   public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
+      return 1;
+   }
+
 
 }

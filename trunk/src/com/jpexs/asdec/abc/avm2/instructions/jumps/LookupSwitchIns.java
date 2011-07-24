@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.jumps;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
@@ -41,4 +42,9 @@ public class LookupSwitchIns extends InstructionDefinition {
         int caseCount = ins.operands[1];
         //stack.push("switch(...)");
     }
+
+    @Override
+   public int getStackDelta(AVM2Instruction ins, ABC abc) {
+      return -1;
+   }
 }

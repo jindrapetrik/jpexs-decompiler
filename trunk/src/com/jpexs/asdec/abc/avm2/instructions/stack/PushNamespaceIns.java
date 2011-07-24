@@ -43,5 +43,8 @@ public class PushNamespaceIns extends InstructionDefinition {
         stack.push(new NameSpaceTreeItem(ins, ins.operands[0]));
     }
 
-
+@Override
+   public int getStackDelta(AVM2Instruction ins, ABC abc) {
+      return 1;
+   }
 }

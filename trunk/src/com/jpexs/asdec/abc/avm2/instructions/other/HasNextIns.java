@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.other;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
@@ -42,4 +43,11 @@ public class HasNextIns extends InstructionDefinition {
         stack.push(new EachTreeItem(ins, curIndex, obj));
 
     }
+
+   @Override
+   public int getStackDelta(AVM2Instruction ins, ABC abc) {
+      return -2+1;
+   }
+
+
 }

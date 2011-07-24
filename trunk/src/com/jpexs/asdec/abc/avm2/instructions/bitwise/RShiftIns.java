@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.bitwise;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
@@ -41,4 +42,9 @@ public class RShiftIns extends InstructionDefinition {
         TreeItem v1 = (TreeItem) stack.pop();
         stack.push(new RShiftTreeItem(ins, v1, v2));
     }
+
+    @Override
+   public int getStackDelta(AVM2Instruction ins, ABC abc) {
+      return -2+1;
+   }
 }

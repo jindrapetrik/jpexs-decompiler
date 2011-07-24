@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.types;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
@@ -48,4 +49,9 @@ public class CoerceIns extends InstructionDefinition implements CoerceOrConvertT
         int multinameIndex = ins.operands[0];
         stack.push(new CoerceTreeItem(ins, (TreeItem) stack.pop(), constants.constant_multiname[multinameIndex].getName(constants)));
     }
+
+    @Override
+   public int getStackDelta(AVM2Instruction ins, ABC abc) {
+      return -1+1;
+   }
 }

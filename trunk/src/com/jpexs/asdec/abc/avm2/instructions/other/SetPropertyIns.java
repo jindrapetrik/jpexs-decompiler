@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.other;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
@@ -54,4 +55,17 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
         if ((!obj.toString().equals(""))) multiname = "." + multiname;
         return obj + multiname;
     }
+
+    @Override
+   public int getStackDelta(AVM2Instruction ins, ABC abc) {
+      int ret=-2;
+      int multinameIndex = ins.operands[0];
+      if(abc.constants.constant_multiname[multinameIndex].needsName()){
+         ret--;
+      }
+      if(abc.constants.constant_multiname[multinameIndex].needsNs()){
+         ret--;
+      }
+      return ret;
+   }
 }

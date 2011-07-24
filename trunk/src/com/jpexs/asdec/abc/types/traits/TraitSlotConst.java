@@ -38,12 +38,12 @@ public class TraitSlotConst extends Trait {
     public TreeItem assignedValue;
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(ABC abc) {
         String typeStr = "*";
         if (type_index > 0) {
-            typeStr = constants.constant_multiname[type_index].toString(constants);
+            typeStr = abc.constants.constant_multiname[type_index].toString(abc.constants);
         }
-        return "0x" + Helper.formatAddress(fileOffset) + " " + Helper.byteArrToString(bytes) + " SlotConst " + constants.constant_multiname[name_index].toString(constants) + " slot=" + slot_id + " type=" + typeStr + " value=" + (new ValueKind(value_index, value_kind)).toString(constants) + " metadata=" + Helper.intArrToString(metadata);
+        return "0x" + Helper.formatAddress(fileOffset) + " " + Helper.byteArrToString(bytes) + " SlotConst " + abc.constants.constant_multiname[name_index].toString(abc.constants) + " slot=" + slot_id + " type=" + typeStr + " value=" + (new ValueKind(value_index, value_kind)).toString(abc.constants) + " metadata=" + Helper.intArrToString(metadata);
     }
 
     public String getNameValueStr(ConstantPool constants) {
