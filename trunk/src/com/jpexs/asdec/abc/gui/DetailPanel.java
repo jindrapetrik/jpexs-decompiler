@@ -18,18 +18,22 @@
 
 package com.jpexs.asdec.abc.gui;
 
+import com.jpexs.asdec.Main;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.EtchedBorder;
 
 /**
  *
@@ -38,12 +42,15 @@ import javax.swing.SwingConstants;
 public class DetailPanel extends JPanel implements ActionListener {
    public MethodTraitDetailPanel methodTraitPanel;
    public JPanel unsupportedTraitPanel;
-   public static final String METHOD_TRAIT_CARD="MethodTrait";
-   public static final String UNSUPPORTED_TRAIT_CARD="UnsupportedTrait";
+   public SlotConstTraitDetailPanel slotConstTraitPanel;
+   public static final String METHOD_TRAIT_CARD="Method/Getter/Setter Trait";
+   public static final String UNSUPPORTED_TRAIT_CARD="Unsupported Trait Type";
+   public static final String SLOT_CONST_TRAIT_CARD="Slot/Const Trait";
    private JPanel innerPanel;
    public JButton saveButton;
    private HashMap<String,JComponent> cardMap=new HashMap<String,JComponent>();
    private String selectedCard;
+   private JLabel selectedLabel;
 
    public DetailPanel()
    {
@@ -59,6 +66,8 @@ public class DetailPanel extends JPanel implements ActionListener {
 
       cardMap.put(UNSUPPORTED_TRAIT_CARD, unsupportedTraitPanel);
 
+      slotConstTraitPanel=new SlotConstTraitDetailPanel();
+      cardMap.put(SLOT_CONST_TRAIT_CARD,slotConstTraitPanel);
 
       for(String key:cardMap.keySet())
       {
@@ -70,14 +79,20 @@ public class DetailPanel extends JPanel implements ActionListener {
 
       JPanel buttonsPanel=new JPanel();
       buttonsPanel.setLayout(new FlowLayout());
-      saveButton = new JButton("Save");
+      saveButton = new JButton("Save trait");
       saveButton.setActionCommand("SAVEDETAIL");
       saveButton.addActionListener(this);
+      buttonsPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
       buttonsPanel.add(saveButton);
       add(buttonsPanel,BorderLayout.SOUTH);
       selectedCard=UNSUPPORTED_TRAIT_CARD;
       layout.show(innerPanel, UNSUPPORTED_TRAIT_CARD);
       saveButton.setVisible(false);
+      selectedLabel=new JLabel("");
+      selectedLabel.setText(selectedCard);
+      selectedLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
+      selectedLabel.setHorizontalAlignment(SwingConstants.CENTER);
+      add(selectedLabel,BorderLayout.NORTH);
    }
 
    public void showCard(String name)
@@ -86,6 +101,7 @@ public class DetailPanel extends JPanel implements ActionListener {
       layout.show(innerPanel, name);
       saveButton.setVisible(cardMap.get(name) instanceof TraitDetail);
       selectedCard=name;
+      selectedLabel.setText(selectedCard);
    }
 
    public void actionPerformed(ActionEvent e) {
@@ -94,6 +110,9 @@ public class DetailPanel extends JPanel implements ActionListener {
             {
                if(((TraitDetail)cardMap.get(selectedCard)).save())
                {
+                  int lasttrait = Main.abcMainFrame.decompiledTextArea.lastTraitIndex;
+                  Main.abcMainFrame.decompiledTextArea.reloadClass();
+                  Main.abcMainFrame.decompiledTextArea.gotoTrait(lasttrait);
                   JOptionPane.showMessageDialog(this, "Trait Successfully saved");
                }
             }

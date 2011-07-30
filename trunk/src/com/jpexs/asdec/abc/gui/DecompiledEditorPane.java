@@ -20,6 +20,8 @@ package com.jpexs.asdec.abc.gui;
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConvertException;
+import com.jpexs.asdec.abc.types.traits.Trait;
+import com.jpexs.asdec.abc.types.traits.TraitSlotConst;
 import com.jpexs.asdec.helpers.Highlighting;
 
 import java.awt.event.MouseEvent;
@@ -48,13 +50,20 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
       int pos = getCaretPosition();
       for (Highlighting th : traitHighlights) {
          if ((pos >= th.startPos) && (pos < th.startPos + th.len)) {
-
+            lastTraitIndex = (int) th.offset;
+            Trait tr=abc.findTraitByTraitId(classIndex, (int) th.offset);
+            if(tr!=null){
+               if(tr instanceof TraitSlotConst){
+                  Main.abcMainFrame.detailPanel.slotConstTraitPanel.load((TraitSlotConst)tr, abc);
+                  Main.abcMainFrame.detailPanel.showCard(DetailPanel.SLOT_CONST_TRAIT_CARD);
+                  return;
+               }
+            }
             int bi = abc.findBodyIndex(abc.findMethodIdByTraitId(classIndex, (int) th.offset));
             if (bi == -1) {
                break;
             }
-            Main.abcMainFrame.detailPanel.showCard(DetailPanel.METHOD_TRAIT_CARD);
-            lastTraitIndex = (int) th.offset;
+            Main.abcMainFrame.detailPanel.showCard(DetailPanel.METHOD_TRAIT_CARD);            
             if (Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.bodyIndex != bi) {
                Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.setBodyIndex(bi, abc);
                Main.abcMainFrame.detailPanel.methodTraitPanel.methodBodyParamsPanel.loadFromBody(abc.bodies[bi]);
@@ -102,8 +111,12 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
       }
       for (Highlighting th : traitHighlights) {
          if (th.offset == traitId) {
-            //setCaretPosition(th.startPos + th.len - 1);
-            setCaretPosition(th.startPos);
+            try{
+               setCaretPosition(th.startPos + th.len - 1);
+               setCaretPosition(th.startPos);
+            }catch(IllegalArgumentException iae){
+
+            }
             return;
          }
       }

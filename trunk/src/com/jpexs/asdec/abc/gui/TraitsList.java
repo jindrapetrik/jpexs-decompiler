@@ -37,8 +37,7 @@ public class TraitsList extends JList implements ListSelectionListener {
 
     public void setABC(ABC abc) {
         this.abc = abc;
-        if (classIndex != -1)
-            setModel(new TraitsListModel(abc, classIndex));
+        setModel(new DefaultListModel());
     }
 
     public void setClassIndex(int classIndex) {

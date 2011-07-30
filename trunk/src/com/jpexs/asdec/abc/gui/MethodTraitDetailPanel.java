@@ -54,10 +54,7 @@ public class MethodTraitDetailPanel extends JTabbedPane implements TraitDetail {
       {
          return false;
       }
-
-      int lasttrait = Main.abcMainFrame.decompiledTextArea.lastTraitIndex;
-      Main.abcMainFrame.decompiledTextArea.reloadClass();
-      Main.abcMainFrame.decompiledTextArea.gotoTrait(lasttrait);      
+            
       return true;
    }
 }
