@@ -247,8 +247,10 @@ public class Main {
     }
 
 
-    public static boolean saveFileDialog(Frame f) {
+    public static boolean saveFileDialog() {
         JFileChooser fc = new JFileChooser();
+        JFrame f=new JFrame();
+        View.setWindowIcon(f);
         int returnVal = fc.showSaveDialog(f);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
@@ -279,7 +281,9 @@ public class Main {
             }
 
         });
-        int returnVal = fc.showOpenDialog(null);
+        JFrame f=new JFrame();
+        View.setWindowIcon(f);
+        int returnVal = fc.showOpenDialog(f);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File selfile = fc.getSelectedFile();
             Main.openFile(selfile.getAbsolutePath());

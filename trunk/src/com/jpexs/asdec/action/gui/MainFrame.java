@@ -147,15 +147,19 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
 
         JMenu menuFile = new JMenu("File");
         JMenuItem miOpen = new JMenuItem("Open...");
+        miOpen.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/open16.png")));
         miOpen.setActionCommand("OPEN");
         miOpen.addActionListener(this);
         JMenuItem miSave = new JMenuItem("Save");
+        miSave.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/save16.png")));
         miSave.setActionCommand("SAVE");
         miSave.addActionListener(this);
         JMenuItem miSaveAs = new JMenuItem("Save as...");
+        miSaveAs.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/save16.png")));
         miSaveAs.setActionCommand("SAVEAS");
         miSaveAs.addActionListener(this);
         JMenuItem miExport = new JMenuItem("Export...");
+        miExport.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/exportas16.png")));
         miExport.setActionCommand("EXPORT");
         miExport.addActionListener(this);
         menuFile.add(miOpen);
@@ -164,6 +168,7 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
         //menuFile.add(miExport);
         menuFile.addSeparator();
         JMenuItem miClose = new JMenuItem("Exit");
+        miClose.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/exit16.png")));
         miClose.setActionCommand("EXIT");
         miClose.addActionListener(this);
         menuFile.add(miClose);
@@ -289,7 +294,7 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
             }
         }
         if (e.getActionCommand().equals("SAVEAS")) {
-            if (Main.saveFileDialog(this)) {
+            if (Main.saveFileDialog()) {
                 setTitle(Main.applicationName + " - " + Main.getFileTitle());
             }
         }

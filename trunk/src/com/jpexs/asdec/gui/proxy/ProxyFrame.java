@@ -121,8 +121,8 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
         buttonsPanel3.setLayout(new FlowLayout());
         buttonsPanel3.add(new JLabel("Sniff:"));
         buttonsPanel3.add(sniffSWFCheckBox);
-        buttonsPanel3.add(sniffJSCheckBox);
-        buttonsPanel3.add(sniffXMLCheckBox);
+        //buttonsPanel3.add(sniffJSCheckBox);
+        //buttonsPanel3.add(sniffXMLCheckBox);
 
         buttonsPanel23.add(buttonsPanel2);
         buttonsPanel23.add(buttonsPanel3);
