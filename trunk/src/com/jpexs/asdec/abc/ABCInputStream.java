@@ -29,7 +29,11 @@ import java.util.List;
 
 public class ABCInputStream extends InputStream {
 
-    private InputStream is;
+    private static final int CLASS_PROTECTED_NS = 8;
+
+	private static final int ATTR_METADATA = 4;
+
+	private InputStream is;
     private long bytesRead = 0;
     private ByteArrayOutputStream bufferOs = null;
     public static boolean DEBUG_READ=false;
@@ -291,7 +295,7 @@ public class ABCInputStream extends InputStream {
         trait.kindType = kindType;
         trait.kindFlags = kindFlags;
         trait.name_index = name_index;
-        if ((kindFlags & 4) == 4) {
+        if ((kindFlags & ATTR_METADATA) != 0) {
             int metadata_count = readU30();
             trait.metadata = new int[metadata_count];
             for (int i = 0; i < metadata_count; i++) {
@@ -331,7 +335,7 @@ public class ABCInputStream extends InputStream {
         ret.name_index = readU30();
         ret.super_index = readU30();
         ret.flags = read();
-        if ((ret.flags & 8) == 8) {
+        if ((ret.flags & CLASS_PROTECTED_NS) != 0) {
             ret.protectedNS = readU30();
         }
         int interfaces_count = readU30();
