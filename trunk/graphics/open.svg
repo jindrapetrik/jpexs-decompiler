@@ -15,13 +15,25 @@
    id="svg2"
    inkscape:label="Pozadí"
    version="1.1"
-   inkscape:version="0.47 r22583"
+   inkscape:version="0.48.1 "
    sodipodi:docname="open.svg"
    inkscape:export-filename="D:\Dokumenty\Programovani\JavaSE\ASDec\trunk\src\com\jpexs\asdec\gui\graphics\open.png"
    inkscape:export-xdpi="67.5"
    inkscape:export-ydpi="67.5">
   <defs
      id="defs3">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient2999">
+      <stop
+         style="stop-color:#00ff00;stop-opacity:1;"
+         offset="0"
+         id="stop3001" />
+      <stop
+         style="stop-color:#006c00;stop-opacity:1"
+         offset="1"
+         id="stop3003" />
+    </linearGradient>
     <linearGradient
        inkscape:collect="always"
        id="linearGradient3601">
@@ -71,6 +83,16 @@
        x2="13.257614"
        y2="22.292511"
        gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient2999"
+       id="linearGradient3005"
+       x1="18.392857"
+       y1="1026.9158"
+       x2="18.392859"
+       y2="1035.7551"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.77544041,0.47830451,-0.41398115,0.8959264,435.0972,95.947657)" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -80,8 +102,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="11.2"
-     inkscape:cx="18.374709"
-     inkscape:cy="13.203513"
+     inkscape:cx="27.253664"
+     inkscape:cy="19.970552"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -98,7 +120,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -113,6 +135,12 @@
        id="path2815"
        transform="translate(0,1020.3622)"
        sodipodi:nodetypes="ccccccc" />
+    <path
+       style="fill:url(#linearGradient3005);fill-opacity:1;stroke:#000000;stroke-width:0.7492525px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 17.681208,1032.8286 2.196417,-4.7534 -4.725686,-2.9148 10.824268,-3.789 3.13106,11.8674 -4.368513,-2.6946 -2.445387,5.2922 c -0.787518,-0.5136 -1.575037,-1.0272 -2.362556,-1.5407 -0.749868,-0.4891 -1.499735,-0.9781 -2.249603,-1.4671 z"
+       id="path2997"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccccccsc" />
     <path
        style="fill:url(#linearGradient2827);stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1;"
        d="M 2,30 9,16 32,16 25,30 2,30 z"
