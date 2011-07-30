@@ -177,6 +177,13 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
         menuTools.add(miProxy);
         menuBar.add(menuTools);
 
+        JMenu menuHelp = new JMenu("Help");
+        JMenuItem miAbout = new JMenuItem("About...");
+        miAbout.setActionCommand("ABOUT");
+        miAbout.addActionListener(this);
+        menuHelp.add(miAbout);
+        menuBar.add(menuHelp);
+        
         setJMenuBar(menuBar);
 
         setTitle(Main.applicationName + " - " + Main.getFileTitle());
@@ -195,8 +202,12 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
                     @Override
                     public void run() {
                         editor.setText(asm.getASMSource(10)); //TODO:Ensure correct version here
-                        if(Main.DO_DECOMPILE)
-                          decompiledEditor.setText(Highlighting.stripHilights(com.jpexs.asdec.action.Action.actionsToSource(asm.getActions(10), 10))); //TODO:Ensure correct version here
+                        if(Main.DO_DECOMPILE){
+                          List<com.jpexs.asdec.action.Action> as=asm.getActions(10);//TODO:Ensure correct version here
+                          com.jpexs.asdec.action.Action.setActionsAddresses(as, 0, 10);//TODO:Ensure correct version here
+
+                          decompiledEditor.setText(Highlighting.stripHilights(com.jpexs.asdec.action.Action.actionsToSource(as, 10))); //TODO:Ensure correct version here
+                       }
                         Main.stopWork();
                     }
                 }).start();
@@ -213,6 +224,9 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("EXIT")) {
             System.exit(0);
+        }
+        if (e.getActionCommand().equals("ABOUT")) {
+            Main.about();
         }
         if (e.getActionCommand().equals("SHOWPROXY")) {
             Main.showProxy();

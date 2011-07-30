@@ -283,6 +283,13 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
         menuTools.add(miProxy);
         menuBar.add(menuTools);
 
+        JMenu menuHelp = new JMenu("Help");
+        JMenuItem miAbout = new JMenuItem("About...");
+        miAbout.setActionCommand("ABOUT");
+        miAbout.addActionListener(this);
+        menuHelp.add(miAbout);
+        menuBar.add(menuHelp);
+
         setJMenuBar(menuBar);
 
         /* Constants */
@@ -327,6 +334,10 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
             Main.exit();
         }
         if (Main.isWorking()) return;
+
+        if (e.getActionCommand().equals("ABOUT")) {
+            Main.about();
+        }
        
 
         if (e.getActionCommand().equals("SHOWPROXY")) {

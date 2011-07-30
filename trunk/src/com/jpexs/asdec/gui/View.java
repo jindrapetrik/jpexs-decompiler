@@ -61,7 +61,7 @@ public class View {
      *
      * @param f Frame to set icon in
      */
-    public static void setWindowIcon(Frame f) {
+    public static void setWindowIcon(Window f) {
         java.util.List<Image> images = new ArrayList<Image>();
         images.add(loadImage("com/jpexs/asdec/gui/graphics/icon16.png"));
         images.add(loadImage("com/jpexs/asdec/gui/graphics/icon32.png"));
@@ -74,7 +74,7 @@ public class View {
      *
      * @param f Frame to center on the screen
      */
-    public static void centerScreen(Frame f) {
+    public static void centerScreen(Window f) {
         Dimension dim = f.getToolkit().getScreenSize();
         Rectangle abounds = f.getBounds();
         f.setLocation((dim.width - abounds.width) / 2,

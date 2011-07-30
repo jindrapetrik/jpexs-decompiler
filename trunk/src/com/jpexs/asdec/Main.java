@@ -19,6 +19,7 @@
 package com.jpexs.asdec;
 
 import com.jpexs.asdec.abc.NotSameException;
+import com.jpexs.asdec.gui.AboutDialog;
 import com.jpexs.asdec.gui.LoadingDialog;
 import com.jpexs.asdec.gui.ModeFrame;
 import com.jpexs.asdec.gui.View;
@@ -463,5 +464,10 @@ public class Main {
     public static void exit() {
         saveReplacements();
         System.exit(0);
+    }
+
+    public static void about()
+    {
+         (new AboutDialog()).setVisible(true);
     }
 }

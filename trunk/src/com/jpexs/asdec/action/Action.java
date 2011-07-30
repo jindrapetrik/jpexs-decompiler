@@ -430,9 +430,13 @@ public class Action {
      * @return address
      */
     public static long ip2adr(List<Action> actions, int ip, int version) {
-        if (ip == actions.size()) {
+        if (ip >= actions.size()) {
             if (actions.size() == 0) return 0;
             return actions.get(actions.size() - 1).getAddress() + actions.get(actions.size() - 1).getBytes(version).length;
+        }
+        if(ip==-1)
+        {
+           return 0;
         }
         return actions.get(ip).getAddress();
     }
