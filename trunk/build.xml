@@ -48,7 +48,7 @@
         <delete dir="${COMPILEDIR}"/>
         <mkdir dir="${COMPILEDIR}"/>
         <javac srcdir="${SOURCEDIR}" destdir="${COMPILEDIR}" includes="**/*.java" target="1.6" debug="true"
-               debuglevel="lines,vars,source">
+               debuglevel="lines,vars,source" includeantruntime="false">
             <classpath>
                 <fileset dir="${LIBRARIESDIR}" includes="**/*.jar"/>
             </classpath>
@@ -67,7 +67,7 @@
         <mkdir dir="${TESTRESULTSDIR}/raw/"/>
         <delete dir="${COMPILETESTSDIR}"/>
         <mkdir dir="${COMPILETESTSDIR}"/>
-        <javac srcdir="${TESTDIR}" destdir="${COMPILETESTSDIR}" includes="**/*.java" target="1.6">
+        <javac srcdir="${TESTDIR}" destdir="${COMPILETESTSDIR}" includes="**/*.java" target="1.6" debug="true" includeantruntime="false">
             <classpath>
                 <pathelement path="${COMPILEDIR}"/>
                 <fileset dir="${LIBRARIESDIR}" includes="**/*.jar"/>
