@@ -53,7 +53,7 @@ public class Main {
     public static String file;
     public static String maskURL;
     public static SWF swf;
-    public static final String version = "alpha10";
+    public static final String version = "beta1";
     public static String applicationName = "JP ActionScript Decompiler v." + version;
     public static String shortApplicationName = "JPAD v."+version;
     public static LoadingDialog loadingDialog = new LoadingDialog();
