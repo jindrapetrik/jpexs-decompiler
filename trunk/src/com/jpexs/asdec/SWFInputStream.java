@@ -461,6 +461,78 @@ public class SWFInputStream extends InputStream {
             case 34:
                 ret = new DefineButton2Tag(data, version);
                 break;
+            case 69:
+            	ret = new FileAttributes(data);
+            	break;
+            case 77:
+            	ret = new Metadata(data);
+            	break;
+            case 65:
+            	ret = new ScriptLimits(data, version);
+            	break;
+            case 9:
+            	ret = new SetBackgroundColor(data);
+            	break;
+            case 41:
+            	ret = new ProductInfo(data, version);
+            	break;
+            case 43:
+            	ret = new FrameLabel(data, version);
+            	break;
+            case 36:
+            	ret = new DefineBitsLossless2(data, version);
+            	break;
+            case 76:
+            	ret = new SymbolClass(data, version);
+            	break;
+            case 32:
+            	ret = new DefineShape3(data, version);
+            	break;
+            case 28:
+            	ret = new RemoveObject2(data, version);
+            	break;
+            case 78:
+            	ret = new DefineScalingGrid(data, version);
+            	break;
+            case 2:
+            	ret = new DefineShape(data, version);
+            	break;
+            case 22:
+            	ret = new DefineShape2(data, version);
+            	break;
+            case 83:
+            	ret = new DefineShape4(data, version);
+            	break;
+            case 20:
+            	ret = new DefineBitsLossless(data, version);
+            	break;
+            case 35:
+            	ret = new DefineBitsJPEG3(data, version);
+            	break;
+            case 87:
+            	ret = new DefineBinaryData(data, version);
+            	break;
+            case 8:
+            	ret = new JPEGTables(data);
+            	break;
+            case 6:
+            	ret = new DefineBits(data, version);
+            	break;
+            case 21:
+            	ret = new DefineBitsJPEG2(data, version);
+            	break;
+            case 75:
+            	ret = new DefineFont3(data, version);
+            	break;
+            case 73:
+            	ret = new DefineFontAlignZones(data, version);
+            	break;
+            case 88:
+            	ret = new DefineFontName(data, version);
+            	break;            	
+            case 91:
+            	ret = new DefineFont4(data, version);
+            	break;
             default:
                 ret = new Tag(tagID, data);
         }
