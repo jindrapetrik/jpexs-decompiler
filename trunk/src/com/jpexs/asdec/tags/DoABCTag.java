@@ -66,18 +66,13 @@ public class DoABCTag extends Tag {
      * @param version SWF version
      * @throws IOException
      */
-    public DoABCTag(byte[] data, int version) {
+    public DoABCTag(byte[] data, int version) throws IOException {
         super(82, data);       
-        try {
-            InputStream is = new ByteArrayInputStream(data);
-            SWFInputStream sis = new SWFInputStream(is, version);
-            flags = sis.readUI32();
-            name = sis.readString();
-            abc = new ABC(is);
-
-        } catch (IOException e) {
-
-        }
+        InputStream is = new ByteArrayInputStream(data);
+        SWFInputStream sis = new SWFInputStream(is, version);
+        flags = sis.readUI32();
+        name = sis.readString();
+        abc = new ABC(is);
     }
 
     /**

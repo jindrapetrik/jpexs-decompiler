@@ -17,15 +17,15 @@
 
 package com.jpexs.asdec.tags;
 
-import com.jpexs.asdec.SWFInputStream;
-import com.jpexs.asdec.SWFOutputStream;
-import com.jpexs.asdec.action.Action;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.jpexs.asdec.SWFInputStream;
+import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.action.Action;
 
 public class DoInitActionTag extends Tag implements ASMSource {
     /**
@@ -50,17 +50,12 @@ public class DoInitActionTag extends Tag implements ASMSource {
      * @param version SWF version
      * @throws IOException
      */
-    public DoInitActionTag(byte[] data, int version) {
+    public DoInitActionTag(byte[] data, int version) throws IOException {
         super(59, data);
-        try {
-            ByteArrayInputStream bais = new ByteArrayInputStream(data);
-            SWFInputStream sis = new SWFInputStream(bais, version);
-            spriteId = sis.readUI16();
-            //actions = sis.readActionList();
-            actionBytes=sis.readBytes(sis.available());
-        } catch (IOException e) {
-
-        }
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        spriteId = sis.readUI16();
+        //actions = sis.readActionList();
+        actionBytes=sis.readBytes(sis.available());
     }
 
     /**
