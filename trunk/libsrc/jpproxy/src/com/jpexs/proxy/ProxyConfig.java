@@ -36,4 +36,8 @@ public class ProxyConfig {
    public static String httpProxyHost="";
    public static int httpProxyPort=0;
 
+   public static String httpsKeyStoreFile=null;
+   public static String httpsKeyStorePass=null;
+   public static String httpsKeyPass=null;
+
 }

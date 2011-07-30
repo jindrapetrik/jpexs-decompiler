@@ -126,7 +126,7 @@ class Handler implements Runnable
 		}
       catch(SSLHandshakeException she)
       {
-         client.close();
+         she.printStackTrace();         
          break;
       }
 		catch (IOException e)
@@ -136,7 +136,7 @@ class Handler implements Runnable
 		}
 
       
-      if(request.getCommand().equals("CONNECT")){         
+      if(request.getCommand().equals("CONNECT")){
          secureServer=request.getHost();
          securePort=request.getPort();
          if((ProxyConfig.httpsMode==ProxyConfig.HTTPS_FILTER)||((ProxyConfig.httpsMode==ProxyConfig.HTTPS_FILTERLIST)&&(ProxyConfig.enabledHttpsServers.contains(secureServer)))){
@@ -392,7 +392,24 @@ class Handler implements Runnable
 
    if((ProxyConfig.httpsMode==ProxyConfig.HTTPS_FILTER)||((ProxyConfig.httpsMode==ProxyConfig.HTTPS_FILTERLIST)&&(ProxyConfig.enabledHttpsServers.contains(secureHost))))
       {
-          http=Https.open(secureHost,securePort,ProxyConfig.useHTTPSProxy);
+         if(ProxyConfig.useHTTPSProxy){
+            http=Https.open(ProxyConfig.httpsProxyHost,ProxyConfig.httpsProxyPort,true);
+             Request connectReq=new Request(null);
+             connectReq.setStatusLine("CONNECT "+secureHost+":"+securePort+" HTTP/1.1");
+             connectReq.setCommand("CONNECT");
+             connectReq.setURL(secureHost+":"+securePort);
+             connectReq.setProtocol("HTTP/1.1");
+            try {
+               http.sendRequest(connectReq);
+               Reply rep=http.recvReply(connectReq);               
+            } catch (RetryRequestException ex) {
+
+            }
+            ((Https)http).promoteToClientSSL();
+         }else{
+          http=Https.open(secureHost,securePort,false);
+          ((Https)http).promoteToClientSSL();
+         }
           /*http = new Http(request.getHost(),request.getPort(),ProxyConfig.useHTTPSProxy);
           if(ProxyConfig.useHTTPSProxy){
              Request connectReq=new Request(client);

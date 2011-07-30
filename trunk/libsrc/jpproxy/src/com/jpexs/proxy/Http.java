@@ -86,7 +86,7 @@ class Http extends HttpConnection
 
 	try
 	{
-	    return recv();
+       return recv();
 	}
 	catch (IOException e)
 	{
@@ -130,20 +130,25 @@ class Http extends HttpConnection
     {
 	
 	/* Prepare HTTP/1.1 request */
-	request.removeHeaderField("Proxy-Connection");
-   if(request.containsHeaderField("Connection")&&(request.getHeaderField("Connection").toLowerCase().equals("keep-alive"))){
-      //request.removeHeaderField("Connection");
-   }else{
-      request.setHeaderField("Connection", "open");
+   
+   request.removeHeaderField("Proxy-Connection");
+  
+
+   if(!proxy){
+      if(request.containsHeaderField("Connection")&&(request.getHeaderField("Connection").toLowerCase().equals("keep-alive"))){
+
+      }else{
+         request.setHeaderField("Connection", "open");
+      }
+      if (!request.containsHeaderField("Host"))
+      {
+          request.setHeaderField("Host", request.getHost());
+      }
    }
-	if (!request.containsHeaderField("Host"))
-	{
-	    request.setHeaderField("Host", request.getHost());
-	}
 
 	if (proxy)
 	{
-	    request.write(getOutputStream());
+         request.write(getOutputStream());
 	}
 	else
 	{
@@ -151,7 +156,7 @@ class Http extends HttpConnection
 	    StringBuffer head = new StringBuffer();
 	    head.append(request.getCommand());
 	    head.append(" ");
-	    head.append(request.getPath());
+       head.append(request.getPath());
 	    head.append(" ");
 	    head.append("HTTP/1.0");
 	    request.statusLine = head.toString();

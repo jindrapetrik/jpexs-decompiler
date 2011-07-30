@@ -23,20 +23,7 @@ public class Https extends Http {
 
     public Https(String host, int port, boolean isProxy) throws IOException
     {
-         super(host, port,isProxy);
-         if(isProxy){
-             Request connectReq=new Request(null);
-             connectReq.setCommand("CONNECT");
-             connectReq.setURL(host+":"+port);
-             connectReq.setProtocol("HTTP/1.1");
-            try {
-               sendRequest(connectReq);
-               recvReply(connectReq);
-            } catch (RetryRequestException ex) {
-
-            }
-          }
-          promoteToClientSSL();
+         super(host, port,isProxy);         
     }
 
     private static String cacheKey(String host, int port)

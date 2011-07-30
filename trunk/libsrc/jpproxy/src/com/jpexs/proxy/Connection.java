@@ -22,6 +22,27 @@ class Connection
     Socket socket = null;
     InputStream in = null;
     OutputStream out = null;
+    static SSLSocketFactory sf;
+
+    static{
+       String ksName = ProxyConfig.httpsKeyStoreFile;      
+      if(ksName!=null){
+            char ksPass[] = ProxyConfig.httpsKeyStorePass.toCharArray();
+            char ctPass[] = ProxyConfig.httpsKeyPass.toCharArray();
+            try{
+               KeyStore ks = KeyStore.getInstance("JKS");
+               ks.load(new FileInputStream(ksName), ksPass);
+               KeyManagerFactory kmf =
+               KeyManagerFactory.getInstance("SunX509");
+               kmf.init(ks, ctPass);
+               SSLContext sc = SSLContext.getInstance("TLS");
+               sc.init(kmf.getKeyManagers(), null, null);
+               sf=sc.getSocketFactory();
+             }catch(Exception ex){
+
+             }
+       }
+    }
 
     public void promoteToClientSSL(){
        SSLSocketFactory f = (SSLSocketFactory) SSLSocketFactory.getDefault();
@@ -36,22 +57,11 @@ class Connection
     }
 
     public void promoteToServerSSL(){
-       String ksName = "server.jks";
-      char ksPass[] = "ServerJKS".toCharArray();
-      char ctPass[] = "ServerKey".toCharArray();
-      try{
-         KeyStore ks = KeyStore.getInstance("JKS");
-         ks.load(new FileInputStream(ksName), ksPass);
-         KeyManagerFactory kmf =
-         KeyManagerFactory.getInstance("SunX509");
-         kmf.init(ks, ctPass);
-         SSLContext sc = SSLContext.getInstance("TLS");
-         sc.init(kmf.getKeyManagers(), null, null);
-         SSLSocketFactory sf=sc.getSocketFactory();
+       try{
          socket=sf.createSocket(socket,null,socket.getPort(),false);
          ((SSLSocket)socket).setUseClientMode(false);
        }catch(Exception ex){
-
+         ex.printStackTrace();
        }
       try {
          in = socket.getInputStream();
