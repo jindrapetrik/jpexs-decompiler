@@ -21,6 +21,7 @@ package com.jpexs.asdec.abc.types;
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
+import com.jpexs.asdec.abc.avm2.CodeStats;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.types.traits.Traits;
@@ -117,6 +118,20 @@ public class MethodBody implements Cloneable {
         ret.init_scope_depth = init_scope_depth;
         ret.traits = traits; //maybe deep clone
         return ret;
+    }
+
+    public boolean autoFillStats(ABC abc)
+    {
+       CodeStats stats=code.getStats(abc,this);
+       if(stats==null){
+          return false;
+       }
+       max_stack=stats.maxstack;
+       max_scope_depth=init_scope_depth+stats.maxscope;
+       max_regs=stats.maxlocal;
+       abc.method_info[method_info].setFlagSetsdxns(stats.has_set_dxns);
+       abc.method_info[method_info].setFlagNeed_activation(stats.has_activation);
+       return true;
     }
 
 

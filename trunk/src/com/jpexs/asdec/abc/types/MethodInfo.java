@@ -35,6 +35,48 @@ public class MethodInfo {
     public ValueKind optional[];
     public int paramNames[];
 
+    public void setFlagSetsdxns()
+    {
+       flags|=64;
+    }
+
+    public void setFlagSetsdxns(boolean val)
+    {
+       if(val){
+          setFlagSetsdxns();
+       }else{
+          unsetFlagSetsdxns();
+       }
+    }
+
+    public void unsetFlagSetsdxns()
+    {
+       if(flagSetsdxns()){
+          flags-=64;
+       }
+    }
+
+    public void setFlagNeed_activation()
+    {
+       flags|=2;
+    }
+
+    public void setFlagNeed_activation(boolean val)
+    {
+       if(val){
+          setFlagNeed_activation();
+       }else{
+          unsetFlagNeed_activation();
+       }
+    }
+
+    public void unsetFlagNeed_activation()
+    {
+       if(flagNeed_activation()){
+          flags-=2;
+       }
+    }
+
     public void setFlagNeed_rest()
     {
        flags|=4;
@@ -44,6 +86,15 @@ public class MethodInfo {
     {
        if(flagNeed_rest()){
           flags-=4;
+       }
+    }
+
+    public void setFlagNeed_rest(boolean val)
+    {
+       if(val){
+          setFlagNeed_rest();
+       }else{
+          unsetFlagNeed_rest();
        }
     }
 
@@ -59,6 +110,15 @@ public class MethodInfo {
        }
     }
 
+    public void setFlagHas_optional(boolean val)
+    {
+       if(val){
+          setFlagHas_optional();
+       }else{
+          unsetFlagHas_optional();
+       }
+    }
+
     public void setFlagHas_paramnames()
     {
        flags|=128;
@@ -68,6 +128,15 @@ public class MethodInfo {
     {
        if(flagHas_paramnames()){
           flags-=128;
+       }
+    }
+
+    public void setFlagHas_paramnames(boolean val)
+    {
+       if(val){
+          setFlagHas_paramnames();
+       }else{
+          unsetFlagHas_paramnames();
        }
     }
 

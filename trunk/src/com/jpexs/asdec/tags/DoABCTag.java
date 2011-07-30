@@ -88,7 +88,7 @@ public class DoABCTag extends Tag {
      * @return Bytes of data
      */
     @Override
-    public byte[] getData(int version) {
+    public byte[] getData(int version) {       
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             OutputStream os = bos;

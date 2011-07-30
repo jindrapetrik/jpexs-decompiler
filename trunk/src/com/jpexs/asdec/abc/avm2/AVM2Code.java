@@ -2319,11 +2319,21 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
        return true;
     }
 
-    public CodeStats getStats(ABC abc)
+    public CodeStats getStats(ABC abc,MethodBody body)
     {
        CodeStats stats=new CodeStats(this);
        if(!walkCode(stats,0,0,0,abc)){
           return null;
+       }
+       for(ABCException ex:body.exceptions){
+         try {
+            int exStart=adr2pos(ex.start);
+            if(!walkCode(stats, adr2pos(ex.target), stats.instructionStats[exStart].stackpos, stats.instructionStats[exStart].scopepos, abc)){
+               return null;
+            }
+         } catch (ConvertException ex1) {
+
+         }
        }
        return stats;
     }

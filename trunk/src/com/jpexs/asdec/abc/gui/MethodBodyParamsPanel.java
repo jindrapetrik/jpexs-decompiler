@@ -20,6 +20,7 @@ package com.jpexs.asdec.abc.gui;
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.avm2.CodeStats;
 import com.jpexs.asdec.abc.types.MethodBody;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.text.NumberFormat;
 import javax.swing.JCheckBox;
@@ -47,7 +48,7 @@ public class MethodBodyParamsPanel extends JPanel implements ChangeListener{
    public JFormattedTextField maxScopeDepthField = new JFormattedTextField(NumberFormat.getNumberInstance());
    public MethodBody body;
    public JCheckBox autoFillCheckBox=new JCheckBox("Auto fill on code save (GLOBAL SETTING)");
-
+   public JLabel experimentalLabel=new JLabel("...EXPERIMENTAL");
    public MethodBodyParamsPanel()  {
       setLayout(null);
 
@@ -71,9 +72,13 @@ public class MethodBodyParamsPanel extends JPanel implements ChangeListener{
       add(maxScopeDepthLabel);
       add(maxScopeDepthField);
       
-      autoFillCheckBox.setBounds(50, 10+30+30+30+30, 250, 25);
+      autoFillCheckBox.setBounds(30, 10+30+30+30+30, 230, 25);
       add(autoFillCheckBox);
       autoFillCheckBox.addChangeListener(this);
+
+      experimentalLabel.setForeground(Color.red);
+      experimentalLabel.setBounds(250,10+30+30+30+30, 100, 25);
+      add(experimentalLabel);
 
       setPreferredSize(new Dimension(300,150));
    }
@@ -101,16 +106,10 @@ public class MethodBodyParamsPanel extends JPanel implements ChangeListener{
             body.max_stack = Integer.parseInt(maxStackField.getText());
             body.max_regs = Integer.parseInt(localCountField.getText());
             body.max_scope_depth = Integer.parseInt(maxScopeDepthField.getText());
-         }else{
-            CodeStats stats=body.code.getStats(Main.abcMainFrame.abc);
-            if(stats==null)
+         }else{            
+            if(!body.autoFillStats(Main.abcMainFrame.abc))
             {
                JOptionPane.showMessageDialog(null, "Cannot get code stats for automatic body params.\r\nUncheck autofill to avoid this message.","Warning",JOptionPane.WARNING_MESSAGE);
-            }else{
-               System.out.println(stats.toString(Main.abcMainFrame.abc));
-               /*body.max_stack=stats.maxstack;
-               body.max_scope_depth=body.init_scope_depth+stats.maxscope;
-               body.max_regs=stats.maxlocal;*/
             }
          }
          return true;
