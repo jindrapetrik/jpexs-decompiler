@@ -191,7 +191,7 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
 
     public void valueChanged(TreeSelectionEvent e) {
         if (Main.isWorking()) return;
-        Object obj = ((JTree) e.getSource()).getLastSelectedPathComponent();
+        Object obj = tagTree.getLastSelectedPathComponent();
         if (obj instanceof TagTreeItem) {
             obj = ((TagTreeItem) obj).tag;
             if (obj instanceof ASMSource) {
@@ -268,16 +268,18 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
             }
         }
 
-        if (e.getActionCommand().equals("SAVEACTION")) {
+        if (e.getActionCommand().equals("SAVEACTION")) {           
             TagTreeItem ti = (TagTreeItem) tagTree.getLastSelectedPathComponent();
             if (ti.tag instanceof ASMSource) {
                 ASMSource dat = (ASMSource) ti.tag;
                 try {
                     dat.setActions(ASMParser.parse(new ByteArrayInputStream(editor.getText().getBytes()), 10),10); //TODO:Ensure correct version here
+                    valueChanged(null);
+                    JOptionPane.showMessageDialog(this, "Code successfully saved");
                 } catch (IOException ex) {
                 } catch (ParseException ex) {
                     JOptionPane.showMessageDialog(this, "" + ex.text + " on line " + ex.line, "Error", JOptionPane.ERROR_MESSAGE);
-                }
+                }                
             }
         }
         if (e.getActionCommand().equals("SAVE")) {
