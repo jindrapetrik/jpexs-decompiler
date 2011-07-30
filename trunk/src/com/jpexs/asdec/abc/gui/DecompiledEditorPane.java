@@ -102,7 +102,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
       }
       for (Highlighting th : traitHighlights) {
          if (th.offset == traitId) {
-            setCaretPosition(th.startPos + th.len - 1);
+            //setCaretPosition(th.startPos + th.len - 1);
             setCaretPosition(th.startPos);
             return;
          }

@@ -32,7 +32,33 @@ import java.util.List;
  */
 public class MethodInfoParser {
 
-   public static void parse(String text, MethodInfo update,ABC abc) throws ParseException {
+   public static boolean parseReturnType(String text, MethodInfo update) throws ParseException {
+      MethodInfoLexer lexer = new MethodInfoLexer(new ByteArrayInputStream(text.getBytes()));
+      ParsedSymbol symb;
+      int type=-1;
+      try {
+         symb = lexer.yylex();
+         if(symb.type==ParsedSymbol.TYPE_STAR)
+         {
+               type=0;
+         }else if(symb.type==ParsedSymbol.TYPE_MULTINAME){
+            type=(int)(long)(Long)symb.value;
+         }else{
+            throw new ParseException("Multiname or * expected", lexer.yyline());
+         }
+         symb = lexer.yylex();
+         if(symb.type!=ParsedSymbol.TYPE_EOF)
+         {
+            throw new ParseException("Only one return type allowed", lexer.yyline());
+         }
+         update.ret_type=type;
+         return true;
+      } catch (IOException ex) {
+
+      }
+      return false;
+   }
+   public static boolean parseParams(String text, MethodInfo update,ABC abc) throws ParseException {
       MethodInfoLexer lexer = new MethodInfoLexer(new ByteArrayInputStream(text.getBytes()));
       List<String> paramNames=new ArrayList<String>();
       List<Long> paramTypes=new ArrayList<Long>();
@@ -173,6 +199,7 @@ public class MethodInfoParser {
             symb = lexer.yylex();
          } 
       } catch (IOException iex) {
+         return false;
       }
 
       if(needsRest&&(!optionalValues.isEmpty())){
@@ -213,7 +240,7 @@ public class MethodInfoParser {
             update.paramNames[p]=abc.constants.forceGetStringId(paramNames.get(p));
          }
       }
-
+      return true;
 
    }
 }
