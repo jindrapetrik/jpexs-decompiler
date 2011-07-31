@@ -19,6 +19,7 @@
 package com.jpexs.asdec.abc.usages;
 
 import com.jpexs.asdec.abc.ABC;
+import com.jpexs.asdec.abc.types.traits.Traits;
 
 /**
  *
@@ -26,13 +27,13 @@ import com.jpexs.asdec.abc.ABC;
  */
 public class MethodParamsMultinameUsage extends MethodMultinameUsage {
 
-    public MethodParamsMultinameUsage(int multinameIndex,int classIndex,int traitIndex,boolean isStatic,boolean isInitializer)
+    public MethodParamsMultinameUsage(int multinameIndex,int classIndex,int traitIndex,boolean isStatic,boolean isInitializer,Traits traits,int parentTraitIndex)
     {
-       super(multinameIndex,classIndex,traitIndex,isStatic,isInitializer);
+       super(multinameIndex,classIndex,traitIndex,isStatic,isInitializer,traits,parentTraitIndex);
     }
 
    @Override
    public String toString(ABC abc) {
-      return super.toString(abc)+" return type";
+      return super.toString(abc)+" params";
    }
 }

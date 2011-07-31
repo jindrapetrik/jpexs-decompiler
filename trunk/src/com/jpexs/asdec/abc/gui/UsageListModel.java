@@ -42,6 +42,10 @@ public class UsageListModel extends DefaultListModel{
       return ((MultinameUsage)super.getElementAt(index)).toString(abc);
    }
 
+   public MultinameUsage getUsage(int index){
+      return ((MultinameUsage)super.getElementAt(index));
+   }
+
 
 
 

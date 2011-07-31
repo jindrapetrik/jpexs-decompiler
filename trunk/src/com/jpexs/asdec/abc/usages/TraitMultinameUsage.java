@@ -18,22 +18,23 @@
 
 package com.jpexs.asdec.abc.usages;
 
-import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.types.traits.Traits;
 
 /**
  *
  * @author JPEXS
  */
-public class MethodNameMultinameUsage extends MethodMultinameUsage {
-
-    public MethodNameMultinameUsage(int multinameIndex,int classIndex,int traitIndex,boolean isStatic,boolean isInitializer,Traits traits,int parentTraitIndex)
-    {
-       super(multinameIndex,classIndex,traitIndex,isStatic,isInitializer,traits,parentTraitIndex);
-    }
-
-   @Override
-   public String toString(ABC abc) {
-      return super.toString(abc)+" name";
+public abstract class TraitMultinameUsage extends InsideClassMultinameUsage {
+   public int traitIndex ;
+   public boolean isStatic;
+   public Traits traits;
+   public int parentTraitIndex;
+   public TraitMultinameUsage(int multinameIndex,int classIndex,int traitIndex,boolean isStatic,Traits traits,int parentTraitIndex)
+   {
+      super(multinameIndex,classIndex);
+      this.traitIndex=traitIndex;
+      this.isStatic=isStatic;
+      this.traits=traits;
+      this.parentTraitIndex=parentTraitIndex;
    }
 }

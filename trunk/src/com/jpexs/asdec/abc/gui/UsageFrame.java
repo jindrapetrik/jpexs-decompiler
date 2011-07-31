@@ -15,67 +15,134 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-
 package com.jpexs.asdec.abc.gui;
 
+import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.usages.InsideClassMultinameUsage;
+import com.jpexs.asdec.abc.usages.MethodMultinameUsage;
 import com.jpexs.asdec.abc.usages.MultinameUsage;
+import com.jpexs.asdec.abc.usages.TraitMultinameUsage;
 import com.jpexs.asdec.gui.View;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.tree.TreePath;
 
 /**
  *
  * @author JPEXS
  */
-public class UsageFrame extends JFrame implements ActionListener {
-    private JButton gotoButton=new JButton("Go to");
-    private JButton cancelButton=new JButton("Cancel");
-    private JList usageList;
-    private UsageListModel usageListModel;
-    public UsageFrame(ABC abc,int multinameIndex){
-      List<MultinameUsage> usages=abc.findMultinameUsage(multinameIndex);
-      usageListModel=new UsageListModel(abc);
-      for(MultinameUsage u:usages){
-          usageListModel.addElement(u);
+public class UsageFrame extends JFrame implements ActionListener, MouseListener {
+
+   private JButton gotoButton = new JButton("Go to");
+   private JButton cancelButton = new JButton("Cancel");
+   private JList usageList;
+   private UsageListModel usageListModel;
+   private ABC abc;
+
+   public UsageFrame(ABC abc, int multinameIndex) {
+      List<MultinameUsage> usages = abc.findMultinameUsage(multinameIndex);
+      this.abc = abc;
+      usageListModel = new UsageListModel(abc);
+      for (MultinameUsage u : usages) {
+         usageListModel.addElement(u);
       }
-      usageList=new JList(usageListModel);
+      usageList = new JList(usageListModel);
       gotoButton.setActionCommand("GOTO");
       gotoButton.addActionListener(this);
       cancelButton.setActionCommand("CANCEL");
       cancelButton.addActionListener(this);
-      JPanel buttonsPanel=new JPanel();
+      JPanel buttonsPanel = new JPanel();
       buttonsPanel.setLayout(new FlowLayout());
-      //buttonsPanel.add(gotoButton);
+      buttonsPanel.add(gotoButton);
       buttonsPanel.add(cancelButton);
 
-      Container cont=getContentPane();
+      usageList.addMouseListener(this);
+      Container cont = getContentPane();
       cont.setLayout(new BorderLayout());
-      cont.add(new JScrollPane(usageList),BorderLayout.CENTER);
+      cont.add(new JScrollPane(usageList), BorderLayout.CENTER);
       cont.add(buttonsPanel, BorderLayout.SOUTH);
-      setSize(400,300);
-      setTitle("Usages:"+abc.constants.constant_multiname[multinameIndex].getNameWithNamespace(abc.constants));
+      setSize(400, 300);
+      setTitle("Usages:" + abc.constants.constant_multiname[multinameIndex].getNameWithNamespace(abc.constants));
       View.centerScreen(this);
       View.setWindowIcon(this);
-    }
+   }
 
-    public void actionPerformed(ActionEvent e) {
-        if(e.getActionCommand().equals("GOTO")){
+   private void gotoUsage() {
+      if (usageList.getSelectedIndex() != -1) {
+         MultinameUsage usage = usageListModel.getUsage(usageList.getSelectedIndex());
+         if (usage instanceof InsideClassMultinameUsage) {
+            InsideClassMultinameUsage icu = (InsideClassMultinameUsage) usage;
+            Main.abcMainFrame.classTree.selectClass(icu.classIndex);
+            try {
+               Thread.sleep(100);
+            } catch (InterruptedException ex) {
+               
+            }
+            if (usage instanceof TraitMultinameUsage) {
+               TraitMultinameUsage tmu=(TraitMultinameUsage)usage;
+               int traitIndex=0;
+               if(tmu.parentTraitIndex>-1){
+                  traitIndex=tmu.parentTraitIndex;
+               }else{
+                  traitIndex=tmu.traitIndex;
+               }
+               if(!tmu.isStatic){
+                  traitIndex+=abc.class_info[tmu.classIndex].static_traits.traits.length;
+               }
+               if(tmu instanceof MethodMultinameUsage){
+                  MethodMultinameUsage mmu=(MethodMultinameUsage)usage;
+                  if(mmu.isInitializer==true){
+                     traitIndex=abc.class_info[mmu.classIndex].static_traits.traits.length+abc.instance_info[mmu.classIndex].instance_traits.traits.length+(mmu.isStatic?1:0);
+                  }
+               }
+               Main.abcMainFrame.decompiledTextArea.gotoTrait(traitIndex);
+            }
+         }
+      }
+   }
 
-        }
-        if(e.getActionCommand().equals("CANCEL")){
-            setVisible(false);
-        }
-    }
+   public void actionPerformed(ActionEvent e) {
+      if (e.getActionCommand().equals("GOTO")) {
+         gotoUsage();
+         setVisible(false);
+      }
+      if (e.getActionCommand().equals("CANCEL")) {
+         setVisible(false);
+      }
+   }
+
+   public void mouseClicked(MouseEvent e) {
+      if (e.getClickCount() == 2) {
+         gotoUsage();
+      }
+   }
+
+   public void mousePressed(MouseEvent e) {
+   }
+
+   public void mouseReleased(MouseEvent e) {
+   }
+
+   public void mouseEntered(MouseEvent e) {
+   }
+
+   public void mouseExited(MouseEvent e) {
+   }
 }

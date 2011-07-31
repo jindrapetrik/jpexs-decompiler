@@ -19,6 +19,7 @@
 package com.jpexs.asdec.abc.usages;
 
 import com.jpexs.asdec.abc.ABC;
+import com.jpexs.asdec.abc.types.traits.Traits;
 
 /**
  *
@@ -26,9 +27,9 @@ import com.jpexs.asdec.abc.ABC;
  */
 public class ConstVarTypeMultinameUsage extends ConstVarMultinameUsage{
 
-   public ConstVarTypeMultinameUsage(int multinameIndex,int classIndex,int traitIndex,boolean isStatic)
+   public ConstVarTypeMultinameUsage(int multinameIndex,int classIndex,int traitIndex,boolean isStatic,Traits traits,int parentTraitIndex)
    {
-      super(multinameIndex,classIndex,traitIndex,isStatic);
+      super(multinameIndex,classIndex,traitIndex,isStatic,traits,parentTraitIndex);
    }
 
    @Override

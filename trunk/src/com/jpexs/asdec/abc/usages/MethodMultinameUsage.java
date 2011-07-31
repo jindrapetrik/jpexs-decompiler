@@ -20,21 +20,19 @@ package com.jpexs.asdec.abc.usages;
 
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.types.traits.TraitMethodGetterSetter;
+import com.jpexs.asdec.abc.types.traits.Traits;
 
 /**
  *
  * @author JPEXS
  */
-public abstract class MethodMultinameUsage extends InsideClassMultinameUsage {
+public abstract class MethodMultinameUsage extends TraitMultinameUsage {
 
-   public int traitIndex ;
-   public boolean isStatic;
    public boolean isInitializer;
-   public MethodMultinameUsage(int multinameIndex,int classIndex,int traitIndex,boolean isStatic,boolean isInitializer)
+
+   public MethodMultinameUsage(int multinameIndex,int classIndex,int traitIndex,boolean isStatic,boolean isInitializer,Traits traits,int parentTraitIndex)
    {
-      super(multinameIndex,classIndex);
-      this.traitIndex=traitIndex;
-      this.isStatic=isStatic;
+      super(multinameIndex,classIndex,traitIndex,isStatic,traits,parentTraitIndex);
       this.isInitializer=isInitializer;
    }
 
@@ -51,12 +49,17 @@ public abstract class MethodMultinameUsage extends InsideClassMultinameUsage {
                  (isStatic?
                     "class initializer":
                     "instance initializer")
-                 :
+                 :(
+         (parentTraitIndex>-1?
          (isStatic?
-         ((TraitMethodGetterSetter)abc.class_info[classIndex].static_traits.traits[traitIndex]).convert(abc.constants, abc.method_info, abc,true)
-              :
-         ((TraitMethodGetterSetter)abc.instance_info[classIndex].instance_traits.traits[traitIndex]).convert(abc.constants, abc.method_info, abc,false)
-         ));
+            (((TraitMethodGetterSetter)abc.class_info[classIndex].static_traits.traits[parentTraitIndex]).convert(abc.constants, abc.method_info, abc,isStatic)):
+            (((TraitMethodGetterSetter)abc.instance_info[classIndex].instance_traits.traits[parentTraitIndex]).convert(abc.constants, abc.method_info, abc,isStatic))
+          )+" "
+         :
+         "")
+         +
+         (((TraitMethodGetterSetter)traits.traits[traitIndex]).convert(abc.constants, abc.method_info, abc,isStatic)))
+         );
    }
 
    public int getTraitIndex() {
