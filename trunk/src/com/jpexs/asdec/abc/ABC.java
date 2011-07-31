@@ -29,6 +29,19 @@ import com.jpexs.asdec.abc.types.*;
 import com.jpexs.asdec.abc.types.traits.Trait;
 import com.jpexs.asdec.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.asdec.abc.types.traits.TraitSlotConst;
+import com.jpexs.asdec.abc.types.traits.Traits;
+import com.jpexs.asdec.abc.usages.ClassNameMultinameUsage;
+import com.jpexs.asdec.abc.usages.ConstVarNameMultinameUsage;
+import com.jpexs.asdec.abc.usages.ConstVarTypeMultinameUsage;
+import com.jpexs.asdec.abc.usages.ExtendsMultinameUsage;
+import com.jpexs.asdec.abc.usages.ImplementsMultinameUsage;
+import com.jpexs.asdec.abc.usages.MethodBodyMultinameUsage;
+import com.jpexs.asdec.abc.usages.MethodNameMultinameUsage;
+import com.jpexs.asdec.abc.usages.MethodParamsMultinameUsage;
+import com.jpexs.asdec.abc.usages.MethodReturnTypeMultinameUsage;
+import com.jpexs.asdec.abc.usages.InsideClassMultinameUsage;
+import com.jpexs.asdec.abc.usages.MultinameUsage;
+import com.jpexs.asdec.abc.usages.TypeNameMultinameUsage;
 import com.jpexs.asdec.helpers.Highlighting;
 
 import java.io.*;
@@ -519,8 +532,7 @@ public class ABC {
       return ret;
    }
 
-   public Trait findTraitByTraitId(int classIndex, int traitId)
-   {
+   public Trait findTraitByTraitId(int classIndex, int traitId) {
       if (traitId < class_info[classIndex].static_traits.traits.length) {
          return class_info[classIndex].static_traits.traits[traitId];
       } else if (traitId < class_info[classIndex].static_traits.traits.length + instance_info[classIndex].instance_traits.traits.length) {
@@ -580,7 +592,7 @@ public class ABC {
       out.println(IDENT_STRING + classHeader);
       out.println(IDENT_STRING + "{");
 
-      String toPrint="";
+      String toPrint = "";
 
       //if (class_info[i].cinit_index != 0) {
       if (AUTOINIT_STATIC_VARIABLES) {
@@ -614,14 +626,14 @@ public class ABC {
       String bodyStr = "";
       int bodyIndex = findBodyIndex(class_info[i].cinit_index);
       if (bodyIndex != -1) {
-         bodyStr = addTabs(bodies[bodyIndex].toString(pcode,true,i,this, constants, method_info, highlight), 3);
+         bodyStr = addTabs(bodies[bodyIndex].toString(pcode, true, i, this, constants, method_info, highlight), 3);
       }
-     // if (!bodyStr.equals("")) {
-         toPrint = IDENT_STRING + IDENT_STRING + "{\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}";
-         if (highlight) {
-            toPrint = Highlighting.hilighTrait(toPrint, class_info[i].static_traits.traits.length + instance_info[i].instance_traits.traits.length + 1);
-         }
-         out.println(toPrint);
+      // if (!bodyStr.equals("")) {
+      toPrint = IDENT_STRING + IDENT_STRING + "{\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}";
+      if (highlight) {
+         toPrint = Highlighting.hilighTrait(toPrint, class_info[i].static_traits.traits.length + instance_info[i].instance_traits.traits.length + 1);
+      }
+      out.println(toPrint);
       //}
       //}
 
@@ -796,105 +808,90 @@ public class ABC {
       return isValid;
    }
 
-   public List<Usage> findMultinameUsage(int multinameIndex) {
-      List<Usage> ret = new ArrayList<Usage>();
-      List<Integer> bodyIndices = new ArrayList<Integer>();
-      List<Integer> subTraitBodyIndices = new ArrayList<Integer>();
-      List<Integer> subTraitIndexIndices = new ArrayList<Integer>();
-      for (int i = 0; i < bodies.length; i++) {
-         for (int t = 0; t < bodies[i].traits.traits.length; t++) {
-            Trait tr = bodies[i].traits.traits[t];
-            if (tr.name_index == multinameIndex) {
-               subTraitBodyIndices.add(i);
-               subTraitIndexIndices.add(t);
+   private void checkMultinameUsedInMethod(int multinameIndex, int methodInfo, List<MultinameUsage> ret, int classIndex, int traitIndex, boolean isStatic, boolean isInitializer) {
+      for (int p = 0; p < method_info[methodInfo].param_types.length; p++) {
+         if (method_info[methodInfo].param_types[p] == multinameIndex) {
+            ret.add(new MethodParamsMultinameUsage(multinameIndex, classIndex, traitIndex, isStatic, isInitializer));
+         }
+      }
+      if (method_info[methodInfo].ret_type == multinameIndex) {
+         ret.add(new MethodReturnTypeMultinameUsage(multinameIndex, classIndex, traitIndex, isStatic, isInitializer));
+      }
+      MethodBody body = findBody(methodInfo);
+      if (body != null) {
+         for(ABCException e:body.exceptions){
+            if((e.name_index==multinameIndex)||(e.type_index==multinameIndex)){
+                ret.add(new MethodBodyMultinameUsage(multinameIndex, classIndex, traitIndex, isStatic, isInitializer));
+                return;
             }
          }
-         loopbody:
-         for (AVM2Instruction ins : bodies[i].code.code) {
-            for (int op = 0; op < ins.definition.operands.length; op++) {
-               if (ins.definition.operands[op] == AVM2Code.DAT_MULTINAME_INDEX) {
-                  if (ins.operands[op] == multinameIndex) {
-                     bodyIndices.add(i);
-                     break loopbody;
+         for (AVM2Instruction ins : body.code.code) {
+            for (int o = 0; o < ins.definition.operands.length; o++) {
+               if (ins.definition.operands[o] == AVM2Code.DAT_MULTINAME_INDEX) {
+                  if (ins.operands[o] == multinameIndex) {
+                     ret.add(new MethodBodyMultinameUsage(multinameIndex, classIndex, traitIndex, isStatic, isInitializer));
+                     return;
                   }
                }
             }
          }
       }
+   }
 
+   private void findMultinameUsageInTraits(Traits traits, int multinameIndex, boolean isStatic, int classIndex, List<MultinameUsage> ret) {
+      for (int t = 0; t < traits.traits.length; t++) {
+         if (traits.traits[t] instanceof TraitSlotConst) {
+            TraitSlotConst tsc = (TraitSlotConst) traits.traits[t];
+            if (tsc.name_index == multinameIndex) {
+               ret.add(new ConstVarNameMultinameUsage(multinameIndex, classIndex, t, isStatic));
+            }
+            if (tsc.type_index == multinameIndex) {
+               ret.add(new ConstVarTypeMultinameUsage(multinameIndex, classIndex, t, isStatic));
+            }
+         }
+         if (traits.traits[t] instanceof TraitMethodGetterSetter) {
+            TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) traits.traits[t];
+            if (tmgs.name_index == multinameIndex) {
+               ret.add(new MethodNameMultinameUsage(multinameIndex, classIndex, t, isStatic, false));
+            }
+            checkMultinameUsedInMethod(multinameIndex, tmgs.method_info, ret, classIndex, t, isStatic, false);
+         }
+      }
+   }
 
-      for (int c = 0; c < class_info.length; c++) {
+   public List<MultinameUsage> findMultinameUsage(int multinameIndex) {
+      List<MultinameUsage> ret = new ArrayList<MultinameUsage>();
+      if (multinameIndex == 0) {
+         return ret;
+      }
+      for (int c = 0; c < instance_info.length; c++) {
          if (instance_info[c].name_index == multinameIndex) {
-            ret.add(new Usage(this, -1, c, -1, -1, false, Usage.TYPE_CLASS_NAME));
+            ret.add(new ClassNameMultinameUsage(multinameIndex, c));
          }
-         for (int t = 0; t < class_info[c].static_traits.traits.length; t++) {
-            Trait tr = class_info[c].static_traits.traits[t];
-            if (tr.name_index == multinameIndex) {
-               ret.add(new Usage(this, -1, c, t, -1, true, Usage.TYPE_TRAIT_NAME));
+         if (instance_info[c].super_index == multinameIndex) {
+            ret.add(new ExtendsMultinameUsage(multinameIndex, c));
+         }
+         for (int i = 0; i < instance_info[c].interfaces.length; i++) {
+            if (instance_info[c].interfaces[i] == multinameIndex) {
+               ret.add(new ImplementsMultinameUsage(multinameIndex, c));
             }
          }
-         for (int t = 0; t < instance_info[c].instance_traits.traits.length; t++) {
-            Trait tr = instance_info[c].instance_traits.traits[t];
-            if (tr.name_index == multinameIndex) {
-               ret.add(new Usage(this, -1, c, t, -1, false, Usage.TYPE_TRAIT_NAME));
-            }
-         }
+         checkMultinameUsedInMethod(multinameIndex, instance_info[c].iinit_index, ret, c, 0, false, true);
+         checkMultinameUsedInMethod(multinameIndex, class_info[c].cinit_index, ret, c, 0, true, true);
+         findMultinameUsageInTraits(instance_info[c].instance_traits, multinameIndex, false, c, ret);
+         findMultinameUsageInTraits(class_info[c].static_traits, multinameIndex, true, c, ret);
       }
-      for (int bodyIndex : bodyIndices) {
-         for (int c = 0; c < class_info.length; c++) {
-            if (class_info[c].cinit_index == bodyIndex) {
-               ret.add(new Usage(this, bodyIndex, c, -1, -1, true, Usage.TYPE_INITIALIZER));
+      loopm:
+      for (int m = 1; m < constants.constant_multiname.length; m++) {
+         if (constants.constant_multiname[m].kind == Multiname.TYPENAME) {
+            if (constants.constant_multiname[m].qname_index == multinameIndex) {
+               ret.add(new TypeNameMultinameUsage(m));
+               continue;
             }
-            if (instance_info[c].iinit_index == bodyIndex) {
-               ret.add(new Usage(this, bodyIndex, c, -1, -1, false, Usage.TYPE_INITIALIZER));
-            }
-            for (int t = 0; t < class_info[c].static_traits.traits.length; t++) {
-               Trait tr = class_info[c].static_traits.traits[t];
-               if (tr instanceof TraitMethodGetterSetter) {
-                  TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) tr;
-                  if (tmgs.method_info == bodies[bodyIndex].method_info) {
-                     ret.add(new Usage(this, bodyIndex, c, t, -1, true, Usage.TYPE_TRAIT_BODY));
-                  }
-               }
-            }
-            for (int t = 0; t < instance_info[c].instance_traits.traits.length; t++) {
-               Trait tr = instance_info[c].instance_traits.traits[t];
-               if (tr instanceof TraitMethodGetterSetter) {
-                  TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) tr;
-                  if (tmgs.method_info == bodies[bodyIndex].method_info) {
-                     ret.add(new Usage(this, bodyIndex, c, t, -1, false, Usage.TYPE_TRAIT_BODY));
-                  }
-               }
-            }
-         }
-      }
-
-
-      for (int b = 0; b < subTraitBodyIndices.size(); b++) {
-         int bodyIndex = subTraitBodyIndices.get(b);
-         for (int c = 0; c < class_info.length; c++) {
-            if (class_info[c].cinit_index == bodyIndex) {
-               ret.add(new Usage(this, bodyIndex, c, -1, subTraitIndexIndices.get(b), true, Usage.TYPE_INITIALIZER_SUBTRAIT_NAME));
-            }
-            if (instance_info[c].iinit_index == bodyIndex) {
-               ret.add(new Usage(this, bodyIndex, c, -1, subTraitIndexIndices.get(b), false, Usage.TYPE_INITIALIZER_SUBTRAIT_NAME));
-            }
-            for (int t = 0; t < class_info[c].static_traits.traits.length; t++) {
-               Trait tr = class_info[c].static_traits.traits[t];
-               if (tr instanceof TraitMethodGetterSetter) {
-                  TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) tr;
-                  if (tmgs.method_info == bodies[bodyIndex].method_info) {
-                     ret.add(new Usage(this, bodyIndex, c, t, subTraitIndexIndices.get(b), true, Usage.TYPE_SUBTRAIT_NAME));
-                  }
-               }
-            }
-            for (int t = 0; t < instance_info[c].instance_traits.traits.length; t++) {
-               Trait tr = instance_info[c].instance_traits.traits[t];
-               if (tr instanceof TraitMethodGetterSetter) {
-                  TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) tr;
-                  if (tmgs.method_info == bodies[bodyIndex].method_info) {
-                     ret.add(new Usage(this, bodyIndex, c, t, subTraitIndexIndices.get(b), false, Usage.TYPE_SUBTRAIT_NAME));
-                  }
+            for (int mp : constants.constant_multiname[m].params) {
+               if (mp == multinameIndex) {
+                  ret.add(new TypeNameMultinameUsage(m));
+                  continue loopm;
                }
             }
          }
@@ -902,8 +899,8 @@ public class ABC {
       return ret;
    }
 
-   public void autoFillAllBodyParams(){
-      for(int i=0;i<bodies.length;i++){
+   public void autoFillAllBodyParams() {
+      for (int i = 0; i < bodies.length; i++) {
          bodies[i].autoFillStats(this);
       }
    }

@@ -19,9 +19,8 @@
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.abc.ABC;
-import com.jpexs.asdec.abc.Usage;
-import com.jpexs.asdec.abc.types.traits.Trait;
-import com.jpexs.asdec.abc.types.traits.TraitMethodGetterSetter;
+import com.jpexs.asdec.abc.usages.InsideClassMultinameUsage;
+import com.jpexs.asdec.abc.usages.MultinameUsage;
 import com.jpexs.asdec.gui.View;
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -44,10 +43,11 @@ public class UsageFrame extends JFrame implements ActionListener {
     private JButton gotoButton=new JButton("Go to");
     private JButton cancelButton=new JButton("Cancel");
     private JList usageList;
-    private DefaultListModel usageListModel=new DefaultListModel();
+    private UsageListModel usageListModel;
     public UsageFrame(ABC abc,int multinameIndex){
-      List<Usage> usages=abc.findMultinameUsage(multinameIndex);
-      for(Usage u:usages){
+      List<MultinameUsage> usages=abc.findMultinameUsage(multinameIndex);
+      usageListModel=new UsageListModel(abc);
+      for(MultinameUsage u:usages){
           usageListModel.addElement(u);
       }
       usageList=new JList(usageListModel);
