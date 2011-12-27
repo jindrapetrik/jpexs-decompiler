@@ -19,6 +19,8 @@
 package com.jpexs.asdec.action.parser;
 
 import com.jpexs.asdec.action.Action;
+import com.jpexs.asdec.action.flashlite.ActionFSCommand2;
+import com.jpexs.asdec.action.flashlite.ActionStrictMode;
 import com.jpexs.asdec.action.swf3.*;
 import com.jpexs.asdec.action.swf4.*;
 import com.jpexs.asdec.action.swf5.*;
@@ -240,6 +242,10 @@ public class ASMParser {
                     list.add(new ActionThrow());
                 } else if (instructionName.equals("Try".toLowerCase())) {
                     list.add(new ActionTry(labels, address, lexer, constantPool, version));
+                } else if (instructionName.equals("FSCommand2".toLowerCase())) {
+                    list.add(new ActionFSCommand2());
+                } else if (instructionName.equals("StrictMode".toLowerCase())) {
+                    list.add(new ActionStrictMode(lexer));
                 } else {
                     throw new ParseException("Unknown instruction name :" + instructionName, lexer.yyline());
                 }
