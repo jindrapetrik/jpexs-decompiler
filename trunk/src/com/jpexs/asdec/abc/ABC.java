@@ -250,7 +250,7 @@ public class ABC {
          }
          bodies[i].traits = ais.readTraits();
       }
-   }
+  }
 
    public void saveToStream(OutputStream os) throws IOException {
       ABCOutputStream aos = new ABCOutputStream(os);
@@ -367,6 +367,7 @@ public class ABC {
          String name = m.getName(constants);
          if (ns != null) {
             String newimport = ns.getName(constants);
+            if(newimport.equals("-")) newimport="";
             if (!newimport.equals("")) {
                newimport += "." + name;
                if (newimport.contains(":")) {

@@ -74,6 +74,9 @@ public class Namespace {
     }
 
     public String getName(ConstantPool constants) {
+        if(name_index==0){
+           return "-";
+        }
         return constants.constant_string[name_index];
     }
 }

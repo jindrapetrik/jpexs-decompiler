@@ -203,13 +203,22 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
         navigator = new TraitsList();
         navigator.setABC(abc);
 
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Traits", new JScrollPane(navigator));
+        
+        JPanel navPanel=new JPanel(new BorderLayout());
+        JLabel traitsLabel=new JLabel("Traits");
+        navPanel.add(traitsLabel,BorderLayout.NORTH);
+
+        traitsLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        navPanel.add(navigator,BorderLayout.CENTER);
+
         splitPane2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                 new JScrollPane(classTree = new ClassesListTree(abc)),
-                tabbedPane);
+                navPanel);
 
-        pan2.add(splitPane2, BorderLayout.CENTER);
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("Classes", splitPane2);
+
+        pan2.add(tabbedPane, BorderLayout.CENTER);
         abcComboBox.addItemListener(this);
 
 

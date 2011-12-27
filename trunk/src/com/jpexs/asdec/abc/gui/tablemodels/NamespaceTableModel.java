@@ -109,10 +109,10 @@ public class NamespaceTableModel implements TableModel {
             case 0:
                 return rowIndex;
             case 1:
-                if (rowIndex == 0) return "";
+                if (rowIndex == 0) return "-";
                 return abc.constants.constant_namespace[rowIndex].getKindStr();
             case 2:
-                if (rowIndex == 0) return "";
+                if (rowIndex == 0) return "-";
                 return abc.constants.constant_namespace[rowIndex].getName(abc.constants);
             default:
                 return null;
