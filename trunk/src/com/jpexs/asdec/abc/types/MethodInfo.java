@@ -276,7 +276,10 @@ public class MethodInfo {
             }
         }
         if(flagNeed_rest()){
-           paramStr+=", ... ";
+           if((param_types!=null)&&(param_types.length>0)){
+              paramStr+=", ";
+           }
+           paramStr+="... ";
            if(!localRegNames.isEmpty())
             {
                paramStr+=localRegNames.get(param_types.length+1);
