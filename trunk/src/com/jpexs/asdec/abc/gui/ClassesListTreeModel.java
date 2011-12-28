@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2011 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS, Paolo Cancedda
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -29,9 +29,35 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 
+
+class ClassIndexVisitor implements TreeVisitor{
+   
+   private TreeElement found=null;
+   private int classIndex;
+   public ClassIndexVisitor(int classIndex){
+      this.classIndex=classIndex;
+   }
+   
+   public void onBranch(TreeElement branch) {
+      if(branch.getClassIndex()==classIndex){
+         found=branch;
+      }
+   }
+
+   public void onLeaf(TreeElement leaf) {
+      if(leaf.getClassIndex()==classIndex){
+         found=leaf;
+      }
+   }
+   public TreeElement getFound(){
+      return found;
+   }
+   
+}
+
 public class ClassesListTreeModel implements TreeModel {
-    private ABC abc;
-    private List<TreePart> pathList = new ArrayList<TreePart>();
+	private ABC abc;
+    private Tree classTree = new Tree();
 
     public ClassesListTreeModel(ABC abc) {
         this.abc = abc;
@@ -39,65 +65,42 @@ public class ClassesListTreeModel implements TreeModel {
             String packageName = abc.instance_info[i].getName(abc.constants).getNamespace(abc.constants).getName(abc.constants);
             String className = abc.instance_info[i].getName(abc.constants).getName(abc.constants);
             String full = packageName + "." + className;
-            String parts[] = full.split("\\.");
-            String s = "";
-            for (int j = 0; j < parts.length; j++) {
-                if (!s.endsWith(".")) s += ".";
-                s += parts[j];
-                TreePart tp = new TreePart(s, parts[j], j < parts.length - 1 ? -1 : i);
-                if (!pathList.contains(tp)) {
-                    pathList.add(tp);
-                }
-            }
+            classTree.add(className, packageName, i);
         }
-        for (int k1 = 0; k1 < pathList.size(); k1++) {
-            TreePart tp1 = pathList.get(k1);
-            for (int k2 = 0; k2 < pathList.size(); k2++) {
-                if (k1 == k2) continue;
-                TreePart tp2 = pathList.get(k2);
-                if (!tp1.path.equals(tp2.path)) {
-                    if (tp1.path.startsWith(tp2.path + ".")) {
-                        tp2.hasSubParts = true;
-                    }
-                    if (tp2.path.startsWith(tp1.path + ".")) {
-                        tp1.hasSubParts = true;
-                    }
-                }
-            }
-        }
-        Collections.sort(pathList);
     }
 
+    public int getClassIndexByPath(String fullPath){
+       TreeElement elem=classTree.get(fullPath);
+       if(elem==null){
+          return -1;
+       }
+       return elem.getClassIndex();
+    }
+    
+    public TreeElement getElementByClassIndex(int classIndex){
+       ClassIndexVisitor civ=new ClassIndexVisitor(classIndex);
+       classTree.visit(civ);
+       return civ.getFound();
+    }
 
     public Object getRoot() {
-        return new TreePart("", "", -1);
+        return classTree.getRoot();
     }
 
     public Object getChild(Object parent, int index) {
-        int i = -1;
-        for (TreePart tp : pathList) {
-            if (tp.path.matches(Pattern.quote(((TreePart) parent).path) + "\\.[^\\.]+")) {
-                i++;
-                if (i == index) {
-                    return tp;
-                }
-            }
-        }
-        return null;
+    	TreeElement pte = (TreeElement)parent;
+    	TreeElement te = pte.getChild(index);
+        return te;
     }
 
-    public int getChildCount(Object parent) {
-        int i = 0;
-        for (TreePart tp : pathList) {
-            if (tp.path.matches(Pattern.quote(((TreePart) parent).path) + "\\.[^\\.]+")) {
-                i++;
-            }
-        }
-        return i;
+	public int getChildCount(Object parent) {
+    	TreeElement te = (TreeElement)parent;
+    	return te.getChildCount();
     }
 
     public boolean isLeaf(Object node) {
-        return getChildCount(node) == 0;
+    	TreeElement te = (TreeElement)node;
+    	return te.isLeaf();
     }
 
     public void valueForPathChanged(TreePath path, Object newValue) {
@@ -105,16 +108,9 @@ public class ClassesListTreeModel implements TreeModel {
     }
 
     public int getIndexOfChild(Object parent, Object child) {
-        int i = -1;
-        for (TreePart tp : pathList) {
-            if (tp.path.matches(Pattern.quote(((TreePart) parent).path) + "\\.[^\\.]+")) {
-                i++;
-                if (tp.equals(child)) {
-                    return i;
-                }
-            }
-        }
-        return i;
+    	TreeElement te1 = (TreeElement)parent;
+    	TreeElement te2 = (TreeElement)child;
+    	return te1.getIndexOfChild(te2);
     }
 
     public void addTreeModelListener(TreeModelListener l) {

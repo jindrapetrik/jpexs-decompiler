@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2011 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS, Paolo Cancedda
  * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -15,6 +15,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.Main;
@@ -29,72 +30,52 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 
 public class ClassesListTree extends JTree implements TreeSelectionListener {
+    public ABC abc;
 
-   public ABC abc;
-
-   public void selectClass(int classIndex) {
-      List<TreePart> pathList = new ArrayList<TreePart>();
-      String packageName = abc.instance_info[classIndex].getName(abc.constants).getNamespace(abc.constants).getName(abc.constants);
-      String className = abc.instance_info[classIndex].getName(abc.constants).getName(abc.constants);
-      String full = packageName + "." + className;
-      String parts[] = full.split("\\.");
-      String s = "";
-      pathList.add(new TreePart("", "", -1));
-      for (int j = 0; j < parts.length; j++) {
-         if (!s.endsWith(".")) {
-            s += ".";
-         }
-         s += parts[j];
-         TreePart tp = new TreePart(s, parts[j], j < parts.length - 1 ? -1 : classIndex);
-         if (!pathList.contains(tp)) {
-            pathList.add(tp);
-         }
-      }
-
-      TreePath tp = new TreePath(pathList.toArray());
-      setSelectionPath(tp);
-      scrollPathToVisible(tp);
+   public void selectClass(int classIndex) {      
+      ClassesListTreeModel model=(ClassesListTreeModel)getModel();
+      TreeElement selectedElement=model.getElementByClassIndex(classIndex);
+      TreePath treePath=selectedElement.getTreePath();
+      setSelectionPath(treePath);
+      scrollPathToVisible(treePath);
    }
 
-   public ClassesListTree(ABC abc) {
-      this.abc = abc;
-      setModel(new ClassesListTreeModel(abc));
-      addTreeSelectionListener(this);
-      DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
-      ClassLoader cldr = this.getClass().getClassLoader();
-      java.net.URL imageURL = cldr.getResource("com/jpexs/asdec/abc/gui/graphics/class.png");
-      ImageIcon leafIcon = new ImageIcon(imageURL);
-      treeRenderer.setLeafIcon(leafIcon);
-      setCellRenderer(treeRenderer);
-   }
+    public ClassesListTree(ABC abc) {
+        this.abc = abc;
+        setModel(new ClassesListTreeModel(abc));
+        addTreeSelectionListener(this);
+        DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
+        ClassLoader cldr = this.getClass().getClassLoader();
+        java.net.URL imageURL = cldr.getResource("com/jpexs/asdec/abc/gui/graphics/class.png");
+        ImageIcon leafIcon = new ImageIcon(imageURL);
+        treeRenderer.setLeafIcon(leafIcon);
+        setCellRenderer(treeRenderer);
+    }
 
-   public void setABC(ABC abc) {
-      setModel(new ClassesListTreeModel(abc));
-      this.abc = abc;
-   }
+    public void setABC(ABC abc) {
+        setModel(new ClassesListTreeModel(abc));
+        this.abc = abc;
+    }
 
-   public void valueChanged(TreeSelectionEvent e) {
-      if (Main.isWorking()) {
-         return;
-      }
-      final TreePart tp = (TreePart) getLastSelectedPathComponent();
-      if (tp == null) {
-         return;
-      }
-      if (tp.classIndex != -1) {
-         if (!Main.isWorking()) {
-            Main.startWork("Decompiling class...");
-            (new Thread() {
+    public void valueChanged(TreeSelectionEvent e) {
+        if (Main.isWorking()) return;
+        final TreeElement tp = (TreeElement) getLastSelectedPathComponent();
+        if (tp == null) return;
+        final int classIndex = tp.getClassIndex();
+        if (classIndex != -1) {
+            if (!Main.isWorking()) {
+                Main.startWork("Decompiling class...");
+                (new Thread() {
 
-               @Override
-               public void run() {
-                  Main.abcMainFrame.navigator.setClassIndex(tp.classIndex);
-                  Main.abcMainFrame.decompiledTextArea.setClassIndex(tp.classIndex, abc);
-                  Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.setText("");
-                  Main.stopWork();
-               }
-            }).start();
-         }
-      }
-   }
+                    @Override
+                    public void run() {
+                        Main.abcMainFrame.navigator.setClassIndex(classIndex);
+                        Main.abcMainFrame.decompiledTextArea.setClassIndex(classIndex, abc);
+                        Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.setText("");
+                        Main.stopWork();
+                    }
+                }).start();
+            }
+        }
+    }
 }
