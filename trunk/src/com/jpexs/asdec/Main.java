@@ -428,7 +428,7 @@ public class Main {
                 proxyFrame.setPort(port);
                 addTrayIcon();
                 switchProxy();
-            } if (args[0].equals("-export")) {
+            }else if (args[0].equals("-export")) {
                if(args.length<4){
                   badArguments();
                }
