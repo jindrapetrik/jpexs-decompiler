@@ -153,7 +153,9 @@ public class Multiname {
                if(i>0){
                   typeNameStr+=",";
                }
-               typeNameStr+=constants.constant_multiname[params.get(i)].getName(constants);
+               if(params.get(i)!=0){ //What does value 0 mean?
+                  typeNameStr+=constants.constant_multiname[params.get(i)].getName(constants);
+               }
             }
             typeNameStr+=">";
          }
