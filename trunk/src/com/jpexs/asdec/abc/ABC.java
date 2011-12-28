@@ -730,7 +730,11 @@ public class ABC {
       for (int i = 0; i < instance_info.length; i++) {
          String packageName = instance_info[i].getName(constants).getNamespace(constants).getName(constants);
          String className = instance_info[i].getName(constants).getName(constants);
-         Main.startWork("Exporting " + (i + 1) + "/" + instance_info.length + " " + packageName + "." + className + "...");
+         String fullName=className;
+         if((packageName!=null)&&(!packageName.equals(""))){
+            fullName=packageName+"."+fullName;
+         }
+         Main.startWork("Exporting " + (i + 1) + "/" + instance_info.length + " " + fullName + " ...");
          File outDir = new File(directory + File.separatorChar + packageName.replace('.', File.separatorChar));
          if (!outDir.exists()) {
             outDir.mkdirs();

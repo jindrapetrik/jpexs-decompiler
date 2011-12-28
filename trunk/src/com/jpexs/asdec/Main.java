@@ -61,6 +61,11 @@ public class Main {
     private static boolean working = false;
     private static TrayIcon trayIcon;
     private static MenuItem stopMenuItem;
+    private static boolean commandLineMode=false;
+    
+    public static boolean isCommandLineMode(){
+       return commandLineMode;
+    }
 
     public static boolean DEBUG_COPY = false;
     /** Debug mode = throwing an error when comparing original file and recompiled */
@@ -154,6 +159,9 @@ public class Main {
         abcMainFrame.setStatus(name);
         if(actionMainFrame!=null)
           actionMainFrame.setStatus(name);
+        if(Main.isCommandLineMode()){
+           System.out.println(name);
+        }
     }
 
     public static void stopWork() {
@@ -177,6 +185,18 @@ public class Main {
     }
 
 
+    public static boolean exportSWF(String inFile,String outdir,boolean isPcode) throws Exception {       
+       SWF swf = parseSWF(inFile);
+       boolean asFound=false;
+       for (Tag t : swf.tags) {
+         if (t instanceof DoABCTag){
+            ((DoABCTag)t).abc.export(outdir,isPcode);
+            asFound=true;
+         }
+       }
+       return asFound;
+    }
+    
     private static class OpenFileWorker extends SwingWorker {
         @Override
         protected Object doInBackground() throws Exception {
@@ -350,7 +370,40 @@ public class Main {
         }
 
     }
+    
+    public static void badArguments(){
+       System.err.println("Error: Bad Commandline Arguments!");
+       printCmdLineUsage();
+       System.exit(1);
+    }
 
+    public static void printHeader(){
+       System.out.println(applicationName);
+       for(int i=0;i<applicationName.length();i++){
+          System.out.print("-");
+       }
+       System.out.println();
+    }
+    
+    public static void printCmdLineUsage(){       
+       System.out.println("Commandline arguments:");
+       System.out.println(" 1) -help | --help | /?");
+       System.out.println(" ...shows commandline arguments (this help)");
+       System.out.println(" 2) infile");
+       System.out.println(" ...opens SWF file with the decompiler GUI");
+       System.out.println(" 3) -proxy (-PXXX)");
+       System.out.println("  ...auto start proxy in the tray. Optional parameter -P specifies port for proxy. Defaults to 55555. ");
+       System.out.println(" 4) -export (as|pcode) outdirectory infile");       
+       System.out.println("  ...export infile actionscript to outdirectory as AsctionScript code (\"as\" argument) or as PCode (\"pcode\" argument)");
+       System.out.println();
+       System.out.println("Examples:");
+       System.out.println("java -jar ASDec.jar myfile.swf");
+       System.out.println("java -jar ASDec.jar -proxy");
+       System.out.println("java -jar ASDec.jar -proxy -P1234");
+       System.out.println("java -jar ASDec.jar -export as \"C:\\decompiled\\\" myfile.swf");
+       System.out.println("java -jar ASDec.jar -export pcode \"C:\\decompiled\\\" myfile.swf");       
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -375,8 +428,50 @@ public class Main {
                 proxyFrame.setPort(port);
                 addTrayIcon();
                 switchProxy();
-            } else {
+            } if (args[0].equals("-export")) {
+               if(args.length<4){
+                  badArguments();
+               }
+               String exportFormat=args[1];
+               if(!exportFormat.toLowerCase().equals("as")){
+                  if(!exportFormat.toLowerCase().equals("pcode")){
+                     System.err.println("Invalid export format:"+exportFormat);
+                     badArguments();
+                  }
+               }
+               File outDir=new File(args[2]);              
+               File inFile=new File(args[3]);
+               if(!inFile.exists()){
+                  System.err.println("Input SWF file does not exist!");
+                  badArguments();
+               }
+               commandLineMode=true;
+               boolean exportOK=true;
+               try{
+                  printHeader();
+                  exportOK=exportSWF(inFile.getAbsolutePath(),outDir.getAbsolutePath(),exportFormat.equals("pcode"));
+               }catch(Exception ex){
+                  exportOK=false;
+                  System.err.print("FAIL: Exporting Failed on Exception - ");
+                  System.err.println(ex.getLocalizedMessage());
+                  System.exit(1);
+               }
+               if(exportOK){
+                  System.out.println("OK");
+                  System.exit(0);
+               }else{
+                  System.err.println("FAIL: No ActionScript version 3 found in the input file.");
+                  System.exit(1);
+               }
+            } else if (args[0].equals("-help")||args[0].equals("--help")||args[0].equals("/?")){
+               printHeader();
+               printCmdLineUsage();
+               System.exit(0);
+            }
+            else if(args.length==1){
                 openFile(args[0]);
+            }else{
+               badArguments();
             }
         }
     }
