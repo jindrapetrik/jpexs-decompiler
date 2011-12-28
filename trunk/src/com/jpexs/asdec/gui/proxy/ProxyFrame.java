@@ -48,6 +48,7 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
     private JTextField portField = new JTextField("55555");
 
     private JCheckBox sniffSWFCheckBox = new JCheckBox("SWF", false);
+    private JCheckBox sniffOSCheckBox = new JCheckBox("OctetStream", false);
     private JCheckBox sniffJSCheckBox = new JCheckBox("JS", false);
     private JCheckBox sniffXMLCheckBox = new JCheckBox("XML", false);
 
@@ -121,6 +122,7 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
         buttonsPanel3.setLayout(new FlowLayout());
         buttonsPanel3.add(new JLabel("Sniff:"));
         buttonsPanel3.add(sniffSWFCheckBox);
+        buttonsPanel3.add(sniffOSCheckBox);
         //buttonsPanel3.add(sniffJSCheckBox);
         //buttonsPanel3.add(sniffXMLCheckBox);
 
@@ -242,6 +244,7 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
             catchedContentTypes.add("application/json");
             catchedContentTypes.add("text/xml");
             catchedContentTypes.add("application/xml");
+            catchedContentTypes.add("application/octet-stream");
             Server.startServer(port, Main.replacements, catchedContentTypes, this, this);
             switchButton.setText("Stop proxy");
             portField.setEditable(false);
@@ -315,11 +318,19 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
             return;
         if ((!sniffXMLCheckBox.isSelected()) && (contentType.equals("application/xml") || contentType.equals("text/xml")))
             return;
-
+        if ((!sniffOSCheckBox.isSelected()) && (contentType.equals("application/octet-stream")))
+            return;
         if (!listModel.contains(url)) {
             try {
+                byte hdr[]=new byte[3];                
+                data.read(hdr);        
+                String shdr=new String(hdr);
+                if((!shdr.equals("FWS")) && (!shdr.equals("CWS"))){
+                   return; //NOT SWF
+                }
                 File f = new File(Main.tempFile(url));
                 FileOutputStream fos = new FileOutputStream(f);
+                fos.write(hdr);
                 byte buf[] = new byte[2048];
                 int count = 0;
                 while ((count = data.read(buf)) > 0) {
