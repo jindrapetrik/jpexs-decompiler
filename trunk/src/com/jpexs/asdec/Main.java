@@ -77,6 +77,8 @@ public class Main {
     public static final boolean RESOLVE_CONSTANTS = true;
     /** Turn off decompiling if needed */
     public static final boolean DO_DECOMPILE=true;
+    /** Dump tags to stdout */
+    public static final boolean DUMP_TAGS = false;
 
     //using parameter names in decompiling may cause problems because oficial programs like Flash CS 5.5 inserts wrong parameter names indices
     public static final boolean PARAM_NAMES_ENABLE=false;
@@ -289,6 +291,8 @@ public class Main {
     public static boolean openFileDialog() {
         maskURL = null;
         JFileChooser fc = new JFileChooser();
+        // FIXME debug only, think about keeping/removing it 
+        fc.setCurrentDirectory(new File("."));
         fc.setFileFilter(new FileFilter() {
 
             @Override
