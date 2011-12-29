@@ -1,10 +1,10 @@
 /*
  *  Copyright (C) 2010-2011 JPEXS
  * 
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  * 
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,8 +12,7 @@
  *  GNU General Public License for more details.
  * 
  *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.jpexs.asdec;
@@ -38,6 +37,8 @@ import java.awt.event.MouseEvent;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -320,8 +321,19 @@ public class Main {
     }
 
 
+    /**
+     * Script for updating license header in java files :-)
+     * @param dir Star directory (e.g. "src/")
+     */
     public static void updateLicenseInDir(File dir){
-        String license="/*\r\n *  Copyright (C) 2010-2011 JPEXS\r\n * \r\n *  This program is free software; you can redistribute it and/or\r\n *  modify it under the terms of the GNU General Public License\r\n *  as published by the Free Software Foundation; either version 2\r\n *  of the License, or (at your option) any later version.\r\n * \r\n *  This program is distributed in the hope that it will be useful,\r\n *  but WITHOUT ANY WARRANTY; without even the implied warranty of\r\n *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\r\n *  GNU General Public License for more details.\r\n * \r\n *  You should have received a copy of the GNU General Public License\r\n *  along with this program; if not, write to the Free Software\r\n *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.\r\n */\r\n";
+        int defaultStartYear=2010;
+        int defaultFinalYear=2011;
+        String defaultAuthor="JPEXS";
+        String defaultYearStr=""+defaultStartYear;
+        if(defaultFinalYear!=defaultStartYear){
+           defaultYearStr+="-"+defaultFinalYear;
+        }
+        String license="/*\r\n *  Copyright (C) {year} {author}\r\n * \r\n *  This program is free software: you can redistribute it and/or modify\r\n *  it under the terms of the GNU General Public License as published by\r\n *  the Free Software Foundation, either version 3 of the License, or\r\n *  (at your option) any later version.\r\n * \r\n *  This program is distributed in the hope that it will be useful,\r\n *  but WITHOUT ANY WARRANTY; without even the implied warranty of\r\n *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\r\n *  GNU General Public License for more details.\r\n * \r\n *  You should have received a copy of the GNU General Public License\r\n *  along with this program.  If not, see <http://www.gnu.org/licenses/>.\r\n */\r\n";
 
         File files[]=dir.listFiles();
         for(File f:files){
@@ -340,11 +352,27 @@ public class Main {
                         BufferedReader br=new BufferedReader(new FileReader(f));
                         String s="";
                         boolean packageFound=false;
+                        String author=defaultAuthor;
+                        String yearStr=defaultYearStr;
                         while((s=br.readLine())!=null){
                             if(!packageFound){
                                 if(s.trim().startsWith("package")){
-                                    packageFound=true;
-                                    pw.println(license);
+                                    packageFound=true;                                    
+                                    pw.println(license.replace("{year}", yearStr).replace("{author}", author));
+                                }else{
+                                    Matcher mAuthor=Pattern.compile("^.*Copyright \\(C\\) ([0-9]+)(-[0-9]+)? (.*)$").matcher(s);  
+                                    if(mAuthor.matches()){
+                                       author=mAuthor.group(3).trim();
+                                       int startYear=Integer.parseInt(mAuthor.group(1).trim());                                       
+                                       if(startYear==defaultFinalYear){
+                                          yearStr=""+startYear;
+                                       }else{
+                                          yearStr=""+startYear+"-"+defaultFinalYear;
+                                       }
+                                       if(!author.equals(defaultAuthor)){
+                                          System.out.println("Detected nodefault author:"+author+" in "+f.getAbsolutePath());
+                                       }                                         
+                                    }                                
                                 }
                             }
                             if(packageFound){
