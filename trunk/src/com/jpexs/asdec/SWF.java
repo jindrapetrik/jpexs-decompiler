@@ -159,11 +159,15 @@ public class SWF {
      * @param fis Input stream
      * @param fos Output stream
      */
-    public static void fws2cws(InputStream fis, OutputStream fos) {
+    public static boolean fws2cws(InputStream fis, OutputStream fos) {
         try {
             byte swfHead[] = new byte[8];
             fis.read(swfHead);
 
+            if(swfHead[0]!= 'F'){
+               fis.close();
+               return false;
+            }
             swfHead[0] = 'C';
             fos.write(swfHead);
             fos = new DeflaterOutputStream(fos);
@@ -175,9 +179,11 @@ public class SWF {
             fis.close();
             fos.close();
         } catch (FileNotFoundException ex) {
+           return false;
         } catch (IOException ex) {
+           return false;
         }
-
+        return true;
     }
 
     /**
@@ -186,11 +192,15 @@ public class SWF {
      * @param fis Input stream
      * @param fos Output stream
      */
-    public static void cws2fws(InputStream fis, OutputStream fos) {
+    public static boolean cws2fws(InputStream fis, OutputStream fos) {
         try {
             byte swfHead[] = new byte[8];
             fis.read(swfHead);
             InflaterInputStream iis = new InflaterInputStream(fis);
+            if(swfHead[0]!= 'C'){
+               fis.close();
+               return false;
+            }
             swfHead[0] = 'F';
             fos.write(swfHead);
             int i = 0;
@@ -201,8 +211,10 @@ public class SWF {
             fis.close();
             fos.close();
         } catch (FileNotFoundException ex) {
+           return false;
         } catch (IOException ex) {
+           return false;
         }
-
+        return true;
     }
 }

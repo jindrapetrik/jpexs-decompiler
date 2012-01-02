@@ -596,7 +596,7 @@ public class SWFInputStream extends InputStream {
         		break;
         	}
             tags.add(tag);
-        	if (Main.DUMP_TAGS && level == 0) {
+        	if (Main.dump_tags && level == 0) {
         		dumpTag(System.out, version, tag, level);
         	}
         }

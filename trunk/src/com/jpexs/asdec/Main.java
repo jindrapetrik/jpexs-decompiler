@@ -37,6 +37,8 @@ import java.awt.event.MouseEvent;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -78,7 +80,7 @@ public class Main {
     /** Turn off decompiling if needed */
     public static final boolean DO_DECOMPILE=true;
     /** Dump tags to stdout */
-    public static final boolean DUMP_TAGS = false;
+    public static boolean dump_tags = false;
 
     //using parameter names in decompiling may cause problems because oficial programs like Flash CS 5.5 inserts wrong parameter names indices
     public static final boolean PARAM_NAMES_ENABLE=false;
@@ -427,13 +429,22 @@ public class Main {
        System.out.println("  ...auto start proxy in the tray. Optional parameter -P specifies port for proxy. Defaults to 55555. ");
        System.out.println(" 4) -export (as|pcode) outdirectory infile");       
        System.out.println("  ...export infile actionscript to outdirectory as AsctionScript code (\"as\" argument) or as PCode (\"pcode\" argument)");
+       System.out.println(" 5) -dumpSWF infile");
+       System.out.println("  ...dumps list of SWF tags to console");
+       System.out.println(" 6) -compress infile outfile");
+       System.out.println("  ...Compress SWF infile and save it to outfile");
+       System.out.println(" 7) -decompress infile outfile");
+       System.out.println("  ...Decompress infile and save it to outfile");
        System.out.println();
        System.out.println("Examples:");
        System.out.println("java -jar ASDec.jar myfile.swf");
        System.out.println("java -jar ASDec.jar -proxy");
        System.out.println("java -jar ASDec.jar -proxy -P1234");
        System.out.println("java -jar ASDec.jar -export as \"C:\\decompiled\\\" myfile.swf");
-       System.out.println("java -jar ASDec.jar -export pcode \"C:\\decompiled\\\" myfile.swf");       
+       System.out.println("java -jar ASDec.jar -export pcode \"C:\\decompiled\\\" myfile.swf");  
+       System.out.println("java -jar ASDec.jar -dumpSWF myfile.swf");
+       System.out.println("java -jar ASDec.jar -compress myfile.swf myfiledec.swf");
+       System.out.println("java -jar ASDec.jar -deccompress myfiledec.swf myfile.swf");
     }
     
     /**
@@ -497,7 +508,41 @@ public class Main {
                   System.err.println("FAIL: No ActionScript version 3 found in the input file.");
                   System.exit(1);
                }
-            } else if (args[0].equals("-help")||args[0].equals("--help")||args[0].equals("/?")){
+            } else if (args[0].equals("-compress")) {
+               if(args.length<3){
+                  badArguments();
+               }
+               
+               if(SWF.fws2cws(new FileInputStream(args[1]), new FileOutputStream(args[2]))){
+                  System.out.println("OK");
+               }else{
+                  System.err.println("FAIL");;
+               }
+            } else if (args[0].equals("-decompress")) {
+               if(args.length<3){
+                  badArguments();
+               }
+               
+               if(SWF.cws2fws(new FileInputStream(args[1]), new FileOutputStream(args[2]))){
+                  System.out.println("OK");
+                  System.exit(0);
+               }else{
+                  System.err.println("FAIL");
+                  System.exit(1);
+               }           
+            } else if (args[0].equals("-dumpSWF")) {
+               if(args.length<2){
+                  badArguments();
+               }
+               try {
+                  dump_tags=true;
+                  parseSWF(args[1]);
+               } catch (Exception ex) {
+                  System.err.println("Dump failed due to Exception - "+ex.getLocalizedMessage());
+                  System.exit(1);
+               }
+               System.exit(0);
+            }else if (args[0].equals("-help")||args[0].equals("--help")||args[0].equals("/?")){
                printHeader();
                printCmdLineUsage();
                System.exit(0);
