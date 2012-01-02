@@ -158,7 +158,7 @@ public class AVM2Code {
             new DecLocalIIns(),
             new DecrementIns(),
             new DecrementIIns(),
-            new InstructionDefinition(0x5b,"deldescendants",new int[]{}){
+             new InstructionDefinition(0x5b,"deldescendants",new int[]{}){
 
                @Override
                public int getStackDelta(AVM2Instruction ins, ABC abc) {
@@ -191,7 +191,8 @@ public class AVM2Code {
             new EscXAttrIns(),
             new EscXElemIns(),
             new InstructionDefinition(0x5f,"finddef",new int[]{AVM2Code.DAT_MULTINAME_INDEX}),
-            new InstructionDefinition(0x5b,"findpropglobalstrict",new int[]{AVM2Code.DAT_MULTINAME_INDEX}){
+            /* //Duplicate OPCODE with deldescendants. Prefering deldescendants (found in FLEX compiler)
+             new InstructionDefinition(0x5b,"findpropglobalstrict",new int[]{AVM2Code.DAT_MULTINAME_INDEX}){
 
                @Override
                public int getStackDelta(AVM2Instruction ins, ABC abc) {
@@ -203,7 +204,7 @@ public class AVM2Code {
                   throw new UnsupportedOperationException();
                }
 
-            },
+            },*/
             new InstructionDefinition(0x5c,"findpropglobal",new int[]{AVM2Code.DAT_MULTINAME_INDEX}){
 
                @Override
@@ -585,6 +586,19 @@ public class AVM2Code {
             
     };
     //endoflist
+    public static InstructionDefinition instructionSetByCode[] = buildInstructionSetByCode();
+
+	private static InstructionDefinition[] buildInstructionSetByCode() {
+		InstructionDefinition result[] = new InstructionDefinition[256];
+		for (InstructionDefinition id : instructionSet) {
+			if (result[id.instructionCode] != null) {
+				System.out.println("Warning: Duplicate OPCODE for instruction "+result[id.instructionCode]+" "+id);
+			}
+			result[id.instructionCode] = id;
+		}
+		return result;
+	}
+
     public static final String IDENTOPEN = "/*IDENTOPEN*/";
     public static final String IDENTCLOSE = "/*IDENTCLOSE*/";
 
@@ -602,7 +616,7 @@ public class AVM2Code {
     public AVM2Code() {
     }
 
-    public Object execute(HashMap arguments,ConstantPool constants){
+	public Object execute(HashMap arguments,ConstantPool constants){
         int pos=0;
         LocalDataArea lda=new LocalDataArea();
         lda.localRegisters=arguments;
@@ -652,46 +666,40 @@ public class AVM2Code {
             long startOffset = ais.getPosition();
             ais.startBuffer();
             int instructionCode = ais.read();
-            boolean known = false;
-            loopi:
-            for (int i = 0; i < instructionSet.length; i++) {
-                if (instructionSet[i].instructionCode == instructionCode) {
-                    known = true;
-                    int actualOperands[];
-                    if (instructionCode == 0x1b) { //switch
-                        int firstOperand = ais.readS24();
-                        int case_count = ais.readU30();
-                        actualOperands = new int[case_count + 3];
-                        actualOperands[0] = firstOperand;
-                        actualOperands[1] = case_count;
-                        for (int c = 0; c < case_count + 1; c++) {
-                            actualOperands[2 + c] = ais.readS24();
-                        }
-                    } else {
-                        actualOperands = new int[instructionSet[i].operands.length];
-                        for (int op = 0; op < instructionSet[i].operands.length; op++) {
-                            switch (instructionSet[i].operands[op] & 0xff00) {
-                                case OPT_U30:
-                                    actualOperands[op] = ais.readU30();
-                                    break;
-                                case OPT_U8:
-                                    actualOperands[op] = ais.read();
-                                    break;
-                                case OPT_BYTE:
-                                    actualOperands[op] = (byte) ais.read();
-                                    break;
-                                case OPT_S24:
-                                    actualOperands[op] = ais.readS24();
-                                    break;
-                            }
+            InstructionDefinition instr = instructionSetByCode[instructionCode];
+            if (instr != null) {
+                int actualOperands[];
+                if (instructionCode == 0x1b) { //switch
+                    int firstOperand = ais.readS24();
+                    int case_count = ais.readU30();
+                    actualOperands = new int[case_count + 3];
+                    actualOperands[0] = firstOperand;
+                    actualOperands[1] = case_count;
+                    for (int c = 0; c < case_count + 1; c++) {
+                        actualOperands[2 + c] = ais.readS24();
+                    }
+                } else {
+                    actualOperands = new int[instr.operands.length];
+                    for (int op = 0; op < instr.operands.length; op++) {
+                        switch (instr.operands[op] & 0xff00) {
+                            case OPT_U30:
+                                actualOperands[op] = ais.readU30();
+                                break;
+                            case OPT_U8:
+                                actualOperands[op] = ais.read();
+                                break;
+                            case OPT_BYTE:
+                                actualOperands[op] = (byte) ais.read();
+                                break;
+                            case OPT_S24:
+                                actualOperands[op] = ais.readS24();
+                                break;
                         }
                     }
-
-                    code.add(new AVM2Instruction(startOffset, instructionSet[i], actualOperands, ais.stopBuffer()));
-                    break loopi;
                 }
-            }
-            if (!known) {
+
+                code.add(new AVM2Instruction(startOffset, instr, actualOperands, ais.stopBuffer()));
+            } else {
                 throw new UnknownInstructionCode(instructionCode);
             }
         }
