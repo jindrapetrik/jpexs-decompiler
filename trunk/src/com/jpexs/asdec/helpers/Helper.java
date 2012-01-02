@@ -20,7 +20,7 @@ package com.jpexs.asdec.helpers;
 /**
  * Class with helper method
  *
- * @author JPEXS
+ * @author JPEXS, Paolo Cancedda
  */
 public class Helper {
     /**
@@ -124,4 +124,75 @@ public class Helper {
         }
         return ret;
     }
+    
+    private final static String SPACES12 = "            ";
+	private final static String ZEROS8 = "00000000";
+
+	public static String formatHex(int value, int width) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(Integer.toHexString(value));
+		if (width > sb.length()) {
+			sb.insert(0, ZEROS8, 0, width - sb.length());
+		}
+		return sb.toString();
+	}
+
+	public static String formatInt(int value, int width) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(value);
+		if (width > sb.length()) {
+			sb.insert(0, SPACES12, 0, width - sb.length());
+		}
+		return sb.toString();
+	}
+
+	public static String indent(int level, String ss) {
+		StringBuilder sb = new StringBuilder();
+		for (int ii = 0; ii < level * 2; ii++) {
+			sb.append(' ');
+		}
+		sb.append(ss);
+		return sb.toString();
+	}
+
+	public static String bytesToHexString(byte bytes[], int start) {
+		StringBuilder sb = new StringBuilder();
+		if (start < bytes.length) {
+			for (int ii = start; ii < bytes.length; ii++) {
+				sb.append(formatHex(bytes[ii] & 0xff, 2));
+				sb.append(' ');
+			}
+			sb.setLength(sb.length() - 1);
+		}
+		return sb.toString();
+	}
+
+	public static String bytesToHexString(int maxByteCountInString, byte bytes[], int start) {
+		if (bytes.length - start <= maxByteCountInString) {
+			return bytesToHexString(bytes, start);
+		}
+		byte trailingBytes[] = new byte[maxByteCountInString/2];
+		byte headingBytes[] = new byte[maxByteCountInString - trailingBytes.length];
+		System.arraycopy(bytes, start, headingBytes, 0, headingBytes.length);
+		int startOfTrailingBytes = bytes.length - trailingBytes.length;
+		System.arraycopy(bytes, startOfTrailingBytes, trailingBytes, 0, trailingBytes.length);
+		StringBuilder sb = new StringBuilder();
+		sb.append(bytesToHexString(headingBytes, 0));
+		if (trailingBytes.length > 0) {
+			sb.append(" ... ");
+			sb.append(bytesToHexString(trailingBytes, 0));
+		}
+		return sb.toString();
+	}
+
+	public static String format(String str, int len) {
+		if (len <= str.length()) {
+			return str;
+		}
+		StringBuilder sb = new StringBuilder(str);
+		for (int ii = str.length(); ii < len; ii++) {
+			sb.append(' ');
+		}
+		return sb.toString();
+	}
 }
