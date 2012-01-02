@@ -1,5 +1,4 @@
 ﻿package classes {
-
 public class Test {
 	private var testPriv:int=5;
 	protected var testProt:int=9;
@@ -398,6 +397,26 @@ public class Test {
 			  trace("item #"+testPriv);
 		  }
 	  }
+	  
+	  public function testParamsCount(firstp:int,secondp:int,thirdp:int):int
+	  {
+		  return firstp;
+	  }
+	  
+	  
+	  public function testCalcStackSize() {       
+         var a=[1];
+         var b=[2];
+		 a[0]++;
+		 b[0]++;
+         //b=c[2]++;
+         /*trace("--arr");
+         b=--c[2];
+         trace("arr--");
+         b=c[2]--;*/
+		 
+         return;
+      }
 	  
    }
 }
