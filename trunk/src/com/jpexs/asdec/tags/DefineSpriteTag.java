@@ -51,6 +51,8 @@ public class DefineSpriteTag extends Tag implements Container {
      */
     public List<ExportAssetsTag> exportAssetsTags = new ArrayList<ExportAssetsTag>();
 
+	private int level;
+
     /**
      * Constructor
      *
@@ -58,12 +60,12 @@ public class DefineSpriteTag extends Tag implements Container {
      * @param version SWF version
      * @throws IOException
      */
-    public DefineSpriteTag(byte[] data, int version) throws IOException {
-        super(39, data);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+    public DefineSpriteTag(byte[] data, int version, int level, long pos) throws IOException {
+        super(39, data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version, pos);
         spriteId = sis.readUI16();
         frameCount = sis.readUI16();
-        subTags = sis.readTagList();
+        subTags = sis.readTagList(level + 1);
     }
 
 
@@ -129,5 +131,15 @@ public class DefineSpriteTag extends Tag implements Container {
      */
     public int getItemCount() {
         return subTags.size();
+    }
+
+    @Override
+    public boolean hasSubTags() {
+    	return true;
+    }
+
+    @Override
+    public List<Tag> getSubTags() {
+    	return subTags;
     }
 }

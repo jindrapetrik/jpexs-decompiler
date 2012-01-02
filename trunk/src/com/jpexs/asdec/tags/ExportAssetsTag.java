@@ -41,8 +41,8 @@ public class ExportAssetsTag extends Tag {
      * @param version SWF version
      * @throws IOException
      */
-    public ExportAssetsTag(byte[] data, int version) throws IOException {
-        super(56, data);
+    public ExportAssetsTag(byte[] data, int version, long pos) throws IOException {
+        super(56, data, pos);
         assets = new HashMap<Integer, String>();
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         int count = sis.readUI16();

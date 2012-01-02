@@ -26,8 +26,8 @@ public class ShowFrameTag extends Tag {
     /**
      * Constructor
      */
-    public ShowFrameTag() {
-        super(1, new byte[0]);
+    public ShowFrameTag(long pos) {
+        super(1, new byte[0], pos);
     }
 
     /**

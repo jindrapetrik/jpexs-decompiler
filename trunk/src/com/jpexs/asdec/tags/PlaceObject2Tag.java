@@ -166,8 +166,8 @@ public class PlaceObject2Tag extends Tag implements Container {
      * @param version SWF version
      * @throws IOException
      */
-    public PlaceObject2Tag(byte data[], int version) throws IOException {
-        super(26, data);
+    public PlaceObject2Tag(byte data[], int version, long pos) throws IOException {
+        super(26, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         placeFlagHasClipActions = sis.readUB(1) == 1;
         placeFlagHasClipDepth = sis.readUB(1) == 1;

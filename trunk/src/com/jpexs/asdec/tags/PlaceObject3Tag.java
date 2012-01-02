@@ -150,6 +150,8 @@ public class PlaceObject3Tag extends Tag implements Container {
      *        If PlaceFlagHasClipActions, Clip Actions Data
      */
     public CLIPACTIONS clipActions;
+	// FIXME bug found in ecoDrive.swf, 
+	private boolean bitmapCacheBug;
 
 
     /**
@@ -211,7 +213,9 @@ public class PlaceObject3Tag extends Tag implements Container {
                 sos.writeUI8(blendMode);
             }
             if (placeFlagHasCacheAsBitmap) {
-                sos.writeUI8(bitmapCache);
+            	if (!bitmapCacheBug) {
+            		sos.writeUI8(bitmapCache);
+            	}
             }
             if (placeFlagHasClipActions) {
                 sos.writeCLIPACTIONS(clipActions);
@@ -230,8 +234,8 @@ public class PlaceObject3Tag extends Tag implements Container {
      * @param version SWF version
      * @throws IOException
      */
-    public PlaceObject3Tag(byte data[], int version) throws IOException {
-        super(70, data);
+    public PlaceObject3Tag(byte data[], int version, long pos) throws IOException {
+        super(70, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         placeFlagHasClipActions = sis.readUB(1) == 1;
         placeFlagHasClipDepth = sis.readUB(1) == 1;
@@ -276,8 +280,14 @@ public class PlaceObject3Tag extends Tag implements Container {
         if (placeFlagHasBlendMode) {
             blendMode = sis.readUI8();
         }
+        bitmapCacheBug = false;
         if (placeFlagHasCacheAsBitmap) {
             bitmapCache = sis.readUI8();
+            if (bitmapCache == -1) {
+            	// EOF
+            	bitmapCacheBug = true;
+            	bitmapCache = 1;
+            }
         }
         if (placeFlagHasClipActions) {
             clipActions = sis.readCLIPACTIONS();

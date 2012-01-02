@@ -64,8 +64,8 @@ public class DefineButtonTag extends Tag implements ASMSource {
      * @param version SWF version
      * @throws IOException
      */
-    public DefineButtonTag(byte[] data, int version) throws IOException {
-        super(7, data);
+    public DefineButtonTag(byte[] data, int version, long pos) throws IOException {
+        super(7, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         buttonId = sis.readUI16();
         characters = sis.readBUTTONRECORDList(false);
@@ -127,7 +127,7 @@ public class DefineButtonTag extends Tag implements ASMSource {
         try {
             actions = (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
         } catch (IOException ex) {
-
+        	ex.printStackTrace();
         }
         return Action.actionsToString(actions, null, version);
     }

@@ -66,8 +66,8 @@ public class DefineButton2Tag extends Tag implements Container {
      * @param version SWF version
      * @throws IOException
      */
-    public DefineButton2Tag(byte data[], int version) throws IOException {
-        super(34, data);
+    public DefineButton2Tag(byte data[], int version, long pos) throws IOException {
+        super(34, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         buttonId = sis.readUI16();
         sis.readUB(7); //reserved
@@ -138,7 +138,7 @@ public class DefineButton2Tag extends Tag implements Container {
             sos.writeBUTTONCONDACTIONList(actions);
             sos.close();
         } catch (IOException e) {
-
+        	e.printStackTrace();
         }
         return baos.toByteArray();
     }

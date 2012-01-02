@@ -82,7 +82,7 @@ public class CLIPACTIONRECORD implements ASMSource {
         try {
             actions = (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
         } catch (IOException ex) {
-
+        	ex.printStackTrace();
         }
         return Action.actionsToString(actions, null, version);
     }
@@ -101,6 +101,7 @@ public class CLIPACTIONRECORD implements ASMSource {
         try {
             return (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
         } catch (IOException ex) {
+        	ex.printStackTrace();
             return new ArrayList<Action>();
         }
     }

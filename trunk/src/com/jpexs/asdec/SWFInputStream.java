@@ -17,23 +17,168 @@
 
 package com.jpexs.asdec;
 
-import com.jpexs.asdec.action.Action;
-import com.jpexs.asdec.action.swf3.*;
-import com.jpexs.asdec.action.swf4.*;
-import com.jpexs.asdec.action.swf5.*;
-import com.jpexs.asdec.action.swf6.*;
-import com.jpexs.asdec.action.swf7.*;
-import com.jpexs.asdec.tags.*;
-import com.jpexs.asdec.types.*;
-import com.jpexs.asdec.types.filters.*;
-
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+
+import com.jpexs.asdec.action.Action;
+import com.jpexs.asdec.action.swf3.ActionGetURL;
+import com.jpexs.asdec.action.swf3.ActionGoToLabel;
+import com.jpexs.asdec.action.swf3.ActionGotoFrame;
+import com.jpexs.asdec.action.swf3.ActionNextFrame;
+import com.jpexs.asdec.action.swf3.ActionPlay;
+import com.jpexs.asdec.action.swf3.ActionPrevFrame;
+import com.jpexs.asdec.action.swf3.ActionSetTarget;
+import com.jpexs.asdec.action.swf3.ActionStop;
+import com.jpexs.asdec.action.swf3.ActionStopSounds;
+import com.jpexs.asdec.action.swf3.ActionToggleQuality;
+import com.jpexs.asdec.action.swf3.ActionWaitForFrame;
+import com.jpexs.asdec.action.swf4.ActionAdd;
+import com.jpexs.asdec.action.swf4.ActionAnd;
+import com.jpexs.asdec.action.swf4.ActionAsciiToChar;
+import com.jpexs.asdec.action.swf4.ActionCall;
+import com.jpexs.asdec.action.swf4.ActionCharToAscii;
+import com.jpexs.asdec.action.swf4.ActionCloneSprite;
+import com.jpexs.asdec.action.swf4.ActionDivide;
+import com.jpexs.asdec.action.swf4.ActionEndDrag;
+import com.jpexs.asdec.action.swf4.ActionEquals;
+import com.jpexs.asdec.action.swf4.ActionGetProperty;
+import com.jpexs.asdec.action.swf4.ActionGetTime;
+import com.jpexs.asdec.action.swf4.ActionGetURL2;
+import com.jpexs.asdec.action.swf4.ActionGetVariable;
+import com.jpexs.asdec.action.swf4.ActionGotoFrame2;
+import com.jpexs.asdec.action.swf4.ActionIf;
+import com.jpexs.asdec.action.swf4.ActionJump;
+import com.jpexs.asdec.action.swf4.ActionLess;
+import com.jpexs.asdec.action.swf4.ActionMBAsciiToChar;
+import com.jpexs.asdec.action.swf4.ActionMBCharToAscii;
+import com.jpexs.asdec.action.swf4.ActionMBStringExtract;
+import com.jpexs.asdec.action.swf4.ActionMBStringLength;
+import com.jpexs.asdec.action.swf4.ActionMultiply;
+import com.jpexs.asdec.action.swf4.ActionNot;
+import com.jpexs.asdec.action.swf4.ActionOr;
+import com.jpexs.asdec.action.swf4.ActionPop;
+import com.jpexs.asdec.action.swf4.ActionPush;
+import com.jpexs.asdec.action.swf4.ActionRandomNumber;
+import com.jpexs.asdec.action.swf4.ActionRemoveSprite;
+import com.jpexs.asdec.action.swf4.ActionSetProperty;
+import com.jpexs.asdec.action.swf4.ActionSetTarget2;
+import com.jpexs.asdec.action.swf4.ActionSetVariable;
+import com.jpexs.asdec.action.swf4.ActionStartDrag;
+import com.jpexs.asdec.action.swf4.ActionStringAdd;
+import com.jpexs.asdec.action.swf4.ActionStringEquals;
+import com.jpexs.asdec.action.swf4.ActionStringExtract;
+import com.jpexs.asdec.action.swf4.ActionStringLength;
+import com.jpexs.asdec.action.swf4.ActionStringLess;
+import com.jpexs.asdec.action.swf4.ActionSubtract;
+import com.jpexs.asdec.action.swf4.ActionToInteger;
+import com.jpexs.asdec.action.swf4.ActionTrace;
+import com.jpexs.asdec.action.swf4.ActionWaitForFrame2;
+import com.jpexs.asdec.action.swf5.ActionAdd2;
+import com.jpexs.asdec.action.swf5.ActionBitAnd;
+import com.jpexs.asdec.action.swf5.ActionBitLShift;
+import com.jpexs.asdec.action.swf5.ActionBitOr;
+import com.jpexs.asdec.action.swf5.ActionBitRShift;
+import com.jpexs.asdec.action.swf5.ActionBitURShift;
+import com.jpexs.asdec.action.swf5.ActionBitXor;
+import com.jpexs.asdec.action.swf5.ActionCallFunction;
+import com.jpexs.asdec.action.swf5.ActionCallMethod;
+import com.jpexs.asdec.action.swf5.ActionConstantPool;
+import com.jpexs.asdec.action.swf5.ActionDecrement;
+import com.jpexs.asdec.action.swf5.ActionDefineFunction;
+import com.jpexs.asdec.action.swf5.ActionDefineLocal;
+import com.jpexs.asdec.action.swf5.ActionDefineLocal2;
+import com.jpexs.asdec.action.swf5.ActionDelete;
+import com.jpexs.asdec.action.swf5.ActionDelete2;
+import com.jpexs.asdec.action.swf5.ActionEnumerate;
+import com.jpexs.asdec.action.swf5.ActionEquals2;
+import com.jpexs.asdec.action.swf5.ActionGetMember;
+import com.jpexs.asdec.action.swf5.ActionIncrement;
+import com.jpexs.asdec.action.swf5.ActionInitArray;
+import com.jpexs.asdec.action.swf5.ActionInitObject;
+import com.jpexs.asdec.action.swf5.ActionLess2;
+import com.jpexs.asdec.action.swf5.ActionModulo;
+import com.jpexs.asdec.action.swf5.ActionNewMethod;
+import com.jpexs.asdec.action.swf5.ActionNewObject;
+import com.jpexs.asdec.action.swf5.ActionPushDuplicate;
+import com.jpexs.asdec.action.swf5.ActionReturn;
+import com.jpexs.asdec.action.swf5.ActionSetMember;
+import com.jpexs.asdec.action.swf5.ActionStackSwap;
+import com.jpexs.asdec.action.swf5.ActionStoreRegister;
+import com.jpexs.asdec.action.swf5.ActionTargetPath;
+import com.jpexs.asdec.action.swf5.ActionToNumber;
+import com.jpexs.asdec.action.swf5.ActionToString;
+import com.jpexs.asdec.action.swf5.ActionTypeOf;
+import com.jpexs.asdec.action.swf5.ActionWith;
+import com.jpexs.asdec.action.swf6.ActionEnumerate2;
+import com.jpexs.asdec.action.swf6.ActionGreater;
+import com.jpexs.asdec.action.swf6.ActionInstanceOf;
+import com.jpexs.asdec.action.swf6.ActionStrictEquals;
+import com.jpexs.asdec.action.swf6.ActionStringGreater;
+import com.jpexs.asdec.action.swf7.ActionCastOp;
+import com.jpexs.asdec.action.swf7.ActionDefineFunction2;
+import com.jpexs.asdec.action.swf7.ActionExtends;
+import com.jpexs.asdec.action.swf7.ActionImplementsOp;
+import com.jpexs.asdec.action.swf7.ActionThrow;
+import com.jpexs.asdec.action.swf7.ActionTry;
+import com.jpexs.asdec.helpers.Helper;
+import com.jpexs.asdec.tags.DefineBinaryData;
+import com.jpexs.asdec.tags.DefineBits;
+import com.jpexs.asdec.tags.DefineBitsJPEG2;
+import com.jpexs.asdec.tags.DefineBitsJPEG3;
+import com.jpexs.asdec.tags.DefineBitsLossless;
+import com.jpexs.asdec.tags.DefineBitsLossless2;
+import com.jpexs.asdec.tags.DefineButton2Tag;
+import com.jpexs.asdec.tags.DefineButtonTag;
+import com.jpexs.asdec.tags.DefineFont3;
+import com.jpexs.asdec.tags.DefineFont4;
+import com.jpexs.asdec.tags.DefineFontAlignZones;
+import com.jpexs.asdec.tags.DefineFontName;
+import com.jpexs.asdec.tags.DefineScalingGrid;
+import com.jpexs.asdec.tags.DefineShape;
+import com.jpexs.asdec.tags.DefineShape2;
+import com.jpexs.asdec.tags.DefineShape3;
+import com.jpexs.asdec.tags.DefineShape4;
+import com.jpexs.asdec.tags.DefineSpriteTag;
+import com.jpexs.asdec.tags.DoABCTag;
+import com.jpexs.asdec.tags.DoActionTag;
+import com.jpexs.asdec.tags.DoInitActionTag;
+import com.jpexs.asdec.tags.ExportAssetsTag;
+import com.jpexs.asdec.tags.FileAttributes;
+import com.jpexs.asdec.tags.FrameLabel;
+import com.jpexs.asdec.tags.JPEGTables;
+import com.jpexs.asdec.tags.Metadata;
+import com.jpexs.asdec.tags.PlaceObject2Tag;
+import com.jpexs.asdec.tags.PlaceObject3Tag;
+import com.jpexs.asdec.tags.ProductInfo;
+import com.jpexs.asdec.tags.RemoveObject2;
+import com.jpexs.asdec.tags.ScriptLimits;
+import com.jpexs.asdec.tags.SetBackgroundColor;
+import com.jpexs.asdec.tags.ShowFrameTag;
+import com.jpexs.asdec.tags.SymbolClass;
+import com.jpexs.asdec.tags.Tag;
+import com.jpexs.asdec.types.BUTTONCONDACTION;
+import com.jpexs.asdec.types.BUTTONRECORD;
+import com.jpexs.asdec.types.CLIPACTIONRECORD;
+import com.jpexs.asdec.types.CLIPACTIONS;
+import com.jpexs.asdec.types.CLIPEVENTFLAGS;
+import com.jpexs.asdec.types.CXFORMWITHALPHA;
+import com.jpexs.asdec.types.MATRIX;
+import com.jpexs.asdec.types.RECT;
+import com.jpexs.asdec.types.RGBA;
+import com.jpexs.asdec.types.filters.BEVELFILTER;
+import com.jpexs.asdec.types.filters.BLURFILTER;
+import com.jpexs.asdec.types.filters.COLORMATRIXFILTER;
+import com.jpexs.asdec.types.filters.CONVOLUTIONFILTER;
+import com.jpexs.asdec.types.filters.DROPSHADOWFILTER;
+import com.jpexs.asdec.types.filters.FILTER;
+import com.jpexs.asdec.types.filters.GLOWFILTER;
+import com.jpexs.asdec.types.filters.GRADIENTBEVELFILTER;
+import com.jpexs.asdec.types.filters.GRADIENTGLOWFILTER;
 
 /**
  * Class for reading data from SWF file
@@ -41,9 +186,9 @@ import java.util.Stack;
  * @author JPEXS
  */
 public class SWFInputStream extends InputStream {
-    private InputStream is;
+	private InputStream is;
     private Stack<Integer> margedPos = new Stack<Integer>();
-    private long pos = 0;
+    private long pos;
     private int version;
 
     /**
@@ -52,9 +197,20 @@ public class SWFInputStream extends InputStream {
      * @param is      Existing inputstream
      * @param version Version of SWF to read
      */
-    public SWFInputStream(InputStream is, int version) {
+    public SWFInputStream(InputStream is, int version, long startingPos) {
         this.version = version;
         this.is = is;
+        pos = startingPos;
+    }
+
+    /**
+     * Constructor
+     *
+     * @param is      Existing inputstream
+     * @param version Version of SWF to read
+     */
+    public SWFInputStream(InputStream is, int version) {
+    	this(is, version, 0L);
     }
 
     /**
@@ -77,6 +233,14 @@ public class SWFInputStream extends InputStream {
         pos++;
         bitPos = 0;
         return is.read();
+    }
+
+    @Override
+    public int read(byte[] b, int off, int len) throws IOException {
+    	int bytesRead = super.read(b, off, len);
+    	bitPos = 0;
+    	pos += bytesRead;
+    	return bytesRead;
     }
 
     private void alignByte() {
@@ -395,17 +559,46 @@ public class SWFInputStream extends InputStream {
         return ret;
     }
 
+    private static void dumpTag(PrintStream out, int version, Tag tag, int level) {
+    	StringBuilder sb = new StringBuilder();
+    	sb.append(Helper.formatHex((int)tag.getPos(), 8));
+    	sb.append(": ");
+    	sb.append(Helper.indent(level, ""));
+    	sb.append(Helper.format(tag.toString(), 25 - 2*level));
+    	sb.append(" tagId=");
+    	sb.append(Helper.formatInt(tag.getId(), 3));
+    	sb.append(" len=");
+    	sb.append(Helper.formatInt((int)tag.getOrigDataLength(), 8));
+    	sb.append("  ");
+    	sb.append(Helper.bytesToHexString(64, tag.getData(version), 0));
+    	out.println(sb.toString());
+//        out.println(Utils.formatHex((int)tag.getPos(), 8) + ": " + Utils.indent(level, "") + Utils.format(tag.toString(), 25 - 2*level) + " tagId="+tag.getId()+" len="+tag.getOrigDataLength()+": "+Utils.bytesToHexString(64, tag.getData(version), 0));
+		if (tag.hasSubTags()) {
+			for (Tag subTag: tag.getSubTags()) {
+				dumpTag(out, version, subTag, level + 1);
+			}
+		}
+    }
+
     /**
      * Reads list of tags from the stream. Reading ends with End tag(=0) or end of the stream.
      *
      * @return List of tags
      * @throws IOException
      */
-    public List<Tag> readTagList() throws IOException {
+    public List<Tag> readTagList(int level) throws IOException {
         List<Tag> tags = new ArrayList<Tag>();
         Tag tag;
-        while ((tag = readTag()) != null) {
+        while (true) {
+            long pos = getPos();
+        	tag = readTag(level, pos);
+        	if (tag == null) {
+        		break;
+        	}
             tags.add(tag);
+        	if (Main.DUMP_TAGS && level == 0) {
+        		dumpTag(System.out, version, tag, level);
+        	}
         }
         return tags;
     }
@@ -416,7 +609,7 @@ public class SWFInputStream extends InputStream {
      * @return Tag or null when End tag
      * @throws IOException
      */
-    public Tag readTag() throws IOException {
+    public Tag readTag(int level, long pos) throws IOException {
         int tagIDTagLength = readUI16();
         int tagID = (tagIDTagLength) >> 6;
         if (tagID == 0) {
@@ -432,109 +625,109 @@ public class SWFInputStream extends InputStream {
         Tag ret;
         switch (tagID) {
             case 82:
-                ret = new DoABCTag(data, version);
+                ret = new DoABCTag(data, version, pos);
                 break;
             case 12:
-                ret = new DoActionTag(data, version);
+                ret = new DoActionTag(data, version, pos);
                 break;
             case 59:
-                ret = new DoInitActionTag(data, version);
+                ret = new DoInitActionTag(data, version, pos);
                 break;
             case 39:
-                ret = new DefineSpriteTag(data, version);
+                ret = new DefineSpriteTag(data, version, level, pos);
                 break;
             case 1:
-                ret = new ShowFrameTag();
+                ret = new ShowFrameTag(pos);
                 break;
             case 26:
-                ret = new PlaceObject2Tag(data, version);
+                ret = new PlaceObject2Tag(data, version, pos);
                 break;
             case 56:
-                ret = new ExportAssetsTag(data, version);
+                ret = new ExportAssetsTag(data, version, pos);
                 break;
             case 70:
-                ret = new PlaceObject3Tag(data, version);
+                ret = new PlaceObject3Tag(data, version, pos);
                 break;
             case 7:
-                ret = new DefineButtonTag(data, version);
+                ret = new DefineButtonTag(data, version, pos);
                 break;
             case 34:
-                ret = new DefineButton2Tag(data, version);
+                ret = new DefineButton2Tag(data, version, pos);
                 break;
             case 69:
-            	ret = new FileAttributes(data);
+            	ret = new FileAttributes(data, version, pos);
             	break;
             case 77:
-            	ret = new Metadata(data);
+            	ret = new Metadata(data, pos);
             	break;
             case 65:
-            	ret = new ScriptLimits(data, version);
+            	ret = new ScriptLimits(data, version, pos);
             	break;
             case 9:
-            	ret = new SetBackgroundColor(data);
+            	ret = new SetBackgroundColor(data, pos);
             	break;
             case 41:
-            	ret = new ProductInfo(data, version);
+            	ret = new ProductInfo(data, version, pos);
             	break;
             case 43:
-            	ret = new FrameLabel(data, version);
+            	ret = new FrameLabel(data, version, pos);
             	break;
             case 36:
-            	ret = new DefineBitsLossless2(data, version);
+            	ret = new DefineBitsLossless2(data, version, pos);
             	break;
             case 76:
-            	ret = new SymbolClass(data, version);
+            	ret = new SymbolClass(data, version, pos);
             	break;
             case 32:
-            	ret = new DefineShape3(data, version);
+            	ret = new DefineShape3(data, version, pos);
             	break;
             case 28:
-            	ret = new RemoveObject2(data, version);
+            	ret = new RemoveObject2(data, version, pos);
             	break;
             case 78:
-            	ret = new DefineScalingGrid(data, version);
+            	ret = new DefineScalingGrid(data, version, pos);
             	break;
             case 2:
-            	ret = new DefineShape(data, version);
+            	ret = new DefineShape(data, version, pos);
             	break;
             case 22:
-            	ret = new DefineShape2(data, version);
+            	ret = new DefineShape2(data, version, pos);
             	break;
             case 83:
-            	ret = new DefineShape4(data, version);
+            	ret = new DefineShape4(data, version, pos);
             	break;
             case 20:
-            	ret = new DefineBitsLossless(data, version);
+            	ret = new DefineBitsLossless(data, version, pos);
             	break;
             case 35:
-            	ret = new DefineBitsJPEG3(data, version);
+            	ret = new DefineBitsJPEG3(data, version, pos);
             	break;
             case 87:
-            	ret = new DefineBinaryData(data, version);
+            	ret = new DefineBinaryData(data, version, pos);
             	break;
             case 8:
-            	ret = new JPEGTables(data);
+            	ret = new JPEGTables(data, pos);
             	break;
             case 6:
-            	ret = new DefineBits(data, version);
+            	ret = new DefineBits(data, version, pos);
             	break;
             case 21:
-            	ret = new DefineBitsJPEG2(data, version);
+            	ret = new DefineBitsJPEG2(data, version, pos);
             	break;
             case 75:
-            	ret = new DefineFont3(data, version);
+            	ret = new DefineFont3(data, version, pos);
             	break;
             case 73:
-            	ret = new DefineFontAlignZones(data, version);
+            	ret = new DefineFontAlignZones(data, version, pos);
             	break;
             case 88:
-            	ret = new DefineFontName(data, version);
-            	break;            	
+            	ret = new DefineFontName(data, version, pos);
+            	break;
             case 91:
-            	ret = new DefineFont4(data, version);
+            	ret = new DefineFont4(data, version, pos);
             	break;
             default:
-                ret = new Tag(tagID, data);
+                ret = new Tag(tagID, data, pos);
         }
         ret.forceWriteAsLong = readLong;
         return ret;

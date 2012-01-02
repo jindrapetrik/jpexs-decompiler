@@ -135,20 +135,21 @@ public class SWF {
             throw new IOException("Invalid SWF file");
         }
         version = is.read();
-        SWFInputStream sis = new SWFInputStream(is, version);
+        SWFInputStream sis = new SWFInputStream(is, version, 4);
         fileSize = sis.readUI32();
 
         if (hdr[0] == 'C') {
-            sis = new SWFInputStream(new InflaterInputStream(is), version);
+            sis = new SWFInputStream(new InflaterInputStream(is), version, 8);
             compressed = true;
         }
 
 
         displayRect = sis.readRECT();
-        sis.readUI8();
+        // FIXED8 (16 bit fixed point) frameRate
+        int tmpFirstByetOfFrameRate = sis.readUI8();
         frameRate = sis.readUI8();
         frameCount = sis.readUI16();
-        tags = sis.readTagList();
+        tags = sis.readTagList(0);
     }
 
 

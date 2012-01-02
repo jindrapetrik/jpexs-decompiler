@@ -17,6 +17,8 @@
 
 package com.jpexs.asdec.tags;
 
+import java.util.List;
+
 /**
  * Represents Tag inside SWF file
  */
@@ -35,6 +37,8 @@ public class Tag {
      */
     public boolean forceWriteAsLong = false;
 
+    private final long pos;
+
     /**
      * Returns identifier of tag type
      *
@@ -50,9 +54,10 @@ public class Tag {
      * @param id   Tag type identifier
      * @param data Bytes of data
      */
-    public Tag(int id, byte[] data) {
+    public Tag(int id, byte[] data, long pos) {
         this.id = id;
         this.data = data;
+        this.pos = pos;
     }
 
     /**
@@ -79,4 +84,15 @@ public class Tag {
         return data.length;
     }
 
+    public boolean hasSubTags() {
+    	return false;
+    }
+
+    public List<Tag> getSubTags() {
+    	return null;
+    }
+
+    public long getPos() {
+		return pos;
+	}
 }

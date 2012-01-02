@@ -50,8 +50,8 @@ public class DoInitActionTag extends Tag implements ASMSource {
      * @param version SWF version
      * @throws IOException
      */
-    public DoInitActionTag(byte[] data, int version) throws IOException {
-        super(59, data);
+    public DoInitActionTag(byte[] data, int version, long pos) throws IOException {
+        super(59, data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         spriteId = sis.readUI16();
         //actions = sis.readActionList();
@@ -116,7 +116,7 @@ public class DoInitActionTag extends Tag implements ASMSource {
         try {
             actions = (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
         } catch (IOException ex) {
-
+        	ex.printStackTrace();
         }
         return Action.actionsToString(actions, null, version);
     }
@@ -125,6 +125,7 @@ public class DoInitActionTag extends Tag implements ASMSource {
         try {
             return (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
         } catch (IOException ex) {
+        	ex.printStackTrace();
             return new ArrayList<Action>();
         }
     }
