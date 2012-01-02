@@ -17,9 +17,11 @@
 
 package com.jpexs.asdec.abc;
 
+import com.jpexs.asdec.helpers.Helper;
+
 
 public class NotSameException extends RuntimeException {
     public NotSameException(long pos) {
-        super("Streams are not the same at pos:" + pos);
+        super("Streams are not the same at pos " + Helper.formatHex((int)pos, 8));
     }
 }
