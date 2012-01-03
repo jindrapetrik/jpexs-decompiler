@@ -60,7 +60,7 @@ import java.util.regex.Pattern;
 
 public class AVM2Code {
 
-    public List<AVM2Instruction> code = new LinkedList<AVM2Instruction>();
+    public ArrayList<AVM2Instruction> code = new ArrayList<AVM2Instruction>();
     public static boolean DEBUG_REWRITE=false;
     public static final int OPT_U30 = 0x100;
     public static final int OPT_U8 = 0x200;
@@ -704,6 +704,10 @@ public class AVM2Code {
             }
         }
     }
+
+	public void compact() {
+		code.trimToSize();
+	}
 
     public byte[] getBytes() {
        return getBytes(null);

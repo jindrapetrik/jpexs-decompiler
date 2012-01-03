@@ -287,6 +287,8 @@ public class ASM3Parser {
             }
         } while (symb.type != ParsedSymbol.TYPE_EOF);
 
+        code.compact();
+
         for (OffsetItem oi : offsetItems) {
             for (LabelItem li : labelItems) {
                 if (oi.label.equals(li.label)) {
