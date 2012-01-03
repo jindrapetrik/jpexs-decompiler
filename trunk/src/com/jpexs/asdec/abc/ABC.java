@@ -17,6 +17,19 @@
 
 package com.jpexs.asdec.abc;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JOptionPane;
+
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
@@ -25,7 +38,17 @@ import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.InitPropertyTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.SetPropertyTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
-import com.jpexs.asdec.abc.types.*;
+import com.jpexs.asdec.abc.types.ABCException;
+import com.jpexs.asdec.abc.types.ClassInfo;
+import com.jpexs.asdec.abc.types.Decimal;
+import com.jpexs.asdec.abc.types.InstanceInfo;
+import com.jpexs.asdec.abc.types.MetadataInfo;
+import com.jpexs.asdec.abc.types.MethodBody;
+import com.jpexs.asdec.abc.types.MethodInfo;
+import com.jpexs.asdec.abc.types.Multiname;
+import com.jpexs.asdec.abc.types.Namespace;
+import com.jpexs.asdec.abc.types.NamespaceSet;
+import com.jpexs.asdec.abc.types.ScriptInfo;
 import com.jpexs.asdec.abc.types.traits.Trait;
 import com.jpexs.asdec.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.asdec.abc.types.traits.TraitSlotConst;
@@ -39,15 +62,9 @@ import com.jpexs.asdec.abc.usages.MethodBodyMultinameUsage;
 import com.jpexs.asdec.abc.usages.MethodNameMultinameUsage;
 import com.jpexs.asdec.abc.usages.MethodParamsMultinameUsage;
 import com.jpexs.asdec.abc.usages.MethodReturnTypeMultinameUsage;
-import com.jpexs.asdec.abc.usages.InsideClassMultinameUsage;
 import com.jpexs.asdec.abc.usages.MultinameUsage;
 import com.jpexs.asdec.abc.usages.TypeNameMultinameUsage;
 import com.jpexs.asdec.helpers.Highlighting;
-
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import javax.swing.JOptionPane;
 
 public class ABC {
 
@@ -60,6 +77,7 @@ public class ABC {
    public ClassInfo class_info[];
    public ScriptInfo script_info[];
    public MethodBody bodies[];
+   private int bodyIdxFromMethodIdx[];
    public long stringOffsets[];
    public static String IDENT_STRING = "   ";
    public static final int MINORwithDECIMAL = 17;
@@ -178,8 +196,10 @@ public class ABC {
       //method info
       int methods_count = ais.readU30();
       method_info = new MethodInfo[methods_count];
+      bodyIdxFromMethodIdx = new int[methods_count];
       for (int i = 0; i < methods_count; i++) {
          method_info[i] = ais.readMethodInfo();
+         bodyIdxFromMethodIdx[i] = -1;
       }
 
       //metadata info
@@ -206,49 +226,54 @@ public class ABC {
       }
       class_info = new ClassInfo[class_count];
       for (int i = 0; i < class_count; i++) {
-         class_info[i] = new ClassInfo();
-         class_info[i].cinit_index = ais.readU30();
-         class_info[i].static_traits = ais.readTraits();
+         ClassInfo ci = new ClassInfo();
+         ci.cinit_index = ais.readU30();
+         ci.static_traits = ais.readTraits();
+         class_info[i] = ci;
       }
       int script_count = ais.readU30();
       script_info = new ScriptInfo[script_count];
       for (int i = 0; i < script_count; i++) {
-         script_info[i] = new ScriptInfo();
-         script_info[i].init_index = ais.readU30();
-         script_info[i].traits = ais.readTraits();
+         ScriptInfo si = new ScriptInfo();
+         si.init_index = ais.readU30();
+         si.traits = ais.readTraits();
+         script_info[i] = si;
       }
 
       int bodies_count = ais.readU30();
       bodies = new MethodBody[bodies_count];
       for (int i = 0; i < bodies_count; i++) {
-         bodies[i] = new MethodBody();
-         bodies[i].method_info = ais.readU30();
-         bodies[i].max_stack = ais.readU30();
-         bodies[i].max_regs = ais.readU30();
-         bodies[i].init_scope_depth = ais.readU30();
-         bodies[i].max_scope_depth = ais.readU30();
+    	 MethodBody mb = new MethodBody();
+         mb.method_info = ais.readU30();
+         mb.max_stack = ais.readU30();
+         mb.max_regs = ais.readU30();
+         mb.init_scope_depth = ais.readU30();
+         mb.max_scope_depth = ais.readU30();
          int code_length = ais.readU30();
-         bodies[i].codeBytes = new byte[code_length];
-         for (int j = 0; j < code_length; j++) {
-            bodies[i].codeBytes[j] = (byte) ais.read();
-         }
+         mb.codeBytes = new byte[code_length];
+         ais.read(mb.codeBytes);
          try {
-            bodies[i].code = new AVM2Code(new ByteArrayInputStream(bodies[i].codeBytes));
+            mb.code = new AVM2Code(new ByteArrayInputStream(mb.codeBytes));
          } catch (UnknownInstructionCode re) {
-            bodies[i].code = new AVM2Code();
+            mb.code = new AVM2Code();
             System.err.println(re.toString());
          }
+         mb.code.compact();
          int ex_count = ais.readU30();
-         bodies[i].exceptions = new ABCException[ex_count];
+         mb.exceptions = new ABCException[ex_count];
          for (int j = 0; j < ex_count; j++) {
-            bodies[i].exceptions[j] = new ABCException();
-            bodies[i].exceptions[j].start = ais.readU30();
-            bodies[i].exceptions[j].end = ais.readU30();
-            bodies[i].exceptions[j].target = ais.readU30();
-            bodies[i].exceptions[j].type_index = ais.readU30();
-            bodies[i].exceptions[j].name_index = ais.readU30();
+        	ABCException abce = new ABCException();
+            abce.start = ais.readU30();
+            abce.end = ais.readU30();
+            abce.target = ais.readU30();
+            abce.type_index = ais.readU30();
+            abce.name_index = ais.readU30();
+            mb.exceptions[j] = abce;
          }
-         bodies[i].traits = ais.readTraits();
+         mb.traits = ais.readTraits();
+         bodies[i] = mb;
+         method_info[mb.method_info].setBody(mb);
+         bodyIdxFromMethodIdx[mb.method_info] = i;
       }
   }
 
@@ -455,24 +480,17 @@ public class ABC {
    }
 
    public MethodBody findBody(int methodInfo) {
-      int pos = findBodyIndex(methodInfo);
-      if (pos == -1) {
+      if (methodInfo < 0) {
          return null;
-      } else {
-         return bodies[pos];
       }
+      return method_info[methodInfo].getBody();
    }
 
    public int findBodyIndex(int methodInfo) {
       if (methodInfo == -1) {
          return -1;
       }
-      for (int b = 0; b < bodies.length; b++) {
-         if (bodies[b].method_info == methodInfo) {
-            return b;
-         }
-      }
-      return -1;
+      return bodyIdxFromMethodIdx[methodInfo];
    }
 
    public MethodBody findBodyByClassAndName(String className, String methodName) {

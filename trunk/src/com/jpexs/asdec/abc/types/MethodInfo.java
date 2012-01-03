@@ -33,6 +33,7 @@ public class MethodInfo {
     public int flags;
     public ValueKind optional[];
     public int paramNames[];
+    private MethodBody body;
 
     public void setFlagSetsdxns()
     {
@@ -294,5 +295,13 @@ public class MethodInfo {
         if (ret_type == 0) return "*";
         return constants.constant_multiname[ret_type].getName(constants);
     }
+
+	public void setBody(MethodBody body) {
+		this.body = body;
+	}
+
+	public MethodBody getBody() {
+		return body;
+	}
 }
 
