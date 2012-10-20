@@ -79,6 +79,8 @@ public class Main {
     public static final boolean RESOLVE_CONSTANTS = true;
     /** Turn off decompiling if needed */
     public static final boolean DO_DECOMPILE=true;
+    /** Find latest constant pool in the code */
+    public static final boolean LATEST_CONSTANTPOOL_HACK=false;
     /** Dump tags to stdout */
     public static boolean dump_tags = false;
 

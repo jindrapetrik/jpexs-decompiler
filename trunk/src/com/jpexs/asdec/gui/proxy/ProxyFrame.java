@@ -239,6 +239,7 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
             java.util.List<String> catchedContentTypes = new ArrayList<String>();
             catchedContentTypes.add("application/x-shockwave-flash");
             catchedContentTypes.add("application/x-javascript");
+            catchedContentTypes.add("application/javascript");
             catchedContentTypes.add("text/javascript");
             catchedContentTypes.add("application/json");
             catchedContentTypes.add("text/xml");
@@ -311,9 +312,10 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
      * @param data        Data stream
      */
     public void catched(String contentType, String url, InputStream data) {
+       boolean swfOnly=false;
         if (contentType.contains(";")) contentType = contentType.substring(0, contentType.indexOf(";"));
         if ((!sniffSWFCheckBox.isSelected()) && (contentType.equals("application/x-shockwave-flash"))) return;
-        if ((!sniffJSCheckBox.isSelected()) && (contentType.equals("application/x-javascript") || contentType.equals("text/javascript")|| contentType.equals("application/json")))
+        if ((!sniffJSCheckBox.isSelected()) && (contentType.equals("application/javascript") || contentType.equals("application/x-javascript") || contentType.equals("text/javascript")|| contentType.equals("application/json")))
             return;
         if ((!sniffXMLCheckBox.isSelected()) && (contentType.equals("application/xml") || contentType.equals("text/xml")))
             return;
@@ -324,9 +326,10 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
                 byte hdr[]=new byte[3];                
                 data.read(hdr);        
                 String shdr=new String(hdr);
-                if((!shdr.equals("FWS")) && (!shdr.equals("CWS"))){
+                if((swfOnly) &&((!shdr.equals("FWS")) && (!shdr.equals("CWS")))){
                    return; //NOT SWF
                 }
+                
                 File f = new File(Main.tempFile(url));
                 FileOutputStream fos = new FileOutputStream(f);
                 fos.write(hdr);

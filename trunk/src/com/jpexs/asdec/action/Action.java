@@ -17,6 +17,7 @@
 
 package com.jpexs.asdec.action;
 
+import com.jpexs.asdec.Main;
 import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.action.parser.FlasmLexer;
 import com.jpexs.asdec.action.parser.ParseException;
@@ -359,10 +360,21 @@ public class Action {
         }
 
         offset = 0;
-        for (Action a : list) {
-            if (a instanceof ActionConstantPool) {
+        if(Main.LATEST_CONSTANTPOOL_HACK){
+           for (Action a : list) {
+            if (a instanceof ActionConstantPool) {                
                 constantPool.clear();
                 constantPool.addAll(((ActionConstantPool) a).constantPool);
+            }
+           }
+        }
+        for (Action a : list) {
+            if(!Main.LATEST_CONSTANTPOOL_HACK)
+            {
+            if (a instanceof ActionConstantPool) {                
+                constantPool.clear();
+                constantPool.addAll(((ActionConstantPool) a).constantPool);
+            }
             }
             if (a instanceof ActionPush) {
                 ((ActionPush) a).constantPool = constantPool;

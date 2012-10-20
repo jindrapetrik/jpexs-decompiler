@@ -91,6 +91,10 @@ public abstract class TreeItem {
                 return (String)((DirectValueTreeItem)target).value;
             }
         }
-        return target.toString();
+        if(target==null){
+           return "";
+        }else{
+            return target.toString();
+        }
     }
 }
