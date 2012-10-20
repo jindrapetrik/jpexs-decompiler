@@ -181,7 +181,8 @@ public class Main {
 
     public static SWF parseSWF(String file) throws Exception {
         FileInputStream fis = new FileInputStream(file);
-        SWF locswf = new SWF(fis);
+        InputStream bis = new BufferedInputStream(fis);
+        SWF locswf = new SWF(bis);
         return locswf;
     }
 

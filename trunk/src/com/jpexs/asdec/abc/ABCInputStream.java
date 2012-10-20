@@ -68,6 +68,31 @@ public class ABCInputStream extends InputStream {
         return i;
     }
 
+    @Override
+    public int read(byte[] b) throws IOException {
+        int currBytesRead = is.read(b);
+        bytesRead += currBytesRead;
+        if(DEBUG_READ)
+        {
+           StringBuilder sb = new StringBuilder("Read[");
+           sb.append(currBytesRead);
+           sb.append('/');
+           sb.append(b.length);
+           sb.append("]: ");
+           for (int jj = 0; jj < currBytesRead; jj++) {
+        	   sb.append("0x");
+        	   sb.append(Integer.toHexString(b[jj]));
+        	   sb.append(' ');
+           }
+           System.out.println(sb.toString());
+        }
+        if (bufferOs != null) {
+            if (currBytesRead > 0)
+                bufferOs.write(b, 0, currBytesRead);
+        }
+        return currBytesRead;
+    };
+
     public int readU8() throws IOException {
         return read();
     }
