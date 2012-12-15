@@ -458,8 +458,6 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
-       //updateLicenseInDir(new File("src/")); System.exit(0); //For automatic update of lincense in source files
-       
         View.setWinLookAndFeel();
         loadReplacements();
         if (args.length < 1) {

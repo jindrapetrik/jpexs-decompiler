@@ -26,6 +26,7 @@ import com.jpexs.asdec.abc.avm2.treemodel.NewFunctionTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.MethodBody;
 import com.jpexs.asdec.abc.types.MethodInfo;
+import com.jpexs.asdec.helpers.Highlighting;
 
 import java.util.List;
 import java.util.Stack;
@@ -42,10 +43,12 @@ public class NewFunctionIns extends InstructionDefinition {
         int methodIndex = ins.operands[0];
         MethodBody mybody = abc.findBody(methodIndex);
         String bodyStr = "";
+        String paramStr = "";
         if (mybody != null) {
-            bodyStr = mybody.toString(false,isStatic, classIndex, abc, constants, method_info, false);
+            bodyStr = Highlighting.hilighMethodEnd()+mybody.toString(false,isStatic, classIndex, abc, constants, method_info, true)+Highlighting.hilighMethodBegin(body.method_info);
+            paramStr = method_info[methodIndex].getParamStr(constants,mybody,abc);
         }
-        stack.push(new NewFunctionTreeItem(ins, method_info[methodIndex].getParamStr(constants,body,abc), method_info[methodIndex].getReturnTypeStr(constants), bodyStr));
+        stack.push(new NewFunctionTreeItem(ins, paramStr, method_info[methodIndex].getReturnTypeStr(constants), bodyStr));
     }
 
    @Override

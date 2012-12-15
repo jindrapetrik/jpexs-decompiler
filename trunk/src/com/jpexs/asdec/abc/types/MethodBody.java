@@ -24,6 +24,7 @@ import com.jpexs.asdec.abc.avm2.CodeStats;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.types.traits.Traits;
+import com.jpexs.asdec.helpers.Highlighting;
 import java.util.HashMap;
 
 
@@ -85,6 +86,10 @@ public class MethodBody implements Cloneable {
         try {
             HashMap<Integer,String> localRegNames=code.getLocalRegNamesFromDebug(abc);
             s += code.toSource(isStatic, classIndex, abc, constants, method_info, this, hilight);
+            if(hilight)
+            {
+               s=Highlighting.hilighMethod(s, this.method_info);
+            }
             if(!localRegNames.isEmpty())
             {
                s=replaceDebugRegNames(s,localRegNames);

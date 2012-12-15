@@ -36,6 +36,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
 
    private List<Highlighting> highlights = new ArrayList<Highlighting>();
    private List<Highlighting> traitHighlights = new ArrayList<Highlighting>();
+   private List<Highlighting> methodHighlights = new ArrayList<Highlighting>();
    private ABC abc;
    private int classIndex;
    public int lastTraitIndex = 0;
@@ -45,9 +46,42 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
       Main.abcMainFrame.detailPanel.showCard(DetailPanel.UNSUPPORTED_TRAIT_CARD);
    }
 
+   private boolean displayMethod(int pos,int methodIndex)
+   {
+      int bi = abc.findBodyIndex(methodIndex);
+      if (bi == -1) {
+         return false;
+      }
+      Main.abcMainFrame.detailPanel.showCard(DetailPanel.METHOD_TRAIT_CARD);            
+      if (Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.bodyIndex != bi) {
+         Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.setBodyIndex(bi, abc);
+         Main.abcMainFrame.detailPanel.methodTraitPanel.methodBodyParamsPanel.loadFromBody(abc.bodies[bi]);
+         Main.abcMainFrame.detailPanel.methodTraitPanel.methodInfoPanel.load(abc.bodies[bi].method_info, abc);
+      }
+      boolean success=false;
+      for (Highlighting h : highlights) {
+         if ((pos >= h.startPos) && (pos < h.startPos + h.len)) {
+            try {
+               Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.selectInstruction(abc.bodies[bi].code.adr2pos(h.offset));
+
+            } catch (ConvertException ex) {
+            }
+            success=true;
+            //return true;
+         }
+      }
+      return success;
+   }
+   
    public void caretUpdate(CaretEvent e) {
       getCaret().setVisible(true);
       int pos = getCaretPosition();
+      for (Highlighting tm : methodHighlights) {
+         if ((pos >= tm.startPos) && (pos < tm.startPos + tm.len)) {
+            displayMethod(pos,(int)tm.offset);
+            return;
+         }
+      }
       for (Highlighting th : traitHighlights) {
          if ((pos >= th.startPos) && (pos < th.startPos + th.len)) {
             lastTraitIndex = (int) th.offset;
@@ -59,26 +93,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
                   return;
                }
             }
-            int bi = abc.findBodyIndex(abc.findMethodIdByTraitId(classIndex, (int) th.offset));
-            if (bi == -1) {
-               break;
-            }
-            Main.abcMainFrame.detailPanel.showCard(DetailPanel.METHOD_TRAIT_CARD);            
-            if (Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.bodyIndex != bi) {
-               Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.setBodyIndex(bi, abc);
-               Main.abcMainFrame.detailPanel.methodTraitPanel.methodBodyParamsPanel.loadFromBody(abc.bodies[bi]);
-               Main.abcMainFrame.detailPanel.methodTraitPanel.methodInfoPanel.load(abc.bodies[bi].method_info, abc);
-            }
-            for (Highlighting h : highlights) {
-               if ((pos >= h.startPos) && (pos < h.startPos + h.len)) {
-                  try {
-                     Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.selectInstruction(abc.bodies[bi].code.adr2pos(h.offset));
-
-                  } catch (ConvertException ex) {
-                  }
-                  break;
-               }
-            }
+            displayMethod(pos,abc.findMethodIdByTraitId(classIndex, (int) th.offset));
             return;
          }         
       }
@@ -90,11 +105,13 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
       public String text;
       public List<Highlighting> highlights;
       public List<Highlighting> traitHighlights;
+      public List<Highlighting> methodHighlights;
 
-      public BufferedClass(String text, List<Highlighting> highlights, List<Highlighting> traitHighlights) {
+      public BufferedClass(String text, List<Highlighting> highlights, List<Highlighting> traitHighlights,List<Highlighting> methodHighlights) {
          this.text = text;
          this.highlights = highlights;
          this.traitHighlights = traitHighlights;
+         this.methodHighlights = methodHighlights;
       }
    }
    private HashMap<Integer, BufferedClass> bufferedClasses = new HashMap<Integer, BufferedClass>();
@@ -138,13 +155,15 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
          hilightedCode = abc.classToString(index, true, false);
          highlights = Highlighting.getInstrHighlights(hilightedCode);
          traitHighlights = Highlighting.getTraitHighlights(hilightedCode);
+         methodHighlights = Highlighting.getMethodHighlights(hilightedCode);
          hilightedCode = Highlighting.stripHilights(hilightedCode);
-         bufferedClasses.put(index, new BufferedClass(hilightedCode, highlights, traitHighlights));
+         bufferedClasses.put(index, new BufferedClass(hilightedCode, highlights, traitHighlights,methodHighlights));
       } else {
          BufferedClass bc = bufferedClasses.get(index);
          hilightedCode = bc.text;
          highlights = bc.highlights;
          traitHighlights = bc.traitHighlights;
+         methodHighlights=bc.methodHighlights;
       }
       setText(hilightedCode);
       this.abc = abc;

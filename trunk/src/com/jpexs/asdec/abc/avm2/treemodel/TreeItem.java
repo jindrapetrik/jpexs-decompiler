@@ -60,7 +60,7 @@ public abstract class TreeItem {
             return str;
         return Highlighting.hilighOffset(str, instruction.offset);
     }
-
+    
     public boolean isFalse() {
         return false;
     }

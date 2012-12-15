@@ -35,7 +35,7 @@ public class NewFunctionTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return hilight("new function(" + paramStr + "):" + returnStr + "\r\n{\r\n" + functionBody + "}\r\n");
+        return hilight("new function(" + paramStr + "):" + returnStr + "\r\n{\r\n") + functionBody + hilight("}\r\n");
     }
 
 
