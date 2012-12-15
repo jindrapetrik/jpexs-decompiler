@@ -1313,7 +1313,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                                 if (evalTo == -1)
                                     subend--;
                                 List commands = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, substart, subend).output;
-                                if ((evalTo == -1) && (casePos < code.get(switchPos).operands.length - 2)) {
+                                if ((evalTo == -1) && (casePos + 1< code.get(switchPos).operands.length - 2)) {
                                     if (commands.size() == 1) {
                                         commands.remove(0);
                                     }
