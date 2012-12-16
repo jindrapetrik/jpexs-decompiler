@@ -17,6 +17,7 @@
 
 package com.jpexs.asdec.gui.proxy;
 
+import com.jpexs.asdec.Configuration;
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.gui.View;
 import com.jpexs.proxy.CatchedListener;
@@ -74,7 +75,7 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
      */
     public ProxyFrame() {
 
-        listModel = new SWFListModel(Main.replacements);
+        listModel = new SWFListModel(Configuration.getReplacements());
         swfList = new JList(listModel);
         swfList.addMouseListener(this);
         swfList.setFont(new Font("Monospaced", Font.PLAIN, 12));
@@ -245,7 +246,7 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
             catchedContentTypes.add("text/xml");
             catchedContentTypes.add("application/xml");
             catchedContentTypes.add("application/octet-stream");
-            Server.startServer(port, Main.replacements, catchedContentTypes, this, this);
+            Server.startServer(port, Configuration.getReplacements(), catchedContentTypes, this, this);
             switchButton.setText("Stop proxy");
             portField.setEditable(false);
         } else {

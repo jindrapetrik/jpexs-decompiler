@@ -70,7 +70,7 @@ public class Main {
     public static boolean isCommandLineMode(){
        return commandLineMode;
     }
-
+  
     public static boolean DEBUG_COPY = false;
     /** Debug mode = throwing an error when comparing original file and recompiled */
     public static boolean DEBUG_MODE = false;
@@ -96,70 +96,14 @@ public class Main {
         return file;
     }
 
-    /**
-     * List of replacements
-     */
-    public static java.util.List<Replacement> replacements = new ArrayList<Replacement>();
-
-
+    
+  
     public static void setSubLimiter(boolean value)
     {
         if(value){
             AVM2Code.toSourceLimit=Main.SUBLIMITER;
         }else{
             AVM2Code.toSourceLimit=-1;
-        }
-    }
-    
-    private static String getASDecHome() {
-        String dir = ".";//System.getProperty("user.home");
-        if (!dir.endsWith(File.separator)) dir += File.separator;
-        dir += "config" + File.separator;
-        return dir;
-    }
-
-    private static String getReplacementsFile() {
-        return getASDecHome() + "replacements.ini";
-    }
-
-    /**
-     * Saves replacements to file for future use
-     */
-    public static void saveReplacements() {
-        try {            
-            if(replacements.isEmpty()){
-                File rf=new File(getReplacementsFile());
-                if(rf.exists()) rf.delete();
-            }else{
-                File f = new File(getASDecHome());
-                if (!f.exists()) f.mkdir();
-                PrintWriter pw = new PrintWriter(new FileWriter(getReplacementsFile()));
-                for (Replacement r : replacements) {
-                    pw.println(r.urlPattern);
-                    pw.println(r.targetFile);
-                }
-                pw.close();
-            }
-        } catch (IOException e) {
-
-        }
-    }
-
-    /**
-     * Load replacements from file
-     */
-    public static void loadReplacements() {
-        replacements = new ArrayList<Replacement>();
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(getReplacementsFile()));
-            String s = "";
-            while ((s = br.readLine()) != null) {
-                Replacement r = new Replacement(s, br.readLine());
-                replacements.add(r);
-            }
-            br.close();
-        } catch (IOException e) {
-
         }
     }
 
@@ -294,6 +238,7 @@ public class Main {
 
     public static boolean saveFileDialog() {
         JFileChooser fc = new JFileChooser();
+        fc.setCurrentDirectory(new File((String)Configuration.getConfig("lastSaveDir",".")));        
         JFrame f=new JFrame();
         View.setWindowIcon(f);
         int returnVal = fc.showSaveDialog(f);
@@ -301,6 +246,7 @@ public class Main {
             File file = fc.getSelectedFile();
             try {
                 Main.saveFile(file.getAbsolutePath());
+                Configuration.setConfig("lastSaveDir", file.getParentFile().getAbsolutePath());            
                 maskURL = null;
                 return true;
             } catch (IOException ex) {
@@ -313,8 +259,7 @@ public class Main {
     public static boolean openFileDialog() {
         maskURL = null;
         JFileChooser fc = new JFileChooser();
-        // FIXME debug only, think about keeping/removing it 
-        fc.setCurrentDirectory(new File("."));
+        fc.setCurrentDirectory(new File((String)Configuration.getConfig("lastOpenDir",".")));
         fc.setFileFilter(new FileFilter() {
 
             @Override
@@ -332,6 +277,7 @@ public class Main {
         View.setWindowIcon(f);
         int returnVal = fc.showOpenDialog(f);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
+            Configuration.setConfig("lastOpenDir", fc.getSelectedFile().getParentFile().getAbsolutePath());
             File selfile = fc.getSelectedFile();
             Main.openFile(selfile.getAbsolutePath());
             return true;
@@ -472,7 +418,7 @@ public class Main {
      */
     public static void main(String[] args) throws IOException {
         View.setWinLookAndFeel();
-        loadReplacements();
+        Configuration.load();
         if (args.length < 1) {
             showModeFrame();
         } else {
@@ -575,9 +521,9 @@ public class Main {
 
 
     public static String tempFile(String url) {
-        File f = new File(getASDecHome() + "saved" + File.separator);
+        File f = new File(Configuration.getASDecHome() + "saved" + File.separator);
         if (!f.exists()) f.mkdirs();
-        return getASDecHome() + "saved" + File.separator + "asdec_" + Integer.toHexString(url.hashCode()) + ".tmp";
+        return Configuration.getASDecHome() + "saved" + File.separator + "asdec_" + Integer.toHexString(url.hashCode()) + ".tmp";
 
     }
 
@@ -658,7 +604,7 @@ public class Main {
     }
 
     public static void exit() {
-        saveReplacements();
+        Configuration.save();
         System.exit(0);
     }
 
