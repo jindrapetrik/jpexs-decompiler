@@ -797,27 +797,36 @@ public class AVM2Code {
         return ret;
     }
 
+    private boolean cacheActual=false;
+    private List<Long> posCache;
+    private void buildCache()
+    {
+       posCache=new ArrayList<Long>();
+       long a = 0;
+       for (int i = 0; i < code.size(); i++) {
+            posCache.add(a);
+            a += code.get(i).getBytes().length;            
+       }
+       posCache.add(a);
+       cacheActual=true;
+    }
+    
     public int adr2pos(long address) throws ConvertException {
-        int a = 0;
-        for (int i = 0; i < code.size(); i++) {
-            if (a == address) {
-                return i;
-            }
-            a += code.get(i).getBytes().length;
-        }
-        if (a == address) {
-            return code.size();
-        }
-        throw new ConvertException("Bad jump", -1);
+       if(!cacheActual){
+          buildCache();
+       }
+       int ret=posCache.indexOf(address);
+       if(ret == -1) {
+          throw new ConvertException("Bad jump", -1);
+       }
+       return ret;
     }
 
     public int pos2adr(int pos) {
-        int a = 0;
-        for (int i = 0; i < pos; i++) {
-            a += code.get(i).getBytes().length;
-        }
-
-        return a;
+        if(!cacheActual){
+          buildCache();
+       }
+       return posCache.get(pos).intValue();     
     }
 
     private static String listToString(List<TreeItem> stack, ConstantPool constants) {
@@ -1713,7 +1722,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
             }
             if (debugMode)
                 System.out.println("CLOSE SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
-            clearKilledAssigments(output);
+            //clearKilledAssigments(output);
             return new ConvertOutput(stack, output);
         } catch (ConvertException cex) {
             throw cex;
@@ -2349,7 +2358,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
          } catch (ConvertException ex1) {
 
          }
-       }
+       }       
        return stats;
     }
 }
