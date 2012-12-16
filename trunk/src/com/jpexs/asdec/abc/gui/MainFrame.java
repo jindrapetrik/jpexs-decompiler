@@ -19,6 +19,7 @@ package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
+import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.gui.tablemodels.*;
 import com.jpexs.asdec.gui.LoadingPanel;
 import com.jpexs.asdec.gui.View;
@@ -289,6 +290,13 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
         menuFile.add(miClose);
         menuBar.add(menuFile);
 
+        JMenu menuOptions = new JMenu("Options");
+        JCheckBoxMenuItem  miSubLimiter = new JCheckBoxMenuItem ("Enable sub limiter");
+        miSubLimiter.setActionCommand("SUBLIMITER");
+        miSubLimiter.addActionListener(this);
+        menuOptions.add(miSubLimiter);
+        menuBar.add(menuOptions);
+        
         JMenu menuTools = new JMenu("Tools");
         JMenuItem miProxy = new JMenuItem("Proxy");
         miProxy.setActionCommand("SHOWPROXY");
@@ -356,7 +364,15 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
 
         if (e.getActionCommand().equals("SHOWPROXY")) {
             Main.showProxy();
-        }        
+        }    
+        
+        if (e.getActionCommand().equals("SUBLIMITER")) {      
+            if(e.getSource() instanceof JCheckBoxMenuItem){
+                  Main.setSubLimiter(((JCheckBoxMenuItem)e.getSource()).getState());
+            }
+            
+        } 
+         
         if (e.getActionCommand().equals("SAVE")) {
             try {
                 Main.saveFile(Main.file);

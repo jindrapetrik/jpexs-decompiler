@@ -18,6 +18,7 @@
 package com.jpexs.asdec;
 
 import com.jpexs.asdec.abc.NotSameException;
+import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.gui.AboutDialog;
 import com.jpexs.asdec.gui.LoadingDialog;
 import com.jpexs.asdec.gui.ModeFrame;
@@ -83,6 +84,9 @@ public class Main {
     public static final boolean LATEST_CONSTANTPOOL_HACK=false;
     /** Dump tags to stdout */
     public static boolean dump_tags = false;
+    
+    /** Limit of code subs (for obfuscated code) */
+    public static final int SUBLIMITER=500;
 
     //using parameter names in decompiling may cause problems because oficial programs like Flash CS 5.5 inserts wrong parameter names indices
     public static final boolean PARAM_NAMES_ENABLE=false;
@@ -98,6 +102,15 @@ public class Main {
     public static java.util.List<Replacement> replacements = new ArrayList<Replacement>();
 
 
+    public static void setSubLimiter(boolean value)
+    {
+        if(value){
+            AVM2Code.toSourceLimit=Main.SUBLIMITER;
+        }else{
+            AVM2Code.toSourceLimit=-1;
+        }
+    }
+    
     private static String getASDecHome() {
         String dir = ".";//System.getProperty("user.home");
         if (!dir.endsWith(File.separator)) dir += File.separator;

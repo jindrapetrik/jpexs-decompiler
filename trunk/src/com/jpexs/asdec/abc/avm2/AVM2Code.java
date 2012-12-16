@@ -60,6 +60,8 @@ import java.util.regex.Pattern;
 
 public class AVM2Code {
 
+   
+    public static int toSourceLimit=-1;
     public ArrayList<AVM2Instruction> code = new ArrayList<AVM2Instruction>();
     public static boolean DEBUG_REWRITE=false;
     public static final int OPT_U30 = 0x100;
@@ -1042,8 +1044,10 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
             System.out.println("OPEN SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
         //if(true) return "";
         toSourceCount++;
-        if (toSourceCount > 255) {
-            throw new ConvertException("StackOverflow", start);
+        if(toSourceLimit>0){
+            if (toSourceCount > toSourceLimit) {
+                  throw new ConvertException("Limit of subs("+toSourceLimit+") was reached", start);
+            }
         }
         List<TreeItem> output = new ArrayList();
         String ret = "";
