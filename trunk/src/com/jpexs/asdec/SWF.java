@@ -17,9 +17,9 @@
 
 package com.jpexs.asdec;
 
+import SevenZip.Compression.LZMA.Encoder;
 import com.jpexs.asdec.tags.Tag;
 import com.jpexs.asdec.types.RECT;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +62,23 @@ public class SWF {
      * Use compression
      */
     public boolean compressed = false;
+    
+    /**
+     * Use LZMA compression
+     */
+    public boolean lzma = true;
+    
+    /**
+     * Compressed size of the file (LZMA)
+     */
+    public long compressedSize;
+    
+    /**
+     * LZMA Properties
+     */
+    public byte lzmaProperties[];
+    
+    
 
     /**
      * Gets all tags with specified id
@@ -97,7 +114,9 @@ public class SWF {
             sos.writeTags(tags);
             sos.writeUI16(0);
             sos.close();
-            if (compressed) {
+            if (compressed && lzma) {
+                os.write('Z');
+            }else if(compressed){
                 os.write('C');
             } else {
                 os.write('F');
@@ -110,7 +129,32 @@ public class SWF {
             sos.writeUI32(data.length + 8);
 
             if (compressed) {
-                os = new DeflaterOutputStream(os);
+                if(lzma){
+                     Encoder enc=new Encoder();
+                     int val = lzmaProperties[0] & 0xFF;
+                     int lc = val % 9;
+                     int remainder = val / 9;
+                     int lp = remainder % 5;
+                     int pb = remainder / 5;
+                     int dictionarySize = 0;
+                     for (int i = 0; i < 4; i++)
+                        dictionarySize += ((int)(lzmaProperties[1 + i]) & 0xFF) << (i * 8);
+                     enc.SetDictionarySize(dictionarySize);
+                     enc.SetLcLpPb(lc, lp, pb);
+                     baos = new ByteArrayOutputStream();
+                     enc.SetEndMarkerMode(true);
+                     enc.Code(new ByteArrayInputStream(data), baos, -1, -1, null);                     
+                     data = baos.toByteArray();
+                     byte udata[]=new byte[4];
+                     udata[0]=(byte)(data.length&0xFF);
+                     udata[1]=(byte)((data.length>>8) & 0xFF);
+                     udata[2]=(byte)((data.length>>16) & 0xFF);
+                     udata[3]=(byte)((data.length>>24) & 0xFF);
+                     os.write(udata);
+                     os.write(lzmaProperties);
+                }else{
+                     os = new DeflaterOutputStream(os);
+                }
             }
             os.write(data);
         }
@@ -131,7 +175,7 @@ public class SWF {
         byte hdr[] = new byte[3];
         is.read(hdr);
         String shdr = new String(hdr);
-        if ((!shdr.equals("FWS")) && (!shdr.equals("CWS"))) {
+        if ((!shdr.equals("FWS")) && (!shdr.equals("CWS")) && (!shdr.equals("ZWS"))) {
             throw new IOException("Invalid SWF file");
         }
         version = is.read();
@@ -142,6 +186,26 @@ public class SWF {
             sis = new SWFInputStream(new InflaterInputStream(is), version, 8);
             compressed = true;
         }
+        
+        if (hdr[0] == 'Z') {
+            ByteArrayOutputStream baos=new ByteArrayOutputStream();
+            long outSize = sis.readUI32();
+            int propertiesSize = 5;
+				lzmaProperties = new byte[propertiesSize];
+				if (sis.read(lzmaProperties, 0, propertiesSize) != propertiesSize)
+					throw new IOException("LZMA:input .lzma file is too short");
+				SevenZip.Compression.LZMA.Decoder decoder = new SevenZip.Compression.LZMA.Decoder();
+				if (!decoder.SetDecoderProperties(lzmaProperties))
+					throw new IOException("LZMA:Incorrect stream properties");
+				
+				if (!decoder.Code(sis, baos, fileSize-8))
+					throw new IOException("LZMA:Error in data stream");
+            sis = new SWFInputStream(new ByteArrayInputStream(baos.toByteArray()), version, 8);            
+            compressed = true;
+            lzma = true;
+        }
+        
+        
 
 
         displayRect = sis.readRECT();
@@ -216,5 +280,5 @@ public class SWF {
            return false;
         }
         return true;
-    }
+    }   
 }

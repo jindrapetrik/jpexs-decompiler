@@ -26,7 +26,6 @@ import com.jpexs.asdec.gui.View;
 import com.jpexs.asdec.gui.proxy.ProxyFrame;
 import com.jpexs.asdec.tags.DoABCTag;
 import com.jpexs.asdec.tags.Tag;
-import com.jpexs.proxy.Replacement;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -38,8 +37,6 @@ import java.awt.event.MouseEvent;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
