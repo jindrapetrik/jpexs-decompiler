@@ -66,7 +66,7 @@ public class SWF {
     /**
      * Use LZMA compression
      */
-    public boolean lzma = true;
+    public boolean lzma = false;
     
     /**
      * Compressed size of the file (LZMA)
