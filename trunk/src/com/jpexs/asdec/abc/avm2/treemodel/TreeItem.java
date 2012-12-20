@@ -41,7 +41,7 @@ public abstract class TreeItem {
     public static final int PRECEDENCE_ASSIGMENT = 14;
     public static final int PRECEDENCE_COMMA = 15;
     public static final int NOPRECEDENCE = 16;
-
+         
 
     public int precedence = NOPRECEDENCE;
     public AVM2Instruction instruction;
@@ -53,7 +53,18 @@ public abstract class TreeItem {
 
 
     public abstract String toString(ConstantPool constants);
+    
+    public String toStringSemicoloned(ConstantPool constants)
+    {
+       return toString(constants)+(needsSemicolon()?";":"");
+    }
 
+    public boolean needsSemicolon()
+    {
+       return true;
+    }
+            
+    
 
     protected String hilight(String str) {
         if (instruction == null)

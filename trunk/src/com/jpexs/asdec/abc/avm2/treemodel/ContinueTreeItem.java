@@ -37,7 +37,7 @@ public class ContinueTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return hilight("continue") + " " + (isKnown ? "loop" : "unk") + loopPos + ";";
+        return hilight("continue") + " " + (isKnown ? "loop" : "unk") + loopPos;
     }
 
 }

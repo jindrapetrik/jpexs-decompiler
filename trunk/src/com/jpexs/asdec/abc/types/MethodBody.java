@@ -86,6 +86,7 @@ public class MethodBody implements Cloneable {
         try {
             HashMap<Integer,String> localRegNames=code.getLocalRegNamesFromDebug(abc);
             s += code.toSource(isStatic, classIndex, abc, constants, method_info, this, hilight);
+            s=s.trim();
             if(hilight)
             {
                s=Highlighting.hilighMethod(s, this.method_info);

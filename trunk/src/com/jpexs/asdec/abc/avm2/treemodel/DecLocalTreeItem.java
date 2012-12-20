@@ -32,7 +32,7 @@ public class DecLocalTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return InstructionDefinition.localRegName(regIndex) + hilight("--") + ";";
+        return InstructionDefinition.localRegName(regIndex) + hilight("--");
     }
 
 

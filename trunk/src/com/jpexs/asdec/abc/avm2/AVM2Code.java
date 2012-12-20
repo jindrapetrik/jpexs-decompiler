@@ -833,7 +833,7 @@ public class AVM2Code {
         String ret = "";
         for (int d = 0; d < stack.size(); d++) {
             TreeItem o = stack.get(d);
-            ret += o.toString(constants) + "\r\n";
+            ret += o.toStringSemicoloned(constants) + "\r\n";
         }
         return ret;
     }
@@ -1172,7 +1172,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                     throw new UnknownJumpException(stack, ip, output);
                 }
                 AVM2Instruction ins = code.get(ip);
-                //Ify s vice podminkama
+                //Ifs with multiple conditions
                 if (ins.definition instanceof JumpIns) {
                     if (ins.operands[0] == 0) {
                         ip++;
@@ -1468,6 +1468,12 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                         if (ip - 1 >= start) {
                             insBefore = code.get(ip - 1);
                         }
+                        if (insAfter.definition instanceof ConvertBIns) { //SWF compiled with debug contain convert_b
+                           ip++;
+                           addr=pos2adr(ip);
+                           insAfter = code.get(ip + 1);
+                        }
+                        
                         boolean isAnd = false;
                         if (insAfter.definition instanceof IfFalseIns) {
                             //stack.add("(" + stack.pop() + ")&&");
@@ -1847,6 +1853,12 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
         } catch (Exception ex) {
         }
         for (int p = 0; p < parts.length; p++) {
+            if(p==parts.length-1){
+               if(parts[p].equals(""))
+               {
+                  continue;
+               }
+            }
             String strippedP = Highlighting.stripHilights(parts[p]);
             if (strippedP.endsWith(":") && (!strippedP.startsWith("case ")) && (!strippedP.equals("default:"))) {
                 String loopname = strippedP.substring(0, strippedP.length() - 1);
@@ -1880,7 +1892,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                 level++;
                 sub += tabString(level) + parts[p] + "\r\n";
                 level++;
-            } else if (strippedP.equals("}")) {
+            } else if (strippedP.equals("}")||strippedP.equals("};")) {
                 level--;
                 sub += tabString(level) + parts[p] + "\r\n";
                 level--;

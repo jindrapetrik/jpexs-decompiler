@@ -36,7 +36,7 @@ public class BreakTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return hilight("break") + " loop" + loopPos + ";";
+        return hilight("break") + " loop" + loopPos;
     }
 
 }

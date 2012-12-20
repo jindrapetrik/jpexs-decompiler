@@ -46,7 +46,7 @@ public class CallPropertyTreeItem extends TreeItem {
             }
             args = args + arguments.get(a).toString(constants);
         }
-        return formatProperty(constants, receiver, propertyName) + hilight("(") + args + hilight(")") + (isVoid ? ";" : "");
+        return formatProperty(constants, receiver, propertyName) + hilight("(") + args + hilight(")");
     }
 
 

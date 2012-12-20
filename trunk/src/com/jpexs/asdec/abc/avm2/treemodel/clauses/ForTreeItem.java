@@ -70,13 +70,18 @@ public class ForTreeItem extends LoopTreeItem implements Block {
         }
         ret += hilight(")") + "\r\n{\r\n";
         for (TreeItem ti : commands) {
-            ret += ti.toString(constants) + "\r\n";
+            ret += ti.toStringSemicoloned(constants) + "\r\n";
         }
         ret += hilight("}") + "\r\n";
         ret += ":loop" + loopBreak;
         return ret;
     }
 
+    @Override
+   public boolean needsSemicolon() {
+      return false;
+   }
+    
     public List<ContinueTreeItem> getContinues() {
         List<ContinueTreeItem> ret = new ArrayList<ContinueTreeItem>();
         for (TreeItem ti : commands) {

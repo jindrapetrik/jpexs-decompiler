@@ -49,7 +49,7 @@ public class CallSuperTreeItem extends TreeItem {
         }
         String calee = receiver.toString(constants) + ".";
         if (Highlighting.stripHilights(calee).equals("this.")) calee = "";
-        return calee + hilight("super.") + multiname.toString(constants) + hilight("(") + args + hilight(")") + (isVoid ? ";" : "");
+        return calee + hilight("super.") + multiname.toString(constants) + hilight("(") + args + hilight(")");
     }
 
 

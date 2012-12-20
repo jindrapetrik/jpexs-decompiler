@@ -43,19 +43,24 @@ public class IfTreeItem extends TreeItem implements Block {
         String ret = "";
         ret = hilight("if(") + expression.toString(constants) + hilight(")\r\n{\r\n");
         for (TreeItem ti : onTrue) {
-            ret += ti.toString(constants) + "\r\n";
+            ret += ti.toStringSemicoloned(constants) + "\r\n";
         }
         ret += hilight("}");
         if (onFalse.size() > 0) {
             ret += hilight("\r\nelse\r\n{\r\n");
             for (TreeItem ti : onFalse) {
-                ret += ti.toString(constants) + "\r\n";
+                ret += ti.toStringSemicoloned(constants) + "\r\n";
             }
             ret += hilight("}");
         }
         return ret;
     }
 
+    @Override
+   public boolean needsSemicolon() {
+      return false;
+   }
+    
     public List<ContinueTreeItem> getContinues() {
         List<ContinueTreeItem> ret = new ArrayList<ContinueTreeItem>();
         for (TreeItem ti : onTrue) {

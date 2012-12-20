@@ -34,7 +34,7 @@ public class SetLocalTreeItem extends TreeItem implements SetTypeTreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return hilight(InstructionDefinition.localRegName(regIndex) + "=") + value.toString(constants) + ";";
+        return hilight(InstructionDefinition.localRegName(regIndex) + "=") + value.toString(constants);
     }
 
    public TreeItem getObject() {

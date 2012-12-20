@@ -30,4 +30,8 @@ public abstract class LoopTreeItem extends TreeItem {
         this.loopBreak = loopBreak;
         this.loopContinue = loopContinue;
     }
+    @Override
+   public boolean needsSemicolon() {
+      return false;
+   }
 }

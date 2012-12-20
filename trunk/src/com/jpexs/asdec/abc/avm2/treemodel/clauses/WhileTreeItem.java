@@ -43,7 +43,7 @@ public class WhileTreeItem extends LoopTreeItem implements Block {
         ret += "loop" + loopBreak + ":\r\n";
         ret += hilight("while(") + expression.toString(constants) + hilight(")") + "\r\n{\r\n";
         for (TreeItem ti : commands) {
-            ret += ti.toString(constants) + "\r\n";
+            ret += ti.toStringSemicoloned(constants) + "\r\n";
         }
         ret += hilight("}") + "\r\n";
         ret += ":loop" + loopBreak;
@@ -62,4 +62,9 @@ public class WhileTreeItem extends LoopTreeItem implements Block {
         }
         return ret;
     }
+    
+    @Override
+   public boolean needsSemicolon() {
+      return false;
+   }
 }

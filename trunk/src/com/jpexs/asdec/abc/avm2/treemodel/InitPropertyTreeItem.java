@@ -35,7 +35,7 @@ public class InitPropertyTreeItem extends TreeItem implements SetTypeTreeItem{
 
     @Override
     public String toString(ConstantPool constants) {
-        return formatProperty(constants, object, propertyName) + hilight("=") + value.toString(constants) + ";";
+        return formatProperty(constants, object, propertyName) + hilight("=") + value.toString(constants);
     }
 
    public TreeItem getObject() {

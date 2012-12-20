@@ -39,7 +39,7 @@ public class SetSuperTreeItem extends TreeItem {
     public String toString(ConstantPool constants) {
         String calee = object.toString(constants) + ".";
         if (Highlighting.stripHilights(calee).equals("this.")) calee = "";
-        return calee + hilight("super.") + propertyName.toString(constants) + hilight("=") + value.toString(constants) + ";";
+        return calee + hilight("super.") + propertyName.toString(constants) + hilight("=") + value.toString(constants);
     }
 
 

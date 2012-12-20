@@ -54,6 +54,11 @@ public class ForEachTreeItem extends LoopTreeItem implements Block {
         this.expression = expression;
         this.commands = commands;
     }
+    
+    @Override
+   public boolean needsSemicolon() {
+      return false;
+   }
 
     @Override
     public String toString(ConstantPool constants) {
@@ -61,7 +66,7 @@ public class ForEachTreeItem extends LoopTreeItem implements Block {
         ret += "loop" + loopBreak + ":\r\n";
         ret += hilight("for ") + expression.toString(constants) + "\r\n{\r\n";
         for (TreeItem ti : commands) {
-            ret += ti.toString(constants) + "\r\n";
+            ret += ti.toStringSemicoloned(constants) + "\r\n";
         }
         ret += hilight("}") + "\r\n";
         ret += ":loop" + loopBreak;

@@ -48,7 +48,7 @@ public class SetSlotTreeItem extends TreeItem implements SetTypeTreeItem {
                 }
             }
         }
-        return ret + hilight(slotName.getName(constants)) + hilight("=") + value.toString(constants) + ";";
+        return ret + hilight(slotName.getName(constants)) + hilight("=") + value.toString(constants);
     }
 
    public TreeItem getObject() {

@@ -33,7 +33,7 @@ public class SetGlobalSlotTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return hilight("setglobalslot(" + slotId + ",") + value.toString(constants) + hilight(")") + ";";
+        return hilight("setglobalslot(" + slotId + ",") + value.toString(constants) + hilight(")");
     }
 
 

@@ -31,7 +31,7 @@ public class DefineLocalTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        if (value == null) return "var " + stripQuotes(name) + ";";
-        return "var " + stripQuotes(name) + "=" + value.toString(constants) + ";";
+        if (value == null) return "var " + stripQuotes(name);
+        return "var " + stripQuotes(name) + "=" + value.toString(constants);
     }
 }

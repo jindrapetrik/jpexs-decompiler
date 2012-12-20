@@ -51,7 +51,7 @@ public class SwitchTreeItem extends LoopTreeItem implements Block {
             ret += "case " + caseValues.get(i).toString(constants) + ":\r\n";
             ret += AVM2Code.IDENTOPEN + "\r\n";
             for (int j = 0; j < caseCommands.get(i).size(); j++) {
-                ret += caseCommands.get(i).get(j).toString(constants) + "\r\n";
+                ret += caseCommands.get(i).get(j).toStringSemicoloned(constants) + "\r\n";
             }
             ret += AVM2Code.IDENTCLOSE + "\r\n";
         }
@@ -59,7 +59,7 @@ public class SwitchTreeItem extends LoopTreeItem implements Block {
             ret += hilight("default") + ":\r\n";
             ret += AVM2Code.IDENTOPEN + "\r\n";
             for (int j = 0; j < defaultCommands.size(); j++) {
-                ret += defaultCommands.get(j).toString(constants) + "\r\n";
+                ret += defaultCommands.get(j).toStringSemicoloned(constants) + "\r\n";
             }
             ret += AVM2Code.IDENTCLOSE + "\r\n";
         }
@@ -68,6 +68,11 @@ public class SwitchTreeItem extends LoopTreeItem implements Block {
         return ret;
     }
 
+    @Override
+   public boolean needsSemicolon() {
+      return false;
+   }
+    
     public List<ContinueTreeItem> getContinues() {
         List<ContinueTreeItem> ret = new ArrayList<ContinueTreeItem>();
 

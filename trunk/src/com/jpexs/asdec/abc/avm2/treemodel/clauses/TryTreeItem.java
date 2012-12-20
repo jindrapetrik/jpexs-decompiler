@@ -46,21 +46,21 @@ public class TryTreeItem extends TreeItem implements Block {
         String ret = "";
         ret += "try\r\n{\r\n";
         for (TreeItem ti : tryCommands) {
-            ret += ti.toString(constants) + "\r\n";
+            ret += ti.toStringSemicoloned(constants) + "\r\n";
         }
         ret += "}";
         for (int e = 0; e < catchExceptions.size(); e++) {
             ret += "\r\ncatch(" + catchExceptions.get(e).getVarName(constants) + ":" + catchExceptions.get(e).getTypeName(constants) + ")\r\n{\r\n";
             List<TreeItem> commands = catchCommands.get(e);
             for (TreeItem ti : commands) {
-                ret += ti.toString(constants) + "\r\n";
+                ret += ti.toStringSemicoloned(constants) + "\r\n";
             }
             ret += "}";
         }
         if (finallyCommands.size() > 0) {
             ret += "\r\nfinally\r\n{\r\n";
             for (TreeItem ti : finallyCommands) {
-                ret += ti.toString(constants) + "\r\n";
+                ret += ti.toStringSemicoloned(constants) + "\r\n";
             }
             ret += "}";
         }
@@ -99,4 +99,9 @@ public class TryTreeItem extends TreeItem implements Block {
         }
         return ret;
     }
+    
+    @Override
+   public boolean needsSemicolon() {
+      return false;
+   }
 }

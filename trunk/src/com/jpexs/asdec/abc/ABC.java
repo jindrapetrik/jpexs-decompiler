@@ -533,20 +533,20 @@ public class ABC {
       return null;
    }
 
-   private String addTabs(String s, int tabs) {
+   private String addTabs(String s, int tabs) {      
       String parts[] = s.split("\r\n");
       if (!s.contains("\r\n")) {
          parts = s.split("\n");
-      }
+      }     
       String ret = "";
       for (int i = 0; i < parts.length; i++) {
          for (int t = 0; t < tabs; t++) {
             ret += IDENT_STRING;
-         }
+         }         
          ret += parts[i];
          if (i < parts.length - 1) {
             ret += "\r\n";
-         }
+         }    
       }
       return ret;
    }

@@ -29,7 +29,7 @@ public class ReturnVoidTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return hilight("return") + ";";
+        return hilight("return");
     }
 
 

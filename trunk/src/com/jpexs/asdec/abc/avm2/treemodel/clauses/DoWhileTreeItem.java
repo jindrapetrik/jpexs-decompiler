@@ -31,6 +31,13 @@ public class DoWhileTreeItem extends LoopTreeItem implements Block {
     public List<TreeItem> commands;
     public TreeItem expression;
 
+   @Override
+   public boolean needsSemicolon() {
+      return false;
+   }
+    
+    
+
     public DoWhileTreeItem(AVM2Instruction instruction, int loopBreak, int loopContinue, List<TreeItem> commands, TreeItem expression) {
         super(instruction, loopBreak, loopContinue);
         this.expression = expression;
@@ -43,7 +50,7 @@ public class DoWhileTreeItem extends LoopTreeItem implements Block {
         ret += "loop" + loopBreak + ":\r\n";
         ret += hilight("do\r\n{") + "\r\n";
         for (TreeItem ti : commands) {
-            ret += ti.toString(constants) + "\r\n";
+            ret += ti.toStringSemicoloned(constants) + "\r\n";
         }
         ret += hilight("}\r\nwhile(") + expression.toString(constants) + hilight(");") + "\r\n";
         ret += ":loop" + loopBreak;
