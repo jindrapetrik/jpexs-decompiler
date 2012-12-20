@@ -41,6 +41,11 @@ public class Highlighting {
     public long offset;
 
     /**
+     * Turn hignlighting on/off
+     */
+    public static boolean doHighlight=true;
+    
+    /**
      * Returns a string representation of the object
      *
      * @return a string representation of the object.
@@ -49,6 +54,8 @@ public class Highlighting {
     public String toString() {
         return "" + startPos + "-" + (startPos + len) + " ofs" + offset;
     }
+    
+    
 
     /**
      * Constructor
@@ -85,6 +92,9 @@ public class Highlighting {
      * @return Highlighted text
      */
     public static String hilighOffset(String text, long offset) {
+        if(!doHighlight){
+           return text;
+        }         
         return OFSOPEN + offset + OFSCLOSE + text + OFSEND;
     }
     
@@ -96,6 +106,9 @@ public class Highlighting {
      * @return Highlighted text
      */
     public static String hilighMethod(String text, long index) {
+        if(!doHighlight){
+           return text;
+        } 
         return hilighMethodBegin(index) + text + hilighMethodEnd();
     }
 
@@ -105,6 +118,9 @@ public class Highlighting {
      * @return 
      */
     public static String hilighMethodBegin(long index) {
+       if(!doHighlight){
+           return "";
+       } 
        return METHODOPEN + index + METHODCLOSE;
     }
     
@@ -113,6 +129,9 @@ public class Highlighting {
      * @return 
      */
     public static String hilighMethodEnd() {
+       if(!doHighlight){
+           return "";
+        } 
        return METHODEND;
     }
     /**
@@ -123,6 +142,9 @@ public class Highlighting {
      * @return Highlighted text
      */
     public static String hilighTrait(String text, long offset) {
+        if(!doHighlight){
+           return text;
+        } 
         return TRAITOPEN + offset + TRAITCLOSE + text + TRAITEND;
     }
 
@@ -133,6 +155,9 @@ public class Highlighting {
      * @return Text with no highlights
      */
     public static String stripHilights(String text) {
+        if(!doHighlight){
+           return text;
+        } 
         text = stripInstrHilights(text);
         text = stripTraitHilights(text);
         text = stripMethodHilights(text);

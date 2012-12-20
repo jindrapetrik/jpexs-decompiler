@@ -821,7 +821,7 @@ public class AVM2Code {
        }
        return ret;
     }
-
+    
     public int pos2adr(int pos) {
         if(!cacheActual){
           buildCache();

@@ -589,6 +589,10 @@ public class ABC {
    }
 
    public String classToString(int i, boolean highlight, boolean pcode) {
+      if(!highlight)
+      {
+         Highlighting.doHighlight=false;
+      }
       String ret = "";
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       PrintStream out = new PrintStream(baos);
@@ -740,7 +744,7 @@ public class ABC {
       out.println(IDENT_STRING + "}");//class
       out.println("}");//package
       out.flush();
-
+      Highlighting.doHighlight=true;
       return baos.toString();
    }
 
