@@ -25,9 +25,10 @@ import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.operations.AddTreeItem;
 import com.jpexs.asdec.abc.types.MethodInfo;
+import java.util.HashMap;
 
 import java.util.List;
-import java.util.Stack;
+import java.util.Stack; import java.util.HashMap;
 
 
 public class AddIns extends InstructionDefinition {
@@ -59,7 +60,7 @@ public class AddIns extends InstructionDefinition {
     }
 
     @Override
-    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc) {
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc,HashMap<Integer,String> localRegNames) {
         TreeItem v2 = (TreeItem) stack.pop();
         TreeItem v1 = (TreeItem) stack.pop();
         stack.push(new AddTreeItem(ins, v1, v2));

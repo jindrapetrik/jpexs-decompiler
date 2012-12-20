@@ -17,7 +17,7 @@
 
 package com.jpexs.asdec.abc.avm2.treemodel;
 
-import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.ConstantPool; import java.util.HashMap;
 
 
 public class ThisTreeItem extends TreeItem {
@@ -27,7 +27,7 @@ public class ThisTreeItem extends TreeItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
         return "this";
     }
 

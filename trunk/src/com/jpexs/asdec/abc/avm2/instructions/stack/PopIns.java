@@ -31,7 +31,7 @@ import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.MethodInfo;
 
 import java.util.List;
-import java.util.Stack;
+import java.util.Stack; import java.util.HashMap;
 
 
 public class PopIns extends InstructionDefinition {
@@ -46,7 +46,7 @@ public class PopIns extends InstructionDefinition {
     }
 
     @Override
-    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc) {
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer,String> localRegNames) {
         if (stack.size() > 0)
         {
             TreeItem top=stack.pop();

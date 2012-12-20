@@ -17,7 +17,7 @@
 
 package com.jpexs.asdec.abc.avm2.treemodel;
 
-import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.ConstantPool; import java.util.HashMap;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 
 import java.util.List;
@@ -32,13 +32,13 @@ public class NewArrayTreeItem extends TreeItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
         String args = "";
         for (int a = 0; a < values.size(); a++) {
             if (a > 0) {
                 args = args + ",";
             }
-            args = args + values.get(a).toString(constants);
+            args = args + values.get(a).toString(constants,localRegNames);
         }
         return hilight("[") + args + hilight("]");
     }

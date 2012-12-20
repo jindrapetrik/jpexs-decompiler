@@ -17,7 +17,7 @@
 
 package com.jpexs.asdec.abc.avm2.treemodel.clauses;
 
-import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.ConstantPool; import java.util.HashMap;
 import com.jpexs.asdec.abc.avm2.treemodel.ContinueTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.ABCException;
@@ -42,25 +42,25 @@ public class TryTreeItem extends TreeItem implements Block {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
         String ret = "";
         ret += "try\r\n{\r\n";
         for (TreeItem ti : tryCommands) {
-            ret += ti.toStringSemicoloned(constants) + "\r\n";
+            ret += ti.toStringSemicoloned(constants,localRegNames) + "\r\n";
         }
         ret += "}";
         for (int e = 0; e < catchExceptions.size(); e++) {
             ret += "\r\ncatch(" + catchExceptions.get(e).getVarName(constants) + ":" + catchExceptions.get(e).getTypeName(constants) + ")\r\n{\r\n";
             List<TreeItem> commands = catchCommands.get(e);
             for (TreeItem ti : commands) {
-                ret += ti.toStringSemicoloned(constants) + "\r\n";
+                ret += ti.toStringSemicoloned(constants,localRegNames) + "\r\n";
             }
             ret += "}";
         }
         if (finallyCommands.size() > 0) {
             ret += "\r\nfinally\r\n{\r\n";
             for (TreeItem ti : finallyCommands) {
-                ret += ti.toStringSemicoloned(constants) + "\r\n";
+                ret += ti.toStringSemicoloned(constants,localRegNames) + "\r\n";
             }
             ret += "}";
         }

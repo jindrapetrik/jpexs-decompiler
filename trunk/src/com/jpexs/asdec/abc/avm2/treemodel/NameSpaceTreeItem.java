@@ -17,7 +17,7 @@
 
 package com.jpexs.asdec.abc.avm2.treemodel;
 
-import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.ConstantPool; import java.util.HashMap;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 
 
@@ -29,7 +29,7 @@ public class NameSpaceTreeItem extends TreeItem {
         this.namespaceIndex = namespaceIndex;
     }
 
-    public String toString(ConstantPool constants) {
+    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
         if (namespaceIndex == 0) return "*";
         return hilight(constants.constant_namespace[namespaceIndex].toString(constants));
     }

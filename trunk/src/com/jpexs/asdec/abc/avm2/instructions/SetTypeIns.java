@@ -22,9 +22,9 @@ import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.MethodInfo;
 
 import java.util.List;
-import java.util.Stack;
+import java.util.Stack; import java.util.HashMap;
 
 
 public interface SetTypeIns {
-    public abstract String getObject(Stack<TreeItem> stack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body);
+    public abstract String getObject(Stack<TreeItem> stack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body,HashMap<Integer,String> localRegNames);
 }

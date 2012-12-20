@@ -47,29 +47,28 @@ public class MethodBody implements Cloneable {
         s += "\r\nCode:\r\n" + code.toString();
         return s;
     }
-
-     private String replaceDebugRegNames(String code,HashMap<Integer,String> debugRegNames)
+     
+     public HashMap<Integer,String> getLocalRegNames(ABC abc)
      {
-         for(Integer key:debugRegNames.keySet())
-         {
-            code = code.replace(InstructionDefinition.localRegName(key), debugRegNames.get(key));
-         }
-         return code;
-     }
-     private String replaceParams(String code, ABC abc) {
+        HashMap<Integer,String> debugRegNames=code.getLocalRegNamesFromDebug(abc);
+        if(!debugRegNames.isEmpty())
+        {
+           return debugRegNames;
+        }
+        HashMap<Integer,String> ret=new HashMap<Integer,String>();
         for (int i = 1; i <= abc.method_info[this.method_info].param_types.length; i++) {
             String paramName="param"+i;
             if(abc.method_info[this.method_info].flagHas_paramnames()&&Main.PARAM_NAMES_ENABLE){
                paramName=abc.constants.constant_string[abc.method_info[this.method_info].paramNames[i-1]];
             }
-            code = code.replace(InstructionDefinition.localRegName(i), paramName);
+            ret.put(i, paramName);
         }
         if(abc.method_info[this.method_info].flagNeed_rest())
         {
-           code = code.replace(InstructionDefinition.localRegName(abc.method_info[this.method_info].param_types.length+1), "rest");
+           ret.put(abc.method_info[this.method_info].param_types.length+1,"rest");
         }
-        return code;
-    }
+        return ret;
+     }    
 
     public String toString(boolean pcode,boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[]) {
         return toString(pcode,isStatic, classIndex, abc, constants, method_info, false);
@@ -83,19 +82,12 @@ public class MethodBody implements Cloneable {
         if(pcode){
          s+=code.toASMSource(constants, this);
         }else{
-        try {
-            HashMap<Integer,String> localRegNames=code.getLocalRegNamesFromDebug(abc);
-            s += code.toSource(isStatic, classIndex, abc, constants, method_info, this, hilight);
+        try {            
+            s += code.toSource(isStatic, classIndex, abc, constants, method_info, this, hilight,getLocalRegNames(abc));
             s=s.trim();
             if(hilight)
             {
                s=Highlighting.hilighMethod(s, this.method_info);
-            }
-            if(!localRegNames.isEmpty())
-            {
-               s=replaceDebugRegNames(s,localRegNames);
-            }else{
-               s = replaceParams(s, abc);
             }
         } catch (Exception ex) {
             s = "//error:" + ex.toString();

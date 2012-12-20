@@ -19,7 +19,7 @@ package com.jpexs.asdec.abc.avm2.instructions;
 
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 
-import java.util.Stack;
+import java.util.Stack; import java.util.HashMap;
 
 
 public interface IfTypeIns {

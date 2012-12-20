@@ -24,6 +24,7 @@ import com.jpexs.asdec.abc.types.MethodInfo;
 import com.jpexs.asdec.abc.types.ValueKind;
 import com.jpexs.asdec.helpers.Helper;
 import com.jpexs.asdec.helpers.Highlighting;
+import java.util.HashMap;
 
 
 public class TraitSlotConst extends Trait {
@@ -55,7 +56,7 @@ public class TraitSlotConst extends Trait {
         }
 
         if (assignedValue != null) {
-            valueStr = " = " + Highlighting.stripHilights(assignedValue.toString(constants));
+            valueStr = " = " + Highlighting.stripHilights(assignedValue.toString(constants,new HashMap<Integer,String>()));
         }
 
         String slotconst = "var";

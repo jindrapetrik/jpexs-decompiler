@@ -17,7 +17,7 @@
 
 package com.jpexs.asdec.abc.avm2.treemodel.operations;
 
-import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.ConstantPool; import java.util.HashMap;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.FullMultinameTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
@@ -34,8 +34,8 @@ public class DeletePropertyTreeItem extends TreeItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("delete ") + object.toString(constants) + "[" + propertyName.toString(constants) + "]";
+    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
+        return hilight("delete ") + object.toString(constants,localRegNames) + "[" + propertyName.toString(constants,localRegNames) + "]";
     }
 
 

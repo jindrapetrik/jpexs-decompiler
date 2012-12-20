@@ -17,7 +17,7 @@
 
 package com.jpexs.asdec.abc.avm2.treemodel;
 
-import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.ConstantPool; import java.util.HashMap;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 
@@ -36,8 +36,8 @@ public class LocalRegTreeItem extends TreeItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight(InstructionDefinition.localRegName(regIndex));
+    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
+        return hilight(localRegName(localRegNames, regIndex));
     }
 
     @Override

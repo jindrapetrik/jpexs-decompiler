@@ -17,7 +17,7 @@
 
 package com.jpexs.asdec.abc.avm2.treemodel;
 
-import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.ConstantPool; import java.util.HashMap;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 
 import java.util.List;
@@ -36,17 +36,17 @@ public class ConstructPropTreeItem extends TreeItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
         String argStr = "";
         for (int a = 0; a < args.size(); a++) {
             if (a > 0) {
                 argStr = argStr + ",";
             }
-            argStr = argStr + args.get(a).toString(constants);
+            argStr = argStr + args.get(a).toString(constants,localRegNames);
         }
-        String objstr = object.toString(constants);
+        String objstr = object.toString(constants,localRegNames);
         if (!objstr.equals("")) objstr += ".";
-        return hilight("new ") + objstr + propertyName.toString(constants) + hilight("(") + argStr + hilight(")");
+        return hilight("new ") + objstr + propertyName.toString(constants,localRegNames) + hilight("(") + argStr + hilight(")");
 
     }
 

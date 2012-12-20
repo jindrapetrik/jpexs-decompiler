@@ -17,7 +17,7 @@
 
 package com.jpexs.asdec.abc.avm2.treemodel.operations;
 
-import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.ConstantPool; import java.util.HashMap;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 
@@ -33,8 +33,8 @@ public abstract class UnaryOpTreeItem extends TreeItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        String s = value.toString(constants);
+    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
+        String s = value.toString(constants,localRegNames);
         if (value.precedence > precedence) s = "(" + s + ")";
         return hilight(operator) + s;
     }

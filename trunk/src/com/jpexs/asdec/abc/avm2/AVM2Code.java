@@ -829,11 +829,11 @@ public class AVM2Code {
        return posCache.get(pos).intValue();     
     }
 
-    private static String listToString(List<TreeItem> stack, ConstantPool constants) {
+    private static String listToString(List<TreeItem> stack, ConstantPool constants,HashMap<Integer,String> localRegNames) {
         String ret = "";
         for (int d = 0; d < stack.size(); d++) {
             TreeItem o = stack.get(d);
-            ret += o.toStringSemicoloned(constants) + "\r\n";
+            ret += o.toStringSemicoloned(constants,localRegNames) + "\r\n";
         }
         return ret;
     }
@@ -1047,7 +1047,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
        return pos2adr(fixIPAfterDebugLine(adr2pos(addr)));
     }
 
-    private ConvertOutput toSource(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, int start, int end) throws ConvertException {
+    private ConvertOutput toSource(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, int start, int end,HashMap<Integer,String> localRegNames) throws ConvertException {
         boolean debugMode = false;
         if (debugMode)
             System.out.println("OPEN SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
@@ -1126,7 +1126,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                                                     if (swins.operands.length >= 3) {
                                                         if (swins.operands[0] == swins.getBytes().length) {
                                                             if (adr2pos(pos2adr(f) + swins.operands[2]) < finStart) {
-                                                                finallyCommands = toSource(isStatic, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, finStart, f - 1).output;
+                                                                finallyCommands = toSource(isStatic, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, finStart, f - 1,localRegNames).output;
                                                                 returnPos = f + 1;
                                                                 break;
                                                             }
@@ -1151,10 +1151,10 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                             }
                             Stack<TreeItem> substack = new Stack<TreeItem>();
                             substack.add(new ExceptionTreeItem(catchedExceptions.get(e)));
-                            catchedCommands.add(toSource(isStatic, classIndex, localRegs, substack, new Stack<TreeItem>(), abc, constants, method_info, body, adr2pos(fixAddrAfterDebugLine(catchedExceptions.get(e).target)), eendpos).output);
+                            catchedCommands.add(toSource(isStatic, classIndex, localRegs, substack, new Stack<TreeItem>(), abc, constants, method_info, body, adr2pos(fixAddrAfterDebugLine(catchedExceptions.get(e).target)), eendpos,localRegNames).output);
                         }
 
-                        List<TreeItem> tryCommands = toSource(isStatic, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, ip, endpos - 1).output;
+                        List<TreeItem> tryCommands = toSource(isStatic, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, ip, endpos - 1,localRegNames).output;
 
 
                         output.add(new TryTreeItem(tryCommands, catchedExceptions, catchedCommands, finallyCommands));
@@ -1279,7 +1279,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                                 throw new ConvertException("Unknown pattern: no setlocal before lookupswitch", switchPos);
                             }
                             loopList.add(new Loop(ip, switchPos + 1));
-                            Stack<TreeItem> substack = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, jumpPos, evalTo - 1).stack;
+                            Stack<TreeItem> substack = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, jumpPos, evalTo - 1,localRegNames).stack;
                             TreeItem switchedValue = substack.pop();
                             //output.add("loop" + (switchPos + 1) + ":");
                             int switchBreak = switchPos + 1;
@@ -1314,7 +1314,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
 
 
                                 if (evalTo > -1) {
-                                    substack = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, curPos, evalTo - 1).stack;
+                                    substack = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, curPos, evalTo - 1,localRegNames).stack;
                                     casesList.add(substack.pop());
                                 }
                                 int substart = adr2pos(code.get(switchPos).operands[2 + casePos] + pos2adr(switchPos));
@@ -1325,7 +1325,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
 
                                 if (evalTo == -1)
                                     subend--;
-                                List commands = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, substart, subend).output;
+                                List commands = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, substart, subend,localRegNames).output;
                                 if ((evalTo == -1) && (casePos + 1< code.get(switchPos).operands.length - 2)) {
                                     if (commands.size() == 1) {
                                         commands.remove(0);
@@ -1372,16 +1372,16 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                         loopList.add(currentLoop);
 
 
-                        ConvertOutput co = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, jumpPos, adr2pos(afterBackJumpAddr) - 2);
+                        ConvertOutput co = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, jumpPos, adr2pos(afterBackJumpAddr) - 2,localRegNames);
                         Stack<TreeItem> substack = co.stack;
-                        backJumpIns.definition.translate(isStatic, classIndex, localRegs, substack, scopeStack, constants, backJumpIns, method_info, output, body, abc);
+                        backJumpIns.definition.translate(isStatic, classIndex, localRegs, substack, scopeStack, constants, backJumpIns, method_info, output, body, abc,localRegNames);
 
                         TreeItem expression = substack.pop();
                         List<TreeItem> subins = new ArrayList<TreeItem>();
                         boolean isFor = false;
                         List<TreeItem> finalExpression = new ArrayList<TreeItem>();
                         try {
-                            subins = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, adr2pos(secondAddr) + 1/*label*/, jumpPos - 1).output;
+                            subins = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, adr2pos(secondAddr) + 1/*label*/, jumpPos - 1,localRegNames).output;
                         } catch (UnknownJumpException uje) {
                             if ((uje.ip >= start) && (uje.ip <= end)) {
                                 currentLoop.loopContinue = uje.ip;
@@ -1406,7 +1406,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                                         }
                                     }
                                 }
-                                finalExpression = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, uje.ip, jumpPos - 1).output;
+                                finalExpression = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, uje.ip, jumpPos - 1,localRegNames).output;
                                 isFor = true;
                             } else {
                                 throw new ConvertException("Unknown pattern: jump to nowhere", ip);
@@ -1512,7 +1512,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                                 }
 
                             }
-                            ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc);
+                            ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc,localRegNames);
                             ip++;
                             addr = pos2adr(ip);
                             break;
@@ -1547,7 +1547,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                                 }
 
                             }
-                            ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc);
+                            ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc,localRegNames);
                             ip++;
                             addr = pos2adr(ip);
                             break;
@@ -1584,7 +1584,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                                 }
 
                             }
-                            ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc);
+                            ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc,localRegNames);
                             ip++;
                             addr = pos2adr(ip);
                             break;
@@ -1621,7 +1621,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                                 }
 
                             }
-                            ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc);
+                            ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc,localRegNames);
                             ip++;
                             addr = pos2adr(ip);
                             break;
@@ -1631,14 +1631,14 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                                 addr = pos2adr(ip);
                                 break;
                             } else {*/
-                            ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc);
+                            ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc,localRegNames);
                             ip++;
                             addr = pos2adr(ip);
                             break;
                             //}
 
                         } else {
-                            ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc);
+                            ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc,localRegNames);
                             ip++;
                             addr = pos2adr(ip);
                             break;
@@ -1647,9 +1647,9 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                         addr = addr + ins.getBytes().length + insAfter.getBytes().length + insAfter.operands[0];
                         nextPos = adr2pos(addr) - 1;
                         if (isAnd) {
-                            stack.add(new AndTreeItem(insAfter, stack.pop(), toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, ip + 3, nextPos).stack.pop()));
+                            stack.add(new AndTreeItem(insAfter, stack.pop(), toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, ip + 3, nextPos,localRegNames).stack.pop()));
                         } else {
-                            stack.add(new OrTreeItem(insAfter, stack.pop(), toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, ip + 3, nextPos).stack.pop()));
+                            stack.add(new OrTreeItem(insAfter, stack.pop(), toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, ip + 3, nextPos,localRegNames).stack.pop()));
                         }
                         ins = code.get(nextPos + 1);
                         ip = nextPos + 1;
@@ -1697,14 +1697,14 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                             }
                         }
                     }
-                    ConvertOutput onTrue = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, ip + 1, targetIns - 1 - ((hasElse || hasReturn) ? 1 : 0));
+                    ConvertOutput onTrue = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, ip + 1, targetIns - 1 - ((hasElse || hasReturn) ? 1 : 0),localRegNames);
                     addr = targetAddr;
                     ip = targetIns;
                     ConvertOutput onFalse = new ConvertOutput(new Stack<TreeItem>(), new ArrayList<TreeItem>());
                     if (hasElse) {
                         int finalAddr = targetAddr + code.get(targetIns - 1).operands[0];
                         int finalIns = adr2pos(finalAddr);
-                        onFalse = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, targetIns, finalIns - 1);
+                        onFalse = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, targetIns, finalIns - 1,localRegNames);
                         addr = finalAddr;
                         ip = finalIns;
                     }
@@ -1715,11 +1715,11 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                     }
 
                 } else if ((ins.definition instanceof ReturnValueIns) || (ins.definition instanceof ReturnVoidIns) || (ins.definition instanceof ThrowIns)) {
-                    ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc);
+                    ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc,localRegNames);
                     ip = end + 1;
                     break;
                 } else {
-                    ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc);
+                    ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc,localRegNames);
 
                     addr += ins.getBytes().length;
                     ip++;
@@ -1748,11 +1748,11 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
         return ret;
     }
 
-    public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body) {
-        return toSource(isStatic, classIndex, abc, constants, method_info, body, false);
+    public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body,HashMap<Integer,String> localRegNames) {
+        return toSource(isStatic, classIndex, abc, constants, method_info, body, false,localRegNames);
     }
 
-    public List<TreeItem> toTree(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body) {
+    public List<TreeItem> toTree(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body,HashMap<Integer,String> localRegNames) {
         toSourceCount = 0;
         loopList = new ArrayList<Loop>();
         unknownJumps = new ArrayList<Integer>();
@@ -1760,7 +1760,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
         finallyJumps = new ArrayList<Integer>();
         HashMap<Integer, TreeItem> localRegs = new HashMap<Integer, TreeItem>();
         try {
-            return toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), new Stack<TreeItem>(), abc, constants, method_info, body, 0, code.size() - 1).output;
+            return toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), new Stack<TreeItem>(), abc, constants, method_info, body, 0, code.size() - 1,localRegNames).output;
         } catch (ConvertException ex) {
             return new ArrayList<TreeItem>();
         }
@@ -1787,7 +1787,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
        return maxRegister+1;
     }
 
-    public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted) {
+    public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted,HashMap<Integer,String> localRegNames) {
         toSourceCount = 0;
         loopList = new ArrayList<Loop>();
         unknownJumps = new ArrayList<Integer>();
@@ -1797,8 +1797,8 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
         String s = "";
         HashMap<Integer, TreeItem> localRegs = new HashMap<Integer, TreeItem>();
         try {            
-            list = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), new Stack<TreeItem>(), abc, constants, method_info, body, 0, code.size() - 1).output;
-            s = listToString(list, constants);
+            list = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), new Stack<TreeItem>(), abc, constants, method_info, body, 0, code.size() - 1,localRegNames).output;
+            s = listToString(list, constants,localRegNames);
         } catch (Exception ex) {            
             s = "/*\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error Message: " + ex.getMessage()+"\r\n */";
             return s;
@@ -1824,7 +1824,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
         for(int i=paramCount+1;i<regCount;i++)
         {
             if((!(localRegs.get(i) instanceof NewActivationTreeItem))&&(!isKilled(i, 0, code.size()-1))){
-               sub+="var "+InstructionDefinition.localRegName(i)+";\r\n";
+               sub+="var "+TreeItem.localRegName(localRegNames,i)+";\r\n";
             }
         }
         try {

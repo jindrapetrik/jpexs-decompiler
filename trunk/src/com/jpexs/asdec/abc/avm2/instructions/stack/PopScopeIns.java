@@ -29,7 +29,7 @@ import com.jpexs.asdec.abc.types.MethodInfo;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
+import java.util.Stack; import java.util.HashMap;
 
 
 public class PopScopeIns extends InstructionDefinition {
@@ -44,7 +44,7 @@ public class PopScopeIns extends InstructionDefinition {
     }
 
     @Override
-    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, MethodBody body, ABC abc) {
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, MethodBody body, ABC abc,HashMap<Integer,String> localRegNames) {
         TreeItem scope = (TreeItem) scopeStack.pop();
         for (int i = output.size() - 1; i >= 0; i--) {
             if (output.get(i) instanceof WithTreeItem) {

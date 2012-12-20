@@ -17,7 +17,7 @@
 
 package com.jpexs.asdec.abc.avm2.treemodel;
 
-import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.ConstantPool; import java.util.HashMap;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.types.Multiname;
 
@@ -35,11 +35,11 @@ public class SetSlotTreeItem extends TreeItem implements SetTypeTreeItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
         String ret = "";
 
         if (!(scope instanceof NewActivationTreeItem)) {
-            ret = scope.toString(constants) + ".";
+            ret = scope.toString(constants,localRegNames) + ".";
         }
         if(scope instanceof LocalRegTreeItem){
             if(((LocalRegTreeItem)scope).computedValue !=null){
@@ -48,7 +48,7 @@ public class SetSlotTreeItem extends TreeItem implements SetTypeTreeItem {
                 }
             }
         }
-        return ret + hilight(slotName.getName(constants)) + hilight("=") + value.toString(constants);
+        return ret + hilight(slotName.getName(constants)) + hilight("=") + value.toString(constants,localRegNames);
     }
 
    public TreeItem getObject() {

@@ -17,9 +17,11 @@
 
 package com.jpexs.asdec.abc.avm2.treemodel;
 
-import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.ConstantPool; import java.util.HashMap;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.helpers.Highlighting;
+import java.util.HashMap;
 
 
 public abstract class TreeItem {
@@ -52,11 +54,11 @@ public abstract class TreeItem {
     }
 
 
-    public abstract String toString(ConstantPool constants);
+    public abstract String toString(ConstantPool constants,HashMap<Integer,String> localRegNames);
     
-    public String toStringSemicoloned(ConstantPool constants)
+    public String toStringSemicoloned(ConstantPool constants,HashMap<Integer,String> localRegNames)
     {
-       return toString(constants)+(needsSemicolon()?";":"");
+       return toString(constants,localRegNames)+(needsSemicolon()?";":"");
     }
 
     public boolean needsSemicolon()
@@ -80,8 +82,8 @@ public abstract class TreeItem {
         return false;
     }
 
-    protected String formatProperty(ConstantPool constants, TreeItem object, TreeItem propertyName) {
-        String obStr = object.toString(constants);
+    protected String formatProperty(ConstantPool constants, TreeItem object, TreeItem propertyName,HashMap<Integer,String> localRegNames) {
+        String obStr = object.toString(constants,localRegNames);
         if (object.precedence > PRECEDENCE_PRIMARY) {
             obStr = "(" + obStr + ")";
         }
@@ -92,16 +94,27 @@ public abstract class TreeItem {
         if (propertyName instanceof FullMultinameTreeItem) {
 
             if (((FullMultinameTreeItem) propertyName).isRuntime()) {
-                return obStr + "[" + propertyName.toString(constants) + "]";
+                return obStr + "[" + propertyName.toString(constants,localRegNames) + "]";
             } else {
                 if (!obStr.equals("")) obStr += ".";
-                return obStr + ((FullMultinameTreeItem) propertyName).toString(constants);
+                return obStr + ((FullMultinameTreeItem) propertyName).toString(constants,localRegNames);
             }
         } else {
-            return obStr + "[" + propertyName.toString(constants) + "]";
+            return obStr + "[" + propertyName.toString(constants,localRegNames) + "]";
         }
     }
     public TreeItem getNotCoerced(){
        return this;
+    }
+    
+    public static String localRegName(HashMap<Integer,String> localRegNames,int reg)
+    {
+       if(localRegNames.containsKey(reg))
+       {
+          return localRegNames.get(reg);
+       }else{
+          if (reg == 0) return "this";
+          return "_loc" + reg + "_";
+       }
     }
 }

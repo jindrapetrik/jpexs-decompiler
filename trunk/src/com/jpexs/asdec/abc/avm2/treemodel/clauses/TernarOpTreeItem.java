@@ -17,7 +17,7 @@
 
 package com.jpexs.asdec.abc.avm2.treemodel.clauses;
 
-import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.ConstantPool; import java.util.HashMap;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 
@@ -35,8 +35,8 @@ public class TernarOpTreeItem extends TreeItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return expression.toString(constants) + hilight("?") + onTrue.toString(constants) + hilight(":") + onFalse.toString(constants);
+    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
+        return expression.toString(constants,localRegNames) + hilight("?") + onTrue.toString(constants,localRegNames) + hilight(":") + onFalse.toString(constants,localRegNames);
     }
 
 

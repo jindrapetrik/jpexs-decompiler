@@ -17,7 +17,7 @@
 
 package com.jpexs.asdec.abc.avm2.treemodel;
 
-import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.ConstantPool; import java.util.HashMap;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 
 
@@ -32,8 +32,8 @@ public class GetDescendantsTreeItem extends TreeItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return object.toString(constants) + hilight("..") + multiname.toString(constants);
+    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
+        return object.toString(constants,localRegNames) + hilight("..") + multiname.toString(constants,localRegNames);
     }
 
 

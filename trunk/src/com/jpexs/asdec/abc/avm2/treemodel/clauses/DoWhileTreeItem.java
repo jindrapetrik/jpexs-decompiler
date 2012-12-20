@@ -17,7 +17,7 @@
 
 package com.jpexs.asdec.abc.avm2.treemodel.clauses;
 
-import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.ConstantPool; import java.util.HashMap;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.ContinueTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
@@ -45,14 +45,14 @@ public class DoWhileTreeItem extends LoopTreeItem implements Block {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
         String ret = "";
         ret += "loop" + loopBreak + ":\r\n";
         ret += hilight("do\r\n{") + "\r\n";
         for (TreeItem ti : commands) {
-            ret += ti.toStringSemicoloned(constants) + "\r\n";
+            ret += ti.toStringSemicoloned(constants,localRegNames) + "\r\n";
         }
-        ret += hilight("}\r\nwhile(") + expression.toString(constants) + hilight(");") + "\r\n";
+        ret += hilight("}\r\nwhile(") + expression.toString(constants,localRegNames) + hilight(");") + "\r\n";
         ret += ":loop" + loopBreak;
 
         return ret;

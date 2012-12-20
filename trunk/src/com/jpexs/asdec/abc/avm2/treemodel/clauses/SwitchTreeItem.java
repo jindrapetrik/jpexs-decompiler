@@ -18,7 +18,7 @@
 package com.jpexs.asdec.abc.avm2.treemodel.clauses;
 
 import com.jpexs.asdec.abc.avm2.AVM2Code;
-import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.ConstantPool; import java.util.HashMap;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.ContinueTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
@@ -43,15 +43,15 @@ public class SwitchTreeItem extends LoopTreeItem implements Block {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
         String ret = "";
         ret += "loop" + loopBreak + ":\r\n";
-        ret += hilight("switch(") + switchedObject.toString(constants) + hilight(")") + "\r\n{\r\n";
+        ret += hilight("switch(") + switchedObject.toString(constants,localRegNames) + hilight(")") + "\r\n{\r\n";
         for (int i = 0; i < caseValues.size(); i++) {
-            ret += "case " + caseValues.get(i).toString(constants) + ":\r\n";
+            ret += "case " + caseValues.get(i).toString(constants,localRegNames) + ":\r\n";
             ret += AVM2Code.IDENTOPEN + "\r\n";
             for (int j = 0; j < caseCommands.get(i).size(); j++) {
-                ret += caseCommands.get(i).get(j).toStringSemicoloned(constants) + "\r\n";
+                ret += caseCommands.get(i).get(j).toStringSemicoloned(constants,localRegNames) + "\r\n";
             }
             ret += AVM2Code.IDENTCLOSE + "\r\n";
         }
@@ -59,7 +59,7 @@ public class SwitchTreeItem extends LoopTreeItem implements Block {
             ret += hilight("default") + ":\r\n";
             ret += AVM2Code.IDENTOPEN + "\r\n";
             for (int j = 0; j < defaultCommands.size(); j++) {
-                ret += defaultCommands.get(j).toStringSemicoloned(constants) + "\r\n";
+                ret += defaultCommands.get(j).toStringSemicoloned(constants,localRegNames) + "\r\n";
             }
             ret += AVM2Code.IDENTCLOSE + "\r\n";
         }

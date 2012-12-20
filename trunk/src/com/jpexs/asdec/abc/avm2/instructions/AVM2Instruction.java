@@ -18,7 +18,7 @@
 package com.jpexs.asdec.abc.avm2.instructions;
 
 import com.jpexs.asdec.abc.ABCOutputStream;
-import com.jpexs.asdec.abc.avm2.AVM2Code;
+import com.jpexs.asdec.abc.avm2.AVM2Code; import java.util.HashMap;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.helpers.Helper;
 

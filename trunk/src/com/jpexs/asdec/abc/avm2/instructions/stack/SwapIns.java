@@ -27,7 +27,7 @@ import com.jpexs.asdec.abc.types.MethodBody;
 import com.jpexs.asdec.abc.types.MethodInfo;
 
 import java.util.List;
-import java.util.Stack;
+import java.util.Stack; import java.util.HashMap;
 
 
 public class SwapIns extends InstructionDefinition {
@@ -45,7 +45,7 @@ public class SwapIns extends InstructionDefinition {
     }
 
     @Override
-    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, MethodBody body, ABC abc) {
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, MethodBody body, ABC abc,HashMap<Integer,String> localRegNames) {
 
         TreeItem o1 = stack.pop();
         TreeItem o2 = stack.pop();

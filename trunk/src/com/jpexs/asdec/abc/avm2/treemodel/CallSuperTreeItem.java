@@ -17,7 +17,7 @@
 
 package com.jpexs.asdec.abc.avm2.treemodel;
 
-import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.ConstantPool; import java.util.HashMap;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.helpers.Highlighting;
 
@@ -39,17 +39,17 @@ public class CallSuperTreeItem extends TreeItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
         String args = "";
         for (int a = 0; a < arguments.size(); a++) {
             if (a > 0) {
                 args = args + ",";
             }
-            args = args + arguments.get(a).toString(constants);
+            args = args + arguments.get(a).toString(constants,localRegNames);
         }
-        String calee = receiver.toString(constants) + ".";
+        String calee = receiver.toString(constants,localRegNames) + ".";
         if (Highlighting.stripHilights(calee).equals("this.")) calee = "";
-        return calee + hilight("super.") + multiname.toString(constants) + hilight("(") + args + hilight(")");
+        return calee + hilight("super.") + multiname.toString(constants,localRegNames) + hilight("(") + args + hilight(")");
     }
 
 

@@ -17,7 +17,7 @@
 
 package com.jpexs.asdec.abc.avm2.treemodel.clauses;
 
-import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.ConstantPool; import java.util.HashMap;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.ContinueTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
@@ -39,17 +39,17 @@ public class IfTreeItem extends TreeItem implements Block {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
         String ret = "";
-        ret = hilight("if(") + expression.toString(constants) + hilight(")\r\n{\r\n");
+        ret = hilight("if(") + expression.toString(constants,localRegNames) + hilight(")\r\n{\r\n");
         for (TreeItem ti : onTrue) {
-            ret += ti.toStringSemicoloned(constants) + "\r\n";
+            ret += ti.toStringSemicoloned(constants,localRegNames) + "\r\n";
         }
         ret += hilight("}");
         if (onFalse.size() > 0) {
             ret += hilight("\r\nelse\r\n{\r\n");
             for (TreeItem ti : onFalse) {
-                ret += ti.toStringSemicoloned(constants) + "\r\n";
+                ret += ti.toStringSemicoloned(constants,localRegNames) + "\r\n";
             }
             ret += hilight("}");
         }

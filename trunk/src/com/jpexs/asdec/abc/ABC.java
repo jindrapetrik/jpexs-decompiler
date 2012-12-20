@@ -620,7 +620,7 @@ public class ABC {
       //if (class_info[i].cinit_index != 0) {
       if (AUTOINIT_STATIC_VARIABLES) {
          int bodyIndex = findBodyIndex(class_info[i].cinit_index);
-         List<TreeItem> initializer = bodies[bodyIndex].code.toTree(true, i, this, constants, method_info, bodies[bodyIndex]);
+         List<TreeItem> initializer = bodies[bodyIndex].code.toTree(true, i, this, constants, method_info, bodies[bodyIndex],bodies[bodyIndex].code.getLocalRegNamesFromDebug(this));
          for (TreeItem ti : initializer) {
             if (ti instanceof SetPropertyTreeItem) {
                int multinameIndex = ((SetPropertyTreeItem) ti).propertyName.multinameIndex;

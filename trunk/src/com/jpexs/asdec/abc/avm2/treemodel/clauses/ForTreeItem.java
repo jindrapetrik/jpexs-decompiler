@@ -17,7 +17,7 @@
 
 package com.jpexs.asdec.abc.avm2.treemodel.clauses;
 
-import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.ConstantPool; import java.util.HashMap;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.ContinueTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
@@ -49,7 +49,7 @@ public class ForTreeItem extends LoopTreeItem implements Block {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
         String ret = "";
         ret += "loop" + loopBreak + ":\r\n";
         ret += hilight("for(");
@@ -57,20 +57,20 @@ public class ForTreeItem extends LoopTreeItem implements Block {
             if (i > 0) {
                 ret += ",";
             }
-            ret += stripSemicolon(firstCommands.get(i).toString(constants));
+            ret += stripSemicolon(firstCommands.get(i).toString(constants,localRegNames));
         }
         ret += ";";
-        ret += expression.toString(constants);
+        ret += expression.toString(constants,localRegNames);
         ret += ";";
         for (int i = 0; i < finalCommands.size(); i++) {
             if (i > 0) {
                 ret += ",";
             }
-            ret += stripSemicolon(finalCommands.get(i).toString(constants));
+            ret += stripSemicolon(finalCommands.get(i).toString(constants,localRegNames));
         }
         ret += hilight(")") + "\r\n{\r\n";
         for (TreeItem ti : commands) {
-            ret += ti.toStringSemicoloned(constants) + "\r\n";
+            ret += ti.toStringSemicoloned(constants,localRegNames) + "\r\n";
         }
         ret += hilight("}") + "\r\n";
         ret += ":loop" + loopBreak;

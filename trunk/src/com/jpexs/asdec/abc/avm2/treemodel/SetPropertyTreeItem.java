@@ -17,7 +17,7 @@
 
 package com.jpexs.asdec.abc.avm2.treemodel;
 
-import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.ConstantPool; import java.util.HashMap;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 
 
@@ -34,8 +34,8 @@ public class SetPropertyTreeItem extends TreeItem implements SetTypeTreeItem{
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return formatProperty(constants, object, propertyName) + hilight("=") + value.toString(constants);
+    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
+        return formatProperty(constants, object, propertyName,localRegNames) + hilight("=") + value.toString(constants,localRegNames);
     }
 
    public TreeItem getObject() {
