@@ -210,7 +210,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
         navPanel.add(traitsLabel,BorderLayout.NORTH);
 
         traitsLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
-        navPanel.add(navigator,BorderLayout.CENTER);
+        navPanel.add(new JScrollPane(navigator),BorderLayout.CENTER);
 
         splitPane2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                 new JScrollPane(classTree = new ClassesListTree(abc)),
