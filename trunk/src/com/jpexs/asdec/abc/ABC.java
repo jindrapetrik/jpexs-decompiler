@@ -64,7 +64,9 @@ import com.jpexs.asdec.abc.usages.MethodParamsMultinameUsage;
 import com.jpexs.asdec.abc.usages.MethodReturnTypeMultinameUsage;
 import com.jpexs.asdec.abc.usages.MultinameUsage;
 import com.jpexs.asdec.abc.usages.TypeNameMultinameUsage;
+import com.jpexs.asdec.helpers.Helper;
 import com.jpexs.asdec.helpers.Highlighting;
+import java.util.LinkedList;
 
 public class ABC {
 
@@ -609,14 +611,15 @@ public class ABC {
 
       //class header
       String classHeader = instance_info[i].getClassHeaderStr(constants);
-      if (classHeader.startsWith("private ")) {
+      /*if (classHeader.startsWith("private ")) {
          classHeader = "public " + classHeader.substring("private ".length());
-      }
+      }*/
       out.println(IDENT_STRING + classHeader);
       out.println(IDENT_STRING + "{");
 
       String toPrint = "";
-
+      List<String> outTraits=new LinkedList<String>();
+      
       //if (class_info[i].cinit_index != 0) {
       if (AUTOINIT_STATIC_VARIABLES) {
          int bodyIndex = findBodyIndex(class_info[i].cinit_index);
@@ -656,7 +659,7 @@ public class ABC {
       if (highlight) {
          toPrint = Highlighting.hilighTrait(toPrint, class_info[i].static_traits.traits.length + instance_info[i].instance_traits.traits.length + 1);
       }
-      out.println(toPrint);
+      outTraits.add(toPrint);      
       //}
       //}
 
@@ -687,7 +690,7 @@ public class ABC {
       if (highlight) {
          toPrint = Highlighting.hilighTrait(toPrint, class_info[i].static_traits.traits.length + instance_info[i].instance_traits.traits.length);
       }
-      out.println(toPrint);
+      outTraits.add(toPrint);
       //}
 
       //static variables,constants & methods
@@ -713,7 +716,7 @@ public class ABC {
          } else {
             toPrint = Highlighting.stripHilights(toPrint);
          }
-         out.println(toPrint);
+         outTraits.add(toPrint);
       }
       for (int ti = 0; ti < instance_info[i].instance_traits.traits.length; ti++) {
          Trait t = instance_info[i].instance_traits.traits[ti];
@@ -737,10 +740,10 @@ public class ABC {
          } else {
             toPrint = Highlighting.stripHilights(toPrint);
          }
-         out.println(toPrint);
+         outTraits.add(toPrint);
       }
 
-
+      out.println(Helper.joinStrings(outTraits, "\r\n\r\n"));
       out.println(IDENT_STRING + "}");//class
       out.println("}");//package
       out.flush();

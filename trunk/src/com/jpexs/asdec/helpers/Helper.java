@@ -17,6 +17,8 @@
 
 package com.jpexs.asdec.helpers;
 
+import java.util.List;
+
 /**
  * Class with helper method
  *
@@ -195,4 +197,34 @@ public class Helper {
 		}
 		return sb.toString();
 	}
+   
+   public static String joinStrings(List<String> arr,String glue)
+   {
+      String ret="";
+      boolean first=true;
+      for(String s:arr){
+         if(!first){
+            ret += glue;
+         }else{
+            first=false;
+         }
+         ret+=s;
+      }      
+      return ret;
+   }
+   
+   public static String joinStrings(String arr[],String glue)
+   {
+      String ret="";
+      boolean first=true;
+      for(String s:arr){
+         if(!first){
+            ret += glue;
+         }else{
+            first=false;
+         }
+         ret+=s;
+      }      
+      return ret;
+   }
 }
