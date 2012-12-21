@@ -17,6 +17,7 @@
 
 package com.jpexs.asdec.abc.avm2;
 
+import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.ABCInputStream;
 import com.jpexs.asdec.abc.CopyOutputStream;
@@ -1065,7 +1066,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
             int addr;
             iploop:
             while (ip <= end) {
-
+               
                 addr = pos2adr(ip);
                 int ipfix=fixIPAfterDebugLine(ip);
                 int addrfix=pos2adr(ipfix);
@@ -1172,8 +1173,52 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                     throw new UnknownJumpException(stack, ip, output);
                 }
                 AVM2Instruction ins = code.get(ip);
-                //Ifs with multiple conditions
-                if (ins.definition instanceof JumpIns) {
+                
+                if((ip+8<code.size())){ //return in finally clause
+                   if(ins.definition instanceof SetLocalTypeIns)
+                   {
+                      if(code.get(ip+1).definition instanceof PushByteIns) {
+                        AVM2Instruction jmp=code.get(ip+2);
+                        if(jmp.definition instanceof JumpIns) {
+                           if(jmp.operands[0]==0){
+                              if(code.get(ip+3).definition instanceof LabelIns) {
+                                 if(code.get(ip+4).definition instanceof PopIns) {
+                                    if(code.get(ip+5).definition instanceof LabelIns) {
+                                       AVM2Instruction gl=code.get(ip+6);
+                                       if(gl.definition instanceof GetLocalTypeIns) {
+                                          if(((GetLocalTypeIns)gl.definition).getRegisterId(gl)==((SetLocalTypeIns)ins.definition).getRegisterId(ins)){
+                                             AVM2Instruction ki=code.get(ip+7);
+                                             if(ki.definition instanceof KillIns) {
+                                                if(ki.operands[0]==((SetLocalTypeIns)ins.definition).getRegisterId(ins))
+                                                {
+                                                   if(code.get(ip+8).definition instanceof ReturnValueIns) {
+                                                      ip=ip+8;
+                                                      continue;
+                                                   }
+                                                }
+                                             }
+                                          }
+                                       }
+                                    }
+                                 }
+                              }
+                           }
+                        }
+                      }
+                   }
+                }
+                
+                if((ip+2<code.size())&&(ins.definition instanceof NewCatchIns)){ //Filling local register in catch clause
+                   if(code.get(ip+1).definition instanceof DupIns){
+                      if(code.get(ip+2).definition instanceof SetLocalTypeIns){
+                         ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc,localRegNames);
+                         ip+=3;
+                         continue;
+                      }
+                   }
+                }
+                
+                if (ins.definition instanceof JumpIns) { //Ifs with multiple conditions
                     if (ins.operands[0] == 0) {
                         ip++;
                         addr = pos2adr(ip);
