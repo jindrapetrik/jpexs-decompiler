@@ -1687,7 +1687,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                                         if(code.get(t+1).operands[0]==reg)
                                         {                                           
                                            ConvertOutput assignment = toSource(isStatic, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, ip + 2, t-1,localRegNames);
-                                           stack.push(assignment.output.remove(output.size()-1));                                           
+                                           stack.push(assignment.output.remove(assignment.output.size()-1));                                           
                                            ip=t+2;                     
                                            continue iploop;
                                         }
@@ -1799,7 +1799,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
         } catch (Exception ex) {
             if (ex instanceof UnknownJumpException) {
                 throw (UnknownJumpException) ex;
-            }
+            }            
             throw new ConvertException(ex.getClass().getSimpleName(), ip);
     }
     }
@@ -1915,7 +1915,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
         HashMap<Integer,String> localRegTypes=getLocalRegTypes(constants);
         for(int i=paramCount+1;i<regCount;i++)
         {
-            if((!(localRegs.get(i) instanceof NewActivationTreeItem))&&(!isKilled(i, 0, code.size()-1))){
+            if((!(localRegs.get(i) instanceof NewActivationTreeItem))/*&&(!isKilled(i, 0, code.size()-1))*/){
                sub+="var "+TreeItem.localRegName(localRegNames,i);
                if(localRegTypes.containsKey(i)){
                   sub+=":"+localRegTypes.get(i);
