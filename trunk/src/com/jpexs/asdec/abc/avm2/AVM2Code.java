@@ -871,6 +871,7 @@ public class AVM2Code {
     private List<Integer> unknownJumps;
     private List<Integer> finallyJumps;
     private List<ABCException> parsedExceptions;
+    private List<Integer> ignoredIns;
 
     private String stripBrackets(String s) {
         if (s.startsWith("(") && (s.endsWith(")"))) {
@@ -1050,7 +1051,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
     }
 
     private ConvertOutput toSource(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, int start, int end,HashMap<Integer,String> localRegNames) throws ConvertException {
-        boolean debugMode = false;
+        boolean debugMode = true;
         if (debugMode)
             System.out.println("OPEN SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
         //if(true) return "";
@@ -1068,6 +1069,11 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
             iploop:
             while (ip <= end) {
                
+                if(ignoredIns.contains(ip))
+                {
+                   ip++;
+                   continue;
+                }
                 addr = pos2adr(ip);
                 int ipfix=fixIPAfterDebugLine(ip);
                 int addrfix=pos2adr(ipfix);
@@ -1671,12 +1677,24 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                             ip++;
                             addr = pos2adr(ip);
                             break;
-                        } else if (insAfter.definition instanceof SetLocalTypeIns) {
-                            /*if (isKilled(((SetLocalTypeIns) insAfter.definition).getRegisterId(insAfter), ip + 2, end)) {
-                                ip += 2;
-                                addr = pos2adr(ip);
-                                break;
-                            } else {*/
+                        } else if (insAfter.definition instanceof SetLocalTypeIns) {                                                                                 
+                            //chained assignments
+                            int reg=(((SetLocalTypeIns)insAfter.definition).getRegisterId(insAfter));
+                            for(int t=ip+1;t<end-1;t++){
+                               if(code.get(t).definition instanceof GetLocalTypeIns){
+                                  if(((GetLocalTypeIns)code.get(t).definition).getRegisterId(code.get(t))==reg){
+                                     if(code.get(t+1).definition instanceof KillIns){
+                                        if(code.get(t+1).operands[0]==reg)
+                                        {                                           
+                                           ConvertOutput assignment = toSource(isStatic, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, ip + 2, t-1,localRegNames);
+                                           stack.push(assignment.output.remove(output.size()-1));                                           
+                                           ip=t+2;                     
+                                           continue iploop;
+                                        }
+                                     }
+                                  }
+                               }
+                            }
                             ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc,localRegNames);
                             ip++;
                             addr = pos2adr(ip);
@@ -1856,6 +1874,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
         unknownJumps = new ArrayList<Integer>();
         finallyJumps = new ArrayList<Integer>();
         parsedExceptions = new ArrayList<ABCException>();
+        ignoredIns = new ArrayList<Integer>();
         List<TreeItem> list;
         String s = "";
         HashMap<Integer, TreeItem> localRegs = new HashMap<Integer, TreeItem>();
