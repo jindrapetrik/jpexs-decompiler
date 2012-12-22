@@ -63,9 +63,14 @@ public class TraitSlotConst extends Trait {
         if (kindType == TRAIT_CONST) {
             slotconst = "const";
         }
-        return slotconst + " " + constants.constant_multiname[name_index].getName(constants) + ":" + typeStr + valueStr;
+        return slotconst + " " + getName(constants) + ":" + typeStr + valueStr;
     }
 
+    public String getName(ConstantPool constants)
+    {
+       return constants.constant_multiname[name_index].getName(constants);
+    }
+    
     @Override
     public String convert(ConstantPool constants, MethodInfo[] methodInfo,ABC abc, boolean isStatic) {
         String modifier = getModifiers(constants, isStatic) + " ";

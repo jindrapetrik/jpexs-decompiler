@@ -44,7 +44,16 @@ public class CallTreeItem extends TreeItem {
             }
             args = args + arguments.get(a).toString(constants,localRegNames);
         }
-        return receiver.toString(constants,localRegNames) + hilight(".") + function.toString(constants,localRegNames) + hilight("(") + args + hilight(")");
+        String recPart=receiver.toString(constants,localRegNames) + hilight(".");
+        if(receiver instanceof NewActivationTreeItem)
+        {
+           recPart="";
+        }
+        if(receiver instanceof ThisTreeItem)
+        {
+           recPart="";
+        }
+        return  recPart+ function.toString(constants,localRegNames) + hilight("(") + args + hilight(")");
     }
 
 

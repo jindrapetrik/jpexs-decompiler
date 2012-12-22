@@ -48,6 +48,7 @@ import com.jpexs.asdec.abc.avm2.treemodel.operations.PreIncrementTreeItem;
 import com.jpexs.asdec.abc.types.ABCException;
 import com.jpexs.asdec.abc.types.MethodBody;
 import com.jpexs.asdec.abc.types.MethodInfo;
+import com.jpexs.asdec.abc.types.traits.TraitSlotConst;
 import com.jpexs.asdec.helpers.Helper;
 import com.jpexs.asdec.helpers.Highlighting;
 
@@ -1871,7 +1872,16 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
         String sub = "";
         int level = 0;
         for (int t = 0; t < body.traits.traits.length; t++) {
-            sub += body.traits.traits[t].convert(constants, method_info,abc) + ";\r\n";
+            //Skip traits with same name as local registers
+            if(
+               (body.traits.traits[t] instanceof TraitSlotConst)
+               &&(((TraitSlotConst)body.traits.traits[t]).isVar())
+               &&(localRegNames.containsValue(((TraitSlotConst)body.traits.traits[t]).getName(constants))))
+            {
+                  continue;               
+            }else{
+               sub += body.traits.traits[t].convert(constants, method_info,abc) + ";\r\n";
+            }
         }
         int regCount=getRegisterCount();
         int paramCount=0;

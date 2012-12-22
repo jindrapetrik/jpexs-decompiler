@@ -23,6 +23,7 @@ import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.avm2.instructions.SetTypeIns;
+import com.jpexs.asdec.abc.avm2.treemodel.NewActivationTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.SetSlotTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.clauses.ExceptionTreeItem;
@@ -59,6 +60,14 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
             }
 
         }
+        
+        //if new activation sets params of the function
+        if(obj instanceof NewActivationTreeItem){
+           if(localRegNames.containsValue(slotname.getName(constants))){
+              return;
+           }
+        }
+        
         output.add(new SetSlotTreeItem(ins, obj, slotname, value));
     }
 
