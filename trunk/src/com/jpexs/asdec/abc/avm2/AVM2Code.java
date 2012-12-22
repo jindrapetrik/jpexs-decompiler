@@ -1051,7 +1051,7 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
     }
 
     private ConvertOutput toSource(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, int start, int end,HashMap<Integer,String> localRegNames) throws ConvertException {
-        boolean debugMode = true;
+        boolean debugMode = false;
         if (debugMode)
             System.out.println("OPEN SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
         //if(true) return "";
