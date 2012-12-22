@@ -1832,6 +1832,23 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
        return maxRegister+1;
     }
 
+    public HashMap<Integer,String> getLocalRegTypes(ConstantPool constants){
+       HashMap<Integer,String> ret=new HashMap<Integer,String>();
+       AVM2Instruction prev=null;
+       for(AVM2Instruction ins:code){
+          if(ins.definition instanceof SetLocalTypeIns){
+             if(prev!=null){
+                if(prev.definition instanceof CoerceOrConvertTypeIns)
+                {
+                   ret.put(((SetLocalTypeIns)ins.definition).getRegisterId(ins),((CoerceOrConvertTypeIns)prev.definition).getTargetType(constants, prev));
+                }
+             }
+          }
+          prev=ins;
+       }
+       return ret;
+    }
+    
     public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted,HashMap<Integer,String> localRegNames) {
         toSourceCount = 0;
         loopList = new ArrayList<Loop>();
@@ -1866,10 +1883,15 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
               paramCount++;
            }
         }
+        HashMap<Integer,String> localRegTypes=getLocalRegTypes(constants);
         for(int i=paramCount+1;i<regCount;i++)
         {
             if((!(localRegs.get(i) instanceof NewActivationTreeItem))&&(!isKilled(i, 0, code.size()-1))){
-               sub+="var "+TreeItem.localRegName(localRegNames,i)+";\r\n";
+               sub+="var "+TreeItem.localRegName(localRegNames,i);
+               if(localRegTypes.containsKey(i)){
+                  sub+=":"+localRegTypes.get(i);
+               }
+               sub+=";\r\n";
             }
         }
         try {

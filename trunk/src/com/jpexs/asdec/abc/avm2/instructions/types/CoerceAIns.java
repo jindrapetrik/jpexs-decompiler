@@ -36,6 +36,10 @@ public class CoerceAIns extends InstructionDefinition implements CoerceOrConvert
         super(0x82, "coerce_a", new int[]{});
     }
 
+    public String getTargetType(){
+       return "*";
+    }
+    
     @Override
     public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
         //coerce any type
@@ -51,4 +55,8 @@ public class CoerceAIns extends InstructionDefinition implements CoerceOrConvert
    public int getStackDelta(AVM2Instruction ins, ABC abc) {
       return -1+1;
    }
+    
+    public String getTargetType(ConstantPool constants,AVM2Instruction ins){
+       return "*";
+    }
 }

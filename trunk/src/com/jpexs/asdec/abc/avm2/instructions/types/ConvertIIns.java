@@ -67,4 +67,8 @@ public class ConvertIIns extends InstructionDefinition implements CoerceOrConver
    public int getStackDelta(AVM2Instruction ins, ABC abc) {
       return -1+1;
    }
+    
+    public String getTargetType(ConstantPool constants,AVM2Instruction ins){
+       return "int";
+    }
 }

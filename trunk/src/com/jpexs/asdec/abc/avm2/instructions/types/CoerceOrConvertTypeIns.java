@@ -17,10 +17,13 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.types;
 
+import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
+
 /**
  *
  * @author JPEXS
  */
 public interface CoerceOrConvertTypeIns {
-
+   public String getTargetType(ConstantPool constants,AVM2Instruction ins);
 }

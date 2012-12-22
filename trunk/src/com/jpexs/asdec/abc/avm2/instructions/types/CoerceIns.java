@@ -48,6 +48,11 @@ public class CoerceIns extends InstructionDefinition implements CoerceOrConvertT
         int multinameIndex = ins.operands[0];
         stack.push(new CoerceTreeItem(ins, (TreeItem) stack.pop(), constants.constant_multiname[multinameIndex].getName(constants)));
     }
+    
+    public String getTargetType(ConstantPool constants,AVM2Instruction ins){
+       int multinameIndex = ins.operands[0];
+       return constants.constant_multiname[multinameIndex].getName(constants);
+    }
 
     @Override
    public int getStackDelta(AVM2Instruction ins, ABC abc) {
