@@ -1501,8 +1501,22 @@ public HashMap<Integer,String> getLocalRegNamesFromDebug(ABC abc){
                         } else if (isDoWhile) {
                             output.add(new DoWhileTreeItem(ins, currentLoop.loopBreak, currentLoop.loopContinue, loopBody, expression));
                         } else {
-                            if (expression instanceof EachTreeItem) {
-                                output.add(new ForEachTreeItem(ins, currentLoop.loopBreak, currentLoop.loopContinue, (EachTreeItem) expression, loopBody));
+                            if (expression instanceof InTreeItem) {
+                                for(int g=ip+1;g<jumpPos;g++)
+                                {
+                                   if(code.get(g).definition instanceof NextValueIns)
+                                   {
+                                      output.add(new ForEachInTreeItem(ins, currentLoop.loopBreak, currentLoop.loopContinue, (InTreeItem) expression, loopBody));
+                                      break;
+                                   }
+                                   if(code.get(g).definition instanceof NextNameIns)
+                                   {
+                                      output.add(new ForInTreeItem(ins, currentLoop.loopBreak, currentLoop.loopContinue, (InTreeItem) expression, loopBody));
+                                      break;
+                                   }
+                                }
+                                throw new ConvertException("Unknown pattern: hasnext without nextvalue/nextname", ip);
+                                
                             } else {
                                 output.add(new WhileTreeItem(ins, currentLoop.loopBreak, currentLoop.loopContinue, expression, loopBody));
                             }

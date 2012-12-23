@@ -20,7 +20,7 @@ package com.jpexs.asdec.abc.avm2.treemodel.clauses;
 import com.jpexs.asdec.abc.avm2.ConstantPool; import java.util.HashMap;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.ContinueTreeItem;
-import com.jpexs.asdec.abc.avm2.treemodel.EachTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.InTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.LocalRegTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.SetLocalTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.SetTypeTreeItem;
@@ -30,12 +30,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ForEachTreeItem extends LoopTreeItem implements Block {
+public class ForEachInTreeItem extends LoopTreeItem implements Block {
 
-    public EachTreeItem expression;
+    public InTreeItem expression;
     public List<TreeItem> commands;
 
-    public ForEachTreeItem(AVM2Instruction instruction, int loopBreak, int loopContinue, EachTreeItem expression, List<TreeItem> commands) {
+    public ForEachInTreeItem(AVM2Instruction instruction, int loopBreak, int loopContinue, InTreeItem expression, List<TreeItem> commands) {
         super(instruction, loopBreak, loopContinue);
         TreeItem firstAssign=commands.get(0);
         if(firstAssign instanceof SetTypeTreeItem){
@@ -64,7 +64,7 @@ public class ForEachTreeItem extends LoopTreeItem implements Block {
     public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
         String ret = "";
         ret += "loop" + loopBreak + ":\r\n";
-        ret += hilight("for ") + expression.toString(constants,localRegNames) + "\r\n{\r\n";
+        ret += hilight("for each (") + expression.toString(constants,localRegNames) + ")\r\n{\r\n";
         for (TreeItem ti : commands) {
             ret += ti.toStringSemicoloned(constants,localRegNames) + "\r\n";
         }

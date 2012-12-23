@@ -21,11 +21,11 @@ import com.jpexs.asdec.abc.avm2.ConstantPool; import java.util.HashMap;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 
 
-public class EachTreeItem extends TreeItem {
+public class InTreeItem extends TreeItem {
     public TreeItem object;
     public TreeItem collection;
 
-    public EachTreeItem(AVM2Instruction instruction, TreeItem object, TreeItem collection) {
+    public InTreeItem(AVM2Instruction instruction, TreeItem object, TreeItem collection) {
         super(instruction, NOPRECEDENCE);
         this.object = object;
         this.collection = collection;
@@ -33,7 +33,7 @@ public class EachTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
-        return hilight("each (") + object.toString(constants,localRegNames) + hilight(" in ") + collection.toString(constants,localRegNames) + ")";
+        return  object.toString(constants,localRegNames) + hilight(" in ") + collection.toString(constants,localRegNames);
     }
 
 
