@@ -152,7 +152,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
         //DefaultTableColumnModel colModel  = (DefaultTableColumnModel) constantTable.getColumnModel();
         //colModel.getColumn(0).setMaxWidth(50);
     }
-
+    
     public void switchAbc(int index) {
         listIndex = index;
         this.abc = list.get(listIndex).abc;
@@ -291,12 +291,21 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
         menuFile.add(miClose);
         menuBar.add(menuFile);
 
-        JMenu menuOptions = new JMenu("Options");
+        JMenu menuDeobfuscation = new JMenu("Deobfuscation");
         JCheckBoxMenuItem  miSubLimiter = new JCheckBoxMenuItem ("Enable sub limiter");
         miSubLimiter.setActionCommand("SUBLIMITER");
         miSubLimiter.addActionListener(this);
-        menuOptions.add(miSubLimiter);
-        menuBar.add(menuOptions);
+        
+        JMenuItem miRenameIdentifiers=new JMenuItem("Rename identifiers");
+        miRenameIdentifiers.setActionCommand("RENAMEIDENTIFIERS");
+        miRenameIdentifiers.addActionListener(this);
+        
+        
+        menuDeobfuscation.add(miSubLimiter);
+        menuDeobfuscation.add(miRenameIdentifiers);
+       
+        
+        //menuBar.add(menuOptions);
         
         JMenu menuTools = new JMenu("Tools");
         JMenuItem miProxy = new JMenuItem("Proxy");
@@ -304,6 +313,8 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
         miProxy.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/proxy16.png")));
         miProxy.addActionListener(this);
         menuTools.add(miProxy);
+        
+        menuTools.add(menuDeobfuscation);
         menuBar.add(menuTools);
 
         JMenu menuHelp = new JMenu("Help");
@@ -420,6 +431,21 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
             }
 
         }        
+        if(e.getActionCommand().equals("RENAMEIDENTIFIERS")){
+           int pocet=0;
+           Main.startWork("Renaming identifiers...");
+           for (DoABCTag tag : list) {
+               pocet+=tag.abc.deobfuscateIdentifiers();
+           }
+           JOptionPane.showMessageDialog(null, "Identifiers renamed: "+pocet);                        
+           reload();
+           Main.stopWork();
+        }
+        
+    }
+    
+    public void reload(){
+       switchAbc(listIndex);       
     }
 
     public void itemStateChanged(ItemEvent e) {

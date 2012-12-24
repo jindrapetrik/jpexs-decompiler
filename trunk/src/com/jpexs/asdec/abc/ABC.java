@@ -67,6 +67,7 @@ import com.jpexs.asdec.abc.usages.TypeNameMultinameUsage;
 import com.jpexs.asdec.helpers.Helper;
 import com.jpexs.asdec.helpers.Highlighting;
 import java.util.LinkedList;
+import java.util.regex.Pattern;
 
 public class ABC {
 
@@ -83,34 +84,26 @@ public class ABC {
    public long stringOffsets[];
    public static String IDENT_STRING = "   ";
    public static final int MINORwithDECIMAL = 17;
-   private int fixNamesStrategy = 0;
-   private final int STRATEGY_FIX_NAMES = 1;
-   private final int STRATEGY_IGNORE = 2;
    public static final boolean AUTOINIT_STATIC_VARIABLES = false;
-
-   private void fixNameWithStrategy(int index) {
-      if (fixNamesStrategy == 0) {
-         if (!isValidName(index, false)) {
-            int val = JOptionPane.showOptionDialog(null, "Decompiler found unusual name '" + constants.constant_string[index] + "' for a variable/class which can cause problems when decompiling.\r\nDo you want the decompiler to fix it?", "Decompilation", 0, JOptionPane.INFORMATION_MESSAGE, null, new String[]{"Yes", "Yes to all", "No", "No to all"}, "Yes to all");
-            if (val == JOptionPane.CLOSED_OPTION) {
-               val = 2; //NO
-            }
-            if ((val == 0) || (val == 1)) //YES,YES TO ALL
-            {
-               isValidName(index, true);
-            }
-            if (val == 1) //YES TO ALL
-            {
-               fixNamesStrategy = STRATEGY_FIX_NAMES;
-            }
-            if (val == 3) { //NO TO ALL
-               fixNamesStrategy = STRATEGY_IGNORE;
-            }
+   
+   public int deobfuscateIdentifiers()
+   {
+      int ret=0;
+      for(int i=1;i<constants.constant_multiname.length;i++)
+      {
+         if(deobfuscateName(constants.constant_multiname[i].name_index))
+         {
+            ret++;
          }
-      } else if (fixNamesStrategy == STRATEGY_FIX_NAMES) {
-         isValidName(index, true);
-      } else if (fixNamesStrategy == STRATEGY_IGNORE) {
       }
+      for(int i=1;i<constants.constant_namespace.length;i++)
+      {
+         if(deobfuscateNameSpace(constants.constant_namespace[i].name_index))
+         {
+            ret++;
+         }
+      }
+      return ret;
    }
 
    public ABC(InputStream is) throws IOException {
@@ -167,7 +160,6 @@ public class ABC {
       constants.constant_namespace = new Namespace[constant_namespace_pool_count];
       for (int i = 1; i < constant_namespace_pool_count; i++) { //index 0 not used. Values 1..n-1
          constants.constant_namespace[i] = ais.readNamespace();
-         fixNameWithStrategy(constants.constant_namespace[i].name_index);
       }
 
       //constant namespace set
@@ -191,7 +183,6 @@ public class ABC {
       constants.constant_multiname = new Multiname[constant_multiname_pool_count];
       for (int i = 1; i < constant_multiname_pool_count; i++) { //index 0 not used. Values 1..n-1
          constants.constant_multiname[i] = ais.readMultiname();
-         fixNameWithStrategy(constants.constant_multiname[i].name_index);
       }
 
 
@@ -801,12 +792,15 @@ public class ABC {
       "return", "super", "switch", "this", "throw", "true", "try", "typeof", "use", "var", /*"void",*/ "while",
       "with", "dynamic", "default", "final", "in"};
    public int unknownCount = 0;
+   
+   public static final String validFirstCharacters="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
+   public static final String validNextCharacters=validFirstCharacters+"0123456789";
 
-   public boolean isValidName(int index, boolean autoFix) {
-      if (index <= 0) {
-         return true;
+   public boolean deobfuscateNameSpace(int strIndex) {
+      if (strIndex <= 0) {
+         return false;
       }
-      String s = constants.constant_string[index];
+      String s = constants.constant_string[strIndex];
       boolean isValid = true;
       boolean isReserved = false;
       for (String rw : reservedWords) {
@@ -815,6 +809,45 @@ public class ABC {
             isReserved = true;
             break;
          }
+      }
+            if (isValid) {
+         for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) > 127) {
+               isValid = false;
+               break;
+            }
+         }
+      }
+
+      if (!isValid) {         
+         if (isReserved) {
+            constants.constant_string[strIndex] = "name_" + s.replace(" ", "_");
+         } else {
+            unknownCount++;
+            constants.constant_string[strIndex] = "_name" + unknownCount;
+         }         
+      }
+      return !isValid;
+   }
+   
+   public boolean deobfuscateName(int strIndex) {
+      if (strIndex <= 0) {
+         return false;
+      }
+      String s = constants.constant_string[strIndex];
+      boolean isValid = true;
+      boolean isReserved = false;
+      for (String rw : reservedWords) {
+         if (rw.equals(s.trim())) {
+            isValid = false;
+            isReserved = true;
+            break;
+         }
+      }
+      
+      Pattern pat=Pattern.compile("^["+Pattern.quote(validFirstCharacters) +"]"+"["+Pattern.quote(validFirstCharacters+validNextCharacters) +"]*$");
+      if(!pat.matcher(s).matches()){
+         isValid=false;
       }
       if (isValid) {
          for (int i = 0; i < s.length(); i++) {
@@ -825,17 +858,15 @@ public class ABC {
          }
       }
 
-      if (!isValid) {
-         if (autoFix) {
-            if (isReserved) {
-               constants.constant_string[index] = "name_" + s.replace(" ", "_");
-            } else {
-               unknownCount++;
-               constants.constant_string[index] = "_name" + unknownCount;
-            }
-         }
+      if (!isValid) {         
+         if (isReserved) {
+            constants.constant_string[strIndex] = "name_" + s.replace(" ", "_");
+         } else {
+            unknownCount++;
+            constants.constant_string[strIndex] = "_name" + unknownCount;
+         }         
       }
-      return isValid;
+      return !isValid;
    }
 
    private void checkMultinameUsedInMethod(int multinameIndex, int methodInfo, List<MultinameUsage> ret, int classIndex, int traitIndex, boolean isStatic, boolean isInitializer,Traits traits,int parentTraitIndex) {
