@@ -15,11 +15,11 @@
    id="svg2"
    inkscape:label="Pozadí"
    version="1.1"
-   inkscape:version="0.47 r22583"
+   inkscape:version="0.48.1 "
    sodipodi:docname="icon.svg"
-   inkscape:export-filename="D:\Dokumenty\Programovani\JavaSE\ASDec\trunk\graphics\logo55.png"
-   inkscape:export-xdpi="99"
-   inkscape:export-ydpi="99">
+   inkscape:export-filename="D:\Dokumenty\Programovani\JavaSE\ASDec\trunk\graphics\icon256.png"
+   inkscape:export-xdpi="460.79999"
+   inkscape:export-ydpi="460.79999">
   <defs
      id="defs3">
     <linearGradient
@@ -176,7 +176,7 @@
      inkscape:current-layer="layer2"
      showgrid="false"
      inkscape:window-width="1366"
-     inkscape:window-height="706"
+     inkscape:window-height="705"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1" />
