@@ -91,10 +91,13 @@ public abstract class TreeItem {
             if (((LocalRegTreeItem) object).computedValue instanceof FindPropertyTreeItem)
                 obStr = "";
         }
+        if(obStr.equals("")){
+           return propertyName.toString(constants,localRegNames);
+        }
         if (propertyName instanceof FullMultinameTreeItem) {
 
-            if (((FullMultinameTreeItem) propertyName).isRuntime()) {
-                return obStr + "[" + propertyName.toString(constants,localRegNames) + "]";
+            if (((FullMultinameTreeItem) propertyName).isRuntime()) {                
+                return obStr + propertyName.toString(constants,localRegNames);
             } else {
                 if (!obStr.equals("")) obStr += ".";
                 return obStr + ((FullMultinameTreeItem) propertyName).toString(constants,localRegNames);

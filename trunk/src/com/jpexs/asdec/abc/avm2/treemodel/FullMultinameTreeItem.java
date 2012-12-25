@@ -56,21 +56,17 @@ public class FullMultinameTreeItem extends TreeItem {
     public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
         String ret = "";
         if (name != null) {
-            ret = name.toString(constants,localRegNames);
+            ret = "["+name.toString(constants,localRegNames)+"]";
         } else {
-            ret = constants.constant_multiname[multinameIndex].getName(constants);
+            ret = hilight(constants.constant_multiname[multinameIndex].getName(constants));
         }
         if (namespace != null) {
-            ret = ret + "[" + namespace.toString(constants,localRegNames) + "]";
+           ret=namespace.toString(constants,localRegNames)+"::"+ret;
         } else {
-            Namespace ns = constants.constant_multiname[multinameIndex].getNamespace(constants);
-            if (ns != null) {
-                ret = ret + "[" + ns.getName(constants) + "]";
-            }
-        }
-
-        if ((name == null) && (namespace == null)) {
-            ret = hilight(constants.constant_multiname[multinameIndex].getName(constants));
+            /*Namespace ns = constants.constant_multiname[multinameIndex].getNamespace(constants);
+            if ((ns != null)&&(ns.name_index!=0)) {
+                ret =  hilight(ns.getName(constants) + "::")+ret;
+            }*/
         }
         return ret;
     }

@@ -82,12 +82,12 @@ public class InstructionDefinition {
 
     protected FullMultinameTreeItem resolveMultiname(Stack<TreeItem> stack, ConstantPool constants, int multinameIndex, AVM2Instruction ins) {
         TreeItem ns = null;
-        TreeItem name = null;
-        if (constants.constant_multiname[multinameIndex].needsNs()) {
-            ns = (TreeItem) stack.pop();
-        }
+        TreeItem name = null;        
         if (constants.constant_multiname[multinameIndex].needsName()) {
             name = (TreeItem) stack.pop();
+        }
+        if (constants.constant_multiname[multinameIndex].needsNs()) {
+            ns = (TreeItem) stack.pop();
         }
         return new FullMultinameTreeItem(ins, multinameIndex, name, ns);
     }
