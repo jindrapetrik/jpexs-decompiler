@@ -48,4 +48,11 @@ public class LocalRegTreeItem extends TreeItem {
    public boolean isTrue() {
       return computedValue.isTrue();
    }
+
+   @Override
+   public TreeItem getThroughRegister() {
+      return computedValue.getThroughRegister();
+   }
+   
+   
 }

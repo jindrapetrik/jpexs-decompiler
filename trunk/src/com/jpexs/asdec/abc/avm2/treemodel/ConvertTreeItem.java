@@ -36,4 +36,9 @@ public class ConvertTreeItem extends TreeItem {
       //return hilight("("+type+")")+
       return value.toString(constants, localRegNames);
    }
+   
+   @Override
+   public TreeItem getNotCoerced() {
+      return value;
+   }
 }

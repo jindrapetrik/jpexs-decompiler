@@ -31,42 +31,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-public class SetLocal3Ins extends InstructionDefinition implements SetTypeIns, SetLocalTypeIns {
+public class SetLocal3Ins extends SetLocalTypeIns {
 
    public SetLocal3Ins() {
       super(0xd7, "setlocal_3", new int[]{});
    }
 
-   @Override
-   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-      lda.localRegisters.put(3, lda.operandStack.pop());
-   }
-
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer, String> localRegNames) {
-      TreeItem val = (TreeItem) stack.pop();
-      localRegs.put(3, val);
-      if (val instanceof NewActivationTreeItem) {
-         return;
-      }
-      if (val instanceof FindPropertyTreeItem) {
-         return;
-      }
-      //if(val.startsWith("catchscope ")) return;
-      //if(val.startsWith("newactivation()")) return;
-      output.add(new SetLocalTreeItem(ins, 3, val));
-   }
-
-   public String getObject(Stack<TreeItem> stack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, HashMap<Integer, String> localRegNames) {
-      return TreeItem.localRegName(localRegNames, 3);
-   }
-
    public int getRegisterId(AVM2Instruction ins) {
       return 3;
-   }
-
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -1;
    }
 }

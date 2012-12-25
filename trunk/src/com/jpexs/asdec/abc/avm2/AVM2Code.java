@@ -527,6 +527,8 @@ public class AVM2Code {
    };
    //endoflist
    public static InstructionDefinition instructionSetByCode[] = buildInstructionSetByCode();
+   
+   public boolean hideTemporaryRegisters=true;
 
    private static InstructionDefinition[] buildInstructionSetByCode() {
       InstructionDefinition result[] = new InstructionDefinition[256];
@@ -948,7 +950,7 @@ public class AVM2Code {
       return localRegNames;
    }
 
-   private void clearKilledAssigments(List<TreeItem> output) {
+   private void clearTemporaryRegisters(List<TreeItem> output) {
       for (int i = 0; i < output.size(); i++) {
          if (output.get(i) instanceof SetLocalTreeItem) {
             if (isKilled(((SetLocalTreeItem) output.get(i)).regIndex, 0, code.size() - 1)) {
@@ -1471,148 +1473,6 @@ public class AVM2Code {
                   } else if (insAfter.definition instanceof IfTrueIns) {
                      //stack.add("(" + stack.pop() + ")||");
                      isAnd = false;
-                  } else if ((insAfter.definition instanceof IncrementIIns) || ((insAfter.definition instanceof IncrementIns))) {
-                     int np = -1;
-                     if (((np = ipOfType(ip + 2, false, SetLocalTypeIns.class, CoerceOrConvertTypeIns.class, start, end)) > -1)
-                             && (ipOfType(ip - 1, true, GetLocalTypeIns.class, CoerceOrConvertTypeIns.class, start, end) > -1)) {
-                        stack.add(new PostIncrementTreeItem(insAfter, stack.pop()));
-                        ip = np + 1;
-                        addr = pos2adr(ip);
-                        break;
-                     }
-                     if (((ip - 1 >= start) && (ip + 2 <= end))
-                             && (code.get(ip + 2).definition instanceof SetLocalTypeIns)
-                             && (isKilled(((SetLocalTypeIns) code.get(ip + 2).definition).getRegisterId(code.get(ip + 2)), ip + 3, end))) {
-                        int pos = -1;
-                        for (int d = ip + 3; d <= end; d++) {
-                           if (!((code.get(d).definition instanceof GetLocalTypeIns)
-                                   && (isKilled(((GetLocalTypeIns) code.get(d).definition).getRegisterId(code.get(d)), d + 1, end)))) {
-                              pos = d;
-                              break;
-                           }
-                        }
-                        if (pos > -1) {
-                           if (code.get(pos).definition instanceof SetTypeIns) {
-                              stack.push(new PostIncrementTreeItem(insAfter, stack.pop()));
-                              ip = pos + 1;
-                              addr = pos2adr(ip);
-                              break;
-                           }
-                        }
-
-                     }
-                     ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames);
-                     ip++;
-                     addr = pos2adr(ip);
-                     break;
-                  } else if ((insAfter.definition instanceof DecrementIIns) || ((insAfter.definition instanceof DecrementIns))) {
-                     int np = -1;
-                     if (((np = ipOfType(ip + 2, false, SetLocalTypeIns.class, CoerceOrConvertTypeIns.class, start, end)) > -1)
-                             && (ipOfType(ip - 1, true, GetLocalTypeIns.class, CoerceOrConvertTypeIns.class, start, end) > -1)) {
-                        stack.add(new PostDecrementTreeItem(insAfter, stack.pop()));
-                        ip = np + 1;
-                        addr = pos2adr(ip);
-                        break;
-                     }
-                     if (((ip - 1 >= start) && (ip + 2 <= end))
-                             && (code.get(ip + 2).definition instanceof SetLocalTypeIns)
-                             && (isKilled(((SetLocalTypeIns) code.get(ip + 2).definition).getRegisterId(code.get(ip + 2)), ip + 3, end))) {
-                        int pos = -1;
-                        for (int d = ip + 3; d <= end; d++) {
-                           if (!((code.get(d).definition instanceof GetLocalTypeIns)
-                                   && (isKilled(((GetLocalTypeIns) code.get(d).definition).getRegisterId(code.get(d)), d + 1, end)))) {
-                              pos = d;
-                              break;
-                           }
-                        }
-                        if (pos > -1) {
-                           if (code.get(pos).definition instanceof SetTypeIns) {
-                              stack.push(new PostDecrementTreeItem(insAfter, stack.pop()));
-                              ip = pos + 1;
-                              addr = pos2adr(ip);
-                              break;
-                           }
-                        }
-
-                     }
-                     ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames);
-                     ip++;
-                     addr = pos2adr(ip);
-                     break;
-                  } else if ((insBefore.definition instanceof IncrementIIns) || ((insBefore.definition instanceof IncrementIns))) {
-                     if (((ip - 2 >= start) && (ip + 2 <= end)) && (code.get(ip + 1).definition instanceof CoerceOrConvertTypeIns) && (code.get(ip + 2).definition instanceof SetLocalTypeIns) && (code.get(ip - 2).definition instanceof GetLocalTypeIns)) {
-                        stack.pop();
-                        int regId = ((SetLocalTypeIns) code.get(ip + 2).definition).getRegisterId(code.get(ip + 2));
-                        stack.add(new PreIncrementTreeItem(insBefore, new LocalRegTreeItem(code.get(ip + 2), regId, localRegs.get(regId))));
-                        ip += 3;
-                        addr = pos2adr(ip);
-                        break;
-                     }
-                     if (((ip - 1 >= start) && (ip + 2 <= end))
-                             && (code.get(ip + 1).definition instanceof SetLocalTypeIns)
-                             && (isKilled(((SetLocalTypeIns) code.get(ip + 1).definition).getRegisterId(code.get(ip + 1)), ip + 2, end))) {
-                        int pos = -1;
-                        for (int d = ip + 2; d <= end; d++) {
-                           if (!((code.get(d).definition instanceof GetLocalTypeIns)
-                                   && (isKilled(((GetLocalTypeIns) code.get(d).definition).getRegisterId(code.get(d)), d + 1, end)))) {
-                              pos = d;
-                              break;
-                           }
-                        }
-                        if (pos > -1) {
-                           if (code.get(pos).definition instanceof SetTypeIns) {
-                              TreeItem s = stack.pop();
-                              if (s instanceof IncrementTreeItem) {
-                                 stack.push(new PreIncrementTreeItem(insBefore, ((IncrementTreeItem) s).object));
-                              }
-                              ip = pos + 1;
-                              addr = pos2adr(ip);
-                              break;
-                           }
-                        }
-
-                     }
-                     ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames);
-                     ip++;
-                     addr = pos2adr(ip);
-                     break;
-                  } else if ((insBefore.definition instanceof DecrementIIns) || ((insBefore.definition instanceof DecrementIns))) {
-                     if (((ip - 2 >= start) && (ip + 2 <= end)) && (code.get(ip + 1).definition instanceof CoerceOrConvertTypeIns) && (code.get(ip + 2).definition instanceof SetLocalTypeIns) && (code.get(ip - 2).definition instanceof GetLocalTypeIns)) {
-                        stack.pop();
-                        int regId = ((SetLocalTypeIns) code.get(ip + 2).definition).getRegisterId(code.get(ip + 2));
-                        stack.add(new PreDecrementTreeItem(insBefore, new LocalRegTreeItem(code.get(ip + 2), regId, localRegs.get(regId))));
-                        ip += 3;
-                        addr = pos2adr(ip);
-                        break;
-                     }
-                     if (((ip - 1 >= start) && (ip + 2 <= end))
-                             && (code.get(ip + 1).definition instanceof SetLocalTypeIns)
-                             && (isKilled(((SetLocalTypeIns) code.get(ip + 1).definition).getRegisterId(code.get(ip + 1)), ip + 2, end))) {
-                        int pos = -1;
-                        for (int d = ip + 2; d <= end; d++) {
-                           if (!((code.get(d).definition instanceof GetLocalTypeIns)
-                                   && (isKilled(((GetLocalTypeIns) code.get(d).definition).getRegisterId(code.get(d)), d + 1, end)))) {
-                              pos = d;
-                              break;
-                           }
-                        }
-                        if (pos > -1) {
-                           if (code.get(pos).definition instanceof SetTypeIns) {
-                              TreeItem s = stack.pop();
-                              if (s instanceof DecrementTreeItem) {
-                                 stack.push(new PreDecrementTreeItem(insBefore, ((DecrementTreeItem) s).object));
-                              }
-                              ip = pos + 1;
-                              addr = pos2adr(ip);
-                              break;
-                           }
-                        }
-
-                     }
-                     ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames);
-                     ip++;
-                     addr = pos2adr(ip);
-                     break;
                   } else if (insAfter.definition instanceof SetLocalTypeIns) {
                      //chained assignments
                      int reg = (((SetLocalTypeIns) insAfter.definition).getRegisterId(insAfter));
@@ -1728,7 +1588,10 @@ public class AVM2Code {
          if (debugMode) {
             System.out.println("CLOSE SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
          }
-         //clearKilledAssigments(output);
+         if(hideTemporaryRegisters)
+         {
+            clearTemporaryRegisters(output);
+         }
          return new ConvertOutput(stack, output);
       } catch (ConvertException cex) {
          throw cex;
@@ -1736,6 +1599,7 @@ public class AVM2Code {
          if (ex instanceof UnknownJumpException) {
             throw (UnknownJumpException) ex;
          }
+         ex.printStackTrace();
          throw new ConvertException(ex.getClass().getSimpleName(), ip);
       }
    }
@@ -1813,6 +1677,7 @@ public class AVM2Code {
          list = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), new Stack<TreeItem>(), abc, constants, method_info, body, 0, code.size() - 1, localRegNames).output;
          s = listToString(list, constants, localRegNames);
       } catch (Exception ex) {
+         ex.printStackTrace();
          s = "/*\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error Message: " + ex.getMessage() + "\r\n */";
          return s;
       }
@@ -1842,7 +1707,7 @@ public class AVM2Code {
       }
       HashMap<Integer, String> localRegTypes = getLocalRegTypes(constants);
       for (int i = paramCount + 1; i < regCount; i++) {
-         if ((!(localRegs.get(i) instanceof NewActivationTreeItem))/*&&(!isKilled(i, 0, code.size()-1))*/) {
+         if ((!(localRegs.get(i) instanceof NewActivationTreeItem)&&((!hideTemporaryRegisters)||(!isKilled(i, 0, code.size()-1))))) {
             sub += "var " + TreeItem.localRegName(localRegNames, i);
             if (localRegTypes.containsKey(i)) {
                sub += ":" + localRegTypes.get(i);

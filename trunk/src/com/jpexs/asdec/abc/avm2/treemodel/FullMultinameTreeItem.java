@@ -24,8 +24,8 @@ public class FullMultinameTreeItem extends TreeItem {
 
    public int multinameIndex;
    public TreeItem name;
-   public TreeItem namespace;
-
+   public TreeItem namespace;   
+   
    public FullMultinameTreeItem(AVM2Instruction instruction, int multinameIndex, TreeItem name) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.multinameIndex = multinameIndex;
@@ -68,5 +68,38 @@ public class FullMultinameTreeItem extends TreeItem {
           }*/
       }
       return ret;
+   }
+   
+   public boolean compareSame(FullMultinameTreeItem other)
+   {
+      if(multinameIndex!=other.multinameIndex){
+         return false;
+      }
+      TreeItem tiName=name;
+      while(tiName instanceof LocalRegTreeItem){
+         tiName=((LocalRegTreeItem)tiName).computedValue;
+      }
+      
+      TreeItem tiName2=other.name;
+      while(tiName2 instanceof LocalRegTreeItem){
+         tiName2=((LocalRegTreeItem)tiName2).computedValue;
+      }
+      if(tiName!=tiName2){
+         return false;
+      }
+      
+      TreeItem tiNameSpace=namespace;
+      while(tiNameSpace instanceof LocalRegTreeItem){
+         tiNameSpace=((LocalRegTreeItem)tiNameSpace).computedValue;
+      }
+      
+      TreeItem tiNameSpace2=other.namespace;
+      while(tiNameSpace2 instanceof LocalRegTreeItem){
+         tiNameSpace2=((LocalRegTreeItem)tiNameSpace2).computedValue;
+      }
+      if(tiNameSpace!=tiNameSpace2){
+         return false;
+      }
+      return true;
    }
 }

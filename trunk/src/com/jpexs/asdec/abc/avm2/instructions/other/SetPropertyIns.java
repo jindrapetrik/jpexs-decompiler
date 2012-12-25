@@ -22,9 +22,17 @@ import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.avm2.instructions.SetTypeIns;
+import com.jpexs.asdec.abc.avm2.treemodel.DecrementTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.FullMultinameTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.GetPropertyTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.IncrementTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.LocalRegTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.PostDecrementTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.PostIncrementTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.SetPropertyTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.operations.PreDecrementTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.operations.PreIncrementTreeItem;
 import com.jpexs.asdec.abc.types.MethodInfo;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +50,65 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
       TreeItem value = (TreeItem) stack.pop();
       FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
       TreeItem obj = (TreeItem) stack.pop();
+      if (value.getThroughRegister() instanceof IncrementTreeItem) {
+         TreeItem inside = ((IncrementTreeItem) value.getThroughRegister()).object.getThroughRegister().getNotCoerced();
+         if (inside instanceof GetPropertyTreeItem) {
+            GetPropertyTreeItem insideProp = ((GetPropertyTreeItem) inside);
+            if (insideProp.propertyName.compareSame(multiname)) {
+               TreeItem insideObj = obj;
+               if (insideObj instanceof LocalRegTreeItem) {
+                  insideObj = ((LocalRegTreeItem) insideObj).computedValue;
+               }
+               if (insideProp.object == insideObj) {
+                  if (stack.size() > 0) {
+                     TreeItem top = stack.peek().getNotCoerced();
+                     if (top == insideProp) {
+                        stack.pop();
+                        stack.push(new PostIncrementTreeItem(ins, insideProp));
+                     } else if ((top instanceof IncrementTreeItem) && (((IncrementTreeItem) top).object == inside)) {
+                        stack.pop();
+                        stack.push(new PreIncrementTreeItem(ins, insideProp));
+                     } else {
+                        output.add(new PostIncrementTreeItem(ins, insideProp));
+                     }
+                  } else {
+                     output.add(new PostIncrementTreeItem(ins, insideProp));
+                  }
+                  return;
+               }
+            }
+         }
+      }
+
+      if (value.getThroughRegister() instanceof DecrementTreeItem) {
+         TreeItem inside = ((DecrementTreeItem) value.getThroughRegister()).object.getThroughRegister().getNotCoerced();
+         if (inside instanceof GetPropertyTreeItem) {
+            GetPropertyTreeItem insideProp = ((GetPropertyTreeItem) inside);
+            if (insideProp.propertyName.compareSame(multiname)) {
+               TreeItem insideObj = obj;
+               if (insideObj instanceof LocalRegTreeItem) {
+                  insideObj = ((LocalRegTreeItem) insideObj).computedValue;
+               }
+               if (insideProp.object == insideObj) {
+                  if (stack.size() > 0) {
+                     TreeItem top = stack.peek().getNotCoerced();
+                     if (top == insideProp) {
+                        stack.pop();
+                        stack.push(new PostDecrementTreeItem(ins, insideProp));
+                     } else if ((top instanceof DecrementTreeItem) && (((DecrementTreeItem) top).object == inside)) {
+                        stack.pop();
+                        stack.push(new PreDecrementTreeItem(ins, insideProp));
+                     } else {
+                        output.add(new PostDecrementTreeItem(ins, insideProp));
+                     }
+                  } else {
+                     output.add(new PostDecrementTreeItem(ins, insideProp));
+                  }
+                  return;
+               }
+            }
+         }
+      }
       output.add(new SetPropertyTreeItem(ins, obj, multiname, value));
    }
 

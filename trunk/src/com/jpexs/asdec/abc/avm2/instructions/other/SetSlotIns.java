@@ -22,10 +22,18 @@ import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.avm2.instructions.SetTypeIns;
+import com.jpexs.asdec.abc.avm2.treemodel.DecrementTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.GetSlotTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.IncrementTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.LocalRegTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.NewActivationTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.PostDecrementTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.PostIncrementTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.SetSlotTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.clauses.ExceptionTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.operations.PreDecrementTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.operations.PreIncrementTreeItem;
 import com.jpexs.asdec.abc.types.MethodInfo;
 import com.jpexs.asdec.abc.types.Multiname;
 import com.jpexs.asdec.abc.types.traits.TraitSlotConst;
@@ -65,7 +73,59 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
             return;
          }
       }
-
+            
+      if (value.getNotCoerced() instanceof IncrementTreeItem) {         
+         TreeItem inside = ((IncrementTreeItem) value.getNotCoerced()).object.getThroughRegister().getNotCoerced();
+         if (inside instanceof GetSlotTreeItem) {
+            GetSlotTreeItem slotItem=(GetSlotTreeItem)inside;
+            if ((slotItem.scope.getThroughRegister()==obj.getThroughRegister())
+                    &&(slotItem.slotName==slotname))
+            {            
+               if (stack.size() > 0) {
+                  TreeItem top = stack.peek().getNotCoerced();
+                  if (top == inside) {
+                     stack.pop();
+                     stack.push(new PostIncrementTreeItem(ins, inside));
+                  } else if ((top instanceof IncrementTreeItem) && (((IncrementTreeItem) top).object == inside)) {
+                     stack.pop();
+                     stack.push(new PreIncrementTreeItem(ins, inside));
+                  } else {
+                     output.add(new PostIncrementTreeItem(ins, inside));
+                  }
+               } else {
+                  output.add(new PostIncrementTreeItem(ins, inside));
+               }
+               return;
+            }
+         }
+      }
+      
+      if (value.getNotCoerced() instanceof DecrementTreeItem) {         
+         TreeItem inside = ((DecrementTreeItem) value.getNotCoerced()).object.getThroughRegister().getNotCoerced();
+         if (inside instanceof GetSlotTreeItem) {
+            GetSlotTreeItem slotItem=(GetSlotTreeItem)inside;
+            if ((slotItem.scope.getThroughRegister()==obj.getThroughRegister())
+                    &&(slotItem.slotName==slotname))
+            {            
+               if (stack.size() > 0) {
+                  TreeItem top = stack.peek().getNotCoerced();
+                  if (top == inside) {
+                     stack.pop();
+                     stack.push(new PostDecrementTreeItem(ins, inside));
+                  } else if ((top instanceof DecrementTreeItem) && (((DecrementTreeItem) top).object == inside)) {
+                     stack.pop();
+                     stack.push(new PreDecrementTreeItem(ins, inside));
+                  } else {
+                     output.add(new PostDecrementTreeItem(ins, inside));
+                  }
+               } else {
+                  output.add(new PostDecrementTreeItem(ins, inside));
+               }
+               return;
+            }
+         }
+      }
+      
       output.add(new SetSlotTreeItem(ins, obj, slotname, value));
    }
 
