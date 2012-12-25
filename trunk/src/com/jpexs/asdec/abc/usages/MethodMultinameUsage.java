@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.usages;
 
 import com.jpexs.asdec.abc.ABC;
@@ -29,36 +28,27 @@ public abstract class MethodMultinameUsage extends TraitMultinameUsage {
 
    public boolean isInitializer;
 
-   public MethodMultinameUsage(int multinameIndex,int classIndex,int traitIndex,boolean isStatic,boolean isInitializer,Traits traits,int parentTraitIndex)
-   {
-      super(multinameIndex,classIndex,traitIndex,isStatic,traits,parentTraitIndex);
-      this.isInitializer=isInitializer;
+   public MethodMultinameUsage(int multinameIndex, int classIndex, int traitIndex, boolean isStatic, boolean isInitializer, Traits traits, int parentTraitIndex) {
+      super(multinameIndex, classIndex, traitIndex, isStatic, traits, parentTraitIndex);
+      this.isInitializer = isInitializer;
    }
 
    public boolean isInitializer() {
       return isInitializer;
    }
 
-
-
    @Override
    public String toString(ABC abc) {
-      return super.toString(abc)+" "+(
-              isInitializer?
-                 (isStatic?
-                    "class initializer":
-                    "instance initializer")
-                 :(
-         (parentTraitIndex>-1?
-         (isStatic?
-            (((TraitMethodGetterSetter)abc.class_info[classIndex].static_traits.traits[parentTraitIndex]).convert(abc.constants, abc.method_info, abc,isStatic)):
-            (((TraitMethodGetterSetter)abc.instance_info[classIndex].instance_traits.traits[parentTraitIndex]).convert(abc.constants, abc.method_info, abc,isStatic))
-          )+" "
-         :
-         "")
-         +
-         (((TraitMethodGetterSetter)traits.traits[traitIndex]).convert(abc.constants, abc.method_info, abc,isStatic)))
-         );
+      return super.toString(abc) + " " + (isInitializer
+              ? (isStatic
+              ? "class initializer"
+              : "instance initializer")
+              : ((parentTraitIndex > -1
+              ? (isStatic
+              ? (((TraitMethodGetterSetter) abc.class_info[classIndex].static_traits.traits[parentTraitIndex]).convert(abc.constants, abc.method_info, abc, isStatic))
+              : (((TraitMethodGetterSetter) abc.instance_info[classIndex].instance_traits.traits[parentTraitIndex]).convert(abc.constants, abc.method_info, abc, isStatic))) + " "
+              : "")
+              + (((TraitMethodGetterSetter) traits.traits[traitIndex]).convert(abc.constants, abc.method_info, abc, isStatic))));
    }
 
    public int getTraitIndex() {
@@ -68,8 +58,4 @@ public abstract class MethodMultinameUsage extends TraitMultinameUsage {
    public boolean isStatic() {
       return isStatic;
    }
-
-   
-
-
 }

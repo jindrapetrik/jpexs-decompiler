@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
@@ -24,19 +23,18 @@ import java.io.IOException;
 
 public class DefineScalingGrid extends Tag {
 
-	private int characterId;
-	private RECT splitter;
+   private int characterId;
+   private RECT splitter;
 
-	public DefineScalingGrid(byte[] data, int version, long pos) throws IOException {
-		super(78, data, pos);
-		SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-        characterId = sis.readUI16();
-        splitter = sis.readRECT();
-	}
+   public DefineScalingGrid(byte[] data, int version, long pos) throws IOException {
+      super(78, data, pos);
+      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+      characterId = sis.readUI16();
+      splitter = sis.readRECT();
+   }
 
-	@Override
-	public String toString() {
-		return "DefineScalingGrid";
-	}
-
+   @Override
+   public String toString() {
+      return "DefineScalingGrid";
+   }
 }

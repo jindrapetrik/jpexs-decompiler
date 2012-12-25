@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf3;
 
 import com.jpexs.asdec.action.Action;
@@ -26,17 +25,17 @@ import java.util.Stack;
 
 public class ActionPrevFrame extends Action {
 
-    public ActionPrevFrame() {
-        super(0x05, 0);
-    }
+   public ActionPrevFrame() {
+      super(0x05, 0);
+   }
 
-    @Override
-    public String toString() {
-        return "PrevFrame";
-    }
+   @Override
+   public String toString() {
+      return "PrevFrame";
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        output.add(new SimpleActionTreeItem(this, "prevFrame();"));
-    }
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      output.add(new SimpleActionTreeItem(this, "prevFrame();"));
+   }
 }

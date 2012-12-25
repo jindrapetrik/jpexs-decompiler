@@ -14,10 +14,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.instructions.stack;
 
- import com.jpexs.asdec.abc.ABC;
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
@@ -29,35 +28,32 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-
 public class SwapIns extends InstructionDefinition {
 
-    public SwapIns() {
-        super(0x2b, "swap", new int[]{});
-    }
-
-    @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-        Object obj1 = lda.operandStack.pop();
-        Object obj2 = lda.operandStack.pop();
-        lda.operandStack.push(obj1);
-        lda.operandStack.push(obj2);
-    }
-
-    @Override
-    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, MethodBody body, ABC abc,HashMap<Integer,String> localRegNames) {
-
-        TreeItem o1 = stack.pop();
-        TreeItem o2 = stack.pop();
-        stack.push(o1);
-        stack.push(o2);
-
-    }
-
-    @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -2+2;
+   public SwapIns() {
+      super(0x2b, "swap", new int[]{});
    }
 
+   @Override
+   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+      Object obj1 = lda.operandStack.pop();
+      Object obj2 = lda.operandStack.pop();
+      lda.operandStack.push(obj1);
+      lda.operandStack.push(obj2);
+   }
 
+   @Override
+   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames) {
+
+      TreeItem o1 = stack.pop();
+      TreeItem o2 = stack.pop();
+      stack.push(o1);
+      stack.push(o2);
+
+   }
+
+   @Override
+   public int getStackDelta(AVM2Instruction ins, ABC abc) {
+      return -2 + 2;
+   }
 }

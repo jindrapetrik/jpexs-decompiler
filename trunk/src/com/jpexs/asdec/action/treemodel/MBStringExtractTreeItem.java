@@ -14,25 +14,25 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
 
 public class MBStringExtractTreeItem extends TreeItem {
-    public TreeItem value;
-    public TreeItem index;
-    public TreeItem count;
 
-    public MBStringExtractTreeItem(Action instruction, TreeItem value, TreeItem index, TreeItem count) {
-        super(instruction, PRECEDENCE_PRIMARY);
-        this.value = value;
-        this.index = index;
-        this.count = count;
-    }
+   public TreeItem value;
+   public TreeItem index;
+   public TreeItem count;
 
-    @Override
-    public String toString(ConstantPool constants) {
-        return "mbsubstring(" + value.toString(constants) + "," + index.toString(constants) + "," + count.toString(constants) + ")";
-    }
+   public MBStringExtractTreeItem(Action instruction, TreeItem value, TreeItem index, TreeItem count) {
+      super(instruction, PRECEDENCE_PRIMARY);
+      this.value = value;
+      this.index = index;
+      this.count = count;
+   }
+
+   @Override
+   public String toString(ConstantPool constants) {
+      return "mbsubstring(" + value.toString(constants) + "," + index.toString(constants) + "," + count.toString(constants) + ")";
+   }
 }

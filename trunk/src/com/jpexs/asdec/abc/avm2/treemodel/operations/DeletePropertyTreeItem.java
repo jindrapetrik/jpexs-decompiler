@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel.operations;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
@@ -23,21 +22,19 @@ import com.jpexs.asdec.abc.avm2.treemodel.FullMultinameTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import java.util.HashMap;
 
-
 public class DeletePropertyTreeItem extends TreeItem {
-    public TreeItem object;
-    public FullMultinameTreeItem propertyName;
 
-    public DeletePropertyTreeItem(AVM2Instruction instruction, TreeItem object, FullMultinameTreeItem propertyName) {
-        super(instruction, PRECEDENCE_UNARY);
-        this.object = object;
-        this.propertyName = propertyName;
-    }
+   public TreeItem object;
+   public FullMultinameTreeItem propertyName;
 
-    @Override
-    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
-        return hilight("delete ") + object.toString(constants,localRegNames) + "[" + propertyName.toString(constants,localRegNames) + "]";
-    }
+   public DeletePropertyTreeItem(AVM2Instruction instruction, TreeItem object, FullMultinameTreeItem propertyName) {
+      super(instruction, PRECEDENCE_UNARY);
+      this.object = object;
+      this.propertyName = propertyName;
+   }
 
-
+   @Override
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+      return hilight("delete ") + object.toString(constants, localRegNames) + "[" + propertyName.toString(constants, localRegNames) + "]";
+   }
 }

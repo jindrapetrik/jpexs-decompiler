@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.usages;
 
 import com.jpexs.asdec.abc.ABC;
@@ -28,23 +27,19 @@ import com.jpexs.asdec.abc.types.traits.Traits;
  */
 public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {
 
-   public ConstVarMultinameUsage(int multinameIndex,int classIndex,int traitIndex,boolean isStatic,Traits traits,int parentTraitIndex)
-   {
-      super(multinameIndex,classIndex,traitIndex,isStatic,traits,parentTraitIndex);
+   public ConstVarMultinameUsage(int multinameIndex, int classIndex, int traitIndex, boolean isStatic, Traits traits, int parentTraitIndex) {
+      super(multinameIndex, classIndex, traitIndex, isStatic, traits, parentTraitIndex);
    }
 
    @Override
    public String toString(ABC abc) {
-      return super.toString(abc)+" "+
-              (parentTraitIndex>-1?
-         (isStatic?
-            (((TraitMethodGetterSetter)abc.class_info[classIndex].static_traits.traits[parentTraitIndex]).convert(abc.constants, abc.method_info, abc,isStatic)):
-            (((TraitMethodGetterSetter)abc.instance_info[classIndex].instance_traits.traits[parentTraitIndex]).convert(abc.constants, abc.method_info, abc,isStatic))
-          )  
-         :
-         "")+
-              ((TraitSlotConst)traits.traits[traitIndex]).convert(abc.constants, abc.method_info, abc,isStatic)
-             ;
+      return super.toString(abc) + " "
+              + (parentTraitIndex > -1
+              ? (isStatic
+              ? (((TraitMethodGetterSetter) abc.class_info[classIndex].static_traits.traits[parentTraitIndex]).convert(abc.constants, abc.method_info, abc, isStatic))
+              : (((TraitMethodGetterSetter) abc.instance_info[classIndex].instance_traits.traits[parentTraitIndex]).convert(abc.constants, abc.method_info, abc, isStatic)))
+              : "")
+              + ((TraitSlotConst) traits.traits[traitIndex]).convert(abc.constants, abc.method_info, abc, isStatic);
    }
 
    public int getTraitIndex() {
@@ -54,8 +49,4 @@ public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {
    public boolean isStatic() {
       return isStatic;
    }
-
-   
-
-
 }

@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.Main;
@@ -83,23 +82,22 @@ public class UsageFrame extends JFrame implements ActionListener, MouseListener 
             try {
                Thread.sleep(100);
             } catch (InterruptedException ex) {
-               
             }
             if (usage instanceof TraitMultinameUsage) {
-               TraitMultinameUsage tmu=(TraitMultinameUsage)usage;
-               int traitIndex=0;
-               if(tmu.parentTraitIndex>-1){
-                  traitIndex=tmu.parentTraitIndex;
-               }else{
-                  traitIndex=tmu.traitIndex;
+               TraitMultinameUsage tmu = (TraitMultinameUsage) usage;
+               int traitIndex = 0;
+               if (tmu.parentTraitIndex > -1) {
+                  traitIndex = tmu.parentTraitIndex;
+               } else {
+                  traitIndex = tmu.traitIndex;
                }
-               if(!tmu.isStatic){
-                  traitIndex+=abc.class_info[tmu.classIndex].static_traits.traits.length;
+               if (!tmu.isStatic) {
+                  traitIndex += abc.class_info[tmu.classIndex].static_traits.traits.length;
                }
-               if(tmu instanceof MethodMultinameUsage){
-                  MethodMultinameUsage mmu=(MethodMultinameUsage)usage;
-                  if(mmu.isInitializer==true){
-                     traitIndex=abc.class_info[mmu.classIndex].static_traits.traits.length+abc.instance_info[mmu.classIndex].instance_traits.traits.length+(mmu.isStatic?1:0);
+               if (tmu instanceof MethodMultinameUsage) {
+                  MethodMultinameUsage mmu = (MethodMultinameUsage) usage;
+                  if (mmu.isInitializer == true) {
+                     traitIndex = abc.class_info[mmu.classIndex].static_traits.traits.length + abc.instance_info[mmu.classIndex].instance_traits.traits.length + (mmu.isStatic ? 1 : 0);
                   }
                }
                Main.abcMainFrame.decompiledTextArea.gotoTrait(traitIndex);

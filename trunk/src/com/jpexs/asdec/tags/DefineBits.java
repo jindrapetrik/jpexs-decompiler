@@ -14,18 +14,17 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.tags;
 
 public class DefineBits extends Tag {
 
-	public DefineBits(byte[] data, int version, long pos) {
-		super(6, data, pos);
-		// TODO Auto-generated constructor stub
-	}
+   public DefineBits(byte[] data, int version, long pos) {
+      super(6, data, pos);
+      // TODO Auto-generated constructor stub
+   }
 
-	@Override
-	public String toString() {
-		return "DefineBits";
-	}
+   @Override
+   public String toString() {
+      return "DefineBits";
+   }
 }

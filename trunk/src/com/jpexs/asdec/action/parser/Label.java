@@ -14,15 +14,15 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.parser;
 
 public class Label {
-    public String name;
-    public long address;
 
-    public Label(String name, long address) {
-        this.name = name;
-        this.address = address;
-    }
+   public String name;
+   public long address;
+
+   public Label(String name, long address) {
+      this.name = name;
+      this.address = address;
+   }
 }

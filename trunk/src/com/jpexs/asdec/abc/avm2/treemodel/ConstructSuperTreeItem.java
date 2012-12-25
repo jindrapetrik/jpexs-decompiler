@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
@@ -23,31 +22,31 @@ import com.jpexs.asdec.helpers.Highlighting;
 import java.util.HashMap;
 import java.util.List;
 
-
 public class ConstructSuperTreeItem extends TreeItem {
-    public TreeItem object;
-    public List<TreeItem> args;
 
-    public ConstructSuperTreeItem(AVM2Instruction instruction, TreeItem object, List<TreeItem> args) {
-        super(instruction, PRECEDENCE_PRIMARY);
-        this.object = object;
-        this.args = args;
-    }
+   public TreeItem object;
+   public List<TreeItem> args;
 
-    @Override
-    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
-        String argStr = "";
-        for (int a = 0; a < args.size(); a++) {
-            if (a > 0) {
-                argStr = argStr + ",";
-            }
-            argStr = argStr + args.get(a).toString(constants,localRegNames);
-        }
-        String calee = object.toString(constants,localRegNames) + ".";
-        if (Highlighting.stripHilights(calee).equals("this.")) calee = "";
-        return calee + hilight("super(") + argStr + hilight(")");
+   public ConstructSuperTreeItem(AVM2Instruction instruction, TreeItem object, List<TreeItem> args) {
+      super(instruction, PRECEDENCE_PRIMARY);
+      this.object = object;
+      this.args = args;
+   }
 
-    }
+   @Override
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+      String argStr = "";
+      for (int a = 0; a < args.size(); a++) {
+         if (a > 0) {
+            argStr = argStr + ",";
+         }
+         argStr = argStr + args.get(a).toString(constants, localRegNames);
+      }
+      String calee = object.toString(constants, localRegNames) + ".";
+      if (Highlighting.stripHilights(calee).equals("this.")) {
+         calee = "";
+      }
+      return calee + hilight("super(") + argStr + hilight(")");
 
-
+   }
 }

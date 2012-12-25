@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf6;
 
 import com.jpexs.asdec.action.Action;
@@ -25,18 +24,19 @@ import java.util.List;
 import java.util.Stack;
 
 public class ActionEnumerate2 extends Action {
-    public ActionEnumerate2() {
-        super(0x55, 0);
-    }
 
-    @Override
-    public String toString() {
-        return "Enumerate2";
-    }
+   public ActionEnumerate2() {
+      super(0x55, 0);
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        TreeItem object = stack.pop();
-        stack.push(new EnumerateTreeItem(this, object));
-    }
+   @Override
+   public String toString() {
+      return "Enumerate2";
+   }
+
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      TreeItem object = stack.pop();
+      stack.push(new EnumerateTreeItem(this, object));
+   }
 }

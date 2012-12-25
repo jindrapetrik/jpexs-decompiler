@@ -14,30 +14,30 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
 import java.util.List;
 
 public class FSCommand2TreeItem extends TreeItem {
-    public String target;
-    public List<TreeItem> arguments;
-    public TreeItem command;
 
-    public FSCommand2TreeItem(Action instruction, TreeItem command,List<TreeItem> arguments) {
-        super(instruction, PRECEDENCE_PRIMARY);
-        this.command = command;
-        this.arguments=arguments;
-    }
+   public String target;
+   public List<TreeItem> arguments;
+   public TreeItem command;
 
-    @Override
-    public String toString(ConstantPool constants) {
-        String paramStr = "";
-        for (int t = 0; t < arguments.size(); t++) {
-            paramStr += ",";
-            paramStr += arguments.get(t).toString(constants);
-        }
-        return "FSCommand2(" + command.toString(constants)+paramStr+");";
-    }
+   public FSCommand2TreeItem(Action instruction, TreeItem command, List<TreeItem> arguments) {
+      super(instruction, PRECEDENCE_PRIMARY);
+      this.command = command;
+      this.arguments = arguments;
+   }
+
+   @Override
+   public String toString(ConstantPool constants) {
+      String paramStr = "";
+      for (int t = 0; t < arguments.size(); t++) {
+         paramStr += ",";
+         paramStr += arguments.get(t).toString(constants);
+      }
+      return "FSCommand2(" + command.toString(constants) + paramStr + ");";
+   }
 }

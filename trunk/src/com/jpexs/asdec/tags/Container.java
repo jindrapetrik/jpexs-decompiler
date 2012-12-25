@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.tags;
 
 import java.util.List;
@@ -25,17 +24,18 @@ import java.util.List;
  * @author JPEXS
  */
 public interface Container {
-    /**
-     * Returns all sub-items
-     *
-     * @return List of sub-items
-     */
-    public List<Object> getSubItems();
 
-    /**
-     * Returns number of sub-items
-     *
-     * @return Number of sub-items
-     */
-    public int getItemCount();
+   /**
+    * Returns all sub-items
+    *
+    * @return List of sub-items
+    */
+   public List<Object> getSubItems();
+
+   /**
+    * Returns number of sub-items
+    *
+    * @return Number of sub-items
+    */
+   public int getItemCount();
 }

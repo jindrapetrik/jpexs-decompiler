@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc;
 
 import java.io.IOException;
@@ -22,46 +21,47 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class CopyOutputStream extends OutputStream {
-    private OutputStream os;
-    private InputStream is;
-    private long pos = 0;
-    private int TEMPSIZE = 5;
-    private int temp[] = new int[TEMPSIZE];
-    private int tempPos = 0;
 
-    public CopyOutputStream(OutputStream os, InputStream is) {
-        this.os = os;
-        this.is = is;
-    }
+   private OutputStream os;
+   private InputStream is;
+   private long pos = 0;
+   private int TEMPSIZE = 5;
+   private int temp[] = new int[TEMPSIZE];
+   private int tempPos = 0;
 
-    @Override
-    public void write(int b) throws IOException {
-        temp[tempPos] = b;
-        tempPos = (tempPos + 1) % TEMPSIZE;
+   public CopyOutputStream(OutputStream os, InputStream is) {
+      this.os = os;
+      this.is = is;
+   }
 
-        pos++;
-        int r = is.read();
-        if ((b & 0xff) != r) {
-            os.flush();
+   @Override
+   public void write(int b) throws IOException {
+      temp[tempPos] = b;
+      tempPos = (tempPos + 1) % TEMPSIZE;
 
-            boolean output = false;
+      pos++;
+      int r = is.read();
+      if ((b & 0xff) != r) {
+         os.flush();
 
-            if (output) {
-                System.out.print("Last written:");
-                for (int i = 0; i < TEMPSIZE; i++) {
-                    System.out.print("" + Integer.toHexString(temp[(tempPos + i) % TEMPSIZE]) + " ");
-                }
-                System.out.println("");
-                System.out.println("More expected:");
-                for (int i = 0; i < TEMPSIZE; i++) {
-                    System.out.println("" + Integer.toHexString(is.read()));
-                }
+         boolean output = false;
 
-                System.out.println("");
-                System.out.println(Integer.toHexString(r) + " expected but " + Integer.toHexString(b) + " found");
+         if (output) {
+            System.out.print("Last written:");
+            for (int i = 0; i < TEMPSIZE; i++) {
+               System.out.print("" + Integer.toHexString(temp[(tempPos + i) % TEMPSIZE]) + " ");
             }
-            throw new NotSameException(pos);
-        }
-        os.write(b);
-    }
+            System.out.println("");
+            System.out.println("More expected:");
+            for (int i = 0; i < TEMPSIZE; i++) {
+               System.out.println("" + Integer.toHexString(is.read()));
+            }
+
+            System.out.println("");
+            System.out.println(Integer.toHexString(r) + " expected but " + Integer.toHexString(b) + " found");
+         }
+         throw new NotSameException(pos);
+      }
+      os.write(b);
+   }
 }

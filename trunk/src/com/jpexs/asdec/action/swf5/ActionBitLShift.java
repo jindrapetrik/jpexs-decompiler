@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf5;
 
 import com.jpexs.asdec.action.Action;
@@ -25,19 +24,20 @@ import java.util.List;
 import java.util.Stack;
 
 public class ActionBitLShift extends Action {
-    public ActionBitLShift() {
-        super(0x63, 0);
-    }
 
-    @Override
-    public String toString() {
-        return "BitLShift";
-    }
+   public ActionBitLShift() {
+      super(0x63, 0);
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        TreeItem a = stack.pop();
-        TreeItem b = stack.pop();
-        stack.push(new LShiftTreeItem(this, b, a));
-    }
+   @Override
+   public String toString() {
+      return "BitLShift";
+   }
+
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      TreeItem a = stack.pop();
+      TreeItem b = stack.pop();
+      stack.push(new LShiftTreeItem(this, b, a));
+   }
 }

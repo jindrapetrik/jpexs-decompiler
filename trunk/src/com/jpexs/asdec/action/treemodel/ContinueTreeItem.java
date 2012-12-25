@@ -14,30 +14,28 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
 
-
 public class ContinueTreeItem extends TreeItem {
-    public long loopPos;
-    public boolean isKnown;
-    public boolean isBreak;
 
-    public ContinueTreeItem(Action instruction, long loopPos) {
-        this(instruction, loopPos, true);
-    }
+   public long loopPos;
+   public boolean isKnown;
+   public boolean isBreak;
 
-    public ContinueTreeItem(Action instruction, long loopPos, boolean isKnown) {
-        super(instruction, NOPRECEDENCE);
-        this.loopPos = loopPos;
-        this.isKnown = isKnown;
-    }
+   public ContinueTreeItem(Action instruction, long loopPos) {
+      this(instruction, loopPos, true);
+   }
 
-    @Override
-    public String toString(ConstantPool constants) {
-        return hilight(isBreak ? "break" : "continue") + " " + (isKnown ? "loop" : "unk") + loopPos;
-    }
+   public ContinueTreeItem(Action instruction, long loopPos, boolean isKnown) {
+      super(instruction, NOPRECEDENCE);
+      this.loopPos = loopPos;
+      this.isKnown = isKnown;
+   }
 
+   @Override
+   public String toString(ConstantPool constants) {
+      return hilight(isBreak ? "break" : "continue") + " " + (isKnown ? "loop" : "unk") + loopPos;
+   }
 }

@@ -14,17 +14,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.treemodel.operations;
 
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 
-
 public class BitXorTreeItem extends BinaryOpTreeItem {
 
-    public BitXorTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
-        super(instruction, PRECEDENCE_BITWISEXOR, leftSide, rightSide, "^");
-    }
-
+   public BitXorTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
+      super(instruction, PRECEDENCE_BITWISEXOR, leftSide, rightSide, "^");
+   }
 }

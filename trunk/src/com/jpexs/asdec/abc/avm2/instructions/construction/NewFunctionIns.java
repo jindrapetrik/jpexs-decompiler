@@ -14,10 +14,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.instructions.construction;
 
- import com.jpexs.asdec.abc.ABC;
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
@@ -31,30 +30,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-
 public class NewFunctionIns extends InstructionDefinition {
 
-    public NewFunctionIns() {
-        super(0x40, "newfunction", new int[]{AVM2Code.DAT_METHOD_INDEX});
-    }
+   public NewFunctionIns() {
+      super(0x40, "newfunction", new int[]{AVM2Code.DAT_METHOD_INDEX});
+   }
 
-    @Override
-    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer,String> localRegNames) {
-        int methodIndex = ins.operands[0];
-        MethodBody mybody = abc.findBody(methodIndex);
-        String bodyStr = "";
-        String paramStr = "";
-        if (mybody != null) {
-            bodyStr = Highlighting.hilighMethodEnd()+mybody.toString(false,isStatic, classIndex, abc, constants, method_info, true)+Highlighting.hilighMethodBegin(body.method_info);
-            paramStr = method_info[methodIndex].getParamStr(constants,mybody,abc);
-        }
-        stack.push(new NewFunctionTreeItem(ins, paramStr, method_info[methodIndex].getReturnTypeStr(constants), bodyStr));
-    }
+   @Override
+   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer, String> localRegNames) {
+      int methodIndex = ins.operands[0];
+      MethodBody mybody = abc.findBody(methodIndex);
+      String bodyStr = "";
+      String paramStr = "";
+      if (mybody != null) {
+         bodyStr = Highlighting.hilighMethodEnd() + mybody.toString(false, isStatic, classIndex, abc, constants, method_info, true) + Highlighting.hilighMethodBegin(body.method_info);
+         paramStr = method_info[methodIndex].getParamStr(constants, mybody, abc);
+      }
+      stack.push(new NewFunctionTreeItem(ins, paramStr, method_info[methodIndex].getReturnTypeStr(constants), bodyStr));
+   }
 
    @Override
    public int getStackDelta(AVM2Instruction ins, ABC abc) {
       return 1;
    }
-
-
 }

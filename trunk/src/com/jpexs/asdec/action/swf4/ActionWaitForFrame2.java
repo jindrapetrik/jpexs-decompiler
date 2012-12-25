@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf4;
 
 import com.jpexs.asdec.SWFInputStream;
@@ -31,38 +30,38 @@ import java.util.List;
 import java.util.Stack;
 
 public class ActionWaitForFrame2 extends Action {
-    public int skipCount;
 
-    public ActionWaitForFrame2(SWFInputStream sis) throws IOException {
-        super(0x8D, 1);
-        skipCount = sis.readUI8();
-    }
+   public int skipCount;
 
-    public ActionWaitForFrame2(FlasmLexer lexer) throws IOException, ParseException {
-        super(0x8D, 1);
-        skipCount = (int) lexLong(lexer);
-    }
+   public ActionWaitForFrame2(SWFInputStream sis) throws IOException {
+      super(0x8D, 1);
+      skipCount = sis.readUI8();
+   }
 
-    public byte[] getBytes(int version) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
-        try {
-            sos.writeUI8(skipCount);
-            sos.close();
-        } catch (IOException e) {
+   public ActionWaitForFrame2(FlasmLexer lexer) throws IOException, ParseException {
+      super(0x8D, 1);
+      skipCount = (int) lexLong(lexer);
+   }
 
-        }
-        return surroundWithAction(baos.toByteArray(), version);
-    }
+   public byte[] getBytes(int version) {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      SWFOutputStream sos = new SWFOutputStream(baos, version);
+      try {
+         sos.writeUI8(skipCount);
+         sos.close();
+      } catch (IOException e) {
+      }
+      return surroundWithAction(baos.toByteArray(), version);
+   }
 
-    @Override
-    public String toString() {
-        return "WaitForFrame2 " + skipCount;
-    }
+   @Override
+   public String toString() {
+      return "WaitForFrame2 " + skipCount;
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        TreeItem frame = stack.pop();
-        output.add(new WaitForFrame2TreeItem(this, frame, skipCount));
-    }
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      TreeItem frame = stack.pop();
+      output.add(new WaitForFrame2TreeItem(this, frame, skipCount));
+   }
 }

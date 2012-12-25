@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf7;
 
 import com.jpexs.asdec.action.Action;
@@ -26,19 +25,19 @@ import java.util.Stack;
 
 public class ActionCastOp extends Action {
 
-    public ActionCastOp() {
-        super(0x2B, 0);
-    }
+   public ActionCastOp() {
+      super(0x2B, 0);
+   }
 
-    @Override
-    public String toString() {
-        return "CastOp";
-    }
+   @Override
+   public String toString() {
+      return "CastOp";
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        TreeItem object = stack.pop();
-        TreeItem constructor = stack.pop();
-        stack.push(new CastOpTreeItem(this, constructor, object));
-    }
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      TreeItem object = stack.pop();
+      TreeItem constructor = stack.pop();
+      stack.push(new CastOpTreeItem(this, constructor, object));
+   }
 }

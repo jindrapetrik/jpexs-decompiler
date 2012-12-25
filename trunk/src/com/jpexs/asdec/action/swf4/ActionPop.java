@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf4;
 
 import com.jpexs.asdec.action.Action;
@@ -27,19 +26,20 @@ import java.util.Stack;
 
 public class ActionPop extends Action {
 
-    public ActionPop() {
-        super(0x17, 0);
-    }
+   public ActionPop() {
+      super(0x17, 0);
+   }
 
-    @Override
-    public String toString() {
-        return "Pop";
-    }
+   @Override
+   public String toString() {
+      return "Pop";
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        TreeItem val = stack.pop();
-        if (!(val instanceof DirectValueTreeItem))
-            output.add(new VoidTreeItem(this, val));
-    }
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      TreeItem val = stack.pop();
+      if (!(val instanceof DirectValueTreeItem)) {
+         output.add(new VoidTreeItem(this, val));
+      }
+   }
 }

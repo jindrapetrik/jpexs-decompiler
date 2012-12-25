@@ -14,20 +14,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.treemodel.clauses;
 
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 
-
 public abstract class LoopTreeItem extends TreeItem {
-    public long loopBreak;
-    public long loopContinue;
 
-    public LoopTreeItem(Action instruction, long loopBreak, long loopContinue) {
-        super(instruction, NOPRECEDENCE);
-        this.loopBreak = loopBreak;
-        this.loopContinue = loopContinue;
-    }
+   public long loopBreak;
+   public long loopContinue;
+
+   public LoopTreeItem(Action instruction, long loopBreak, long loopContinue) {
+      super(instruction, NOPRECEDENCE);
+      this.loopBreak = loopBreak;
+      this.loopContinue = loopContinue;
+   }
 }

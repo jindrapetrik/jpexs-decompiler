@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.types.filters;
 
 /**
@@ -23,15 +22,16 @@ package com.jpexs.asdec.types.filters;
  * @author JPEXS
  */
 public class COLORMATRIXFILTER extends FILTER {
-    /**
-     * Color matrix values
-     */
-    public float matrix[] = new float[20];
 
-    /**
-     * Constructor
-     */
-    public COLORMATRIXFILTER() {
-        super(6);
-    }
+   /**
+    * Color matrix values
+    */
+   public float matrix[] = new float[20];
+
+   /**
+    * Constructor
+    */
+   public COLORMATRIXFILTER() {
+      super(6);
+   }
 }

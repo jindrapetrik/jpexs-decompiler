@@ -14,10 +14,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.instructions.types;
 
- import com.jpexs.asdec.abc.ABC;
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
@@ -30,32 +29,31 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-
 public class CoerceIns extends InstructionDefinition implements CoerceOrConvertTypeIns {
 
-    public CoerceIns() {
-        super(0x80, "coerce", new int[]{AVM2Code.DAT_MULTINAME_INDEX});
-    }
+   public CoerceIns() {
+      super(0x80, "coerce", new int[]{AVM2Code.DAT_MULTINAME_INDEX});
+   }
 
-    @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-        int multinameIndex = (int) ((Long) arguments.get(0)).longValue();
-        //push and pop coerced value to specified type
-    }
+   @Override
+   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+      int multinameIndex = (int) ((Long) arguments.get(0)).longValue();
+      //push and pop coerced value to specified type
+   }
 
-    @Override
-    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer,String> localRegNames) {
-        int multinameIndex = ins.operands[0];
-        stack.push(new CoerceTreeItem(ins, (TreeItem) stack.pop(), constants.constant_multiname[multinameIndex].getName(constants)));
-    }
-    
-    public String getTargetType(ConstantPool constants,AVM2Instruction ins){
-       int multinameIndex = ins.operands[0];
-       return constants.constant_multiname[multinameIndex].getName(constants);
-    }
+   @Override
+   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer, String> localRegNames) {
+      int multinameIndex = ins.operands[0];
+      stack.push(new CoerceTreeItem(ins, (TreeItem) stack.pop(), constants.constant_multiname[multinameIndex].getName(constants)));
+   }
 
-    @Override
+   public String getTargetType(ConstantPool constants, AVM2Instruction ins) {
+      int multinameIndex = ins.operands[0];
+      return constants.constant_multiname[multinameIndex].getName(constants);
+   }
+
+   @Override
    public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -1+1;
+      return -1 + 1;
    }
 }

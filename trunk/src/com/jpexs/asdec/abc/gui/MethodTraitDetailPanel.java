@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.Main;
@@ -34,27 +33,24 @@ public class MethodTraitDetailPanel extends JTabbedPane implements TraitDetail {
    public MethodTraitDetailPanel() {
       methodCodePanel = new MethodCodePanel();
       methodBodyParamsPanel = new MethodBodyParamsPanel();
-      methodInfoPanel=new MethodInfoPanel();
-      addTab("MethodInfo",methodInfoPanel);
+      methodInfoPanel = new MethodInfoPanel();
+      addTab("MethodInfo", methodInfoPanel);
       addTab("MethodBody Code", methodCodePanel);
       addTab("MethodBody params", new JScrollPane(methodBodyParamsPanel));
       setSelectedIndex(1);
    }
 
    public boolean save() {
-      if(!methodInfoPanel.save())
-      {
+      if (!methodInfoPanel.save()) {
          return false;
       }
-      if (!methodCodePanel.sourceTextArea.save(Main.abcMainFrame.abc.constants))
-      {
+      if (!methodCodePanel.sourceTextArea.save(Main.abcMainFrame.abc.constants)) {
          return false;
       }
-      if(!methodBodyParamsPanel.save())
-      {
+      if (!methodBodyParamsPanel.save()) {
          return false;
       }
-            
+
       return true;
    }
 }

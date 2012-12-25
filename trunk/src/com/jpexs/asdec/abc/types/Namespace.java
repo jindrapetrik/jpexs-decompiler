@@ -14,68 +14,65 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.types;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 
-
 public class Namespace {
 
-    public static final int nameSpaceKinds[] = new int[]{8, 5, 22, 23, 24, 25, 26};
-    public static final String nameSpaceKindNames[] = new String[]{"Namespace", "PrivateNamespace", "PackageNamespace", "PackageInternalNamespace", "ProtectedNamespace", "ExplicitNamespace", "StaticProtectedNamespace"};
-    public static final String namePrefixes[] = new String[]{"", "private", "public", "", "protected", "explicit", ""};
+   public static final int nameSpaceKinds[] = new int[]{8, 5, 22, 23, 24, 25, 26};
+   public static final String nameSpaceKindNames[] = new String[]{"Namespace", "PrivateNamespace", "PackageNamespace", "PackageInternalNamespace", "ProtectedNamespace", "ExplicitNamespace", "StaticProtectedNamespace"};
+   public static final String namePrefixes[] = new String[]{"", "private", "public", "", "protected", "explicit", ""};
+   public int kind;
+   public int name_index;
 
-    public int kind;
-    public int name_index;
+   public Namespace(int kind, int name_index) {
+      this.kind = kind;
+      this.name_index = name_index;
+   }
 
-    public Namespace(int kind, int name_index) {
-        this.kind = kind;
-        this.name_index = name_index;
-    }
+   public String getKindStr() {
+      String kindStr = "?";
+      for (int k = 0; k < nameSpaceKinds.length; k++) {
+         if (nameSpaceKinds[k] == kind) {
+            kindStr = nameSpaceKindNames[k];
+            break;
+         }
+      }
+      return kindStr;
+   }
 
-    public String getKindStr() {
-        String kindStr = "?";
-        for (int k = 0; k < nameSpaceKinds.length; k++) {
-            if (nameSpaceKinds[k] == kind) {
-                kindStr = nameSpaceKindNames[k];
-                break;
-            }
-        }
-        return kindStr;
-    }
+   @Override
+   public String toString() {
 
-    @Override
-    public String toString() {
+      return "Namespace: kind=" + getKindStr() + " name_index=" + name_index;
+   }
 
-        return "Namespace: kind=" + getKindStr() + " name_index=" + name_index;
-    }
+   public String toString(ConstantPool constants) {
+      return getName(constants); //getPrefix(constants)+" "+getName(constants);
+   }
 
-    public String toString(ConstantPool constants) {
-        return getName(constants); //getPrefix(constants)+" "+getName(constants);
-    }
+   public String getNameWithKind(ConstantPool constants) {
+      String kindStr = getKindStr();
+      String nameStr = constants.constant_string[name_index];
+      return kindStr + (nameStr.equals("") ? "" : " " + nameStr);
+   }
 
-    public String getNameWithKind(ConstantPool constants) {
-        String kindStr = getKindStr();
-        String nameStr = constants.constant_string[name_index];
-        return kindStr + (nameStr.equals("") ? "" : " " + nameStr);
-    }
+   public String getPrefix(ConstantPool constants) {
+      String kindStr = "?";
+      for (int k = 0; k < nameSpaceKinds.length; k++) {
+         if (nameSpaceKinds[k] == kind) {
+            kindStr = namePrefixes[k];
+            break;
+         }
+      }
+      return kindStr;
+   }
 
-    public String getPrefix(ConstantPool constants) {
-        String kindStr = "?";
-        for (int k = 0; k < nameSpaceKinds.length; k++) {
-            if (nameSpaceKinds[k] == kind) {
-                kindStr = namePrefixes[k];
-                break;
-            }
-        }
-        return kindStr;
-    }
-
-    public String getName(ConstantPool constants) {
-        if(name_index==0){
-           return "-";
-        }
-        return constants.constant_string[name_index];
-    }
+   public String getName(ConstantPool constants) {
+      if (name_index == 0) {
+         return "-";
+      }
+      return constants.constant_string[name_index];
+   }
 }

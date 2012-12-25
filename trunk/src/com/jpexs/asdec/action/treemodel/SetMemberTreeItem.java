@@ -14,25 +14,25 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
 
 public class SetMemberTreeItem extends TreeItem {
-    public TreeItem object;
-    public TreeItem objectName;
-    public TreeItem value;
 
-    public SetMemberTreeItem(Action instruction, TreeItem object, TreeItem objectName, TreeItem value) {
-        super(instruction, PRECEDENCE_PRIMARY);
-        this.object = object;
-        this.objectName = objectName;
-        this.value = value;
-    }
+   public TreeItem object;
+   public TreeItem objectName;
+   public TreeItem value;
 
-    @Override
-    public String toString(ConstantPool constants) {
-        return object.toString(constants) + "." + stripQuotes(objectName) + "=" + value.toString(constants) + ";";
-    }
+   public SetMemberTreeItem(Action instruction, TreeItem object, TreeItem objectName, TreeItem value) {
+      super(instruction, PRECEDENCE_PRIMARY);
+      this.object = object;
+      this.objectName = objectName;
+      this.value = value;
+   }
+
+   @Override
+   public String toString(ConstantPool constants) {
+      return object.toString(constants) + "." + stripQuotes(objectName) + "=" + value.toString(constants) + ";";
+   }
 }

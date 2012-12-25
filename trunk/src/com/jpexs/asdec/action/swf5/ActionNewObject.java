@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf5;
 
 import com.jpexs.asdec.action.Action;
@@ -27,23 +26,23 @@ import java.util.Stack;
 
 public class ActionNewObject extends Action {
 
-    public ActionNewObject() {
-        super(0x40, 0);
-    }
+   public ActionNewObject() {
+      super(0x40, 0);
+   }
 
-    @Override
-    public String toString() {
-        return "NewObject";
-    }
+   @Override
+   public String toString() {
+      return "NewObject";
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        TreeItem objectName = stack.pop();
-        long numArgs = popLong(stack);
-        List<TreeItem> args = new ArrayList<TreeItem>();
-        for (long l = 0; l < numArgs; l++) {
-            args.add(stack.pop());
-        }
-        stack.push(new NewObjectTreeItem(this, objectName, args));
-    }
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      TreeItem objectName = stack.pop();
+      long numArgs = popLong(stack);
+      List<TreeItem> args = new ArrayList<TreeItem>();
+      for (long l = 0; l < numArgs; l++) {
+         args.add(stack.pop());
+      }
+      stack.push(new NewObjectTreeItem(this, objectName, args));
+   }
 }

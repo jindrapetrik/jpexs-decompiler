@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
@@ -28,37 +27,38 @@ import java.util.HashMap;
  * @author JPEXS
  */
 public class ExportAssetsTag extends Tag {
-    /**
-     * HashMap with assets
-     */
-    public HashMap<Integer, String> assets;
 
-    /**
-     * Constructor
-     *
-     * @param data    Data bytes
-     * @param version SWF version
-     * @throws IOException
-     */
-    public ExportAssetsTag(byte[] data, int version, long pos) throws IOException {
-        super(56, data, pos);
-        assets = new HashMap<Integer, String>();
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-        int count = sis.readUI16();
-        for (int i = 0; i < count; i++) {
-            int characterId = sis.readUI16();
-            String name = sis.readString();
-            assets.put(characterId, name);
-        }
-    }
+   /**
+    * HashMap with assets
+    */
+   public HashMap<Integer, String> assets;
 
-    /**
-     * Returns string representation of the object
-     *
-     * @return String representation of the object
-     */
-    @Override
-    public String toString() {
-        return "ExportAssets";
-    }
+   /**
+    * Constructor
+    *
+    * @param data Data bytes
+    * @param version SWF version
+    * @throws IOException
+    */
+   public ExportAssetsTag(byte[] data, int version, long pos) throws IOException {
+      super(56, data, pos);
+      assets = new HashMap<Integer, String>();
+      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+      int count = sis.readUI16();
+      for (int i = 0; i < count; i++) {
+         int characterId = sis.readUI16();
+         String name = sis.readString();
+         assets.put(characterId, name);
+      }
+   }
+
+   /**
+    * Returns string representation of the object
+    *
+    * @return String representation of the object
+    */
+   @Override
+   public String toString() {
+      return "ExportAssets";
+   }
 }

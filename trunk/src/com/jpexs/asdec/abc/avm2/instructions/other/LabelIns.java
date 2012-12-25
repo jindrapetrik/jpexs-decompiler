@@ -14,17 +14,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.instructions.other;
 
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 
-
 public class LabelIns extends InstructionDefinition {
 //this can be target of branch
 
-    public LabelIns() {
-        super(0x09, "label", new int[]{});
-    }
-
+   public LabelIns() {
+      super(0x09, "label", new int[]{});
+   }
 }

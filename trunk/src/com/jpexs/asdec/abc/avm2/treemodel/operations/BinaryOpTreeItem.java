@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel.operations;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
@@ -22,36 +21,33 @@ import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import java.util.HashMap;
 
-
 public abstract class BinaryOpTreeItem extends TreeItem {
 
-    public TreeItem leftSide;
-    public TreeItem rightSide;
-    protected String operator = "";
+   public TreeItem leftSide;
+   public TreeItem rightSide;
+   protected String operator = "";
 
-    public BinaryOpTreeItem(AVM2Instruction instruction, int precedence, TreeItem leftSide, TreeItem rightSide, String operator) {
-        super(instruction, precedence);
-        this.leftSide = leftSide;
-        this.rightSide = rightSide;
-        this.operator = operator;
-    }
+   public BinaryOpTreeItem(AVM2Instruction instruction, int precedence, TreeItem leftSide, TreeItem rightSide, String operator) {
+      super(instruction, precedence);
+      this.leftSide = leftSide;
+      this.rightSide = rightSide;
+      this.operator = operator;
+   }
 
-    @Override
-    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
-        String ret = "";
-        if (leftSide.precedence > precedence) {
-            ret += "(" + leftSide.toString(constants,localRegNames) + ")";
-        } else {
-            ret += leftSide.toString(constants,localRegNames);
-        }
-        ret += hilight(operator);
-        if (rightSide.precedence > precedence) {
-            ret += "(" + rightSide.toString(constants,localRegNames) + ")";
-        } else {
-            ret += rightSide.toString(constants,localRegNames);
-        }
-        return ret;
-    }
-
-
+   @Override
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+      String ret = "";
+      if (leftSide.precedence > precedence) {
+         ret += "(" + leftSide.toString(constants, localRegNames) + ")";
+      } else {
+         ret += leftSide.toString(constants, localRegNames);
+      }
+      ret += hilight(operator);
+      if (rightSide.precedence > precedence) {
+         ret += "(" + rightSide.toString(constants, localRegNames) + ")";
+      } else {
+         ret += rightSide.toString(constants, localRegNames);
+      }
+      return ret;
+   }
 }

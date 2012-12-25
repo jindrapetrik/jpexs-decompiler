@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.action.Action;
@@ -26,36 +25,39 @@ import java.util.List;
  * @author JPEXS
  */
 public interface ASMSource {
-    /**
-     * Converts actions to ASM source
-     *
-     * @param version SWF version
-     * @return ASM source
-     */
-    public String getASMSource(int version);
 
-    /**
-     * Whether or not this object contains ASM source
-     *
-     * @return True when contains
-     */
-    public boolean containsSource();
+   /**
+    * Converts actions to ASM source
+    *
+    * @param version SWF version
+    * @return ASM source
+    */
+   public String getASMSource(int version);
 
-    /**
-     * Returns actions associated with this object
-     *
-     * @param version Version
-     * @return List of actions
-     */
-    public List<Action> getActions(int version);
+   /**
+    * Whether or not this object contains ASM source
+    *
+    * @return True when contains
+    */
+   public boolean containsSource();
 
-    /**
-     * Sets actions associated with this object
-     * @param version Version
-     * @param actions Action list
-     */
-    public void setActions(List<Action> actions,int version);
+   /**
+    * Returns actions associated with this object
+    *
+    * @param version Version
+    * @return List of actions
+    */
+   public List<Action> getActions(int version);
 
-    public byte[] getActionBytes();
-    public void setActionBytes(byte actionBytes[]);
+   /**
+    * Sets actions associated with this object
+    *
+    * @param version Version
+    * @param actions Action list
+    */
+   public void setActions(List<Action> actions, int version);
+
+   public byte[] getActionBytes();
+
+   public void setActionBytes(byte actionBytes[]);
 }

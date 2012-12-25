@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.usages;
 
 import com.jpexs.asdec.abc.ABC;
@@ -24,15 +23,14 @@ import com.jpexs.asdec.abc.types.traits.Traits;
  *
  * @author JPEXS
  */
-public class ConstVarNameMultinameUsage extends ConstVarMultinameUsage{
+public class ConstVarNameMultinameUsage extends ConstVarMultinameUsage {
 
-   public ConstVarNameMultinameUsage(int multinameIndex,int classIndex,int traitIndex,boolean isStatic,Traits traits,int parentTraitIndex)
-   {
-      super(multinameIndex,classIndex,traitIndex,isStatic,traits,parentTraitIndex);
+   public ConstVarNameMultinameUsage(int multinameIndex, int classIndex, int traitIndex, boolean isStatic, Traits traits, int parentTraitIndex) {
+      super(multinameIndex, classIndex, traitIndex, isStatic, traits, parentTraitIndex);
    }
 
    @Override
    public String toString(ABC abc) {
-      return super.toString(abc)+" name";
+      return super.toString(abc) + " name";
    }
 }

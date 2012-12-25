@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel.clauses;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
@@ -22,23 +21,21 @@ import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import java.util.HashMap;
 
-
 public class TernarOpTreeItem extends TreeItem {
-    public TreeItem expression;
-    public TreeItem onTrue;
-    public TreeItem onFalse;
 
-    public TernarOpTreeItem(AVM2Instruction instruction, TreeItem expression, TreeItem onTrue, TreeItem onFalse) {
-        super(instruction, PRECEDENCE_CONDITIONAL);
-        this.expression = expression;
-        this.onTrue = onTrue;
-        this.onFalse = onFalse;
-    }
+   public TreeItem expression;
+   public TreeItem onTrue;
+   public TreeItem onFalse;
 
-    @Override
-    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
-        return expression.toString(constants,localRegNames) + hilight("?") + onTrue.toString(constants,localRegNames) + hilight(":") + onFalse.toString(constants,localRegNames);
-    }
+   public TernarOpTreeItem(AVM2Instruction instruction, TreeItem expression, TreeItem onTrue, TreeItem onFalse) {
+      super(instruction, PRECEDENCE_CONDITIONAL);
+      this.expression = expression;
+      this.onTrue = onTrue;
+      this.onFalse = onFalse;
+   }
 
-
+   @Override
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+      return expression.toString(constants, localRegNames) + hilight("?") + onTrue.toString(constants, localRegNames) + hilight(":") + onFalse.toString(constants, localRegNames);
+   }
 }

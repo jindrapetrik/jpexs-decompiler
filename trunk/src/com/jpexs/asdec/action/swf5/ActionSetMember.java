@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf5;
 
 import com.jpexs.asdec.action.Action;
@@ -26,20 +25,20 @@ import java.util.Stack;
 
 public class ActionSetMember extends Action {
 
-    public ActionSetMember() {
-        super(0x4F, 0);
-    }
+   public ActionSetMember() {
+      super(0x4F, 0);
+   }
 
-    @Override
-    public String toString() {
-        return "SetMember";
-    }
+   @Override
+   public String toString() {
+      return "SetMember";
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        TreeItem value = stack.pop();
-        TreeItem objectName = stack.pop();
-        TreeItem object = stack.pop();
-        output.add(new SetMemberTreeItem(this, object, objectName, value));
-    }
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      TreeItem value = stack.pop();
+      TreeItem objectName = stack.pop();
+      TreeItem object = stack.pop();
+      output.add(new SetMemberTreeItem(this, object, objectName, value));
+   }
 }

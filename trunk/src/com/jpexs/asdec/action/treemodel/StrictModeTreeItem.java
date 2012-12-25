@@ -14,21 +14,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
 
 public class StrictModeTreeItem extends TreeItem {
+
    public int mode;
-   public StrictModeTreeItem(Action instruction,int mode){
-      super(instruction,PRECEDENCE_PRIMARY);
-      this.mode=mode;
+
+   public StrictModeTreeItem(Action instruction, int mode) {
+      super(instruction, PRECEDENCE_PRIMARY);
+      this.mode = mode;
    }
-   
+
    @Override
    public String toString(ConstantPool constants) {
-      return "StrictMode("+mode+");"; //I still don't know how AS source of Strict Mode instruction looks like, assuming this...
+      return "StrictMode(" + mode + ");"; //I still don't know how AS source of Strict Mode instruction looks like, assuming this...
    }
-   
 }

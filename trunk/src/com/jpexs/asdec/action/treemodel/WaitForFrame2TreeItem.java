@@ -14,23 +14,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
 
 public class WaitForFrame2TreeItem extends TreeItem {
-    public TreeItem frame;
-    public int skipCount;
 
-    public WaitForFrame2TreeItem(Action instruction, TreeItem frame, int skipCount) {
-        super(instruction, PRECEDENCE_PRIMARY);
-        this.frame = frame;
-        this.skipCount = skipCount;
-    }
+   public TreeItem frame;
+   public int skipCount;
 
-    @Override
-    public String toString(ConstantPool constants) {
-        return "waitForFrame2(" + frame.toString(constants) + "," + skipCount + ");";
-    }
+   public WaitForFrame2TreeItem(Action instruction, TreeItem frame, int skipCount) {
+      super(instruction, PRECEDENCE_PRIMARY);
+      this.frame = frame;
+      this.skipCount = skipCount;
+   }
+
+   @Override
+   public String toString(ConstantPool constants) {
+      return "waitForFrame2(" + frame.toString(constants) + "," + skipCount + ");";
+   }
 }

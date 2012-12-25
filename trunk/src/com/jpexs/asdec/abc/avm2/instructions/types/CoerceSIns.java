@@ -14,10 +14,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.instructions.types;
 
- import com.jpexs.asdec.abc.ABC;
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
@@ -29,31 +28,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-
 public class CoerceSIns extends InstructionDefinition implements CoerceOrConvertTypeIns {
 
-    public CoerceSIns() {
-        super(0x85, "coerce_s", new int[]{});
-    }
-
-
-    @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-        Object obj = lda.operandStack.pop();
-        lda.operandStack.push(obj.toString());
-    }
-
-    @Override
-    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer,String> localRegNames) {
-        stack.push(new CoerceTreeItem(ins, (TreeItem) stack.pop(), "string"));
-    }
-
-    @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -1+1;
+   public CoerceSIns() {
+      super(0x85, "coerce_s", new int[]{});
    }
-    
-    public String getTargetType(ConstantPool constants,AVM2Instruction ins){
-       return "String";
-    }
+
+   @Override
+   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+      Object obj = lda.operandStack.pop();
+      lda.operandStack.push(obj.toString());
+   }
+
+   @Override
+   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer, String> localRegNames) {
+      stack.push(new CoerceTreeItem(ins, (TreeItem) stack.pop(), "string"));
+   }
+
+   @Override
+   public int getStackDelta(AVM2Instruction ins, ABC abc) {
+      return -1 + 1;
+   }
+
+   public String getTargetType(ConstantPool constants, AVM2Instruction ins) {
+      return "String";
+   }
 }

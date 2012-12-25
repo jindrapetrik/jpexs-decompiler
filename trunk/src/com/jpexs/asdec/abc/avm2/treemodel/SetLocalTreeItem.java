@@ -14,28 +14,27 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import java.util.HashMap;
 
-
 public class SetLocalTreeItem extends TreeItem implements SetTypeTreeItem {
-    public int regIndex;
-    public TreeItem value;
 
-    public SetLocalTreeItem(AVM2Instruction instruction, int regIndex, TreeItem value) {
-        super(instruction, PRECEDENCE_ASSIGMENT);
-        this.regIndex = regIndex;
-        this.value = value;
-    }
+   public int regIndex;
+   public TreeItem value;
 
-    @Override
-    public String toString(ConstantPool constants,HashMap<Integer,String> localRegNames) {
-        return hilight(localRegName(localRegNames,regIndex) + "=") + value.toString(constants,localRegNames);
-    }
+   public SetLocalTreeItem(AVM2Instruction instruction, int regIndex, TreeItem value) {
+      super(instruction, PRECEDENCE_ASSIGMENT);
+      this.regIndex = regIndex;
+      this.value = value;
+   }
+
+   @Override
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+      return hilight(localRegName(localRegNames, regIndex) + "=") + value.toString(constants, localRegNames);
+   }
 
    public TreeItem getObject() {
       return new LocalRegTreeItem(instruction, regIndex, null);
@@ -44,6 +43,4 @@ public class SetLocalTreeItem extends TreeItem implements SetTypeTreeItem {
    public TreeItem getValue() {
       return value;
    }
-
-
 }

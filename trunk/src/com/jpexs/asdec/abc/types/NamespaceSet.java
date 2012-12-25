@@ -14,24 +14,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.types;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 
-
 public class NamespaceSet {
 
-    public int namespaces[];
+   public int namespaces[];
 
-    public String toString(ConstantPool constants) {
-        String s = "";
-        for (int i = 0; i < this.namespaces.length; i++) {
-            if (i > 0) s += ", ";
-            s += constants.constant_namespace[namespaces[i]].getNameWithKind(constants);
-        }
-        return s;
-    }
-
-
+   public String toString(ConstantPool constants) {
+      String s = "";
+      for (int i = 0; i < this.namespaces.length; i++) {
+         if (i > 0) {
+            s += ", ";
+         }
+         s += constants.constant_namespace[namespaces[i]].getNameWithKind(constants);
+      }
+      return s;
+   }
 }

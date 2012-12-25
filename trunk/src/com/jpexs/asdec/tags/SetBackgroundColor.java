@@ -14,25 +14,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.types.RGB;
 
 public class SetBackgroundColor extends Tag {
 
-	private RGB backgroundColor;
+   private RGB backgroundColor;
 
-	public SetBackgroundColor(byte[] data, long pos) {
-		super(9, data, pos);
-		backgroundColor = new RGB();
-		backgroundColor.red = data[0] & 0xff;
-		backgroundColor.green = data[1] & 0xff;
-		backgroundColor.blue = data[2] & 0xff;
-	}
+   public SetBackgroundColor(byte[] data, long pos) {
+      super(9, data, pos);
+      backgroundColor = new RGB();
+      backgroundColor.red = data[0] & 0xff;
+      backgroundColor.green = data[1] & 0xff;
+      backgroundColor.blue = data[2] & 0xff;
+   }
 
-	@Override
-	public String toString() {
-		return "SetBackgroundColor";
-	}
+   @Override
+   public String toString() {
+      return "SetBackgroundColor";
+   }
 }

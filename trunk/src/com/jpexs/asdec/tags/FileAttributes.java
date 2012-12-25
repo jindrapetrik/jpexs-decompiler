@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
@@ -23,28 +22,28 @@ import java.io.IOException;
 
 public class FileAttributes extends Tag {
 
-	private boolean useDirectBlit;
-	private boolean useGPU;
-	private boolean hasMetadata;
-	private boolean actionScript3;
-	private boolean useNetwork;
+   private boolean useDirectBlit;
+   private boolean useGPU;
+   private boolean hasMetadata;
+   private boolean actionScript3;
+   private boolean useNetwork;
 
-	public FileAttributes(byte[] data, int version, long pos) throws IOException {
-		super(69, data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-        sis.readUB(1); // reserved
-		// UB[1] == 0  (reserved)
-		useDirectBlit = sis.readUB(1) != 0;
-		useGPU = sis.readUB(1) != 0;
-		hasMetadata = sis.readUB(1) != 0;
-		actionScript3 = sis.readUB(1) != 0;
-		sis.readUB(2); // reserved
-		useNetwork = sis.readUB(1) != 0;
-		// UB[24] == 0 (reserved)
-	}
+   public FileAttributes(byte[] data, int version, long pos) throws IOException {
+      super(69, data, pos);
+      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+      sis.readUB(1); // reserved
+      // UB[1] == 0  (reserved)
+      useDirectBlit = sis.readUB(1) != 0;
+      useGPU = sis.readUB(1) != 0;
+      hasMetadata = sis.readUB(1) != 0;
+      actionScript3 = sis.readUB(1) != 0;
+      sis.readUB(2); // reserved
+      useNetwork = sis.readUB(1) != 0;
+      // UB[24] == 0 (reserved)
+   }
 
-	@Override
-	public String toString() {
-		return "FileAttributes";
-	}
+   @Override
+   public String toString() {
+      return "FileAttributes";
+   }
 }

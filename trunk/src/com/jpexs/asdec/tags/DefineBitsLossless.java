@@ -14,18 +14,17 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.tags;
 
 public class DefineBitsLossless extends Tag {
 
-	public DefineBitsLossless(byte[] data, int version, long pos) {
-		super(20, data, pos);
-		// TODO Auto-generated constructor stub
-	}
+   public DefineBitsLossless(byte[] data, int version, long pos) {
+      super(20, data, pos);
+      // TODO Auto-generated constructor stub
+   }
 
-	@Override
-	public String toString() {
-		return "DefineBitsLossless";
-	}
+   @Override
+   public String toString() {
+      return "DefineBitsLossless";
+   }
 }

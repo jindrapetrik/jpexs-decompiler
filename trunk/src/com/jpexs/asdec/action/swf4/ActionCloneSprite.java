@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf4;
 
 import com.jpexs.asdec.action.Action;
@@ -26,20 +25,20 @@ import java.util.Stack;
 
 public class ActionCloneSprite extends Action {
 
-    public ActionCloneSprite() {
-        super(0x24, 0);
-    }
+   public ActionCloneSprite() {
+      super(0x24, 0);
+   }
 
-    @Override
-    public String toString() {
-        return "CloneSprite";
-    }
+   @Override
+   public String toString() {
+      return "CloneSprite";
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        TreeItem depth = stack.pop();
-        TreeItem target = stack.pop();
-        TreeItem source = stack.pop();
-        output.add(new CloneSpriteTreeItem(this, source, target, depth));
-    }
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      TreeItem depth = stack.pop();
+      TreeItem target = stack.pop();
+      TreeItem source = stack.pop();
+      output.add(new CloneSpriteTreeItem(this, source, target, depth));
+   }
 }

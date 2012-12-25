@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc;
 
 import com.jpexs.asdec.Main;
@@ -55,21 +54,16 @@ public class ABC {
    public static String IDENT_STRING = "   ";
    public static final int MINORwithDECIMAL = 17;
    public static final boolean AUTOINIT_STATIC_VARIABLES = false;
-   
-   public int deobfuscateIdentifiers()
-   {
-      int ret=0;
-      for(int i=1;i<constants.constant_multiname.length;i++)
-      {
-         if(deobfuscateName(constants.constant_multiname[i].name_index))
-         {
+
+   public int deobfuscateIdentifiers() {
+      int ret = 0;
+      for (int i = 1; i < constants.constant_multiname.length; i++) {
+         if (deobfuscateName(constants.constant_multiname[i].name_index)) {
             ret++;
          }
       }
-      for(int i=1;i<constants.constant_namespace.length;i++)
-      {
-         if(deobfuscateNameSpace(constants.constant_namespace[i].name_index))
-         {
+      for (int i = 1; i < constants.constant_namespace.length; i++) {
+         if (deobfuscateNameSpace(constants.constant_namespace[i].name_index)) {
             ret++;
          }
       }
@@ -206,7 +200,7 @@ public class ABC {
       int bodies_count = ais.readU30();
       bodies = new MethodBody[bodies_count];
       for (int i = 0; i < bodies_count; i++) {
-    	 MethodBody mb = new MethodBody();
+         MethodBody mb = new MethodBody();
          mb.method_info = ais.readU30();
          mb.max_stack = ais.readU30();
          mb.max_regs = ais.readU30();
@@ -225,7 +219,7 @@ public class ABC {
          int ex_count = ais.readU30();
          mb.exceptions = new ABCException[ex_count];
          for (int j = 0; j < ex_count; j++) {
-        	ABCException abce = new ABCException();
+            ABCException abce = new ABCException();
             abce.start = ais.readU30();
             abce.end = ais.readU30();
             abce.target = ais.readU30();
@@ -238,7 +232,7 @@ public class ABC {
          method_info[mb.method_info].setBody(mb);
          bodyIdxFromMethodIdx[mb.method_info] = i;
       }
-  }
+   }
 
    public void saveToStream(OutputStream os) throws IOException {
       ABCOutputStream aos = new ABCOutputStream(os);
@@ -355,7 +349,9 @@ public class ABC {
          String name = m.getName(constants);
          if (ns != null) {
             String newimport = ns.getName(constants);
-            if(newimport.equals("-")) newimport="";
+            if (newimport.equals("-")) {
+               newimport = "";
+            }
             if (!newimport.equals("")) {
                newimport += "." + name;
                if (newimport.contains(":")) {
@@ -496,20 +492,20 @@ public class ABC {
       return null;
    }
 
-   private String addTabs(String s, int tabs) {      
+   private String addTabs(String s, int tabs) {
       String parts[] = s.split("\r\n");
       if (!s.contains("\r\n")) {
          parts = s.split("\n");
-      }     
+      }
       String ret = "";
       for (int i = 0; i < parts.length; i++) {
          for (int t = 0; t < tabs; t++) {
             ret += IDENT_STRING;
-         }         
+         }
          ret += parts[i];
          if (i < parts.length - 1) {
             ret += "\r\n";
-         }    
+         }
       }
       return ret;
    }
@@ -552,9 +548,8 @@ public class ABC {
    }
 
    public String classToString(int i, boolean highlight, boolean pcode) {
-      if(!highlight)
-      {
-         Highlighting.doHighlight=false;
+      if (!highlight) {
+         Highlighting.doHighlight = false;
       }
       String ret = "";
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -573,18 +568,18 @@ public class ABC {
       //class header
       String classHeader = instance_info[i].getClassHeaderStr(constants);
       /*if (classHeader.startsWith("private ")) {
-         classHeader = "public " + classHeader.substring("private ".length());
-      }*/
+       classHeader = "public " + classHeader.substring("private ".length());
+       }*/
       out.println(IDENT_STRING + classHeader);
       out.println(IDENT_STRING + "{");
 
       String toPrint = "";
-      List<String> outTraits=new LinkedList<String>();
-      
+      List<String> outTraits = new LinkedList<String>();
+
       //if (class_info[i].cinit_index != 0) {
       if (AUTOINIT_STATIC_VARIABLES) {
          int bodyIndex = findBodyIndex(class_info[i].cinit_index);
-         List<TreeItem> initializer = bodies[bodyIndex].code.toTree(true, i, this, constants, method_info, bodies[bodyIndex],bodies[bodyIndex].code.getLocalRegNamesFromDebug(this));
+         List<TreeItem> initializer = bodies[bodyIndex].code.toTree(true, i, this, constants, method_info, bodies[bodyIndex], bodies[bodyIndex].code.getLocalRegNamesFromDebug(this));
          for (TreeItem ti : initializer) {
             if (ti instanceof SetPropertyTreeItem) {
                int multinameIndex = ((SetPropertyTreeItem) ti).propertyName.multinameIndex;
@@ -620,7 +615,7 @@ public class ABC {
       if (highlight) {
          toPrint = Highlighting.hilighTrait(toPrint, class_info[i].static_traits.traits.length + instance_info[i].instance_traits.traits.length + 1);
       }
-      outTraits.add(toPrint);      
+      outTraits.add(toPrint);
       //}
       //}
 
@@ -708,7 +703,7 @@ public class ABC {
       out.println(IDENT_STRING + "}");//class
       out.println("}");//package
       out.flush();
-      Highlighting.doHighlight=true;
+      Highlighting.doHighlight = true;
       return baos.toString();
    }
 
@@ -716,9 +711,9 @@ public class ABC {
       for (int i = 0; i < instance_info.length; i++) {
          String packageName = instance_info[i].getName(constants).getNamespace(constants).getName(constants);
          String className = instance_info[i].getName(constants).getName(constants);
-         String fullName=className;
-         if((packageName!=null)&&(!packageName.equals(""))){
-            fullName=packageName+"."+fullName;
+         String fullName = className;
+         if ((packageName != null) && (!packageName.equals(""))) {
+            fullName = packageName + "." + fullName;
          }
          Main.startWork("Exporting " + (i + 1) + "/" + instance_info.length + " " + fullName + " ...");
          File outDir = new File(directory + File.separatorChar + packageName.replace('.', File.separatorChar));
@@ -762,9 +757,8 @@ public class ABC {
       "return", "super", "switch", "this", "throw", "true", "try", "typeof", "use", "var", /*"void",*/ "while",
       "with", "dynamic", "default", "final", "in"};
    public int unknownCount = 0;
-   
-   public static final String validFirstCharacters="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
-   public static final String validNextCharacters=validFirstCharacters+"0123456789";
+   public static final String validFirstCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
+   public static final String validNextCharacters = validFirstCharacters + "0123456789";
 
    public boolean deobfuscateNameSpace(int strIndex) {
       if (strIndex <= 0) {
@@ -780,7 +774,7 @@ public class ABC {
             break;
          }
       }
-            if (isValid) {
+      if (isValid) {
          for (int i = 0; i < s.length(); i++) {
             if (s.charAt(i) > 127) {
                isValid = false;
@@ -789,17 +783,17 @@ public class ABC {
          }
       }
 
-      if (!isValid) {         
+      if (!isValid) {
          if (isReserved) {
             constants.constant_string[strIndex] = "name_" + s.replace(" ", "_");
          } else {
             unknownCount++;
             constants.constant_string[strIndex] = "_name" + unknownCount;
-         }         
+         }
       }
       return !isValid;
    }
-   
+
    public boolean deobfuscateName(int strIndex) {
       if (strIndex <= 0) {
          return false;
@@ -814,10 +808,10 @@ public class ABC {
             break;
          }
       }
-      
-      Pattern pat=Pattern.compile("^["+Pattern.quote(validFirstCharacters) +"]"+"["+Pattern.quote(validFirstCharacters+validNextCharacters) +"]*$");
-      if(!pat.matcher(s).matches()){
-         isValid=false;
+
+      Pattern pat = Pattern.compile("^[" + Pattern.quote(validFirstCharacters) + "]" + "[" + Pattern.quote(validFirstCharacters + validNextCharacters) + "]*$");
+      if (!pat.matcher(s).matches()) {
+         isValid = false;
       }
       if (isValid) {
          for (int i = 0; i < s.length(); i++) {
@@ -828,41 +822,41 @@ public class ABC {
          }
       }
 
-      if (!isValid) {         
+      if (!isValid) {
          if (isReserved) {
             constants.constant_string[strIndex] = "name_" + s.replace(" ", "_");
          } else {
             unknownCount++;
             constants.constant_string[strIndex] = "_name" + unknownCount;
-         }         
+         }
       }
       return !isValid;
    }
 
-   private void checkMultinameUsedInMethod(int multinameIndex, int methodInfo, List<MultinameUsage> ret, int classIndex, int traitIndex, boolean isStatic, boolean isInitializer,Traits traits,int parentTraitIndex) {
+   private void checkMultinameUsedInMethod(int multinameIndex, int methodInfo, List<MultinameUsage> ret, int classIndex, int traitIndex, boolean isStatic, boolean isInitializer, Traits traits, int parentTraitIndex) {
       for (int p = 0; p < method_info[methodInfo].param_types.length; p++) {
          if (method_info[methodInfo].param_types[p] == multinameIndex) {
-            ret.add(new MethodParamsMultinameUsage(multinameIndex, classIndex, traitIndex, isStatic, isInitializer,traits,parentTraitIndex));
+            ret.add(new MethodParamsMultinameUsage(multinameIndex, classIndex, traitIndex, isStatic, isInitializer, traits, parentTraitIndex));
             break;
          }
       }
       if (method_info[methodInfo].ret_type == multinameIndex) {
-         ret.add(new MethodReturnTypeMultinameUsage(multinameIndex, classIndex, traitIndex, isStatic, isInitializer,traits,parentTraitIndex));
+         ret.add(new MethodReturnTypeMultinameUsage(multinameIndex, classIndex, traitIndex, isStatic, isInitializer, traits, parentTraitIndex));
       }
       MethodBody body = findBody(methodInfo);
       if (body != null) {
-         findMultinameUsageInTraits(body.traits,multinameIndex,isStatic,classIndex,ret,traitIndex);
-         for(ABCException e:body.exceptions){
-            if((e.name_index==multinameIndex)||(e.type_index==multinameIndex)){
-                ret.add(new MethodBodyMultinameUsage(multinameIndex, classIndex, traitIndex, isStatic, isInitializer,traits,parentTraitIndex));
-                return;
+         findMultinameUsageInTraits(body.traits, multinameIndex, isStatic, classIndex, ret, traitIndex);
+         for (ABCException e : body.exceptions) {
+            if ((e.name_index == multinameIndex) || (e.type_index == multinameIndex)) {
+               ret.add(new MethodBodyMultinameUsage(multinameIndex, classIndex, traitIndex, isStatic, isInitializer, traits, parentTraitIndex));
+               return;
             }
          }
          for (AVM2Instruction ins : body.code.code) {
             for (int o = 0; o < ins.definition.operands.length; o++) {
                if (ins.definition.operands[o] == AVM2Code.DAT_MULTINAME_INDEX) {
                   if (ins.operands[o] == multinameIndex) {
-                     ret.add(new MethodBodyMultinameUsage(multinameIndex, classIndex, traitIndex, isStatic, isInitializer,traits,parentTraitIndex));
+                     ret.add(new MethodBodyMultinameUsage(multinameIndex, classIndex, traitIndex, isStatic, isInitializer, traits, parentTraitIndex));
                      return;
                   }
                }
@@ -871,23 +865,23 @@ public class ABC {
       }
    }
 
-   private void findMultinameUsageInTraits(Traits traits, int multinameIndex, boolean isStatic, int classIndex, List<MultinameUsage> ret,int parentTraitIndex) {
+   private void findMultinameUsageInTraits(Traits traits, int multinameIndex, boolean isStatic, int classIndex, List<MultinameUsage> ret, int parentTraitIndex) {
       for (int t = 0; t < traits.traits.length; t++) {
          if (traits.traits[t] instanceof TraitSlotConst) {
             TraitSlotConst tsc = (TraitSlotConst) traits.traits[t];
             if (tsc.name_index == multinameIndex) {
-               ret.add(new ConstVarNameMultinameUsage(multinameIndex, classIndex, t, isStatic,traits,parentTraitIndex));
+               ret.add(new ConstVarNameMultinameUsage(multinameIndex, classIndex, t, isStatic, traits, parentTraitIndex));
             }
             if (tsc.type_index == multinameIndex) {
-               ret.add(new ConstVarTypeMultinameUsage(multinameIndex, classIndex, t, isStatic,traits,parentTraitIndex));
+               ret.add(new ConstVarTypeMultinameUsage(multinameIndex, classIndex, t, isStatic, traits, parentTraitIndex));
             }
          }
          if (traits.traits[t] instanceof TraitMethodGetterSetter) {
             TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) traits.traits[t];
             if (tmgs.name_index == multinameIndex) {
-               ret.add(new MethodNameMultinameUsage(multinameIndex, classIndex, t, isStatic, false,traits,parentTraitIndex));
+               ret.add(new MethodNameMultinameUsage(multinameIndex, classIndex, t, isStatic, false, traits, parentTraitIndex));
             }
-            checkMultinameUsedInMethod(multinameIndex, tmgs.method_info, ret, classIndex, t, isStatic, false,traits,parentTraitIndex);
+            checkMultinameUsedInMethod(multinameIndex, tmgs.method_info, ret, classIndex, t, isStatic, false, traits, parentTraitIndex);
          }
       }
    }
@@ -909,10 +903,10 @@ public class ABC {
                ret.add(new ImplementsMultinameUsage(multinameIndex, c));
             }
          }
-         checkMultinameUsedInMethod(multinameIndex, instance_info[c].iinit_index, ret, c, 0, false, true,null,-1);
-         checkMultinameUsedInMethod(multinameIndex, class_info[c].cinit_index, ret, c, 0, true, true,null,-1);
-         findMultinameUsageInTraits(instance_info[c].instance_traits, multinameIndex, false, c, ret,-1);
-         findMultinameUsageInTraits(class_info[c].static_traits, multinameIndex, true, c, ret,-1);
+         checkMultinameUsedInMethod(multinameIndex, instance_info[c].iinit_index, ret, c, 0, false, true, null, -1);
+         checkMultinameUsedInMethod(multinameIndex, class_info[c].cinit_index, ret, c, 0, true, true, null, -1);
+         findMultinameUsageInTraits(instance_info[c].instance_traits, multinameIndex, false, c, ret, -1);
+         findMultinameUsageInTraits(class_info[c].static_traits, multinameIndex, true, c, ret, -1);
       }
       loopm:
       for (int m = 1; m < constants.constant_multiname.length; m++) {

@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.usages;
 
 import com.jpexs.asdec.abc.ABC;
@@ -24,5 +23,6 @@ import com.jpexs.asdec.abc.ABC;
  * @author JPEXS
  */
 public abstract class MultinameUsage {
+
    public abstract String toString(ABC abc);
 }

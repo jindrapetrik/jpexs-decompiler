@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.Main;
@@ -31,49 +30,51 @@ import javax.swing.JScrollPane;
  * @author JPEXS
  */
 public class MethodCodePanel extends JPanel implements ActionListener {
-    public ASMSourceEditorPane sourceTextArea;
-    public JPanel buttonsPanel;
+
+   public ASMSourceEditorPane sourceTextArea;
+   public JPanel buttonsPanel;
 
    public MethodCodePanel() {
       sourceTextArea = new ASMSourceEditorPane();
-      
+
       setLayout(new BorderLayout());
       add(new JScrollPane(sourceTextArea), BorderLayout.CENTER);
       sourceTextArea.setContentType("text/flasm3");
-      
-        buttonsPanel = new JPanel();
-        buttonsPanel.setLayout(new FlowLayout());
-        JButton verifyButton = new JButton("Verify");
-        verifyButton.setActionCommand("VERIFYBODY");
-        verifyButton.addActionListener(this);      
 
-        JButton graphButton = new JButton("Graph");
-        graphButton.setActionCommand("GRAPH");
-        graphButton.addActionListener(this);
+      buttonsPanel = new JPanel();
+      buttonsPanel.setLayout(new FlowLayout());
+      JButton verifyButton = new JButton("Verify");
+      verifyButton.setActionCommand("VERIFYBODY");
+      verifyButton.addActionListener(this);
 
-        JButton execButton = new JButton("Execute");
-        execButton.setActionCommand("EXEC");
-        execButton.addActionListener(this);
+      JButton graphButton = new JButton("Graph");
+      graphButton.setActionCommand("GRAPH");
+      graphButton.addActionListener(this);
 
-         //buttonsPan.add(graphButton);
-       // buttonsPanel.add(saveButton);
-       // buttonsPan.add(execButton);
+      JButton execButton = new JButton("Execute");
+      execButton.setActionCommand("EXEC");
+      execButton.addActionListener(this);
 
-        //add(buttonsPanel, BorderLayout.SOUTH);
+      //buttonsPan.add(graphButton);
+      // buttonsPanel.add(saveButton);
+      // buttonsPan.add(execButton);
+
+      //add(buttonsPanel, BorderLayout.SOUTH);
    }
 
    public void actionPerformed(ActionEvent e) {
-      if (Main.isWorking()) return;
-       if (e.getActionCommand().equals("GRAPH")) {
-            sourceTextArea.graph();
-        }
+      if (Main.isWorking()) {
+         return;
+      }
+      if (e.getActionCommand().equals("GRAPH")) {
+         sourceTextArea.graph();
+      }
 
-        if (e.getActionCommand().equals("EXEC")) {
-            sourceTextArea.exec();
-        }
+      if (e.getActionCommand().equals("EXEC")) {
+         sourceTextArea.exec();
+      }
       if (e.getActionCommand().equals("VERIFYBODY")) {
-            sourceTextArea.verify(Main.abcMainFrame.abc.constants, Main.abcMainFrame.abc);
-        }        
+         sourceTextArea.verify(Main.abcMainFrame.abc.constants, Main.abcMainFrame.abc);
+      }
    }
-
 }

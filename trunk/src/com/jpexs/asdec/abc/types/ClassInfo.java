@@ -14,30 +14,27 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.types;
 
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.types.traits.Traits;
 
-
 public class ClassInfo {
 
-    public int cinit_index; //MethodInfo - static initializer
-    public Traits static_traits;
+   public int cinit_index; //MethodInfo - static initializer
+   public Traits static_traits;
 
-    @Override
-    public String toString() {
-        return "method_index=" + cinit_index + "\r\n" + static_traits.toString();
-    }
+   @Override
+   public String toString() {
+      return "method_index=" + cinit_index + "\r\n" + static_traits.toString();
+   }
 
+   public String toString(ABC abc) {
+      return "method_index=" + cinit_index + "\r\n" + static_traits.toString(abc);
+   }
 
-    public String toString(ABC abc) {
-        return "method_index=" + cinit_index + "\r\n" + static_traits.toString(abc);
-    }
-
-    public String getStaticVarsStr(ConstantPool constants,ABC abc) {
-        return static_traits.convert(constants, "\tstatic ",abc);
-    }
+   public String getStaticVarsStr(ConstantPool constants, ABC abc) {
+      return static_traits.convert(constants, "\tstatic ", abc);
+   }
 }

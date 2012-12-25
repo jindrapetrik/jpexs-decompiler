@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf7;
 
 import com.jpexs.asdec.action.Action;
@@ -27,23 +26,23 @@ import java.util.Stack;
 
 public class ActionImplementsOp extends Action {
 
-    public ActionImplementsOp() {
-        super(0x2C, 0);
-    }
+   public ActionImplementsOp() {
+      super(0x2C, 0);
+   }
 
-    @Override
-    public String toString() {
-        return "ImplementsOp";
-    }
+   @Override
+   public String toString() {
+      return "ImplementsOp";
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        TreeItem subclass = stack.pop();
-        long inCount = popLong(stack);
-        List<TreeItem> superclasses = new ArrayList<TreeItem>();
-        for (long l = 0; l < inCount; l++) {
-            superclasses.add(stack.pop());
-        }
-        output.add(new ImplementsOpTreeItem(this, subclass, superclasses));
-    }
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      TreeItem subclass = stack.pop();
+      long inCount = popLong(stack);
+      List<TreeItem> superclasses = new ArrayList<TreeItem>();
+      for (long l = 0; l < inCount; l++) {
+         superclasses.add(stack.pop());
+      }
+      output.add(new ImplementsOpTreeItem(this, subclass, superclasses));
+   }
 }

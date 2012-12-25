@@ -14,10 +14,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.gui;
 
 public interface TreeVisitor {
-	public void onBranch(TreeElement branch);
-	public void onLeaf(TreeElement leaf);
+
+   public void onBranch(TreeElement branch);
+
+   public void onLeaf(TreeElement leaf);
 }

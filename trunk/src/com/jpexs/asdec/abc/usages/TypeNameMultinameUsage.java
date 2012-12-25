@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.usages;
 
 import com.jpexs.asdec.abc.ABC;
@@ -24,15 +23,15 @@ import com.jpexs.asdec.abc.ABC;
  * @author JPEXS
  */
 public class TypeNameMultinameUsage extends MultinameUsage {
+
    public int typename_index;
 
-   public TypeNameMultinameUsage(int typename_index){
-      this.typename_index=typename_index;
+   public TypeNameMultinameUsage(int typename_index) {
+      this.typename_index = typename_index;
    }
 
    @Override
    public String toString(ABC abc) {
-      return "TypeName "+abc.constants.constant_multiname[typename_index].toString(abc.constants);
+      return "TypeName " + abc.constants.constant_multiname[typename_index].toString(abc.constants);
    }
-
 }

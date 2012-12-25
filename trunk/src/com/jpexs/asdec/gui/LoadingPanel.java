@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.gui;
 
 import java.awt.Graphics;
@@ -28,39 +27,40 @@ import javax.swing.JPanel;
  * @author JPEXS
  */
 public class LoadingPanel extends JPanel {
-    private int pos = 0;
-    private Image animationImage;
-    private int iconWidth;
-    private int iconHeight;
 
-    /**
-     * Constructor
-     *
-     * @param iconWidth  Width of displayed icon
-     * @param iconHeight Height of displayed icon
-     */
-    public LoadingPanel(int iconWidth, int iconHeight) {
-        this.iconWidth = iconWidth;
-        this.iconHeight = iconHeight;
-        ImageIcon icon = (new ImageIcon(this.getClass().getResource("/com/jpexs/asdec/gui/graphics/loading.png")));
-        animationImage = icon.getImage();
-        java.util.Timer timer = new java.util.Timer();
-        timer.schedule(new java.util.TimerTask() {
-            public void run() {
-                pos = (pos + 1) % 12;
-                repaint();
-            }
-        }, 100, 100);
-    }
+   private int pos = 0;
+   private Image animationImage;
+   private int iconWidth;
+   private int iconHeight;
 
-    /**
-     * Paints component
-     *
-     * @param g Graphics to paint on
-     */
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        g.drawImage(animationImage, getWidth() / 2 - iconWidth / 2, getHeight() / 2 - iconHeight / 2, getWidth() / 2 + iconWidth / 2, getHeight() / 2 + iconHeight / 2, pos * 100, 0, (pos + 1) * 100, 100, this);
-    }
+   /**
+    * Constructor
+    *
+    * @param iconWidth Width of displayed icon
+    * @param iconHeight Height of displayed icon
+    */
+   public LoadingPanel(int iconWidth, int iconHeight) {
+      this.iconWidth = iconWidth;
+      this.iconHeight = iconHeight;
+      ImageIcon icon = (new ImageIcon(this.getClass().getResource("/com/jpexs/asdec/gui/graphics/loading.png")));
+      animationImage = icon.getImage();
+      java.util.Timer timer = new java.util.Timer();
+      timer.schedule(new java.util.TimerTask() {
+         public void run() {
+            pos = (pos + 1) % 12;
+            repaint();
+         }
+      }, 100, 100);
+   }
+
+   /**
+    * Paints component
+    *
+    * @param g Graphics to paint on
+    */
+   @Override
+   protected void paintComponent(Graphics g) {
+      super.paintComponent(g);
+      g.drawImage(animationImage, getWidth() / 2 - iconWidth / 2, getHeight() / 2 - iconHeight / 2, getWidth() / 2 + iconWidth / 2, getHeight() / 2 + iconHeight / 2, pos * 100, 0, (pos + 1) * 100, 100, this);
+   }
 }

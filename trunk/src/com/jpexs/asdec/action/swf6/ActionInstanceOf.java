@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf6;
 
 import com.jpexs.asdec.action.Action;
@@ -25,19 +24,20 @@ import java.util.List;
 import java.util.Stack;
 
 public class ActionInstanceOf extends Action {
-    public ActionInstanceOf() {
-        super(0x54, 0);
-    }
 
-    @Override
-    public String toString() {
-        return "InstanceOf";
-    }
+   public ActionInstanceOf() {
+      super(0x54, 0);
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        TreeItem a = stack.pop();
-        TreeItem b = stack.pop();
-        stack.push(new InstanceOfTreeItem(this, b, a));
-    }
+   @Override
+   public String toString() {
+      return "InstanceOf";
+   }
+
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      TreeItem a = stack.pop();
+      TreeItem b = stack.pop();
+      stack.push(new InstanceOfTreeItem(this, b, a));
+   }
 }

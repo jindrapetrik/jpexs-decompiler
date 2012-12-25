@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.types;
 
 /**
@@ -22,16 +21,15 @@ package com.jpexs.asdec.abc.types;
  * @author JPEXS
  */
 public class Decimal {
+
    public byte data[];
-   public Decimal(byte data[])
-   {
-      this.data=data;
+
+   public Decimal(byte data[]) {
+      this.data = data;
    }
 
    @Override
    public String toString() {
       return new String(data);
    }
-
-
 }

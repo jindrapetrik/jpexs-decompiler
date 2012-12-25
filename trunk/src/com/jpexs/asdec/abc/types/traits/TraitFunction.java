@@ -14,20 +14,18 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.types.traits;
 
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.helpers.Helper;
 
-
 public class TraitFunction extends Trait {
 
-    public int slot_index;
-    public int method_info;
+   public int slot_index;
+   public int method_info;
 
-    @Override
-    public String toString(ABC abc) {
-        return "Function " + abc.constants.constant_multiname[name_index].toString(abc.constants) + " slot=" + slot_index + " method_info=" + method_info + " metadata=" + Helper.intArrToString(metadata);
-    }
+   @Override
+   public String toString(ABC abc) {
+      return "Function " + abc.constants.constant_multiname[name_index].toString(abc.constants) + " slot=" + slot_index + " method_info=" + method_info + " metadata=" + Helper.intArrToString(metadata);
+   }
 }

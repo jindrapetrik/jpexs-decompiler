@@ -14,29 +14,27 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
 
-
 public class BreakTreeItem extends TreeItem {
-    public long loopPos;
-    public boolean isKnown;
 
-    public BreakTreeItem(Action instruction, long loopPos) {
-        this(instruction, loopPos, true);
-    }
+   public long loopPos;
+   public boolean isKnown;
 
-    public BreakTreeItem(Action instruction, long loopPos, boolean isKnown) {
-        super(instruction, NOPRECEDENCE);
-        this.loopPos = loopPos;
-        this.isKnown = isKnown;
-    }
+   public BreakTreeItem(Action instruction, long loopPos) {
+      this(instruction, loopPos, true);
+   }
 
-    @Override
-    public String toString(ConstantPool constants) {
-        return hilight("break") + " loop" + loopPos;
-    }
+   public BreakTreeItem(Action instruction, long loopPos, boolean isKnown) {
+      super(instruction, NOPRECEDENCE);
+      this.loopPos = loopPos;
+      this.isKnown = isKnown;
+   }
 
+   @Override
+   public String toString(ConstantPool constants) {
+      return hilight("break") + " loop" + loopPos;
+   }
 }

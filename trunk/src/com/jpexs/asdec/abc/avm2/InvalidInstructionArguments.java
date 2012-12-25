@@ -14,14 +14,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2;
-
 
 public class InvalidInstructionArguments extends RuntimeException {
 
-    public InvalidInstructionArguments() {
-        super("Invalid method arguments");
-    }
-
+   public InvalidInstructionArguments() {
+      super("Invalid method arguments");
+   }
 }

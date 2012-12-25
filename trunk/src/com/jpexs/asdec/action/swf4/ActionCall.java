@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf4;
 
 import com.jpexs.asdec.action.Action;
@@ -26,17 +25,17 @@ import java.util.Stack;
 
 public class ActionCall extends Action {
 
-    public ActionCall() {
-        super(0x9E, 0);
-    }
+   public ActionCall() {
+      super(0x9E, 0);
+   }
 
-    @Override
-    public String toString() {
-        return "Call";
-    }
+   @Override
+   public String toString() {
+      return "Call";
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        output.add(new CallTreeItem(this, stack.pop()));
-    }
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      output.add(new CallTreeItem(this, stack.pop()));
+   }
 }

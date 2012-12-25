@@ -14,12 +14,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf4;
 
 public class Null {
-    @Override
-    public String toString() {
-        return "null";
-    }
+
+   @Override
+   public String toString() {
+      return "null";
+   }
 }

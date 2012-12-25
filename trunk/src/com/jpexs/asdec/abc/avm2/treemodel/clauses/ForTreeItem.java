@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel.clauses;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
@@ -25,73 +24,72 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-
 public class ForTreeItem extends LoopTreeItem implements Block {
 
-    public List<TreeItem> firstCommands;
-    public TreeItem expression;
-    public List<TreeItem> finalCommands;
-    public List<TreeItem> commands;
+   public List<TreeItem> firstCommands;
+   public TreeItem expression;
+   public List<TreeItem> finalCommands;
+   public List<TreeItem> commands;
 
-    public ForTreeItem(AVM2Instruction instruction, int loopBreak, int loopContinue, List<TreeItem> firstCommands, TreeItem expression, List<TreeItem> finalCommands, List<TreeItem> commands) {
-        super(instruction, loopBreak, loopContinue);
-        this.firstCommands = firstCommands;
-        this.expression = expression;
-        this.finalCommands = finalCommands;
-        this.commands = commands;
-    }
+   public ForTreeItem(AVM2Instruction instruction, int loopBreak, int loopContinue, List<TreeItem> firstCommands, TreeItem expression, List<TreeItem> finalCommands, List<TreeItem> commands) {
+      super(instruction, loopBreak, loopContinue);
+      this.firstCommands = firstCommands;
+      this.expression = expression;
+      this.finalCommands = finalCommands;
+      this.commands = commands;
+   }
 
-    private String stripSemicolon(String s) {
-        if (s.endsWith(";")) {
-            s = s.substring(0, s.length() - 1);
-        }
-        return s;
-    }
+   private String stripSemicolon(String s) {
+      if (s.endsWith(";")) {
+         s = s.substring(0, s.length() - 1);
+      }
+      return s;
+   }
 
-    @Override
-    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
-        String ret = "";
-        ret += "loop" + loopBreak + ":\r\n";
-        ret += hilight("for(");
-        for (int i = 0; i < firstCommands.size(); i++) {
-            if (i > 0) {
-                ret += ",";
-            }
-            ret += stripSemicolon(firstCommands.get(i).toString(constants,localRegNames));
-        }
-        ret += ";";
-        ret += expression.toString(constants,localRegNames);
-        ret += ";";
-        for (int i = 0; i < finalCommands.size(); i++) {
-            if (i > 0) {
-                ret += ",";
-            }
-            ret += stripSemicolon(finalCommands.get(i).toString(constants,localRegNames));
-        }
-        ret += hilight(")") + "\r\n{\r\n";
-        for (TreeItem ti : commands) {
-            ret += ti.toStringSemicoloned(constants,localRegNames) + "\r\n";
-        }
-        ret += hilight("}") + "\r\n";
-        ret += ":loop" + loopBreak;
-        return ret;
-    }
+   @Override
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+      String ret = "";
+      ret += "loop" + loopBreak + ":\r\n";
+      ret += hilight("for(");
+      for (int i = 0; i < firstCommands.size(); i++) {
+         if (i > 0) {
+            ret += ",";
+         }
+         ret += stripSemicolon(firstCommands.get(i).toString(constants, localRegNames));
+      }
+      ret += ";";
+      ret += expression.toString(constants, localRegNames);
+      ret += ";";
+      for (int i = 0; i < finalCommands.size(); i++) {
+         if (i > 0) {
+            ret += ",";
+         }
+         ret += stripSemicolon(finalCommands.get(i).toString(constants, localRegNames));
+      }
+      ret += hilight(")") + "\r\n{\r\n";
+      for (TreeItem ti : commands) {
+         ret += ti.toStringSemicoloned(constants, localRegNames) + "\r\n";
+      }
+      ret += hilight("}") + "\r\n";
+      ret += ":loop" + loopBreak;
+      return ret;
+   }
 
-    @Override
+   @Override
    public boolean needsSemicolon() {
       return false;
    }
-    
-    public List<ContinueTreeItem> getContinues() {
-        List<ContinueTreeItem> ret = new ArrayList<ContinueTreeItem>();
-        for (TreeItem ti : commands) {
-            if (ti instanceof ContinueTreeItem) {
-                ret.add((ContinueTreeItem) ti);
-            }
-            if (ti instanceof Block) {
-                ret.addAll(((Block) ti).getContinues());
-            }
-        }
-        return ret;
-    }
+
+   public List<ContinueTreeItem> getContinues() {
+      List<ContinueTreeItem> ret = new ArrayList<ContinueTreeItem>();
+      for (TreeItem ti : commands) {
+         if (ti instanceof ContinueTreeItem) {
+            ret.add((ContinueTreeItem) ti);
+         }
+         if (ti instanceof Block) {
+            ret.addAll(((Block) ti).getContinues());
+         }
+      }
+      return ret;
+   }
 }

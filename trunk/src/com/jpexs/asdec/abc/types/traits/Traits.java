@@ -14,44 +14,46 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.types.traits;
 
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 
-
 public class Traits {
-    public Trait traits[] = new Trait[0];
 
-    @Override
-    public String toString() {
-        String s = "";
-        for (int t = 0; t < traits.length; t++) {
-            if (t > 0) s += "\r\n";
-            s += traits[t].toString();
-        }
-        return s;
-    }
+   public Trait traits[] = new Trait[0];
 
+   @Override
+   public String toString() {
+      String s = "";
+      for (int t = 0; t < traits.length; t++) {
+         if (t > 0) {
+            s += "\r\n";
+         }
+         s += traits[t].toString();
+      }
+      return s;
+   }
 
-    public String toString(ABC abc) {
-        String s = "";
-        for (int t = 0; t < traits.length; t++) {
-            if (t > 0) s += "\r\n";
-            s += traits[t].toString(abc);
-        }
-        return s;
-    }
+   public String toString(ABC abc) {
+      String s = "";
+      for (int t = 0; t < traits.length; t++) {
+         if (t > 0) {
+            s += "\r\n";
+         }
+         s += traits[t].toString(abc);
+      }
+      return s;
+   }
 
-    public String convert(ConstantPool constants, String prefix,ABC abc) {
-        String s = "";
-        for (int t = 0; t < traits.length; t++) {
-            if (t > 0) s += "\r\n";
-            s += prefix + traits[t].convert(constants, null,abc);
-        }
-        return s;
-    }
-
-
+   public String convert(ConstantPool constants, String prefix, ABC abc) {
+      String s = "";
+      for (int t = 0; t < traits.length; t++) {
+         if (t > 0) {
+            s += "\r\n";
+         }
+         s += prefix + traits[t].convert(constants, null, abc);
+      }
+      return s;
+   }
 }

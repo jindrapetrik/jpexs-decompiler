@@ -14,34 +14,31 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import java.util.HashMap;
 
-
 public class CoerceTreeItem extends TreeItem {
-    public TreeItem value;
-    public String type;
 
-    public CoerceTreeItem(AVM2Instruction instruction, TreeItem value, String type) {
-        super(instruction, NOPRECEDENCE);
-        this.value = value;
-        this.type = type;
-    }
+   public TreeItem value;
+   public String type;
 
-    @Override
-    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
-        //return hilight("("+type+")")+
-        return value.toString(constants,localRegNames);
-    }
+   public CoerceTreeItem(AVM2Instruction instruction, TreeItem value, String type) {
+      super(instruction, NOPRECEDENCE);
+      this.value = value;
+      this.type = type;
+   }
+
+   @Override
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+      //return hilight("("+type+")")+
+      return value.toString(constants, localRegNames);
+   }
 
    @Override
    public TreeItem getNotCoerced() {
       return value;
    }
-
-
 }

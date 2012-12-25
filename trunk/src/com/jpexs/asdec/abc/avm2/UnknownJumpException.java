@@ -14,29 +14,26 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2;
 
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import java.util.List;
 import java.util.Stack;
 
-
 public class UnknownJumpException extends RuntimeException {
-    public Stack stack;
-    public int ip;
-    public List<TreeItem> output;
 
-    public UnknownJumpException(Stack stack, int ip, List<TreeItem> output) {
-        this.stack = stack;
-        this.ip = ip;
-        this.output = output;
-    }
+   public Stack stack;
+   public int ip;
+   public List<TreeItem> output;
 
-    @Override
-    public String toString() {
-        return "Unknown jump to " + ip;
-    }
+   public UnknownJumpException(Stack stack, int ip, List<TreeItem> output) {
+      this.stack = stack;
+      this.ip = ip;
+      this.output = output;
+   }
 
-
+   @Override
+   public String toString() {
+      return "Unknown jump to " + ip;
+   }
 }

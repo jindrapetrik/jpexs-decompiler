@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.types.filters;
 
 /**
@@ -23,17 +22,18 @@ package com.jpexs.asdec.types.filters;
  * @author JPEXS
  */
 public class FILTER {
-    /**
-     * Identificator of type of the filter
-     */
-    public int id;
 
-    /**
-     * Constructor
-     *
-     * @param id Type identificator
-     */
-    public FILTER(int id) {
-        this.id = id;
-    }
+   /**
+    * Identificator of type of the filter
+    */
+   public int id;
+
+   /**
+    * Constructor
+    *
+    * @param id Type identificator
+    */
+   public FILTER(int id) {
+      this.id = id;
+   }
 }

@@ -14,10 +14,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.instructions.other;
 
- import com.jpexs.asdec.abc.ABC;
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
@@ -32,38 +31,35 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-
 public class GetSlotIns extends InstructionDefinition {
 
-    public GetSlotIns() {
-        super(0x6c, "getslot", new int[]{AVM2Code.DAT_SLOT_INDEX});
-    }
+   public GetSlotIns() {
+      super(0x6c, "getslot", new int[]{AVM2Code.DAT_SLOT_INDEX});
+   }
 
-    @Override
-    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer,String> localRegNames) {
-        int slotIndex = ins.operands[0];
-        TreeItem obj = (TreeItem) stack.pop(); //scope
-        Multiname slotname = null;
-        if (obj instanceof ExceptionTreeItem) {
-            slotname = constants.constant_multiname[((ExceptionTreeItem) obj).exception.name_index];
-        } else {
+   @Override
+   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer, String> localRegNames) {
+      int slotIndex = ins.operands[0];
+      TreeItem obj = (TreeItem) stack.pop(); //scope
+      Multiname slotname = null;
+      if (obj instanceof ExceptionTreeItem) {
+         slotname = constants.constant_multiname[((ExceptionTreeItem) obj).exception.name_index];
+      } else {
 
-            for (int t = 0; t < body.traits.traits.length; t++) {
-                if (body.traits.traits[t] instanceof TraitSlotConst) {
-                    if (((TraitSlotConst) body.traits.traits[t]).slot_id == slotIndex) {
-                        slotname = body.traits.traits[t].getMultiName(constants);
-                    }
-                }
-
+         for (int t = 0; t < body.traits.traits.length; t++) {
+            if (body.traits.traits[t] instanceof TraitSlotConst) {
+               if (((TraitSlotConst) body.traits.traits[t]).slot_id == slotIndex) {
+                  slotname = body.traits.traits[t].getMultiName(constants);
+               }
             }
-        }
-        stack.push(new GetSlotTreeItem(ins, obj, slotname));
-    }
+
+         }
+      }
+      stack.push(new GetSlotTreeItem(ins, obj, slotname));
+   }
 
    @Override
    public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -1+1;
+      return -1 + 1;
    }
-
-
 }

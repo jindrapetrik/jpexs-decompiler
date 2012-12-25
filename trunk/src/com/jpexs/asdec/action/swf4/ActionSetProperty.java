@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf4;
 
 import com.jpexs.asdec.action.Action;
@@ -27,26 +26,26 @@ import java.util.Stack;
 
 public class ActionSetProperty extends Action {
 
-    public ActionSetProperty() {
-        super(0x23, 0);
-    }
+   public ActionSetProperty() {
+      super(0x23, 0);
+   }
 
-    @Override
-    public String toString() {
-        return "SetProperty";
-    }
+   @Override
+   public String toString() {
+      return "SetProperty";
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        TreeItem value = stack.pop();
-        TreeItem index = stack.pop();
-        TreeItem target = stack.pop();
-        int indexInt = 0;
-        if (index instanceof DirectValueTreeItem) {
-            if (((DirectValueTreeItem) index).value instanceof Long) {
-                indexInt = (int) (long) (Long) ((DirectValueTreeItem) index).value;
-            }
-        }
-        output.add(new SetPropertyTreeItem(this, target, indexInt, value));
-    }
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      TreeItem value = stack.pop();
+      TreeItem index = stack.pop();
+      TreeItem target = stack.pop();
+      int indexInt = 0;
+      if (index instanceof DirectValueTreeItem) {
+         if (((DirectValueTreeItem) index).value instanceof Long) {
+            indexInt = (int) (long) (Long) ((DirectValueTreeItem) index).value;
+         }
+      }
+      output.add(new SetPropertyTreeItem(this, target, indexInt, value));
+   }
 }

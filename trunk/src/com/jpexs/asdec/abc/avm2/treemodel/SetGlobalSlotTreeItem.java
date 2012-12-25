@@ -14,28 +14,25 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import java.util.HashMap;
 
-
 public class SetGlobalSlotTreeItem extends TreeItem {
-    public int slotId;
-    public TreeItem value;
 
-    public SetGlobalSlotTreeItem(AVM2Instruction instruction, int slotId, TreeItem value) {
-        super(instruction, PRECEDENCE_ASSIGMENT);
-        this.slotId = slotId;
-        this.value = value;
-    }
+   public int slotId;
+   public TreeItem value;
 
-    @Override
-    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
-        return hilight("setglobalslot(" + slotId + ",") + value.toString(constants,localRegNames) + hilight(")");
-    }
+   public SetGlobalSlotTreeItem(AVM2Instruction instruction, int slotId, TreeItem value) {
+      super(instruction, PRECEDENCE_ASSIGMENT);
+      this.slotId = slotId;
+      this.value = value;
+   }
 
-
+   @Override
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+      return hilight("setglobalslot(" + slotId + ",") + value.toString(constants, localRegNames) + hilight(")");
+   }
 }

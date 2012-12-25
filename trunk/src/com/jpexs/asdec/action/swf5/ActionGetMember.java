@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf5;
 
 import com.jpexs.asdec.action.Action;
@@ -26,19 +25,19 @@ import java.util.Stack;
 
 public class ActionGetMember extends Action {
 
-    public ActionGetMember() {
-        super(0x4E, 0);
-    }
+   public ActionGetMember() {
+      super(0x4E, 0);
+   }
 
-    @Override
-    public String toString() {
-        return "GetMember";
-    }
+   @Override
+   public String toString() {
+      return "GetMember";
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        TreeItem functionName = stack.pop();
-        TreeItem object = stack.pop();
-        stack.push(new GetMemberTreeItem(this, object, functionName));
-    }
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      TreeItem functionName = stack.pop();
+      TreeItem object = stack.pop();
+      stack.push(new GetMemberTreeItem(this, object, functionName));
+   }
 }

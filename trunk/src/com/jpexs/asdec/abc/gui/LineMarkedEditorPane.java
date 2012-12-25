@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.gui;
 
 import java.awt.Color;
@@ -31,36 +30,35 @@ import javax.swing.text.Element;
  */
 public class LineMarkedEditorPane extends JEditorPane {
 
-   int lastLine=-1;
-   public LineMarkedEditorPane() {
-         setOpaque(false);
-		   addCaretListener(new CaretListener(){
+   int lastLine = -1;
 
+   public LineMarkedEditorPane() {
+      setOpaque(false);
+      addCaretListener(new CaretListener() {
          public void caretUpdate(CaretEvent e) {
             int caretPosition = getCaretPosition();
             Element root = getDocument().getDefaultRootElement();
             int currentLine = root.getElementIndex(caretPosition);
-            if(currentLine!=lastLine){
-                  lastLine=currentLine;
-                  repaint();
+            if (currentLine != lastLine) {
+               lastLine = currentLine;
+               repaint();
             }
          }
-
-         });
-    }
+      });
+   }
 
    @Override
    public void paint(Graphics g) {
       g.setColor(Color.white);
-      g.fillRect(0, 0, getWidth(),getHeight());
+      g.fillRect(0, 0, getWidth(), getHeight());
       FontMetrics fontMetrics = g.getFontMetrics();
       int lh = fontMetrics.getHeight();
-        int a = fontMetrics.getAscent();
-        int d=fontMetrics.getDescent();
-        int h = a + d;
-        int rH = h;
-        g.setColor(new Color(0xee,0xee,0xee));
-        g.fillRect(0, d+lh*lastLine-1, getWidth(),lh);
+      int a = fontMetrics.getAscent();
+      int d = fontMetrics.getDescent();
+      int h = a + d;
+      int rH = h;
+      g.setColor(new Color(0xee, 0xee, 0xee));
+      g.fillRect(0, d + lh * lastLine - 1, getWidth(), lh);
       super.paint(g);
    }
 }

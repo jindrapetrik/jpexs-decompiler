@@ -14,23 +14,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel.clauses;
 
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 
-
 public abstract class LoopTreeItem extends TreeItem {
-    public int loopBreak;
-    public int loopContinue;
 
-    public LoopTreeItem(AVM2Instruction instruction, int loopBreak, int loopContinue) {
-        super(instruction, NOPRECEDENCE);
-        this.loopBreak = loopBreak;
-        this.loopContinue = loopContinue;
-    }
-    @Override
+   public int loopBreak;
+   public int loopContinue;
+
+   public LoopTreeItem(AVM2Instruction instruction, int loopBreak, int loopContinue) {
+      super(instruction, NOPRECEDENCE);
+      this.loopBreak = loopBreak;
+      this.loopContinue = loopContinue;
+   }
+
+   @Override
    public boolean needsSemicolon() {
       return false;
    }

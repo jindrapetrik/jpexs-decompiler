@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.tags.DoABCTag;
@@ -22,38 +21,34 @@ import java.util.List;
 import javax.swing.ComboBoxModel;
 import javax.swing.event.ListDataListener;
 
-
 public class ABCComboBoxModel implements ComboBoxModel {
-    public List<DoABCTag> list;
-    public int itemIndex = 0;
 
-    public ABCComboBoxModel(List<DoABCTag> list) {
-        this.list = list;
-    }
+   public List<DoABCTag> list;
+   public int itemIndex = 0;
 
+   public ABCComboBoxModel(List<DoABCTag> list) {
+      this.list = list;
+   }
 
-    public int getSize() {
-        return list.size();
-    }
+   public int getSize() {
+      return list.size();
+   }
 
-    public Object getElementAt(int index) {
-        return list.get(index);
-    }
+   public Object getElementAt(int index) {
+      return list.get(index);
+   }
 
-    public void addListDataListener(ListDataListener l) {
+   public void addListDataListener(ListDataListener l) {
+   }
 
-    }
+   public void removeListDataListener(ListDataListener l) {
+   }
 
-    public void removeListDataListener(ListDataListener l) {
+   public void setSelectedItem(Object anItem) {
+      itemIndex = list.indexOf(anItem);
+   }
 
-    }
-
-    public void setSelectedItem(Object anItem) {
-        itemIndex = list.indexOf(anItem);
-    }
-
-    public Object getSelectedItem() {
-        return getElementAt(itemIndex);
-    }
-
+   public Object getSelectedItem() {
+      return getElementAt(itemIndex);
+   }
 }

@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.types;
 
 /**
@@ -23,20 +22,21 @@ package com.jpexs.asdec.types;
  * @author JPEXS
  */
 public class ARGB {
-    /**
-     * Alpha value defining opacity
-     */
-    public int alpha;
-    /**
-     * Red color value
-     */
-    public int red;
-    /**
-     * Green color value
-     */
-    public int green;
-    /**
-     * Blue color value
-     */
-    public int blue;
+
+   /**
+    * Alpha value defining opacity
+    */
+   public int alpha;
+   /**
+    * Red color value
+    */
+   public int red;
+   /**
+    * Green color value
+    */
+   public int green;
+   /**
+    * Blue color value
+    */
+   public int blue;
 }

@@ -14,16 +14,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel;
 
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 
-
 public abstract class NumberValueTreeItem extends TreeItem {
 
-    public NumberValueTreeItem(AVM2Instruction instruction) {
-        super(instruction, PRECEDENCE_PRIMARY);
-    }
-
+   public NumberValueTreeItem(AVM2Instruction instruction) {
+      super(instruction, PRECEDENCE_PRIMARY);
+   }
 }

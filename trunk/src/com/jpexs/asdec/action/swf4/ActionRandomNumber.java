@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf4;
 
 import com.jpexs.asdec.action.Action;
@@ -26,18 +25,18 @@ import java.util.Stack;
 
 public class ActionRandomNumber extends Action {
 
-    public ActionRandomNumber() {
-        super(0x30, 0);
-    }
+   public ActionRandomNumber() {
+      super(0x30, 0);
+   }
 
-    @Override
-    public String toString() {
-        return "RandomNumber";
-    }
+   @Override
+   public String toString() {
+      return "RandomNumber";
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        TreeItem maximum = stack.pop();
-        stack.push(new RandomNumberTreeItem(this, maximum));
-    }
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      TreeItem maximum = stack.pop();
+      stack.push(new RandomNumberTreeItem(this, maximum));
+   }
 }

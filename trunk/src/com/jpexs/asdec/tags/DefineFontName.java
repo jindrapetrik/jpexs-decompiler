@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
@@ -23,21 +22,20 @@ import java.io.IOException;
 
 public class DefineFontName extends Tag {
 
-	private int fontId;
-	private String fontName;
-	private String fontCopyright;
+   private int fontId;
+   private String fontName;
+   private String fontCopyright;
 
-	public DefineFontName(byte[] data, int version, long pos) throws IOException {
-		super(88, data, pos);
-		SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-        fontId = sis.readUI16();
-        fontName = sis.readString();
-        fontCopyright = sis.readString();
-	}
+   public DefineFontName(byte[] data, int version, long pos) throws IOException {
+      super(88, data, pos);
+      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+      fontId = sis.readUI16();
+      fontName = sis.readString();
+      fontCopyright = sis.readString();
+   }
 
-	@Override
-	public String toString() {
-		return "DefineFontName";
-	}
-
+   @Override
+   public String toString() {
+      return "DefineFontName";
+   }
 }

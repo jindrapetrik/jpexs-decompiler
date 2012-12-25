@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf5;
 
 import com.jpexs.asdec.SWFInputStream;
@@ -32,42 +31,42 @@ import java.util.List;
 import java.util.Stack;
 
 public class ActionStoreRegister extends Action {
-    public int registerNumber;
 
-    public ActionStoreRegister(SWFInputStream sis) throws IOException {
-        super(0x87, 1);
-        registerNumber = sis.readUI8();
-    }
+   public int registerNumber;
 
-    public ActionStoreRegister(FlasmLexer lexer) throws IOException, ParseException {
-        super(0x87, 1);
-        registerNumber = (int) lexLong(lexer);
-    }
+   public ActionStoreRegister(SWFInputStream sis) throws IOException {
+      super(0x87, 1);
+      registerNumber = sis.readUI8();
+   }
 
-    public byte[] getBytes(int version) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
-        try {
-            sos.writeUI8(registerNumber);
-            sos.close();
-        } catch (IOException e) {
+   public ActionStoreRegister(FlasmLexer lexer) throws IOException, ParseException {
+      super(0x87, 1);
+      registerNumber = (int) lexLong(lexer);
+   }
 
-        }
-        return surroundWithAction(baos.toByteArray(), version);
-    }
+   public byte[] getBytes(int version) {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      SWFOutputStream sos = new SWFOutputStream(baos, version);
+      try {
+         sos.writeUI8(registerNumber);
+         sos.close();
+      } catch (IOException e) {
+      }
+      return surroundWithAction(baos.toByteArray(), version);
+   }
 
-    @Override
-    public String toString() {
-        return "StoreRegister " + registerNumber;
-    }
+   @Override
+   public String toString() {
+      return "StoreRegister " + registerNumber;
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        TreeItem item = stack.peek();
-        RegisterNumber rn=new RegisterNumber(registerNumber);
-        if(regNames.containsKey(registerNumber)){
-            rn.name=regNames.get(registerNumber);
-        }
-        output.add(new StoreRegisterTreeItem(this, rn, item));
-    }
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      TreeItem item = stack.peek();
+      RegisterNumber rn = new RegisterNumber(registerNumber);
+      if (regNames.containsKey(registerNumber)) {
+         rn.name = regNames.get(registerNumber);
+      }
+      output.add(new StoreRegisterTreeItem(this, rn, item));
+   }
 }

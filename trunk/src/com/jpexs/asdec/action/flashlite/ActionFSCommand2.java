@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.flashlite;
 
 import com.jpexs.asdec.action.Action;
@@ -27,23 +26,23 @@ import java.util.Stack;
 
 public class ActionFSCommand2 extends Action {
 
-    public ActionFSCommand2() {
-        super(0x2D, 0);
-    }
+   public ActionFSCommand2() {
+      super(0x2D, 0);
+   }
 
-    @Override
-    public String toString() {
-        return "FSCommand2";
-    }
+   @Override
+   public String toString() {
+      return "FSCommand2";
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        long numArgs = popLong(stack);
-        TreeItem command = stack.pop();
-        List<TreeItem> args = new ArrayList<TreeItem>();
-        for (long l = 0; l < numArgs; l++) {
-            args.add(stack.pop());
-        }        
-        stack.push(new FSCommand2TreeItem(this, command, args));
-    }
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      long numArgs = popLong(stack);
+      TreeItem command = stack.pop();
+      List<TreeItem> args = new ArrayList<TreeItem>();
+      for (long l = 0; l < numArgs; l++) {
+         args.add(stack.pop());
+      }
+      stack.push(new FSCommand2TreeItem(this, command, args));
+   }
 }

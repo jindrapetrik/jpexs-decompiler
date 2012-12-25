@@ -14,26 +14,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import java.util.HashMap;
 
-
 public class DecrementTreeItem extends TreeItem {
-    public TreeItem object;
 
-    public DecrementTreeItem(AVM2Instruction instruction, TreeItem object) {
-        super(instruction, PRECEDENCE_ADDITIVE);
-        this.object = object;
-    }
+   public TreeItem object;
 
-    @Override
-    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
-        return object.toString(constants,localRegNames) + hilight("-1");
-    }
+   public DecrementTreeItem(AVM2Instruction instruction, TreeItem object) {
+      super(instruction, PRECEDENCE_ADDITIVE);
+      this.object = object;
+   }
 
-
+   @Override
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+      return object.toString(constants, localRegNames) + hilight("-1");
+   }
 }

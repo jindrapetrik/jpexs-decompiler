@@ -14,18 +14,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.treemodel.operations;
 
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 
-
 public class AsTypeTreeItem extends BinaryOpTreeItem {
 
-    public AsTypeTreeItem(Action instruction, TreeItem value, TreeItem type) {
-        super(instruction, PRECEDENCE_RELATIONAL, value, type, " as ");
-    }
-
-
+   public AsTypeTreeItem(Action instruction, TreeItem value, TreeItem type) {
+      super(instruction, PRECEDENCE_RELATIONAL, value, type, " as ");
+   }
 }

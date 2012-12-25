@@ -14,17 +14,16 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.parser;
 
-
 public class ParseException extends Exception {
-    public long line;
-    public String text;
 
-    public ParseException(String text, long line) {
-        super("ParseException:" + text + " on line " + line);
-        this.line = line;
-        this.text = text;
-    }
+   public long line;
+   public String text;
+
+   public ParseException(String text, long line) {
+      super("ParseException:" + text + " on line " + line);
+      this.line = line;
+      this.text = text;
+   }
 }

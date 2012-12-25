@@ -14,10 +14,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.instructions.localregs;
 
- import com.jpexs.asdec.abc.ABC;
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
@@ -33,39 +32,41 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-
 public class SetLocalIns extends InstructionDefinition implements SetTypeIns, SetLocalTypeIns {
 
-    public SetLocalIns() {
-        super(0x63, "setlocal", new int[]{AVM2Code.DAT_LOCAL_REG_INDEX});
-    }
+   public SetLocalIns() {
+      super(0x63, "setlocal", new int[]{AVM2Code.DAT_LOCAL_REG_INDEX});
+   }
 
-    @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-        lda.localRegisters.put((int)(long)(Long)arguments.get(0),lda.operandStack.pop());
-    }
+   @Override
+   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+      lda.localRegisters.put((int) (long) (Long) arguments.get(0), lda.operandStack.pop());
+   }
 
+   @Override
+   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer, String> localRegNames) {
+      TreeItem val = (TreeItem) stack.pop();
+      localRegs.put(ins.operands[0], val);
+      if (val instanceof NewActivationTreeItem) {
+         return;
+      }
+      if (val instanceof FindPropertyTreeItem) {
+         return;
+      }
+      //if(val.startsWith("catchscope ")) return;
+      //if(val.startsWith("newactivation()")) return;
+      output.add(new SetLocalTreeItem(ins, ins.operands[0], val));
+   }
 
-    @Override
-    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer,String> localRegNames) {
-        TreeItem val = (TreeItem) stack.pop();
-        localRegs.put(ins.operands[0], val);
-        if (val instanceof NewActivationTreeItem) return;
-        if (val instanceof FindPropertyTreeItem) return;
-        //if(val.startsWith("catchscope ")) return;
-        //if(val.startsWith("newactivation()")) return;
-        output.add(new SetLocalTreeItem(ins, ins.operands[0], val));
-    }
+   public String getObject(Stack<TreeItem> stack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, HashMap<Integer, String> localRegNames) {
+      return TreeItem.localRegName(localRegNames, ins.operands[0]);
+   }
 
-    public String getObject(Stack<TreeItem> stack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body,HashMap<Integer,String> localRegNames) {
-        return TreeItem.localRegName(localRegNames,ins.operands[0]);
-    }
+   public int getRegisterId(AVM2Instruction ins) {
+      return ins.operands[0];
+   }
 
-    public int getRegisterId(AVM2Instruction ins) {
-        return ins.operands[0];
-    }
-
-    @Override
+   @Override
    public int getStackDelta(AVM2Instruction ins, ABC abc) {
       return -1;
    }

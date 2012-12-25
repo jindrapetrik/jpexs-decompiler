@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.Main;
@@ -32,82 +31,78 @@ import javax.swing.border.BevelBorder;
  * @author JPEXS
  */
 public class DetailPanel extends JPanel implements ActionListener {
+
    public MethodTraitDetailPanel methodTraitPanel;
    public JPanel unsupportedTraitPanel;
    public SlotConstTraitDetailPanel slotConstTraitPanel;
-   public static final String METHOD_TRAIT_CARD="Method/Getter/Setter Trait";
-   public static final String UNSUPPORTED_TRAIT_CARD="Unsupported Trait Type";
-   public static final String SLOT_CONST_TRAIT_CARD="Slot/Const Trait";
+   public static final String METHOD_TRAIT_CARD = "Method/Getter/Setter Trait";
+   public static final String UNSUPPORTED_TRAIT_CARD = "Unsupported Trait Type";
+   public static final String SLOT_CONST_TRAIT_CARD = "Slot/Const Trait";
    private JPanel innerPanel;
    public JButton saveButton;
-   private HashMap<String,JComponent> cardMap=new HashMap<String,JComponent>();
+   private HashMap<String, JComponent> cardMap = new HashMap<String, JComponent>();
    private String selectedCard;
    private JLabel selectedLabel;
 
-   public DetailPanel()
-   {
-      innerPanel=new JPanel();
-      CardLayout layout=new CardLayout();
+   public DetailPanel() {
+      innerPanel = new JPanel();
+      CardLayout layout = new CardLayout();
       innerPanel.setLayout(layout);
-      methodTraitPanel=new MethodTraitDetailPanel();
+      methodTraitPanel = new MethodTraitDetailPanel();
       cardMap.put(METHOD_TRAIT_CARD, methodTraitPanel);
-      
-      unsupportedTraitPanel=new JPanel(new BorderLayout());
-      JLabel unsup=new JLabel("Editing of this trait type is currently unsupported",SwingConstants.CENTER);
-      unsupportedTraitPanel.add(unsup,BorderLayout.CENTER);
+
+      unsupportedTraitPanel = new JPanel(new BorderLayout());
+      JLabel unsup = new JLabel("Editing of this trait type is currently unsupported", SwingConstants.CENTER);
+      unsupportedTraitPanel.add(unsup, BorderLayout.CENTER);
 
       cardMap.put(UNSUPPORTED_TRAIT_CARD, unsupportedTraitPanel);
 
-      slotConstTraitPanel=new SlotConstTraitDetailPanel();
-      cardMap.put(SLOT_CONST_TRAIT_CARD,slotConstTraitPanel);
+      slotConstTraitPanel = new SlotConstTraitDetailPanel();
+      cardMap.put(SLOT_CONST_TRAIT_CARD, slotConstTraitPanel);
 
-      for(String key:cardMap.keySet())
-      {
-         innerPanel.add(cardMap.get(key),key);
+      for (String key : cardMap.keySet()) {
+         innerPanel.add(cardMap.get(key), key);
       }
 
       setLayout(new BorderLayout());
-      add(innerPanel,BorderLayout.CENTER);
+      add(innerPanel, BorderLayout.CENTER);
 
-      JPanel buttonsPanel=new JPanel();
+      JPanel buttonsPanel = new JPanel();
       buttonsPanel.setLayout(new FlowLayout());
       saveButton = new JButton("Save trait");
       saveButton.setActionCommand("SAVEDETAIL");
       saveButton.addActionListener(this);
       buttonsPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
       buttonsPanel.add(saveButton);
-      add(buttonsPanel,BorderLayout.SOUTH);
-      selectedCard=UNSUPPORTED_TRAIT_CARD;
+      add(buttonsPanel, BorderLayout.SOUTH);
+      selectedCard = UNSUPPORTED_TRAIT_CARD;
       layout.show(innerPanel, UNSUPPORTED_TRAIT_CARD);
       saveButton.setVisible(false);
-      selectedLabel=new JLabel("");
+      selectedLabel = new JLabel("");
       selectedLabel.setText(selectedCard);
       selectedLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
       selectedLabel.setHorizontalAlignment(SwingConstants.CENTER);
-      add(selectedLabel,BorderLayout.NORTH);
+      add(selectedLabel, BorderLayout.NORTH);
    }
 
-   public void showCard(String name)
-   {
-      CardLayout layout=(CardLayout)innerPanel.getLayout();
+   public void showCard(String name) {
+      CardLayout layout = (CardLayout) innerPanel.getLayout();
       layout.show(innerPanel, name);
       saveButton.setVisible(cardMap.get(name) instanceof TraitDetail);
-      selectedCard=name;
+      selectedCard = name;
       selectedLabel.setText(selectedCard);
    }
 
    public void actionPerformed(ActionEvent e) {
       if (e.getActionCommand().equals("SAVEDETAIL")) {
-            if(cardMap.get(selectedCard) instanceof TraitDetail)
-            {
-               if(((TraitDetail)cardMap.get(selectedCard)).save())
-               {
-                  int lasttrait = Main.abcMainFrame.decompiledTextArea.lastTraitIndex;
-                  Main.abcMainFrame.decompiledTextArea.reloadClass();
-                  Main.abcMainFrame.decompiledTextArea.gotoTrait(lasttrait);
-                  JOptionPane.showMessageDialog(this, "Trait Successfully saved");
-               }
+         if (cardMap.get(selectedCard) instanceof TraitDetail) {
+            if (((TraitDetail) cardMap.get(selectedCard)).save()) {
+               int lasttrait = Main.abcMainFrame.decompiledTextArea.lastTraitIndex;
+               Main.abcMainFrame.decompiledTextArea.reloadClass();
+               Main.abcMainFrame.decompiledTextArea.gotoTrait(lasttrait);
+               JOptionPane.showMessageDialog(this, "Trait Successfully saved");
             }
-        }
+         }
+      }
    }
 }

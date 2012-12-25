@@ -14,58 +14,58 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.types;
 
 /**
- * Represents a standard 2x3 transformation matrix of the sort commonly used in 2D graphics
+ * Represents a standard 2x3 transformation matrix of the sort commonly used in
+ * 2D graphics
  *
  * @author JPEXS
  */
 public class MATRIX {
-    /**
-     * Has scale values
-     */
-    public boolean hasScale;
-    /**
-     * X scale value
-     */
-    public double scaleX;
-    /**
-     * Y scale value
-     */
-    public double scaleY;
-    /**
-     * Has rotate and skew values
-     */
-    public boolean hasRotate;
-    /**
-     * First rotate and skew value
-     */
-    public double rotateSkew0;
-    /**
-     * Second rotate and skew value
-     */
-    public double rotateSkew1;
-    /**
-     * X translate value in twips
-     */
-    public int translateX;
-    /**
-     * Y translate value in twips
-     */
-    public int translateY;
 
-    /**
-     * Nbits used for store translate values
-     */
-    public int translateNBits;
-    /**
-     * Nbits used for store scale values
-     */
-    public int scaleNBits;
-    /**
-     * Nbits used for store rotate values
-     */
-    public int rotateNBits;
+   /**
+    * Has scale values
+    */
+   public boolean hasScale;
+   /**
+    * X scale value
+    */
+   public double scaleX;
+   /**
+    * Y scale value
+    */
+   public double scaleY;
+   /**
+    * Has rotate and skew values
+    */
+   public boolean hasRotate;
+   /**
+    * First rotate and skew value
+    */
+   public double rotateSkew0;
+   /**
+    * Second rotate and skew value
+    */
+   public double rotateSkew1;
+   /**
+    * X translate value in twips
+    */
+   public int translateX;
+   /**
+    * Y translate value in twips
+    */
+   public int translateY;
+   /**
+    * Nbits used for store translate values
+    */
+   public int translateNBits;
+   /**
+    * Nbits used for store scale values
+    */
+   public int scaleNBits;
+   /**
+    * Nbits used for store rotate values
+    */
+   public int rotateNBits;
 }

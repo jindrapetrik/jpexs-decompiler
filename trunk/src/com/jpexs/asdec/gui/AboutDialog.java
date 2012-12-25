@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.gui;
 
 import com.jpexs.asdec.Main;
@@ -31,66 +30,66 @@ import javax.swing.SwingConstants;
  * @author JPEXS
  */
 public class AboutDialog extends JDialog {
+
    public AboutDialog() {
       setDefaultCloseOperation(HIDE_ON_CLOSE);
-      setSize(new Dimension(300,270));
+      setSize(new Dimension(300, 270));
       setTitle("About");
-      
-      
-      Container cp=getContentPane();
+
+
+      Container cp = getContentPane();
       cp.setLayout(new FlowLayout());
 
-      JLabel jpLabel=new JLabel("JP");
-      jpLabel.setForeground(new Color(0,0,160));
-      jpLabel.setFont(new Font("Tahoma",Font.BOLD,25));
+      JLabel jpLabel = new JLabel("JP");
+      jpLabel.setForeground(new Color(0, 0, 160));
+      jpLabel.setFont(new Font("Tahoma", Font.BOLD, 25));
       jpLabel.setHorizontalAlignment(SwingConstants.CENTER);
       cp.add(jpLabel);
 
-      JLabel asLabel=new JLabel("ActionScript");
-      asLabel.setFont(new Font("Tahoma",Font.BOLD,25));
+      JLabel asLabel = new JLabel("ActionScript");
+      asLabel.setFont(new Font("Tahoma", Font.BOLD, 25));
       asLabel.setHorizontalAlignment(SwingConstants.CENTER);
       cp.add(asLabel);
 
-      JLabel decLabel=new JLabel("Decompiler");
+      JLabel decLabel = new JLabel("Decompiler");
       decLabel.setForeground(Color.red);
-      decLabel.setFont(new Font("Tahoma",Font.BOLD,25));
+      decLabel.setFont(new Font("Tahoma", Font.BOLD, 25));
       decLabel.setHorizontalAlignment(SwingConstants.CENTER);
       cp.add(decLabel);
 
-      JLabel verLabel=new JLabel("version "+Main.version);
+      JLabel verLabel = new JLabel("version " + Main.version);
       verLabel.setPreferredSize(new Dimension(300, 15));
-      verLabel.setFont(new Font("Tahoma",Font.BOLD,15));
+      verLabel.setFont(new Font("Tahoma", Font.BOLD, 15));
       verLabel.setHorizontalAlignment(SwingConstants.CENTER);
       cp.add(verLabel);
-      
 
-      JLabel byLabel=new JLabel("by");
+
+      JLabel byLabel = new JLabel("by");
       byLabel.setPreferredSize(new Dimension(300, 15));
       byLabel.setHorizontalAlignment(SwingConstants.CENTER);
       cp.add(byLabel);
 
-      JLabel jpexsLabel=new JLabel("JPEXS");
-      jpexsLabel.setForeground(new Color(0,0,160));
-      jpexsLabel.setFont(new Font("Tahoma",Font.BOLD,20));
+      JLabel jpexsLabel = new JLabel("JPEXS");
+      jpexsLabel.setForeground(new Color(0, 0, 160));
+      jpexsLabel.setFont(new Font("Tahoma", Font.BOLD, 20));
       jpexsLabel.setPreferredSize(new Dimension(300, 25));
       jpexsLabel.setHorizontalAlignment(SwingConstants.CENTER);
       cp.add(jpexsLabel);
 
-      JLabel dateLabel=new JLabel("2010-2012");
+      JLabel dateLabel = new JLabel("2010-2012");
       dateLabel.setPreferredSize(new Dimension(300, 10));
       dateLabel.setHorizontalAlignment(SwingConstants.CENTER);
       cp.add(dateLabel);
 
-      LinkLabel wwwLabel=new LinkLabel("http://code.google.com/p/asdec/");
+      LinkLabel wwwLabel = new LinkLabel("http://code.google.com/p/asdec/");
       wwwLabel.setForeground(Color.blue);
       wwwLabel.setPreferredSize(new Dimension(300, 25));
       wwwLabel.setHorizontalAlignment(SwingConstants.CENTER);
       cp.add(wwwLabel);
 
-      JButton okButton=new JButton("OK");
+      JButton okButton = new JButton("OK");
       cp.add(okButton);
-      okButton.addActionListener(new ActionListener(){
-
+      okButton.addActionListener(new ActionListener() {
          public void actionPerformed(ActionEvent e) {
             setVisible(false);
          }
@@ -100,6 +99,4 @@ public class AboutDialog extends JDialog {
       View.centerScreen(this);
       View.setWindowIcon(this);
    }
-
-
 }

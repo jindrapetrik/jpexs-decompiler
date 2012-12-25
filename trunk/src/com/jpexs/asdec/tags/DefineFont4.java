@@ -14,18 +14,17 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.tags;
 
 public class DefineFont4 extends Tag {
 
-	public DefineFont4(byte[] data, int version, long pos) {
-		super(91, data, pos);
-		// TODO Auto-generated constructor stub
-	}
+   public DefineFont4(byte[] data, int version, long pos) {
+      super(91, data, pos);
+      // TODO Auto-generated constructor stub
+   }
 
-	@Override
-	public String toString() {
-		return "DefineFont4";
-	}
+   @Override
+   public String toString() {
+      return "DefineFont4";
+   }
 }

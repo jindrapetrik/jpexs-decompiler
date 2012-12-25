@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf7;
 
 import com.jpexs.asdec.action.Action;
@@ -26,18 +25,18 @@ import java.util.Stack;
 
 public class ActionThrow extends Action {
 
-    public ActionThrow() {
-        super(0x2A, 0);
-    }
+   public ActionThrow() {
+      super(0x2A, 0);
+   }
 
-    @Override
-    public String toString() {
-        return "Throw";
-    }
+   @Override
+   public String toString() {
+      return "Throw";
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        TreeItem object = stack.pop();
-        output.add(new ThrowTreeItem(this, object));
-    }
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      TreeItem object = stack.pop();
+      output.add(new ThrowTreeItem(this, object));
+   }
 }

@@ -14,28 +14,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.treemodel.operations;
 
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 
-
 public class NotTreeItem extends UnaryOpTreeItem {
 
-    public NotTreeItem(Action instruction, TreeItem value) {
-        super(instruction, PRECEDENCE_UNARY, value, "!");
-    }
+   public NotTreeItem(Action instruction, TreeItem value) {
+      super(instruction, PRECEDENCE_UNARY, value, "!");
+   }
 
-    @Override
-    public boolean isTrue() {
-        return !value.isTrue();
-    }
+   @Override
+   public boolean isTrue() {
+      return !value.isTrue();
+   }
 
-    @Override
-    public boolean isFalse() {
-        return !value.isFalse();
-    }
-
-
+   @Override
+   public boolean isFalse() {
+      return !value.isFalse();
+   }
 }

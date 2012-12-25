@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.abc.avm2.flowgraph.Graph;
@@ -32,48 +31,44 @@ import javax.swing.tree.TreePath;
  * @author JPEXS
  */
 public class GraphTreeFrame extends JFrame {
-    public JTree graphTree;
 
+   public JTree graphTree;
 
+   public GraphTreeFrame(final Graph graph) {
+      setSize(400, 400);
+      graphTree = new JTree(new TreeModel() {
+         public Object getRoot() {
+            return graph.head;
+         }
 
-    public GraphTreeFrame(final Graph graph){
-        setSize(400,400);
-        graphTree=new JTree(new TreeModel(){
-            public Object getRoot() {
-                return graph.head;
-            }
+         public Object getChild(Object parent, int index) {
+            return ((GraphPart) parent).nextParts.get(index);
+         }
 
-            public Object getChild(Object parent, int index) {                
-                return ((GraphPart)parent).nextParts.get(index);
-            }
+         public int getChildCount(Object parent) {
+            return ((GraphPart) parent).nextParts.size();
+         }
 
-            public int getChildCount(Object parent) {
-                return ((GraphPart)parent).nextParts.size();
-            }
+         public boolean isLeaf(Object node) {
+            return getChildCount(node) == 0;
+         }
 
-            public boolean isLeaf(Object node) {
-                return getChildCount(node)==0;
-            }
+         public void valueForPathChanged(TreePath path, Object newValue) {
+         }
 
-            public void valueForPathChanged(TreePath path, Object newValue) {
+         public int getIndexOfChild(Object parent, Object child) {
+            return ((GraphPart) parent).nextParts.indexOf(child);
+         }
 
-            }
+         public void addTreeModelListener(TreeModelListener l) {
+         }
 
-            public int getIndexOfChild(Object parent, Object child) {
-                return ((GraphPart)parent).nextParts.indexOf(child);
-            }
+         public void removeTreeModelListener(TreeModelListener l) {
+         }
+      });
 
-            public void addTreeModelListener(TreeModelListener l) {
-
-            }
-
-            public void removeTreeModelListener(TreeModelListener l) {
-
-            }
-        });
-
-        Container cnt=getContentPane();
-        cnt.setLayout(new BorderLayout());
-        cnt.add(graphTree,BorderLayout.CENTER);
-    }
+      Container cnt = getContentPane();
+      cnt.setLayout(new BorderLayout());
+      cnt.add(graphTree, BorderLayout.CENTER);
+   }
 }

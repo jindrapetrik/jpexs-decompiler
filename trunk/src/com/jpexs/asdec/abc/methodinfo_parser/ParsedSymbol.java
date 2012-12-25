@@ -14,53 +14,42 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.methodinfo_parser;
 
-
 public class ParsedSymbol {
-    public int type;
-    public Object value;
 
-    public static final int TYPE_INTEGER = 1;
-    public static final int TYPE_FLOAT = 2;
-    public static final int TYPE_TRUE = 3;
-    public static final int TYPE_FALSE = 4;
-    public static final int TYPE_NULL = 5;
-    public static final int TYPE_UNDEFINED = 6;
-    public static final int TYPE_STRING = 7;
+   public int type;
+   public Object value;
+   public static final int TYPE_INTEGER = 1;
+   public static final int TYPE_FLOAT = 2;
+   public static final int TYPE_TRUE = 3;
+   public static final int TYPE_FALSE = 4;
+   public static final int TYPE_NULL = 5;
+   public static final int TYPE_UNDEFINED = 6;
+   public static final int TYPE_STRING = 7;
+   //8-12 namespace prefix
+   public static final int TYPE_PRIVATE = 8;
+   public static final int TYPE_PACKAGE = 9;
+   public static final int TYPE_INTERNAL = 10;
+   public static final int TYPE_STATIC = 11;
+   public static final int TYPE_EXPLICIT = 12;
+   public static final int TYPE_PROTECTED = 13;
+   public static final int TYPE_NAMESPACE = 14;
+   public static final int TYPE_COLON = 15;
+   public static final int TYPE_COMMA = 16;
+   public static final int TYPE_DOTS = 17;
+   public static final int TYPE_MULTINAME = 18;
+   public static final int TYPE_IDENTIFIER = 19;
+   public static final int TYPE_EOF = 20;
+   public static final int TYPE_STAR = 21;
+   public static final int TYPE_ASSIGN = 22;
 
-    //8-12 namespace prefix
-    public static final int TYPE_PRIVATE = 8;
-    public static final int TYPE_PACKAGE = 9;
-    public static final int TYPE_INTERNAL = 10;
-    public static final int TYPE_STATIC = 11;
-    public static final int TYPE_EXPLICIT = 12;
-    public static final int TYPE_PROTECTED = 13;
-    public static final int TYPE_NAMESPACE = 14;
+   public ParsedSymbol(int type, Object value) {
+      this.type = type;
+      this.value = value;
+   }
 
-    public static final int TYPE_COLON = 15;
-    public static final int TYPE_COMMA = 16;
-    public static final int TYPE_DOTS = 17;
-    
-    
-
-
-    public static final int TYPE_MULTINAME = 18;
-    public static final int TYPE_IDENTIFIER = 19;
-    
-    
-    public static final int TYPE_EOF = 20;
-    public static final int TYPE_STAR = 21;
-    public static final int TYPE_ASSIGN = 22;
-
-    public ParsedSymbol(int type, Object value) {
-        this.type = type;
-        this.value = value;
-    }
-
-    public ParsedSymbol(int type) {
-        this.type = type;
-    }
-
+   public ParsedSymbol(int type) {
+      this.type = type;
+   }
 }

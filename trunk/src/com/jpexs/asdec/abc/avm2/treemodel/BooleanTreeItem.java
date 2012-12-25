@@ -14,37 +14,33 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import java.util.HashMap;
 
-
 public class BooleanTreeItem extends TreeItem {
 
-    public Boolean value;
+   public Boolean value;
 
-    public BooleanTreeItem(AVM2Instruction instruction, Boolean value) {
-        super(instruction, PRECEDENCE_PRIMARY);
-        this.value = value;
-    }
+   public BooleanTreeItem(AVM2Instruction instruction, Boolean value) {
+      super(instruction, PRECEDENCE_PRIMARY);
+      this.value = value;
+   }
 
-    @Override
-    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
-        return value.toString();
-    }
+   @Override
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+      return value.toString();
+   }
 
-    @Override
-    public boolean isFalse() {
-        return value == false;
-    }
+   @Override
+   public boolean isFalse() {
+      return value == false;
+   }
 
-    @Override
-    public boolean isTrue() {
-        return value == true;
-    }
-
-
+   @Override
+   public boolean isTrue() {
+      return value == true;
+   }
 }

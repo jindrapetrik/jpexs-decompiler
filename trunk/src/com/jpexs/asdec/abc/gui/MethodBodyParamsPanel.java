@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.Main;
@@ -30,51 +29,52 @@ import javax.swing.event.ChangeListener;
  *
  * @author JPEXS
  */
-public class MethodBodyParamsPanel extends JPanel implements ChangeListener{
+public class MethodBodyParamsPanel extends JPanel implements ChangeListener {
 
-   public JLabel maxStackLabel = new JLabel("Max stack:",SwingConstants.RIGHT);
+   public JLabel maxStackLabel = new JLabel("Max stack:", SwingConstants.RIGHT);
    public JFormattedTextField maxStackField = new JFormattedTextField(NumberFormat.getNumberInstance());
-   public JLabel localCountLabel = new JLabel("Local registers count:",SwingConstants.RIGHT);
+   public JLabel localCountLabel = new JLabel("Local registers count:", SwingConstants.RIGHT);
    public JFormattedTextField localCountField = new JFormattedTextField(NumberFormat.getNumberInstance());
-   public JLabel initScopeDepthLabel = new JLabel("Minimum scope depth:",SwingConstants.RIGHT);
+   public JLabel initScopeDepthLabel = new JLabel("Minimum scope depth:", SwingConstants.RIGHT);
    public JFormattedTextField initScopeDepthField = new JFormattedTextField(NumberFormat.getNumberInstance());
-   public JLabel maxScopeDepthLabel = new JLabel("Maximum scope depth:",SwingConstants.RIGHT);
+   public JLabel maxScopeDepthLabel = new JLabel("Maximum scope depth:", SwingConstants.RIGHT);
    public JFormattedTextField maxScopeDepthField = new JFormattedTextField(NumberFormat.getNumberInstance());
    public MethodBody body;
-   public JCheckBox autoFillCheckBox=new JCheckBox("Auto fill on code save (GLOBAL SETTING)");
-   public JLabel experimentalLabel=new JLabel("...EXPERIMENTAL");
-   public MethodBodyParamsPanel()  {
+   public JCheckBox autoFillCheckBox = new JCheckBox("Auto fill on code save (GLOBAL SETTING)");
+   public JLabel experimentalLabel = new JLabel("...EXPERIMENTAL");
+
+   public MethodBodyParamsPanel() {
       setLayout(null);
 
       maxStackLabel.setBounds(10, 10, 150, 25);
-      maxStackField.setBounds(10+150+10, 10, 75, 25);
+      maxStackField.setBounds(10 + 150 + 10, 10, 75, 25);
       add(maxStackLabel);
       add(maxStackField);
 
-      localCountLabel.setBounds(10, 10+30, 150, 25);
-      localCountField.setBounds(10+150+10, 10+30, 75, 25);
+      localCountLabel.setBounds(10, 10 + 30, 150, 25);
+      localCountField.setBounds(10 + 150 + 10, 10 + 30, 75, 25);
       add(localCountLabel);
       add(localCountField);
 
-      initScopeDepthLabel.setBounds(10, 10+30+30, 150, 25);
-      initScopeDepthField.setBounds(10+150+10, 10+30+30, 75, 25);
+      initScopeDepthLabel.setBounds(10, 10 + 30 + 30, 150, 25);
+      initScopeDepthField.setBounds(10 + 150 + 10, 10 + 30 + 30, 75, 25);
       add(initScopeDepthLabel);
       add(initScopeDepthField);
 
-      maxScopeDepthLabel.setBounds(10, 10+30+30+30, 150, 25);
-      maxScopeDepthField.setBounds(10+150+10, 10+30+30+30, 75, 25);
+      maxScopeDepthLabel.setBounds(10, 10 + 30 + 30 + 30, 150, 25);
+      maxScopeDepthField.setBounds(10 + 150 + 10, 10 + 30 + 30 + 30, 75, 25);
       add(maxScopeDepthLabel);
       add(maxScopeDepthField);
-      
-      autoFillCheckBox.setBounds(30, 10+30+30+30+30, 230, 25);
+
+      autoFillCheckBox.setBounds(30, 10 + 30 + 30 + 30 + 30, 230, 25);
       add(autoFillCheckBox);
       autoFillCheckBox.addChangeListener(this);
 
       experimentalLabel.setForeground(Color.red);
-      experimentalLabel.setBounds(250,10+30+30+30+30, 100, 25);
+      experimentalLabel.setBounds(250, 10 + 30 + 30 + 30 + 30, 100, 25);
       add(experimentalLabel);
 
-      setPreferredSize(new Dimension(300,150));
+      setPreferredSize(new Dimension(300, 150));
    }
 
    public void loadFromBody(MethodBody body) {
@@ -95,15 +95,13 @@ public class MethodBodyParamsPanel extends JPanel implements ChangeListener{
    public boolean save() {
       if (body != null) {
          body.init_scope_depth = Integer.parseInt(initScopeDepthField.getText());
-         if(!autoFillCheckBox.isSelected())
-         {
+         if (!autoFillCheckBox.isSelected()) {
             body.max_stack = Integer.parseInt(maxStackField.getText());
             body.max_regs = Integer.parseInt(localCountField.getText());
             body.max_scope_depth = Integer.parseInt(maxScopeDepthField.getText());
-         }else{            
-            if(!body.autoFillStats(Main.abcMainFrame.abc))
-            {
-               JOptionPane.showMessageDialog(null, "Cannot get code stats for automatic body params.\r\nUncheck autofill to avoid this message.","Warning",JOptionPane.WARNING_MESSAGE);
+         } else {
+            if (!body.autoFillStats(Main.abcMainFrame.abc)) {
+               JOptionPane.showMessageDialog(null, "Cannot get code stats for automatic body params.\r\nUncheck autofill to avoid this message.", "Warning", JOptionPane.WARNING_MESSAGE);
             }
          }
          return true;
@@ -112,12 +110,12 @@ public class MethodBodyParamsPanel extends JPanel implements ChangeListener{
    }
 
    public void stateChanged(ChangeEvent e) {
-      if(e.getSource()==autoFillCheckBox){
-         if(autoFillCheckBox.isSelected()){
+      if (e.getSource() == autoFillCheckBox) {
+         if (autoFillCheckBox.isSelected()) {
             localCountField.setEnabled(false);
             maxScopeDepthField.setEnabled(false);
             maxStackField.setEnabled(false);
-         }else{
+         } else {
             localCountField.setEnabled(true);
             maxScopeDepthField.setEnabled(true);
             maxStackField.setEnabled(true);

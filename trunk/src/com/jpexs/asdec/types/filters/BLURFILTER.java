@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.types.filters;
 
 /**
@@ -23,20 +22,21 @@ package com.jpexs.asdec.types.filters;
  * @author JPEXS
  */
 public class BLURFILTER extends FILTER {
-    /**
-     * Horizontal blur amount
-     */
-    public double blurX;
-    /**
-     * Vertical blur amount
-     */
-    public double blurY;
-    /**
-     * Number of blur passes
-     */
-    public int passes;
 
-    public BLURFILTER() {
-        super(1);
-    }
+   /**
+    * Horizontal blur amount
+    */
+   public double blurX;
+   /**
+    * Vertical blur amount
+    */
+   public double blurY;
+   /**
+    * Number of blur passes
+    */
+   public int passes;
+
+   public BLURFILTER() {
+      super(1);
+   }
 }

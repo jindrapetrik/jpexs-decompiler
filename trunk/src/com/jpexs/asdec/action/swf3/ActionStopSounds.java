@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf3;
 
 import com.jpexs.asdec.action.Action;
@@ -25,17 +24,18 @@ import java.util.List;
 import java.util.Stack;
 
 public class ActionStopSounds extends Action {
-    public ActionStopSounds() {
-        super(0x09, 0);
-    }
 
-    @Override
-    public String toString() {
-        return "StopSounds";
-    }
+   public ActionStopSounds() {
+      super(0x09, 0);
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        output.add(new SimpleActionTreeItem(this, "stopAllSounds();"));
-    }
+   @Override
+   public String toString() {
+      return "StopSounds";
+   }
+
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      output.add(new SimpleActionTreeItem(this, "stopAllSounds();"));
+   }
 }

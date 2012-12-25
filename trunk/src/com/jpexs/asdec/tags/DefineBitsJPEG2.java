@@ -14,18 +14,17 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.tags;
 
 public class DefineBitsJPEG2 extends Tag {
 
-	public DefineBitsJPEG2(byte[] data, int version, long pos) {
-		super(21, data, pos);
-		// TODO Auto-generated constructor stub
-	}
+   public DefineBitsJPEG2(byte[] data, int version, long pos) {
+      super(21, data, pos);
+      // TODO Auto-generated constructor stub
+   }
 
-	@Override
-	public String toString() {
-		return "DefineBitsJPEG2";
-	}
+   @Override
+   public String toString() {
+      return "DefineBitsJPEG2";
+   }
 }

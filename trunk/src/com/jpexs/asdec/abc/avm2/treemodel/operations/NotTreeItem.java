@@ -14,28 +14,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel.operations;
 
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 
-
 public class NotTreeItem extends UnaryOpTreeItem {
 
-    public NotTreeItem(AVM2Instruction instruction, TreeItem value) {
-        super(instruction, PRECEDENCE_UNARY, value, "!");
-    }
+   public NotTreeItem(AVM2Instruction instruction, TreeItem value) {
+      super(instruction, PRECEDENCE_UNARY, value, "!");
+   }
 
-    @Override
-    public boolean isTrue() {
-        return !value.isTrue();
-    }
+   @Override
+   public boolean isTrue() {
+      return !value.isTrue();
+   }
 
-    @Override
-    public boolean isFalse() {
-        return !value.isFalse();
-    }
-
-
+   @Override
+   public boolean isFalse() {
+      return !value.isFalse();
+   }
 }

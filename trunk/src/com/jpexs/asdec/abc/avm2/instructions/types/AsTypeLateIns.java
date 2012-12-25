@@ -14,10 +14,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.instructions.types;
 
- import com.jpexs.asdec.abc.ABC;
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
@@ -29,31 +28,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-
 public class AsTypeLateIns extends InstructionDefinition {
 
-    public AsTypeLateIns() {
-        super(0x87, "astypelate", new int[]{});
-    }
+   public AsTypeLateIns() {
+      super(0x87, "astypelate", new int[]{});
+   }
 
-    @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-        Object objClass = lda.operandStack.pop();
-        Object obj = lda.operandStack.pop();
-        //if obj.class=objClass
-        lda.operandStack.push(obj);
-        //else push null
-    }
+   @Override
+   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+      Object objClass = lda.operandStack.pop();
+      Object obj = lda.operandStack.pop();
+      //if obj.class=objClass
+      lda.operandStack.push(obj);
+      //else push null
+   }
 
-    @Override
-    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer,String> localRegNames) {
-        TreeItem cls = (TreeItem) stack.pop();
-        TreeItem val = (TreeItem) stack.pop();
-        stack.push(new AsTypeTreeItem(ins, val, cls));
-    }
+   @Override
+   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer, String> localRegNames) {
+      TreeItem cls = (TreeItem) stack.pop();
+      TreeItem val = (TreeItem) stack.pop();
+      stack.push(new AsTypeTreeItem(ins, val, cls));
+   }
 
-    @Override
+   @Override
    public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -2+1;
+      return -2 + 1;
    }
 }

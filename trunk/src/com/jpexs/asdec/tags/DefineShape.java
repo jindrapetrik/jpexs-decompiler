@@ -14,20 +14,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.tags;
 
 import java.io.IOException;
 
 public class DefineShape extends Tag {
 
-	public DefineShape(byte[] data, int version, long pos) throws IOException {
-		super(2, data, pos);
-		// TODO Auto-generated constructor stub
-	}
+   public DefineShape(byte[] data, int version, long pos) throws IOException {
+      super(2, data, pos);
+      // TODO Auto-generated constructor stub
+   }
 
-	@Override
-	public String toString() {
-		return "DefineShape";
-	}
+   @Override
+   public String toString() {
+      return "DefineShape";
+   }
 }

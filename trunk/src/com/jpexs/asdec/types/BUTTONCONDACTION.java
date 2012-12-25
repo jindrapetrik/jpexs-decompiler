@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.types;
 
 import com.jpexs.asdec.SWFInputStream;
@@ -31,128 +30,127 @@ import java.util.List;
  * @author JPEXS
  */
 public class BUTTONCONDACTION implements ASMSource {
-    /**
-     * Is this BUTTONCONDACTION last in the list?
-     */
-    public boolean isLast;
-    /**
-     * Idle to OverDown
-     */
-    public boolean condIdleToOverDown;
-    /**
-     * OutDown to Idle
-     */
-    public boolean condOutDownToIdle;
-    /**
-     * OutDown to OverDown
-     */
-    public boolean condOutDownToOverDown;
-    /**
-     * OverDown to OutDown
-     */
-    public boolean condOverDownToOutDown;
-    /**
-     * OverDown to OverUp
-     */
-    public boolean condOverDownToOverUp;
-    /**
-     * OverUp to OverDown
-     */
-    public boolean condOverUpToOverDown;
-    /**
-     * OverUp to Idle
-     */
-    public boolean condOverUpToIddle;
-    /**
-     * Idle to OverUp
-     */
-    public boolean condIdleToOverUp;
-    /**
-     * @since SWF 4
-     *        key code
-     */
-    public int condKeyPress;
-    /**
-     * OverDown to Idle
-     */
-    public boolean condOverDownToIddle;
-    /**
-     * Actions to perform
-     */
-    //public List<Action> actions;
 
-    /**
-     * Actions to perform in byte array
-     */
-    public byte[] actionBytes;
+   /**
+    * Is this BUTTONCONDACTION last in the list?
+    */
+   public boolean isLast;
+   /**
+    * Idle to OverDown
+    */
+   public boolean condIdleToOverDown;
+   /**
+    * OutDown to Idle
+    */
+   public boolean condOutDownToIdle;
+   /**
+    * OutDown to OverDown
+    */
+   public boolean condOutDownToOverDown;
+   /**
+    * OverDown to OutDown
+    */
+   public boolean condOverDownToOutDown;
+   /**
+    * OverDown to OverUp
+    */
+   public boolean condOverDownToOverUp;
+   /**
+    * OverUp to OverDown
+    */
+   public boolean condOverUpToOverDown;
+   /**
+    * OverUp to Idle
+    */
+   public boolean condOverUpToIddle;
+   /**
+    * Idle to OverUp
+    */
+   public boolean condIdleToOverUp;
+   /**
+    * @since SWF 4 key code
+    */
+   public int condKeyPress;
+   /**
+    * OverDown to Idle
+    */
+   public boolean condOverDownToIddle;
+   /**
+    * Actions to perform
+    */
+   //public List<Action> actions;
+   /**
+    * Actions to perform in byte array
+    */
+   public byte[] actionBytes;
 
-    /**
-     * Sets actions associated with this object
-     *
-     * @param actions Action list
-     */
-    /*public void setActions(List<Action> actions) {
-        this.actions = actions;
+   /**
+    * Sets actions associated with this object
+    *
+    * @param actions Action list
+    */
+   /*public void setActions(List<Action> actions) {
+    this.actions = actions;
     }*/
+   /**
+    * Returns a string representation of the object
+    *
+    * @return a string representation of the object.
+    */
+   @Override
+   public String toString() {
+      return "BUTTONCONDACTION";
+   }
 
-    /**
-     * Returns a string representation of the object
-     *
-     * @return a string representation of the object.
-     */
-    @Override
-    public String toString() {
-        return "BUTTONCONDACTION";
-    }
+   /**
+    * Converts actions to ASM source
+    *
+    * @param version SWF version
+    * @return ASM source
+    */
+   public String getASMSource(int version) {
+      List<Action> actions = new ArrayList<Action>();
+      try {
+         actions = (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
+      } catch (IOException ex) {
+         ex.printStackTrace();
+      }
+      return Action.actionsToString(actions, null, version);
+   }
 
-    /**
-     * Converts actions to ASM source
-     *
-     * @param version SWF version
-     * @return ASM source
-     */
-    public String getASMSource(int version) {
-        List<Action> actions=new ArrayList<Action>();
-        try {
-            actions = (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return Action.actionsToString(actions, null, version);
-    }
+   /**
+    * Whether or not this object contains ASM source
+    *
+    * @return True when contains
+    */
+   public boolean containsSource() {
+      return true;
+   }
 
-    /**
-     * Whether or not this object contains ASM source
-     *
-     * @return True when contains
-     */
-    public boolean containsSource() {
-        return true;
-    }
+   /**
+    * Returns actions associated with this object
+    *
+    * @param version Version
+    * @return List of actions
+    */
+   public List<Action> getActions(int version) {
+      try {
+         return (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
+      } catch (IOException ex) {
+         ex.printStackTrace();
+         return new ArrayList<Action>();
+      }
+   }
 
-    /**
-     * Returns actions associated with this object
-     * @param version Version
-     * @return List of actions
-     */
-    public List<Action> getActions(int version) {
-        try {
-            return (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
-        } catch (IOException ex) {
-        	ex.printStackTrace();
-            return new ArrayList<Action>();
-        }
-    }
+   public void setActions(List<Action> actions, int version) {
+      actionBytes = Action.actionsToBytes(actions, true, version);
+   }
 
-    public void setActions(List<Action> actions,int version) {
-        actionBytes=Action.actionsToBytes(actions, true, version);
-    }
+   public byte[] getActionBytes() {
+      return actionBytes;
+   }
 
-    public byte[] getActionBytes() {
-        return actionBytes;
-    }
-
-    public void setActionBytes(byte[] actionBytes) {
-        this.actionBytes=actionBytes;
-    }
+   public void setActionBytes(byte[] actionBytes) {
+      this.actionBytes = actionBytes;
+   }
 }

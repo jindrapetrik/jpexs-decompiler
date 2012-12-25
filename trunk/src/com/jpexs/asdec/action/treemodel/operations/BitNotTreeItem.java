@@ -14,16 +14,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.treemodel.operations;
 
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 
-
 public class BitNotTreeItem extends UnaryOpTreeItem {
 
-    public BitNotTreeItem(Action instruction, TreeItem value) {
-        super(instruction, PRECEDENCE_UNARY, value, "~");
-    }
+   public BitNotTreeItem(Action instruction, TreeItem value) {
+      super(instruction, PRECEDENCE_UNARY, value, "~");
+   }
 }

@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.instructions.types;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
@@ -25,5 +24,6 @@ import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
  * @author JPEXS
  */
 public interface CoerceOrConvertTypeIns {
-   public String getTargetType(ConstantPool constants,AVM2Instruction ins);
+
+   public String getTargetType(ConstantPool constants, AVM2Instruction ins);
 }

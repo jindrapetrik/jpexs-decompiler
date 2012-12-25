@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf4;
 
 import com.jpexs.asdec.action.Action;
@@ -26,20 +25,20 @@ import java.util.Stack;
 
 public class ActionStringExtract extends Action {
 
-    public ActionStringExtract() {
-        super(0x15, 0);
-    }
+   public ActionStringExtract() {
+      super(0x15, 0);
+   }
 
-    @Override
-    public String toString() {
-        return "StringExtract";
-    }
+   @Override
+   public String toString() {
+      return "StringExtract";
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        TreeItem count = stack.pop();
-        TreeItem index = stack.pop();
-        TreeItem value = stack.pop();
-        stack.push(new StringExtractTreeItem(this, value, index, count));
-    }
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      TreeItem count = stack.pop();
+      TreeItem index = stack.pop();
+      TreeItem value = stack.pop();
+      stack.push(new StringExtractTreeItem(this, value, index, count));
+   }
 }

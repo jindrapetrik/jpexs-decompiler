@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
@@ -23,18 +22,18 @@ import java.io.IOException;
 
 public class ScriptLimits extends Tag {
 
-	private int maxRecursionDepth;
-	private int scriptTimeoutSeconds;
+   private int maxRecursionDepth;
+   private int scriptTimeoutSeconds;
 
-	public ScriptLimits(byte[] data, int version, long pos) throws IOException {
-		super(65, data, pos);
-        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-        maxRecursionDepth = sis.readUI16();
-        scriptTimeoutSeconds = sis.readUI16();
-	}
+   public ScriptLimits(byte[] data, int version, long pos) throws IOException {
+      super(65, data, pos);
+      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+      maxRecursionDepth = sis.readUI16();
+      scriptTimeoutSeconds = sis.readUI16();
+   }
 
-	@Override
-	public String toString() {
-		return "ScriptLimits";
-	}
+   @Override
+   public String toString() {
+      return "ScriptLimits";
+   }
 }

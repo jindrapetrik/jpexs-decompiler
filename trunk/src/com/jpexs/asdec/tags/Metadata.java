@@ -14,27 +14,26 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.tags;
 
 import java.io.UnsupportedEncodingException;
 
 public class Metadata extends Tag {
 
-	private String xmlMetadata;
+   private String xmlMetadata;
 
-	public Metadata(byte[] data, long pos) {
-		super(77, data, pos);
-		try {
-			xmlMetadata = new String(data, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			// cannot get here
-			e.printStackTrace();
-		}
-	}
+   public Metadata(byte[] data, long pos) {
+      super(77, data, pos);
+      try {
+         xmlMetadata = new String(data, "UTF-8");
+      } catch (UnsupportedEncodingException e) {
+         // cannot get here
+         e.printStackTrace();
+      }
+   }
 
-	@Override
-	public String toString() {
-		return "Metadata";
-	}
+   @Override
+   public String toString() {
+      return "Metadata";
+   }
 }

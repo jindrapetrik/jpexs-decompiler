@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.types.filters;
 
 import com.jpexs.asdec.types.RGBA;
@@ -25,43 +24,44 @@ import com.jpexs.asdec.types.RGBA;
  * @author JPEXS
  */
 public class GLOWFILTER extends FILTER {
-    /**
-     * Color of the shadow
-     */
-    public RGBA glowColor;
-    /**
-     * Horizontal blur amount
-     */
-    public double blurX;
-    /**
-     * Vertical blur amount
-     */
-    public double blurY;
-    /**
-     * Strength of the glow
-     */
-    public float strength;
-    /**
-     * Inner glow mode
-     */
-    public boolean innerGlow;
-    /**
-     * Knockout mode
-     */
-    public boolean knockout;
-    /**
-     * Composite source
-     */
-    public boolean compositeSource;
-    /**
-     * Number of blur passes
-     */
-    public int passes;
 
-    /**
-     * Constructor
-     */
-    public GLOWFILTER() {
-        super(2);
-    }
+   /**
+    * Color of the shadow
+    */
+   public RGBA glowColor;
+   /**
+    * Horizontal blur amount
+    */
+   public double blurX;
+   /**
+    * Vertical blur amount
+    */
+   public double blurY;
+   /**
+    * Strength of the glow
+    */
+   public float strength;
+   /**
+    * Inner glow mode
+    */
+   public boolean innerGlow;
+   /**
+    * Knockout mode
+    */
+   public boolean knockout;
+   /**
+    * Composite source
+    */
+   public boolean compositeSource;
+   /**
+    * Number of blur passes
+    */
+   public int passes;
+
+   /**
+    * Constructor
+    */
+   public GLOWFILTER() {
+      super(2);
+   }
 }

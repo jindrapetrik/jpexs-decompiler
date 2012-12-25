@@ -14,37 +14,37 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.gui;
 
 import java.util.StringTokenizer;
 
 public class Tree {
-	private final TreeElement ROOT = new TreeElement("", "", -1, null);
 
-	public void add(String name, String path, int classIndex) {
-		StringTokenizer st = new StringTokenizer(path, ".");
-		TreeElement parent = ROOT;
-		while (st.hasMoreTokens()) {
-			String pathElement = st.nextToken();
-			parent = parent.getBranch(pathElement);
-		}
-		parent.addLeaf(name, classIndex);
-	}
+   private final TreeElement ROOT = new TreeElement("", "", -1, null);
 
-	public TreeElement getRoot() {
-		return ROOT;
-	}
+   public void add(String name, String path, int classIndex) {
+      StringTokenizer st = new StringTokenizer(path, ".");
+      TreeElement parent = ROOT;
+      while (st.hasMoreTokens()) {
+         String pathElement = st.nextToken();
+         parent = parent.getBranch(pathElement);
+      }
+      parent.addLeaf(name, classIndex);
+   }
 
-	public void visit(TreeVisitor visitor) {
-		ROOT.visitLeafs(visitor);
-		ROOT.visitBranches(visitor);
-	}
+   public TreeElement getRoot() {
+      return ROOT;
+   }
 
-	public TreeElement get(String fullPath) {
-		if ("".equals(fullPath)) {
-			return ROOT;
-		}
-		return ROOT.getByPath(fullPath);
-	}
+   public void visit(TreeVisitor visitor) {
+      ROOT.visitLeafs(visitor);
+      ROOT.visitBranches(visitor);
+   }
+
+   public TreeElement get(String fullPath) {
+      if ("".equals(fullPath)) {
+         return ROOT;
+      }
+      return ROOT.getByPath(fullPath);
+   }
 }

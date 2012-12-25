@@ -14,27 +14,28 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
 
 public class SetPropertyTreeItem extends TreeItem {
-    public TreeItem target;
-    public int propertyIndex;
-    public TreeItem value;
 
-    public SetPropertyTreeItem(Action instruction, TreeItem target, int propertyIndex, TreeItem value) {
-        super(instruction, PRECEDENCE_PRIMARY);
-        this.target = target;
-        this.propertyIndex = propertyIndex;
-        this.value=value;
-    }
+   public TreeItem target;
+   public int propertyIndex;
+   public TreeItem value;
 
-    @Override
-    public String toString(ConstantPool constants) {
-        if(isEmptyString(target))
-                      return Action.propertyNames[propertyIndex] + "=" + value.toString(constants) + ";";
-        return target.toString(constants) + "." + Action.propertyNames[propertyIndex] + "=" + value.toString(constants) + ";";
-    }
+   public SetPropertyTreeItem(Action instruction, TreeItem target, int propertyIndex, TreeItem value) {
+      super(instruction, PRECEDENCE_PRIMARY);
+      this.target = target;
+      this.propertyIndex = propertyIndex;
+      this.value = value;
+   }
+
+   @Override
+   public String toString(ConstantPool constants) {
+      if (isEmptyString(target)) {
+         return Action.propertyNames[propertyIndex] + "=" + value.toString(constants) + ";";
+      }
+      return target.toString(constants) + "." + Action.propertyNames[propertyIndex] + "=" + value.toString(constants) + ";";
+   }
 }

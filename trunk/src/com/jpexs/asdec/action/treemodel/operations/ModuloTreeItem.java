@@ -14,17 +14,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.treemodel.operations;
 
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 
-
 public class ModuloTreeItem extends BinaryOpTreeItem {
 
-    public ModuloTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
-        super(instruction, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "%");
-    }
-
+   public ModuloTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
+      super(instruction, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "%");
+   }
 }

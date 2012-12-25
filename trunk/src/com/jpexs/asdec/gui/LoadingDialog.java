@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.gui;
 
 import com.jpexs.asdec.Main;
@@ -33,32 +32,31 @@ import javax.swing.SwingConstants;
  * @author JPEXS
  */
 public class LoadingDialog extends JFrame implements ImageObserver {
-    private JLabel loadingLabel = new JLabel("Loading SWF file, please wait...");
-    private LoadingPanel loadingPanel;
 
-    /**
-     * Constructor
-     */
-    public LoadingDialog() {
-        setResizable(false);
-        setTitle(Main.shortApplicationName);
-        setSize(300, 150);
-        setLayout(new BorderLayout());
+   private JLabel loadingLabel = new JLabel("Loading SWF file, please wait...");
+   private LoadingPanel loadingPanel;
 
-        loadingPanel = new LoadingPanel(50, 50);
-        loadingPanel.setPreferredSize(new Dimension(100, 100));
-        add(loadingPanel, BorderLayout.WEST);
-        add(loadingLabel, BorderLayout.CENTER);
-        View.centerScreen(this);
-        View.setWindowIcon(this);
-        loadingLabel.setHorizontalAlignment(SwingConstants.LEFT);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                System.exit(0);
-            }
-        });
-    }
+   /**
+    * Constructor
+    */
+   public LoadingDialog() {
+      setResizable(false);
+      setTitle(Main.shortApplicationName);
+      setSize(300, 150);
+      setLayout(new BorderLayout());
 
-
+      loadingPanel = new LoadingPanel(50, 50);
+      loadingPanel.setPreferredSize(new Dimension(100, 100));
+      add(loadingPanel, BorderLayout.WEST);
+      add(loadingLabel, BorderLayout.CENTER);
+      View.centerScreen(this);
+      View.setWindowIcon(this);
+      loadingLabel.setHorizontalAlignment(SwingConstants.LEFT);
+      addWindowListener(new WindowAdapter() {
+         @Override
+         public void windowClosing(WindowEvent e) {
+            System.exit(0);
+         }
+      });
+   }
 }

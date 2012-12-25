@@ -14,41 +14,38 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import java.util.HashMap;
 
-
 public class LocalRegTreeItem extends TreeItem {
-    public int regIndex;
-    public TreeItem computedValue;
 
-    public LocalRegTreeItem(AVM2Instruction instruction, int regIndex, TreeItem computedValue) {
-        super(instruction, PRECEDENCE_PRIMARY);
-        this.regIndex = regIndex;
-        if (computedValue == null) {
-            computedValue = new UndefinedTreeItem(instruction);
-        }
-        this.computedValue = computedValue;
-    }
+   public int regIndex;
+   public TreeItem computedValue;
 
-    @Override
-    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
-        return hilight(localRegName(localRegNames, regIndex));
-    }
+   public LocalRegTreeItem(AVM2Instruction instruction, int regIndex, TreeItem computedValue) {
+      super(instruction, PRECEDENCE_PRIMARY);
+      this.regIndex = regIndex;
+      if (computedValue == null) {
+         computedValue = new UndefinedTreeItem(instruction);
+      }
+      this.computedValue = computedValue;
+   }
 
-    @Override
-    public boolean isFalse() {
-        return computedValue.isFalse();
-    }
+   @Override
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+      return hilight(localRegName(localRegNames, regIndex));
+   }
 
-    @Override
-    public boolean isTrue() {
-        return computedValue.isTrue();
-    }
+   @Override
+   public boolean isFalse() {
+      return computedValue.isFalse();
+   }
 
-
+   @Override
+   public boolean isTrue() {
+      return computedValue.isTrue();
+   }
 }

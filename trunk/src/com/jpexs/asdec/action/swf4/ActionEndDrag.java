@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf4;
 
 import com.jpexs.asdec.action.Action;
@@ -26,17 +25,17 @@ import java.util.Stack;
 
 public class ActionEndDrag extends Action {
 
-    public ActionEndDrag() {
-        super(0x28, 0);
-    }
+   public ActionEndDrag() {
+      super(0x28, 0);
+   }
 
-    @Override
-    public String toString() {
-        return "EndDrag";
-    }
+   @Override
+   public String toString() {
+      return "EndDrag";
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        output.add(new SimpleActionTreeItem(this, "stopDrag();"));
-    }
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      output.add(new SimpleActionTreeItem(this, "stopDrag();"));
+   }
 }

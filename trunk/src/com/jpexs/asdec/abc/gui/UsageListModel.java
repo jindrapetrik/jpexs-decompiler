@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.abc.ABC;
@@ -25,28 +24,25 @@ import javax.swing.DefaultListModel;
  *
  * @author JPEXS
  */
-public class UsageListModel extends DefaultListModel{
+public class UsageListModel extends DefaultListModel {
 
    private ABC abc;
-   public UsageListModel(ABC abc){
-      this.abc=abc;
+
+   public UsageListModel(ABC abc) {
+      this.abc = abc;
    }
+
    @Override
    public Object get(int index) {
-      return ((MultinameUsage)super.get(index)).toString(abc);
+      return ((MultinameUsage) super.get(index)).toString(abc);
    }
 
    @Override
    public Object getElementAt(int index) {
-      return ((MultinameUsage)super.getElementAt(index)).toString(abc);
+      return ((MultinameUsage) super.getElementAt(index)).toString(abc);
    }
 
-   public MultinameUsage getUsage(int index){
-      return ((MultinameUsage)super.getElementAt(index));
+   public MultinameUsage getUsage(int index) {
+      return ((MultinameUsage) super.getElementAt(index));
    }
-
-
-
-
-
 }

@@ -14,16 +14,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2;
 
 import java.util.HashMap;
 import java.util.Stack;
 
-
 public class LocalDataArea {
-    public Stack operandStack = new Stack();
-    public Stack scopeStack = new Stack();
-    public HashMap localRegisters = new HashMap<Integer,Object>();
 
+   public Stack operandStack = new Stack();
+   public Stack scopeStack = new Stack();
+   public HashMap localRegisters = new HashMap<Integer, Object>();
 }

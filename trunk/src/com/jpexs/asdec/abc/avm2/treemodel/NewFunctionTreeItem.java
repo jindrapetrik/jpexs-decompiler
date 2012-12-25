@@ -14,30 +14,27 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import java.util.HashMap;
 
-
 public class NewFunctionTreeItem extends TreeItem {
-    public String paramStr;
-    public String returnStr;
-    public String functionBody;
 
-    public NewFunctionTreeItem(AVM2Instruction instruction, String paramStr, String returnStr, String functionBody) {
-        super(instruction, PRECEDENCE_PRIMARY);
-        this.paramStr = paramStr;
-        this.returnStr = returnStr;
-        this.functionBody = functionBody;
-    }
+   public String paramStr;
+   public String returnStr;
+   public String functionBody;
 
-    @Override
-    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
-        return hilight("new function(" + paramStr + "):" + returnStr + "\r\n{\r\n") + functionBody +"\r\n"+ hilight("}");
-    }
+   public NewFunctionTreeItem(AVM2Instruction instruction, String paramStr, String returnStr, String functionBody) {
+      super(instruction, PRECEDENCE_PRIMARY);
+      this.paramStr = paramStr;
+      this.returnStr = returnStr;
+      this.functionBody = functionBody;
+   }
 
-
+   @Override
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+      return hilight("new function(" + paramStr + "):" + returnStr + "\r\n{\r\n") + functionBody + "\r\n" + hilight("}");
+   }
 }

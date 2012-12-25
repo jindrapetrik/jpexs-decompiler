@@ -14,30 +14,29 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import java.util.HashMap;
 
+public class InitPropertyTreeItem extends TreeItem implements SetTypeTreeItem {
 
-public class InitPropertyTreeItem extends TreeItem implements SetTypeTreeItem{
-    public TreeItem object;
-    public FullMultinameTreeItem propertyName;
-    public TreeItem value;
+   public TreeItem object;
+   public FullMultinameTreeItem propertyName;
+   public TreeItem value;
 
-    public InitPropertyTreeItem(AVM2Instruction instruction, TreeItem object, FullMultinameTreeItem propertyName, TreeItem value) {
-        super(instruction, PRECEDENCE_ASSIGMENT);
-        this.object = object;
-        this.propertyName = propertyName;
-        this.value = value;
-    }
+   public InitPropertyTreeItem(AVM2Instruction instruction, TreeItem object, FullMultinameTreeItem propertyName, TreeItem value) {
+      super(instruction, PRECEDENCE_ASSIGMENT);
+      this.object = object;
+      this.propertyName = propertyName;
+      this.value = value;
+   }
 
-    @Override
-    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
-        return formatProperty(constants, object, propertyName,localRegNames) + hilight("=") + value.toString(constants,localRegNames);
-    }
+   @Override
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+      return formatProperty(constants, object, propertyName, localRegNames) + hilight("=") + value.toString(constants, localRegNames);
+   }
 
    public TreeItem getObject() {
       return new GetPropertyTreeItem(instruction, object, propertyName);
@@ -46,6 +45,4 @@ public class InitPropertyTreeItem extends TreeItem implements SetTypeTreeItem{
    public TreeItem getValue() {
       return value;
    }
-
-
 }

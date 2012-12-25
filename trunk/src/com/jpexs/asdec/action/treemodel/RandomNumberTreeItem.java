@@ -14,21 +14,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
 
 public class RandomNumberTreeItem extends TreeItem {
-    private TreeItem maximum;
 
-    public RandomNumberTreeItem(Action instruction, TreeItem maximum) {
-        super(instruction, PRECEDENCE_PRIMARY);
-        this.maximum = maximum;
-    }
+   private TreeItem maximum;
 
-    @Override
-    public String toString(ConstantPool constants) {
-        return "random(" + maximum.toString(constants) + ")";
-    }
+   public RandomNumberTreeItem(Action instruction, TreeItem maximum) {
+      super(instruction, PRECEDENCE_PRIMARY);
+      this.maximum = maximum;
+   }
+
+   @Override
+   public String toString(ConstantPool constants) {
+      return "random(" + maximum.toString(constants) + ")";
+   }
 }

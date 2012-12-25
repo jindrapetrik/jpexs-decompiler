@@ -14,31 +14,29 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import java.util.HashMap;
 
-
 public class ContinueTreeItem extends TreeItem {
-    public int loopPos;
-    public boolean isKnown;
 
-    public ContinueTreeItem(AVM2Instruction instruction, int loopPos) {
-        this(instruction, loopPos, true);
-    }
+   public int loopPos;
+   public boolean isKnown;
 
-    public ContinueTreeItem(AVM2Instruction instruction, int loopPos, boolean isKnown) {
-        super(instruction, NOPRECEDENCE);
-        this.loopPos = loopPos;
-        this.isKnown = isKnown;
-    }
+   public ContinueTreeItem(AVM2Instruction instruction, int loopPos) {
+      this(instruction, loopPos, true);
+   }
 
-    @Override
-    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
-        return hilight("continue") + " " + (isKnown ? "loop" : "unk") + loopPos;
-    }
+   public ContinueTreeItem(AVM2Instruction instruction, int loopPos, boolean isKnown) {
+      super(instruction, NOPRECEDENCE);
+      this.loopPos = loopPos;
+      this.isKnown = isKnown;
+   }
 
+   @Override
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+      return hilight("continue") + " " + (isKnown ? "loop" : "unk") + loopPos;
+   }
 }

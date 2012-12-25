@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
@@ -23,16 +22,16 @@ import java.io.IOException;
 
 public class FrameLabel extends Tag {
 
-	private String name;
+   private String name;
 
-	public FrameLabel(byte[] data, int version, long pos) throws IOException {
-		super(43, data, pos);
-		SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-        name = sis.readString();
-	}
+   public FrameLabel(byte[] data, int version, long pos) throws IOException {
+      super(43, data, pos);
+      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+      name = sis.readString();
+   }
 
-	@Override
-	public String toString() {
-		return "FrameLabel";
-	}
+   @Override
+   public String toString() {
+      return "FrameLabel";
+   }
 }

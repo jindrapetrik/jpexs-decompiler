@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.types;
 
 import com.jpexs.asdec.Main;
@@ -26,117 +25,108 @@ import com.jpexs.asdec.abc.types.traits.Traits;
 import com.jpexs.asdec.helpers.Highlighting;
 import java.util.HashMap;
 
-
 public class MethodBody implements Cloneable {
 
-    public int method_info;
-    public int max_stack;
-    public int max_regs;
-    public int init_scope_depth;
-    public int max_scope_depth;
-    public byte codeBytes[];
-    public AVM2Code code;
-    public ABCException exceptions[] = new ABCException[0];
-    public Traits traits = new Traits();
+   public int method_info;
+   public int max_stack;
+   public int max_regs;
+   public int init_scope_depth;
+   public int max_scope_depth;
+   public byte codeBytes[];
+   public AVM2Code code;
+   public ABCException exceptions[] = new ABCException[0];
+   public Traits traits = new Traits();
 
-    @Override
-    public String toString() {
-        String s = "";
-        s += "method_info=" + method_info + " max_stack=" + max_stack + " max_regs=" + max_regs + " scope_depth=" + init_scope_depth + " max_scope=" + max_scope_depth;
-        s += "\r\nCode:\r\n" + code.toString();
-        return s;
-    }
-     
-     public HashMap<Integer,String> getLocalRegNames(ABC abc)
-     {        
-        HashMap<Integer,String> ret=new HashMap<Integer,String>();
-        for (int i = 1; i <= abc.method_info[this.method_info].param_types.length; i++) {
-            String paramName="param"+i;
-            if(abc.method_info[this.method_info].flagHas_paramnames()&&Main.PARAM_NAMES_ENABLE){
-               paramName=abc.constants.constant_string[abc.method_info[this.method_info].paramNames[i-1]];
+   @Override
+   public String toString() {
+      String s = "";
+      s += "method_info=" + method_info + " max_stack=" + max_stack + " max_regs=" + max_regs + " scope_depth=" + init_scope_depth + " max_scope=" + max_scope_depth;
+      s += "\r\nCode:\r\n" + code.toString();
+      return s;
+   }
+
+   public HashMap<Integer, String> getLocalRegNames(ABC abc) {
+      HashMap<Integer, String> ret = new HashMap<Integer, String>();
+      for (int i = 1; i <= abc.method_info[this.method_info].param_types.length; i++) {
+         String paramName = "param" + i;
+         if (abc.method_info[this.method_info].flagHas_paramnames() && Main.PARAM_NAMES_ENABLE) {
+            paramName = abc.constants.constant_string[abc.method_info[this.method_info].paramNames[i - 1]];
+         }
+         ret.put(i, paramName);
+      }
+      int pos = abc.method_info[this.method_info].param_types.length + 1;
+      if (abc.method_info[this.method_info].flagNeed_arguments()) {
+         ret.put(pos, "arguments");
+         pos++;
+      }
+      if (abc.method_info[this.method_info].flagNeed_rest()) {
+         ret.put(pos, "rest");
+         pos++;
+      }
+
+      HashMap<Integer, String> debugRegNames = code.getLocalRegNamesFromDebug(abc);
+      for (int k : debugRegNames.keySet()) {
+         ret.put(k, debugRegNames.get(k));
+      }
+      return ret;
+   }
+
+   public String toString(boolean pcode, boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[]) {
+      return toString(pcode, isStatic, classIndex, abc, constants, method_info, false);
+   }
+
+   public String toString(boolean pcode, boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], boolean hilight) {
+      String s = "";
+
+      //s+="method_info="+method_info+" max_stack="+max_stack+" max_regs="+max_regs+" scope_depth="+scope_depth+" max_scope="+max_scope;
+      //s+="\r\nCode:\r\n"+
+      if (pcode) {
+         s += code.toASMSource(constants, this);
+      } else {
+         try {
+            s += code.toSource(isStatic, classIndex, abc, constants, method_info, this, hilight, getLocalRegNames(abc));
+            s = s.trim();
+            if (hilight) {
+               s = Highlighting.hilighMethod(s, this.method_info);
             }
-            ret.put(i, paramName);
-        }
-        int pos=abc.method_info[this.method_info].param_types.length+1;
-        if(abc.method_info[this.method_info].flagNeed_arguments())
-        {
-           ret.put(pos,"arguments");
-           pos++;
-        }
-        if(abc.method_info[this.method_info].flagNeed_rest())
-        {
-           ret.put(pos,"rest");
-           pos++;
-        }
-        
-        HashMap<Integer,String> debugRegNames=code.getLocalRegNamesFromDebug(abc);
-        for(int k:debugRegNames.keySet())
-        {
-           ret.put(k,debugRegNames.get(k));           
-        }
-        return ret;
-     }    
-
-    public String toString(boolean pcode,boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[]) {
-        return toString(pcode,isStatic, classIndex, abc, constants, method_info, false);
-    }
-
-    public String toString(boolean pcode,boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], boolean hilight) {
-        String s = "";
-
-        //s+="method_info="+method_info+" max_stack="+max_stack+" max_regs="+max_regs+" scope_depth="+scope_depth+" max_scope="+max_scope;
-        //s+="\r\nCode:\r\n"+
-        if(pcode){
-         s+=code.toASMSource(constants, this);
-        }else{
-        try {            
-            s += code.toSource(isStatic, classIndex, abc, constants, method_info, this, hilight,getLocalRegNames(abc));
-            s=s.trim();
-            if(hilight)
-            {
-               s=Highlighting.hilighMethod(s, this.method_info);
-            }
-        } catch (Exception ex) {
+         } catch (Exception ex) {
             s = "//error:" + ex.toString();
-        }
-        }
-        //s+="----------- ORIGINAL ------------\r\n";
-        //s+=code.toString(constants);
+         }
+      }
+      //s+="----------- ORIGINAL ------------\r\n";
+      //s+=code.toString(constants);
         /*s+="Exceptions:";
-        for(int i=0;i<exceptions.length;i++){
-        s+="\r\n"+exceptions[i].toString(constants);
-        }*/
-        return s;
-    }
+       for(int i=0;i<exceptions.length;i++){
+       s+="\r\n"+exceptions[i].toString(constants);
+       }*/
+      return s;
+   }
 
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        MethodBody ret = new MethodBody();
-        ret.code = code;
-        ret.codeBytes = codeBytes;
-        ret.exceptions = exceptions;
-        ret.max_regs = max_regs;
-        ret.max_scope_depth = max_scope_depth;
-        ret.max_stack = max_stack;
-        ret.method_info = method_info;
-        ret.init_scope_depth = init_scope_depth;
-        ret.traits = traits; //maybe deep clone
-        return ret;
-    }
+   @Override
+   public Object clone() throws CloneNotSupportedException {
+      MethodBody ret = new MethodBody();
+      ret.code = code;
+      ret.codeBytes = codeBytes;
+      ret.exceptions = exceptions;
+      ret.max_regs = max_regs;
+      ret.max_scope_depth = max_scope_depth;
+      ret.max_stack = max_stack;
+      ret.method_info = method_info;
+      ret.init_scope_depth = init_scope_depth;
+      ret.traits = traits; //maybe deep clone
+      return ret;
+   }
 
-    public boolean autoFillStats(ABC abc)
-    {
-       CodeStats stats=code.getStats(abc,this);
-       if(stats==null){
-          return false;
-       }
-       max_stack=stats.maxstack;
-       max_scope_depth=init_scope_depth+stats.maxscope;
-       max_regs=stats.maxlocal;
-       abc.method_info[method_info].setFlagSetsdxns(stats.has_set_dxns);
-       abc.method_info[method_info].setFlagNeed_activation(stats.has_activation);
-       return true;
-    }
-
-
+   public boolean autoFillStats(ABC abc) {
+      CodeStats stats = code.getStats(abc, this);
+      if (stats == null) {
+         return false;
+      }
+      max_stack = stats.maxstack;
+      max_scope_depth = init_scope_depth + stats.maxscope;
+      max_regs = stats.maxlocal;
+      abc.method_info[method_info].setFlagSetsdxns(stats.has_set_dxns);
+      abc.method_info[method_info].setFlagNeed_activation(stats.has_activation);
+      return true;
+   }
 }

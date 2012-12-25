@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.types;
 
 /**
@@ -23,20 +22,21 @@ package com.jpexs.asdec.types;
  * @author JPEXS
  */
 public class RECT {
-    /**
-     * X minimum position for rectangle in twips
-     */
-    public int Xmin;
-    /**
-     * X maximum position for rectangle in twips
-     */
-    public int Xmax;
-    /**
-     * Y minimum position for rectangle in twips
-     */
-    public int Ymin;
-    /**
-     * Y maximum position for rectangle in twips
-     */
-    public int Ymax;
+
+   /**
+    * X minimum position for rectangle in twips
+    */
+   public int Xmin;
+   /**
+    * X maximum position for rectangle in twips
+    */
+   public int Xmax;
+   /**
+    * Y minimum position for rectangle in twips
+    */
+   public int Ymin;
+   /**
+    * Y maximum position for rectangle in twips
+    */
+   public int Ymax;
 }

@@ -14,27 +14,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.types;
 
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.types.traits.Traits;
 
-
 public class ScriptInfo {
 
-    public int init_index; //MethodInfo
-    public Traits traits;
+   public int init_index; //MethodInfo
+   public Traits traits;
 
-    @Override
-    public String toString() {
-        return "method_index=" + init_index + "\r\n" + traits.toString();
-    }
+   @Override
+   public String toString() {
+      return "method_index=" + init_index + "\r\n" + traits.toString();
+   }
 
-
-    public String toString(ABC abc) {
-        return "method_index=" + init_index + "\r\n" + traits.toString(abc);
-    }
-
-
+   public String toString(ABC abc) {
+      return "method_index=" + init_index + "\r\n" + traits.toString(abc);
+   }
 }

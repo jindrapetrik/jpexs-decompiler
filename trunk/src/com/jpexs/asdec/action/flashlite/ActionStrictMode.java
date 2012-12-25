@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.flashlite;
 
 import com.jpexs.asdec.SWFInputStream;
@@ -31,37 +30,37 @@ import java.util.List;
 import java.util.Stack;
 
 public class ActionStrictMode extends Action {
-    public int mode;
 
-    public ActionStrictMode(SWFInputStream sis) throws IOException {
-        super(0x89, 1);
-        mode = sis.readUI8();
-    }
+   public int mode;
 
-    public ActionStrictMode(FlasmLexer lexer) throws IOException, ParseException {
-        super(0x89, 1);
-        mode = (int) lexLong(lexer);
-    }
+   public ActionStrictMode(SWFInputStream sis) throws IOException {
+      super(0x89, 1);
+      mode = sis.readUI8();
+   }
 
-    public byte[] getBytes(int version) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
-        try {
-            sos.writeUI8(mode);
-            sos.close();
-        } catch (IOException e) {
+   public ActionStrictMode(FlasmLexer lexer) throws IOException, ParseException {
+      super(0x89, 1);
+      mode = (int) lexLong(lexer);
+   }
 
-        }
-        return surroundWithAction(baos.toByteArray(), version);
-    }
+   public byte[] getBytes(int version) {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      SWFOutputStream sos = new SWFOutputStream(baos, version);
+      try {
+         sos.writeUI8(mode);
+         sos.close();
+      } catch (IOException e) {
+      }
+      return surroundWithAction(baos.toByteArray(), version);
+   }
 
-    @Override
-    public String toString() {
-        return "StrictMode " + mode;
-    }
+   @Override
+   public String toString() {
+      return "StrictMode " + mode;
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {        
-        output.add(new StrictModeTreeItem(this, mode));
-    }
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      output.add(new StrictModeTreeItem(this, mode));
+   }
 }

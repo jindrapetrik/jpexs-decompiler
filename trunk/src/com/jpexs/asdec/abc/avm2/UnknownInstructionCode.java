@@ -14,15 +14,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2;
 
-
 public class UnknownInstructionCode extends RuntimeException {
-    public int code;
 
-    public UnknownInstructionCode(int code) {
-        super("Unknown instruction code: 0x" + Integer.toHexString(code));
-        this.code = code;
-    }
+   public int code;
+
+   public UnknownInstructionCode(int code) {
+      super("Unknown instruction code: 0x" + Integer.toHexString(code));
+      this.code = code;
+   }
 }

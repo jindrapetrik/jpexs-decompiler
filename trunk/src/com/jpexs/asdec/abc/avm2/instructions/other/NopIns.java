@@ -14,16 +14,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.instructions.other;
 
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 
-
 public class NopIns extends InstructionDefinition {
 
-    public NopIns() {
-        super(0x02, "nop", new int[]{});
-    }
-
+   public NopIns() {
+      super(0x02, "nop", new int[]{});
+   }
 }

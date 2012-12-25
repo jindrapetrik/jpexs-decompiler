@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
@@ -22,34 +21,30 @@ import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import java.util.HashMap;
 import java.util.List;
 
-
 public class ApplyTypeTreeItem extends TreeItem {
-    public TreeItem object;
-    public List<TreeItem> params;
 
-    public ApplyTypeTreeItem(AVM2Instruction instruction, TreeItem object, List<TreeItem> params) {
-        super(instruction, PRECEDENCE_PRIMARY);
-        this.params=params;
-        this.object=object;
-    }
+   public TreeItem object;
+   public List<TreeItem> params;
 
+   public ApplyTypeTreeItem(AVM2Instruction instruction, TreeItem object, List<TreeItem> params) {
+      super(instruction, PRECEDENCE_PRIMARY);
+      this.params = params;
+      this.object = object;
+   }
 
-    @Override
-    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {       
-        String ret=object.toString(constants,localRegNames);
-        if(!params.isEmpty())
-        {
-           ret+=hilight(".<");
-           for(int i=0;i<params.size();i++)
-           {
-               if(i>0){
-                  ret+=hilight(",");
-               }
-               ret+=params.get(i).toString(constants,localRegNames);
-           }
-           ret+=hilight(">");
-        }
-        return ret;
-    }
-
+   @Override
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+      String ret = object.toString(constants, localRegNames);
+      if (!params.isEmpty()) {
+         ret += hilight(".<");
+         for (int i = 0; i < params.size(); i++) {
+            if (i > 0) {
+               ret += hilight(",");
+            }
+            ret += params.get(i).toString(constants, localRegNames);
+         }
+         ret += hilight(">");
+      }
+      return ret;
+   }
 }

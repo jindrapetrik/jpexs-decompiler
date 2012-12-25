@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2;
 
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
@@ -24,14 +23,13 @@ import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
  * @author JPEXS
  */
 public class InstructionStats {
-   public boolean seen=false;
-   public int stackpos=0;
-   public int scopepos=0;
+
+   public boolean seen = false;
+   public int stackpos = 0;
+   public int scopepos = 0;
    public AVM2Instruction ins;
 
    public InstructionStats(AVM2Instruction ins) {
       this.ins = ins;
    }
-
-   
 }

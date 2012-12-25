@@ -14,23 +14,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
 
 public class ExtendsTreeItem extends TreeItem {
-    public TreeItem subclass;
-    public TreeItem superclass;
 
-    public ExtendsTreeItem(Action instruction, TreeItem subclass, TreeItem superclass) {
-        super(instruction, PRECEDENCE_PRIMARY);
-        this.subclass = subclass;
-        this.superclass = superclass;
-    }
+   public TreeItem subclass;
+   public TreeItem superclass;
 
-    @Override
-    public String toString(ConstantPool constants) {
-        return subclass.toString(constants) + " extends " + stripQuotes(superclass);
-    }
+   public ExtendsTreeItem(Action instruction, TreeItem subclass, TreeItem superclass) {
+      super(instruction, PRECEDENCE_PRIMARY);
+      this.subclass = subclass;
+      this.superclass = superclass;
+   }
+
+   @Override
+   public String toString(ConstantPool constants) {
+      return subclass.toString(constants) + " extends " + stripQuotes(superclass);
+   }
 }

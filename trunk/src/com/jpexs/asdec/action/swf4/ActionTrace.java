@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf4;
 
 import com.jpexs.asdec.action.Action;
@@ -26,18 +25,18 @@ import java.util.Stack;
 
 public class ActionTrace extends Action {
 
-    public ActionTrace() {
-        super(0x26, 0);
-    }
+   public ActionTrace() {
+      super(0x26, 0);
+   }
 
-    @Override
-    public String toString() {
-        return "Trace";
-    }
+   @Override
+   public String toString() {
+      return "Trace";
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        TreeItem value = stack.pop();
-        output.add(new TraceTreeItem(this, value));
-    }
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      TreeItem value = stack.pop();
+      output.add(new TraceTreeItem(this, value));
+   }
 }

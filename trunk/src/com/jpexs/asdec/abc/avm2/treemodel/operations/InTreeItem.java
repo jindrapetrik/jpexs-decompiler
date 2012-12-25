@@ -14,18 +14,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel.operations;
 
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 
-
 public class InTreeItem extends BinaryOpTreeItem {
 
-    public InTreeItem(AVM2Instruction instruction, TreeItem name, TreeItem object) {
-        super(instruction, PRECEDENCE_RELATIONAL, name, object, " in ");
-    }
-
-
+   public InTreeItem(AVM2Instruction instruction, TreeItem name, TreeItem object) {
+      super(instruction, PRECEDENCE_RELATIONAL, name, object, " in ");
+   }
 }

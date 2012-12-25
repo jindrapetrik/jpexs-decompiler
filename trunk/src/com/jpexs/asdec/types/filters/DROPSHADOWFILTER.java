@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.types.filters;
 
 import com.jpexs.asdec.types.RGBA;
@@ -25,51 +24,52 @@ import com.jpexs.asdec.types.RGBA;
  * @author JPEXS
  */
 public class DROPSHADOWFILTER extends FILTER {
-    /**
-     * Color of the shadow
-     */
-    public RGBA dropShadowColor;
-    /**
-     * Horizontal blur amount
-     */
-    public double blurX;
-    /**
-     * Vertical blur amount
-     */
-    public double blurY;
-    /**
-     * Radian angle of the drop shadow
-     */
-    public double angle;
-    /**
-     * Distance of the drop shadow
-     */
-    public double distance;
-    /**
-     * Strength of the drop shadow
-     */
-    public float strength;
-    /**
-     * Inner shadow mode
-     */
-    public boolean innerShadow;
-    /**
-     * Knockout mode
-     */
-    public boolean knockout;
-    /**
-     * Composite source
-     */
-    public boolean compositeSource;
-    /**
-     * Number of blur passes
-     */
-    public int passes;
 
-    /**
-     * Constructor
-     */
-    public DROPSHADOWFILTER() {
-        super(0);
-    }
+   /**
+    * Color of the shadow
+    */
+   public RGBA dropShadowColor;
+   /**
+    * Horizontal blur amount
+    */
+   public double blurX;
+   /**
+    * Vertical blur amount
+    */
+   public double blurY;
+   /**
+    * Radian angle of the drop shadow
+    */
+   public double angle;
+   /**
+    * Distance of the drop shadow
+    */
+   public double distance;
+   /**
+    * Strength of the drop shadow
+    */
+   public float strength;
+   /**
+    * Inner shadow mode
+    */
+   public boolean innerShadow;
+   /**
+    * Knockout mode
+    */
+   public boolean knockout;
+   /**
+    * Composite source
+    */
+   public boolean compositeSource;
+   /**
+    * Number of blur passes
+    */
+   public int passes;
+
+   /**
+    * Constructor
+    */
+   public DROPSHADOWFILTER() {
+      super(0);
+   }
 }

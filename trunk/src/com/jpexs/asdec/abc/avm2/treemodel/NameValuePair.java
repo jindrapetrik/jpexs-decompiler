@@ -14,30 +14,27 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel;
 
- import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.ConstantPool;
 import java.util.HashMap;
 
-
 public class NameValuePair extends TreeItem {
-    public TreeItem name;
-    public TreeItem value;
 
-    public NameValuePair(TreeItem name, TreeItem value) {
-        super(name.instruction, NOPRECEDENCE);
-        this.name = name;
-        this.value = value;
-    }
+   public TreeItem name;
+   public TreeItem value;
 
-    @Override
-    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
-        if (name instanceof StringTreeItem) {
-            return ((StringTreeItem) name).value + ":" + value.toString(constants,localRegNames);
-        }
-        return name.toString(constants,localRegNames) + ":" + value.toString(constants,localRegNames);
-    }
+   public NameValuePair(TreeItem name, TreeItem value) {
+      super(name.instruction, NOPRECEDENCE);
+      this.name = name;
+      this.value = value;
+   }
 
-
+   @Override
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+      if (name instanceof StringTreeItem) {
+         return ((StringTreeItem) name).value + ":" + value.toString(constants, localRegNames);
+      }
+      return name.toString(constants, localRegNames) + ":" + value.toString(constants, localRegNames);
+   }
 }

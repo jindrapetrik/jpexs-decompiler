@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.instructions.xml;
 
 import com.jpexs.asdec.abc.avm2.AVM2Code;
@@ -23,19 +22,17 @@ import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import java.util.List;
 
-
 public class DXNSIns extends InstructionDefinition {
 
-    public DXNSIns() {
-        super(0x06, "dxns", new int[]{AVM2Code.DAT_STRING_INDEX});
-    }
+   public DXNSIns() {
+      super(0x06, "dxns", new int[]{AVM2Code.DAT_STRING_INDEX});
+   }
 
-    @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-        int strIndex = (int) ((Long) arguments.get(0)).longValue();
-        String s = constants.constant_string[strIndex];
-        System.out.println("Set default XML space " + s);
+   @Override
+   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+      int strIndex = (int) ((Long) arguments.get(0)).longValue();
+      String s = constants.constant_string[strIndex];
+      System.out.println("Set default XML space " + s);
 
-    }
-
+   }
 }

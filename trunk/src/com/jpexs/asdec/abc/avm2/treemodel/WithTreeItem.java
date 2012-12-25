@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
@@ -23,33 +22,31 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-
 public class WithTreeItem extends TreeItem {
-    public TreeItem scope;
-    public List<TreeItem> items;
 
-    public WithTreeItem(AVM2Instruction instruction, TreeItem scope, List<TreeItem> items) {
-        super(instruction, NOPRECEDENCE);
-        this.scope = scope;
-        this.items = items;
-    }
+   public TreeItem scope;
+   public List<TreeItem> items;
 
-    public WithTreeItem(AVM2Instruction instruction, TreeItem scope) {
-        super(instruction, NOPRECEDENCE);
-        this.scope = scope;
-        this.items = new ArrayList<TreeItem>();
-    }
+   public WithTreeItem(AVM2Instruction instruction, TreeItem scope, List<TreeItem> items) {
+      super(instruction, NOPRECEDENCE);
+      this.scope = scope;
+      this.items = items;
+   }
 
+   public WithTreeItem(AVM2Instruction instruction, TreeItem scope) {
+      super(instruction, NOPRECEDENCE);
+      this.scope = scope;
+      this.items = new ArrayList<TreeItem>();
+   }
 
-    @Override
-    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
-        String ret = "";
-        ret = hilight("with(") + scope.toString(constants,localRegNames) + hilight(")\r\n{\r\n");
-        for (TreeItem ti : items) {
-            ret += ti.toString(constants,localRegNames) + "\r\n";
-        }
-        ret += hilight("}");
-        return ret;
-    }
-
+   @Override
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+      String ret = "";
+      ret = hilight("with(") + scope.toString(constants, localRegNames) + hilight(")\r\n{\r\n");
+      for (TreeItem ti : items) {
+         ret += ti.toString(constants, localRegNames) + "\r\n";
+      }
+      ret += hilight("}");
+      return ret;
+   }
 }

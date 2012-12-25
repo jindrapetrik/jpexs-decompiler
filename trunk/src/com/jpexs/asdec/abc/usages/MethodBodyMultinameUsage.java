@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.usages;
 
 import com.jpexs.asdec.abc.ABC;
@@ -26,13 +25,12 @@ import com.jpexs.asdec.abc.types.traits.Traits;
  */
 public class MethodBodyMultinameUsage extends MethodMultinameUsage {
 
-    public MethodBodyMultinameUsage(int multinameIndex,int classIndex,int traitIndex,boolean isStatic,boolean isInitializer,Traits traits,int parentTraitIndex)
-    {
-       super(multinameIndex,classIndex,traitIndex,isStatic,isInitializer,traits,parentTraitIndex);
-    }
+   public MethodBodyMultinameUsage(int multinameIndex, int classIndex, int traitIndex, boolean isStatic, boolean isInitializer, Traits traits, int parentTraitIndex) {
+      super(multinameIndex, classIndex, traitIndex, isStatic, isInitializer, traits, parentTraitIndex);
+   }
 
    @Override
    public String toString(ABC abc) {
-      return super.toString(abc)+" body";
+      return super.toString(abc) + " body";
    }
 }

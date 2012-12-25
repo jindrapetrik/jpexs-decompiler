@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel.clauses;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
@@ -22,19 +21,17 @@ import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.ABCException;
 import java.util.HashMap;
 
-
 public class ExceptionTreeItem extends TreeItem {
-    public ABCException exception;
 
-    public ExceptionTreeItem(ABCException exception) {
-        super(null, NOPRECEDENCE);
-        this.exception = exception;
-    }
+   public ABCException exception;
 
-    @Override
-    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
-        return exception.getVarName(constants);
-    }
+   public ExceptionTreeItem(ABCException exception) {
+      super(null, NOPRECEDENCE);
+      this.exception = exception;
+   }
 
-
+   @Override
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+      return exception.getVarName(constants);
+   }
 }

@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf4;
 
 import com.jpexs.asdec.Main;
@@ -24,29 +23,28 @@ import java.util.List;
 
 public class ConstantIndex {
 
-    public int index;
-    public List<String> constantPool;
-    
+   public int index;
+   public List<String> constantPool;
 
-    public ConstantIndex(int index) {
-        this.index = index;
-        this.constantPool = new ArrayList<String>();
-    }
+   public ConstantIndex(int index) {
+      this.index = index;
+      this.constantPool = new ArrayList<String>();
+   }
 
-    public ConstantIndex(int index, List<String> constantPool) {
-        this.index = index;
-        this.constantPool = constantPool;
-    }
+   public ConstantIndex(int index, List<String> constantPool) {
+      this.index = index;
+      this.constantPool = constantPool;
+   }
 
-    @Override
-    public String toString() {
-        if (Main.RESOLVE_CONSTANTS) {
-            if (constantPool != null) {
-                if (index < constantPool.size()) {
-                    return "\"" + Helper.escapeString(constantPool.get(index)) + "\"";
-                }
+   @Override
+   public String toString() {
+      if (Main.RESOLVE_CONSTANTS) {
+         if (constantPool != null) {
+            if (index < constantPool.size()) {
+               return "\"" + Helper.escapeString(constantPool.get(index)) + "\"";
             }
-        }
-        return "constant" + index;
-    }
+         }
+      }
+      return "constant" + index;
+   }
 }

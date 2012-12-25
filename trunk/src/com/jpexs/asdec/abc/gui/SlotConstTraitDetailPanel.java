@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.abc.ABC;
@@ -38,46 +37,44 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
    private TraitSlotConst trait;
 
    public SlotConstTraitDetailPanel() {
-      slotConstEditor=new JEditorPane();
+      slotConstEditor = new JEditorPane();
       setLayout(new BorderLayout());
-      add(new JLabel("Type and Value:"),BorderLayout.NORTH);
-      add(new JScrollPane(slotConstEditor),BorderLayout.CENTER);
+      add(new JLabel("Type and Value:"), BorderLayout.NORTH);
+      add(new JScrollPane(slotConstEditor), BorderLayout.CENTER);
       slotConstEditor.setContentType("text/flasm3_methodinfo");
-      Flasm3MethodInfoSyntaxKit sk=(Flasm3MethodInfoSyntaxKit)slotConstEditor.getEditorKit();
+      Flasm3MethodInfoSyntaxKit sk = (Flasm3MethodInfoSyntaxKit) slotConstEditor.getEditorKit();
       sk.deinstallComponent(slotConstEditor, "jsyntaxpane.components.LineNumbersRuler");
    }
 
-
-   public void load(TraitSlotConst trait,ABC abc){
-      this.abc=abc;
-      this.trait=trait;
-      String s="";
+   public void load(TraitSlotConst trait, ABC abc) {
+      this.abc = abc;
+      this.trait = trait;
+      String s = "";
       String typeStr = "*";
-        if (trait.type_index > 0) {
-            typeStr = "m["+trait.type_index+"]\""+Helper.escapeString(abc.constants.constant_multiname[trait.type_index].toString(abc.constants))+"\"";
-        }else{
-            typeStr = "*";
-        }
-        String valueStr = "";
-        if (trait.value_kind != 0) {
-            valueStr = " = " + (new ValueKind(trait.value_index, trait.value_kind)).toString(abc.constants);
-        }
+      if (trait.type_index > 0) {
+         typeStr = "m[" + trait.type_index + "]\"" + Helper.escapeString(abc.constants.constant_multiname[trait.type_index].toString(abc.constants)) + "\"";
+      } else {
+         typeStr = "*";
+      }
+      String valueStr = "";
+      if (trait.value_kind != 0) {
+         valueStr = " = " + (new ValueKind(trait.value_index, trait.value_kind)).toString(abc.constants);
+      }
 
-        s=typeStr + valueStr;
-    
-      slotConstEditor.setText(s);      
+      s = typeStr + valueStr;
+
+      slotConstEditor.setText(s);
    }
 
    public boolean save() {
       try {
-         if(!MethodInfoParser.parseSlotConst(slotConstEditor.getText(), trait, abc)){
+         if (!MethodInfoParser.parseSlotConst(slotConstEditor.getText(), trait, abc)) {
             return false;
          }
       } catch (ParseException ex) {
-        JOptionPane.showMessageDialog(slotConstEditor, ex.text, "SlotConst typevalue Error", JOptionPane.ERROR_MESSAGE);
-        return false;
+         JOptionPane.showMessageDialog(slotConstEditor, ex.text, "SlotConst typevalue Error", JOptionPane.ERROR_MESSAGE);
+         return false;
       }
       return true;
    }
-
 }

@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf5;
 
 import com.jpexs.asdec.action.Action;
@@ -26,18 +25,18 @@ import java.util.Stack;
 
 public class ActionToString extends Action {
 
-    public ActionToString() {
-        super(0x4B, 0);
-    }
+   public ActionToString() {
+      super(0x4B, 0);
+   }
 
-    @Override
-    public String toString() {
-        return "ToString";
-    }
+   @Override
+   public String toString() {
+      return "ToString";
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        TreeItem object = stack.pop();
-        stack.push(new ToStringTreeItem(this, object));
-    }
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      TreeItem object = stack.pop();
+      stack.push(new ToStringTreeItem(this, object));
+   }
 }

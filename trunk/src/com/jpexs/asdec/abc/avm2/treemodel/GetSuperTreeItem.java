@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
@@ -22,23 +21,23 @@ import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.helpers.Highlighting;
 import java.util.HashMap;
 
-
 public class GetSuperTreeItem extends TreeItem {
-    public TreeItem object;
-    public FullMultinameTreeItem propertyName;
 
-    public GetSuperTreeItem(AVM2Instruction instruction, TreeItem object, FullMultinameTreeItem propertyName) {
-        super(instruction, PRECEDENCE_PRIMARY);
-        this.object = object;
-        this.propertyName = propertyName;
-    }
+   public TreeItem object;
+   public FullMultinameTreeItem propertyName;
 
-    @Override
-    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
-        String calee = object.toString(constants,localRegNames) + ".";
-        if (Highlighting.stripHilights(calee).equals("this.")) calee = "";
-        return calee + hilight("super.") + propertyName.toString(constants,localRegNames);
-    }
+   public GetSuperTreeItem(AVM2Instruction instruction, TreeItem object, FullMultinameTreeItem propertyName) {
+      super(instruction, PRECEDENCE_PRIMARY);
+      this.object = object;
+      this.propertyName = propertyName;
+   }
 
-
+   @Override
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+      String calee = object.toString(constants, localRegNames) + ".";
+      if (Highlighting.stripHilights(calee).equals("this.")) {
+         calee = "";
+      }
+      return calee + hilight("super.") + propertyName.toString(constants, localRegNames);
+   }
 }

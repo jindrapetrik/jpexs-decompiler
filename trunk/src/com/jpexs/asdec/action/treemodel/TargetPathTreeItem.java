@@ -14,21 +14,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
 
 public class TargetPathTreeItem extends TreeItem {
-    public TreeItem object;
 
-    public TargetPathTreeItem(Action instruction, TreeItem object) {
-        super(instruction, PRECEDENCE_PRIMARY);
-        this.object = object;
-    }
+   public TreeItem object;
 
-    @Override
-    public String toString(ConstantPool constants) {
-        return "targetPath(" + object.toString(constants) + ");";
-    }
+   public TargetPathTreeItem(Action instruction, TreeItem object) {
+      super(instruction, PRECEDENCE_PRIMARY);
+      this.object = object;
+   }
+
+   @Override
+   public String toString(ConstantPool constants) {
+      return "targetPath(" + object.toString(constants) + ");";
+   }
 }

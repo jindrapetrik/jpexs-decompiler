@@ -14,20 +14,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
 
 public class UnsupportedTreeItem extends TreeItem {
-    public String value;
-    public UnsupportedTreeItem(Action instruction, String value) {
-        super(instruction, PRECEDENCE_PRIMARY);
-        this.value=value;
-    }
 
-    @Override
-    public String toString(ConstantPool constants) {
-        return "Unsupported:"+value+";";
-    }
+   public String value;
+
+   public UnsupportedTreeItem(Action instruction, String value) {
+      super(instruction, PRECEDENCE_PRIMARY);
+      this.value = value;
+   }
+
+   @Override
+   public String toString(ConstantPool constants) {
+      return "Unsupported:" + value + ";";
+   }
 }

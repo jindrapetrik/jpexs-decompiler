@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.tags;
 
 /**
@@ -23,31 +22,32 @@ package com.jpexs.asdec.tags;
  * @author JPEXS
  */
 public class ShowFrameTag extends Tag {
-    /**
-     * Constructor
-     */
-    public ShowFrameTag(long pos) {
-        super(1, new byte[0], pos);
-    }
 
-    /**
-     * Gets data bytes
-     *
-     * @param version SWF version
-     * @return Bytes of data
-     */
-    @Override
-    public byte[] getData(int version) {
-        return super.getData(version);
-    }
+   /**
+    * Constructor
+    */
+   public ShowFrameTag(long pos) {
+      super(1, new byte[0], pos);
+   }
 
-    /**
-     * Returns string representation of the object
-     *
-     * @return String representation of the object
-     */
-    @Override
-    public String toString() {
-        return "ShowFrame";
-    }
+   /**
+    * Gets data bytes
+    *
+    * @param version SWF version
+    * @return Bytes of data
+    */
+   @Override
+   public byte[] getData(int version) {
+      return super.getData(version);
+   }
+
+   /**
+    * Returns string representation of the object
+    *
+    * @return String representation of the object
+    */
+   @Override
+   public String toString() {
+      return "ShowFrame";
+   }
 }

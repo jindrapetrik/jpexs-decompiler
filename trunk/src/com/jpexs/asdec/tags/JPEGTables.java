@@ -14,20 +14,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.tags;
 
 import java.io.IOException;
 
 public class JPEGTables extends Tag {
 
-	public JPEGTables(byte[] data, long pos) throws IOException {
-		super(8, data, pos);
-		// TODO Auto-generated constructor stub
-	}
+   public JPEGTables(byte[] data, long pos) throws IOException {
+      super(8, data, pos);
+      // TODO Auto-generated constructor stub
+   }
 
-	@Override
-	public String toString() {
-		return "JPEGTables";
-	}
+   @Override
+   public String toString() {
+      return "JPEGTables";
+   }
 }

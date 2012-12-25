@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf5;
 
 import com.jpexs.asdec.action.Action;
@@ -27,20 +26,20 @@ import java.util.Stack;
 
 public class ActionDelete2 extends Action {
 
-    public ActionDelete2() {
-        super(0x3B, 0);
-    }
+   public ActionDelete2() {
+      super(0x3B, 0);
+   }
 
-    @Override
-    public String toString() {
-        return "Delete2";
-    }
+   @Override
+   public String toString() {
+      return "Delete2";
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        TreeItem propertyName = stack.pop();
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      TreeItem propertyName = stack.pop();
 
-        output.add(new DeleteTreeItem(this, null, propertyName));
-        stack.push(new DirectValueTreeItem(this, Boolean.TRUE, constants));
-    }
+      output.add(new DeleteTreeItem(this, null, propertyName));
+      stack.push(new DirectValueTreeItem(this, Boolean.TRUE, constants));
+   }
 }

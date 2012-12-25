@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.usages;
 
 import com.jpexs.asdec.abc.types.traits.Traits;
@@ -24,16 +23,17 @@ import com.jpexs.asdec.abc.types.traits.Traits;
  * @author JPEXS
  */
 public abstract class TraitMultinameUsage extends InsideClassMultinameUsage {
-   public int traitIndex ;
+
+   public int traitIndex;
    public boolean isStatic;
    public Traits traits;
    public int parentTraitIndex;
-   public TraitMultinameUsage(int multinameIndex,int classIndex,int traitIndex,boolean isStatic,Traits traits,int parentTraitIndex)
-   {
-      super(multinameIndex,classIndex);
-      this.traitIndex=traitIndex;
-      this.isStatic=isStatic;
-      this.traits=traits;
-      this.parentTraitIndex=parentTraitIndex;
+
+   public TraitMultinameUsage(int multinameIndex, int classIndex, int traitIndex, boolean isStatic, Traits traits, int parentTraitIndex) {
+      super(multinameIndex, classIndex);
+      this.traitIndex = traitIndex;
+      this.isStatic = isStatic;
+      this.traits = traits;
+      this.parentTraitIndex = parentTraitIndex;
    }
 }

@@ -14,17 +14,16 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.tags;
 
 public class DefineShape4 extends Tag {
 
-	public DefineShape4(byte[] data, int version, long pos) {
-		super(83, data, pos);
-	}
+   public DefineShape4(byte[] data, int version, long pos) {
+      super(83, data, pos);
+   }
 
-	@Override
-	public String toString() {
-		return "DefineShape4";
-	}
+   @Override
+   public String toString() {
+      return "DefineShape4";
+   }
 }

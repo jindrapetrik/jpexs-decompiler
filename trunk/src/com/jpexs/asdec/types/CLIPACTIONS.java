@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.types;
 
 import java.util.List;
@@ -25,12 +24,13 @@ import java.util.List;
  * @author JPEXS
  */
 public class CLIPACTIONS {
-    /**
-     * All events used in these clip actions
-     */
-    public CLIPEVENTFLAGS allEventFlags;
-    /**
-     * Individual event handlers
-     */
-    public List<CLIPACTIONRECORD> clipActionRecords;
+
+   /**
+    * All events used in these clip actions
+    */
+   public CLIPEVENTFLAGS allEventFlags;
+   /**
+    * Individual event handlers
+    */
+   public List<CLIPACTIONRECORD> clipActionRecords;
 }

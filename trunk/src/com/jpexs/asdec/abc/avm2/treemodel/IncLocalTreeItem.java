@@ -14,26 +14,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import java.util.HashMap;
 
-
 public class IncLocalTreeItem extends TreeItem {
-    public int regIndex;
 
-    public IncLocalTreeItem(AVM2Instruction instruction, int regIndex) {
-        super(instruction, PRECEDENCE_POSTFIX);
-        this.regIndex = regIndex;
-    }
+   public int regIndex;
 
-    @Override
-    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
-        return localRegName(localRegNames, regIndex) + hilight("++");
-    }
+   public IncLocalTreeItem(AVM2Instruction instruction, int regIndex) {
+      super(instruction, PRECEDENCE_POSTFIX);
+      this.regIndex = regIndex;
+   }
 
-
+   @Override
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+      return localRegName(localRegNames, regIndex) + hilight("++");
+   }
 }

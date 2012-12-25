@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.Main;
@@ -24,33 +23,34 @@ import javax.swing.JList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-
 public class TraitsList extends JList implements ListSelectionListener {
-    ABC abc;
-    int classIndex = -1;
 
-    public TraitsList() {
-        addListSelectionListener(this);
-        setCellRenderer(new IconListRenderer());
-    }
+   ABC abc;
+   int classIndex = -1;
 
-    public void setABC(ABC abc) {
-        this.abc = abc;
-        setModel(new DefaultListModel());
-    }
+   public TraitsList() {
+      addListSelectionListener(this);
+      setCellRenderer(new IconListRenderer());
+   }
 
-    public void setClassIndex(int classIndex) {
-        if (abc != null)
-            setModel(new TraitsListModel(abc, classIndex));
-        this.classIndex = classIndex;
+   public void setABC(ABC abc) {
+      this.abc = abc;
+      setModel(new DefaultListModel());
+   }
 
-    }
+   public void setClassIndex(int classIndex) {
+      if (abc != null) {
+         setModel(new TraitsListModel(abc, classIndex));
+      }
+      this.classIndex = classIndex;
 
-    public void valueChanged(ListSelectionEvent e) {
+   }
 
-        int index = getSelectedIndex();
-       
-        Main.abcMainFrame.decompiledTextArea.gotoTrait(index);
+   public void valueChanged(ListSelectionEvent e) {
 
-    }
+      int index = getSelectedIndex();
+
+      Main.abcMainFrame.decompiledTextArea.gotoTrait(index);
+
+   }
 }

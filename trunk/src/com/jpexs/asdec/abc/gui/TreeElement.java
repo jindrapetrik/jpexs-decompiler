@@ -14,155 +14,154 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.gui;
 
 import java.util.*;
 import javax.swing.tree.TreePath;
 
 public class TreeElement {
-	private SortedMap<String, TreeElement> branches;
-	private SortedMap<String, TreeElement> leafs;
-	private String name;
-	private String path;
-	private int classIndex;
-	private TreeElement parent;
 
-	public TreeElement(String name, String path, int classIndex, TreeElement parent) {
-		this.name = name;
-		this.path = path;
-		this.classIndex = classIndex;
-		this.parent = parent;
-		branches = new TreeMap<String, TreeElement>();
-		leafs = new TreeMap<String, TreeElement>();
-	}
+   private SortedMap<String, TreeElement> branches;
+   private SortedMap<String, TreeElement> leafs;
+   private String name;
+   private String path;
+   private int classIndex;
+   private TreeElement parent;
+
+   public TreeElement(String name, String path, int classIndex, TreeElement parent) {
+      this.name = name;
+      this.path = path;
+      this.classIndex = classIndex;
+      this.parent = parent;
+      branches = new TreeMap<String, TreeElement>();
+      leafs = new TreeMap<String, TreeElement>();
+   }
 
    public TreeElement getParent() {
       return parent;
-   }   
-   
-	public String getName() {
-		return name;
-	}
+   }
 
-	public String getPath() {
-		return path;
-	}
-   
+   public String getName() {
+      return name;
+   }
+
+   public String getPath() {
+      return path;
+   }
+
    public TreePath getTreePath() {
       List<TreeElement> pathList = new ArrayList<TreeElement>();
-      TreeElement temp=this;
-      do{
-         pathList.add(0,temp);
-      }
-      while((temp=temp.getParent())!=null);
+      TreeElement temp = this;
+      do {
+         pathList.add(0, temp);
+      } while ((temp = temp.getParent()) != null);
       return new TreePath(pathList.toArray());
    }
 
-	public int getClassIndex() {
-		return classIndex;
-	}
+   public int getClassIndex() {
+      return classIndex;
+   }
 
-	@Override
-	public String toString() {
-    	return name; 
-	}
+   @Override
+   public String toString() {
+      return name;
+   }
 
-	TreeElement getBranch(String pathElement) {
-		TreeElement branch = branches.get(pathElement);
-		if (branch == null) {
-			branch = new TreeElement(pathElement, path+"."+pathElement, -1, this);
-			branches.put(pathElement, branch);
-		}
-		return branch;
-	}
+   TreeElement getBranch(String pathElement) {
+      TreeElement branch = branches.get(pathElement);
+      if (branch == null) {
+         branch = new TreeElement(pathElement, path + "." + pathElement, -1, this);
+         branches.put(pathElement, branch);
+      }
+      return branch;
+   }
 
-	void addLeaf(String pathElement, int classIndex) {
-		TreeElement child = new TreeElement(pathElement, path+"."+pathElement, classIndex, this);
-		leafs.put(pathElement, child);
-	}
+   void addLeaf(String pathElement, int classIndex) {
+      TreeElement child = new TreeElement(pathElement, path + "." + pathElement, classIndex, this);
+      leafs.put(pathElement, child);
+   }
 
-	public TreeElement getChild(int index) {
-		Iterator<TreeElement> iter;
-		int startingIndex;
-		if (index < branches.size()) {
-			iter = branches.values().iterator();
-			startingIndex = 0;
-		} else {
-			iter = leafs.values().iterator();
-			startingIndex = branches.size(); 
-		}
-		int ii = startingIndex;
-		TreeElement child = null;
-		while (ii <= index && iter.hasNext()) {
-			child = iter.next();
-			ii++;
-		}
-		return child;
-	}
+   public TreeElement getChild(int index) {
+      Iterator<TreeElement> iter;
+      int startingIndex;
+      if (index < branches.size()) {
+         iter = branches.values().iterator();
+         startingIndex = 0;
+      } else {
+         iter = leafs.values().iterator();
+         startingIndex = branches.size();
+      }
+      int ii = startingIndex;
+      TreeElement child = null;
+      while (ii <= index && iter.hasNext()) {
+         child = iter.next();
+         ii++;
+      }
+      return child;
+   }
 
-	public int getChildCount() {
-		return branches.size() + leafs.size();
-	}
+   public int getChildCount() {
+      return branches.size() + leafs.size();
+   }
 
-	public boolean isLeaf() {
-		return getChildCount() == 0;
-	}
+   public boolean isLeaf() {
+      return getChildCount() == 0;
+   }
 
-	public int getIndexOfChild(TreeElement child) {
-		if (getChildCount() < 1) {
-			return -1;
-		}
-		Iterator<TreeElement> iter = branches.values().iterator();
-		int ii = 0;
-		TreeElement aChild = null;
-		while (aChild != child && iter.hasNext()) {
-			aChild = iter.next();
-			if (aChild == child) {
-				return ii;
-			}
-			ii++;
-		}
-		iter = leafs.values().iterator();
-		while (aChild != child && iter.hasNext()) {
-			aChild = iter.next();
-			if (aChild == child) {
-				return ii;
-			}
-			ii++;
-		}
-		return -1;
-	}
+   public int getIndexOfChild(TreeElement child) {
+      if (getChildCount() < 1) {
+         return -1;
+      }
+      Iterator<TreeElement> iter = branches.values().iterator();
+      int ii = 0;
+      TreeElement aChild = null;
+      while (aChild != child && iter.hasNext()) {
+         aChild = iter.next();
+         if (aChild == child) {
+            return ii;
+         }
+         ii++;
+      }
+      iter = leafs.values().iterator();
+      while (aChild != child && iter.hasNext()) {
+         aChild = iter.next();
+         if (aChild == child) {
+            return ii;
+         }
+         ii++;
+      }
+      return -1;
+   }
 
-	void visitBranches(TreeVisitor visitor) {
-		Iterator<TreeElement> iter = branches.values().iterator();
-		while (iter.hasNext()) {
-			TreeElement branch = iter.next();
-			visitor.onBranch(branch);
-			branch.visitLeafs(visitor);
-			branch.visitBranches(visitor);
-		}
-	}
+   void visitBranches(TreeVisitor visitor) {
+      Iterator<TreeElement> iter = branches.values().iterator();
+      while (iter.hasNext()) {
+         TreeElement branch = iter.next();
+         visitor.onBranch(branch);
+         branch.visitLeafs(visitor);
+         branch.visitBranches(visitor);
+      }
+   }
 
-	void visitLeafs(TreeVisitor visitor) {
-		Iterator<TreeElement> iter = leafs.values().iterator();
-		while (iter.hasNext()) {
-			TreeElement leaf = iter.next();
-			visitor.onLeaf(leaf);
-		}
-	}
+   void visitLeafs(TreeVisitor visitor) {
+      Iterator<TreeElement> iter = leafs.values().iterator();
+      while (iter.hasNext()) {
+         TreeElement leaf = iter.next();
+         visitor.onLeaf(leaf);
+      }
+   }
 
-	TreeElement getByPath(String fullPath) {
-		TreeElement te = this;
-		StringTokenizer st = new StringTokenizer(fullPath, ".");
-		while (st.hasMoreTokens()) {
-			String pathElement = st.nextToken();
-			TreeElement nte = te.branches.get(pathElement);
-			if (nte == null) {
-				nte = te.leafs.get(pathElement);
-			}
-			te = nte;
-		}
-		return te;
-	}
+   TreeElement getByPath(String fullPath) {
+      TreeElement te = this;
+      StringTokenizer st = new StringTokenizer(fullPath, ".");
+      while (st.hasMoreTokens()) {
+         String pathElement = st.nextToken();
+         TreeElement nte = te.branches.get(pathElement);
+         if (nte == null) {
+            nte = te.leafs.get(pathElement);
+         }
+         te = nte;
+      }
+      return te;
+   }
 }

@@ -14,17 +14,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.instructions.debug;
 
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 
-
 public class DebugIns extends InstructionDefinition {
 
-    public DebugIns() {
-        super(0xef, "debug", new int[]{AVM2Code.DAT_DEBUG_TYPE, AVM2Code.DAT_STRING_INDEX, AVM2Code.DAT_REGISTER_INDEX, AVM2Code.OPT_U30});
-    }
-
+   public DebugIns() {
+      super(0xef, "debug", new int[]{AVM2Code.DAT_DEBUG_TYPE, AVM2Code.DAT_STRING_INDEX, AVM2Code.DAT_REGISTER_INDEX, AVM2Code.OPT_U30});
+   }
 }

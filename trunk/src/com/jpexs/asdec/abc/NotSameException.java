@@ -14,14 +14,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc;
 
 import com.jpexs.asdec.helpers.Helper;
 
-
 public class NotSameException extends RuntimeException {
-    public NotSameException(long pos) {
-        super("Streams are not the same at pos " + Helper.formatHex((int)pos, 8));
-    }
+
+   public NotSameException(long pos) {
+      super("Streams are not the same at pos " + Helper.formatHex((int) pos, 8));
+   }
 }

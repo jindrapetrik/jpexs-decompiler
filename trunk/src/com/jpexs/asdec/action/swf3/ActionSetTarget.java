@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf3;
 
 import com.jpexs.asdec.SWFInputStream;
@@ -33,39 +32,39 @@ import java.util.List;
 import java.util.Stack;
 
 public class ActionSetTarget extends Action {
-    public String targetName;
 
-    public ActionSetTarget(int actionLength, SWFInputStream sis,int version) throws IOException {
-        super(0x8B, actionLength);
-        byte data[]=sis.readBytes(actionLength);
-        sis=new SWFInputStream(new ByteArrayInputStream(data),version);
-        targetName = sis.readString();
-    }
+   public String targetName;
 
-    @Override
-    public String toString() {
-        return "SetTarget \"" + Helper.escapeString(targetName) + "\"";
-    }
+   public ActionSetTarget(int actionLength, SWFInputStream sis, int version) throws IOException {
+      super(0x8B, actionLength);
+      byte data[] = sis.readBytes(actionLength);
+      sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+      targetName = sis.readString();
+   }
 
-    public byte[] getBytes(int version) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
-        try {
-            sos.writeString(targetName);
-            sos.close();
-        } catch (IOException e) {
+   @Override
+   public String toString() {
+      return "SetTarget \"" + Helper.escapeString(targetName) + "\"";
+   }
 
-        }
-        return surroundWithAction(baos.toByteArray(), version);
-    }
+   public byte[] getBytes(int version) {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      SWFOutputStream sos = new SWFOutputStream(baos, version);
+      try {
+         sos.writeString(targetName);
+         sos.close();
+      } catch (IOException e) {
+      }
+      return surroundWithAction(baos.toByteArray(), version);
+   }
 
-    public ActionSetTarget(FlasmLexer lexer) throws IOException, ParseException {
-        super(0x8B, 0);
-        targetName = lexString(lexer);
-    }
+   public ActionSetTarget(FlasmLexer lexer) throws IOException, ParseException {
+      super(0x8B, 0);
+      targetName = lexString(lexer);
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        output.add(new SetTargetTreeItem(this, targetName));
-    }
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      output.add(new SetTargetTreeItem(this, targetName));
+   }
 }

@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.swf3;
 
 import com.jpexs.asdec.SWFInputStream;
@@ -31,37 +30,37 @@ import java.util.List;
 import java.util.Stack;
 
 public class ActionGotoFrame extends Action {
-    public int frame;
 
-    public ActionGotoFrame(SWFInputStream sis) throws IOException {
-        super(0x81, 2);
-        frame = sis.readUI16();
-    }
+   public int frame;
 
-    @Override
-    public String toString() {
-        return "GotoFrame " + frame;
-    }
+   public ActionGotoFrame(SWFInputStream sis) throws IOException {
+      super(0x81, 2);
+      frame = sis.readUI16();
+   }
 
-    public byte[] getBytes(int version) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
-        try {
-            sos.writeUI16(frame);
-            sos.close();
-        } catch (IOException e) {
+   @Override
+   public String toString() {
+      return "GotoFrame " + frame;
+   }
 
-        }
-        return surroundWithAction(baos.toByteArray(), version);
-    }
+   public byte[] getBytes(int version) {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      SWFOutputStream sos = new SWFOutputStream(baos, version);
+      try {
+         sos.writeUI16(frame);
+         sos.close();
+      } catch (IOException e) {
+      }
+      return surroundWithAction(baos.toByteArray(), version);
+   }
 
-    public ActionGotoFrame(FlasmLexer lexer) throws IOException, ParseException {
-        super(0x81, 0);
-        frame = (int) lexLong(lexer);
-    }
+   public ActionGotoFrame(FlasmLexer lexer) throws IOException, ParseException {
+      super(0x81, 0);
+      frame = (int) lexLong(lexer);
+   }
 
-    @Override
-    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer,String> regNames) {
-        output.add(new GotoFrameTreeItem(this, frame));
-    }
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      output.add(new GotoFrameTreeItem(this, frame));
+   }
 }

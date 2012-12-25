@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.treemodel;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
@@ -22,26 +21,24 @@ import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import java.util.HashMap;
 import java.util.List;
 
-
 public class NewArrayTreeItem extends TreeItem {
-    public List<TreeItem> values;
 
-    public NewArrayTreeItem(AVM2Instruction instruction, List<TreeItem> values) {
-        super(instruction, PRECEDENCE_PRIMARY);
-        this.values = values;
-    }
+   public List<TreeItem> values;
 
-    @Override
-    public String toString(ConstantPool constants, HashMap<Integer,String> localRegNames) {
-        String args = "";
-        for (int a = 0; a < values.size(); a++) {
-            if (a > 0) {
-                args = args + ",";
-            }
-            args = args + values.get(a).toString(constants,localRegNames);
-        }
-        return hilight("[") + args + hilight("]");
-    }
+   public NewArrayTreeItem(AVM2Instruction instruction, List<TreeItem> values) {
+      super(instruction, PRECEDENCE_PRIMARY);
+      this.values = values;
+   }
 
-
+   @Override
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+      String args = "";
+      for (int a = 0; a < values.size(); a++) {
+         if (a > 0) {
+            args = args + ",";
+         }
+         args = args + values.get(a).toString(constants, localRegNames);
+      }
+      return hilight("[") + args + hilight("]");
+   }
 }

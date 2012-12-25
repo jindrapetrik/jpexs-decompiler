@@ -14,22 +14,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.helpers.Helper;
 
 public class GotoLabelTreeItem extends TreeItem {
-    public String label;
 
-    public GotoLabelTreeItem(Action instruction, String label) {
-        super(instruction, PRECEDENCE_PRIMARY);
-        this.label = label;
-    }
+   public String label;
 
-    @Override
-    public String toString(ConstantPool constants) {
-        return "gotoAndStop(\"" + Helper.escapeString(label) + "\");";
-    }
+   public GotoLabelTreeItem(Action instruction, String label) {
+      super(instruction, PRECEDENCE_PRIMARY);
+      this.label = label;
+   }
+
+   @Override
+   public String toString(ConstantPool constants) {
+      return "gotoAndStop(\"" + Helper.escapeString(label) + "\");";
+   }
 }

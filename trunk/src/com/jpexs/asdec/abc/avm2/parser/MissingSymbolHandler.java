@@ -14,17 +14,15 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2.parser;
 
-
 public interface MissingSymbolHandler {
-    public boolean missingString(String value);
 
-    public boolean missingInt(long value);
+   public boolean missingString(String value);
 
-    public boolean missingUInt(long value);
+   public boolean missingInt(long value);
 
-    public boolean missingDouble(double value);
+   public boolean missingUInt(long value);
 
+   public boolean missingDouble(double value);
 }

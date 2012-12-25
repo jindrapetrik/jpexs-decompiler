@@ -14,14 +14,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.avm2;
 
-
 public class ConvertException extends Exception {
-    public int line;
-    public ConvertException(String s,int line) {
-        super(s+" on line "+line);
-        this.line=line;
-    }
+
+   public int line;
+
+   public ConvertException(String s, int line) {
+      super(s + " on line " + line);
+      this.line = line;
+   }
 }

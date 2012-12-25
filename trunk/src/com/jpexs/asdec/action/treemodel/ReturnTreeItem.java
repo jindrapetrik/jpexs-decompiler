@@ -14,21 +14,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
 
 public class ReturnTreeItem extends TreeItem {
-    public TreeItem value;
 
-    public ReturnTreeItem(Action instruction, TreeItem value) {
-        super(instruction, PRECEDENCE_PRIMARY);
-        this.value = value;
-    }
+   public TreeItem value;
 
-    @Override
-    public String toString(ConstantPool constants) {
-        return "return " + value.toString(constants) + ";";
-    }
+   public ReturnTreeItem(Action instruction, TreeItem value) {
+      super(instruction, PRECEDENCE_PRIMARY);
+      this.value = value;
+   }
+
+   @Override
+   public String toString(ConstantPool constants) {
+      return "return " + value.toString(constants) + ";";
+   }
 }

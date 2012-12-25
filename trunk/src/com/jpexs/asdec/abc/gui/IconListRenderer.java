@@ -14,59 +14,60 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.asdec.abc.gui;
 
 import java.awt.Component;
 import javax.swing.*;
 
-
 public class IconListRenderer
         extends DefaultListCellRenderer {
 
-    private Icon constIcon;
-    private Icon functionIcon;
-    private Icon variableIcon;
+   private Icon constIcon;
+   private Icon functionIcon;
+   private Icon variableIcon;
 
-    private Icon loadIcon(String path) {
-        ClassLoader cldr = this.getClass().getClassLoader();
-        java.net.URL imageURL = cldr.getResource(path);
-        return new ImageIcon(imageURL);
-    }
+   private Icon loadIcon(String path) {
+      ClassLoader cldr = this.getClass().getClassLoader();
+      java.net.URL imageURL = cldr.getResource(path);
+      return new ImageIcon(imageURL);
+   }
 
-    public IconListRenderer() {
-        constIcon = loadIcon("com/jpexs/asdec/abc/gui/graphics/constant.png");
-        functionIcon = loadIcon("com/jpexs/asdec/abc/gui/graphics/function.png");
-        variableIcon = loadIcon("com/jpexs/asdec/abc/gui/graphics/variable.png");
-    }
+   public IconListRenderer() {
+      constIcon = loadIcon("com/jpexs/asdec/abc/gui/graphics/constant.png");
+      functionIcon = loadIcon("com/jpexs/asdec/abc/gui/graphics/function.png");
+      variableIcon = loadIcon("com/jpexs/asdec/abc/gui/graphics/variable.png");
+   }
 
-    @Override
-    public Component getListCellRendererComponent(
-            JList list, Object value, int index,
-            boolean isSelected, boolean cellHasFocus) {
+   @Override
+   public Component getListCellRendererComponent(
+           JList list, Object value, int index,
+           boolean isSelected, boolean cellHasFocus) {
 
-        // Get the renderer component from parent class
+      // Get the renderer component from parent class
 
-        JLabel label =
-                (JLabel) super.getListCellRendererComponent(list,
-                        value, index, isSelected, cellHasFocus);
+      JLabel label =
+              (JLabel) super.getListCellRendererComponent(list,
+              value, index, isSelected, cellHasFocus);
 
-        // Get icon to use for the list item value
+      // Get icon to use for the list item value
 
-        String modifiersRegex = "(public |static |final |override |private |protected |package )*";
+      String modifiersRegex = "(public |static |final |override |private |protected |package )*";
 
-        if (value.toString().matches(modifiersRegex + "const .*"))
-            label.setIcon(constIcon);
-        if (value.toString().matches(modifiersRegex + "var .*"))
-            label.setIcon(variableIcon);
-        if (value.toString().matches(modifiersRegex + "function .*"))
-            label.setIcon(functionIcon);
-        if (value.toString().equals(TraitsListModel.STR_CLASS_INITIALIZER))
-            label.setIcon(functionIcon);
-        if (value.toString().equals(TraitsListModel.STR_INSTANCE_INITIALIZER))
-            label.setIcon(functionIcon);
-        return label;
-    }
-
+      if (value.toString().matches(modifiersRegex + "const .*")) {
+         label.setIcon(constIcon);
+      }
+      if (value.toString().matches(modifiersRegex + "var .*")) {
+         label.setIcon(variableIcon);
+      }
+      if (value.toString().matches(modifiersRegex + "function .*")) {
+         label.setIcon(functionIcon);
+      }
+      if (value.toString().equals(TraitsListModel.STR_CLASS_INITIALIZER)) {
+         label.setIcon(functionIcon);
+      }
+      if (value.toString().equals(TraitsListModel.STR_INSTANCE_INITIALIZER)) {
+         label.setIcon(functionIcon);
+      }
+      return label;
+   }
 }
-
