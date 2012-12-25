@@ -18,10 +18,9 @@
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.tags.DoABCTag;
-
-import javax.swing.*;
-import javax.swing.event.ListDataListener;
 import java.util.List;
+import javax.swing.ComboBoxModel;
+import javax.swing.event.ListDataListener;
 
 
 public class ABCComboBoxModel implements ComboBoxModel {

@@ -25,7 +25,6 @@ import com.jpexs.asdec.action.parser.FlasmLexer;
 import com.jpexs.asdec.action.parser.Label;
 import com.jpexs.asdec.action.parser.ParseException;
 import com.jpexs.asdec.helpers.Helper;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

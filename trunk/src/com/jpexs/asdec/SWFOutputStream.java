@@ -17,32 +17,13 @@
 
 package com.jpexs.asdec;
 
+import com.jpexs.asdec.tags.Tag;
+import com.jpexs.asdec.types.*;
+import com.jpexs.asdec.types.filters.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
-
-import com.jpexs.asdec.abc.NotSameException;
-import com.jpexs.asdec.helpers.Helper;
-import com.jpexs.asdec.tags.Tag;
-import com.jpexs.asdec.types.BUTTONCONDACTION;
-import com.jpexs.asdec.types.BUTTONRECORD;
-import com.jpexs.asdec.types.CLIPACTIONRECORD;
-import com.jpexs.asdec.types.CLIPACTIONS;
-import com.jpexs.asdec.types.CLIPEVENTFLAGS;
-import com.jpexs.asdec.types.CXFORMWITHALPHA;
-import com.jpexs.asdec.types.MATRIX;
-import com.jpexs.asdec.types.RECT;
-import com.jpexs.asdec.types.RGBA;
-import com.jpexs.asdec.types.filters.BEVELFILTER;
-import com.jpexs.asdec.types.filters.BLURFILTER;
-import com.jpexs.asdec.types.filters.COLORMATRIXFILTER;
-import com.jpexs.asdec.types.filters.CONVOLUTIONFILTER;
-import com.jpexs.asdec.types.filters.DROPSHADOWFILTER;
-import com.jpexs.asdec.types.filters.FILTER;
-import com.jpexs.asdec.types.filters.GLOWFILTER;
-import com.jpexs.asdec.types.filters.GRADIENTBEVELFILTER;
-import com.jpexs.asdec.types.filters.GRADIENTGLOWFILTER;
 
 /**
  * Class for writing data into SWF file

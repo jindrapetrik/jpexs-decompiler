@@ -22,7 +22,6 @@ import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.CodeStats;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
-import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.types.traits.Traits;
 import com.jpexs.asdec.helpers.Highlighting;
 import java.util.HashMap;

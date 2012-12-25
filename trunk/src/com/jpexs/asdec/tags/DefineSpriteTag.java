@@ -21,7 +21,6 @@ import com.jpexs.asdec.Main;
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.abc.CopyOutputStream;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

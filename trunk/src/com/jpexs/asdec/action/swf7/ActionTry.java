@@ -23,7 +23,6 @@ import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.parser.*;
 import com.jpexs.asdec.action.swf4.RegisterNumber;
 import com.jpexs.asdec.helpers.Helper;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

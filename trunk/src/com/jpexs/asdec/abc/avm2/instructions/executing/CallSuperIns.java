@@ -17,8 +17,8 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.executing;
 
-import com.jpexs.asdec.abc.ABC;
-import com.jpexs.asdec.abc.avm2.AVM2Code; import java.util.HashMap;
+ import com.jpexs.asdec.abc.ABC;
+import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
@@ -27,10 +27,10 @@ import com.jpexs.asdec.abc.avm2.treemodel.CallSuperTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.FullMultinameTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.MethodInfo;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Stack; import java.util.HashMap;
+import java.util.Stack;
 
 
 public class CallSuperIns extends InstructionDefinition {

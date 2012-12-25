@@ -24,13 +24,7 @@ import com.jpexs.asdec.abc.types.ValueKind;
 import com.jpexs.asdec.abc.types.traits.TraitSlotConst;
 import com.jpexs.asdec.helpers.Helper;
 import java.awt.BorderLayout;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JEditorPane;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+import javax.swing.*;
 import jsyntaxpane.syntaxkits.Flasm3MethodInfoSyntaxKit;
 
 /**

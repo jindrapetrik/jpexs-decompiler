@@ -17,9 +17,8 @@
 
 package com.jpexs.asdec.abc.avm2.instructions;
 
-import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
-
-import java.util.Stack; import java.util.HashMap;
+ import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
+import java.util.Stack;
 
 
 public interface IfTypeIns {

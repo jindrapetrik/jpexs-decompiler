@@ -17,12 +17,12 @@
 
 package com.jpexs.asdec.abc.avm2.treemodel.clauses;
 
-import com.jpexs.asdec.abc.avm2.ConstantPool; import java.util.HashMap;
+import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.ContinueTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 

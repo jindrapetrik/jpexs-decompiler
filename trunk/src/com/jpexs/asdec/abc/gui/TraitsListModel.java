@@ -18,8 +18,7 @@
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.abc.ABC;
-
-import javax.swing.*;
+import javax.swing.ListModel;
 import javax.swing.event.ListDataListener;
 
 

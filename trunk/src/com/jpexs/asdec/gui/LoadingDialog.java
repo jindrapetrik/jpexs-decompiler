@@ -18,12 +18,14 @@
 package com.jpexs.asdec.gui;
 
 import com.jpexs.asdec.Main;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.ImageObserver;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 
 /**
  * Dialog showing loading of SWF file

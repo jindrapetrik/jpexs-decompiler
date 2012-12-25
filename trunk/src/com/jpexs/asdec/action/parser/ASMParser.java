@@ -25,7 +25,6 @@ import com.jpexs.asdec.action.swf4.*;
 import com.jpexs.asdec.action.swf5.*;
 import com.jpexs.asdec.action.swf6.*;
 import com.jpexs.asdec.action.swf7.*;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;

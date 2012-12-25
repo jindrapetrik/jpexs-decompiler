@@ -17,7 +17,8 @@
 
 package com.jpexs.asdec.abc.avm2.treemodel;
 
-import com.jpexs.asdec.abc.avm2.ConstantPool; import java.util.HashMap;
+ import com.jpexs.asdec.abc.avm2.ConstantPool;
+import java.util.HashMap;
 
 
 public class ClassTreeItem extends TreeItem {

@@ -18,9 +18,9 @@
 package com.jpexs.asdec.action.parser;
 
 import com.jpexs.asdec.action.swf4.ConstantIndex;
+import com.jpexs.asdec.action.swf4.Null;
 import com.jpexs.asdec.action.swf4.RegisterNumber;
 import com.jpexs.asdec.action.swf4.Undefined;
-import com.jpexs.asdec.action.swf4.Null;
 
 
 /**

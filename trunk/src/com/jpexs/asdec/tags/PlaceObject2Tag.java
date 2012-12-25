@@ -24,7 +24,6 @@ import com.jpexs.asdec.abc.CopyOutputStream;
 import com.jpexs.asdec.types.CLIPACTIONS;
 import com.jpexs.asdec.types.CXFORMWITHALPHA;
 import com.jpexs.asdec.types.MATRIX;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

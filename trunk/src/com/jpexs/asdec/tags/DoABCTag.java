@@ -22,7 +22,6 @@ import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.CopyOutputStream;
-
 import java.io.*;
 
 /**

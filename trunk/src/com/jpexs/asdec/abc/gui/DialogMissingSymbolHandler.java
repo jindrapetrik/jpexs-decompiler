@@ -18,8 +18,7 @@
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.abc.avm2.parser.MissingSymbolHandler;
-
-import javax.swing.*;
+import javax.swing.JOptionPane;
 
 
 public class DialogMissingSymbolHandler implements MissingSymbolHandler {

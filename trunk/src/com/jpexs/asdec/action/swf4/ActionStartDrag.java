@@ -22,7 +22,6 @@ import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.DirectValueTreeItem;
 import com.jpexs.asdec.action.treemodel.StartDragTreeItem;
 import com.jpexs.asdec.action.treemodel.TreeItem;
-
 import java.util.List;
 import java.util.Stack;
 

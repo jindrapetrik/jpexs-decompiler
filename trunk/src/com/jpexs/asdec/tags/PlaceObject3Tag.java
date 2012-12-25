@@ -25,7 +25,6 @@ import com.jpexs.asdec.types.CLIPACTIONS;
 import com.jpexs.asdec.types.CXFORMWITHALPHA;
 import com.jpexs.asdec.types.MATRIX;
 import com.jpexs.asdec.types.filters.FILTER;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

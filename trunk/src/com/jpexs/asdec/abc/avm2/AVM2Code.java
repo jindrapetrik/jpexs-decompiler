@@ -17,7 +17,6 @@
 
 package com.jpexs.asdec.abc.avm2;
 
-import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.ABCInputStream;
 import com.jpexs.asdec.abc.CopyOutputStream;
@@ -51,7 +50,6 @@ import com.jpexs.asdec.abc.types.MethodInfo;
 import com.jpexs.asdec.abc.types.traits.TraitSlotConst;
 import com.jpexs.asdec.helpers.Helper;
 import com.jpexs.asdec.helpers.Highlighting;
-
 import java.io.*;
 import java.util.*;
 import java.util.logging.Level;

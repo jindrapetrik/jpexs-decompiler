@@ -18,7 +18,6 @@
 package com.jpexs.asdec.abc.avm2.treemodel.clauses;
 
 import com.jpexs.asdec.abc.avm2.treemodel.ContinueTreeItem;
-
 import java.util.List;
 
 

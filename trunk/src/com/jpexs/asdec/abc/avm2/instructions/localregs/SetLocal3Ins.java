@@ -17,7 +17,7 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.localregs;
 
-import com.jpexs.asdec.abc.ABC;
+ import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
@@ -28,9 +28,9 @@ import com.jpexs.asdec.abc.avm2.treemodel.NewActivationTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.SetLocalTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.MethodInfo;
-
+import java.util.HashMap;
 import java.util.List;
-import java.util.Stack; import java.util.HashMap;
+import java.util.Stack;
 
 
 public class SetLocal3Ins extends InstructionDefinition implements SetTypeIns, SetLocalTypeIns {

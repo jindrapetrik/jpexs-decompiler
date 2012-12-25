@@ -23,7 +23,6 @@ import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.types.ABCException;
 import com.jpexs.asdec.abc.types.MethodBody;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;

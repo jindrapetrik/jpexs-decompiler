@@ -17,7 +17,7 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.localregs;
 
-import com.jpexs.asdec.abc.ABC;
+ import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
@@ -26,9 +26,9 @@ import com.jpexs.asdec.abc.avm2.treemodel.ClassTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.ThisTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.MethodInfo;
-
+import java.util.HashMap;
 import java.util.List;
-import java.util.Stack; import java.util.HashMap;
+import java.util.Stack;
 
 
 public class GetLocal0Ins extends InstructionDefinition implements GetLocalTypeIns {

@@ -18,7 +18,6 @@
 package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.action.Action;
-
 import java.util.List;
 
 /**

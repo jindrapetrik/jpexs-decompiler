@@ -35,14 +35,9 @@ import com.jpexs.asdec.action.treemodel.operations.NotTreeItem;
 import com.jpexs.asdec.action.treemodel.operations.OrTreeItem;
 import com.jpexs.asdec.helpers.Helper;
 import com.jpexs.asdec.helpers.Highlighting;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.EmptyStackException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Represents one ACTIONRECORD,

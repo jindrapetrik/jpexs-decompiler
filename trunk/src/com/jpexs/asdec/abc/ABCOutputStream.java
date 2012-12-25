@@ -17,13 +17,8 @@
 
 package com.jpexs.asdec.abc;
 
-import com.jpexs.asdec.abc.types.Decimal;
-import com.jpexs.asdec.abc.types.InstanceInfo;
-import com.jpexs.asdec.abc.types.MethodInfo;
-import com.jpexs.asdec.abc.types.Multiname;
-import com.jpexs.asdec.abc.types.Namespace;
+import com.jpexs.asdec.abc.types.*;
 import com.jpexs.asdec.abc.types.traits.*;
-
 import java.io.IOException;
 import java.io.OutputStream;
 

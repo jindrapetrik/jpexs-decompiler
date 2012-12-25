@@ -19,7 +19,6 @@ package com.jpexs.asdec.action.swf4;
 
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.helpers.Helper;
-
 import java.util.ArrayList;
 import java.util.List;
 

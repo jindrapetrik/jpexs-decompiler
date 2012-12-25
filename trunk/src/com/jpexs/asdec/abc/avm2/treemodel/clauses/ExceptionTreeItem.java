@@ -17,9 +17,10 @@
 
 package com.jpexs.asdec.abc.avm2.treemodel.clauses;
 
-import com.jpexs.asdec.abc.avm2.ConstantPool; import java.util.HashMap;
+import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.ABCException;
+import java.util.HashMap;
 
 
 public class ExceptionTreeItem extends TreeItem {

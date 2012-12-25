@@ -20,23 +20,20 @@ package com.jpexs.asdec.abc.gui;
 import com.jpexs.asdec.Configuration;
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
-import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.gui.tablemodels.*;
 import com.jpexs.asdec.gui.LoadingPanel;
 import com.jpexs.asdec.gui.View;
 import com.jpexs.asdec.tags.DoABCTag;
-import jsyntaxpane.DefaultSyntaxKit;
-
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.*;
+import java.io.IOException;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.table.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import jsyntaxpane.actions.ComboCompletionAction;
-import jsyntaxpane.syntaxkits.Flasm3SyntaxKit;
+import jsyntaxpane.DefaultSyntaxKit;
 
 
 public class MainFrame extends JFrame implements ActionListener, ItemListener {

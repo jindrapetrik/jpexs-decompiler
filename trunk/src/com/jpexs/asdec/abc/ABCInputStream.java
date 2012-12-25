@@ -19,7 +19,6 @@ package com.jpexs.asdec.abc;
 
 import com.jpexs.asdec.abc.types.*;
 import com.jpexs.asdec.abc.types.traits.*;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;

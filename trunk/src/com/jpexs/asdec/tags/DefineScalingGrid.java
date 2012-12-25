@@ -17,11 +17,10 @@
 
 package com.jpexs.asdec.tags;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.types.RECT;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 public class DefineScalingGrid extends Tag {
 

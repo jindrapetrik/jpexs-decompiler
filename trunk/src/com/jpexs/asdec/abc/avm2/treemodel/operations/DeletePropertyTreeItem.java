@@ -17,10 +17,11 @@
 
 package com.jpexs.asdec.abc.avm2.treemodel.operations;
 
-import com.jpexs.asdec.abc.avm2.ConstantPool; import java.util.HashMap;
+import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.FullMultinameTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
+import java.util.HashMap;
 
 
 public class DeletePropertyTreeItem extends TreeItem {

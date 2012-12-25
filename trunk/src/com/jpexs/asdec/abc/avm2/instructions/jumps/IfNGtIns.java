@@ -17,8 +17,8 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.jumps;
 
-import com.jpexs.asdec.abc.ABC;
-import com.jpexs.asdec.abc.avm2.AVM2Code; import java.util.HashMap;
+ import com.jpexs.asdec.abc.ABC;
+import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.IfTypeIns;
@@ -27,9 +27,9 @@ import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.operations.GtTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.operations.LeTreeItem;
 import com.jpexs.asdec.abc.types.MethodInfo;
-
+import java.util.HashMap;
 import java.util.List;
-import java.util.Stack; import java.util.HashMap;
+import java.util.Stack;
 
 
 public class IfNGtIns extends InstructionDefinition implements IfTypeIns {

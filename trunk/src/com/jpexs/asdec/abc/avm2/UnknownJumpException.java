@@ -18,7 +18,6 @@
 package com.jpexs.asdec.abc.avm2;
 
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
-
 import java.util.List;
 import java.util.Stack;
 

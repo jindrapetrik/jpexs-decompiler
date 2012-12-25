@@ -17,8 +17,8 @@
 
 package com.jpexs.asdec.abc.gui;
 
+import java.awt.Component;
 import javax.swing.*;
-import java.awt.*;
 
 
 public class IconListRenderer

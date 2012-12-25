@@ -24,12 +24,7 @@ import com.jpexs.asdec.abc.methodinfo_parser.ParseException;
 import com.jpexs.asdec.abc.types.MethodInfo;
 import com.jpexs.asdec.helpers.Helper;
 import java.awt.Dimension;
-import javax.swing.BoxLayout;
-import javax.swing.JEditorPane;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+import javax.swing.*;
 import jsyntaxpane.syntaxkits.Flasm3MethodInfoSyntaxKit;
 
 /**

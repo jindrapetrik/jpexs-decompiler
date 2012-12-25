@@ -18,7 +18,6 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
-
 import java.util.List;
 
 public class FunctionTreeItem extends TreeItem {

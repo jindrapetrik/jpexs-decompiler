@@ -17,16 +17,16 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.localregs;
 
-import com.jpexs.asdec.abc.avm2.AVM2Code; import java.util.HashMap;
+ import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.avm2.treemodel.IncLocalTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.MethodInfo;
-
+import java.util.HashMap;
 import java.util.List;
-import java.util.Stack; import java.util.HashMap;
+import java.util.Stack;
 
 
 public class IncLocalIIns extends InstructionDefinition {

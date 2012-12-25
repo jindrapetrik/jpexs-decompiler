@@ -17,8 +17,6 @@
 
 package com.jpexs.asdec.abc.methodinfo_parser;
 
-import com.jpexs.asdec.action.parser.*;
-
 
 public class ParseException extends Exception {
     public long line;

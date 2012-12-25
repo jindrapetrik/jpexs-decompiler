@@ -26,9 +26,6 @@ import com.jpexs.asdec.gui.View;
 import com.jpexs.asdec.gui.proxy.ProxyFrame;
 import com.jpexs.asdec.tags.DoABCTag;
 import com.jpexs.asdec.tags.Tag;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -39,6 +36,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
+import javax.swing.filechooser.FileFilter;
 
 
 /**

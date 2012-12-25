@@ -17,9 +17,10 @@
 
 package com.jpexs.asdec.gui;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 /**
  * Contains methods for GUI

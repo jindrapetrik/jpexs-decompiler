@@ -21,7 +21,6 @@ package com.jpexs.asdec.action.treemodel.clauses;
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.TreeItem;
-
 import java.util.ArrayList;
 import java.util.List;
 

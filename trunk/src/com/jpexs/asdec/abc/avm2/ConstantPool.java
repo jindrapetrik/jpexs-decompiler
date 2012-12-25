@@ -21,7 +21,6 @@ import com.jpexs.asdec.abc.types.Decimal;
 import com.jpexs.asdec.abc.types.Multiname;
 import com.jpexs.asdec.abc.types.Namespace;
 import com.jpexs.asdec.abc.types.NamespaceSet;
-
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Arrays;

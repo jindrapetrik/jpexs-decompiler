@@ -17,18 +17,16 @@
 
 package com.jpexs.asdec.abc.gui;
 
-import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.flowgraph.Graph;
 import com.jpexs.asdec.abc.avm2.parser.ASM3Parser;
 import com.jpexs.asdec.abc.avm2.parser.ParseException;
-
-import javax.swing.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import javax.swing.JOptionPane;
 
 
 public class ASMSourceEditorPane extends LineMarkedEditorPane {

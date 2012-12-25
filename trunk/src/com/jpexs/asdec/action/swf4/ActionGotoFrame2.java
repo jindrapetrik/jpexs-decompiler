@@ -25,7 +25,6 @@ import com.jpexs.asdec.action.parser.ParseException;
 import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.GotoFrame2TreeItem;
 import com.jpexs.asdec.action.treemodel.TreeItem;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;

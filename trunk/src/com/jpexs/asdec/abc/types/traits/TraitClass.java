@@ -18,7 +18,6 @@
 package com.jpexs.asdec.abc.types.traits;
 
 import com.jpexs.asdec.abc.ABC;
-import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.helpers.Helper;
 
 

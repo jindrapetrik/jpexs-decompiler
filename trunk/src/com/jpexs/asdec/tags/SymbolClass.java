@@ -17,10 +17,9 @@
 
 package com.jpexs.asdec.tags;
 
+import com.jpexs.asdec.SWFInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-
-import com.jpexs.asdec.SWFInputStream;
 
 public class SymbolClass extends Tag {
 	private int tagIDs[];

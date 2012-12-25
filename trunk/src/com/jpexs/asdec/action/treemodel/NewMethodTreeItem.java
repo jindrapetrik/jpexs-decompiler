@@ -19,7 +19,6 @@ package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.swf4.Undefined;
-
 import java.util.List;
 
 public class NewMethodTreeItem extends TreeItem {

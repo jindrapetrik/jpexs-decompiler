@@ -18,12 +18,11 @@
 package com.jpexs.asdec.action.gui;
 
 import com.jpexs.asdec.tags.*;
-
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
-import java.util.ArrayList;
-import java.util.List;
 
 public class TagTreeModel implements TreeModel {
     private String root = "";

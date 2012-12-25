@@ -18,17 +18,11 @@
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.Main;
-import com.jpexs.asdec.abc.avm2.CodeStats;
 import com.jpexs.asdec.abc.types.MethodBody;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.text.NumberFormat;
-import javax.swing.JCheckBox;
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 

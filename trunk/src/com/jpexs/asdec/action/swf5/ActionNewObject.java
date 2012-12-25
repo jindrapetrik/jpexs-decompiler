@@ -21,7 +21,6 @@ import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.NewObjectTreeItem;
 import com.jpexs.asdec.action.treemodel.TreeItem;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;

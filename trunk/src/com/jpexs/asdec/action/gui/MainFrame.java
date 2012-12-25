@@ -25,17 +25,10 @@ import com.jpexs.asdec.gui.View;
 import com.jpexs.asdec.helpers.Highlighting;
 import com.jpexs.asdec.tags.ASMSource;
 import com.jpexs.asdec.tags.Tag;
-import java.io.FileNotFoundException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import jsyntaxpane.DefaultSyntaxKit;
-
-import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -45,6 +38,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import jsyntaxpane.DefaultSyntaxKit;
 
 public class MainFrame extends JFrame implements TreeSelectionListener, ActionListener {
 

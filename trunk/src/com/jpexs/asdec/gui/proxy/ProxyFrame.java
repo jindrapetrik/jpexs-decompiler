@@ -24,8 +24,6 @@ import com.jpexs.proxy.CatchedListener;
 import com.jpexs.proxy.ReplacedListener;
 import com.jpexs.proxy.Replacement;
 import com.jpexs.proxy.Server;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -34,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
+import javax.swing.*;
 
 /**
  * Frame with Proxy

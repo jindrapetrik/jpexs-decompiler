@@ -19,10 +19,8 @@ package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeCellRenderer;

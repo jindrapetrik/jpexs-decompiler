@@ -23,7 +23,6 @@ import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.abc.CopyOutputStream;
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.types.BUTTONRECORD;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

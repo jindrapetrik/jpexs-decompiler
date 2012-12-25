@@ -18,7 +18,6 @@
 package com.jpexs.asdec.abc.gui.tablemodels;
 
 import com.jpexs.asdec.abc.ABC;
-
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 

@@ -23,7 +23,6 @@ import com.jpexs.asdec.abc.avm2.ConvertException;
 import com.jpexs.asdec.abc.types.traits.Trait;
 import com.jpexs.asdec.abc.types.traits.TraitSlotConst;
 import com.jpexs.asdec.helpers.Highlighting;
-
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;

@@ -24,11 +24,9 @@ import com.jpexs.asdec.action.parser.ASMParser;
 import com.jpexs.asdec.action.parser.FlasmLexer;
 import com.jpexs.asdec.action.parser.Label;
 import com.jpexs.asdec.action.parser.ParseException;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ActionWith extends Action {

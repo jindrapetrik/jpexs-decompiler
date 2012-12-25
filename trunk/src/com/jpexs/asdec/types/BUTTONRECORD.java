@@ -18,7 +18,6 @@
 package com.jpexs.asdec.types;
 
 import com.jpexs.asdec.types.filters.FILTER;
-
 import java.util.List;
 
 /**

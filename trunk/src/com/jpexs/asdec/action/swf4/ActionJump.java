@@ -23,7 +23,6 @@ import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.parser.FlasmLexer;
 import com.jpexs.asdec.action.parser.ParseException;
 import com.jpexs.asdec.helpers.Helper;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;

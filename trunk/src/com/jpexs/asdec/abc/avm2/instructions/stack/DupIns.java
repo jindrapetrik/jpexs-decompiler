@@ -17,16 +17,16 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.stack;
 
-import com.jpexs.asdec.abc.ABC;
+ import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.MethodInfo;
-
+import java.util.HashMap;
 import java.util.List;
-import java.util.Stack; import java.util.HashMap;
+import java.util.Stack;
 
 
 public class DupIns extends InstructionDefinition {

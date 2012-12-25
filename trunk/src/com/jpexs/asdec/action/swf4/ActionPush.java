@@ -27,7 +27,6 @@ import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.DirectValueTreeItem;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 import com.jpexs.asdec.helpers.Helper;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

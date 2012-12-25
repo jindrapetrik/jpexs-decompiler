@@ -17,8 +17,8 @@
 
 package com.jpexs.asdec.abc.avm2.instructions.construction;
 
-import com.jpexs.asdec.abc.ABC;
-import com.jpexs.asdec.abc.avm2.AVM2Code; import java.util.HashMap;
+ import com.jpexs.asdec.abc.ABC;
+import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
@@ -27,9 +27,9 @@ import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.MethodBody;
 import com.jpexs.asdec.abc.types.MethodInfo;
 import com.jpexs.asdec.helpers.Highlighting;
-
+import java.util.HashMap;
 import java.util.List;
-import java.util.Stack; import java.util.HashMap;
+import java.util.Stack;
 
 
 public class NewFunctionIns extends InstructionDefinition {

@@ -19,8 +19,7 @@ package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.helpers.Helper;
-
-import javax.swing.*;
+import javax.swing.ListModel;
 import javax.swing.event.ListDataListener;
 
 

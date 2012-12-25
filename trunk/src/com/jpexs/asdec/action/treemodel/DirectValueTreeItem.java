@@ -20,7 +20,6 @@ package com.jpexs.asdec.action.treemodel;
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.swf4.ConstantIndex;
 import com.jpexs.asdec.helpers.Helper;
-
 import java.util.List;
 
 public class DirectValueTreeItem extends TreeItem {

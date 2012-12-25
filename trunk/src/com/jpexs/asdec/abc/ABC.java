@@ -17,19 +17,6 @@
 
 package com.jpexs.asdec.abc;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JOptionPane;
-
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
@@ -38,35 +25,18 @@ import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.InitPropertyTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.SetPropertyTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
-import com.jpexs.asdec.abc.types.ABCException;
-import com.jpexs.asdec.abc.types.ClassInfo;
-import com.jpexs.asdec.abc.types.Decimal;
-import com.jpexs.asdec.abc.types.InstanceInfo;
-import com.jpexs.asdec.abc.types.MetadataInfo;
-import com.jpexs.asdec.abc.types.MethodBody;
-import com.jpexs.asdec.abc.types.MethodInfo;
-import com.jpexs.asdec.abc.types.Multiname;
-import com.jpexs.asdec.abc.types.Namespace;
-import com.jpexs.asdec.abc.types.NamespaceSet;
-import com.jpexs.asdec.abc.types.ScriptInfo;
+import com.jpexs.asdec.abc.types.*;
 import com.jpexs.asdec.abc.types.traits.Trait;
 import com.jpexs.asdec.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.asdec.abc.types.traits.TraitSlotConst;
 import com.jpexs.asdec.abc.types.traits.Traits;
-import com.jpexs.asdec.abc.usages.ClassNameMultinameUsage;
-import com.jpexs.asdec.abc.usages.ConstVarNameMultinameUsage;
-import com.jpexs.asdec.abc.usages.ConstVarTypeMultinameUsage;
-import com.jpexs.asdec.abc.usages.ExtendsMultinameUsage;
-import com.jpexs.asdec.abc.usages.ImplementsMultinameUsage;
-import com.jpexs.asdec.abc.usages.MethodBodyMultinameUsage;
-import com.jpexs.asdec.abc.usages.MethodNameMultinameUsage;
-import com.jpexs.asdec.abc.usages.MethodParamsMultinameUsage;
-import com.jpexs.asdec.abc.usages.MethodReturnTypeMultinameUsage;
-import com.jpexs.asdec.abc.usages.MultinameUsage;
-import com.jpexs.asdec.abc.usages.TypeNameMultinameUsage;
+import com.jpexs.asdec.abc.usages.*;
 import com.jpexs.asdec.helpers.Helper;
 import com.jpexs.asdec.helpers.Highlighting;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class ABC {
