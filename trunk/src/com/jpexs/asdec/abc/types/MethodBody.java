@@ -49,12 +49,7 @@ public class MethodBody implements Cloneable {
     }
      
      public HashMap<Integer,String> getLocalRegNames(ABC abc)
-     {
-        HashMap<Integer,String> debugRegNames=code.getLocalRegNamesFromDebug(abc);
-        if(!debugRegNames.isEmpty())
-        {
-           return debugRegNames;
-        }
+     {        
         HashMap<Integer,String> ret=new HashMap<Integer,String>();
         for (int i = 1; i <= abc.method_info[this.method_info].param_types.length; i++) {
             String paramName="param"+i;
@@ -63,9 +58,22 @@ public class MethodBody implements Cloneable {
             }
             ret.put(i, paramName);
         }
+        int pos=abc.method_info[this.method_info].param_types.length+1;
+        if(abc.method_info[this.method_info].flagNeed_arguments())
+        {
+           ret.put(pos,"arguments");
+           pos++;
+        }
         if(abc.method_info[this.method_info].flagNeed_rest())
         {
-           ret.put(abc.method_info[this.method_info].param_types.length+1,"rest");
+           ret.put(pos,"rest");
+           pos++;
+        }
+        
+        HashMap<Integer,String> debugRegNames=code.getLocalRegNamesFromDebug(abc);
+        for(int k:debugRegNames.keySet())
+        {
+           ret.put(k,debugRegNames.get(k));           
         }
         return ret;
      }    
