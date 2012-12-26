@@ -46,6 +46,7 @@ import com.jpexs.asdec.abc.avm2.treemodel.operations.PreIncrementTreeItem;
 import com.jpexs.asdec.abc.types.ABCException;
 import com.jpexs.asdec.abc.types.MethodBody;
 import com.jpexs.asdec.abc.types.MethodInfo;
+import com.jpexs.asdec.abc.types.Multiname;
 import com.jpexs.asdec.abc.types.traits.TraitSlotConst;
 import com.jpexs.asdec.helpers.Helper;
 import com.jpexs.asdec.helpers.Highlighting;
@@ -58,6 +59,7 @@ import java.util.regex.Pattern;
 
 public class AVM2Code {
 
+   private static final boolean DEBUG_MODE=false;
    public static int toSourceLimit = -1;
    public ArrayList<AVM2Instruction> code = new ArrayList<AVM2Instruction>();
    public static boolean DEBUG_REWRITE = false;
@@ -1599,7 +1601,10 @@ public class AVM2Code {
          if (ex instanceof UnknownJumpException) {
             throw (UnknownJumpException) ex;
          }
-         ex.printStackTrace();
+         if(DEBUG_MODE)
+         {
+            ex.printStackTrace();
+         }
          throw new ConvertException(ex.getClass().getSimpleName(), ip);
       }
    }
@@ -1663,6 +1668,33 @@ public class AVM2Code {
       return ret;
    }
 
+   private class Slot{
+      public TreeItem scope;
+      public Multiname multiname;
+
+      public Slot(TreeItem scope, Multiname multiname) {
+         this.scope = scope;
+         this.multiname = multiname;
+      }
+
+      @Override
+      public boolean equals(Object obj) {
+         if(obj instanceof Slot){
+            return (((Slot)obj).scope.getThroughRegister()==scope.getThroughRegister())
+                    &&(((Slot)obj).multiname==multiname);
+         }
+         return false;
+      }            
+
+      @Override
+      public int hashCode() {
+         int hash = 7;
+         hash = 59 * hash + (this.scope != null ? this.scope.hashCode() : 0);
+         hash = 59 * hash + (this.multiname != null ? this.multiname.hashCode() : 0);
+         return hash;
+      }
+   }
+   
    public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted, HashMap<Integer, String> localRegNames) {
       toSourceCount = 0;
       loopList = new ArrayList<Loop>();
@@ -1673,30 +1705,8 @@ public class AVM2Code {
       List<TreeItem> list;
       String s = "";
       HashMap<Integer, TreeItem> localRegs = new HashMap<Integer, TreeItem>();
-      try {
-         list = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), new Stack<TreeItem>(), abc, constants, method_info, body, 0, code.size() - 1, localRegNames).output;
-         s = listToString(list, constants, localRegNames);
-      } catch (Exception ex) {
-         ex.printStackTrace();
-         s = "/*\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error Message: " + ex.getMessage() + "\r\n */";
-         return s;
-      }
-
-
-      String parts[] = s.split("\r\n");
-      String sub = "";
-      int level = 0;
-      for (int t = 0; t < body.traits.traits.length; t++) {
-         //Skip traits with same name as local registers
-         if ((body.traits.traits[t] instanceof TraitSlotConst)
-                 && (((TraitSlotConst) body.traits.traits[t]).isVar())
-                 && (localRegNames.containsValue(((TraitSlotConst) body.traits.traits[t]).getName(constants)))) {
-            continue;
-         } else {
-            sub += body.traits.traits[t].convert(constants, method_info, abc) + ";\r\n";
-         }
-      }
-      int regCount = getRegisterCount();
+      
+       int regCount = getRegisterCount();
       int paramCount = 0;
       if (body.method_info != -1) {
          MethodInfo mi = method_info[body.method_info];
@@ -1705,16 +1715,56 @@ public class AVM2Code {
             paramCount++;
          }
       }
-      HashMap<Integer, String> localRegTypes = getLocalRegTypes(constants);
-      for (int i = paramCount + 1; i < regCount; i++) {
-         if ((!(localRegs.get(i) instanceof NewActivationTreeItem)&&((!hideTemporaryRegisters)||(!isKilled(i, 0, code.size()-1))))) {
-            sub += "var " + TreeItem.localRegName(localRegNames, i);
-            if (localRegTypes.containsKey(i)) {
-               sub += ":" + localRegTypes.get(i);
-            }
-            sub += ";\r\n";
+      
+      try {
+         list = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), new Stack<TreeItem>(), abc, constants, method_info, body, 0, code.size() - 1, localRegNames).output;
+         
+         //Declarations
+         boolean declaredRegisters[]=new boolean[regCount];
+         for(int b=0;b<declaredRegisters.length;b++){
+            declaredRegisters[b]=false;
          }
+         List<Slot> declaredSlots=new ArrayList<Slot>();
+         for(int i=0;i<list.size();i++){
+            TreeItem ti=list.get(i);
+            if(ti instanceof SetLocalTreeItem){
+               int reg=((SetLocalTreeItem)ti).regIndex;
+               if(!declaredRegisters[reg]){
+                  list.set(i, new DeclarationTreeItem(ti));
+                  declaredRegisters[reg]=true;
+               }
+            }
+            if(ti instanceof SetSlotTreeItem){
+               SetSlotTreeItem ssti=(SetSlotTreeItem)ti;
+               Slot sl=new Slot(ssti.scope,ssti.slotName);
+               if(!declaredSlots.contains(sl)){
+                  String type="*";
+                  for (int t = 0; t < body.traits.traits.length; t++) {     
+                     if(body.traits.traits[t].getMultiName(constants)==sl.multiname){
+                        if(body.traits.traits[t] instanceof TraitSlotConst){
+                           type=((TraitSlotConst)body.traits.traits[t]).getType(constants);
+                        }
+                     }                     
+                  }
+                  list.set(i, new DeclarationTreeItem(ti,type));
+                  declaredSlots.add(sl);
+               }
+            }
+         }
+      
+         s = listToString(list, constants, localRegNames);
+      } catch (Exception ex) {
+         s = "/*\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error Message: " + ex.getMessage() + "\r\n */";
+         return s;
       }
+
+
+      String sub = "";
+      int level = 0;           
+      
+      String parts[] = s.split("\r\n");
+      
+      
       try {
          Stack<String> loopStack = new Stack<String>();
          for (int p = 0; p < parts.length; p++) {
