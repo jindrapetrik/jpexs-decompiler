@@ -17,19 +17,20 @@
 package com.jpexs.asdec.abc.avm2.treemodel;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.types.Multiname;
 import java.util.HashMap;
 
 public class ClassTreeItem extends TreeItem {
 
-   public String className;
+   public Multiname className;
 
-   public ClassTreeItem(String className) {
+   public ClassTreeItem(Multiname className) {
       super(null, PRECEDENCE_PRIMARY);
       this.className = className;
    }
 
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
-      return className;
+      return className.getName(constants);
    }
 }

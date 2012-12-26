@@ -36,6 +36,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 import java.util.regex.Pattern;
 
 public class ABC {
@@ -232,6 +233,11 @@ public class ABC {
          method_info[mb.method_info].setBody(mb);
          bodyIdxFromMethodIdx[mb.method_info] = i;
       }
+      
+      /*for(ScriptInfo si:script_info){         
+         System.out.println("--------------------------------------------");
+         System.out.println(findBody(si.init_index).toString(true, false, -1, this, constants, method_info,new Stack<TreeItem>()));
+      }*/
    }
 
    public void saveToStream(OutputStream os) throws IOException {
@@ -608,7 +614,7 @@ public class ABC {
       String bodyStr = "";
       int bodyIndex = findBodyIndex(class_info[i].cinit_index);
       if (bodyIndex != -1) {
-         bodyStr = addTabs(bodies[bodyIndex].toString(pcode, true, i, this, constants, method_info, highlight), 3);
+         bodyStr = addTabs(bodies[bodyIndex].toString(pcode, true, i, this, constants, method_info, new Stack<TreeItem>(),highlight), 3);
       }
       // if (!bodyStr.equals("")) {
       toPrint = IDENT_STRING + IDENT_STRING + "{\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}";
@@ -637,7 +643,7 @@ public class ABC {
       bodyStr = "";
       bodyIndex = findBodyIndex(instance_info[i].iinit_index);
       if (bodyIndex != -1) {
-         bodyStr = addTabs(bodies[bodyIndex].toString(pcode, false, i, this, constants, method_info, highlight), 3);
+         bodyStr = addTabs(bodies[bodyIndex].toString(pcode, false, i, this, constants, method_info, new Stack<TreeItem>(),highlight), 3);
          constructorParams = method_info[instance_info[i].iinit_index].getParamStr(constants, bodies[bodyIndex], this);
       } else {
          constructorParams = method_info[instance_info[i].iinit_index].getParamStr(constants, null, this);
@@ -658,7 +664,7 @@ public class ABC {
             bodyStr = "";
             bodyIndex = findBodyIndex(tm.method_info);
             if (bodyIndex != -1) {
-               bodyStr = addTabs(bodies[bodyIndex].toString(pcode, true, i, this, constants, method_info, highlight), 3);
+               bodyStr = addTabs(bodies[bodyIndex].toString(pcode, true, i, this, constants, method_info, new Stack<TreeItem>(), highlight), 3);
             }
             toPrint = IDENT_STRING + IDENT_STRING + tm.convert(constants, method_info, this, true) + " {\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}";
          }
@@ -687,7 +693,7 @@ public class ABC {
             bodyStr = "";
             bodyIndex = findBodyIndex(tm.method_info);
             if (bodyIndex != -1) {
-               bodyStr = addTabs(bodies[bodyIndex].toString(pcode, false, i, this, constants, method_info, highlight), 3);
+               bodyStr = addTabs(bodies[bodyIndex].toString(pcode, false, i, this, constants, method_info, new Stack<TreeItem>(), highlight), 3);
             }
             toPrint = IDENT_STRING + IDENT_STRING + tm.convert(constants, method_info, this, false) + " {\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}";
          }

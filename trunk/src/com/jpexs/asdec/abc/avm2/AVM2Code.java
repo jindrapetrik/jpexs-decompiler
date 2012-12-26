@@ -59,7 +59,7 @@ import java.util.regex.Pattern;
 
 public class AVM2Code {
 
-   private static final boolean DEBUG_MODE=false;
+   private static final boolean DEBUG_MODE=true;
    public static int toSourceLimit = -1;
    public ArrayList<AVM2Instruction> code = new ArrayList<AVM2Instruction>();
    public static boolean DEBUG_REWRITE = false;
@@ -1617,8 +1617,8 @@ public class AVM2Code {
       return ret;
    }
 
-   public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames) {
-      return toSource(isStatic, classIndex, abc, constants, method_info, body, false, localRegNames);
+   public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames,Stack<TreeItem> scopeStack) {
+      return toSource(isStatic, classIndex, abc, constants, method_info, body, false, localRegNames,scopeStack);
    }
 
    public List<TreeItem> toTree(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames) {
@@ -1695,7 +1695,7 @@ public class AVM2Code {
       }
    }
    
-   public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted, HashMap<Integer, String> localRegNames) {
+   public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted, HashMap<Integer, String> localRegNames,Stack<TreeItem> scopeStack) {
       toSourceCount = 0;
       loopList = new ArrayList<Loop>();
       unknownJumps = new ArrayList<Integer>();
@@ -1717,7 +1717,7 @@ public class AVM2Code {
       }
       
       try {
-         list = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), new Stack<TreeItem>(), abc, constants, method_info, body, 0, code.size() - 1, localRegNames).output;
+         list = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, 0, code.size() - 1, localRegNames).output;
          
          //Declarations
          boolean declaredRegisters[]=new boolean[regCount];
@@ -1754,6 +1754,9 @@ public class AVM2Code {
       
          s = listToString(list, constants, localRegNames);
       } catch (Exception ex) {
+         if(DEBUG_MODE){
+            ex.printStackTrace();
+         }
          s = "/*\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error Message: " + ex.getMessage() + "\r\n */";
          return s;
       }

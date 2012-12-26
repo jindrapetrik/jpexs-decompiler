@@ -43,9 +43,9 @@ public class GetLocal0Ins extends InstructionDefinition implements GetLocalTypeI
    @Override
    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer, String> localRegNames) {
       if (isStatic) {
-         stack.push(new ClassTreeItem(abc.instance_info[classIndex].getName(constants).getName(constants)));
+         stack.push(new ClassTreeItem(abc.instance_info[classIndex].getName(constants)));
       } else {
-         stack.push(new ThisTreeItem());
+         stack.push(new ThisTreeItem(abc.instance_info[classIndex].getName(constants)));
       }
    }
 

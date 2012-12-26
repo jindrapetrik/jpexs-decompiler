@@ -17,12 +17,15 @@
 package com.jpexs.asdec.abc.avm2.treemodel;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.types.Multiname;
 import java.util.HashMap;
 
 public class ThisTreeItem extends TreeItem {
 
-   public ThisTreeItem() {
+   public Multiname className;
+   public ThisTreeItem(Multiname className) {
       super(null, PRECEDENCE_PRIMARY);
+      this.className=className;
    }
 
    @Override

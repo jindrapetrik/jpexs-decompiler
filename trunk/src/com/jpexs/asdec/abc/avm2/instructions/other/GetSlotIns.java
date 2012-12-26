@@ -21,7 +21,9 @@ import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.asdec.abc.avm2.treemodel.ClassTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.GetSlotTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.ThisTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.clauses.ExceptionTreeItem;
 import com.jpexs.asdec.abc.types.MethodInfo;
@@ -44,8 +46,11 @@ public class GetSlotIns extends InstructionDefinition {
       Multiname slotname = null;
       if (obj instanceof ExceptionTreeItem) {
          slotname = constants.constant_multiname[((ExceptionTreeItem) obj).exception.name_index];
-      } else {
-
+      } else if(obj instanceof ClassTreeItem){
+         slotname=((ClassTreeItem)obj).className;
+      } else if(obj instanceof ThisTreeItem){
+         slotname=((ThisTreeItem)obj).className;
+      }else{
          for (int t = 0; t < body.traits.traits.length; t++) {
             if (body.traits.traits[t] instanceof TraitSlotConst) {
                if (((TraitSlotConst) body.traits.traits[t]).slot_id == slotIndex) {
