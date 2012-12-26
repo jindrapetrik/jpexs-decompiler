@@ -54,7 +54,7 @@ public class Main {
    public static String file;
    public static String maskURL;
    public static SWF swf;
-   public static final String version = "1.0.0";
+   public static final String version = "1.0.1";
    public static String applicationName = "JP ActionScript Decompiler v." + version;
    public static String shortApplicationName = "ASDec v." + version;
    public static LoadingDialog loadingDialog;

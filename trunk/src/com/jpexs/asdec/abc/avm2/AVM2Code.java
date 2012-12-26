@@ -59,7 +59,7 @@ import java.util.regex.Pattern;
 
 public class AVM2Code {
 
-   private static final boolean DEBUG_MODE=true;
+   private static final boolean DEBUG_MODE=false;
    public static int toSourceLimit = -1;
    public ArrayList<AVM2Instruction> code = new ArrayList<AVM2Instruction>();
    public static boolean DEBUG_REWRITE = false;
