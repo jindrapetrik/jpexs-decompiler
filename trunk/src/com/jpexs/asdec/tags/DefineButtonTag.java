@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class DefineButtonTag extends Tag implements ASMSource {
+public class DefineButtonTag extends Tag implements ASMSource,TagName {
 
    /**
     * ID for this character
@@ -98,12 +98,12 @@ public class DefineButtonTag extends Tag implements ASMSource {
       return baos.toByteArray();
    }
 
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
+   public String getName() {
+      return "DefineButtonTag"+buttonId;
+   }
+
+   
+   
    public String toString() {
       String name = "";
       for (ExportAssetsTag eat : exportAssetsTags) {

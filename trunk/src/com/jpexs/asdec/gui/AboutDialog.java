@@ -81,7 +81,7 @@ public class AboutDialog extends JDialog {
       dateLabel.setHorizontalAlignment(SwingConstants.CENTER);
       cp.add(dateLabel);
 
-      LinkLabel wwwLabel = new LinkLabel("http://code.google.com/p/asdec/");
+      LinkLabel wwwLabel = new LinkLabel(Main.projectPage);
       wwwLabel.setForeground(Color.blue);
       wwwLabel.setPreferredSize(new Dimension(300, 25));
       wwwLabel.setHorizontalAlignment(SwingConstants.CENTER);

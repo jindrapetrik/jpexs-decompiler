@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class DefineButton2Tag extends Tag implements Container {
+public class DefineButton2Tag extends Tag implements Container,TagName {
 
    /**
     * ID for this character
@@ -165,12 +165,10 @@ public class DefineButton2Tag extends Tag implements Container {
       return actions.size();
    }
 
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
+   public String getName() {
+      return "DefineButton2Tag"+buttonId;
+   }
+   
    public String toString() {
       String name = "";
       for (ExportAssetsTag eat : exportAssetsTags) {

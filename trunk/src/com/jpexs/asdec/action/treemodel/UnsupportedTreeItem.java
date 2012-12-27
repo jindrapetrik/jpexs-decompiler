@@ -29,6 +29,6 @@ public class UnsupportedTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return "Unsupported:" + value + ";";
+      return "//Unsupported by decompiler:" + value + ";";
    }
 }

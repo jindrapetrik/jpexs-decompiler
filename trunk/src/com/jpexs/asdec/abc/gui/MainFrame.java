@@ -313,7 +313,12 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
       JMenuItem miAbout = new JMenuItem("About...");
       miAbout.setActionCommand("ABOUT");
       miAbout.addActionListener(this);
+      
+      JMenuItem miCheckUpdates = new JMenuItem("Check for updates...");
+      miCheckUpdates.setActionCommand("CHECKUPDATES");
+      miCheckUpdates.addActionListener(this);
       menuHelp.add(miAbout);
+      menuHelp.add(miCheckUpdates);
       menuBar.add(menuHelp);
 
       setJMenuBar(menuBar);
@@ -425,6 +430,12 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
 
          }
 
+      }
+      
+      if (e.getActionCommand().equals("CHECKUPDATES")) {
+         if(!Main.checkForUpdates()){
+            JOptionPane.showMessageDialog(null, "No new version available.");
+         }
       }
       if (e.getActionCommand().equals("RENAMEIDENTIFIERS")) {
          int pocet = 0;

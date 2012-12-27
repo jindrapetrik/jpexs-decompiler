@@ -578,8 +578,13 @@ public class Action {
     * @return String with Source code
     */
    public static String actionsToSource(List<Action> actions, int version) {
+      try{
       List<TreeItem> tree = actionsToTree(new HashMap<Integer, String>(), actions, version);
+      
       return treeToString(tree);
+      }catch(Exception ex){
+         return "//Decompilation error :"+ex.getLocalizedMessage();
+      }
    }
 
    /**
@@ -776,32 +781,36 @@ public class Action {
                }
             } catch (UnknownJumpException uje) {
                if ((adr2ip(actions, uje.addr, version) >= start) && (adr2ip(actions, uje.addr, version) <= end)) {
-                  currentLoop.loopContinue = uje.addr;
-                  onTrue = uje.output;
-                  List<ContinueTreeItem> contList = new ArrayList<ContinueTreeItem>();
-                  for (TreeItem ti : onTrue) {
-                     if (ti instanceof ContinueTreeItem) {
-                        contList.add((ContinueTreeItem) ti);
-                     }
-                     if (ti instanceof Block) {
-                        List<ContinueTreeItem> subcont = ((Block) ti).getContinues();
-                        for (int k = 0; k < subcont.size(); k++) {
-                           contList.add(subcont.get(k));
+                  if (currentLoop == null) {
+                     output.add(new UnsupportedTreeItem(action, "UnknownJump"));
+                  } else {
+                     currentLoop.loopContinue = uje.addr;
+                     onTrue = uje.output;
+                     List<ContinueTreeItem> contList = new ArrayList<ContinueTreeItem>();
+                     for (TreeItem ti : onTrue) {
+                        if (ti instanceof ContinueTreeItem) {
+                           contList.add((ContinueTreeItem) ti);
                         }
-                     }
-                  }
-                  for (int u = 0; u < contList.size(); u++) {
-                     if (contList.get(u) instanceof ContinueTreeItem) {
-                        if (((ContinueTreeItem) contList.get(u)).loopPos == uje.addr) {
-                           if (!((ContinueTreeItem) contList.get(u)).isKnown) {
-                              ((ContinueTreeItem) contList.get(u)).isKnown = true;
-                              ((ContinueTreeItem) contList.get(u)).loopPos = currentLoop.loopBreak;
+                        if (ti instanceof Block) {
+                           List<ContinueTreeItem> subcont = ((Block) ti).getContinues();
+                           for (int k = 0; k < subcont.size(); k++) {
+                              contList.add(subcont.get(k));
                            }
                         }
                      }
+                     for (int u = 0; u < contList.size(); u++) {
+                        if (contList.get(u) instanceof ContinueTreeItem) {
+                           if (((ContinueTreeItem) contList.get(u)).loopPos == uje.addr) {
+                              if (!((ContinueTreeItem) contList.get(u)).isKnown) {
+                                 ((ContinueTreeItem) contList.get(u)).isKnown = true;
+                                 ((ContinueTreeItem) contList.get(u)).loopPos = currentLoop.loopBreak;
+                              }
+                           }
+                        }
+                     }
+                     finalExpression = actionsToTree(registerNames, unknownJumps, loopList, jumpsOrIfs, stack, constants, actions, adr2ip(actions, uje.addr, version), jumpIp - 2, version);
+                     isFor = true;
                   }
-                  finalExpression = actionsToTree(registerNames, unknownJumps, loopList, jumpsOrIfs, stack, constants, actions, adr2ip(actions, uje.addr, version), jumpIp - 2, version);
-                  isFor = true;
                } else {
                   //throw new ConvertException("Unknown pattern: jump to nowhere", ip);
                }

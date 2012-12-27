@@ -18,21 +18,31 @@ package com.jpexs.asdec;
 
 import com.jpexs.asdec.abc.NotSameException;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
+import com.jpexs.asdec.action.TagNode;
 import com.jpexs.asdec.gui.AboutDialog;
 import com.jpexs.asdec.gui.LoadingDialog;
 import com.jpexs.asdec.gui.ModeFrame;
 import com.jpexs.asdec.gui.View;
 import com.jpexs.asdec.gui.proxy.ProxyFrame;
+import com.jpexs.asdec.helpers.Highlighting;
+import com.jpexs.asdec.tags.ASMSource;
+import com.jpexs.asdec.tags.DefineSpriteTag;
 import com.jpexs.asdec.tags.DoABCTag;
+import com.jpexs.asdec.tags.DoInitActionTag;
 import com.jpexs.asdec.tags.Tag;
+import com.jpexs.asdec.tags.TagName;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.*;
+import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
@@ -40,6 +50,11 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Main executable class
@@ -56,7 +71,9 @@ public class Main {
    public static SWF swf;
    public static final String version = "1.0.1";
    public static String applicationName = "JP ActionScript Decompiler v." + version;
-   public static String shortApplicationName = "ASDec v." + version;
+   public static String shortApplicationName = "ASDec";
+   public static String shortApplicationVerName = shortApplicationName + " v." + version;
+   public static String projectPage = "http://code.google.com/p/asdec/";
    public static LoadingDialog loadingDialog;
    public static ModeFrame modeFrame;
    private static boolean working = false;
@@ -73,7 +90,8 @@ public class Main {
     */
    public static boolean DEBUG_MODE = false;
    /**
-    * Turn off reading unsafe tags (tags which can cause problems with recompiling)
+    * Turn off reading unsafe tags (tags which can cause problems with
+    * recompiling)
     */
    public static boolean DISABLE_DANGEROUS = false;
    /**
@@ -163,14 +181,68 @@ public class Main {
 
    public static boolean exportSWF(String inFile, String outdir, boolean isPcode) throws Exception {
       SWF swf = parseSWF(inFile);
-      boolean asFound = false;
+      boolean asV3Found = false;
       for (Tag t : swf.tags) {
          if (t instanceof DoABCTag) {
             ((DoABCTag) t).abc.export(outdir, isPcode);
-            asFound = true;
+            asV3Found = true;
          }
       }
-      return asFound;
+      if (!asV3Found) {
+         List<Object> list2 = new ArrayList<Object>();
+         list2.addAll(swf.tags);
+         return exportNode(TagNode.createTagList(list2), outdir, isPcode);
+      }
+      return asV3Found;
+   }
+
+   public static boolean exportNode(List<TagNode> nodeList, String outdir, boolean isPcode) {
+      File dir = new File(outdir);
+      if (!dir.exists()) {
+         dir.mkdirs();
+      }
+      List<String> existingNames = new ArrayList<String>();
+      for (TagNode node : nodeList) {
+         String name = "";
+         if (node.tag instanceof TagName) {
+            name = ((TagName) node.tag).getName();
+         } else {
+            name = node.tag.toString();
+         }
+         int i = 1;
+         String baseName = name;
+         while (existingNames.contains(name)) {
+            i++;
+            name = baseName + "_" + i;
+         }
+         existingNames.add(name);
+         if (node.subItems.isEmpty()) {
+            if (node.tag instanceof ASMSource) {
+               try {
+                  String f = outdir + File.separatorChar + name + ".as";
+                  Main.startWork("Exporting " + f + " ...");
+                  String ret = "";
+                  if (isPcode) {
+                     ret = ((ASMSource) node.tag).getASMSource(10); //TODO:Ensure correct version here
+                  } else {
+                     List<com.jpexs.asdec.action.Action> as = ((ASMSource) node.tag).getActions(10);//TODO:Ensure correct version here
+                     com.jpexs.asdec.action.Action.setActionsAddresses(as, 0, 10);//TODO:Ensure correct version here
+                     ret = (Highlighting.stripHilights(com.jpexs.asdec.action.Action.actionsToSource(as, 10))); //TODO:Ensure correct version here
+                  }
+
+
+                  FileOutputStream fos = new FileOutputStream(f);
+                  fos.write(ret.getBytes());
+                  fos.close();
+               } catch (Exception ex) {
+               }
+            }
+         } else {
+            exportNode(node.subItems, outdir + File.separatorChar + name, isPcode);
+         }
+
+      }
+      return true;
    }
 
    private static class OpenFileWorker extends SwingWorker {
@@ -429,6 +501,7 @@ public class Main {
       View.setWinLookAndFeel();
       Configuration.load();
       if (args.length < 1) {
+         autoCheckForUpdates();
          showModeFrame();
       } else {
          if (args[0].equals("-proxy")) {
@@ -522,6 +595,7 @@ public class Main {
             printCmdLineUsage();
             System.exit(0);
          } else if (args.length == 1) {
+            autoCheckForUpdates();
             openFile(args[0]);
          } else {
             badArguments();
@@ -628,5 +702,83 @@ public class Main {
 
    public static void about() {
       (new AboutDialog()).setVisible(true);
+   }
+
+   public static void autoCheckForUpdates() {
+      Calendar lastUpdatesCheckDate = (Calendar) Configuration.getConfig("lastUpdatesCheckDate", null);
+      if ((lastUpdatesCheckDate == null) || (lastUpdatesCheckDate.getTime().getTime() < Calendar.getInstance().getTime().getTime() - 1000 * 60 * 60 * 24)) {
+         checkForUpdates();
+      }
+   }
+
+   public static boolean checkForUpdates() {
+      try {
+         Socket sock = new Socket("code.google.com", 80);
+         OutputStream os = sock.getOutputStream();
+         os.write("GET /feeds/p/asdec/downloads/basic HTTP/1.1\r\nHost: code.google.com\r\nConnection: close\r\n\r\n".getBytes());
+         BufferedReader br = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+         String s = "";
+         String response = "";
+         boolean start = false;
+         while ((s = br.readLine()) != null) {
+            if (start) {
+               response += s + "\r\n";
+            }
+            if (s.equals("")) {
+               start = true;
+            }
+         }
+         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+         Document doc = builder.parse(new ByteArrayInputStream(response.getBytes()));
+         NodeList contents = doc.getElementsByTagName("content");
+         for (int i = 0; i < contents.getLength(); i++) {
+            Node nod = contents.item(i);
+            String cont = nod.getTextContent().trim();
+            String parts[] = cont.split("\n");
+            boolean featured = false;
+            for (String part : parts) {
+               if (part.trim().equals("Featured")) {
+                  featured = true;
+                  break;
+               }
+            }
+            if ((parts.length > 4) && (featured)) {
+               String downloadName = parts[1];
+               String link = parts[parts.length - 2];
+               if (downloadName.startsWith(shortApplicationName + " version ")) {
+                  String downVersion = downloadName.substring((shortApplicationName + " version ").length());
+                  if (link.startsWith("<a href=\"")) {
+                     link = link.substring(link.indexOf("\"") + 1);
+                     link = link.substring(0, link.indexOf("\""));
+                     if (!downVersion.equals(version)) {
+                        java.awt.Desktop desktop = null;
+                        if (java.awt.Desktop.isDesktopSupported()) {
+                           desktop = java.awt.Desktop.getDesktop();
+                           if (desktop.isSupported(java.awt.Desktop.Action.BROWSE)) {
+                              if (JOptionPane.showConfirmDialog(null, "New version of " + shortApplicationName + " is available: " + downloadName + ".\r\nDo you want to go to download page?", "New version", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.YES_OPTION) {
+                                 java.net.URI uri = new java.net.URI(link);
+                                 desktop.browse(uri);
+                              }
+                           } else {
+                              desktop = null;
+                           }
+                        }
+                        if (desktop == null) {
+                           JOptionPane.showMessageDialog(null, "New version of " + shortApplicationName + " is available: " + downloadName + ".\r\nPlease go to", "New version", JOptionPane.INFORMATION_MESSAGE);
+                        }
+
+                        Configuration.setConfig("lastUpdatesCheckDate", Calendar.getInstance());
+                        return true;
+                     }
+                  }
+               }
+            }
+         }
+
+      } catch (Exception ex) {
+         return false;
+      }
+      Configuration.setConfig("lastUpdatesCheckDate", Calendar.getInstance());
+      return false;
    }
 }

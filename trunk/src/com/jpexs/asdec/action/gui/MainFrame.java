@@ -16,6 +16,8 @@
  */
 package com.jpexs.asdec.action.gui;
 
+import com.jpexs.asdec.Configuration;
+import com.jpexs.asdec.action.TagNode;
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.action.parser.ASMParser;
 import com.jpexs.asdec.action.parser.ParseException;
@@ -23,6 +25,7 @@ import com.jpexs.asdec.gui.LoadingPanel;
 import com.jpexs.asdec.gui.View;
 import com.jpexs.asdec.helpers.Highlighting;
 import com.jpexs.asdec.tags.ASMSource;
+import com.jpexs.asdec.tags.DoABCTag;
 import com.jpexs.asdec.tags.Tag;
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -36,6 +39,7 @@ import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -154,14 +158,20 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
       miSaveAs.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/save16.png")));
       miSaveAs.setActionCommand("SAVEAS");
       miSaveAs.addActionListener(this);
-      JMenuItem miExport = new JMenuItem("Export...");
+      JMenuItem miExport = new JMenuItem("Export as ActionScript...");
       miExport.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/exportas16.png")));
       miExport.setActionCommand("EXPORT");
       miExport.addActionListener(this);
+
+      JMenuItem miExportPCode = new JMenuItem("Export as PCode...");
+      miExportPCode.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/exportpc16.png")));
+      miExportPCode.setActionCommand("EXPORTPCODE");
+      miExportPCode.addActionListener(this);
       menuFile.add(miOpen);
       menuFile.add(miSave);
       menuFile.add(miSaveAs);
-      //menuFile.add(miExport);
+      menuFile.add(miExport);
+      menuFile.add(miExportPCode);
       menuFile.addSeparator();
       JMenuItem miClose = new JMenuItem("Exit");
       miClose.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/exit16.png")));
@@ -182,7 +192,12 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
       JMenuItem miAbout = new JMenuItem("About...");
       miAbout.setActionCommand("ABOUT");
       miAbout.addActionListener(this);
+
+      JMenuItem miCheckUpdates = new JMenuItem("Check for updates...");
+      miCheckUpdates.setActionCommand("CHECKUPDATES");
+      miCheckUpdates.addActionListener(this);
       menuHelp.add(miAbout);
+      menuHelp.add(miCheckUpdates);
       menuBar.add(menuHelp);
 
       setJMenuBar(menuBar);
@@ -195,8 +210,8 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
          return;
       }
       Object obj = tagTree.getLastSelectedPathComponent();
-      if (obj instanceof TagTreeItem) {
-         obj = ((TagTreeItem) obj).tag;
+      if (obj instanceof TagNode) {
+         obj = ((TagNode) obj).tag;
          if (obj instanceof ASMSource) {
             Main.startWork("Decompiling...");
             final ASMSource asm = (ASMSource) obj;
@@ -238,7 +253,7 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
       }
 
       if (e.getActionCommand().equals("SAVEHEXACTION")) {
-         TagTreeItem ti = (TagTreeItem) tagTree.getLastSelectedPathComponent();
+         TagNode ti = (TagNode) tagTree.getLastSelectedPathComponent();
          if (ti.tag instanceof ASMSource) {
             ASMSource dat = (ASMSource) ti.tag;
             FileOutputStream fos;
@@ -253,7 +268,7 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
       }
 
       if (e.getActionCommand().equals("LOADHEXACTION")) {
-         TagTreeItem ti = (TagTreeItem) tagTree.getLastSelectedPathComponent();
+         TagNode ti = (TagNode) tagTree.getLastSelectedPathComponent();
          if (ti.tag instanceof ASMSource) {
             ASMSource dat = (ASMSource) ti.tag;
             FileInputStream fis;
@@ -271,7 +286,7 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
       }
 
       if (e.getActionCommand().equals("SAVEACTION")) {
-         TagTreeItem ti = (TagTreeItem) tagTree.getLastSelectedPathComponent();
+         TagNode ti = (TagNode) tagTree.getLastSelectedPathComponent();
          if (ti.tag instanceof ASMSource) {
             ASMSource dat = (ASMSource) ti.tag;
             try {
@@ -297,6 +312,41 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
       }
       if (e.getActionCommand().equals("OPEN")) {
          Main.openFileDialog();
+      }
+      
+      if (e.getActionCommand().equals("CHECKUPDATES")) {
+         if(!Main.checkForUpdates()){
+            JOptionPane.showMessageDialog(null, "No new version available.");
+         }
+      }
+      
+      if (e.getActionCommand().equals("EXPORT") || e.getActionCommand().equals("EXPORTPCODE")) {
+         JFileChooser chooser = new JFileChooser();
+         chooser.setCurrentDirectory(new java.io.File((String) Configuration.getConfig("lastExportDir", ".")));
+         chooser.setDialogTitle("Select directory to export");
+         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+         chooser.setAcceptAllFileFilterUsed(false);
+         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            Main.startWork("Exporting...");
+            final String selFile = chooser.getSelectedFile().getAbsolutePath();
+            Configuration.setConfig("lastExportDir", chooser.getSelectedFile().getParentFile().getAbsolutePath());
+            final boolean isPcode = e.getActionCommand().equals("EXPORTPCODE");
+            (new Thread() {
+               @Override
+               public void run() {
+                  try {
+                     List<Object> list2 = new ArrayList<Object>();
+                     list2.addAll(list);
+                     Main.exportNode(TagNode.createTagList(list2), selFile, isPcode);
+                  } catch (Exception ignored) {
+                     JOptionPane.showMessageDialog(null, "Cannot write to the file");
+                  }
+                  Main.stopWork();
+               }
+            }).start();
+
+         }
+
       }
    }
 

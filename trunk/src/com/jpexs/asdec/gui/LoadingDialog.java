@@ -41,7 +41,7 @@ public class LoadingDialog extends JFrame implements ImageObserver {
     */
    public LoadingDialog() {
       setResizable(false);
-      setTitle(Main.shortApplicationName);
+      setTitle(Main.shortApplicationVerName);
       setSize(300, 150);
       setLayout(new BorderLayout());
 

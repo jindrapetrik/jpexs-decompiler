@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * Defines a sprite character
  */
-public class DefineSpriteTag extends Tag implements Container {
+public class DefineSpriteTag extends Tag implements Container,TagName {
 
    /**
     * Character ID of sprite
@@ -94,12 +94,13 @@ public class DefineSpriteTag extends Tag implements Container {
       return baos.toByteArray();
    }
 
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
    @Override
+   public String getName() {
+      return "DefineSpriteTag"+spriteId;
+   }
+
+   
+   
    public String toString() {
       String name = "";
       for (ExportAssetsTag eat : exportAssetsTags) {
