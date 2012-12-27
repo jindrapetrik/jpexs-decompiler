@@ -171,78 +171,19 @@ public class Main {
       FileInputStream fis = new FileInputStream(file);
       InputStream bis = new BufferedInputStream(fis);
       SWF locswf = new SWF(bis);
+      locswf.addEventListener(new EventListener() {
+         public void handleEvent(String event, Object data) {
+            if (event.equals("export")) {
+               startWork((String) data);
+            }
+         }
+      });
       return locswf;
    }
 
    public static void saveFile(String outfile) throws IOException {
       file = outfile;
       swf.saveTo(new FileOutputStream(outfile));
-   }
-
-   public static boolean exportSWF(String inFile, String outdir, boolean isPcode) throws Exception {
-      SWF swf = parseSWF(inFile);
-      boolean asV3Found = false;
-      for (Tag t : swf.tags) {
-         if (t instanceof DoABCTag) {
-            ((DoABCTag) t).abc.export(outdir, isPcode);
-            asV3Found = true;
-         }
-      }
-      if (!asV3Found) {
-         List<Object> list2 = new ArrayList<Object>();
-         list2.addAll(swf.tags);
-         return exportNode(TagNode.createTagList(list2), outdir, isPcode);
-      }
-      return asV3Found;
-   }
-
-   public static boolean exportNode(List<TagNode> nodeList, String outdir, boolean isPcode) {
-      File dir = new File(outdir);
-      if (!dir.exists()) {
-         dir.mkdirs();
-      }
-      List<String> existingNames = new ArrayList<String>();
-      for (TagNode node : nodeList) {
-         String name = "";
-         if (node.tag instanceof TagName) {
-            name = ((TagName) node.tag).getName();
-         } else {
-            name = node.tag.toString();
-         }
-         int i = 1;
-         String baseName = name;
-         while (existingNames.contains(name)) {
-            i++;
-            name = baseName + "_" + i;
-         }
-         existingNames.add(name);
-         if (node.subItems.isEmpty()) {
-            if (node.tag instanceof ASMSource) {
-               try {
-                  String f = outdir + File.separatorChar + name + ".as";
-                  Main.startWork("Exporting " + f + " ...");
-                  String ret = "";
-                  if (isPcode) {
-                     ret = ((ASMSource) node.tag).getASMSource(10); //TODO:Ensure correct version here
-                  } else {
-                     List<com.jpexs.asdec.action.Action> as = ((ASMSource) node.tag).getActions(10);//TODO:Ensure correct version here
-                     com.jpexs.asdec.action.Action.setActionsAddresses(as, 0, 10);//TODO:Ensure correct version here
-                     ret = (Highlighting.stripHilights(com.jpexs.asdec.action.Action.actionsToSource(as, 10))); //TODO:Ensure correct version here
-                  }
-
-
-                  FileOutputStream fos = new FileOutputStream(f);
-                  fos.write(ret.getBytes());
-                  fos.close();
-               } catch (Exception ex) {
-               }
-            }
-         } else {
-            exportNode(node.subItems, outdir + File.separatorChar + name, isPcode);
-         }
-
-      }
-      return true;
    }
 
    private static class OpenFileWorker extends SwingWorker {
@@ -542,7 +483,15 @@ public class Main {
             boolean exportOK = true;
             try {
                printHeader();
-               exportOK = exportSWF(inFile.getAbsolutePath(), outDir.getAbsolutePath(), exportFormat.equals("pcode"));
+               SWF exfile = new SWF(new FileInputStream(inFile));
+               exfile.addEventListener(new EventListener() {
+                  public void handleEvent(String event, Object data) {
+                     if (event.equals("export")) {
+                        System.out.println((String) data);
+                     }
+                  }
+               });
+               exportOK = exfile.exportActionScript(outDir.getAbsolutePath(), exportFormat.equals("pcode"));
             } catch (Exception ex) {
                exportOK = false;
                System.err.print("FAIL: Exporting Failed on Exception - ");

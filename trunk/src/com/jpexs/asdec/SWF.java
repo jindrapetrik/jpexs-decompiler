@@ -17,10 +17,16 @@
 package com.jpexs.asdec;
 
 import SevenZip.Compression.LZMA.Encoder;
+import com.jpexs.asdec.action.TagNode;
+import com.jpexs.asdec.helpers.Highlighting;
+import com.jpexs.asdec.tags.ASMSource;
+import com.jpexs.asdec.tags.DoABCTag;
 import com.jpexs.asdec.tags.Tag;
+import com.jpexs.asdec.tags.TagName;
 import com.jpexs.asdec.types.RECT;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
@@ -276,5 +282,96 @@ public class SWF {
          return false;
       }
       return true;
+   }
+   
+   
+   public boolean exportActionScript(String outdir, boolean isPcode) throws Exception {
+      boolean asV3Found = false;     
+      final EventListener evl=new EventListener(){
+
+         public void handleEvent(String event, Object data) {
+            if(event.equals("export")){
+               informListeners(event, data);
+            }
+         }
+         
+      };
+      for (Tag t : tags) {
+         if (t instanceof DoABCTag) {
+            ((DoABCTag) t).abc.addEventListener(evl);
+            ((DoABCTag) t).abc.export(outdir, isPcode);
+            asV3Found = true;
+         }
+      }
+      if (!asV3Found) {
+         List<Object> list2 = new ArrayList<Object>();
+         list2.addAll(tags);
+         return exportNode(TagNode.createTagList(list2), outdir, isPcode);
+      }
+      return asV3Found;
+   }
+
+   private boolean exportNode(List<TagNode> nodeList, String outdir, boolean isPcode) {
+      File dir = new File(outdir);
+      if (!dir.exists()) {
+         dir.mkdirs();
+      }
+      List<String> existingNames = new ArrayList<String>();
+      for (TagNode node : nodeList) {
+         String name = "";
+         if (node.tag instanceof TagName) {
+            name = ((TagName) node.tag).getName();
+         } else {
+            name = node.tag.toString();
+         }
+         int i = 1;
+         String baseName = name;
+         while (existingNames.contains(name)) {
+            i++;
+            name = baseName + "_" + i;
+         }
+         existingNames.add(name);
+         if (node.subItems.isEmpty()) {
+            if (node.tag instanceof ASMSource) {
+               try {
+                  String f = outdir + File.separatorChar + name + ".as";         
+                  informListeners("export", "Exporting " + f + " ...");
+                  String ret = "";
+                  if (isPcode) {
+                     ret = ((ASMSource) node.tag).getASMSource(10); //TODO:Ensure correct version here
+                  } else {
+                     List<com.jpexs.asdec.action.Action> as = ((ASMSource) node.tag).getActions(10);//TODO:Ensure correct version here
+                     com.jpexs.asdec.action.Action.setActionsAddresses(as, 0, 10);//TODO:Ensure correct version here
+                     ret = (Highlighting.stripHilights(com.jpexs.asdec.action.Action.actionsToSource(as, 10))); //TODO:Ensure correct version here
+                  }
+
+
+                  FileOutputStream fos = new FileOutputStream(f);
+                  fos.write(ret.getBytes());
+                  fos.close();
+               } catch (Exception ex) {
+               }
+            }
+         } else {
+            exportNode(node.subItems, outdir + File.separatorChar + name, isPcode);
+         }
+
+      }
+      return true;
+   }
+   
+   
+   protected HashSet<EventListener> listeners=new HashSet<EventListener>();
+   
+   public void addEventListener(EventListener listener){
+      listeners.add(listener);
+   }
+   public void removeEventListener(EventListener listener){
+      listeners.remove(listener);
+   }
+   protected void informListeners(String event,Object data){      
+      for(EventListener listener:listeners){
+         listener.handleEvent(event, data);
+      }
    }
 }

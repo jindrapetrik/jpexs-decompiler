@@ -335,9 +335,7 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
                @Override
                public void run() {
                   try {
-                     List<Object> list2 = new ArrayList<Object>();
-                     list2.addAll(list);
-                     Main.exportNode(TagNode.createTagList(list2), selFile, isPcode);
+                     Main.swf.exportActionScript(selFile, isPcode);
                   } catch (Exception ignored) {
                      JOptionPane.showMessageDialog(null, "Cannot write to the file");
                   }

@@ -16,6 +16,7 @@
  */
 package com.jpexs.asdec.abc;
 
+import com.jpexs.asdec.EventListener;
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
@@ -34,6 +35,7 @@ import com.jpexs.asdec.helpers.Helper;
 import com.jpexs.asdec.helpers.Highlighting;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -56,6 +58,22 @@ public class ABC {
    public static final int MINORwithDECIMAL = 17;
    public static final boolean AUTOINIT_STATIC_VARIABLES = false;
 
+   protected HashSet<EventListener> listeners=new HashSet<EventListener>();
+   
+   public void addEventListener(EventListener listener){
+      listeners.add(listener);
+   }
+   public void removeEventListener(EventListener listener){
+      listeners.remove(listener);
+   }
+   protected void informListeners(String event,Object data){
+      for(EventListener listener:listeners){
+         listener.handleEvent(event, data);
+      }
+   }
+   
+   
+   
    public int deobfuscateIdentifiers() {
       int ret = 0;
       for (int i = 1; i < constants.constant_multiname.length; i++) {
@@ -721,7 +739,7 @@ public class ABC {
          if ((packageName != null) && (!packageName.equals(""))) {
             fullName = packageName + "." + fullName;
          }
-         Main.startWork("Exporting " + (i + 1) + "/" + instance_info.length + " " + fullName + " ...");
+         informListeners("export", "Exporting " + (i + 1) + "/" + instance_info.length + " " + fullName + " ...");        
          File outDir = new File(directory + File.separatorChar + packageName.replace('.', File.separatorChar));
          if (!outDir.exists()) {
             outDir.mkdirs();
