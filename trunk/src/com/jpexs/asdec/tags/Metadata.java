@@ -17,6 +17,8 @@
 package com.jpexs.asdec.tags;
 
 import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Metadata extends Tag {
 
@@ -27,8 +29,7 @@ public class Metadata extends Tag {
       try {
          xmlMetadata = new String(data, "UTF-8");
       } catch (UnsupportedEncodingException e) {
-         // cannot get here
-         e.printStackTrace();
+         //ignore
       }
    }
 

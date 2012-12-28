@@ -17,6 +17,7 @@
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.tags.DoABCTag;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.ComboBoxModel;
 import javax.swing.event.ListDataListener;
@@ -28,6 +29,7 @@ public class ABCComboBoxModel implements ComboBoxModel {
 
    public ABCComboBoxModel(List<DoABCTag> list) {
       this.list = list;
+      Collections.sort(this.list);
    }
 
    public int getSize() {

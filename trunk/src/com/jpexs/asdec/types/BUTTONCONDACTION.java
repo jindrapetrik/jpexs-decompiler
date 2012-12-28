@@ -19,10 +19,13 @@ package com.jpexs.asdec.types;
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.tags.ASMSource;
+import com.jpexs.asdec.tags.DoInitActionTag;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Actions to execute at particular button events
@@ -113,7 +116,7 @@ public class BUTTONCONDACTION implements ASMSource {
       try {
          actions = (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
       } catch (IOException ex) {
-         ex.printStackTrace();
+         Logger.getLogger(BUTTONCONDACTION.class.getName()).log(Level.SEVERE, null, ex); 
       }
       return Action.actionsToString(actions, null, version);
    }
@@ -137,7 +140,7 @@ public class BUTTONCONDACTION implements ASMSource {
       try {
          return (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
       } catch (IOException ex) {
-         ex.printStackTrace();
+         Logger.getLogger(BUTTONCONDACTION.class.getName()).log(Level.SEVERE, null, ex); 
          return new ArrayList<Action>();
       }
    }

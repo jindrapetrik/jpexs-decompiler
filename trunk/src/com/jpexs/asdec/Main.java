@@ -35,6 +35,11 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
@@ -80,7 +85,7 @@ public class Main {
    /**
     * Debug mode = throwing an error when comparing original file and recompiled
     */
-   public static boolean DEBUG_MODE = false;
+   public static boolean debugMode = false;
    /**
     * Turn off reading unsafe tags (tags which can cause problems with
     * recompiling)
@@ -186,22 +191,17 @@ public class Main {
             swf = parseSWF(Main.file);
             FileInputStream fis = new FileInputStream(file);
             DEBUG_COPY = true;
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();            
             try {
                swf.saveTo(baos);
             } catch (NotSameException nse) {
-               if (DEBUG_MODE) {
-                  nse.printStackTrace();
-                  System.exit(0);
-               }
+               Logger.getLogger(Main.class.getName()).log(Level.FINE, null, nse);               
                JOptionPane.showMessageDialog(null, "WARNING: The SWF decompiler may have problems saving this file. Recommended usage is READ ONLY.");
             }
             DEBUG_COPY = false;
             //DEBUG_COPY=true;
          } catch (Exception ex) {
-            if (DEBUG_MODE) {
-               ex.printStackTrace();
-            }
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);  
             JOptionPane.showMessageDialog(null, "Cannot load SWF file.");
             loadingDialog.setVisible(false);
             return false;
@@ -213,7 +213,7 @@ public class Main {
             }
          }
 
-
+         
          if (false) {
             JOptionPane.showMessageDialog(null, "This SWF file does not contain any ActionScript parts");
             loadingDialog.setVisible(false);
@@ -424,7 +424,7 @@ public class Main {
       System.out.println("java -jar ASDec.jar -export pcode \"C:\\decompiled\\\" myfile.swf");
       System.out.println("java -jar ASDec.jar -dumpSWF myfile.swf");
       System.out.println("java -jar ASDec.jar -compress myfile.swf myfiledec.swf");
-      System.out.println("java -jar ASDec.jar -deccompress myfiledec.swf myfile.swf");
+      System.out.println("java -jar ASDec.jar -decompress myfiledec.swf myfile.swf");
    }
 
    /**
@@ -432,17 +432,25 @@ public class Main {
     */
    public static void main(String[] args) throws IOException {
       View.setWinLookAndFeel();
-      Configuration.load();
-      if (args.length < 1) {
+      Configuration.load();           
+      int pos=0;
+      if(args.length>0){
+         if(args[0].equals("-debug")){
+            debugMode=true;
+            pos++;
+         }
+      }
+      initLogging(debugMode);     
+      if (args.length < pos+1) {
          autoCheckForUpdates();
          showModeFrame();
-      } else {
-         if (args[0].equals("-proxy")) {
+      }else {         
+         if (args[pos].equals("-proxy")) {
             int port = 55555;
-            for (int i = 0; i < args.length; i++) {
+            for (int i = pos; i < args.length; i++) {
                if (args[i].startsWith("-P")) {
                   try {
-                     port = Integer.parseInt(args[i].substring(2));
+                     port = Integer.parseInt(args[pos].substring(2));
                   } catch (NumberFormatException nex) {
                      System.err.println("Bad port number");
                   }
@@ -454,19 +462,19 @@ public class Main {
             proxyFrame.setPort(port);
             addTrayIcon();
             switchProxy();
-         } else if (args[0].equals("-export")) {
-            if (args.length < 4) {
+         } else if (args[pos].equals("-export")) {
+            if (args.length < pos+4) {
                badArguments();
             }
-            String exportFormat = args[1];
+            String exportFormat = args[pos+1];
             if (!exportFormat.toLowerCase().equals("as")) {
                if (!exportFormat.toLowerCase().equals("pcode")) {
                   System.err.println("Invalid export format:" + exportFormat);
                   badArguments();
                }
             }
-            File outDir = new File(args[2]);
-            File inFile = new File(args[3]);
+            File outDir = new File(args[pos+2]);
+            File inFile = new File(args[pos+3]);
             if (!inFile.exists()) {
                System.err.println("Input SWF file does not exist!");
                badArguments();
@@ -494,50 +502,50 @@ public class Main {
                System.out.println("OK");
                System.exit(0);
             } else {
-               System.err.println("FAIL: No ActionScript version 3 found in the input file.");
+               System.err.println("FAIL");
                System.exit(1);
             }
-         } else if (args[0].equals("-compress")) {
-            if (args.length < 3) {
+         } else if (args[pos].equals("-compress")) {
+            if (args.length < pos+3) {
                badArguments();
             }
 
-            if (SWF.fws2cws(new FileInputStream(args[1]), new FileOutputStream(args[2]))) {
+            if (SWF.fws2cws(new FileInputStream(args[pos+1]), new FileOutputStream(args[pos+2]))) {
                System.out.println("OK");
             } else {
                System.err.println("FAIL");
             }
-         } else if (args[0].equals("-decompress")) {
+         } else if (args[pos].equals("-decompress")) {
             if (args.length < 3) {
                badArguments();
             }
 
-            if (SWF.cws2fws(new FileInputStream(args[1]), new FileOutputStream(args[2]))) {
+            if (SWF.cws2fws(new FileInputStream(args[pos+1]), new FileOutputStream(args[pos+2]))) {
                System.out.println("OK");
                System.exit(0);
             } else {
                System.err.println("FAIL");
                System.exit(1);
             }
-         } else if (args[0].equals("-dumpSWF")) {
+         } else if (args[pos].equals("-dumpSWF")) {
             if (args.length < 2) {
                badArguments();
             }
             try {
                dump_tags = true;
-               parseSWF(args[1]);
+               parseSWF(args[pos+1]);
             } catch (Exception ex) {
-               System.err.println("Dump failed due to Exception - " + ex.getLocalizedMessage());
+               Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);  
                System.exit(1);
             }
             System.exit(0);
-         } else if (args[0].equals("-help") || args[0].equals("--help") || args[0].equals("/?")) {
+         } else if (args[pos].equals("-help") || args[pos].equals("--help") || args[pos].equals("/?")) {
             printHeader();
             printCmdLineUsage();
             System.exit(0);
-         } else if (args.length == 1) {
+         } else if (args.length == pos+1) {
             autoCheckForUpdates();
-            openFile(args[0]);
+            openFile(args[pos]);
          } else {
             badArguments();
          }
@@ -721,5 +729,26 @@ public class Main {
       }
       Configuration.setConfig("lastUpdatesCheckDate", Calendar.getInstance());
       return false;
+   }
+
+   public static void initLogging(boolean debug) {
+      try {
+         Logger logger = Logger.getLogger("");
+         logger.setLevel(debug?Level.CONFIG:Level.WARNING);
+         FileHandler fileTxt = new FileHandler("log.txt");
+
+         SimpleFormatter formatterTxt = new SimpleFormatter();
+         fileTxt.setFormatter(formatterTxt);
+         logger.addHandler(fileTxt);
+         
+         if(debug){
+            ConsoleHandler conHan=new ConsoleHandler();
+            conHan.setFormatter(formatterTxt);
+            logger.addHandler(conHan);
+         }
+
+      } catch (Exception ex) {
+         throw new RuntimeException("Problems with creating the log files");
+      }
    }
 }

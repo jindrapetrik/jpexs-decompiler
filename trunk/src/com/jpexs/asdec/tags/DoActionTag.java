@@ -22,6 +22,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Instructs Flash Player to perform a list of actions when the current frame is
@@ -50,7 +52,7 @@ public class DoActionTag extends Tag implements ASMSource {
          //actions = sis.readActionList();
          actionBytes = sis.readBytes(sis.available());
       } catch (IOException e) {
-         e.printStackTrace();
+         Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, e); 
       }
    }
 
@@ -76,7 +78,7 @@ public class DoActionTag extends Tag implements ASMSource {
       try {
          actions = (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
       } catch (IOException ex) {
-         ex.printStackTrace();
+         Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex); 
       }
       return Action.actionsToString(actions, null, version);
    }
@@ -104,7 +106,7 @@ public class DoActionTag extends Tag implements ASMSource {
       try {
          return (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
       } catch (IOException ex) {
-         ex.printStackTrace();
+         Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex); 
          return new ArrayList<Action>();
       }
    }

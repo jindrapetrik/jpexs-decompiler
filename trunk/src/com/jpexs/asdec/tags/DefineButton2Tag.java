@@ -20,6 +20,7 @@ import com.jpexs.asdec.Main;
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.abc.CopyOutputStream;
+import com.jpexs.asdec.abc.gui.MainFrame;
 import com.jpexs.asdec.types.BUTTONCONDACTION;
 import com.jpexs.asdec.types.BUTTONRECORD;
 import java.io.ByteArrayInputStream;
@@ -28,6 +29,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Extends the capabilities of DefineButton by allowing any state transition to
@@ -140,7 +143,7 @@ public class DefineButton2Tag extends Tag implements Container, TagName {
          sos.writeBUTTONCONDACTIONList(actions);
          sos.close();
       } catch (IOException e) {
-         e.printStackTrace();
+         Logger.getLogger(DefineButton2Tag.class.getName()).log(Level.SEVERE, null, e); 
       }
       return baos.toByteArray();
    }

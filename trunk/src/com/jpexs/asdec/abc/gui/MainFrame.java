@@ -29,6 +29,8 @@ import java.awt.Dimension;
 import java.awt.event.*;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.table.*;
@@ -390,7 +392,8 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
          try {
             Main.saveFile(Main.file);
          } catch (IOException ex) {
-            ex.printStackTrace();
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);  
+            JOptionPane.showMessageDialog(null, "Cannot save file","Error",JOptionPane.ERROR_MESSAGE);
          }
       }
       if (e.getActionCommand().equals("SAVEAS")) {

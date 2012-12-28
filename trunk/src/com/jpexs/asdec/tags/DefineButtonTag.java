@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Defines a button character
@@ -124,7 +126,7 @@ public class DefineButtonTag extends Tag implements ASMSource, TagName {
       try {
          actions = (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
       } catch (IOException ex) {
-         ex.printStackTrace();
+         Logger.getLogger(DefineButtonTag.class.getName()).log(Level.SEVERE, null, ex); 
       }
       return Action.actionsToString(actions, null, version);
    }

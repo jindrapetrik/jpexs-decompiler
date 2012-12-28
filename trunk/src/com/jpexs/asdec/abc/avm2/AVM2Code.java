@@ -16,6 +16,7 @@
  */
 package com.jpexs.asdec.abc.avm2;
 
+import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.ABCInputStream;
 import com.jpexs.asdec.abc.CopyOutputStream;
@@ -1597,9 +1598,7 @@ public class AVM2Code {
          if (ex instanceof UnknownJumpException) {
             throw (UnknownJumpException) ex;
          }
-         if (DEBUG_MODE) {
-            ex.printStackTrace();
-         }
+         Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, null, ex);  
          throw new ConvertException(ex.getClass().getSimpleName(), ip);
       }
    }
@@ -1750,9 +1749,7 @@ public class AVM2Code {
 
          s = listToString(list, constants, localRegNames);
       } catch (Exception ex) {
-         if (DEBUG_MODE) {
-            ex.printStackTrace();
-         }
+         Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, null, ex);  
          s = "/*\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error Message: " + ex.getMessage() + "\r\n */";
          return s;
       }

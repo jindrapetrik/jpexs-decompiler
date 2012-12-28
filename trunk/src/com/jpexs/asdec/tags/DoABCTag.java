@@ -26,7 +26,7 @@ import java.io.*;
 /**
  * Defines a series of ActionScript 3 bytecodes to be executed
  */
-public class DoABCTag extends Tag {
+public class DoABCTag extends Tag implements Comparable<DoABCTag> {
 
    /**
     * ActionScript 3 bytecodes
@@ -93,5 +93,11 @@ public class DoABCTag extends Tag {
       } catch (IOException e) {
       }
       return new byte[0];
+   }
+
+   public int compareTo(DoABCTag n) {
+      int lastCmp = name.compareTo(n.name);
+      return (lastCmp != 0 ? lastCmp
+              : name.compareTo(n.name));
    }
 }

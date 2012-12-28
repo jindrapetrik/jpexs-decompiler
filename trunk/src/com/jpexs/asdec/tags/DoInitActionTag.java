@@ -24,6 +24,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DoInitActionTag extends Tag implements ASMSource, TagName {
 
@@ -111,7 +113,7 @@ public class DoInitActionTag extends Tag implements ASMSource, TagName {
       try {
          actions = (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
       } catch (IOException ex) {
-         ex.printStackTrace();
+         Logger.getLogger(DoInitActionTag.class.getName()).log(Level.SEVERE, null, ex); 
       }
       return Action.actionsToString(actions, null, version);
    }
@@ -120,7 +122,7 @@ public class DoInitActionTag extends Tag implements ASMSource, TagName {
       try {
          return (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
       } catch (IOException ex) {
-         ex.printStackTrace();
+         Logger.getLogger(DoInitActionTag.class.getName()).log(Level.SEVERE, null, ex); 
          return new ArrayList<Action>();
       }
    }

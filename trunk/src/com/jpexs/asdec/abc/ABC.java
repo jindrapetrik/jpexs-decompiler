@@ -38,6 +38,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class ABC {
@@ -58,6 +60,8 @@ public class ABC {
    public static final boolean AUTOINIT_STATIC_VARIABLES = false;
    protected HashSet<EventListener> listeners = new HashSet<EventListener>();
 
+   private static Logger logger =Logger.getLogger(ABC.class.getName()); 
+   
    public void addEventListener(EventListener listener) {
       listeners.add(listener);
    }
@@ -88,15 +92,16 @@ public class ABC {
    }
 
    public ABC(InputStream is) throws IOException {
-      ABCInputStream ais = new ABCInputStream(is);
+      ABCInputStream ais = new ABCInputStream(is);   
       minor_version = ais.readU16();
       major_version = ais.readU16();
+      logger.log(Level.FINE, "ABC minor_version: {0}, major_version: {1}", new Object[]{minor_version, major_version});
       constants = new ConstantPool();
       //constant integers
       int constant_int_pool_count = ais.readU30();
       constants.constant_int = new long[constant_int_pool_count];
-      for (int i = 1; i < constant_int_pool_count; i++) { //index 0 not used. Values 1..n-1
-         constants.constant_int[i] = ais.readS32();
+      for (int i = 1; i < constant_int_pool_count; i++) { //index 0 not used. Values 1..n-1         
+         constants.constant_int[i] = ais.readS32();         
       }
 
       //constant unsigned integers
@@ -253,7 +258,7 @@ public class ABC {
       /*for(ScriptInfo si:script_info){         
        System.out.println("--------------------------------------------");
        System.out.println(findBody(si.init_index).toString(true, false, -1, this, constants, method_info,new Stack<TreeItem>()));
-       }*/
+       }*/       
    }
 
    public void saveToStream(OutputStream os) throws IOException {
@@ -737,7 +742,9 @@ public class ABC {
          if ((packageName != null) && (!packageName.equals(""))) {
             fullName = packageName + "." + fullName;
          }
-         informListeners("export", "Exporting " + (i + 1) + "/" + instance_info.length + " " + fullName + " ...");
+         String exStr="Exporting " + (i + 1) + "/" + instance_info.length + " " + fullName + " ...";
+         informListeners("export", exStr);
+         logger.info(exStr);
          File outDir = new File(directory + File.separatorChar + packageName.replace('.', File.separatorChar));
          if (!outDir.exists()) {
             outDir.mkdirs();
