@@ -45,6 +45,7 @@ public class ActionWaitForFrame extends Action {
       return "WaitForFrame " + frame + " " + skipCount;
    }
 
+   @Override
    public byte[] getBytes(int version) {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       SWFOutputStream sos = new SWFOutputStream(baos, version);

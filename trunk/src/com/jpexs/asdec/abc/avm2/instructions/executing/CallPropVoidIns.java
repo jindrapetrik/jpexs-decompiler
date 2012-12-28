@@ -40,7 +40,7 @@ public class CallPropVoidIns extends InstructionDefinition {
    @Override
    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
       //same as callproperty
-
+/*
       int multinameIndex = (int) ((Long) arguments.get(0)).longValue();
       int argCount = (int) ((Long) arguments.get(1)).longValue();
       List passArguments = new ArrayList();
@@ -49,7 +49,7 @@ public class CallPropVoidIns extends InstructionDefinition {
       }
       //if multiname[multinameIndex] is runtime
       //pop(name) pop(ns)
-      Object obj = lda.operandStack.pop();
+      Object obj = lda.operandStack.pop();*/
       throw new RuntimeException("Call to unknown property");
       //do not push anything
    }

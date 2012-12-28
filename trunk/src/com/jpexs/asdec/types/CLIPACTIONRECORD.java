@@ -61,7 +61,7 @@ public class CLIPACTIONRECORD implements ASMSource {
     * @return String representation of events
     */
    public String getHeader() {
-      String ret = "";
+      String ret;
       ret = eventFlags.toString();
       if (eventFlags.clipEventKeyPress) {
          ret = ret.replace("keyPress", "keyPress<" + keyCode + ">");

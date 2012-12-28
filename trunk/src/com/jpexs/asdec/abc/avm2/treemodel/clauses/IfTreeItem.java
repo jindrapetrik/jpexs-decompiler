@@ -39,7 +39,7 @@ public class IfTreeItem extends TreeItem implements Block {
 
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
-      String ret = "";
+      String ret;
       ret = hilight("if(") + expression.toString(constants, localRegNames) + hilight(")") + "\r\n{\r\n";
       for (TreeItem ti : onTrue) {
          ret += ti.toStringSemicoloned(constants, localRegNames) + "\r\n";

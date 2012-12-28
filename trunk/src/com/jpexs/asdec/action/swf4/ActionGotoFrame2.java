@@ -45,6 +45,7 @@ public class ActionGotoFrame2 extends Action {
       }
    }
 
+   @Override
    public byte[] getBytes(int version) {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       SWFOutputStream sos = new SWFOutputStream(baos, version);

@@ -47,6 +47,7 @@ public class ActionSetTarget extends Action {
       return "SetTarget \"" + Helper.escapeString(targetName) + "\"";
    }
 
+   @Override
    public byte[] getBytes(int version) {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       SWFOutputStream sos = new SWFOutputStream(baos, version);

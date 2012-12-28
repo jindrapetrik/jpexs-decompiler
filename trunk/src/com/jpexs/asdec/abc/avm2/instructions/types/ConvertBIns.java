@@ -37,7 +37,7 @@ public class ConvertBIns extends InstructionDefinition implements CoerceOrConver
    @Override
    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
       Object value = lda.operandStack.pop();
-      boolean bval = false;
+      boolean bval;
       if (value instanceof Boolean) {
          bval = (Boolean) value;
       } else if (value instanceof Long) {
@@ -47,7 +47,7 @@ public class ConvertBIns extends InstructionDefinition implements CoerceOrConver
       } else {
          bval = true;
       }
-      lda.operandStack.push(new Boolean(bval));
+      lda.operandStack.push((Boolean)bval);
    }
 
    @Override

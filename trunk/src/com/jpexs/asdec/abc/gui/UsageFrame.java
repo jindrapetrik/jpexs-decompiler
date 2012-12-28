@@ -85,7 +85,7 @@ public class UsageFrame extends JFrame implements ActionListener, MouseListener 
             }
             if (usage instanceof TraitMultinameUsage) {
                TraitMultinameUsage tmu = (TraitMultinameUsage) usage;
-               int traitIndex = 0;
+               int traitIndex;
                if (tmu.parentTraitIndex > -1) {
                   traitIndex = tmu.parentTraitIndex;
                } else {

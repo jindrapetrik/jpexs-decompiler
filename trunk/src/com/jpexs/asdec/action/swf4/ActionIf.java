@@ -48,6 +48,7 @@ public class ActionIf extends Action {
       return getAddress() + getBytes(version).length + offset;
    }
 
+   @Override
    public byte[] getBytes(int version) {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       SWFOutputStream sos = new SWFOutputStream(baos, version);

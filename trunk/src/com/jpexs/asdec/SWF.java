@@ -237,7 +237,7 @@ public class SWF {
          swfHead[0] = 'C';
          fos.write(swfHead);
          fos = new DeflaterOutputStream(fos);
-         int i = 0;
+         int i;
          while ((i = fis.read()) != -1) {
             fos.write(i);
          }
@@ -269,7 +269,7 @@ public class SWF {
          }
          swfHead[0] = 'F';
          fos.write(swfHead);
-         int i = 0;
+         int i;
          while ((i = iis.read()) != -1) {
             fos.write(i);
          }
@@ -315,7 +315,7 @@ public class SWF {
       }
       List<String> existingNames = new ArrayList<String>();
       for (TagNode node : nodeList) {
-         String name = "";
+         String name;
          if (node.tag instanceof TagName) {
             name = ((TagName) node.tag).getName();
          } else {
@@ -333,7 +333,7 @@ public class SWF {
                try {
                   String f = outdir + File.separatorChar + name + ".as";
                   informListeners("export", "Exporting " + f + " ...");
-                  String ret = "";
+                  String ret;
                   if (isPcode) {
                      ret = ((ASMSource) node.tag).getASMSource(10); //TODO:Ensure correct version here
                   } else {

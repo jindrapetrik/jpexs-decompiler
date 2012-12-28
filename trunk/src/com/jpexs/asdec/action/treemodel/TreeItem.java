@@ -48,6 +48,7 @@ public abstract class TreeItem {
 
    public abstract String toString(ConstantPool constants);
 
+   @Override
    public String toString() {
       return toString(null);
    }

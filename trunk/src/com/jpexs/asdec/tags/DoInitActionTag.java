@@ -76,6 +76,7 @@ public class DoInitActionTag extends Tag implements ASMSource, TagName {
       return baos.toByteArray();
    }
 
+   @Override
    public String toString() {
       String name = "";
       for (ExportAssetsTag eat : exportAssetsTags) {

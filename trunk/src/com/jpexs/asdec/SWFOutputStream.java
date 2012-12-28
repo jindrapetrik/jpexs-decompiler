@@ -179,7 +179,7 @@ public class SWFOutputStream extends OutputStream {
       writeBuffer[7] = (byte) (value >>> 24);
       writeBuffer[6] = (byte) (value >>> 16);
       writeBuffer[5] = (byte) (value >>> 8);
-      writeBuffer[4] = (byte) (value >>> 0);
+      writeBuffer[4] = (byte) (value);
       write(writeBuffer);
    }
 
@@ -473,9 +473,9 @@ public class SWFOutputStream extends OutputStream {
    public void writeMatrix(MATRIX value) throws IOException {
       writeUB(1, value.hasScale ? 1 : 0);
       if (value.hasScale) {
-         int nBits = 0;
-         nBits = enlargeBitCountF(nBits, value.scaleX);
-         nBits = enlargeBitCountF(nBits, value.scaleY);
+         int nBits;
+         //nBits = enlargeBitCountF(nBits, value.scaleX);
+         //nBits = enlargeBitCountF(nBits, value.scaleY);
          nBits = value.scaleNBits; //FFFUUU
          writeUB(5, nBits);
          writeFB(nBits, value.scaleX);
@@ -483,17 +483,17 @@ public class SWFOutputStream extends OutputStream {
       }
       writeUB(1, value.hasRotate ? 1 : 0);
       if (value.hasRotate) {
-         int nBits = 0;
-         nBits = enlargeBitCountF(nBits, value.rotateSkew0);
-         nBits = enlargeBitCountF(nBits, value.rotateSkew1);
+         int nBits;// = 0;
+         //nBits = enlargeBitCountF(nBits, value.rotateSkew0);
+         //nBits = enlargeBitCountF(nBits, value.rotateSkew1);
          nBits = value.rotateNBits; //FFFUUU
          writeUB(5, nBits);
          writeFB(nBits, value.rotateSkew0);
          writeFB(nBits, value.rotateSkew1);
       }
-      int NTranslateBits = 0;
-      NTranslateBits = enlargeBitCountS(NTranslateBits, value.translateX);
-      NTranslateBits = enlargeBitCountS(NTranslateBits, value.translateY);
+      int NTranslateBits;
+      //NTranslateBits = enlargeBitCountS(NTranslateBits, value.translateX);
+      ///NTranslateBits = enlargeBitCountS(NTranslateBits, value.translateY);
       NTranslateBits = value.translateNBits; //FFFUUU
       writeUB(5, NTranslateBits);
 

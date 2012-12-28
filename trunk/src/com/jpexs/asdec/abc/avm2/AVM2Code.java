@@ -1073,7 +1073,7 @@ public class AVM2Code {
                   }
 
                   for (int e = 0; e < catchedExceptions.size(); e++) {
-                     int eendpos = 0;
+                     int eendpos;
                      if (e < catchedExceptions.size() - 1) {
                         eendpos = adr2pos(fixAddrAfterDebugLine(catchedExceptions.get(e + 1).target)) - 2;
                      } else {
@@ -1149,7 +1149,6 @@ public class AVM2Code {
             if (ins.definition instanceof JumpIns) { //Ifs with multiple conditions
                if (ins.operands[0] == 0) {
                   ip++;
-                  addr = pos2adr(ip);
                } else if (ins.operands[0] > 0) {
                   int secondAddr = addr + ins.getBytes().length;
                   int jumpAddr = secondAddr + ins.operands[0];
@@ -1181,14 +1180,12 @@ public class AVM2Code {
                   for (Loop l : loopList) {
                      if (l.loopBreak == jumpPos) {
                         output.add(new BreakTreeItem(ins, l.loopBreak));
-                        addr = secondAddr;
                         ip = ip + 1;
                         continue iploop;
                      }
                      if (l.loopContinue == jumpPos) {
                         l.continueCount++;
                         output.add(new ContinueTreeItem(ins, l.loopBreak));
-                        addr = secondAddr;
                         ip = ip + 1;
                         continue iploop;
                      }
@@ -1323,18 +1320,15 @@ public class AVM2Code {
                      } while (true);
                      output.add(new SwitchTreeItem(code.get(switchPos), switchBreak, switchedValue, casesList, caseCommands, defaultCommands));
                      ip = switchPos + 1;
-                     addr = pos2adr(ip);
                      continue;
                   }
 
                   if (!backJumpFound) {
                      if (jumpPos <= end + 1) { //probably skipping catch
                         ip = jumpPos;
-                        addr = pos2adr(ip);
                         continue;
                      }
                      output.add(new ContinueTreeItem(ins, jumpPos, false));
-                     addr = secondAddr;
                      ip = ip + 1;
                      if (!unknownJumps.contains(jumpPos)) {
                         unknownJumps.add(jumpPos);
@@ -1451,7 +1445,7 @@ public class AVM2Code {
                   throw new ConvertException("Unknown pattern: back jump ", ip);
                }
             } else if (ins.definition instanceof DupIns) {
-               int nextPos = 0;
+               int nextPos;
                do {
                   AVM2Instruction insAfter = code.get(ip + 1);
                   AVM2Instruction insBefore = ins;
@@ -1464,7 +1458,7 @@ public class AVM2Code {
                      insAfter = code.get(ip + 1);
                   }
 
-                  boolean isAnd = false;
+                  boolean isAnd;
                   if (insAfter.definition instanceof IfFalseIns) {
                      //stack.add("(" + stack.pop() + ")&&");
                      isAnd = true;
@@ -1496,14 +1490,12 @@ public class AVM2Code {
                         ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames);
                      }
                      ip++;
-                     addr = pos2adr(ip);
-                     break;
+                    break;
                      //}
 
                   } else {
                      ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames);
                      ip++;
-                     addr = pos2adr(ip);
                      break;
                      //throw new ConvertException("Unknown pattern after DUP:" + insComparsion.toString());
                   }
@@ -1566,14 +1558,12 @@ public class AVM2Code {
                   }
                }
                ConvertOutput onTrue = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, ip + 1, targetIns - 1 - ((hasElse || hasReturn) ? 1 : 0), localRegNames);
-               addr = targetAddr;
                ip = targetIns;
                ConvertOutput onFalse = new ConvertOutput(new Stack<TreeItem>(), new ArrayList<TreeItem>());
                if (hasElse) {
                   int finalAddr = targetAddr + code.get(targetIns - 1).operands[0];
                   int finalIns = adr2pos(finalAddr);
                   onFalse = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, targetIns, finalIns - 1, localRegNames);
-                  addr = finalAddr;
                   ip = finalIns;
                }
                if ((onTrue.stack.size() > 0) && (onFalse != null) && (onFalse.stack.size() > 0)) {
@@ -1709,11 +1699,11 @@ public class AVM2Code {
       parsedExceptions = new ArrayList<ABCException>();
       ignoredIns = new ArrayList<Integer>();
       List<TreeItem> list;
-      String s = "";
+      String s;
       HashMap<Integer, TreeItem> localRegs = new HashMap<Integer, TreeItem>();
 
       int regCount = getRegisterCount();
-      int paramCount = 0;
+      int paramCount;
       if (body.method_info != -1) {
          MethodInfo mi = method_info[body.method_info];
          paramCount = mi.param_types.length;
@@ -2120,7 +2110,7 @@ public class AVM2Code {
                      }
                      System.out.println("trueIndex:" + trueIndex);
                      System.out.println("falseIndex:" + falseIndex);
-                     boolean found = false;
+                     boolean found;
                      do {
                         found = false;
                         for (int ip = pos; ip < code.size(); ip++) {
@@ -2196,7 +2186,7 @@ public class AVM2Code {
                         }
                      } while (found);
                   } else {
-                     isSecure = false;
+                     //isSecure = false;
                   }
                }
 

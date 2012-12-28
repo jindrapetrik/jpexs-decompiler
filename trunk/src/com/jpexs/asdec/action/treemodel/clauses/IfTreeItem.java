@@ -38,8 +38,8 @@ public class IfTreeItem extends TreeItem implements Block {
 
    @Override
    public String toString(ConstantPool constants) {
-      String ret = "";
-      ret = hilight("if(") + expression.toString(constants) + hilight(")\r\n{\r\n");
+      String ret;
+      ret = hilight("if(") + expression.toString(constants) + hilight(")")+"\r\n{\r\n";
       for (TreeItem ti : onTrue) {
          ret += ti.toString(constants) + "\r\n";
       }

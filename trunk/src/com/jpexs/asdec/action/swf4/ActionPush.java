@@ -61,7 +61,7 @@ public class ActionPush extends Action {
                values.add(new RegisterNumber(sis.readUI8()));
                break;
             case 5:
-               values.add(new Boolean(sis.readUI8() == 1));
+               values.add((Boolean)(sis.readUI8() == 1));
                break;
             case 6:
                values.add(sis.readDOUBLE());
@@ -79,6 +79,7 @@ public class ActionPush extends Action {
       }
    }
 
+   @Override
    public byte[] getBytes(int version) {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       SWFOutputStream sos = new SWFOutputStream(baos, version);
@@ -142,7 +143,7 @@ public class ActionPush extends Action {
          switch (symb.type) {
             case ParsedSymbol.TYPE_STRING:
                count++;
-               if (constantPool.contains(symb.value)) {
+               if (constantPool.contains((String)symb.value)) {
                   values.add(new ConstantIndex(constantPool.indexOf(symb.value), constantPool));
                } else {
                   values.add(symb.value);

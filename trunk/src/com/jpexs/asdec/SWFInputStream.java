@@ -125,7 +125,7 @@ public class SWFInputStream extends InputStream {
     */
    public String readString() throws IOException {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      int r = 0;
+      int r;
       while (true) {
          r = read();
          if (r <= 0) {
@@ -233,7 +233,7 @@ public class SWFInputStream extends InputStream {
               + ((long) (readBuffer[7] & 255) << 24)
               + ((readBuffer[6] & 255) << 16)
               + ((readBuffer[5] & 255) << 8)
-              + ((readBuffer[4] & 255) << 0));
+              + ((readBuffer[4] & 255)));
    }
 
    /**

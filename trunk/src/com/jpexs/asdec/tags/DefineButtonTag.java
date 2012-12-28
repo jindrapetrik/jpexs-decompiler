@@ -102,6 +102,7 @@ public class DefineButtonTag extends Tag implements ASMSource, TagName {
       return "DefineButtonTag" + buttonId;
    }
 
+   @Override
    public String toString() {
       String name = "";
       for (ExportAssetsTag eat : exportAssetsTags) {

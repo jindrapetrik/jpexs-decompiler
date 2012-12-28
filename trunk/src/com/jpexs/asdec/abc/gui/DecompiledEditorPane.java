@@ -144,7 +144,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
    public void setClassIndex(int index, ABC abc) {
       setText("//Please wait...");
 
-      String hilightedCode = "";
+      String hilightedCode;
       if (!bufferedClasses.containsKey(index)) {
          hilightedCode = abc.classToString(index, true, false);
          highlights = Highlighting.getInstrHighlights(hilightedCode);

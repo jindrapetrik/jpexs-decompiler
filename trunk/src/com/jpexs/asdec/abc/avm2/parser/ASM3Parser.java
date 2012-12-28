@@ -294,7 +294,7 @@ public class ASM3Parser {
          for (LabelItem li : labelItems) {
             if (oi.label.equals(li.label)) {
                AVM2Instruction ins = code.code.get((int) oi.insPosition);
-               int relOffset = 0;
+               int relOffset;
                if (oi instanceof CaseOffsetItem) {
                   relOffset = li.offset - (int) ins.offset;
                } else {

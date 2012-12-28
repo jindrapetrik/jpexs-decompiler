@@ -37,7 +37,7 @@ public class ConvertIIns extends InstructionDefinition implements CoerceOrConver
    @Override
    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
       Object value = lda.operandStack.pop();
-      long ret = 0;
+      long ret;
       if (value == null) {
          ret = 0;
       } else if (value instanceof Boolean) {

@@ -52,6 +52,7 @@ public class ActionWith extends Action {
       Action.setActionsAddresses(actions, address + 5, version);
    }
 
+   @Override
    public byte[] getBytes(int version) {
       ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
       ByteArrayOutputStream baos = new ByteArrayOutputStream();

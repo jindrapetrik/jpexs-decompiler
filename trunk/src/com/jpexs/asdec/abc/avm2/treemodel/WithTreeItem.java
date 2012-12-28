@@ -41,7 +41,7 @@ public class WithTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
-      String ret = "";
+      String ret;
       ret = hilight("with(") + scope.toString(constants, localRegNames) + hilight(")\r\n{\r\n");
       for (TreeItem ti : items) {
          ret += ti.toString(constants, localRegNames) + "\r\n";

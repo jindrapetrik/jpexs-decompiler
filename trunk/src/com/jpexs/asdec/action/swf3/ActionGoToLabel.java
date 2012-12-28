@@ -47,6 +47,7 @@ public class ActionGoToLabel extends Action {
       return "GoToLabel \"" + Helper.escapeString(label) + "\"";
    }
 
+   @Override
    public byte[] getBytes(int version) {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       SWFOutputStream sos = new SWFOutputStream(baos, version);

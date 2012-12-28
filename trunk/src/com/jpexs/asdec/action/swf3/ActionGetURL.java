@@ -50,6 +50,7 @@ public class ActionGetURL extends Action {
       targetString = lexString(lexer);
    }
 
+   @Override
    public byte[] getBytes(int version) {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       SWFOutputStream sos = new SWFOutputStream(baos, version);

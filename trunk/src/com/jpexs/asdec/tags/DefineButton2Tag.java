@@ -128,7 +128,7 @@ public class DefineButton2Tag extends Tag implements Container, TagName {
          if (Main.DEBUG_COPY) {
             sos = new SWFOutputStream(baos, version);
          }
-         if ((actions == null) || (actions.size() == 0)) {
+         if ((actions == null) || (actions.isEmpty())) {
             sos.writeUI16(0);
          } else {
             sos.writeUI16(2 + brdata.length);
@@ -169,6 +169,7 @@ public class DefineButton2Tag extends Tag implements Container, TagName {
       return "DefineButton2Tag" + buttonId;
    }
 
+   @Override
    public String toString() {
       String name = "";
       for (ExportAssetsTag eat : exportAssetsTags) {

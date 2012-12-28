@@ -595,7 +595,7 @@ public class ABC {
       out.println(IDENT_STRING + classHeader);
       out.println(IDENT_STRING + "{");
 
-      String toPrint = "";
+      String toPrint;
       List<String> outTraits = new LinkedList<String>();
 
       //if (class_info[i].cinit_index != 0) {
@@ -654,7 +654,7 @@ public class ABC {
             }
          }
       }
-      String constructorParams = "";
+      String constructorParams;
 
       bodyStr = "";
       bodyIndex = findBodyIndex(instance_info[i].iinit_index);

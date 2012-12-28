@@ -48,6 +48,7 @@ public class LinkLabel extends JLabel {
    /**
     * Sets the text of the label.
     */
+   @Override
    public void setText(String text) {
       super.setText("<html><font color=\"#0000CF\"><u>" + text + "</u></font></html>");
       this.text = text;
@@ -63,6 +64,7 @@ public class LinkLabel extends JLabel {
    /**
     * Processes mouse events and responds to clicks.
     */
+   @Override
    protected void processMouseEvent(MouseEvent evt) {
       super.processMouseEvent(evt);
       if (evt.getID() == MouseEvent.MOUSE_CLICKED) {

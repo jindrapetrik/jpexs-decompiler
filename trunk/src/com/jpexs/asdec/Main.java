@@ -62,10 +62,10 @@ public class Main {
    public static String maskURL;
    public static SWF swf;
    public static final String version = "1.0.1";
-   public static String applicationName = "JP ActionScript Decompiler v." + version;
-   public static String shortApplicationName = "ASDec";
-   public static String shortApplicationVerName = shortApplicationName + " v." + version;
-   public static String projectPage = "http://code.google.com/p/asdec/";
+   public static final String applicationName = "JP ActionScript Decompiler v." + version;
+   public static final String shortApplicationName = "ASDec";
+   public static final String shortApplicationVerName = shortApplicationName + " v." + version;
+   public static final String projectPage = "http://code.google.com/p/asdec/";
    public static LoadingDialog loadingDialog;
    public static ModeFrame modeFrame;
    private static boolean working = false;
@@ -338,7 +338,7 @@ public class Main {
                }
                try {
                   BufferedReader br = new BufferedReader(new FileReader(f));
-                  String s = "";
+                  String s;
                   boolean packageFound = false;
                   String author = defaultAuthor;
                   String yearStr = defaultYearStr;
@@ -472,7 +472,7 @@ public class Main {
                badArguments();
             }
             commandLineMode = true;
-            boolean exportOK = true;
+            boolean exportOK;
             try {
                printHeader();
                SWF exfile = new SWF(new FileInputStream(inFile));
@@ -505,7 +505,7 @@ public class Main {
             if (SWF.fws2cws(new FileInputStream(args[1]), new FileOutputStream(args[2]))) {
                System.out.println("OK");
             } else {
-               System.err.println("FAIL");;
+               System.err.println("FAIL");
             }
          } else if (args[0].equals("-decompress")) {
             if (args.length < 3) {
@@ -658,7 +658,7 @@ public class Main {
          OutputStream os = sock.getOutputStream();
          os.write("GET /feeds/p/asdec/downloads/basic HTTP/1.1\r\nHost: code.google.com\r\nConnection: close\r\n\r\n".getBytes());
          BufferedReader br = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-         String s = "";
+         String s;
          String response = "";
          boolean start = false;
          while ((s = br.readLine()) != null) {

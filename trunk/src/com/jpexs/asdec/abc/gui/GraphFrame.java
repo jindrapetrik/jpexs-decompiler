@@ -100,7 +100,7 @@ public class GraphFrame extends JFrame {
             return 1;
          }
          used.add(part);
-         if (part.nextParts.size() == 0) {
+         if (part.nextParts.isEmpty()) {
             return 1;
          }
          int w = 0;

@@ -99,6 +99,7 @@ public class DefineSpriteTag extends Tag implements Container, TagName {
       return "DefineSpriteTag" + spriteId;
    }
 
+   @Override
    public String toString() {
       String name = "";
       for (ExportAssetsTag eat : exportAssetsTags) {

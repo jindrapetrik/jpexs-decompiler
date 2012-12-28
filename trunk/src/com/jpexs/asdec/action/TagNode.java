@@ -104,7 +104,7 @@ public class TagNode {
                continue;
             }
          }
-         if (ret.get(i).subItems.size() == 0) {
+         if (ret.get(i).subItems.isEmpty()) {
             ret.remove(i);
          }
       }

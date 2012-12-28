@@ -83,7 +83,6 @@ public class ABCOutputStream extends OutputStream {
       value = value >> 8;
       ret = (int) (value & 0xff);
       write(ret);
-      value = value >> 8;
    }
 
    public void writeS32(long value) throws IOException {
@@ -127,7 +126,7 @@ public class ABCOutputStream extends OutputStream {
       writeBuffer[3] = (byte) (value >>> 24);
       writeBuffer[2] = (byte) (value >>> 16);
       writeBuffer[1] = (byte) (value >>> 8);
-      writeBuffer[0] = (byte) (value >>> 0);
+      writeBuffer[0] = (byte) (value);
       write(writeBuffer);
    }
 

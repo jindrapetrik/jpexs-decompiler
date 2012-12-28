@@ -90,7 +90,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane {
       String text = getText();
       int lineCnt = 1;
       int lineStart = 0;
-      int lineEnd = -1;
+      int lineEnd;
       int instrCount = 0;
       int dot = -2;
       for (int i = 0; i < text.length(); i++) {
@@ -111,7 +111,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane {
          }
       }
       if (lineCnt == -1) {
-         lineEnd = text.length() - 1;
+         //lineEnd = text.length() - 1;
       }
       //select(lineStart, lineEnd);
       setCaretPosition(lineStart);

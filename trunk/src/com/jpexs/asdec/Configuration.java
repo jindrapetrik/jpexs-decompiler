@@ -82,7 +82,7 @@ public class Configuration {
       replacements = new ArrayList<Replacement>();
       try {
          BufferedReader br = new BufferedReader(new FileReader(getReplacementsFile()));
-         String s = "";
+         String s;
          while ((s = br.readLine()) != null) {
             Replacement r = new Replacement(s, br.readLine());
             replacements.add(r);

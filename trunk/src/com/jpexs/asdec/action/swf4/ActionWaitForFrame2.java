@@ -43,6 +43,7 @@ public class ActionWaitForFrame2 extends Action {
       skipCount = (int) lexLong(lexer);
    }
 
+   @Override
    public byte[] getBytes(int version) {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       SWFOutputStream sos = new SWFOutputStream(baos, version);

@@ -43,6 +43,7 @@ public class ActionStrictMode extends Action {
       mode = (int) lexLong(lexer);
    }
 
+   @Override
    public byte[] getBytes(int version) {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       SWFOutputStream sos = new SWFOutputStream(baos, version);

@@ -50,6 +50,7 @@ public class ActionGetURL2 extends Action {
       return "GetURL2 " + sendVarsMethod + " " + loadTargetFlag + " " + loadVariablesFlag;
    }
 
+   @Override
    public byte[] getBytes(int version) {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       SWFOutputStream sos = new SWFOutputStream(baos, version);

@@ -67,7 +67,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
       statusLabel.setText(s);
    }
 
-   public JTable autoResizeColWidth(JTable table, TableModel model) {
+   private JTable autoResizeColWidth(JTable table, TableModel model) {
       table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
       table.setModel(model);
 
@@ -77,7 +77,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
          int vColIndex = i;
          DefaultTableColumnModel colModel = (DefaultTableColumnModel) table.getColumnModel();
          TableColumn col = colModel.getColumn(vColIndex);
-         int width = 0;
+         int width;
 
          // Get width of column header
          TableCellRenderer renderer = col.getHeaderRenderer();

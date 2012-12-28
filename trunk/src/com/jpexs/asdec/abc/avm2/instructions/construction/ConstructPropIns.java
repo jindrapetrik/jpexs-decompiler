@@ -39,12 +39,12 @@ public class ConstructPropIns extends InstructionDefinition {
 
    @Override
    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-      int multinameIndex = (int) ((Long) arguments.get(0)).longValue();
+      /*int multinameIndex = (int) ((Long) arguments.get(0)).longValue();
       int argCount = (int) ((Long) arguments.get(1)).longValue();
       List passArguments = new ArrayList();
       for (int i = argCount - 1; i >= 0; i--) {
          passArguments.set(i, lda.operandStack.pop());
-      }
+      }*/
       //if multiname[multinameIndex] is runtime
       //pop(name) pop(ns)
       throw new RuntimeException("Cannot construct property");

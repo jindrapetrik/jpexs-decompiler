@@ -49,8 +49,8 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
    public void load(TraitSlotConst trait, ABC abc) {
       this.abc = abc;
       this.trait = trait;
-      String s = "";
-      String typeStr = "*";
+      String s;
+      String typeStr;
       if (trait.type_index > 0) {
          typeStr = "m[" + trait.type_index + "]\"" + Helper.escapeString(abc.constants.constant_multiname[trait.type_index].toString(abc.constants)) + "\"";
       } else {

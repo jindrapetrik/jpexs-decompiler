@@ -99,7 +99,7 @@ public class InstructionDefinition {
 
    protected String resolveMultinameNoPop(int pos, Stack<TreeItem> stack, ConstantPool constants, int multinameIndex, AVM2Instruction ins) {
       String ns = "";
-      String name = "";
+      String name;
       if (constants.constant_multiname[multinameIndex].needsNs()) {
          ns = "[" + stack.get(pos) + "]";
          pos++;

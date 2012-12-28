@@ -342,7 +342,7 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
             FileOutputStream fos = new FileOutputStream(f);
             fos.write(hdr);
             byte buf[] = new byte[2048];
-            int count = 0;
+            int count;
             while ((count = data.read(buf)) > 0) {
                fos.write(buf, 0, count);
             }

@@ -38,13 +38,13 @@ public class CallIns extends InstructionDefinition {
 
    @Override
    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-      int argCount = (int) ((Long) arguments.get(0)).longValue();
+      /*int argCount = (int) ((Long) arguments.get(0)).longValue();
       List passArguments = new ArrayList();
       for (int i = argCount - 1; i >= 0; i--) {
          passArguments.set(i, lda.operandStack.pop());
       }
       Object receiver = lda.operandStack.pop();
-      Object function = lda.operandStack.pop();
+      Object function = lda.operandStack.pop();*/
       throw new RuntimeException("Call to unknown function");
       //push(result)
    }

@@ -53,7 +53,7 @@ public class InstanceInfo {
       if (super_index > 0) {
          supIndexStr = " extends " + constants.constant_multiname[super_index].getName(constants);////+" flags="+flags+" protectedNS="+protectedNS+" interfaces="+Helper.intArrToString(interfaces)+" method_index="+iinit_index
       }
-      String modifiers = "";
+      String modifiers;
       Namespace ns = constants.constant_multiname[name_index].getNamespace(constants);
       modifiers = ns.getPrefix(constants);
       if (!modifiers.equals("")) {

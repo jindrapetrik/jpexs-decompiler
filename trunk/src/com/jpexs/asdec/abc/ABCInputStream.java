@@ -97,11 +97,11 @@ public class ABCInputStream extends InputStream {
    }
 
    public int readU32() throws IOException {
-      int i = 0;
+      int i;
       int ret = 0;
       int bytePos = 0;
       int byteCount = 0;
-      boolean nextByte = false;
+      boolean nextByte;
       do {
          i = read();
          nextByte = (i >> 7) == 1;
@@ -132,11 +132,11 @@ public class ABCInputStream extends InputStream {
    }
 
    public long readS32() throws IOException {
-      int i = 0;
+      int i;
       long ret = 0;
       int bytePos = 0;
       int byteCount = 0;
-      boolean nextByte = false;
+      boolean nextByte;
       do {
          i = read();
          nextByte = (i >> 7) == 1;
@@ -168,7 +168,7 @@ public class ABCInputStream extends InputStream {
               + ((long) (readBuffer[3] & 255) << 24)
               + ((readBuffer[2] & 255) << 16)
               + ((readBuffer[1] & 255) << 8)
-              + ((readBuffer[0] & 255) << 0));
+              + ((readBuffer[0] & 255)));
    }
 
    public double readDouble() throws IOException {

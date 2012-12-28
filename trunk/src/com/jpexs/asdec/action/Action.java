@@ -350,7 +350,7 @@ public class Action {
     */
    public static String actionsToString(List<Action> list, List<Long> importantOffsets, List<String> constantPool, int version) {
       String ret = "";
-      long offset = 0;
+      long offset;
       if (importantOffsets == null) {
          setActionsAddresses(list, 0, version);
          importantOffsets = getActionsAllRefs(list, version);
@@ -437,7 +437,7 @@ public class Action {
     */
    public static long ip2adr(List<Action> actions, int ip, int version) {
       if (ip >= actions.size()) {
-         if (actions.size() == 0) {
+         if (actions.isEmpty()) {
             return 0;
          }
          return actions.get(actions.size() - 1).getAddress() + actions.get(actions.size() - 1).getBytes(version).length;
@@ -715,7 +715,6 @@ public class Action {
             if (!unknownJumps.contains(((ActionJump) action).getRef(version))) {
                unknownJumps.add(((ActionJump) action).getRef(version));
             }
-            ip = ip + 1;
             break;
 
          } else if (action instanceof ActionIf) {
@@ -776,7 +775,7 @@ public class Action {
             try {
 
                onTrue = actionsToTree(registerNames, unknownJumps, loopList, jumpsOrIfs, trueStack, constants, actions, ip + 1, jumpIp - 1 - (hasElse || isWhile || isForIn ? 1 : 0), version);
-               if (onTrue.size() == 0 && trueStack.size() > 0) {
+               if (onTrue.isEmpty() && trueStack.size() > 0) {
                   isTernar = true;
                }
             } catch (UnknownJumpException uje) {
