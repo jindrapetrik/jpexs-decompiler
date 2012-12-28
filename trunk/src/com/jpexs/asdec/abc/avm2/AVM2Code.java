@@ -59,7 +59,7 @@ import java.util.regex.Pattern;
 
 public class AVM2Code {
 
-   private static final boolean DEBUG_MODE=false;
+   private static final boolean DEBUG_MODE = false;
    public static int toSourceLimit = -1;
    public ArrayList<AVM2Instruction> code = new ArrayList<AVM2Instruction>();
    public static boolean DEBUG_REWRITE = false;
@@ -529,8 +529,7 @@ public class AVM2Code {
    };
    //endoflist
    public static InstructionDefinition instructionSetByCode[] = buildInstructionSetByCode();
-   
-   public boolean hideTemporaryRegisters=true;
+   public boolean hideTemporaryRegisters = true;
 
    private static InstructionDefinition[] buildInstructionSetByCode() {
       InstructionDefinition result[] = new InstructionDefinition[256];
@@ -1492,7 +1491,13 @@ public class AVM2Code {
                            }
                         }
                      }
-                     ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames);
+                     if(!isKilled(reg, ip, end)){
+                        TreeItem v = (TreeItem) stack.pop();
+                        stack.push(new LocalRegTreeItem(ins, reg,v));
+                        stack.push(v);
+                     }else{
+                        ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames);                     
+                     }
                      ip++;
                      addr = pos2adr(ip);
                      break;
@@ -1550,6 +1555,11 @@ public class AVM2Code {
                            break;
                         }
                      }
+
+                     if (jumpPos > ip && jumpPos < targetIns - 1) {
+                        hasElse = false;
+                     }
+
                      if (hasElse) {
                         if (adr2pos(jumpAddr) > end + 1) {
                            hasElse = false;
@@ -1590,8 +1600,7 @@ public class AVM2Code {
          if (debugMode) {
             System.out.println("CLOSE SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
          }
-         if(hideTemporaryRegisters)
-         {
+         if (hideTemporaryRegisters) {
             clearTemporaryRegisters(output);
          }
          return new ConvertOutput(stack, output);
@@ -1601,8 +1610,7 @@ public class AVM2Code {
          if (ex instanceof UnknownJumpException) {
             throw (UnknownJumpException) ex;
          }
-         if(DEBUG_MODE)
-         {
+         if (DEBUG_MODE) {
             ex.printStackTrace();
          }
          throw new ConvertException(ex.getClass().getSimpleName(), ip);
@@ -1617,8 +1625,8 @@ public class AVM2Code {
       return ret;
    }
 
-   public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames,Stack<TreeItem> scopeStack) {
-      return toSource(isStatic, classIndex, abc, constants, method_info, body, false, localRegNames,scopeStack);
+   public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames, Stack<TreeItem> scopeStack) {
+      return toSource(isStatic, classIndex, abc, constants, method_info, body, false, localRegNames, scopeStack);
    }
 
    public List<TreeItem> toTree(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames) {
@@ -1668,7 +1676,8 @@ public class AVM2Code {
       return ret;
    }
 
-   private class Slot{
+   private class Slot {
+
       public TreeItem scope;
       public Multiname multiname;
 
@@ -1679,12 +1688,12 @@ public class AVM2Code {
 
       @Override
       public boolean equals(Object obj) {
-         if(obj instanceof Slot){
-            return (((Slot)obj).scope.getThroughRegister()==scope.getThroughRegister())
-                    &&(((Slot)obj).multiname==multiname);
+         if (obj instanceof Slot) {
+            return (((Slot) obj).scope.getThroughRegister() == scope.getThroughRegister())
+                    && (((Slot) obj).multiname == multiname);
          }
          return false;
-      }            
+      }
 
       @Override
       public int hashCode() {
@@ -1694,8 +1703,8 @@ public class AVM2Code {
          return hash;
       }
    }
-   
-   public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted, HashMap<Integer, String> localRegNames,Stack<TreeItem> scopeStack) {
+
+   public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted, HashMap<Integer, String> localRegNames, Stack<TreeItem> scopeStack) {
       toSourceCount = 0;
       loopList = new ArrayList<Loop>();
       unknownJumps = new ArrayList<Integer>();
@@ -1705,8 +1714,8 @@ public class AVM2Code {
       List<TreeItem> list;
       String s = "";
       HashMap<Integer, TreeItem> localRegs = new HashMap<Integer, TreeItem>();
-      
-       int regCount = getRegisterCount();
+
+      int regCount = getRegisterCount();
       int paramCount = 0;
       if (body.method_info != -1) {
          MethodInfo mi = method_info[body.method_info];
@@ -1715,46 +1724,46 @@ public class AVM2Code {
             paramCount++;
          }
       }
-      
+
       try {
          list = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, 0, code.size() - 1, localRegNames).output;
-         
+
          //Declarations
-         boolean declaredRegisters[]=new boolean[regCount];
-         for(int b=0;b<declaredRegisters.length;b++){
-            declaredRegisters[b]=false;
+         boolean declaredRegisters[] = new boolean[regCount];
+         for (int b = 0; b < declaredRegisters.length; b++) {
+            declaredRegisters[b] = false;
          }
-         List<Slot> declaredSlots=new ArrayList<Slot>();
-         for(int i=0;i<list.size();i++){
-            TreeItem ti=list.get(i);
-            if(ti instanceof SetLocalTreeItem){
-               int reg=((SetLocalTreeItem)ti).regIndex;
-               if(!declaredRegisters[reg]){
+         List<Slot> declaredSlots = new ArrayList<Slot>();
+         for (int i = 0; i < list.size(); i++) {
+            TreeItem ti = list.get(i);
+            if (ti instanceof SetLocalTreeItem) {
+               int reg = ((SetLocalTreeItem) ti).regIndex;
+               if (!declaredRegisters[reg]) {
                   list.set(i, new DeclarationTreeItem(ti));
-                  declaredRegisters[reg]=true;
+                  declaredRegisters[reg] = true;
                }
             }
-            if(ti instanceof SetSlotTreeItem){
-               SetSlotTreeItem ssti=(SetSlotTreeItem)ti;
-               Slot sl=new Slot(ssti.scope,ssti.slotName);
-               if(!declaredSlots.contains(sl)){
-                  String type="*";
-                  for (int t = 0; t < body.traits.traits.length; t++) {     
-                     if(body.traits.traits[t].getMultiName(constants)==sl.multiname){
-                        if(body.traits.traits[t] instanceof TraitSlotConst){
-                           type=((TraitSlotConst)body.traits.traits[t]).getType(constants);
+            if (ti instanceof SetSlotTreeItem) {
+               SetSlotTreeItem ssti = (SetSlotTreeItem) ti;
+               Slot sl = new Slot(ssti.scope, ssti.slotName);
+               if (!declaredSlots.contains(sl)) {
+                  String type = "*";
+                  for (int t = 0; t < body.traits.traits.length; t++) {
+                     if (body.traits.traits[t].getMultiName(constants) == sl.multiname) {
+                        if (body.traits.traits[t] instanceof TraitSlotConst) {
+                           type = ((TraitSlotConst) body.traits.traits[t]).getType(constants);
                         }
-                     }                     
+                     }
                   }
-                  list.set(i, new DeclarationTreeItem(ti,type));
+                  list.set(i, new DeclarationTreeItem(ti, type));
                   declaredSlots.add(sl);
                }
             }
          }
-      
+
          s = listToString(list, constants, localRegNames);
       } catch (Exception ex) {
-         if(DEBUG_MODE){
+         if (DEBUG_MODE) {
             ex.printStackTrace();
          }
          s = "/*\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error Message: " + ex.getMessage() + "\r\n */";
@@ -1763,11 +1772,11 @@ public class AVM2Code {
 
 
       String sub = "";
-      int level = 0;           
-      
+      int level = 0;
+
       String parts[] = s.split("\r\n");
-      
-      
+
+
       try {
          Stack<String> loopStack = new Stack<String>();
          for (int p = 0; p < parts.length; p++) {
