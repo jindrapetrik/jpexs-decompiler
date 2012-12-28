@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2011 JPEXS
+ *  Copyright (C) 2012 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -14,25 +14,17 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.asdec.tags;
+package com.jpexs.asdec.abc.gui;
 
-import java.io.UnsupportedEncodingException;
+/**
+ *
+ * @author JPEXS
+ */
+public class TreeLeafClass {
 
-public class Metadata extends Tag {
+   public int classIndex;
 
-   private String xmlMetadata;
-
-   public Metadata(byte[] data, long pos) {
-      super(77, data, pos);
-      try {
-         xmlMetadata = new String(data, "UTF-8");
-      } catch (UnsupportedEncodingException e) {
-         //ignore
-      }
-   }
-
-   @Override
-   public String toString() {
-      return "Metadata";
+   public TreeLeafClass(int classIndex) {
+      this.classIndex = classIndex;
    }
 }

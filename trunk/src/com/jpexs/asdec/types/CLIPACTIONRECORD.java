@@ -19,7 +19,6 @@ package com.jpexs.asdec.types;
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.tags.ASMSource;
-import com.jpexs.asdec.tags.DoInitActionTag;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -83,7 +82,7 @@ public class CLIPACTIONRECORD implements ASMSource {
       try {
          actions = (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
       } catch (IOException ex) {
-         Logger.getLogger(CLIPACTIONRECORD.class.getName()).log(Level.SEVERE, null, ex); 
+         Logger.getLogger(CLIPACTIONRECORD.class.getName()).log(Level.SEVERE, null, ex);
       }
       return Action.actionsToString(actions, null, version);
    }
@@ -101,7 +100,7 @@ public class CLIPACTIONRECORD implements ASMSource {
       try {
          return (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
       } catch (IOException ex) {
-         Logger.getLogger(CLIPACTIONRECORD.class.getName()).log(Level.SEVERE, null, ex); 
+         Logger.getLogger(CLIPACTIONRECORD.class.getName()).log(Level.SEVERE, null, ex);
          return new ArrayList<Action>();
       }
    }

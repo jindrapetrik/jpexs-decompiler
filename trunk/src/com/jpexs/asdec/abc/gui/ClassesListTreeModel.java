@@ -17,6 +17,7 @@
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.abc.ABC;
+import java.util.HashMap;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -24,20 +25,20 @@ import javax.swing.tree.TreePath;
 class ClassIndexVisitor implements TreeVisitor {
 
    private TreeElement found = null;
-   private int classIndex;
+   private Object item;
 
-   public ClassIndexVisitor(int classIndex) {
-      this.classIndex = classIndex;
+   public ClassIndexVisitor(Object item) {
+      this.item = item;
    }
 
    public void onBranch(TreeElement branch) {
-      if (branch.getClassIndex() == classIndex) {
+      if (branch.getItem() == item) {
          found = branch;
       }
    }
 
    public void onLeaf(TreeElement leaf) {
-      if (leaf.getClassIndex() == classIndex) {
+      if (leaf.getItem() == item) {
          found = leaf;
       }
    }
@@ -57,17 +58,23 @@ public class ClassesListTreeModel implements TreeModel {
       for (int i = 0; i < abc.instance_info.length; i++) {
          String packageName = abc.instance_info[i].getName(abc.constants).getNamespace(abc.constants).getName(abc.constants);
          String className = abc.instance_info[i].getName(abc.constants).getName(abc.constants);
-         String full = packageName + "." + className;
-         classTree.add(className, packageName, i);
+         //String full = packageName + "." + className;
+         classTree.add(className, packageName, new TreeLeafClass(i));
+      }
+      HashMap<String, String> ns = abc.namespacesToString();
+      for (String n : ns.keySet()) {
+         String nsName = n.substring(n.lastIndexOf(".") + 1);
+         String packageName = n.substring(0, n.lastIndexOf("."));
+         classTree.add(nsName, packageName, new TreeLeafString(ns.get(n)));
       }
    }
 
-   public int getClassIndexByPath(String fullPath) {
+   public Object getItemByPath(String fullPath) {
       TreeElement elem = classTree.get(fullPath);
       if (elem == null) {
          return -1;
       }
-      return elem.getClassIndex();
+      return elem.getItem();
    }
 
    public TreeElement getElementByClassIndex(int classIndex) {

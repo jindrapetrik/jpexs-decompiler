@@ -62,20 +62,29 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
       if (tp == null) {
          return;
       }
-      final int classIndex = tp.getClassIndex();
-      if (classIndex != -1) {
-         if (!Main.isWorking()) {
-            Main.startWork("Decompiling class...");
-            (new Thread() {
-               @Override
-               public void run() {
-                  Main.abcMainFrame.navigator.setClassIndex(classIndex);
-                  Main.abcMainFrame.decompiledTextArea.setClassIndex(classIndex, abc);
-                  Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.setText("");
-                  Main.stopWork();
-               }
-            }).start();
+      Object item = tp.getItem();
+      if (item instanceof TreeLeafString) {
+         Main.abcMainFrame.navigator.setClassIndex(-1);
+         Main.abcMainFrame.decompiledTextArea.setClassIndex(-1, abc);
+         Main.abcMainFrame.decompiledTextArea.setText(((TreeLeafString) item).str);
+      }
+      if (item instanceof TreeLeafClass) {
+         final int classIndex = ((TreeLeafClass) item).classIndex;
+         if (classIndex != -1) {
+            if (!Main.isWorking()) {
+               Main.startWork("Decompiling class...");
+               (new Thread() {
+                  @Override
+                  public void run() {
+                     Main.abcMainFrame.navigator.setClassIndex(classIndex);
+                     Main.abcMainFrame.decompiledTextArea.setClassIndex(classIndex, abc);
+                     Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.setText("");
+                     Main.stopWork();
+                  }
+               }).start();
+            }
          }
       }
+
    }
 }

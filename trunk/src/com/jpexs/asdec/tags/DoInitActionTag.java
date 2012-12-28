@@ -113,7 +113,7 @@ public class DoInitActionTag extends Tag implements ASMSource, TagName {
       try {
          actions = (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
       } catch (IOException ex) {
-         Logger.getLogger(DoInitActionTag.class.getName()).log(Level.SEVERE, null, ex); 
+         Logger.getLogger(DoInitActionTag.class.getName()).log(Level.SEVERE, null, ex);
       }
       return Action.actionsToString(actions, null, version);
    }
@@ -122,7 +122,7 @@ public class DoInitActionTag extends Tag implements ASMSource, TagName {
       try {
          return (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
       } catch (IOException ex) {
-         Logger.getLogger(DoInitActionTag.class.getName()).log(Level.SEVERE, null, ex); 
+         Logger.getLogger(DoInitActionTag.class.getName()).log(Level.SEVERE, null, ex);
          return new ArrayList<Action>();
       }
    }

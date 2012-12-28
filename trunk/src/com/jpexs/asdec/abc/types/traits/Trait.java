@@ -42,16 +42,20 @@ public class Trait {
    public static final int TRAIT_FUNCTION = 5;
    public static final int TRAIT_CONST = 6;
 
-   public String getModifiers(ConstantPool constants, boolean isStatic) {
+   public String getModifiers(ABC abc, boolean isStatic) {
       String ret = "";
       if ((kindFlags & ATTR_Override) > 0) {
          ret += "override";
       }
-      Multiname m = getMultiName(constants);
+      Multiname m = getMultiName(abc.constants);
       if (m != null) {
-         Namespace ns = m.getNamespace(constants);
+         int v = abc.nsValueToName(m.namespace_index);
+         if (v > -1) {
+            ret += " " + abc.constants.constant_multiname[v].getName(abc.constants);
+         }
+         Namespace ns = m.getNamespace(abc.constants);
          if (ns != null) {
-            ret += " " + ns.getPrefix(constants);
+            ret += " " + ns.getPrefix(abc);
          }
       }
       if (isStatic) {
@@ -74,12 +78,12 @@ public class Trait {
       return abc.constants.constant_multiname[name_index].toString(abc.constants) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
    }
 
-   public String convert(ConstantPool constants, MethodInfo[] methodInfo, ABC abc) {
-      return convert(constants, methodInfo, abc, false);
+   public String convert(MethodInfo[] methodInfo, ABC abc) {
+      return convert(methodInfo, abc, false);
    }
 
-   public String convert(ConstantPool constants, MethodInfo[] methodInfo, ABC abc, boolean isStatic) {
-      return constants.constant_multiname[name_index].toString(constants) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
+   public String convert(MethodInfo[] methodInfo, ABC abc, boolean isStatic) {
+      return abc.constants.constant_multiname[name_index].toString(abc.constants) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
    }
 
    public Multiname getMultiName(ConstantPool constants) {

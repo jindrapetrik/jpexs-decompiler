@@ -16,6 +16,7 @@
  */
 package com.jpexs.asdec.abc.types;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 
 public class Namespace {
@@ -58,7 +59,7 @@ public class Namespace {
       return kindStr + (nameStr.equals("") ? "" : " " + nameStr);
    }
 
-   public String getPrefix(ConstantPool constants) {
+   public String getPrefix(ABC abc) {
       String kindStr = "?";
       for (int k = 0; k < nameSpaceKinds.length; k++) {
          if (nameSpaceKinds[k] == kind) {

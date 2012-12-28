@@ -25,13 +25,13 @@ public class TreeElement {
    private SortedMap<String, TreeElement> leafs;
    private String name;
    private String path;
-   private int classIndex;
+   private Object item;
    private TreeElement parent;
 
-   public TreeElement(String name, String path, int classIndex, TreeElement parent) {
+   public TreeElement(String name, String path, Object item, TreeElement parent) {
       this.name = name;
       this.path = path;
-      this.classIndex = classIndex;
+      this.item = item;
       this.parent = parent;
       branches = new TreeMap<String, TreeElement>();
       leafs = new TreeMap<String, TreeElement>();
@@ -58,8 +58,8 @@ public class TreeElement {
       return new TreePath(pathList.toArray());
    }
 
-   public int getClassIndex() {
-      return classIndex;
+   public Object getItem() {
+      return item;
    }
 
    @Override
@@ -76,8 +76,8 @@ public class TreeElement {
       return branch;
    }
 
-   void addLeaf(String pathElement, int classIndex) {
-      TreeElement child = new TreeElement(pathElement, path + "." + pathElement, classIndex, this);
+   void addLeaf(String pathElement, Object item) {
+      TreeElement child = new TreeElement(pathElement, path + "." + pathElement, item, this);
       leafs.put(pathElement, child);
    }
 

@@ -34,6 +34,7 @@ import com.jpexs.asdec.helpers.Helper;
 import com.jpexs.asdec.helpers.Highlighting;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,9 +60,8 @@ public class ABC {
    public static final int MINORwithDECIMAL = 17;
    public static final boolean AUTOINIT_STATIC_VARIABLES = false;
    protected HashSet<EventListener> listeners = new HashSet<EventListener>();
+   private static Logger logger = Logger.getLogger(ABC.class.getName());
 
-   private static Logger logger =Logger.getLogger(ABC.class.getName()); 
-   
    public void addEventListener(EventListener listener) {
       listeners.add(listener);
    }
@@ -92,7 +92,7 @@ public class ABC {
    }
 
    public ABC(InputStream is) throws IOException {
-      ABCInputStream ais = new ABCInputStream(is);   
+      ABCInputStream ais = new ABCInputStream(is);
       minor_version = ais.readU16();
       major_version = ais.readU16();
       logger.log(Level.FINE, "ABC minor_version: {0}, major_version: {1}", new Object[]{minor_version, major_version});
@@ -101,7 +101,7 @@ public class ABC {
       int constant_int_pool_count = ais.readU30();
       constants.constant_int = new long[constant_int_pool_count];
       for (int i = 1; i < constant_int_pool_count; i++) { //index 0 not used. Values 1..n-1         
-         constants.constant_int[i] = ais.readS32();         
+         constants.constant_int[i] = ais.readS32();
       }
 
       //constant unsigned integers
@@ -254,11 +254,12 @@ public class ABC {
          method_info[mb.method_info].setBody(mb);
          bodyIdxFromMethodIdx[mb.method_info] = i;
       }
-
+      loadNamespaceMap();
       /*for(ScriptInfo si:script_info){         
        System.out.println("--------------------------------------------");
        System.out.println(findBody(si.init_index).toString(true, false, -1, this, constants, method_info,new Stack<TreeItem>()));
-       }*/       
+       System.out.println("sitrait:"+si.traits.toString(this));
+       }*/
    }
 
    public void saveToStream(OutputStream os) throws IOException {
@@ -573,6 +574,51 @@ public class ABC {
          }
       }
    }
+   /* Map from multiname index of namespace value to namespace name**/
+   private HashMap<Integer, Integer> namespaceMap;
+
+   private void loadNamespaceMap() {
+      namespaceMap = new HashMap<Integer, Integer>();
+      for (ScriptInfo si : script_info) {
+         for (Trait t : si.traits.traits) {
+            if (t instanceof TraitSlotConst) {
+               TraitSlotConst s = ((TraitSlotConst) t);
+               if (s.value_kind == ValueKind.CONSTANT_Namespace) {
+                  namespaceMap.put(s.value_index, s.name_index);
+               }
+            }
+         }
+      }
+   }
+
+   public int nsValueToName(int value_index) {
+      if (namespaceMap.containsKey(value_index)) {
+         return namespaceMap.get(value_index);
+      } else {
+         return -1;
+      }
+   }
+
+   public HashMap<String, String> namespacesToString() {
+      HashMap<String, String> ret = new HashMap<String, String>();
+      for (Integer value_index : namespaceMap.keySet()) {
+         int name_index = namespaceMap.get(value_index);
+         String n = "";
+         String packageName = constants.constant_multiname[name_index].getNamespace(constants).getName(constants);
+         n += ("package " + packageName + "\r\n");
+         n += ("{\r\n");
+         Namespace ns = constants.constant_multiname[name_index].getNamespace(constants);
+         String modifiers = ns.getPrefix(this);
+         if (!modifiers.equals("")) {
+            modifiers += " ";
+         }
+         String nsname = constants.constant_multiname[name_index].getName(constants);
+         n += IDENT_STRING + modifiers + "namespace " + nsname + "=\"" + Helper.escapeString(constants.constant_namespace[value_index].getName(constants)) + "\";\r\n";
+         n += ("}\r\n");
+         ret.put(packageName + "." + nsname, n);
+      }
+      return ret;
+   }
 
    public String classToString(int i, boolean highlight, boolean pcode) {
       if (!highlight) {
@@ -593,7 +639,7 @@ public class ABC {
       out.println();
 
       //class header
-      String classHeader = instance_info[i].getClassHeaderStr(constants);
+      String classHeader = instance_info[i].getClassHeaderStr(this);
       /*if (classHeader.startsWith("private ")) {
        classHeader = "public " + classHeader.substring("private ".length());
        }*/
@@ -653,7 +699,7 @@ public class ABC {
       if (m != null) {
          Namespace ns = m.getNamespace(constants);
          if (ns != null) {
-            modifier = ns.getPrefix(constants) + " ";
+            modifier = ns.getPrefix(this) + " ";
             if (modifier.equals(" ")) {
                modifier = "";
             }
@@ -687,12 +733,12 @@ public class ABC {
             if (bodyIndex != -1) {
                bodyStr = addTabs(bodies[bodyIndex].toString(pcode, true, i, this, constants, method_info, new Stack<TreeItem>(), highlight), 3);
             }
-            toPrint = IDENT_STRING + IDENT_STRING + tm.convert(constants, method_info, this, true) + " {\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}";
+            toPrint = IDENT_STRING + IDENT_STRING + tm.convert(method_info, this, true) + " {\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}";
          }
          if (t instanceof TraitSlotConst) {
             TraitSlotConst ts = (TraitSlotConst) t;
 
-            toPrint = IDENT_STRING + IDENT_STRING + ts.convert(constants, method_info, this, true) + ";";
+            toPrint = IDENT_STRING + IDENT_STRING + ts.convert(method_info, this, true) + ";";
          }
          if (highlight) {
             toPrint = Highlighting.hilighTrait(toPrint, ti);
@@ -706,7 +752,7 @@ public class ABC {
          toPrint = "";
          if (t instanceof TraitSlotConst) {
             TraitSlotConst ts = (TraitSlotConst) t;
-            toPrint = IDENT_STRING + IDENT_STRING + ts.convert(constants, method_info, this, false) + ";";
+            toPrint = IDENT_STRING + IDENT_STRING + ts.convert(method_info, this, false) + ";";
          }
 
          if (t instanceof TraitMethodGetterSetter) {
@@ -716,7 +762,7 @@ public class ABC {
             if (bodyIndex != -1) {
                bodyStr = addTabs(bodies[bodyIndex].toString(pcode, false, i, this, constants, method_info, new Stack<TreeItem>(), highlight), 3);
             }
-            toPrint = IDENT_STRING + IDENT_STRING + tm.convert(constants, method_info, this, false) + " {\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}";
+            toPrint = IDENT_STRING + IDENT_STRING + tm.convert(method_info, this, false) + " {\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}";
          }
          if (highlight) {
             toPrint = Highlighting.hilighTrait(toPrint, class_info[i].static_traits.traits.length + ti);
@@ -742,7 +788,7 @@ public class ABC {
          if ((packageName != null) && (!packageName.equals(""))) {
             fullName = packageName + "." + fullName;
          }
-         String exStr="Exporting " + (i + 1) + "/" + instance_info.length + " " + fullName + " ...";
+         String exStr = "Exporting " + (i + 1) + "/" + instance_info.length + " " + fullName + " ...";
          informListeners("export", exStr);
          logger.info(exStr);
          File outDir = new File(directory + File.separatorChar + packageName.replace('.', File.separatorChar));
@@ -752,6 +798,20 @@ public class ABC {
          String fileName = outDir.toString() + File.separator + className + ".as";
          FileOutputStream fos = new FileOutputStream(fileName);
          fos.write(classToString(i, false, pcode).getBytes());
+         fos.close();
+      }
+      informListeners("export", "Exporting namespaces...");
+      HashMap<String, String> ns = namespacesToString();
+      for (String n : ns.keySet()) {
+         String nsName = n.substring(n.lastIndexOf(".") + 1);
+         String packageName = n.substring(0, n.lastIndexOf("."));
+         File outDir = new File(directory + File.separatorChar + packageName.replace('.', File.separatorChar));
+         if (!outDir.exists()) {
+            outDir.mkdirs();
+         }
+         String fileName = outDir.toString() + File.separator + nsName + ".as";
+         FileOutputStream fos = new FileOutputStream(fileName);
+         fos.write(n.getBytes());
          fos.close();
       }
 

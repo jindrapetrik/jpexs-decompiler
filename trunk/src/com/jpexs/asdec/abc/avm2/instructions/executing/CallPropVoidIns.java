@@ -41,15 +41,15 @@ public class CallPropVoidIns extends InstructionDefinition {
    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
       //same as callproperty
 /*
-      int multinameIndex = (int) ((Long) arguments.get(0)).longValue();
-      int argCount = (int) ((Long) arguments.get(1)).longValue();
-      List passArguments = new ArrayList();
-      for (int i = argCount - 1; i >= 0; i--) {
-         passArguments.set(i, lda.operandStack.pop());
-      }
-      //if multiname[multinameIndex] is runtime
-      //pop(name) pop(ns)
-      Object obj = lda.operandStack.pop();*/
+       int multinameIndex = (int) ((Long) arguments.get(0)).longValue();
+       int argCount = (int) ((Long) arguments.get(1)).longValue();
+       List passArguments = new ArrayList();
+       for (int i = argCount - 1; i >= 0; i--) {
+       passArguments.set(i, lda.operandStack.pop());
+       }
+       //if multiname[multinameIndex] is runtime
+       //pop(name) pop(ns)
+       Object obj = lda.operandStack.pop();*/
       throw new RuntimeException("Call to unknown property");
       //do not push anything
    }

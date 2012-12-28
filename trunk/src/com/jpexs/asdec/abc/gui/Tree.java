@@ -22,14 +22,14 @@ public class Tree {
 
    private final TreeElement ROOT = new TreeElement("", "", -1, null);
 
-   public void add(String name, String path, int classIndex) {
+   public void add(String name, String path, Object item) {
       StringTokenizer st = new StringTokenizer(path, ".");
       TreeElement parent = ROOT;
       while (st.hasMoreTokens()) {
          String pathElement = st.nextToken();
          parent = parent.getBranch(pathElement);
       }
-      parent.addLeaf(name, classIndex);
+      parent.addLeaf(name, item);
    }
 
    public TreeElement getRoot() {

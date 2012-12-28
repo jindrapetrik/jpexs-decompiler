@@ -74,12 +74,12 @@ public class TraitSlotConst extends Trait {
    }
 
    @Override
-   public String convert(ConstantPool constants, MethodInfo[] methodInfo, ABC abc, boolean isStatic) {
-      String modifier = getModifiers(constants, isStatic) + " ";
+   public String convert(MethodInfo[] methodInfo, ABC abc, boolean isStatic) {
+      String modifier = getModifiers(abc, isStatic) + " ";
       if (modifier.equals(" ")) {
          modifier = "";
       }
-      return modifier + getNameValueStr(constants);
+      return modifier + getNameValueStr(abc.constants);
    }
 
    public boolean isConst() {

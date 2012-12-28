@@ -17,7 +17,6 @@
 package com.jpexs.asdec.abc.types.traits;
 
 import com.jpexs.asdec.abc.ABC;
-import com.jpexs.asdec.abc.avm2.ConstantPool;
 
 public class Traits {
 
@@ -46,13 +45,13 @@ public class Traits {
       return s;
    }
 
-   public String convert(ConstantPool constants, String prefix, ABC abc) {
+   public String convert(String prefix, ABC abc) {
       String s = "";
       for (int t = 0; t < traits.length; t++) {
          if (t > 0) {
             s += "\r\n";
          }
-         s += prefix + traits[t].convert(constants, null, abc);
+         s += prefix + traits[t].convert(null, abc);
       }
       return s;
    }

@@ -39,12 +39,12 @@ public class CallMethodIns extends InstructionDefinition {
    @Override
    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
       /*int methodIndex = (int) ((Long) arguments.get(0)).longValue(); //index of object's method
-      int argCount = (int) ((Long) arguments.get(1)).longValue();
-      List passArguments = new ArrayList();
-      for (int i = argCount - 1; i >= 0; i--) {
-         passArguments.set(i, lda.operandStack.pop());
-      }
-      Object receiver = lda.operandStack.pop();*/
+       int argCount = (int) ((Long) arguments.get(1)).longValue();
+       List passArguments = new ArrayList();
+       for (int i = argCount - 1; i >= 0; i--) {
+       passArguments.set(i, lda.operandStack.pop());
+       }
+       Object receiver = lda.operandStack.pop();*/
       throw new RuntimeException("Call to unknown method");
       //push(result)
    }

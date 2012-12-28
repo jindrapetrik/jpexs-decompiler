@@ -20,7 +20,6 @@ import com.jpexs.asdec.Main;
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.abc.CopyOutputStream;
-import com.jpexs.asdec.abc.gui.MainFrame;
 import com.jpexs.asdec.types.BUTTONCONDACTION;
 import com.jpexs.asdec.types.BUTTONRECORD;
 import java.io.ByteArrayInputStream;
@@ -143,7 +142,7 @@ public class DefineButton2Tag extends Tag implements Container, TagName {
          sos.writeBUTTONCONDACTIONList(actions);
          sos.close();
       } catch (IOException e) {
-         Logger.getLogger(DefineButton2Tag.class.getName()).log(Level.SEVERE, null, e); 
+         Logger.getLogger(DefineButton2Tag.class.getName()).log(Level.SEVERE, null, e);
       }
       return baos.toByteArray();
    }

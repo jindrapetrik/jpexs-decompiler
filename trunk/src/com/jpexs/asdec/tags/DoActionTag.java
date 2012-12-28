@@ -52,7 +52,7 @@ public class DoActionTag extends Tag implements ASMSource {
          //actions = sis.readActionList();
          actionBytes = sis.readBytes(sis.available());
       } catch (IOException e) {
-         Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, e); 
+         Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, e);
       }
    }
 
@@ -78,7 +78,7 @@ public class DoActionTag extends Tag implements ASMSource {
       try {
          actions = (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
       } catch (IOException ex) {
-         Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex); 
+         Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex);
       }
       return Action.actionsToString(actions, null, version);
    }
@@ -106,7 +106,7 @@ public class DoActionTag extends Tag implements ASMSource {
       try {
          return (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
       } catch (IOException ex) {
-         Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex); 
+         Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex);
          return new ArrayList<Action>();
       }
    }

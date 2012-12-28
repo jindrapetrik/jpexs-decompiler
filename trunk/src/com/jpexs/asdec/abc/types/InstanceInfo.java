@@ -43,19 +43,19 @@ public class InstanceInfo {
    public String toString(ABC abc) {
       String supIndexStr = "[nothing]";
       if (super_index > 0) {
-         abc.constants.constant_multiname[super_index].toString(abc.constants);
+         supIndexStr = abc.constants.constant_multiname[super_index].toString(abc.constants);
       }
       return "name_index=" + abc.constants.constant_multiname[name_index].toString(abc.constants) + " super_index=" + supIndexStr + " flags=" + flags + " protectedNS=" + protectedNS + " interfaces=" + Helper.intArrToString(interfaces) + " method_index=" + iinit_index + "\r\n" + instance_traits.toString(abc);
    }
 
-   public String getClassHeaderStr(ConstantPool constants) {
+   public String getClassHeaderStr(ABC abc) {
       String supIndexStr = "";
       if (super_index > 0) {
-         supIndexStr = " extends " + constants.constant_multiname[super_index].getName(constants);////+" flags="+flags+" protectedNS="+protectedNS+" interfaces="+Helper.intArrToString(interfaces)+" method_index="+iinit_index
+         supIndexStr = " extends " + abc.constants.constant_multiname[super_index].getName(abc.constants);////+" flags="+flags+" protectedNS="+protectedNS+" interfaces="+Helper.intArrToString(interfaces)+" method_index="+iinit_index
       }
       String modifiers;
-      Namespace ns = constants.constant_multiname[name_index].getNamespace(constants);
-      modifiers = ns.getPrefix(constants);
+      Namespace ns = abc.constants.constant_multiname[name_index].getNamespace(abc.constants);
+      modifiers = ns.getPrefix(abc);
       if (!modifiers.equals("")) {
          modifiers += " ";
       }
@@ -70,11 +70,11 @@ public class InstanceInfo {
       if ((flags & CLASS_INTERFACE) == CLASS_INTERFACE) {
          objType = "interface ";
       }
-      return modifiers + objType + constants.constant_multiname[name_index].getName(constants) + supIndexStr;
+      return modifiers + objType + abc.constants.constant_multiname[name_index].getName(abc.constants) + supIndexStr;
    }
 
-   public String getInstanceVarsStr(ConstantPool constants, ABC abc) {
-      return instance_traits.convert(constants, "\t", abc);
+   public String getInstanceVarsStr(ABC abc) {
+      return instance_traits.convert("\t", abc);
    }
 
    public Multiname getName(ConstantPool constants) {

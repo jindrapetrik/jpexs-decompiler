@@ -126,7 +126,7 @@ public class DefineButtonTag extends Tag implements ASMSource, TagName {
       try {
          actions = (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
       } catch (IOException ex) {
-         Logger.getLogger(DefineButtonTag.class.getName()).log(Level.SEVERE, null, ex); 
+         Logger.getLogger(DefineButtonTag.class.getName()).log(Level.SEVERE, null, ex);
       }
       return Action.actionsToString(actions, null, version);
    }

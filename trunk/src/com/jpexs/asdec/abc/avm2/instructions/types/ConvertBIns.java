@@ -47,7 +47,7 @@ public class ConvertBIns extends InstructionDefinition implements CoerceOrConver
       } else {
          bval = true;
       }
-      lda.operandStack.push((Boolean)bval);
+      lda.operandStack.push((Boolean) bval);
    }
 
    @Override

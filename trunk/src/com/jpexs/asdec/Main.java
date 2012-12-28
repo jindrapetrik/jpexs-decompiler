@@ -191,17 +191,17 @@ public class Main {
             swf = parseSWF(Main.file);
             FileInputStream fis = new FileInputStream(file);
             DEBUG_COPY = true;
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();            
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             try {
                swf.saveTo(baos);
             } catch (NotSameException nse) {
-               Logger.getLogger(Main.class.getName()).log(Level.FINE, null, nse);               
+               Logger.getLogger(Main.class.getName()).log(Level.FINE, null, nse);
                JOptionPane.showMessageDialog(null, "WARNING: The SWF decompiler may have problems saving this file. Recommended usage is READ ONLY.");
             }
             DEBUG_COPY = false;
             //DEBUG_COPY=true;
          } catch (Exception ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);  
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(null, "Cannot load SWF file.");
             loadingDialog.setVisible(false);
             return false;
@@ -213,7 +213,7 @@ public class Main {
             }
          }
 
-         
+
          if (false) {
             JOptionPane.showMessageDialog(null, "This SWF file does not contain any ActionScript parts");
             loadingDialog.setVisible(false);
@@ -432,19 +432,19 @@ public class Main {
     */
    public static void main(String[] args) throws IOException {
       View.setWinLookAndFeel();
-      Configuration.load();           
-      int pos=0;
-      if(args.length>0){
-         if(args[0].equals("-debug")){
-            debugMode=true;
+      Configuration.load();
+      int pos = 0;
+      if (args.length > 0) {
+         if (args[0].equals("-debug")) {
+            debugMode = true;
             pos++;
          }
       }
-      initLogging(debugMode);     
-      if (args.length < pos+1) {
+      initLogging(debugMode);
+      if (args.length < pos + 1) {
          autoCheckForUpdates();
          showModeFrame();
-      }else {         
+      } else {
          if (args[pos].equals("-proxy")) {
             int port = 55555;
             for (int i = pos; i < args.length; i++) {
@@ -463,18 +463,18 @@ public class Main {
             addTrayIcon();
             switchProxy();
          } else if (args[pos].equals("-export")) {
-            if (args.length < pos+4) {
+            if (args.length < pos + 4) {
                badArguments();
             }
-            String exportFormat = args[pos+1];
+            String exportFormat = args[pos + 1];
             if (!exportFormat.toLowerCase().equals("as")) {
                if (!exportFormat.toLowerCase().equals("pcode")) {
                   System.err.println("Invalid export format:" + exportFormat);
                   badArguments();
                }
             }
-            File outDir = new File(args[pos+2]);
-            File inFile = new File(args[pos+3]);
+            File outDir = new File(args[pos + 2]);
+            File inFile = new File(args[pos + 3]);
             if (!inFile.exists()) {
                System.err.println("Input SWF file does not exist!");
                badArguments();
@@ -506,11 +506,11 @@ public class Main {
                System.exit(1);
             }
          } else if (args[pos].equals("-compress")) {
-            if (args.length < pos+3) {
+            if (args.length < pos + 3) {
                badArguments();
             }
 
-            if (SWF.fws2cws(new FileInputStream(args[pos+1]), new FileOutputStream(args[pos+2]))) {
+            if (SWF.fws2cws(new FileInputStream(args[pos + 1]), new FileOutputStream(args[pos + 2]))) {
                System.out.println("OK");
             } else {
                System.err.println("FAIL");
@@ -520,7 +520,7 @@ public class Main {
                badArguments();
             }
 
-            if (SWF.cws2fws(new FileInputStream(args[pos+1]), new FileOutputStream(args[pos+2]))) {
+            if (SWF.cws2fws(new FileInputStream(args[pos + 1]), new FileOutputStream(args[pos + 2]))) {
                System.out.println("OK");
                System.exit(0);
             } else {
@@ -533,9 +533,9 @@ public class Main {
             }
             try {
                dump_tags = true;
-               parseSWF(args[pos+1]);
+               parseSWF(args[pos + 1]);
             } catch (Exception ex) {
-               Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);  
+               Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                System.exit(1);
             }
             System.exit(0);
@@ -543,7 +543,7 @@ public class Main {
             printHeader();
             printCmdLineUsage();
             System.exit(0);
-         } else if (args.length == pos+1) {
+         } else if (args.length == pos + 1) {
             autoCheckForUpdates();
             openFile(args[pos]);
          } else {
@@ -734,15 +734,15 @@ public class Main {
    public static void initLogging(boolean debug) {
       try {
          Logger logger = Logger.getLogger("");
-         logger.setLevel(debug?Level.CONFIG:Level.WARNING);
+         logger.setLevel(debug ? Level.CONFIG : Level.WARNING);
          FileHandler fileTxt = new FileHandler("log.txt");
 
          SimpleFormatter formatterTxt = new SimpleFormatter();
          fileTxt.setFormatter(formatterTxt);
          logger.addHandler(fileTxt);
-         
-         if(debug){
-            ConsoleHandler conHan=new ConsoleHandler();
+
+         if (debug) {
+            ConsoleHandler conHan = new ConsoleHandler();
             conHan.setFormatter(formatterTxt);
             logger.addHandler(conHan);
          }

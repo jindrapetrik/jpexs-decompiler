@@ -392,8 +392,8 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
          try {
             Main.saveFile(Main.file);
          } catch (IOException ex) {
-            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);  
-            JOptionPane.showMessageDialog(null, "Cannot save file","Error",JOptionPane.ERROR_MESSAGE);
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, "Cannot save file", "Error", JOptionPane.ERROR_MESSAGE);
          }
       }
       if (e.getActionCommand().equals("SAVEAS")) {

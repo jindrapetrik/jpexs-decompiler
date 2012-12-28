@@ -33,8 +33,8 @@ public class TraitMethodGetterSetter extends Trait {
    }
 
    @Override
-   public String convert(ConstantPool constants, MethodInfo[] methodInfo, ABC abc, boolean isStatic) {
-      String modifier = getModifiers(constants, isStatic) + " ";
+   public String convert(MethodInfo[] methodInfo, ABC abc, boolean isStatic) {
+      String modifier = getModifiers(abc, isStatic) + " ";
       if (modifier.equals(" ")) {
          modifier = "";
       }
@@ -46,7 +46,7 @@ public class TraitMethodGetterSetter extends Trait {
          addKind = "set ";
       }
       MethodBody body = abc.findBody(method_info);
-      return modifier + "function " + addKind + getMethodName(constants) + "(" + methodInfo[method_info].getParamStr(constants, body, abc) + ") : " + methodInfo[method_info].getReturnTypeStr(constants);
+      return modifier + "function " + addKind + getMethodName(abc.constants) + "(" + methodInfo[method_info].getParamStr(abc.constants, body, abc) + ") : " + methodInfo[method_info].getReturnTypeStr(abc.constants);
    }
 
    public String getMethodName(ConstantPool constants) {
