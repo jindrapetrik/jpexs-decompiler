@@ -35,36 +35,35 @@ public class DeclarationTreeItem extends TreeItem {
 
    public TreeItem assignment;
    public String type;
-   public DeclarationTreeItem(TreeItem assignment,String type){
-      super(assignment.instruction,assignment.precedence);
-      this.type=type;
-      this.assignment=assignment;
+
+   public DeclarationTreeItem(TreeItem assignment, String type) {
+      super(assignment.instruction, assignment.precedence);
+      this.type = type;
+      this.assignment = assignment;
    }
-   
-   public DeclarationTreeItem(TreeItem assignment){
-      this(assignment,null);
+
+   public DeclarationTreeItem(TreeItem assignment) {
+      this(assignment, null);
    }
-   
+
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
-      if(assignment instanceof SetLocalTreeItem)
-      {
-         SetLocalTreeItem lti=(SetLocalTreeItem)assignment;
-         String type="*";
-         if(lti.value instanceof CoerceTreeItem){
-            type = ((CoerceTreeItem)lti.value).type;
+      if (assignment instanceof SetLocalTreeItem) {
+         SetLocalTreeItem lti = (SetLocalTreeItem) assignment;
+         String type = "*";
+         if (lti.value instanceof CoerceTreeItem) {
+            type = ((CoerceTreeItem) lti.value).type;
          }
-         if(lti.value instanceof ConvertTreeItem){
-            type = ((ConvertTreeItem)lti.value).type;
+         if (lti.value instanceof ConvertTreeItem) {
+            type = ((ConvertTreeItem) lti.value).type;
          }
-         return "var "+hilight(localRegName(localRegNames, lti.regIndex) + ":"+type+" = ") + lti.value.toString(constants, localRegNames);
+         return "var " + hilight(localRegName(localRegNames, lti.regIndex) + ":" + type + " = ") + lti.value.toString(constants, localRegNames);
       }
-      if(assignment instanceof SetSlotTreeItem)
-      {
-         SetSlotTreeItem ssti=(SetSlotTreeItem)assignment;
-         String ret="";
+      if (assignment instanceof SetSlotTreeItem) {
+         SetSlotTreeItem ssti = (SetSlotTreeItem) assignment;
+         String ret = "";
          if (!(ssti.scope instanceof NewActivationTreeItem)) {
-         ret = ssti.scope.toString(constants, localRegNames) + ".";
+            ret = ssti.scope.toString(constants, localRegNames) + ".";
          }
          if (ssti.scope instanceof LocalRegTreeItem) {
             if (((LocalRegTreeItem) ssti.scope).computedValue != null) {
@@ -72,10 +71,9 @@ public class DeclarationTreeItem extends TreeItem {
                   ret = "";
                }
             }
-         }         
-         return "var "+ret + hilight(ssti.slotName.getName(constants)) + ":"+type+hilight(" = ") + ssti.value.toString(constants, localRegNames);                 
+         }
+         return "var " + ret + hilight(ssti.slotName.getName(constants)) + ":" + type + hilight(" = ") + ssti.value.toString(constants, localRegNames);
       }
-      return "var "+assignment.toString(constants, localRegNames);
+      return "var " + assignment.toString(constants, localRegNames);
    }
-   
 }

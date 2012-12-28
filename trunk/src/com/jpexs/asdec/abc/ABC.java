@@ -17,7 +17,6 @@
 package com.jpexs.asdec.abc;
 
 import com.jpexs.asdec.EventListener;
-import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.UnknownInstructionCode;
@@ -57,23 +56,22 @@ public class ABC {
    public static String IDENT_STRING = "   ";
    public static final int MINORwithDECIMAL = 17;
    public static final boolean AUTOINIT_STATIC_VARIABLES = false;
+   protected HashSet<EventListener> listeners = new HashSet<EventListener>();
 
-   protected HashSet<EventListener> listeners=new HashSet<EventListener>();
-   
-   public void addEventListener(EventListener listener){
+   public void addEventListener(EventListener listener) {
       listeners.add(listener);
    }
-   public void removeEventListener(EventListener listener){
+
+   public void removeEventListener(EventListener listener) {
       listeners.remove(listener);
    }
-   protected void informListeners(String event,Object data){
-      for(EventListener listener:listeners){
+
+   protected void informListeners(String event, Object data) {
+      for (EventListener listener : listeners) {
          listener.handleEvent(event, data);
       }
    }
-   
-   
-   
+
    public int deobfuscateIdentifiers() {
       int ret = 0;
       for (int i = 1; i < constants.constant_multiname.length; i++) {
@@ -251,11 +249,11 @@ public class ABC {
          method_info[mb.method_info].setBody(mb);
          bodyIdxFromMethodIdx[mb.method_info] = i;
       }
-      
+
       /*for(ScriptInfo si:script_info){         
-         System.out.println("--------------------------------------------");
-         System.out.println(findBody(si.init_index).toString(true, false, -1, this, constants, method_info,new Stack<TreeItem>()));
-      }*/
+       System.out.println("--------------------------------------------");
+       System.out.println(findBody(si.init_index).toString(true, false, -1, this, constants, method_info,new Stack<TreeItem>()));
+       }*/
    }
 
    public void saveToStream(OutputStream os) throws IOException {
@@ -632,7 +630,7 @@ public class ABC {
       String bodyStr = "";
       int bodyIndex = findBodyIndex(class_info[i].cinit_index);
       if (bodyIndex != -1) {
-         bodyStr = addTabs(bodies[bodyIndex].toString(pcode, true, i, this, constants, method_info, new Stack<TreeItem>(),highlight), 3);
+         bodyStr = addTabs(bodies[bodyIndex].toString(pcode, true, i, this, constants, method_info, new Stack<TreeItem>(), highlight), 3);
       }
       // if (!bodyStr.equals("")) {
       toPrint = IDENT_STRING + IDENT_STRING + "{\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}";
@@ -661,7 +659,7 @@ public class ABC {
       bodyStr = "";
       bodyIndex = findBodyIndex(instance_info[i].iinit_index);
       if (bodyIndex != -1) {
-         bodyStr = addTabs(bodies[bodyIndex].toString(pcode, false, i, this, constants, method_info, new Stack<TreeItem>(),highlight), 3);
+         bodyStr = addTabs(bodies[bodyIndex].toString(pcode, false, i, this, constants, method_info, new Stack<TreeItem>(), highlight), 3);
          constructorParams = method_info[instance_info[i].iinit_index].getParamStr(constants, bodies[bodyIndex], this);
       } else {
          constructorParams = method_info[instance_info[i].iinit_index].getParamStr(constants, null, this);
@@ -739,7 +737,7 @@ public class ABC {
          if ((packageName != null) && (!packageName.equals(""))) {
             fullName = packageName + "." + fullName;
          }
-         informListeners("export", "Exporting " + (i + 1) + "/" + instance_info.length + " " + fullName + " ...");        
+         informListeners("export", "Exporting " + (i + 1) + "/" + instance_info.length + " " + fullName + " ...");
          File outDir = new File(directory + File.separatorChar + packageName.replace('.', File.separatorChar));
          if (!outDir.exists()) {
             outDir.mkdirs();

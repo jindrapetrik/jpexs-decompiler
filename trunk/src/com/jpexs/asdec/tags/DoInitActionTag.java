@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DoInitActionTag extends Tag implements ASMSource,TagName {
+public class DoInitActionTag extends Tag implements ASMSource, TagName {
 
    /**
     * Identifier of Sprite
@@ -76,7 +76,6 @@ public class DoInitActionTag extends Tag implements ASMSource,TagName {
       return baos.toByteArray();
    }
 
-   
    public String toString() {
       String name = "";
       for (ExportAssetsTag eat : exportAssetsTags) {
@@ -88,11 +87,9 @@ public class DoInitActionTag extends Tag implements ASMSource,TagName {
    }
 
    public String getName() {
-      return "DoInitActionTag"+spriteId;
+      return "DoInitActionTag" + spriteId;
    }
 
-   
-   
    /**
     * Whether or not this object contains ASM source
     *

@@ -42,16 +42,16 @@ public abstract class TreeItem {
    public static final int NOPRECEDENCE = 16;
    public int precedence = NOPRECEDENCE;
    public AVM2Instruction instruction;
-   
+
    public TreeItem(AVM2Instruction instruction, int precedence) {
       this.instruction = instruction;
       this.precedence = precedence;
    }
 
    public abstract String toString(ConstantPool constants, HashMap<Integer, String> localRegNames);
-   
-   public String toStringNoH(ConstantPool constants, HashMap<Integer, String> localRegNames){
-      return Highlighting.stripHilights(toString(constants,localRegNames));
+
+   public String toStringNoH(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+      return Highlighting.stripHilights(toString(constants, localRegNames));
    }
 
    public String toStringSemicoloned(ConstantPool constants, HashMap<Integer, String> localRegNames) {
@@ -108,7 +108,7 @@ public abstract class TreeItem {
    public TreeItem getNotCoerced() {
       return this;
    }
-   
+
    public TreeItem getThroughRegister() {
       return this;
    }

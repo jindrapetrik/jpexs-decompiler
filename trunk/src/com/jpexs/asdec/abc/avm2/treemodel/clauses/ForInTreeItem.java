@@ -56,7 +56,7 @@ public class ForInTreeItem extends LoopTreeItem implements Block {
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
       String ret = "";
       ret += "loop" + loopBreak + ":\r\n";
-      ret += hilight("for (") + expression.toString(constants, localRegNames) + hilight(")")+"\r\n{\r\n";
+      ret += hilight("for (") + expression.toString(constants, localRegNames) + hilight(")") + "\r\n{\r\n";
       for (TreeItem ti : commands) {
          ret += ti.toStringSemicoloned(constants, localRegNames) + "\r\n";
       }

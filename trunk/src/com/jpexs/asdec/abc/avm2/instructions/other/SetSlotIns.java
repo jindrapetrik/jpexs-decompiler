@@ -25,7 +25,6 @@ import com.jpexs.asdec.abc.avm2.instructions.SetTypeIns;
 import com.jpexs.asdec.abc.avm2.treemodel.DecrementTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.GetSlotTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.IncrementTreeItem;
-import com.jpexs.asdec.abc.avm2.treemodel.LocalRegTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.NewActivationTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.PostDecrementTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.PostIncrementTreeItem;
@@ -73,14 +72,13 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
             return;
          }
       }
-            
-      if (value.getNotCoerced() instanceof IncrementTreeItem) {         
+
+      if (value.getNotCoerced() instanceof IncrementTreeItem) {
          TreeItem inside = ((IncrementTreeItem) value.getNotCoerced()).object.getThroughRegister().getNotCoerced();
          if (inside instanceof GetSlotTreeItem) {
-            GetSlotTreeItem slotItem=(GetSlotTreeItem)inside;
-            if ((slotItem.scope.getThroughRegister()==obj.getThroughRegister())
-                    &&(slotItem.slotName==slotname))
-            {            
+            GetSlotTreeItem slotItem = (GetSlotTreeItem) inside;
+            if ((slotItem.scope.getThroughRegister() == obj.getThroughRegister())
+                    && (slotItem.slotName == slotname)) {
                if (stack.size() > 0) {
                   TreeItem top = stack.peek().getNotCoerced();
                   if (top == inside) {
@@ -99,14 +97,13 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
             }
          }
       }
-      
-      if (value.getNotCoerced() instanceof DecrementTreeItem) {         
+
+      if (value.getNotCoerced() instanceof DecrementTreeItem) {
          TreeItem inside = ((DecrementTreeItem) value.getNotCoerced()).object.getThroughRegister().getNotCoerced();
          if (inside instanceof GetSlotTreeItem) {
-            GetSlotTreeItem slotItem=(GetSlotTreeItem)inside;
-            if ((slotItem.scope.getThroughRegister()==obj.getThroughRegister())
-                    &&(slotItem.slotName==slotname))
-            {            
+            GetSlotTreeItem slotItem = (GetSlotTreeItem) inside;
+            if ((slotItem.scope.getThroughRegister() == obj.getThroughRegister())
+                    && (slotItem.slotName == slotname)) {
                if (stack.size() > 0) {
                   TreeItem top = stack.peek().getNotCoerced();
                   if (top == inside) {
@@ -125,7 +122,7 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
             }
          }
       }
-      
+
       output.add(new SetSlotTreeItem(ins, obj, slotname, value));
    }
 

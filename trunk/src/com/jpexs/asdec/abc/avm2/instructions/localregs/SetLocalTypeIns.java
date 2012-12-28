@@ -23,7 +23,6 @@ import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.avm2.instructions.SetTypeIns;
 import com.jpexs.asdec.abc.avm2.treemodel.DecrementTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.FindPropertyTreeItem;
-import com.jpexs.asdec.abc.avm2.treemodel.GetPropertyTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.IncrementTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.LocalRegTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.NewActivationTreeItem;
@@ -55,7 +54,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
       if (value instanceof FindPropertyTreeItem) {
          return;
       }
-      if (value.getNotCoerced() instanceof IncrementTreeItem) {         
+      if (value.getNotCoerced() instanceof IncrementTreeItem) {
          TreeItem inside = ((IncrementTreeItem) value.getNotCoerced()).object.getNotCoerced();
          if (inside instanceof LocalRegTreeItem) {
             if (((LocalRegTreeItem) inside).regIndex == regId) {
@@ -78,7 +77,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
          }
       }
 
-      if (value.getNotCoerced() instanceof DecrementTreeItem) {         
+      if (value.getNotCoerced() instanceof DecrementTreeItem) {
          TreeItem inside = ((DecrementTreeItem) value.getNotCoerced()).object.getNotCoerced();
          if (inside instanceof LocalRegTreeItem) {
             if (((LocalRegTreeItem) inside).regIndex == regId) {
@@ -100,7 +99,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
             }
          }
       }
-      
+
       //if(val.startsWith("catchscope ")) return;
       //if(val.startsWith("newactivation()")) return;
       output.add(new SetLocalTreeItem(ins, regId, value));

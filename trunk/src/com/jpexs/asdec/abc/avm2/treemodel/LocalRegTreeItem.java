@@ -53,6 +53,4 @@ public class LocalRegTreeItem extends TreeItem {
    public TreeItem getThroughRegister() {
       return computedValue.getThroughRegister();
    }
-   
-   
 }

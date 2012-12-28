@@ -17,15 +17,14 @@
 package com.jpexs.asdec.action.gui;
 
 import com.jpexs.asdec.Configuration;
-import com.jpexs.asdec.action.TagNode;
 import com.jpexs.asdec.Main;
+import com.jpexs.asdec.action.TagNode;
 import com.jpexs.asdec.action.parser.ASMParser;
 import com.jpexs.asdec.action.parser.ParseException;
 import com.jpexs.asdec.gui.LoadingPanel;
 import com.jpexs.asdec.gui.View;
 import com.jpexs.asdec.helpers.Highlighting;
 import com.jpexs.asdec.tags.ASMSource;
-import com.jpexs.asdec.tags.DoABCTag;
 import com.jpexs.asdec.tags.Tag;
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -39,7 +38,6 @@ import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -313,13 +311,13 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
       if (e.getActionCommand().equals("OPEN")) {
          Main.openFileDialog();
       }
-      
+
       if (e.getActionCommand().equals("CHECKUPDATES")) {
-         if(!Main.checkForUpdates()){
+         if (!Main.checkForUpdates()) {
             JOptionPane.showMessageDialog(null, "No new version available.");
          }
       }
-      
+
       if (e.getActionCommand().equals("EXPORT") || e.getActionCommand().equals("EXPORTPCODE")) {
          JFileChooser chooser = new JFileChooser();
          chooser.setCurrentDirectory(new java.io.File((String) Configuration.getConfig("lastExportDir", ".")));

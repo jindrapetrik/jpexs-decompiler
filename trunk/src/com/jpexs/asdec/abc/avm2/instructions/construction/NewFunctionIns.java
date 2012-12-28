@@ -43,7 +43,7 @@ public class NewFunctionIns extends InstructionDefinition {
       String bodyStr = "";
       String paramStr = "";
       if (mybody != null) {
-         bodyStr = Highlighting.hilighMethodEnd() + mybody.toString(false, isStatic, classIndex, abc, constants, method_info,scopeStack, true) + Highlighting.hilighMethodBegin(body.method_info);
+         bodyStr = Highlighting.hilighMethodEnd() + mybody.toString(false, isStatic, classIndex, abc, constants, method_info, scopeStack, true) + Highlighting.hilighMethodBegin(body.method_info);
          paramStr = method_info[methodIndex].getParamStr(constants, mybody, abc);
       }
       stack.push(new NewFunctionTreeItem(ins, paramStr, method_info[methodIndex].getReturnTypeStr(constants), bodyStr));

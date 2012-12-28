@@ -42,16 +42,16 @@ public class TraitSlotConst extends Trait {
       return "0x" + Helper.formatAddress(fileOffset) + " " + Helper.byteArrToString(bytes) + " SlotConst " + abc.constants.constant_multiname[name_index].toString(abc.constants) + " slot=" + slot_id + " type=" + typeStr + " value=" + (new ValueKind(value_index, value_kind)).toString(abc.constants) + " metadata=" + Helper.intArrToString(metadata);
    }
 
-   public String getType(ConstantPool constants){
+   public String getType(ConstantPool constants) {
       String typeStr = "*";
       if (type_index > 0) {
          typeStr = constants.constant_multiname[type_index].getName(constants);
       }
       return typeStr;
    }
-   
+
    public String getNameValueStr(ConstantPool constants) {
-      
+
       String typeStr = getType(constants);
       String valueStr = "";
       if (value_kind != 0) {

@@ -16,27 +16,14 @@
  */
 package com.jpexs.asdec.abc.avm2.instructions.localregs;
 
-import com.jpexs.asdec.abc.ABC;
-import com.jpexs.asdec.abc.avm2.ConstantPool;
-import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.asdec.abc.avm2.instructions.SetTypeIns;
-import com.jpexs.asdec.abc.avm2.treemodel.FindPropertyTreeItem;
-import com.jpexs.asdec.abc.avm2.treemodel.NewActivationTreeItem;
-import com.jpexs.asdec.abc.avm2.treemodel.SetLocalTreeItem;
-import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
-import com.jpexs.asdec.abc.types.MethodInfo;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
 
 public class SetLocal0Ins extends SetLocalTypeIns {
 
    public SetLocal0Ins() {
       super(0xd4, "setlocal_0", new int[]{});
    }
-   
+
    public int getRegisterId(AVM2Instruction ins) {
       return 0;
    }

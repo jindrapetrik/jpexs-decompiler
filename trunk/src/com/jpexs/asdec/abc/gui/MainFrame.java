@@ -19,7 +19,6 @@ package com.jpexs.asdec.abc.gui;
 import com.jpexs.asdec.Configuration;
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
-import com.jpexs.asdec.EventListener;
 import com.jpexs.asdec.abc.gui.tablemodels.*;
 import com.jpexs.asdec.gui.LoadingPanel;
 import com.jpexs.asdec.gui.View;
@@ -314,7 +313,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
       JMenuItem miAbout = new JMenuItem("About...");
       miAbout.setActionCommand("ABOUT");
       miAbout.addActionListener(this);
-      
+
       JMenuItem miCheckUpdates = new JMenuItem("Check for updates...");
       miCheckUpdates.setActionCommand("CHECKUPDATES");
       miCheckUpdates.addActionListener(this);
@@ -418,8 +417,8 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
             (new Thread() {
                @Override
                public void run() {
-                  try {                     
-                      Main.swf.exportActionScript(selFile, isPcode);
+                  try {
+                     Main.swf.exportActionScript(selFile, isPcode);
                   } catch (Exception ignored) {
                      JOptionPane.showMessageDialog(null, "Cannot write to the file");
                   }
@@ -430,9 +429,9 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
          }
 
       }
-      
+
       if (e.getActionCommand().equals("CHECKUPDATES")) {
-         if(!Main.checkForUpdates()){
+         if (!Main.checkForUpdates()) {
             JOptionPane.showMessageDialog(null, "No new version available.");
          }
       }

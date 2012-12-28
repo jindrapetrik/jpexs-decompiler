@@ -21,5 +21,6 @@ package com.jpexs.asdec;
  * @author Jindra
  */
 public interface EventListener {
-   public void handleEvent(String event,Object data);
+
+   public void handleEvent(String event, Object data);
 }

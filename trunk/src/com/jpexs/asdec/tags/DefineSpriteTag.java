@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * Defines a sprite character
  */
-public class DefineSpriteTag extends Tag implements Container,TagName {
+public class DefineSpriteTag extends Tag implements Container, TagName {
 
    /**
     * Character ID of sprite
@@ -96,11 +96,9 @@ public class DefineSpriteTag extends Tag implements Container,TagName {
 
    @Override
    public String getName() {
-      return "DefineSpriteTag"+spriteId;
+      return "DefineSpriteTag" + spriteId;
    }
 
-   
-   
    public String toString() {
       String name = "";
       for (ExportAssetsTag eat : exportAssetsTags) {

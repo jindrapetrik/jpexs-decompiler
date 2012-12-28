@@ -22,7 +22,6 @@ import com.jpexs.asdec.abc.CopyOutputStream;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.asdec.abc.avm2.instructions.SetTypeIns;
 import com.jpexs.asdec.abc.avm2.instructions.arithmetic.*;
 import com.jpexs.asdec.abc.avm2.instructions.bitwise.*;
 import com.jpexs.asdec.abc.avm2.instructions.comparsion.*;
@@ -41,8 +40,6 @@ import com.jpexs.asdec.abc.avm2.treemodel.*;
 import com.jpexs.asdec.abc.avm2.treemodel.clauses.*;
 import com.jpexs.asdec.abc.avm2.treemodel.operations.AndTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.operations.OrTreeItem;
-import com.jpexs.asdec.abc.avm2.treemodel.operations.PreDecrementTreeItem;
-import com.jpexs.asdec.abc.avm2.treemodel.operations.PreIncrementTreeItem;
 import com.jpexs.asdec.abc.types.ABCException;
 import com.jpexs.asdec.abc.types.MethodBody;
 import com.jpexs.asdec.abc.types.MethodInfo;
@@ -1491,12 +1488,12 @@ public class AVM2Code {
                            }
                         }
                      }
-                     if(!isKilled(reg, ip, end)){
+                     if (!isKilled(reg, ip, end)) {
                         TreeItem v = (TreeItem) stack.pop();
-                        stack.push(new LocalRegTreeItem(ins, reg,v));
+                        stack.push(new LocalRegTreeItem(ins, reg, v));
                         stack.push(v);
-                     }else{
-                        ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames);                     
+                     } else {
+                        ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames);
                      }
                      ip++;
                      addr = pos2adr(ip);

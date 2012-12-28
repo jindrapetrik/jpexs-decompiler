@@ -578,12 +578,12 @@ public class Action {
     * @return String with Source code
     */
    public static String actionsToSource(List<Action> actions, int version) {
-      try{
-      List<TreeItem> tree = actionsToTree(new HashMap<Integer, String>(), actions, version);
-      
-      return treeToString(tree);
-      }catch(Exception ex){
-         return "//Decompilation error :"+ex.getLocalizedMessage();
+      try {
+         List<TreeItem> tree = actionsToTree(new HashMap<Integer, String>(), actions, version);
+
+         return treeToString(tree);
+      } catch (Exception ex) {
+         return "//Decompilation error :" + ex.getLocalizedMessage();
       }
    }
 

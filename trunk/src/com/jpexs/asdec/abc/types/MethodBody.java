@@ -74,7 +74,7 @@ public class MethodBody implements Cloneable {
    }
 
    public String toString(boolean pcode, boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], Stack<TreeItem> scopeStack) {
-      return toString(pcode, isStatic, classIndex, abc, constants, method_info, scopeStack,false);
+      return toString(pcode, isStatic, classIndex, abc, constants, method_info, scopeStack, false);
    }
 
    public String toString(boolean pcode, boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], Stack<TreeItem> scopeStack, boolean hilight) {
@@ -86,7 +86,7 @@ public class MethodBody implements Cloneable {
          s += code.toASMSource(constants, this);
       } else {
          try {
-            s += code.toSource(isStatic, classIndex, abc, constants, method_info, this, hilight, getLocalRegNames(abc),scopeStack);
+            s += code.toSource(isStatic, classIndex, abc, constants, method_info, this, hilight, getLocalRegNames(abc), scopeStack);
             s = s.trim();
             if (hilight) {
                s = Highlighting.hilighMethod(s, this.method_info);

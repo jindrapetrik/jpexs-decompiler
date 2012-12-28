@@ -23,9 +23,10 @@ import java.util.HashMap;
 public class ThisTreeItem extends TreeItem {
 
    public Multiname className;
+
    public ThisTreeItem(Multiname className) {
       super(null, PRECEDENCE_PRIMARY);
-      this.className=className;
+      this.className = className;
    }
 
    @Override

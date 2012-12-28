@@ -21,5 +21,6 @@ package com.jpexs.asdec.tags;
  * @author JPEXS
  */
 public interface TagName {
+
    public String getName();
 }

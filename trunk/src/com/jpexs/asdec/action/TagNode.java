@@ -41,7 +41,7 @@ public class TagNode {
    public String toString() {
       return tag.toString();
    }
-   
+
    public static List<TagNode> createTagList(List<Object> list) {
       List<TagNode> ret = new ArrayList<TagNode>();
       int frame = 1;

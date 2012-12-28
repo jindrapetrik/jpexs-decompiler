@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class DefineButtonTag extends Tag implements ASMSource,TagName {
+public class DefineButtonTag extends Tag implements ASMSource, TagName {
 
    /**
     * ID for this character
@@ -99,11 +99,9 @@ public class DefineButtonTag extends Tag implements ASMSource,TagName {
    }
 
    public String getName() {
-      return "DefineButtonTag"+buttonId;
+      return "DefineButtonTag" + buttonId;
    }
 
-   
-   
    public String toString() {
       String name = "";
       for (ExportAssetsTag eat : exportAssetsTags) {

@@ -283,18 +283,15 @@ public class SWF {
       }
       return true;
    }
-   
-   
-   public boolean exportActionScript(String outdir, boolean isPcode) throws Exception {
-      boolean asV3Found = false;     
-      final EventListener evl=new EventListener(){
 
+   public boolean exportActionScript(String outdir, boolean isPcode) throws Exception {
+      boolean asV3Found = false;
+      final EventListener evl = new EventListener() {
          public void handleEvent(String event, Object data) {
-            if(event.equals("export")){
+            if (event.equals("export")) {
                informListeners(event, data);
             }
          }
-         
       };
       for (Tag t : tags) {
          if (t instanceof DoABCTag) {
@@ -334,7 +331,7 @@ public class SWF {
          if (node.subItems.isEmpty()) {
             if (node.tag instanceof ASMSource) {
                try {
-                  String f = outdir + File.separatorChar + name + ".as";         
+                  String f = outdir + File.separatorChar + name + ".as";
                   informListeners("export", "Exporting " + f + " ...");
                   String ret = "";
                   if (isPcode) {
@@ -359,18 +356,18 @@ public class SWF {
       }
       return true;
    }
-   
-   
-   protected HashSet<EventListener> listeners=new HashSet<EventListener>();
-   
-   public void addEventListener(EventListener listener){
+   protected HashSet<EventListener> listeners = new HashSet<EventListener>();
+
+   public void addEventListener(EventListener listener) {
       listeners.add(listener);
    }
-   public void removeEventListener(EventListener listener){
+
+   public void removeEventListener(EventListener listener) {
       listeners.remove(listener);
    }
-   protected void informListeners(String event,Object data){      
-      for(EventListener listener:listeners){
+
+   protected void informListeners(String event, Object data) {
+      for (EventListener listener : listeners) {
          listener.handleEvent(event, data);
       }
    }

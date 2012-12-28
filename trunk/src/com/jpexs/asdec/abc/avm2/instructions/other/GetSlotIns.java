@@ -46,11 +46,11 @@ public class GetSlotIns extends InstructionDefinition {
       Multiname slotname = null;
       if (obj instanceof ExceptionTreeItem) {
          slotname = constants.constant_multiname[((ExceptionTreeItem) obj).exception.name_index];
-      } else if(obj instanceof ClassTreeItem){
-         slotname=((ClassTreeItem)obj).className;
-      } else if(obj instanceof ThisTreeItem){
-         slotname=((ThisTreeItem)obj).className;
-      }else{
+      } else if (obj instanceof ClassTreeItem) {
+         slotname = ((ClassTreeItem) obj).className;
+      } else if (obj instanceof ThisTreeItem) {
+         slotname = ((ThisTreeItem) obj).className;
+      } else {
          for (int t = 0; t < body.traits.traits.length; t++) {
             if (body.traits.traits[t] instanceof TraitSlotConst) {
                if (((TraitSlotConst) body.traits.traits[t]).slot_id == slotIndex) {
