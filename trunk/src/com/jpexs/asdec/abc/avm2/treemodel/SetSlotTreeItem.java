@@ -18,10 +18,11 @@ package com.jpexs.asdec.abc.avm2.treemodel;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.asdec.abc.avm2.treemodel.clauses.AssignmentTreeItem;
 import com.jpexs.asdec.abc.types.Multiname;
 import java.util.HashMap;
 
-public class SetSlotTreeItem extends TreeItem implements SetTypeTreeItem {
+public class SetSlotTreeItem extends TreeItem implements SetTypeTreeItem,AssignmentTreeItem {
 
    public Multiname slotName;
    public TreeItem value;
@@ -36,8 +37,14 @@ public class SetSlotTreeItem extends TreeItem implements SetTypeTreeItem {
 
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+      
+      return  getName(constants,localRegNames)+ hilight("=") + value.toString(constants, localRegNames);
+   }
+   
+   public String getName(ConstantPool constants, HashMap<Integer, String> localRegNames){
       String ret = "";
 
+      /*ret = scope.toString(constants, localRegNames) + ".";
       if (!(scope instanceof NewActivationTreeItem)) {
          ret = scope.toString(constants, localRegNames) + ".";
       }
@@ -47,8 +54,8 @@ public class SetSlotTreeItem extends TreeItem implements SetTypeTreeItem {
                ret = "";
             }
          }
-      }
-      return ret + hilight(slotName.getName(constants)) + hilight("=") + value.toString(constants, localRegNames);
+      }*/
+      return ret + hilight(slotName.getName(constants));
    }
 
    public TreeItem getObject() {

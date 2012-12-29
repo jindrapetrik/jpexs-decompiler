@@ -18,9 +18,10 @@ package com.jpexs.asdec.abc.avm2.treemodel;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.asdec.abc.avm2.treemodel.clauses.AssignmentTreeItem;
 import java.util.HashMap;
 
-public class SetLocalTreeItem extends TreeItem implements SetTypeTreeItem {
+public class SetLocalTreeItem extends TreeItem implements SetTypeTreeItem,AssignmentTreeItem {
 
    public int regIndex;
    public TreeItem value;

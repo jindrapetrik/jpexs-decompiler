@@ -66,12 +66,9 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
 
       }
 
-      //if new activation sets params of the function
-      if (obj.getThroughRegister() instanceof NewActivationTreeItem) {
-         if (localRegNames.containsValue(slotname.getName(constants))) {
-            return;
-         }
-      }
+      if (localRegNames.containsValue(slotname.getName(constants))) {
+         return;
+      };
 
       if (value.getNotCoerced() instanceof IncrementTreeItem) {
          TreeItem inside = ((IncrementTreeItem) value.getNotCoerced()).object.getThroughRegister().getNotCoerced();

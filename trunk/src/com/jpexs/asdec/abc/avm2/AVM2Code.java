@@ -1610,8 +1610,8 @@ public class AVM2Code {
       return ret;
    }
 
-   public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames, Stack<TreeItem> scopeStack) {
-      return toSource(isStatic, classIndex, abc, constants, method_info, body, false, localRegNames, scopeStack);
+   public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames, Stack<TreeItem> scopeStack,boolean isStaticInitializer) {
+      return toSource(isStatic, classIndex, abc, constants, method_info, body, false, localRegNames, scopeStack,isStaticInitializer);
    }
 
    public List<TreeItem> toTree(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames) {
@@ -1689,7 +1689,7 @@ public class AVM2Code {
       }
    }
 
-   public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted, HashMap<Integer, String> localRegNames, Stack<TreeItem> scopeStack) {
+   public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted, HashMap<Integer, String> localRegNames, Stack<TreeItem> scopeStack,boolean isStaticInitializer) {
       toSourceCount = 0;
       loopList = new ArrayList<Loop>();
       unknownJumps = new ArrayList<Integer>();
@@ -1712,7 +1712,23 @@ public class AVM2Code {
 
       try {
          list = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, 0, code.size() - 1, localRegNames).output;
-
+         if(isStaticInitializer){
+            
+            List<TreeItem> newList=new ArrayList<TreeItem>();
+            for(TreeItem ti:list){
+               if(!(ti instanceof ReturnVoidTreeItem)){
+                  if(!(ti instanceof InitPropertyTreeItem)){
+                     if(!(ti instanceof SetPropertyTreeItem)){
+                        newList.add(ti);
+                     }
+                  }
+               }
+            }
+            list=newList;
+            if(list.isEmpty()){
+               return "";
+            }
+         }
          //Declarations
          boolean declaredRegisters[] = new boolean[regCount];
          for (int b = 0; b < declaredRegisters.length; b++) {

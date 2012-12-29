@@ -22,6 +22,7 @@ import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.avm2.treemodel.*;
+import com.jpexs.asdec.abc.avm2.treemodel.clauses.AssignmentTreeItem;
 import com.jpexs.asdec.abc.types.MethodInfo;
 import java.util.HashMap;
 import java.util.List;
@@ -51,6 +52,8 @@ public class PopIns extends InstructionDefinition {
          } else if (top instanceof CallMethodTreeItem) {
             output.add(top);
          } else if (top instanceof CallTreeItem) {
+            output.add(top);
+         } else if (top instanceof AssignmentTreeItem) {
             output.add(top);
          }
       }

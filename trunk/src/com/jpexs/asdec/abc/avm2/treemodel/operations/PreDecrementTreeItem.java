@@ -18,8 +18,9 @@ package com.jpexs.asdec.abc.avm2.treemodel.operations;
 
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.clauses.AssignmentTreeItem;
 
-public class PreDecrementTreeItem extends UnaryOpTreeItem {
+public class PreDecrementTreeItem extends UnaryOpTreeItem implements AssignmentTreeItem {
 
    public PreDecrementTreeItem(AVM2Instruction instruction, TreeItem object) {
       super(instruction, PRECEDENCE_UNARY, object, "--");

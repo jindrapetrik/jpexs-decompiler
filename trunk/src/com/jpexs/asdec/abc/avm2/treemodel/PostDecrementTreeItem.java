@@ -18,9 +18,10 @@ package com.jpexs.asdec.abc.avm2.treemodel;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.asdec.abc.avm2.treemodel.clauses.AssignmentTreeItem;
 import java.util.HashMap;
 
-public class PostDecrementTreeItem extends TreeItem {
+public class PostDecrementTreeItem extends TreeItem implements AssignmentTreeItem {
 
    public TreeItem object;
 

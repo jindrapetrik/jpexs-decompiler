@@ -30,18 +30,20 @@ public class ForEachInTreeItem extends LoopTreeItem implements Block {
 
    public ForEachInTreeItem(AVM2Instruction instruction, int loopBreak, int loopContinue, InTreeItem expression, List<TreeItem> commands) {
       super(instruction, loopBreak, loopContinue);
-      TreeItem firstAssign = commands.get(0);
-      if (firstAssign instanceof SetTypeTreeItem) {
-         if (expression.object instanceof LocalRegTreeItem) {
-            if (((SetTypeTreeItem) firstAssign).getValue().getNotCoerced() instanceof LocalRegTreeItem) {
-               if (((LocalRegTreeItem) ((SetTypeTreeItem) firstAssign).getValue().getNotCoerced()).regIndex == ((LocalRegTreeItem) expression.object).regIndex) {
-                  commands.remove(0);
-                  expression.object = ((SetTypeTreeItem) firstAssign).getObject();
+      if (!commands.isEmpty()) {
+         TreeItem firstAssign = commands.get(0);
+         if (firstAssign instanceof SetTypeTreeItem) {
+            if (expression.object instanceof LocalRegTreeItem) {
+               if (((SetTypeTreeItem) firstAssign).getValue().getNotCoerced() instanceof LocalRegTreeItem) {
+                  if (((LocalRegTreeItem) ((SetTypeTreeItem) firstAssign).getValue().getNotCoerced()).regIndex == ((LocalRegTreeItem) expression.object).regIndex) {
+                     commands.remove(0);
+                     expression.object = ((SetTypeTreeItem) firstAssign).getObject();
+                  }
                }
-            }
 
+            }
+            //locAssign.
          }
-         //locAssign.
       }
       this.expression = expression;
       this.commands = commands;

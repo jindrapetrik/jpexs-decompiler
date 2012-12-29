@@ -60,19 +60,8 @@ public class DeclarationTreeItem extends TreeItem {
          return "var " + hilight(localRegName(localRegNames, lti.regIndex) + ":" + type + " = ") + lti.value.toString(constants, localRegNames);
       }
       if (assignment instanceof SetSlotTreeItem) {
-         SetSlotTreeItem ssti = (SetSlotTreeItem) assignment;
-         String ret = "";
-         if (!(ssti.scope instanceof NewActivationTreeItem)) {
-            ret = ssti.scope.toString(constants, localRegNames) + ".";
-         }
-         if (ssti.scope instanceof LocalRegTreeItem) {
-            if (((LocalRegTreeItem) ssti.scope).computedValue != null) {
-               if (((LocalRegTreeItem) ssti.scope).computedValue instanceof NewActivationTreeItem) {
-                  ret = "";
-               }
-            }
-         }
-         return "var " + ret + hilight(ssti.slotName.getName(constants)) + ":" + type + hilight(" = ") + ssti.value.toString(constants, localRegNames);
+         SetSlotTreeItem ssti = (SetSlotTreeItem) assignment;         
+         return "var " + ssti.getName(constants, localRegNames) + ":" + type + hilight(" = ") + ssti.value.toString(constants, localRegNames);
       }
       return "var " + assignment.toString(constants, localRegNames);
    }
