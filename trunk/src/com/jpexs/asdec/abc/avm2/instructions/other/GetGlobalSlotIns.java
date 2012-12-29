@@ -49,7 +49,7 @@ public class GetGlobalSlotIns extends InstructionDefinition {
          for (int t = 0; t < body.traits.traits.length; t++) {
             if (body.traits.traits[t] instanceof TraitSlotConst) {
                if (((TraitSlotConst) body.traits.traits[t]).slot_id == slotIndex) {
-                  slotname = body.traits.traits[t].getMultiName(constants);
+                  slotname = body.traits.traits[t].getName(abc);
                }
             }
 

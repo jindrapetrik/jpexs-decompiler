@@ -19,7 +19,6 @@ package com.jpexs.asdec.abc.types.traits;
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
-import com.jpexs.asdec.abc.types.MethodInfo;
 import com.jpexs.asdec.abc.types.ValueKind;
 import com.jpexs.asdec.helpers.Helper;
 import com.jpexs.asdec.helpers.Highlighting;
@@ -50,36 +49,41 @@ public class TraitSlotConst extends Trait {
       return typeStr;
    }
 
-   public String getNameValueStr(ConstantPool constants) {
+   public String getNameValueStr(ABC abc) {
 
-      String typeStr = getType(constants);
+      String typeStr = getType(abc.constants);
+      if (typeStr.equals("*")) {
+         typeStr = "";
+      } else {
+         typeStr = ":" + typeStr;
+      }
       String valueStr = "";
+      ValueKind val = null;
       if (value_kind != 0) {
-         valueStr = " = " + (new ValueKind(value_index, value_kind)).toString(constants);
+         val = new ValueKind(value_index, value_kind);
+         valueStr = " = " + val.toString(abc.constants);
       }
 
       if (assignedValue != null) {
-         valueStr = " = " + Highlighting.stripHilights(assignedValue.toString(constants, new HashMap<Integer, String>()));
+         valueStr = " = " + Highlighting.stripHilights(assignedValue.toString(abc.constants, new HashMap<Integer, String>()));
       }
-
       String slotconst = "var";
       if (kindType == TRAIT_CONST) {
          slotconst = "const";
       }
-      return slotconst + " " + getName(constants) + ":" + typeStr + valueStr;
-   }
-
-   public String getName(ConstantPool constants) {
-      return constants.constant_multiname[name_index].getName(constants);
+      if (val != null && val.isNamespace()) {
+         slotconst = "namespace";
+      }
+      return slotconst + " " + getName(abc).getName(abc.constants) + typeStr + valueStr + ";";
    }
 
    @Override
-   public String convert(MethodInfo[] methodInfo, ABC abc, boolean isStatic) {
+   public String convert(ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight) {
       String modifier = getModifiers(abc, isStatic) + " ";
       if (modifier.equals(" ")) {
          modifier = "";
       }
-      return modifier + getNameValueStr(abc.constants);
+      return ABC.IDENT_STRING + ABC.IDENT_STRING + modifier + getNameValueStr(abc);
    }
 
    public boolean isConst() {

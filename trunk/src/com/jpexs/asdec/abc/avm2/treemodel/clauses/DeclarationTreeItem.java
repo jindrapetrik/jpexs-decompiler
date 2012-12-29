@@ -20,8 +20,6 @@ package com.jpexs.asdec.abc.avm2.treemodel.clauses;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.treemodel.CoerceTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.ConvertTreeItem;
-import com.jpexs.asdec.abc.avm2.treemodel.LocalRegTreeItem;
-import com.jpexs.asdec.abc.avm2.treemodel.NewActivationTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.SetLocalTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.SetSlotTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
@@ -60,7 +58,7 @@ public class DeclarationTreeItem extends TreeItem {
          return "var " + hilight(localRegName(localRegNames, lti.regIndex) + ":" + type + " = ") + lti.value.toString(constants, localRegNames);
       }
       if (assignment instanceof SetSlotTreeItem) {
-         SetSlotTreeItem ssti = (SetSlotTreeItem) assignment;         
+         SetSlotTreeItem ssti = (SetSlotTreeItem) assignment;
          return "var " + ssti.getName(constants, localRegNames) + ":" + type + hilight(" = ") + ssti.value.toString(constants, localRegNames);
       }
       return "var " + assignment.toString(constants, localRegNames);

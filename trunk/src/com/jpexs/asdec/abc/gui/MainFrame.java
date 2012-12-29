@@ -210,7 +210,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
               navPanel);
 
       JTabbedPane tabbedPane = new JTabbedPane();
-      tabbedPane.addTab("Classes", splitPane2);
+      tabbedPane.addTab("Scripts", splitPane2);
 
       pan2.add(tabbedPane, BorderLayout.CENTER);
       abcComboBox.addItemListener(this);

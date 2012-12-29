@@ -39,7 +39,7 @@ public class GetScopeObjectIns extends InstructionDefinition {
       /* System.out.println("Getting scope object"+index+":");
        for(TreeItem ti:scopeStack){
        System.out.println(ti.toString(constants));
-       }*/      
+       }*/
       stack.push(scopeStack.get(index));
    }
 

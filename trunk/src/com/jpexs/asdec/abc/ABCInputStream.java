@@ -269,7 +269,7 @@ public class ABCInputStream extends InputStream {
       int kind = read();
       int kindType = 0xf & kind;
       int kindFlags = kind >> 4;
-      Trait trait = new Trait();
+      Trait trait;
 
       switch (kindType) {
          case 0: //slot
@@ -303,6 +303,8 @@ public class ABCInputStream extends InputStream {
             t4.method_info = readU30();
             trait = t4;
             break;
+         default:
+            throw new IOException("Unknown trait kind:" + kind);
       }
       trait.fileOffset = pos;
       trait.kindType = kindType;

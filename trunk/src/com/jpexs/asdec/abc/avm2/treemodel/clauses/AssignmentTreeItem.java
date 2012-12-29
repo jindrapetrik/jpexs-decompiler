@@ -22,5 +22,4 @@ package com.jpexs.asdec.abc.avm2.treemodel.clauses;
  * @author JPEXS
  */
 public interface AssignmentTreeItem {
-
 }

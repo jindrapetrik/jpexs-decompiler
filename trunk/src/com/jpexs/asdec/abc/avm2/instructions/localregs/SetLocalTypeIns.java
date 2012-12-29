@@ -105,7 +105,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
       output.add(new SetLocalTreeItem(ins, regId, value));
    }
 
-   public String getObject(Stack<TreeItem> stack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, HashMap<Integer, String> localRegNames) {
+   public String getObject(Stack<TreeItem> stack, ABC abc, AVM2Instruction ins, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, HashMap<Integer, String> localRegNames) {
       return TreeItem.localRegName(localRegNames, getRegisterId(ins));
    }
 

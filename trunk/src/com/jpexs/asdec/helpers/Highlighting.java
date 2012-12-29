@@ -18,6 +18,8 @@ package com.jpexs.asdec.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
@@ -75,6 +77,9 @@ public class Highlighting {
    private static final String METHODOPEN = "[METHOD";
    private static final String METHODCLOSE = "]";
    private static final String METHODEND = "[/METHOD]";
+   private static final String CLASSOPEN = "[CLASS";
+   private static final String CLASSCLOSE = "]";
+   private static final String CLASSEND = "[/CLASS]";
 
    /**
     * Highlights specified text as instruction by adding special tags
@@ -144,6 +149,20 @@ public class Highlighting {
    }
 
    /**
+    * Highlights specified text as class by adding special tags
+    *
+    * @param text Text to highlight
+    * @param offset Offset of trait
+    * @return Highlighted text
+    */
+   public static String hilighClass(String text, long offset) {
+      if (!doHighlight) {
+         return text;
+      }
+      return CLASSOPEN + offset + CLASSCLOSE + text + CLASSEND;
+   }
+
+   /**
     * Strips all highlights from the text
     *
     * @param text Text to strip highlights in
@@ -156,6 +175,7 @@ public class Highlighting {
       text = stripInstrHilights(text);
       text = stripTraitHilights(text);
       text = stripMethodHilights(text);
+      text = stripClassHilights(text);
       return text;
    }
 
@@ -166,9 +186,7 @@ public class Highlighting {
     * @return Text with no instruction highlights
     */
    public static String stripInstrHilights(String text) {
-      text = text.replaceAll(Pattern.quote(OFSOPEN) + "[0-9]+" + Pattern.quote(OFSCLOSE), "");
-      text = text.replace(OFSEND, "");
-      return text;
+      return stripSpecificHilights(text, OFSOPEN, OFSCLOSE, OFSEND);
    }
 
    /**
@@ -178,9 +196,7 @@ public class Highlighting {
     * @return Text with no method highlights
     */
    public static String stripMethodHilights(String text) {
-      text = text.replaceAll(Pattern.quote(METHODOPEN) + "[0-9]+" + Pattern.quote(METHODCLOSE), "");
-      text = text.replace(METHODEND, "");
-      return text;
+      return stripSpecificHilights(text, METHODOPEN, METHODCLOSE, METHODEND);
    }
 
    /**
@@ -190,9 +206,51 @@ public class Highlighting {
     * @return Text with no trait highlights
     */
    public static String stripTraitHilights(String text) {
-      text = text.replaceAll(Pattern.quote(TRAITOPEN) + "[0-9]+" + Pattern.quote(TRAITCLOSE), "");
-      text = text.replace(TRAITEND, "");
+      return stripSpecificHilights(text, TRAITOPEN, TRAITCLOSE, TRAITEND);
+   }
+
+   /**
+    * Strips class highlights from the text
+    *
+    * @param text Text to strip trait highlights in
+    * @return Text with no class highlights
+    */
+   public static String stripClassHilights(String text) {
+      return stripSpecificHilights(text, CLASSOPEN, CLASSCLOSE, CLASSEND);
+   }
+
+   private static String stripSpecificHilights(String text, String txtOpen, String txtClose, String txtEnd) {
+      text = text.replaceAll(Pattern.quote(txtOpen) + "[0-9]+" + Pattern.quote(txtClose), "");
+      text = text.replace(txtEnd, "");
       return text;
+   }
+
+   private static List<Highlighting> getSpecificHighlights(String text, String txtOpen, String txtClose, String txtEnd) {
+      List<Highlighting> ret = new ArrayList<Highlighting>();
+      int pos = 0;
+      while (true) {
+         int openpos = text.indexOf(txtOpen);
+         if (openpos == -1) {
+            break;
+         }
+         int closepos = text.indexOf(txtClose, openpos);
+         int enpos = text.indexOf(txtEnd, openpos);
+         int textlen = enpos - closepos - txtClose.length();
+
+         int nextopenpos = text.indexOf(txtOpen, openpos + 1);
+         if (nextopenpos != -1) {
+            if (nextopenpos < enpos) {
+               Logger.getLogger(Highlighting.class.getName()).log(Level.SEVERE, "Crossed highligh - str:{0}", text);
+               enpos = nextopenpos;
+            }
+         }
+         long offset = Long.parseLong(text.substring(openpos + txtOpen.length(), closepos));
+         Highlighting hl = new Highlighting(pos + openpos, textlen, offset);
+         pos += openpos + textlen;
+         text = text.substring(enpos + txtEnd.length());
+         ret.add(hl);
+      }
+      return ret;
    }
 
    /**
@@ -205,31 +263,8 @@ public class Highlighting {
       text = text.replace("\r\n", "\n");
       text = stripInstrHilights(text);
       text = stripMethodHilights(text);
-      List<Highlighting> ret = new ArrayList<Highlighting>();
-      int pos = 0;
-      while (true) {
-         int openpos = text.indexOf(TRAITOPEN);
-         if (openpos == -1) {
-            break;
-         }
-         int closepos = text.indexOf(TRAITCLOSE, openpos);
-         int enpos = text.indexOf(TRAITEND, openpos);
-         int textlen = enpos - closepos - TRAITCLOSE.length();
-
-         int nextopenpos = text.indexOf(TRAITOPEN, openpos + 1);
-         if (nextopenpos != -1) {
-            if (nextopenpos < enpos) {
-               System.err.println(text);
-               throw new RuntimeException("Crossed highlight");
-            }
-         }
-         long offset = Long.parseLong(text.substring(openpos + TRAITOPEN.length(), closepos));
-         Highlighting hl = new Highlighting(pos + openpos, textlen, offset);
-         pos += openpos + textlen;
-         text = text.substring(enpos + TRAITEND.length());
-         ret.add(hl);
-      }
-      return ret;
+      text = stripClassHilights(text);
+      return getSpecificHighlights(text, TRAITOPEN, TRAITCLOSE, TRAITEND);
    }
 
    /**
@@ -242,31 +277,8 @@ public class Highlighting {
       text = text.replace("\r\n", "\n");
       text = stripInstrHilights(text);
       text = stripTraitHilights(text);
-      List<Highlighting> ret = new ArrayList<Highlighting>();
-      int pos = 0;
-      while (true) {
-         int openpos = text.indexOf(METHODOPEN);
-         if (openpos == -1) {
-            break;
-         }
-         int closepos = text.indexOf(METHODCLOSE, openpos);
-         int enpos = text.indexOf(METHODEND, openpos);
-         int textlen = enpos - closepos - METHODCLOSE.length();
-
-         int nextopenpos = text.indexOf(METHODOPEN, openpos + 1);
-         if (nextopenpos != -1) {
-            if (nextopenpos < enpos) {
-               System.err.println(text);
-               throw new RuntimeException("Crossed highlight");
-            }
-         }
-         long offset = Long.parseLong(text.substring(openpos + METHODOPEN.length(), closepos));
-         Highlighting hl = new Highlighting(pos + openpos, textlen, offset);
-         pos += openpos + textlen;
-         text = text.substring(enpos + METHODEND.length());
-         ret.add(hl);
-      }
-      return ret;
+      text = stripClassHilights(text);
+      return getSpecificHighlights(text, METHODOPEN, METHODCLOSE, METHODEND);
    }
 
    /**
@@ -279,30 +291,21 @@ public class Highlighting {
       text = text.replace("\r\n", "\n");
       text = stripTraitHilights(text);
       text = stripMethodHilights(text);
-      List<Highlighting> ret = new ArrayList<Highlighting>();
-      int pos = 0;
-      while (true) {
-         int openpos = text.indexOf(OFSOPEN);
-         if (openpos == -1) {
-            break;
-         }
-         int closepos = text.indexOf(OFSCLOSE, openpos);
-         int enpos = text.indexOf(OFSEND, openpos);
-         int textlen = enpos - closepos - OFSCLOSE.length();
+      text = stripClassHilights(text);
+      return getSpecificHighlights(text, OFSOPEN, OFSCLOSE, OFSEND);
+   }
 
-         int nextopenpos = text.indexOf(OFSOPEN, openpos + 1);
-         if (nextopenpos != -1) {
-            if (nextopenpos < enpos) {
-               System.err.println(text);
-               throw new RuntimeException("Crossed highlight");
-            }
-         }
-         long offset = Long.parseLong(text.substring(openpos + OFSOPEN.length(), closepos));
-         Highlighting hl = new Highlighting(pos + openpos, textlen, offset);
-         pos += openpos + textlen;
-         text = text.substring(enpos + OFSEND.length());
-         ret.add(hl);
-      }
-      return ret;
+   /**
+    * Gets all class highlight objects from specified text
+    *
+    * @param text Text to get highlights from
+    * @return List of class highlights
+    */
+   public static List<Highlighting> getClassHighlights(String text) {
+      text = text.replace("\r\n", "\n");
+      text = stripTraitHilights(text);
+      text = stripMethodHilights(text);
+      text = stripInstrHilights(text);
+      return getSpecificHighlights(text, CLASSOPEN, CLASSCLOSE, CLASSEND);
    }
 }

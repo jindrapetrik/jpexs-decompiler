@@ -17,6 +17,7 @@
 package com.jpexs.asdec.abc.types.traits;
 
 import com.jpexs.asdec.abc.ABC;
+import com.jpexs.asdec.helpers.Highlighting;
 
 public class Traits {
 
@@ -45,13 +46,32 @@ public class Traits {
       return s;
    }
 
-   public String convert(String prefix, ABC abc) {
+   public String convert(ABC abc, boolean isStatic, boolean pcode, boolean makePackages, int classIndex, boolean highlighting) {
       String s = "";
       for (int t = 0; t < traits.length; t++) {
          if (t > 0) {
-            s += "\r\n";
+            s += "\r\n\r\n";
          }
-         s += prefix + traits[t].convert(null, abc);
+         String plus;
+         if (makePackages) {
+            plus = traits[t].convertPackaged(abc, isStatic, pcode, classIndex, highlighting);
+         } else {
+            plus = traits[t].convert(abc, isStatic, pcode, classIndex, highlighting);
+         }
+         if (highlighting) {
+            int h = t;
+            if (classIndex != -1) {
+               if (!isStatic) {
+                  h = h + abc.class_info[classIndex].static_traits.traits.length;
+               }
+            }
+            if (traits[t] instanceof TraitClass) {
+               plus = Highlighting.hilighClass(plus, h);
+            } else {
+               plus = Highlighting.hilighTrait(plus, h);
+            }
+         }
+         s += plus;
       }
       return s;
    }

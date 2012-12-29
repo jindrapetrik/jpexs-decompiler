@@ -230,7 +230,7 @@ public class Multiname {
          return null;
       } else if (namespace_set_index == -1) {
          return null;
-      }else {
+      } else {
          return constants.constant_namespace_set[namespace_set_index];
       }
    }

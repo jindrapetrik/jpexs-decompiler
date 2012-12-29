@@ -64,6 +64,20 @@ public class ValueKind {
       return s;
    }
 
+   public boolean isNamespace() {
+      switch (value_kind) {
+         case CONSTANT_Namespace:
+         case CONSTANT_PackageInternalNs:
+         case CONSTANT_ProtectedNamespace:
+         case CONSTANT_ExplicitNamespace:
+         case CONSTANT_StaticProtectedNs:
+         case CONSTANT_PrivateNs:
+            return true;
+         default:
+            return false;
+      }
+   }
+
    public String toString(ConstantPool constants) {
       String ret = "?";
       switch (value_kind) {
@@ -95,22 +109,12 @@ public class ValueKind {
             ret = "undefined";
             break;
          case CONSTANT_Namespace:
-            ret = "ns[" + value_index + "]";
-            break;
          case CONSTANT_PackageInternalNs:
-            ret = "package internal ns[" + value_index + "]";
-            break;
          case CONSTANT_ProtectedNamespace:
-            ret = "protected ns[" + value_index + "]";
-            break;
          case CONSTANT_ExplicitNamespace:
-            ret = "explicit ns[" + value_index + "]";
-            break;
          case CONSTANT_StaticProtectedNs:
-            ret = "static protected ns[" + value_index + "]";
-            break;
          case CONSTANT_PrivateNs:
-            ret = "private ns[" + value_index + "]";
+            ret = "\"" + constants.constant_namespace[value_index].getName(constants) + "\"";
             break;
       }
       return ret;

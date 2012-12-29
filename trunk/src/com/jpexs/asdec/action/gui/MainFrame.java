@@ -222,7 +222,7 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
                      List<com.jpexs.asdec.action.Action> as = asm.getActions(SWF.DEFAULT_VERSION);
                      com.jpexs.asdec.action.Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
 
-                     decompiledEditor.setText(Highlighting.stripHilights(com.jpexs.asdec.action.Action.actionsToSource(as, SWF.DEFAULT_VERSION))); 
+                     decompiledEditor.setText(Highlighting.stripHilights(com.jpexs.asdec.action.Action.actionsToSource(as, SWF.DEFAULT_VERSION)));
                   }
                   Main.stopWork();
                }

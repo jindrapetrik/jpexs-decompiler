@@ -17,13 +17,11 @@
 package com.jpexs.asdec.abc.types.traits;
 
 import com.jpexs.asdec.abc.ABC;
-import com.jpexs.asdec.abc.avm2.ConstantPool;
-import com.jpexs.asdec.abc.types.MethodInfo;
 import com.jpexs.asdec.abc.types.Multiname;
 import com.jpexs.asdec.abc.types.Namespace;
 import com.jpexs.asdec.helpers.Helper;
 
-public class Trait {
+public abstract class Trait {
 
    public int name_index;
    public int kindType;
@@ -47,7 +45,7 @@ public class Trait {
       if ((kindFlags & ATTR_Override) > 0) {
          ret += "override";
       }
-      Multiname m = getMultiName(abc.constants);
+      Multiname m = getName(abc);
       if (m != null) {
          int v = abc.nsValueToName(m.namespace_index);
          if (v > -1) {
@@ -78,19 +76,32 @@ public class Trait {
       return abc.constants.constant_multiname[name_index].toString(abc.constants) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
    }
 
-   public String convert(MethodInfo[] methodInfo, ABC abc) {
-      return convert(methodInfo, abc, false);
-   }
-
-   public String convert(MethodInfo[] methodInfo, ABC abc, boolean isStatic) {
+   public String convert(ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight) {
       return abc.constants.constant_multiname[name_index].toString(abc.constants) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
    }
 
-   public Multiname getMultiName(ConstantPool constants) {
+   public String convertPackaged(ABC abc, boolean isStatic, boolean pcod, int classIndex, boolean highlight) {
+      return makePackageFromIndex(abc, name_index, convert(abc, isStatic, pcod, classIndex, highlight));
+   }
+
+   public String convertHeader(ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight) {
+      return convert(abc, isStatic, pcode, classIndex, highlight).trim();
+   }
+
+   protected String makePackageFromIndex(ABC abc, int name_index, String value) {
+      Namespace ns = abc.constants.constant_multiname[name_index].getNamespace(abc.constants);
+      if (ns.kind == Namespace.KIND_PACKAGE) {
+         String nsname = ns.getName(abc.constants);
+         return "package " + nsname + "\r\n{\r\n" + value + "\r\n}";
+      }
+      return value;
+   }
+
+   public Multiname getName(ABC abc) {
       if (name_index == 0) {
          return null;
       } else {
-         return constants.constant_multiname[name_index];
+         return abc.constants.constant_multiname[name_index];
       }
    }
 }

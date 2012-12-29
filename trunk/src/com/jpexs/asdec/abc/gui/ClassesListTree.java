@@ -18,6 +18,9 @@ package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
+import com.jpexs.asdec.abc.types.ScriptInfo;
+import com.jpexs.asdec.abc.types.traits.Trait;
+import com.jpexs.asdec.abc.types.traits.TraitClass;
 import javax.swing.ImageIcon;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
@@ -63,27 +66,29 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
          return;
       }
       Object item = tp.getItem();
-      if (item instanceof TreeLeafString) {
-         Main.abcMainFrame.navigator.setClassIndex(-1);
-         Main.abcMainFrame.decompiledTextArea.setClassIndex(-1, abc);
-         Main.abcMainFrame.decompiledTextArea.setText(((TreeLeafString) item).str);
-      }
-      if (item instanceof TreeLeafClass) {
-         final int classIndex = ((TreeLeafClass) item).classIndex;
-         if (classIndex != -1) {
-            if (!Main.isWorking()) {
-               Main.startWork("Decompiling class...");
-               (new Thread() {
-                  @Override
-                  public void run() {
-                     Main.abcMainFrame.navigator.setClassIndex(classIndex);
-                     Main.abcMainFrame.decompiledTextArea.setClassIndex(classIndex, abc);
-                     Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.setText("");
-                     Main.stopWork();
+      if (item instanceof ScriptInfo) {
+         final ScriptInfo script = (ScriptInfo) item;
+
+         if (!Main.isWorking()) {
+            Main.startWork("Decompiling class...");
+            (new Thread() {
+               @Override
+               public void run() {
+                  int classIndex = -1;
+                  for (Trait t : script.traits.traits) {
+                     if (t instanceof TraitClass) {
+                        classIndex = ((TraitClass) t).class_info;
+                        break;
+                     }
                   }
-               }).start();
-            }
+                  Main.abcMainFrame.navigator.setClassIndex(classIndex);
+                  Main.abcMainFrame.decompiledTextArea.setScript(script, abc);
+                  Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.setText("");
+                  Main.stopWork();
+               }
+            }).start();
          }
+
       }
 
    }

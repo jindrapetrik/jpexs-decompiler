@@ -32,8 +32,4 @@ public class ClassInfo {
    public String toString(ABC abc) {
       return "method_index=" + cinit_index + "\r\n" + static_traits.toString(abc);
    }
-
-   public String getStaticVarsStr(ABC abc) {
-      return static_traits.convert("\tstatic ", abc);
-   }
 }

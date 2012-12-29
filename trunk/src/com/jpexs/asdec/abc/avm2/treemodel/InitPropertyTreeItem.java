@@ -21,7 +21,7 @@ import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.clauses.AssignmentTreeItem;
 import java.util.HashMap;
 
-public class InitPropertyTreeItem extends TreeItem implements SetTypeTreeItem,AssignmentTreeItem {
+public class InitPropertyTreeItem extends TreeItem implements SetTypeTreeItem, AssignmentTreeItem {
 
    public TreeItem object;
    public FullMultinameTreeItem propertyName;

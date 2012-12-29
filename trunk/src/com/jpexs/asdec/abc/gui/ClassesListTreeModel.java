@@ -17,7 +17,7 @@
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.abc.ABC;
-import java.util.HashMap;
+import com.jpexs.asdec.abc.types.ScriptInfo;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -55,17 +55,11 @@ public class ClassesListTreeModel implements TreeModel {
 
    public ClassesListTreeModel(ABC abc) {
       this.abc = abc;
-      for (int i = 0; i < abc.instance_info.length; i++) {
-         String packageName = abc.instance_info[i].getName(abc.constants).getNamespace(abc.constants).getName(abc.constants);
-         String className = abc.instance_info[i].getName(abc.constants).getName(abc.constants);
-         //String full = packageName + "." + className;
-         classTree.add(className, packageName, new TreeLeafClass(i));
-      }
-      HashMap<String, String> ns = abc.namespacesToString();
-      for (String n : ns.keySet()) {
-         String nsName = n.substring(n.lastIndexOf(".") + 1);
-         String packageName = n.substring(0, n.lastIndexOf("."));
-         classTree.add(nsName, packageName, new TreeLeafString(ns.get(n)));
+      for (ScriptInfo si : abc.script_info) {
+         String path = si.getPath(abc);
+         String nsName = path.substring(path.lastIndexOf(".") + 1);
+         String packageName = path.substring(0, path.lastIndexOf("."));
+         classTree.add(nsName, packageName, si);
       }
    }
 

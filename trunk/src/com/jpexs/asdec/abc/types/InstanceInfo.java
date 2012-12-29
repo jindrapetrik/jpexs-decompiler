@@ -54,14 +54,14 @@ public class InstanceInfo {
          supIndexStr = " extends " + abc.constants.constant_multiname[super_index].getName(abc.constants);////+" flags="+flags+" protectedNS="+protectedNS+" interfaces="+Helper.intArrToString(interfaces)+" method_index="+iinit_index
       }
       String implStr = "";
-      if(interfaces.length>0){
-         if(isInterface()){
+      if (interfaces.length > 0) {
+         if (isInterface()) {
             implStr = " extends ";
-         }else{
+         } else {
             implStr = " implements ";
          }
-         for(int i=0;i<interfaces.length;i++){
-            if(i>0){
+         for (int i = 0; i < interfaces.length; i++) {
+            if (i > 0) {
                implStr += ", ";
             }
             implStr += abc.constants.constant_multiname[interfaces[i]].getName(abc.constants);
@@ -87,24 +87,19 @@ public class InstanceInfo {
       return modifiers + objType + abc.constants.constant_multiname[name_index].getName(abc.constants) + supIndexStr + implStr;
    }
 
-   public String getInstanceVarsStr(ABC abc) {
-      return instance_traits.convert("\t", abc);
-   }
-
    public Multiname getName(ConstantPool constants) {
       return constants.constant_multiname[name_index];
    }
-   
-   public boolean isInterface(){
+
+   public boolean isInterface() {
       return ((flags & CLASS_INTERFACE) == CLASS_INTERFACE);
    }
-   
-   public boolean isDynamic(){
+
+   public boolean isDynamic() {
       return (flags & CLASS_SEALED) == 0;
    }
-   
-   public boolean isFinal()
-   {
+
+   public boolean isFinal() {
       return (flags & CLASS_FINAL) == CLASS_FINAL;
    }
 }

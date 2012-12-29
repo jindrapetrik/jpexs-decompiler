@@ -19,6 +19,7 @@ package com.jpexs.asdec.abc.gui;
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConvertException;
+import com.jpexs.asdec.abc.types.ScriptInfo;
 import com.jpexs.asdec.abc.types.traits.Trait;
 import com.jpexs.asdec.abc.types.traits.TraitSlotConst;
 import com.jpexs.asdec.helpers.Highlighting;
@@ -35,8 +36,9 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
    private List<Highlighting> highlights = new ArrayList<Highlighting>();
    private List<Highlighting> traitHighlights = new ArrayList<Highlighting>();
    private List<Highlighting> methodHighlights = new ArrayList<Highlighting>();
+   private List<Highlighting> classHighlights = new ArrayList<Highlighting>();
    private ABC abc;
-   private int classIndex;
+   private ScriptInfo script;
    public int lastTraitIndex = 0;
 
    public void setNoTrait() {
@@ -69,9 +71,30 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
       return success;
    }
 
+   public void displayClass(int classIndex) {
+      if (Main.abcMainFrame.navigator.getClassIndex() != classIndex) {
+         Main.abcMainFrame.navigator.setClassIndex(classIndex);
+      }
+   }
+   private int classIndex = -1;
+
    public void caretUpdate(CaretEvent e) {
       getCaret().setVisible(true);
       int pos = getCaretPosition();
+
+
+      for (Highlighting cm : classHighlights) {
+         if ((pos >= cm.startPos) && (pos < cm.startPos + cm.len)) {
+            classIndex = (int) cm.offset;
+            displayClass(classIndex);
+            break;
+         }
+      }
+
+      if (classIndex == -1) {
+         setNoTrait();
+         return;
+      }
       for (Highlighting tm : methodHighlights) {
          if ((pos >= tm.startPos) && (pos < tm.startPos + tm.len)) {
             displayMethod(pos, (int) tm.offset);
@@ -102,15 +125,17 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
       public List<Highlighting> highlights;
       public List<Highlighting> traitHighlights;
       public List<Highlighting> methodHighlights;
+      public List<Highlighting> classHighlights;
 
-      public BufferedClass(String text, List<Highlighting> highlights, List<Highlighting> traitHighlights, List<Highlighting> methodHighlights) {
+      public BufferedClass(String text, List<Highlighting> highlights, List<Highlighting> traitHighlights, List<Highlighting> methodHighlights, List<Highlighting> classHighlights) {
          this.text = text;
          this.highlights = highlights;
          this.traitHighlights = traitHighlights;
          this.methodHighlights = methodHighlights;
+         this.classHighlights = classHighlights;
       }
    }
-   private HashMap<Integer, BufferedClass> bufferedClasses = new HashMap<Integer, BufferedClass>();
+   private HashMap<ScriptInfo, BufferedClass> bufferedClasses = new HashMap<ScriptInfo, BufferedClass>();
 
    public void gotoLastTrait() {
       gotoTrait(lastTraitIndex);
@@ -121,16 +146,27 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
          setCaretPosition(0);
          return;
       }
-      for (Highlighting th : traitHighlights) {
-         if (th.offset == traitId) {
-            try {
-               setCaretPosition(th.startPos + th.len - 1);
-               setCaretPosition(th.startPos);
-            } catch (IllegalArgumentException iae) {
+
+      for (Highlighting tc : classHighlights) {
+         if (tc.offset == classIndex) {
+            for (Highlighting th : traitHighlights) {
+               if ((th.startPos > tc.startPos) && (th.startPos + th.len < tc.startPos + tc.len)) {
+                  if (th.offset == traitId) {
+                     try {
+                        setCaretPosition(th.startPos + th.len - 1);
+                        setCaretPosition(th.startPos);
+                     } catch (IllegalArgumentException iae) {
+                     }
+                     return;
+                  }
+               }
             }
-            return;
+            break;
          }
       }
+
+
+
       setCaretPosition(0);
    }
 
@@ -141,26 +177,27 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
       addCaretListener(this);
    }
 
-   public void setClassIndex(int index, ABC abc) {
+   public void setScript(ScriptInfo script, ABC abc) {
       setText("//Please wait...");
-      if (index == -1) {
+      if (script == null) {
          highlights = new ArrayList<Highlighting>();
          traitHighlights = new ArrayList<Highlighting>();
          methodHighlights = new ArrayList<Highlighting>();
-         classIndex = -1;
+         this.script = null;
          return;
       }
 
       String hilightedCode;
-      if (!bufferedClasses.containsKey(index)) {
-         hilightedCode = abc.classToString(index, true, false);
+      if (!bufferedClasses.containsKey(script)) {
+         hilightedCode = script.convert(abc, false, true);
          highlights = Highlighting.getInstrHighlights(hilightedCode);
          traitHighlights = Highlighting.getTraitHighlights(hilightedCode);
          methodHighlights = Highlighting.getMethodHighlights(hilightedCode);
+         classHighlights = Highlighting.getClassHighlights(hilightedCode);
          hilightedCode = Highlighting.stripHilights(hilightedCode);
-         bufferedClasses.put(index, new BufferedClass(hilightedCode, highlights, traitHighlights, methodHighlights));
+         bufferedClasses.put(script, new BufferedClass(hilightedCode, highlights, traitHighlights, methodHighlights, classHighlights));
       } else {
-         BufferedClass bc = bufferedClasses.get(index);
+         BufferedClass bc = bufferedClasses.get(script);
          hilightedCode = bc.text;
          highlights = bc.highlights;
          traitHighlights = bc.traitHighlights;
@@ -168,14 +205,14 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
       }
       setText(hilightedCode);
       this.abc = abc;
-      classIndex = index;
+      this.script = script;
    }
 
    public void reloadClass() {
-      if (bufferedClasses.containsKey(classIndex)) {
-         bufferedClasses.remove(classIndex);
+      if (bufferedClasses.containsKey(script)) {
+         bufferedClasses.remove(script);
       }
-      setClassIndex(classIndex, abc);
+      setScript(script, abc);
       setNoTrait();
    }
 

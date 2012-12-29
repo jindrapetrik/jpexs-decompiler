@@ -21,9 +21,6 @@ import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.UnknownInstructionCode;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.asdec.abc.avm2.treemodel.InitPropertyTreeItem;
-import com.jpexs.asdec.abc.avm2.treemodel.SetPropertyTreeItem;
-import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.*;
 import com.jpexs.asdec.abc.types.traits.Trait;
 import com.jpexs.asdec.abc.types.traits.TraitMethodGetterSetter;
@@ -31,14 +28,11 @@ import com.jpexs.asdec.abc.types.traits.TraitSlotConst;
 import com.jpexs.asdec.abc.types.traits.Traits;
 import com.jpexs.asdec.abc.usages.*;
 import com.jpexs.asdec.helpers.Helper;
-import com.jpexs.asdec.helpers.Highlighting;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -255,7 +249,7 @@ public class ABC {
          bodyIdxFromMethodIdx[mb.method_info] = i;
       }
       loadNamespaceMap();
-     /* for(ScriptInfo si:script_info){         
+      /* for(ScriptInfo si:script_info){         
        System.out.println("--------------------------------------------");
        System.out.println(findBody(si.init_index).toString(true, false, -1, this, constants, method_info,new Stack<TreeItem>(),false,false));
        System.out.println("sitrait:"+si.traits.toString(this));
@@ -371,116 +365,6 @@ public class ABC {
       }
    }
 
-   private void parseImportFromNS(List imports, Namespace ns, String ignorePackage, String name) {
-      if(name.equals("")){
-         name="*";
-      }
-      if(ns.kind!=Namespace.KIND_PACKAGE){
-         return;
-      }
-      String newimport = ns.getName(constants);
-      if (newimport.equals("-")) {
-         newimport = "";
-      }
-      if (!newimport.equals("")) {
-         newimport += "." + name;
-         if (newimport.contains(":")) {
-            return;
-         }
-         if (!imports.contains(newimport)) {
-            String pkg = newimport.substring(0, newimport.lastIndexOf("."));
-            if (!pkg.equals(ignorePackage)) {
-               imports.add(newimport);
-            }
-         }
-      }
-   }
-
-   private void parseImportFromMultiname(List imports, Multiname m, String ignorePackage) {
-      if (m != null) {
-         Namespace ns = m.getNamespace(constants);
-         String name = m.getName(constants);
-         NamespaceSet nss = m.getNamespaceSet(constants);
-         if (ns != null) {
-            parseImportFromNS(imports, ns, ignorePackage, name);
-         }
-         if (nss != null) {
-            for (int ni : nss.namespaces) {
-               parseImportFromNS(imports, constants.constant_namespace[ni], ignorePackage, name);
-            }
-         }
-      }
-   }
-
-   private void parseImportsFromMethodInfo(int method_index,List imports, String ignorePackage){
-      if(method_info[method_index].ret_type!=0){
-         parseImportFromMultiname(imports, constants.constant_multiname[method_info[method_index].ret_type], ignorePackage);
-      }
-      for(int t:method_info[method_index].param_types){
-         if(t!=0){
-            parseImportFromMultiname(imports, constants.constant_multiname[t], ignorePackage);      
-         }
-      }
-      MethodBody body = findBody(method_index);
-               if (body != null) {
-                  for (AVM2Instruction ins : body.code.code) {
-                     for (int k = 0; k < ins.definition.operands.length; k++) {
-                        if (ins.definition.operands[k] == AVM2Code.DAT_MULTINAME_INDEX) {
-                           int multinameIndex = ins.operands[k];
-                           parseImportFromMultiname(imports, constants.constant_multiname[multinameIndex], ignorePackage);
-                        }
-                     }
-                  }
-               }
-   }
-   
-   private List getImports(int instanceIndex) {
-      List<String> imports = new ArrayList<String>();
-
-      //constructor
-
-      //parseImportFromMultiname(imports, constants.constant_multiname[instance_info[instanceIndex].name_index]);
-
-      String packageName = instance_info[instanceIndex].getName(constants).getNamespace(constants).getName(constants);
-
-      if (instance_info[instanceIndex].super_index > 0) {
-         parseImportFromMultiname(imports, constants.constant_multiname[instance_info[instanceIndex].super_index], packageName);
-      }
-      for (int i : instance_info[instanceIndex].interfaces) {
-         parseImportFromMultiname(imports, constants.constant_multiname[i], packageName);
-      }
-
-      //static
-      for (Trait t : class_info[instanceIndex].static_traits.traits) {
-         //parseImportFromMultiname(imports, t.getMultiName(constants));
-         if (t instanceof TraitMethodGetterSetter) {
-            TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;            
-            if (tm.method_info != 0) {         
-               parseImportsFromMethodInfo(tm.method_info,imports,packageName);               
-            }
-         }
-
-      }
-
-      //static initializer
-      parseImportsFromMethodInfo(class_info[instanceIndex].cinit_index,imports,packageName);      
-
-      //instance
-      for (Trait t : instance_info[instanceIndex].instance_traits.traits) {
-         //parseImportFromMultiname(imports, t.getMultiName(constants));
-         if (t instanceof TraitMethodGetterSetter) {
-            TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
-            if (tm.method_info != 0) {
-               parseImportsFromMethodInfo(tm.method_info,imports,packageName);                               
-            }
-         }
-      }
-
-      //instance initializer
-      parseImportsFromMethodInfo(instance_info[instanceIndex].iinit_index,imports,packageName);           
-      return imports;
-   }
-
    public MethodBody findBody(int methodInfo) {
       if (methodInfo < 0) {
          return null;
@@ -501,7 +385,7 @@ public class ABC {
             for (Trait t : instance_info[i].instance_traits.traits) {
                if (t instanceof TraitMethodGetterSetter) {
                   TraitMethodGetterSetter t2 = (TraitMethodGetterSetter) t;
-                  if (methodName.equals(t2.getMethodName(constants))) {
+                  if (methodName.equals(t2.getName(this).getName(constants))) {
                      for (MethodBody body : bodies) {
                         if (body.method_info == t2.method_info) {
                            return body;
@@ -518,7 +402,7 @@ public class ABC {
             for (Trait t : class_info[i].static_traits.traits) {
                if (t instanceof TraitMethodGetterSetter) {
                   TraitMethodGetterSetter t2 = (TraitMethodGetterSetter) t;
-                  if (methodName.equals(t2.getMethodName(constants))) {
+                  if (methodName.equals(t2.getName(this).getName(constants))) {
                      for (MethodBody body : bodies) {
                         if (body.method_info == t2.method_info) {
                            return body;
@@ -535,7 +419,7 @@ public class ABC {
       return null;
    }
 
-   private String addTabs(String s, int tabs) {
+   public static String addTabs(String s, int tabs) {
       String parts[] = s.split("\r\n");
       if (!s.contains("\r\n")) {
          parts = s.split("\n");
@@ -635,179 +519,15 @@ public class ABC {
       return ret;
    }
 
-   public String classToString(int i, boolean highlight, boolean pcode) {
-      if (!highlight) {
-         Highlighting.doHighlight = false;
-      }
-      String ret = "";
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      PrintStream out = new PrintStream(baos);
-      String packageName = instance_info[i].getName(constants).getNamespace(constants).getName(constants);
-      out.println("package " + packageName);
-      out.println("{");
-
-      //imports
-      List<String> imports = getImports(i);
-      for (String imp : imports) {
-         out.println(IDENT_STRING + "import " + imp + ";");
-      }
-      out.println();
-
-      //class header
-      String classHeader = instance_info[i].getClassHeaderStr(this);
-      /*if (classHeader.startsWith("private ")) {
-       classHeader = "public " + classHeader.substring("private ".length());
-       }*/
-      out.println(IDENT_STRING + classHeader);
-      out.println(IDENT_STRING + "{");
-
-      String toPrint;
-      List<String> outTraits = new LinkedList<String>();
-
-      //if (class_info[i].cinit_index != 0) {
-      if (AUTOINIT_STATIC_VARIABLES) {
-         int bodyIndex = findBodyIndex(class_info[i].cinit_index);
-         List<TreeItem> initializer = bodies[bodyIndex].code.toTree(true, i, this, constants, method_info, bodies[bodyIndex], bodies[bodyIndex].code.getLocalRegNamesFromDebug(this));
-         for (TreeItem ti : initializer) {
-            if (ti instanceof SetPropertyTreeItem) {
-               int multinameIndex = ((SetPropertyTreeItem) ti).propertyName.multinameIndex;
-               TreeItem value = ((SetPropertyTreeItem) ti).value;
-               for (Trait t : class_info[i].static_traits.traits) {
-                  if (t.name_index == multinameIndex) {
-                     if (t instanceof TraitSlotConst) {
-                        ((TraitSlotConst) t).assignedValue = value;
-                     }
-                  }
-               }
-            }
-            if (ti instanceof InitPropertyTreeItem) {
-               int multinameIndex = ((InitPropertyTreeItem) ti).propertyName.multinameIndex;
-               TreeItem value = ((InitPropertyTreeItem) ti).value;
-               for (Trait t : class_info[i].static_traits.traits) {
-                  if (t.name_index == multinameIndex) {
-                     if (t instanceof TraitSlotConst) {
-                        ((TraitSlotConst) t).assignedValue = value;
-                     }
-                  }
-               }
-            }
-         }
-      }
-      String bodyStr = "";
-      int bodyIndex = findBodyIndex(class_info[i].cinit_index);
-      if (bodyIndex != -1) {
-         bodyStr = bodies[bodyIndex].toString(pcode, true, i, this, constants, method_info, new Stack<TreeItem>(), true, highlight);
-      }
-      if (Highlighting.stripHilights(bodyStr).equals("")) {
-         toPrint = addTabs(bodyStr, 3);
-      } else {
-         toPrint = IDENT_STRING + IDENT_STRING + "{\r\n" + addTabs(bodyStr, 3) + "\r\n" + IDENT_STRING + IDENT_STRING + "}";
-      }
-      if (highlight) {
-         toPrint = Highlighting.hilighTrait(toPrint, class_info[i].static_traits.traits.length + instance_info[i].instance_traits.traits.length + 1);
-      }
-      outTraits.add(toPrint);
-      //}
-
-      //constructor
-      //if (instance_info[i].iinit_index != 0) {
-      if (!instance_info[i].isInterface()) {
-         String modifier = "";
-         Multiname m = constants.constant_multiname[instance_info[i].name_index];
-         if (m != null) {
-            Namespace ns = m.getNamespace(constants);
-            if (ns != null) {
-               modifier = ns.getPrefix(this) + " ";
-               if (modifier.equals(" ")) {
-                  modifier = "";
-               }
-            }
-         }
-         String constructorParams;
-
-         bodyStr = "";
-         bodyIndex = findBodyIndex(instance_info[i].iinit_index);
-         if (bodyIndex != -1) {
-            bodyStr = addTabs(bodies[bodyIndex].toString(pcode, false, i, this, constants, method_info, new Stack<TreeItem>(), false, highlight), 3);
-            constructorParams = method_info[instance_info[i].iinit_index].getParamStr(constants, bodies[bodyIndex], this);
-         } else {
-            constructorParams = method_info[instance_info[i].iinit_index].getParamStr(constants, null, this);
-         }
-         toPrint = IDENT_STRING + IDENT_STRING + modifier + "function " + constants.constant_multiname[instance_info[i].name_index].getName(constants) + "(" + constructorParams + ") {\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}";
-         if (highlight) {
-            toPrint = Highlighting.hilighTrait(toPrint, class_info[i].static_traits.traits.length + instance_info[i].instance_traits.traits.length);
-         }
-         outTraits.add(toPrint);
-      }
-      //}
-
-      //static variables,constants & methods
-      for (int ti = 0; ti < class_info[i].static_traits.traits.length; ti++) {
-         Trait t = class_info[i].static_traits.traits[ti];
-         toPrint = "";
-         if (t instanceof TraitMethodGetterSetter) {
-            TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
-            bodyStr = "";
-            bodyIndex = findBodyIndex(tm.method_info);
-            if (bodyIndex != -1) {
-               bodyStr = addTabs(bodies[bodyIndex].toString(pcode, true, i, this, constants, method_info, new Stack<TreeItem>(), false, highlight), 3);
-            }
-            toPrint = IDENT_STRING + IDENT_STRING + tm.convert(method_info, this, true) + (instance_info[i].isInterface() ? ";" : " {\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}");
-         }
-         if (t instanceof TraitSlotConst) {
-            TraitSlotConst ts = (TraitSlotConst) t;
-
-            toPrint = IDENT_STRING + IDENT_STRING + ts.convert(method_info, this, true) + ";";
-         }
-         if (highlight) {
-            toPrint = Highlighting.hilighTrait(toPrint, ti);
-         } else {
-            toPrint = Highlighting.stripHilights(toPrint);
-         }
-         outTraits.add(toPrint);
-      }
-      for (int ti = 0; ti < instance_info[i].instance_traits.traits.length; ti++) {
-         Trait t = instance_info[i].instance_traits.traits[ti];
-         toPrint = "";
-         if (t instanceof TraitSlotConst) {
-            TraitSlotConst ts = (TraitSlotConst) t;
-            toPrint = IDENT_STRING + IDENT_STRING + ts.convert(method_info, this, false) + ";";
-         }
-
-         if (t instanceof TraitMethodGetterSetter) {
-            TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
-            bodyStr = "";
-            bodyIndex = findBodyIndex(tm.method_info);
-            if (bodyIndex != -1) {
-               bodyStr = addTabs(bodies[bodyIndex].toString(pcode, false, i, this, constants, method_info, new Stack<TreeItem>(), false, highlight), 3);
-            }
-            toPrint = IDENT_STRING + IDENT_STRING + tm.convert(method_info, this, false) + (instance_info[i].isInterface() ? ";" : " {\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}");
-         }
-         if (highlight) {
-            toPrint = Highlighting.hilighTrait(toPrint, class_info[i].static_traits.traits.length + ti);
-         } else {
-            toPrint = Highlighting.stripHilights(toPrint);
-         }
-         outTraits.add(toPrint);
-      }
-
-      out.println(Helper.joinStrings(outTraits, "\r\n\r\n"));
-      out.println(IDENT_STRING + "}");//class
-      out.println("}");//package
-      out.flush();
-      Highlighting.doHighlight = true;
-      return baos.toString();
-   }
-
    public void export(String directory, boolean pcode) throws IOException {
-      for (int i = 0; i < instance_info.length; i++) {
-         String packageName = instance_info[i].getName(constants).getNamespace(constants).getName(constants);
-         String className = instance_info[i].getName(constants).getName(constants);
-         String fullName = className;
-         if ((packageName != null) && (!packageName.equals(""))) {
-            fullName = packageName + "." + fullName;
+      for (int i = 0; i < script_info.length; i++) {
+         String path = script_info[i].getPath(this);
+         String packageName = path.substring(0, path.lastIndexOf("."));
+         String className = path.substring(path.lastIndexOf(".") + 1);
+         if (packageName.equals("")) {
+            path = path.substring(1);
          }
-         String exStr = "Exporting " + (i + 1) + "/" + instance_info.length + " " + fullName + " ...";
+         String exStr = "Exporting " + (i + 1) + "/" + script_info.length + " " + path + " ...";
          informListeners("export", exStr);
          logger.info(exStr);
          File outDir = new File(directory + File.separatorChar + packageName.replace('.', File.separatorChar));
@@ -816,24 +536,9 @@ public class ABC {
          }
          String fileName = outDir.toString() + File.separator + className + ".as";
          FileOutputStream fos = new FileOutputStream(fileName);
-         fos.write(classToString(i, false, pcode).getBytes());
+         fos.write(script_info[i].convert(this, pcode, false).getBytes());
          fos.close();
       }
-      informListeners("export", "Exporting namespaces...");
-      HashMap<String, String> ns = namespacesToString();
-      for (String n : ns.keySet()) {
-         String nsName = n.substring(n.lastIndexOf(".") + 1);
-         String packageName = n.substring(0, n.lastIndexOf("."));
-         File outDir = new File(directory + File.separatorChar + packageName.replace('.', File.separatorChar));
-         if (!outDir.exists()) {
-            outDir.mkdirs();
-         }
-         String fileName = outDir.toString() + File.separator + nsName + ".as";
-         FileOutputStream fos = new FileOutputStream(fileName);
-         fos.write(ns.get(n).getBytes());
-         fos.close();
-      }
-
    }
 
    public void dump(OutputStream os) {

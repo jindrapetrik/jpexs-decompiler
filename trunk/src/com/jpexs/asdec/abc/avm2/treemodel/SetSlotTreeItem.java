@@ -22,7 +22,7 @@ import com.jpexs.asdec.abc.avm2.treemodel.clauses.AssignmentTreeItem;
 import com.jpexs.asdec.abc.types.Multiname;
 import java.util.HashMap;
 
-public class SetSlotTreeItem extends TreeItem implements SetTypeTreeItem,AssignmentTreeItem {
+public class SetSlotTreeItem extends TreeItem implements SetTypeTreeItem, AssignmentTreeItem {
 
    public Multiname slotName;
    public TreeItem value;
@@ -37,24 +37,24 @@ public class SetSlotTreeItem extends TreeItem implements SetTypeTreeItem,Assignm
 
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
-      
-      return  getName(constants,localRegNames)+ hilight("=") + value.toString(constants, localRegNames);
+
+      return getName(constants, localRegNames) + hilight("=") + value.toString(constants, localRegNames);
    }
-   
-   public String getName(ConstantPool constants, HashMap<Integer, String> localRegNames){
+
+   public String getName(ConstantPool constants, HashMap<Integer, String> localRegNames) {
       String ret = "";
 
       /*ret = scope.toString(constants, localRegNames) + ".";
-      if (!(scope instanceof NewActivationTreeItem)) {
-         ret = scope.toString(constants, localRegNames) + ".";
-      }
-      if (scope instanceof LocalRegTreeItem) {
-         if (((LocalRegTreeItem) scope).computedValue != null) {
-            if (((LocalRegTreeItem) scope).computedValue instanceof NewActivationTreeItem) {
-               ret = "";
-            }
-         }
-      }*/
+       if (!(scope instanceof NewActivationTreeItem)) {
+       ret = scope.toString(constants, localRegNames) + ".";
+       }
+       if (scope instanceof LocalRegTreeItem) {
+       if (((LocalRegTreeItem) scope).computedValue != null) {
+       if (((LocalRegTreeItem) scope).computedValue instanceof NewActivationTreeItem) {
+       ret = "";
+       }
+       }
+       }*/
       return ret + hilight(slotName.getName(constants));
    }
 

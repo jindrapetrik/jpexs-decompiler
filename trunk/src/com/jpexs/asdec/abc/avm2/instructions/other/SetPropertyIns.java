@@ -112,10 +112,10 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
       output.add(new SetPropertyTreeItem(ins, obj, multiname, value));
    }
 
-   public String getObject(Stack<TreeItem> stack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, HashMap<Integer, String> localRegNames) {
+   public String getObject(Stack<TreeItem> stack, ABC abc, AVM2Instruction ins, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, HashMap<Integer, String> localRegNames) {
       int multinameIndex = ins.operands[0];
-      String multiname = resolveMultinameNoPop(0, stack, constants, multinameIndex, ins);
-      TreeItem obj = stack.get(1 + resolvedCount(constants, multinameIndex)); //pod vrcholem
+      String multiname = resolveMultinameNoPop(0, stack, abc.constants, multinameIndex, ins);
+      TreeItem obj = stack.get(1 + resolvedCount(abc.constants, multinameIndex)); //pod vrcholem
       if ((!obj.toString().equals(""))) {
          multiname = "." + multiname;
       }

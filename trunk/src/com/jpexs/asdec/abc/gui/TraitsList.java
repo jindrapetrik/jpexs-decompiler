@@ -28,6 +28,10 @@ public class TraitsList extends JList implements ListSelectionListener {
    ABC abc;
    int classIndex = -1;
 
+   public int getClassIndex() {
+      return classIndex;
+   }
+
    public TraitsList() {
       addListSelectionListener(this);
       setCellRenderer(new IconListRenderer());
@@ -36,9 +40,11 @@ public class TraitsList extends JList implements ListSelectionListener {
    public void setABC(ABC abc) {
       this.abc = abc;
       setModel(new DefaultListModel());
+      setClassIndex(-1);
    }
 
    public void setClassIndex(int classIndex) {
+      this.classIndex = classIndex;
       if (classIndex == -1) {
          setModel(new DefaultListModel());
       } else {
@@ -46,8 +52,6 @@ public class TraitsList extends JList implements ListSelectionListener {
             setModel(new TraitsListModel(abc, classIndex));
          }
       }
-      this.classIndex = classIndex;
-
    }
 
    public void valueChanged(ListSelectionEvent e) {

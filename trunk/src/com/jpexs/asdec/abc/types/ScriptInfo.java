@@ -17,6 +17,7 @@
 package com.jpexs.asdec.abc.types;
 
 import com.jpexs.asdec.abc.ABC;
+import com.jpexs.asdec.abc.types.traits.Trait;
 import com.jpexs.asdec.abc.types.traits.Traits;
 
 public class ScriptInfo {
@@ -31,5 +32,20 @@ public class ScriptInfo {
 
    public String toString(ABC abc) {
       return "method_index=" + init_index + "\r\n" + traits.toString(abc);
+   }
+
+   public String getPath(ABC abc) {
+      for (Trait t : traits.traits) {
+         Multiname name = t.getName(abc);
+         Namespace ns = name.getNamespace(abc.constants);
+         if (ns.kind == Namespace.KIND_PACKAGE) {
+            return ns.getName(abc.constants) + "." + name.getName(abc.constants);
+         }
+      }
+      return "";
+   }
+
+   public String convert(ABC abc, boolean pcode, boolean highlighting) {
+      return traits.convert(abc, false, pcode, true, -1, highlighting);
    }
 }

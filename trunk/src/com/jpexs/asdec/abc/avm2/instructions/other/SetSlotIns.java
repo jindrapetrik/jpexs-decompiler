@@ -25,7 +25,6 @@ import com.jpexs.asdec.abc.avm2.instructions.SetTypeIns;
 import com.jpexs.asdec.abc.avm2.treemodel.DecrementTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.GetSlotTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.IncrementTreeItem;
-import com.jpexs.asdec.abc.avm2.treemodel.NewActivationTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.PostDecrementTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.PostIncrementTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.SetSlotTreeItem;
@@ -60,7 +59,7 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
       for (int t = 0; t < body.traits.traits.length; t++) {
          if (body.traits.traits[t] instanceof TraitSlotConst) {
             if (((TraitSlotConst) body.traits.traits[t]).slot_id == slotIndex) {
-               slotname = body.traits.traits[t].getMultiName(constants);
+               slotname = body.traits.traits[t].getName(abc);
             }
          }
 
@@ -123,14 +122,14 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
       output.add(new SetSlotTreeItem(ins, obj, slotname, value));
    }
 
-   public String getObject(Stack<TreeItem> stack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, HashMap<Integer, String> localRegNames) {
+   public String getObject(Stack<TreeItem> stack, ABC abc, AVM2Instruction ins, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, HashMap<Integer, String> localRegNames) {
       int slotIndex = ins.operands[0];
       ////String obj = stack.get(1);
       String slotname = "";
       for (int t = 0; t < body.traits.traits.length; t++) {
          if (body.traits.traits[t] instanceof TraitSlotConst) {
             if (((TraitSlotConst) body.traits.traits[t]).slot_id == slotIndex) {
-               slotname = body.traits.traits[t].getMultiName(constants).getName(constants);
+               slotname = body.traits.traits[t].getName(abc).getName(abc.constants);
             }
          }
 
