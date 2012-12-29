@@ -613,7 +613,7 @@ public class ABC {
             modifiers += " ";
          }
          String nsname = constants.constant_multiname[name_index].getName(constants);
-         n += IDENT_STRING + modifiers + "namespace " + nsname + "=\"" + Helper.escapeString(constants.constant_namespace[value_index].getName(constants)) + "\";\r\n";
+         n += IDENT_STRING + modifiers + "namespace " + nsname + " = \"" + Helper.escapeString(constants.constant_namespace[value_index].getName(constants)) + "\";\r\n";
          n += ("}\r\n");
          ret.put(packageName + "." + nsname, n);
       }
@@ -811,7 +811,7 @@ public class ABC {
          }
          String fileName = outDir.toString() + File.separator + nsName + ".as";
          FileOutputStream fos = new FileOutputStream(fileName);
-         fos.write(n.getBytes());
+         fos.write(ns.get(n).getBytes());
          fos.close();
       }
 
