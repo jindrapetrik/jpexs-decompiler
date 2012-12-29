@@ -495,7 +495,7 @@ public class Main {
             } catch (Exception ex) {
                exportOK = false;
                System.err.print("FAIL: Exporting Failed on Exception - ");
-               System.err.println(ex.getLocalizedMessage());
+               Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                System.exit(1);
             }
             if (exportOK) {

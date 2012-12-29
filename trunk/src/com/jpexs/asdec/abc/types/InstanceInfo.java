@@ -53,6 +53,20 @@ public class InstanceInfo {
       if (super_index > 0) {
          supIndexStr = " extends " + abc.constants.constant_multiname[super_index].getName(abc.constants);////+" flags="+flags+" protectedNS="+protectedNS+" interfaces="+Helper.intArrToString(interfaces)+" method_index="+iinit_index
       }
+      String implStr = "";
+      if(interfaces.length>0){
+         if(isInterface()){
+            implStr = " extends ";
+         }else{
+            implStr = " implements ";
+         }
+         for(int i=0;i<interfaces.length;i++){
+            if(i>0){
+               implStr += ", ";
+            }
+            implStr += abc.constants.constant_multiname[interfaces[i]].getName(abc.constants);
+         }
+      }
       String modifiers;
       Namespace ns = abc.constants.constant_multiname[name_index].getNamespace(abc.constants);
       modifiers = ns.getPrefix(abc);
@@ -60,17 +74,17 @@ public class InstanceInfo {
          modifiers += " ";
       }
 
-      if ((flags & CLASS_FINAL) == CLASS_FINAL) {
+      if (isFinal()) {
          modifiers = "final ";
       }
-      if ((flags & CLASS_SEALED) == 0) {
+      if (isDynamic()) {
          modifiers = modifiers + "dynamic ";
       }
       String objType = "class ";
-      if ((flags & CLASS_INTERFACE) == CLASS_INTERFACE) {
+      if (isInterface()) {
          objType = "interface ";
       }
-      return modifiers + objType + abc.constants.constant_multiname[name_index].getName(abc.constants) + supIndexStr;
+      return modifiers + objType + abc.constants.constant_multiname[name_index].getName(abc.constants) + supIndexStr + implStr;
    }
 
    public String getInstanceVarsStr(ABC abc) {
@@ -79,5 +93,18 @@ public class InstanceInfo {
 
    public Multiname getName(ConstantPool constants) {
       return constants.constant_multiname[name_index];
+   }
+   
+   public boolean isInterface(){
+      return ((flags & CLASS_INTERFACE) == CLASS_INTERFACE);
+   }
+   
+   public boolean isDynamic(){
+      return (flags & CLASS_SEALED) == 0;
+   }
+   
+   public boolean isFinal()
+   {
+      return (flags & CLASS_FINAL) == CLASS_FINAL;
    }
 }

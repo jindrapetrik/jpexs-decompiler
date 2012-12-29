@@ -21,11 +21,20 @@ import com.jpexs.asdec.abc.avm2.ConstantPool;
 
 public class Namespace {
 
-   public static final int nameSpaceKinds[] = new int[]{8, 5, 22, 23, 24, 25, 26};
+   public static final int KIND_NAMESPACE=8;
+   public static final int KIND_PRIVATE=5;
+   public static final int KIND_PACKAGE=22;
+   public static final int KIND_PACKAGE_INTERNAL=23;
+   public static final int KIND_PROTECTED=24;
+   public static final int KIND_EXPLICIT=25;
+   public static final int KIND_STATIC_PROTECTED=26;
+   
+   
+   public static final int nameSpaceKinds[] = new int[]{KIND_NAMESPACE, KIND_PRIVATE, KIND_PACKAGE, KIND_PACKAGE_INTERNAL, KIND_PROTECTED, KIND_EXPLICIT, KIND_STATIC_PROTECTED};
    public static final String nameSpaceKindNames[] = new String[]{"Namespace", "PrivateNamespace", "PackageNamespace", "PackageInternalNamespace", "ProtectedNamespace", "ExplicitNamespace", "StaticProtectedNamespace"};
    public static final String namePrefixes[] = new String[]{"", "private", "public", "", "protected", "explicit", ""};
    public int kind;
-   public int name_index;
+   public int name_index;   
 
    public Namespace(int kind, int name_index) {
       this.kind = kind;

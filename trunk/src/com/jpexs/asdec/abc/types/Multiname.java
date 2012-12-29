@@ -228,7 +228,9 @@ public class Multiname {
    public NamespaceSet getNamespaceSet(ConstantPool constants) {
       if (namespace_set_index == 0) {
          return null;
-      } else {
+      } else if (namespace_set_index == -1) {
+         return null;
+      }else {
          return constants.constant_namespace_set[namespace_set_index];
       }
    }

@@ -255,9 +255,9 @@ public class ABC {
          bodyIdxFromMethodIdx[mb.method_info] = i;
       }
       loadNamespaceMap();
-      /*for(ScriptInfo si:script_info){         
+     /* for(ScriptInfo si:script_info){         
        System.out.println("--------------------------------------------");
-       System.out.println(findBody(si.init_index).toString(true, false, -1, this, constants, method_info,new Stack<TreeItem>()));
+       System.out.println(findBody(si.init_index).toString(true, false, -1, this, constants, method_info,new Stack<TreeItem>(),false,false));
        System.out.println("sitrait:"+si.traits.toString(this));
        }*/
    }
@@ -371,31 +371,69 @@ public class ABC {
       }
    }
 
-   private void parseImportFromMultiname(List imports, Multiname m, String ignorePackage) {
-      if (m != null) {
-         Namespace ns = m.getNamespace(constants);
-         String name = m.getName(constants);
-         if (ns != null) {
-            String newimport = ns.getName(constants);
-            if (newimport.equals("-")) {
-               newimport = "";
-            }
-            if (!newimport.equals("")) {
-               newimport += "." + name;
-               if (newimport.contains(":")) {
-                  return;
-               }
-               if (!imports.contains(newimport)) {
-                  String pkg = newimport.substring(0,newimport.lastIndexOf("."));
-                  if (!pkg.equals(ignorePackage)) {                    
-                     imports.add(newimport);
-                  }
-               }
+   private void parseImportFromNS(List imports, Namespace ns, String ignorePackage, String name) {
+      if(name.equals("")){
+         name="*";
+      }
+      if(ns.kind!=Namespace.KIND_PACKAGE){
+         return;
+      }
+      String newimport = ns.getName(constants);
+      if (newimport.equals("-")) {
+         newimport = "";
+      }
+      if (!newimport.equals("")) {
+         newimport += "." + name;
+         if (newimport.contains(":")) {
+            return;
+         }
+         if (!imports.contains(newimport)) {
+            String pkg = newimport.substring(0, newimport.lastIndexOf("."));
+            if (!pkg.equals(ignorePackage)) {
+               imports.add(newimport);
             }
          }
       }
    }
 
+   private void parseImportFromMultiname(List imports, Multiname m, String ignorePackage) {
+      if (m != null) {
+         Namespace ns = m.getNamespace(constants);
+         String name = m.getName(constants);
+         NamespaceSet nss = m.getNamespaceSet(constants);
+         if (ns != null) {
+            parseImportFromNS(imports, ns, ignorePackage, name);
+         }
+         if (nss != null) {
+            for (int ni : nss.namespaces) {
+               parseImportFromNS(imports, constants.constant_namespace[ni], ignorePackage, name);
+            }
+         }
+      }
+   }
+
+   private void parseImportsFromMethodInfo(int method_index,List imports, String ignorePackage){
+      if(method_info[method_index].ret_type!=0){
+         parseImportFromMultiname(imports, constants.constant_multiname[method_info[method_index].ret_type], ignorePackage);
+      }
+      for(int t:method_info[method_index].param_types){
+         if(t!=0){
+            parseImportFromMultiname(imports, constants.constant_multiname[t], ignorePackage);      
+         }
+      }
+      MethodBody body = findBody(method_index);
+               if (body != null) {
+                  for (AVM2Instruction ins : body.code.code) {
+                     for (int k = 0; k < ins.definition.operands.length; k++) {
+                        if (ins.definition.operands[k] == AVM2Code.DAT_MULTINAME_INDEX) {
+                           int multinameIndex = ins.operands[k];
+                           parseImportFromMultiname(imports, constants.constant_multiname[multinameIndex], ignorePackage);
+                        }
+                     }
+                  }
+               }
+   }
+   
    private List getImports(int instanceIndex) {
       List<String> imports = new ArrayList<String>();
 
@@ -404,62 +442,28 @@ public class ABC {
       //parseImportFromMultiname(imports, constants.constant_multiname[instance_info[instanceIndex].name_index]);
 
       String packageName = instance_info[instanceIndex].getName(constants).getNamespace(constants).getName(constants);
-      
+
       if (instance_info[instanceIndex].super_index > 0) {
-         parseImportFromMultiname(imports, constants.constant_multiname[instance_info[instanceIndex].super_index],packageName);
+         parseImportFromMultiname(imports, constants.constant_multiname[instance_info[instanceIndex].super_index], packageName);
       }
       for (int i : instance_info[instanceIndex].interfaces) {
-         parseImportFromMultiname(imports, constants.constant_multiname[i],packageName);
+         parseImportFromMultiname(imports, constants.constant_multiname[i], packageName);
       }
-
-
-      MethodBody body;
-
-
-
 
       //static
       for (Trait t : class_info[instanceIndex].static_traits.traits) {
          //parseImportFromMultiname(imports, t.getMultiName(constants));
          if (t instanceof TraitMethodGetterSetter) {
-            TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
-            if (tm.method_info != 0) {
-               body = findBody(tm.method_info);
-               if (body != null) {
-                  for (AVM2Instruction ins : body.code.code) {
-                     for (int k = 0; k < ins.definition.operands.length; k++) {
-                        if (ins.definition.operands[k] == AVM2Code.DAT_MULTINAME_INDEX) {
-                           int multinameIndex = ins.operands[k];
-                           parseImportFromMultiname(imports, constants.constant_multiname[multinameIndex],packageName);
-                        }
-                     }
-                  }
-               }
-               for (int p = 0; p < method_info[tm.method_info].param_types.length; p++) {
-                  if (method_info[tm.method_info].param_types[p] != 0) {
-                     parseImportFromMultiname(imports, constants.constant_multiname[method_info[tm.method_info].param_types[p]],packageName);
-                  }
-                  if (method_info[tm.method_info].ret_type != 0) {
-                     parseImportFromMultiname(imports, constants.constant_multiname[method_info[tm.method_info].ret_type],packageName);
-                  }
-               }
+            TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;            
+            if (tm.method_info != 0) {         
+               parseImportsFromMethodInfo(tm.method_info,imports,packageName);               
             }
          }
 
       }
 
       //static initializer
-      body = findBody(class_info[instanceIndex].cinit_index);
-      if (body != null) {
-         for (AVM2Instruction ins : body.code.code) {
-            for (int k = 0; k < ins.definition.operands.length; k++) {
-               if (ins.definition.operands[k] == AVM2Code.DAT_MULTINAME_INDEX) {
-                  int multinameIndex = ins.operands[k];
-                  parseImportFromMultiname(imports, constants.constant_multiname[multinameIndex],packageName);
-               }
-            }
-         }
-      }
+      parseImportsFromMethodInfo(class_info[instanceIndex].cinit_index,imports,packageName);      
 
       //instance
       for (Trait t : instance_info[instanceIndex].instance_traits.traits) {
@@ -467,42 +471,13 @@ public class ABC {
          if (t instanceof TraitMethodGetterSetter) {
             TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
             if (tm.method_info != 0) {
-               body = findBody(tm.method_info);
-               if (body != null) {
-                  for (AVM2Instruction ins : body.code.code) {
-                     for (int k = 0; k < ins.definition.operands.length; k++) {
-                        if (ins.definition.operands[k] == AVM2Code.DAT_MULTINAME_INDEX) {
-                           int multinameIndex = ins.operands[k];
-                           parseImportFromMultiname(imports, constants.constant_multiname[multinameIndex],packageName);
-                        }
-                     }
-                  }
-               }
-               for (int p = 0; p < method_info[tm.method_info].param_types.length; p++) {
-                  if (method_info[tm.method_info].param_types[p] != 0) {
-                     parseImportFromMultiname(imports, constants.constant_multiname[method_info[tm.method_info].param_types[p]],packageName);
-                  }
-                  if (method_info[tm.method_info].ret_type != 0) {
-                     parseImportFromMultiname(imports, constants.constant_multiname[method_info[tm.method_info].ret_type],packageName);
-                  }
-               }
+               parseImportsFromMethodInfo(tm.method_info,imports,packageName);                               
             }
          }
       }
 
       //instance initializer
-      body = findBody(instance_info[instanceIndex].iinit_index);
-      if (body != null) {
-         for (AVM2Instruction ins : body.code.code) {
-            for (int k = 0; k < ins.definition.operands.length; k++) {
-               if (ins.definition.operands[k] == AVM2Code.DAT_MULTINAME_INDEX) {
-                  int multinameIndex = ins.operands[k];
-                  parseImportFromMultiname(imports, constants.constant_multiname[multinameIndex],packageName);
-               }
-            }
-         }
-      }
-
+      parseImportsFromMethodInfo(instance_info[instanceIndex].iinit_index,imports,packageName);           
       return imports;
    }
 
@@ -736,32 +711,34 @@ public class ABC {
 
       //constructor
       //if (instance_info[i].iinit_index != 0) {
-      String modifier = "";
-      Multiname m = constants.constant_multiname[instance_info[i].name_index];
-      if (m != null) {
-         Namespace ns = m.getNamespace(constants);
-         if (ns != null) {
-            modifier = ns.getPrefix(this) + " ";
-            if (modifier.equals(" ")) {
-               modifier = "";
+      if (!instance_info[i].isInterface()) {
+         String modifier = "";
+         Multiname m = constants.constant_multiname[instance_info[i].name_index];
+         if (m != null) {
+            Namespace ns = m.getNamespace(constants);
+            if (ns != null) {
+               modifier = ns.getPrefix(this) + " ";
+               if (modifier.equals(" ")) {
+                  modifier = "";
+               }
             }
          }
-      }
-      String constructorParams;
+         String constructorParams;
 
-      bodyStr = "";
-      bodyIndex = findBodyIndex(instance_info[i].iinit_index);
-      if (bodyIndex != -1) {
-         bodyStr = addTabs(bodies[bodyIndex].toString(pcode, false, i, this, constants, method_info, new Stack<TreeItem>(), false, highlight), 3);
-         constructorParams = method_info[instance_info[i].iinit_index].getParamStr(constants, bodies[bodyIndex], this);
-      } else {
-         constructorParams = method_info[instance_info[i].iinit_index].getParamStr(constants, null, this);
+         bodyStr = "";
+         bodyIndex = findBodyIndex(instance_info[i].iinit_index);
+         if (bodyIndex != -1) {
+            bodyStr = addTabs(bodies[bodyIndex].toString(pcode, false, i, this, constants, method_info, new Stack<TreeItem>(), false, highlight), 3);
+            constructorParams = method_info[instance_info[i].iinit_index].getParamStr(constants, bodies[bodyIndex], this);
+         } else {
+            constructorParams = method_info[instance_info[i].iinit_index].getParamStr(constants, null, this);
+         }
+         toPrint = IDENT_STRING + IDENT_STRING + modifier + "function " + constants.constant_multiname[instance_info[i].name_index].getName(constants) + "(" + constructorParams + ") {\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}";
+         if (highlight) {
+            toPrint = Highlighting.hilighTrait(toPrint, class_info[i].static_traits.traits.length + instance_info[i].instance_traits.traits.length);
+         }
+         outTraits.add(toPrint);
       }
-      toPrint = IDENT_STRING + IDENT_STRING + modifier + "function " + constants.constant_multiname[instance_info[i].name_index].getName(constants) + "(" + constructorParams + ") {\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}";
-      if (highlight) {
-         toPrint = Highlighting.hilighTrait(toPrint, class_info[i].static_traits.traits.length + instance_info[i].instance_traits.traits.length);
-      }
-      outTraits.add(toPrint);
       //}
 
       //static variables,constants & methods
@@ -775,7 +752,7 @@ public class ABC {
             if (bodyIndex != -1) {
                bodyStr = addTabs(bodies[bodyIndex].toString(pcode, true, i, this, constants, method_info, new Stack<TreeItem>(), false, highlight), 3);
             }
-            toPrint = IDENT_STRING + IDENT_STRING + tm.convert(method_info, this, true) + " {\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}";
+            toPrint = IDENT_STRING + IDENT_STRING + tm.convert(method_info, this, true) + (instance_info[i].isInterface() ? ";" : " {\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}");
          }
          if (t instanceof TraitSlotConst) {
             TraitSlotConst ts = (TraitSlotConst) t;
@@ -804,7 +781,7 @@ public class ABC {
             if (bodyIndex != -1) {
                bodyStr = addTabs(bodies[bodyIndex].toString(pcode, false, i, this, constants, method_info, new Stack<TreeItem>(), false, highlight), 3);
             }
-            toPrint = IDENT_STRING + IDENT_STRING + tm.convert(method_info, this, false) + " {\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}";
+            toPrint = IDENT_STRING + IDENT_STRING + tm.convert(method_info, this, false) + (instance_info[i].isInterface() ? ";" : " {\r\n" + bodyStr + "\r\n" + IDENT_STRING + IDENT_STRING + "}");
          }
          if (highlight) {
             toPrint = Highlighting.hilighTrait(toPrint, class_info[i].static_traits.traits.length + ti);
