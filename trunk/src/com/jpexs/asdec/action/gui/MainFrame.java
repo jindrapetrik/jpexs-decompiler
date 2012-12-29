@@ -18,6 +18,7 @@ package com.jpexs.asdec.action.gui;
 
 import com.jpexs.asdec.Configuration;
 import com.jpexs.asdec.Main;
+import com.jpexs.asdec.SWF;
 import com.jpexs.asdec.action.TagNode;
 import com.jpexs.asdec.action.parser.ASMParser;
 import com.jpexs.asdec.action.parser.ParseException;
@@ -216,12 +217,12 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
             (new Thread() {
                @Override
                public void run() {
-                  editor.setText(asm.getASMSource(10)); //TODO:Ensure correct version here
+                  editor.setText(asm.getASMSource(SWF.DEFAULT_VERSION));
                   if (Main.DO_DECOMPILE) {
-                     List<com.jpexs.asdec.action.Action> as = asm.getActions(10);//TODO:Ensure correct version here
-                     com.jpexs.asdec.action.Action.setActionsAddresses(as, 0, 10);//TODO:Ensure correct version here
+                     List<com.jpexs.asdec.action.Action> as = asm.getActions(SWF.DEFAULT_VERSION);
+                     com.jpexs.asdec.action.Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
 
-                     decompiledEditor.setText(Highlighting.stripHilights(com.jpexs.asdec.action.Action.actionsToSource(as, 10))); //TODO:Ensure correct version here
+                     decompiledEditor.setText(Highlighting.stripHilights(com.jpexs.asdec.action.Action.actionsToSource(as, SWF.DEFAULT_VERSION))); 
                   }
                   Main.stopWork();
                }
@@ -276,7 +277,7 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
                dat.setActionBytes(data);
                fis.read(data);
                fis.close();
-               editor.setText(dat.getASMSource(10));
+               editor.setText(dat.getASMSource(SWF.DEFAULT_VERSION));
             } catch (IOException ex) {
             }
 
@@ -288,7 +289,7 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
          if (ti.tag instanceof ASMSource) {
             ASMSource dat = (ASMSource) ti.tag;
             try {
-               dat.setActions(ASMParser.parse(new ByteArrayInputStream(editor.getText().getBytes()), 10), 10); //TODO:Ensure correct version here
+               dat.setActions(ASMParser.parse(new ByteArrayInputStream(editor.getText().getBytes()), SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION);
                valueChanged(null);
                JOptionPane.showMessageDialog(this, "Code successfully saved");
             } catch (IOException ex) {

@@ -39,6 +39,10 @@ import java.util.zip.InflaterInputStream;
 public class SWF {
 
    /**
+    * Default version of SWF file format
+    */
+   public static final int DEFAULT_VERSION = 10;
+   /**
     * Tags inside of file
     */
    public List<Tag> tags = new ArrayList<Tag>();
@@ -335,11 +339,11 @@ public class SWF {
                   informListeners("export", "Exporting " + f + " ...");
                   String ret;
                   if (isPcode) {
-                     ret = ((ASMSource) node.tag).getASMSource(10); //TODO:Ensure correct version here
+                     ret = ((ASMSource) node.tag).getASMSource(SWF.DEFAULT_VERSION);
                   } else {
-                     List<com.jpexs.asdec.action.Action> as = ((ASMSource) node.tag).getActions(10);//TODO:Ensure correct version here
-                     com.jpexs.asdec.action.Action.setActionsAddresses(as, 0, 10);//TODO:Ensure correct version here
-                     ret = (Highlighting.stripHilights(com.jpexs.asdec.action.Action.actionsToSource(as, 10))); //TODO:Ensure correct version here
+                     List<com.jpexs.asdec.action.Action> as = ((ASMSource) node.tag).getActions(SWF.DEFAULT_VERSION);
+                     com.jpexs.asdec.action.Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
+                     ret = (Highlighting.stripHilights(com.jpexs.asdec.action.Action.actionsToSource(as, SWF.DEFAULT_VERSION)));
                   }
 
 
