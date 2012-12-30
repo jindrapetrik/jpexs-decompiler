@@ -20,6 +20,7 @@ import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.ConvertException;
 import com.jpexs.asdec.helpers.Helper;
+import java.util.List;
 
 public class ABCException {
 
@@ -34,13 +35,13 @@ public class ABCException {
       return "Exception: startServer=" + Helper.formatAddress(start) + " end=" + Helper.formatAddress(end) + " target=" + target + " type_index=" + type_index + " name_index=" + name_index;
    }
 
-   public String toString(ConstantPool constants) {
-      return "Exception: startServer=" + Helper.formatAddress(start) + " end=" + Helper.formatAddress(end) + " target=" + target + " type=\"" + getTypeName(constants) + "\" name=\"" + getVarName(constants) + "\"";
+   public String toString(ConstantPool constants, List<String> fullyQualifiedNames) {
+      return "Exception: startServer=" + Helper.formatAddress(start) + " end=" + Helper.formatAddress(end) + " target=" + target + " type=\"" + getTypeName(constants, fullyQualifiedNames) + "\" name=\"" + getVarName(constants, fullyQualifiedNames) + "\"";
    }
 
-   public String toString(ConstantPool constants, AVM2Code code) {
+   public String toString(ConstantPool constants, AVM2Code code, List<String> fullyQualifiedNames) {
       try {
-         return "Exception: startServer=" + code.adr2pos(start) + ":" + code.code.get(code.adr2pos(start)).toStringNoAddress(constants) + " end=" + code.adr2pos(end) + ":" + code.code.get(code.adr2pos(end)).toStringNoAddress(constants) + " target=" + code.adr2pos(target) + ":" + code.code.get(code.adr2pos(target)).toStringNoAddress(constants) + " type=\"" + getTypeName(constants) + "\" name=\"" + getVarName(constants) + "\"";
+         return "Exception: startServer=" + code.adr2pos(start) + ":" + code.code.get(code.adr2pos(start)).toStringNoAddress(constants, fullyQualifiedNames) + " end=" + code.adr2pos(end) + ":" + code.code.get(code.adr2pos(end)).toStringNoAddress(constants, fullyQualifiedNames) + " target=" + code.adr2pos(target) + ":" + code.code.get(code.adr2pos(target)).toStringNoAddress(constants, fullyQualifiedNames) + " type=\"" + getTypeName(constants, fullyQualifiedNames) + "\" name=\"" + getVarName(constants, fullyQualifiedNames) + "\"";
       } catch (ConvertException ex) {
          return "";
       }
@@ -50,17 +51,17 @@ public class ABCException {
       return (name_index == 0) && (type_index == 0);
    }
 
-   public String getVarName(ConstantPool constants) {
+   public String getVarName(ConstantPool constants, List<String> fullyQualifiedNames) {
       if (name_index == 0) {
          return "";
       }
-      return constants.constant_multiname[name_index].getName(constants);
+      return constants.constant_multiname[name_index].getName(constants, fullyQualifiedNames);
    }
 
-   public String getTypeName(ConstantPool constants) {
+   public String getTypeName(ConstantPool constants, List<String> fullyQualifiedNames) {
       if (type_index == 0) {
          return "*";
       }
-      return constants.constant_multiname[type_index].getName(constants);
+      return constants.constant_multiname[type_index].getName(constants, fullyQualifiedNames);
    }
 }

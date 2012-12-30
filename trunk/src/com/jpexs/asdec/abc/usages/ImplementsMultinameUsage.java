@@ -31,7 +31,7 @@ public class ImplementsMultinameUsage extends InsideClassMultinameUsage {
    }
 
    @Override
-   public String toString(List<DoABCTag> abcTags,ABC abc) {
-      return super.toString(abcTags,abc) + " implements";
+   public String toString(List<DoABCTag> abcTags, ABC abc) {
+      return super.toString(abcTags, abc) + " implements";
    }
 }

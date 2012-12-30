@@ -17,6 +17,7 @@
 package com.jpexs.asdec.abc.avm2;
 
 import com.jpexs.asdec.abc.ABC;
+import java.util.List;
 
 /**
  *
@@ -31,7 +32,7 @@ public class CodeStats {
    public boolean has_activation = false;
    public InstructionStats instructionStats[];
 
-   public String toString(ABC abc) {
+   public String toString(ABC abc, List<String> fullyQualifiedNames) {
       String ret = "Stats: maxstack=" + maxstack + ", maxscope=" + maxscope + ", maxlocal=" + maxlocal + "\r\n";
       int i = 0;
       int ms = 0;
@@ -40,7 +41,7 @@ public class CodeStats {
          if (stats.stackpos > ms) {
             ms = stats.stackpos;
          }
-         ret += "" + i + ":" + stats.stackpos + (deltastack >= 0 ? "+" + deltastack : deltastack) + "," + stats.scopepos + "    " + stats.ins.toString(abc.constants) + "\r\n";
+         ret += "" + i + ":" + stats.stackpos + (deltastack >= 0 ? "+" + deltastack : deltastack) + "," + stats.scopepos + "    " + stats.ins.toString(abc.constants, fullyQualifiedNames) + "\r\n";
          i++;
       }
       return ret;

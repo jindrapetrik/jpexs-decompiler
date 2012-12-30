@@ -22,6 +22,7 @@ import com.jpexs.asdec.abc.types.Namespace;
 import com.jpexs.asdec.abc.types.NamespaceSet;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ConstantPool {
@@ -96,15 +97,6 @@ public class ConstantPool {
       return 0;
    }
 
-   public int getMultiNameId(String s) {
-      for (int i = 1; i < constant_multiname.length; i++) {
-         if (constant_multiname[i].getName(this).equals(s)) {
-            return i;
-         }
-      }
-      return 0;
-   }
-
    public int forceGetStringId(String val) {
       int id = getStringId(val);
       if (id == 0) {
@@ -160,7 +152,7 @@ public class ConstantPool {
       }
 
       for (int i = 1; i < constant_multiname.length; i++) {
-         output.println("Multiname[" + i + "]=" + constant_multiname[i].toString(this));
+         output.println("Multiname[" + i + "]=" + constant_multiname[i].toString(this, new ArrayList<String>()));
       }
    }
 }

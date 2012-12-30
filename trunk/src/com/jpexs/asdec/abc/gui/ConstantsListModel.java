@@ -18,6 +18,7 @@ package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.helpers.Helper;
+import java.util.ArrayList;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataListener;
 
@@ -85,7 +86,7 @@ public class ConstantsListModel implements ListModel {
          case TYPE_NAMESPACESET:
             return "" + (index + 1) + ":" + constants.constant_namespace_set[index + 1].toString(constants);
          case TYPE_MULTINAME:
-            return "" + (index + 1) + ":" + constants.constant_multiname[index + 1].toString(constants);
+            return "" + (index + 1) + ":" + constants.constant_multiname[index + 1].toString(constants, new ArrayList<String>());
       }
       return null;
    }

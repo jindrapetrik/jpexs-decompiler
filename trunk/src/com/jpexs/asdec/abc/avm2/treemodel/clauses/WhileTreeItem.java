@@ -36,12 +36,12 @@ public class WhileTreeItem extends LoopTreeItem implements Block {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       String ret = "";
       ret += "loop" + loopBreak + ":\r\n";
-      ret += hilight("while(") + expression.toString(constants, localRegNames) + hilight(")") + "\r\n{\r\n";
+      ret += hilight("while(") + expression.toString(constants, localRegNames, fullyQualifiedNames) + hilight(")") + "\r\n{\r\n";
       for (TreeItem ti : commands) {
-         ret += ti.toStringSemicoloned(constants, localRegNames) + "\r\n";
+         ret += ti.toStringSemicoloned(constants, localRegNames, fullyQualifiedNames) + "\r\n";
       }
       ret += hilight("}") + "\r\n";
       ret += ":loop" + loopBreak;

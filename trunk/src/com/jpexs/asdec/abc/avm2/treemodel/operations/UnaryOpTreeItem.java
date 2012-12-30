@@ -20,6 +20,7 @@ import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import java.util.HashMap;
+import java.util.List;
 
 public abstract class UnaryOpTreeItem extends TreeItem {
 
@@ -33,8 +34,8 @@ public abstract class UnaryOpTreeItem extends TreeItem {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
-      String s = value.toString(constants, localRegNames);
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+      String s = value.toString(constants, localRegNames, fullyQualifiedNames);
       if (value.precedence > precedence) {
          s = "(" + s + ")";
       }

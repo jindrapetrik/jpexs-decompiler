@@ -20,6 +20,7 @@ import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.clauses.AssignmentTreeItem;
 import java.util.HashMap;
+import java.util.List;
 
 public class SetLocalTreeItem extends TreeItem implements SetTypeTreeItem, AssignmentTreeItem {
 
@@ -33,8 +34,8 @@ public class SetLocalTreeItem extends TreeItem implements SetTypeTreeItem, Assig
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
-      return hilight(localRegName(localRegNames, regIndex) + "=") + value.toString(constants, localRegNames);
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+      return hilight(localRegName(localRegNames, regIndex) + "=") + value.toString(constants, localRegNames, fullyQualifiedNames);
    }
 
    public TreeItem getObject() {

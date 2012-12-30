@@ -24,6 +24,7 @@ import com.jpexs.asdec.abc.avm2.treemodel.SetLocalTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.SetSlotTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  *
@@ -45,7 +46,7 @@ public class DeclarationTreeItem extends TreeItem {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       if (assignment instanceof SetLocalTreeItem) {
          SetLocalTreeItem lti = (SetLocalTreeItem) assignment;
          String type = "*";
@@ -55,12 +56,12 @@ public class DeclarationTreeItem extends TreeItem {
          if (lti.value instanceof ConvertTreeItem) {
             type = ((ConvertTreeItem) lti.value).type;
          }
-         return "var " + hilight(localRegName(localRegNames, lti.regIndex) + ":" + type + " = ") + lti.value.toString(constants, localRegNames);
+         return "var " + hilight(localRegName(localRegNames, lti.regIndex) + ":" + type + " = ") + lti.value.toString(constants, localRegNames, fullyQualifiedNames);
       }
       if (assignment instanceof SetSlotTreeItem) {
          SetSlotTreeItem ssti = (SetSlotTreeItem) assignment;
-         return "var " + ssti.getName(constants, localRegNames) + ":" + type + hilight(" = ") + ssti.value.toString(constants, localRegNames);
+         return "var " + ssti.getName(constants, localRegNames, fullyQualifiedNames) + ":" + type + hilight(" = ") + ssti.value.toString(constants, localRegNames, fullyQualifiedNames);
       }
-      return "var " + assignment.toString(constants, localRegNames);
+      return "var " + assignment.toString(constants, localRegNames, fullyQualifiedNames);
    }
 }

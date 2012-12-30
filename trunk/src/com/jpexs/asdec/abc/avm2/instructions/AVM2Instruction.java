@@ -146,12 +146,12 @@ public class AVM2Instruction {
       return s;
    }
 
-   public String getParams(ConstantPool constants) {
+   public String getParams(ConstantPool constants, List<String> fullyQualifiedNames) {
       String s = "";
       for (int i = 0; i < definition.operands.length; i++) {
          switch (definition.operands[i]) {
             case AVM2Code.DAT_MULTINAME_INDEX:
-               s += " m[" + operands[i] + "]\"" + Helper.escapeString(constants.constant_multiname[operands[i]].toString(constants)) + "\"";
+               s += " m[" + operands[i] + "]\"" + Helper.escapeString(constants.constant_multiname[operands[i]].toString(constants, fullyQualifiedNames)) + "\"";
                break;
             case AVM2Code.DAT_STRING_INDEX:
                s += " \"" + Helper.escapeString(constants.constant_string[operands[i]]) + "\"";
@@ -207,15 +207,15 @@ public class AVM2Instruction {
       return " ;" + comment;
    }
 
-   public String toString(ConstantPool constants) {
+   public String toString(ConstantPool constants, List<String> fullyQualifiedNames) {
       String s = Helper.formatAddress(offset) + " " + Helper.padSpaceRight(Helper.byteArrToString(getBytes()), 30) + definition.instructionName;
-      s += getParams(constants) + getComment();
+      s += getParams(constants, fullyQualifiedNames) + getComment();
       return s;
    }
 
-   public String toStringNoAddress(ConstantPool constants) {
+   public String toStringNoAddress(ConstantPool constants, List<String> fullyQualifiedNames) {
       String s = definition.instructionName;
-      s += getParams(constants) + getComment();
+      s += getParams(constants, fullyQualifiedNames) + getComment();
       return s;
    }
 }

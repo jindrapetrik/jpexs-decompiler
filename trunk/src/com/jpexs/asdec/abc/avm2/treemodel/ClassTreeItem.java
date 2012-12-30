@@ -19,6 +19,7 @@ package com.jpexs.asdec.abc.avm2.treemodel;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.types.Multiname;
 import java.util.HashMap;
+import java.util.List;
 
 public class ClassTreeItem extends TreeItem {
 
@@ -30,7 +31,7 @@ public class ClassTreeItem extends TreeItem {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
-      return className.getName(constants);
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+      return className.getName(constants, fullyQualifiedNames);
    }
 }

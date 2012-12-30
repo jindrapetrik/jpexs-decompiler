@@ -20,6 +20,8 @@ import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.types.traits.Traits;
 import com.jpexs.asdec.helpers.Helper;
+import java.util.ArrayList;
+import java.util.List;
 
 public class InstanceInfo {
 
@@ -40,18 +42,18 @@ public class InstanceInfo {
       return "name_index=" + name_index + " super_index=" + super_index + " flags=" + flags + " protectedNS=" + protectedNS + " interfaces=" + Helper.intArrToString(interfaces) + " method_index=" + iinit_index + "\r\n" + instance_traits.toString();
    }
 
-   public String toString(ABC abc) {
+   public String toString(ABC abc, List<String> fullyQualifiedNames) {
       String supIndexStr = "[nothing]";
       if (super_index > 0) {
-         supIndexStr = abc.constants.constant_multiname[super_index].toString(abc.constants);
+         supIndexStr = abc.constants.constant_multiname[super_index].toString(abc.constants, fullyQualifiedNames);
       }
-      return "name_index=" + abc.constants.constant_multiname[name_index].toString(abc.constants) + " super_index=" + supIndexStr + " flags=" + flags + " protectedNS=" + protectedNS + " interfaces=" + Helper.intArrToString(interfaces) + " method_index=" + iinit_index + "\r\n" + instance_traits.toString(abc);
+      return "name_index=" + abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " super_index=" + supIndexStr + " flags=" + flags + " protectedNS=" + protectedNS + " interfaces=" + Helper.intArrToString(interfaces) + " method_index=" + iinit_index + "\r\n" + instance_traits.toString(abc, fullyQualifiedNames);
    }
 
-   public String getClassHeaderStr(ABC abc) {
+   public String getClassHeaderStr(ABC abc, List<String> fullyQualifiedNames) {
       String supIndexStr = "";
       if (super_index > 0) {
-         supIndexStr = " extends " + abc.constants.constant_multiname[super_index].getName(abc.constants);////+" flags="+flags+" protectedNS="+protectedNS+" interfaces="+Helper.intArrToString(interfaces)+" method_index="+iinit_index
+         supIndexStr = " extends " + abc.constants.constant_multiname[super_index].getName(abc.constants, fullyQualifiedNames);////+" flags="+flags+" protectedNS="+protectedNS+" interfaces="+Helper.intArrToString(interfaces)+" method_index="+iinit_index
       }
       String implStr = "";
       if (interfaces.length > 0) {
@@ -64,7 +66,7 @@ public class InstanceInfo {
             if (i > 0) {
                implStr += ", ";
             }
-            implStr += abc.constants.constant_multiname[interfaces[i]].getName(abc.constants);
+            implStr += abc.constants.constant_multiname[interfaces[i]].getName(abc.constants, fullyQualifiedNames);
          }
       }
       String modifiers;
@@ -84,7 +86,7 @@ public class InstanceInfo {
       if (isInterface()) {
          objType = "interface ";
       }
-      return modifiers + objType + abc.constants.constant_multiname[name_index].getName(abc.constants) + supIndexStr + implStr;
+      return modifiers + objType + abc.constants.constant_multiname[name_index].getName(abc.constants, new ArrayList<String>()/* No full names here*/) + supIndexStr + implStr;
    }
 
    public Multiname getName(ConstantPool constants) {

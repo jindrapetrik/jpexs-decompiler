@@ -37,18 +37,18 @@ public class Traits {
       return s;
    }
 
-   public String toString(ABC abc) {
+   public String toString(ABC abc, List<String> fullyQualifiedNames) {
       String s = "";
       for (int t = 0; t < traits.length; t++) {
          if (t > 0) {
             s += "\r\n";
          }
-         s += traits[t].toString(abc);
+         s += traits[t].toString(abc, fullyQualifiedNames);
       }
       return s;
    }
 
-   public String convert(List<DoABCTag> abcTags,ABC abc, boolean isStatic, boolean pcode, boolean makePackages, int classIndex, boolean highlighting) {
+   public String convert(List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, boolean makePackages, int classIndex, boolean highlighting, List<String> fullyQualifiedNames) {
       String s = "";
       for (int t = 0; t < traits.length; t++) {
          if (t > 0) {
@@ -56,9 +56,9 @@ public class Traits {
          }
          String plus;
          if (makePackages) {
-            plus = traits[t].convertPackaged(abcTags,abc, isStatic, pcode, classIndex, highlighting);
+            plus = traits[t].convertPackaged(abcTags, abc, isStatic, pcode, classIndex, highlighting, fullyQualifiedNames);
          } else {
-            plus = traits[t].convert(abcTags,abc, isStatic, pcode, classIndex, highlighting);
+            plus = traits[t].convert(abcTags, abc, isStatic, pcode, classIndex, highlighting, fullyQualifiedNames);
          }
          if (highlighting) {
             int h = t;

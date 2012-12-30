@@ -24,5 +24,5 @@ import java.util.Stack;
 
 public interface SetTypeIns {
 
-   public abstract String getObject(Stack<TreeItem> stack, ABC abc, AVM2Instruction ins, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, HashMap<Integer, String> localRegNames);
+   public abstract String getObject(Stack<TreeItem> stack, ABC abc, AVM2Instruction ins, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames);
 }

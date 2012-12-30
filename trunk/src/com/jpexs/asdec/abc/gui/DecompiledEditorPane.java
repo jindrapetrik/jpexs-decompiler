@@ -177,10 +177,9 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
       getCaret().setVisible(true);
       addCaretListener(this);
    }
-
    private List<DoABCTag> abcList;
-   
-   public void setScript(ScriptInfo script, ABC abc,List<DoABCTag> abcList) {
+
+   public void setScript(ScriptInfo script, ABC abc, List<DoABCTag> abcList) {
       setText("//Please wait...");
       if (script == null) {
          highlights = new ArrayList<Highlighting>();
@@ -192,7 +191,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
 
       String hilightedCode;
       if (!bufferedClasses.containsKey(script)) {
-         hilightedCode = script.convert(abcList,abc, false, true);
+         hilightedCode = script.convert(abcList, abc, false, true);
          highlights = Highlighting.getInstrHighlights(hilightedCode);
          traitHighlights = Highlighting.getTraitHighlights(hilightedCode);
          methodHighlights = Highlighting.getMethodHighlights(hilightedCode);
@@ -216,7 +215,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
       if (bufferedClasses.containsKey(script)) {
          bufferedClasses.remove(script);
       }
-      setScript(script, abc,abcList);
+      setScript(script, abc, abcList);
       setNoTrait();
    }
 

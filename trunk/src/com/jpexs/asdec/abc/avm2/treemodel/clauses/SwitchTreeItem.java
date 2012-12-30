@@ -41,15 +41,15 @@ public class SwitchTreeItem extends LoopTreeItem implements Block {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       String ret = "";
       ret += "loop" + loopBreak + ":\r\n";
-      ret += hilight("switch(") + switchedObject.toString(constants, localRegNames) + hilight(")") + "\r\n{\r\n";
+      ret += hilight("switch(") + switchedObject.toString(constants, localRegNames, fullyQualifiedNames) + hilight(")") + "\r\n{\r\n";
       for (int i = 0; i < caseValues.size(); i++) {
-         ret += "case " + caseValues.get(i).toString(constants, localRegNames) + ":\r\n";
+         ret += "case " + caseValues.get(i).toString(constants, localRegNames, fullyQualifiedNames) + ":\r\n";
          ret += AVM2Code.IDENTOPEN + "\r\n";
          for (int j = 0; j < caseCommands.get(i).size(); j++) {
-            ret += caseCommands.get(i).get(j).toStringSemicoloned(constants, localRegNames) + "\r\n";
+            ret += caseCommands.get(i).get(j).toStringSemicoloned(constants, localRegNames, fullyQualifiedNames) + "\r\n";
          }
          ret += AVM2Code.IDENTCLOSE + "\r\n";
       }
@@ -57,7 +57,7 @@ public class SwitchTreeItem extends LoopTreeItem implements Block {
          ret += hilight("default") + ":\r\n";
          ret += AVM2Code.IDENTOPEN + "\r\n";
          for (int j = 0; j < defaultCommands.size(); j++) {
-            ret += defaultCommands.get(j).toStringSemicoloned(constants, localRegNames) + "\r\n";
+            ret += defaultCommands.get(j).toStringSemicoloned(constants, localRegNames, fullyQualifiedNames) + "\r\n";
          }
          ret += AVM2Code.IDENTCLOSE + "\r\n";
       }

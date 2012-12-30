@@ -32,7 +32,7 @@ public class MethodReturnTypeMultinameUsage extends MethodMultinameUsage {
    }
 
    @Override
-   public String toString(List<DoABCTag> abcTags,ABC abc) {
-      return super.toString(abcTags,abc) + " return type";
+   public String toString(List<DoABCTag> abcTags, ABC abc) {
+      return super.toString(abcTags, abc) + " return type";
    }
 }

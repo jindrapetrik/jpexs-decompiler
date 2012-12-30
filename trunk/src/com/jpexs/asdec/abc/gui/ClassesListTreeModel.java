@@ -16,8 +16,6 @@
  */
 package com.jpexs.asdec.abc.gui;
 
-import com.jpexs.asdec.abc.ABC;
-import com.jpexs.asdec.abc.types.ScriptInfo;
 import com.jpexs.asdec.tags.DoABCTag;
 import java.util.List;
 import javax.swing.event.TreeModelListener;

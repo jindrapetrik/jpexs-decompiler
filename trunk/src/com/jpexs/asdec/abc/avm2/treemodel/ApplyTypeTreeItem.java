@@ -33,15 +33,15 @@ public class ApplyTypeTreeItem extends TreeItem {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
-      String ret = object.toString(constants, localRegNames);
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+      String ret = object.toString(constants, localRegNames, fullyQualifiedNames);
       if (!params.isEmpty()) {
          ret += hilight(".<");
          for (int i = 0; i < params.size(); i++) {
             if (i > 0) {
                ret += hilight(",");
             }
-            ret += params.get(i).toString(constants, localRegNames);
+            ret += params.get(i).toString(constants, localRegNames, fullyQualifiedNames);
          }
          ret += hilight(">");
       }

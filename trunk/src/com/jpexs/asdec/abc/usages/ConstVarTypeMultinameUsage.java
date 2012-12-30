@@ -32,7 +32,7 @@ public class ConstVarTypeMultinameUsage extends ConstVarMultinameUsage {
    }
 
    @Override
-   public String toString(List<DoABCTag> abcTags,ABC abc) {
-      return super.toString(abcTags,abc) + " type";
+   public String toString(List<DoABCTag> abcTags, ABC abc) {
+      return super.toString(abcTags, abc) + " type";
    }
 }

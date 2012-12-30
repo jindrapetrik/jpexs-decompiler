@@ -40,9 +40,9 @@ public class TraitsList extends JList implements ListSelectionListener {
       setCellRenderer(new IconListRenderer());
    }
 
-   public void setABC(List<DoABCTag> abcTags,ABC abc) {
+   public void setABC(List<DoABCTag> abcTags, ABC abc) {
       this.abc = abc;
-      this.abcTags=abcTags;
+      this.abcTags = abcTags;
       setModel(new DefaultListModel());
       setClassIndex(-1);
    }
@@ -53,7 +53,7 @@ public class TraitsList extends JList implements ListSelectionListener {
          setModel(new DefaultListModel());
       } else {
          if (abc != null) {
-            setModel(new TraitsListModel(abcTags,abc, classIndex));
+            setModel(new TraitsListModel(abcTags, abc, classIndex));
          }
       }
    }

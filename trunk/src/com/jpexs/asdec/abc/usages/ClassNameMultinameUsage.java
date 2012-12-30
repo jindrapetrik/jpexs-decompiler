@@ -31,7 +31,7 @@ public class ClassNameMultinameUsage extends InsideClassMultinameUsage {
    }
 
    @Override
-   public String toString(List<DoABCTag> abcTags,ABC abc) {
+   public String toString(List<DoABCTag> abcTags, ABC abc) {
       return "class " + abc.constants.constant_multiname[abc.instance_info[classIndex].name_index].getNameWithNamespace(abc.constants);
    }
 }

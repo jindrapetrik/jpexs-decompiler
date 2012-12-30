@@ -19,6 +19,7 @@ package com.jpexs.asdec.abc.avm2.treemodel;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import java.util.HashMap;
+import java.util.List;
 
 public class FullMultinameTreeItem extends TreeItem {
 
@@ -52,15 +53,15 @@ public class FullMultinameTreeItem extends TreeItem {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       String ret = "";
       if (name != null) {
-         ret = "[" + name.toString(constants, localRegNames) + "]";
+         ret = "[" + name.toString(constants, localRegNames, fullyQualifiedNames) + "]";
       } else {
-         ret = hilight(constants.constant_multiname[multinameIndex].getName(constants));
+         ret = hilight(constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames));
       }
       if (namespace != null) {
-         ret = namespace.toString(constants, localRegNames) + "::" + ret;
+         ret = namespace.toString(constants, localRegNames, fullyQualifiedNames) + "::" + ret;
       } else {
          /*Namespace ns = constants.constant_multiname[multinameIndex].getNamespace(constants);
           if ((ns != null)&&(ns.name_index!=0)) {

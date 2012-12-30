@@ -35,25 +35,25 @@ public class TraitSlotConst extends Trait {
    public TreeItem assignedValue;
 
    @Override
-   public String toString(ABC abc) {
+   public String toString(ABC abc, List<String> fullyQualifiedNames) {
       String typeStr = "*";
       if (type_index > 0) {
-         typeStr = abc.constants.constant_multiname[type_index].toString(abc.constants);
+         typeStr = abc.constants.constant_multiname[type_index].toString(abc.constants, fullyQualifiedNames);
       }
-      return "0x" + Helper.formatAddress(fileOffset) + " " + Helper.byteArrToString(bytes) + " SlotConst " + abc.constants.constant_multiname[name_index].toString(abc.constants) + " slot=" + slot_id + " type=" + typeStr + " value=" + (new ValueKind(value_index, value_kind)).toString(abc.constants) + " metadata=" + Helper.intArrToString(metadata);
+      return "0x" + Helper.formatAddress(fileOffset) + " " + Helper.byteArrToString(bytes) + " SlotConst " + abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " type=" + typeStr + " value=" + (new ValueKind(value_index, value_kind)).toString(abc.constants) + " metadata=" + Helper.intArrToString(metadata);
    }
 
-   public String getType(ConstantPool constants) {
+   public String getType(ConstantPool constants, List<String> fullyQualifiedNames) {
       String typeStr = "*";
       if (type_index > 0) {
-         typeStr = constants.constant_multiname[type_index].getName(constants);
+         typeStr = constants.constant_multiname[type_index].getName(constants, fullyQualifiedNames);
       }
       return typeStr;
    }
 
-   public String getNameValueStr(ABC abc) {
+   public String getNameValueStr(ABC abc, List<String> fullyQualifiedNames) {
 
-      String typeStr = getType(abc.constants);
+      String typeStr = getType(abc.constants, fullyQualifiedNames);
       if (typeStr.equals("*")) {
          typeStr = "";
       } else {
@@ -67,7 +67,7 @@ public class TraitSlotConst extends Trait {
       }
 
       if (assignedValue != null) {
-         valueStr = " = " + Highlighting.stripHilights(assignedValue.toString(abc.constants, new HashMap<Integer, String>()));
+         valueStr = " = " + Highlighting.stripHilights(assignedValue.toString(abc.constants, new HashMap<Integer, String>(), fullyQualifiedNames));
       }
       String slotconst = "var";
       if (kindType == TRAIT_CONST) {
@@ -76,24 +76,24 @@ public class TraitSlotConst extends Trait {
       if (val != null && val.isNamespace()) {
          slotconst = "namespace";
       }
-      return slotconst + " " + getName(abc).getName(abc.constants) + typeStr + valueStr + ";";
+      return slotconst + " " + getName(abc).getName(abc.constants, fullyQualifiedNames) + typeStr + valueStr + ";";
    }
 
-   public boolean isNamespace(){
+   public boolean isNamespace() {
       if (value_kind != 0) {
          ValueKind val = new ValueKind(value_index, value_kind);
          return val.isNamespace();
       }
       return false;
    }
-   
+
    @Override
-   public String convert(List<DoABCTag> abcTags,ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight) {
-      String modifier = getModifiers(abcTags,abc, isStatic) + " ";
+   public String convert(List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+      String modifier = getModifiers(abcTags, abc, isStatic) + " ";
       if (modifier.equals(" ")) {
          modifier = "";
       }
-      return ABC.IDENT_STRING + ABC.IDENT_STRING + modifier + getNameValueStr(abc);
+      return ABC.IDENT_STRING + ABC.IDENT_STRING + modifier + getNameValueStr(abc, fullyQualifiedNames);
    }
 
    public boolean isConst() {

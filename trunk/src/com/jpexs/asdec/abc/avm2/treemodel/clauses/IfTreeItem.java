@@ -38,17 +38,17 @@ public class IfTreeItem extends TreeItem implements Block {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       String ret;
-      ret = hilight("if(") + expression.toString(constants, localRegNames) + hilight(")") + "\r\n{\r\n";
+      ret = hilight("if(") + expression.toString(constants, localRegNames, fullyQualifiedNames) + hilight(")") + "\r\n{\r\n";
       for (TreeItem ti : onTrue) {
-         ret += ti.toStringSemicoloned(constants, localRegNames) + "\r\n";
+         ret += ti.toStringSemicoloned(constants, localRegNames, fullyQualifiedNames) + "\r\n";
       }
       ret += hilight("}");
       if (onFalse.size() > 0) {
          ret += hilight("\r\nelse\r\n{\r\n");
          for (TreeItem ti : onFalse) {
-            ret += ti.toStringSemicoloned(constants, localRegNames) + "\r\n";
+            ret += ti.toStringSemicoloned(constants, localRegNames, fullyQualifiedNames) + "\r\n";
          }
          ret += hilight("}");
       }

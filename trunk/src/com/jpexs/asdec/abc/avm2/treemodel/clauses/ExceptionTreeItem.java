@@ -20,6 +20,7 @@ import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.ABCException;
 import java.util.HashMap;
+import java.util.List;
 
 public class ExceptionTreeItem extends TreeItem {
 
@@ -31,7 +32,7 @@ public class ExceptionTreeItem extends TreeItem {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
-      return exception.getVarName(constants);
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+      return exception.getVarName(constants, fullyQualifiedNames);
    }
 }

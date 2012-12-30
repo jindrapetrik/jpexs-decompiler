@@ -18,6 +18,7 @@ package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.tags.DoABCTag;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataListener;
@@ -30,9 +31,9 @@ public class TraitsListModel implements ListModel {
    public static final String STR_CLASS_INITIALIZER = "class initializer";
    private List<DoABCTag> abcTags;
 
-   public TraitsListModel(List<DoABCTag> abcTags,ABC abc, int classIndex) {
+   public TraitsListModel(List<DoABCTag> abcTags, ABC abc, int classIndex) {
       this.abc = abc;
-      this.abcTags=abcTags;
+      this.abcTags = abcTags;
       this.classIndex = classIndex;
    }
 
@@ -45,9 +46,9 @@ public class TraitsListModel implements ListModel {
 
    public Object getElementAt(int index) {
       if (index < abc.class_info[classIndex].static_traits.traits.length) {
-         return abc.class_info[classIndex].static_traits.traits[index].convertHeader(abcTags,abc, true, false, classIndex, false);
+         return abc.class_info[classIndex].static_traits.traits[index].convertHeader(abcTags, abc, true, false, classIndex, false, new ArrayList<String>());
       } else if (index < abc.class_info[classIndex].static_traits.traits.length + abc.instance_info[classIndex].instance_traits.traits.length) {
-         return abc.instance_info[classIndex].instance_traits.traits[index - abc.class_info[classIndex].static_traits.traits.length].convertHeader(abcTags,abc, false, false, classIndex, false);
+         return abc.instance_info[classIndex].instance_traits.traits[index - abc.class_info[classIndex].static_traits.traits.length].convertHeader(abcTags, abc, false, false, classIndex, false, new ArrayList<String>());
       } else if (index == abc.class_info[classIndex].static_traits.traits.length + abc.instance_info[classIndex].instance_traits.traits.length) {
          return STR_INSTANCE_INITIALIZER;
       } else {

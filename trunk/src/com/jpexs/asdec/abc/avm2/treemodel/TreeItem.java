@@ -20,6 +20,7 @@ import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.helpers.Highlighting;
 import java.util.HashMap;
+import java.util.List;
 
 public abstract class TreeItem {
 
@@ -48,14 +49,14 @@ public abstract class TreeItem {
       this.precedence = precedence;
    }
 
-   public abstract String toString(ConstantPool constants, HashMap<Integer, String> localRegNames);
+   public abstract String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames);
 
-   public String toStringNoH(ConstantPool constants, HashMap<Integer, String> localRegNames) {
-      return Highlighting.stripHilights(toString(constants, localRegNames));
+   public String toStringNoH(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+      return Highlighting.stripHilights(toString(constants, localRegNames, fullyQualifiedNames));
    }
 
-   public String toStringSemicoloned(ConstantPool constants, HashMap<Integer, String> localRegNames) {
-      return toString(constants, localRegNames) + (needsSemicolon() ? ";" : "");
+   public String toStringSemicoloned(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+      return toString(constants, localRegNames, fullyQualifiedNames) + (needsSemicolon() ? ";" : "");
    }
 
    public boolean needsSemicolon() {
@@ -77,8 +78,8 @@ public abstract class TreeItem {
       return false;
    }
 
-   protected String formatProperty(ConstantPool constants, TreeItem object, TreeItem propertyName, HashMap<Integer, String> localRegNames) {
-      String obStr = object.toString(constants, localRegNames);
+   protected String formatProperty(ConstantPool constants, TreeItem object, TreeItem propertyName, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+      String obStr = object.toString(constants, localRegNames, fullyQualifiedNames);
       if (object.precedence > PRECEDENCE_PRIMARY) {
          obStr = "(" + obStr + ")";
       }
@@ -88,27 +89,27 @@ public abstract class TreeItem {
          }
       }
       if (obStr.equals("")) {
-         return propertyName.toString(constants, localRegNames);
+         return propertyName.toString(constants, localRegNames, fullyQualifiedNames);
       }
       if (propertyName instanceof FullMultinameTreeItem) {
          if (((FullMultinameTreeItem) propertyName).isRuntime()) {
-            return joinProperty(obStr ,propertyName.toString(constants, localRegNames));
+            return joinProperty(obStr, propertyName.toString(constants, localRegNames, fullyQualifiedNames));
          } else {
-            return joinProperty(obStr,((FullMultinameTreeItem) propertyName).toString(constants, localRegNames));
+            return joinProperty(obStr, ((FullMultinameTreeItem) propertyName).toString(constants, localRegNames, fullyQualifiedNames));
          }
       } else {
-         return obStr + "[" + propertyName.toString(constants, localRegNames) + "]";
+         return obStr + "[" + propertyName.toString(constants, localRegNames, fullyQualifiedNames) + "]";
       }
    }
-   
-   private String joinProperty(String prefix,String name){
-      if(prefix.endsWith(".")){
-         prefix=prefix.substring(0,prefix.length()-1);
+
+   private String joinProperty(String prefix, String name) {
+      if (prefix.endsWith(".")) {
+         prefix = prefix.substring(0, prefix.length() - 1);
       }
-      if(!Highlighting.stripHilights(name).startsWith("[")){
-         return prefix+"."+name;
+      if (!Highlighting.stripHilights(name).startsWith("[")) {
+         return prefix + "." + name;
       }
-      return prefix+name;
+      return prefix + name;
    }
 
    public TreeItem getNotCoerced() {

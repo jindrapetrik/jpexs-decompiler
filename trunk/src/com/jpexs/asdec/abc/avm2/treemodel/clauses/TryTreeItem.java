@@ -40,25 +40,25 @@ public class TryTreeItem extends TreeItem implements Block {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       String ret = "";
       ret += "try\r\n{\r\n";
       for (TreeItem ti : tryCommands) {
-         ret += ti.toStringSemicoloned(constants, localRegNames) + "\r\n";
+         ret += ti.toStringSemicoloned(constants, localRegNames, fullyQualifiedNames) + "\r\n";
       }
       ret += "}";
       for (int e = 0; e < catchExceptions.size(); e++) {
-         ret += "\r\ncatch(" + catchExceptions.get(e).getVarName(constants) + ":" + catchExceptions.get(e).getTypeName(constants) + ")\r\n{\r\n";
+         ret += "\r\ncatch(" + catchExceptions.get(e).getVarName(constants, fullyQualifiedNames) + ":" + catchExceptions.get(e).getTypeName(constants, fullyQualifiedNames) + ")\r\n{\r\n";
          List<TreeItem> commands = catchCommands.get(e);
          for (TreeItem ti : commands) {
-            ret += ti.toStringSemicoloned(constants, localRegNames) + "\r\n";
+            ret += ti.toStringSemicoloned(constants, localRegNames, fullyQualifiedNames) + "\r\n";
          }
          ret += "}";
       }
       if (finallyCommands.size() > 0) {
          ret += "\r\nfinally\r\n{\r\n";
          for (TreeItem ti : finallyCommands) {
-            ret += ti.toStringSemicoloned(constants, localRegNames) + "\r\n";
+            ret += ti.toStringSemicoloned(constants, localRegNames, fullyQualifiedNames) + "\r\n";
          }
          ret += "}";
       }

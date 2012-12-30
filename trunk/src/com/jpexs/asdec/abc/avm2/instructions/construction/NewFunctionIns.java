@@ -37,16 +37,16 @@ public class NewFunctionIns extends InstructionDefinition {
    }
 
    @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer, String> localRegNames) {
+   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       int methodIndex = ins.operands[0];
       MethodBody mybody = abc.findBody(methodIndex);
       String bodyStr = "";
       String paramStr = "";
       if (mybody != null) {
-         bodyStr = Highlighting.hilighMethodEnd() + mybody.toString(false, isStatic, classIndex, abc, constants, method_info, new Stack<TreeItem>()/*scopeStack*/, false, true) + Highlighting.hilighMethodBegin(body.method_info);
-         paramStr = method_info[methodIndex].getParamStr(constants, mybody, abc);
+         bodyStr = Highlighting.hilighMethodEnd() + mybody.toString(false, isStatic, classIndex, abc, constants, method_info, new Stack<TreeItem>()/*scopeStack*/, false, true, fullyQualifiedNames) + Highlighting.hilighMethodBegin(body.method_info);
+         paramStr = method_info[methodIndex].getParamStr(constants, mybody, abc, fullyQualifiedNames);
       }
-      stack.push(new NewFunctionTreeItem(ins, paramStr, method_info[methodIndex].getReturnTypeStr(constants), bodyStr));
+      stack.push(new NewFunctionTreeItem(ins, paramStr, method_info[methodIndex].getReturnTypeStr(constants, fullyQualifiedNames), bodyStr));
    }
 
    @Override

@@ -683,7 +683,7 @@ public class AVM2Code {
       String s = "";
       int i = 0;
       for (AVM2Instruction instruction : code) {
-         s += Helper.formatAddress(i) + " " + instruction.toString(constants) + "\r\n";
+         s += Helper.formatAddress(i) + " " + instruction.toString(constants, new ArrayList<String>()) + "\r\n";
          i++;
       }
       return s;
@@ -703,8 +703,8 @@ public class AVM2Code {
    public String toASMSource(ConstantPool constants, MethodBody body) {
       String ret = "";
       for (int e = 0; e < body.exceptions.length; e++) {
-         ret += "exception " + e + " m[" + body.exceptions[e].name_index + "]\"" + Helper.escapeString(body.exceptions[e].getVarName(constants)) + "\" "
-                 + "m[" + body.exceptions[e].type_index + "]\"" + Helper.escapeString(body.exceptions[e].getTypeName(constants)) + "\"\n";
+         ret += "exception " + e + " m[" + body.exceptions[e].name_index + "]\"" + Helper.escapeString(body.exceptions[e].getVarName(constants, new ArrayList<String>())) + "\" "
+                 + "m[" + body.exceptions[e].type_index + "]\"" + Helper.escapeString(body.exceptions[e].getTypeName(constants, new ArrayList<String>())) + "\"\n";
       }
       List<Long> offsets = new ArrayList<Long>();
       for (AVM2Instruction ins : code) {
@@ -726,7 +726,7 @@ public class AVM2Code {
                ret += "exceptiontarget " + e + ":";
             }
          }
-         ret += ins.toStringNoAddress(constants) + "\n";
+         ret += ins.toStringNoAddress(constants, new ArrayList<String>()) + "\n";
          ofs += ins.getBytes().length;
       }
 
@@ -764,11 +764,11 @@ public class AVM2Code {
       return posCache.get(pos).intValue();
    }
 
-   private static String listToString(List<TreeItem> stack, ConstantPool constants, HashMap<Integer, String> localRegNames) {
+   private static String listToString(List<TreeItem> stack, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       String ret = "";
       for (int d = 0; d < stack.size(); d++) {
          TreeItem o = stack.get(d);
-         ret += o.toStringSemicoloned(constants, localRegNames) + "\r\n";
+         ret += o.toStringSemicoloned(constants, localRegNames, fullyQualifiedNames) + "\r\n";
       }
       return ret;
    }
@@ -973,7 +973,7 @@ public class AVM2Code {
       return pos2adr(fixIPAfterDebugLine(adr2pos(addr)));
    }
 
-   private ConvertOutput toSource(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, int start, int end, HashMap<Integer, String> localRegNames) throws ConvertException {
+   private ConvertOutput toSource(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) throws ConvertException {
       boolean debugMode = false;
       if (debugMode) {
          System.out.println("OPEN SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
@@ -1056,7 +1056,7 @@ public class AVM2Code {
                                        if (swins.operands.length >= 3) {
                                           if (swins.operands[0] == swins.getBytes().length) {
                                              if (adr2pos(pos2adr(f) + swins.operands[2]) < finStart) {
-                                                finallyCommands = toSource(isStatic, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, finStart, f - 1, localRegNames).output;
+                                                finallyCommands = toSource(isStatic, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, finStart, f - 1, localRegNames, fullyQualifiedNames).output;
                                                 returnPos = f + 1;
                                                 break;
                                              }
@@ -1081,10 +1081,10 @@ public class AVM2Code {
                      }
                      Stack<TreeItem> substack = new Stack<TreeItem>();
                      substack.add(new ExceptionTreeItem(catchedExceptions.get(e)));
-                     catchedCommands.add(toSource(isStatic, classIndex, localRegs, substack, new Stack<TreeItem>(), abc, constants, method_info, body, adr2pos(fixAddrAfterDebugLine(catchedExceptions.get(e).target)), eendpos, localRegNames).output);
+                     catchedCommands.add(toSource(isStatic, classIndex, localRegs, substack, new Stack<TreeItem>(), abc, constants, method_info, body, adr2pos(fixAddrAfterDebugLine(catchedExceptions.get(e).target)), eendpos, localRegNames, fullyQualifiedNames).output);
                   }
 
-                  List<TreeItem> tryCommands = toSource(isStatic, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, ip, endpos - 1, localRegNames).output;
+                  List<TreeItem> tryCommands = toSource(isStatic, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, ip, endpos - 1, localRegNames, fullyQualifiedNames).output;
 
 
                   output.add(new TryTreeItem(tryCommands, catchedExceptions, catchedCommands, finallyCommands));
@@ -1139,7 +1139,7 @@ public class AVM2Code {
             if ((ip + 2 < code.size()) && (ins.definition instanceof NewCatchIns)) { //Filling local register in catch clause
                if (code.get(ip + 1).definition instanceof DupIns) {
                   if (code.get(ip + 2).definition instanceof SetLocalTypeIns) {
-                     ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames);
+                     ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
                      ip += 3;
                      continue;
                   }
@@ -1249,7 +1249,7 @@ public class AVM2Code {
                         throw new ConvertException("Unknown pattern: no setlocal before lookupswitch", switchPos);
                      }
                      loopList.add(new Loop(ip, switchPos + 1));
-                     Stack<TreeItem> substack = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, jumpPos, evalTo - 1, localRegNames).stack;
+                     Stack<TreeItem> substack = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, jumpPos, evalTo - 1, localRegNames, fullyQualifiedNames).stack;
                      TreeItem switchedValue = substack.pop();
                      //output.add("loop" + (switchPos + 1) + ":");
                      int switchBreak = switchPos + 1;
@@ -1284,7 +1284,7 @@ public class AVM2Code {
 
 
                         if (evalTo > -1) {
-                           substack = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, curPos, evalTo - 1, localRegNames).stack;
+                           substack = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, curPos, evalTo - 1, localRegNames, fullyQualifiedNames).stack;
                            casesList.add(substack.pop());
                         }
                         int substart = adr2pos(code.get(switchPos).operands[2 + casePos] + pos2adr(switchPos));
@@ -1296,7 +1296,7 @@ public class AVM2Code {
                         if (evalTo == -1) {
                            subend--;
                         }
-                        List commands = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, substart, subend, localRegNames).output;
+                        List commands = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, substart, subend, localRegNames, fullyQualifiedNames).output;
                         if ((evalTo == -1) && (casePos + 1 < code.get(switchPos).operands.length - 2)) {
                            if (commands.size() == 1) {
                               commands.remove(0);
@@ -1340,16 +1340,16 @@ public class AVM2Code {
                   loopList.add(currentLoop);
 
 
-                  ConvertOutput co = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, jumpPos, adr2pos(afterBackJumpAddr) - 2, localRegNames);
+                  ConvertOutput co = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, jumpPos, adr2pos(afterBackJumpAddr) - 2, localRegNames, fullyQualifiedNames);
                   Stack<TreeItem> substack = co.stack;
-                  backJumpIns.definition.translate(isStatic, classIndex, localRegs, substack, scopeStack, constants, backJumpIns, method_info, output, body, abc, localRegNames);
+                  backJumpIns.definition.translate(isStatic, classIndex, localRegs, substack, scopeStack, constants, backJumpIns, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
 
                   TreeItem expression = substack.pop();
                   List<TreeItem> subins = new ArrayList<TreeItem>();
                   boolean isFor = false;
                   List<TreeItem> finalExpression = new ArrayList<TreeItem>();
                   try {
-                     subins = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, adr2pos(secondAddr) + 1/*label*/, jumpPos - 1, localRegNames).output;
+                     subins = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, adr2pos(secondAddr) + 1/*label*/, jumpPos - 1, localRegNames, fullyQualifiedNames).output;
                   } catch (UnknownJumpException uje) {
                      if ((uje.ip >= start) && (uje.ip <= end)) {
                         currentLoop.loopContinue = uje.ip;
@@ -1374,7 +1374,7 @@ public class AVM2Code {
                               }
                            }
                         }
-                        finalExpression = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, uje.ip, jumpPos - 1, localRegNames).output;
+                        finalExpression = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, uje.ip, jumpPos - 1, localRegNames, fullyQualifiedNames).output;
                         isFor = true;
                      } else {
                         throw new ConvertException("Unknown pattern: jump to nowhere", ip);
@@ -1444,20 +1444,20 @@ public class AVM2Code {
                } else {
                   throw new ConvertException("Unknown pattern: back jump ", ip);
                }
-            } else if ((ins.definition instanceof SetLocalTypeIns)&&(ip+1<=end)&&(isKilled(((SetLocalTypeIns)ins.definition).getRegisterId(ins), ip, end))){ //set_local_x,get_local_x..kill x
-               
-               AVM2Instruction insAfter=code.get(ip+1);
-               if((insAfter.definition instanceof GetLocalTypeIns)&&(((GetLocalTypeIns)insAfter.definition).getRegisterId(insAfter)==((SetLocalTypeIns)ins.definition).getRegisterId(ins))){
-                  TreeItem before=stack.peek();
-                  ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames);
+            } else if ((ins.definition instanceof SetLocalTypeIns) && (ip + 1 <= end) && (isKilled(((SetLocalTypeIns) ins.definition).getRegisterId(ins), ip, end))) { //set_local_x,get_local_x..kill x
+
+               AVM2Instruction insAfter = code.get(ip + 1);
+               if ((insAfter.definition instanceof GetLocalTypeIns) && (((GetLocalTypeIns) insAfter.definition).getRegisterId(insAfter) == ((SetLocalTypeIns) ins.definition).getRegisterId(ins))) {
+                  TreeItem before = stack.peek();
+                  ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
                   stack.push(before);
-                  ip+=2;
+                  ip += 2;
                   continue iploop;
-               }else{
-                  ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames);                  
+               } else {
+                  ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
                   ip++;
                   continue iploop;
-               }               
+               }
             } else if (ins.definition instanceof DupIns) {
                int nextPos;
                do {
@@ -1487,7 +1487,7 @@ public class AVM2Code {
                            if (((GetLocalTypeIns) code.get(t).definition).getRegisterId(code.get(t)) == reg) {
                               if (code.get(t + 1).definition instanceof KillIns) {
                                  if (code.get(t + 1).operands[0] == reg) {
-                                    ConvertOutput assignment = toSource(isStatic, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, ip + 2, t - 1, localRegNames);
+                                    ConvertOutput assignment = toSource(isStatic, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, ip + 2, t - 1, localRegNames, fullyQualifiedNames);
                                     stack.push(assignment.output.remove(assignment.output.size() - 1));
                                     ip = t + 2;
                                     continue iploop;
@@ -1501,14 +1501,14 @@ public class AVM2Code {
                         stack.push(new LocalRegTreeItem(ins, reg, v));
                         stack.push(v);
                      } else {
-                        ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames);
+                        ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
                      }
                      ip++;
                      break;
                      //}
 
                   } else {
-                     ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames);
+                     ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
                      ip++;
                      break;
                      //throw new ConvertException("Unknown pattern after DUP:" + insComparsion.toString());
@@ -1516,9 +1516,9 @@ public class AVM2Code {
                   addr = addr + ins.getBytes().length + insAfter.getBytes().length + insAfter.operands[0];
                   nextPos = adr2pos(addr) - 1;
                   if (isAnd) {
-                     stack.add(new AndTreeItem(insAfter, stack.pop(), toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, ip + 3, nextPos, localRegNames).stack.pop()));
+                     stack.add(new AndTreeItem(insAfter, stack.pop(), toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, ip + 3, nextPos, localRegNames, fullyQualifiedNames).stack.pop()));
                   } else {
-                     stack.add(new OrTreeItem(insAfter, stack.pop(), toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, ip + 3, nextPos, localRegNames).stack.pop()));
+                     stack.add(new OrTreeItem(insAfter, stack.pop(), toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, ip + 3, nextPos, localRegNames, fullyQualifiedNames).stack.pop()));
                   }
                   ins = code.get(nextPos + 1);
                   ip = nextPos + 1;
@@ -1571,13 +1571,13 @@ public class AVM2Code {
                      }
                   }
                }
-               ConvertOutput onTrue = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, ip + 1, targetIns - 1 - ((hasElse || hasReturn) ? 1 : 0), localRegNames);
+               ConvertOutput onTrue = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, ip + 1, targetIns - 1 - ((hasElse || hasReturn) ? 1 : 0), localRegNames, fullyQualifiedNames);
                ip = targetIns;
                ConvertOutput onFalse = new ConvertOutput(new Stack<TreeItem>(), new ArrayList<TreeItem>());
                if (hasElse) {
                   int finalAddr = targetAddr + code.get(targetIns - 1).operands[0];
                   int finalIns = adr2pos(finalAddr);
-                  onFalse = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, targetIns, finalIns - 1, localRegNames);
+                  onFalse = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, targetIns, finalIns - 1, localRegNames, fullyQualifiedNames);
                   ip = finalIns;
                }
                if ((onTrue.stack.size() > 0) && (onFalse != null) && (onFalse.stack.size() > 0)) {
@@ -1587,11 +1587,11 @@ public class AVM2Code {
                }
 
             } else if ((ins.definition instanceof ReturnValueIns) || (ins.definition instanceof ReturnVoidIns) || (ins.definition instanceof ThrowIns)) {
-               ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames);
+               ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
                ip = end + 1;
                break;
             } else {
-               ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames);
+               ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
 
                addr += ins.getBytes().length;
                ip++;
@@ -1624,11 +1624,11 @@ public class AVM2Code {
       return ret;
    }
 
-   public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames, Stack<TreeItem> scopeStack, boolean isStaticInitializer) {
-      return toSource(isStatic, classIndex, abc, constants, method_info, body, false, localRegNames, scopeStack, isStaticInitializer);
+   public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames, Stack<TreeItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames) {
+      return toSource(isStatic, classIndex, abc, constants, method_info, body, false, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames);
    }
 
-   public List<TreeItem> toTree(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames) {
+   public List<TreeItem> toTree(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       toSourceCount = 0;
       loopList = new ArrayList<Loop>();
       unknownJumps = new ArrayList<Integer>();
@@ -1636,7 +1636,7 @@ public class AVM2Code {
       finallyJumps = new ArrayList<Integer>();
       HashMap<Integer, TreeItem> localRegs = new HashMap<Integer, TreeItem>();
       try {
-         return toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), new Stack<TreeItem>(), abc, constants, method_info, body, 0, code.size() - 1, localRegNames).output;
+         return toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), new Stack<TreeItem>(), abc, constants, method_info, body, 0, code.size() - 1, localRegNames, fullyQualifiedNames).output;
       } catch (ConvertException ex) {
          return new ArrayList<TreeItem>();
       }
@@ -1659,14 +1659,14 @@ public class AVM2Code {
       return maxRegister + 1;
    }
 
-   public HashMap<Integer, String> getLocalRegTypes(ConstantPool constants) {
+   public HashMap<Integer, String> getLocalRegTypes(ConstantPool constants, List<String> fullyQualifiedNames) {
       HashMap<Integer, String> ret = new HashMap<Integer, String>();
       AVM2Instruction prev = null;
       for (AVM2Instruction ins : code) {
          if (ins.definition instanceof SetLocalTypeIns) {
             if (prev != null) {
                if (prev.definition instanceof CoerceOrConvertTypeIns) {
-                  ret.put(((SetLocalTypeIns) ins.definition).getRegisterId(ins), ((CoerceOrConvertTypeIns) prev.definition).getTargetType(constants, prev));
+                  ret.put(((SetLocalTypeIns) ins.definition).getRegisterId(ins), ((CoerceOrConvertTypeIns) prev.definition).getTargetType(constants, prev, fullyQualifiedNames));
                }
             }
          }
@@ -1703,7 +1703,7 @@ public class AVM2Code {
       }
    }
 
-   public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted, HashMap<Integer, String> localRegNames, Stack<TreeItem> scopeStack, boolean isStaticInitializer) {
+   public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted, HashMap<Integer, String> localRegNames, Stack<TreeItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames) {
       toSourceCount = 0;
       loopList = new ArrayList<Loop>();
       unknownJumps = new ArrayList<Integer>();
@@ -1725,7 +1725,7 @@ public class AVM2Code {
       }
 
       try {
-         list = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, 0, code.size() - 1, localRegNames).output;
+         list = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, 0, code.size() - 1, localRegNames, fullyQualifiedNames).output;
          if (isStaticInitializer) {
 
             List<TreeItem> newList = new ArrayList<TreeItem>();
@@ -1766,7 +1766,7 @@ public class AVM2Code {
                   for (int t = 0; t < body.traits.traits.length; t++) {
                      if (body.traits.traits[t].getName(abc) == sl.multiname) {
                         if (body.traits.traits[t] instanceof TraitSlotConst) {
-                           type = ((TraitSlotConst) body.traits.traits[t]).getType(constants);
+                           type = ((TraitSlotConst) body.traits.traits[t]).getType(constants, fullyQualifiedNames);
                         }
                      }
                   }
@@ -1776,7 +1776,7 @@ public class AVM2Code {
             }
          }
 
-         s = listToString(list, constants, localRegNames);
+         s = listToString(list, constants, localRegNames, fullyQualifiedNames);
       } catch (Exception ex) {
          Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, null, ex);
          s = "/*\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error Message: " + ex.getMessage() + "\r\n */";

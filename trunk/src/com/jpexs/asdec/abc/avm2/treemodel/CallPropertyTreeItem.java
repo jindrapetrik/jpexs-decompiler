@@ -37,14 +37,14 @@ public class CallPropertyTreeItem extends TreeItem {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       String args = "";
       for (int a = 0; a < arguments.size(); a++) {
          if (a > 0) {
             args = args + hilight(",");
          }
-         args = args + arguments.get(a).toString(constants, localRegNames);
+         args = args + arguments.get(a).toString(constants, localRegNames, fullyQualifiedNames);
       }
-      return formatProperty(constants, receiver, propertyName, localRegNames) + hilight("(") + args + hilight(")");
+      return formatProperty(constants, receiver, propertyName, localRegNames, fullyQualifiedNames) + hilight("(") + args + hilight(")");
    }
 }

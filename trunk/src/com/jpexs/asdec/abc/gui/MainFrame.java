@@ -121,8 +121,6 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
       this.abc = abc;
       updateConstList();
    }
-   
-   
 
    public void updateConstList() {
       switch (constantTypeList.getSelectedIndex()) {
@@ -156,13 +154,13 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
    }
 
    public void switchAbc(int index) {
-      listIndex = index;      
+      listIndex = index;
       if (index == -1) {
          classTree.setDoABCTags(list);
       } else {
          List<DoABCTag> oneList = new ArrayList<DoABCTag>();
          oneList.add(list.get(index));
-         this.abc=list.get(index).abc;
+         this.abc = list.get(index).abc;
          classTree.setDoABCTags(oneList);
       }
       //decompiledTextArea.setABC(abc);
@@ -208,7 +206,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
       pan2.add((abcComboBox = new JComboBox(new ABCComboBoxModel(list))), BorderLayout.NORTH);
 
       navigator = new TraitsList();
-      navigator.setABC(list,abc);
+      navigator.setABC(list, abc);
 
 
       JPanel navPanel = new JPanel(new BorderLayout());
@@ -345,9 +343,9 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
       constantTable = new JTable();
       autoResizeColWidth(constantTable, new UIntTableModel(abc));
       constantTable.setAutoCreateRowSorter(true);
-      
-      final List<DoABCTag> inlist=list;
-      
+
+      final List<DoABCTag> inlist = list;
+
       constantTable.addMouseListener(new MouseAdapter() {
          @Override
          public void mouseClicked(MouseEvent e) {
@@ -359,7 +357,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
                   }
                   int multinameIndex = constantTable.convertRowIndexToModel(rowIndex);
                   if (multinameIndex > 0) {
-                     UsageFrame usageFrame = new UsageFrame(inlist,abc, multinameIndex);
+                     UsageFrame usageFrame = new UsageFrame(inlist, abc, multinameIndex);
                      usageFrame.setVisible(true);
                   }
                }
@@ -468,7 +466,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
    }
 
    public void reload() {
-      switchAbc(listIndex-1);
+      switchAbc(listIndex - 1);
    }
 
    public void itemStateChanged(ItemEvent e) {
@@ -477,7 +475,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
          if (index == -1) {
             return;
          }
-         switchAbc(index-1);
+         switchAbc(index - 1);
       }
       if (e.getSource() == constantTypeList) {
          int index = ((JComboBox) e.getSource()).getSelectedIndex();

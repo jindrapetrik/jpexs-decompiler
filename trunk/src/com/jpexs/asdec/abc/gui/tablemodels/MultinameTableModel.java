@@ -17,6 +17,7 @@
 package com.jpexs.asdec.abc.gui.tablemodels;
 
 import com.jpexs.asdec.abc.ABC;
+import java.util.ArrayList;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
@@ -122,7 +123,7 @@ public class MultinameTableModel implements TableModel {
             if (abc.constants.constant_multiname[rowIndex].name_index == -1) {
                return "";
             }
-            return abc.constants.constant_multiname[rowIndex].getName(abc.constants);
+            return abc.constants.constant_multiname[rowIndex].getName(abc.constants, new ArrayList<String>());
          case 3:
             if (rowIndex == 0) {
                return "";

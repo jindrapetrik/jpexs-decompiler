@@ -18,6 +18,7 @@ package com.jpexs.asdec.abc.avm2.instructions.types;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
+import java.util.List;
 
 /**
  *
@@ -25,5 +26,5 @@ import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
  */
 public interface CoerceOrConvertTypeIns {
 
-   public String getTargetType(ConstantPool constants, AVM2Instruction ins);
+   public String getTargetType(ConstantPool constants, AVM2Instruction ins, List<String> fullyQualifiedNames);
 }

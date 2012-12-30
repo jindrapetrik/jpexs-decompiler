@@ -103,20 +103,20 @@ public abstract class Trait {
       return "name_index=" + name_index + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
    }
 
-   public String toString(ABC abc) {
-      return abc.constants.constant_multiname[name_index].toString(abc.constants) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
+   public String toString(ABC abc, List<String> fullyQualifiedNames) {
+      return abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
    }
 
-   public String convert(List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight) {
-      return abc.constants.constant_multiname[name_index].toString(abc.constants) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
+   public String convert(List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+      return abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
    }
 
-   public String convertPackaged(List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcod, int classIndex, boolean highlight) {
-      return makePackageFromIndex(abc, name_index, convert(abcTags, abc, isStatic, pcod, classIndex, highlight));
+   public String convertPackaged(List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcod, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+      return makePackageFromIndex(abc, name_index, convert(abcTags, abc, isStatic, pcod, classIndex, highlight, fullyQualifiedNames));
    }
 
-   public String convertHeader(List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight) {
-      return convert(abcTags, abc, isStatic, pcode, classIndex, highlight).trim();
+   public String convertHeader(List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+      return convert(abcTags, abc, isStatic, pcode, classIndex, highlight, fullyQualifiedNames).trim();
    }
 
    protected String makePackageFromIndex(ABC abc, int name_index, String value) {

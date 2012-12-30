@@ -31,6 +31,4 @@ public class TreeLeafScript {
       this.abc = abc;
       this.scriptIndex = scriptIndex;
    }
-
-   
 }

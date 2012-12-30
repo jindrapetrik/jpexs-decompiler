@@ -19,6 +19,7 @@ package com.jpexs.asdec.abc.avm2.treemodel;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import java.util.HashMap;
+import java.util.List;
 
 public class InTreeItem extends TreeItem {
 
@@ -32,7 +33,7 @@ public class InTreeItem extends TreeItem {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
-      return object.toString(constants, localRegNames) + hilight(" in ") + collection.toString(constants, localRegNames);
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+      return object.toString(constants, localRegNames, fullyQualifiedNames) + hilight(" in ") + collection.toString(constants, localRegNames, fullyQualifiedNames);
    }
 }

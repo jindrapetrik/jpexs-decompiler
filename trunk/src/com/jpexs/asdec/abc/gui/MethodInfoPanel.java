@@ -23,6 +23,7 @@ import com.jpexs.asdec.abc.methodinfo_parser.ParseException;
 import com.jpexs.asdec.abc.types.MethodInfo;
 import com.jpexs.asdec.helpers.Helper;
 import java.awt.Dimension;
+import java.util.ArrayList;
 import javax.swing.*;
 import jsyntaxpane.syntaxkits.Flasm3MethodInfoSyntaxKit;
 
@@ -78,7 +79,7 @@ public class MethodInfoPanel extends JPanel {
          if (ptype == 0) {
             ret += "*";
          } else {
-            ret += "m[" + ptype + "]\"" + Helper.escapeString(abc.constants.constant_multiname[ptype].toString(abc.constants)) + "\"";
+            ret += "m[" + ptype + "]\"" + Helper.escapeString(abc.constants.constant_multiname[ptype].toString(abc.constants, new ArrayList<String>())) + "\"";
          }
          if (methodInfo.flagHas_optional()) {
             if (p >= optParPos) {
@@ -94,7 +95,7 @@ public class MethodInfoPanel extends JPanel {
       if (methodInfo.ret_type == 0) {
          returnTypeEditor.setText("*");
       } else {
-         returnTypeEditor.setText("m[" + methodInfo.ret_type + "]\"" + Helper.escapeString(abc.constants.constant_multiname[methodInfo.ret_type].toString(abc.constants)) + "\"");
+         returnTypeEditor.setText("m[" + methodInfo.ret_type + "]\"" + Helper.escapeString(abc.constants.constant_multiname[methodInfo.ret_type].toString(abc.constants, new ArrayList<String>())) + "\"");
       }
    }
 

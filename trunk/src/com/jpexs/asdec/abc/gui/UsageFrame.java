@@ -46,10 +46,10 @@ public class UsageFrame extends JFrame implements ActionListener, MouseListener 
    private UsageListModel usageListModel;
    private ABC abc;
 
-   public UsageFrame(List<DoABCTag> abcTags,ABC abc, int multinameIndex) {
+   public UsageFrame(List<DoABCTag> abcTags, ABC abc, int multinameIndex) {
       List<MultinameUsage> usages = abc.findMultinameUsage(multinameIndex);
       this.abc = abc;
-      usageListModel = new UsageListModel(abcTags,abc);
+      usageListModel = new UsageListModel(abcTags, abc);
       for (MultinameUsage u : usages) {
          usageListModel.addElement(u);
       }

@@ -35,13 +35,13 @@ public class CallTreeItem extends TreeItem {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       String args = "";
       for (int a = 0; a < arguments.size(); a++) {
          if (a > 0) {
             args = args + ",";
          }
-         args = args + arguments.get(a).toString(constants, localRegNames);
+         args = args + arguments.get(a).toString(constants, localRegNames, fullyQualifiedNames);
       }
       /*String recPart = ""; receiver.toString(constants, localRegNames) + hilight(".");
        if (receiver instanceof NewActivationTreeItem) {
@@ -50,6 +50,6 @@ public class CallTreeItem extends TreeItem {
        if (receiver instanceof ThisTreeItem) {
        recPart = "";
        }*/
-      return function.toString(constants, localRegNames) + hilight("(") + args + hilight(")");
+      return function.toString(constants, localRegNames, fullyQualifiedNames) + hilight("(") + args + hilight(")");
    }
 }

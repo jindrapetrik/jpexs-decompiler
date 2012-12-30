@@ -19,6 +19,7 @@ package com.jpexs.asdec.abc.avm2.treemodel;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import java.util.HashMap;
+import java.util.List;
 
 public class ThrowTreeItem extends TreeItem {
 
@@ -30,7 +31,7 @@ public class ThrowTreeItem extends TreeItem {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
-      return hilight("throw ") + value.toString(constants, localRegNames);
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+      return hilight("throw ") + value.toString(constants, localRegNames, fullyQualifiedNames);
    }
 }

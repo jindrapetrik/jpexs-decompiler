@@ -21,6 +21,7 @@ import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.helpers.Helper;
 import java.util.HashMap;
+import java.util.List;
 
 public class MethodInfo {
 
@@ -179,7 +180,7 @@ public class MethodInfo {
       return "MethodInfo: param_types=" + Helper.intArrToString(param_types) + " ret_type=" + ret_type + " name_index=" + name_index + " flags=" + flags + " optional=" + optionalStr + " paramNames=" + Helper.intArrToString(paramNames);
    }
 
-   public String toString(ConstantPool constants) {
+   public String toString(ConstantPool constants, List<String> fullyQualifiedNames) {
       String optionalStr = "[";
       if (optional != null) {
          for (int i = 0; i < optional.length; i++) {
@@ -199,7 +200,7 @@ public class MethodInfo {
          if (param_types[i] == 0) {
             param_typesStr += "*";
          } else {
-            param_typesStr += constants.constant_multiname[param_types[i]].toString(constants);
+            param_typesStr += constants.constant_multiname[param_types[i]].toString(constants, fullyQualifiedNames);
          }
       }
 
@@ -215,7 +216,7 @@ public class MethodInfo {
       if (ret_type == 0) {
          ret_typeStr += "*";
       } else {
-         ret_typeStr += constants.constant_multiname[ret_type].toString(constants);
+         ret_typeStr += constants.constant_multiname[ret_type].toString(constants, fullyQualifiedNames);
       }
 
       return "param_types=" + param_typesStr + " ret_type=" + ret_typeStr + " name=\"" + constants.constant_string[name_index] + "\" flags=" + flags + " optional=" + optionalStr + " paramNames=" + paramNamesStr;
@@ -228,7 +229,7 @@ public class MethodInfo {
       return constants.constant_string[name_index];
    }
 
-   public String getParamStr(ConstantPool constants, MethodBody body, ABC abc) {
+   public String getParamStr(ConstantPool constants, MethodBody body, ABC abc, List<String> fullyQualifiedNames) {
       HashMap<Integer, String> localRegNames = new HashMap<Integer, String>();
       if (body != null) {
          localRegNames = body.code.getLocalRegNamesFromDebug(abc);
@@ -249,7 +250,7 @@ public class MethodInfo {
          if (param_types[i] == 0) {
             paramStr += "*";
          } else {
-            paramStr += constants.constant_multiname[param_types[i]].getName(constants);
+            paramStr += constants.constant_multiname[param_types[i]].getName(constants, fullyQualifiedNames);
          }
          if (optional != null) {
             if (i >= param_types.length - optional.length) {
@@ -272,11 +273,11 @@ public class MethodInfo {
       return paramStr;
    }
 
-   public String getReturnTypeStr(ConstantPool constants) {
+   public String getReturnTypeStr(ConstantPool constants, List<String> fullyQualifiedNames) {
       if (ret_type == 0) {
          return "*";
       }
-      return constants.constant_multiname[ret_type].getName(constants);
+      return constants.constant_multiname[ret_type].getName(constants, fullyQualifiedNames);
    }
 
    public void setBody(MethodBody body) {

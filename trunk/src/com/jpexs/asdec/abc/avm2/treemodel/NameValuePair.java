@@ -18,6 +18,7 @@ package com.jpexs.asdec.abc.avm2.treemodel;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import java.util.HashMap;
+import java.util.List;
 
 public class NameValuePair extends TreeItem {
 
@@ -31,10 +32,10 @@ public class NameValuePair extends TreeItem {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       if (name instanceof StringTreeItem) {
-         return ((StringTreeItem) name).value + ":" + value.toString(constants, localRegNames);
+         return ((StringTreeItem) name).value + ":" + value.toString(constants, localRegNames, fullyQualifiedNames);
       }
-      return name.toString(constants, localRegNames) + ":" + value.toString(constants, localRegNames);
+      return name.toString(constants, localRegNames, fullyQualifiedNames) + ":" + value.toString(constants, localRegNames, fullyQualifiedNames);
    }
 }

@@ -20,6 +20,7 @@ import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.helpers.Helper;
 import java.util.HashMap;
+import java.util.List;
 
 public class StringTreeItem extends TreeItem {
 
@@ -31,7 +32,7 @@ public class StringTreeItem extends TreeItem {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       return hilight("\"" + Helper.escapeString(value) + "\"");
    }
 }

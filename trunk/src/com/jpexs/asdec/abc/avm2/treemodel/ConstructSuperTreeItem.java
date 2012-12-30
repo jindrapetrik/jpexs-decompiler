@@ -34,15 +34,15 @@ public class ConstructSuperTreeItem extends TreeItem {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       String argStr = "";
       for (int a = 0; a < args.size(); a++) {
          if (a > 0) {
             argStr = argStr + ",";
          }
-         argStr = argStr + args.get(a).toString(constants, localRegNames);
+         argStr = argStr + args.get(a).toString(constants, localRegNames, fullyQualifiedNames);
       }
-      String calee = object.toString(constants, localRegNames) + ".";
+      String calee = object.toString(constants, localRegNames, fullyQualifiedNames) + ".";
       if (Highlighting.stripHilights(calee).equals("this.")) {
          calee = "";
       }

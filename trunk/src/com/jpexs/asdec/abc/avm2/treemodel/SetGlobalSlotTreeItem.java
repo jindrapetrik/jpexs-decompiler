@@ -19,6 +19,7 @@ package com.jpexs.asdec.abc.avm2.treemodel;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import java.util.HashMap;
+import java.util.List;
 
 public class SetGlobalSlotTreeItem extends TreeItem {
 
@@ -32,7 +33,7 @@ public class SetGlobalSlotTreeItem extends TreeItem {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
-      return hilight("setglobalslot(" + slotId + ",") + value.toString(constants, localRegNames) + hilight(")");
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+      return hilight("setglobalslot(" + slotId + ",") + value.toString(constants, localRegNames, fullyQualifiedNames) + hilight(")");
    }
 }

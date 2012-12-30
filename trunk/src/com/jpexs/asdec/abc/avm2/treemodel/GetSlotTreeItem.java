@@ -20,6 +20,7 @@ import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.types.Multiname;
 import java.util.HashMap;
+import java.util.List;
 
 public class GetSlotTreeItem extends TreeItem {
 
@@ -33,8 +34,8 @@ public class GetSlotTreeItem extends TreeItem {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       //scope.toString(constants)+"."
-      return hilight(slotName.getName(constants));
+      return hilight(slotName.getName(constants, fullyQualifiedNames));
    }
 }

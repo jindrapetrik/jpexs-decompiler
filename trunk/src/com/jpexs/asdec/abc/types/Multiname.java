@@ -135,7 +135,7 @@ public class Multiname {
 
    }
 
-   public String toString(ConstantPool constants) {
+   public String toString(ConstantPool constants, List<String> fullyQualifiedNames) {
       String kindStr = "?";
       for (int k = 0; k < multinameKinds.length; k++) {
          if (multinameKinds[k] == kind) {
@@ -166,15 +166,15 @@ public class Multiname {
       }
       String typeNameStr = "";
       if (kind == TYPENAME) {
-         typeNameStr = typeNameToStr(constants);
+         typeNameStr = typeNameToStr(constants, fullyQualifiedNames);
       }
 
       return namespaceStr + nameStr + namespaceSetStr + typeNameStr;
 
    }
 
-   private String typeNameToStr(ConstantPool constants) {
-      String typeNameStr = constants.constant_multiname[qname_index].getName(constants);
+   private String typeNameToStr(ConstantPool constants, List<String> fullyQualifiedNames) {
+      String typeNameStr = constants.constant_multiname[qname_index].getName(constants, fullyQualifiedNames);
       if (!params.isEmpty()) {
          typeNameStr += ".<";
          for (int i = 0; i < params.size(); i++) {
@@ -182,7 +182,7 @@ public class Multiname {
                typeNameStr += ",";
             }
             if (params.get(i) != 0) { //What does value 0 mean?
-               typeNameStr += constants.constant_multiname[params.get(i)].getName(constants);
+               typeNameStr += constants.constant_multiname[params.get(i)].getName(constants, fullyQualifiedNames);
             }
          }
          typeNameStr += ">";
@@ -190,9 +190,9 @@ public class Multiname {
       return typeNameStr;
    }
 
-   public String getName(ConstantPool constants) {
+   public String getName(ConstantPool constants, List<String> fullyQualifiedNames) {
       if (kind == TYPENAME) {
-         return typeNameToStr(constants);
+         return typeNameToStr(constants, fullyQualifiedNames);
       }
       if (name_index == -1) {
          return "";
@@ -200,7 +200,11 @@ public class Multiname {
       if (name_index == 0) {
          return "*";
       } else {
-         return (isAttribute() ? "@" : "") + constants.constant_string[name_index];
+         String name = constants.constant_string[name_index];
+         if ((fullyQualifiedNames != null) && fullyQualifiedNames.contains(name)) {
+            return getNameWithNamespace(constants);
+         }
+         return (isAttribute() ? "@" : "") + name;
       }
    }
 
@@ -213,7 +217,7 @@ public class Multiname {
             ret += nsname + ".";
          }
       }
-      ret += getName(constants);
+      ret += getName(constants, null);
       return ret;
    }
 

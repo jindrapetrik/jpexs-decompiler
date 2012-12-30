@@ -25,6 +25,7 @@ import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.traits.Traits;
 import com.jpexs.asdec.helpers.Highlighting;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Stack;
 
 public class MethodBody implements Cloneable {
@@ -76,7 +77,7 @@ public class MethodBody implements Cloneable {
    /*public String toString(boolean pcode, boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], Stack<TreeItem> scopeStack, boolean isStaticInitializer) {
     return toString(pcode, isStatic, classIndex, abc, constants, method_info, scopeStack, isStaticInitializer,false);
     }*/
-   public String toString(boolean pcode, boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], Stack<TreeItem> scopeStack, boolean isStaticInitializer, boolean hilight) {
+   public String toString(boolean pcode, boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], Stack<TreeItem> scopeStack, boolean isStaticInitializer, boolean hilight, List<String> fullyQualifiedNames) {
       String s = "";
 
       //s+="method_info="+method_info+" max_stack="+max_stack+" max_regs="+max_regs+" scope_depth="+scope_depth+" max_scope="+max_scope;
@@ -85,7 +86,7 @@ public class MethodBody implements Cloneable {
          s += code.toASMSource(constants, this);
       } else {
          try {
-            s += code.toSource(isStatic, classIndex, abc, constants, method_info, this, hilight, getLocalRegNames(abc), scopeStack, isStaticInitializer);
+            s += code.toSource(isStatic, classIndex, abc, constants, method_info, this, hilight, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames);
             s = s.trim();
             if (hilight) {
                s = Highlighting.hilighMethod(s, this.method_info);

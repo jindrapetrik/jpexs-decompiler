@@ -35,19 +35,19 @@ public class ConstructPropTreeItem extends TreeItem {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       String argStr = "";
       for (int a = 0; a < args.size(); a++) {
          if (a > 0) {
             argStr = argStr + ",";
          }
-         argStr = argStr + args.get(a).toString(constants, localRegNames);
+         argStr = argStr + args.get(a).toString(constants, localRegNames, fullyQualifiedNames);
       }
-      String objstr = object.toString(constants, localRegNames);
+      String objstr = object.toString(constants, localRegNames, fullyQualifiedNames);
       if (!objstr.equals("")) {
          objstr += ".";
       }
-      return hilight("new ") + objstr + propertyName.toString(constants, localRegNames) + hilight("(") + argStr + hilight(")");
+      return hilight("new ") + objstr + propertyName.toString(constants, localRegNames, fullyQualifiedNames) + hilight("(") + argStr + hilight(")");
 
    }
 }

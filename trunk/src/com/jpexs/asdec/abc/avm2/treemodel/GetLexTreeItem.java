@@ -20,6 +20,7 @@ import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.types.Multiname;
 import java.util.HashMap;
+import java.util.List;
 
 public class GetLexTreeItem extends TreeItem {
 
@@ -31,7 +32,7 @@ public class GetLexTreeItem extends TreeItem {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
-      return hilight(propertyName.getName(constants));
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+      return hilight(propertyName.getName(constants, fullyQualifiedNames));
    }
 }

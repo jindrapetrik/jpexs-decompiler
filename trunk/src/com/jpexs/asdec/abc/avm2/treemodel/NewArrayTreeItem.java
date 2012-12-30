@@ -31,13 +31,13 @@ public class NewArrayTreeItem extends TreeItem {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       String args = "";
       for (int a = 0; a < values.size(); a++) {
          if (a > 0) {
             args = args + ",";
          }
-         args = args + values.get(a).toString(constants, localRegNames);
+         args = args + values.get(a).toString(constants, localRegNames, fullyQualifiedNames);
       }
       return hilight("[") + args + hilight("]");
    }

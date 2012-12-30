@@ -35,14 +35,14 @@ public class CallStaticTreeItem extends TreeItem {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       String args = "";
       for (int a = 0; a < arguments.size(); a++) {
          if (a > 0) {
             args = args + ",";
          }
-         args = args + arguments.get(a).toString(constants, localRegNames);
+         args = args + arguments.get(a).toString(constants, localRegNames, fullyQualifiedNames);
       }
-      return receiver.toString(constants, localRegNames) + hilight(".") + methodName + hilight("(") + args + hilight(")");
+      return receiver.toString(constants, localRegNames, fullyQualifiedNames) + hilight(".") + methodName + hilight("(") + args + hilight(")");
    }
 }

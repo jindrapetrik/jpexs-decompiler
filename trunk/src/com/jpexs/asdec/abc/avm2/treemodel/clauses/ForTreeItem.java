@@ -47,7 +47,7 @@ public class ForTreeItem extends LoopTreeItem implements Block {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       String ret = "";
       ret += "loop" + loopBreak + ":\r\n";
       ret += hilight("for(");
@@ -55,20 +55,20 @@ public class ForTreeItem extends LoopTreeItem implements Block {
          if (i > 0) {
             ret += ",";
          }
-         ret += stripSemicolon(firstCommands.get(i).toString(constants, localRegNames));
+         ret += stripSemicolon(firstCommands.get(i).toString(constants, localRegNames, fullyQualifiedNames));
       }
       ret += ";";
-      ret += expression.toString(constants, localRegNames);
+      ret += expression.toString(constants, localRegNames, fullyQualifiedNames);
       ret += ";";
       for (int i = 0; i < finalCommands.size(); i++) {
          if (i > 0) {
             ret += ",";
          }
-         ret += stripSemicolon(finalCommands.get(i).toString(constants, localRegNames));
+         ret += stripSemicolon(finalCommands.get(i).toString(constants, localRegNames, fullyQualifiedNames));
       }
       ret += hilight(")") + "\r\n{\r\n";
       for (TreeItem ti : commands) {
-         ret += ti.toStringSemicoloned(constants, localRegNames) + "\r\n";
+         ret += ti.toStringSemicoloned(constants, localRegNames, fullyQualifiedNames) + "\r\n";
       }
       ret += hilight("}") + "\r\n";
       ret += ":loop" + loopBreak;

@@ -34,7 +34,7 @@ public abstract class InsideClassMultinameUsage extends MultinameUsage {
       this.classIndex = classIndex;
    }
 
-   public String toString(List<DoABCTag> abcTags,ABC abc) {
+   public String toString(List<DoABCTag> abcTags, ABC abc) {
       return "class " + abc.constants.constant_multiname[abc.instance_info[classIndex].name_index].getNameWithNamespace(abc.constants);
    }
 

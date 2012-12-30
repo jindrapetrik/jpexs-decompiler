@@ -38,18 +38,18 @@ public class CallSuperTreeItem extends TreeItem {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       String args = "";
       for (int a = 0; a < arguments.size(); a++) {
          if (a > 0) {
             args = args + ",";
          }
-         args = args + arguments.get(a).toString(constants, localRegNames);
+         args = args + arguments.get(a).toString(constants, localRegNames, fullyQualifiedNames);
       }
-      String calee = receiver.toString(constants, localRegNames) + ".";
+      String calee = receiver.toString(constants, localRegNames, fullyQualifiedNames) + ".";
       if (Highlighting.stripHilights(calee).equals("this.")) {
          calee = "";
       }
-      return calee + hilight("super.") + multiname.toString(constants, localRegNames) + hilight("(") + args + hilight(")");
+      return calee + hilight("super.") + multiname.toString(constants, localRegNames, fullyQualifiedNames) + hilight("(") + args + hilight(")");
    }
 }

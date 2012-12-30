@@ -45,7 +45,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
    }
 
    @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer, String> localRegNames) {
+   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       int multinameIndex = ins.operands[0];
       TreeItem value = (TreeItem) stack.pop();
       FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
@@ -112,9 +112,9 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
       output.add(new SetPropertyTreeItem(ins, obj, multiname, value));
    }
 
-   public String getObject(Stack<TreeItem> stack, ABC abc, AVM2Instruction ins, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, HashMap<Integer, String> localRegNames) {
+   public String getObject(Stack<TreeItem> stack, ABC abc, AVM2Instruction ins, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       int multinameIndex = ins.operands[0];
-      String multiname = resolveMultinameNoPop(0, stack, abc.constants, multinameIndex, ins);
+      String multiname = resolveMultinameNoPop(0, stack, abc.constants, multinameIndex, ins, fullyQualifiedNames);
       TreeItem obj = stack.get(1 + resolvedCount(abc.constants, multinameIndex)); //pod vrcholem
       if ((!obj.toString().equals(""))) {
          multiname = "." + multiname;

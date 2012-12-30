@@ -18,6 +18,7 @@ package com.jpexs.asdec.abc.types;
 
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.types.traits.Traits;
+import java.util.List;
 
 public class ClassInfo {
 
@@ -29,7 +30,7 @@ public class ClassInfo {
       return "method_index=" + cinit_index + "\r\n" + static_traits.toString();
    }
 
-   public String toString(ABC abc) {
-      return "method_index=" + cinit_index + "\r\n" + static_traits.toString(abc);
+   public String toString(ABC abc, List<String> fullyQualifiedNames) {
+      return "method_index=" + cinit_index + "\r\n" + static_traits.toString(abc, fullyQualifiedNames);
    }
 }

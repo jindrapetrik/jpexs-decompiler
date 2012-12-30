@@ -27,7 +27,6 @@ import com.jpexs.asdec.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.asdec.abc.types.traits.TraitSlotConst;
 import com.jpexs.asdec.abc.types.traits.Traits;
 import com.jpexs.asdec.abc.usages.*;
-import com.jpexs.asdec.helpers.Helper;
 import com.jpexs.asdec.tags.DoABCTag;
 import java.io.*;
 import java.util.ArrayList;
@@ -382,11 +381,11 @@ public class ABC {
 
    public MethodBody findBodyByClassAndName(String className, String methodName) {
       for (int i = 0; i < instance_info.length; i++) {
-         if (className.equals(constants.constant_multiname[instance_info[i].name_index].getName(constants))) {
+         if (className.equals(constants.constant_multiname[instance_info[i].name_index].getName(constants, new ArrayList<String>()))) {
             for (Trait t : instance_info[i].instance_traits.traits) {
                if (t instanceof TraitMethodGetterSetter) {
                   TraitMethodGetterSetter t2 = (TraitMethodGetterSetter) t;
-                  if (methodName.equals(t2.getName(this).getName(constants))) {
+                  if (methodName.equals(t2.getName(this).getName(constants, new ArrayList<String>()))) {
                      for (MethodBody body : bodies) {
                         if (body.method_info == t2.method_info) {
                            return body;
@@ -399,11 +398,11 @@ public class ABC {
          }
       }
       for (int i = 0; i < class_info.length; i++) {
-         if (className.equals(constants.constant_multiname[instance_info[i].name_index].getName(constants))) {
+         if (className.equals(constants.constant_multiname[instance_info[i].name_index].getName(constants, new ArrayList<String>()))) {
             for (Trait t : class_info[i].static_traits.traits) {
                if (t instanceof TraitMethodGetterSetter) {
                   TraitMethodGetterSetter t2 = (TraitMethodGetterSetter) t;
-                  if (methodName.equals(t2.getName(this).getName(constants))) {
+                  if (methodName.equals(t2.getName(this).getName(constants, new ArrayList<String>()))) {
                      for (MethodBody body : bodies) {
                         if (body.method_info == t2.method_info) {
                            return body;
@@ -484,8 +483,8 @@ public class ABC {
             if (t instanceof TraitSlotConst) {
                TraitSlotConst s = ((TraitSlotConst) t);
                if (s.isNamespace()) {
-                  String key=constants.constant_namespace[s.value_index].getName(constants);
-                  String val=constants.constant_multiname[s.name_index].getNameWithNamespace(constants);
+                  String key = constants.constant_namespace[s.value_index].getName(constants);
+                  String val = constants.constant_multiname[s.name_index].getNameWithNamespace(constants);
                   namespaceMap.put(key, val);
                }
             }
@@ -497,7 +496,7 @@ public class ABC {
       if (ns.equals("http://www.adobe.com/2006/actionscript/flash/proxy")) {
          return "flash.utils.flash_proxy";
       }
-      if(ns.equals("http://adobe.com/AS3/2006/builtin")){
+      if (ns.equals("http://adobe.com/AS3/2006/builtin")) {
          return "-";
       }
       return null;
@@ -507,16 +506,16 @@ public class ABC {
       if (namespaceMap.containsKey(value)) {
          return namespaceMap.get(value);
       } else {
-         String ns=builtInNs(value);        
-         if(ns==null){
+         String ns = builtInNs(value);
+         if (ns == null) {
             return "";
-         }else{
+         } else {
             return ns;
          }
       }
    }
 
-   public void export(String directory, boolean pcode,List<DoABCTag> abcList) throws IOException {
+   public void export(String directory, boolean pcode, List<DoABCTag> abcList) throws IOException {
       for (int i = 0; i < script_info.length; i++) {
          String path = script_info[i].getPath(this);
          String packageName = path.substring(0, path.lastIndexOf("."));
@@ -533,7 +532,7 @@ public class ABC {
          }
          String fileName = outDir.toString() + File.separator + className + ".as";
          FileOutputStream fos = new FileOutputStream(fileName);
-         fos.write(script_info[i].convert(abcList,this, pcode, false).getBytes());
+         fos.write(script_info[i].convert(abcList, this, pcode, false).getBytes());
          fos.close();
       }
    }
@@ -542,19 +541,19 @@ public class ABC {
       PrintStream output = new PrintStream(os);
       constants.dump(output);
       for (int i = 0; i < method_info.length; i++) {
-         output.println("MethodInfo[" + i + "]:" + method_info[i].toString(constants));
+         output.println("MethodInfo[" + i + "]:" + method_info[i].toString(constants, new ArrayList<String>()));
       }
       for (int i = 0; i < metadata_info.length; i++) {
          output.println("MetadataInfo[" + i + "]:" + metadata_info[i].toString(constants));
       }
       for (int i = 0; i < instance_info.length; i++) {
-         output.println("InstanceInfo[" + i + "]:" + instance_info[i].toString(this));
+         output.println("InstanceInfo[" + i + "]:" + instance_info[i].toString(this, new ArrayList<String>()));
       }
       for (int i = 0; i < class_info.length; i++) {
-         output.println("ClassInfo[" + i + "]:" + class_info[i].toString(this));
+         output.println("ClassInfo[" + i + "]:" + class_info[i].toString(this, new ArrayList<String>()));
       }
       for (int i = 0; i < script_info.length; i++) {
-         output.println("ScriptInfo[" + i + "]:" + script_info[i].toString(this));
+         output.println("ScriptInfo[" + i + "]:" + script_info[i].toString(this, new ArrayList<String>()));
       }
       for (int i = 0; i < bodies.length; i++) {
          output.println("MethodBody[" + i + "]:"); //+ bodies[i].toString(this, constants, method_info));

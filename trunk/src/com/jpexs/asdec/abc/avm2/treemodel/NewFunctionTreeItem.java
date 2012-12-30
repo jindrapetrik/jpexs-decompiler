@@ -19,6 +19,7 @@ package com.jpexs.asdec.abc.avm2.treemodel;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import java.util.HashMap;
+import java.util.List;
 
 public class NewFunctionTreeItem extends TreeItem {
 
@@ -34,7 +35,7 @@ public class NewFunctionTreeItem extends TreeItem {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       return hilight("new function(" + paramStr + "):" + returnStr + "\r\n{\r\n") + functionBody + "\r\n" + hilight("}");
    }
 }

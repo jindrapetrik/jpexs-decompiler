@@ -59,8 +59,8 @@ public class ConvertDIns extends InstructionDefinition implements CoerceOrConver
    }
 
    @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer, String> localRegNames) {
-      stack.push(new ConvertTreeItem(ins, (TreeItem) stack.pop(), getTargetType(constants, ins)));
+   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+      stack.push(new ConvertTreeItem(ins, (TreeItem) stack.pop(), getTargetType(constants, ins, fullyQualifiedNames)));
    }
 
    @Override
@@ -68,7 +68,7 @@ public class ConvertDIns extends InstructionDefinition implements CoerceOrConver
       return -1 + 1;
    }
 
-   public String getTargetType(ConstantPool constants, AVM2Instruction ins) {
+   public String getTargetType(ConstantPool constants, AVM2Instruction ins, List<String> fullyQualifiedNames) {
       return "Number";
    }
 }

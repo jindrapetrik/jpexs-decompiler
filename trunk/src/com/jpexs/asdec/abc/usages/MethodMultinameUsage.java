@@ -20,6 +20,7 @@ import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.asdec.abc.types.traits.Traits;
 import com.jpexs.asdec.tags.DoABCTag;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,17 +41,17 @@ public abstract class MethodMultinameUsage extends TraitMultinameUsage {
    }
 
    @Override
-   public String toString(List<DoABCTag> abcTags,ABC abc) {
-      return super.toString(abcTags,abc) + " " + (isInitializer
+   public String toString(List<DoABCTag> abcTags, ABC abc) {
+      return super.toString(abcTags, abc) + " " + (isInitializer
               ? (isStatic
               ? "class initializer"
               : "instance initializer")
               : ((parentTraitIndex > -1
               ? (isStatic
-              ? (((TraitMethodGetterSetter) abc.class_info[classIndex].static_traits.traits[parentTraitIndex]).convertHeader(abcTags,abc, isStatic, false, classIndex, false))
-              : (((TraitMethodGetterSetter) abc.instance_info[classIndex].instance_traits.traits[parentTraitIndex]).convertHeader(abcTags,abc, isStatic, false, classIndex, false))) + " "
+              ? (((TraitMethodGetterSetter) abc.class_info[classIndex].static_traits.traits[parentTraitIndex]).convertHeader(abcTags, abc, isStatic, false, classIndex, false, new ArrayList<String>()))
+              : (((TraitMethodGetterSetter) abc.instance_info[classIndex].instance_traits.traits[parentTraitIndex]).convertHeader(abcTags, abc, isStatic, false, classIndex, false, new ArrayList<String>()))) + " "
               : "")
-              + (((TraitMethodGetterSetter) traits.traits[traitIndex]).convertHeader(abcTags,abc, isStatic, false, classIndex, false))));
+              + (((TraitMethodGetterSetter) traits.traits[traitIndex]).convertHeader(abcTags, abc, isStatic, false, classIndex, false, new ArrayList<String>()))));
    }
 
    public int getTraitIndex() {

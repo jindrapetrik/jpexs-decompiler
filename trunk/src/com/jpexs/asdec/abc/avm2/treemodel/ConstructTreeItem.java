@@ -33,18 +33,18 @@ public class ConstructTreeItem extends TreeItem {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       String argStr = "";
       for (int a = 0; a < args.size(); a++) {
          if (a > 0) {
             argStr = argStr + ",";
          }
-         argStr = argStr + args.get(a).toString(constants, localRegNames);
+         argStr = argStr + args.get(a).toString(constants, localRegNames, fullyQualifiedNames);
       }
       if (object instanceof NewFunctionTreeItem) {
-         return object.toString(constants, localRegNames);
+         return object.toString(constants, localRegNames, fullyQualifiedNames);
       }
-      return hilight("new ") + object.toString(constants, localRegNames) + hilight("(") + argStr + hilight(")");
+      return hilight("new ") + object.toString(constants, localRegNames, fullyQualifiedNames) + hilight("(") + argStr + hilight(")");
 
    }
 }

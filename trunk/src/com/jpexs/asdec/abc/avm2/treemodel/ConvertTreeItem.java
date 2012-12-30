@@ -19,6 +19,7 @@ package com.jpexs.asdec.abc.avm2.treemodel;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import java.util.HashMap;
+import java.util.List;
 
 public class ConvertTreeItem extends TreeItem {
 
@@ -32,9 +33,9 @@ public class ConvertTreeItem extends TreeItem {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       //return hilight("("+type+")")+
-      return value.toString(constants, localRegNames);
+      return value.toString(constants, localRegNames, fullyQualifiedNames);
    }
 
    @Override

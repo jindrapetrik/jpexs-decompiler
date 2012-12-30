@@ -28,6 +28,7 @@ import com.jpexs.asdec.abc.types.MethodBody;
 import com.jpexs.asdec.abc.types.Multiname;
 import com.jpexs.asdec.abc.types.Namespace;
 import com.jpexs.asdec.abc.types.NamespaceSet;
+import com.jpexs.asdec.abc.types.ScriptInfo;
 import com.jpexs.asdec.helpers.Helper;
 import com.jpexs.asdec.helpers.Highlighting;
 import com.jpexs.asdec.tags.DoABCTag;
@@ -44,8 +45,8 @@ public class TraitClass extends Trait {
    public int class_info;
 
    @Override
-   public String toString(ABC abc) {
-      return "Class " + abc.constants.constant_multiname[name_index].toString(abc.constants) + " slot=" + slot_id + " class_info=" + class_info + " metadata=" + Helper.intArrToString(metadata);
+   public String toString(ABC abc, List<String> fullyQualifiedNames) {
+      return "Class " + abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " class_info=" + class_info + " metadata=" + Helper.intArrToString(metadata);
    }
 
    private void parseImportsUsagesFromNS(List<DoABCTag> abcTags, ABC abc, List imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
@@ -76,14 +77,14 @@ public class TraitClass extends Trait {
                if (newimport.contains(".")) {
                   pkg = newimport.substring(0, newimport.lastIndexOf("."));
                }
-               String usname=newimport;
-               if(usname.contains(".")){
-                  usname=usname.substring(usname.lastIndexOf(".")+1);
+               String usname = newimport;
+               if (usname.contains(".")) {
+                  usname = usname.substring(usname.lastIndexOf(".") + 1);
                }
                if (!pkg.equals(ignorePackage)) {
-                  imports.add(newimport);                  
+                  imports.add(newimport);
                }
-               if(!uses.contains(usname)){
+               if (!uses.contains(usname)) {
                   uses.add(usname);
                }
             }
@@ -95,133 +96,188 @@ public class TraitClass extends Trait {
       if (newimport.equals("-")) {
          newimport = "";
       }
-      if (!newimport.equals("")) {
-         newimport += "." + name;
-         if (newimport.contains(":")) {
-            return;
-         }
-         if (!imports.contains(newimport)) {
-            String pkg = newimport.substring(0, newimport.lastIndexOf("."));
-            if (!pkg.equals(ignorePackage)) {
-               imports.add(newimport);
-            }
+      //if (!newimport.equals("")) {
+      newimport += "." + name;
+      if (newimport.contains(":")) {
+         return;
+      }
+      if (!imports.contains(newimport)) {
+         String pkg = newimport.substring(0, newimport.lastIndexOf("."));
+         if (!pkg.equals(ignorePackage)) {
+            imports.add(newimport);
          }
       }
+      //}
    }
 
-   private void parseImportsUsagesFromMultiname(List<DoABCTag> abcTags, ABC abc, List<String> imports, List<String> uses, Multiname m, String ignorePackage) {
+   private void parseImportsUsagesFromMultiname(List<DoABCTag> abcTags, ABC abc, List<String> imports, List<String> uses, Multiname m, String ignorePackage, List<String> fullyQualifiedNames) {
       if (m != null) {
          Namespace ns = m.getNamespace(abc.constants);
-         String name = m.getName(abc.constants);
+         String name = m.getName(abc.constants, fullyQualifiedNames);
          NamespaceSet nss = m.getNamespaceSet(abc.constants);
          if (ns != null) {
-            parseImportsUsagesFromNS(abcTags, abc, imports,uses, m.namespace_index, ignorePackage, name);
+            parseImportsUsagesFromNS(abcTags, abc, imports, uses, m.namespace_index, ignorePackage, name);
          }
          if (nss != null) {
             for (int ni : nss.namespaces) {
-               parseImportsUsagesFromNS(abcTags, abc, imports,uses, ni, ignorePackage, name);
+               parseImportsUsagesFromNS(abcTags, abc, imports, uses, ni, ignorePackage, name);
             }
          }
       }
    }
 
-   private void parseImportsUsagesFromMethodInfo(List<DoABCTag> abcTags, ABC abc, int method_index, List<String> imports, List<String> uses, String ignorePackage) {
+   private void parseImportsUsagesFromMethodInfo(List<DoABCTag> abcTags, ABC abc, int method_index, List<String> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames) {
       if (abc.method_info[method_index].ret_type != 0) {
-         parseImportsUsagesFromMultiname(abcTags, abc, imports,uses, abc.constants.constant_multiname[abc.method_info[method_index].ret_type], ignorePackage);
+         parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[abc.method_info[method_index].ret_type], ignorePackage, fullyQualifiedNames);
       }
       for (int t : abc.method_info[method_index].param_types) {
          if (t != 0) {
-            parseImportsUsagesFromMultiname(abcTags, abc, imports,uses, abc.constants.constant_multiname[t], ignorePackage);
+            parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[t], ignorePackage, fullyQualifiedNames);
          }
       }
       MethodBody body = abc.findBody(method_index);
       if (body != null) {
          for (ABCException ex : body.exceptions) {
-            parseImportsUsagesFromMultiname(abcTags, abc, imports,uses, abc.constants.constant_multiname[ex.type_index], ignorePackage);
+            parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[ex.type_index], ignorePackage, fullyQualifiedNames);
          }
          for (AVM2Instruction ins : body.code.code) {
             if (ins.definition instanceof NewFunctionIns) {
-               parseImportsUsagesFromMethodInfo(abcTags, abc, ins.operands[0], imports,uses, ignorePackage);
+               parseImportsUsagesFromMethodInfo(abcTags, abc, ins.operands[0], imports, uses, ignorePackage, fullyQualifiedNames);
             }
             for (int k = 0; k < ins.definition.operands.length; k++) {
                if (ins.definition.operands[k] == AVM2Code.DAT_MULTINAME_INDEX) {
                   int multinameIndex = ins.operands[k];
-                  parseImportsUsagesFromMultiname(abcTags, abc, imports,uses, abc.constants.constant_multiname[multinameIndex], ignorePackage);
+                  parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[multinameIndex], ignorePackage, fullyQualifiedNames);
                }
             }
          }
       }
    }
 
-   private void parseImportsUsagesFromTrait(List<DoABCTag> abcTags, ABC abc, Trait t, List<String> imports, List<String> uses, String ignorePackage) {
+   private void parseImportsUsagesFromTrait(List<DoABCTag> abcTags, ABC abc, Trait t, List<String> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames) {
       if (t instanceof TraitMethodGetterSetter) {
          TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
+         parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[tm.name_index], ignorePackage, fullyQualifiedNames);
          if (tm.method_info != 0) {
-            parseImportsUsagesFromMethodInfo(abcTags, abc, tm.method_info, imports,uses, ignorePackage);
+            parseImportsUsagesFromMethodInfo(abcTags, abc, tm.method_info, imports, uses, ignorePackage, fullyQualifiedNames);
          }
       }
-      parseImportsUsagesFromMultiname(abcTags, abc, imports,uses, t.getName(abc), ignorePackage);
+      parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, t.getName(abc), ignorePackage, fullyQualifiedNames);
       if (t instanceof TraitSlotConst) {
          TraitSlotConst ts = (TraitSlotConst) t;
-         parseImportsUsagesFromMultiname(abcTags, abc, imports,uses, abc.constants.constant_multiname[ts.type_index], ignorePackage);
+         parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[ts.name_index], ignorePackage, fullyQualifiedNames);
+         parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[ts.type_index], ignorePackage, fullyQualifiedNames);
       }
    }
 
-   private List getImportsUsages(List<DoABCTag> abcTags, ABC abc,List<String> imports,List<String> uses) {
+   private List getImportsUsages(List<DoABCTag> abcTags, ABC abc, List<String> imports, List<String> uses, List<String> fullyQualifiedNames) {
       //constructor
 
-      //parseImportFromMultiname(imports, constants.constant_multiname[instance_info[instanceIndex].name_index]);
 
       String packageName = abc.instance_info[class_info].getName(abc.constants).getNamespace(abc.constants).getName(abc.constants);
 
+      parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[abc.instance_info[class_info].name_index], packageName, fullyQualifiedNames);
+
       if (abc.instance_info[class_info].super_index > 0) {
-         parseImportsUsagesFromMultiname(abcTags, abc, imports,uses, abc.constants.constant_multiname[abc.instance_info[class_info].super_index], packageName);
+         parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[abc.instance_info[class_info].super_index], packageName, fullyQualifiedNames);
       }
       for (int i : abc.instance_info[class_info].interfaces) {
-         parseImportsUsagesFromMultiname(abcTags, abc, imports,uses, abc.constants.constant_multiname[i], packageName);
+         parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[i], packageName, fullyQualifiedNames);
       }
 
       //static
       for (Trait t : abc.class_info[class_info].static_traits.traits) {
-         parseImportsUsagesFromTrait(abcTags, abc, t, imports, uses, packageName);
+         parseImportsUsagesFromTrait(abcTags, abc, t, imports, uses, packageName, fullyQualifiedNames);
       }
 
       //static initializer
-      parseImportsUsagesFromMethodInfo(abcTags, abc, abc.class_info[class_info].cinit_index, imports, uses, packageName);
+      parseImportsUsagesFromMethodInfo(abcTags, abc, abc.class_info[class_info].cinit_index, imports, uses, packageName, fullyQualifiedNames);
 
       //instance
       for (Trait t : abc.instance_info[class_info].instance_traits.traits) {
-         parseImportsUsagesFromTrait(abcTags, abc, t, imports, uses, packageName);
+         parseImportsUsagesFromTrait(abcTags, abc, t, imports, uses, packageName, fullyQualifiedNames);
       }
 
       //instance initializer
-      parseImportsUsagesFromMethodInfo(abcTags, abc, abc.instance_info[class_info].iinit_index, imports, uses, packageName);
+      parseImportsUsagesFromMethodInfo(abcTags, abc, abc.instance_info[class_info].iinit_index, imports, uses, packageName, fullyQualifiedNames);
       return imports;
    }
 
    @Override
-   public String convert(List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight) {
+   public String convert(List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
       if (!highlight) {
          Highlighting.doHighlight = false;
       }
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       PrintStream out = new PrintStream(baos);
 
+      String packageName = abc.instance_info[class_info].getName(abc.constants).getNamespace(abc.constants).getName(abc.constants);
+
+      List<String> namesInThisPackage = new ArrayList<String>();
+      for (DoABCTag tag : abcTags) {
+         for (ScriptInfo si : tag.abc.script_info) {
+            String path = si.getPath(tag.abc);
+            String pkg = "";
+            String name = path;
+            if (path.contains(".")) {
+               pkg = path.substring(0, path.lastIndexOf("."));
+               name = path.substring(path.lastIndexOf(".") + 1);
+            }
+            if (pkg.equals(packageName)) {
+               namesInThisPackage.add(name);
+            }
+         }
+      }
       //imports
       List<String> imports = new ArrayList<String>();
       List<String> uses = new ArrayList<String>();
-      getImportsUsages(abcTags, abc,imports,uses);
+      getImportsUsages(abcTags, abc, imports, uses, new ArrayList<String>());
+
+      fullyQualifiedNames = new ArrayList<String>();
+
+      List<String> importnames = new ArrayList<String>();
+      importnames.addAll(namesInThisPackage);
+      for (String path : imports) {
+         String name = path;
+         String pkg = "";
+         if (name.contains(".")) {
+            pkg = name.substring(0, name.lastIndexOf("."));
+            name = name.substring(name.lastIndexOf(".") + 1);
+         }
+         if (importnames.contains(name)) {
+            fullyQualifiedNames.add(name);
+         } else {
+            importnames.add(name);
+         }
+      }
+      List<String> imports2 = new ArrayList<String>();
+      for (String path : imports) {
+         String name = path;
+         String pkg = "";
+         if (name.contains(".")) {
+            pkg = name.substring(0, name.lastIndexOf("."));
+            name = name.substring(name.lastIndexOf(".") + 1);
+         }
+
+         if ((!packageName.equals(pkg)) && (!fullyQualifiedNames.contains(name))) {
+            imports2.add(path);
+         }
+      }
+      imports = imports2;
+
       for (String imp : imports) {
-         out.println(ABC.IDENT_STRING + "import " + imp + ";");
+         if (!imp.startsWith(".")) {
+            out.println(ABC.IDENT_STRING + "import " + imp + ";");
+         }
       }
       out.println();
       for (String us : uses) {
          out.println(ABC.IDENT_STRING + "use namespace " + us + ";");
       }
       out.println();
-      
+
       //class header
-      String classHeader = abc.instance_info[class_info].getClassHeaderStr(abc);
+      String classHeader = abc.instance_info[class_info].getClassHeaderStr(abc, fullyQualifiedNames);
       if (classHeader.startsWith("private ")) {
          classHeader = classHeader.substring("private ".length());
       }
@@ -234,7 +290,7 @@ public class TraitClass extends Trait {
       //if (class_info[i].cinit_index != 0) {
       if (ABC.AUTOINIT_STATIC_VARIABLES) {
          int bodyIndex = abc.findBodyIndex(abc.class_info[class_info].cinit_index);
-         List<TreeItem> initializer = abc.bodies[bodyIndex].code.toTree(true, class_info, abc, abc.constants, abc.method_info, abc.bodies[bodyIndex], abc.bodies[bodyIndex].code.getLocalRegNamesFromDebug(abc));
+         List<TreeItem> initializer = abc.bodies[bodyIndex].code.toTree(true, class_info, abc, abc.constants, abc.method_info, abc.bodies[bodyIndex], abc.bodies[bodyIndex].code.getLocalRegNamesFromDebug(abc), fullyQualifiedNames);
          for (TreeItem ti : initializer) {
             if (ti instanceof SetPropertyTreeItem) {
                int multinameIndex = ((SetPropertyTreeItem) ti).propertyName.multinameIndex;
@@ -263,7 +319,7 @@ public class TraitClass extends Trait {
       String bodyStr = "";
       int bodyIndex = abc.findBodyIndex(abc.class_info[class_info].cinit_index);
       if (bodyIndex != -1) {
-         bodyStr = abc.bodies[bodyIndex].toString(pcode, true, class_info, abc, abc.constants, abc.method_info, new Stack<TreeItem>(), true, highlight);
+         bodyStr = abc.bodies[bodyIndex].toString(pcode, true, class_info, abc, abc.constants, abc.method_info, new Stack<TreeItem>(), true, highlight, fullyQualifiedNames);
       }
       if (Highlighting.stripHilights(bodyStr).equals("")) {
          toPrint = ABC.addTabs(bodyStr, 3);
@@ -298,12 +354,12 @@ public class TraitClass extends Trait {
          bodyStr = "";
          bodyIndex = abc.findBodyIndex(abc.instance_info[class_info].iinit_index);
          if (bodyIndex != -1) {
-            bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(pcode, false, class_info, abc, abc.constants, abc.method_info, new Stack<TreeItem>(), false, highlight), 3);
-            constructorParams = abc.method_info[abc.instance_info[class_info].iinit_index].getParamStr(abc.constants, abc.bodies[bodyIndex], abc);
+            bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(pcode, false, class_info, abc, abc.constants, abc.method_info, new Stack<TreeItem>(), false, highlight, fullyQualifiedNames), 3);
+            constructorParams = abc.method_info[abc.instance_info[class_info].iinit_index].getParamStr(abc.constants, abc.bodies[bodyIndex], abc, fullyQualifiedNames);
          } else {
-            constructorParams = abc.method_info[abc.instance_info[class_info].iinit_index].getParamStr(abc.constants, null, abc);
+            constructorParams = abc.method_info[abc.instance_info[class_info].iinit_index].getParamStr(abc.constants, null, abc, fullyQualifiedNames);
          }
-         toPrint = ABC.IDENT_STRING + ABC.IDENT_STRING + modifier + "function " + abc.constants.constant_multiname[abc.instance_info[class_info].name_index].getName(abc.constants) + "(" + constructorParams + ") {\r\n" + bodyStr + "\r\n" + ABC.IDENT_STRING + ABC.IDENT_STRING + "}";
+         toPrint = ABC.IDENT_STRING + ABC.IDENT_STRING + modifier + "function " + abc.constants.constant_multiname[abc.instance_info[class_info].name_index].getName(abc.constants, new ArrayList<String>()/*do not want full names here*/) + "(" + constructorParams + ") {\r\n" + bodyStr + "\r\n" + ABC.IDENT_STRING + ABC.IDENT_STRING + "}";
          if (highlight) {
             toPrint = Highlighting.hilighTrait(toPrint, abc.class_info[class_info].static_traits.traits.length + abc.instance_info[class_info].instance_traits.traits.length);
          }
@@ -312,9 +368,9 @@ public class TraitClass extends Trait {
       //}
 
       //static variables,constants & methods
-      outTraits.add(abc.class_info[class_info].static_traits.convert(abcTags, abc, true, pcode, false, class_info, highlight));
+      outTraits.add(abc.class_info[class_info].static_traits.convert(abcTags, abc, true, pcode, false, class_info, highlight, fullyQualifiedNames));
 
-      outTraits.add(abc.instance_info[class_info].instance_traits.convert(abcTags, abc, false, pcode, false, class_info, highlight));
+      outTraits.add(abc.instance_info[class_info].instance_traits.convert(abcTags, abc, false, pcode, false, class_info, highlight, fullyQualifiedNames));
 
       out.println(Helper.joinStrings(outTraits, "\r\n\r\n"));
       out.println(ABC.IDENT_STRING + "}");//class

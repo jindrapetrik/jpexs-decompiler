@@ -23,6 +23,7 @@ import com.jpexs.asdec.abc.types.ValueKind;
 import com.jpexs.asdec.abc.types.traits.TraitSlotConst;
 import com.jpexs.asdec.helpers.Helper;
 import java.awt.BorderLayout;
+import java.util.ArrayList;
 import javax.swing.*;
 import jsyntaxpane.syntaxkits.Flasm3MethodInfoSyntaxKit;
 
@@ -52,7 +53,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
       String s;
       String typeStr;
       if (trait.type_index > 0) {
-         typeStr = "m[" + trait.type_index + "]\"" + Helper.escapeString(abc.constants.constant_multiname[trait.type_index].toString(abc.constants)) + "\"";
+         typeStr = "m[" + trait.type_index + "]\"" + Helper.escapeString(abc.constants.constant_multiname[trait.type_index].toString(abc.constants, new ArrayList<String>())) + "\"";
       } else {
          typeStr = "*";
       }

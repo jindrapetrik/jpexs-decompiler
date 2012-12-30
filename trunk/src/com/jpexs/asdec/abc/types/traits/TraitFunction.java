@@ -30,27 +30,27 @@ public class TraitFunction extends Trait {
    public int method_info;
 
    @Override
-   public String toString(ABC abc) {
-      return "Function " + abc.constants.constant_multiname[name_index].toString(abc.constants) + " slot=" + slot_index + " method_info=" + method_info + " metadata=" + Helper.intArrToString(metadata);
+   public String toString(ABC abc, List<String> fullyQualifiedNames) {
+      return "Function " + abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_index + " method_info=" + method_info + " metadata=" + Helper.intArrToString(metadata);
    }
 
    @Override
-   public String convertHeader(List<DoABCTag> abcTags,ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight) {
-      String modifier = getModifiers(abcTags,abc, isStatic) + " ";
+   public String convertHeader(List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+      String modifier = getModifiers(abcTags, abc, isStatic) + " ";
       if (modifier.equals(" ")) {
          modifier = "";
       }
       MethodBody body = abc.findBody(method_info);
-      return modifier + "function " + abc.constants.constant_multiname[name_index].getName(abc.constants) + "(" + abc.method_info[method_info].getParamStr(abc.constants, body, abc) + ") : " + abc.method_info[method_info].getReturnTypeStr(abc.constants);
+      return modifier + "function " + abc.constants.constant_multiname[name_index].getName(abc.constants, fullyQualifiedNames) + "(" + abc.method_info[method_info].getParamStr(abc.constants, body, abc, fullyQualifiedNames) + ") : " + abc.method_info[method_info].getReturnTypeStr(abc.constants, fullyQualifiedNames);
    }
 
    @Override
-   public String convert(List<DoABCTag> abcTags,ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight) {
-      String header = convertHeader(abcTags,abc, isStatic, pcode, classIndex, highlight);
+   public String convert(List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+      String header = convertHeader(abcTags, abc, isStatic, pcode, classIndex, highlight, fullyQualifiedNames);
       String bodyStr = "";
       int bodyIndex = abc.findBodyIndex(method_info);
       if (bodyIndex != -1) {
-         bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(pcode, isStatic, classIndex, abc, abc.constants, abc.method_info, new Stack<TreeItem>(), false, highlight), 3);
+         bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(pcode, isStatic, classIndex, abc, abc.constants, abc.method_info, new Stack<TreeItem>(), false, highlight, fullyQualifiedNames), 3);
       }
       return ABC.IDENT_STRING + ABC.IDENT_STRING + header + (abc.instance_info[classIndex].isInterface() ? ";" : " {\r\n" + bodyStr + "\r\n" + ABC.IDENT_STRING + ABC.IDENT_STRING + "}");
 
