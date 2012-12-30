@@ -26,6 +26,7 @@ public class ABCComboBoxModel implements ComboBoxModel {
 
    public List<DoABCTag> list;
    public int itemIndex = 0;
+   public static final String ROOT=" - all - ";
 
    public ABCComboBoxModel(List<DoABCTag> list) {
       this.list = list;
@@ -33,11 +34,14 @@ public class ABCComboBoxModel implements ComboBoxModel {
    }
 
    public int getSize() {
-      return list.size();
+      return 1+list.size();
    }
 
    public Object getElementAt(int index) {
-      return list.get(index);
+      if(index==0){
+         return ROOT;
+      }
+      return list.get(index-1);
    }
 
    public void addListDataListener(ListDataListener l) {
@@ -47,7 +51,11 @@ public class ABCComboBoxModel implements ComboBoxModel {
    }
 
    public void setSelectedItem(Object anItem) {
-      itemIndex = list.indexOf(anItem);
+      if(anItem==ROOT){
+         itemIndex=0;
+      }else{
+         itemIndex = 1+list.indexOf(anItem);
+      }
    }
 
    public Object getSelectedItem() {

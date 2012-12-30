@@ -91,18 +91,24 @@ public abstract class TreeItem {
          return propertyName.toString(constants, localRegNames);
       }
       if (propertyName instanceof FullMultinameTreeItem) {
-
          if (((FullMultinameTreeItem) propertyName).isRuntime()) {
-            return obStr + propertyName.toString(constants, localRegNames);
+            return joinProperty(obStr ,propertyName.toString(constants, localRegNames));
          } else {
-            if (!obStr.equals("")) {
-               obStr += ".";
-            }
-            return obStr + ((FullMultinameTreeItem) propertyName).toString(constants, localRegNames);
+            return joinProperty(obStr,((FullMultinameTreeItem) propertyName).toString(constants, localRegNames));
          }
       } else {
          return obStr + "[" + propertyName.toString(constants, localRegNames) + "]";
       }
+   }
+   
+   private String joinProperty(String prefix,String name){
+      if(prefix.endsWith(".")){
+         prefix=prefix.substring(0,prefix.length()-1);
+      }
+      if(!name.startsWith("[")){
+         return prefix+"."+name;
+      }
+      return prefix+name;
    }
 
    public TreeItem getNotCoerced() {

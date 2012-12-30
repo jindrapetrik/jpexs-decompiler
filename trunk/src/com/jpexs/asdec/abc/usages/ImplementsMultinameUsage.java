@@ -17,6 +17,8 @@
 package com.jpexs.asdec.abc.usages;
 
 import com.jpexs.asdec.abc.ABC;
+import com.jpexs.asdec.tags.DoABCTag;
+import java.util.List;
 
 /**
  *
@@ -29,7 +31,7 @@ public class ImplementsMultinameUsage extends InsideClassMultinameUsage {
    }
 
    @Override
-   public String toString(ABC abc) {
-      return super.toString(abc) + " implements";
+   public String toString(List<DoABCTag> abcTags,ABC abc) {
+      return super.toString(abcTags,abc) + " implements";
    }
 }

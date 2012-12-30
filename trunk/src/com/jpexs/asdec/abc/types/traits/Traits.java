@@ -18,6 +18,8 @@ package com.jpexs.asdec.abc.types.traits;
 
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.helpers.Highlighting;
+import com.jpexs.asdec.tags.DoABCTag;
+import java.util.List;
 
 public class Traits {
 
@@ -46,7 +48,7 @@ public class Traits {
       return s;
    }
 
-   public String convert(ABC abc, boolean isStatic, boolean pcode, boolean makePackages, int classIndex, boolean highlighting) {
+   public String convert(List<DoABCTag> abcTags,ABC abc, boolean isStatic, boolean pcode, boolean makePackages, int classIndex, boolean highlighting) {
       String s = "";
       for (int t = 0; t < traits.length; t++) {
          if (t > 0) {
@@ -54,9 +56,9 @@ public class Traits {
          }
          String plus;
          if (makePackages) {
-            plus = traits[t].convertPackaged(abc, isStatic, pcode, classIndex, highlighting);
+            plus = traits[t].convertPackaged(abcTags,abc, isStatic, pcode, classIndex, highlighting);
          } else {
-            plus = traits[t].convert(abc, isStatic, pcode, classIndex, highlighting);
+            plus = traits[t].convert(abcTags,abc, isStatic, pcode, classIndex, highlighting);
          }
          if (highlighting) {
             int h = t;

@@ -297,13 +297,18 @@ public class SWF {
             }
          }
       };
+      List<DoABCTag> abcTags=new ArrayList<DoABCTag>();
       for (Tag t : tags) {
          if (t instanceof DoABCTag) {
-            ((DoABCTag) t).abc.addEventListener(evl);
-            ((DoABCTag) t).abc.export(outdir, isPcode);
+            abcTags.add((DoABCTag)t);            
             asV3Found = true;
          }
       }
+      for(DoABCTag t:abcTags){
+            t.abc.addEventListener(evl);
+            t.abc.export(outdir, isPcode,abcTags);
+      }
+      
       if (!asV3Found) {
          List<Object> list2 = new ArrayList<Object>();
          list2.addAll(tags);

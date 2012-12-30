@@ -18,6 +18,8 @@ package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.types.ScriptInfo;
+import com.jpexs.asdec.tags.DoABCTag;
+import java.util.List;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -50,16 +52,18 @@ class ClassIndexVisitor implements TreeVisitor {
 
 public class ClassesListTreeModel implements TreeModel {
 
-   private ABC abc;
    private Tree classTree = new Tree();
+   private List<DoABCTag> list;
 
-   public ClassesListTreeModel(ABC abc) {
-      this.abc = abc;
-      for (ScriptInfo si : abc.script_info) {
-         String path = si.getPath(abc);
-         String nsName = path.substring(path.lastIndexOf(".") + 1);
-         String packageName = path.substring(0, path.lastIndexOf("."));
-         classTree.add(nsName, packageName, si);
+   public ClassesListTreeModel(List<DoABCTag> list) {
+      this.list = list;
+      for (DoABCTag tag : list) {
+         for (int i = 0; i < tag.abc.script_info.length; i++) {
+            String path = tag.abc.script_info[i].getPath(tag.abc);
+            String nsName = path.substring(path.lastIndexOf(".") + 1);
+            String packageName = path.substring(0, path.lastIndexOf("."));
+            classTree.add(nsName, packageName, new TreeLeafScript(tag.abc, i));
+         }
       }
    }
 

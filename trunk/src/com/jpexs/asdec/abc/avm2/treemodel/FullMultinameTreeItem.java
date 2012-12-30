@@ -53,7 +53,7 @@ public class FullMultinameTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames) {
-      String ret;
+      String ret = "";
       if (name != null) {
          ret = "[" + name.toString(constants, localRegNames) + "]";
       } else {

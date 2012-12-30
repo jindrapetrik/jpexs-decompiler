@@ -16,15 +16,21 @@
  */
 package com.jpexs.asdec.abc.gui;
 
+import com.jpexs.asdec.abc.ABC;
+
 /**
  *
  * @author JPEXS
  */
-public class TreeLeafClass {
+public class TreeLeafScript {
 
-   public int classIndex;
+   public ABC abc;
+   public int scriptIndex;
 
-   public TreeLeafClass(int classIndex) {
-      this.classIndex = classIndex;
+   public TreeLeafScript(ABC abc, int scriptIndex) {
+      this.abc = abc;
+      this.scriptIndex = scriptIndex;
    }
+
+   
 }

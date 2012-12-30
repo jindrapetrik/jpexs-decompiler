@@ -19,6 +19,8 @@ package com.jpexs.asdec.abc.types;
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.types.traits.Trait;
 import com.jpexs.asdec.abc.types.traits.Traits;
+import com.jpexs.asdec.tags.DoABCTag;
+import java.util.List;
 
 public class ScriptInfo {
 
@@ -45,7 +47,7 @@ public class ScriptInfo {
       return "";
    }
 
-   public String convert(ABC abc, boolean pcode, boolean highlighting) {
-      return traits.convert(abc, false, pcode, true, -1, highlighting);
+   public String convert(List<DoABCTag> abcTags,ABC abc, boolean pcode, boolean highlighting) {
+      return traits.convert(abcTags,abc, false, pcode, true, -1, highlighting);
    }
 }

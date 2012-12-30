@@ -52,14 +52,13 @@ public class IconListRenderer
       // Get icon to use for the list item value
 
       String modifiersRegex = "(public |static |final |override |private |protected |package )*";
-
-      if (value.toString().matches(modifiersRegex + "const .*")) {
+      if((" "+value.toString()).contains(" const ")){
          label.setIcon(constIcon);
       }
-      if (value.toString().matches(modifiersRegex + "var .*")) {
+      if((" "+value.toString()).contains(" var ")){
          label.setIcon(variableIcon);
       }
-      if (value.toString().matches(modifiersRegex + "function .*")) {
+      if((" "+value.toString()).contains(" function ")){
          label.setIcon(functionIcon);
       }
       if (value.toString().equals(TraitsListModel.STR_CLASS_INITIALIZER)) {

@@ -28,6 +28,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -116,6 +117,13 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
       return table;
    }
 
+   public void setAbc(ABC abc) {
+      this.abc = abc;
+      updateConstList();
+   }
+   
+   
+
    public void updateConstList() {
       switch (constantTypeList.getSelectedIndex()) {
          case 0:
@@ -148,14 +156,19 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
    }
 
    public void switchAbc(int index) {
-      listIndex = index;
-      this.abc = list.get(listIndex).abc;
-      classTree.setABC(abc);
-      decompiledTextArea.setABC(abc);
-      navigator.setABC(abc);
+      listIndex = index;      
+      if (index == -1) {
+         classTree.setDoABCTags(list);
+      } else {
+         List<DoABCTag> oneList = new ArrayList<DoABCTag>();
+         oneList.add(list.get(index));
+         this.abc=list.get(index).abc;
+         classTree.setDoABCTags(oneList);
+      }
+      //decompiledTextArea.setABC(abc);
+      //navigator.setABC(abc);
       //constantTypeList = new JComboBox(new String[]{"UINT", "INT", "DOUBLE", "STRING", "NAMESPACE", "NAMESPACESET", "MULTINAME"});
       updateConstList();
-
    }
 
    public MainFrame(List<DoABCTag> list) {
@@ -195,7 +208,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
       pan2.add((abcComboBox = new JComboBox(new ABCComboBoxModel(list))), BorderLayout.NORTH);
 
       navigator = new TraitsList();
-      navigator.setABC(abc);
+      navigator.setABC(list,abc);
 
 
       JPanel navPanel = new JPanel(new BorderLayout());
@@ -206,7 +219,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
       navPanel.add(new JScrollPane(navigator), BorderLayout.CENTER);
 
       splitPane2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-              new JScrollPane(classTree = new ClassesListTree(abc)),
+              new JScrollPane(classTree = new ClassesListTree(list)),
               navPanel);
 
       JTabbedPane tabbedPane = new JTabbedPane();
@@ -332,6 +345,9 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
       constantTable = new JTable();
       autoResizeColWidth(constantTable, new UIntTableModel(abc));
       constantTable.setAutoCreateRowSorter(true);
+      
+      final List<DoABCTag> inlist=list;
+      
       constantTable.addMouseListener(new MouseAdapter() {
          @Override
          public void mouseClicked(MouseEvent e) {
@@ -343,7 +359,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
                   }
                   int multinameIndex = constantTable.convertRowIndexToModel(rowIndex);
                   if (multinameIndex > 0) {
-                     UsageFrame usageFrame = new UsageFrame(abc, multinameIndex);
+                     UsageFrame usageFrame = new UsageFrame(inlist,abc, multinameIndex);
                      usageFrame.setVisible(true);
                   }
                }
@@ -452,7 +468,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
    }
 
    public void reload() {
-      switchAbc(listIndex);
+      switchAbc(listIndex-1);
    }
 
    public void itemStateChanged(ItemEvent e) {
@@ -461,7 +477,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
          if (index == -1) {
             return;
          }
-         switchAbc(index);
+         switchAbc(index-1);
       }
       if (e.getSource() == constantTypeList) {
          int index = ((JComboBox) e.getSource()).getSelectedIndex();

@@ -20,6 +20,8 @@ import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.MethodBody;
 import com.jpexs.asdec.helpers.Helper;
+import com.jpexs.asdec.tags.DoABCTag;
+import java.util.List;
 import java.util.Stack;
 
 public class TraitFunction extends Trait {
@@ -33,8 +35,8 @@ public class TraitFunction extends Trait {
    }
 
    @Override
-   public String convertHeader(ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight) {
-      String modifier = getModifiers(abc, isStatic) + " ";
+   public String convertHeader(List<DoABCTag> abcTags,ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight) {
+      String modifier = getModifiers(abcTags,abc, isStatic) + " ";
       if (modifier.equals(" ")) {
          modifier = "";
       }
@@ -43,8 +45,8 @@ public class TraitFunction extends Trait {
    }
 
    @Override
-   public String convert(ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight) {
-      String header = convertHeader(abc, isStatic, pcode, classIndex, highlight);
+   public String convert(List<DoABCTag> abcTags,ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight) {
+      String header = convertHeader(abcTags,abc, isStatic, pcode, classIndex, highlight);
       String bodyStr = "";
       int bodyIndex = abc.findBodyIndex(method_info);
       if (bodyIndex != -1) {

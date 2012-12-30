@@ -22,7 +22,9 @@ import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.ValueKind;
 import com.jpexs.asdec.helpers.Helper;
 import com.jpexs.asdec.helpers.Highlighting;
+import com.jpexs.asdec.tags.DoABCTag;
 import java.util.HashMap;
+import java.util.List;
 
 public class TraitSlotConst extends Trait {
 
@@ -77,9 +79,17 @@ public class TraitSlotConst extends Trait {
       return slotconst + " " + getName(abc).getName(abc.constants) + typeStr + valueStr + ";";
    }
 
+   public boolean isNamespace(){
+      if (value_kind != 0) {
+         ValueKind val = new ValueKind(value_index, value_kind);
+         return val.isNamespace();
+      }
+      return false;
+   }
+   
    @Override
-   public String convert(ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight) {
-      String modifier = getModifiers(abc, isStatic) + " ";
+   public String convert(List<DoABCTag> abcTags,ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight) {
+      String modifier = getModifiers(abcTags,abc, isStatic) + " ";
       if (modifier.equals(" ")) {
          modifier = "";
       }

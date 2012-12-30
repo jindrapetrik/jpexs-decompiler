@@ -28,6 +28,7 @@ import com.jpexs.asdec.abc.types.traits.TraitSlotConst;
 import com.jpexs.asdec.abc.types.traits.Traits;
 import com.jpexs.asdec.abc.usages.*;
 import com.jpexs.asdec.helpers.Helper;
+import com.jpexs.asdec.tags.DoABCTag;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -474,52 +475,48 @@ public class ABC {
       }
    }
    /* Map from multiname index of namespace value to namespace name**/
-   private HashMap<Integer, Integer> namespaceMap;
+   private HashMap<String, String> namespaceMap;
 
    private void loadNamespaceMap() {
-      namespaceMap = new HashMap<Integer, Integer>();
+      namespaceMap = new HashMap<String, String>();
       for (ScriptInfo si : script_info) {
          for (Trait t : si.traits.traits) {
             if (t instanceof TraitSlotConst) {
                TraitSlotConst s = ((TraitSlotConst) t);
-               if (s.value_kind == ValueKind.CONSTANT_Namespace) {
-                  namespaceMap.put(s.value_index, s.name_index);
+               if (s.isNamespace()) {
+                  String key=constants.constant_namespace[s.value_index].getName(constants);
+                  String val=constants.constant_multiname[s.name_index].getNameWithNamespace(constants);
+                  namespaceMap.put(key, val);
                }
             }
          }
       }
    }
 
-   public int nsValueToName(int value_index) {
-      if (namespaceMap.containsKey(value_index)) {
-         return namespaceMap.get(value_index);
+   public String builtInNs(String ns) {
+      if (ns.equals("http://www.adobe.com/2006/actionscript/flash/proxy")) {
+         return "flash.utils.flash_proxy";
+      }
+      if(ns.equals("http://adobe.com/AS3/2006/builtin")){
+         return "-";
+      }
+      return null;
+   }
+
+   public String nsValueToName(String value) {
+      if (namespaceMap.containsKey(value)) {
+         return namespaceMap.get(value);
       } else {
-         return -1;
-      }
-   }
-
-   public HashMap<String, String> namespacesToString() {
-      HashMap<String, String> ret = new HashMap<String, String>();
-      for (Integer value_index : namespaceMap.keySet()) {
-         int name_index = namespaceMap.get(value_index);
-         String n = "";
-         String packageName = constants.constant_multiname[name_index].getNamespace(constants).getName(constants);
-         n += ("package " + packageName + "\r\n");
-         n += ("{\r\n");
-         Namespace ns = constants.constant_multiname[name_index].getNamespace(constants);
-         String modifiers = ns.getPrefix(this);
-         if (!modifiers.equals("")) {
-            modifiers += " ";
+         String ns=builtInNs(value);        
+         if(ns==null){
+            return "";
+         }else{
+            return ns;
          }
-         String nsname = constants.constant_multiname[name_index].getName(constants);
-         n += IDENT_STRING + modifiers + "namespace " + nsname + " = \"" + Helper.escapeString(constants.constant_namespace[value_index].getName(constants)) + "\";\r\n";
-         n += ("}\r\n");
-         ret.put(packageName + "." + nsname, n);
       }
-      return ret;
    }
 
-   public void export(String directory, boolean pcode) throws IOException {
+   public void export(String directory, boolean pcode,List<DoABCTag> abcList) throws IOException {
       for (int i = 0; i < script_info.length; i++) {
          String path = script_info[i].getPath(this);
          String packageName = path.substring(0, path.lastIndexOf("."));
@@ -536,7 +533,7 @@ public class ABC {
          }
          String fileName = outDir.toString() + File.separator + className + ".as";
          FileOutputStream fos = new FileOutputStream(fileName);
-         fos.write(script_info[i].convert(this, pcode, false).getBytes());
+         fos.write(script_info[i].convert(abcList,this, pcode, false).getBytes());
          fos.close();
       }
    }

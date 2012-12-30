@@ -21,6 +21,8 @@ import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.types.ScriptInfo;
 import com.jpexs.asdec.abc.types.traits.Trait;
 import com.jpexs.asdec.abc.types.traits.TraitClass;
+import com.jpexs.asdec.tags.DoABCTag;
+import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
@@ -30,8 +32,7 @@ import javax.swing.tree.TreePath;
 
 public class ClassesListTree extends JTree implements TreeSelectionListener {
 
-   public ABC abc;
-
+   private List<DoABCTag> abcList;
    public void selectClass(int classIndex) {
       ClassesListTreeModel model = (ClassesListTreeModel) getModel();
       TreeElement selectedElement = model.getElementByClassIndex(classIndex);
@@ -40,9 +41,9 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
       scrollPathToVisible(treePath);
    }
 
-   public ClassesListTree(ABC abc) {
-      this.abc = abc;
-      setModel(new ClassesListTreeModel(abc));
+   public ClassesListTree(List<DoABCTag> list) {
+      this.abcList=list;
+      setModel(new ClassesListTreeModel(list));
       addTreeSelectionListener(this);
       DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
       ClassLoader cldr = this.getClass().getClassLoader();
@@ -52,9 +53,9 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
       setCellRenderer(treeRenderer);
    }
 
-   public void setABC(ABC abc) {
-      setModel(new ClassesListTreeModel(abc));
-      this.abc = abc;
+   public void setDoABCTags(List<DoABCTag> list) {
+      this.abcList=list;
+      setModel(new ClassesListTreeModel(list));
    }
 
    public void valueChanged(TreeSelectionEvent e) {
@@ -66,23 +67,25 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
          return;
       }
       Object item = tp.getItem();
-      if (item instanceof ScriptInfo) {
-         final ScriptInfo script = (ScriptInfo) item;
+      if (item instanceof TreeLeafScript) {
+         final TreeLeafScript scriptLeaf = (TreeLeafScript) item;        
 
          if (!Main.isWorking()) {
-            Main.startWork("Decompiling class...");
+            Main.startWork("Decompiling...");
             (new Thread() {
                @Override
                public void run() {
                   int classIndex = -1;
-                  for (Trait t : script.traits.traits) {
+                  for (Trait t : scriptLeaf.abc.script_info[scriptLeaf.scriptIndex].traits.traits) {
                      if (t instanceof TraitClass) {
                         classIndex = ((TraitClass) t).class_info;
                         break;
                      }
                   }
                   Main.abcMainFrame.navigator.setClassIndex(classIndex);
-                  Main.abcMainFrame.decompiledTextArea.setScript(script, abc);
+                  Main.abcMainFrame.navigator.setABC(abcList,scriptLeaf.abc);
+                  Main.abcMainFrame.setAbc(scriptLeaf.abc);
+                  Main.abcMainFrame.decompiledTextArea.setScript(scriptLeaf.abc.script_info[scriptLeaf.scriptIndex], scriptLeaf.abc,abcList);
                   Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.setText("");
                   Main.stopWork();
                }

@@ -17,6 +17,8 @@
 package com.jpexs.asdec.abc.usages;
 
 import com.jpexs.asdec.abc.ABC;
+import com.jpexs.asdec.tags.DoABCTag;
+import java.util.List;
 
 /**
  *
@@ -24,5 +26,5 @@ import com.jpexs.asdec.abc.ABC;
  */
 public abstract class MultinameUsage {
 
-   public abstract String toString(ABC abc);
+   public abstract String toString(List<DoABCTag> abcTags,ABC abc);
 }

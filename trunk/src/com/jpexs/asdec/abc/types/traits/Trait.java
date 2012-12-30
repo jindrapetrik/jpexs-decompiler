@@ -20,6 +20,8 @@ import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.types.Multiname;
 import com.jpexs.asdec.abc.types.Namespace;
 import com.jpexs.asdec.helpers.Helper;
+import com.jpexs.asdec.tags.DoABCTag;
+import java.util.List;
 
 public abstract class Trait {
 
@@ -40,18 +42,47 @@ public abstract class Trait {
    public static final int TRAIT_FUNCTION = 5;
    public static final int TRAIT_CONST = 6;
 
-   public String getModifiers(ABC abc, boolean isStatic) {
+   public String getModifiers(List<DoABCTag> abcTags, ABC abc, boolean isStatic) {
       String ret = "";
       if ((kindFlags & ATTR_Override) > 0) {
          ret += "override";
       }
       Multiname m = getName(abc);
       if (m != null) {
-         int v = abc.nsValueToName(m.namespace_index);
-         if (v > -1) {
-            ret += " " + abc.constants.constant_multiname[v].getName(abc.constants);
+         String nsname = "";
+         if (abc.constants.constant_namespace[m.namespace_index].kind == Namespace.KIND_NAMESPACE) {
+            for (DoABCTag abcTag : abcTags) {
+               nsname = abcTag.abc.nsValueToName(abc.constants.constant_namespace[m.namespace_index].getName(abc.constants));
+               if (nsname.equals("-")) {
+                  break;
+               }
+               if (nsname.contains(".")) {
+                  nsname = nsname.substring(nsname.lastIndexOf(".") + 1);
+               }
+               if (!nsname.equals("")) {
+                  break;
+               }
+            }
          }
          Namespace ns = m.getNamespace(abc.constants);
+
+         if (nsname.contains(":")) {
+            nsname = "";
+         }
+
+
+         if ((!nsname.equals("")) && (!nsname.equals("-"))) {
+         } else {
+            if (ns != null) {
+               if (ns.kind == Namespace.KIND_NAMESPACE) {
+                  nsname = ns.getName(abc.constants);
+               }
+            }
+         }
+
+         if (!nsname.contains(":")) {
+            ret += " " + nsname;
+         }
          if (ns != null) {
             ret += " " + ns.getPrefix(abc);
          }
@@ -76,16 +107,16 @@ public abstract class Trait {
       return abc.constants.constant_multiname[name_index].toString(abc.constants) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
    }
 
-   public String convert(ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight) {
+   public String convert(List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight) {
       return abc.constants.constant_multiname[name_index].toString(abc.constants) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
    }
 
-   public String convertPackaged(ABC abc, boolean isStatic, boolean pcod, int classIndex, boolean highlight) {
-      return makePackageFromIndex(abc, name_index, convert(abc, isStatic, pcod, classIndex, highlight));
+   public String convertPackaged(List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcod, int classIndex, boolean highlight) {
+      return makePackageFromIndex(abc, name_index, convert(abcTags, abc, isStatic, pcod, classIndex, highlight));
    }
 
-   public String convertHeader(ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight) {
-      return convert(abc, isStatic, pcode, classIndex, highlight).trim();
+   public String convertHeader(List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight) {
+      return convert(abcTags, abc, isStatic, pcode, classIndex, highlight).trim();
    }
 
    protected String makePackageFromIndex(ABC abc, int name_index, String value) {

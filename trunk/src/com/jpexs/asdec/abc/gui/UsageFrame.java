@@ -23,6 +23,7 @@ import com.jpexs.asdec.abc.usages.MethodMultinameUsage;
 import com.jpexs.asdec.abc.usages.MultinameUsage;
 import com.jpexs.asdec.abc.usages.TraitMultinameUsage;
 import com.jpexs.asdec.gui.View;
+import com.jpexs.asdec.tags.DoABCTag;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
@@ -45,10 +46,10 @@ public class UsageFrame extends JFrame implements ActionListener, MouseListener 
    private UsageListModel usageListModel;
    private ABC abc;
 
-   public UsageFrame(ABC abc, int multinameIndex) {
+   public UsageFrame(List<DoABCTag> abcTags,ABC abc, int multinameIndex) {
       List<MultinameUsage> usages = abc.findMultinameUsage(multinameIndex);
       this.abc = abc;
-      usageListModel = new UsageListModel(abc);
+      usageListModel = new UsageListModel(abcTags,abc);
       for (MultinameUsage u : usages) {
          usageListModel.addElement(u);
       }

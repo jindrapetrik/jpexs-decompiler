@@ -18,6 +18,8 @@ package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.usages.MultinameUsage;
+import com.jpexs.asdec.tags.DoABCTag;
+import java.util.List;
 import javax.swing.DefaultListModel;
 
 /**
@@ -27,19 +29,21 @@ import javax.swing.DefaultListModel;
 public class UsageListModel extends DefaultListModel {
 
    private ABC abc;
+   private List<DoABCTag> abcTags;
 
-   public UsageListModel(ABC abc) {
+   public UsageListModel(List<DoABCTag> abcTags,ABC abc) {
       this.abc = abc;
+      this.abcTags=abcTags;
    }
 
    @Override
    public Object get(int index) {
-      return ((MultinameUsage) super.get(index)).toString(abc);
+      return ((MultinameUsage) super.get(index)).toString(abcTags,abc);
    }
 
    @Override
    public Object getElementAt(int index) {
-      return ((MultinameUsage) super.getElementAt(index)).toString(abc);
+      return ((MultinameUsage) super.getElementAt(index)).toString(abcTags,abc);
    }
 
    public MultinameUsage getUsage(int index) {

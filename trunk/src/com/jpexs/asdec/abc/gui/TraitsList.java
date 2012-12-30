@@ -18,6 +18,8 @@ package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
+import com.jpexs.asdec.tags.DoABCTag;
+import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.event.ListSelectionEvent;
@@ -26,6 +28,7 @@ import javax.swing.event.ListSelectionListener;
 public class TraitsList extends JList implements ListSelectionListener {
 
    ABC abc;
+   List<DoABCTag> abcTags;
    int classIndex = -1;
 
    public int getClassIndex() {
@@ -37,8 +40,9 @@ public class TraitsList extends JList implements ListSelectionListener {
       setCellRenderer(new IconListRenderer());
    }
 
-   public void setABC(ABC abc) {
+   public void setABC(List<DoABCTag> abcTags,ABC abc) {
       this.abc = abc;
+      this.abcTags=abcTags;
       setModel(new DefaultListModel());
       setClassIndex(-1);
    }
@@ -49,7 +53,7 @@ public class TraitsList extends JList implements ListSelectionListener {
          setModel(new DefaultListModel());
       } else {
          if (abc != null) {
-            setModel(new TraitsListModel(abc, classIndex));
+            setModel(new TraitsListModel(abcTags,abc, classIndex));
          }
       }
    }

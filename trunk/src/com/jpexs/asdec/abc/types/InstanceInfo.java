@@ -75,7 +75,7 @@ public class InstanceInfo {
       }
 
       if (isFinal()) {
-         modifiers = "final ";
+         modifiers += "final ";
       }
       if (isDynamic()) {
          modifiers = modifiers + "dynamic ";

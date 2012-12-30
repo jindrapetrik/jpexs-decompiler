@@ -17,6 +17,8 @@
 package com.jpexs.asdec.abc.usages;
 
 import com.jpexs.asdec.abc.ABC;
+import com.jpexs.asdec.tags.DoABCTag;
+import java.util.List;
 
 /**
  *
@@ -31,7 +33,7 @@ public class TypeNameMultinameUsage extends MultinameUsage {
    }
 
    @Override
-   public String toString(ABC abc) {
+   public String toString(List<DoABCTag> abcTags,ABC abc) {
       return "TypeName " + abc.constants.constant_multiname[typename_index].toString(abc.constants);
    }
 }
