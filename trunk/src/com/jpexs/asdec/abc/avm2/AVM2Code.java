@@ -1444,6 +1444,20 @@ public class AVM2Code {
                } else {
                   throw new ConvertException("Unknown pattern: back jump ", ip);
                }
+            } else if ((ins.definition instanceof SetLocalTypeIns)&&(ip+1<=end)&&(isKilled(((SetLocalTypeIns)ins.definition).getRegisterId(ins), ip, end))){ //set_local_x,get_local_x..kill x
+               
+               AVM2Instruction insAfter=code.get(ip+1);
+               if((insAfter.definition instanceof GetLocalTypeIns)&&(((GetLocalTypeIns)insAfter.definition).getRegisterId(insAfter)==((SetLocalTypeIns)ins.definition).getRegisterId(ins))){
+                  TreeItem before=stack.peek();
+                  ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames);
+                  stack.push(before);
+                  ip+=2;
+                  continue iploop;
+               }else{
+                  ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames);                  
+                  ip++;
+                  continue iploop;
+               }               
             } else if (ins.definition instanceof DupIns) {
                int nextPos;
                do {
