@@ -105,7 +105,7 @@ public abstract class TreeItem {
       if(prefix.endsWith(".")){
          prefix=prefix.substring(0,prefix.length()-1);
       }
-      if(!name.startsWith("[")){
+      if(!Highlighting.stripHilights(name).startsWith("[")){
          return prefix+"."+name;
       }
       return prefix+name;
