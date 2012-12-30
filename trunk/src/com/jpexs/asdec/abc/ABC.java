@@ -516,6 +516,10 @@ public class ABC {
    }
 
    public void export(String directory, boolean pcode, List<DoABCTag> abcList) throws IOException {
+      export(directory, pcode, abcList, "");
+   }
+
+   public void export(String directory, boolean pcode, List<DoABCTag> abcList, String abcStr) throws IOException {
       for (int i = 0; i < script_info.length; i++) {
          String path = script_info[i].getPath(this);
          String packageName = path.substring(0, path.lastIndexOf("."));
@@ -523,7 +527,11 @@ public class ABC {
          if (packageName.equals("")) {
             path = path.substring(1);
          }
-         String exStr = "Exporting " + (i + 1) + "/" + script_info.length + " " + path + " ...";
+         String cnt = "";
+         if (script_info.length > 1) {
+            cnt = "script " + (i + 1) + "/" + script_info.length+" ";
+         }
+         String exStr = "Exporting " + abcStr + cnt + path + " ...";
          informListeners("export", exStr);
          logger.info(exStr);
          File outDir = new File(directory + File.separatorChar + packageName.replace('.', File.separatorChar));

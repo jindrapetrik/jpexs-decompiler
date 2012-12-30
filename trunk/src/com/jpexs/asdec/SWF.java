@@ -304,9 +304,13 @@ public class SWF {
             asV3Found = true;
          }
       }
-      for (DoABCTag t : abcTags) {
+      for (int i = 0; i < abcTags.size(); i++) {
+         DoABCTag t=abcTags.get(i);
          t.abc.addEventListener(evl);
-         t.abc.export(outdir, isPcode, abcTags);
+         t.abc.export(outdir, isPcode, abcTags,"tag "+(i+1)+"/"+abcTags.size()+" ");        
+      }
+      for (DoABCTag t : abcTags) {
+         
       }
 
       if (!asV3Found) {
