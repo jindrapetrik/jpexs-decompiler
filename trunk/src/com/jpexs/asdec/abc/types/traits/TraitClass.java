@@ -83,7 +83,9 @@ public class TraitClass extends Trait {
                if (!pkg.equals(ignorePackage)) {
                   imports.add(newimport);                  
                }
-               uses.add(usname);
+               if(!uses.contains(usname)){
+                  uses.add(usname);
+               }
             }
          }
          return;
