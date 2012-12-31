@@ -576,6 +576,7 @@ public class ABC {
    public int unknownCount = 0;
    public static final String validFirstCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
    public static final String validNextCharacters = validFirstCharacters + "0123456789";
+   public static final String validNsCharacters = ".:";
 
    public boolean deobfuscateNameSpace(int strIndex) {
       if (strIndex <= 0) {
@@ -599,7 +600,10 @@ public class ABC {
             }
          }
       }
-
+      Pattern pat = Pattern.compile("^[" + Pattern.quote(validFirstCharacters) + "]" + "[" + Pattern.quote(validFirstCharacters + validNextCharacters + validNsCharacters) + "]*$");
+      if (!pat.matcher(s).matches()) {
+         isValid = false;
+      }
       if (!isValid) {
          if (isReserved) {
             constants.constant_string[strIndex] = "name_" + s.replace(" ", "_");
