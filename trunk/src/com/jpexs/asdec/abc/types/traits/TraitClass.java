@@ -112,6 +112,17 @@ public class TraitClass extends Trait {
 
    private void parseImportsUsagesFromMultiname(List<DoABCTag> abcTags, ABC abc, List<String> imports, List<String> uses, Multiname m, String ignorePackage, List<String> fullyQualifiedNames) {
       if (m != null) {
+         if (m.kind == Multiname.TYPENAME) {
+            if (m.qname_index != 0) {
+               parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[m.qname_index], ignorePackage, fullyQualifiedNames);
+            }
+            for (Integer i : m.params) {
+               if (i != 0) {
+                  parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[i], ignorePackage, fullyQualifiedNames);
+               }
+            }
+            return;
+         }
          Namespace ns = m.getNamespace(abc.constants);
          String name = m.getName(abc.constants, fullyQualifiedNames);
          NamespaceSet nss = m.getNamespaceSet(abc.constants);
@@ -238,18 +249,18 @@ public class TraitClass extends Trait {
       List<String> importnames = new ArrayList<String>();
       importnames.addAll(namesInThisPackage);
       /*for (String path : imports) {
-         String name = path;
-         String pkg = "";
-         if (name.contains(".")) {
-            pkg = name.substring(0, name.lastIndexOf("."));
-            name = name.substring(name.lastIndexOf(".") + 1);
-         }
-         if (importnames.contains(name)) {
-            fullyQualifiedNames.add(name);
-         } else {
-            importnames.add(name);
-         }
-      }*/
+       String name = path;
+       String pkg = "";
+       if (name.contains(".")) {
+       pkg = name.substring(0, name.lastIndexOf("."));
+       name = name.substring(name.lastIndexOf(".") + 1);
+       }
+       if (importnames.contains(name)) {
+       fullyQualifiedNames.add(name);
+       } else {
+       importnames.add(name);
+       }
+       }*/
       List<String> imports2 = new ArrayList<String>();
       for (String path : imports) {
          String name = path;
