@@ -47,6 +47,8 @@ import jsyntaxpane.TokenType;
     private static final byte BRACKET   = 2;
     private static final byte CURLY     = 3;
 
+    private static String xmlTagName="";
+
 %}
 
 /* main character classes */
@@ -61,8 +63,19 @@ Comment = {TraditionalComment} | {EndOfLineComment}
 TraditionalComment = "/*" [^*] ~"*/" | "/*" "*"+ "/"
 EndOfLineComment = "//" {InputCharacter}* {LineTerminator}?
 
+
+
 /* identifiers */
 Identifier = [:jletter:][:jletterdigit:]*
+
+IdentifierNs = {Identifier} ":" {Identifier}
+
+/* XML */
+LetterColon = [:jletter] | ":"
+XMLIdentifier = {Identifier} | {IdentifierNs}
+XMLAttribute = {XMLIdentifier} " "* "=" " "* \" {InputCharacter}* \" " "*
+XMLBeginTag = "<" {XMLIdentifier}
+XMLEndTag = "</" {XMLIdentifier} ">"
 
 /* integer literals */
 DecIntegerLiteral = 0 | [1-9][0-9]*
@@ -85,60 +98,61 @@ Exponent = [eE] [+-]? [0-9]+
 StringCharacter = [^\r\n\"\\]
 SingleCharacter = [^\r\n\'\\]
 
-%state STRING, CHARLITERAL
+%state STRING, CHARLITERAL, XMLSTARTTAG, XML
 
 %%
 
 <YYINITIAL> {
 
   /* keywords */
-  "abstract"                     |
-  "boolean"                      |
   "break"                        |
   "case"                         |
-  "catch"                        |
-  "char"                         |
-  "class"                        |
-  "const"                        |
   "continue"                     |
-  "do"                           |
-  "else"                         |
-  "extends"                      |
-  "final"                        |
-  "finally"                      |
-  "for"                          |
   "default"                      |
-  "implements"                   |
-  "import"                       |
-  "instanceof"                   |
-  "interface"                    |
-  "new"                          |
+  "do"                           |
+  "while"                        |
+  "else"                         |
+  "for"                          |
+  "each"                         |
+  "in"                           |
   "if"                           |
-  "public"                       |
+  "label"                        |
+  "return"                       |
   "super"                        |
   "switch"                       |
-  "package"                      |
+  "throw"                        |
+  "try"                          |
+  "catch"                        |
+  "finally"                      |
+  "while"                        |
+  "with"                         |
+  "dynamic"                      |
+  "final"                        |
+  "internal"                     |
+  "native"                       |
+  "override"                     |
   "private"                      |
   "protected"                    |
-  "return"                       |
-  "void"                         |
+  "public"                       |
   "static"                       |
-  "while"                        |
-  "this"                         |
-  "throw"                        |
-  "throws"                       |
-  "try"                          |
-  "var"                          |
-
-  "true"                         |
-  "false"                        |
-  "NaN"                          |
+  "class"                        |
+  "const"                        |
+  "extends"                      |
   "function"                     |
-  "dynamic"                     |
-  "override"                     |
-"with"                     |
-"each"                     |
-  "null"                         { return token(TokenType.KEYWORD); }
+  "get"                          |
+  "implements"                   |
+  "interface"                    |
+  "namespace"                    |
+  "package"                      |
+  "set"                          |
+  "var"                          |
+  "import"                       |
+  "include"                      |
+  "use"                          |
+  "false"                        |
+  "null"                         |
+  "this"                         |
+  "true"                         { return token(TokenType.KEYWORD); }
 
 
   /* operators */
@@ -151,9 +165,10 @@ SingleCharacter = [^\r\n\'\\]
   "]"                            { return token(TokenType.OPERATOR, -BRACKET); }
   ";"                            | 
   ","                            | 
+  "..."                          |
   "."                            | 
   "="                            | 
-  ">"                            | 
+  ">"                            |  
   "<"                            |
   "!"                            | 
   "~"                            | 
@@ -188,7 +203,16 @@ SingleCharacter = [^\r\n\'\\]
   "%="                           | 
   "<<="                          | 
   ">>="                          | 
-  ">>>="                         { return token(TokenType.OPERATOR); } 
+  ">>>="                         |
+  "as"                           | 
+  "delete"                       | 
+  "instanceof"                   | 
+  "is"                           | 
+  "::"                           | 
+  "new"                          | 
+  "typeof"                       | 
+  "void"                         | 
+  "@"                            { return token(TokenType.OPERATOR); } 
   
   /* string literal */
   \"                             {  
@@ -222,11 +246,33 @@ SingleCharacter = [^\r\n\'\\]
 
   /* whitespace */
   {WhiteSpace}                   { }
-
+  {XMLBeginTag}                  {  yybegin(XMLSTARTTAG); 
+                                    tokenStart = yychar;
+                                    tokenLength = yylength(); 
+                                    String s=yytext();                                    
+                                    xmlTagName = s.substring(1);
+                                 }
   /* identifiers */ 
-  {Identifier}                   { return token(TokenType.IDENTIFIER); }
+  {Identifier}                   { return token(TokenType.IDENTIFIER); }  
 }
 
+<XMLSTARTTAG> {
+   {XMLAttribute}                { tokenLength += yylength();}
+   {WhiteSpace}                   { tokenLength += yylength(); }
+   ">"                             { yybegin(XML);  tokenLength += yylength();}
+}
+<XML> {
+   {XMLBeginTag}                 { yybegin(XMLSTARTTAG); tokenLength += yylength();}
+   {XMLEndTag}                   { tokenLength += yylength();
+                                   String endtagname=yytext();
+                                   endtagname=endtagname.substring(2,endtagname.length()-1);                                   
+                                   if(endtagname.equals(xmlTagName)){
+                                       yybegin(YYINITIAL);
+                                       return token(TokenType.STRING, tokenStart, tokenLength);
+                                   }
+                                 }
+   .                             { tokenLength += yylength(); }
+}
 
 <STRING> {
   \"                             { 
