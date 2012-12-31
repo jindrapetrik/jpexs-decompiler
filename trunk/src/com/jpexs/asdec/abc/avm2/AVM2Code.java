@@ -1418,22 +1418,54 @@ public class AVM2Code {
                      output.add(new DoWhileTreeItem(ins, currentLoop.loopBreak, currentLoop.loopContinue, loopBody, expression));
                   } else {
                      if (expression instanceof InTreeItem) {
-                        boolean found = false;
-                        for (int g = ip + 1; g < jumpPos; g++) {
-                           if (code.get(g).definition instanceof NextValueIns) {
-                              output.add(new ForEachInTreeItem(ins, currentLoop.loopBreak, currentLoop.loopContinue, (InTreeItem) expression, loopBody));
-                              found = true;
-                              break;
+                        TreeItem gti=((InTreeItem) expression).collection.getNotCoerced().getThroughRegister();
+                        if (gti instanceof FilteredCheckTreeItem) {
+                           boolean found = false;
+                           if (loopBody.size() == 1) {
+                              TreeItem ft = loopBody.get(0);
+                              if (ft instanceof WithTreeItem) {
+                                 if (((WithTreeItem) ft).items.size() == 1) {
+                                    ft = ((WithTreeItem) ft).items.get(0);
+                                    if (ft instanceof IfTreeItem) {
+                                       IfTreeItem ift = (IfTreeItem) ft;
+                                       if (ift.onTrue.size() > 0) {
+                                          ft = ift.onTrue.get(0);
+                                          if (ft instanceof SetPropertyTreeItem) {
+                                             SetPropertyTreeItem spt = (SetPropertyTreeItem) ft;
+                                             if (spt.object instanceof LocalRegTreeItem) {
+                                                int regIndex = ((LocalRegTreeItem) spt.object).regIndex;
+                                                InTreeItem iti=(InTreeItem) expression;
+                                                localRegs.put(regIndex, new FilterTreeItem(ins,iti.collection.getThroughRegister(),ift.expression));
+                                                found = true;
+                                             }
+                                          }
+                                       }
+                                    }
+                                 }
+                              }
                            }
-                           if (code.get(g).definition instanceof NextNameIns) {
-                              output.add(new ForInTreeItem(ins, currentLoop.loopBreak, currentLoop.loopContinue, (InTreeItem) expression, loopBody));
-                              found = true;
-                              break;
+                           if (!found) {
+                              throw new ConvertException("Unknown pattern: bad filter loop", ip);
+                           }
+                        } else {
+                           boolean found = false;
+                           for (int g = ip + 1; g < jumpPos; g++) {
+                              if (code.get(g).definition instanceof NextValueIns) {
+                                 output.add(new ForEachInTreeItem(ins, currentLoop.loopBreak, currentLoop.loopContinue, (InTreeItem) expression, loopBody));
+                                 found = true;
+                                 break;
+                              }
+                              if (code.get(g).definition instanceof NextNameIns) {
+                                 output.add(new ForInTreeItem(ins, currentLoop.loopBreak, currentLoop.loopContinue, (InTreeItem) expression, loopBody));
+                                 found = true;
+                                 break;
+                              }
+                           }
+                           if (!found) {
+                              throw new ConvertException("Unknown pattern: hasnext without nextvalue/nextname", ip);
                            }
                         }
-                        if (!found) {
-                           throw new ConvertException("Unknown pattern: hasnext without nextvalue/nextname", ip);
-                        }
+
 
                      } else {
                         output.add(new WhileTreeItem(ins, currentLoop.loopBreak, currentLoop.loopContinue, expression, loopBody));

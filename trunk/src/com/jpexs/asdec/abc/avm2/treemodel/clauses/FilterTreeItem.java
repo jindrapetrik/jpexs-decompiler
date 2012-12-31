@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2011 JPEXS
+ *  Copyright (C) 2012 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -14,24 +14,31 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.asdec.abc.avm2.treemodel;
+package com.jpexs.asdec.abc.avm2.treemodel.clauses;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import java.util.HashMap;
 import java.util.List;
 
-public class UnparsedTreeItem extends TreeItem {
+/**
+ *
+ * @author JPEXS
+ */
+public class FilterTreeItem extends TreeItem {
 
-   public String value;
+   public TreeItem expression;
+   public TreeItem collection;
 
-   public UnparsedTreeItem(AVM2Instruction instruction, String value) {
+   public FilterTreeItem(AVM2Instruction instruction, TreeItem collection, TreeItem expression) {
       super(instruction, NOPRECEDENCE);
-      this.value = value;
+      this.expression = expression;
+      this.collection = collection;
    }
 
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return value;
+      return collection.toString(constants, localRegNames, fullyQualifiedNames)+hilight(".(") + expression.toString(constants, localRegNames, fullyQualifiedNames) + hilight(")");
    }
 }

@@ -198,7 +198,7 @@ public class Multiname {
          return "";
       }
       if (name_index == 0) {
-         return "*";
+         return (isAttribute() ? "@*" : "*");
       } else {
          String name = constants.constant_string[name_index];
          if ((fullyQualifiedNames != null) && fullyQualifiedNames.contains(name)) {
