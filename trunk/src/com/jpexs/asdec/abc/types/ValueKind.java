@@ -17,6 +17,7 @@
 package com.jpexs.asdec.abc.types;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.helpers.Helper;
 
 public class ValueKind {
 
@@ -94,7 +95,7 @@ public class ValueKind {
             ret = "" + constants.constant_decimal[value_index];
             break;
          case CONSTANT_Utf8:
-            ret = "\"" + constants.constant_string[value_index] + "\"";
+            ret = "\"" + Helper.escapeString(constants.constant_string[value_index]) + "\"";
             break;
          case CONSTANT_True:
             ret = "true";
