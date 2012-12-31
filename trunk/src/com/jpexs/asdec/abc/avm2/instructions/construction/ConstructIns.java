@@ -23,7 +23,13 @@ import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.avm2.treemodel.ConstructTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.EscapeXElemTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.FindPropertyTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.GetPropertyTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.StringTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.XMLTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.operations.AddTreeItem;
 import com.jpexs.asdec.abc.types.MethodInfo;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,6 +55,19 @@ public class ConstructIns extends InstructionDefinition {
       //push new instance
    }
 
+   private boolean walkXML(TreeItem item,List<TreeItem> list){
+      boolean ret=true;
+      if(item instanceof StringTreeItem){
+         list.add(item);
+      }else if(item instanceof AddTreeItem){
+         ret=ret && walkXML(((AddTreeItem)item).leftSide,list);
+         ret=ret && walkXML(((AddTreeItem)item).rightSide,list);
+      }else if(item instanceof EscapeXElemTreeItem){
+         list.add(item);
+      }
+      return ret;  
+   }
+   
    @Override
    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       int argCount = ins.operands[0];
@@ -57,6 +76,22 @@ public class ConstructIns extends InstructionDefinition {
          args.add(0, (TreeItem) stack.pop());
       }
       TreeItem obj = (TreeItem) stack.pop();
+      if (obj instanceof GetPropertyTreeItem) {
+         GetPropertyTreeItem gpt = (GetPropertyTreeItem) obj;
+         if (gpt.object instanceof FindPropertyTreeItem) {
+            FindPropertyTreeItem fpt = (FindPropertyTreeItem) gpt.object;
+            if (fpt.propertyName.isXML(constants, localRegNames, fullyQualifiedNames) && gpt.propertyName.isXML(constants, localRegNames, fullyQualifiedNames)) {
+               if (args.size() == 1) {
+                  TreeItem arg = args.get(0);
+                  List<TreeItem> xmlLines = new ArrayList<TreeItem>();
+                  if (walkXML(arg,xmlLines)) {
+                     stack.push(new XMLTreeItem(ins, xmlLines));
+                     return;
+                  }
+               }
+            }
+         }
+      }
       stack.push(new ConstructTreeItem(ins, obj, args));
    }
 

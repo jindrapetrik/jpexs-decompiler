@@ -21,6 +21,7 @@ import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.asdec.abc.avm2.treemodel.EscapeXElemTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.UnparsedTreeItem;
 import com.jpexs.asdec.abc.types.MethodInfo;
@@ -43,7 +44,7 @@ public class EscXElemIns extends InstructionDefinition {
 
    @Override
    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      stack.push(new UnparsedTreeItem(ins, "esc_xelem(" + stack.pop().toString(constants, localRegNames, fullyQualifiedNames) + ")"));
+      stack.push(new EscapeXElemTreeItem(ins, stack.pop()));
    }
 
    @Override
