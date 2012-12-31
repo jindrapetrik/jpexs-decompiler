@@ -149,6 +149,9 @@ public class Main {
       if (actionMainFrame != null) {
          actionMainFrame.setStatus(name);
       }
+      if(loadingDialog!=null){
+         loadingDialog.setDetail(name);
+      }
       if (Main.isCommandLineMode()) {
          System.out.println(name);
       }
@@ -161,6 +164,9 @@ public class Main {
       }
       if (actionMainFrame != null) {
          actionMainFrame.setStatus("");
+      }
+      if(loadingDialog!=null){
+         loadingDialog.setDetail("");
       }
    }
 
@@ -188,6 +194,7 @@ public class Main {
       @Override
       protected Object doInBackground() throws Exception {
          try {
+            Main.startWork("Reading SWF...");
             swf = parseSWF(Main.file);
             FileInputStream fis = new FileInputStream(file);
             DEBUG_COPY = true;

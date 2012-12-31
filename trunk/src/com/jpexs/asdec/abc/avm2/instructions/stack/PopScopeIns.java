@@ -17,6 +17,7 @@
 package com.jpexs.asdec.abc.avm2.instructions.stack;
 
 import com.jpexs.asdec.abc.ABC;
+import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
@@ -55,7 +56,7 @@ public class PopScopeIns extends InstructionDefinition {
                }
                while (output.size() > i + 1) {
                   output.remove(i + 1);
-               }
+               }               
                /*int count=output.size()-1-(i+1);
                 for(int c=0;c<count;c++){
                 output.remove(i+1);

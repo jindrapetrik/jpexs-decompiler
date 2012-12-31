@@ -24,6 +24,7 @@ import java.awt.event.WindowEvent;
 import java.awt.image.ImageObserver;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 /**
@@ -33,16 +34,20 @@ import javax.swing.SwingConstants;
  */
 public class LoadingDialog extends JFrame implements ImageObserver {
 
-   private JLabel loadingLabel = new JLabel("Loading SWF file, please wait...");
+   private JLabel loadingLabel = new JLabel("");
    private LoadingPanel loadingPanel;
-
+   String load="Loading, please wait...";
+   
+   public void setDetail(String d){
+      loadingLabel.setText("<html><center>"+load+"<br>"+d+"</center></html>");
+   }
    /**
     * Constructor
     */
    public LoadingDialog() {
       setResizable(false);
       setTitle(Main.shortApplicationVerName);
-      setSize(300, 150);
+      setSize(250, 150);
       setLayout(new BorderLayout());
 
       loadingPanel = new LoadingPanel(50, 50);

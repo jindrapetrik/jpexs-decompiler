@@ -948,13 +948,16 @@ public class AVM2Code {
       return localRegNames;
    }
 
-   private void clearTemporaryRegisters(List<TreeItem> output) {
+   public void clearTemporaryRegisters(List<TreeItem> output) {
       for (int i = 0; i < output.size(); i++) {
          if (output.get(i) instanceof SetLocalTreeItem) {
             if (isKilled(((SetLocalTreeItem) output.get(i)).regIndex, 0, code.size() - 1)) {
                output.remove(i);
                i--;
             }
+         }else
+         if (output.get(i) instanceof WithTreeItem) {
+            clearTemporaryRegisters(((WithTreeItem) output.get(i)).items);
          }
       }
    }
@@ -1418,7 +1421,7 @@ public class AVM2Code {
                      output.add(new DoWhileTreeItem(ins, currentLoop.loopBreak, currentLoop.loopContinue, loopBody, expression));
                   } else {
                      if (expression instanceof InTreeItem) {
-                        TreeItem gti=((InTreeItem) expression).collection.getNotCoerced().getThroughRegister();
+                        TreeItem gti = ((InTreeItem) expression).collection.getNotCoerced().getThroughRegister();
                         if (gti instanceof FilteredCheckTreeItem) {
                            boolean found = false;
                            if (loopBody.size() == 1) {
@@ -1434,9 +1437,12 @@ public class AVM2Code {
                                              SetPropertyTreeItem spt = (SetPropertyTreeItem) ft;
                                              if (spt.object instanceof LocalRegTreeItem) {
                                                 int regIndex = ((LocalRegTreeItem) spt.object).regIndex;
-                                                InTreeItem iti=(InTreeItem) expression;
-                                                localRegs.put(regIndex, new FilterTreeItem(ins,iti.collection.getThroughRegister(),ift.expression));
+                                                InTreeItem iti = (InTreeItem) expression;
+                                                localRegs.put(regIndex, new FilterTreeItem(ins, iti.collection.getThroughRegister(), ift.expression));
                                                 found = true;
+                                                addr = afterBackJumpAddr;
+                                                ip = adr2pos(addr);
+                                                continue iploop;
                                              }
                                           }
                                        }
@@ -1447,7 +1453,8 @@ public class AVM2Code {
                            if (!found) {
                               throw new ConvertException("Unknown pattern: bad filter loop", ip);
                            }
-                        } else {
+                        }
+                        {
                            boolean found = false;
                            for (int g = ip + 1; g < jumpPos; g++) {
                               if (code.get(g).definition instanceof NextValueIns) {

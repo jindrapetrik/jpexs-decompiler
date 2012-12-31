@@ -202,6 +202,7 @@ public class MainFrame extends JFrame implements TreeSelectionListener, ActionLi
       setJMenuBar(menuBar);
 
       setTitle(Main.applicationName + " - " + Main.getFileTitle());
+      Main.stopWork();
    }
 
    public void valueChanged(TreeSelectionEvent e) {
