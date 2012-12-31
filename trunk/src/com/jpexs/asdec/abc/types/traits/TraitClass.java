@@ -237,7 +237,7 @@ public class TraitClass extends Trait {
 
       List<String> importnames = new ArrayList<String>();
       importnames.addAll(namesInThisPackage);
-      for (String path : imports) {
+      /*for (String path : imports) {
          String name = path;
          String pkg = "";
          if (name.contains(".")) {
@@ -249,7 +249,7 @@ public class TraitClass extends Trait {
          } else {
             importnames.add(name);
          }
-      }
+      }*/
       List<String> imports2 = new ArrayList<String>();
       for (String path : imports) {
          String name = path;
