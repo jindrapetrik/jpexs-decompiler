@@ -246,12 +246,12 @@ SingleCharacter = [^\r\n\'\\]
 
   /* whitespace */
   {WhiteSpace}                   { }
-  {XMLBeginTag}                  {  yybegin(XMLSTARTTAG); 
+ /* {XMLBeginTag}                  {  yybegin(XMLSTARTTAG); 
                                     tokenStart = yychar;
                                     tokenLength = yylength(); 
                                     String s=yytext();                                    
                                     xmlTagName = s.substring(1);
-                                 }
+                                 }*/
   /* identifiers */ 
   {Identifier}                   { return token(TokenType.IDENTIFIER); }  
 }
