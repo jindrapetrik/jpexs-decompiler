@@ -44,7 +44,11 @@ public class ConstructTreeItem extends TreeItem {
       if (object instanceof NewFunctionTreeItem) {
          return object.toString(constants, localRegNames, fullyQualifiedNames);
       }
-      return hilight("new ") + object.toString(constants, localRegNames, fullyQualifiedNames) + hilight("(") + argStr + hilight(")");
+      String obStr = object.toString(constants, localRegNames, fullyQualifiedNames);
+      if (object.precedence > precedence) {
+         obStr = "(" + obStr + ")";
+      }
+      return hilight("new ") + obStr + hilight("(") + argStr + hilight(")");
 
    }
 }

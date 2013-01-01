@@ -50,6 +50,10 @@ public class CallTreeItem extends TreeItem {
        if (receiver instanceof ThisTreeItem) {
        recPart = "";
        }*/
-      return function.toString(constants, localRegNames, fullyQualifiedNames) + hilight("(") + args + hilight(")");
+      String fstr = function.toString(constants, localRegNames, fullyQualifiedNames);
+      if (function.precedence > precedence) {
+         fstr = "(" + fstr + ")";
+      }
+      return fstr + hilight("(") + args + hilight(")");
    }
 }
