@@ -23,6 +23,7 @@ import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.WithObjectTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.WithTreeItem;
 import com.jpexs.asdec.abc.types.MethodBody;
 import com.jpexs.asdec.abc.types.MethodInfo;
@@ -45,6 +46,9 @@ public class PopScopeIns extends InstructionDefinition {
    @Override
    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       TreeItem scope = (TreeItem) scopeStack.pop();
+      if(scope instanceof WithObjectTreeItem){
+         scope = ((WithObjectTreeItem)scope).scope;
+      }
       for (int i = output.size() - 1; i >= 0; i--) {
          if (output.get(i) instanceof WithTreeItem) {
             WithTreeItem wti = (WithTreeItem) output.get(i);
