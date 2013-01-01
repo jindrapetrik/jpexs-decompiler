@@ -1541,7 +1541,7 @@ public class AVM2Code {
                            }
                         }
                      }
-                     if (!isKilled(reg, ip, end)) {
+                     if (!isKilled(reg, 0, end)) {
                         TreeItem v = (TreeItem) stack.pop();
                         stack.push(new LocalRegTreeItem(ins, reg, v));
                         stack.push(v);
