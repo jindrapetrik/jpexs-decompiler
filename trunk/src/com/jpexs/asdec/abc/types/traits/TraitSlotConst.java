@@ -19,6 +19,8 @@ package com.jpexs.asdec.abc.types.traits;
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
+import com.jpexs.asdec.abc.types.Multiname;
+import com.jpexs.asdec.abc.types.Namespace;
 import com.jpexs.asdec.abc.types.ValueKind;
 import com.jpexs.asdec.helpers.Helper;
 import com.jpexs.asdec.helpers.Highlighting;
@@ -91,6 +93,21 @@ public class TraitSlotConst extends Trait {
    public String convert(List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
       String modifier = getModifiers(abcTags, abc, isStatic) + " ";
       if (modifier.equals(" ")) {
+         modifier = "";
+      }
+      Multiname n = getName(abc);
+      boolean showModifier = true;
+      if ((classIndex == -1) && (n != null)) {
+         Namespace ns = n.getNamespace(abc.constants);
+         if (ns == null) {
+            showModifier = false;
+         } else {
+            if ((ns.kind != Namespace.KIND_PACKAGE) && (ns.kind != Namespace.KIND_PACKAGE_INTERNAL)) {
+               showModifier = false;
+            }
+         }
+      }
+      if (!showModifier) {
          modifier = "";
       }
       return ABC.IDENT_STRING + ABC.IDENT_STRING + modifier + getNameValueStr(abc, fullyQualifiedNames);

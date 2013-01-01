@@ -17,7 +17,6 @@
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.Configuration;
-import com.jpexs.asdec.EventListener;
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.gui.tablemodels.*;
@@ -30,7 +29,6 @@ import java.awt.Dimension;
 import java.awt.event.*;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,7 +60,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
    public JLabel asmLabel = new JLabel("P-code source (editable)");
    public JLabel decLabel = new JLabel("ActionScript source");
    public DetailPanel detailPanel;
-      
+
    public void setStatus(String s) {
       if (s.equals("")) {
          loadingPanel.setVisible(false);
@@ -339,7 +337,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
 
       setJMenuBar(menuBar);
 
-     
+
       JPanel panConstants = new JPanel();
       panConstants.setLayout(new BorderLayout());
       constantTypeList = new JComboBox(new String[]{"UINT", "INT", "DOUBLE", "DECIMAL", "STRING", "NAMESPACE", "NAMESPACESET", "MULTINAME"});
@@ -373,7 +371,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
       tabbedPane.addTab("Constants", panConstants);
       View.centerScreen(this);
       Main.stopWork();
-      
+
    }
 
    public void actionPerformed(ActionEvent e) {

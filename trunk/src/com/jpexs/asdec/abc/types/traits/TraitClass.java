@@ -20,6 +20,10 @@ import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.construction.NewFunctionIns;
+import com.jpexs.asdec.abc.avm2.instructions.other.FindPropertyIns;
+import com.jpexs.asdec.abc.avm2.instructions.other.FindPropertyStrictIns;
+import com.jpexs.asdec.abc.avm2.instructions.other.GetLexIns;
+import com.jpexs.asdec.abc.avm2.instructions.types.CoerceIns;
 import com.jpexs.asdec.abc.avm2.treemodel.InitPropertyTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.SetPropertyTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
@@ -43,25 +47,35 @@ public class TraitClass extends Trait {
 
    public int slot_id;
    public int class_info;
+   private static final String[] builtInClasses = {"ArgumentError", "arguments", "Array", "Boolean", "Class", "Date", "DefinitionError", "Error", "EvalError", "Function", "int", "JSON", "Math", "Namespace", "Number", "Object", "QName", "RangeError", "ReferenceError", "RegExp", "SecurityError", "String", "SyntaxError", "TypeError", "uint", "URIError", "VerifyError", "XML", "XMLList"};
+
+   private static boolean isBuiltInClass(String name) {
+      for (String g : builtInClasses) {
+         if (g.equals(name)) {
+            return true;
+         }
+      }
+      return false;
+   }
 
    @Override
    public String toString(ABC abc, List<String> fullyQualifiedNames) {
       return "Class " + abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " class_info=" + class_info + " metadata=" + Helper.intArrToString(metadata);
    }
 
-   private void parseImportsUsagesFromNS(List<DoABCTag> abcTags, ABC abc, List imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
+   private boolean parseUsagesFromNS(List<DoABCTag> abcTags, ABC abc, List imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
       Namespace ns = abc.constants.constant_namespace[namespace_index];
       if (name.equals("")) {
          name = "*";
       }
       String newimport = ns.getName(abc.constants);
-      if (ns.kind == Namespace.KIND_NAMESPACE) {
+      /*if (ns.kind == Namespace.KIND_NAMESPACE)*/ {
          String oldimport = newimport;
          newimport = null;
          for (DoABCTag abcTag : abcTags) {
             String newname = abcTag.abc.nsValueToName(oldimport);
             if (newname.equals("-")) {
-               return;
+               return true;
             }
             if (!newname.equals("")) {
                newimport = newname;
@@ -71,7 +85,7 @@ public class TraitClass extends Trait {
          if (newimport != null) {
             if (!imports.contains(newimport)) {
                if (newimport.contains(":")) {
-                  return;
+                  return true;
                }
                String pkg = "";
                if (newimport.contains(".")) {
@@ -88,9 +102,21 @@ public class TraitClass extends Trait {
                   uses.add(usname);
                }
             }
+            return true;
          }
+      }
+      return false;
+   }
+
+   private void parseImportsUsagesFromNS(List<DoABCTag> abcTags, ABC abc, List imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
+      Namespace ns = abc.constants.constant_namespace[namespace_index];
+      if (name.equals("")) {
+         name = "*";
+      }
+      String newimport = ns.getName(abc.constants);
+      if (parseUsagesFromNS(abcTags, abc, imports, uses, namespace_index, ignorePackage, name)) {
          return;
-      } else if (ns.kind != Namespace.KIND_PACKAGE) {
+      } else if ((ns.kind != Namespace.KIND_PACKAGE) && (ns.kind != Namespace.KIND_PACKAGE_INTERNAL)) {
          return;
       }
       if (newimport.equals("-")) {
@@ -108,6 +134,33 @@ public class TraitClass extends Trait {
          }
       }
       //}
+   }
+
+   private void parseUsagesFromMultiname(List<DoABCTag> abcTags, ABC abc, List<String> imports, List<String> uses, Multiname m, String ignorePackage, List<String> fullyQualifiedNames) {
+      if (m != null) {
+         if (m.kind == Multiname.TYPENAME) {
+            if (m.qname_index != 0) {
+               parseUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[m.qname_index], ignorePackage, fullyQualifiedNames);
+            }
+            for (Integer i : m.params) {
+               if (i != 0) {
+                  parseUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[i], ignorePackage, fullyQualifiedNames);
+               }
+            }
+            return;
+         }
+         Namespace ns = m.getNamespace(abc.constants);
+         String name = m.getName(abc.constants, fullyQualifiedNames);
+         NamespaceSet nss = m.getNamespaceSet(abc.constants);
+         if (ns != null) {
+            parseUsagesFromNS(abcTags, abc, imports, uses, m.namespace_index, ignorePackage, name);
+         }
+         if (nss != null) {
+            if (nss.namespaces.length == 1) {
+               parseUsagesFromNS(abcTags, abc, imports, uses, nss.namespaces[0], ignorePackage, name);
+            }
+         }
+      }
    }
 
    private void parseImportsUsagesFromMultiname(List<DoABCTag> abcTags, ABC abc, List<String> imports, List<String> uses, Multiname m, String ignorePackage, List<String> fullyQualifiedNames) {
@@ -130,8 +183,8 @@ public class TraitClass extends Trait {
             parseImportsUsagesFromNS(abcTags, abc, imports, uses, m.namespace_index, ignorePackage, name);
          }
          if (nss != null) {
-            for (int ni : nss.namespaces) {
-               parseImportsUsagesFromNS(abcTags, abc, imports, uses, ni, ignorePackage, name);
+            if (nss.namespaces.length == 1) {
+               parseImportsUsagesFromNS(abcTags, abc, imports, uses, nss.namespaces[0], ignorePackage, name);
             }
          }
       }
@@ -148,6 +201,7 @@ public class TraitClass extends Trait {
       }
       MethodBody body = abc.findBody(method_index);
       if (body != null) {
+         parseImportsUsagesFromTraits(abcTags, abc, body.traits, imports, uses, ignorePackage, fullyQualifiedNames);
          for (ABCException ex : body.exceptions) {
             parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[ex.type_index], ignorePackage, fullyQualifiedNames);
          }
@@ -155,13 +209,30 @@ public class TraitClass extends Trait {
             if (ins.definition instanceof NewFunctionIns) {
                parseImportsUsagesFromMethodInfo(abcTags, abc, ins.operands[0], imports, uses, ignorePackage, fullyQualifiedNames);
             }
-            for (int k = 0; k < ins.definition.operands.length; k++) {
-               if (ins.definition.operands[k] == AVM2Code.DAT_MULTINAME_INDEX) {
-                  int multinameIndex = ins.operands[k];
-                  parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[multinameIndex], ignorePackage, fullyQualifiedNames);
+            if ((ins.definition instanceof FindPropertyStrictIns)
+                    || (ins.definition instanceof FindPropertyIns)
+                    || (ins.definition instanceof GetLexIns)
+                    || (ins.definition instanceof CoerceIns)) {
+               int m = ins.operands[0];
+               if (m != 0) {
+                  parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[m], ignorePackage, fullyQualifiedNames);
+               }
+            } else {
+               for (int k = 0; k < ins.definition.operands.length; k++) {
+
+                  if (ins.definition.operands[k] == AVM2Code.DAT_MULTINAME_INDEX) {
+                     int multinameIndex = ins.operands[k];
+                     parseUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[multinameIndex], ignorePackage, fullyQualifiedNames);
+                  }
                }
             }
          }
+      }
+   }
+
+   private void parseImportsUsagesFromTraits(List<DoABCTag> abcTags, ABC abc, Traits ts, List<String> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames) {
+      for (Trait t : ts.traits) {
+         parseImportsUsagesFromTrait(abcTags, abc, t, imports, uses, ignorePackage, fullyQualifiedNames);
       }
    }
 
@@ -197,17 +268,14 @@ public class TraitClass extends Trait {
       }
 
       //static
-      for (Trait t : abc.class_info[class_info].static_traits.traits) {
-         parseImportsUsagesFromTrait(abcTags, abc, t, imports, uses, packageName, fullyQualifiedNames);
-      }
+      parseImportsUsagesFromTraits(abcTags, abc, abc.class_info[class_info].static_traits, imports, uses, packageName, fullyQualifiedNames);
 
       //static initializer
       parseImportsUsagesFromMethodInfo(abcTags, abc, abc.class_info[class_info].cinit_index, imports, uses, packageName, fullyQualifiedNames);
 
       //instance
-      for (Trait t : abc.instance_info[class_info].instance_traits.traits) {
-         parseImportsUsagesFromTrait(abcTags, abc, t, imports, uses, packageName, fullyQualifiedNames);
-      }
+      parseImportsUsagesFromTraits(abcTags, abc, abc.instance_info[class_info].instance_traits, imports, uses, packageName, fullyQualifiedNames);
+
 
       //instance initializer
       parseImportsUsagesFromMethodInfo(abcTags, abc, abc.instance_info[class_info].iinit_index, imports, uses, packageName, fullyQualifiedNames);
@@ -248,20 +316,6 @@ public class TraitClass extends Trait {
 
       List<String> importnames = new ArrayList<String>();
       importnames.addAll(namesInThisPackage);
-      /*for (String path : imports) {
-       String name = path;
-       String pkg = "";
-       if (name.contains(".")) {
-       pkg = name.substring(0, name.lastIndexOf("."));
-       name = name.substring(name.lastIndexOf(".") + 1);
-       }
-       if (importnames.contains(name)) {
-       fullyQualifiedNames.add(name);
-       } else {
-       importnames.add(name);
-       }
-       }*/
-      List<String> imports2 = new ArrayList<String>();
       for (String path : imports) {
          String name = path;
          String pkg = "";
@@ -269,12 +323,26 @@ public class TraitClass extends Trait {
             pkg = name.substring(0, name.lastIndexOf("."));
             name = name.substring(name.lastIndexOf(".") + 1);
          }
-
-         if ((!packageName.equals(pkg)) && (!fullyQualifiedNames.contains(name))) {
-            imports2.add(path);
+         if (importnames.contains(name) || ((!pkg.equals("")) && isBuiltInClass(name))) {
+            fullyQualifiedNames.add(name);
+         } else {
+            importnames.add(name);
          }
       }
-      imports = imports2;
+      /*List<String> imports2 = new ArrayList<String>();
+       for (String path : imports) {
+       String name = path;
+       String pkg = "";
+       if (name.contains(".")) {
+       pkg = name.substring(0, name.lastIndexOf("."));
+       name = name.substring(name.lastIndexOf(".") + 1);
+       }
+
+       if ((!packageName.equals(pkg)) && (!fullyQualifiedNames.contains(name))) {
+       imports2.add(path);
+       }
+       }
+       imports = imports2;*/
 
       for (String imp : imports) {
          if (!imp.startsWith(".")) {

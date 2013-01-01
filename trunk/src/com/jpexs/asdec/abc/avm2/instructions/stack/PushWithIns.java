@@ -38,7 +38,7 @@ public class PushWithIns extends InstructionDefinition {
    @Override
    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       TreeItem w = (TreeItem) stack.pop();
-      WithObjectTreeItem wot = new WithObjectTreeItem(ins,w);
+      WithObjectTreeItem wot = new WithObjectTreeItem(ins, w);
       scopeStack.push(wot);
       output.add(new WithTreeItem(ins, w));
    }

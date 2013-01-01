@@ -955,8 +955,7 @@ public class AVM2Code {
                output.remove(i);
                i--;
             }
-         }else
-         if (output.get(i) instanceof WithTreeItem) {
+         } else if (output.get(i) instanceof WithTreeItem) {
             clearTemporaryRegisters(((WithTreeItem) output.get(i)).items);
          }
       }

@@ -24,7 +24,7 @@ import java.util.List;
 public class WithObjectTreeItem extends TreeItem {
 
    public TreeItem scope;
-   
+
    public WithObjectTreeItem(AVM2Instruction instruction, TreeItem scope) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.scope = scope;

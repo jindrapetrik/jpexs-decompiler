@@ -50,7 +50,8 @@ public abstract class Trait {
       Multiname m = getName(abc);
       if (m != null) {
          String nsname = "";
-         if (abc.constants.constant_namespace[m.namespace_index].kind == Namespace.KIND_NAMESPACE) {
+         //if (abc.constants.constant_namespace[m.namespace_index].kind == Namespace.KIND_NAMESPACE) {
+         {
             for (DoABCTag abcTag : abcTags) {
                nsname = abcTag.abc.nsValueToName(abc.constants.constant_namespace[m.namespace_index].getName(abc.constants));
                if (nsname.equals("-")) {
@@ -121,7 +122,7 @@ public abstract class Trait {
 
    protected String makePackageFromIndex(ABC abc, int name_index, String value) {
       Namespace ns = abc.constants.constant_multiname[name_index].getNamespace(abc.constants);
-      if (ns.kind == Namespace.KIND_PACKAGE) {
+      if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
          String nsname = ns.getName(abc.constants);
          return "package " + nsname + "\r\n{\r\n" + value + "\r\n}";
       }

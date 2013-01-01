@@ -38,7 +38,7 @@ public class LocalRegTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      if(computedValue instanceof FilterTreeItem){
+      if (computedValue instanceof FilterTreeItem) {
          return computedValue.toString(constants, localRegNames, fullyQualifiedNames);
       }
       return hilight(localRegName(localRegNames, regIndex));

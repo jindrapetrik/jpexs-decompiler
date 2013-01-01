@@ -17,7 +17,6 @@
 package com.jpexs.asdec.abc.avm2.instructions.stack;
 
 import com.jpexs.asdec.abc.ABC;
-import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
@@ -46,8 +45,8 @@ public class PopScopeIns extends InstructionDefinition {
    @Override
    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       TreeItem scope = (TreeItem) scopeStack.pop();
-      if(scope instanceof WithObjectTreeItem){
-         scope = ((WithObjectTreeItem)scope).scope;
+      if (scope instanceof WithObjectTreeItem) {
+         scope = ((WithObjectTreeItem) scope).scope;
       }
       for (int i = output.size() - 1; i >= 0; i--) {
          if (output.get(i) instanceof WithTreeItem) {
@@ -60,7 +59,7 @@ public class PopScopeIns extends InstructionDefinition {
                }
                while (output.size() > i + 1) {
                   output.remove(i + 1);
-               }               
+               }
                /*int count=output.size()-1-(i+1);
                 for(int c=0;c<count;c++){
                 output.remove(i+1);

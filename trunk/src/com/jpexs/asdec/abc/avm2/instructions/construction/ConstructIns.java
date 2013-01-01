@@ -55,21 +55,21 @@ public class ConstructIns extends InstructionDefinition {
       //push new instance
    }
 
-   private boolean walkXML(TreeItem item,List<TreeItem> list){
-      boolean ret=true;
-      if(item instanceof StringTreeItem){
+   private boolean walkXML(TreeItem item, List<TreeItem> list) {
+      boolean ret = true;
+      if (item instanceof StringTreeItem) {
          list.add(item);
-      }else if(item instanceof AddTreeItem){
-         ret=ret && walkXML(((AddTreeItem)item).leftSide,list);
-         ret=ret && walkXML(((AddTreeItem)item).rightSide,list);
-      }else if(item instanceof EscapeXElemTreeItem){
+      } else if (item instanceof AddTreeItem) {
+         ret = ret && walkXML(((AddTreeItem) item).leftSide, list);
+         ret = ret && walkXML(((AddTreeItem) item).rightSide, list);
+      } else if (item instanceof EscapeXElemTreeItem) {
          list.add(item);
-      }else{
+      } else {
          return false;
       }
-      return ret;  
+      return ret;
    }
-   
+
    @Override
    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       int argCount = ins.operands[0];
@@ -86,7 +86,7 @@ public class ConstructIns extends InstructionDefinition {
                if (args.size() == 1) {
                   TreeItem arg = args.get(0);
                   List<TreeItem> xmlLines = new ArrayList<TreeItem>();
-                  if (walkXML(arg,xmlLines)) {
+                  if (walkXML(arg, xmlLines)) {
                      stack.push(new XMLTreeItem(ins, xmlLines));
                      return;
                   }

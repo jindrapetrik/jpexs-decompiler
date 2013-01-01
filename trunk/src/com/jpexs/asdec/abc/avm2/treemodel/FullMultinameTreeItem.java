@@ -69,7 +69,7 @@ public class FullMultinameTreeItem extends TreeItem {
             cns = ns.getName(constants);
          }
       }
-      return cname.equals("XML")&&cns.equals("");
+      return cname.equals("XML") && cns.equals("");
    }
 
    @Override

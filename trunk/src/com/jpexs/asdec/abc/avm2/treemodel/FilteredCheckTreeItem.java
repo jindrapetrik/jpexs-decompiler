@@ -28,15 +28,14 @@ import java.util.List;
 public class FilteredCheckTreeItem extends TreeItem {
 
    TreeItem object;
-   
-   public FilteredCheckTreeItem(AVM2Instruction instruction,TreeItem object) {
+
+   public FilteredCheckTreeItem(AVM2Instruction instruction, TreeItem object) {
       super(instruction, NOPRECEDENCE);
-      this.object=object;
+      this.object = object;
    }
 
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       return object.toString(constants, localRegNames, fullyQualifiedNames);
    }
-   
 }

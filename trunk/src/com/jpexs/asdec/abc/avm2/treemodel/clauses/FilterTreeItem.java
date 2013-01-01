@@ -39,6 +39,6 @@ public class FilterTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return collection.toString(constants, localRegNames, fullyQualifiedNames)+hilight(".(") + expression.toString(constants, localRegNames, fullyQualifiedNames) + hilight(")");
+      return collection.toString(constants, localRegNames, fullyQualifiedNames) + hilight(".(") + expression.toString(constants, localRegNames, fullyQualifiedNames) + hilight(")");
    }
 }

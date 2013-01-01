@@ -83,7 +83,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
       getCaret().setVisible(true);
       int pos = getCaretPosition();
 
-
+      classIndex = -1;
       for (Highlighting cm : classHighlights) {
          if ((pos >= cm.startPos) && (pos < cm.startPos + cm.len)) {
             classIndex = (int) cm.offset;

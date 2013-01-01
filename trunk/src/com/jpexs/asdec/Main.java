@@ -149,7 +149,7 @@ public class Main {
       if (actionMainFrame != null) {
          actionMainFrame.setStatus(name);
       }
-      if(loadingDialog!=null){
+      if (loadingDialog != null) {
          loadingDialog.setDetail(name);
       }
       if (Main.isCommandLineMode()) {
@@ -165,7 +165,7 @@ public class Main {
       if (actionMainFrame != null) {
          actionMainFrame.setStatus("");
       }
-      if(loadingDialog!=null){
+      if (loadingDialog != null) {
          loadingDialog.setDetail("");
       }
    }

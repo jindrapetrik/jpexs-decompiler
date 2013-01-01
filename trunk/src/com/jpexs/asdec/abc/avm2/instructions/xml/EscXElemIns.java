@@ -23,7 +23,6 @@ import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.avm2.treemodel.EscapeXElemTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
-import com.jpexs.asdec.abc.avm2.treemodel.UnparsedTreeItem;
 import com.jpexs.asdec.abc.types.MethodInfo;
 import java.util.HashMap;
 import java.util.List;

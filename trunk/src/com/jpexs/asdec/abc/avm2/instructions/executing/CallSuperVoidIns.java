@@ -58,7 +58,7 @@ public class CallSuperVoidIns extends InstructionDefinition {
       int argCount = ins.operands[1];
       List<TreeItem> args = new ArrayList<TreeItem>();
       for (int a = 0; a < argCount; a++) {
-         args.add(0,(TreeItem) stack.pop());
+         args.add(0, (TreeItem) stack.pop());
       }
       FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
       TreeItem receiver = (TreeItem) stack.pop();

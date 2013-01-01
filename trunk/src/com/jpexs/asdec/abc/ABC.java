@@ -529,7 +529,7 @@ public class ABC {
          }
          String cnt = "";
          if (script_info.length > 1) {
-            cnt = "script " + (i + 1) + "/" + script_info.length+" ";
+            cnt = "script " + (i + 1) + "/" + script_info.length + " ";
          }
          String exStr = "Exporting " + abcStr + cnt + path + " ...";
          informListeners("export", exStr);
