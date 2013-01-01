@@ -23,9 +23,8 @@ import com.jpexs.asdec.abc.avm2.instructions.construction.NewFunctionIns;
 import com.jpexs.asdec.abc.avm2.instructions.other.FindPropertyIns;
 import com.jpexs.asdec.abc.avm2.instructions.other.FindPropertyStrictIns;
 import com.jpexs.asdec.abc.avm2.instructions.other.GetLexIns;
+import com.jpexs.asdec.abc.avm2.instructions.types.AsTypeIns;
 import com.jpexs.asdec.abc.avm2.instructions.types.CoerceIns;
-import com.jpexs.asdec.abc.avm2.treemodel.InitPropertyTreeItem;
-import com.jpexs.asdec.abc.avm2.treemodel.SetPropertyTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.ABCException;
 import com.jpexs.asdec.abc.types.MethodBody;
@@ -212,7 +211,8 @@ public class TraitClass extends Trait {
             if ((ins.definition instanceof FindPropertyStrictIns)
                     || (ins.definition instanceof FindPropertyIns)
                     || (ins.definition instanceof GetLexIns)
-                    || (ins.definition instanceof CoerceIns)) {
+                    || (ins.definition instanceof CoerceIns)
+                    || (ins.definition instanceof AsTypeIns)) {
                int m = ins.operands[0];
                if (m != 0) {
                   parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[m], ignorePackage, fullyQualifiedNames);
