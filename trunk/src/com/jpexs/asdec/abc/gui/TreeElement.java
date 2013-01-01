@@ -70,7 +70,7 @@ public class TreeElement {
    TreeElement getBranch(String pathElement) {
       TreeElement branch = branches.get(pathElement);
       if (branch == null) {
-         branch = new TreeElement(pathElement, path + "." + pathElement, -1, this);
+         branch = new TreeElement(pathElement, path + "." + pathElement, null, this);
          branches.put(pathElement, branch);
       }
       return branch;

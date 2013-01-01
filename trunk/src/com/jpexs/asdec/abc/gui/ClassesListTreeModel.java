@@ -16,6 +16,8 @@
  */
 package com.jpexs.asdec.abc.gui;
 
+import com.jpexs.asdec.abc.types.traits.Trait;
+import com.jpexs.asdec.abc.types.traits.TraitClass;
 import com.jpexs.asdec.tags.DoABCTag;
 import java.util.List;
 import javax.swing.event.TreeModelListener;
@@ -25,21 +27,41 @@ import javax.swing.tree.TreePath;
 class ClassIndexVisitor implements TreeVisitor {
 
    private TreeElement found = null;
-   private Object item;
+   private int classIndex=0;
 
-   public ClassIndexVisitor(Object item) {
-      this.item = item;
+   public ClassIndexVisitor(int classIndex) {
+      this.classIndex = classIndex;
    }
 
    public void onBranch(TreeElement branch) {
-      if (branch.getItem() == item) {
-         found = branch;
+      Object o=branch.getItem();
+      if(o==null){
+         return;
+      }
+      TreeLeafScript sc=(TreeLeafScript)o;
+      for(Trait t:sc.abc.script_info[sc.scriptIndex].traits.traits){
+         if(t instanceof TraitClass){
+            if(((TraitClass)t).class_info==classIndex){
+               found = branch;
+               return;
+            }
+         }
       }
    }
 
    public void onLeaf(TreeElement leaf) {
-      if (leaf.getItem() == item) {
-         found = leaf;
+      Object o=leaf.getItem();
+      if(o==null){
+         return;
+      }
+      TreeLeafScript sc=(TreeLeafScript)o;
+      for(Trait t:sc.abc.script_info[sc.scriptIndex].traits.traits){
+         if(t instanceof TraitClass){
+            if(((TraitClass)t).class_info==classIndex){
+               found = leaf;
+               return;
+            }
+         }
       }
    }
 
