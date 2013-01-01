@@ -43,6 +43,7 @@ public abstract class TreeItem {
    public static final int NOPRECEDENCE = 16;
    public int precedence = NOPRECEDENCE;
    public AVM2Instruction instruction;
+   public boolean hidden = false;
 
    public TreeItem(AVM2Instruction instruction, int precedence) {
       this.instruction = instruction;

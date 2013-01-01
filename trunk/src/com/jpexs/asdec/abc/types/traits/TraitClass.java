@@ -366,39 +366,12 @@ public class TraitClass extends Trait {
       String toPrint;
       List<String> outTraits = new LinkedList<String>();
 
-      //if (class_info[i].cinit_index != 0) {
-      if (ABC.AUTOINIT_STATIC_VARIABLES) {
-         int bodyIndex = abc.findBodyIndex(abc.class_info[class_info].cinit_index);
-         List<TreeItem> initializer = abc.bodies[bodyIndex].code.toTree(true, class_info, abc, abc.constants, abc.method_info, abc.bodies[bodyIndex], abc.bodies[bodyIndex].code.getLocalRegNamesFromDebug(abc), fullyQualifiedNames);
-         for (TreeItem ti : initializer) {
-            if (ti instanceof SetPropertyTreeItem) {
-               int multinameIndex = ((SetPropertyTreeItem) ti).propertyName.multinameIndex;
-               TreeItem value = ((SetPropertyTreeItem) ti).value;
-               for (Trait t : abc.class_info[class_info].static_traits.traits) {
-                  if (t.name_index == multinameIndex) {
-                     if (t instanceof TraitSlotConst) {
-                        ((TraitSlotConst) t).assignedValue = value;
-                     }
-                  }
-               }
-            }
-            if (ti instanceof InitPropertyTreeItem) {
-               int multinameIndex = ((InitPropertyTreeItem) ti).propertyName.multinameIndex;
-               TreeItem value = ((InitPropertyTreeItem) ti).value;
-               for (Trait t : abc.class_info[class_info].static_traits.traits) {
-                  if (t.name_index == multinameIndex) {
-                     if (t instanceof TraitSlotConst) {
-                        ((TraitSlotConst) t).assignedValue = value;
-                     }
-                  }
-               }
-            }
-         }
-      }
+
+      int bodyIndex;
       String bodyStr = "";
-      int bodyIndex = abc.findBodyIndex(abc.class_info[class_info].cinit_index);
+      bodyIndex = abc.findBodyIndex(abc.class_info[class_info].cinit_index);
       if (bodyIndex != -1) {
-         bodyStr = abc.bodies[bodyIndex].toString(pcode, true, class_info, abc, abc.constants, abc.method_info, new Stack<TreeItem>(), true, highlight, fullyQualifiedNames);
+         bodyStr = abc.bodies[bodyIndex].toString(pcode, true, class_info, abc, abc.constants, abc.method_info, new Stack<TreeItem>(), true, highlight, fullyQualifiedNames, abc.class_info[class_info].static_traits);
       }
       if (Highlighting.stripHilights(bodyStr).equals("")) {
          toPrint = ABC.addTabs(bodyStr, 3);
@@ -412,7 +385,6 @@ public class TraitClass extends Trait {
       //}
 
       //constructor
-      //if (instance_info[i].iinit_index != 0) {
       if (!abc.instance_info[class_info].isInterface()) {
          String modifier = "";
          Multiname m = abc.constants.constant_multiname[abc.instance_info[class_info].name_index];
@@ -433,7 +405,7 @@ public class TraitClass extends Trait {
          bodyStr = "";
          bodyIndex = abc.findBodyIndex(abc.instance_info[class_info].iinit_index);
          if (bodyIndex != -1) {
-            bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(pcode, false, class_info, abc, abc.constants, abc.method_info, new Stack<TreeItem>(), false, highlight, fullyQualifiedNames), 3);
+            bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(pcode, false, class_info, abc, abc.constants, abc.method_info, new Stack<TreeItem>(), false, highlight, fullyQualifiedNames, abc.instance_info[class_info].instance_traits), 3);
             constructorParams = abc.method_info[abc.instance_info[class_info].iinit_index].getParamStr(abc.constants, abc.bodies[bodyIndex], abc, fullyQualifiedNames);
          } else {
             constructorParams = abc.method_info[abc.instance_info[class_info].iinit_index].getParamStr(abc.constants, null, abc, fullyQualifiedNames);

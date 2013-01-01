@@ -44,7 +44,9 @@ import com.jpexs.asdec.abc.types.ABCException;
 import com.jpexs.asdec.abc.types.MethodBody;
 import com.jpexs.asdec.abc.types.MethodInfo;
 import com.jpexs.asdec.abc.types.Multiname;
+import com.jpexs.asdec.abc.types.traits.Trait;
 import com.jpexs.asdec.abc.types.traits.TraitSlotConst;
+import com.jpexs.asdec.abc.types.traits.Traits;
 import com.jpexs.asdec.helpers.Helper;
 import com.jpexs.asdec.helpers.Highlighting;
 import java.io.*;
@@ -1662,8 +1664,8 @@ public class AVM2Code {
       return ret;
    }
 
-   public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames, Stack<TreeItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames) {
-      return toSource(isStatic, classIndex, abc, constants, method_info, body, false, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames);
+   public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames, Stack<TreeItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits) {
+      return toSource(isStatic, classIndex, abc, constants, method_info, body, false, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
    }
 
    public List<TreeItem> toTree(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
@@ -1672,6 +1674,7 @@ public class AVM2Code {
       unknownJumps = new ArrayList<Integer>();
       parsedExceptions = new ArrayList<ABCException>();
       finallyJumps = new ArrayList<Integer>();
+      ignoredIns = new ArrayList<Integer>();
       HashMap<Integer, TreeItem> localRegs = new HashMap<Integer, TreeItem>();
       try {
          return toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), new Stack<TreeItem>(), abc, constants, method_info, body, 0, code.size() - 1, localRegNames, fullyQualifiedNames).output;
@@ -1741,7 +1744,7 @@ public class AVM2Code {
       }
    }
 
-   public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted, HashMap<Integer, String> localRegNames, Stack<TreeItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames) {
+   public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted, HashMap<Integer, String> localRegNames, Stack<TreeItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits) {
       toSourceCount = 0;
       loopList = new ArrayList<Loop>();
       unknownJumps = new ArrayList<Integer>();
@@ -1764,8 +1767,31 @@ public class AVM2Code {
 
       try {
          list = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, 0, code.size() - 1, localRegNames, fullyQualifiedNames).output;
+         if (initTraits != null) {
+            for (int i = 0; i < list.size(); i++) {
+               TreeItem ti = list.get(i);
+               if (ti instanceof InitPropertyTreeItem) {
+                  int multinameIndex = ((InitPropertyTreeItem) ti).propertyName.multinameIndex;
+                  TreeItem value = ((InitPropertyTreeItem) ti).value;
+                  for (Trait t : initTraits.traits) {
+                     if (t.name_index == multinameIndex) {
+                        if ((t instanceof TraitSlotConst)) {
+                           if (((TraitSlotConst) t).isConst() || isStaticInitializer) {
+                              ((TraitSlotConst) t).assignedValue = value;
+                              list.remove(i);
+                              i--;
+                              continue;
+                           }
+                           break;
+                        }
+                     }
+                  }
+               } else {
+                  break;
+               }
+            }
+         }
          if (isStaticInitializer) {
-
             List<TreeItem> newList = new ArrayList<TreeItem>();
             for (TreeItem ti : list) {
                if (!(ti instanceof ReturnVoidTreeItem)) {

@@ -50,7 +50,7 @@ public class TraitFunction extends Trait {
       String bodyStr = "";
       int bodyIndex = abc.findBodyIndex(method_info);
       if (bodyIndex != -1) {
-         bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(pcode, isStatic, classIndex, abc, abc.constants, abc.method_info, new Stack<TreeItem>(), false, highlight, fullyQualifiedNames), 3);
+         bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(pcode, isStatic, classIndex, abc, abc.constants, abc.method_info, new Stack<TreeItem>(), false, highlight, fullyQualifiedNames, null), 3);
       }
       return ABC.IDENT_STRING + ABC.IDENT_STRING + header + (abc.instance_info[classIndex].isInterface() ? ";" : " {\r\n" + bodyStr + "\r\n" + ABC.IDENT_STRING + ABC.IDENT_STRING + "}");
 

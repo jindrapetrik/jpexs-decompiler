@@ -27,21 +27,21 @@ import javax.swing.tree.TreePath;
 class ClassIndexVisitor implements TreeVisitor {
 
    private TreeElement found = null;
-   private int classIndex=0;
+   private int classIndex = 0;
 
    public ClassIndexVisitor(int classIndex) {
       this.classIndex = classIndex;
    }
 
    public void onBranch(TreeElement branch) {
-      Object o=branch.getItem();
-      if(o==null){
+      Object o = branch.getItem();
+      if (o == null) {
          return;
       }
-      TreeLeafScript sc=(TreeLeafScript)o;
-      for(Trait t:sc.abc.script_info[sc.scriptIndex].traits.traits){
-         if(t instanceof TraitClass){
-            if(((TraitClass)t).class_info==classIndex){
+      TreeLeafScript sc = (TreeLeafScript) o;
+      for (Trait t : sc.abc.script_info[sc.scriptIndex].traits.traits) {
+         if (t instanceof TraitClass) {
+            if (((TraitClass) t).class_info == classIndex) {
                found = branch;
                return;
             }
@@ -50,14 +50,14 @@ class ClassIndexVisitor implements TreeVisitor {
    }
 
    public void onLeaf(TreeElement leaf) {
-      Object o=leaf.getItem();
-      if(o==null){
+      Object o = leaf.getItem();
+      if (o == null) {
          return;
       }
-      TreeLeafScript sc=(TreeLeafScript)o;
-      for(Trait t:sc.abc.script_info[sc.scriptIndex].traits.traits){
-         if(t instanceof TraitClass){
-            if(((TraitClass)t).class_info==classIndex){
+      TreeLeafScript sc = (TreeLeafScript) o;
+      for (Trait t : sc.abc.script_info[sc.scriptIndex].traits.traits) {
+         if (t instanceof TraitClass) {
+            if (((TraitClass) t).class_info == classIndex) {
                found = leaf;
                return;
             }

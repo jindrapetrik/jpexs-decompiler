@@ -52,7 +52,6 @@ public class ABC {
    public long stringOffsets[];
    public static String IDENT_STRING = "   ";
    public static final int MINORwithDECIMAL = 17;
-   public static final boolean AUTOINIT_STATIC_VARIABLES = false;
    protected HashSet<EventListener> listeners = new HashSet<EventListener>();
    private static Logger logger = Logger.getLogger(ABC.class.getName());
 
