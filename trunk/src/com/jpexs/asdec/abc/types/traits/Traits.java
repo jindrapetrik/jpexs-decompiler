@@ -68,7 +68,7 @@ public class Traits {
                }
             }
             if (traits[t] instanceof TraitClass) {
-               plus = Highlighting.hilighClass(plus, h);
+               plus = Highlighting.hilighClass(plus, ((TraitClass)traits[t]).class_info);
             } else {
                plus = Highlighting.hilighTrait(plus, h);
             }
