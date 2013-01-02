@@ -511,7 +511,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
                   try {
                      if (onlySel) {
                         List<TreeLeafScript> tlsList = classTree.getSelectedScripts();
-                        if(tlsList.isEmpty()){
+                        if (tlsList.isEmpty()) {
                            JOptionPane.showMessageDialog(null, "No script selected!");
                         }
                         for (int i = 0; i < tlsList.size(); i++) {
@@ -539,14 +539,16 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
          }
       }
       if (e.getActionCommand().equals("RENAMEIDENTIFIERS")) {
-         int pocet = 0;
-         Main.startWork("Renaming identifiers...");
-         for (DoABCTag tag : list) {
-            pocet += tag.abc.deobfuscateIdentifiers();
+         if (JOptionPane.showConfirmDialog(null, "Following procedure can damage SWF file which can be then unplayable.\r\nUSE IT ON YOUR OWN RISK. Do you want to continue?", "Warning", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
+            int pocet = 0;
+            Main.startWork("Renaming identifiers...");
+            for (DoABCTag tag : list) {
+               pocet += tag.abc.deobfuscateIdentifiers();
+            }
+            JOptionPane.showMessageDialog(null, "Identifiers renamed: " + pocet);
+            reload();
+            Main.stopWork();
          }
-         JOptionPane.showMessageDialog(null, "Identifiers renamed: " + pocet);
-         reload();
-         Main.stopWork();
       }
 
    }
