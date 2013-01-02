@@ -1522,7 +1522,7 @@ public class AVM2Code {
                   } else if (insAfter.definition instanceof SetLocalTypeIns) {
                      //chained assignments
                      int reg = (((SetLocalTypeIns) insAfter.definition).getRegisterId(insAfter));
-                     for (int t = ip + 1; t < end - 1; t++) {
+                     for (int t = ip + 1; t <= end - 1; t++) {
                         if (code.get(t).definition instanceof KillIns) {
                            if (code.get(t).operands[0] == reg) {
                               break;
