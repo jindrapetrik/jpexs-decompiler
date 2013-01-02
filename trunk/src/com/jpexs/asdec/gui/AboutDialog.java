@@ -76,7 +76,7 @@ public class AboutDialog extends JDialog {
       jpexsLabel.setHorizontalAlignment(SwingConstants.CENTER);
       cp.add(jpexsLabel);
 
-      JLabel dateLabel = new JLabel("2010-2012");
+      JLabel dateLabel = new JLabel("2010-2013");
       dateLabel.setPreferredSize(new Dimension(300, 10));
       dateLabel.setHorizontalAlignment(SwingConstants.CENTER);
       cp.add(dateLabel);

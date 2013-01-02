@@ -66,7 +66,7 @@ public class Main {
    public static String file;
    public static String maskURL;
    public static SWF swf;
-   public static final String version = "1.0.1";
+   public static final String version = "1.1.0";
    public static final String applicationName = "JP ActionScript Decompiler v." + version;
    public static final String shortApplicationName = "ASDec";
    public static final String shortApplicationVerName = shortApplicationName + " v." + version;
