@@ -16,11 +16,20 @@
  */
 package com.jpexs.asdec.abc.avm2.instructions.xml;
 
+import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
+import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.asdec.abc.avm2.treemodel.DefaultXMLNamespace;
+import com.jpexs.asdec.abc.avm2.treemodel.StringTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
+import com.jpexs.asdec.abc.types.MethodBody;
+import com.jpexs.asdec.abc.types.MethodInfo;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
 public class DXNSIns extends InstructionDefinition {
 
@@ -34,5 +43,10 @@ public class DXNSIns extends InstructionDefinition {
       String s = constants.constant_string[strIndex];
       System.out.println("Set default XML space " + s);
 
+   }
+
+   @Override
+   public void translate(boolean isStatic, int classIndex, HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+      output.add(new DefaultXMLNamespace(ins, new StringTreeItem(ins, constants.constant_string[ins.operands[0]])));
    }
 }

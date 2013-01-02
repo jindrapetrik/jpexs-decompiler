@@ -21,6 +21,8 @@ import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.asdec.abc.avm2.treemodel.DefaultXMLNamespace;
+import com.jpexs.asdec.abc.avm2.treemodel.StringTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.UnparsedTreeItem;
 import com.jpexs.asdec.abc.types.MethodInfo;
@@ -43,7 +45,8 @@ public class DXNSLateIns extends InstructionDefinition {
    @Override
    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.asdec.abc.types.MethodBody body, com.jpexs.asdec.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       TreeItem xmlns = stack.pop();
-      stack.push(new UnparsedTreeItem(ins, "XMLNS:" + xmlns.toString(constants, localRegNames, fullyQualifiedNames)));
+      output.add(new DefaultXMLNamespace(ins, xmlns));
+
    }
 
    @Override
