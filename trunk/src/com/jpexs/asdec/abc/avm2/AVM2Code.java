@@ -1542,9 +1542,15 @@ public class AVM2Code {
                         }
                      }
                      if (!isKilled(reg, 0, end)) {
-                        TreeItem v = (TreeItem) stack.pop();
-                        stack.push(new LocalRegTreeItem(ins, reg, v));
-                        stack.push(v);
+                        for (int i = ip; i >= start; i--) {
+                           if (code.get(i).definition instanceof DupIns) {
+                              TreeItem v = (TreeItem) stack.pop();
+                              stack.push(new LocalRegTreeItem(ins, reg, v));
+                              stack.push(v);
+                           } else {
+                              break;
+                           }
+                        }
                      } else {
                         ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
                      }
