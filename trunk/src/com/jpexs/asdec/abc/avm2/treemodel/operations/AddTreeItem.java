@@ -18,6 +18,7 @@ package com.jpexs.asdec.abc.avm2.treemodel.operations;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.asdec.abc.avm2.treemodel.DecrementTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +31,7 @@ public class AddTreeItem extends BinaryOpTreeItem {
    
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      if(rightSide instanceof SubtractTreeItem){ //Subtract must use parentheses because + can concatenate strings
+      if(rightSide.precedence>=precedence){
          String ret = "";
          if (leftSide.precedence > precedence) {
             ret += "(" + leftSide.toString(constants, localRegNames, fullyQualifiedNames) + ")";
