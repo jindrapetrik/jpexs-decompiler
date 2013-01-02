@@ -36,7 +36,7 @@ public class DetailPanel extends JPanel implements ActionListener {
    public JPanel unsupportedTraitPanel;
    public SlotConstTraitDetailPanel slotConstTraitPanel;
    public static final String METHOD_TRAIT_CARD = "Method/Getter/Setter Trait";
-   public static final String UNSUPPORTED_TRAIT_CARD = "Unsupported Trait Type";
+   public static final String UNSUPPORTED_TRAIT_CARD = "-";
    public static final String SLOT_CONST_TRAIT_CARD = "Slot/Const Trait";
    private JPanel innerPanel;
    public JButton saveButton;
@@ -52,7 +52,7 @@ public class DetailPanel extends JPanel implements ActionListener {
       cardMap.put(METHOD_TRAIT_CARD, methodTraitPanel);
 
       unsupportedTraitPanel = new JPanel(new BorderLayout());
-      JLabel unsup = new JLabel("Editing of this trait type is currently unsupported", SwingConstants.CENTER);
+      JLabel unsup = new JLabel("Select class and click a trait in Actionscript source to edit it.", SwingConstants.CENTER);
       unsupportedTraitPanel.add(unsup, BorderLayout.CENTER);
 
       cardMap.put(UNSUPPORTED_TRAIT_CARD, unsupportedTraitPanel);

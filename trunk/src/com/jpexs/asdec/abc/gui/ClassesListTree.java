@@ -57,6 +57,7 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
       setModel(new ClassesListTreeModel(list));
    }
 
+   @Override
    public void valueChanged(TreeSelectionEvent e) {
       if (Main.isWorking()) {
          return;
@@ -83,8 +84,9 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
                   }
                   Main.abcMainFrame.navigator.setABC(abcList, scriptLeaf.abc);
                   Main.abcMainFrame.navigator.setClassIndex(classIndex);
-                  Main.abcMainFrame.setAbc(scriptLeaf.abc);
+                  Main.abcMainFrame.setAbc(scriptLeaf.abc);                
                   Main.abcMainFrame.decompiledTextArea.setScript(scriptLeaf.abc.script_info[scriptLeaf.scriptIndex], scriptLeaf.abc, abcList);
+                  Main.abcMainFrame.decompiledTextArea.setClassIndex(classIndex);
                   Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.setText("");
                   Main.stopWork();
                }

@@ -46,6 +46,12 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
       Main.abcMainFrame.detailPanel.showCard(DetailPanel.UNSUPPORTED_TRAIT_CARD);
    }
 
+   public void setClassIndex(int classIndex) {
+      this.classIndex = classIndex;
+   }
+   
+   
+
    private boolean displayMethod(int pos, int methodIndex) {
       int bi = abc.findBodyIndex(methodIndex);
       if (bi == -1) {
