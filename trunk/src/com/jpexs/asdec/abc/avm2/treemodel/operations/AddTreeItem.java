@@ -16,12 +16,32 @@
  */
 package com.jpexs.asdec.abc.avm2.treemodel.operations;
 
+import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
+import java.util.HashMap;
+import java.util.List;
 
 public class AddTreeItem extends BinaryOpTreeItem {
 
    public AddTreeItem(AVM2Instruction instruction, TreeItem leftSide, TreeItem rightSide) {
       super(instruction, PRECEDENCE_ADDITIVE, leftSide, rightSide, "+");
+   }
+   
+   @Override
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+      if(rightSide instanceof SubtractTreeItem){ //Subtract must use parentheses because + can concatenate strings
+         String ret = "";
+         if (leftSide.precedence > precedence) {
+            ret += "(" + leftSide.toString(constants, localRegNames, fullyQualifiedNames) + ")";
+         } else {
+            ret += leftSide.toString(constants, localRegNames, fullyQualifiedNames);
+         }
+         ret += hilight(operator);
+         ret += "(" + rightSide.toString(constants, localRegNames, fullyQualifiedNames) + ")";
+         return ret;
+      }else{
+         return super.toString(constants, localRegNames, fullyQualifiedNames);
+      }
    }
 }
