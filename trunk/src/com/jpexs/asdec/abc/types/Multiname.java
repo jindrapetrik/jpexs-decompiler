@@ -181,7 +181,9 @@ public class Multiname {
             if (i > 0) {
                typeNameStr += ",";
             }
-            if (params.get(i) != 0) { //What does value 0 mean?
+            if (params.get(i) == 0) {
+               typeNameStr += "*";
+            }else{
                typeNameStr += constants.constant_multiname[params.get(i)].getName(constants, fullyQualifiedNames);
             }
          }

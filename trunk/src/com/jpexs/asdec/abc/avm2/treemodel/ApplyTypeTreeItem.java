@@ -41,7 +41,12 @@ public class ApplyTypeTreeItem extends TreeItem {
             if (i > 0) {
                ret += hilight(",");
             }
-            ret += params.get(i).toString(constants, localRegNames, fullyQualifiedNames);
+            TreeItem p = params.get(i);
+            if (p instanceof NullTreeItem) {
+               ret += "*";
+            } else {
+               ret += p.toString(constants, localRegNames, fullyQualifiedNames);
+            }
          }
          ret += hilight(">");
       }

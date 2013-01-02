@@ -49,9 +49,8 @@ public class ApplyTypeIns extends InstructionDefinition {
       int argCount = ins.operands[0];
       List<TreeItem> params = new ArrayList<TreeItem>();
       for (int i = 0; i < argCount; i++) {
-         params.add(stack.pop());
+         params.add(0,stack.pop());
       }
-      Collections.reverse(params);
       stack.push(new ApplyTypeTreeItem(ins, stack.pop(), params));
    }
 
