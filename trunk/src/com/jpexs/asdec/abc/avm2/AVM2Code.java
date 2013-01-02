@@ -978,7 +978,7 @@ public class AVM2Code {
    }
 
    private ConvertOutput toSource(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) throws ConvertException {
-      boolean debugMode = false;
+      boolean debugMode = DEBUG_MODE;
       if (debugMode) {
          System.out.println("OPEN SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
       }
@@ -1599,6 +1599,10 @@ public class AVM2Code {
 
                      for (Loop l : loopList) {
                         if (l.loopBreak == jumpPos) {
+                           hasElse = false;
+                           break;
+                        }
+                        if (l.loopContinue == jumpPos) {
                            hasElse = false;
                            break;
                         }
