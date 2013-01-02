@@ -37,6 +37,8 @@ import javax.swing.border.BevelBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.*;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 import jsyntaxpane.DefaultSyntaxKit;
 
 public class MainFrame extends JFrame implements ActionListener, ItemListener {
@@ -254,7 +256,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
       searchPanel.add(filterField, BorderLayout.CENTER);
       JLabel picLabel = new JLabel(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/search.png")));
       searchPanel.add(picLabel, BorderLayout.EAST);
-      treePanel.add(searchPanel, BorderLayout.SOUTH);
+      treePanel.add(searchPanel, BorderLayout.NORTH);
 
       splitPane2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
               treePanel,
@@ -314,20 +316,41 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
       miSaveAs.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/save16.png")));
       miSaveAs.setActionCommand("SAVEAS");
       miSaveAs.addActionListener(this);
-      JMenuItem miExport = new JMenuItem("Export as ActionScript...");
-      miExport.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/exportas16.png")));
-      miExport.setActionCommand("EXPORT");
-      miExport.addActionListener(this);
+      JMenu menuExportAll = new JMenu("Export all");
+      JMenuItem miExportAllAS = new JMenuItem("ActionScript...");
+      miExportAllAS.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/exportas16.png")));
+      miExportAllAS.setActionCommand("EXPORT");
+      miExportAllAS.addActionListener(this);
 
-      JMenuItem miExportPCode = new JMenuItem("Export as PCode...");
-      miExportPCode.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/exportpc16.png")));
-      miExportPCode.setActionCommand("EXPORTPCODE");
-      miExportPCode.addActionListener(this);
+      JMenuItem miExportAllPCode = new JMenuItem("PCode...");
+      miExportAllPCode.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/exportpc16.png")));
+      miExportAllPCode.setActionCommand("EXPORTPCODE");
+      miExportAllPCode.addActionListener(this);
+
+      menuExportAll.add(miExportAllAS);
+      menuExportAll.add(miExportAllPCode);
+
+
+      JMenu menuExportSel = new JMenu("Export selection");
+      JMenuItem miExportSelAS = new JMenuItem("ActionScript...");
+      miExportSelAS.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/exportas16.png")));
+      miExportSelAS.setActionCommand("EXPORTSEL");
+      miExportSelAS.addActionListener(this);
+
+      JMenuItem miExportSelPCode = new JMenuItem("PCode...");
+      miExportSelPCode.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/exportpc16.png")));
+      miExportSelPCode.setActionCommand("EXPORTPCODESEL");
+      miExportSelPCode.addActionListener(this);
+
+      menuExportSel.add(miExportSelAS);
+      menuExportSel.add(miExportSelPCode);
+
+
       menuFile.add(miOpen);
       menuFile.add(miSave);
       menuFile.add(miSaveAs);
-      menuFile.add(miExport);
-      menuFile.add(miExportPCode);
+      menuFile.add(menuExportAll);
+      menuFile.add(menuExportSel);
       menuFile.addSeparator();
       JMenuItem miClose = new JMenuItem("Exit");
       miClose.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/exit16.png")));
@@ -470,7 +493,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
 
       }
 
-      if (e.getActionCommand().equals("EXPORT") || e.getActionCommand().equals("EXPORTPCODE")) {
+      if (e.getActionCommand().startsWith("EXPORT")) {
          JFileChooser chooser = new JFileChooser();
          chooser.setCurrentDirectory(new java.io.File((String) Configuration.getConfig("lastExportDir", ".")));
          chooser.setDialogTitle("Select directory to export");
@@ -480,12 +503,25 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
             Main.startWork("Exporting...");
             final String selFile = chooser.getSelectedFile().getAbsolutePath();
             Configuration.setConfig("lastExportDir", chooser.getSelectedFile().getParentFile().getAbsolutePath());
-            final boolean isPcode = e.getActionCommand().equals("EXPORTPCODE");
+            final boolean isPcode = e.getActionCommand().startsWith("EXPORTPCODE");
+            final boolean onlySel = e.getActionCommand().endsWith("SEL");
             (new Thread() {
                @Override
                public void run() {
                   try {
-                     Main.swf.exportActionScript(selFile, isPcode);
+                     if (onlySel) {
+                        List<TreeLeafScript> tlsList = classTree.getSelectedScripts();
+                        if(tlsList.isEmpty()){
+                           JOptionPane.showMessageDialog(null, "No script selected!");
+                        }
+                        for (int i = 0; i < tlsList.size(); i++) {
+                           TreeLeafScript tls = tlsList.get(i);
+                           Main.startWork("Exporting " + (i + 1) + "/" + tlsList.size() + " " + tls.abc.script_info[tls.scriptIndex].getPath(tls.abc) + " ...");
+                           tls.abc.script_info[tls.scriptIndex].export(tls.abc, list, selFile, isPcode);
+                        }
+                     } else {
+                        Main.swf.exportActionScript(selFile, isPcode);
+                     }
                   } catch (Exception ignored) {
                      JOptionPane.showMessageDialog(null, "Cannot write to the file");
                   }

@@ -20,7 +20,7 @@ import java.util.StringTokenizer;
 
 public class Tree {
 
-   private final TreeElement ROOT = new TreeElement("", "", -1, null);
+   private final TreeElement ROOT = new TreeElement("", "", null, null);
 
    public void add(String name, String path, Object item) {
       StringTokenizer st = new StringTokenizer(path, ".");

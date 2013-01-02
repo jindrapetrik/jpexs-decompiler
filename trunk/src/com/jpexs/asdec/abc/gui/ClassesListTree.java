@@ -20,6 +20,7 @@ import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.types.traits.Trait;
 import com.jpexs.asdec.abc.types.traits.TraitClass;
 import com.jpexs.asdec.tags.DoABCTag;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.ImageIcon;
@@ -28,6 +29,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 public class ClassesListTree extends JTree implements TreeSelectionListener {
 
@@ -53,6 +55,41 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
       ImageIcon leafIcon = new ImageIcon(imageURL);
       treeRenderer.setLeafIcon(leafIcon);
       setCellRenderer(treeRenderer);
+   }
+
+   public List<TreeLeafScript> getSelectedScripts() {
+      TreeSelectionModel tsm = getSelectionModel();
+      final List<TreeLeafScript> selectedScripts = new ArrayList<TreeLeafScript>();
+      TreePath tps[] = tsm.getSelectionPaths();
+      if (tps == null) {
+         return selectedScripts;
+      }
+      for (TreePath tp : tps) {
+         TreeElement te = (TreeElement) tp.getLastPathComponent();
+         if (te.isLeaf()) {
+            Object item = te.getItem();
+            if (item instanceof TreeLeafScript) {
+               selectedScripts.add((TreeLeafScript) item);
+            }
+         } else {
+            TreeVisitor tvi = new TreeVisitor() {
+               @Override
+               public void onBranch(TreeElement branch) {
+               }
+
+               @Override
+               public void onLeaf(TreeElement leaf) {
+                  Object item = leaf.getItem();
+                  if (item instanceof TreeLeafScript) {
+                     selectedScripts.add((TreeLeafScript) item);
+                  }
+               }
+            };
+            te.visitBranches(tvi);
+            te.visitLeafs(tvi);
+         }
+      }
+      return selectedScripts;
    }
 
    public HashMap<String, TreeLeafScript> getTreeList(List<DoABCTag> list) {

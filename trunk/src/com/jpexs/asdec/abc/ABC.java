@@ -522,7 +522,6 @@ public class ABC {
       for (int i = 0; i < script_info.length; i++) {
          String path = script_info[i].getPath(this);
          String packageName = path.substring(0, path.lastIndexOf("."));
-         String className = path.substring(path.lastIndexOf(".") + 1);
          if (packageName.equals("")) {
             path = path.substring(1);
          }
@@ -532,15 +531,7 @@ public class ABC {
          }
          String exStr = "Exporting " + abcStr + cnt + path + " ...";
          informListeners("export", exStr);
-         logger.info(exStr);
-         File outDir = new File(directory + File.separatorChar + packageName.replace('.', File.separatorChar));
-         if (!outDir.exists()) {
-            outDir.mkdirs();
-         }
-         String fileName = outDir.toString() + File.separator + className + ".as";
-         FileOutputStream fos = new FileOutputStream(fileName);
-         fos.write(script_info[i].convert(abcList, this, pcode, false).getBytes());
-         fos.close();
+         script_info[i].export(this, abcList, directory, pcode);
       }
    }
 

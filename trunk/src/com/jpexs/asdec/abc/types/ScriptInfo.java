@@ -20,6 +20,9 @@ import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.types.traits.Trait;
 import com.jpexs.asdec.abc.types.traits.Traits;
 import com.jpexs.asdec.tags.DoABCTag;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,5 +53,20 @@ public class ScriptInfo {
 
    public String convert(List<DoABCTag> abcTags, ABC abc, boolean pcode, boolean highlighting) {
       return traits.convert(abcTags, abc, false, pcode, true, -1, highlighting, new ArrayList<String>());
+   }
+
+   public void export(ABC abc, List<DoABCTag> abcList, String directory, boolean pcode) throws IOException {
+      String path = getPath(abc);
+      String packageName = path.substring(0, path.lastIndexOf("."));
+      String className = path.substring(path.lastIndexOf(".") + 1);
+      File outDir = new File(directory + File.separatorChar + packageName.replace('.', File.separatorChar));
+      if (!outDir.exists()) {
+         outDir.mkdirs();
+      }
+      String fileName = outDir.toString() + File.separator + className + ".as";
+      FileOutputStream fos = new FileOutputStream(fileName);
+      fos.write(convert(abcList, abc, pcode, false).getBytes());
+      fos.close();
+
    }
 }
