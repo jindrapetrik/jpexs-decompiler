@@ -183,7 +183,7 @@ public class Multiname {
             }
             if (params.get(i) == 0) {
                typeNameStr += "*";
-            }else{
+            } else {
                typeNameStr += constants.constant_multiname[params.get(i)].getName(constants, fullyQualifiedNames);
             }
          }

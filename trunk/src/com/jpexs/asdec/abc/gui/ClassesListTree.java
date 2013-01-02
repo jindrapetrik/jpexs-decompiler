@@ -20,6 +20,7 @@ import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.types.traits.Trait;
 import com.jpexs.asdec.abc.types.traits.TraitClass;
 import com.jpexs.asdec.tags.DoABCTag;
+import java.util.HashMap;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JTree;
@@ -31,6 +32,7 @@ import javax.swing.tree.TreePath;
 public class ClassesListTree extends JTree implements TreeSelectionListener {
 
    private List<DoABCTag> abcList;
+   private HashMap<String, TreeLeafScript> treeList;
 
    public void selectClass(int classIndex) {
       ClassesListTreeModel model = (ClassesListTreeModel) getModel();
@@ -42,7 +44,8 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
 
    public ClassesListTree(List<DoABCTag> list) {
       this.abcList = list;
-      setModel(new ClassesListTreeModel(list));
+      this.treeList = getTreeList(list);
+      setModel(new ClassesListTreeModel(this.treeList));
       addTreeSelectionListener(this);
       DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
       ClassLoader cldr = this.getClass().getClassLoader();
@@ -52,9 +55,25 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
       setCellRenderer(treeRenderer);
    }
 
+   public HashMap<String, TreeLeafScript> getTreeList(List<DoABCTag> list) {
+      HashMap<String, TreeLeafScript> ret = new HashMap<String, TreeLeafScript>();
+      for (DoABCTag tag : list) {
+         for (int i = 0; i < tag.abc.script_info.length; i++) {
+            String path = tag.abc.script_info[i].getPath(tag.abc);
+            ret.put(path, new TreeLeafScript(tag.abc, i));
+         }
+      }
+      return ret;
+   }
+
    public void setDoABCTags(List<DoABCTag> list) {
       this.abcList = list;
-      setModel(new ClassesListTreeModel(list));
+      this.treeList = getTreeList(list);
+      setModel(new ClassesListTreeModel(this.treeList));
+   }
+
+   public void applyFilter(String filter) {
+      setModel(new ClassesListTreeModel(this.treeList, filter));
    }
 
    @Override
@@ -84,7 +103,7 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
                   }
                   Main.abcMainFrame.navigator.setABC(abcList, scriptLeaf.abc);
                   Main.abcMainFrame.navigator.setClassIndex(classIndex);
-                  Main.abcMainFrame.setAbc(scriptLeaf.abc);                
+                  Main.abcMainFrame.setAbc(scriptLeaf.abc);
                   Main.abcMainFrame.decompiledTextArea.setScript(scriptLeaf.abc.script_info[scriptLeaf.scriptIndex], scriptLeaf.abc, abcList);
                   Main.abcMainFrame.decompiledTextArea.setClassIndex(classIndex);
                   Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.setText("");

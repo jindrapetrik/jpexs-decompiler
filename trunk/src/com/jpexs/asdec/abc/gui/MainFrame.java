@@ -34,6 +34,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.*;
 import jsyntaxpane.DefaultSyntaxKit;
 
@@ -60,6 +62,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
    public JLabel asmLabel = new JLabel("P-code source (editable)");
    public JLabel decLabel = new JLabel("ActionScript source");
    public DetailPanel detailPanel;
+   public JTextField filterField = new JTextField("");
 
    public void setStatus(String s) {
       if (s.equals("")) {
@@ -217,8 +220,44 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
       navPanel.add(new JScrollPane(navigator), BorderLayout.CENTER);
 
       Main.startWork("Building script tree...");
+
+      filterField.setActionCommand("FILTERSCRIPT");
+      filterField.addActionListener(this);
+
+
+      filterField.getDocument().addDocumentListener(new DocumentListener() {
+         @Override
+         public void changedUpdate(DocumentEvent e) {
+            warn();
+         }
+
+         @Override
+         public void removeUpdate(DocumentEvent e) {
+            warn();
+         }
+
+         @Override
+         public void insertUpdate(DocumentEvent e) {
+            warn();
+         }
+
+         public void warn() {
+            doFilter();
+         }
+      });
+
+      JPanel treePanel = new JPanel();
+      treePanel.setLayout(new BorderLayout());
+      treePanel.add(new JScrollPane(classTree = new ClassesListTree(list)), BorderLayout.CENTER);
+      JPanel searchPanel = new JPanel();
+      searchPanel.setLayout(new BorderLayout());
+      searchPanel.add(filterField, BorderLayout.CENTER);
+      JLabel picLabel = new JLabel(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/search.png")));
+      searchPanel.add(picLabel, BorderLayout.EAST);
+      treePanel.add(searchPanel, BorderLayout.SOUTH);
+
       splitPane2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-              new JScrollPane(classTree = new ClassesListTree(list)),
+              treePanel,
               navPanel);
       Main.startWork("Creating window...");
       JTabbedPane tabbedPane = new JTabbedPane();
@@ -374,7 +413,16 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener {
 
    }
 
+   private void doFilter() {
+      classTree.applyFilter(filterField.getText());
+   }
+
    public void actionPerformed(ActionEvent e) {
+
+      if (e.getActionCommand().equals("FILTERSCRIPT")) {
+         doFilter();
+      }
+
       if (e.getActionCommand().equals("EXIT")) {
          setVisible(false);
          if (Main.proxyFrame != null) {

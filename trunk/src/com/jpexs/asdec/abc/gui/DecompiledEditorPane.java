@@ -49,8 +49,6 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
    public void setClassIndex(int classIndex) {
       this.classIndex = classIndex;
    }
-   
-   
 
    private boolean displayMethod(int pos, int methodIndex) {
       int bi = abc.findBodyIndex(methodIndex);

@@ -18,8 +18,7 @@ package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.abc.types.traits.Trait;
 import com.jpexs.asdec.abc.types.traits.TraitClass;
-import com.jpexs.asdec.tags.DoABCTag;
-import java.util.List;
+import java.util.HashMap;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -73,18 +72,25 @@ class ClassIndexVisitor implements TreeVisitor {
 public class ClassesListTreeModel implements TreeModel {
 
    private Tree classTree = new Tree();
-   private List<DoABCTag> list;
 
-   public ClassesListTreeModel(List<DoABCTag> list) {
-      this.list = list;
-      for (DoABCTag tag : list) {
-         for (int i = 0; i < tag.abc.script_info.length; i++) {
-            String path = tag.abc.script_info[i].getPath(tag.abc);
-            String nsName = path.substring(path.lastIndexOf(".") + 1);
-            String packageName = path.substring(0, path.lastIndexOf("."));
-            classTree.add(nsName, packageName, new TreeLeafScript(tag.abc, i));
+   public ClassesListTreeModel(HashMap<String, TreeLeafScript> list) {
+      this(list, null);
+   }
+
+   public ClassesListTreeModel(HashMap<String, TreeLeafScript> list, String filter) {
+      for (String path : list.keySet()) {
+         if (filter != null) {
+            if (!filter.equals("")) {
+               if (!path.contains(filter)) {
+                  continue;
+               }
+            }
          }
+         String nsName = path.substring(path.lastIndexOf(".") + 1);
+         String packageName = path.substring(0, path.lastIndexOf("."));
+         classTree.add(nsName, packageName, list.get(path));
       }
+
    }
 
    public Object getItemByPath(String fullPath) {

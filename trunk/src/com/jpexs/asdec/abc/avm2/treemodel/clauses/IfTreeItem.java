@@ -46,7 +46,7 @@ public class IfTreeItem extends TreeItem implements Block {
       }
       ret += hilight("}");
       if (onFalse.size() > 0) {
-         ret += "\r\n"+hilight("else")+"\r\n"+hilight("{")+"\r\n";
+         ret += "\r\n" + hilight("else") + "\r\n" + hilight("{") + "\r\n";
          for (TreeItem ti : onFalse) {
             ret += ti.toStringSemicoloned(constants, localRegNames, fullyQualifiedNames) + "\r\n";
          }

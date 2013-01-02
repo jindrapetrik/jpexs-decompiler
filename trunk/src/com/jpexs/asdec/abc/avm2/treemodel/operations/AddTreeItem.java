@@ -18,7 +18,6 @@ package com.jpexs.asdec.abc.avm2.treemodel.operations;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.asdec.abc.avm2.treemodel.DecrementTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import java.util.HashMap;
 import java.util.List;
@@ -28,10 +27,10 @@ public class AddTreeItem extends BinaryOpTreeItem {
    public AddTreeItem(AVM2Instruction instruction, TreeItem leftSide, TreeItem rightSide) {
       super(instruction, PRECEDENCE_ADDITIVE, leftSide, rightSide, "+");
    }
-   
+
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      if(rightSide.precedence>=precedence){
+      if (rightSide.precedence >= precedence) {
          String ret = "";
          if (leftSide.precedence > precedence) {
             ret += "(" + leftSide.toString(constants, localRegNames, fullyQualifiedNames) + ")";
@@ -41,7 +40,7 @@ public class AddTreeItem extends BinaryOpTreeItem {
          ret += hilight(operator);
          ret += "(" + rightSide.toString(constants, localRegNames, fullyQualifiedNames) + ")";
          return ret;
-      }else{
+      } else {
          return super.toString(constants, localRegNames, fullyQualifiedNames);
       }
    }
