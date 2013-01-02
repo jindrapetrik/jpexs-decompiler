@@ -1635,11 +1635,48 @@ public class AVM2Code {
                ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
                ip = end + 1;
                break;
+            } else if (ins.definition instanceof NewFunctionIns) {
+               String functionName = "";
+               if ((ip >= start + 2) && (ip <= end - 4)) {
+                  AVM2Instruction prev2 = code.get(ip - 2);
+                  if (prev2.definition instanceof NewObjectIns) {
+                     if (prev2.operands[0] == 0) {
+                        if (code.get(ip - 1).definition instanceof PushWithIns) {
+                           boolean hasDup = false;
+                           int plus = 0;
+                           if (code.get(ip + 1).definition instanceof DupIns) {
+                              hasDup = true;
+                              plus = 1;
+                           }
+                           AVM2Instruction psco = code.get(ip + 1 + plus);
+                           if (psco.definition instanceof GetScopeObjectIns) {
+                              if (psco.operands[0] == scopeStack.size() - 1) {
+                                 if (code.get(ip + plus + 2).definition instanceof SwapIns) {
+                                    if (code.get(ip + plus + 4).definition instanceof PopScopeIns) {
+                                       if (code.get(ip + plus + 3).definition instanceof SetPropertyIns) {
+                                          functionName = abc.constants.constant_multiname[code.get(ip + plus + 3).operands[0]].getName(constants, fullyQualifiedNames);
+                                          scopeStack.pop();//with
+                                          output.remove(output.size()-1); //with
+                                          ip = ip + plus + 4; //+1 below
+                                       }
+                                    }
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+               }
+               //What to do when hasDup is false?
+               ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
+               NewFunctionTreeItem nft=(NewFunctionTreeItem)stack.peek();
+               nft.functionName=functionName;
+               ip++;
             } else {
                ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
-
-               addr += ins.getBytes().length;
+               
                ip++;
+               addr = pos2adr(ip);
             }
 
          }
