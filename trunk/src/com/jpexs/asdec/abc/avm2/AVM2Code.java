@@ -1656,7 +1656,7 @@ public class AVM2Code {
                                        if (code.get(ip + plus + 3).definition instanceof SetPropertyIns) {
                                           functionName = abc.constants.constant_multiname[code.get(ip + plus + 3).operands[0]].getName(constants, fullyQualifiedNames);
                                           scopeStack.pop();//with
-                                          output.remove(output.size()-1); //with
+                                          output.remove(output.size() - 1); //with
                                           ip = ip + plus + 4; //+1 below
                                        }
                                     }
@@ -1669,12 +1669,12 @@ public class AVM2Code {
                }
                //What to do when hasDup is false?
                ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
-               NewFunctionTreeItem nft=(NewFunctionTreeItem)stack.peek();
-               nft.functionName=functionName;
+               NewFunctionTreeItem nft = (NewFunctionTreeItem) stack.peek();
+               nft.functionName = functionName;
                ip++;
             } else {
                ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
-               
+
                ip++;
                addr = pos2adr(ip);
             }
@@ -1812,9 +1812,17 @@ public class AVM2Code {
          if (initTraits != null) {
             for (int i = 0; i < list.size(); i++) {
                TreeItem ti = list.get(i);
-               if (ti instanceof InitPropertyTreeItem) {
-                  int multinameIndex = ((InitPropertyTreeItem) ti).propertyName.multinameIndex;
-                  TreeItem value = ((InitPropertyTreeItem) ti).value;
+               if ((ti instanceof InitPropertyTreeItem) || (ti instanceof SetPropertyTreeItem)) {
+                  int multinameIndex = 0;
+                  TreeItem value = null;
+                  if (ti instanceof InitPropertyTreeItem) {
+                     multinameIndex = ((InitPropertyTreeItem) ti).propertyName.multinameIndex;
+                     value = ((InitPropertyTreeItem) ti).value;
+                  }
+                  if (ti instanceof SetPropertyTreeItem) {
+                     multinameIndex = ((SetPropertyTreeItem) ti).propertyName.multinameIndex;
+                     value = ((SetPropertyTreeItem) ti).value;
+                  }
                   for (Trait t : initTraits.traits) {
                      if (t.name_index == multinameIndex) {
                         if ((t instanceof TraitSlotConst)) {
