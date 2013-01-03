@@ -22,27 +22,15 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
-public class FrameLabelTag extends Tag {
-
-   private String name;
-   private boolean namedAnchor = false;
-
-   public FrameLabelTag(byte[] data, int version, long pos) throws IOException {
-      super(43, data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      name = sis.readString();
-      if (sis.available() > 0) {
-         if (sis.readUI8() == 1) {
-            namedAnchor = true;
-         }
-      }
-   }
-
-   @Override
-   public String toString() {
-      return "FrameLabel";
-   }
+/**
+ * 
+ *
+ * @author JPEXS
+ */
+public class DefineFontTag extends Tag {
 
    /**
     * Gets data bytes
@@ -55,13 +43,33 @@ public class FrameLabelTag extends Tag {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       OutputStream os = baos;
       SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         sos.writeString(name);
-         if (namedAnchor) {
-            sos.writeUI8(1);
-         }
-      } catch (IOException e) {
-      }
+      /*try {
+       //sos.write
+       } catch (IOException e) {
+       }*/
       return baos.toByteArray();
+   }
+
+   /**
+    * Constructor
+    *
+    * @param data Data bytes
+    * @param version SWF version
+    * @throws IOException
+    */
+   public DefineFontTag(byte data[], int version, long pos) throws IOException {
+      super(10, data, pos);
+      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+
+   }
+
+   /**
+    * Returns string representation of the object
+    *
+    * @return String representation of the object
+    */
+   @Override
+   public String toString() {
+      return "DefineFont";
    }
 }

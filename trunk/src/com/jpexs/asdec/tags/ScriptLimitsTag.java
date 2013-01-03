@@ -17,8 +17,11 @@
 package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
+import com.jpexs.asdec.SWFOutputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 public class ScriptLimitsTag extends Tag {
 
@@ -32,6 +35,25 @@ public class ScriptLimitsTag extends Tag {
       scriptTimeoutSeconds = sis.readUI16();
    }
 
+   /**
+    * Gets data bytes
+    *
+    * @param version SWF version
+    * @return Bytes of data
+    */
+   @Override
+   public byte[] getData(int version) {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      OutputStream os = baos;
+      SWFOutputStream sos = new SWFOutputStream(os, version);
+      try {
+         sos.writeUI16(maxRecursionDepth);
+         sos.writeUI16(scriptTimeoutSeconds);
+      } catch (IOException e) {
+      }
+      return baos.toByteArray();
+   }
+   
    @Override
    public String toString() {
       return "ScriptLimits";

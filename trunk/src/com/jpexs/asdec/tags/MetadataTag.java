@@ -16,19 +16,43 @@
  */
 package com.jpexs.asdec.tags;
 
-import java.io.UnsupportedEncodingException;
+import com.jpexs.asdec.SWFInputStream;
+import com.jpexs.asdec.SWFOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 public class MetadataTag extends Tag {
 
    private String xmlMetadata;
 
-   public MetadataTag(byte[] data, long pos) {
-      super(77, data, pos);
+   public MetadataTag(byte[] data, int version, long pos) {
+      super(77, data, pos);      
       try {
-         xmlMetadata = new String(data, "UTF-8");
-      } catch (UnsupportedEncodingException e) {
-         //ignore
+         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+         xmlMetadata = sis.readString();
+      } catch (IOException ex) {
+         
       }
+   }
+   
+   /**
+    * Gets data bytes
+    *
+    * @param version SWF version
+    * @return Bytes of data
+    */
+   @Override
+   public byte[] getData(int version) {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      OutputStream os = baos;
+      SWFOutputStream sos = new SWFOutputStream(os, version);
+      try {
+         sos.writeString(xmlMetadata);
+      } catch (IOException e) {
+      }
+      return baos.toByteArray();
    }
 
    @Override

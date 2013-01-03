@@ -23,26 +23,21 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class FrameLabelTag extends Tag {
+/**
+ * Sets the index of an object within the tab order.
+ *
+ * @author JPEXS
+ */
+public class SetTabIndexTag extends Tag {
 
-   private String name;
-   private boolean namedAnchor = false;
-
-   public FrameLabelTag(byte[] data, int version, long pos) throws IOException {
-      super(43, data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      name = sis.readString();
-      if (sis.available() > 0) {
-         if (sis.readUI8() == 1) {
-            namedAnchor = true;
-         }
-      }
-   }
-
-   @Override
-   public String toString() {
-      return "FrameLabel";
-   }
+   /**
+    * Depth of character
+    */
+   public int depth;
+   /**
+    * Tab order value
+    */
+   public int tabIndex;
 
    /**
     * Gets data bytes
@@ -56,12 +51,34 @@ public class FrameLabelTag extends Tag {
       OutputStream os = baos;
       SWFOutputStream sos = new SWFOutputStream(os, version);
       try {
-         sos.writeString(name);
-         if (namedAnchor) {
-            sos.writeUI8(1);
-         }
+         sos.writeUI16(depth);
+         sos.writeUI16(tabIndex);
       } catch (IOException e) {
       }
       return baos.toByteArray();
+   }
+
+   /**
+    * Constructor
+    *
+    * @param data Data bytes
+    * @param version SWF version
+    * @throws IOException
+    */
+   public SetTabIndexTag(byte data[], int version, long pos) throws IOException {
+      super(66, data, pos);
+      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+      depth = sis.readUI16();
+      tabIndex = sis.readUI16();
+   }
+
+   /**
+    * Returns string representation of the object
+    *
+    * @return String representation of the object
+    */
+   @Override
+   public String toString() {
+      return "";
    }
 }

@@ -537,7 +537,7 @@ public class SWFOutputStream extends OutputStream {
       }
       alignByte();
    }
-   
+
    /**
     * Writes CXFORMWITHALPHA value to the stream
     *
@@ -672,6 +672,18 @@ public class SWFOutputStream extends OutputStream {
       writeUI8(value.green);
       writeUI8(value.blue);
       writeUI8(value.alpha);
+   }
+
+   /**
+    * Writes RGB value to the stream
+    *
+    * @param value RGB value
+    * @throws IOException
+    */
+   public void writeRGB(RGB value) throws IOException {
+      writeUI8(value.red);
+      writeUI8(value.green);
+      writeUI8(value.blue);
    }
 
    /**
@@ -954,5 +966,186 @@ public class SWFOutputStream extends OutputStream {
          writeUI16(data.length + 2);
       }
       write(data);
+   }
+
+   /**
+    * Writes FILLSTYLE value to the stream
+    *
+    * @param value FILLSTYLE value
+    * @throws IOException
+    */
+   public void writeFILLSTYLE(FILLSTYLE value, int shapeNum) throws IOException {
+      writeUI8(value.fillStyleType);
+      if (value.fillStyleType == FILLSTYLE.SOLID) {
+         if (shapeNum == 3) {
+            writeRGBA(value.colorA);
+         } else if (shapeNum == 1 || shapeNum == 2) {
+            writeRGB(value.color);
+         }
+      }
+      if ((value.fillStyleType == FILLSTYLE.LINEAR_GRADIENT)
+              || (value.fillStyleType == FILLSTYLE.RADIAL_GRADIENT)
+              || (value.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT)) {
+         writeMatrix(value.gradientMatrix);
+      }
+      if ((value.fillStyleType == FILLSTYLE.LINEAR_GRADIENT)
+              || (value.fillStyleType == FILLSTYLE.RADIAL_GRADIENT)) {
+         writeGRADIENT(value.gradient, shapeNum);
+      }
+      if (value.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
+         writeFOCALGRADIENT(value.focalGradient, shapeNum);
+      }
+
+      if ((value.fillStyleType == FILLSTYLE.REPEATING_BITMAP)
+              || (value.fillStyleType == FILLSTYLE.CLIPPED_BITMAP)
+              || (value.fillStyleType == FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP)
+              || (value.fillStyleType == FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP)) {
+         writeUI16(value.bitmapId);
+         writeMatrix(value.bitmapMatrix);
+      }
+   }
+
+   /**
+    * Writes FILLSTYLEARRAY value to the stream
+    *
+    * @param value FILLSTYLEARRAY value
+    * @throws IOException
+    */
+   public void writeFILLSTYLEARRAY(FILLSTYLEARRAY value,int shapeNum) throws IOException {
+      int fillStyleCount=value.fillStyles.length;
+      if(shapeNum==2||shapeNum==3){
+         if(fillStyleCount>=0xff){
+            writeUI8(0xff);
+            writeUI16(fillStyleCount);
+         }else{
+            writeUI8(fillStyleCount);
+         }
+      }else{
+         writeUI8(fillStyleCount);
+      }
+      for (int i = 0; i < value.fillStyles.length; i++) {
+         writeFILLSTYLE(value.fillStyles[i], shapeNum);         
+      }
+   }
+
+   /**
+    * Writes FOCALGRADIENT value to the stream
+    *
+    * @param value FILLSTYLEARRAY value
+    * @throws IOException
+    */
+   public void writeFOCALGRADIENT(FOCALGRADIENT value, int shapeNum) throws IOException {
+      writeUB(2, value.spreadMode);
+      writeUB(2, value.interPolationMode);
+      writeUB(4, value.gradientRecords.length);
+      for (int i = 0; i < value.gradientRecords.length; i++) {
+         writeGRADRECORD(value.gradientRecords[i], shapeNum);
+      }
+      writeFIXED8(value.focalPoint);
+   }
+
+   /**
+    * Writes GRADIENT value to the stream
+    *
+    * @param value GRADIENT value
+    * @throws IOException
+    */
+   public void writeGRADIENT(GRADIENT value, int shapeNum) throws IOException {
+      writeUB(2, value.spreadMode);
+      writeUB(2, value.interPolationMode);
+      writeUB(4, value.gradientRecords.length);
+      for (int i = 0; i < value.gradientRecords.length; i++) {
+         writeGRADRECORD(value.gradientRecords[i], shapeNum);
+      }
+   }
+
+   /**
+    * Writes GRADRECORD value to the stream
+    *
+    * @param value GRADRECORD value
+    * @throws IOException
+    */
+   public void writeGRADRECORD(GRADRECORD value, int shapeNum) throws IOException {
+      writeUI8(value.ratio);
+      if (shapeNum == 1 || shapeNum == 2) {
+         writeRGB(value.color);
+      } else if (shapeNum == 3) {
+         writeRGBA(value.colorA);
+      }
+   }
+
+   /**
+    * Writes LINESTYLE value to the stream
+    *
+    * @param value LINESTYLE value
+    * @throws IOException
+    */
+   public void writeLINESTYLE(LINESTYLE value, int shapeNum) throws IOException {
+      writeUI16(value.width);
+      if (shapeNum == 1 || shapeNum == 2) {
+         writeRGB(value.color);
+      } else if (shapeNum == 3) {
+         writeRGBA(value.colorA);
+      }
+   }
+
+   /**
+    * Writes LINESTYLE2 value to the stream
+    *
+    * @param value LINESTYLE2 value
+    * @throws IOException
+    */
+   public void writeLINESTYLE2(LINESTYLE2 value,int shapeNum) throws IOException {
+      writeUI16(value.width);
+      writeUB(2, value.startCapStyle);
+      writeUB(2, value.joinStyle);
+      writeUB(1, value.hasFillFlag ? 1 : 0);
+      writeUB(1, value.noHScaleFlag ? 1 : 0);
+      writeUB(1, value.noVScaleFlag ? 1 : 0);
+      writeUB(1, value.pixelHintingFlag ? 1 : 0);
+      writeUB(5, 0);//reserved
+      writeUB(1, value.noClose ? 1 : 0);
+      writeUB(2, value.endCapStyle);
+      if (value.joinStyle == LINESTYLE2.MITER_JOIN) {
+         writeUI16(value.miterLimitFactor);
+      }
+      if (!value.hasFillFlag) {
+         writeRGBA(value.color);
+      } else {
+         writeFILLSTYLE(value.fillType,shapeNum);
+      }
+   }
+
+   /**
+    * Writes LINESTYLEARRAY value to the stream
+    *
+    * @param value FILLSTYLEARRAY value
+    * @throws IOException
+    */
+   public void writeLINESTYLEARRAY(LINESTYLEARRAY value, int shapeNum) throws IOException {
+      int lineStyleCount;
+      if (shapeNum == 1 || shapeNum == 2 || shapeNum == 3) {
+         lineStyleCount = value.lineStyles.length;
+         if (lineStyleCount >= 0xff) {
+            writeUI8(0xff);
+            writeUI16(lineStyleCount);
+         } else {
+            writeUI8(lineStyleCount);
+         }
+         for (int i = 0; i < lineStyleCount; i++) {
+            writeLINESTYLE(value.lineStyles[i], shapeNum);
+         }
+      } else if (shapeNum == 4) {
+         lineStyleCount = value.lineStyles2.length;
+         if (lineStyleCount >= 0xff) {
+            writeUI8(0xff);
+            writeUI16(lineStyleCount);
+         } else {
+            writeUI8(lineStyleCount);
+         }
+         for (int i = 0; i < lineStyleCount; i++) {
+            writeLINESTYLE2(value.lineStyles2[i],shapeNum);
+         }
+      }
    }
 }

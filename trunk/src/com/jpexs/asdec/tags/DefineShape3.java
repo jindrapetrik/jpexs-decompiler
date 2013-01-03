@@ -16,13 +16,24 @@
  */
 package com.jpexs.asdec.tags;
 
+import com.jpexs.asdec.SWFInputStream;
+import com.jpexs.asdec.types.RECT;
+import com.jpexs.asdec.types.SHAPEWITHSTYLE;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 public class DefineShape3 extends Tag {
 
+   public int shapeId;
+   public RECT shapeBounds;
+   public SHAPEWITHSTYLE shapes;
+
    public DefineShape3(byte[] data, int version, long pos) throws IOException {
       super(32, data, pos);
-      // TODO Auto-generated constructor stub
+      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+      shapeId = sis.readUI16();
+      shapeBounds = sis.readRECT();
+      shapes = sis.readSHAPEWITHSTYLE(3);
    }
 
    @Override

@@ -17,8 +17,11 @@
 package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
+import com.jpexs.asdec.SWFOutputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 
 /**
@@ -50,6 +53,28 @@ public class ExportAssetsTag extends Tag {
          String name = sis.readString();
          assets.put(characterId, name);
       }
+   }
+   
+   /**
+    * Gets data bytes
+    *
+    * @param version SWF version
+    * @return Bytes of data
+    */
+   @Override
+   public byte[] getData(int version) {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      OutputStream os = baos;
+      SWFOutputStream sos = new SWFOutputStream(os, version);
+      try {
+         sos.writeUI16(assets.size());
+         for(int characterId:assets.keySet()){
+            sos.writeUI16(characterId);
+            sos.writeString(assets.get(characterId));
+         }
+      } catch (IOException e) {
+      }
+      return baos.toByteArray();
    }
 
    /**

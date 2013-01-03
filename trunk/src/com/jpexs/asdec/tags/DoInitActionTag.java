@@ -88,11 +88,11 @@ public class DoInitActionTag extends Tag implements ASMSource, TagName {
             name = ": " + eat.assets.get((Integer) spriteId);
          }
       }
-      return "DoInitActionTag (" + spriteId + name + ")";
+      return "DoInitAction (" + spriteId + name + ")";
    }
 
    public String getName() {
-      return "DoInitActionTag" + spriteId;
+      return "DoInitAction" + spriteId;
    }
 
    /**

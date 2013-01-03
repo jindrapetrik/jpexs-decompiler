@@ -16,26 +16,21 @@
  */
 package com.jpexs.asdec.tags;
 
-import com.jpexs.asdec.SWFInputStream;
-import com.jpexs.asdec.types.RECT;
-import com.jpexs.asdec.types.SHAPEWITHSTYLE;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-
-public class DefineShape2 extends Tag {
-   public int shapeId;
-   public RECT shapeBounds;
-   public SHAPEWITHSTYLE shapes;
-   public DefineShape2(byte[] data, int version, long pos) throws IOException {
-      super(22, data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      shapeId=sis.readUI16();
-      shapeBounds=sis.readRECT();
-      shapes=sis.readSHAPEWITHSTYLE(2);
+/**
+ *
+ * @author JPEXS
+ */
+public class NotDefinedTag extends Tag {
+   private String name;
+   public NotDefinedTag(String name,int id, byte[] data, long pos) {
+      super(id, data, pos);
+      this.name=name;
    }
 
    @Override
    public String toString() {
-      return "DefineShape2";
+      return name;
    }
+   
+   
 }

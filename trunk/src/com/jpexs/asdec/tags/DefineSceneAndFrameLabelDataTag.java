@@ -22,22 +22,20 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Removes the specified character
+ *
  *
  * @author JPEXS
  */
-public class RemoveObjectTag extends Tag {
+public class DefineSceneAndFrameLabelDataTag extends Tag {
 
-   /**
-    * ID of character to place
-    */
-   public int characterId;
-   /**
-    * Depth of character
-    */
-   public int depth;
+   public long sceneOffsets[];
+   public String sceneNames[];
+   public long frameNums[];
+   public String frameNames[];
 
    /**
     * Gets data bytes
@@ -51,8 +49,18 @@ public class RemoveObjectTag extends Tag {
       OutputStream os = baos;
       SWFOutputStream sos = new SWFOutputStream(os, version);
       try {
-         sos.writeUI16(characterId);
-         sos.writeUI16(depth);
+         int sceneCount = sceneOffsets.length;
+         sos.writeEncodedU32(sceneCount);
+         for (int i = 0; i < sceneCount; i++) {
+            sos.writeEncodedU32(sceneOffsets[i]);
+            sos.writeString(sceneNames[i]);
+         }
+         int frameLabelCount = frameNums.length;
+         sos.writeEncodedU32(frameLabelCount);
+         for (int i = 0; i < frameLabelCount; i++) {
+            sos.writeEncodedU32(frameNums[i]);
+            sos.writeString(frameNames[i]);
+         }
       } catch (IOException e) {
       }
       return baos.toByteArray();
@@ -65,11 +73,22 @@ public class RemoveObjectTag extends Tag {
     * @param version SWF version
     * @throws IOException
     */
-   public RemoveObjectTag(byte data[], int version, long pos) throws IOException {
-      super(5, data, pos);
+   public DefineSceneAndFrameLabelDataTag(byte data[], int version, long pos) throws IOException {
+      super(86, data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      characterId = sis.readUI16();
-      depth = sis.readUI16();
+      int sceneCount = (int) sis.readEncodedU32();
+      sceneOffsets = new long[sceneCount];
+      sceneNames = new String[sceneCount];
+      for (int i = 0; i < sceneCount; i++) {
+         sceneOffsets[i] = sis.readEncodedU32();
+         sceneNames[i] = sis.readString();
+      }
+      int frameLabelCount = (int) sis.readEncodedU32();
+      for (int i = 0; i < frameLabelCount; i++) {
+         frameNums[i] = sis.readEncodedU32();
+         frameNames[i] = sis.readString();
+      }
+
    }
 
    /**
@@ -79,6 +98,6 @@ public class RemoveObjectTag extends Tag {
     */
    @Override
    public String toString() {
-      return "RemoveObject";
+      return "DefineSceneAndFrameLabelData";
    }
 }

@@ -22,27 +22,15 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
-public class FrameLabelTag extends Tag {
-
-   private String name;
-   private boolean namedAnchor = false;
-
-   public FrameLabelTag(byte[] data, int version, long pos) throws IOException {
-      super(43, data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      name = sis.readString();
-      if (sis.available() > 0) {
-         if (sis.readUI8() == 1) {
-            namedAnchor = true;
-         }
-      }
-   }
-
-   @Override
-   public String toString() {
-      return "FrameLabel";
-   }
+/**
+ * Extends the functionality of the PlaceObject2Tag
+ *
+ * @author JPEXS
+ */
+public class EndTag extends Tag {
 
    /**
     * Gets data bytes
@@ -52,16 +40,28 @@ public class FrameLabelTag extends Tag {
     */
    @Override
    public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         sos.writeString(name);
-         if (namedAnchor) {
-            sos.writeUI8(1);
-         }
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
+      return new byte[0];
+   }
+
+   /**
+    * Constructor
+    *
+    * @param data Data bytes
+    * @param version SWF version
+    * @throws IOException
+    */
+   public EndTag(byte data[], int version, long pos) throws IOException {
+      super(0, data, pos);
+
+   }
+
+   /**
+    * Returns string representation of the object
+    *
+    * @return String representation of the object
+    */
+   @Override
+   public String toString() {
+      return "End";
    }
 }

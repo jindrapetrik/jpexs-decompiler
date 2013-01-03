@@ -17,10 +17,16 @@
 package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
+import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.types.RECT;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
+/**
+ * @author JPEXS
+ */
 public class DefineScalingGridTag extends Tag {
 
    private int characterId;
@@ -31,6 +37,25 @@ public class DefineScalingGridTag extends Tag {
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       characterId = sis.readUI16();
       splitter = sis.readRECT();
+   }
+
+   /**
+    * Gets data bytes
+    *
+    * @param version SWF version
+    * @return Bytes of data
+    */
+   @Override
+   public byte[] getData(int version) {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      OutputStream os = baos;
+      SWFOutputStream sos = new SWFOutputStream(os, version);
+      try {
+         sos.writeUI16(characterId);
+         sos.writeRECT(splitter);
+      } catch (IOException e) {
+      }
+      return baos.toByteArray();
    }
 
    @Override

@@ -26,6 +26,11 @@ import com.jpexs.asdec.helpers.Helper;
 import com.jpexs.asdec.tags.*;
 import com.jpexs.asdec.types.*;
 import com.jpexs.asdec.types.filters.*;
+import com.jpexs.asdec.types.shaperecords.CurvedEdgeRecord;
+import com.jpexs.asdec.types.shaperecords.EndShapeRecord;
+import com.jpexs.asdec.types.shaperecords.SHAPERECORD;
+import com.jpexs.asdec.types.shaperecords.StraightEdgeRecord;
+import com.jpexs.asdec.types.shaperecords.StyleChangeRecord;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -485,104 +490,214 @@ public class SWFInputStream extends InputStream {
       byte data[] = readBytes((int) tagLength);
       Tag ret;
       switch (tagID) {
-         case 82:
-            ret = new DoABCTag(data, version, pos);
-            break;
-         case 12:
-            ret = new DoActionTag(data, version, pos);
-            break;
-         case 59:
-            ret = new DoInitActionTag(data, version, pos);
-            break;
-         case 39:
-            ret = new DefineSpriteTag(data, version, level, pos);
-            break;
          case 1:
             ret = new ShowFrameTag(pos);
-            break;
-         case 26:
-            ret = new PlaceObject2Tag(data, version, pos);
-            break;
-         case 56:
-            ret = new ExportAssetsTag(data, version, pos);
-            break;
-         case 70:
-            ret = new PlaceObject3Tag(data, version, pos);
-            break;
-         case 7:
-            ret = new DefineButtonTag(data, version, pos);
-            break;
-         case 34:
-            ret = new DefineButton2Tag(data, version, pos);
-            break;
-         case 69:
-            ret = new FileAttributesTag(data, version, pos);
-            break;
-         case 77:
-            ret = new MetadataTag(data, pos);
-            break;
-         case 65:
-            ret = new ScriptLimitsTag(data, version, pos);
-            break;
-         case 9:
-            ret = new SetBackgroundColorTag(data, pos);
-            break;
-         case 41:
-            ret = new ProductInfoTag(data, version, pos);
-            break;
-         case 43:
-            ret = new FrameLabelTag(data, version, pos);
-            break;
-         case 36:
-            ret = new DefineBitsLossless2Tag(data, version, pos);
-            break;
-         case 76:
-            ret = new SymbolClassTag(data, version, pos);
-            break;
-         case 32:
-            ret = new DefineShape3(data, version, pos);
-            break;
-         case 28:
-            ret = new RemoveObject2Tag(data, version, pos);
-            break;
-         case 78:
-            ret = new DefineScalingGridTag(data, version, pos);
             break;
          case 2:
             ret = new DefineShapeTag(data, version, pos);
             break;
-         case 22:
-            ret = new DefineShape2(data, version, pos);
+         //case 3
+         case 4:
+            ret = new PlaceObjectTag(data, version, pos);
             break;
-         case 83:
-            ret = new DefineShape4(data, version, pos);
-            break;
-         case 20:
-            ret = new DefineBitsLosslessTag(data, version, pos);
-            break;
-         case 35:
-            ret = new DefineBitsJPEG3Tag(data, version, pos);
-            break;
-         case 87:
-            ret = new DefineBinaryDataTag(data, version, pos);
-            break;
-         case 8:
-            ret = new JPEGTablesTag(data, pos);
+         case 5:
+            ret = new RemoveObjectTag(data, version, pos);
             break;
          case 6:
             ret = new DefineBitsTag(data, version, pos);
             break;
+         case 7:
+            ret = new DefineButtonTag(data, version, pos);
+            break;
+         case 8:
+            ret = new JPEGTablesTag(data, pos);
+            break;         
+         case 9:
+            ret = new SetBackgroundColorTag(data, pos);
+            break;
+         case 10:
+            ret = new DefineFontTag(data, version, pos);
+            break;
+         case 11:
+            ret = new DefineTextTag(data, version, pos);
+            break;
+         case 12:
+            ret = new DoActionTag(data, version, pos);
+            break;
+         case 13:
+            ret = new NotDefinedTag("DefineFontInfo",13,data,pos);
+            break;
+         case 14:
+            ret = new NotDefinedTag("DefineSound",14,data,pos);
+            break;
+         case 15:
+            ret = new NotDefinedTag("StartSound",15,data,pos);
+            break;
+         //case 16
+         case 17:
+            ret = new NotDefinedTag("DefineButtonSound",17,data,pos);
+            break;
+         case 18:
+            ret = new NotDefinedTag("SoundStreamHead",18,data,pos);
+            break;
+         case 19:
+            ret = new NotDefinedTag("SoundStreamBlock",19,data,pos);
+            break;
          case 21:
             ret = new DefineBitsJPEG2Tag(data, version, pos);
+            break;
+         case 20:
+            ret = new DefineBitsLosslessTag(data, version, pos);
+            break;
+         case 22:
+            ret = new DefineShape2(data, version, pos);
+            break;
+         case 23:
+            ret = new NotDefinedTag("DefineButtonCxform",23,data,pos);
+            break;   
+         case 24:
+            ret = new ProtectTag(data, version, pos);
+            break;
+         //case 25:
+         case 26:
+            ret = new PlaceObject2Tag(data, version, pos);
+            break;
+         //case 27: 
+         case 28:
+            ret = new RemoveObject2Tag(data, version, pos);
+            break;
+         //case 29:
+         //case 30:
+         //case 31: 
+         case 32:
+            ret = new DefineShape3(data, version, pos);
+            break;
+         case 33:
+            ret = new NotDefinedTag("DefineText2",33,data,pos);
+            break; 
+         case 34:
+            ret = new DefineButton2Tag(data, version, pos);
+            break;
+         case 35:
+            ret = new DefineBitsJPEG3Tag(data, version, pos);
+            break;
+         case 36:
+            ret = new DefineBitsLossless2Tag(data, version, pos);
+            break;
+         case 37:
+            ret = new NotDefinedTag("DefineEditText",37,data,pos);
+            break; 
+         //case 38:
+         case 39:
+            ret = new DefineSpriteTag(data, version, level, pos);
+            break;
+         //case 40:
+         case 41:
+            ret = new ProductInfoTag(data, version, pos);
+            break;
+         //case 42:
+         case 43:
+            ret = new FrameLabelTag(data, version, pos);
+            break;
+         //case 44:
+         case 45:
+            ret = new NotDefinedTag("SoundStreamHead2",45,data,pos);
+            break;
+         case 46:
+            ret = new NotDefinedTag("DefineMorphShape",46,data,pos);
+            break;
+         //case 47:
+         case 48:
+            ret = new NotDefinedTag("DefineFont2",48,data,pos);
+            break;
+         //case 49-55:
+         case 56:
+            ret = new ExportAssetsTag(data, version, pos);
+            break;
+         case 57:
+            ret = new ImportAssetsTag(data, version, pos);
+            break;
+         case 58:
+            ret = new EnableDebuggerTag(data, version, pos);
+            break;   
+         case 59:
+            ret = new DoInitActionTag(data, version, pos);
+            break;   
+         case 60:
+            ret = new NotDefinedTag("DefineVideoStream",60,data,pos);
+            break;
+         case 61:
+            ret = new NotDefinedTag("VideoFrame",61,data,pos);
+            break;
+         case 62:
+            ret = new NotDefinedTag("DefineFontInfo2",62,data,pos);
+            break;
+         case 63:
+            ret = new DebugIDTag(data, version, pos);
+            break;
+         case 64:
+            ret = new EnableDebugger2Tag(data, version, pos);
+            break; 
+         case 65:
+            ret = new ScriptLimitsTag(data, version, pos);
+            break;
+         case 66:
+            ret = new SetTabIndexTag(data, version, pos);
+            break;
+         //case 67-68:
+         case 69:
+            ret = new FileAttributesTag(data, version, pos);
+            break;
+         case 70:
+            ret = new PlaceObject3Tag(data, version, pos);
+            break;    
+         case 71:
+            ret = new ImportAssets2Tag(data, version, pos);
+            break; 
+         //case 72:
+         case 73:
+            ret = new DefineFontAlignZonesTag(data, version, pos);
+            break;
+         case 74:
+            ret = new NotDefinedTag("DefineFontInfo2",62,data,pos);
             break;
          case 75:
             ret = new DefineFont3Tag(data, version, pos);
             break;
-         case 73:
-            ret = new DefineFontAlignZonesTag(data, version, pos);
+         case 76:
+            ret = new SymbolClassTag(data, version, pos);
             break;
+         case 77:
+            ret = new MetadataTag(data, version, pos);
+            break;
+         case 78:
+            ret = new DefineScalingGridTag(data, version, pos);
+            break;
+         //case 79-81:
+         case 82:
+            ret = new DoABCTag(data, version, pos);
+            break;
+         case 83:
+            ret = new DefineShape4(data, version, pos);
+            break;        
+         case 84:
+            ret = new NotDefinedTag("DefineMorphShape2",84,data,pos);
+            break;
+         //case 85:
+         case 86:
+            ret = new DefineSceneAndFrameLabelDataTag(data, version, pos);
+            break;
+         case 87:
+            ret = new DefineBinaryDataTag(data, version, pos);
+            break;                           
          case 88:
             ret = new DefineFontNameTag(data, version, pos);
+            break;
+         case 89:
+            ret = new NotDefinedTag("StartSound2",89,data,pos);
+            break;
+         case 90:
+            ret = new NotDefinedTag("DefineBitsJPEG4",84,data,pos);
             break;
          case 91:
             ret = new DefineFont4Tag(data, version, pos);
@@ -884,7 +999,7 @@ public class SWFInputStream extends InputStream {
       alignByte();
       return ret;
    }
-   
+
    /**
     * Reads one CXFORM value from the stream
     *
@@ -900,7 +1015,7 @@ public class SWFInputStream extends InputStream {
       if (ret.hasMultTerms) {
          ret.redMultTerm = (int) readSB(Nbits);
          ret.greenMultTerm = (int) readSB(Nbits);
-         ret.blueMultTerm = (int) readSB(Nbits);         
+         ret.blueMultTerm = (int) readSB(Nbits);
       }
       if (ret.hasAddTerms) {
          ret.redAddTerm = (int) readSB(Nbits);
@@ -1012,6 +1127,20 @@ public class SWFInputStream extends InputStream {
       ret.green = readUI8();
       ret.blue = readUI8();
       ret.alpha = readUI8();
+      return ret;
+   }
+
+   /**
+    * Reads one RGB value from the stream
+    *
+    * @return RGB value
+    * @throws IOException
+    */
+   public RGB readRGB() throws IOException {
+      RGB ret = new RGB();
+      ret.red = readUI8();
+      ret.green = readUI8();
+      ret.blue = readUI8();
       return ret;
    }
 
@@ -1328,6 +1457,320 @@ public class SWFInputStream extends InputStream {
          ret.actionBytes = readBytes(condActionSize - 4);
       }
       //ret.actions = readActionList();
+      return ret;
+   }
+
+   /**
+    * Reads one GRADRECORD value from the stream
+    *
+    * @return GRADRECORD value
+    * @throws IOException
+    */
+   public GRADRECORD readGRADRECORD(boolean inShape3) throws IOException {
+      GRADRECORD ret = new GRADRECORD();
+      ret.ratio = readUI8();
+      if (ret.inShape3 = inShape3) {
+         ret.colorA = readRGBA();
+      } else {
+         ret.color = readRGB();
+      }
+      return ret;
+   }
+
+   /**
+    * Reads one GRADIENT value from the stream
+    *
+    * @return GRADIENT value
+    * @throws IOException
+    */
+   public GRADIENT readGRADIENT(boolean inShape3) throws IOException {
+      GRADIENT ret = new GRADIENT();
+      ret.spreadMode = (int) readUB(2);
+      ret.interPolationMode = (int) readUB(2);
+      int numGradients = (int) readUB(4);
+      ret.gradientRecords = new GRADRECORD[numGradients];
+      for (int i = 0; i < numGradients; i++) {
+         ret.gradientRecords[i] = readGRADRECORD(inShape3);
+
+      }
+      return ret;
+   }
+
+   /**
+    * Reads one FOCALGRADIENT value from the stream
+    *
+    * @return FOCALGRADIENT value
+    * @throws IOException
+    */
+   public FOCALGRADIENT readFOCALGRADIENT(boolean inShape3) throws IOException {
+      FOCALGRADIENT ret = new FOCALGRADIENT();
+      ret.spreadMode = (int) readUB(2);
+      ret.interPolationMode = (int) readUB(2);
+      int numGradients = (int) readUB(4);
+      ret.gradientRecords = new GRADRECORD[numGradients];
+      for (int i = 0; i < numGradients; i++) {
+         ret.gradientRecords[i] = readGRADRECORD(inShape3);
+      }
+      ret.focalPoint = readFIXED8();
+      return ret;
+   }
+
+   /**
+    * Reads one FILLSTYLE value from the stream
+    *
+    * @return FILLSTYLE value
+    * @throws IOException
+    */
+   public FILLSTYLE readFILLSTYLE(boolean inShape3) throws IOException {
+      FILLSTYLE ret = new FILLSTYLE();
+      ret.fillStyleType = readUI8();
+      if (ret.fillStyleType == FILLSTYLE.SOLID) {
+         if (ret.inShape3 = inShape3) {
+            ret.colorA = readRGBA();
+         } else {
+            ret.color = readRGB();
+         }
+      }
+      if ((ret.fillStyleType == FILLSTYLE.LINEAR_GRADIENT)
+              || (ret.fillStyleType == FILLSTYLE.RADIAL_GRADIENT)
+              || (ret.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT)) {
+         ret.gradientMatrix = readMatrix();
+      }
+      if ((ret.fillStyleType == FILLSTYLE.LINEAR_GRADIENT)
+              || (ret.fillStyleType == FILLSTYLE.RADIAL_GRADIENT)) {
+         ret.gradient = readGRADIENT(inShape3);
+      }
+      if (ret.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
+         ret.focalGradient = readFOCALGRADIENT(inShape3);
+      }
+
+      if ((ret.fillStyleType == FILLSTYLE.REPEATING_BITMAP)
+              || (ret.fillStyleType == FILLSTYLE.CLIPPED_BITMAP)
+              || (ret.fillStyleType == FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP)
+              || (ret.fillStyleType == FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP)) {
+         ret.bitmapId = readUI16();
+         ret.bitmapMatrix = readMatrix();
+      }
+      return ret;
+   }
+
+   /**
+    * Reads one FILLSTYLEARRAY value from the stream
+    *
+    * @return FILLSTYLEARRAY value
+    * @throws IOException
+    */
+   public FILLSTYLEARRAY readFILLSTYLEARRAY(int shapeNum) throws IOException {
+
+      FILLSTYLEARRAY ret = new FILLSTYLEARRAY();
+      int fillStyleCount = readUI8();
+      if (((shapeNum == 2) || (shapeNum == 3)) && (fillStyleCount == 0xff)) {
+         fillStyleCount = readUI16();
+      }
+      ret.fillStyles = new FILLSTYLE[fillStyleCount];
+      for (int i = 0; i < fillStyleCount; i++) {
+         ret.fillStyles[i] = readFILLSTYLE(shapeNum == 3);
+      }
+      return ret;
+   }
+
+   /**
+    * Reads one LINESTYLE value from the stream
+    *
+    * @return LINESTYLE value
+    * @throws IOException
+    */
+   public LINESTYLE readLINESTYLE(int shapeNum) throws IOException {
+      LINESTYLE ret = new LINESTYLE();
+      ret.width = readUI16();
+      if ((shapeNum == 1) || (shapeNum == 2)) {
+         ret.color = readRGB();
+      }
+      if (shapeNum == 3) {
+         ret.colorA = readRGBA();
+      }
+      return ret;
+   }
+
+   /**
+    * Reads one LINESTYLE2 value from the stream
+    *
+    * @return LINESTYLE2 value
+    * @throws IOException
+    */
+   public LINESTYLE2 readLINESTYLE2(boolean inShape3) throws IOException {
+      LINESTYLE2 ret = new LINESTYLE2();
+      ret.width = readUI16();
+      ret.startCapStyle = (int) readUB(2);
+      ret.joinStyle = (int) readUB(2);
+      ret.hasFillFlag = (int) readUB(1) == 1;
+      ret.noHScaleFlag = (int) readUB(1) == 1;
+      ret.noVScaleFlag = (int) readUB(1) == 1;
+      ret.pixelHintingFlag = (int) readUB(1) == 1;
+      readUB(5);//reserved
+      ret.noClose = (int) readUB(1) == 1;
+      ret.endCapStyle = (int) readUB(2);
+      if (ret.joinStyle == LINESTYLE2.MITER_JOIN) {
+         ret.miterLimitFactor = readUI16();
+      }
+      if (!ret.hasFillFlag) {
+         ret.color = readRGBA();
+      } else {
+         ret.fillType = readFILLSTYLE(inShape3);
+      }
+      return ret;
+   }
+
+   /**
+    * Reads one LINESTYLEARRAY value from the stream
+    *
+    * @return LINESTYLEARRAY value
+    * @throws IOException
+    */
+   public LINESTYLEARRAY readLINESTYLEARRAY(int shapeNum) throws IOException {
+      LINESTYLEARRAY ret = new LINESTYLEARRAY();
+      int lineStyleCount = readUI8();
+      if (lineStyleCount == 0xff) {
+         lineStyleCount = readUI16();
+      }
+      if ((shapeNum == 1 || shapeNum == 2 || shapeNum == 3)) {
+         ret.lineStyles = new LINESTYLE[lineStyleCount];
+         for (int i = 0; i < lineStyleCount; i++) {
+            ret.lineStyles[i] = readLINESTYLE(shapeNum);
+         }
+      } else if (shapeNum == 4) {
+         ret.lineStyles2 = new LINESTYLE2[lineStyleCount];
+         for (int i = 0; i < lineStyleCount; i++) {
+            ret.lineStyles2[i] = readLINESTYLE2(shapeNum == 3);
+         }
+      }
+      return ret;
+   }
+
+   /**
+    * Reads one SHAPERECORD value from the stream
+    *
+    * @return SHAPERECORD value
+    * @throws IOException
+    */
+   public SHAPERECORD readSHAPERECORD(int fillBits, int lineBits, int shapeNum) throws IOException {
+      SHAPERECORD ret;
+      int typeFlag = (int) readUB(1);
+      if (typeFlag == 0) {
+         boolean stateNewStyles = readUB(1) == 1;
+         boolean stateLineStyle = readUB(1) == 1;
+         boolean stateFillStyle1 = readUB(1) == 1;
+         boolean stateFillStyle0 = readUB(1) == 1;
+         boolean stateMoveTo = readUB(1) == 1;
+         if ((!stateNewStyles) && (!stateLineStyle) && (!stateFillStyle1) && (!stateFillStyle0) && (!stateMoveTo)) {
+            ret = new EndShapeRecord();
+         } else {
+            StyleChangeRecord scr = new StyleChangeRecord();
+            scr.stateNewStyles = stateNewStyles;
+            scr.stateLineStyle = stateLineStyle;
+            scr.stateFillStyle0 = stateFillStyle0;
+            scr.stateFillStyle1 = stateFillStyle1;
+            scr.stateMoveTo = stateMoveTo;
+            if (stateMoveTo) {
+               scr.moveBits = (int) readUB(5);
+               scr.moveDeltaX = (int) readSB(scr.moveBits);
+               scr.moveDeltaY = (int) readSB(scr.moveBits);
+            }
+            if (stateFillStyle0) {
+               scr.fillStyle0 = (int) readUB(fillBits);
+            }
+            if (stateFillStyle1) {
+               scr.fillStyle1 = (int) readUB(fillBits);
+            }
+            if (stateLineStyle) {
+               scr.lineStyle = (int) readUB(lineBits);
+            }
+            if (stateNewStyles) {
+               scr.fillStyles = readFILLSTYLEARRAY(shapeNum);
+               scr.lineStyles = readLINESTYLEARRAY(shapeNum);
+               scr.numFillBits = (int) readUB(4);
+               scr.numLineBits = (int) readUB(4);
+            }
+            ret = scr;
+         }
+      } else {//typeFlag==1
+         int straightFlag = (int) readUB(1);
+         if (straightFlag == 1) {
+            StraightEdgeRecord ser = new StraightEdgeRecord();
+            ser.numBits = (int) readUB(4);
+            ser.generalLineFlag = readUB(1) == 1;
+            if (!ser.generalLineFlag) {
+               ser.vertLineFlag = readSB(1) == 1;
+            }
+            if (ser.generalLineFlag || (!ser.vertLineFlag)) {
+               ser.deltaX = (int) readSB(ser.numBits + 2);
+            }
+            if (ser.generalLineFlag || (ser.vertLineFlag)) {
+               ser.deltaY = (int) readSB(ser.numBits + 2);
+            }
+            ret = ser;
+         } else {
+            CurvedEdgeRecord cer = new CurvedEdgeRecord();
+            cer.numBits = (int) readUB(4);
+            cer.controlDeltaX = (int) readSB(cer.numBits + 2);
+            cer.controlDeltaY = (int) readSB(cer.numBits + 2);
+            cer.anchorDeltaX = (int) readSB(cer.numBits + 2);
+            cer.anchorDeltaY = (int) readSB(cer.numBits + 2);
+            ret = cer;
+         }
+      }
+      return ret;
+   }
+
+   /**
+    * Reads one SHAPE value from the stream
+    *
+    * @return SHAPE value
+    * @throws IOException
+    */
+   public SHAPE readSHAPE(int shapeNum) throws IOException {
+      SHAPE ret = new SHAPE();
+      ret.numFillBits = (int) readUB(4);
+      ret.numLineBits = (int) readUB(4);
+      ret.shapeRecords = readSHAPERECORDS(shapeNum, ret.numFillBits, ret.numLineBits);
+      return ret;
+   }
+
+   /**
+    * Reads one SHAPEWITHSTYLE value from the stream
+    *
+    * @return SHAPEWITHSTYLE value
+    * @throws IOException
+    */
+   public SHAPEWITHSTYLE readSHAPEWITHSTYLE(int shapeNum) throws IOException {
+      SHAPEWITHSTYLE ret = new SHAPEWITHSTYLE();
+      ret.fillStyles = readFILLSTYLEARRAY(shapeNum);
+      ret.lineStyles = readLINESTYLEARRAY(shapeNum);
+      ret.numFillBits = (int) readUB(4);
+      ret.numLineBits = (int) readUB(4);
+      ret.shapeRecords = readSHAPERECORDS(shapeNum, ret.numFillBits, ret.numLineBits);
+      return ret;
+   }
+
+   /**
+    * Reads list of SHAPERECORDs from the stream
+    *
+    * @return SHAPERECORDs array
+    * @throws IOException
+    */
+   public List<SHAPERECORD> readSHAPERECORDS(int shapeNum, int fillBits, int lineBits) throws IOException {
+      List<SHAPERECORD> ret = new ArrayList<SHAPERECORD>();
+      SHAPERECORD rec;
+      do {
+         rec = readSHAPERECORD(fillBits, lineBits, shapeNum);
+         if (rec instanceof StyleChangeRecord) {
+            if (((StyleChangeRecord) rec).stateNewStyles) {
+               fillBits = ((StyleChangeRecord) rec).numFillBits;
+               lineBits = ((StyleChangeRecord) rec).numLineBits;
+            }
+         }
+         ret.add(rec);
+      } while (!(rec instanceof EndShapeRecord));
       return ret;
    }
 

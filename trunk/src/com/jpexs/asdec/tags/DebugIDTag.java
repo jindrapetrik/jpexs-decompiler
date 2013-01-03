@@ -22,27 +22,17 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
-public class FrameLabelTag extends Tag {
+/**
+ *
+ *
+ * @author JPEXS
+ */
+public class DebugIDTag extends Tag {
 
-   private String name;
-   private boolean namedAnchor = false;
-
-   public FrameLabelTag(byte[] data, int version, long pos) throws IOException {
-      super(43, data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      name = sis.readString();
-      if (sis.available() > 0) {
-         if (sis.readUI8() == 1) {
-            namedAnchor = true;
-         }
-      }
-   }
-
-   @Override
-   public String toString() {
-      return "FrameLabel";
-   }
+   public byte debugId[];
 
    /**
     * Gets data bytes
@@ -56,12 +46,32 @@ public class FrameLabelTag extends Tag {
       OutputStream os = baos;
       SWFOutputStream sos = new SWFOutputStream(os, version);
       try {
-         sos.writeString(name);
-         if (namedAnchor) {
-            sos.writeUI8(1);
-         }
+         sos.write(debugId);
       } catch (IOException e) {
       }
       return baos.toByteArray();
+   }
+
+   /**
+    * Constructor
+    *
+    * @param data Data bytes
+    * @param version SWF version
+    * @throws IOException
+    */
+   public DebugIDTag(byte data[], int version, long pos) throws IOException {
+      super(63, data, pos);
+      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+      debugId = sis.readBytes(16);
+   }
+
+   /**
+    * Returns string representation of the object
+    *
+    * @return String representation of the object
+    */
+   @Override
+   public String toString() {
+      return "DebugID";
    }
 }

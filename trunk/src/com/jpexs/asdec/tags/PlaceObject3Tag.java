@@ -294,7 +294,7 @@ public class PlaceObject3Tag extends Tag implements Container {
     */
    @Override
    public String toString() {
-      return "PlaceObject3Tag";
+      return "PlaceObject3";
    }
 
    /**

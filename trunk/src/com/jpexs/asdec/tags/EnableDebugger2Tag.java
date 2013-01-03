@@ -23,26 +23,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class FrameLabelTag extends Tag {
+/**
+ * Marks the file is not importable for editing
+ *
+ * @author JPEXS
+ */
+public class EnableDebugger2Tag extends Tag {
 
-   private String name;
-   private boolean namedAnchor = false;
-
-   public FrameLabelTag(byte[] data, int version, long pos) throws IOException {
-      super(43, data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      name = sis.readString();
-      if (sis.available() > 0) {
-         if (sis.readUI8() == 1) {
-            namedAnchor = true;
-         }
-      }
-   }
-
-   @Override
-   public String toString() {
-      return "FrameLabel";
-   }
+   /**
+    * MD5 hash of password
+    */
+   public String passwordHash;
 
    /**
     * Gets data bytes
@@ -56,12 +47,35 @@ public class FrameLabelTag extends Tag {
       OutputStream os = baos;
       SWFOutputStream sos = new SWFOutputStream(os, version);
       try {
-         sos.writeString(name);
-         if (namedAnchor) {
-            sos.writeUI8(1);
-         }
+         sos.writeUI16(0);//reserved
+         sos.writeString(passwordHash);
+
       } catch (IOException e) {
       }
       return baos.toByteArray();
+   }
+
+   /**
+    * Constructor
+    *
+    * @param data Data bytes
+    * @param version SWF version
+    * @throws IOException
+    */
+   public EnableDebugger2Tag(byte data[], int version, long pos) throws IOException {
+      super(64, data, pos);
+      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+      sis.readUI16(); //reserved
+      passwordHash = sis.readString();
+   }
+
+   /**
+    * Returns string representation of the object
+    *
+    * @return String representation of the object
+    */
+   @Override
+   public String toString() {
+      return "EnableDebugger2";
    }
 }

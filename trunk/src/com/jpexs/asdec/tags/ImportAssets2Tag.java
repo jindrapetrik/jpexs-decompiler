@@ -22,26 +22,41 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
 
-public class FrameLabelTag extends Tag {
+/**
+ * Imports characters from another file, v2
+ *
+ * @author JPEXS
+ */
+public class ImportAssets2Tag extends Tag {
 
-   private String name;
-   private boolean namedAnchor = false;
+   public String url;
+   /**
+    * HashMap with assets
+    */
+   public HashMap<Integer, String> assets;
 
-   public FrameLabelTag(byte[] data, int version, long pos) throws IOException {
-      super(43, data, pos);
+   /**
+    * Constructor
+    *
+    * @param data Data bytes
+    * @param version SWF version
+    * @throws IOException
+    */
+   public ImportAssets2Tag(byte data[], int version, long pos) throws IOException {
+      super(57, data, pos);
+      assets = new HashMap<Integer, String>();
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      name = sis.readString();
-      if (sis.available() > 0) {
-         if (sis.readUI8() == 1) {
-            namedAnchor = true;
-         }
+      url = sis.readString();
+      sis.readUI8();//reserved, must be 1
+      sis.readUI8();//reserved, must be 0
+      int count = sis.readUI16();
+      for (int i = 0; i < count; i++) {
+         int characterId = sis.readUI16();
+         String name = sis.readString();
+         assets.put(characterId, name);
       }
-   }
-
-   @Override
-   public String toString() {
-      return "FrameLabel";
    }
 
    /**
@@ -56,12 +71,26 @@ public class FrameLabelTag extends Tag {
       OutputStream os = baos;
       SWFOutputStream sos = new SWFOutputStream(os, version);
       try {
-         sos.writeString(name);
-         if (namedAnchor) {
-            sos.writeUI8(1);
+         sos.writeString(url);
+         sos.writeUI8(1); //reserved
+         sos.writeUI8(0); //reserved
+         sos.writeUI16(assets.size());
+         for (int characterId : assets.keySet()) {
+            sos.writeUI16(characterId);
+            sos.writeString(assets.get(characterId));
          }
       } catch (IOException e) {
       }
       return baos.toByteArray();
+   }
+
+   /**
+    * Returns string representation of the object
+    *
+    * @return String representation of the object
+    */
+   @Override
+   public String toString() {
+      return "ImportAssets2";
    }
 }

@@ -287,6 +287,58 @@ public class SWF {
       }
       return true;
    }
+   
+   
+   /**
+    * Decompress LZMA compressed SWF file
+    *
+    * @param fis Input stream
+    * @param fos Output stream
+    */
+   public static boolean zws2fws(InputStream fis, OutputStream fos) {
+      try {
+         byte hdr[] = new byte[3];
+      fis.read(hdr);
+      String shdr = new String(hdr);
+      if (!shdr.equals("ZWS")) {
+         return false;
+      }
+      int version = fis.read();
+      SWFInputStream sis = new SWFInputStream(fis, version, 4);
+      long fileSize = sis.readUI32();
+
+      if (hdr[0] == 'Z') {
+         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+         long outSize = sis.readUI32();
+         int propertiesSize = 5;
+         byte lzmaProperties[] = new byte[propertiesSize];
+         if (sis.read(lzmaProperties, 0, propertiesSize) != propertiesSize) {
+            throw new IOException("LZMA:input .lzma file is too short");
+         }
+         SevenZip.Compression.LZMA.Decoder decoder = new SevenZip.Compression.LZMA.Decoder();
+         if (!decoder.SetDecoderProperties(lzmaProperties)) {
+            throw new IOException("LZMA:Incorrect stream properties");
+         }
+
+         if (!decoder.Code(sis, baos, fileSize - 8)) {
+            throw new IOException("LZMA:Error in data stream");
+         }
+         SWFOutputStream sos=new SWFOutputStream(fos,version);
+         sos.write("FWS".getBytes());
+         sos.write(version);
+         sos.writeUI32(fileSize);
+         sos.write(baos.toByteArray());
+         sos.close();
+      }else{
+         return false;
+      }
+      } catch (FileNotFoundException ex) {
+         return false;
+      } catch (IOException ex) {
+         return false;
+      }
+      return true;
+   }
 
    public boolean exportActionScript(String outdir, boolean isPcode) throws Exception {
       boolean asV3Found = false;

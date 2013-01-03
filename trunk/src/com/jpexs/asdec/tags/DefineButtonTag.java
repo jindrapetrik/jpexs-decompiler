@@ -114,7 +114,7 @@ public class DefineButtonTag extends Tag implements ASMSource, TagName {
             name = ": " + eat.assets.get((Integer) buttonId);
          }
       }
-      return "DefineButtonTag (" + buttonId + name + ")";
+      return "DefineButton (" + buttonId + name + ")";
    }
 
    /**

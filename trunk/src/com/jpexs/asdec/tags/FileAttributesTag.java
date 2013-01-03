@@ -17,8 +17,11 @@
 package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
+import com.jpexs.asdec.SWFOutputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 public class FileAttributesTag extends Tag {
 
@@ -40,6 +43,42 @@ public class FileAttributesTag extends Tag {
       sis.readUB(2); // reserved
       useNetwork = sis.readUB(1) != 0;
       // UB[24] == 0 (reserved)
+      sis.readUB(24); //reserved
+   }
+   
+   /**
+    * Gets data bytes
+    *
+    * @param version SWF version
+    * @return Bytes of data
+    */
+   @Override
+   public byte[] getData(int version) {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      OutputStream os = baos;
+      SWFOutputStream sos = new SWFOutputStream(os, version);
+      try {
+         sos.writeUB(1, 0); //reserved
+         if(useDirectBlit){
+            sos.writeUB(1, 1);
+         }
+         if(useGPU){
+            sos.writeUB(1, 1);
+         }
+         if(hasMetadata){
+            sos.writeUB(1, 1);
+         }
+         if(actionScript3){
+            sos.writeUB(1, 1);
+         }
+         sos.writeUB(2, 0); //reserved
+         if(useNetwork){
+            sos.writeUB(1, 1);
+         }
+         sos.writeUB(24, 0); //reserved
+      } catch (IOException e) {
+      }
+      return baos.toByteArray();
    }
 
    @Override

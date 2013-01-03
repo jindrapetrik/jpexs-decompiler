@@ -181,6 +181,6 @@ public class DefineButton2Tag extends Tag implements Container, TagName {
             name = ": " + eat.assets.get((Integer) buttonId);
          }
       }
-      return "DefineButton2Tag (" + buttonId + name + ")";
+      return "DefineButton2 (" + buttonId + name + ")";
    }
 }

@@ -100,7 +100,7 @@ public class DoActionTag extends Tag implements ASMSource {
     */
    @Override
    public String toString() {
-      return "DoActionTag";
+      return "DoAction";
    }
 
    public List<Action> getActions(int version) {

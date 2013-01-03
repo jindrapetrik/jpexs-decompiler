@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Extends the functionality of the PlaceObject2Tag
+ * Adds character to the display list
  *
  * @author JPEXS
  */
@@ -97,6 +97,6 @@ public class PlaceObjectTag extends Tag {
     */
    @Override
    public String toString() {
-      return "PlaceObjectTag";
+      return "PlaceObject";
    }
 }

@@ -206,7 +206,7 @@ public class PlaceObject2Tag extends Tag implements Container {
     */
    @Override
    public String toString() {
-      return "PlaceObject2Tag";
+      return "PlaceObject2";
    }
 
    /**

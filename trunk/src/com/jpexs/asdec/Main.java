@@ -523,7 +523,7 @@ public class Main {
                System.err.println("FAIL");
             }
          } else if (args[pos].equals("-decompress")) {
-            if (args.length < 3) {
+            if (args.length < pos+3) {
                badArguments();
             }
 
@@ -535,7 +535,7 @@ public class Main {
                System.exit(1);
             }
          } else if (args[pos].equals("-dumpSWF")) {
-            if (args.length < 2) {
+            if (args.length < pos+2) {
                badArguments();
             }
             try {

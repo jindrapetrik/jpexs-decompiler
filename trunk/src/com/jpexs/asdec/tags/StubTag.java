@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Extends the functionality of the PlaceObject2Tag
+ * 
  *
  * @author JPEXS
  */
@@ -70,6 +70,6 @@ public class StubTag extends Tag {
     */
    @Override
    public String toString() {
-      return "PlaceObjectTag";
+      return "";
    }
 }
