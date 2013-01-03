@@ -23,6 +23,7 @@ import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.avm2.treemodel.ConstructTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.EscapeXAttrTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.EscapeXElemTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.FindPropertyTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.GetPropertyTreeItem;
@@ -62,7 +63,7 @@ public class ConstructIns extends InstructionDefinition {
       } else if (item instanceof AddTreeItem) {
          ret = ret && walkXML(((AddTreeItem) item).leftSide, list);
          ret = ret && walkXML(((AddTreeItem) item).rightSide, list);
-      } else if (item instanceof EscapeXElemTreeItem) {
+      } else if ((item instanceof EscapeXElemTreeItem)||(item instanceof EscapeXAttrTreeItem)) {
          list.add(item);
       } else {
          return false;
