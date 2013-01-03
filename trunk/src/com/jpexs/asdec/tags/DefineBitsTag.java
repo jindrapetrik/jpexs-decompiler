@@ -16,26 +16,15 @@
  */
 package com.jpexs.asdec.tags;
 
-import com.jpexs.asdec.SWFInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+public class DefineBitsTag extends Tag {
 
-public class DefineFontName extends Tag {
-
-   private int fontId;
-   private String fontName;
-   private String fontCopyright;
-
-   public DefineFontName(byte[] data, int version, long pos) throws IOException {
-      super(88, data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      fontId = sis.readUI16();
-      fontName = sis.readString();
-      fontCopyright = sis.readString();
+   public DefineBitsTag(byte[] data, int version, long pos) {
+      super(6, data, pos);
+      // TODO Auto-generated constructor stub
    }
 
    @Override
    public String toString() {
-      return "DefineFontName";
+      return "DefineBits";
    }
 }

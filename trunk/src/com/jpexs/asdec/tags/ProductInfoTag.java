@@ -20,7 +20,7 @@ import com.jpexs.asdec.SWFInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-public class ProductInfo extends Tag {
+public class ProductInfoTag extends Tag {
 
    private long productID;
    private long edition;
@@ -30,7 +30,7 @@ public class ProductInfo extends Tag {
    private long buildHigh;
    private long compilationDate;
 
-   public ProductInfo(byte[] data, int version, long pos) throws IOException {
+   public ProductInfoTag(byte[] data, int version, long pos) throws IOException {
       super(41, data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       /*

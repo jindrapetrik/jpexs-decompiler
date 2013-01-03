@@ -20,20 +20,30 @@ import com.jpexs.asdec.SWFInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-public class ScriptLimits extends Tag {
+public class FileAttributesTag extends Tag {
 
-   private int maxRecursionDepth;
-   private int scriptTimeoutSeconds;
+   private boolean useDirectBlit;
+   private boolean useGPU;
+   private boolean hasMetadata;
+   private boolean actionScript3;
+   private boolean useNetwork;
 
-   public ScriptLimits(byte[] data, int version, long pos) throws IOException {
-      super(65, data, pos);
+   public FileAttributesTag(byte[] data, int version, long pos) throws IOException {
+      super(69, data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      maxRecursionDepth = sis.readUI16();
-      scriptTimeoutSeconds = sis.readUI16();
+      sis.readUB(1); // reserved
+      // UB[1] == 0  (reserved)
+      useDirectBlit = sis.readUB(1) != 0;
+      useGPU = sis.readUB(1) != 0;
+      hasMetadata = sis.readUB(1) != 0;
+      actionScript3 = sis.readUB(1) != 0;
+      sis.readUB(2); // reserved
+      useNetwork = sis.readUB(1) != 0;
+      // UB[24] == 0 (reserved)
    }
 
    @Override
    public String toString() {
-      return "ScriptLimits";
+      return "FileAttributes";
    }
 }

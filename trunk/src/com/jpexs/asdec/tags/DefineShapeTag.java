@@ -16,23 +16,17 @@
  */
 package com.jpexs.asdec.tags;
 
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 
-public class Metadata extends Tag {
+public class DefineShapeTag extends Tag {
 
-   private String xmlMetadata;
-
-   public Metadata(byte[] data, long pos) {
-      super(77, data, pos);
-      try {
-         xmlMetadata = new String(data, "UTF-8");
-      } catch (UnsupportedEncodingException e) {
-         //ignore
-      }
+   public DefineShapeTag(byte[] data, int version, long pos) throws IOException {
+      super(2, data, pos);
+      // TODO Auto-generated constructor stub
    }
 
    @Override
    public String toString() {
-      return "Metadata";
+      return "DefineShape";
    }
 }

@@ -16,25 +16,15 @@
  */
 package com.jpexs.asdec.tags;
 
-import com.jpexs.asdec.SWFInputStream;
-import com.jpexs.asdec.types.RECT;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+public class DefineBitsJPEG3Tag extends Tag {
 
-public class DefineScalingGrid extends Tag {
-
-   private int characterId;
-   private RECT splitter;
-
-   public DefineScalingGrid(byte[] data, int version, long pos) throws IOException {
-      super(78, data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      characterId = sis.readUI16();
-      splitter = sis.readRECT();
+   public DefineBitsJPEG3Tag(byte[] data, int version, long pos) {
+      super(35, data, pos);
+      // TODO Auto-generated constructor stub
    }
 
    @Override
    public String toString() {
-      return "DefineScalingGrid";
+      return "DefineBitsJPEG3";
    }
 }

@@ -16,17 +16,26 @@
  */
 package com.jpexs.asdec.tags;
 
+import com.jpexs.asdec.SWFInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-public class DefineShape extends Tag {
+public class DefineFontNameTag extends Tag {
 
-   public DefineShape(byte[] data, int version, long pos) throws IOException {
-      super(2, data, pos);
-      // TODO Auto-generated constructor stub
+   private int fontId;
+   private String fontName;
+   private String fontCopyright;
+
+   public DefineFontNameTag(byte[] data, int version, long pos) throws IOException {
+      super(88, data, pos);
+      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+      fontId = sis.readUI16();
+      fontName = sis.readString();
+      fontCopyright = sis.readString();
    }
 
    @Override
    public String toString() {
-      return "DefineShape";
+      return "DefineFontName";
    }
 }

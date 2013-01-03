@@ -16,17 +16,22 @@
  */
 package com.jpexs.asdec.tags;
 
-import java.io.IOException;
+import com.jpexs.asdec.types.RGB;
 
-public class JPEGTables extends Tag {
+public class SetBackgroundColorTag extends Tag {
 
-   public JPEGTables(byte[] data, long pos) throws IOException {
-      super(8, data, pos);
-      // TODO Auto-generated constructor stub
+   private RGB backgroundColor;
+
+   public SetBackgroundColorTag(byte[] data, long pos) {
+      super(9, data, pos);
+      backgroundColor = new RGB();
+      backgroundColor.red = data[0] & 0xff;
+      backgroundColor.green = data[1] & 0xff;
+      backgroundColor.blue = data[2] & 0xff;
    }
 
    @Override
    public String toString() {
-      return "JPEGTables";
+      return "SetBackgroundColor";
    }
 }

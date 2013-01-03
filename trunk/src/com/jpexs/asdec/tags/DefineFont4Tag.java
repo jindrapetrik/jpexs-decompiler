@@ -16,22 +16,15 @@
  */
 package com.jpexs.asdec.tags;
 
-import com.jpexs.asdec.SWFInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+public class DefineFont4Tag extends Tag {
 
-public class RemoveObject2 extends Tag {
-
-   private int depth;
-
-   public RemoveObject2(byte[] data, int version, long pos) throws IOException {
-      super(28, data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      depth = sis.readUI16();
+   public DefineFont4Tag(byte[] data, int version, long pos) {
+      super(91, data, pos);
+      // TODO Auto-generated constructor stub
    }
 
    @Override
    public String toString() {
-      return "RemoveObject2";
+      return "DefineFont4";
    }
 }

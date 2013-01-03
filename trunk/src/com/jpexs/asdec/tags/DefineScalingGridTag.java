@@ -16,22 +16,25 @@
  */
 package com.jpexs.asdec.tags;
 
-import com.jpexs.asdec.types.RGB;
+import com.jpexs.asdec.SWFInputStream;
+import com.jpexs.asdec.types.RECT;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
-public class SetBackgroundColor extends Tag {
+public class DefineScalingGridTag extends Tag {
 
-   private RGB backgroundColor;
+   private int characterId;
+   private RECT splitter;
 
-   public SetBackgroundColor(byte[] data, long pos) {
-      super(9, data, pos);
-      backgroundColor = new RGB();
-      backgroundColor.red = data[0] & 0xff;
-      backgroundColor.green = data[1] & 0xff;
-      backgroundColor.blue = data[2] & 0xff;
+   public DefineScalingGridTag(byte[] data, int version, long pos) throws IOException {
+      super(78, data, pos);
+      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+      characterId = sis.readUI16();
+      splitter = sis.readRECT();
    }
 
    @Override
    public String toString() {
-      return "SetBackgroundColor";
+      return "DefineScalingGrid";
    }
 }

@@ -16,15 +16,15 @@
  */
 package com.jpexs.asdec.tags;
 
-public class DefineBitsLossless extends Tag {
+public class DefineBinaryDataTag extends Tag {
 
-   public DefineBitsLossless(byte[] data, int version, long pos) {
-      super(20, data, pos);
+   public DefineBinaryDataTag(byte[] data, int version, long pos) {
+      super(87, data, pos);
       // TODO Auto-generated constructor stub
    }
 
    @Override
    public String toString() {
-      return "DefineBitsLossless";
+      return "DefineBinaryData";
    }
 }

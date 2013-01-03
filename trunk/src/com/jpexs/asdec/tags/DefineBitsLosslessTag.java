@@ -16,15 +16,15 @@
  */
 package com.jpexs.asdec.tags;
 
-public class DefineFontAlignZones extends Tag {
+public class DefineBitsLosslessTag extends Tag {
 
-   public DefineFontAlignZones(byte[] data, int version, long pos) {
-      super(73, data, pos);
+   public DefineBitsLosslessTag(byte[] data, int version, long pos) {
+      super(20, data, pos);
       // TODO Auto-generated constructor stub
    }
 
    @Override
    public String toString() {
-      return "DefineFontAlignZones";
+      return "DefineBitsLossless";
    }
 }

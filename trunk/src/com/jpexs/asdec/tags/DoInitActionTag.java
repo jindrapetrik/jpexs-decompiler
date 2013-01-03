@@ -16,6 +16,8 @@
  */
 package com.jpexs.asdec.tags;
 
+import com.jpexs.asdec.tags.base.TagName;
+import com.jpexs.asdec.tags.base.ASMSource;
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.action.Action;

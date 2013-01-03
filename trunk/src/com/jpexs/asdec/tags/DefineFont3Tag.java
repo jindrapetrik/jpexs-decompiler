@@ -16,22 +16,15 @@
  */
 package com.jpexs.asdec.tags;
 
-import com.jpexs.asdec.SWFInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+public class DefineFont3Tag extends Tag {
 
-public class FrameLabel extends Tag {
-
-   private String name;
-
-   public FrameLabel(byte[] data, int version, long pos) throws IOException {
-      super(43, data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      name = sis.readString();
+   public DefineFont3Tag(byte[] data, int version, long pos) {
+      super(75, data, pos);
+      // TODO Auto-generated constructor stub
    }
 
    @Override
    public String toString() {
-      return "FrameLabel";
+      return "DefineFont3";
    }
 }

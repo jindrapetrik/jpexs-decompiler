@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2011 JPEXS
+ *  Copyright (C) 2010-2012 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -14,17 +14,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.asdec.tags;
+package com.jpexs.asdec.tags.base;
 
-public class DefineBits extends Tag {
+/**
+ *
+ * @author JPEXS
+ */
+public interface TagName {
 
-   public DefineBits(byte[] data, int version, long pos) {
-      super(6, data, pos);
-      // TODO Auto-generated constructor stub
-   }
-
-   @Override
-   public String toString() {
-      return "DefineBits";
-   }
+   public String getName();
 }

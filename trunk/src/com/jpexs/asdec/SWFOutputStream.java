@@ -505,6 +505,40 @@ public class SWFOutputStream extends OutputStream {
    }
 
    /**
+    * Writes CXFORM value to the stream
+    *
+    * @param value CXFORM value
+    * @throws IOException
+    */
+   public void writeCXFORM(CXFORM value) throws IOException {
+      writeUB(1, value.hasAddTerms ? 1 : 0);
+      writeUB(1, value.hasMultTerms ? 1 : 0);
+      int Nbits = 1;
+      if (value.hasMultTerms) {
+         Nbits = enlargeBitCountS(Nbits, value.redMultTerm);
+         Nbits = enlargeBitCountS(Nbits, value.greenMultTerm);
+         Nbits = enlargeBitCountS(Nbits, value.blueMultTerm);
+      }
+      if (value.hasAddTerms) {
+         Nbits = enlargeBitCountS(Nbits, value.redAddTerm);
+         Nbits = enlargeBitCountS(Nbits, value.greenAddTerm);
+         Nbits = enlargeBitCountS(Nbits, value.blueAddTerm);
+      }
+      writeUB(4, Nbits);
+      if (value.hasMultTerms) {
+         writeSB(Nbits, value.redMultTerm);
+         writeSB(Nbits, value.greenMultTerm);
+         writeSB(Nbits, value.blueMultTerm);
+      }
+      if (value.hasAddTerms) {
+         writeSB(Nbits, value.redAddTerm);
+         writeSB(Nbits, value.greenAddTerm);
+         writeSB(Nbits, value.blueAddTerm);
+      }
+      alignByte();
+   }
+   
+   /**
     * Writes CXFORMWITHALPHA value to the stream
     *
     * @param value CXFORMWITHALPHA value

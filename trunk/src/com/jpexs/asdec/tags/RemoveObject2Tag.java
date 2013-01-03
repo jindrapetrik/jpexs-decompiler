@@ -16,15 +16,22 @@
  */
 package com.jpexs.asdec.tags;
 
-public class DefineBinaryData extends Tag {
+import com.jpexs.asdec.SWFInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
-   public DefineBinaryData(byte[] data, int version, long pos) {
-      super(87, data, pos);
-      // TODO Auto-generated constructor stub
+public class RemoveObject2Tag extends Tag {
+
+   private int depth;
+
+   public RemoveObject2Tag(byte[] data, int version, long pos) throws IOException {
+      super(28, data, pos);
+      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+      depth = sis.readUI16();
    }
 
    @Override
    public String toString() {
-      return "DefineBinaryData";
+      return "RemoveObject2";
    }
 }

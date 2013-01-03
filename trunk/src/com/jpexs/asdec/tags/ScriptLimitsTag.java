@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 JPEXS
+ *  Copyright (C) 2010-2011 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,11 +16,24 @@
  */
 package com.jpexs.asdec.tags;
 
-/**
- *
- * @author JPEXS
- */
-public interface TagName {
+import com.jpexs.asdec.SWFInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
-   public String getName();
+public class ScriptLimitsTag extends Tag {
+
+   private int maxRecursionDepth;
+   private int scriptTimeoutSeconds;
+
+   public ScriptLimitsTag(byte[] data, int version, long pos) throws IOException {
+      super(65, data, pos);
+      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+      maxRecursionDepth = sis.readUI16();
+      scriptTimeoutSeconds = sis.readUI16();
+   }
+
+   @Override
+   public String toString() {
+      return "ScriptLimits";
+   }
 }

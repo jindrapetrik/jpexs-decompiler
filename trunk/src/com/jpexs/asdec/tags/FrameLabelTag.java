@@ -16,26 +16,22 @@
  */
 package com.jpexs.asdec.tags;
 
-import java.util.List;
+import com.jpexs.asdec.SWFInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
-/**
- * Object which contains other objects
- *
- * @author JPEXS
- */
-public interface Container {
+public class FrameLabelTag extends Tag {
 
-   /**
-    * Returns all sub-items
-    *
-    * @return List of sub-items
-    */
-   public List<Object> getSubItems();
+   private String name;
 
-   /**
-    * Returns number of sub-items
-    *
-    * @return Number of sub-items
-    */
-   public int getItemCount();
+   public FrameLabelTag(byte[] data, int version, long pos) throws IOException {
+      super(43, data, pos);
+      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+      name = sis.readString();
+   }
+
+   @Override
+   public String toString() {
+      return "FrameLabel";
+   }
 }

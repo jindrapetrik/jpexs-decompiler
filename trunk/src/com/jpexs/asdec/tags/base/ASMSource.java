@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.asdec.tags;
+package com.jpexs.asdec.tags.base;
 
 import com.jpexs.asdec.action.Action;
 import java.util.List;

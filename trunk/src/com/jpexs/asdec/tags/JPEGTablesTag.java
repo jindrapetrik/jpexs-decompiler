@@ -16,15 +16,17 @@
  */
 package com.jpexs.asdec.tags;
 
-public class DefineBitsJPEG2 extends Tag {
+import java.io.IOException;
 
-   public DefineBitsJPEG2(byte[] data, int version, long pos) {
-      super(21, data, pos);
+public class JPEGTablesTag extends Tag {
+
+   public JPEGTablesTag(byte[] data, long pos) throws IOException {
+      super(8, data, pos);
       // TODO Auto-generated constructor stub
    }
 
    @Override
    public String toString() {
-      return "DefineBitsJPEG2";
+      return "JPEGTables";
    }
 }

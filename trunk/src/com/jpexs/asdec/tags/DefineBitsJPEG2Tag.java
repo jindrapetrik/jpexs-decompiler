@@ -16,15 +16,15 @@
  */
 package com.jpexs.asdec.tags;
 
-public class DefineFont4 extends Tag {
+public class DefineBitsJPEG2Tag extends Tag {
 
-   public DefineFont4(byte[] data, int version, long pos) {
-      super(91, data, pos);
+   public DefineBitsJPEG2Tag(byte[] data, int version, long pos) {
+      super(21, data, pos);
       // TODO Auto-generated constructor stub
    }
 
    @Override
    public String toString() {
-      return "DefineFont4";
+      return "DefineBitsJPEG2";
    }
 }

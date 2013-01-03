@@ -16,31 +16,17 @@
  */
 package com.jpexs.asdec.tags;
 
-import com.jpexs.asdec.SWFInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-public class SymbolClass extends Tag {
+public class DefineBitsLossless2Tag extends Tag {
 
-   private int tagIDs[];
-   private String classNames[];
-
-   public SymbolClass(byte[] data, int version, long pos) throws IOException {
-      super(76, data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      int numSymbols = sis.readUI16();
-      tagIDs = new int[numSymbols];
-      classNames = new String[numSymbols];
-      for (int ii = 0; ii < numSymbols; ii++) {
-         int tagID = sis.readUI16();
-         String className = sis.readString();
-         tagIDs[ii] = tagID;
-         classNames[ii] = className;
-      }
+   public DefineBitsLossless2Tag(byte[] data, int version, long pos) throws IOException {
+      super(36, data, pos);
+      // TODO Auto-generated constructor stub
    }
 
    @Override
    public String toString() {
-      return "SymbolClass";
+      return "DefineBitsLossless2";
    }
 }

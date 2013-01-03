@@ -25,7 +25,7 @@ import com.jpexs.asdec.action.parser.ParseException;
 import com.jpexs.asdec.gui.LoadingPanel;
 import com.jpexs.asdec.gui.View;
 import com.jpexs.asdec.helpers.Highlighting;
-import com.jpexs.asdec.tags.ASMSource;
+import com.jpexs.asdec.tags.base.ASMSource;
 import com.jpexs.asdec.tags.Tag;
 import java.awt.BorderLayout;
 import java.awt.Container;

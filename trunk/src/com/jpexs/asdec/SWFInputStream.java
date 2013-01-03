@@ -516,40 +516,40 @@ public class SWFInputStream extends InputStream {
             ret = new DefineButton2Tag(data, version, pos);
             break;
          case 69:
-            ret = new FileAttributes(data, version, pos);
+            ret = new FileAttributesTag(data, version, pos);
             break;
          case 77:
-            ret = new Metadata(data, pos);
+            ret = new MetadataTag(data, pos);
             break;
          case 65:
-            ret = new ScriptLimits(data, version, pos);
+            ret = new ScriptLimitsTag(data, version, pos);
             break;
          case 9:
-            ret = new SetBackgroundColor(data, pos);
+            ret = new SetBackgroundColorTag(data, pos);
             break;
          case 41:
-            ret = new ProductInfo(data, version, pos);
+            ret = new ProductInfoTag(data, version, pos);
             break;
          case 43:
-            ret = new FrameLabel(data, version, pos);
+            ret = new FrameLabelTag(data, version, pos);
             break;
          case 36:
-            ret = new DefineBitsLossless2(data, version, pos);
+            ret = new DefineBitsLossless2Tag(data, version, pos);
             break;
          case 76:
-            ret = new SymbolClass(data, version, pos);
+            ret = new SymbolClassTag(data, version, pos);
             break;
          case 32:
             ret = new DefineShape3(data, version, pos);
             break;
          case 28:
-            ret = new RemoveObject2(data, version, pos);
+            ret = new RemoveObject2Tag(data, version, pos);
             break;
          case 78:
-            ret = new DefineScalingGrid(data, version, pos);
+            ret = new DefineScalingGridTag(data, version, pos);
             break;
          case 2:
-            ret = new DefineShape(data, version, pos);
+            ret = new DefineShapeTag(data, version, pos);
             break;
          case 22:
             ret = new DefineShape2(data, version, pos);
@@ -558,34 +558,34 @@ public class SWFInputStream extends InputStream {
             ret = new DefineShape4(data, version, pos);
             break;
          case 20:
-            ret = new DefineBitsLossless(data, version, pos);
+            ret = new DefineBitsLosslessTag(data, version, pos);
             break;
          case 35:
-            ret = new DefineBitsJPEG3(data, version, pos);
+            ret = new DefineBitsJPEG3Tag(data, version, pos);
             break;
          case 87:
-            ret = new DefineBinaryData(data, version, pos);
+            ret = new DefineBinaryDataTag(data, version, pos);
             break;
          case 8:
-            ret = new JPEGTables(data, pos);
+            ret = new JPEGTablesTag(data, pos);
             break;
          case 6:
-            ret = new DefineBits(data, version, pos);
+            ret = new DefineBitsTag(data, version, pos);
             break;
          case 21:
-            ret = new DefineBitsJPEG2(data, version, pos);
+            ret = new DefineBitsJPEG2Tag(data, version, pos);
             break;
          case 75:
-            ret = new DefineFont3(data, version, pos);
+            ret = new DefineFont3Tag(data, version, pos);
             break;
          case 73:
-            ret = new DefineFontAlignZones(data, version, pos);
+            ret = new DefineFontAlignZonesTag(data, version, pos);
             break;
          case 88:
-            ret = new DefineFontName(data, version, pos);
+            ret = new DefineFontNameTag(data, version, pos);
             break;
          case 91:
-            ret = new DefineFont4(data, version, pos);
+            ret = new DefineFont4Tag(data, version, pos);
             break;
          default:
             ret = new Tag(tagID, data, pos);
@@ -880,6 +880,32 @@ public class SWFInputStream extends InputStream {
          ret.greenAddTerm = (int) readSB(Nbits);
          ret.blueAddTerm = (int) readSB(Nbits);
          ret.alphaAddTerm = (int) readSB(Nbits);
+      }
+      alignByte();
+      return ret;
+   }
+   
+   /**
+    * Reads one CXFORM value from the stream
+    *
+    * @return CXFORM value
+    * @throws IOException
+    */
+   public CXFORM readCXFORM() throws IOException {
+      CXFORM ret = new CXFORM();
+      ret.hasAddTerms = readUB(1) == 1;
+      ret.hasMultTerms = readUB(1) == 1;
+      int Nbits = (int) readUB(4);
+      ret.nbits = Nbits;
+      if (ret.hasMultTerms) {
+         ret.redMultTerm = (int) readSB(Nbits);
+         ret.greenMultTerm = (int) readSB(Nbits);
+         ret.blueMultTerm = (int) readSB(Nbits);         
+      }
+      if (ret.hasAddTerms) {
+         ret.redAddTerm = (int) readSB(Nbits);
+         ret.greenAddTerm = (int) readSB(Nbits);
+         ret.blueAddTerm = (int) readSB(Nbits);
       }
       alignByte();
       return ret;

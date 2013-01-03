@@ -16,6 +16,7 @@
  */
 package com.jpexs.asdec.tags;
 
+import com.jpexs.asdec.tags.base.ASMSource;
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.action.Action;
 import java.io.ByteArrayInputStream;

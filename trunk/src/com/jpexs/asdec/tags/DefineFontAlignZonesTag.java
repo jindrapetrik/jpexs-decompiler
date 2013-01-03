@@ -16,17 +16,15 @@
  */
 package com.jpexs.asdec.tags;
 
-import java.io.IOException;
+public class DefineFontAlignZonesTag extends Tag {
 
-public class DefineBitsLossless2 extends Tag {
-
-   public DefineBitsLossless2(byte[] data, int version, long pos) throws IOException {
-      super(36, data, pos);
+   public DefineFontAlignZonesTag(byte[] data, int version, long pos) {
+      super(73, data, pos);
       // TODO Auto-generated constructor stub
    }
 
    @Override
    public String toString() {
-      return "DefineBitsLossless2";
+      return "DefineFontAlignZones";
    }
 }

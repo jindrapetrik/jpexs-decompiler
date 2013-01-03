@@ -20,30 +20,27 @@ import com.jpexs.asdec.SWFInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-public class FileAttributes extends Tag {
+public class SymbolClassTag extends Tag {
 
-   private boolean useDirectBlit;
-   private boolean useGPU;
-   private boolean hasMetadata;
-   private boolean actionScript3;
-   private boolean useNetwork;
+   private int tagIDs[];
+   private String classNames[];
 
-   public FileAttributes(byte[] data, int version, long pos) throws IOException {
-      super(69, data, pos);
+   public SymbolClassTag(byte[] data, int version, long pos) throws IOException {
+      super(76, data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      sis.readUB(1); // reserved
-      // UB[1] == 0  (reserved)
-      useDirectBlit = sis.readUB(1) != 0;
-      useGPU = sis.readUB(1) != 0;
-      hasMetadata = sis.readUB(1) != 0;
-      actionScript3 = sis.readUB(1) != 0;
-      sis.readUB(2); // reserved
-      useNetwork = sis.readUB(1) != 0;
-      // UB[24] == 0 (reserved)
+      int numSymbols = sis.readUI16();
+      tagIDs = new int[numSymbols];
+      classNames = new String[numSymbols];
+      for (int ii = 0; ii < numSymbols; ii++) {
+         int tagID = sis.readUI16();
+         String className = sis.readString();
+         tagIDs[ii] = tagID;
+         classNames[ii] = className;
+      }
    }
 
    @Override
    public String toString() {
-      return "FileAttributes";
+      return "SymbolClass";
    }
 }

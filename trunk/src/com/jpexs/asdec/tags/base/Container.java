@@ -14,17 +14,28 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.asdec.tags;
+package com.jpexs.asdec.tags.base;
 
-public class DefineBitsJPEG3 extends Tag {
+import java.util.List;
 
-   public DefineBitsJPEG3(byte[] data, int version, long pos) {
-      super(35, data, pos);
-      // TODO Auto-generated constructor stub
-   }
+/**
+ * Object which contains other objects
+ *
+ * @author JPEXS
+ */
+public interface Container {
 
-   @Override
-   public String toString() {
-      return "DefineBitsJPEG3";
-   }
+   /**
+    * Returns all sub-items
+    *
+    * @return List of sub-items
+    */
+   public List<Object> getSubItems();
+
+   /**
+    * Returns number of sub-items
+    *
+    * @return Number of sub-items
+    */
+   public int getItemCount();
 }

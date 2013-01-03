@@ -16,15 +16,23 @@
  */
 package com.jpexs.asdec.tags;
 
-public class DefineFont3 extends Tag {
+import java.io.UnsupportedEncodingException;
 
-   public DefineFont3(byte[] data, int version, long pos) {
-      super(75, data, pos);
-      // TODO Auto-generated constructor stub
+public class MetadataTag extends Tag {
+
+   private String xmlMetadata;
+
+   public MetadataTag(byte[] data, long pos) {
+      super(77, data, pos);
+      try {
+         xmlMetadata = new String(data, "UTF-8");
+      } catch (UnsupportedEncodingException e) {
+         //ignore
+      }
    }
 
    @Override
    public String toString() {
-      return "DefineFont3";
+      return "Metadata";
    }
 }
