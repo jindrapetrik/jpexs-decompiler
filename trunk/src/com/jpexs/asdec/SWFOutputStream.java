@@ -40,6 +40,12 @@ public class SWFOutputStream extends OutputStream {
    private int version;
    private long pos = 0;
 
+   public long getPos() {
+      return pos;
+   }
+
+   
+   
    /**
     * Constructor
     *
@@ -983,7 +989,7 @@ public class SWFOutputStream extends OutputStream {
    public void writeFILLSTYLE(FILLSTYLE value, int shapeNum) throws IOException {
       writeUI8(value.fillStyleType);
       if (value.fillStyleType == FILLSTYLE.SOLID) {
-         if (shapeNum == 3) {
+         if (shapeNum >= 3) {
             writeRGBA(value.colorA);
          } else if (shapeNum == 1 || shapeNum == 2) {
             writeRGB(value.color);
@@ -1545,7 +1551,7 @@ public class SWFOutputStream extends OutputStream {
     * @throws IOException
     */
    public void writeZONEDATA(ZONEDATA value) throws IOException {
-      writeFLOAT16(value.alignmentCoordinate);
-      writeFLOAT16(value.range);
+      writeUI16(value.alignmentCoordinate);
+      writeUI16(value.range);
    }
 }

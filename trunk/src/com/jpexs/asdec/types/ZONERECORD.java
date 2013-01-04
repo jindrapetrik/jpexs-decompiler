@@ -26,4 +26,17 @@ public class ZONERECORD {
    public ZONEDATA zonedata[];
    public boolean zoneMaskX;
    public boolean zoneMaskY;
+
+   @Override
+   public String toString() {
+      String ret="[ZONERECORD data:";
+      for(int i=0;i<zonedata.length;i++){
+         if(i>0){
+            ret+=", ";
+         }
+         ret+=zonedata[i];
+      }
+      return ret+", zoneMaskX:"+zoneMaskX+", zoneMaskY:"+zoneMaskY+"]";
+   }
+   
 }

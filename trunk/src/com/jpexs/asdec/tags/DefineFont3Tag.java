@@ -18,6 +18,7 @@ package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.abc.CopyOutputStream;
 import com.jpexs.asdec.types.KERNINGRECORD;
 import com.jpexs.asdec.types.LANGCODE;
 import com.jpexs.asdec.types.RECT;
@@ -26,6 +27,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 public class DefineFont3Tag extends Tag {
 
@@ -75,15 +77,23 @@ public class DefineFont3Tag extends Tag {
             offsetTable[i] = sis.readUI16();
          }
       }
-      long codeTableOffset = sis.readUI32();
+      long codeTableOffset;
+      if (fontFlagsWideOffsets) {
+         codeTableOffset = sis.readUI32();
+      } else {
+         codeTableOffset = sis.readUI16();
+      }
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      CopyOutputStream cos = new CopyOutputStream(baos, new ByteArrayInputStream(Arrays.copyOfRange(data, (int) sis.getPos(), data.length - (int) sis.getPos())));
+      SWFOutputStream scos = new SWFOutputStream(cos, 10);
       glyphShapeTable = new SHAPE[numGlyphs];
       for (int i = 0; i < numGlyphs; i++) {
          glyphShapeTable[i] = sis.readSHAPE(1);
+         scos.writeSHAPE(glyphShapeTable[i], 1);
       }
-
       codeTable = new int[numGlyphs];
       for (int i = 0; i < numGlyphs; i++) {
-         if (fontFlagsWideOffsets) {
+         if (fontFlagsWideCodes) {
             codeTable[i] = sis.readUI16();
          } else {
             codeTable[i] = sis.readUI8();
@@ -133,7 +143,7 @@ public class DefineFont3Tag extends Tag {
          sos.writeLANGCODE(languageCode);
          sos.writeUI8(fontName.getBytes().length);
          sos.write(fontName.getBytes());
-         sos.write(numGlyphs);
+         sos.writeUI16(numGlyphs);
 
          ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
          SWFOutputStream sos2 = new SWFOutputStream(baos2, version);
@@ -146,14 +156,24 @@ public class DefineFont3Tag extends Tag {
          }
          byte ba2[] = baos2.toByteArray();
          ByteArrayOutputStream baos3 = new ByteArrayOutputStream();
-         SWFOutputStream sos3 = new SWFOutputStream(baos2, version);
+
+         CopyOutputStream cos = new CopyOutputStream(baos3, new ByteArrayInputStream(Arrays.copyOfRange(data, (int) sos.getPos() + ba2.length + (fontFlagsWideOffsets ? 4 : 2), (int) data.length - (int) sos.getPos() - ba2.length - (fontFlagsWideOffsets ? 4 : 2))));
+         SWFOutputStream sos3 = new SWFOutputStream(cos, version);
          for (int i = 0; i < numGlyphs; i++) {
             sos3.writeSHAPE(glyphShapeTable[i], 1);
          }
          byte ba3[] = baos3.toByteArray();
          sos.write(ba2);
-         sos.writeUI32(ba2.length + ba3.length + 4);
+         //codetableoffset 881         
+         if (fontFlagsWideOffsets) {
+            long offset = ba2.length + ba3.length + 4;
+            sos.writeUI32(offset);
+         } else {
+            long offset = ba2.length + ba3.length + 2;
+            sos.writeUI16((int)offset);
+         }
          sos.write(ba3);
+
 
          for (int i = 0; i < numGlyphs; i++) {
             if (fontFlagsWideCodes) {

@@ -23,7 +23,9 @@ import com.jpexs.asdec.gui.LoadingDialog;
 import com.jpexs.asdec.gui.ModeFrame;
 import com.jpexs.asdec.gui.View;
 import com.jpexs.asdec.gui.proxy.ProxyFrame;
+import com.jpexs.asdec.tags.DefineBitsTag;
 import com.jpexs.asdec.tags.DoABCTag;
+import com.jpexs.asdec.tags.JPEGTablesTag;
 import com.jpexs.asdec.tags.Tag;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -540,7 +542,7 @@ public class Main {
             }
             try {
                dump_tags = true;
-               parseSWF(args[pos + 1]);
+               SWF swf = parseSWF(args[pos + 1]);
             } catch (Exception ex) {
                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                System.exit(1);

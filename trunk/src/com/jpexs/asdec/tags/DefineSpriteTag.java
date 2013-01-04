@@ -105,8 +105,9 @@ public class DefineSpriteTag extends Tag implements Container, TagName {
    public String toString() {
       String name = "";
       for (ExportAssetsTag eat : exportAssetsTags) {
-         if (eat.assets.containsKey(spriteId)) {
-            name = ": " + eat.assets.get((Integer) spriteId);
+         int pos=eat.tags.indexOf(spriteId);         
+         if (pos>-1) {
+            name = ": " + eat.names.get(pos);
          }
       }
       return "DefineSpriteTag (" + spriteId + name + ")";

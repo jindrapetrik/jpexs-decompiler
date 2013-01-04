@@ -19,13 +19,19 @@ package com.jpexs.asdec;
 import SevenZip.Compression.LZMA.Encoder;
 import com.jpexs.asdec.action.TagNode;
 import com.jpexs.asdec.helpers.Highlighting;
+import com.jpexs.asdec.tags.DefineBitsJPEG2Tag;
+import com.jpexs.asdec.tags.DefineBitsJPEG3Tag;
+import com.jpexs.asdec.tags.DefineBitsJPEG4Tag;
+import com.jpexs.asdec.tags.DefineBitsTag;
 import com.jpexs.asdec.tags.DoABCTag;
+import com.jpexs.asdec.tags.JPEGTablesTag;
 import com.jpexs.asdec.tags.Tag;
 import com.jpexs.asdec.tags.base.ASMSource;
 import com.jpexs.asdec.tags.base.TagName;
 import com.jpexs.asdec.types.RECT;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.zip.DeflaterOutputStream;
@@ -432,6 +438,103 @@ public class SWF {
    protected void informListeners(String event, Object data) {
       for (EventListener listener : listeners) {
          listener.handleEvent(event, data);
+      }
+   }
+
+   private String getImageFormat(byte data[]) {
+      if (hasErrorHeader(data)) {
+         return "jpg";
+      }
+      if (data.length > 2 && ((data[0] & 0xff) == 0xff) && ((data[1] & 0xff) == 0xd8)) {
+         return "jpg";
+      }
+      if (data.length > 6 && ((data[0] & 0xff) == 0x47) && ((data[1] & 0xff) == 0x49) && ((data[2] & 0xff) == 0x46) && ((data[3] & 0xff) == 0x38) && ((data[4] & 0xff) == 0x39) && ((data[5] & 0xff) == 0x61)) {
+         return "gif";
+      }
+
+      if (data.length > 8 && ((data[0] & 0xff) == 0x89) && ((data[1] & 0xff) == 0x50) && ((data[2] & 0xff) == 0x4e) && ((data[3] & 0xff) == 0x47) && ((data[4] & 0xff) == 0x0d) && ((data[5] & 0xff) == 0x0a) && ((data[6] & 0xff) == 0x1a) && ((data[7] & 0xff) == 0x0a)) {
+         return "png";
+      }
+
+      return "unk";
+   }
+
+   private boolean hasErrorHeader(byte data[]) {
+      if (data.length > 4) {
+         if ((data[0] & 0xff) == 0xff) {
+            if ((data[1] & 0xff) == 0xd9) {
+               if ((data[2] & 0xff) == 0xff) {
+                  if ((data[3] & 0xff) == 0xd8) {
+                     return true;
+                  }
+               }
+            }
+         }
+      }
+      return false;
+   }
+
+   public void exportImages(String outdir) throws IOException {
+      JPEGTablesTag jtt = null;
+      for (Tag t : tags) {
+         if (t instanceof JPEGTablesTag) {
+            jtt = (JPEGTablesTag) t;
+         }
+      }
+
+      for (Tag t : tags) {
+         if ((t instanceof DefineBitsJPEG2Tag)||(t instanceof DefineBitsJPEG3Tag)||(t instanceof DefineBitsJPEG4Tag)) {
+            byte imageData[]=null;
+            int characterID=0;
+            if(t instanceof DefineBitsJPEG2Tag){
+               imageData=((DefineBitsJPEG2Tag)t).imageData;
+               characterID=((DefineBitsJPEG2Tag)t).characterID;
+            }
+            if(t instanceof DefineBitsJPEG3Tag){
+               imageData=((DefineBitsJPEG3Tag)t).imageData;
+               characterID=((DefineBitsJPEG3Tag)t).characterID;
+            }
+            if(t instanceof DefineBitsJPEG4Tag){
+               imageData=((DefineBitsJPEG4Tag)t).imageData;
+               characterID=((DefineBitsJPEG4Tag)t).characterID;
+            }
+            
+            FileOutputStream fos = null;
+            try {
+               fos = new FileOutputStream(outdir + File.separator + characterID + "."+getImageFormat(imageData));
+               if (hasErrorHeader(imageData)) {
+                  fos.write(imageData,4,imageData.length-4);
+               } else {
+                  fos.write(imageData);
+               }
+            } finally {
+               if (fos != null) {
+                  try {
+                     fos.close();
+                  } catch (Exception ex) {
+                     //ignore
+                  }
+               }
+            }
+         }
+         if ((jtt != null) && (t instanceof DefineBitsTag)) {
+            DefineBitsTag dbt = (DefineBitsTag) t;
+            FileOutputStream fos = null;
+            try {
+               fos = new FileOutputStream(outdir + File.separator + dbt.characterID + ".jpg");
+               byte data[] = jtt.getData(10);
+               fos.write(data, hasErrorHeader(data) ? 4 : 0, data.length - (hasErrorHeader(data) ? 6 : 2));
+               fos.write(dbt.jpegData, hasErrorHeader(dbt.jpegData) ? 6 : 2, dbt.jpegData.length - (hasErrorHeader(data) ? 6 : 2));
+            } finally {
+               if (fos != null) {
+                  try {
+                     fos.close();
+                  } catch (Exception ex) {
+                     //ignore
+                  }
+               }
+            }
+         }
       }
    }
 }

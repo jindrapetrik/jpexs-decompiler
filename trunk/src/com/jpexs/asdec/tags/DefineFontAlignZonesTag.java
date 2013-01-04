@@ -40,7 +40,8 @@ public class DefineFontAlignZonesTag extends Tag {
       sis.readUB(6);
       zoneTable = new ArrayList<ZONERECORD>();
       while (sis.available() > 0) {
-         zoneTable.add(sis.readZONERECORD());
+         ZONERECORD zr=sis.readZONERECORD();
+         zoneTable.add(zr);
       }
    }
 

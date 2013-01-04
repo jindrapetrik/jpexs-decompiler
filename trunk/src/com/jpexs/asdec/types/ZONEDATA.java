@@ -23,6 +23,13 @@ package com.jpexs.asdec.types;
  */
 public class ZONEDATA {
 
-   public float alignmentCoordinate;
-   public float range;
+   public int alignmentCoordinate;
+   public int range;
+
+   @Override
+   public String toString() {
+      return "[ZONEDATA alignmentCoordinate="+alignmentCoordinate+", range="+range+"]";
+   }
+   
+   
 }

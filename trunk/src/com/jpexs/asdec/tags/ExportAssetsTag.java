@@ -22,7 +22,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Makes portions of a SWF file available for import by other SWF files
@@ -34,7 +36,8 @@ public class ExportAssetsTag extends Tag {
    /**
     * HashMap with assets
     */
-   public HashMap<Integer, String> assets;
+   public List<Integer> tags;
+   public List<String> names;
 
    /**
     * Constructor
@@ -45,13 +48,15 @@ public class ExportAssetsTag extends Tag {
     */
    public ExportAssetsTag(byte[] data, int version, long pos) throws IOException {
       super(56, data, pos);
-      assets = new HashMap<Integer, String>();
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       int count = sis.readUI16();
+      tags=new ArrayList<Integer>();
+      names=new ArrayList<String>();
       for (int i = 0; i < count; i++) {
          int characterId = sis.readUI16();
+         tags.add(characterId);
          String name = sis.readString();
-         assets.put(characterId, name);
+         names.add(name);
       }
    }
 
@@ -67,10 +72,10 @@ public class ExportAssetsTag extends Tag {
       OutputStream os = baos;
       SWFOutputStream sos = new SWFOutputStream(os, version);
       try {
-         sos.writeUI16(assets.size());
-         for (int characterId : assets.keySet()) {
-            sos.writeUI16(characterId);
-            sos.writeString(assets.get(characterId));
+         sos.writeUI16(tags.size());
+         for (int i = 0; i < tags.size(); i++) {
+            sos.writeUI16(tags.get(i));
+            sos.writeString(names.get(i));
          }
       } catch (IOException e) {
       }

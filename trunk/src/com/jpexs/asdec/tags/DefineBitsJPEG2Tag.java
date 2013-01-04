@@ -22,13 +22,13 @@ import java.io.IOException;
 
 public class DefineBitsJPEG2Tag extends Tag {
 
-   public int characterId;
+   public int characterID;
    public byte[] imageData;
 
    public DefineBitsJPEG2Tag(byte[] data, int version, long pos) throws IOException {
       super(21, data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      characterId = sis.readUI16();
+      characterID = sis.readUI16();
       imageData = sis.readBytes(sis.available());
    }
 

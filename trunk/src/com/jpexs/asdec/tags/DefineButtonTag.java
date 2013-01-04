@@ -110,8 +110,9 @@ public class DefineButtonTag extends Tag implements ASMSource, TagName {
    public String toString() {
       String name = "";
       for (ExportAssetsTag eat : exportAssetsTags) {
-         if (eat.assets.containsKey(buttonId)) {
-            name = ": " + eat.assets.get((Integer) buttonId);
+         int pos=eat.tags.indexOf(buttonId);         
+         if (pos>-1) {
+            name = ": " + eat.names.get(pos);
          }
       }
       return "DefineButton (" + buttonId + name + ")";

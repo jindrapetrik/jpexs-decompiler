@@ -1502,10 +1502,10 @@ public class SWFInputStream extends InputStream {
     * @return GRADRECORD value
     * @throws IOException
     */
-   public GRADRECORD readGRADRECORD(boolean inShape3) throws IOException {
+   public GRADRECORD readGRADRECORD(int shapeNum) throws IOException {
       GRADRECORD ret = new GRADRECORD();
       ret.ratio = readUI8();
-      if (ret.inShape3 = inShape3) {
+      if (shapeNum >= 3) {
          ret.colorA = readRGBA();
       } else {
          ret.color = readRGB();
@@ -1519,14 +1519,14 @@ public class SWFInputStream extends InputStream {
     * @return GRADIENT value
     * @throws IOException
     */
-   public GRADIENT readGRADIENT(boolean inShape3) throws IOException {
+   public GRADIENT readGRADIENT(int shapeNum) throws IOException {
       GRADIENT ret = new GRADIENT();
       ret.spreadMode = (int) readUB(2);
       ret.interPolationMode = (int) readUB(2);
       int numGradients = (int) readUB(4);
       ret.gradientRecords = new GRADRECORD[numGradients];
       for (int i = 0; i < numGradients; i++) {
-         ret.gradientRecords[i] = readGRADRECORD(inShape3);
+         ret.gradientRecords[i] = readGRADRECORD(shapeNum);
 
       }
       return ret;
@@ -1538,14 +1538,14 @@ public class SWFInputStream extends InputStream {
     * @return FOCALGRADIENT value
     * @throws IOException
     */
-   public FOCALGRADIENT readFOCALGRADIENT(boolean inShape3) throws IOException {
+   public FOCALGRADIENT readFOCALGRADIENT(int shapeNum) throws IOException {
       FOCALGRADIENT ret = new FOCALGRADIENT();
       ret.spreadMode = (int) readUB(2);
       ret.interPolationMode = (int) readUB(2);
       int numGradients = (int) readUB(4);
       ret.gradientRecords = new GRADRECORD[numGradients];
       for (int i = 0; i < numGradients; i++) {
-         ret.gradientRecords[i] = readGRADRECORD(inShape3);
+         ret.gradientRecords[i] = readGRADRECORD(shapeNum);
       }
       ret.focalPoint = readFIXED8();
       return ret;
@@ -1557,11 +1557,11 @@ public class SWFInputStream extends InputStream {
     * @return FILLSTYLE value
     * @throws IOException
     */
-   public FILLSTYLE readFILLSTYLE(boolean inShape3) throws IOException {
+   public FILLSTYLE readFILLSTYLE(int shapeNum) throws IOException {
       FILLSTYLE ret = new FILLSTYLE();
       ret.fillStyleType = readUI8();
       if (ret.fillStyleType == FILLSTYLE.SOLID) {
-         if (ret.inShape3 = inShape3) {
+         if (shapeNum >= 3) {
             ret.colorA = readRGBA();
          } else {
             ret.color = readRGB();
@@ -1574,10 +1574,10 @@ public class SWFInputStream extends InputStream {
       }
       if ((ret.fillStyleType == FILLSTYLE.LINEAR_GRADIENT)
               || (ret.fillStyleType == FILLSTYLE.RADIAL_GRADIENT)) {
-         ret.gradient = readGRADIENT(inShape3);
+         ret.gradient = readGRADIENT(shapeNum);
       }
       if (ret.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
-         ret.focalGradient = readFOCALGRADIENT(inShape3);
+         ret.focalGradient = readFOCALGRADIENT(shapeNum);
       }
 
       if ((ret.fillStyleType == FILLSTYLE.REPEATING_BITMAP)
@@ -1600,13 +1600,12 @@ public class SWFInputStream extends InputStream {
 
       FILLSTYLEARRAY ret = new FILLSTYLEARRAY();
       int fillStyleCount = readUI8();
-
-      if (((shapeNum == 2) || (shapeNum == 3)) && (fillStyleCount == 0xff)) {
+      if (((shapeNum == 2) || (shapeNum == 3) || (shapeNum == 4/*?*/)) && (fillStyleCount == 0xff)) {
          fillStyleCount = readUI16();
       }
       ret.fillStyles = new FILLSTYLE[fillStyleCount];
       for (int i = 0; i < fillStyleCount; i++) {
-         ret.fillStyles[i] = readFILLSTYLE(shapeNum == 3);
+         ret.fillStyles[i] = readFILLSTYLE(shapeNum);
       }
       return ret;
    }
@@ -1635,7 +1634,7 @@ public class SWFInputStream extends InputStream {
     * @return LINESTYLE2 value
     * @throws IOException
     */
-   public LINESTYLE2 readLINESTYLE2(boolean inShape3) throws IOException {
+   public LINESTYLE2 readLINESTYLE2(int shapeNum) throws IOException {
       LINESTYLE2 ret = new LINESTYLE2();
       ret.width = readUI16();
       ret.startCapStyle = (int) readUB(2);
@@ -1653,7 +1652,7 @@ public class SWFInputStream extends InputStream {
       if (!ret.hasFillFlag) {
          ret.color = readRGBA();
       } else {
-         ret.fillType = readFILLSTYLE(inShape3);
+         ret.fillType = readFILLSTYLE(shapeNum);
       }
       return ret;
    }
@@ -1678,7 +1677,7 @@ public class SWFInputStream extends InputStream {
       } else if (shapeNum == 4) {
          ret.lineStyles2 = new LINESTYLE2[lineStyleCount];
          for (int i = 0; i < lineStyleCount; i++) {
-            ret.lineStyles2[i] = readLINESTYLE2(shapeNum == 3);
+            ret.lineStyles2[i] = readLINESTYLE2(shapeNum);
          }
       }
       return ret;
@@ -2132,8 +2131,8 @@ public class SWFInputStream extends InputStream {
     */
    public ZONEDATA readZONEDATA() throws IOException {
       ZONEDATA ret = new ZONEDATA();
-      ret.alignmentCoordinate = readFLOAT16();
-      ret.range = readFLOAT16();
+      ret.alignmentCoordinate = readUI16();
+      ret.range = readUI16();
       return ret;
    }
 
