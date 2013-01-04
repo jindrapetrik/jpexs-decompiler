@@ -54,7 +54,7 @@ public class ExportAssetsTag extends Tag {
          assets.put(characterId, name);
       }
    }
-   
+
    /**
     * Gets data bytes
     *
@@ -68,7 +68,7 @@ public class ExportAssetsTag extends Tag {
       SWFOutputStream sos = new SWFOutputStream(os, version);
       try {
          sos.writeUI16(assets.size());
-         for(int characterId:assets.keySet()){
+         for (int characterId : assets.keySet()) {
             sos.writeUI16(characterId);
             sos.writeString(assets.get(characterId));
          }

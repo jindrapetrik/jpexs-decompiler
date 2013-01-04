@@ -16,13 +16,13 @@
  */
 package com.jpexs.asdec.tags;
 
-import com.jpexs.asdec.tags.base.TagName;
-import com.jpexs.asdec.tags.base.ASMSource;
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.abc.CopyOutputStream;
 import com.jpexs.asdec.action.Action;
+import com.jpexs.asdec.tags.base.ASMSource;
+import com.jpexs.asdec.tags.base.TagName;
 import com.jpexs.asdec.types.BUTTONRECORD;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

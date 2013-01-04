@@ -70,6 +70,15 @@ public class Tag {
    }
 
    /**
+    * Gets original read data
+    *
+    * @return Bytes of data
+    */
+   public byte[] getOriginalData() {
+      return data;
+   }
+
+   /**
     * Returns string representation of the object
     *
     * @return String representation of the object

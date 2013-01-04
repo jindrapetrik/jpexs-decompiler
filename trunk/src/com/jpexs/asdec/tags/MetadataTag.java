@@ -25,18 +25,17 @@ import java.io.OutputStream;
 
 public class MetadataTag extends Tag {
 
-   private String xmlMetadata;
+   public String xmlMetadata;
 
    public MetadataTag(byte[] data, int version, long pos) {
-      super(77, data, pos);      
+      super(77, data, pos);
       try {
          SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
          xmlMetadata = sis.readString();
       } catch (IOException ex) {
-         
       }
    }
-   
+
    /**
     * Gets data bytes
     *

@@ -16,17 +16,22 @@
  */
 package com.jpexs.asdec.types.shaperecords;
 
-
 /**
  *
  * @author JPEXS
  */
-public class StraightEdgeRecord implements SHAPERECORD{
-   public int typeFlag=1;
-   public int straightFlag=1;
+public class StraightEdgeRecord implements SHAPERECORD {
+
+   public int typeFlag = 1;
+   public int straightFlag = 1;
    public int numBits;
    public boolean generalLineFlag;
    public boolean vertLineFlag;
    public int deltaX;
-   public int deltaY;      
+   public int deltaY;
+
+   @Override
+   public String toString() {
+      return "[StraightEdgeRecord numBits=" + numBits + ", generalLineFlag=" + generalLineFlag + ", vertLineFlag=" + vertLineFlag + ", deltaX=" + deltaX + ", deltaY=" + deltaY + "]";
+   }
 }

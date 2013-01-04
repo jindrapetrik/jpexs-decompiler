@@ -18,19 +18,22 @@ package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.types.SHAPE;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * 
+ *
  *
  * @author JPEXS
  */
 public class DefineFontTag extends Tag {
+
+   public int fontId;
+   public int offsetTable[];
+   public SHAPE glyphShapeTable[];
 
    /**
     * Gets data bytes
@@ -43,10 +46,16 @@ public class DefineFontTag extends Tag {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       OutputStream os = baos;
       SWFOutputStream sos = new SWFOutputStream(os, version);
-      /*try {
-       //sos.write
-       } catch (IOException e) {
-       }*/
+      try {
+         sos.writeUI16(fontId);
+         for (int offset : offsetTable) {
+            sos.writeUI16(offset);
+         }
+         for (SHAPE shape : glyphShapeTable) {
+            sos.writeSHAPE(shape, 1);
+         }
+      } catch (IOException e) {
+      }
       return baos.toByteArray();
    }
 
@@ -60,7 +69,18 @@ public class DefineFontTag extends Tag {
    public DefineFontTag(byte data[], int version, long pos) throws IOException {
       super(10, data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-
+      fontId = sis.readUI16();
+      int firstOffset = sis.readUI16();
+      int nGlyphs = firstOffset / 2;
+      offsetTable = new int[nGlyphs];
+      glyphShapeTable = new SHAPE[nGlyphs];
+      offsetTable[0] = firstOffset;
+      for (int i = 1; i < nGlyphs; i++) {
+         offsetTable[i] = sis.readUI16();
+      }
+      for (int i = 0; i < nGlyphs; i++) {
+         glyphShapeTable[i] = sis.readSHAPE(1);
+      }
    }
 
    /**

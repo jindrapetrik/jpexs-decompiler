@@ -20,7 +20,7 @@ import com.jpexs.asdec.types.RGB;
 
 public class SetBackgroundColorTag extends Tag {
 
-   private RGB backgroundColor;
+   public RGB backgroundColor;
 
    public SetBackgroundColorTag(byte[] data, long pos) {
       super(9, data, pos);

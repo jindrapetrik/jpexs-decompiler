@@ -30,6 +30,7 @@ import java.io.OutputStream;
  */
 public class EnableDebugger2Tag extends Tag {
 
+   public int reserved;
    /**
     * MD5 hash of password
     */
@@ -47,7 +48,7 @@ public class EnableDebugger2Tag extends Tag {
       OutputStream os = baos;
       SWFOutputStream sos = new SWFOutputStream(os, version);
       try {
-         sos.writeUI16(0);//reserved
+         sos.writeUI16(reserved);
          sos.writeString(passwordHash);
 
       } catch (IOException e) {
@@ -65,7 +66,7 @@ public class EnableDebugger2Tag extends Tag {
    public EnableDebugger2Tag(byte data[], int version, long pos) throws IOException {
       super(64, data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      sis.readUI16(); //reserved
+      reserved = sis.readUI16();
       passwordHash = sis.readString();
    }
 

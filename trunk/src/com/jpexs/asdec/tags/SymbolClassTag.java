@@ -25,8 +25,8 @@ import java.io.OutputStream;
 
 public class SymbolClassTag extends Tag {
 
-   private int tagIDs[];
-   private String classNames[];
+   public int tagIDs[];
+   public String classNames[];
 
    public SymbolClassTag(byte[] data, int version, long pos) throws IOException {
       super(76, data, pos);

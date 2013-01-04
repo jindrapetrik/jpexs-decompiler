@@ -63,7 +63,7 @@ public class ConstructIns extends InstructionDefinition {
       } else if (item instanceof AddTreeItem) {
          ret = ret && walkXML(((AddTreeItem) item).leftSide, list);
          ret = ret && walkXML(((AddTreeItem) item).rightSide, list);
-      } else if ((item instanceof EscapeXElemTreeItem)||(item instanceof EscapeXAttrTreeItem)) {
+      } else if ((item instanceof EscapeXElemTreeItem) || (item instanceof EscapeXAttrTreeItem)) {
          list.add(item);
       } else {
          return false;

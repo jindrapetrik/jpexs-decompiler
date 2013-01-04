@@ -16,11 +16,11 @@
  */
 package com.jpexs.asdec.tags;
 
-import com.jpexs.asdec.tags.base.Container;
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.abc.CopyOutputStream;
+import com.jpexs.asdec.tags.base.Container;
 import com.jpexs.asdec.types.CLIPACTIONS;
 import com.jpexs.asdec.types.CXFORMWITHALPHA;
 import com.jpexs.asdec.types.MATRIX;

@@ -21,5 +21,6 @@ package com.jpexs.asdec.types;
  * @author JPEXS
  */
 public class FILLSTYLEARRAY {
+
    public FILLSTYLE fillStyles[];
 }

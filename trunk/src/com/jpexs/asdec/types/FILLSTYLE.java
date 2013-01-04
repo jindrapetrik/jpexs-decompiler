@@ -21,16 +21,16 @@ package com.jpexs.asdec.types;
  * @author JPEXS
  */
 public class FILLSTYLE {
+
    public int fillStyleType;
-   public static final int SOLID=0x0;
-   public static final int LINEAR_GRADIENT=0x10;
-   public static final int RADIAL_GRADIENT=0x12;
-   public static final int FOCAL_RADIAL_GRADIENT=0x13;
-   public static final int REPEATING_BITMAP=0x40;
-   public static final int CLIPPED_BITMAP=0x41;
-   public static final int NON_SMOOTHED_REPEATING_BITMAP=0x42;
-   public static final int NON_SMOOTHED_CLIPPED_BITMAP=0x43;
-   
+   public static final int SOLID = 0x0;
+   public static final int LINEAR_GRADIENT = 0x10;
+   public static final int RADIAL_GRADIENT = 0x12;
+   public static final int FOCAL_RADIAL_GRADIENT = 0x13;
+   public static final int REPEATING_BITMAP = 0x40;
+   public static final int CLIPPED_BITMAP = 0x41;
+   public static final int NON_SMOOTHED_REPEATING_BITMAP = 0x42;
+   public static final int NON_SMOOTHED_CLIPPED_BITMAP = 0x43;
    public boolean inShape3;
    public RGB color;
    public RGBA colorA; //Shape3
@@ -39,5 +39,4 @@ public class FILLSTYLE {
    public FOCALGRADIENT focalGradient;
    public int bitmapId;
    public MATRIX bitmapMatrix;
-   
 }

@@ -22,13 +22,13 @@ import java.io.IOException;
 
 public class ProductInfoTag extends Tag {
 
-   private long productID;
-   private long edition;
-   private int majorVersion;
-   private int minorVersion;
-   private long buildLow;
-   private long buildHigh;
-   private long compilationDate;
+   public long productID;
+   public long edition;
+   public int majorVersion;
+   public int minorVersion;
+   public long buildLow;
+   public long buildHigh;
+   public long compilationDate;
 
    public ProductInfoTag(byte[] data, int version, long pos) throws IOException {
       super(41, data, pos);

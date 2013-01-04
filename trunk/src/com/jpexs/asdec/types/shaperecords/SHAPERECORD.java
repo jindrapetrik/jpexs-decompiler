@@ -21,5 +21,4 @@ package com.jpexs.asdec.types.shaperecords;
  * @author JPEXS
  */
 public interface SHAPERECORD {
-   
 }

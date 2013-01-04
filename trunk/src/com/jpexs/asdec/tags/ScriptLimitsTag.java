@@ -25,8 +25,8 @@ import java.io.OutputStream;
 
 public class ScriptLimitsTag extends Tag {
 
-   private int maxRecursionDepth;
-   private int scriptTimeoutSeconds;
+   public int maxRecursionDepth;
+   public int scriptTimeoutSeconds;
 
    public ScriptLimitsTag(byte[] data, int version, long pos) throws IOException {
       super(65, data, pos);
@@ -53,7 +53,7 @@ public class ScriptLimitsTag extends Tag {
       }
       return baos.toByteArray();
    }
-   
+
    @Override
    public String toString() {
       return "ScriptLimits";

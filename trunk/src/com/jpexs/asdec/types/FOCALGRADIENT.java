@@ -21,10 +21,9 @@ package com.jpexs.asdec.types;
  * @author JPEXS
  */
 public class FOCALGRADIENT {
+
    public int spreadMode;
    public int interPolationMode;
-   
    public GRADRECORD gradientRecords[];
    public float focalPoint;
-   
 }

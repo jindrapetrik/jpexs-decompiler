@@ -23,15 +23,17 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 public class DefineShape2Tag extends Tag {
+
    public int shapeId;
    public RECT shapeBounds;
    public SHAPEWITHSTYLE shapes;
+
    public DefineShape2Tag(byte[] data, int version, long pos) throws IOException {
       super(22, data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      shapeId=sis.readUI16();
-      shapeBounds=sis.readRECT();
-      shapes=sis.readSHAPEWITHSTYLE(2);
+      shapeId = sis.readUI16();
+      shapeBounds = sis.readRECT();
+      shapes = sis.readSHAPEWITHSTYLE(2);
    }
 
    @Override

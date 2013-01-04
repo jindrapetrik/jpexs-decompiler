@@ -32,9 +32,7 @@ public class CXFORM {
     * Has color multiply values
     */
    public boolean hasMultTerms;
-   
    public int nbits;
-   
    /**
     * Red multiply value
     */
@@ -47,7 +45,6 @@ public class CXFORM {
     * Blue multiply value
     */
    public int blueMultTerm;
-   
    /**
     * Red addition value
     */
@@ -60,5 +57,4 @@ public class CXFORM {
     * Blue addition value
     */
    public int blueAddTerm;
-   
 }

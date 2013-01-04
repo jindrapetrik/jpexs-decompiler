@@ -18,6 +18,9 @@ package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.types.MATRIX;
+import com.jpexs.asdec.types.RECT;
+import com.jpexs.asdec.types.TEXTRECORD;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -26,11 +29,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ *
  *
  * @author JPEXS
  */
 public class DefineTextTag extends Tag {
+
+   public int characterID;
+   public RECT textBounds;
+   public MATRIX textMatrix;
+   public int glyphBits;
+   public int advanceBits;
+   public List<TEXTRECORD> textRecords;
 
    /**
     * Gets data bytes
@@ -43,10 +53,18 @@ public class DefineTextTag extends Tag {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       OutputStream os = baos;
       SWFOutputStream sos = new SWFOutputStream(os, version);
-      /*try {
-       //sos.write
-       } catch (IOException e) {
-       }*/
+      try {
+         sos.writeUI16(characterID);
+         sos.writeRECT(textBounds);
+         sos.writeMatrix(textMatrix);
+         sos.writeUI8(glyphBits);
+         sos.writeUI8(advanceBits);
+         for (TEXTRECORD tr : textRecords) {
+            sos.writeTEXTRECORD(tr, false, glyphBits, advanceBits);
+         }
+         sos.writeUI8(0);
+      } catch (IOException e) {
+      }
       return baos.toByteArray();
    }
 
@@ -60,7 +78,16 @@ public class DefineTextTag extends Tag {
    public DefineTextTag(byte data[], int version, long pos) throws IOException {
       super(11, data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-
+      characterID = sis.readUI16();
+      textBounds = sis.readRECT();
+      textMatrix = sis.readMatrix();
+      glyphBits = sis.readUI8();
+      advanceBits = sis.readUI8();
+      textRecords = new ArrayList<TEXTRECORD>();
+      TEXTRECORD tr;
+      while ((tr = sis.readTEXTRECORD(false, glyphBits, advanceBits)) != null) {
+         textRecords.add(tr);
+      }
    }
 
    /**

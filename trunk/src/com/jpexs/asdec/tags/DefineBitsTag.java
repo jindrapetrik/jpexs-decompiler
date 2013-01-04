@@ -16,11 +16,42 @@
  */
 package com.jpexs.asdec.tags;
 
+import com.jpexs.asdec.SWFInputStream;
+import com.jpexs.asdec.SWFOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
 public class DefineBitsTag extends Tag {
 
-   public DefineBitsTag(byte[] data, int version, long pos) {
+   public int characterID;
+   public byte jpegData[];
+
+   public DefineBitsTag(byte[] data, int version, long pos) throws IOException {
       super(6, data, pos);
-      // TODO Auto-generated constructor stub
+      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+      characterID = sis.readUI16();
+      jpegData = sis.readBytes(sis.available());
+   }
+
+   /**
+    * Gets data bytes
+    *
+    * @param version SWF version
+    * @return Bytes of data
+    */
+   @Override
+   public byte[] getData(int version) {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      OutputStream os = baos;
+      SWFOutputStream sos = new SWFOutputStream(os, version);
+      try {
+         sos.writeUI16(characterID);
+         sos.write(jpegData);
+      } catch (IOException e) {
+      }
+      return baos.toByteArray();
    }
 
    @Override

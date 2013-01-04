@@ -13,19 +13,17 @@ import java.util.List;
  *
  * @author Jindra
  */
-public class DefaultXMLNamespace extends TreeItem{
+public class DefaultXMLNamespace extends TreeItem {
 
    private TreeItem ns;
-   public DefaultXMLNamespace(AVM2Instruction instruction,TreeItem ns) {
+
+   public DefaultXMLNamespace(AVM2Instruction instruction, TreeItem ns) {
       super(instruction, NOPRECEDENCE);
-      this.ns=ns;
+      this.ns = ns;
    }
 
-   
-   
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return hilight("default xml namespace = ")+ns.toString(constants, localRegNames, fullyQualifiedNames);
+      return hilight("default xml namespace = ") + ns.toString(constants, localRegNames, fullyQualifiedNames);
    }
-   
 }

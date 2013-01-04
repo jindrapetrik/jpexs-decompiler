@@ -25,27 +25,30 @@ import java.io.OutputStream;
 
 public class FileAttributesTag extends Tag {
 
-   private boolean useDirectBlit;
-   private boolean useGPU;
-   private boolean hasMetadata;
-   private boolean actionScript3;
-   private boolean useNetwork;
+   public boolean useDirectBlit;
+   public boolean useGPU;
+   public boolean hasMetadata;
+   public boolean actionScript3;
+   public boolean useNetwork;
+   private int reserved1;
+   private int reserved2;
+   private int reserved3;
 
    public FileAttributesTag(byte[] data, int version, long pos) throws IOException {
       super(69, data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      sis.readUB(1); // reserved
+      reserved1 = (int) sis.readUB(1); // reserved
       // UB[1] == 0  (reserved)
       useDirectBlit = sis.readUB(1) != 0;
       useGPU = sis.readUB(1) != 0;
       hasMetadata = sis.readUB(1) != 0;
       actionScript3 = sis.readUB(1) != 0;
-      sis.readUB(2); // reserved
+      reserved2 = (int) sis.readUB(2); // reserved
       useNetwork = sis.readUB(1) != 0;
       // UB[24] == 0 (reserved)
-      sis.readUB(24); //reserved
+      reserved3 = (int) sis.readUB(24); //reserved
    }
-   
+
    /**
     * Gets data bytes
     *
@@ -58,24 +61,14 @@ public class FileAttributesTag extends Tag {
       OutputStream os = baos;
       SWFOutputStream sos = new SWFOutputStream(os, version);
       try {
-         sos.writeUB(1, 0); //reserved
-         if(useDirectBlit){
-            sos.writeUB(1, 1);
-         }
-         if(useGPU){
-            sos.writeUB(1, 1);
-         }
-         if(hasMetadata){
-            sos.writeUB(1, 1);
-         }
-         if(actionScript3){
-            sos.writeUB(1, 1);
-         }
-         sos.writeUB(2, 0); //reserved
-         if(useNetwork){
-            sos.writeUB(1, 1);
-         }
-         sos.writeUB(24, 0); //reserved
+         sos.writeUB(1, reserved1); //reserved
+         sos.writeUB(1, useDirectBlit ? 1 : 0);
+         sos.writeUB(1, useGPU ? 1 : 0);
+         sos.writeUB(1, hasMetadata ? 1 : 0);
+         sos.writeUB(1, actionScript3 ? 1 : 0);
+         sos.writeUB(2, reserved2); //reserved
+         sos.writeUB(1, useNetwork ? 1 : 0);
+         sos.writeUB(24, reserved3); //reserved
       } catch (IOException e) {
       }
       return baos.toByteArray();

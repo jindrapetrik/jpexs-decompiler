@@ -21,16 +21,16 @@ package com.jpexs.asdec.tags;
  * @author JPEXS
  */
 public class NotDefinedTag extends Tag {
+
    private String name;
-   public NotDefinedTag(String name,int id, byte[] data, long pos) {
+
+   public NotDefinedTag(String name, int id, byte[] data, long pos) {
       super(id, data, pos);
-      this.name=name;
+      this.name = name;
    }
 
    @Override
    public String toString() {
       return name;
    }
-   
-   
 }

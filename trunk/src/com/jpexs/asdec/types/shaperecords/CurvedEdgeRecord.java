@@ -16,17 +16,22 @@
  */
 package com.jpexs.asdec.types.shaperecords;
 
-
 /**
  *
  * @author JPEXS
  */
-public class CurvedEdgeRecord implements SHAPERECORD{
-   public int typeFlag=1;
-   public int straightFlag=0;
+public class CurvedEdgeRecord implements SHAPERECORD {
+
+   public int typeFlag = 1;
+   public int straightFlag = 0;
    public int numBits;
    public int controlDeltaX;
    public int controlDeltaY;
    public int anchorDeltaX;
    public int anchorDeltaY;
+
+   @Override
+   public String toString() {
+      return "[CurvedEdgeRecord numBits=" + numBits + ", controlDeltaX=" + controlDeltaX + ", controlDeltaY=" + controlDeltaY + ", anchorDeltaX=" + anchorDeltaX + ". anchorDeltaY=" + anchorDeltaY + "]";
+   }
 }

@@ -27,12 +27,13 @@ public class DefineShapeTag extends Tag {
    public int shapeId;
    public RECT shapeBounds;
    public SHAPEWITHSTYLE shapes;
+
    public DefineShapeTag(byte[] data, int version, long pos) throws IOException {
-      super(2, data, pos);      
+      super(2, data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      shapeId=sis.readUI16();
-      shapeBounds=sis.readRECT();
-      shapes=sis.readSHAPEWITHSTYLE(1);
+      shapeId = sis.readUI16();
+      shapeBounds = sis.readRECT();
+      shapes = sis.readSHAPEWITHSTYLE(1);
    }
 
    @Override

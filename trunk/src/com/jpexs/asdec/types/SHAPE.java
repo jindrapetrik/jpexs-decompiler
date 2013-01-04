@@ -24,6 +24,7 @@ import java.util.List;
  * @author JPEXS
  */
 public class SHAPE {
+
    public int numFillBits;
    public int numLineBits;
    public List<SHAPERECORD> shapeRecords;

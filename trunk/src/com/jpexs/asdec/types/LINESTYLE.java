@@ -21,8 +21,8 @@ package com.jpexs.asdec.types;
  * @author JPEXS
  */
 public class LINESTYLE {
+
    public int width;
    public RGB color;
    public RGBA colorA;
-   
 }

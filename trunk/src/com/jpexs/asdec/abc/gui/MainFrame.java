@@ -37,8 +37,6 @@ import javax.swing.border.BevelBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.*;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
 import jsyntaxpane.DefaultSyntaxKit;
 
 public class MainFrame extends JFrame implements ActionListener, ItemListener {

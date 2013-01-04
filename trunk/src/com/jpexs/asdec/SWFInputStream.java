@@ -38,6 +38,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import java.util.logging.Logger;
 
 /**
  * Class for reading data from SWF file
@@ -50,6 +51,7 @@ public class SWFInputStream extends InputStream {
    private Stack<Integer> margedPos = new Stack<Integer>();
    private long pos;
    private int version;
+   private static final Logger log = Logger.getLogger(SWFInputStream.class.getName());
 
    /**
     * Constructor
@@ -405,6 +407,7 @@ public class SWFInputStream extends InputStream {
       ret.Xmax = (int) readSB(NBits);
       ret.Ymin = (int) readSB(NBits);
       ret.Ymax = (int) readSB(NBits);
+      alignByte();
       return ret;
    }
 
@@ -511,7 +514,7 @@ public class SWFInputStream extends InputStream {
             break;
          case 8:
             ret = new JPEGTablesTag(data, pos);
-            break;         
+            break;
          case 9:
             ret = new SetBackgroundColorTag(data, pos);
             break;
@@ -525,23 +528,23 @@ public class SWFInputStream extends InputStream {
             ret = new DoActionTag(data, version, pos);
             break;
          case 13:
-            ret = new NotDefinedTag("DefineFontInfo",13,data,pos);
+            ret = new DefineFontInfoTag(data, version, pos);
             break;
          case 14:
-            ret = new NotDefinedTag("DefineSound",14,data,pos);
+            ret = new DefineSoundTag(data, version, pos);
             break;
          case 15:
-            ret = new NotDefinedTag("StartSound",15,data,pos);
+            ret = new StartSoundTag(data, version, pos);
             break;
          //case 16
          case 17:
-            ret = new NotDefinedTag("DefineButtonSound",17,data,pos);
+            ret = new DefineButtonSoundTag(data, version, pos);
             break;
          case 18:
-            ret = new NotDefinedTag("SoundStreamHead",18,data,pos);
+            ret = new SoundStreamHeadTag(data, version, pos);
             break;
          case 19:
-            ret = new NotDefinedTag("SoundStreamBlock",19,data,pos);
+            ret = new SoundStreamBlockTag(data, version, pos);
             break;
          case 21:
             ret = new DefineBitsJPEG2Tag(data, version, pos);
@@ -553,8 +556,8 @@ public class SWFInputStream extends InputStream {
             ret = new DefineShape2Tag(data, version, pos);
             break;
          case 23:
-            ret = new NotDefinedTag("DefineButtonCxform",23,data,pos);
-            break;   
+            ret = new DefineButtonCxform(data, version, pos);
+            break;
          case 24:
             ret = new ProtectTag(data, version, pos);
             break;
@@ -573,8 +576,8 @@ public class SWFInputStream extends InputStream {
             ret = new DefineShape3Tag(data, version, pos);
             break;
          case 33:
-            ret = new NotDefinedTag("DefineText2",33,data,pos);
-            break; 
+            ret = new DefineText2Tag(data, version, pos);
+            break;
          case 34:
             ret = new DefineButton2Tag(data, version, pos);
             break;
@@ -585,8 +588,8 @@ public class SWFInputStream extends InputStream {
             ret = new DefineBitsLossless2Tag(data, version, pos);
             break;
          case 37:
-            ret = new NotDefinedTag("DefineEditText",37,data,pos);
-            break; 
+            ret = new DefineEditTextTag(data, version, pos);
+            break;
          //case 38:
          case 39:
             ret = new DefineSpriteTag(data, version, level, pos);
@@ -601,14 +604,14 @@ public class SWFInputStream extends InputStream {
             break;
          //case 44:
          case 45:
-            ret = new NotDefinedTag("SoundStreamHead2",45,data,pos);
+            ret = new SoundStreamHead2Tag(data, version, pos);
             break;
          case 46:
-            ret = new NotDefinedTag("DefineMorphShape",46,data,pos);
+            ret = new DefineMorphShapeTag(data, version, pos);
             break;
          //case 47:
          case 48:
-            ret = new NotDefinedTag("DefineFont2",48,data,pos);
+            ret = new DefineFont2Tag(data, version, pos);
             break;
          //case 49-55:
          case 56:
@@ -619,25 +622,25 @@ public class SWFInputStream extends InputStream {
             break;
          case 58:
             ret = new EnableDebuggerTag(data, version, pos);
-            break;   
+            break;
          case 59:
             ret = new DoInitActionTag(data, version, pos);
-            break;   
+            break;
          case 60:
-            ret = new NotDefinedTag("DefineVideoStream",60,data,pos);
+            ret = new DefineVideoStreamTag(data, version, pos);
             break;
          case 61:
-            ret = new NotDefinedTag("VideoFrame",61,data,pos);
+            ret = new VideoFrameTag(data, version, pos);
             break;
          case 62:
-            ret = new NotDefinedTag("DefineFontInfo2",62,data,pos);
+            ret = new DefineFontInfo2Tag(data, version, pos);
             break;
          case 63:
             ret = new DebugIDTag(data, version, pos);
             break;
          case 64:
             ret = new EnableDebugger2Tag(data, version, pos);
-            break; 
+            break;
          case 65:
             ret = new ScriptLimitsTag(data, version, pos);
             break;
@@ -650,16 +653,16 @@ public class SWFInputStream extends InputStream {
             break;
          case 70:
             ret = new PlaceObject3Tag(data, version, pos);
-            break;    
+            break;
          case 71:
             ret = new ImportAssets2Tag(data, version, pos);
-            break; 
+            break;
          //case 72:
          case 73:
             ret = new DefineFontAlignZonesTag(data, version, pos);
             break;
          case 74:
-            ret = new NotDefinedTag("DefineFontInfo2",62,data,pos);
+            ret = new CSMTextSettingsTag(data, version, pos);
             break;
          case 75:
             ret = new DefineFont3Tag(data, version, pos);
@@ -679,9 +682,9 @@ public class SWFInputStream extends InputStream {
             break;
          case 83:
             ret = new DefineShape4Tag(data, version, pos);
-            break;        
+            break;
          case 84:
-            ret = new NotDefinedTag("DefineMorphShape2",84,data,pos);
+            ret = new DefineMorphShape2Tag(data, version, pos);
             break;
          //case 85:
          case 86:
@@ -689,15 +692,15 @@ public class SWFInputStream extends InputStream {
             break;
          case 87:
             ret = new DefineBinaryDataTag(data, version, pos);
-            break;                           
+            break;
          case 88:
             ret = new DefineFontNameTag(data, version, pos);
             break;
          case 89:
-            ret = new NotDefinedTag("StartSound2",89,data,pos);
+            ret = new StartSound2Tag(data, version, pos);
             break;
          case 90:
-            ret = new NotDefinedTag("DefineBitsJPEG4",84,data,pos);
+            ret = new DefineBitsJPEG4Tag(data, version, pos);
             break;
          case 91:
             ret = new DefineFont4Tag(data, version, pos);
@@ -706,6 +709,39 @@ public class SWFInputStream extends InputStream {
             ret = new Tag(tagID, data, pos);
       }
       ret.forceWriteAsLong = readLong;
+      byte dataNew[] = ret.getData(version);
+
+      int ignoreFirst = 0;
+      for (int i = 0; i < data.length; i++) {
+         if (i >= dataNew.length) {
+            break;
+         }
+         if (dataNew[i] != data[i]) {
+            if (ignoreFirst > 0) {
+               ignoreFirst--;
+               continue;
+            }
+            String e = "";
+            e = ("TAG " + ret.toString() + " WRONG, ");
+            for (int j = i - 10; j <= i + 5; j++) {
+               while (j < 0) {
+                  j++;
+               }
+               if (j >= data.length) {
+                  break;
+               }
+               if (j >= dataNew.length) {
+                  break;
+               }
+               if (j >= i) {
+                  e += (Long.toHexString(data[j] & 0xff) + " ( is " + Long.toHexString(dataNew[j] & 0xff) + ") ");
+               } else {
+                  e += (Long.toHexString(data[j] & 0xff) + " ");
+               }
+            }
+            log.severe(e);
+         }
+      }
       return ret;
    }
 
@@ -1564,6 +1600,7 @@ public class SWFInputStream extends InputStream {
 
       FILLSTYLEARRAY ret = new FILLSTYLEARRAY();
       int fillStyleCount = readUI8();
+
       if (((shapeNum == 2) || (shapeNum == 3)) && (fillStyleCount == 0xff)) {
          fillStyleCount = readUI16();
       }
@@ -1700,7 +1737,7 @@ public class SWFInputStream extends InputStream {
             ser.numBits = (int) readUB(4);
             ser.generalLineFlag = readUB(1) == 1;
             if (!ser.generalLineFlag) {
-               ser.vertLineFlag = readSB(1) == 1;
+               ser.vertLineFlag = readUB(1) == 1;
             }
             if (ser.generalLineFlag || (!ser.vertLineFlag)) {
                ser.deltaX = (int) readSB(ser.numBits + 2);
@@ -1771,6 +1808,332 @@ public class SWFInputStream extends InputStream {
          }
          ret.add(rec);
       } while (!(rec instanceof EndShapeRecord));
+      alignByte();
+      return ret;
+   }
+
+   /**
+    * Reads one SOUNDINFO value from the stream
+    *
+    * @return SOUNDINFO value
+    * @throws IOException
+    */
+   public SOUNDINFO readSOUNDINFO() throws IOException {
+      SOUNDINFO ret = new SOUNDINFO();
+      readUB(2);
+      ret.syncStop = readUB(1) == 1;
+      ret.syncNoMultiple = readUB(1) == 1;
+      ret.hasEnvelope = readUB(1) == 1;
+      ret.hasLoops = readUB(1) == 1;
+      ret.hasOutPoint = readUB(1) == 1;
+      ret.hasInPoint = readUB(1) == 1;
+      if (ret.hasInPoint) {
+         ret.inPoint = readUI32();
+      }
+      if (ret.hasOutPoint) {
+         ret.outPoint = readUI32();
+      }
+      if (ret.hasLoops) {
+         ret.loopCount = readUI16();
+      }
+      if (ret.hasEnvelope) {
+         int envPoints = readUI8();
+         ret.envelopeRecords = new SOUNDENVELOPE[envPoints];
+         for (int i = 0; i < envPoints; i++) {
+            ret.envelopeRecords[i] = readSOUNDENVELOPE();
+         }
+      }
+      return ret;
+   }
+
+   /**
+    * Reads one SOUNDENVELOPE value from the stream
+    *
+    * @return SOUNDENVELOPE value
+    * @throws IOException
+    */
+   public SOUNDENVELOPE readSOUNDENVELOPE() throws IOException {
+      SOUNDENVELOPE ret = new SOUNDENVELOPE();
+      ret.pos44 = readUI32();
+      ret.leftLevel = readUI16();
+      ret.rightLevel = readUI16();
+      return ret;
+   }
+
+   /**
+    * Reads one GLYPHENTRY value from the stream
+    *
+    * @return GLYPHENTRY value
+    * @throws IOException
+    */
+   public GLYPHENTRY readGLYPHENTRY(int glyphBits, int advanceBits) throws IOException {
+      GLYPHENTRY ret = new GLYPHENTRY();
+      ret.glyphIndex = (int) readUB(glyphBits);
+      ret.glyphAdvance = (int) readUB(advanceBits);
+      return ret;
+   }
+
+   /**
+    * Reads one TEXTRECORD value from the stream
+    *
+    * @return TEXTRECORD value
+    * @throws IOException
+    */
+   public TEXTRECORD readTEXTRECORD(boolean inDefineText2, int glyphBits, int advanceBits) throws IOException {
+      TEXTRECORD ret = new TEXTRECORD();
+      int first = (int) readUB(1); //always 1
+      readUB(3); //always 0
+      ret.styleFlagsHasFont = readUB(1) == 1;
+      ret.styleFlagsHasColor = readUB(1) == 1;
+      ret.styleFlagsHasYOffset = readUB(1) == 1;
+      ret.styleFlagsHasXOffset = readUB(1) == 1;
+      if ((!ret.styleFlagsHasFont) && (!ret.styleFlagsHasColor) && (!ret.styleFlagsHasYOffset) && (!ret.styleFlagsHasXOffset) && (first == 0)) { //final text record
+         return null;
+      }
+      if (ret.styleFlagsHasFont) {
+         ret.fontId = readUI16();
+      }
+      if (ret.styleFlagsHasColor) {
+         if (inDefineText2) {
+            ret.textColorA = readRGBA();
+         } else {
+            ret.textColor = readRGB();
+         }
+      }
+      if (ret.styleFlagsHasXOffset) {
+         ret.xOffset = readSI16();
+      }
+      if (ret.styleFlagsHasYOffset) {
+         ret.yOffset = readSI16();
+      }
+      if (ret.styleFlagsHasFont) {
+         ret.textHeight = readUI16();
+      }
+      int glyphCount = readUI8();
+      ret.glyphEntries = new GLYPHENTRY[glyphCount];
+      for (int i = 0; i < glyphCount; i++) {
+         ret.glyphEntries[i] = readGLYPHENTRY(glyphBits, advanceBits);
+      }
+      return ret;
+   }
+
+   /**
+    * Reads one MORPHGRADRECORD value from the stream
+    *
+    * @return MORPHGRADRECORD value
+    * @throws IOException
+    */
+   public MORPHGRADRECORD readMORPHGRADRECORD() throws IOException {
+      MORPHGRADRECORD ret = new MORPHGRADRECORD();
+      ret.startRatio = readUI8();
+      ret.startColor = readRGBA();
+      ret.endRatio = readUI8();
+      ret.endColor = readRGBA();
+      return ret;
+   }
+
+   /**
+    * Reads one MORPHGRADIENT value from the stream
+    *
+    * @return MORPHGRADIENT value
+    * @throws IOException
+    */
+   public MORPHGRADIENT readMORPHGRADIENT() throws IOException {
+      MORPHGRADIENT ret = new MORPHGRADIENT();
+      int numGradients = (int) readUI8();
+      ret.gradientRecords = new MORPHGRADRECORD[numGradients];
+      for (int i = 0; i < numGradients; i++) {
+         ret.gradientRecords[i] = readMORPHGRADRECORD();
+      }
+      return ret;
+   }
+
+   /**
+    * Reads one MORPHFILLSTYLE value from the stream
+    *
+    * @return MORPHFILLSTYLE value
+    * @throws IOException
+    */
+   public MORPHFILLSTYLE readMORPHFILLSTYLE() throws IOException {
+      MORPHFILLSTYLE ret = new MORPHFILLSTYLE();
+      ret.fillStyleType = readUI8();
+      if (ret.fillStyleType == MORPHFILLSTYLE.SOLID) {
+         ret.startColor = readRGBA();
+         ret.endColor = readRGBA();
+      }
+      if ((ret.fillStyleType == MORPHFILLSTYLE.LINEAR_GRADIENT)
+              || (ret.fillStyleType == MORPHFILLSTYLE.RADIAL_GRADIENT)) {
+         ret.startGradientMatrix = readMatrix();
+         ret.endGradientMatrix = readMatrix();
+      }
+      if ((ret.fillStyleType == MORPHFILLSTYLE.LINEAR_GRADIENT)
+              || (ret.fillStyleType == MORPHFILLSTYLE.RADIAL_GRADIENT)) {
+         ret.gradient = readMORPHGRADIENT();
+      }
+
+      if ((ret.fillStyleType == MORPHFILLSTYLE.REPEATING_BITMAP)
+              || (ret.fillStyleType == MORPHFILLSTYLE.CLIPPED_BITMAP)
+              || (ret.fillStyleType == MORPHFILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP)
+              || (ret.fillStyleType == MORPHFILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP)) {
+         ret.bitmapId = readUI16();
+         ret.startBitmapMatrix = readMatrix();
+         ret.endBitmapMatrix = readMatrix();
+      }
+      return ret;
+   }
+
+   /**
+    * Reads one MORPHFILLSTYLEARRAY value from the stream
+    *
+    * @return MORPHFILLSTYLEARRAY value
+    * @throws IOException
+    */
+   public MORPHFILLSTYLEARRAY readMORPHFILLSTYLEARRAY() throws IOException {
+
+      MORPHFILLSTYLEARRAY ret = new MORPHFILLSTYLEARRAY();
+      int fillStyleCount = readUI8();
+      if (fillStyleCount == 0xff) {
+         fillStyleCount = readUI16();
+      }
+      ret.fillStyles = new MORPHFILLSTYLE[fillStyleCount];
+      for (int i = 0; i < fillStyleCount; i++) {
+         ret.fillStyles[i] = readMORPHFILLSTYLE();
+      }
+      return ret;
+   }
+
+   /**
+    * Reads one MORPHLINESTYLE value from the stream
+    *
+    * @return MORPHLINESTYLE value
+    * @throws IOException
+    */
+   public MORPHLINESTYLE readMORPHLINESTYLE() throws IOException {
+      MORPHLINESTYLE ret = new MORPHLINESTYLE();
+      ret.startWidth = readUI16();
+      ret.endWidth = readUI16();
+      ret.startColor = readRGBA();
+      ret.endColor = readRGBA();
+      return ret;
+   }
+
+   /**
+    * Reads one MORPHLINESTYLE2 value from the stream
+    *
+    * @return MORPHLINESTYLE2 value
+    * @throws IOException
+    */
+   public MORPHLINESTYLE2 readMORPHLINESTYLE2() throws IOException {
+      MORPHLINESTYLE2 ret = new MORPHLINESTYLE2();
+      ret.startWidth = readUI16();
+      ret.endWidth = readUI16();
+      ret.startCapStyle = (int) readUB(2);
+      ret.joinStyle = (int) readUB(2);
+      ret.hasFillFlag = (int) readUB(1) == 1;
+      ret.noHScaleFlag = (int) readUB(1) == 1;
+      ret.noVScaleFlag = (int) readUB(1) == 1;
+      ret.pixelHintingFlag = (int) readUB(1) == 1;
+      readUB(5);//reserved
+      ret.noClose = (int) readUB(1) == 1;
+      ret.endCapStyle = (int) readUB(2);
+      if (ret.joinStyle == LINESTYLE2.MITER_JOIN) {
+         ret.miterLimitFactor = readUI16();
+      }
+      if (!ret.hasFillFlag) {
+         ret.startColor = readRGBA();
+         ret.endColor = readRGBA();
+      } else {
+         ret.fillType = readMORPHFILLSTYLE();
+      }
+      return ret;
+   }
+
+   /**
+    * Reads one MORPHLINESTYLEARRAY value from the stream
+    *
+    * @return MORPHLINESTYLEARRAY value
+    * @throws IOException
+    */
+   public MORPHLINESTYLEARRAY readMORPHLINESTYLEARRAY(int morphShapeNum) throws IOException {
+      MORPHLINESTYLEARRAY ret = new MORPHLINESTYLEARRAY();
+      int lineStyleCount = readUI8();
+      if (lineStyleCount == 0xff) {
+         lineStyleCount = readUI16();
+      }
+      if (morphShapeNum == 1) {
+         ret.lineStyles = new MORPHLINESTYLE[lineStyleCount];
+         for (int i = 0; i < lineStyleCount; i++) {
+            ret.lineStyles[i] = readMORPHLINESTYLE();
+         }
+      } else if (morphShapeNum == 2) {
+         ret.lineStyles2 = new MORPHLINESTYLE2[lineStyleCount];
+         for (int i = 0; i < lineStyleCount; i++) {
+            ret.lineStyles2[i] = readMORPHLINESTYLE2();
+         }
+      }
+      return ret;
+   }
+
+   /**
+    * Reads one KERNINGRECORD value from the stream
+    *
+    * @return KERNINGRECORD value
+    * @throws IOException
+    */
+   public KERNINGRECORD readKERNINGRECORD(boolean fontFlagsWideCodes) throws IOException {
+      KERNINGRECORD ret = new KERNINGRECORD();
+      if (fontFlagsWideCodes) {
+         ret.fontKerningCode1 = readUI16();
+         ret.fontKerningCode2 = readUI16();
+      } else {
+         ret.fontKerningCode1 = readUI8();
+         ret.fontKerningCode2 = readUI8();
+      }
+      ret.fontKerningAdjustment = readSI16();
+      return ret;
+   }
+
+   /**
+    * Reads one LANGCODE value from the stream
+    *
+    * @return LANGCODE value
+    * @throws IOException
+    */
+   public LANGCODE readLANGCODE() throws IOException {
+      LANGCODE ret = new LANGCODE();
+      ret.languageCode = readUI8();
+      return ret;
+   }
+
+   /**
+    * Reads one ZONERECORD value from the stream
+    *
+    * @return ZONERECORD value
+    * @throws IOException
+    */
+   public ZONERECORD readZONERECORD() throws IOException {
+      ZONERECORD ret = new ZONERECORD();
+      int numZoneData = readUI8();
+      ret.zonedata = new ZONEDATA[numZoneData];
+      for (int i = 0; i < numZoneData; i++) {
+         ret.zonedata[i] = readZONEDATA();
+      }
+      readUB(6);
+      ret.zoneMaskX = readUB(1) == 1;
+      ret.zoneMaskY = readUB(1) == 1;
+      return ret;
+   }
+
+   /**
+    * Reads one ZONEDATA value from the stream
+    *
+    * @return ZONEDATA value
+    * @throws IOException
+    */
+   public ZONEDATA readZONEDATA() throws IOException {
+      ZONEDATA ret = new ZONEDATA();
+      ret.alignmentCoordinate = readFLOAT16();
+      ret.range = readFLOAT16();
       return ret;
    }
 

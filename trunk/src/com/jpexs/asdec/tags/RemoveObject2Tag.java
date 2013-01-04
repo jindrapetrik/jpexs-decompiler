@@ -22,7 +22,7 @@ import java.io.IOException;
 
 public class RemoveObject2Tag extends Tag {
 
-   private int depth;
+   public int depth;
 
    public RemoveObject2Tag(byte[] data, int version, long pos) throws IOException {
       super(28, data, pos);

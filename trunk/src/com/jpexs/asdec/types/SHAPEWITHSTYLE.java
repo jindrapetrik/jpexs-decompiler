@@ -24,9 +24,10 @@ import java.util.List;
  * @author JPEXS
  */
 public class SHAPEWITHSTYLE {
+
    public FILLSTYLEARRAY fillStyles;
    public LINESTYLEARRAY lineStyles;
    public int numFillBits;
-   public int numLineBits;   
+   public int numLineBits;
    public List<SHAPERECORD> shapeRecords;
 }

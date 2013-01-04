@@ -22,9 +22,9 @@ import java.io.IOException;
 
 public class DefineFontNameTag extends Tag {
 
-   private int fontId;
-   private String fontName;
-   private String fontCopyright;
+   public int fontId;
+   public String fontName;
+   public String fontCopyright;
 
    public DefineFontNameTag(byte[] data, int version, long pos) throws IOException {
       super(88, data, pos);

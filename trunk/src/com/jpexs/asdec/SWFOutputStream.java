@@ -19,6 +19,11 @@ package com.jpexs.asdec;
 import com.jpexs.asdec.tags.Tag;
 import com.jpexs.asdec.types.*;
 import com.jpexs.asdec.types.filters.*;
+import com.jpexs.asdec.types.shaperecords.CurvedEdgeRecord;
+import com.jpexs.asdec.types.shaperecords.EndShapeRecord;
+import com.jpexs.asdec.types.shaperecords.SHAPERECORD;
+import com.jpexs.asdec.types.shaperecords.StraightEdgeRecord;
+import com.jpexs.asdec.types.shaperecords.StyleChangeRecord;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -329,6 +334,7 @@ public class SWFOutputStream extends OutputStream {
       writeSB(nBits, value.Xmax);
       writeSB(nBits, value.Ymin);
       writeSB(nBits, value.Ymax);
+      alignByte();
    }
 
    /**
@@ -1011,20 +1017,20 @@ public class SWFOutputStream extends OutputStream {
     * @param value FILLSTYLEARRAY value
     * @throws IOException
     */
-   public void writeFILLSTYLEARRAY(FILLSTYLEARRAY value,int shapeNum) throws IOException {
-      int fillStyleCount=value.fillStyles.length;
-      if(shapeNum==2||shapeNum==3){
-         if(fillStyleCount>=0xff){
+   public void writeFILLSTYLEARRAY(FILLSTYLEARRAY value, int shapeNum) throws IOException {
+      int fillStyleCount = value.fillStyles.length;
+      if (shapeNum == 2 || shapeNum == 3) {
+         if (fillStyleCount >= 0xff) {
             writeUI8(0xff);
             writeUI16(fillStyleCount);
-         }else{
+         } else {
             writeUI8(fillStyleCount);
          }
-      }else{
+      } else {
          writeUI8(fillStyleCount);
       }
       for (int i = 0; i < value.fillStyles.length; i++) {
-         writeFILLSTYLE(value.fillStyles[i], shapeNum);         
+         writeFILLSTYLE(value.fillStyles[i], shapeNum);
       }
    }
 
@@ -1095,7 +1101,7 @@ public class SWFOutputStream extends OutputStream {
     * @param value LINESTYLE2 value
     * @throws IOException
     */
-   public void writeLINESTYLE2(LINESTYLE2 value,int shapeNum) throws IOException {
+   public void writeLINESTYLE2(LINESTYLE2 value, int shapeNum) throws IOException {
       writeUI16(value.width);
       writeUB(2, value.startCapStyle);
       writeUB(2, value.joinStyle);
@@ -1112,7 +1118,7 @@ public class SWFOutputStream extends OutputStream {
       if (!value.hasFillFlag) {
          writeRGBA(value.color);
       } else {
-         writeFILLSTYLE(value.fillType,shapeNum);
+         writeFILLSTYLE(value.fillType, shapeNum);
       }
    }
 
@@ -1144,8 +1150,402 @@ public class SWFOutputStream extends OutputStream {
             writeUI8(lineStyleCount);
          }
          for (int i = 0; i < lineStyleCount; i++) {
-            writeLINESTYLE2(value.lineStyles2[i],shapeNum);
+            writeLINESTYLE2(value.lineStyles2[i], shapeNum);
          }
       }
+   }
+
+   /**
+    * Writes SHAPE value to the stream
+    *
+    * @param value SHAPE value
+    * @throws IOException
+    */
+   public void writeSHAPE(SHAPE value, int shapeNum) throws IOException {
+      writeUB(4, value.numFillBits);
+      writeUB(4, value.numLineBits);
+      writeSHAPERECORDS(value.shapeRecords, value.numFillBits, value.numLineBits, shapeNum);
+   }
+
+   /**
+    * Writes SHAPEWITHSTYLE value to the stream
+    *
+    * @param value SHAPEWITHSTYLE value
+    * @throws IOException
+    */
+   public void writeSHAPEWITHSTYLE(SHAPEWITHSTYLE value, int shapeNum) throws IOException {
+      writeFILLSTYLEARRAY(value.fillStyles, shapeNum);
+      writeLINESTYLEARRAY(value.lineStyles, shapeNum);
+      writeUB(4, value.numFillBits);
+      writeUB(4, value.numLineBits);
+      writeSHAPERECORDS(value.shapeRecords, value.numFillBits, value.numLineBits, shapeNum);
+   }
+
+   /**
+    * Writes SHAPERECORDs value to the stream
+    *
+    * @param value SHAPERECORDS value
+    * @throws IOException
+    */
+   public void writeSHAPERECORDS(List<SHAPERECORD> value, int fillBits, int lineBits, int shapeNum) throws IOException {
+      for (SHAPERECORD sh : value) {
+         if (sh instanceof CurvedEdgeRecord) {
+            CurvedEdgeRecord cer = (CurvedEdgeRecord) sh;
+            writeUB(1, 1); //typeFlag
+            writeUB(1, 0);//curvedEdge
+            writeUB(4, cer.numBits);
+            writeUB(cer.numBits + 2, cer.controlDeltaX);
+            writeUB(cer.numBits + 2, cer.controlDeltaY);
+            writeUB(cer.numBits + 2, cer.anchorDeltaX);
+            writeUB(cer.numBits + 2, cer.anchorDeltaY);
+         } else if (sh instanceof StraightEdgeRecord) {
+            StraightEdgeRecord ser = (StraightEdgeRecord) sh;
+            writeUB(1, 1); //typeFlag
+            writeUB(1, 1);//straightEdge
+            writeUB(4, ser.numBits);
+            writeUB(1, ser.generalLineFlag ? 1 : 0);
+            if (!ser.generalLineFlag) {
+               writeUB(1, ser.vertLineFlag ? 1 : 0);
+            }
+            if (ser.generalLineFlag || (!ser.vertLineFlag)) {
+               writeSB(ser.numBits + 2, ser.deltaX);
+            }
+            if (ser.generalLineFlag || ser.vertLineFlag) {
+               writeSB(ser.numBits + 2, ser.deltaY);
+            }
+         } else if (sh instanceof StyleChangeRecord) {
+            StyleChangeRecord scr = (StyleChangeRecord) sh;
+            writeUB(1, 0); //typeFlag
+            writeUB(1, scr.stateNewStyles ? 1 : 0);
+            writeUB(1, scr.stateLineStyle ? 1 : 0);
+            writeUB(1, scr.stateFillStyle1 ? 1 : 0);
+            writeUB(1, scr.stateFillStyle0 ? 1 : 0);
+            writeUB(1, scr.stateMoveTo ? 1 : 0);
+            if (scr.stateMoveTo) {
+               writeUB(5, scr.moveBits);
+               writeUB(scr.moveBits, scr.moveDeltaX);
+               writeUB(scr.moveBits, scr.moveDeltaY);
+            }
+            if (scr.stateFillStyle0) {
+               writeUB(fillBits, scr.fillStyle0);
+            }
+            if (scr.stateFillStyle1) {
+               writeUB(fillBits, scr.fillStyle1);
+            }
+            if (scr.stateLineStyle) {
+               writeUB(lineBits, scr.lineStyle);
+            }
+            if (scr.stateNewStyles) {
+               writeFILLSTYLEARRAY(scr.fillStyles, shapeNum);
+               writeLINESTYLEARRAY(scr.lineStyles, shapeNum);
+               writeUB(4, scr.numFillBits);
+               writeUB(4, scr.numLineBits);
+            }
+
+         } else if (sh instanceof EndShapeRecord) {
+            writeUB(1, 0); //typeFlag
+            writeUB(5, 0); //end of shape flag
+         }
+      }
+      alignByte();
+   }
+
+   /**
+    * Writes SOUNDINFO value to the stream
+    *
+    * @param value SOUNDINFO value
+    * @throws IOException
+    */
+   public void writeSOUNDINFO(SOUNDINFO value) throws IOException {
+      writeUB(2, 0);//reserved
+      writeUB(1, value.syncStop ? 1 : 0);
+      writeUB(1, value.syncNoMultiple ? 1 : 0);
+      writeUB(1, value.hasEnvelope ? 1 : 0);
+      writeUB(1, value.hasLoops ? 1 : 0);
+      writeUB(1, value.hasOutPoint ? 1 : 0);
+      writeUB(1, value.hasInPoint ? 1 : 0);
+      if (value.hasInPoint) {
+         writeUI32(value.inPoint);
+      }
+      if (value.hasOutPoint) {
+         writeUI32(value.outPoint);
+      }
+      if (value.hasLoops) {
+         writeUI16(value.loopCount);
+      }
+      if (value.hasEnvelope) {
+         writeUI8(value.envelopeRecords.length);
+         for (SOUNDENVELOPE env : value.envelopeRecords) {
+            writeSOUNDENVELOPE(env);
+         }
+      }
+   }
+
+   /**
+    * Writes SOUNDENVELOPE value to the stream
+    *
+    * @param value SOUNDENVELOPE value
+    * @throws IOException
+    */
+   public void writeSOUNDENVELOPE(SOUNDENVELOPE value) throws IOException {
+      writeUI32(value.pos44);
+      writeUI16(value.leftLevel);
+      writeUI16(value.rightLevel);
+   }
+
+   /**
+    * Writes TEXTRECORD value to the stream
+    *
+    * @param value TEXTRECORD value
+    * @throws IOException
+    */
+   public void writeTEXTRECORD(TEXTRECORD value, boolean inDefineText2, int glyphBits, int advanceBits) throws IOException {
+      writeUB(1, 1);
+      writeUB(3, 0);
+      writeUB(1, value.styleFlagsHasFont ? 1 : 0);
+      writeUB(1, value.styleFlagsHasColor ? 1 : 0);
+      writeUB(1, value.styleFlagsHasYOffset ? 1 : 0);
+      writeUB(1, value.styleFlagsHasXOffset ? 1 : 0);
+      if (value.styleFlagsHasFont) {
+         writeUI16(value.fontId);
+      }
+      if (value.styleFlagsHasColor) {
+         if (inDefineText2) {
+            writeRGBA(value.textColorA);
+         } else {
+            writeRGB(value.textColor);
+         }
+      }
+      if (value.styleFlagsHasXOffset) {
+         writeSI16(value.xOffset);
+      }
+      if (value.styleFlagsHasYOffset) {
+         writeSI16(value.yOffset);
+      }
+      if (value.styleFlagsHasFont) {
+         writeUI16(value.textHeight);
+      }
+      writeUI8(value.glyphEntries.length);
+      for (GLYPHENTRY ge : value.glyphEntries) {
+         writeGLYPHENTRY(ge, glyphBits, advanceBits);
+      }
+   }
+
+   /**
+    * Writes GLYPHENTRY value to the stream
+    *
+    * @param value GLYPHENTRY value
+    * @throws IOException
+    */
+   public void writeGLYPHENTRY(GLYPHENTRY value, int glyphBits, int advanceBits) throws IOException {
+      writeUB(glyphBits, value.glyphIndex);
+      writeSB(advanceBits, value.glyphAdvance);
+   }
+
+   /**
+    * Writes MORPHFILLSTYLE value to the stream
+    *
+    * @param value MORPHFILLSTYLE value
+    * @throws IOException
+    */
+   public void writeMORPHFILLSTYLE(MORPHFILLSTYLE value, int shapeNum) throws IOException {
+      writeUI8(value.fillStyleType);
+      if (value.fillStyleType == MORPHFILLSTYLE.SOLID) {
+         writeRGBA(value.startColor);
+         writeRGBA(value.endColor);
+      }
+      if ((value.fillStyleType == MORPHFILLSTYLE.LINEAR_GRADIENT)
+              || (value.fillStyleType == MORPHFILLSTYLE.RADIAL_GRADIENT)) {
+         writeMatrix(value.startGradientMatrix);
+         writeMatrix(value.endGradientMatrix);
+      }
+      if ((value.fillStyleType == MORPHFILLSTYLE.LINEAR_GRADIENT)
+              || (value.fillStyleType == MORPHFILLSTYLE.RADIAL_GRADIENT)) {
+         writeMORPHGRADIENT(value.gradient, shapeNum);
+      }
+
+      if ((value.fillStyleType == MORPHFILLSTYLE.REPEATING_BITMAP)
+              || (value.fillStyleType == MORPHFILLSTYLE.CLIPPED_BITMAP)
+              || (value.fillStyleType == MORPHFILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP)
+              || (value.fillStyleType == MORPHFILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP)) {
+         writeUI16(value.bitmapId);
+         writeMatrix(value.startBitmapMatrix);
+         writeMatrix(value.endBitmapMatrix);
+      }
+   }
+
+   /**
+    * WritesMORPH FILLSTYLEARRAY value to the stream
+    *
+    * @param value MORPHFILLSTYLEARRAY value
+    * @throws IOException
+    */
+   public void writeMORPHFILLSTYLEARRAY(MORPHFILLSTYLEARRAY value, int morphShapeNum) throws IOException {
+      int fillStyleCount = value.fillStyles.length;
+      if (fillStyleCount >= 0xff) {
+         writeUI8(0xff);
+         writeUI16(fillStyleCount);
+      } else {
+         writeUI8(fillStyleCount);
+      }
+      for (int i = 0; i < value.fillStyles.length; i++) {
+         writeMORPHFILLSTYLE(value.fillStyles[i], morphShapeNum);
+      }
+   }
+
+   /**
+    * Writes MORPHGRADIENT value to the stream
+    *
+    * @param value MORPHGRADIENT value
+    * @throws IOException
+    */
+   public void writeMORPHGRADIENT(MORPHGRADIENT value, int shapeNum) throws IOException {
+      writeUB(4, value.gradientRecords.length);
+      for (int i = 0; i < value.gradientRecords.length; i++) {
+         writeMORPHGRADRECORD(value.gradientRecords[i]);
+      }
+   }
+
+   /**
+    * Writes MORPHGRADRECORD value to the stream
+    *
+    * @param value MORPHGRADRECORD value
+    * @throws IOException
+    */
+   public void writeMORPHGRADRECORD(MORPHGRADRECORD value) throws IOException {
+      writeUI8(value.startRatio);
+      writeRGBA(value.startColor);
+      writeUI8(value.endRatio);
+      writeRGBA(value.endColor);
+   }
+
+   /**
+    * Writes MORPHLINESTYLE value to the stream
+    *
+    * @param value LINESTYLE value
+    * @throws IOException
+    */
+   public void writeMORPHLINESTYLE(MORPHLINESTYLE value, int shapeNum) throws IOException {
+      writeUI16(value.startWidth);
+      writeUI16(value.endWidth);
+      writeRGBA(value.startColor);
+      writeRGBA(value.endColor);
+
+   }
+
+   /**
+    * Writes MORPHLINESTYLE2 value to the stream
+    *
+    * @param value MORPHLINESTYLE2 value
+    * @throws IOException
+    */
+   public void writeMORPHLINESTYLE2(MORPHLINESTYLE2 value, int shapeNum) throws IOException {
+      writeUI16(value.startWidth);
+      writeUI16(value.endWidth);
+      writeUB(2, value.startCapStyle);
+      writeUB(2, value.joinStyle);
+      writeUB(1, value.hasFillFlag ? 1 : 0);
+      writeUB(1, value.noHScaleFlag ? 1 : 0);
+      writeUB(1, value.noVScaleFlag ? 1 : 0);
+      writeUB(1, value.pixelHintingFlag ? 1 : 0);
+      writeUB(5, 0);//reserved
+      writeUB(1, value.noClose ? 1 : 0);
+      writeUB(2, value.endCapStyle);
+      if (value.joinStyle == LINESTYLE2.MITER_JOIN) {
+         writeUI16(value.miterLimitFactor);
+      }
+      if (!value.hasFillFlag) {
+         writeRGBA(value.startColor);
+         writeRGBA(value.endColor);
+      } else {
+         writeMORPHFILLSTYLE(value.fillType, shapeNum);
+      }
+   }
+
+   /**
+    * Writes MORPHLINESTYLEARRAY value to the stream
+    *
+    * @param value MORPHFILLSTYLEARRAY value
+    * @throws IOException
+    */
+   public void writeMORPHLINESTYLEARRAY(MORPHLINESTYLEARRAY value, int morphShapeNum) throws IOException {
+      int lineStyleCount;
+      if (morphShapeNum == 1) {
+         lineStyleCount = value.lineStyles.length;
+         if (lineStyleCount >= 0xff) {
+            writeUI8(0xff);
+            writeUI16(lineStyleCount);
+         } else {
+            writeUI8(lineStyleCount);
+         }
+         for (int i = 0; i < lineStyleCount; i++) {
+            writeMORPHLINESTYLE(value.lineStyles[i], morphShapeNum);
+         }
+      } else if (morphShapeNum == 2) {
+         lineStyleCount = value.lineStyles2.length;
+         if (lineStyleCount >= 0xff) {
+            writeUI8(0xff);
+            writeUI16(lineStyleCount);
+         } else {
+            writeUI8(lineStyleCount);
+         }
+         for (int i = 0; i < lineStyleCount; i++) {
+            writeMORPHLINESTYLE2(value.lineStyles2[i], morphShapeNum);
+         }
+      }
+   }
+
+   /**
+    * Writes KERNINGRECORD value to the stream
+    *
+    * @param value KERNINGRECORD value
+    * @throws IOException
+    */
+   public void writeKERNINGRECORD(KERNINGRECORD value, boolean fontFlagsWideCodes) throws IOException {
+      if (fontFlagsWideCodes) {
+         writeUI16(value.fontKerningCode1);
+         writeUI16(value.fontKerningCode2);
+      } else {
+         writeUI8(value.fontKerningCode1);
+         writeUI8(value.fontKerningCode2);
+      }
+      writeSI16(value.fontKerningAdjustment);
+   }
+
+   /**
+    * Writes LANGCODE value to the stream
+    *
+    * @param value LANGCODE value
+    * @throws IOException
+    */
+   public void writeLANGCODE(LANGCODE value) throws IOException {
+      writeUI8(value.languageCode);
+   }
+
+   /**
+    * Writes ZONERECORD value to the stream
+    *
+    * @param value ZONERECORD value
+    * @throws IOException
+    */
+   public void writeZONERECORD(ZONERECORD value) throws IOException {
+      writeUI8(value.zonedata.length);
+      for (int i = 0; i < value.zonedata.length; i++) {
+         writeZONEDATA(value.zonedata[i]);
+      }
+      writeUB(6, 0);
+      writeUB(1, value.zoneMaskX ? 1 : 0);
+      writeUB(1, value.zoneMaskY ? 1 : 0);
+   }
+
+   /**
+    * Writes ZONEDATA value to the stream
+    *
+    * @param value ZONEDATA value
+    * @throws IOException
+    */
+   public void writeZONEDATA(ZONEDATA value) throws IOException {
+      writeFLOAT16(value.alignmentCoordinate);
+      writeFLOAT16(value.range);
    }
 }

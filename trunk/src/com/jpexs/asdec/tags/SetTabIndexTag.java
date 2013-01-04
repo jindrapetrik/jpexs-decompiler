@@ -79,6 +79,6 @@ public class SetTabIndexTag extends Tag {
     */
    @Override
    public String toString() {
-      return "";
+      return "SetTabIndex";
    }
 }

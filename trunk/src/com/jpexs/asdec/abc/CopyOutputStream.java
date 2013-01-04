@@ -28,6 +28,7 @@ public class CopyOutputStream extends OutputStream {
    private int TEMPSIZE = 5;
    private int temp[] = new int[TEMPSIZE];
    private int tempPos = 0;
+   public int ignoreFirst = 0;
 
    public CopyOutputStream(OutputStream os, InputStream is) {
       this.os = os;
@@ -42,25 +43,29 @@ public class CopyOutputStream extends OutputStream {
       pos++;
       int r = is.read();
       if ((b & 0xff) != r) {
-         os.flush();
+         if (ignoreFirst <= 0) {
+            os.flush();
 
-         boolean output = false;
+            boolean output = true;
 
-         if (output) {
-            System.out.print("Last written:");
-            for (int i = 0; i < TEMPSIZE; i++) {
-               System.out.print("" + Integer.toHexString(temp[(tempPos + i) % TEMPSIZE]) + " ");
+            if (output) {
+               System.out.print("Last written:");
+               for (int i = 0; i < TEMPSIZE; i++) {
+                  System.out.print("" + Integer.toHexString(temp[(tempPos + i) % TEMPSIZE]) + " ");
+               }
+               System.out.println("");
+               System.out.println("More expected:");
+               for (int i = 0; i < TEMPSIZE; i++) {
+                  System.out.println("" + Integer.toHexString(is.read()));
+               }
+
+               System.out.println("");
+               System.out.println(Integer.toHexString(r) + " expected but " + Integer.toHexString(b) + " found");
             }
-            System.out.println("");
-            System.out.println("More expected:");
-            for (int i = 0; i < TEMPSIZE; i++) {
-               System.out.println("" + Integer.toHexString(is.read()));
-            }
-
-            System.out.println("");
-            System.out.println(Integer.toHexString(r) + " expected but " + Integer.toHexString(b) + " found");
+            throw new NotSameException(pos);
+         } else {
+            ignoreFirst--;
          }
-         throw new NotSameException(pos);
       }
       os.write(b);
    }

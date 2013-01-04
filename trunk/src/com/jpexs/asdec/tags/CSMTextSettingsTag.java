@@ -22,15 +22,19 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * 
+ *
  *
  * @author JPEXS
  */
-public class StubTag extends Tag {
+public class CSMTextSettingsTag extends Tag {
+
+   public int textID;
+   public int useFlashType;
+   public int gridFit;
+   public double thickness;
+   public double sharpness;
 
    /**
     * Gets data bytes
@@ -43,10 +47,15 @@ public class StubTag extends Tag {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       OutputStream os = baos;
       SWFOutputStream sos = new SWFOutputStream(os, version);
-      /*try {
-       //sos.write
-       } catch (IOException e) {
-       }*/
+      try {
+         sos.writeUI16(textID);
+         sos.writeUB(2, useFlashType);
+         sos.writeUB(3, gridFit);
+         sos.writeUB(3, 0);
+         sos.writeFIXED(thickness); //TODO:write F32
+         sos.writeFIXED(sharpness); //TODO:write F32
+      } catch (IOException e) {
+      }
       return baos.toByteArray();
    }
 
@@ -57,10 +66,16 @@ public class StubTag extends Tag {
     * @param version SWF version
     * @throws IOException
     */
-   public StubTag(byte data[], int version, long pos) throws IOException {
-      super(0, data, pos);
+   public CSMTextSettingsTag(byte data[], int version, long pos) throws IOException {
+      super(74, data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-
+      textID = sis.readUI16();
+      useFlashType = (int) sis.readUB(2);
+      gridFit = (int) sis.readUB(3);
+      sis.readUB(3); //reserved
+      thickness = sis.readFIXED(); //TODO: read F32
+      sharpness = sis.readFIXED(); //TODO: read F32
+      sis.readUI8(); //reserved
    }
 
    /**
@@ -70,6 +85,6 @@ public class StubTag extends Tag {
     */
    @Override
    public String toString() {
-      return "";
+      return "CSMTextSettings";
    }
 }

@@ -21,9 +21,9 @@ package com.jpexs.asdec.types;
  * @author JPEXS
  */
 public class GRADRECORD {
+
    public int ratio;
    public boolean inShape3;
    public RGB color;
    public RGBA colorA;
-   
 }
