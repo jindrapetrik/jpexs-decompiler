@@ -550,7 +550,7 @@ public class SWFInputStream extends InputStream {
             ret = new DefineBitsLosslessTag(data, version, pos);
             break;
          case 22:
-            ret = new DefineShape2(data, version, pos);
+            ret = new DefineShape2Tag(data, version, pos);
             break;
          case 23:
             ret = new NotDefinedTag("DefineButtonCxform",23,data,pos);
@@ -570,7 +570,7 @@ public class SWFInputStream extends InputStream {
          //case 30:
          //case 31: 
          case 32:
-            ret = new DefineShape3(data, version, pos);
+            ret = new DefineShape3Tag(data, version, pos);
             break;
          case 33:
             ret = new NotDefinedTag("DefineText2",33,data,pos);
@@ -678,7 +678,7 @@ public class SWFInputStream extends InputStream {
             ret = new DoABCTag(data, version, pos);
             break;
          case 83:
-            ret = new DefineShape4(data, version, pos);
+            ret = new DefineShape4Tag(data, version, pos);
             break;        
          case 84:
             ret = new NotDefinedTag("DefineMorphShape2",84,data,pos);
