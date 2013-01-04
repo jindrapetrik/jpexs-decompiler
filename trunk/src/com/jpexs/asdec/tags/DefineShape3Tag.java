@@ -22,20 +22,22 @@ import com.jpexs.asdec.types.SHAPEWITHSTYLE;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-public class DefineShape2 extends Tag {
+public class DefineShape3Tag extends Tag {
+
    public int shapeId;
    public RECT shapeBounds;
    public SHAPEWITHSTYLE shapes;
-   public DefineShape2(byte[] data, int version, long pos) throws IOException {
-      super(22, data, pos);
+
+   public DefineShape3Tag(byte[] data, int version, long pos) throws IOException {
+      super(32, data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      shapeId=sis.readUI16();
-      shapeBounds=sis.readRECT();
-      shapes=sis.readSHAPEWITHSTYLE(2);
+      shapeId = sis.readUI16();
+      shapeBounds = sis.readRECT();
+      shapes = sis.readSHAPEWITHSTYLE(3);
    }
 
    @Override
    public String toString() {
-      return "DefineShape2";
+      return "DefineShape3";
    }
 }
