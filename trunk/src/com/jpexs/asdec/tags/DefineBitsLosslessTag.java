@@ -18,10 +18,13 @@ package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.types.BITMAPDATA;
+import com.jpexs.asdec.types.COLORMAPDATA;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.zip.InflaterInputStream;
 
 public class DefineBitsLosslessTag extends Tag {
 
@@ -34,6 +37,37 @@ public class DefineBitsLosslessTag extends Tag {
    public static final int FORMAT_8BIT_COLORMAPPED = 3;
    public static final int FORMAT_15BIT_RGB = 4;
    public static final int FORMAT_24BIT_RGB = 5;
+   private COLORMAPDATA colorMapData;
+   private BITMAPDATA bitmapData;
+   private boolean decompressed = false;
+
+   public COLORMAPDATA getColorMapData() {
+      if (!decompressed) {
+         uncompressData();
+      }
+      return colorMapData;
+   }
+
+   public BITMAPDATA getBitmapData() {
+      if (!decompressed) {
+         uncompressData();
+      }
+      return bitmapData;
+   }
+
+   private void uncompressData() {
+      try {
+         SWFInputStream sis = new SWFInputStream(new InflaterInputStream(new ByteArrayInputStream(zlibBitmapData)), 10);
+         if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
+            colorMapData = sis.readCOLORMAPDATA(bitmapColorTableSize, bitmapWidth, bitmapHeight);
+         }
+         if ((bitmapFormat == FORMAT_15BIT_RGB) || (bitmapFormat == FORMAT_24BIT_RGB)) {
+            bitmapData = sis.readBITMAPDATA(bitmapFormat, bitmapWidth, bitmapHeight);
+         }
+      } catch (IOException ex) {
+      }
+      decompressed = true;
+   }
 
    public DefineBitsLosslessTag(byte[] data, int version, long pos) throws IOException {
       super(20, data, pos);
@@ -42,7 +76,7 @@ public class DefineBitsLosslessTag extends Tag {
       bitmapFormat = sis.readUI8();
       bitmapWidth = sis.readUI16();
       bitmapHeight = sis.readUI16();
-      if (bitmapFormat == FORMAT_15BIT_RGB) {
+      if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
          bitmapColorTableSize = sis.readUI8();
       }
       zlibBitmapData = sis.readBytes(sis.available());
@@ -64,7 +98,7 @@ public class DefineBitsLosslessTag extends Tag {
          sos.writeUI8(bitmapFormat);
          sos.writeUI16(bitmapWidth);
          sos.writeUI16(bitmapHeight);
-         if (bitmapFormat == FORMAT_15BIT_RGB) {
+         if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
             sos.writeUI8(bitmapColorTableSize);
          }
          sos.write(zlibBitmapData);

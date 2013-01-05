@@ -17,17 +17,22 @@
 package com.jpexs.asdec.types;
 
 /**
- * Represents 32-bit alpha, red, green and blue value
+ * Represents 15-bit red, green and blue value
  *
  * @author JPEXS
  */
-public class ZONEDATA {
+public class PIX15 {
 
-   public int alignmentCoordinate;
-   public int range;
-
-   @Override
-   public String toString() {
-      return "[ZONEDATA alignmentCoordinate=" + alignmentCoordinate + ", range=" + range + "]";
-   }
+   /**
+    * Red color value
+    */
+   public int red;
+   /**
+    * Green color value
+    */
+   public int green;
+   /**
+    * Blue color value
+    */
+   public int blue;
 }

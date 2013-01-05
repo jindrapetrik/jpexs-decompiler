@@ -29,14 +29,13 @@ public class ZONERECORD {
 
    @Override
    public String toString() {
-      String ret="[ZONERECORD data:";
-      for(int i=0;i<zonedata.length;i++){
-         if(i>0){
-            ret+=", ";
+      String ret = "[ZONERECORD data:";
+      for (int i = 0; i < zonedata.length; i++) {
+         if (i > 0) {
+            ret += ", ";
          }
-         ret+=zonedata[i];
+         ret += zonedata[i];
       }
-      return ret+", zoneMaskX:"+zoneMaskX+", zoneMaskY:"+zoneMaskY+"]";
+      return ret + ", zoneMaskX:" + zoneMaskX + ", zoneMaskY:" + zoneMaskY + "]";
    }
-   
 }

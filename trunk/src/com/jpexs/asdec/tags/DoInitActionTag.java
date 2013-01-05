@@ -84,8 +84,8 @@ public class DoInitActionTag extends Tag implements ASMSource, TagName {
    public String toString() {
       String name = "";
       for (ExportAssetsTag eat : exportAssetsTags) {
-         int pos=eat.tags.indexOf(spriteId);         
-         if (pos>-1) {
+         int pos = eat.tags.indexOf(spriteId);
+         if (pos > -1) {
             name = ": " + eat.names.get(pos);
          }
       }

@@ -177,8 +177,8 @@ public class DefineButton2Tag extends Tag implements Container, TagName {
    public String toString() {
       String name = "";
       for (ExportAssetsTag eat : exportAssetsTags) {
-         int pos=eat.tags.indexOf(buttonId);         
-         if (pos>-1) {
+         int pos = eat.tags.indexOf(buttonId);
+         if (pos > -1) {
             name = ": " + eat.names.get(pos);
          }
       }

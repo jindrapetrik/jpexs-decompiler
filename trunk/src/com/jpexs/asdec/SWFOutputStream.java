@@ -44,8 +44,6 @@ public class SWFOutputStream extends OutputStream {
       return pos;
    }
 
-   
-   
    /**
     * Constructor
     *
@@ -322,6 +320,20 @@ public class SWFOutputStream extends OutputStream {
       writeSB(nBits, longVal);
    }
 
+   private static int bitCount(int value) {
+      value = Math.abs(value);
+      int nBits = 0;
+      while ((value & ~0xF) != 0) {
+         value >>= 4;
+         nBits += 4;
+      }
+      while (value != 0) {
+         value >>= 1;
+         nBits++;
+      }
+      return nBits;
+   }
+
    /**
     * Writes RECT value to the stream
     *
@@ -390,17 +402,7 @@ public class SWFOutputStream extends OutputStream {
     * @return
     */
    public static int getNeededBits(int number, int bits) {
-      number = Math.abs(number);
-      int val = 1;
-      for (int x = 1; val <= number && !(bits > 32); x <<= 1) {
-         val = val | x;
-         bits++;
-      }
-
-      if (bits > 32) {
-         assert false : ("minBits " + bits + " must not exceed 32");
-      }
-      return bits;
+      return bitCount(number) + bits;
    }
 
    /**

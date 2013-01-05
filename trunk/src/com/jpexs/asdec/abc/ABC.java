@@ -300,7 +300,6 @@ public class ABC {
       }
 
       aos.writeU30(constants.constant_multiname.length);
-      //System.out.println("Writing "+constants.constant_multiname.length+" multinames");
       for (int i = 1; i < constants.constant_multiname.length; i++) {
          aos.writeMultiname(constants.constant_multiname[i]);
       }

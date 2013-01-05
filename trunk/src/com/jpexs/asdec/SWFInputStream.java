@@ -1167,6 +1167,21 @@ public class SWFInputStream extends InputStream {
    }
 
    /**
+    * Reads one ARGB value from the stream
+    *
+    * @return ARGB value
+    * @throws IOException
+    */
+   public ARGB readARGB() throws IOException {
+      ARGB ret = new ARGB();
+      ret.alpha = readUI8();
+      ret.red = readUI8();
+      ret.green = readUI8();
+      ret.blue = readUI8();
+      return ret;
+   }
+
+   /**
     * Reads one RGB value from the stream
     *
     * @return RGB value
@@ -2133,6 +2148,145 @@ public class SWFInputStream extends InputStream {
       ZONEDATA ret = new ZONEDATA();
       ret.alignmentCoordinate = readUI16();
       ret.range = readUI16();
+      return ret;
+   }
+
+   /**
+    * Reads one PIX15 value from the stream
+    *
+    * @return PIX15 value
+    * @throws IOException
+    */
+   public PIX15 readPIX15() throws IOException {
+      PIX15 ret = new PIX15();
+      readUB(1);
+      ret.red = (int) readUB(5);
+      ret.green = (int) readUB(5);
+      ret.blue = (int) readUB(5);
+      return ret;
+   }
+
+   /**
+    * Reads one PIX24 value from the stream
+    *
+    * @return PIX24 value
+    * @throws IOException
+    */
+   public PIX24 readPIX24() throws IOException {
+      PIX24 ret = new PIX24();
+      readUI8();
+      ret.red = readUI8();
+      ret.green = readUI8();
+      ret.blue = readUI8();
+      return ret;
+   }
+
+   /**
+    * Reads one COLORMAPDATA value from the stream
+    *
+    * @return COLORMAPDATA value
+    * @throws IOException
+    */
+   public COLORMAPDATA readCOLORMAPDATA(int colorTableSize, int bitmapWidth, int bitmapHeight) throws IOException {
+      COLORMAPDATA ret = new COLORMAPDATA();
+      ret.colorTableRGB = new RGB[colorTableSize + 1];
+      for (int i = 0; i < colorTableSize + 1; i++) {
+         ret.colorTableRGB[i] = readRGB();
+      }
+      int dataLen = 0;
+      for (int y = 0; y < bitmapHeight; y++) {
+         int x = 0;
+         for (; x < bitmapWidth; x++) {
+            dataLen++;
+         }
+         while ((x % 4) != 0) {
+            dataLen++;
+            x++;
+         }
+      }
+      ret.colorMapPixelData = readBytes(dataLen);
+      return ret;
+   }
+
+   /**
+    * Reads one BITMAPDATA value from the stream
+    *
+    * @return COLORMAPDATA value
+    * @throws IOException
+    */
+   public BITMAPDATA readBITMAPDATA(int bitmapFormat, int bitmapWidth, int bitmapHeight) throws IOException {
+      BITMAPDATA ret = new BITMAPDATA();
+      List<PIX15> pix15 = new ArrayList<PIX15>();
+      List<PIX24> pix24 = new ArrayList<PIX24>();
+      int dataLen = 0;
+      for (int y = 0; y < bitmapHeight; y++) {
+         int x = 0;
+         for (; x < bitmapWidth; x++) {
+            if (bitmapFormat == DefineBitsLosslessTag.FORMAT_15BIT_RGB) {
+               dataLen += 2;
+               pix15.add(readPIX15());
+            }
+            if (bitmapFormat == DefineBitsLosslessTag.FORMAT_24BIT_RGB) {
+               dataLen += 4;
+               pix24.add(readPIX24());
+            }
+            dataLen++;
+         }
+         while ((x % 4) != 0) {
+            dataLen++;
+            readUI8();
+            x++;
+         }
+      }
+      if (bitmapFormat == DefineBitsLosslessTag.FORMAT_15BIT_RGB) {
+         ret.bitmapPixelDataPix15 = pix15.toArray(new PIX15[pix15.size()]);
+      } else if (bitmapFormat == DefineBitsLosslessTag.FORMAT_24BIT_RGB) {
+         ret.bitmapPixelDataPix24 = pix24.toArray(new PIX24[pix24.size()]);
+      }
+      return ret;
+   }
+
+   /**
+    * Reads one BITMAPDATA value from the stream
+    *
+    * @return COLORMAPDATA value
+    * @throws IOException
+    */
+   public ALPHABITMAPDATA readALPHABITMAPDATA(int bitmapFormat, int bitmapWidth, int bitmapHeight) throws IOException {
+      ALPHABITMAPDATA ret = new ALPHABITMAPDATA();
+      ret.bitmapPixelData = new ARGB[bitmapWidth * bitmapHeight];
+      for (int y = 0; y < bitmapHeight; y++) {
+         for (int x = 0; x < bitmapWidth; x++) {
+            ret.bitmapPixelData[y * bitmapWidth + x] = readARGB();
+         }
+      }
+      return ret;
+   }
+
+   /**
+    * Reads one ALPHACOLORMAPDATA value from the stream
+    *
+    * @return ALPHACOLORMAPDATA value
+    * @throws IOException
+    */
+   public ALPHACOLORMAPDATA readALPHACOLORMAPDATA(int colorTableSize, int bitmapWidth, int bitmapHeight) throws IOException {
+      ALPHACOLORMAPDATA ret = new ALPHACOLORMAPDATA();
+      ret.colorTableRGB = new RGBA[colorTableSize + 1];
+      for (int i = 0; i < colorTableSize + 1; i++) {
+         ret.colorTableRGB[i] = readRGBA();
+      }
+      int dataLen = 0;
+      for (int y = 0; y < bitmapHeight; y++) {
+         int x = 0;
+         for (; x < bitmapWidth; x++) {
+            dataLen++;
+         }
+         while ((x % 4) != 0) {
+            dataLen++;
+            x++;
+         }
+      }
+      ret.colorMapPixelData = readBytes(dataLen);
       return ret;
    }
 

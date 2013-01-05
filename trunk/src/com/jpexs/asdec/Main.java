@@ -23,9 +23,7 @@ import com.jpexs.asdec.gui.LoadingDialog;
 import com.jpexs.asdec.gui.ModeFrame;
 import com.jpexs.asdec.gui.View;
 import com.jpexs.asdec.gui.proxy.ProxyFrame;
-import com.jpexs.asdec.tags.DefineBitsTag;
 import com.jpexs.asdec.tags.DoABCTag;
-import com.jpexs.asdec.tags.JPEGTablesTag;
 import com.jpexs.asdec.tags.Tag;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -416,8 +414,8 @@ public class Main {
       System.out.println(" ...opens SWF file with the decompiler GUI");
       System.out.println(" 3) -proxy (-PXXX)");
       System.out.println("  ...auto start proxy in the tray. Optional parameter -P specifies port for proxy. Defaults to 55555. ");
-      System.out.println(" 4) -export (as|pcode) outdirectory infile");
-      System.out.println("  ...export infile actionscript to outdirectory as AsctionScript code (\"as\" argument) or as PCode (\"pcode\" argument)");
+      System.out.println(" 4) -export (as|pcode|image) outdirectory infile");
+      System.out.println("  ...export infile sources to outdirectory as AsctionScript code (\"as\" argument) or as PCode (\"pcode\" argument) or images");
       System.out.println(" 5) -dumpSWF infile");
       System.out.println("  ...dumps list of SWF tags to console");
       System.out.println(" 6) -compress infile outfile");
@@ -478,8 +476,10 @@ public class Main {
             String exportFormat = args[pos + 1];
             if (!exportFormat.toLowerCase().equals("as")) {
                if (!exportFormat.toLowerCase().equals("pcode")) {
-                  System.err.println("Invalid export format:" + exportFormat);
-                  badArguments();
+                  if (!exportFormat.toLowerCase().equals("image")) {
+                     System.err.println("Invalid export format:" + exportFormat);
+                     badArguments();
+                  }
                }
             }
             File outDir = new File(args[pos + 2]);
@@ -492,6 +492,7 @@ public class Main {
             boolean exportOK;
             try {
                printHeader();
+               dump_tags = true;
                SWF exfile = new SWF(new FileInputStream(inFile));
                exfile.addEventListener(new EventListener() {
                   public void handleEvent(String event, Object data) {
@@ -500,7 +501,14 @@ public class Main {
                      }
                   }
                });
-               exportOK = exfile.exportActionScript(outDir.getAbsolutePath(), exportFormat.equals("pcode"));
+               if (exportFormat.equals("image")) {
+                  exfile.exportImages(outDir.getAbsolutePath());
+                  exportOK = true;
+               } else if (exportFormat.equals("as") || exportFormat.equals("pcode")) {
+                  exportOK = exfile.exportActionScript(outDir.getAbsolutePath(), exportFormat.equals("pcode"));
+               } else {
+                  exportOK = false;
+               }
             } catch (Exception ex) {
                exportOK = false;
                System.err.print("FAIL: Exporting Failed on Exception - ");

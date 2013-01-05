@@ -29,8 +29,6 @@ public class KERNINGRECORD {
 
    @Override
    public String toString() {
-      return "[KERNINGRECORD fontKerningCode1="+fontKerningCode1+", fontKerningCode2="+fontKerningCode2+", fontKerningAdjustment="+fontKerningAdjustment+"]";
+      return "[KERNINGRECORD fontKerningCode1=" + fontKerningCode1 + ", fontKerningCode2=" + fontKerningCode2 + ", fontKerningAdjustment=" + fontKerningAdjustment + "]";
    }
-   
-   
 }

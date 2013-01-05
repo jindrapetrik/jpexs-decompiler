@@ -18,7 +18,6 @@ package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
-import com.jpexs.asdec.abc.CopyOutputStream;
 import com.jpexs.asdec.types.KERNINGRECORD;
 import com.jpexs.asdec.types.LANGCODE;
 import com.jpexs.asdec.types.RECT;
@@ -27,7 +26,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 
 public class DefineFont3Tag extends Tag {
 
@@ -83,13 +81,9 @@ public class DefineFont3Tag extends Tag {
       } else {
          codeTableOffset = sis.readUI16();
       }
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      CopyOutputStream cos = new CopyOutputStream(baos, new ByteArrayInputStream(Arrays.copyOfRange(data, (int) sis.getPos(), data.length - (int) sis.getPos())));
-      SWFOutputStream scos = new SWFOutputStream(cos, 10);
       glyphShapeTable = new SHAPE[numGlyphs];
       for (int i = 0; i < numGlyphs; i++) {
          glyphShapeTable[i] = sis.readSHAPE(1);
-         scos.writeSHAPE(glyphShapeTable[i], 1);
       }
       codeTable = new int[numGlyphs];
       for (int i = 0; i < numGlyphs; i++) {
@@ -157,8 +151,7 @@ public class DefineFont3Tag extends Tag {
          byte ba2[] = baos2.toByteArray();
          ByteArrayOutputStream baos3 = new ByteArrayOutputStream();
 
-         CopyOutputStream cos = new CopyOutputStream(baos3, new ByteArrayInputStream(Arrays.copyOfRange(data, (int) sos.getPos() + ba2.length + (fontFlagsWideOffsets ? 4 : 2), (int) data.length - (int) sos.getPos() - ba2.length - (fontFlagsWideOffsets ? 4 : 2))));
-         SWFOutputStream sos3 = new SWFOutputStream(cos, version);
+         SWFOutputStream sos3 = new SWFOutputStream(baos3, version);
          for (int i = 0; i < numGlyphs; i++) {
             sos3.writeSHAPE(glyphShapeTable[i], 1);
          }
@@ -170,7 +163,7 @@ public class DefineFont3Tag extends Tag {
             sos.writeUI32(offset);
          } else {
             long offset = ba2.length + ba3.length + 2;
-            sos.writeUI16((int)offset);
+            sos.writeUI16((int) offset);
          }
          sos.write(ba3);
 

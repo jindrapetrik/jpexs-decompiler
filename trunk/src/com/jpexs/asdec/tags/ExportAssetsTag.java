@@ -23,7 +23,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -50,8 +49,8 @@ public class ExportAssetsTag extends Tag {
       super(56, data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       int count = sis.readUI16();
-      tags=new ArrayList<Integer>();
-      names=new ArrayList<String>();
+      tags = new ArrayList<Integer>();
+      names = new ArrayList<String>();
       for (int i = 0; i < count; i++) {
          int characterId = sis.readUI16();
          tags.add(characterId);

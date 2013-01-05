@@ -39,4 +39,9 @@ public class ARGB {
     * Blue color value
     */
    public int blue;
+
+   @Override
+   public String toString() {
+      return "[ARGB a=" + alpha + ",r=" + red + ",g=" + green + ",b=" + blue + "]";
+   }
 }

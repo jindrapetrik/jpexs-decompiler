@@ -2298,11 +2298,9 @@ public class AVM2Code {
                                        ins.ignored = true;
                                        ip++;
                                     } else if (ins.definition instanceof IfTrueIns) {
-                                       System.out.println("iftrue found");
                                        boolean val = myStack.pop();
                                        if (val) {
                                           code.get(ip).definition = new JumpIns();
-                                          System.out.println("changed to jump");
                                           ip = adr2pos(pos2adr(ip + 1) + code.get(ip).operands[0]);
                                        } else {
                                           code.get(ip).ignored = true;

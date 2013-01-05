@@ -39,4 +39,9 @@ public class RECT {
     * Y maximum position for rectangle in twips
     */
    public int Ymax;
+
+   @Override
+   public String toString() {
+      return "[RECT x=" + Xmin + "-" + Xmax + ", y=" + Ymin + "-" + Ymax + "]";
+   }
 }

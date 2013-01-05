@@ -21,13 +21,8 @@ package com.jpexs.asdec.types;
  *
  * @author JPEXS
  */
-public class ZONEDATA {
+public class BITMAPDATA {
 
-   public int alignmentCoordinate;
-   public int range;
-
-   @Override
-   public String toString() {
-      return "[ZONEDATA alignmentCoordinate=" + alignmentCoordinate + ", range=" + range + "]";
-   }
+   public PIX15 bitmapPixelDataPix15[];
+   public PIX24 bitmapPixelDataPix24[];
 }

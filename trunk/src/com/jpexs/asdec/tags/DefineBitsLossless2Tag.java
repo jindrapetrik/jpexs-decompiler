@@ -18,10 +18,13 @@ package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.types.ALPHABITMAPDATA;
+import com.jpexs.asdec.types.ALPHACOLORMAPDATA;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.zip.InflaterInputStream;
 
 public class DefineBitsLossless2Tag extends Tag {
 
@@ -42,10 +45,41 @@ public class DefineBitsLossless2Tag extends Tag {
       bitmapFormat = sis.readUI8();
       bitmapWidth = sis.readUI16();
       bitmapHeight = sis.readUI16();
-      if (bitmapFormat == FORMAT_15BIT_RGB) {
+      if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
          bitmapColorTableSize = sis.readUI8();
       }
       zlibBitmapData = sis.readBytes(sis.available());
+   }
+   private ALPHACOLORMAPDATA colorMapData;
+   private ALPHABITMAPDATA bitmapData;
+   private boolean decompressed = false;
+
+   public ALPHACOLORMAPDATA getColorMapData() {
+      if (!decompressed) {
+         uncompressData();
+      }
+      return colorMapData;
+   }
+
+   public ALPHABITMAPDATA getBitmapData() {
+      if (!decompressed) {
+         uncompressData();
+      }
+      return bitmapData;
+   }
+
+   private void uncompressData() {
+      try {
+         SWFInputStream sis = new SWFInputStream(new InflaterInputStream(new ByteArrayInputStream(zlibBitmapData)), 10);
+         if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
+            colorMapData = sis.readALPHACOLORMAPDATA(bitmapColorTableSize, bitmapWidth, bitmapHeight);
+         }
+         if ((bitmapFormat == FORMAT_15BIT_RGB) || (bitmapFormat == FORMAT_24BIT_RGB)) {
+            bitmapData = sis.readALPHABITMAPDATA(bitmapFormat, bitmapWidth, bitmapHeight);
+         }
+      } catch (IOException ex) {
+      }
+      decompressed = true;
    }
 
    /**
@@ -64,7 +98,7 @@ public class DefineBitsLossless2Tag extends Tag {
          sos.writeUI8(bitmapFormat);
          sos.writeUI16(bitmapWidth);
          sos.writeUI16(bitmapHeight);
-         if (bitmapFormat == FORMAT_15BIT_RGB) {
+         if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
             sos.writeUI8(bitmapColorTableSize);
          }
          sos.write(zlibBitmapData);

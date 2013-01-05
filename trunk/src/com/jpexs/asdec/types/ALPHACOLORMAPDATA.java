@@ -21,13 +21,8 @@ package com.jpexs.asdec.types;
  *
  * @author JPEXS
  */
-public class ZONEDATA {
+public class ALPHACOLORMAPDATA {
 
-   public int alignmentCoordinate;
-   public int range;
-
-   @Override
-   public String toString() {
-      return "[ZONEDATA alignmentCoordinate=" + alignmentCoordinate + ", range=" + range + "]";
-   }
+   public RGBA colorTableRGB[];
+   public byte colorMapPixelData[];
 }
