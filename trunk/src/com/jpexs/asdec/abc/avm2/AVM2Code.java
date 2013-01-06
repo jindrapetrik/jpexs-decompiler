@@ -1945,7 +1945,7 @@ public class AVM2Code {
                continue;
             }
          }
-         String strippedP = Highlighting.stripHilights(parts[p]);
+         String strippedP = Highlighting.stripHilights(parts[p]).trim();
          if (strippedP.endsWith(":") && (!strippedP.startsWith("case ")) && (!strippedP.equals("default:"))) {
             String loopname = strippedP.substring(0, strippedP.length() - 1);
             boolean dorefer = false;
