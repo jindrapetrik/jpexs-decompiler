@@ -18,6 +18,8 @@ package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.tags.base.BoundedTag;
+import com.jpexs.asdec.tags.base.CharacterTag;
 import com.jpexs.asdec.types.MORPHFILLSTYLEARRAY;
 import com.jpexs.asdec.types.MORPHLINESTYLEARRAY;
 import com.jpexs.asdec.types.RECT;
@@ -32,7 +34,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class DefineMorphShapeTag extends Tag {
+public class DefineMorphShapeTag extends Tag implements CharacterTag, BoundedTag{
 
    public int characterId;
    public RECT startBounds;
@@ -42,6 +44,12 @@ public class DefineMorphShapeTag extends Tag {
    public SHAPE startEdges;
    public SHAPE endEdges;
 
+   @Override
+   public int getCharacterID() {
+      return characterId;
+   }
+
+   
    /**
     * Gets data bytes
     *
@@ -100,5 +108,15 @@ public class DefineMorphShapeTag extends Tag {
    @Override
    public String toString() {
       return "DefineMorphShape";
+   }
+
+   @Override
+   public RECT getRect() {
+      RECT rect=new RECT();
+      rect.Xmin=Math.min(startBounds.Xmin,endBounds.Xmin);
+      rect.Ymin=Math.min(startBounds.Ymin,endBounds.Ymin);
+      rect.Xmax=Math.max(startBounds.Xmax,endBounds.Xmax);
+      rect.Ymax=Math.max(startBounds.Ymax,endBounds.Ymax);
+      return rect;
    }
 }

@@ -31,11 +31,11 @@ public class MATRIX {
    /**
     * X scale value
     */
-   public double scaleX;
+   public int scaleX;
    /**
     * Y scale value
     */
-   public double scaleY;
+   public int scaleY;
    /**
     * Has rotate and skew values
     */
@@ -43,11 +43,11 @@ public class MATRIX {
    /**
     * First rotate and skew value
     */
-   public double rotateSkew0;
+   public int rotateSkew0;
    /**
     * Second rotate and skew value
     */
-   public double rotateSkew1;
+   public int rotateSkew1;
    /**
     * X translate value in twips
     */
@@ -55,17 +55,12 @@ public class MATRIX {
    /**
     * Y translate value in twips
     */
-   public int translateY;
-   /**
-    * Nbits used for store translate values
-    */
-   public int translateNBits;
-   /**
-    * Nbits used for store scale values
-    */
-   public int scaleNBits;
-   /**
-    * Nbits used for store rotate values
-    */
-   public int rotateNBits;
+   public int translateY;   
+
+   @Override
+   public String toString() {
+      return "[MATRIX scale:"+scaleX+","+scaleY+", rotate:"+rotateSkew0+","+rotateSkew1+", translate:"+translateX+","+translateY+"]";
+   }
+   
+   
 }

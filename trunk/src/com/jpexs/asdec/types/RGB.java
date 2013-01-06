@@ -35,4 +35,14 @@ public class RGB {
     * Blue color value
     */
    public int blue;
+
+   public RGB(int red, int green, int blue) {
+      this.red = red;
+      this.green = green;
+      this.blue = blue;
+   }
+   
+   public RGB(){
+      
+   }
 }

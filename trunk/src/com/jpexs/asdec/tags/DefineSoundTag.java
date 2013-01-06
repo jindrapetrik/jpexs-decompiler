@@ -18,6 +18,7 @@ package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.tags.base.CharacterTag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,7 +29,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class DefineSoundTag extends Tag {
+public class DefineSoundTag extends Tag implements CharacterTag {
 
    public int soundId;
    public int soundFormat;
@@ -45,6 +46,11 @@ public class DefineSoundTag extends Tag {
    public long soundSampleCount;
    public byte soundData[];
 
+   @Override
+   public int getCharacterID() {
+      return soundId;
+   }
+   
    /**
     * Gets data bytes
     *

@@ -18,6 +18,7 @@ package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.tags.base.CharacterTag;
 import com.jpexs.asdec.types.RECT;
 import com.jpexs.asdec.types.RGBA;
 import java.io.ByteArrayInputStream;
@@ -30,9 +31,9 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class DefineEditTextTag extends Tag {
+public class DefineEditTextTag extends Tag implements CharacterTag {
 
-   public int characterId;
+   public int characterID;
    public RECT bounds;
    public boolean hasText;
    public boolean wordWrap;
@@ -62,6 +63,11 @@ public class DefineEditTextTag extends Tag {
    public int leading;
    public String variableName;
    public String initialText;
+   
+   @Override
+   public int getCharacterID() {
+      return characterID;
+   }
 
    /**
     * Gets data bytes
@@ -75,7 +81,7 @@ public class DefineEditTextTag extends Tag {
       OutputStream os = baos;
       SWFOutputStream sos = new SWFOutputStream(os, version);
       try {
-         sos.writeUI16(characterId);
+         sos.writeUI16(characterID);
          sos.writeRECT(bounds);
          sos.writeUB(1, hasText ? 1 : 0);
          sos.writeUB(1, wordWrap ? 1 : 0);
@@ -133,9 +139,9 @@ public class DefineEditTextTag extends Tag {
     * @throws IOException
     */
    public DefineEditTextTag(byte data[], int version, long pos) throws IOException {
-      super(0, data, pos);
+      super(37, data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      characterId = sis.readUI16();
+      characterID = sis.readUI16();
       bounds = sis.readRECT();
       hasText = sis.readUB(1) == 1;
       wordWrap = sis.readUB(1) == 1;

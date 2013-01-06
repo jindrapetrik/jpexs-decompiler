@@ -18,12 +18,13 @@ package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.tags.base.CharacterTag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class DefineFont4Tag extends Tag {
+public class DefineFont4Tag extends Tag implements CharacterTag{
 
    public int fontID;
    public boolean fontFlagsHasFontData;
@@ -31,6 +32,11 @@ public class DefineFont4Tag extends Tag {
    public boolean fontFlagsBold;
    public String fontName;
    public byte fontData[];
+   
+   @Override
+   public int getCharacterID() {
+      return fontID;
+   }
 
    public DefineFont4Tag(byte[] data, int version, long pos) throws IOException {
       super(91, data, pos);

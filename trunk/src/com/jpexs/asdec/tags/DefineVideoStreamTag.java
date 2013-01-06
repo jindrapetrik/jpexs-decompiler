@@ -18,6 +18,7 @@ package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.tags.base.CharacterTag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,9 +29,9 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class DefineVideoStreamTag extends Tag {
+public class DefineVideoStreamTag extends Tag implements CharacterTag {
 
-   public int characterId;
+   public int characterID;
    public int numFrames;
    public int width;
    public int height;
@@ -38,6 +39,11 @@ public class DefineVideoStreamTag extends Tag {
    public boolean videoFlagsSmoothing;
    public int codecID;
 
+   @Override
+   public int getCharacterID() {
+      return characterID;
+   }
+   
    /**
     * Gets data bytes
     *
@@ -50,7 +56,7 @@ public class DefineVideoStreamTag extends Tag {
       OutputStream os = baos;
       SWFOutputStream sos = new SWFOutputStream(os, version);
       try {
-         sos.writeUI16(characterId);
+         sos.writeUI16(characterID);
          sos.writeUI16(numFrames);
          sos.writeUI16(width);
          sos.writeUI16(height);
@@ -73,7 +79,7 @@ public class DefineVideoStreamTag extends Tag {
    public DefineVideoStreamTag(byte data[], int version, long pos) throws IOException {
       super(60, data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      characterId = sis.readUI16();
+      characterID = sis.readUI16();
       numFrames = sis.readUI16();
       width = sis.readUI16();
       height = sis.readUI16();

@@ -48,6 +48,12 @@ public class EndTag extends Tag {
 
    }
 
+   public EndTag() {
+      super(0, new byte[0], 0);
+   }
+   
+   
+
    /**
     * Returns string representation of the object
     *

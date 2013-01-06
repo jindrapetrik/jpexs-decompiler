@@ -18,6 +18,7 @@ package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.tags.base.CharacterTag;
 import com.jpexs.asdec.types.MATRIX;
 import com.jpexs.asdec.types.RECT;
 import com.jpexs.asdec.types.TEXTRECORD;
@@ -33,7 +34,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class DefineTextTag extends Tag {
+public class DefineTextTag extends Tag implements CharacterTag{
 
    public int characterID;
    public RECT textBounds;
@@ -42,6 +43,23 @@ public class DefineTextTag extends Tag {
    public int advanceBits;
    public List<TEXTRECORD> textRecords;
 
+   @Override
+   public int getCharacterID() {
+      return characterID;
+   }
+
+   public DefineTextTag(int characterID, RECT textBounds, MATRIX textMatrix, int glyphBits, int advanceBits, List<TEXTRECORD> textRecords) {
+      super(11, new byte[0], 0);
+      this.characterID = characterID;
+      this.textBounds = textBounds;
+      this.textMatrix = textMatrix;
+      this.glyphBits = glyphBits;
+      this.advanceBits = advanceBits;
+      this.textRecords = textRecords;
+   }
+
+   
+   
    /**
     * Gets data bytes
     *

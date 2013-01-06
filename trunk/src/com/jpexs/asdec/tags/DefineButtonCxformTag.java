@@ -29,7 +29,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class DefineButtonCxform extends Tag {
+public class DefineButtonCxformTag extends Tag {
 
    public int buttonId;
    public CXFORM buttonColorTransform;
@@ -60,7 +60,7 @@ public class DefineButtonCxform extends Tag {
     * @param version SWF version
     * @throws IOException
     */
-   public DefineButtonCxform(byte data[], int version, long pos) throws IOException {
+   public DefineButtonCxformTag(byte data[], int version, long pos) throws IOException {
       super(23, data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       buttonId = sis.readUI16();

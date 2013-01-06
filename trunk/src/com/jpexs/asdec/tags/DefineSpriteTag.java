@@ -20,6 +20,7 @@ import com.jpexs.asdec.Main;
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.abc.CopyOutputStream;
+import com.jpexs.asdec.tags.base.CharacterTag;
 import com.jpexs.asdec.tags.base.Container;
 import com.jpexs.asdec.tags.base.TagName;
 import java.io.ByteArrayInputStream;
@@ -32,7 +33,7 @@ import java.util.List;
 /**
  * Defines a sprite character
  */
-public class DefineSpriteTag extends Tag implements Container, TagName {
+public class DefineSpriteTag extends Tag implements Container, TagName, CharacterTag {
 
    /**
     * Character ID of sprite
@@ -52,6 +53,14 @@ public class DefineSpriteTag extends Tag implements Container, TagName {
    public List<ExportAssetsTag> exportAssetsTags = new ArrayList<ExportAssetsTag>();
    private int level;
 
+   @Override
+   public int getCharacterID() {
+      return spriteId;
+   }
+
+   
+   
+   
    /**
     * Constructor
     *

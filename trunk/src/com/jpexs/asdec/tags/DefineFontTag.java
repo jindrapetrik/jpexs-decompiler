@@ -18,6 +18,8 @@ package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.tags.base.CharacterTag;
+import com.jpexs.asdec.tags.base.FontTag;
 import com.jpexs.asdec.types.SHAPE;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -29,7 +31,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class DefineFontTag extends Tag {
+public class DefineFontTag extends Tag implements FontTag{
 
    public int fontId;
    public int offsetTable[];

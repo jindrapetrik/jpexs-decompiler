@@ -16,20 +16,42 @@
  */
 package com.jpexs.asdec.tags;
 
+import com.jpexs.asdec.SWFInputStream;
+import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.types.RGB;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 public class SetBackgroundColorTag extends Tag {
 
    public RGB backgroundColor;
 
-   public SetBackgroundColorTag(byte[] data, long pos) {
+   public SetBackgroundColorTag(byte[] data, int version, long pos) throws IOException {
       super(9, data, pos);
-      backgroundColor = new RGB();
-      backgroundColor.red = data[0] & 0xff;
-      backgroundColor.green = data[1] & 0xff;
-      backgroundColor.blue = data[2] & 0xff;
+      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+      backgroundColor = sis.readRGB();
    }
 
+   public SetBackgroundColorTag(RGB backgroundColor) {
+      super(9, new byte[0], 0);
+      this.backgroundColor = backgroundColor;
+   }
+
+   @Override
+   public byte[] getData(int version) {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      SWFOutputStream sos = new SWFOutputStream(baos, version);
+      try {
+        sos.writeRGB(backgroundColor);
+       } catch (IOException e) {
+       }
+      return baos.toByteArray();
+   }
+
+   
+   
    @Override
    public String toString() {
       return "SetBackgroundColor";

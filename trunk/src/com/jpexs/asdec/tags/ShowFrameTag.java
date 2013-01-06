@@ -30,6 +30,10 @@ public class ShowFrameTag extends Tag {
       super(1, new byte[0], pos);
    }
 
+   public ShowFrameTag(){
+      super(1, new byte[0], 0);
+   }
+
    /**
     * Gets data bytes
     *

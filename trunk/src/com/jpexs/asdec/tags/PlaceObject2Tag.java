@@ -157,6 +157,28 @@ public class PlaceObject2Tag extends Tag implements Container {
       return baos.toByteArray();
    }
 
+   public PlaceObject2Tag(boolean placeFlagHasClipActions, boolean placeFlagHasClipDepth, boolean placeFlagHasName, boolean placeFlagHasRatio, boolean placeFlagHasColorTransform, boolean placeFlagHasMatrix, boolean placeFlagHasCharacter, boolean placeFlagMove, int depth, int characterId, MATRIX matrix, CXFORMWITHALPHA colorTransform, int ratio, String name, int clipDepth, CLIPACTIONS clipActions) {
+      super(26, new byte[0], 0);
+      this.placeFlagHasClipActions = placeFlagHasClipActions;
+      this.placeFlagHasClipDepth = placeFlagHasClipDepth;
+      this.placeFlagHasName = placeFlagHasName;
+      this.placeFlagHasRatio = placeFlagHasRatio;
+      this.placeFlagHasColorTransform = placeFlagHasColorTransform;
+      this.placeFlagHasMatrix = placeFlagHasMatrix;
+      this.placeFlagHasCharacter = placeFlagHasCharacter;
+      this.placeFlagMove = placeFlagMove;
+      this.depth = depth;
+      this.characterId = characterId;
+      this.matrix = matrix;
+      this.colorTransform = colorTransform;
+      this.ratio = ratio;
+      this.name = name;
+      this.clipDepth = clipDepth;
+      this.clipActions = clipActions;
+   }
+
+   
+   
    /**
     * Constructor
     *

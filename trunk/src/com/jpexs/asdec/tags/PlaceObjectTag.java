@@ -90,6 +90,16 @@ public class PlaceObjectTag extends Tag {
       }
    }
 
+   public PlaceObjectTag(int characterId, int depth, MATRIX matrix, CXFORM colorTransform) {
+      super(4, new byte[0], 0);
+      this.characterId = characterId;
+      this.depth = depth;
+      this.matrix = matrix;
+      this.colorTransform = colorTransform;
+   }
+
+   
+   
    /**
     * Returns string representation of the object
     *

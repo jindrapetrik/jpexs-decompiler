@@ -20,6 +20,7 @@ import com.jpexs.asdec.Main;
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.abc.CopyOutputStream;
+import com.jpexs.asdec.tags.base.CharacterTag;
 import com.jpexs.asdec.tags.base.Container;
 import com.jpexs.asdec.tags.base.TagName;
 import com.jpexs.asdec.types.BUTTONCONDACTION;
@@ -39,7 +40,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class DefineButton2Tag extends Tag implements Container, TagName {
+public class DefineButton2Tag extends Tag implements Container, TagName,CharacterTag {
 
    /**
     * ID for this character
@@ -62,6 +63,11 @@ public class DefineButton2Tag extends Tag implements Container, TagName {
     */
    public List<ExportAssetsTag> exportAssetsTags = new ArrayList<ExportAssetsTag>();
 
+   @Override
+   public int getCharacterID() {
+      return buttonId;
+   }
+   
    /**
     * Constructor
     *

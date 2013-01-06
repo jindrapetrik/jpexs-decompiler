@@ -387,10 +387,12 @@ public class SWFInputStream extends InputStream {
     * @return Fixed-point value
     * @throws IOException
     */
-   public double readFB(int nBits) throws IOException {
-
-      double val = readSB(nBits);
-      double ret = val / (1 << 16);
+   public float readFB(int nBits) throws IOException {
+      if(nBits==0){
+         return 0;
+      }
+      float val = readSB(nBits);
+      float ret = val / 0x10000;
       return ret;
    }
 
@@ -493,6 +495,9 @@ public class SWFInputStream extends InputStream {
       byte data[] = readBytes((int) tagLength);
       Tag ret;
       switch (tagID) {
+         case 0:
+            ret =new EndTag(data, version, pos);
+            break;
          case 1:
             ret = new ShowFrameTag(pos);
             break;
@@ -516,7 +521,7 @@ public class SWFInputStream extends InputStream {
             ret = new JPEGTablesTag(data, pos);
             break;
          case 9:
-            ret = new SetBackgroundColorTag(data, pos);
+            ret = new SetBackgroundColorTag(data, version,pos);
             break;
          case 10:
             ret = new DefineFontTag(data, version, pos);
@@ -556,7 +561,7 @@ public class SWFInputStream extends InputStream {
             ret = new DefineShape2Tag(data, version, pos);
             break;
          case 23:
-            ret = new DefineButtonCxform(data, version, pos);
+            ret = new DefineButtonCxformTag(data, version, pos);
             break;
          case 24:
             ret = new ProtectTag(data, version, pos);
@@ -988,20 +993,16 @@ public class SWFInputStream extends InputStream {
       ret.hasScale = readUB(1) == 1;
       if (ret.hasScale) {
          int NScaleBits = (int) readUB(5);
-         ret.scaleNBits = NScaleBits;
-
-         ret.scaleX = readFB(NScaleBits);
-         ret.scaleY = readFB(NScaleBits);
+         ret.scaleX = (int)readSB(NScaleBits);
+         ret.scaleY = (int)readSB(NScaleBits);
       }
       ret.hasRotate = readUB(1) == 1;
       if (ret.hasRotate) {
          int NRotateBits = (int) readUB(5);
-         ret.rotateNBits = NRotateBits;
-         ret.rotateSkew0 = readFB(NRotateBits);
-         ret.rotateSkew1 = readFB(NRotateBits);
+         ret.rotateSkew0 = (int)readSB(NRotateBits);
+         ret.rotateSkew1 = (int)readSB(NRotateBits);
       }
       int NTranslateBits = (int) readUB(5);
-      ret.translateNBits = NTranslateBits;
       ret.translateX = (int) readSB(NTranslateBits);
       ret.translateY = (int) readSB(NTranslateBits);
       alignByte();

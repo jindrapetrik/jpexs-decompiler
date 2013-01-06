@@ -17,17 +17,30 @@
 package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
+import com.jpexs.asdec.tags.base.BoundedTag;
+import com.jpexs.asdec.tags.base.CharacterTag;
 import com.jpexs.asdec.types.RECT;
 import com.jpexs.asdec.types.SHAPEWITHSTYLE;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class DefineShape3Tag extends Tag {
+public class DefineShape3Tag extends Tag implements CharacterTag,BoundedTag{
 
    public int shapeId;
    public RECT shapeBounds;
    public SHAPEWITHSTYLE shapes;
+   @Override
+   public RECT getRect() {
+      return shapeBounds;
+   }
 
+   @Override
+   public int getCharacterID() {
+      return shapeId;
+   }
+   
    public DefineShape3Tag(byte[] data, int version, long pos) throws IOException {
       super(32, data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
@@ -36,8 +49,17 @@ public class DefineShape3Tag extends Tag {
       shapes = sis.readSHAPEWITHSTYLE(3);
    }
 
+   public List<ExportAssetsTag> exportAssetsTags = new ArrayList<ExportAssetsTag>();
+   
    @Override
    public String toString() {
-      return "DefineShape3";
+      String name = "";
+      for (ExportAssetsTag eat : exportAssetsTags) {
+         int pos = eat.tags.indexOf(shapeId);
+         if (pos > -1) {
+            name = ": " + eat.names.get(pos);
+         }
+      }
+      return "DefineShape3 (" + shapeId + name + ")";
    }
 }

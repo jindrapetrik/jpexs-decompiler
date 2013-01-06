@@ -18,6 +18,7 @@ package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.tags.base.CharacterTag;
 import com.jpexs.asdec.types.SOUNDINFO;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -29,7 +30,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class DefineButtonSoundTag extends Tag {
+public class DefineButtonSoundTag extends Tag implements CharacterTag{
 
    public int buttonId;
    public int buttonSoundChar0;
@@ -41,6 +42,12 @@ public class DefineButtonSoundTag extends Tag {
    public int buttonSoundChar3;
    public SOUNDINFO buttonSoundInfo3;
 
+   
+   @Override
+   public int getCharacterID() {
+      return buttonId;
+   }
+   
    /**
     * Gets data bytes
     *
