@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="O2ModemTester" default="run" basedir=".">
+    <description>Builds, tests, and runs the project</description>
+    <import file="buildconfig.xml"/>
+    <property name="DISTLIBRARIESFULLDIR" value="${DISTRIBUTIONDIR}/${DISTLIBRARIESDIR}"/>
+    <property name="JAVADOCFULLDIR" value="${DISTRIBUTIONDIR}/${JAVADOCDIR}"/>
+
+
+    <target name="compile">        
+        <delete dir="${COMPILEDIR}"/>
+        <mkdir dir="${COMPILEDIR}"/>
+        <javac srcdir="${SOURCEDIR}" destdir="${COMPILEDIR}" includes="**/*.java">
+            <classpath>
+                <pathelement path="swt.jar"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="compiledebug">
+        <!--<delete dir="${COMPILEDIR}"/>-->
+        <mkdir dir="${COMPILEDIR}"/>
+        <copy todir="${COMPILEDIR}">
+            <fileset dir="${SOURCEDIR}" includes="**/*.java"/>
+        </copy>
+        <javac fork="true" debug="true" debuglevel="lines,vars,source" srcdir="${SOURCEDIR}" destdir="${COMPILEDIR}" includes="**/*.java">
+            <classpath>
+                <pathelement path="swt.jar"/>
+            </classpath>
+        </javac>
+        
+
+    </target>
+    <target name="build">
+        <antcall target="compile"/>
+        <mkdir dir="${DISTRIBUTIONDIR}"/>
+   
+        <jar destfile="${DISTRIBUTIONDIR}/${JARFILENAME}.jar" basedir="${COMPILEDIR}">
+            <manifest>
+                <attribute name="Main-Class" value="${MAINCLASS}"/>
+                <attribute name="Class-Path" value="swt.jar"/>
+            </manifest>
+        </jar>
+        
+    </target>
+    <target name="clean">
+        <delete dir="${DISTRIBUTIONDIR}"/>
+        <delete dir="${COMPILEDIR}"/>
+    </target>
+
+</project>
