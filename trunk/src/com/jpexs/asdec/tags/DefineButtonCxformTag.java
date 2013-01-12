@@ -61,19 +61,9 @@ public class DefineButtonCxformTag extends Tag {
     * @throws IOException
     */
    public DefineButtonCxformTag(byte data[], int version, long pos) throws IOException {
-      super(23, data, pos);
+      super(23, "DefineButtonCxform",data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       buttonId = sis.readUI16();
       buttonColorTransform = sis.readCXFORM();
-   }
-
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
-   public String toString() {
-      return "DefineButtonCxform";
    }
 }

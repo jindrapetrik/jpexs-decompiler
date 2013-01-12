@@ -45,7 +45,7 @@ public class ImportAssetsTag extends Tag {
     * @throws IOException
     */
    public ImportAssetsTag(byte data[], int version, long pos) throws IOException {
-      super(57, data, pos);
+      super(57,"ImportAssets", data, pos);
       assets = new HashMap<Integer, String>();
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       url = sis.readString();
@@ -78,15 +78,5 @@ public class ImportAssetsTag extends Tag {
       } catch (IOException e) {
       }
       return baos.toByteArray();
-   }
-
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
-   public String toString() {
-      return "ImportAssets";
    }
 }

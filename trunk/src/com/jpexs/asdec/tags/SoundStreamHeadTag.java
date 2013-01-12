@@ -77,7 +77,7 @@ public class SoundStreamHeadTag extends Tag {
     * @throws IOException
     */
    public SoundStreamHeadTag(byte data[], int version, long pos) throws IOException {
-      super(18, data, pos);
+      super(18,"SoundStreamHead", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       sis.readUB(4);//reserved
       playBackSoundRate = (int) sis.readUB(2);
@@ -91,15 +91,5 @@ public class SoundStreamHeadTag extends Tag {
       if (streamSoundCompression == 2) {
          latencySeek = sis.readSI16();
       }
-   }
-
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
-   public String toString() {
-      return "SoundStreamHead";
    }
 }

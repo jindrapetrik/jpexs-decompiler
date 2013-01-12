@@ -22,7 +22,6 @@ import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.abc.CopyOutputStream;
 import com.jpexs.asdec.tags.base.CharacterTag;
 import com.jpexs.asdec.tags.base.Container;
-import com.jpexs.asdec.tags.base.TagName;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -33,7 +32,7 @@ import java.util.List;
 /**
  * Defines a sprite character
  */
-public class DefineSpriteTag extends Tag implements Container, TagName, CharacterTag {
+public class DefineSpriteTag extends CharacterTag implements Container {
 
    /**
     * Character ID of sprite
@@ -47,11 +46,7 @@ public class DefineSpriteTag extends Tag implements Container, TagName, Characte
     * A series of tags
     */
    public List<Tag> subTags;
-   /**
-    * List of ExportAssetsTag used for converting to String
-    */
-   public List<ExportAssetsTag> exportAssetsTags = new ArrayList<ExportAssetsTag>();
-   private int level;
+  private int level;
 
    @Override
    public int getCharacterID() {
@@ -69,7 +64,7 @@ public class DefineSpriteTag extends Tag implements Container, TagName, Characte
     * @throws IOException
     */
    public DefineSpriteTag(byte[] data, int version, int level, long pos) throws IOException {
-      super(39, data, pos);
+      super(39,"DefineSprite", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version, pos);
       spriteId = sis.readUI16();
       frameCount = sis.readUI16();
@@ -105,22 +100,7 @@ public class DefineSpriteTag extends Tag implements Container, TagName, Characte
       return baos.toByteArray();
    }
 
-   @Override
-   public String getName() {
-      return "DefineSpriteTag" + spriteId;
-   }
 
-   @Override
-   public String toString() {
-      String name = "";
-      for (ExportAssetsTag eat : exportAssetsTags) {
-         int pos = eat.tags.indexOf(spriteId);
-         if (pos > -1) {
-            name = ": " + eat.names.get(pos);
-         }
-      }
-      return "DefineSpriteTag (" + spriteId + name + ")";
-   }
 
    /**
     * Returns all sub-items

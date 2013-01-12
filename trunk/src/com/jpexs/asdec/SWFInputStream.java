@@ -409,6 +409,7 @@ public class SWFInputStream extends InputStream {
       ret.Xmax = (int) readSB(NBits);
       ret.Ymin = (int) readSB(NBits);
       ret.Ymax = (int) readSB(NBits);
+      ret.nbits=NBits;
       alignByte();
       return ret;
    }
@@ -711,7 +712,7 @@ public class SWFInputStream extends InputStream {
             ret = new DefineFont4Tag(data, version, pos);
             break;
          default:
-            ret = new Tag(tagID, data, pos);
+            ret = new Tag(tagID,"Unknown", data, pos);
       }
       ret.forceWriteAsLong = readLong;
       byte dataNew[] = ret.getData(version);
@@ -744,7 +745,7 @@ public class SWFInputStream extends InputStream {
                   e += (Long.toHexString(data[j] & 0xff) + " ");
                }
             }
-            log.severe(e);
+            log.fine(e);
          }
       }
       return ret;
@@ -995,16 +996,19 @@ public class SWFInputStream extends InputStream {
          int NScaleBits = (int) readUB(5);
          ret.scaleX = (int)readSB(NScaleBits);
          ret.scaleY = (int)readSB(NScaleBits);
+         ret.bitsScale=NScaleBits;
       }
       ret.hasRotate = readUB(1) == 1;
       if (ret.hasRotate) {
          int NRotateBits = (int) readUB(5);
          ret.rotateSkew0 = (int)readSB(NRotateBits);
          ret.rotateSkew1 = (int)readSB(NRotateBits);
+         ret.bitsRotate=NRotateBits;
       }
       int NTranslateBits = (int) readUB(5);
       ret.translateX = (int) readSB(NTranslateBits);
       ret.translateY = (int) readSB(NTranslateBits);
+      ret.bitsTranslate=NTranslateBits;
       alignByte();
       return ret;
    }
@@ -2233,6 +2237,7 @@ public class SWFInputStream extends InputStream {
             }
             dataLen++;
          }
+         x--;
          while ((x % 4) != 0) {
             dataLen++;
             readUI8();

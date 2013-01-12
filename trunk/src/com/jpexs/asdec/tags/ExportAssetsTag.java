@@ -46,7 +46,7 @@ public class ExportAssetsTag extends Tag {
     * @throws IOException
     */
    public ExportAssetsTag(byte[] data, int version, long pos) throws IOException {
-      super(56, data, pos);
+      super(56, "ExportAssets",data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       int count = sis.readUI16();
       tags = new ArrayList<Integer>();
@@ -81,13 +81,4 @@ public class ExportAssetsTag extends Tag {
       return baos.toByteArray();
    }
 
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
-   public String toString() {
-      return "ExportAssets";
-   }
 }

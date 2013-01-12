@@ -44,7 +44,7 @@ public class MethodTraitDetailPanel extends JTabbedPane implements TraitDetail {
       if (!methodInfoPanel.save()) {
          return false;
       }
-      if (!methodCodePanel.sourceTextArea.save(Main.abcMainFrame.abc.constants)) {
+      if (!methodCodePanel.sourceTextArea.save(Main.mainFrame.abcPanel.abc.constants)) {
          return false;
       }
       if (!methodBodyParamsPanel.save()) {

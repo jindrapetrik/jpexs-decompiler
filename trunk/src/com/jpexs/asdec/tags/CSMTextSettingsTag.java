@@ -67,7 +67,7 @@ public class CSMTextSettingsTag extends Tag {
     * @throws IOException
     */
    public CSMTextSettingsTag(byte data[], int version, long pos) throws IOException {
-      super(74, data, pos);
+      super(74, "CSMTextSettings", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       textID = sis.readUI16();
       useFlashType = (int) sis.readUB(2);

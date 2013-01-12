@@ -29,7 +29,7 @@ public class FrameLabelTag extends Tag {
    private boolean namedAnchor = false;
 
    public FrameLabelTag(byte[] data, int version, long pos) throws IOException {
-      super(43, data, pos);
+      super(43,"FrameLabel", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       name = sis.readString();
       if (sis.available() > 0) {
@@ -39,10 +39,6 @@ public class FrameLabelTag extends Tag {
       }
    }
 
-   @Override
-   public String toString() {
-      return "FrameLabel";
-   }
 
    /**
     * Gets data bytes

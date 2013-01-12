@@ -69,7 +69,7 @@ public class DefineFontTag extends Tag implements FontTag{
     * @throws IOException
     */
    public DefineFontTag(byte data[], int version, long pos) throws IOException {
-      super(10, data, pos);
+      super(10,"DefineFont", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       fontId = sis.readUI16();
       int firstOffset = sis.readUI16();
@@ -85,13 +85,4 @@ public class DefineFontTag extends Tag implements FontTag{
       }
    }
 
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
-   public String toString() {
-      return "DefineFont";
-   }
 }

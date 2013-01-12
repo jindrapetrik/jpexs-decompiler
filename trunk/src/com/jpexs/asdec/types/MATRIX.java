@@ -57,6 +57,9 @@ public class MATRIX {
     */
    public int translateY;   
 
+   public int bitsTranslate;
+   public int bitsRotate;
+   public int bitsScale;
    @Override
    public String toString() {
       return "[MATRIX scale:"+scaleX+","+scaleY+", rotate:"+rotateSkew0+","+rotateSkew1+", translate:"+translateX+","+translateY+"]";

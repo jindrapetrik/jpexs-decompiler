@@ -27,11 +27,11 @@ public class ShowFrameTag extends Tag {
     * Constructor
     */
    public ShowFrameTag(long pos) {
-      super(1, new byte[0], pos);
+      super(1,"ShowFrame", new byte[0], pos);
    }
 
    public ShowFrameTag(){
-      super(1, new byte[0], 0);
+      super(1,"ShowFrame", new byte[0], 0);
    }
 
    /**
@@ -45,13 +45,4 @@ public class ShowFrameTag extends Tag {
       return super.getData(version);
    }
 
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
-   public String toString() {
-      return "ShowFrame";
-   }
 }

@@ -18,19 +18,26 @@ package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.tags.base.CharacterTag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class DefineBitsJPEG3Tag extends Tag {
+public class DefineBitsJPEG3Tag extends CharacterTag {
 
    public int characterID;
    public byte imageData[];
    public byte bitmapAlphaData[];
+   
+   
+   @Override
+   public int getCharacterID() {
+      return characterID;
+   }
 
    public DefineBitsJPEG3Tag(byte[] data, int version, long pos) throws IOException {
-      super(35, data, pos);
+      super(35,"DefineBitsJPEG3", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       characterID = sis.readUI16();
       long alphaDataOffset = sis.readUI32();
@@ -57,10 +64,5 @@ public class DefineBitsJPEG3Tag extends Tag {
       } catch (IOException e) {
       }
       return baos.toByteArray();
-   }
-
-   @Override
-   public String toString() {
-      return "DefineBitsJPEG3";
    }
 }

@@ -20,7 +20,7 @@ import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.tags.base.ASMSource;
-import com.jpexs.asdec.tags.base.TagName;
+import com.jpexs.asdec.tags.base.CharacterTag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DoInitActionTag extends Tag implements ASMSource, TagName {
+public class DoInitActionTag extends CharacterTag implements ASMSource {
 
    /**
     * Identifier of Sprite
@@ -39,11 +39,7 @@ public class DoInitActionTag extends Tag implements ASMSource, TagName {
     * List of actions to perform
     */
    //public List<Action> actions = new ArrayList<Action>();
-   public byte[] actionBytes;
-   /**
-    * List of ExportAssetsTag used for converting to String
-    */
-   public List<ExportAssetsTag> exportAssetsTags = new ArrayList<ExportAssetsTag>();
+   public byte[] actionBytes; 
 
    /**
     * Constructor
@@ -53,7 +49,7 @@ public class DoInitActionTag extends Tag implements ASMSource, TagName {
     * @throws IOException
     */
    public DoInitActionTag(byte[] data, int version, long pos) throws IOException {
-      super(59, data, pos);
+      super(59, "DoInitAction",data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       spriteId = sis.readUI16();
       //actions = sis.readActionList();
@@ -78,23 +74,7 @@ public class DoInitActionTag extends Tag implements ASMSource, TagName {
       } catch (IOException e) {
       }
       return baos.toByteArray();
-   }
-
-   @Override
-   public String toString() {
-      String name = "";
-      for (ExportAssetsTag eat : exportAssetsTags) {
-         int pos = eat.tags.indexOf(spriteId);
-         if (pos > -1) {
-            name = ": " + eat.names.get(pos);
-         }
-      }
-      return "DoInitAction (" + spriteId + name + ")";
-   }
-
-   public String getName() {
-      return "DoInitAction" + spriteId;
-   }
+   }  
 
    /**
     * Whether or not this object contains ASM source
@@ -140,5 +120,10 @@ public class DoInitActionTag extends Tag implements ASMSource, TagName {
 
    public void setActionBytes(byte[] actionBytes) {
       this.actionBytes = actionBytes;
+   }
+
+   @Override
+   public int getCharacterID() {
+      return spriteId;
    }
 }

@@ -81,7 +81,7 @@ public class DefineFontInfo2Tag extends Tag {
     * @throws IOException
     */
    public DefineFontInfo2Tag(byte data[], int version, long pos) throws IOException {
-      super(62, data, pos);
+      super(62,"DefineFontInfo2", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       fontID = sis.readUI16();
       int fontNameLen = sis.readUI8();
@@ -98,15 +98,5 @@ public class DefineFontInfo2Tag extends Tag {
       for (int i = 0; i < codeTable.length; i++) {
          codeTable[i] = sis.readUI16();
       }
-   }
-
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
-   public String toString() {
-      return "DefineFontInfo2";
    }
 }

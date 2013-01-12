@@ -44,15 +44,13 @@ public class DoABCTag extends Tag implements Comparable<DoABCTag> {
     */
    public String name;
 
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
+
    @Override
-   public String toString() {
+   public String getName() {
       return "DoABC (" + name + ")";
    }
+   
+   
 
    /**
     * Constructor
@@ -62,7 +60,7 @@ public class DoABCTag extends Tag implements Comparable<DoABCTag> {
     * @throws IOException
     */
    public DoABCTag(byte[] data, int version, long pos) throws IOException {
-      super(82, data, pos);
+      super(82,"DoABC",data, pos);
       InputStream is = new ByteArrayInputStream(data);
       SWFInputStream sis = new SWFInputStream(is, version);
       flags = sis.readUI32();

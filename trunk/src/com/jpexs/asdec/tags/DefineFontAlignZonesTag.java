@@ -33,7 +33,7 @@ public class DefineFontAlignZonesTag extends Tag {
    public List<ZONERECORD> zoneTable;
 
    public DefineFontAlignZonesTag(byte[] data, int version, long pos) throws IOException {
-      super(73, data, pos);
+      super(73, "DefineFontAlignZones",data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       fontID = sis.readUI16();
       CSMTableHint = (int) sis.readUB(2);
@@ -68,8 +68,4 @@ public class DefineFontAlignZonesTag extends Tag {
       return baos.toByteArray();
    }
 
-   @Override
-   public String toString() {
-      return "DefineFontAlignZones";
-   }
 }

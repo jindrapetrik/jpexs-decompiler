@@ -55,7 +55,7 @@ public class DefineFont3Tag extends Tag implements FontTag {
    public KERNINGRECORD fontKerningTable[];
 
    public DefineFont3Tag(byte[] data, int version, long pos) throws IOException {
-      super(75, data, pos);
+      super(75, "DefineFont3",data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       fontId = sis.readUI16();
       fontFlagsHasLayout = sis.readUB(1) == 1;
@@ -200,8 +200,4 @@ public class DefineFont3Tag extends Tag implements FontTag {
       return baos.toByteArray();
    }
 
-   @Override
-   public String toString() {
-      return "DefineFont3";
-   }
 }

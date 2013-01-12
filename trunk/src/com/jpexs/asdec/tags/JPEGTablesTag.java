@@ -21,11 +21,7 @@ import java.io.IOException;
 public class JPEGTablesTag extends Tag {
 
    public JPEGTablesTag(byte[] data, long pos) throws IOException {
-      super(8, data, pos); //data is JPEG data      
+      super(8, "JPEGTables",data, pos); //data is JPEG data   
    }
 
-   @Override
-   public String toString() {
-      return "JPEGTables";
-   }
 }

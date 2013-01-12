@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class DefineText2Tag extends Tag implements CharacterTag {
+public class DefineText2Tag extends CharacterTag  {
 
    public int characterID;
    public RECT textBounds;
@@ -82,7 +82,7 @@ public class DefineText2Tag extends Tag implements CharacterTag {
     * @throws IOException
     */
    public DefineText2Tag(byte data[], int version, long pos) throws IOException {
-      super(33, data, pos);
+      super(33,"DefineText2", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       characterID = sis.readUI16();
       textBounds = sis.readRECT();
@@ -96,13 +96,4 @@ public class DefineText2Tag extends Tag implements CharacterTag {
       }
    }
 
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
-   public String toString() {
-      return "DefineText2";
-   }
 }

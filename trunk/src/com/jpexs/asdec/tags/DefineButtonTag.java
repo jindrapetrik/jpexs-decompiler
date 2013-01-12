@@ -23,7 +23,6 @@ import com.jpexs.asdec.abc.CopyOutputStream;
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.tags.base.ASMSource;
 import com.jpexs.asdec.tags.base.CharacterTag;
-import com.jpexs.asdec.tags.base.TagName;
 import com.jpexs.asdec.types.BUTTONRECORD;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -39,7 +38,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class DefineButtonTag extends Tag implements ASMSource, TagName, CharacterTag {
+public class DefineButtonTag extends CharacterTag implements ASMSource {
 
    /**
     * ID for this character
@@ -54,11 +53,6 @@ public class DefineButtonTag extends Tag implements ASMSource, TagName, Characte
     */
    //public List<Action> actions;
    public byte[] actionBytes;
-   /**
-    * List of ExportAssetsTag used for converting to String
-    */
-   public List<ExportAssetsTag> exportAssetsTags = new ArrayList<ExportAssetsTag>();
-
    
    @Override
    public int getCharacterID() {
@@ -73,7 +67,7 @@ public class DefineButtonTag extends Tag implements ASMSource, TagName, Characte
     * @throws IOException
     */
    public DefineButtonTag(byte[] data, int version, long pos) throws IOException {
-      super(7, data, pos);
+      super(7, "DefineButton",data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       buttonId = sis.readUI16();
       characters = sis.readBUTTONRECORDList(false);
@@ -107,22 +101,6 @@ public class DefineButtonTag extends Tag implements ASMSource, TagName, Characte
       } catch (IOException e) {
       }
       return baos.toByteArray();
-   }
-
-   public String getName() {
-      return "DefineButtonTag" + buttonId;
-   }
-
-   @Override
-   public String toString() {
-      String name = "";
-      for (ExportAssetsTag eat : exportAssetsTags) {
-         int pos = eat.tags.indexOf(buttonId);
-         if (pos > -1) {
-            name = ": " + eat.names.get(pos);
-         }
-      }
-      return "DefineButton (" + buttonId + name + ")";
    }
 
    /**

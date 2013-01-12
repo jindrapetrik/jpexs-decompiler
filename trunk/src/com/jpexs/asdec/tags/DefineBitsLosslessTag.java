@@ -18,15 +18,21 @@ package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.tags.base.CharacterTag;
 import com.jpexs.asdec.types.BITMAPDATA;
 import com.jpexs.asdec.types.COLORMAPDATA;
+import com.jpexs.asdec.types.RGB;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.InflaterInputStream;
 
-public class DefineBitsLosslessTag extends Tag {
+public class DefineBitsLosslessTag extends CharacterTag {
 
    public int characterID;
    public int bitmapFormat;
@@ -40,6 +46,49 @@ public class DefineBitsLosslessTag extends Tag {
    private COLORMAPDATA colorMapData;
    private BITMAPDATA bitmapData;
    private boolean decompressed = false;
+
+   
+   
+   public BufferedImage getImage() {
+      BufferedImage bi = new BufferedImage(bitmapWidth, bitmapHeight, BufferedImage.TYPE_INT_RGB);
+      Graphics g = bi.getGraphics();
+      COLORMAPDATA colorMapData = null;
+      BITMAPDATA bitmapData = null;
+      if (bitmapFormat == DefineBitsLosslessTag.FORMAT_8BIT_COLORMAPPED) {
+         colorMapData = getColorMapData();
+      }
+      if ((bitmapFormat == DefineBitsLosslessTag.FORMAT_15BIT_RGB) || (bitmapFormat == DefineBitsLosslessTag.FORMAT_24BIT_RGB)) {
+         bitmapData = getBitmapData();
+      }
+      int pos32aligned = 0;
+      int pos = 0;
+      for (int y = 0; y < bitmapHeight; y++) {
+         for (int x = 0; x < bitmapWidth; x++) {
+            if (bitmapFormat == DefineBitsLosslessTag.FORMAT_8BIT_COLORMAPPED) {
+               RGB color = colorMapData.colorTableRGB[colorMapData.colorMapPixelData[pos32aligned]];
+               g.setColor(new Color(color.red, color.green, color.blue));
+            }
+            if (bitmapFormat == DefineBitsLosslessTag.FORMAT_15BIT_RGB) {
+               g.setColor(new Color(bitmapData.bitmapPixelDataPix15[pos].red * 8, bitmapData.bitmapPixelDataPix15[pos].green * 8, bitmapData.bitmapPixelDataPix15[pos].blue * 8));
+            }
+            if (bitmapFormat == DefineBitsLosslessTag.FORMAT_24BIT_RGB) {
+               g.setColor(new Color(bitmapData.bitmapPixelDataPix24[pos].red, bitmapData.bitmapPixelDataPix24[pos].green, bitmapData.bitmapPixelDataPix24[pos].blue));
+            }
+            g.fillRect(x, y, 1, 1);
+            pos32aligned++;
+            pos++;
+         }         
+         while ((pos32aligned % 4 != 0)) {
+            pos32aligned++;
+         }
+      }
+      return bi;
+   }
+
+   @Override
+   public int getCharacterID() {
+      return characterID;
+   }
 
    public COLORMAPDATA getColorMapData() {
       if (!decompressed) {
@@ -70,7 +119,7 @@ public class DefineBitsLosslessTag extends Tag {
    }
 
    public DefineBitsLosslessTag(byte[] data, int version, long pos) throws IOException {
-      super(20, data, pos);
+      super(20, "DefineBitsLossless", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       characterID = sis.readUI16();
       bitmapFormat = sis.readUI8();
@@ -105,10 +154,5 @@ public class DefineBitsLosslessTag extends Tag {
       } catch (IOException e) {
       }
       return baos.toByteArray();
-   }
-
-   @Override
-   public String toString() {
-      return "DefineBitsLossless";
    }
 }

@@ -29,7 +29,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class DefineVideoStreamTag extends Tag implements CharacterTag {
+public class DefineVideoStreamTag extends CharacterTag {
 
    public int characterID;
    public int numFrames;
@@ -77,7 +77,7 @@ public class DefineVideoStreamTag extends Tag implements CharacterTag {
     * @throws IOException
     */
    public DefineVideoStreamTag(byte data[], int version, long pos) throws IOException {
-      super(60, data, pos);
+      super(60, "DefineVideoStream",data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       characterID = sis.readUI16();
       numFrames = sis.readUI16();
@@ -89,13 +89,4 @@ public class DefineVideoStreamTag extends Tag implements CharacterTag {
       codecID = sis.readUI8();
    }
 
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
-   public String toString() {
-      return "DefineVideoStream";
-   }
 }

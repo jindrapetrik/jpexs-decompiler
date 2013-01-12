@@ -63,20 +63,10 @@ public class ProtectTag extends Tag {
     * @throws IOException
     */
    public ProtectTag(byte data[], int version, long pos) throws IOException {
-      super(24, data, pos);
+      super(24,"Protect", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       if (sis.available() > 0) {
          passwordHash = sis.readString();
       }
-   }
-
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
-   public String toString() {
-      return "Protect";
    }
 }

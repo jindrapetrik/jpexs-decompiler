@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DefineShape4Tag extends Tag implements CharacterTag,BoundedTag{
+public class DefineShape4Tag extends CharacterTag implements BoundedTag{
 
    public int shapeId;
    public RECT shapeBounds;
@@ -47,7 +47,7 @@ public class DefineShape4Tag extends Tag implements CharacterTag,BoundedTag{
    }
    
    public DefineShape4Tag(byte[] data, int version, long pos) throws IOException {
-      super(83, data, pos);
+      super(83, "DefineShape4", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       shapeId = sis.readUI16();
       shapeBounds = sis.readRECT();
@@ -57,19 +57,5 @@ public class DefineShape4Tag extends Tag implements CharacterTag,BoundedTag{
       usesNonScalingStrokes = sis.readUB(1) == 1;
       usesScalingStrokes = sis.readUB(1) == 1;
       shapes = sis.readSHAPEWITHSTYLE(4);
-   }
-
-   public List<ExportAssetsTag> exportAssetsTags = new ArrayList<ExportAssetsTag>();
-   
-   @Override
-   public String toString() {
-      String name = "";
-      for (ExportAssetsTag eat : exportAssetsTags) {
-         int pos = eat.tags.indexOf(shapeId);
-         if (pos > -1) {
-            name = ": " + eat.names.get(pos);
-         }
-      }
-      return "DefineShape4 (" + shapeId + name + ")";
    }
 }

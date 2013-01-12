@@ -146,7 +146,7 @@ public class DefineFont2Tag extends Tag implements FontTag {
     * @throws IOException
     */
    public DefineFont2Tag(byte data[], int version, long pos) throws IOException {
-      super(48, data, pos);
+      super(48,"DefineFont2", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       fontId = sis.readUI16();
       fontFlagsHasLayout = sis.readUB(1) == 1;
@@ -209,13 +209,4 @@ public class DefineFont2Tag extends Tag implements FontTag {
       }
    }
 
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
-   public String toString() {
-      return "DefineFont2";
-   }
 }

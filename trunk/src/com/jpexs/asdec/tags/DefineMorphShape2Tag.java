@@ -34,7 +34,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class DefineMorphShape2Tag extends Tag implements CharacterTag, BoundedTag {
+public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag {
 
    public int characterId;
    public RECT startBounds;
@@ -105,7 +105,7 @@ public class DefineMorphShape2Tag extends Tag implements CharacterTag, BoundedTa
     * @throws IOException
     */
    public DefineMorphShape2Tag(byte data[], int version, long pos) throws IOException {
-      super(84, data, pos);
+      super(84, "DefineMorphShape2", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       characterId = sis.readUI16();
       startBounds = sis.readRECT();
@@ -122,13 +122,4 @@ public class DefineMorphShape2Tag extends Tag implements CharacterTag, BoundedTa
       endEdges = sis.readSHAPE(1);
    }
 
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
-   public String toString() {
-      return "DefineMorphShape2";
-   }
 }

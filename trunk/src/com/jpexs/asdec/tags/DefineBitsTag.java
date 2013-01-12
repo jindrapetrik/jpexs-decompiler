@@ -16,23 +16,55 @@
  */
 package com.jpexs.asdec.tags;
 
+import com.jpexs.asdec.SWF;
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.tags.base.CharacterTag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class DefineBitsTag extends Tag {
+public class DefineBitsTag extends CharacterTag {
 
    public int characterID;
    public byte jpegData[];
 
    public DefineBitsTag(byte[] data, int version, long pos) throws IOException {
-      super(6, data, pos);
+      super(6, "DefineBits", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       characterID = sis.readUI16();
       jpegData = sis.readBytes(sis.available());
+   }
+
+   public byte[] getFullImageData(JPEGTablesTag jtt) {
+      if ((jtt != null)) {
+         ByteArrayOutputStream baos = null;
+
+         try {
+            baos = new ByteArrayOutputStream();
+            byte jttdata[] = jtt.getData(10);            
+            if(jttdata.length!=0){
+               baos.write(jttdata, SWF.hasErrorHeader(jttdata) ? 4 : 0, jttdata.length - (SWF.hasErrorHeader(jttdata) ? 6 : 2));
+                baos.write(jpegData, SWF.hasErrorHeader(jpegData) ? 6 : 2, jpegData.length - (SWF.hasErrorHeader(jttdata) ? 6 : 2));
+            }else{
+               baos.write(jpegData,0,jpegData.length);
+            }
+           
+         } finally {
+            if (baos != null) {
+               try {
+                  baos.close();
+               } catch (Exception ex) {
+                  //ignore
+               }
+            }
+         }
+         return baos.toByteArray();
+      }
+      return null;
    }
 
    /**
@@ -55,7 +87,7 @@ public class DefineBitsTag extends Tag {
    }
 
    @Override
-   public String toString() {
-      return "DefineBits";
+   public int getCharacterID() {
+      return characterID;
    }
 }

@@ -40,6 +40,9 @@ public class IntTableModel implements TableModel {
     * @see #getColumnCount
     */
    public int getRowCount() {
+      if(abc==null){
+         return 0;
+      }
       return abc.constants.constant_int.length;
    }
 

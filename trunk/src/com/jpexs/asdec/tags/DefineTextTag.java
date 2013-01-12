@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class DefineTextTag extends Tag implements CharacterTag{
+public class DefineTextTag extends CharacterTag{
 
    public int characterID;
    public RECT textBounds;
@@ -49,7 +49,7 @@ public class DefineTextTag extends Tag implements CharacterTag{
    }
 
    public DefineTextTag(int characterID, RECT textBounds, MATRIX textMatrix, int glyphBits, int advanceBits, List<TEXTRECORD> textRecords) {
-      super(11, new byte[0], 0);
+      super(11,"DefineText", new byte[0], 0);
       this.characterID = characterID;
       this.textBounds = textBounds;
       this.textMatrix = textMatrix;
@@ -94,7 +94,7 @@ public class DefineTextTag extends Tag implements CharacterTag{
     * @throws IOException
     */
    public DefineTextTag(byte data[], int version, long pos) throws IOException {
-      super(11, data, pos);
+      super(11,"DefineText", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       characterID = sis.readUI16();
       textBounds = sis.readRECT();
@@ -106,15 +106,5 @@ public class DefineTextTag extends Tag implements CharacterTag{
       while ((tr = sis.readTEXTRECORD(false, glyphBits, advanceBits)) != null) {
          textRecords.add(tr);
       }
-   }
-
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
-   public String toString() {
-      return "DefineText";
    }
 }

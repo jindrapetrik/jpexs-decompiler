@@ -29,7 +29,6 @@ import com.jpexs.asdec.tags.DoABCTag;
 import com.jpexs.asdec.tags.JPEGTablesTag;
 import com.jpexs.asdec.tags.Tag;
 import com.jpexs.asdec.tags.base.ASMSource;
-import com.jpexs.asdec.tags.base.TagName;
 import com.jpexs.asdec.types.ALPHABITMAPDATA;
 import com.jpexs.asdec.types.ALPHACOLORMAPDATA;
 import com.jpexs.asdec.types.BITMAPDATA;
@@ -395,11 +394,9 @@ public class SWF {
       }
       List<String> existingNames = new ArrayList<String>();
       for (TagNode node : nodeList) {
-         String name;
-         if (node.tag instanceof TagName) {
-            name = ((TagName) node.tag).getName();
-         } else {
-            name = node.tag.toString();
+         String name="";         
+         if (node.tag instanceof Tag) {
+            name = ((Tag) node.tag).getExportName();
          }
          int i = 1;
          String baseName = name;
@@ -470,7 +467,7 @@ public class SWF {
       return "unk";
    }
 
-   private boolean hasErrorHeader(byte data[]) {
+   public static boolean hasErrorHeader(byte data[]) {
       if (data.length > 4) {
          if ((data[0] & 0xff) == 0xff) {
             if ((data[1] & 0xff) == 0xd9) {
@@ -529,82 +526,20 @@ public class SWF {
             }
          }
          if (t instanceof DefineBitsLosslessTag) {
-            DefineBitsLosslessTag dbl = (DefineBitsLosslessTag) t;
-            BufferedImage bi = new BufferedImage(dbl.bitmapWidth, dbl.bitmapHeight, BufferedImage.TYPE_INT_RGB);
-            Graphics g = bi.getGraphics();
-            COLORMAPDATA colorMapData = null;
-            BITMAPDATA bitmapData = null;
-            if (dbl.bitmapFormat == DefineBitsLosslessTag.FORMAT_8BIT_COLORMAPPED) {
-               colorMapData = dbl.getColorMapData();
-            }
-            if ((dbl.bitmapFormat == DefineBitsLosslessTag.FORMAT_15BIT_RGB) || (dbl.bitmapFormat == DefineBitsLosslessTag.FORMAT_24BIT_RGB)) {
-               bitmapData = dbl.getBitmapData();
-            }
-            int pos32aligned = 0;
-            int pos = 0;
-            for (int y = 0; y < dbl.bitmapHeight; y++) {
-               for (int x = 0; x < dbl.bitmapWidth; x++) {
-                  if (dbl.bitmapFormat == DefineBitsLosslessTag.FORMAT_8BIT_COLORMAPPED) {
-                     RGB color = colorMapData.colorTableRGB[colorMapData.colorMapPixelData[pos32aligned]];
-                     g.setColor(new Color(color.red, color.green, color.blue));
-                  }
-                  if (dbl.bitmapFormat == DefineBitsLosslessTag.FORMAT_15BIT_RGB) {
-                     g.setColor(new Color(bitmapData.bitmapPixelDataPix15[pos].red * 8, bitmapData.bitmapPixelDataPix15[pos].green * 8, bitmapData.bitmapPixelDataPix15[pos].blue * 8));
-                  }
-                  if (dbl.bitmapFormat == DefineBitsLosslessTag.FORMAT_24BIT_RGB) {
-                     g.setColor(new Color(bitmapData.bitmapPixelDataPix24[pos].red, bitmapData.bitmapPixelDataPix24[pos].green, bitmapData.bitmapPixelDataPix24[pos].blue));
-                  }
-                  g.fillRect(x, y, 1, 1);
-                  pos32aligned++;
-                  pos++;
-               }
-               while ((pos32aligned % 4 != 0)) {
-                  pos32aligned++;
-               }
-            }
-            ImageIO.write(bi, "PNG", new File(outdir + File.separator + dbl.characterID + ".png"));
+            DefineBitsLosslessTag dbl = (DefineBitsLosslessTag) t;            
+            ImageIO.write(dbl.getImage(), "PNG", new File(outdir + File.separator + dbl.characterID + ".png"));
          }
          if (t instanceof DefineBitsLossless2Tag) {
             DefineBitsLossless2Tag dbl = (DefineBitsLossless2Tag) t;
-            BufferedImage bi = new BufferedImage(dbl.bitmapWidth, dbl.bitmapHeight, BufferedImage.TYPE_INT_ARGB);
-            Graphics g = bi.getGraphics();
-            ALPHACOLORMAPDATA colorMapData = null;
-            ALPHABITMAPDATA bitmapData = null;
-            if (dbl.bitmapFormat == DefineBitsLossless2Tag.FORMAT_8BIT_COLORMAPPED) {
-               colorMapData = dbl.getColorMapData();
-            }
-            if ((dbl.bitmapFormat == DefineBitsLossless2Tag.FORMAT_15BIT_RGB) || (dbl.bitmapFormat == DefineBitsLossless2Tag.FORMAT_24BIT_RGB)) {
-               bitmapData = dbl.getBitmapData();
-            }
-            int pos32aligned = 0;
-            int pos = 0;
-            for (int y = 0; y < dbl.bitmapHeight; y++) {
-               for (int x = 0; x < dbl.bitmapWidth; x++) {
-                  if ((dbl.bitmapFormat == DefineBitsLossless2Tag.FORMAT_8BIT_COLORMAPPED)) {
-                     RGBA color = colorMapData.colorTableRGB[colorMapData.colorMapPixelData[pos32aligned]];
-                     g.setColor(new Color(color.red, color.green, color.blue, color.alpha));
-                  }
-                  if ((dbl.bitmapFormat == DefineBitsLossless2Tag.FORMAT_15BIT_RGB) || (dbl.bitmapFormat == DefineBitsLossless2Tag.FORMAT_24BIT_RGB)) {
-                     g.setColor(new Color(bitmapData.bitmapPixelData[pos].red, bitmapData.bitmapPixelData[pos].green, bitmapData.bitmapPixelData[pos].blue, bitmapData.bitmapPixelData[pos].alpha));
-                  }
-                  g.fillRect(x, y, 1, 1);
-                  pos32aligned++;
-                  pos++;
-               }
-               while ((pos32aligned % 4 != 0)) {
-                  pos32aligned++;
-               }
-            }
-            ImageIO.write(bi, "PNG", new File(outdir + File.separator + dbl.characterID + ".png"));
+            
+            ImageIO.write(dbl.getImage(), "PNG", new File(outdir + File.separator + dbl.characterID + ".png"));
          }
          if ((jtt != null) && (t instanceof DefineBitsTag)) {
             DefineBitsTag dbt = (DefineBitsTag) t;
             FileOutputStream fos = null;
             try {
                fos = new FileOutputStream(outdir + File.separator + dbt.characterID + ".jpg");
-               byte data[] = jtt.getData(10);
-               fos.write(data, hasErrorHeader(data) ? 4 : 0, data.length - (hasErrorHeader(data) ? 6 : 2));
-               fos.write(dbt.jpegData, hasErrorHeader(dbt.jpegData) ? 6 : 2, dbt.jpegData.length - (hasErrorHeader(data) ? 6 : 2));
+               fos.write(dbt.getFullImageData(jtt));
             } finally {
                if (fos != null) {
                   try {

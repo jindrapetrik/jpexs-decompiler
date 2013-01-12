@@ -48,14 +48,9 @@ public class DefineBinaryDataTag extends Tag {
    }
 
    public DefineBinaryDataTag(byte[] data, int version, long pos) throws IOException {
-      super(87, data, pos);
+      super(87,"DefineBinaryData", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       tag = sis.readUI16();
       binaryData = sis.readBytes(sis.available());
-   }
-
-   @Override
-   public String toString() {
-      return "DefineBinaryData";
    }
 }

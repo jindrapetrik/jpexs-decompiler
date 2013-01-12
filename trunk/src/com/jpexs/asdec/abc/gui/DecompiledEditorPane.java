@@ -43,7 +43,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
    public int lastTraitIndex = 0;
 
    public void setNoTrait() {
-      Main.abcMainFrame.detailPanel.showCard(DetailPanel.UNSUPPORTED_TRAIT_CARD);
+      Main.mainFrame.abcPanel.detailPanel.showCard(DetailPanel.UNSUPPORTED_TRAIT_CARD);
    }
 
    public void setClassIndex(int classIndex) {
@@ -55,17 +55,17 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
       if (bi == -1) {
          return false;
       }
-      Main.abcMainFrame.detailPanel.showCard(DetailPanel.METHOD_TRAIT_CARD);
-      if (Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.bodyIndex != bi) {
-         Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.setBodyIndex(bi, abc);
-         Main.abcMainFrame.detailPanel.methodTraitPanel.methodBodyParamsPanel.loadFromBody(abc.bodies[bi]);
-         Main.abcMainFrame.detailPanel.methodTraitPanel.methodInfoPanel.load(abc.bodies[bi].method_info, abc);
+      Main.mainFrame.abcPanel.detailPanel.showCard(DetailPanel.METHOD_TRAIT_CARD);
+      if (Main.mainFrame.abcPanel.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.bodyIndex != bi) {
+         Main.mainFrame.abcPanel.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.setBodyIndex(bi, abc);
+         Main.mainFrame.abcPanel.detailPanel.methodTraitPanel.methodBodyParamsPanel.loadFromBody(abc.bodies[bi]);
+         Main.mainFrame.abcPanel.detailPanel.methodTraitPanel.methodInfoPanel.load(abc.bodies[bi].method_info, abc);
       }
       boolean success = false;
       for (Highlighting h : highlights) {
          if ((pos >= h.startPos) && (pos < h.startPos + h.len)) {
             try {
-               Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.selectInstruction(abc.bodies[bi].code.adr2pos(h.offset));
+               Main.mainFrame.abcPanel.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.selectInstruction(abc.bodies[bi].code.adr2pos(h.offset));
 
             } catch (ConvertException ex) {
             }
@@ -77,8 +77,8 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
    }
 
    public void displayClass(int classIndex) {
-      if (Main.abcMainFrame.navigator.getClassIndex() != classIndex) {
-         Main.abcMainFrame.navigator.setClassIndex(classIndex);
+      if (Main.mainFrame.abcPanel.navigator.getClassIndex() != classIndex) {
+         Main.mainFrame.abcPanel.navigator.setClassIndex(classIndex);
       }
    }
    private int classIndex = -1;
@@ -112,8 +112,8 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements MouseL
             Trait tr = abc.findTraitByTraitId(classIndex, (int) th.offset);
             if (tr != null) {
                if (tr instanceof TraitSlotConst) {
-                  Main.abcMainFrame.detailPanel.slotConstTraitPanel.load((TraitSlotConst) tr, abc);
-                  Main.abcMainFrame.detailPanel.showCard(DetailPanel.SLOT_CONST_TRAIT_CARD);
+                  Main.mainFrame.abcPanel.detailPanel.slotConstTraitPanel.load((TraitSlotConst) tr, abc);
+                  Main.mainFrame.abcPanel.detailPanel.showCard(DetailPanel.SLOT_CONST_TRAIT_CARD);
                   return;
                }
             }

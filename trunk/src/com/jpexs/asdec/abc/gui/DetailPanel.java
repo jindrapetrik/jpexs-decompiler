@@ -97,9 +97,9 @@ public class DetailPanel extends JPanel implements ActionListener {
       if (e.getActionCommand().equals("SAVEDETAIL")) {
          if (cardMap.get(selectedCard) instanceof TraitDetail) {
             if (((TraitDetail) cardMap.get(selectedCard)).save()) {
-               int lasttrait = Main.abcMainFrame.decompiledTextArea.lastTraitIndex;
-               Main.abcMainFrame.decompiledTextArea.reloadClass();
-               Main.abcMainFrame.decompiledTextArea.gotoTrait(lasttrait);
+               int lasttrait = Main.mainFrame.abcPanel.decompiledTextArea.lastTraitIndex;
+               Main.mainFrame.abcPanel.decompiledTextArea.reloadClass();
+               Main.mainFrame.abcPanel.decompiledTextArea.gotoTrait(lasttrait);
                JOptionPane.showMessageDialog(this, "Trait Successfully saved");
             }
          }

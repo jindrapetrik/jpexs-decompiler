@@ -138,12 +138,12 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
                         break;
                      }
                   }
-                  Main.abcMainFrame.navigator.setABC(abcList, scriptLeaf.abc);
-                  Main.abcMainFrame.navigator.setClassIndex(classIndex);
-                  Main.abcMainFrame.setAbc(scriptLeaf.abc);
-                  Main.abcMainFrame.decompiledTextArea.setScript(scriptLeaf.abc.script_info[scriptLeaf.scriptIndex], scriptLeaf.abc, abcList);
-                  Main.abcMainFrame.decompiledTextArea.setClassIndex(classIndex);
-                  Main.abcMainFrame.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.setText("");
+                  Main.mainFrame.abcPanel.navigator.setABC(abcList, scriptLeaf.abc);
+                  Main.mainFrame.abcPanel.navigator.setClassIndex(classIndex);
+                  Main.mainFrame.abcPanel.setAbc(scriptLeaf.abc);
+                  Main.mainFrame.abcPanel.decompiledTextArea.setScript(scriptLeaf.abc.script_info[scriptLeaf.scriptIndex], scriptLeaf.abc, abcList);
+                  Main.mainFrame.abcPanel.decompiledTextArea.setClassIndex(classIndex);
+                  Main.mainFrame.abcPanel.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.setText("");
                   Main.stopWork();
                }
             }).start();

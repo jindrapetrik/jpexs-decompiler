@@ -31,7 +31,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class DefineEditTextTag extends Tag implements CharacterTag {
+public class DefineEditTextTag extends CharacterTag {
 
    public int characterID;
    public RECT bounds;
@@ -139,7 +139,7 @@ public class DefineEditTextTag extends Tag implements CharacterTag {
     * @throws IOException
     */
    public DefineEditTextTag(byte data[], int version, long pos) throws IOException {
-      super(37, data, pos);
+      super(37, "DefineEditText", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       characterID = sis.readUI16();
       bounds = sis.readRECT();
@@ -188,13 +188,4 @@ public class DefineEditTextTag extends Tag implements CharacterTag {
 
    }
 
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
-   public String toString() {
-      return "DefineEditText";
-   }
 }

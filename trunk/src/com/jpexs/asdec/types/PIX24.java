@@ -35,4 +35,11 @@ public class PIX24 {
     * Blue color value
     */
    public int blue;
+
+   @Override
+   public String toString() {
+      return "[PIX24 red:"+red+", green:"+green+", blue:"+blue+"]";
+   }
+   
+   
 }

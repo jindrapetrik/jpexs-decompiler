@@ -37,7 +37,18 @@ public class Tag {
     */
    public boolean forceWriteAsLong = false;
    private final long pos;
+   
+   protected String name;
 
+   public String getName() {
+      return name;
+   }
+
+   public String getExportName(){
+      return getName();
+   }
+   
+   
    /**
     * Returns identifier of tag type
     *
@@ -51,10 +62,12 @@ public class Tag {
     * Constructor
     *
     * @param id Tag type identifier
+    * @param name Tag name
     * @param data Bytes of data
     */
-   public Tag(int id, byte[] data, long pos) {
+   public Tag(int id, String name, byte[] data, long pos) {
       this.id = id;
+      this.name = name;
       this.data = data;
       this.pos = pos;
    }
@@ -85,7 +98,7 @@ public class Tag {
     */
    @Override
    public String toString() {
-      return "Tag id:" + id;
+      return getName();
    }
 
    public final long getOrigDataLength() {

@@ -66,19 +66,10 @@ public class RemoveObjectTag extends Tag {
     * @throws IOException
     */
    public RemoveObjectTag(byte data[], int version, long pos) throws IOException {
-      super(5, data, pos);
+      super(5,"RemoveObject", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       characterId = sis.readUI16();
       depth = sis.readUI16();
    }
 
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
-   public String toString() {
-      return "RemoveObject";
-   }
 }

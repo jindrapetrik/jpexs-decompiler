@@ -31,7 +31,7 @@ public class ProductInfoTag extends Tag {
    public long compilationDate;
 
    public ProductInfoTag(byte[] data, int version, long pos) throws IOException {
-      super(41, data, pos);
+      super(41, "ProductInfo",data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       /*
        * 0: Unknown
@@ -59,8 +59,4 @@ public class ProductInfoTag extends Tag {
       compilationDate |= sis.readUI32() << 32;
    }
 
-   @Override
-   public String toString() {
-      return "ProductInfo";
-   }
 }

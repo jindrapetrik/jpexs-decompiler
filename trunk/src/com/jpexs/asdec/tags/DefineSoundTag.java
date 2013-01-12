@@ -29,7 +29,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class DefineSoundTag extends Tag implements CharacterTag {
+public class DefineSoundTag extends CharacterTag {
 
    public int soundId;
    public int soundFormat;
@@ -82,7 +82,7 @@ public class DefineSoundTag extends Tag implements CharacterTag {
     * @throws IOException
     */
    public DefineSoundTag(byte data[], int version, long pos) throws IOException {
-      super(14, data, pos);
+      super(14,"DefineSound", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       soundId = sis.readUI16();
       soundFormat = (int) sis.readUB(4);
@@ -90,15 +90,5 @@ public class DefineSoundTag extends Tag implements CharacterTag {
       soundType = sis.readUB(1) == 1;
       soundSampleCount = sis.readUI32();
       soundData = sis.readBytes(sis.available());
-   }
-
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
-   public String toString() {
-      return "DefineSound";
    }
 }

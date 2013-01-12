@@ -28,7 +28,7 @@ public class MetadataTag extends Tag {
    public String xmlMetadata;
 
    public MetadataTag(byte[] data, int version, long pos) {
-      super(77, data, pos);
+      super(77,"Metadata", data, pos);
       try {
          SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
          xmlMetadata = sis.readString();
@@ -54,8 +54,4 @@ public class MetadataTag extends Tag {
       return baos.toByteArray();
    }
 
-   @Override
-   public String toString() {
-      return "Metadata";
-   }
 }

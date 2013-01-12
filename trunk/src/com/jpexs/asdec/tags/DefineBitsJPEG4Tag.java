@@ -18,6 +18,7 @@ package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.tags.base.CharacterTag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,13 +29,19 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class DefineBitsJPEG4Tag extends Tag {
+public class DefineBitsJPEG4Tag extends CharacterTag {
 
    public int characterID;
    public int deblockParam;
    public byte imageData[];
    public byte bitmapAlphaData[];
 
+   
+   @Override
+   public int getCharacterID() {
+      return characterID;
+   }
+   
    /**
     * Gets data bytes
     *
@@ -65,22 +72,12 @@ public class DefineBitsJPEG4Tag extends Tag {
     * @throws IOException
     */
    public DefineBitsJPEG4Tag(byte data[], int version, long pos) throws IOException {
-      super(90, data, pos);
+      super(90, "DefineBitsJPEG4",data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       characterID = sis.readUI16();
       long alphaDataOffset = sis.readUI32();
       deblockParam = sis.readUI16();
       imageData = sis.readBytes(alphaDataOffset);
       bitmapAlphaData = sis.readBytes(sis.available());
-   }
-
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
-   public String toString() {
-      return "DefineBitsJPEG4";
    }
 }

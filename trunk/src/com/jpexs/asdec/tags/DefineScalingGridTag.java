@@ -33,7 +33,7 @@ public class DefineScalingGridTag extends Tag {
    private RECT splitter;
 
    public DefineScalingGridTag(byte[] data, int version, long pos) throws IOException {
-      super(78, data, pos);
+      super(78, "DefineScalingGrid",data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       characterId = sis.readUI16();
       splitter = sis.readRECT();
@@ -56,10 +56,5 @@ public class DefineScalingGridTag extends Tag {
       } catch (IOException e) {
       }
       return baos.toByteArray();
-   }
-
-   @Override
-   public String toString() {
-      return "DefineScalingGrid";
    }
 }

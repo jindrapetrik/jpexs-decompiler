@@ -62,7 +62,7 @@ public class TraitsList extends JList implements ListSelectionListener {
 
       int index = getSelectedIndex();
 
-      Main.abcMainFrame.decompiledTextArea.gotoTrait(index);
+      Main.mainFrame.abcPanel.decompiledTextArea.gotoTrait(index);
 
    }
 }

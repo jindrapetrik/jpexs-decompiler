@@ -40,6 +40,7 @@ public class RECT {
     */
    public int Ymax;
    
+   public int nbits;
 
    public RECT(int Xmin, int Xmax, int Ymin, int Ymax) {
       this.Xmin = Xmin;

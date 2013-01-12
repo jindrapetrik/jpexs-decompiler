@@ -61,19 +61,9 @@ public class StartSoundTag extends Tag {
     * @throws IOException
     */
    public StartSoundTag(byte data[], int version, long pos) throws IOException {
-      super(15, data, pos);
+      super(15,"StartSound", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       soundId = sis.readUI16();
       soundInfo = sis.readSOUNDINFO();
-   }
-
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
-   public String toString() {
-      return "StartSound";
    }
 }

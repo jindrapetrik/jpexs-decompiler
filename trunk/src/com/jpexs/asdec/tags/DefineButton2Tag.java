@@ -22,7 +22,6 @@ import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.abc.CopyOutputStream;
 import com.jpexs.asdec.tags.base.CharacterTag;
 import com.jpexs.asdec.tags.base.Container;
-import com.jpexs.asdec.tags.base.TagName;
 import com.jpexs.asdec.types.BUTTONCONDACTION;
 import com.jpexs.asdec.types.BUTTONRECORD;
 import java.io.ByteArrayInputStream;
@@ -40,7 +39,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class DefineButton2Tag extends Tag implements Container, TagName,CharacterTag {
+public class DefineButton2Tag extends CharacterTag implements Container {
 
    /**
     * ID for this character
@@ -58,10 +57,6 @@ public class DefineButton2Tag extends Tag implements Container, TagName,Characte
     * Actions to execute at particular button events
     */
    public List<BUTTONCONDACTION> actions = new ArrayList<BUTTONCONDACTION>();
-   /**
-    * List of ExportAssetsTag used for converting to String
-    */
-   public List<ExportAssetsTag> exportAssetsTags = new ArrayList<ExportAssetsTag>();
 
    @Override
    public int getCharacterID() {
@@ -76,7 +71,7 @@ public class DefineButton2Tag extends Tag implements Container, TagName,Characte
     * @throws IOException
     */
    public DefineButton2Tag(byte data[], int version, long pos) throws IOException {
-      super(34, data, pos);
+      super(34,"DefineButton2", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       buttonId = sis.readUI16();
       sis.readUB(7); //reserved
@@ -173,21 +168,5 @@ public class DefineButton2Tag extends Tag implements Container, TagName,Characte
     */
    public int getItemCount() {
       return actions.size();
-   }
-
-   public String getName() {
-      return "DefineButton2Tag" + buttonId;
-   }
-
-   @Override
-   public String toString() {
-      String name = "";
-      for (ExportAssetsTag eat : exportAssetsTags) {
-         int pos = eat.tags.indexOf(buttonId);
-         if (pos > -1) {
-            name = ": " + eat.names.get(pos);
-         }
-      }
-      return "DefineButton2 (" + buttonId + name + ")";
    }
 }

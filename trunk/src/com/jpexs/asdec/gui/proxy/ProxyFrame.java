@@ -137,13 +137,8 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
          public void windowClosing(WindowEvent e) {
             setVisible(false);
             Main.removeTrayIcon();
-            if (Main.abcMainFrame != null) {
-               if (Main.abcMainFrame.isVisible()) {
-                  return;
-               }
-            }
-            if (Main.actionMainFrame != null) {
-               if (Main.actionMainFrame.isVisible()) {
+            if (Main.mainFrame != null) {
+               if (Main.mainFrame.isVisible()) {
                   return;
                }
             }

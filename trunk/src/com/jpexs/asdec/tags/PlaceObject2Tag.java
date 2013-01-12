@@ -158,7 +158,7 @@ public class PlaceObject2Tag extends Tag implements Container {
    }
 
    public PlaceObject2Tag(boolean placeFlagHasClipActions, boolean placeFlagHasClipDepth, boolean placeFlagHasName, boolean placeFlagHasRatio, boolean placeFlagHasColorTransform, boolean placeFlagHasMatrix, boolean placeFlagHasCharacter, boolean placeFlagMove, int depth, int characterId, MATRIX matrix, CXFORMWITHALPHA colorTransform, int ratio, String name, int clipDepth, CLIPACTIONS clipActions) {
-      super(26, new byte[0], 0);
+      super(26,"PlaceObject2", new byte[0], 0);
       this.placeFlagHasClipActions = placeFlagHasClipActions;
       this.placeFlagHasClipDepth = placeFlagHasClipDepth;
       this.placeFlagHasName = placeFlagHasName;
@@ -187,7 +187,7 @@ public class PlaceObject2Tag extends Tag implements Container {
     * @throws IOException
     */
    public PlaceObject2Tag(byte data[], int version, long pos) throws IOException {
-      super(26, data, pos);
+      super(26,"PlaceObject2", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       placeFlagHasClipActions = sis.readUB(1) == 1;
       placeFlagHasClipDepth = sis.readUB(1) == 1;
@@ -219,16 +219,6 @@ public class PlaceObject2Tag extends Tag implements Container {
       if (placeFlagHasClipActions) {
          clipActions = sis.readCLIPACTIONS();
       }
-   }
-
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
-   public String toString() {
-      return "PlaceObject2";
    }
 
    /**

@@ -64,19 +64,10 @@ public class EnableDebugger2Tag extends Tag {
     * @throws IOException
     */
    public EnableDebugger2Tag(byte data[], int version, long pos) throws IOException {
-      super(64, data, pos);
+      super(64,"EnableDebugger2", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       reserved = sis.readUI16();
       passwordHash = sis.readString();
    }
 
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
-   public String toString() {
-      return "EnableDebugger2";
-   }
 }

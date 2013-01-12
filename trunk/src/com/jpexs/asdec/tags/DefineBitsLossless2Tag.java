@@ -18,15 +18,20 @@ package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.tags.base.CharacterTag;
 import com.jpexs.asdec.types.ALPHABITMAPDATA;
 import com.jpexs.asdec.types.ALPHACOLORMAPDATA;
+import com.jpexs.asdec.types.RGBA;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.InflaterInputStream;
 
-public class DefineBitsLossless2Tag extends Tag {
+public class DefineBitsLossless2Tag extends CharacterTag {
 
    public int characterID;
    public int bitmapFormat;
@@ -38,8 +43,15 @@ public class DefineBitsLossless2Tag extends Tag {
    public static final int FORMAT_15BIT_RGB = 4;
    public static final int FORMAT_24BIT_RGB = 5;
 
+   
+   
+   @Override
+   public int getCharacterID() {
+      return characterID;
+   }
+   
    public DefineBitsLossless2Tag(byte[] data, int version, long pos) throws IOException {
-      super(36, data, pos);
+      super(36,"DefineBitsLossless2", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       characterID = sis.readUI16();
       bitmapFormat = sis.readUI8();
@@ -107,8 +119,36 @@ public class DefineBitsLossless2Tag extends Tag {
       return baos.toByteArray();
    }
 
-   @Override
-   public String toString() {
-      return "DefineBitsLossless2";
+   public BufferedImage getImage() {
+      BufferedImage bi = new BufferedImage(bitmapWidth, bitmapHeight, BufferedImage.TYPE_INT_ARGB);
+            Graphics g = bi.getGraphics();
+            ALPHACOLORMAPDATA colorMapData = null;
+            ALPHABITMAPDATA bitmapData = null;
+            if (bitmapFormat == DefineBitsLossless2Tag.FORMAT_8BIT_COLORMAPPED) {
+               colorMapData = getColorMapData();
+            }
+            if ((bitmapFormat == DefineBitsLossless2Tag.FORMAT_15BIT_RGB) || (bitmapFormat == DefineBitsLossless2Tag.FORMAT_24BIT_RGB)) {
+               bitmapData = getBitmapData();
+            }
+            int pos32aligned = 0;
+            int pos = 0;
+            for (int y = 0; y < bitmapHeight; y++) {
+               for (int x = 0; x < bitmapWidth; x++) {
+                  if ((bitmapFormat == DefineBitsLossless2Tag.FORMAT_8BIT_COLORMAPPED)) {
+                     RGBA color = colorMapData.colorTableRGB[colorMapData.colorMapPixelData[pos32aligned]];
+                     g.setColor(new Color(color.red, color.green, color.blue, color.alpha));
+                  }
+                  if ((bitmapFormat == DefineBitsLossless2Tag.FORMAT_15BIT_RGB) || (bitmapFormat == DefineBitsLossless2Tag.FORMAT_24BIT_RGB)) {
+                     g.setColor(new Color(bitmapData.bitmapPixelData[pos].red, bitmapData.bitmapPixelData[pos].green, bitmapData.bitmapPixelData[pos].blue, bitmapData.bitmapPixelData[pos].alpha));
+                  }
+                  g.fillRect(x, y, 1, 1);
+                  pos32aligned++;
+                  pos++;
+               }
+               while ((pos32aligned % 4 != 0)) {
+                  pos32aligned++;
+               }
+            }
+            return bi;
    }
 }

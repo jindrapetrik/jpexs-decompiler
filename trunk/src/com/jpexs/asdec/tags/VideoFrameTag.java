@@ -62,20 +62,10 @@ public class VideoFrameTag extends Tag {
     * @throws IOException
     */
    public VideoFrameTag(byte data[], int version, long pos) throws IOException {
-      super(61, data, pos);
+      super(61,"VideoFrame", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       streamID = sis.readUI16();
       frameNum = sis.readUI16();
       videoData = sis.readBytes(sis.available()); //TODO: Parse video packets
-   }
-
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
-   public String toString() {
-      return "VideoFrame";
    }
 }

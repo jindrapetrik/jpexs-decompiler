@@ -29,13 +29,13 @@ public class SetBackgroundColorTag extends Tag {
    public RGB backgroundColor;
 
    public SetBackgroundColorTag(byte[] data, int version, long pos) throws IOException {
-      super(9, data, pos);
+      super(9,"SetBackgroundColor", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       backgroundColor = sis.readRGB();
    }
 
    public SetBackgroundColorTag(RGB backgroundColor) {
-      super(9, new byte[0], 0);
+      super(9,"SetBackgroundColor", new byte[0], 0);
       this.backgroundColor = backgroundColor;
    }
 
@@ -51,9 +51,5 @@ public class SetBackgroundColorTag extends Tag {
    }
 
    
-   
-   @Override
-   public String toString() {
-      return "SetBackgroundColor";
-   }
+  
 }

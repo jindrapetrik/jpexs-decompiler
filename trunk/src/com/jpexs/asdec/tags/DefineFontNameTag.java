@@ -27,15 +27,10 @@ public class DefineFontNameTag extends Tag {
    public String fontCopyright;
 
    public DefineFontNameTag(byte[] data, int version, long pos) throws IOException {
-      super(88, data, pos);
+      super(88,"DefineFontName", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       fontId = sis.readUI16();
       fontName = sis.readString();
       fontCopyright = sis.readString();
-   }
-
-   @Override
-   public String toString() {
-      return "DefineFontName";
    }
 }

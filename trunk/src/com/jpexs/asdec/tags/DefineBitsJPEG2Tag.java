@@ -17,23 +17,25 @@
 package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
+import com.jpexs.asdec.tags.base.CharacterTag;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-public class DefineBitsJPEG2Tag extends Tag {
+public class DefineBitsJPEG2Tag extends CharacterTag{
 
    public int characterID;
    public byte[] imageData;
+   
+   
+   @Override
+   public int getCharacterID() {
+      return characterID;
+   }
 
    public DefineBitsJPEG2Tag(byte[] data, int version, long pos) throws IOException {
-      super(21, data, pos);
+      super(21,"DefineBitsJPEG2", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       characterID = sis.readUI16();
       imageData = sis.readBytes(sis.available());
-   }
-
-   @Override
-   public String toString() {
-      return "DefineBitsJPEG2";
    }
 }

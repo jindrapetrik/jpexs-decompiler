@@ -74,7 +74,7 @@ public class MethodCodePanel extends JPanel implements ActionListener {
          sourceTextArea.exec();
       }
       if (e.getActionCommand().equals("VERIFYBODY")) {
-         sourceTextArea.verify(Main.abcMainFrame.abc.constants, Main.abcMainFrame.abc);
+         sourceTextArea.verify(Main.mainFrame.abcPanel.abc.constants, Main.mainFrame.abcPanel.abc);
       }
    }
 }

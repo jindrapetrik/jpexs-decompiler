@@ -341,7 +341,6 @@ public class SWFOutputStream extends OutputStream {
       nBits = enlargeBitCountS(nBits, value.Xmax);
       nBits = enlargeBitCountS(nBits, value.Ymin);
       nBits = enlargeBitCountS(nBits, value.Ymax);
-
       writeUB(5, nBits);
       writeSB(nBits, value.Xmin);
       writeSB(nBits, value.Xmax);
@@ -374,7 +373,7 @@ public class SWFOutputStream extends OutputStream {
     * @throws IOException
     */
    public void writeTag(Tag tag) throws IOException {
-      byte data[] = tag.getData(version);      
+      byte data[] = tag.getData(version);     
       int tagLength = data.length;
       int tagID = tag.getId();       
       int tagIDLength = (tagID << 6);
@@ -415,6 +414,9 @@ public class SWFOutputStream extends OutputStream {
     * @return Number of bits
     */
    public static int getNeededBitsS(int v) {
+      if(v==0){
+         //return 0;
+      }
         int counter = 32;
         int mask = 0x80000000;
         final int val = (v < 0) ? -v : v;
@@ -521,10 +523,9 @@ public class SWFOutputStream extends OutputStream {
       int NTranslateBits=0;
       NTranslateBits = enlargeBitCountS(NTranslateBits, value.translateX);
       NTranslateBits = enlargeBitCountS(NTranslateBits, value.translateY);
-         
+            
       writeUB(5, NTranslateBits);
-
-
+      
       writeSB(NTranslateBits, value.translateX);
       writeSB(NTranslateBits, value.translateY);
       alignByte();

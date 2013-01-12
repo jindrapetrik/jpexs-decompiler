@@ -56,18 +56,8 @@ public class TagStub extends Tag {
     * @throws IOException
     */
    public TagStub(byte data[], int version, long pos) throws IOException {
-      super(0, data, pos);
+      super(0,"", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
 
-   }
-
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
-   public String toString() {
-      return "";
    }
 }

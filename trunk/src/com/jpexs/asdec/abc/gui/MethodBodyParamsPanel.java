@@ -100,7 +100,7 @@ public class MethodBodyParamsPanel extends JPanel implements ChangeListener {
             body.max_regs = Integer.parseInt(localCountField.getText());
             body.max_scope_depth = Integer.parseInt(maxScopeDepthField.getText());
          } else {
-            if (!body.autoFillStats(Main.abcMainFrame.abc)) {
+            if (!body.autoFillStats(Main.mainFrame.abcPanel.abc)) {
                JOptionPane.showMessageDialog(null, "Cannot get code stats for automatic body params.\r\nUncheck autofill to avoid this message.", "Warning", JOptionPane.WARNING_MESSAGE);
             }
          }

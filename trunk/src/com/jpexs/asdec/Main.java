@@ -20,6 +20,7 @@ import com.jpexs.asdec.abc.NotSameException;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.gui.AboutDialog;
 import com.jpexs.asdec.gui.LoadingDialog;
+import com.jpexs.asdec.gui.MainFrame;
 import com.jpexs.asdec.gui.ModeFrame;
 import com.jpexs.asdec.gui.View;
 import com.jpexs.asdec.gui.proxy.ProxyFrame;
@@ -60,8 +61,6 @@ import org.w3c.dom.NodeList;
  */
 public class Main {
 
-   public static com.jpexs.asdec.abc.gui.MainFrame abcMainFrame;
-   public static com.jpexs.asdec.action.gui.MainFrame actionMainFrame;
    public static ProxyFrame proxyFrame;
    public static String file;
    public static String maskURL;
@@ -77,6 +76,7 @@ public class Main {
    private static TrayIcon trayIcon;
    private static MenuItem stopMenuItem;
    private static boolean commandLineMode = false;
+   public static MainFrame mainFrame;
 
    public static boolean isCommandLineMode() {
       return commandLineMode;
@@ -143,12 +143,14 @@ public class Main {
 
    public static void startWork(String name) {
       working = true;
-      if (abcMainFrame != null) {
-         abcMainFrame.setStatus(name);
+      if (mainFrame != null) {
+         if (mainFrame.abcPanel != null) {
+            mainFrame.setStatus(name);
+         }
       }
-      if (actionMainFrame != null) {
-         actionMainFrame.setStatus(name);
-      }
+      /*if (actionMainFrame != null) {
+       actionMainFrame.setStatus(name);
+       }*/
       if (loadingDialog != null) {
          loadingDialog.setDetail(name);
       }
@@ -159,12 +161,14 @@ public class Main {
 
    public static void stopWork() {
       working = false;
-      if (abcMainFrame != null) {
-         abcMainFrame.setStatus("");
+      if (mainFrame != null) {
+         if (mainFrame.abcPanel != null) {
+            mainFrame.setStatus("");
+         }
       }
-      if (actionMainFrame != null) {
-         actionMainFrame.setStatus("");
-      }
+      /*if (actionMainFrame != null) {
+       actionMainFrame.setStatus("");
+       }*/
       if (loadingDialog != null) {
          loadingDialog.setDetail("");
       }
@@ -199,12 +203,12 @@ public class Main {
             FileInputStream fis = new FileInputStream(file);
             DEBUG_COPY = true;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            try {
-               swf.saveTo(baos);
-            } catch (NotSameException nse) {
-               Logger.getLogger(Main.class.getName()).log(Level.FINE, null, nse);
-               JOptionPane.showMessageDialog(null, "WARNING: The SWF decompiler may have problems saving this file. Recommended usage is READ ONLY.");
-            }
+            /*try {
+             swf.saveTo(baos);
+             } catch (NotSameException nse) {
+             Logger.getLogger(Main.class.getName()).log(Level.FINE, null, nse);
+             JOptionPane.showMessageDialog(null, "WARNING: The SWF decompiler may have problems saving this file. Recommended usage is READ ONLY.");
+             }*/
             DEBUG_COPY = false;
             //DEBUG_COPY=true;
          } catch (Exception ex) {
@@ -213,45 +217,25 @@ public class Main {
             loadingDialog.setVisible(false);
             return false;
          }
-         List<Tag> listAbc = new ArrayList<Tag>();
-         for (Tag t : swf.tags) {
-            if (t instanceof DoABCTag) {
-               listAbc.add(t);
-            }
-         }
 
-
-         if (false) {
-            JOptionPane.showMessageDialog(null, "This SWF file does not contain any ActionScript parts");
+         try {
+            mainFrame = new MainFrame(swf);
             loadingDialog.setVisible(false);
-            if (!openFileDialog()) {
-               System.exit(0);
-            }
-         } else {
-            if (listAbc.size() > 0) {
-               List<DoABCTag> listAbc2 = new ArrayList<DoABCTag>();
-               for (Tag tag : listAbc) {
-                  listAbc2.add((DoABCTag) tag);
-               }
-               abcMainFrame = new com.jpexs.asdec.abc.gui.MainFrame(listAbc2);
-               abcMainFrame.display();
-            } else {
-               actionMainFrame = new com.jpexs.asdec.action.gui.MainFrame(swf.tags);
-               actionMainFrame.display();
-            }
+            mainFrame.setVisible(true);
+         } catch (Exception ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
          }
-         loadingDialog.setVisible(false);
          return true;
       }
    }
 
    public static boolean openFile(String swfFile) {
-      if (abcMainFrame != null) {
-         abcMainFrame.setVisible(false);
+      if (mainFrame != null) {
+         mainFrame.setVisible(false);
       }
-      if (actionMainFrame != null) {
-         actionMainFrame.setVisible(false);
-      }
+      /*if (actionMainFrame != null) {
+       actionMainFrame.setVisible(false);
+       }*/
       Main.file = swfFile;
       if (Main.loadingDialog == null) {
          Main.loadingDialog = new LoadingDialog();
