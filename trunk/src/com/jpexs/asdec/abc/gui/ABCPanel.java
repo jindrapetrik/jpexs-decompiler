@@ -30,6 +30,7 @@ import java.awt.event.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
@@ -159,10 +160,21 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
       updateConstList();
    }
 
-   public void initSplits(){
-      splitPaneDecompiledVSDetail.setDividerLocation(getWidth()*1/3);
-      splitPaneTreeVSNavigator.setDividerLocation(getHeight()/2);
-      splitPaneTreeNavVSDecompiledDetail.setDividerLocation(getWidth()*1/3);
+   public void initSplits(){            
+      splitPaneTreeVSNavigator.setDividerLocation(splitPaneTreeVSNavigator.getHeight()/2);
+      try {
+         Thread.sleep(100);
+      } catch (InterruptedException ex) {
+         Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
+      }
+      splitPaneTreeNavVSDecompiledDetail.setDividerLocation(splitPaneTreeNavVSDecompiledDetail.getWidth()*1/3);      
+      try {
+         Thread.sleep(100);
+      } catch (InterruptedException ex) {
+         Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
+      }
+      splitPaneDecompiledVSDetail.setDividerLocation(splitPaneDecompiledVSDetail.getWidth()*1/2);       
+          
    }
    
    public ABCPanel(List<DoABCTag> list) {
@@ -193,6 +205,8 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
       decLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
       splitPaneDecompiledVSDetail = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
               panB, detailPanel);
+      splitPaneDecompiledVSDetail.setResizeWeight(0.5);
+      splitPaneDecompiledVSDetail.setContinuousLayout(true);
       decompiledTextArea.setContentType("text/actionscript");
 
       JPanel pan2 = new JPanel();
@@ -250,10 +264,13 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
       splitPaneTreeVSNavigator = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
               treePanel,
               navPanel);
+      splitPaneTreeVSNavigator.setResizeWeight(0.5);
+      splitPaneTreeVSNavigator.setContinuousLayout(true);
       Main.startWork("Creating window...");
       JTabbedPane tabbedPane = new JTabbedPane();
       tabbedPane.addTab("Scripts", splitPaneTreeVSNavigator);
-
+      //tabbedPane.setTabPlacement(JTabbedPane.BOTTOM);
+              
       pan2.add(tabbedPane, BorderLayout.CENTER);
       abcComboBox.addItemListener(this);
 
@@ -261,8 +278,8 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
       splitPaneTreeNavVSDecompiledDetail = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
               pan2,
               splitPaneDecompiledVSDetail);
-      
-
+      splitPaneTreeNavVSDecompiledDetail.setResizeWeight(0);
+      splitPaneTreeNavVSDecompiledDetail.setContinuousLayout(true);
       //pan2.setPreferredSize(new Dimension(300, 200));
 
 
@@ -338,8 +355,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
 
    public void display() {
       setVisible(true);
-      splitPaneTreeVSNavigator.setDividerLocation(0.5);
-      splitPaneDecompiledVSDetail.setDividerLocation(0.5);
    }
 
    @Override

@@ -90,6 +90,8 @@ import javax.swing.border.BevelBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import com.jpexs.flashplayer.FlashPanel;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 /**
  *
  * @author Jindra
@@ -113,9 +115,9 @@ public class MainFrame extends JFrame implements ActionListener {
       }
       statusLabel.setText(s);
    }
-
+   
    public MainFrame(SWF swf) {
-      setSize(1024, 768);
+      setSize(1000, 700);
       tabPane = new JTabbedPane();
       View.setWindowIcon(this);
       addWindowListener(new WindowAdapter() {
@@ -225,7 +227,6 @@ public class MainFrame extends JFrame implements ActionListener {
       menuBar.add(menuHelp);
 
       setJMenuBar(menuBar);
-      setSize(800, 600);
       List<Object> objs = new ArrayList<Object>();
       objs.addAll(swf.tags);
       this.swf = swf;
@@ -272,7 +273,7 @@ public class MainFrame extends JFrame implements ActionListener {
       }
       /*tabPane.addTab("Tags", new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(tagTree), new JScrollPane(fPanel)));*/
 
-      tabPane.setTabPlacement(JTabbedPane.LEFT);
+      //tabPane.setTabPlacement(JTabbedPane.TOP);
       if (!abcList.isEmpty()) {
          tabPane.addTab("ActionScript3", abcPanel = new ABCPanel(abcList));
       } else {
@@ -299,7 +300,7 @@ public class MainFrame extends JFrame implements ActionListener {
       statusPanel.add(loadingPanel, BorderLayout.WEST);
       statusPanel.add(statusLabel, BorderLayout.CENTER);
       loadingPanel.setVisible(false);
-      add(statusPanel, BorderLayout.SOUTH);
+      add(statusPanel, BorderLayout.SOUTH);            
       View.centerScreen(this);
       Main.stopWork();
 

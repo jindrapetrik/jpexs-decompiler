@@ -110,7 +110,8 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
       
       setLayout(new BorderLayout());
       add(splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(tagTree), splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panA, panB)), BorderLayout.CENTER);
-
+      splitPane.setResizeWeight(0.5);
+      splitPane2.setResizeWeight(0.5);
       editor.setContentType("text/flasm");
       decompiledEditor.setContentType("text/actionscript");
       tagTree.addTreeSelectionListener(this);
