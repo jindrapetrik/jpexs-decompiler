@@ -215,6 +215,16 @@ public class MainFrame extends JFrame implements ActionListener {
       getActionScript3(objs, abcList);
 
       getContentPane().add(tabPane, BorderLayout.CENTER);
+      
+      if (!abcList.isEmpty()) {
+         tabPane.addTab("ActionScript3", abcPanel = new ABCPanel(abcList));
+      } else {
+         actionPanel = new ActionPanel(swf.tags);
+         if (actionPanel.tagTree.getRowCount() > 1) {
+            tabPane.addTab("ActionScript", actionPanel);
+         }
+      }
+      
       if (!shapes.isEmpty()) {
          tabPane.addTab("Shapes", new TagPanel(shapes, swf));
       }
@@ -239,14 +249,7 @@ public class MainFrame extends JFrame implements ActionListener {
       /*tabPane.addTab("Tags", new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(tagTree), new JScrollPane(fPanel)));*/
 
       //tabPane.setTabPlacement(JTabbedPane.TOP);
-      if (!abcList.isEmpty()) {
-         tabPane.addTab("ActionScript3", abcPanel = new ABCPanel(abcList));
-      } else {
-         actionPanel = new ActionPanel(swf.tags);
-         if (actionPanel.tagTree.getRowCount() > 1) {
-            tabPane.addTab("ActionScript", actionPanel);
-         }
-      }
+      
 
 
       loadingPanel.setPreferredSize(new Dimension(30, 30));

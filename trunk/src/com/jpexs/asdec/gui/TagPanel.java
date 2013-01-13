@@ -29,6 +29,7 @@ import com.jpexs.asdec.tags.DefineFont3Tag;
 import com.jpexs.asdec.tags.DefineFontTag;
 import com.jpexs.asdec.tags.DefineMorphShape2Tag;
 import com.jpexs.asdec.tags.DefineMorphShapeTag;
+import com.jpexs.asdec.tags.DefineSpriteTag;
 import com.jpexs.asdec.tags.DefineTextTag;
 import com.jpexs.asdec.tags.DoABCTag;
 import com.jpexs.asdec.tags.DoActionTag;
@@ -201,9 +202,9 @@ public class TagPanel extends JPanel implements ListSelectionListener {
                mat.translateY = -r.Ymin;
                mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
                mat.translateY = mat.translateY + height / 2 - r.getHeight() / 2;
-            } else {
-               mat.translateX = width / 2;
-               mat.translateY = height / 2;
+            }else {
+               mat.translateX = width / 4;
+               mat.translateY = height / 4;
             }
             if (tagObj instanceof FontTag) {
 
