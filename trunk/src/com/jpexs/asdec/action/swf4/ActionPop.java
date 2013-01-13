@@ -37,6 +37,9 @@ public class ActionPop extends Action {
 
    @Override
    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+      if(stack.isEmpty()){
+         return;
+      }
       TreeItem val = stack.pop();
       if (!(val instanceof DirectValueTreeItem)) {
          output.add(new VoidTreeItem(this, val));
