@@ -16,6 +16,7 @@
  */
 package com.jpexs.asdec.gui;
 
+import com.jpexs.asdec.Main;
 import com.jpexs.asdec.SWF;
 import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.tags.DefineBitsJPEG2Tag;
@@ -98,9 +99,13 @@ public class TagPanel extends JPanel implements ListSelectionListener {
       tagList.setPreferredSize(new Dimension(200, 1));
       tagList.setSize(200, 1);
       setLayout(new BorderLayout());
-      flashPanel = new FlashPanel();
+      if (Main.FLASH_PLAYER) {
+         flashPanel = new FlashPanel();
+      }
       displayPanel = new JPanel(new CardLayout());
-      displayPanel.add(flashPanel, CARDFLASHPANEL);
+      if (Main.FLASH_PLAYER) {
+         displayPanel.add(flashPanel, CARDFLASHPANEL);
+      }
       imagePanel = new ImagePanel();
       CardLayout cl = (CardLayout) (displayPanel.getLayout());
       cl.show(displayPanel, CARDEMPTYPANEL);
@@ -166,7 +171,7 @@ public class TagPanel extends JPanel implements ListSelectionListener {
 
             if (tagObj instanceof AloneTag) {
                sos2.writeTag(tagObj);
-            }else{
+            } else {
                for (Tag tag : swf.tags) {
                   if ((!(tag instanceof PlaceObjectTag))
                           && (!(tag instanceof PlaceObject2Tag))
@@ -202,7 +207,7 @@ public class TagPanel extends JPanel implements ListSelectionListener {
                mat.translateY = -r.Ymin;
                mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
                mat.translateY = mat.translateY + height / 2 - r.getHeight() / 2;
-            }else {
+            } else {
                mat.translateX = width / 4;
                mat.translateY = height / 4;
             }
@@ -259,10 +264,12 @@ public class TagPanel extends JPanel implements ListSelectionListener {
             sos.write(data);
             fos.close();
             showCard(CARDFLASHPANEL);
-            flashPanel.displaySWF(tempFile.getAbsolutePath());
+            if (Main.FLASH_PLAYER) {
+               flashPanel.displaySWF(tempFile.getAbsolutePath());
+            }
 
          } catch (Exception ex) {
-            ex.printStackTrace();
+            
          }
 
       }

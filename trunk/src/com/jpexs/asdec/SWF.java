@@ -373,57 +373,14 @@ public class SWF {
       if (!asV3Found) {
          List<Object> list2 = new ArrayList<Object>();
          list2.addAll(tags);
-         return exportNode(TagNode.createTagList(list2), outdir, isPcode);
+         List<TagNode> list=TagNode.createTagList(list2);
+         TagNode.setExport(list, true);
+         return TagNode.exportNode(list, outdir, isPcode);
       }
       return asV3Found;
    }
 
-   private boolean exportNode(List<TagNode> nodeList, String outdir, boolean isPcode) {
-      File dir = new File(outdir);
-      if (!dir.exists()) {
-         dir.mkdirs();
-      }
-      List<String> existingNames = new ArrayList<String>();
-      for (TagNode node : nodeList) {
-         String name = "";
-         if (node.tag instanceof Tag) {
-            name = ((Tag) node.tag).getExportName();
-         }
-         int i = 1;
-         String baseName = name;
-         while (existingNames.contains(name)) {
-            i++;
-            name = baseName + "_" + i;
-         }
-         existingNames.add(name);
-         if (node.subItems.isEmpty()) {
-            if (node.tag instanceof ASMSource) {
-               try {
-                  String f = outdir + File.separatorChar + name + ".as";
-                  informListeners("export", "Exporting " + f + " ...");
-                  String ret;
-                  if (isPcode) {
-                     ret = ((ASMSource) node.tag).getASMSource(SWF.DEFAULT_VERSION);
-                  } else {
-                     List<com.jpexs.asdec.action.Action> as = ((ASMSource) node.tag).getActions(SWF.DEFAULT_VERSION);
-                     com.jpexs.asdec.action.Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
-                     ret = (Highlighting.stripHilights(com.jpexs.asdec.action.Action.actionsToSource(as, SWF.DEFAULT_VERSION)));
-                  }
-
-
-                  FileOutputStream fos = new FileOutputStream(f);
-                  fos.write(ret.getBytes());
-                  fos.close();
-               } catch (Exception ex) {
-               }
-            }
-         } else {
-            exportNode(node.subItems, outdir + File.separatorChar + name, isPcode);
-         }
-
-      }
-      return true;
-   }
+   
    protected HashSet<EventListener> listeners = new HashSet<EventListener>();
 
    public void addEventListener(EventListener listener) {

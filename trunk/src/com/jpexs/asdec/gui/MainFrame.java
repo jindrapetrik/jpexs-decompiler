@@ -215,7 +215,7 @@ public class MainFrame extends JFrame implements ActionListener {
       getActionScript3(objs, abcList);
 
       getContentPane().add(tabPane, BorderLayout.CENTER);
-      
+
       if (!abcList.isEmpty()) {
          tabPane.addTab("ActionScript3", abcPanel = new ABCPanel(abcList));
       } else {
@@ -223,8 +223,9 @@ public class MainFrame extends JFrame implements ActionListener {
          if (actionPanel.tagTree.getRowCount() > 1) {
             tabPane.addTab("ActionScript", actionPanel);
          }
+         menuDeobfuscation.setEnabled(false);
       }
-      
+
       if (!shapes.isEmpty()) {
          tabPane.addTab("Shapes", new TagPanel(shapes, swf));
       }
@@ -249,7 +250,7 @@ public class MainFrame extends JFrame implements ActionListener {
       /*tabPane.addTab("Tags", new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(tagTree), new JScrollPane(fPanel)));*/
 
       //tabPane.setTabPlacement(JTabbedPane.TOP);
-      
+
 
 
       loadingPanel.setPreferredSize(new Dimension(30, 30));
@@ -589,14 +590,26 @@ public class MainFrame extends JFrame implements ActionListener {
                public void run() {
                   try {
                      if (onlySel) {
-                        List<TreeLeafScript> tlsList = abcPanel.classTree.getSelectedScripts();
-                        if (tlsList.isEmpty()) {
-                           JOptionPane.showMessageDialog(null, "No script selected!");
-                        }
-                        for (int i = 0; i < tlsList.size(); i++) {
-                           TreeLeafScript tls = tlsList.get(i);
-                           Main.startWork("Exporting " + (i + 1) + "/" + tlsList.size() + " " + tls.abc.script_info[tls.scriptIndex].getPath(tls.abc) + " ...");
-                           tls.abc.script_info[tls.scriptIndex].export(tls.abc, abcPanel.list, selFile, isPcode);
+                        if (abcPanel != null) {
+                           List<TreeLeafScript> tlsList = abcPanel.classTree.getSelectedScripts();
+                           if (tlsList.isEmpty()) {
+                              JOptionPane.showMessageDialog(null, "No script selected!");
+                           }
+                           for (int i = 0; i < tlsList.size(); i++) {
+                              TreeLeafScript tls = tlsList.get(i);
+                              Main.startWork("Exporting " + (i + 1) + "/" + tlsList.size() + " " + tls.abc.script_info[tls.scriptIndex].getPath(tls.abc) + " ...");
+                              tls.abc.script_info[tls.scriptIndex].export(tls.abc, abcPanel.list, selFile, isPcode);
+                           }
+                        } else if(actionPanel!=null) {
+                           List<com.jpexs.asdec.action.TagNode> nodes=actionPanel.getSelectedNodes();
+                           if (nodes.isEmpty()) {
+                              JOptionPane.showMessageDialog(null, "No nodes selected!");
+                           }
+                           com.jpexs.asdec.action.gui.TagTreeModel ttm=(com.jpexs.asdec.action.gui.TagTreeModel)actionPanel.tagTree.getModel();
+                           List<com.jpexs.asdec.action.TagNode> allnodes=ttm.getNodeList();
+                           com.jpexs.asdec.action.TagNode.setExport(allnodes, false);
+                           com.jpexs.asdec.action.TagNode.setExport(nodes, true);
+                           com.jpexs.asdec.action.TagNode.exportNode(allnodes, selFile, isPcode);
                         }
                      } else {
                         Main.swf.exportActionScript(selFile, isPcode);

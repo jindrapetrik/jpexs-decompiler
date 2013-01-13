@@ -18,6 +18,7 @@ package com.jpexs.asdec.action.gui;
 
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.SWF;
+import com.jpexs.asdec.abc.gui.TreeElement;
 import com.jpexs.asdec.action.TagNode;
 import com.jpexs.asdec.action.parser.ASMParser;
 import com.jpexs.asdec.action.parser.ParseException;
@@ -30,12 +31,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
 
 public class ActionPanel extends JPanel implements TreeSelectionListener, ActionListener {
@@ -144,6 +147,19 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
       setVisible(true);
       splitPane.setDividerLocation(0.5);
       splitPane2.setDividerLocation(0.5);
+   }
+
+   public List<TagNode> getSelectedNodes() {
+      List<TagNode> ret = new ArrayList<TagNode>();
+      TreePath tps[] = tagTree.getSelectionPaths();
+      if (tps == null) {
+         return ret;
+      }
+      for (TreePath tp : tps) {
+         TagNode te = (TagNode) tp.getLastPathComponent();
+         ret.add(te);
+      }
+      return ret;
    }
 
    public void actionPerformed(ActionEvent e) {

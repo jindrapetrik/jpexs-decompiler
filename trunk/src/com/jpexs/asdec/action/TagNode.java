@@ -16,14 +16,20 @@
  */
 package com.jpexs.asdec.action;
 
+import com.jpexs.asdec.EventListener;
+import com.jpexs.asdec.SWF;
+import com.jpexs.asdec.helpers.Highlighting;
 import com.jpexs.asdec.tags.DefineButton2Tag;
 import com.jpexs.asdec.tags.DefineButtonTag;
 import com.jpexs.asdec.tags.DefineSpriteTag;
 import com.jpexs.asdec.tags.DoInitActionTag;
 import com.jpexs.asdec.tags.ExportAssetsTag;
 import com.jpexs.asdec.tags.ShowFrameTag;
+import com.jpexs.asdec.tags.Tag;
 import com.jpexs.asdec.tags.base.ASMSource;
 import com.jpexs.asdec.tags.base.Container;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +37,7 @@ public class TagNode {
 
    public List<TagNode> subItems;
    public Object tag;
+   public boolean export=false;
 
    public TagNode(Object tag) {
       this.tag = tag;
@@ -109,5 +116,66 @@ public class TagNode {
          }
       }
       return ret;
+   }
+   
+   public static void setExport(List<TagNode> nodeList,boolean export){
+      for(TagNode node:nodeList){
+         node.export=export;
+         setExport(node.subItems, export);
+      }
+   }
+   
+   public static boolean exportNode(List<TagNode> nodeList, String outdir, boolean isPcode){
+      return exportNode(nodeList,outdir,isPcode,null);
+   }
+   public static boolean exportNode(List<TagNode> nodeList, String outdir, boolean isPcode, EventListener ev) {
+      File dir = new File(outdir);      
+      List<String> existingNames = new ArrayList<String>();
+      for (TagNode node : nodeList) {
+         String name = "";
+         if (node.tag instanceof Tag) {
+            name = ((Tag) node.tag).getExportName();
+         }else{
+            name=node.tag.toString();
+         }
+         int i = 1;
+         String baseName = name;
+         while (existingNames.contains(name)) {
+            i++;
+            name = baseName + "_" + i;
+         }
+         existingNames.add(name);
+         if (node.subItems.isEmpty()) {
+            if ((node.tag instanceof ASMSource)&&(node.export)) {
+               if (!dir.exists()) {
+                  dir.mkdirs();
+               }
+               try {
+                  String f = outdir + File.separatorChar + name + ".as";
+                  if(ev!=null){
+                  ev.handleEvent("export", "Exporting " + f + " ...");
+                  }
+                  String ret;
+                  if (isPcode) {
+                     ret = ((ASMSource) node.tag).getASMSource(SWF.DEFAULT_VERSION);
+                  } else {
+                     List<com.jpexs.asdec.action.Action> as = ((ASMSource) node.tag).getActions(SWF.DEFAULT_VERSION);
+                     com.jpexs.asdec.action.Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
+                     ret = (Highlighting.stripHilights(com.jpexs.asdec.action.Action.actionsToSource(as, SWF.DEFAULT_VERSION)));
+                  }
+
+
+                  FileOutputStream fos = new FileOutputStream(f);
+                  fos.write(ret.getBytes());
+                  fos.close();
+               } catch (Exception ex) {
+               }
+            }
+         } else {
+            exportNode(node.subItems, outdir + File.separatorChar + name, isPcode,ev);
+         }
+
+      }
+      return true;
    }
 }
