@@ -40,9 +40,11 @@ import com.jpexs.asdec.tags.PlaceObject3Tag;
 import com.jpexs.asdec.tags.PlaceObjectTag;
 import com.jpexs.asdec.tags.RemoveObject2Tag;
 import com.jpexs.asdec.tags.RemoveObjectTag;
+import com.jpexs.asdec.tags.SetBackgroundColorTag;
 import com.jpexs.asdec.tags.ShowFrameTag;
 import com.jpexs.asdec.tags.SymbolClassTag;
 import com.jpexs.asdec.tags.Tag;
+import com.jpexs.asdec.tags.base.AloneTag;
 import com.jpexs.asdec.tags.base.BoundedTag;
 import com.jpexs.asdec.tags.base.CharacterTag;
 import com.jpexs.asdec.tags.base.FontTag;
@@ -159,19 +161,25 @@ public class TagPanel extends JPanel implements ListSelectionListener {
             sos2.writeUI8(0);
             sos2.writeUI8(swf.frameRate);
             sos2.writeUI16(100); //framecnt
-            //sos2.writeTag(new SetBackgroundColorTag(new RGB(255, 0, 255)));
-            for (Tag tag : swf.tags) {
-               if ((!(tag instanceof PlaceObjectTag))
-                       && (!(tag instanceof PlaceObject2Tag))
-                       && (!(tag instanceof PlaceObject3Tag))
-                       && (!(tag instanceof RemoveObjectTag))
-                       && (!(tag instanceof RemoveObject2Tag))
-                       && (!(tag instanceof DoActionTag))
-                       && (!(tag instanceof DoInitActionTag))
-                       && (!(tag instanceof DoABCTag))
-                       && (!(tag instanceof SymbolClassTag))
-                       && (!(tag instanceof ShowFrameTag))) {
-                  sos2.writeTag(tag);
+            sos2.writeTag(new SetBackgroundColorTag(new RGB(255, 255, 255)));
+
+            if (tagObj instanceof AloneTag) {
+               sos2.writeTag(tagObj);
+            }else{
+               for (Tag tag : swf.tags) {
+                  if ((!(tag instanceof PlaceObjectTag))
+                          && (!(tag instanceof PlaceObject2Tag))
+                          && (!(tag instanceof PlaceObject3Tag))
+                          && (!(tag instanceof RemoveObjectTag))
+                          && (!(tag instanceof RemoveObject2Tag))
+                          && (!(tag instanceof DoActionTag))
+                          && (!(tag instanceof DoInitActionTag))
+                          && (!(tag instanceof DoABCTag))
+                          && (!(tag instanceof SymbolClassTag))
+                          && (!(tag instanceof ShowFrameTag))
+                          && (!(tag instanceof SetBackgroundColorTag))) {
+                     sos2.writeTag(tag);
+                  }
                }
             }
 
@@ -201,18 +209,18 @@ public class TagPanel extends JPanel implements ListSelectionListener {
 
                int countGlyphs = ((FontTag) tagObj).getGlyphShapeTable().length;
                int fontId = ((FontTag) tagObj).getFontId();
-               int sloupcu=(int)Math.ceil(Math.sqrt(countGlyphs));
-               int radku=(int)Math.ceil(((float)countGlyphs)/((float)sloupcu));
-               int x=0;
-               int y=1;
-               for (int f = 0; f < countGlyphs; f++) {                                    
-                  if(x>=sloupcu){
-                     x=0;
+               int sloupcu = (int) Math.ceil(Math.sqrt(countGlyphs));
+               int radku = (int) Math.ceil(((float) countGlyphs) / ((float) sloupcu));
+               int x = 0;
+               int y = 1;
+               for (int f = 0; f < countGlyphs; f++) {
+                  if (x >= sloupcu) {
+                     x = 0;
                      y++;
                   }
                   List<TEXTRECORD> rec = new ArrayList<TEXTRECORD>();
                   TEXTRECORD tr = new TEXTRECORD();
-                  int textHeight=height/radku;
+                  int textHeight = height / radku;
                   tr.fontId = fontId;
                   tr.styleFlagsHasFont = true;
                   tr.textHeight = textHeight;
@@ -223,10 +231,10 @@ public class TagPanel extends JPanel implements ListSelectionListener {
                   tr.glyphEntries[0].glyphAdvance = 0;
                   tr.glyphEntries[0].glyphIndex = f;
                   rec.add(tr);
-                  mat.translateX=x*width/sloupcu;
-                  mat.translateY=y*height/radku;
+                  mat.translateX = x * width / sloupcu;
+                  mat.translateY = y * height / radku;
                   sos2.writeTag(new DefineTextTag(999 + f, new RECT(0, width, 0, height), new MATRIX(), SWFOutputStream.getNeededBitsU(countGlyphs - 1), SWFOutputStream.getNeededBitsU(0), rec));
-                  sos2.writeTag(new PlaceObject2Tag(false, false, false, true, false, true, true, false, 1+f, 999 + f, mat, null, 0, null, 0, null));
+                  sos2.writeTag(new PlaceObject2Tag(false, false, false, true, false, true, true, false, 1 + f, 999 + f, mat, null, 0, null, 0, null));
                   x++;
                }
                sos2.writeTag(new ShowFrameTag());

@@ -17,6 +17,7 @@
 package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
+import com.jpexs.asdec.tags.base.AloneTag;
 import com.jpexs.asdec.tags.base.BoundedTag;
 import com.jpexs.asdec.tags.base.CharacterTag;
 import com.jpexs.asdec.types.RECT;
@@ -24,7 +25,7 @@ import com.jpexs.asdec.types.SHAPEWITHSTYLE;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-public class DefineShape2Tag extends CharacterTag implements BoundedTag {
+public class DefineShape2Tag extends CharacterTag implements BoundedTag,AloneTag {
 
    public int shapeId;
    public RECT shapeBounds;

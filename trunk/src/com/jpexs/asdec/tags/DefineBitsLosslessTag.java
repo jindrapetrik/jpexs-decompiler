@@ -18,6 +18,7 @@ package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.tags.base.AloneTag;
 import com.jpexs.asdec.tags.base.CharacterTag;
 import com.jpexs.asdec.types.BITMAPDATA;
 import com.jpexs.asdec.types.COLORMAPDATA;
@@ -31,7 +32,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.InflaterInputStream;
 
-public class DefineBitsLosslessTag extends CharacterTag {
+public class DefineBitsLosslessTag extends CharacterTag implements AloneTag {
 
    public int characterID;
    public int bitmapFormat;

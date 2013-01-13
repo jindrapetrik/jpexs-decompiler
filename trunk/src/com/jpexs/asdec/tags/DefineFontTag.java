@@ -18,6 +18,7 @@ package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.tags.base.AloneTag;
 import com.jpexs.asdec.tags.base.FontTag;
 import com.jpexs.asdec.types.SHAPE;
 import java.io.ByteArrayInputStream;

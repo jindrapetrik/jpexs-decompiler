@@ -18,6 +18,7 @@ package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.tags.base.AloneTag;
 import com.jpexs.asdec.tags.base.CharacterTag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -29,7 +30,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class DefineBitsJPEG4Tag extends CharacterTag {
+public class DefineBitsJPEG4Tag extends CharacterTag implements AloneTag {
 
    public int characterID;
    public int deblockParam;

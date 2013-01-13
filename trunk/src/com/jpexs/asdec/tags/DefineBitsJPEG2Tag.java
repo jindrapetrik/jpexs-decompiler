@@ -17,11 +17,12 @@
 package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
+import com.jpexs.asdec.tags.base.AloneTag;
 import com.jpexs.asdec.tags.base.CharacterTag;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-public class DefineBitsJPEG2Tag extends CharacterTag {
+public class DefineBitsJPEG2Tag extends CharacterTag implements AloneTag {
 
    public int characterID;
    public byte[] imageData;

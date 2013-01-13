@@ -18,6 +18,7 @@ package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.tags.base.AloneTag;
 import com.jpexs.asdec.tags.base.BoundedTag;
 import com.jpexs.asdec.tags.base.CharacterTag;
 import com.jpexs.asdec.types.MORPHFILLSTYLEARRAY;
@@ -34,7 +35,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag {
+public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag,AloneTag {
 
    public int characterId;
    public RECT startBounds;
