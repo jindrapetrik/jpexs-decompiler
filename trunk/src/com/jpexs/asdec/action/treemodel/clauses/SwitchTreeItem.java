@@ -41,7 +41,7 @@ public class SwitchTreeItem extends LoopTreeItem implements Block {
    @Override
    public String toString(ConstantPool constants) {
       String ret = "";
-      ret += "loop" + loopBreak + ":\r\n";
+      ret += "loopswitch" + loopBreak + ":\r\n";
       ret += hilight("switch(") + switchedObject.toString(constants) + hilight(")") + "\r\n{\r\n";
       for (int i = 0; i < caseValues.size(); i++) {
          ret += "case " + caseValues.get(i).toString(constants) + ":\r\n";

@@ -494,14 +494,20 @@ public class Action {
                loopStack.add(stripped.substring(0, stripped.length() - 1));
             }
             if (stripped.startsWith("break ")) {
-               if (stripped.equals("break " + loopStack.peek() + ";")) {
-                  parts[p] = parts[p].replace(" " + loopStack.peek(), "");
+               if (stripped.equals("break " + loopStack.peek().replace("switch", "") + ";")) {
+                  parts[p] = parts[p].replace(" " + loopStack.peek().replace("switch", ""), "");
                }
             }
             if (stripped.startsWith("continue ")) {
                if (loopStack.size() > 0) {
-                  if (stripped.equals("continue " + loopStack.peek() + ";")) {
-                     parts[p] = parts[p].replace(" " + loopStack.peek(), "");
+                  int pos=loopStack.size()-1;
+                  String loopname="";
+                  do{
+                     loopname=loopStack.get(pos);                     
+                     pos--;
+                  }while((pos>=0)&&(loopname.startsWith("loopswitch")));
+                  if (stripped.equals("continue " + loopname + ";")) {
+                     parts[p] = parts[p].replace(" " + loopname, "");
                   }
                }
             }
