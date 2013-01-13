@@ -37,6 +37,8 @@ import com.jpexs.asdec.helpers.Highlighting;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Represents one ACTIONRECORD, also has some static method to work with Actions
@@ -520,12 +522,12 @@ public class Action {
 
       int level = 0;
       for (int p = 0; p < parts.length; p++) {
-         String strippedP = Highlighting.stripHilights(parts[p]);
+         String strippedP = Highlighting.stripHilights(parts[p]).trim();
          if (strippedP.endsWith(":") && (!strippedP.startsWith("case ")) && (!strippedP.equals("default:"))) {
             String loopname = strippedP.substring(0, strippedP.length() - 1);
             boolean dorefer = false;
             for (int q = p + 1; q < parts.length; q++) {
-               String strippedQ = Highlighting.stripHilights(parts[q]);
+               String strippedQ = Highlighting.stripHilights(parts[q]).trim();
                if (strippedQ.equals("break " + loopname + ";")) {
                   dorefer = true;
                   break;
@@ -589,6 +591,7 @@ public class Action {
 
          return treeToString(tree);
       } catch (Exception ex) {
+         Logger.getLogger(Action.class.getName()).log(Level.SEVERE,null,ex);
          return "//Decompilation error :" + ex.getLocalizedMessage();
       }
    }
@@ -602,7 +605,8 @@ public class Action {
     * @return List of treeItems
     */
    public static List<TreeItem> actionsToTree(HashMap<Integer, String> regNames, List<Action> actions, int version) {
-      return actionsToTree(regNames, new ArrayList<Long>(), new ArrayList<Loop>(), getActionsAllIfsOrJumps(actions), new Stack<TreeItem>(), new ConstantPool(), actions, 0, actions.size() - 1, version);
+      Stack<TreeItem> stack=new Stack<TreeItem>();
+      return actionsToTree(regNames, new ArrayList<Long>(), new ArrayList<Loop>(), getActionsAllIfsOrJumps(actions), stack, new ConstantPool(), actions, 0, actions.size() - 1, version);
    }
 
    private static Stack<TreeItem> actionsToStackTree(HashMap<Integer, String> regNames, List<Action> jumpsOrIfs, List<Action> actions, ConstantPool constants, int start, int end, int version) {
@@ -637,7 +641,7 @@ public class Action {
          long addr = ip2adr(actions, ip, version);
          if (unknownJumps.contains(addr)) {
             unknownJumps.remove(new Long(addr));
-            boolean switchFound = false;
+           /* boolean switchFound = false;
             for (int i = output.size() - 1; i >= 0; i--) {
                if (output.get(i) instanceof SwitchTreeItem) {
                   if (((SwitchTreeItem) output.get(i)).defaultCommands == null) {
@@ -661,10 +665,12 @@ public class Action {
                   }
                   break;
                }
-            }
-            if (!switchFound) {
+            }*/
+           /* if (!switchFound) {        
                throw new UnknownJumpException(stack, addr, output);
-            }
+            }*/
+            
+            throw new UnknownJumpException(stack, addr, output);
          }
          if (ip > end) {
             break;
@@ -959,6 +965,7 @@ public class Action {
                      }
                   }
                } while (ip < end);
+               loopList.add(new Loop(-1,ip2adr(actions,ip,version)));
                for (int i = 0; i < caseBodyIps.size(); i++) {
                   int caseEnd = ip - 1;
                   if (i < caseBodyIps.size() - 1) {
