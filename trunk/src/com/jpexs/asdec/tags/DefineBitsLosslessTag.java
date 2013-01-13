@@ -24,7 +24,6 @@ import com.jpexs.asdec.types.COLORMAPDATA;
 import com.jpexs.asdec.types.RGB;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -47,8 +46,6 @@ public class DefineBitsLosslessTag extends CharacterTag {
    private BITMAPDATA bitmapData;
    private boolean decompressed = false;
 
-   
-   
    public BufferedImage getImage() {
       BufferedImage bi = new BufferedImage(bitmapWidth, bitmapHeight, BufferedImage.TYPE_INT_RGB);
       Graphics g = bi.getGraphics();
@@ -77,7 +74,7 @@ public class DefineBitsLosslessTag extends CharacterTag {
             g.fillRect(x, y, 1, 1);
             pos32aligned++;
             pos++;
-         }         
+         }
          while ((pos32aligned % 4 != 0)) {
             pos32aligned++;
          }

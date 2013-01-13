@@ -22,20 +22,19 @@ import com.jpexs.asdec.types.RGB;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 public class SetBackgroundColorTag extends Tag {
 
    public RGB backgroundColor;
 
    public SetBackgroundColorTag(byte[] data, int version, long pos) throws IOException {
-      super(9,"SetBackgroundColor", data, pos);
+      super(9, "SetBackgroundColor", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       backgroundColor = sis.readRGB();
    }
 
    public SetBackgroundColorTag(RGB backgroundColor) {
-      super(9,"SetBackgroundColor", new byte[0], 0);
+      super(9, "SetBackgroundColor", new byte[0], 0);
       this.backgroundColor = backgroundColor;
    }
 
@@ -44,12 +43,9 @@ public class SetBackgroundColorTag extends Tag {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       SWFOutputStream sos = new SWFOutputStream(baos, version);
       try {
-        sos.writeRGB(backgroundColor);
-       } catch (IOException e) {
-       }
+         sos.writeRGB(backgroundColor);
+      } catch (IOException e) {
+      }
       return baos.toByteArray();
    }
-
-   
-  
 }

@@ -56,7 +56,7 @@ public class TagStub extends Tag {
     * @throws IOException
     */
    public TagStub(byte data[], int version, long pos) throws IOException {
-      super(0,"", data, pos);
+      super(0, "", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
 
    }

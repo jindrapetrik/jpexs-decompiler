@@ -388,7 +388,7 @@ public class SWFInputStream extends InputStream {
     * @throws IOException
     */
    public float readFB(int nBits) throws IOException {
-      if(nBits==0){
+      if (nBits == 0) {
          return 0;
       }
       float val = readSB(nBits);
@@ -409,7 +409,7 @@ public class SWFInputStream extends InputStream {
       ret.Xmax = (int) readSB(NBits);
       ret.Ymin = (int) readSB(NBits);
       ret.Ymax = (int) readSB(NBits);
-      ret.nbits=NBits;
+      ret.nbits = NBits;
       alignByte();
       return ret;
    }
@@ -497,7 +497,7 @@ public class SWFInputStream extends InputStream {
       Tag ret;
       switch (tagID) {
          case 0:
-            ret =new EndTag(data, version, pos);
+            ret = new EndTag(data, version, pos);
             break;
          case 1:
             ret = new ShowFrameTag(pos);
@@ -522,7 +522,7 @@ public class SWFInputStream extends InputStream {
             ret = new JPEGTablesTag(data, pos);
             break;
          case 9:
-            ret = new SetBackgroundColorTag(data, version,pos);
+            ret = new SetBackgroundColorTag(data, version, pos);
             break;
          case 10:
             ret = new DefineFontTag(data, version, pos);
@@ -712,7 +712,7 @@ public class SWFInputStream extends InputStream {
             ret = new DefineFont4Tag(data, version, pos);
             break;
          default:
-            ret = new Tag(tagID,"Unknown", data, pos);
+            ret = new Tag(tagID, "Unknown", data, pos);
       }
       ret.forceWriteAsLong = readLong;
       byte dataNew[] = ret.getData(version);
@@ -994,21 +994,21 @@ public class SWFInputStream extends InputStream {
       ret.hasScale = readUB(1) == 1;
       if (ret.hasScale) {
          int NScaleBits = (int) readUB(5);
-         ret.scaleX = (int)readSB(NScaleBits);
-         ret.scaleY = (int)readSB(NScaleBits);
-         ret.bitsScale=NScaleBits;
+         ret.scaleX = (int) readSB(NScaleBits);
+         ret.scaleY = (int) readSB(NScaleBits);
+         ret.bitsScale = NScaleBits;
       }
       ret.hasRotate = readUB(1) == 1;
       if (ret.hasRotate) {
          int NRotateBits = (int) readUB(5);
-         ret.rotateSkew0 = (int)readSB(NRotateBits);
-         ret.rotateSkew1 = (int)readSB(NRotateBits);
-         ret.bitsRotate=NRotateBits;
+         ret.rotateSkew0 = (int) readSB(NRotateBits);
+         ret.rotateSkew1 = (int) readSB(NRotateBits);
+         ret.bitsRotate = NRotateBits;
       }
       int NTranslateBits = (int) readUB(5);
       ret.translateX = (int) readSB(NTranslateBits);
       ret.translateY = (int) readSB(NTranslateBits);
-      ret.bitsTranslate=NTranslateBits;
+      ret.bitsTranslate = NTranslateBits;
       alignByte();
       return ret;
    }

@@ -2,10 +2,6 @@ package com.jpexs.asdec.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -26,24 +22,23 @@ import javax.swing.JPanel;
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 public class ImagePanel extends JPanel {
-   public JLabel label=new JLabel();
+
+   public JLabel label = new JLabel();
 
    public ImagePanel() {
       super(new BorderLayout());
       label.setHorizontalAlignment(JLabel.CENTER);
-      add(label,BorderLayout.CENTER);
+      add(label, BorderLayout.CENTER);
    }
-   
-   public void setImage(byte data[]){
+
+   public void setImage(byte data[]) {
       ImageIcon icon = new ImageIcon(data);
       label.setIcon(icon);
    }
-   
-   public void setImage(Image image){
+
+   public void setImage(Image image) {
       ImageIcon icon = new ImageIcon(image);
       label.setIcon(icon);
    }
-   
 }

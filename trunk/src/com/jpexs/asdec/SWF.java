@@ -29,16 +29,7 @@ import com.jpexs.asdec.tags.DoABCTag;
 import com.jpexs.asdec.tags.JPEGTablesTag;
 import com.jpexs.asdec.tags.Tag;
 import com.jpexs.asdec.tags.base.ASMSource;
-import com.jpexs.asdec.types.ALPHABITMAPDATA;
-import com.jpexs.asdec.types.ALPHACOLORMAPDATA;
-import com.jpexs.asdec.types.BITMAPDATA;
-import com.jpexs.asdec.types.COLORMAPDATA;
 import com.jpexs.asdec.types.RECT;
-import com.jpexs.asdec.types.RGB;
-import com.jpexs.asdec.types.RGBA;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -394,7 +385,7 @@ public class SWF {
       }
       List<String> existingNames = new ArrayList<String>();
       for (TagNode node : nodeList) {
-         String name="";         
+         String name = "";
          if (node.tag instanceof Tag) {
             name = ((Tag) node.tag).getExportName();
          }
@@ -526,12 +517,12 @@ public class SWF {
             }
          }
          if (t instanceof DefineBitsLosslessTag) {
-            DefineBitsLosslessTag dbl = (DefineBitsLosslessTag) t;            
+            DefineBitsLosslessTag dbl = (DefineBitsLosslessTag) t;
             ImageIO.write(dbl.getImage(), "PNG", new File(outdir + File.separator + dbl.characterID + ".png"));
          }
          if (t instanceof DefineBitsLossless2Tag) {
             DefineBitsLossless2Tag dbl = (DefineBitsLossless2Tag) t;
-            
+
             ImageIO.write(dbl.getImage(), "PNG", new File(outdir + File.separator + dbl.characterID + ".png"));
          }
          if ((jtt != null) && (t instanceof DefineBitsTag)) {

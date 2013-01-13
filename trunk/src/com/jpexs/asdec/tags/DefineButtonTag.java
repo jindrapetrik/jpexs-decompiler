@@ -53,12 +53,12 @@ public class DefineButtonTag extends CharacterTag implements ASMSource {
     */
    //public List<Action> actions;
    public byte[] actionBytes;
-   
+
    @Override
    public int getCharacterID() {
       return buttonId;
    }
-   
+
    /**
     * Constructor
     *
@@ -67,7 +67,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource {
     * @throws IOException
     */
    public DefineButtonTag(byte[] data, int version, long pos) throws IOException {
-      super(7, "DefineButton",data, pos);
+      super(7, "DefineButton", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       buttonId = sis.readUI16();
       characters = sis.readBUTTONRECORDList(false);

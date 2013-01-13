@@ -50,19 +50,19 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag {
 
    @Override
    public RECT getRect() {
-      RECT rect=new RECT();
-      rect.Xmin=Math.min(startBounds.Xmin,endBounds.Xmin);
-      rect.Ymin=Math.min(startBounds.Ymin,endBounds.Ymin);
-      rect.Xmax=Math.max(startBounds.Xmax,endBounds.Xmax);
-      rect.Ymax=Math.max(startBounds.Ymax,endBounds.Ymax);
+      RECT rect = new RECT();
+      rect.Xmin = Math.min(startBounds.Xmin, endBounds.Xmin);
+      rect.Ymin = Math.min(startBounds.Ymin, endBounds.Ymin);
+      rect.Xmax = Math.max(startBounds.Xmax, endBounds.Xmax);
+      rect.Ymax = Math.max(startBounds.Ymax, endBounds.Ymax);
       return rect;
    }
-   
+
    @Override
    public int getCharacterID() {
       return characterId;
    }
-   
+
    /**
     * Gets data bytes
     *
@@ -121,5 +121,4 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag {
       startEdges = sis.readSHAPE(1);
       endEdges = sis.readSHAPE(1);
    }
-
 }

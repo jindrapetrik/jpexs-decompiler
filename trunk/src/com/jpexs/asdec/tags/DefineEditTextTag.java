@@ -63,7 +63,7 @@ public class DefineEditTextTag extends CharacterTag {
    public int leading;
    public String variableName;
    public String initialText;
-   
+
    @Override
    public int getCharacterID() {
       return characterID;
@@ -187,5 +187,4 @@ public class DefineEditTextTag extends CharacterTag {
       }
 
    }
-
 }

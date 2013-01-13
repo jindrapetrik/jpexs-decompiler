@@ -19,7 +19,6 @@ package com.jpexs.asdec.tags;
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.abc.CopyOutputStream;
-import com.jpexs.asdec.tags.base.CharacterTag;
 import com.jpexs.asdec.tags.base.FontTag;
 import com.jpexs.asdec.types.KERNINGRECORD;
 import com.jpexs.asdec.types.LANGCODE;
@@ -55,7 +54,7 @@ public class DefineFont3Tag extends Tag implements FontTag {
    public KERNINGRECORD fontKerningTable[];
 
    public DefineFont3Tag(byte[] data, int version, long pos) throws IOException {
-      super(75, "DefineFont3",data, pos);
+      super(75, "DefineFont3", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       fontId = sis.readUI16();
       fontFlagsHasLayout = sis.readUB(1) == 1;
@@ -127,7 +126,7 @@ public class DefineFont3Tag extends Tag implements FontTag {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       OutputStream os = baos;
       SWFOutputStream sos = new SWFOutputStream(os, version);
-      sos=new SWFOutputStream(new CopyOutputStream(sos, new ByteArrayInputStream(data)), 10);
+      sos = new SWFOutputStream(new CopyOutputStream(sos, new ByteArrayInputStream(data)), 10);
       try {
          sos.writeUI16(fontId);
          sos.writeUB(1, fontFlagsHasLayout ? 1 : 0);
@@ -199,5 +198,4 @@ public class DefineFont3Tag extends Tag implements FontTag {
       }
       return baos.toByteArray();
    }
-
 }

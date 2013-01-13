@@ -16,7 +16,7 @@
  */
 package com.jpexs.asdec.gui;
 
-import com.jpexs.asdec.action.*;
+import com.jpexs.asdec.gui.TagNode;
 import com.jpexs.asdec.tags.DefineBitsJPEG2Tag;
 import com.jpexs.asdec.tags.DefineBitsJPEG3Tag;
 import com.jpexs.asdec.tags.DefineBitsJPEG4Tag;
@@ -80,103 +80,101 @@ public class TagNode {
          if (t instanceof ExportAssetsTag) {
             exportAssetsTags.add((ExportAssetsTag) t);
          }
-         if((t instanceof DefineFontTag)||
-                 (t instanceof DefineFont2Tag)||
-                 (t instanceof DefineFont3Tag)||
-                 (t instanceof DefineFont4Tag)){
+         if ((t instanceof DefineFontTag)
+                 || (t instanceof DefineFont2Tag)
+                 || (t instanceof DefineFont3Tag)
+                 || (t instanceof DefineFont4Tag)) {
             fonts.add(new TagNode(t));
          }
-         if((t instanceof DefineTextTag)||
-                 (t instanceof DefineText2Tag)
-                 ||(t instanceof DefineEditTextTag)){
+         if ((t instanceof DefineTextTag)
+                 || (t instanceof DefineText2Tag)
+                 || (t instanceof DefineEditTextTag)) {
             texts.add(new TagNode(t));
          }
-         
-         if((t instanceof DefineBitsTag)||
-                 (t instanceof DefineBitsJPEG2Tag)||                 
-                 (t instanceof DefineBitsJPEG3Tag)||
-                 (t instanceof DefineBitsJPEG4Tag)||
-                 (t instanceof DefineBitsLosslessTag)||
-                 (t instanceof DefineBitsLossless2Tag)){
+
+         if ((t instanceof DefineBitsTag)
+                 || (t instanceof DefineBitsJPEG2Tag)
+                 || (t instanceof DefineBitsJPEG3Tag)
+                 || (t instanceof DefineBitsJPEG4Tag)
+                 || (t instanceof DefineBitsLosslessTag)
+                 || (t instanceof DefineBitsLossless2Tag)) {
             images.add(new TagNode(t));
          }
-         if((t instanceof DefineShapeTag)||
-                 (t instanceof DefineShape2Tag)||
-                 (t instanceof DefineShape3Tag)||
-                 (t instanceof DefineShape4Tag))
-         {
+         if ((t instanceof DefineShapeTag)
+                 || (t instanceof DefineShape2Tag)
+                 || (t instanceof DefineShape3Tag)
+                 || (t instanceof DefineShape4Tag)) {
             shapes.add(new TagNode(t));
          }
-         
-         if((t instanceof DefineMorphShapeTag)||(t instanceof DefineMorphShape2Tag)){
+
+         if ((t instanceof DefineMorphShapeTag) || (t instanceof DefineMorphShape2Tag)) {
             morphShapes.add(new TagNode(t));
          }
-         
-         if(t instanceof DefineSpriteTag){
+
+         if (t instanceof DefineSpriteTag) {
             sprites.add(new TagNode(t));
          }
-         if((t instanceof DefineButtonTag)||(
-                 t instanceof DefineButton2Tag)){
+         if ((t instanceof DefineButtonTag) || (t instanceof DefineButton2Tag)) {
             buttons.add(new TagNode(t));
          }
          if (t instanceof ShowFrameTag) {
             TagNode tti = new TagNode("frame" + frame);
 
- /*           for (int r = ret.size() - 1; r >= 0; r--) {
-               if (!(ret.get(r).tag instanceof DefineSpriteTag)) {
-                  if (!(ret.get(r).tag instanceof DefineButtonTag)) {
-                     if (!(ret.get(r).tag instanceof DefineButton2Tag)) {
-                        if (!(ret.get(r).tag instanceof DoInitActionTag)) {
-                           tti.subItems.add(ret.get(r));
-                           ret.remove(r);
-                        }
-                     }
-                  }
-               }
-            }*/
+            /*           for (int r = ret.size() - 1; r >= 0; r--) {
+             if (!(ret.get(r).tag instanceof DefineSpriteTag)) {
+             if (!(ret.get(r).tag instanceof DefineButtonTag)) {
+             if (!(ret.get(r).tag instanceof DefineButton2Tag)) {
+             if (!(ret.get(r).tag instanceof DoInitActionTag)) {
+             tti.subItems.add(ret.get(r));
+             ret.remove(r);
+             }
+             }
+             }
+             }
+             }*/
             frame++;
             frames.add(tti);
          } /*if (t instanceof ASMSource) {
-            TagNode tti = new TagNode(t);
-            ret.add(tti);
-         } else */
+          TagNode tti = new TagNode(t);
+          ret.add(tti);
+          } else */
          if (t instanceof Container) {
             TagNode tti = new TagNode(t);
-            if (((Container) t).getItemCount() > 0) {               
+            if (((Container) t).getItemCount() > 0) {
                List<Object> subItems = ((Container) t).getSubItems();
-               tti.subItems = createTagList(subItems);               
+               tti.subItems = createTagList(subItems);
             }
             //ret.add(tti);
          }
       }
-      
-      TagNode textsNode=new TagNode("texts");
+
+      TagNode textsNode = new TagNode("texts");
       textsNode.subItems.addAll(texts);
-      
-      TagNode imagesNode=new TagNode("images");
+
+      TagNode imagesNode = new TagNode("images");
       imagesNode.subItems.addAll(images);
-      
-      TagNode fontsNode=new TagNode("fonts");
+
+      TagNode fontsNode = new TagNode("fonts");
       fontsNode.subItems.addAll(fonts);
-      
-      
-      TagNode spritesNode=new TagNode("sprites");
+
+
+      TagNode spritesNode = new TagNode("sprites");
       spritesNode.subItems.addAll(sprites);
-      
-      TagNode shapesNode=new TagNode("shapes");
+
+      TagNode shapesNode = new TagNode("shapes");
       shapesNode.subItems.addAll(shapes);
-      
-      TagNode morphShapesNode=new TagNode("morphshapes");
+
+      TagNode morphShapesNode = new TagNode("morphshapes");
       morphShapesNode.subItems.addAll(morphShapes);
-      
-      TagNode buttonsNode=new TagNode("buttons");
+
+      TagNode buttonsNode = new TagNode("buttons");
       buttonsNode.subItems.addAll(buttons);
-      
-      TagNode framesNode=new TagNode("frames");
+
+      TagNode framesNode = new TagNode("frames");
       framesNode.subItems.addAll(frames);
       ret.add(shapesNode);
       ret.add(morphShapesNode);;
-      ret.add(spritesNode); 
+      ret.add(spritesNode);
       ret.add(textsNode);
       ret.add(imagesNode);
       ret.add(buttonsNode);

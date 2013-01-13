@@ -36,12 +36,11 @@ public class DefineBitsJPEG4Tag extends CharacterTag {
    public byte imageData[];
    public byte bitmapAlphaData[];
 
-   
    @Override
    public int getCharacterID() {
       return characterID;
    }
-   
+
    /**
     * Gets data bytes
     *
@@ -72,7 +71,7 @@ public class DefineBitsJPEG4Tag extends CharacterTag {
     * @throws IOException
     */
    public DefineBitsJPEG4Tag(byte data[], int version, long pos) throws IOException {
-      super(90, "DefineBitsJPEG4",data, pos);
+      super(90, "DefineBitsJPEG4", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       characterID = sis.readUI16();
       long alphaDataOffset = sis.readUI32();

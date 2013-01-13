@@ -27,11 +27,11 @@ public class ShowFrameTag extends Tag {
     * Constructor
     */
    public ShowFrameTag(long pos) {
-      super(1,"ShowFrame", new byte[0], pos);
+      super(1, "ShowFrame", new byte[0], pos);
    }
 
-   public ShowFrameTag(){
-      super(1,"ShowFrame", new byte[0], 0);
+   public ShowFrameTag() {
+      super(1, "ShowFrame", new byte[0], 0);
    }
 
    /**
@@ -44,5 +44,4 @@ public class ShowFrameTag extends Tag {
    public byte[] getData(int version) {
       return super.getData(version);
    }
-
 }

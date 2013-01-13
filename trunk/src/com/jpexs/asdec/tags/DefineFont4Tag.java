@@ -24,7 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class DefineFont4Tag extends CharacterTag{
+public class DefineFont4Tag extends CharacterTag {
 
    public int fontID;
    public boolean fontFlagsHasFontData;
@@ -32,14 +32,14 @@ public class DefineFont4Tag extends CharacterTag{
    public boolean fontFlagsBold;
    public String fontName;
    public byte fontData[];
-   
+
    @Override
    public int getCharacterID() {
       return fontID;
    }
 
    public DefineFont4Tag(byte[] data, int version, long pos) throws IOException {
-      super(91,"DefineFont4", data, pos);
+      super(91, "DefineFont4", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       fontID = sis.readUI16();
       sis.readUB(5);
@@ -73,5 +73,4 @@ public class DefineFont4Tag extends CharacterTag{
       }
       return baos.toByteArray();
    }
-
 }

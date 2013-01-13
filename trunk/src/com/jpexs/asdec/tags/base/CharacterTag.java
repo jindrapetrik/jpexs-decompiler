@@ -14,14 +14,13 @@ public abstract class CharacterTag extends Tag {
    public CharacterTag(int id, String name, byte[] data, long pos) {
       super(id, name, data, pos);
    }
-   
-   public abstract int getCharacterID();
 
-    /**
+   public abstract int getCharacterID();
+   /**
     * List of ExportAssetsTag used for converting to String
     */
    public List<ExportAssetsTag> exportAssetsTags = new ArrayList<ExportAssetsTag>();
-   
+
    @Override
    public String getName() {
       String nameAppend = "";
@@ -31,16 +30,11 @@ public abstract class CharacterTag extends Tag {
             nameAppend = ": " + eat.names.get(pos);
          }
       }
-      return super.getName()+" (" + getCharacterID() + nameAppend + ")";
+      return super.getName() + " (" + getCharacterID() + nameAppend + ")";
    }
 
    @Override
    public String getExportName() {
-      return super.getName()+"_"+getCharacterID();
+      return super.getName() + "_" + getCharacterID();
    }
-   
-   
-   
-   
-   
 }

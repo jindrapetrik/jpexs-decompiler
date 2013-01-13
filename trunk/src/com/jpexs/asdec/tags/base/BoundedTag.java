@@ -7,5 +7,6 @@ import com.jpexs.asdec.types.RECT;
  * @author JPEXS
  */
 public interface BoundedTag {
+
    public RECT getRect();
 }

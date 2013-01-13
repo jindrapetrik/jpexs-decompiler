@@ -63,7 +63,7 @@ public class ProtectTag extends Tag {
     * @throws IOException
     */
    public ProtectTag(byte data[], int version, long pos) throws IOException {
-      super(24,"Protect", data, pos);
+      super(24, "Protect", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       if (sis.available() > 0) {
          passwordHash = sis.readString();

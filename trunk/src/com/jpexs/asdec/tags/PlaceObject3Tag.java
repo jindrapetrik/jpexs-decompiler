@@ -228,7 +228,7 @@ public class PlaceObject3Tag extends Tag implements Container {
     * @throws IOException
     */
    public PlaceObject3Tag(byte data[], int version, long pos) throws IOException {
-      super(70,"PlaceObject3", data, pos);
+      super(70, "PlaceObject3", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       placeFlagHasClipActions = sis.readUB(1) == 1;
       placeFlagHasClipDepth = sis.readUB(1) == 1;

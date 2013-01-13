@@ -29,15 +29,14 @@ public class DefineBitsJPEG3Tag extends CharacterTag {
    public int characterID;
    public byte imageData[];
    public byte bitmapAlphaData[];
-   
-   
+
    @Override
    public int getCharacterID() {
       return characterID;
    }
 
    public DefineBitsJPEG3Tag(byte[] data, int version, long pos) throws IOException {
-      super(35,"DefineBitsJPEG3", data, pos);
+      super(35, "DefineBitsJPEG3", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       characterID = sis.readUI16();
       long alphaDataOffset = sis.readUI32();

@@ -58,7 +58,7 @@ public class DebugIDTag extends Tag {
     * @throws IOException
     */
    public DebugIDTag(byte data[], int version, long pos) throws IOException {
-      super(63,"DebugID", data, pos);
+      super(63, "DebugID", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       debugId = sis.readBytes(16);
    }

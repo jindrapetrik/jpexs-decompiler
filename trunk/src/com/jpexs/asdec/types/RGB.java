@@ -41,8 +41,7 @@ public class RGB {
       this.green = green;
       this.blue = blue;
    }
-   
-   public RGB(){
-      
+
+   public RGB() {
    }
 }

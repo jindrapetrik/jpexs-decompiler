@@ -39,7 +39,6 @@ public class RECT {
     * Y maximum position for rectangle in twips
     */
    public int Ymax;
-   
    public int nbits;
 
    public RECT(int Xmin, int Xmax, int Ymin, int Ymax) {
@@ -48,22 +47,20 @@ public class RECT {
       this.Ymin = Ymin;
       this.Ymax = Ymax;
    }
-   
-   public RECT()
-   {
-      
+
+   public RECT() {
    }
 
    @Override
    public String toString() {
       return "[RECT x=" + Xmin + "-" + Xmax + ", y=" + Ymin + "-" + Ymax + "]";
    }
-   
-   public int getWidth(){
-      return Xmax-Xmin;
+
+   public int getWidth() {
+      return Xmax - Xmin;
    }
-   
-   public int getHeight(){
-      return Ymax-Ymin;
+
+   public int getHeight() {
+      return Ymax - Ymin;
    }
 }

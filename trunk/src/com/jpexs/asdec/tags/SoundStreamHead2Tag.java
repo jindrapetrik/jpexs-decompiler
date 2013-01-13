@@ -77,7 +77,7 @@ public class SoundStreamHead2Tag extends Tag {
     * @throws IOException
     */
    public SoundStreamHead2Tag(byte data[], int version, long pos) throws IOException {
-      super(45,"SoundStreamHead2", data, pos);
+      super(45, "SoundStreamHead2", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       sis.readUB(4);//reserved
       playBackSoundRate = (int) sis.readUB(2);

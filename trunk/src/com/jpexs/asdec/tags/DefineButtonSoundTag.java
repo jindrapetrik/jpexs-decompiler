@@ -30,7 +30,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class DefineButtonSoundTag extends CharacterTag{
+public class DefineButtonSoundTag extends CharacterTag {
 
    public int buttonId;
    public int buttonSoundChar0;
@@ -42,12 +42,11 @@ public class DefineButtonSoundTag extends CharacterTag{
    public int buttonSoundChar3;
    public SOUNDINFO buttonSoundInfo3;
 
-   
    @Override
    public int getCharacterID() {
       return buttonId;
    }
-   
+
    /**
     * Gets data bytes
     *
@@ -90,7 +89,7 @@ public class DefineButtonSoundTag extends CharacterTag{
     * @throws IOException
     */
    public DefineButtonSoundTag(byte data[], int version, long pos) throws IOException {
-      super(17, "DefineButtonSound",data, pos);
+      super(17, "DefineButtonSound", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       buttonId = sis.readUI16();
       buttonSoundChar0 = sis.readUI16();
@@ -110,5 +109,4 @@ public class DefineButtonSoundTag extends CharacterTag{
          buttonSoundInfo3 = sis.readSOUNDINFO();
       }
    }
-
 }

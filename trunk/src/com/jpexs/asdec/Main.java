@@ -16,7 +16,6 @@
  */
 package com.jpexs.asdec;
 
-import com.jpexs.asdec.abc.NotSameException;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.gui.AboutDialog;
 import com.jpexs.asdec.gui.LoadingDialog;
@@ -24,8 +23,6 @@ import com.jpexs.asdec.gui.MainFrame;
 import com.jpexs.asdec.gui.ModeFrame;
 import com.jpexs.asdec.gui.View;
 import com.jpexs.asdec.gui.proxy.ProxyFrame;
-import com.jpexs.asdec.tags.DoABCTag;
-import com.jpexs.asdec.tags.Tag;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,9 +30,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;

@@ -44,13 +44,11 @@ public class EndTag extends Tag {
     * @throws IOException
     */
    public EndTag(byte data[], int version, long pos) throws IOException {
-      super(0,"End", data, pos);
+      super(0, "End", data, pos);
 
    }
 
    public EndTag() {
-      super(0,"End", new byte[0], 0);
+      super(0, "End", new byte[0], 0);
    }
-   
-   
 }

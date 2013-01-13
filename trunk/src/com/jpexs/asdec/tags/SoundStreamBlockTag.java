@@ -33,6 +33,6 @@ public class SoundStreamBlockTag extends Tag {
     * @throws IOException
     */
    public SoundStreamBlockTag(byte data[], int version, long pos) throws IOException {
-      super(19,"SoundStreamBlock", data, pos);      //all data is streamSoundData
+      super(19, "SoundStreamBlock", data, pos);      //all data is streamSoundData
    }
 }

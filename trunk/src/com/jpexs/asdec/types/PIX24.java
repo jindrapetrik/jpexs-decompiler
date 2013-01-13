@@ -38,8 +38,6 @@ public class PIX24 {
 
    @Override
    public String toString() {
-      return "[PIX24 red:"+red+", green:"+green+", blue:"+blue+"]";
+      return "[PIX24 red:" + red + ", green:" + green + ", blue:" + blue + "]";
    }
-   
-   
 }

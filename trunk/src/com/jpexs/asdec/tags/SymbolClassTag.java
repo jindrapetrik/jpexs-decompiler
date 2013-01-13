@@ -29,7 +29,7 @@ public class SymbolClassTag extends Tag {
    public String classNames[];
 
    public SymbolClassTag(byte[] data, int version, long pos) throws IOException {
-      super(76,"SymbolClass", data, pos);
+      super(76, "SymbolClass", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       int numSymbols = sis.readUI16();
       tagIDs = new int[numSymbols];

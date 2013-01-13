@@ -34,7 +34,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class DefineMorphShapeTag extends CharacterTag implements BoundedTag{
+public class DefineMorphShapeTag extends CharacterTag implements BoundedTag {
 
    public int characterId;
    public RECT startBounds;
@@ -49,7 +49,6 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag{
       return characterId;
    }
 
-   
    /**
     * Gets data bytes
     *
@@ -88,7 +87,7 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag{
     * @throws IOException
     */
    public DefineMorphShapeTag(byte data[], int version, long pos) throws IOException {
-      super(46,"DefineMorphShape", data, pos);
+      super(46, "DefineMorphShape", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       characterId = sis.readUI16();
       startBounds = sis.readRECT();
@@ -100,14 +99,13 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag{
       endEdges = sis.readSHAPE(1);
    }
 
-
    @Override
    public RECT getRect() {
-      RECT rect=new RECT();
-      rect.Xmin=Math.min(startBounds.Xmin,endBounds.Xmin);
-      rect.Ymin=Math.min(startBounds.Ymin,endBounds.Ymin);
-      rect.Xmax=Math.max(startBounds.Xmax,endBounds.Xmax);
-      rect.Ymax=Math.max(startBounds.Ymax,endBounds.Ymax);
+      RECT rect = new RECT();
+      rect.Xmin = Math.min(startBounds.Xmin, endBounds.Xmin);
+      rect.Ymin = Math.min(startBounds.Ymin, endBounds.Ymin);
+      rect.Xmax = Math.max(startBounds.Xmax, endBounds.Xmax);
+      rect.Ymax = Math.max(startBounds.Ymax, endBounds.Ymax);
       return rect;
    }
 }

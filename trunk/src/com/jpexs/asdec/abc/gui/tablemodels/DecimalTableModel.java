@@ -40,7 +40,7 @@ public class DecimalTableModel implements TableModel {
     * @see #getColumnCount
     */
    public int getRowCount() {
-      if(abc==null){
+      if (abc == null) {
          return 0;
       }
       return abc.constants.constant_decimal.length;

@@ -23,14 +23,13 @@ import com.jpexs.asdec.types.RECT;
 import com.jpexs.asdec.types.SHAPEWITHSTYLE;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-public class DefineShape3Tag extends CharacterTag implements BoundedTag{
+public class DefineShape3Tag extends CharacterTag implements BoundedTag {
 
    public int shapeId;
    public RECT shapeBounds;
    public SHAPEWITHSTYLE shapes;
+
    @Override
    public RECT getRect() {
       return shapeBounds;
@@ -40,9 +39,9 @@ public class DefineShape3Tag extends CharacterTag implements BoundedTag{
    public int getCharacterID() {
       return shapeId;
    }
-   
+
    public DefineShape3Tag(byte[] data, int version, long pos) throws IOException {
-      super(32,"DefineShape3", data, pos);
+      super(32, "DefineShape3", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       shapeId = sis.readUI16();
       shapeBounds = sis.readRECT();

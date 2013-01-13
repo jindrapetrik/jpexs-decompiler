@@ -23,10 +23,8 @@ import com.jpexs.asdec.types.RECT;
 import com.jpexs.asdec.types.SHAPEWITHSTYLE;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-public class DefineShape4Tag extends CharacterTag implements BoundedTag{
+public class DefineShape4Tag extends CharacterTag implements BoundedTag {
 
    public int shapeId;
    public RECT shapeBounds;
@@ -40,12 +38,12 @@ public class DefineShape4Tag extends CharacterTag implements BoundedTag{
    public int getCharacterID() {
       return shapeId;
    }
-   
+
    @Override
    public RECT getRect() {
       return shapeBounds;
    }
-   
+
    public DefineShape4Tag(byte[] data, int version, long pos) throws IOException {
       super(83, "DefineShape4", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);

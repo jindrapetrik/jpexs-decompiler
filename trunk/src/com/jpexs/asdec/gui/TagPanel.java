@@ -16,7 +16,6 @@
  */
 package com.jpexs.asdec.gui;
 
-import com.jpexs.flashplayer.FlashPanel;
 import com.jpexs.asdec.SWF;
 import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.tags.DefineBitsJPEG2Tag;
@@ -52,6 +51,7 @@ import com.jpexs.asdec.types.MATRIX;
 import com.jpexs.asdec.types.RECT;
 import com.jpexs.asdec.types.RGB;
 import com.jpexs.asdec.types.TEXTRECORD;
+import com.jpexs.flashplayer.FlashPanel;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -64,8 +64,6 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -87,17 +85,17 @@ public class TagPanel extends JPanel implements ListSelectionListener {
 
    public TagPanel(List<Tag> list, SWF swf) {
       this.swf = swf;
-      for(Tag t:swf.tags){
-         if(t instanceof JPEGTablesTag){
-            jtt=(JPEGTablesTag)t;
+      for (Tag t : swf.tags) {
+         if (t instanceof JPEGTablesTag) {
+            jtt = (JPEGTablesTag) t;
          }
       }
       tagList = new JList(list.toArray(new Tag[list.size()]));
       tagList.addListSelectionListener(this);
-      tagList.setPreferredSize(new Dimension(200,1));
+      tagList.setPreferredSize(new Dimension(200, 1));
       tagList.setSize(200, 1);
-      setLayout(new BorderLayout());      
-      flashPanel = new FlashPanel();      
+      setLayout(new BorderLayout());
+      flashPanel = new FlashPanel();
       displayPanel = new JPanel(new CardLayout());
       displayPanel.add(flashPanel, CARDFLASHPANEL);
       imagePanel = new ImagePanel();
@@ -105,47 +103,41 @@ public class TagPanel extends JPanel implements ListSelectionListener {
       cl.show(displayPanel, CARDEMPTYPANEL);
       displayPanel.add(imagePanel, CARDIMAGEPANEL);
       displayPanel.add(new JPanel(), CARDEMPTYPANEL);
-      
+
       tagList.setBorder(BorderFactory.createLoweredBevelBorder());
       displayPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-      add(tagList,BorderLayout.WEST);
+      add(tagList, BorderLayout.WEST);
       add(displayPanel, BorderLayout.CENTER);
    }
    private File tempFile;
 
-   public void showCard(String card){
+   public void showCard(String card) {
       CardLayout cl = (CardLayout) (displayPanel.getLayout());
       cl.show(displayPanel, card);
    }
-   
+
    @Override
    public void valueChanged(ListSelectionEvent e) {
       Tag tagObj = (Tag) tagList.getSelectedValue();
-      if(tagObj instanceof DefineBitsTag){
+      if (tagObj instanceof DefineBitsTag) {
          showCard(CARDIMAGEPANEL);
-         imagePanel.setImage(((DefineBitsTag)tagObj).getFullImageData(jtt));
-      }else
-      if(tagObj instanceof DefineBitsJPEG2Tag){
+         imagePanel.setImage(((DefineBitsTag) tagObj).getFullImageData(jtt));
+      } else if (tagObj instanceof DefineBitsJPEG2Tag) {
          showCard(CARDIMAGEPANEL);
-         imagePanel.setImage(((DefineBitsJPEG2Tag)tagObj).imageData);
-      }else
-      if(tagObj instanceof DefineBitsJPEG3Tag){
+         imagePanel.setImage(((DefineBitsJPEG2Tag) tagObj).imageData);
+      } else if (tagObj instanceof DefineBitsJPEG3Tag) {
          showCard(CARDIMAGEPANEL);
-         imagePanel.setImage(((DefineBitsJPEG3Tag)tagObj).imageData);
-      }else
-      if(tagObj instanceof DefineBitsJPEG4Tag){
+         imagePanel.setImage(((DefineBitsJPEG3Tag) tagObj).imageData);
+      } else if (tagObj instanceof DefineBitsJPEG4Tag) {
          showCard(CARDIMAGEPANEL);
-         imagePanel.setImage(((DefineBitsJPEG4Tag)tagObj).imageData);
-      }else
-      if(tagObj instanceof DefineBitsLosslessTag){
+         imagePanel.setImage(((DefineBitsJPEG4Tag) tagObj).imageData);
+      } else if (tagObj instanceof DefineBitsLosslessTag) {
          showCard(CARDIMAGEPANEL);
-         imagePanel.setImage(((DefineBitsLosslessTag)tagObj).getImage());
-      }else
-      if(tagObj instanceof DefineBitsLossless2Tag){
+         imagePanel.setImage(((DefineBitsLosslessTag) tagObj).getImage());
+      } else if (tagObj instanceof DefineBitsLossless2Tag) {
          showCard(CARDIMAGEPANEL);
-         imagePanel.setImage(((DefineBitsLossless2Tag)tagObj).getImage());
-      }  else
-      if (((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag)) {
+         imagePanel.setImage(((DefineBitsLossless2Tag) tagObj).getImage());
+      } else if (((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag)) {
          try {
 
             if (tempFile != null) {
@@ -267,13 +259,13 @@ public class TagPanel extends JPanel implements ListSelectionListener {
             sos.writeUI32(sos.getPos() + data.length + 4);
             sos.write(data);
             fos.close();
-            showCard(CARDFLASHPANEL);            
+            showCard(CARDFLASHPANEL);
             flashPanel.displaySWF(tempFile.getAbsolutePath());
 
          } catch (Exception ex) {
             ex.printStackTrace();
          }
-         
+
       }
    }
 }

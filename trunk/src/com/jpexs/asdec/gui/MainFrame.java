@@ -58,6 +58,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.border.BevelBorder;
+
 /**
  *
  * @author Jindra
@@ -80,7 +81,7 @@ public class MainFrame extends JFrame implements ActionListener {
       }
       statusLabel.setText(s);
    }
-   
+
    public MainFrame(SWF swf) {
       setSize(1000, 700);
       tabPane = new JTabbedPane();
@@ -242,8 +243,8 @@ public class MainFrame extends JFrame implements ActionListener {
          tabPane.addTab("ActionScript3", abcPanel = new ABCPanel(abcList));
       } else {
          actionPanel = new ActionPanel(swf.tags);
-         if(actionPanel.tagTree.getRowCount()>1){
-            tabPane.addTab("ActionScript",actionPanel);
+         if (actionPanel.tagTree.getRowCount() > 1) {
+            tabPane.addTab("ActionScript", actionPanel);
          }
       }
 
@@ -256,7 +257,7 @@ public class MainFrame extends JFrame implements ActionListener {
       statusPanel.add(loadingPanel, BorderLayout.WEST);
       statusPanel.add(statusLabel, BorderLayout.CENTER);
       loadingPanel.setVisible(false);
-      add(statusPanel, BorderLayout.SOUTH);            
+      add(statusPanel, BorderLayout.SOUTH);
       View.centerScreen(this);
       Main.stopWork();
 
@@ -279,7 +280,7 @@ public class MainFrame extends JFrame implements ActionListener {
       for (Object t : list) {
          if (t instanceof Container) {
             getShapes(((Container) t).getSubItems(), shapes);
-         } 
+         }
          if ((t instanceof DefineShapeTag)
                  || (t instanceof DefineShape2Tag)
                  || (t instanceof DefineShape3Tag)
@@ -293,7 +294,7 @@ public class MainFrame extends JFrame implements ActionListener {
       for (Object t : list) {
          if (t instanceof Container) {
             getFonts(((Container) t).getSubItems(), fonts);
-         } 
+         }
          if ((t instanceof DefineFontTag)
                  || (t instanceof DefineFont2Tag)
                  || (t instanceof DefineFont3Tag)
@@ -307,7 +308,7 @@ public class MainFrame extends JFrame implements ActionListener {
       for (Object t : list) {
          if (t instanceof Container) {
             getActionScript3(((Container) t).getSubItems(), actionScripts);
-         } 
+         }
          if (t instanceof DoABCTag) {
             actionScripts.add((DoABCTag) t);
          }
@@ -318,7 +319,7 @@ public class MainFrame extends JFrame implements ActionListener {
       for (Object t : list) {
          if (t instanceof Container) {
             getMorphShapes(((Container) t).getSubItems(), morphShapes);
-         } 
+         }
          if ((t instanceof DefineMorphShapeTag) || (t instanceof DefineMorphShape2Tag)) {
             morphShapes.add((Tag) t);
          }
@@ -329,7 +330,7 @@ public class MainFrame extends JFrame implements ActionListener {
       for (Object t : list) {
          if (t instanceof Container) {
             getImages(((Container) t).getSubItems(), images);
-         } 
+         }
          if ((t instanceof DefineBitsTag)
                  || (t instanceof DefineBitsJPEG2Tag)
                  || (t instanceof DefineBitsJPEG3Tag)
@@ -345,7 +346,7 @@ public class MainFrame extends JFrame implements ActionListener {
       for (Object t : list) {
          if (t instanceof Container) {
             getTexts(((Container) t).getSubItems(), texts);
-         } 
+         }
          if ((t instanceof DefineTextTag)
                  || (t instanceof DefineText2Tag)
                  || (t instanceof DefineEditTextTag)) {
@@ -358,7 +359,7 @@ public class MainFrame extends JFrame implements ActionListener {
       for (Object t : list) {
          if (t instanceof Container) {
             getSprites(((Container) t).getSubItems(), sprites);
-         } 
+         }
          if (t instanceof DefineSpriteTag) {
             sprites.add((Tag) t);
          }
@@ -369,7 +370,7 @@ public class MainFrame extends JFrame implements ActionListener {
       for (Object t : list) {
          if (t instanceof Container) {
             getButtons(((Container) t).getSubItems(), buttons);
-         } 
+         }
          if ((t instanceof DefineButtonTag) || (t instanceof DefineButton2Tag)) {
             buttons.add((Tag) t);
          }

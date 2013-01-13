@@ -46,7 +46,7 @@ public class DoActionTag extends Tag implements ASMSource {
     * @throws IOException
     */
    public DoActionTag(byte[] data, int version, long pos) {
-      super(12, "DoAction",data, pos);
+      super(12, "DoAction", data, pos);
       try {
          ByteArrayInputStream bais = new ByteArrayInputStream(data);
          SWFInputStream sis = new SWFInputStream(bais, version);

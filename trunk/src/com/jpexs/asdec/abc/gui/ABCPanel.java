@@ -16,21 +16,16 @@
  */
 package com.jpexs.asdec.abc.gui;
 
-import com.jpexs.asdec.Configuration;
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.gui.tablemodels.*;
-import com.jpexs.asdec.gui.LoadingPanel;
 import com.jpexs.asdec.gui.View;
 import com.jpexs.asdec.tags.DoABCTag;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.event.*;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
@@ -55,14 +50,10 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
    public JSplitPane splitPaneTreeNavVSDecompiledDetail;
    private JTable constantTable;
    public JComboBox constantTypeList;
-   
-   
    public JLabel asmLabel = new JLabel("P-code source (editable)");
    public JLabel decLabel = new JLabel("ActionScript source");
    public DetailPanel detailPanel;
    public JTextField filterField = new JTextField("");
-
-   
 
    private JTable autoResizeColWidth(JTable table, TableModel model) {
       table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -160,30 +151,30 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
       updateConstList();
    }
 
-   public void initSplits(){            
-      splitPaneTreeVSNavigator.setDividerLocation(splitPaneTreeVSNavigator.getHeight()/2);
+   public void initSplits() {
+      splitPaneTreeVSNavigator.setDividerLocation(splitPaneTreeVSNavigator.getHeight() / 2);
       try {
          Thread.sleep(100);
       } catch (InterruptedException ex) {
          Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
       }
-      splitPaneTreeNavVSDecompiledDetail.setDividerLocation(splitPaneTreeNavVSDecompiledDetail.getWidth()*1/3);      
+      splitPaneTreeNavVSDecompiledDetail.setDividerLocation(splitPaneTreeNavVSDecompiledDetail.getWidth() * 1 / 3);
       try {
          Thread.sleep(100);
       } catch (InterruptedException ex) {
          Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
       }
-      splitPaneDecompiledVSDetail.setDividerLocation(splitPaneDecompiledVSDetail.getWidth()*1/2);       
-          
+      splitPaneDecompiledVSDetail.setDividerLocation(splitPaneDecompiledVSDetail.getWidth() * 1 / 2);
+
    }
-   
+
    public ABCPanel(List<DoABCTag> list) {
-     
+
 
       DefaultSyntaxKit.initKit();
 
       this.list = list;
-      if(list.size()>0){
+      if (list.size() > 0) {
          this.abc = list.get(listIndex).abc;
       }
       setLayout(new BorderLayout());
@@ -270,7 +261,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
       JTabbedPane tabbedPane = new JTabbedPane();
       tabbedPane.addTab("Scripts", splitPaneTreeVSNavigator);
       //tabbedPane.setTabPlacement(JTabbedPane.BOTTOM);
-              
+
       pan2.add(tabbedPane, BorderLayout.CENTER);
       abcComboBox.addItemListener(this);
 
@@ -283,18 +274,18 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
       //pan2.setPreferredSize(new Dimension(300, 200));
 
 
-      
+
 
 
       add(splitPaneTreeNavVSDecompiledDetail, BorderLayout.CENTER);
-      
-           
+
+
       JPanel panConstants = new JPanel();
       panConstants.setLayout(new BorderLayout());
       constantTypeList = new JComboBox(new String[]{"UINT", "INT", "DOUBLE", "DECIMAL", "STRING", "NAMESPACE", "NAMESPACESET", "MULTINAME"});
       constantTable = new JTable();
-      if(abc!=null){
-      autoResizeColWidth(constantTable, new UIntTableModel(abc));
+      if (abc != null) {
+         autoResizeColWidth(constantTable, new UIntTableModel(abc));
       }
       constantTable.setAutoCreateRowSorter(true);
 
@@ -322,15 +313,13 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
       panConstants.add(constantTypeList, BorderLayout.NORTH);
       panConstants.add(new JScrollPane(constantTable), BorderLayout.CENTER);
       tabbedPane.addTab("Constants", panConstants);
-      
+
 
    }
 
    public void doFilter() {
       classTree.applyFilter(filterField.getText());
    }
-
-   
 
    public void reload() {
       switchAbc(listIndex - 1);

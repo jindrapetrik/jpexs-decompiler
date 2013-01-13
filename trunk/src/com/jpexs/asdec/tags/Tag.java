@@ -37,18 +37,16 @@ public class Tag {
     */
    public boolean forceWriteAsLong = false;
    private final long pos;
-   
    protected String name;
 
    public String getName() {
       return name;
    }
 
-   public String getExportName(){
+   public String getExportName() {
       return getName();
    }
-   
-   
+
    /**
     * Returns identifier of tag type
     *

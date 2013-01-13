@@ -39,7 +39,7 @@ public class DoInitActionTag extends CharacterTag implements ASMSource {
     * List of actions to perform
     */
    //public List<Action> actions = new ArrayList<Action>();
-   public byte[] actionBytes; 
+   public byte[] actionBytes;
 
    /**
     * Constructor
@@ -49,7 +49,7 @@ public class DoInitActionTag extends CharacterTag implements ASMSource {
     * @throws IOException
     */
    public DoInitActionTag(byte[] data, int version, long pos) throws IOException {
-      super(59, "DoInitAction",data, pos);
+      super(59, "DoInitAction", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       spriteId = sis.readUI16();
       //actions = sis.readActionList();
@@ -74,7 +74,7 @@ public class DoInitActionTag extends CharacterTag implements ASMSource {
       } catch (IOException e) {
       }
       return baos.toByteArray();
-   }  
+   }
 
    /**
     * Whether or not this object contains ASM source

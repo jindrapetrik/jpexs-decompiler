@@ -62,7 +62,7 @@ public class DefineButton2Tag extends CharacterTag implements Container {
    public int getCharacterID() {
       return buttonId;
    }
-   
+
    /**
     * Constructor
     *
@@ -71,7 +71,7 @@ public class DefineButton2Tag extends CharacterTag implements Container {
     * @throws IOException
     */
    public DefineButton2Tag(byte data[], int version, long pos) throws IOException {
-      super(34,"DefineButton2", data, pos);
+      super(34, "DefineButton2", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       buttonId = sis.readUI16();
       sis.readUB(7); //reserved

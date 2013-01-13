@@ -35,7 +35,7 @@ public class FileAttributesTag extends Tag {
    private int reserved3;
 
    public FileAttributesTag(byte[] data, int version, long pos) throws IOException {
-      super(69,"FileAttributes", data, pos);
+      super(69, "FileAttributes", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       reserved1 = (int) sis.readUB(1); // reserved
       // UB[1] == 0  (reserved)
@@ -73,5 +73,4 @@ public class FileAttributesTag extends Tag {
       }
       return baos.toByteArray();
    }
-
 }

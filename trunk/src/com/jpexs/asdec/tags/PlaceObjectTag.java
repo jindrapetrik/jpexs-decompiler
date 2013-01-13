@@ -80,7 +80,7 @@ public class PlaceObjectTag extends Tag {
     * @throws IOException
     */
    public PlaceObjectTag(byte data[], int version, long pos) throws IOException {
-      super(4,"PlaceObject", data, pos);
+      super(4, "PlaceObject", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       characterId = sis.readUI16();
       depth = sis.readUI16();
@@ -91,13 +91,10 @@ public class PlaceObjectTag extends Tag {
    }
 
    public PlaceObjectTag(int characterId, int depth, MATRIX matrix, CXFORM colorTransform) {
-      super(4,"PlaceObject", new byte[0], 0);
+      super(4, "PlaceObject", new byte[0], 0);
       this.characterId = characterId;
       this.depth = depth;
       this.matrix = matrix;
       this.colorTransform = colorTransform;
    }
-
-   
-  
 }

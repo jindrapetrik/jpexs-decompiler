@@ -55,15 +55,13 @@ public class MATRIX {
    /**
     * Y translate value in twips
     */
-   public int translateY;   
-
+   public int translateY;
    public int bitsTranslate;
    public int bitsRotate;
    public int bitsScale;
+
    @Override
    public String toString() {
-      return "[MATRIX scale:"+scaleX+","+scaleY+", rotate:"+rotateSkew0+","+rotateSkew1+", translate:"+translateX+","+translateY+"]";
+      return "[MATRIX scale:" + scaleX + "," + scaleY + ", rotate:" + rotateSkew0 + "," + rotateSkew1 + ", translate:" + translateX + "," + translateY + "]";
    }
-   
-   
 }

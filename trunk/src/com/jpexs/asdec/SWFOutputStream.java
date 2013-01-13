@@ -307,9 +307,9 @@ public class SWFOutputStream extends OutputStream {
    public void writeSB(int nBits, long value) throws IOException {
       long tmp = value & 0x7FFFFFFF;
 
-		if (value < 0) {
-			tmp = tmp | (1L << (nBits - 1));
-		}
+      if (value < 0) {
+         tmp = tmp | (1L << (nBits - 1));
+      }
       writeUB(nBits, value);
    }
 
@@ -321,13 +321,12 @@ public class SWFOutputStream extends OutputStream {
     * @throws IOException
     */
    public void writeFB(int nBits, double value) throws IOException {
-      if(nBits==0){
+      if (nBits == 0) {
          return;
       }
       long longVal = (long) (value * (1 << 16));
       writeSB(nBits, longVal);
    }
-
 
    /**
     * Writes RECT value to the stream
@@ -373,9 +372,9 @@ public class SWFOutputStream extends OutputStream {
     * @throws IOException
     */
    public void writeTag(Tag tag) throws IOException {
-      byte data[] = tag.getData(version);     
+      byte data[] = tag.getData(version);
       int tagLength = data.length;
-      int tagID = tag.getId();       
+      int tagID = tag.getId();
       int tagIDLength = (tagID << 6);
       if ((tagLength < 0x3f) && (!tag.forceWriteAsLong)) {
          tagIDLength += tagLength;
@@ -387,6 +386,7 @@ public class SWFOutputStream extends OutputStream {
       }
       write(data);
    }
+
    /**
     * Calculates number of bits needed for representing unsigned value
     *
@@ -396,14 +396,14 @@ public class SWFOutputStream extends OutputStream {
    public static int getNeededBitsU(int value) {
       value = Math.abs(value);
       long x = 1;
-		int nBits;
+      int nBits;
 
-		for (nBits = 1; nBits <= 64; nBits++) {
-			x <<= 1;
-			if (x > value) {
-				break;
-			}
-		}
+      for (nBits = 1; nBits <= 64; nBits++) {
+         x <<= 1;
+         if (x > value) {
+            break;
+         }
+      }
       return nBits;
    }
 
@@ -414,17 +414,17 @@ public class SWFOutputStream extends OutputStream {
     * @return Number of bits
     */
    public static int getNeededBitsS(int v) {
-      if(v==0){
+      if (v == 0) {
          //return 0;
       }
-        int counter = 32;
-        int mask = 0x80000000;
-        final int val = (v < 0) ? -v : v;
-        while (((val & mask) == 0) && (counter > 0)) {
-            mask >>>= 1;
-            counter -= 1;
-        }
-        return counter + 1;
+      int counter = 32;
+      int mask = 0x80000000;
+      final int val = (v < 0) ? -v : v;
+      while (((val & mask) == 0) && (counter > 0)) {
+         mask >>>= 1;
+         counter -= 1;
+      }
+      return counter + 1;
    }
 
    private static long getIntPart(double value) {
@@ -441,34 +441,31 @@ public class SWFOutputStream extends OutputStream {
       return value + getIntPart(value);
    }
 
-   
    public static int unsignedSize(final int value) {
 
-        final int val = (value < 0) ? -value - 1 : value;
-        int counter = 32;
-        int mask = 0x80000000;
+      final int val = (value < 0) ? -value - 1 : value;
+      int counter = 32;
+      int mask = 0x80000000;
 
-        while (((val & mask) == 0) && (counter > 0)) {
-            mask >>>= 1;
-            counter -= 1;
-        }
-        return counter;
-    }            
-   
+      while (((val & mask) == 0) && (counter > 0)) {
+         mask >>>= 1;
+         counter -= 1;
+      }
+      return counter;
+   }
 
-   
    /**
     * Calculates number of bits needed for representing fixed-point value
     *
     * @param value Fixed-point value
     * @return Number of bits
     */
-   public static int getNeededBitsF(float value) {     
+   public static int getNeededBitsF(float value) {
       //0.26213074  16bits
       //0.5 17bits
       //1.3476715 18bits
-      int k=(int)value;
-      return getNeededBitsS(k)+16;
+      int k = (int) value;
+      return getNeededBitsS(k) + 16;
    }
 
    private int enlargeBitCountU(int currentBitCount, int value) {
@@ -504,7 +501,7 @@ public class SWFOutputStream extends OutputStream {
    public void writeMatrix(MATRIX value) throws IOException {
       writeUB(1, value.hasScale ? 1 : 0);
       if (value.hasScale) {
-         int nBits=0;
+         int nBits = 0;
          nBits = enlargeBitCountS(nBits, value.scaleX);
          nBits = enlargeBitCountS(nBits, value.scaleY);
          writeUB(5, nBits);
@@ -520,12 +517,12 @@ public class SWFOutputStream extends OutputStream {
          writeSB(nBits, value.rotateSkew0);
          writeSB(nBits, value.rotateSkew1);
       }
-      int NTranslateBits=0;
+      int NTranslateBits = 0;
       NTranslateBits = enlargeBitCountS(NTranslateBits, value.translateX);
       NTranslateBits = enlargeBitCountS(NTranslateBits, value.translateY);
-            
+
       writeUB(5, NTranslateBits);
-      
+
       writeSB(NTranslateBits, value.translateX);
       writeSB(NTranslateBits, value.translateY);
       alignByte();

@@ -43,7 +43,7 @@ public class DefineVideoStreamTag extends CharacterTag {
    public int getCharacterID() {
       return characterID;
    }
-   
+
    /**
     * Gets data bytes
     *
@@ -77,7 +77,7 @@ public class DefineVideoStreamTag extends CharacterTag {
     * @throws IOException
     */
    public DefineVideoStreamTag(byte data[], int version, long pos) throws IOException {
-      super(60, "DefineVideoStream",data, pos);
+      super(60, "DefineVideoStream", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       characterID = sis.readUI16();
       numFrames = sis.readUI16();
@@ -88,5 +88,4 @@ public class DefineVideoStreamTag extends CharacterTag {
       videoFlagsSmoothing = sis.readUB(1) == 1;
       codecID = sis.readUI8();
    }
-
 }

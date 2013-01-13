@@ -66,10 +66,9 @@ public class SetTabIndexTag extends Tag {
     * @throws IOException
     */
    public SetTabIndexTag(byte data[], int version, long pos) throws IOException {
-      super(66,"SetTabIndex", data, pos);
+      super(66, "SetTabIndex", data, pos);
       SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       depth = sis.readUI16();
       tabIndex = sis.readUI16();
    }
-
 }
