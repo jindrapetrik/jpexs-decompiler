@@ -153,15 +153,12 @@ public class TagPanel extends JPanel implements ListSelectionListener {
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             SWFOutputStream sos2 = new SWFOutputStream(baos, 10);
-            int width = 8000;
-            int height = 6000;
-            RECT rct = new RECT();
-            rct.Ymax = height;
-            rct.Xmax = width;
-            sos2.writeRECT(rct);
+            int width = swf.displayRect.Xmax - swf.displayRect.Xmin;
+            int height = swf.displayRect.Ymax - swf.displayRect.Ymin;
+            sos2.writeRECT(swf.displayRect);
             sos2.writeUI8(0);
-            sos2.writeUI8(30);
-            sos2.writeUI16(1); //framecnt
+            sos2.writeUI8(swf.frameRate);
+            sos2.writeUI16(100); //framecnt
             //sos2.writeTag(new SetBackgroundColorTag(new RGB(255, 0, 255)));
             for (Tag tag : swf.tags) {
                if ((!(tag instanceof PlaceObjectTag))
@@ -202,43 +199,36 @@ public class TagPanel extends JPanel implements ListSelectionListener {
             }
             if (tagObj instanceof FontTag) {
 
-               int countGlyphs = 0;
-               int fontId = 0;
-               if (tagObj instanceof DefineFontTag) {
-                  countGlyphs = ((DefineFontTag) tagObj).glyphShapeTable.length;
-                  fontId = ((DefineFontTag) tagObj).fontId;
-               }
-               if (tagObj instanceof DefineFont2Tag) {
-                  countGlyphs = ((DefineFont2Tag) tagObj).glyphShapeTable.length;
-                  fontId = ((DefineFont2Tag) tagObj).fontId;
-               }
-               if (tagObj instanceof DefineFont3Tag) {
-                  countGlyphs = ((DefineFont3Tag) tagObj).glyphShapeTable.length;
-                  fontId = ((DefineFont3Tag) tagObj).fontId;
-               }
-
-               List<TEXTRECORD> rec = new ArrayList<TEXTRECORD>();
-               TEXTRECORD tr = new TEXTRECORD();
-               tr.fontId = fontId;
-               tr.styleFlagsHasFont = true;
-               tr.textHeight = 460;
-               tr.glyphEntries = new GLYPHENTRY[countGlyphs];
-               tr.styleFlagsHasColor = true;
-               tr.textColor = new RGB(0, 0, 0);
-               int adv = 300;
-               int maxadv = 0;
-               for (int f = 0; f < countGlyphs; f++) {
-                  tr.glyphEntries[f] = new GLYPHENTRY();
-                  tr.glyphEntries[f].glyphAdvance = adv;
-                  adv += 300;
-                  if (adv > maxadv) {
-                     maxadv = adv;
+               int countGlyphs = ((FontTag) tagObj).getGlyphShapeTable().length;
+               int fontId = ((FontTag) tagObj).getFontId();
+               int sloupcu=(int)Math.ceil(Math.sqrt(countGlyphs));
+               int radku=(int)Math.ceil(((float)countGlyphs)/((float)sloupcu));
+               int x=0;
+               int y=1;
+               for (int f = 0; f < countGlyphs; f++) {                                    
+                  if(x>=sloupcu){
+                     x=0;
+                     y++;
                   }
-                  tr.glyphEntries[f].glyphIndex = f;
+                  List<TEXTRECORD> rec = new ArrayList<TEXTRECORD>();
+                  TEXTRECORD tr = new TEXTRECORD();
+                  int textHeight=height/radku;
+                  tr.fontId = fontId;
+                  tr.styleFlagsHasFont = true;
+                  tr.textHeight = textHeight;
+                  tr.glyphEntries = new GLYPHENTRY[1];
+                  tr.styleFlagsHasColor = true;
+                  tr.textColor = new RGB(0, 0, 0);
+                  tr.glyphEntries[0] = new GLYPHENTRY();
+                  tr.glyphEntries[0].glyphAdvance = 0;
+                  tr.glyphEntries[0].glyphIndex = f;
+                  rec.add(tr);
+                  mat.translateX=x*width/sloupcu;
+                  mat.translateY=y*height/radku;
+                  sos2.writeTag(new DefineTextTag(999 + f, new RECT(0, width, 0, height), new MATRIX(), SWFOutputStream.getNeededBitsU(countGlyphs - 1), SWFOutputStream.getNeededBitsU(0), rec));
+                  sos2.writeTag(new PlaceObject2Tag(false, false, false, true, false, true, true, false, 1+f, 999 + f, mat, null, 0, null, 0, null));
+                  x++;
                }
-               rec.add(tr);
-               sos2.writeTag(new DefineTextTag(999, new RECT(0, width, 0, height), new MATRIX(), SWFOutputStream.getNeededBitsU(countGlyphs - 1), SWFOutputStream.getNeededBitsU(maxadv), rec));
-               sos2.writeTag(new PlaceObject2Tag(false, false, false, true, false, true, true, false, 1, 999, mat, null, 0, null, 0, null));
                sos2.writeTag(new ShowFrameTag());
             } else if ((tagObj instanceof DefineMorphShapeTag) || (tagObj instanceof DefineMorphShape2Tag)) {
                sos2.writeTag(new PlaceObject2Tag(false, false, false, true, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null));

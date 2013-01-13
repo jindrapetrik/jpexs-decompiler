@@ -83,4 +83,14 @@ public class DefineFontTag extends Tag implements FontTag {
          glyphShapeTable[i] = sis.readSHAPE(1);
       }
    }
+
+   @Override
+   public int getFontId() {
+      return fontId;
+   }
+
+   @Override
+   public SHAPE[] getGlyphShapeTable() {
+      return glyphShapeTable;
+   }
 }

@@ -18,6 +18,7 @@ package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.tags.base.BoundedTag;
 import com.jpexs.asdec.tags.base.CharacterTag;
 import com.jpexs.asdec.types.RECT;
 import com.jpexs.asdec.types.RGBA;
@@ -31,7 +32,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class DefineEditTextTag extends CharacterTag {
+public class DefineEditTextTag extends CharacterTag implements BoundedTag {
 
    public int characterID;
    public RECT bounds;
@@ -64,6 +65,11 @@ public class DefineEditTextTag extends CharacterTag {
    public String variableName;
    public String initialText;
 
+   @Override
+   public RECT getRect() {
+      return bounds;
+   }
+   
    @Override
    public int getCharacterID() {
       return characterID;

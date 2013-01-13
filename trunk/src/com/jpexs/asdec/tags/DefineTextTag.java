@@ -18,6 +18,7 @@ package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
+import com.jpexs.asdec.tags.base.BoundedTag;
 import com.jpexs.asdec.tags.base.CharacterTag;
 import com.jpexs.asdec.types.MATRIX;
 import com.jpexs.asdec.types.RECT;
@@ -34,7 +35,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class DefineTextTag extends CharacterTag {
+public class DefineTextTag extends CharacterTag implements BoundedTag {
 
    public int characterID;
    public RECT textBounds;
@@ -104,5 +105,10 @@ public class DefineTextTag extends CharacterTag {
       while ((tr = sis.readTEXTRECORD(false, glyphBits, advanceBits)) != null) {
          textRecords.add(tr);
       }
+   }
+
+   @Override
+   public RECT getRect() {
+      return textBounds;
    }
 }

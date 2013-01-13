@@ -198,4 +198,14 @@ public class DefineFont3Tag extends Tag implements FontTag {
       }
       return baos.toByteArray();
    }
+
+   @Override
+   public int getFontId() {
+      return fontId;
+   }
+
+   @Override
+   public SHAPE[] getGlyphShapeTable() {
+      return glyphShapeTable;
+   }
 }

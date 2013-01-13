@@ -207,4 +207,14 @@ public class DefineFont2Tag extends Tag implements FontTag {
          }
       }
    }
+   
+   @Override
+   public int getFontId() {
+      return fontId;
+   }
+
+   @Override
+   public SHAPE[] getGlyphShapeTable() {
+      return glyphShapeTable;
+   }
 }
