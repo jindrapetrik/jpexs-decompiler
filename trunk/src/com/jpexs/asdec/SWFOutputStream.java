@@ -1348,6 +1348,7 @@ public class SWFOutputStream extends OutputStream {
       for (GLYPHENTRY ge : value.glyphEntries) {
          writeGLYPHENTRY(ge, glyphBits, advanceBits);
       }
+      alignByte();
    }
 
    /**

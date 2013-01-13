@@ -1931,8 +1931,9 @@ public class SWFInputStream extends InputStream {
       int glyphCount = readUI8();
       ret.glyphEntries = new GLYPHENTRY[glyphCount];
       for (int i = 0; i < glyphCount; i++) {
-         ret.glyphEntries[i] = readGLYPHENTRY(glyphBits, advanceBits);
+         ret.glyphEntries[i] = readGLYPHENTRY(glyphBits, advanceBits);         
       }
+      alignByte();
       return ret;
    }
 
