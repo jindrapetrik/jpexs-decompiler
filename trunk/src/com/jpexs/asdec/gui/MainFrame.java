@@ -1,11 +1,8 @@
 package com.jpexs.asdec.gui;
 
-import com.jpexs.flashplayer.FlashPanel;
 import com.jpexs.asdec.Configuration;
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.SWF;
-import com.jpexs.asdec.SWFInputStream;
-import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.abc.gui.ABCPanel;
 import com.jpexs.asdec.abc.gui.TreeLeafScript;
 import com.jpexs.asdec.action.gui.ActionPanel;
@@ -32,44 +29,21 @@ import com.jpexs.asdec.tags.DefineSpriteTag;
 import com.jpexs.asdec.tags.DefineText2Tag;
 import com.jpexs.asdec.tags.DefineTextTag;
 import com.jpexs.asdec.tags.DoABCTag;
-import com.jpexs.asdec.tags.DoActionTag;
 import com.jpexs.asdec.tags.DoInitActionTag;
-import com.jpexs.asdec.tags.EndTag;
 import com.jpexs.asdec.tags.ExportAssetsTag;
-import com.jpexs.asdec.tags.PlaceObject2Tag;
-import com.jpexs.asdec.tags.PlaceObject3Tag;
-import com.jpexs.asdec.tags.PlaceObjectTag;
-import com.jpexs.asdec.tags.RemoveObject2Tag;
-import com.jpexs.asdec.tags.RemoveObjectTag;
-import com.jpexs.asdec.tags.SetBackgroundColorTag;
 import com.jpexs.asdec.tags.ShowFrameTag;
 import com.jpexs.asdec.tags.Tag;
 import com.jpexs.asdec.tags.base.ASMSource;
-import com.jpexs.asdec.tags.base.BoundedTag;
-import com.jpexs.asdec.tags.base.CharacterTag;
 import com.jpexs.asdec.tags.base.Container;
-import com.jpexs.asdec.tags.base.FontTag;
-import com.jpexs.asdec.types.GLYPHENTRY;
-import com.jpexs.asdec.types.MATRIX;
-import com.jpexs.asdec.types.RECT;
-import com.jpexs.asdec.types.RGB;
-import com.jpexs.asdec.types.TEXTRECORD;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -82,23 +56,14 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTree;
 import javax.swing.border.BevelBorder;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import com.jpexs.flashplayer.FlashPanel;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 /**
  *
  * @author Jindra
  */
 public class MainFrame extends JFrame implements ActionListener {
 
-   FlashPanel fPanel;
    private SWF swf;
    public ABCPanel abcPanel;
    public ActionPanel actionPanel;
@@ -231,7 +196,6 @@ public class MainFrame extends JFrame implements ActionListener {
       objs.addAll(swf.tags);
       this.swf = swf;
       getContentPane().setLayout(new BorderLayout());
-      fPanel = new FlashPanel(400, 400);
       List<Tag> shapes = new ArrayList<Tag>();
       List<Tag> images = new ArrayList<Tag>();
       List<Tag> morphShapes = new ArrayList<Tag>();
@@ -282,14 +246,6 @@ public class MainFrame extends JFrame implements ActionListener {
             tabPane.addTab("ActionScript",actionPanel);
          }
       }
-
-
-      addWindowListener(new WindowAdapter() {
-         @Override
-         public void windowClosing(WindowEvent e) {
-            fPanel.dispose();
-         }
-      });
 
 
       loadingPanel.setPreferredSize(new Dimension(30, 30));

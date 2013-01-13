@@ -54,11 +54,14 @@ import com.jpexs.asdec.types.RGB;
 import com.jpexs.asdec.types.TEXTRECORD;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.BorderFactory;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -91,8 +94,10 @@ public class TagPanel extends JPanel implements ListSelectionListener {
       }
       tagList = new JList(list.toArray(new Tag[list.size()]));
       tagList.addListSelectionListener(this);
+      tagList.setPreferredSize(new Dimension(200,1));
+      tagList.setSize(200, 1);
       setLayout(new BorderLayout());      
-      flashPanel = new FlashPanel(400, 400);      
+      flashPanel = new FlashPanel();      
       displayPanel = new JPanel(new CardLayout());
       displayPanel.add(flashPanel, CARDFLASHPANEL);
       imagePanel = new ImagePanel();
@@ -101,9 +106,10 @@ public class TagPanel extends JPanel implements ListSelectionListener {
       displayPanel.add(imagePanel, CARDIMAGEPANEL);
       displayPanel.add(new JPanel(), CARDEMPTYPANEL);
       
-      JSplitPane sp=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(tagList), new JScrollPane(displayPanel));
-      sp.setDividerLocation(200);
-      add(sp, BorderLayout.CENTER);
+      tagList.setBorder(BorderFactory.createLoweredBevelBorder());
+      displayPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+      add(tagList,BorderLayout.WEST);
+      add(displayPanel, BorderLayout.CENTER);
    }
    private File tempFile;
 
@@ -261,19 +267,13 @@ public class TagPanel extends JPanel implements ListSelectionListener {
             sos.writeUI32(sos.getPos() + data.length + 4);
             sos.write(data);
             fos.close();
+            showCard(CARDFLASHPANEL);            
             flashPanel.displaySWF(tempFile.getAbsolutePath());
 
-            (new Thread() {
-               @Override
-               public void run() {
-                  while (!tagList.requestFocusInWindow())
-                        ;
-               }
-            }).start();
-
          } catch (Exception ex) {
+            ex.printStackTrace();
          }
-         showCard(CARDFLASHPANEL);
+         
       }
    }
 }
