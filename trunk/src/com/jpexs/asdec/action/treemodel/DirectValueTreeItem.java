@@ -32,6 +32,26 @@ public class DirectValueTreeItem extends TreeItem {
       this.value = value;
    }
 
+   public String toStringNoQuotes(ConstantPool constants){
+      if (value instanceof Double) {
+         if (Double.compare((double) (Double) value, 0) == 0) {
+            return "0";
+         }
+      }
+      if (value instanceof Float) {
+         if (Float.compare((float) (Float) value, 0) == 0) {
+            return "0";
+         }
+      }
+      if (value instanceof String) {
+         return Helper.escapeString((String) value);
+      }
+      if (value instanceof ConstantIndex) {
+         return (this.constants.get(((ConstantIndex) value).index));
+      }
+      return value.toString();
+   }
+   
    @Override
    public String toString(ConstantPool constants) {
       if (value instanceof Double) {

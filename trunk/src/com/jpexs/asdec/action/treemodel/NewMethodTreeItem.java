@@ -43,19 +43,25 @@ public class NewMethodTreeItem extends TreeItem {
          paramStr += arguments.get(t).toString(constants);
       }
       boolean blankMethod = false;
+      String methodNameStr="";
       if (methodName instanceof DirectValueTreeItem) {
          if (((DirectValueTreeItem) methodName).value instanceof Undefined) {
             blankMethod = true;
-         }
+         }else
          if (((DirectValueTreeItem) methodName).value instanceof String) {
             if (((DirectValueTreeItem) methodName).value.equals("")) {
                blankMethod = true;
             }
+            methodNameStr=((DirectValueTreeItem) methodName).toStringNoQuotes(constants);
+         }else{
+            methodNameStr=methodName.toString(constants);
          }
+      }else{
+         methodNameStr=methodName.toString(constants);
       }
       if (blankMethod) {
          return scriptObject.toString(constants) + "(" + paramStr + ")";
       }
-      return "new " + scriptObject.toString(constants) + "." + methodName.toString(constants) + "(" + paramStr + ")";
+      return "new " + scriptObject.toString(constants) + "." + methodNameStr + "(" + paramStr + ")";
    }
 }
