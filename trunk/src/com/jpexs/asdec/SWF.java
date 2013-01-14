@@ -18,7 +18,6 @@ package com.jpexs.asdec;
 
 import SevenZip.Compression.LZMA.Encoder;
 import com.jpexs.asdec.action.TagNode;
-import com.jpexs.asdec.helpers.Highlighting;
 import com.jpexs.asdec.tags.DefineBitsJPEG2Tag;
 import com.jpexs.asdec.tags.DefineBitsJPEG3Tag;
 import com.jpexs.asdec.tags.DefineBitsJPEG4Tag;
@@ -28,7 +27,6 @@ import com.jpexs.asdec.tags.DefineBitsTag;
 import com.jpexs.asdec.tags.DoABCTag;
 import com.jpexs.asdec.tags.JPEGTablesTag;
 import com.jpexs.asdec.tags.Tag;
-import com.jpexs.asdec.tags.base.ASMSource;
 import com.jpexs.asdec.types.RECT;
 import java.io.*;
 import java.util.ArrayList;
@@ -373,14 +371,12 @@ public class SWF {
       if (!asV3Found) {
          List<Object> list2 = new ArrayList<Object>();
          list2.addAll(tags);
-         List<TagNode> list=TagNode.createTagList(list2);
+         List<TagNode> list = TagNode.createTagList(list2);
          TagNode.setExport(list, true);
          return TagNode.exportNode(list, outdir, isPcode);
       }
       return asV3Found;
    }
-
-   
    protected HashSet<EventListener> listeners = new HashSet<EventListener>();
 
    public void addEventListener(EventListener listener) {

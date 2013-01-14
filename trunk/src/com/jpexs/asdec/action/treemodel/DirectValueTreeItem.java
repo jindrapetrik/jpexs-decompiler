@@ -32,7 +32,7 @@ public class DirectValueTreeItem extends TreeItem {
       this.value = value;
    }
 
-   public String toStringNoQuotes(ConstantPool constants){
+   public String toStringNoQuotes(ConstantPool constants) {
       if (value instanceof Double) {
          if (Double.compare((double) (Double) value, 0) == 0) {
             return "0";
@@ -51,7 +51,7 @@ public class DirectValueTreeItem extends TreeItem {
       }
       return value.toString();
    }
-   
+
    @Override
    public String toString(ConstantPool constants) {
       if (value instanceof Double) {

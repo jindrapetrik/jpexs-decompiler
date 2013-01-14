@@ -30,7 +30,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Extends the functionality of the PlaceObject2Tag
@@ -310,5 +312,14 @@ public class PlaceObject3Tag extends Tag implements Container {
          return 0;
       }
       return clipActions.clipActionRecords.size();
+   }
+
+   @Override
+   public Set<Integer> getNeededCharacters() {
+      Set<Integer> ret = new HashSet<Integer>();
+      if (placeFlagHasCharacter) {
+         ret.add(characterId);
+      }
+      return ret;
    }
 }

@@ -28,7 +28,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -110,5 +112,16 @@ public class DefineTextTag extends CharacterTag implements BoundedTag {
    @Override
    public RECT getRect() {
       return textBounds;
+   }
+
+   @Override
+   public Set<Integer> getNeededCharacters() {
+      Set<Integer> ret = new HashSet<Integer>();
+      for (TEXTRECORD tr : textRecords) {
+         if (tr.styleFlagsHasFont) {
+            ret.add(tr.fontId);
+         }
+      }
+      return ret;
    }
 }

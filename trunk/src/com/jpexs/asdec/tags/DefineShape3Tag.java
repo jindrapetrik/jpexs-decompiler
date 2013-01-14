@@ -25,7 +25,7 @@ import com.jpexs.asdec.types.SHAPEWITHSTYLE;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-public class DefineShape3Tag extends CharacterTag implements BoundedTag,AloneTag {
+public class DefineShape3Tag extends CharacterTag implements BoundedTag, AloneTag {
 
    public int shapeId;
    public RECT shapeBounds;

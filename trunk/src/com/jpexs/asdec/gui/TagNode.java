@@ -16,7 +16,6 @@
  */
 package com.jpexs.asdec.gui;
 
-import com.jpexs.asdec.gui.TagNode;
 import com.jpexs.asdec.tags.DefineBitsJPEG2Tag;
 import com.jpexs.asdec.tags.DefineBitsJPEG3Tag;
 import com.jpexs.asdec.tags.DefineBitsJPEG4Tag;

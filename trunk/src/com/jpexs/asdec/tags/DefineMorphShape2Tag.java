@@ -35,7 +35,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag,AloneTag {
+public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, AloneTag {
 
    public int characterId;
    public RECT startBounds;

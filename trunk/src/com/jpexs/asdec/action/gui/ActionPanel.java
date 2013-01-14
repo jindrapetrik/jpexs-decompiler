@@ -18,7 +18,6 @@ package com.jpexs.asdec.action.gui;
 
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.SWF;
-import com.jpexs.asdec.abc.gui.TreeElement;
 import com.jpexs.asdec.action.TagNode;
 import com.jpexs.asdec.action.parser.ASMParser;
 import com.jpexs.asdec.action.parser.ParseException;

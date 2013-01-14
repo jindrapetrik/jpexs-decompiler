@@ -600,13 +600,13 @@ public class MainFrame extends JFrame implements ActionListener {
                               Main.startWork("Exporting " + (i + 1) + "/" + tlsList.size() + " " + tls.abc.script_info[tls.scriptIndex].getPath(tls.abc) + " ...");
                               tls.abc.script_info[tls.scriptIndex].export(tls.abc, abcPanel.list, selFile, isPcode);
                            }
-                        } else if(actionPanel!=null) {
-                           List<com.jpexs.asdec.action.TagNode> nodes=actionPanel.getSelectedNodes();
+                        } else if (actionPanel != null) {
+                           List<com.jpexs.asdec.action.TagNode> nodes = actionPanel.getSelectedNodes();
                            if (nodes.isEmpty()) {
                               JOptionPane.showMessageDialog(null, "No nodes selected!");
                            }
-                           com.jpexs.asdec.action.gui.TagTreeModel ttm=(com.jpexs.asdec.action.gui.TagTreeModel)actionPanel.tagTree.getModel();
-                           List<com.jpexs.asdec.action.TagNode> allnodes=ttm.getNodeList();
+                           com.jpexs.asdec.action.gui.TagTreeModel ttm = (com.jpexs.asdec.action.gui.TagTreeModel) actionPanel.tagTree.getModel();
+                           List<com.jpexs.asdec.action.TagNode> allnodes = ttm.getNodeList();
                            com.jpexs.asdec.action.TagNode.setExport(allnodes, false);
                            com.jpexs.asdec.action.TagNode.setExport(nodes, true);
                            com.jpexs.asdec.action.TagNode.exportNode(allnodes, selFile, isPcode);

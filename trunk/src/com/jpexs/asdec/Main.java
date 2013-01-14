@@ -77,9 +77,7 @@ public class Main {
       return commandLineMode;
    }
    public static boolean DEBUG_COPY = false;
-   
    public static boolean FLASH_PLAYER = true;
-   
    /**
     * Debug mode = throwing an error when comparing original file and recompiled
     */

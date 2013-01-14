@@ -25,30 +25,19 @@ import com.jpexs.asdec.tags.DefineBitsJPEG4Tag;
 import com.jpexs.asdec.tags.DefineBitsLossless2Tag;
 import com.jpexs.asdec.tags.DefineBitsLosslessTag;
 import com.jpexs.asdec.tags.DefineBitsTag;
-import com.jpexs.asdec.tags.DefineFont2Tag;
-import com.jpexs.asdec.tags.DefineFont3Tag;
-import com.jpexs.asdec.tags.DefineFontTag;
 import com.jpexs.asdec.tags.DefineMorphShape2Tag;
 import com.jpexs.asdec.tags.DefineMorphShapeTag;
-import com.jpexs.asdec.tags.DefineSpriteTag;
 import com.jpexs.asdec.tags.DefineTextTag;
-import com.jpexs.asdec.tags.DoABCTag;
-import com.jpexs.asdec.tags.DoActionTag;
-import com.jpexs.asdec.tags.DoInitActionTag;
 import com.jpexs.asdec.tags.EndTag;
 import com.jpexs.asdec.tags.JPEGTablesTag;
 import com.jpexs.asdec.tags.PlaceObject2Tag;
-import com.jpexs.asdec.tags.PlaceObject3Tag;
-import com.jpexs.asdec.tags.PlaceObjectTag;
-import com.jpexs.asdec.tags.RemoveObject2Tag;
-import com.jpexs.asdec.tags.RemoveObjectTag;
 import com.jpexs.asdec.tags.SetBackgroundColorTag;
 import com.jpexs.asdec.tags.ShowFrameTag;
-import com.jpexs.asdec.tags.SymbolClassTag;
 import com.jpexs.asdec.tags.Tag;
 import com.jpexs.asdec.tags.base.AloneTag;
 import com.jpexs.asdec.tags.base.BoundedTag;
 import com.jpexs.asdec.tags.base.CharacterTag;
+import com.jpexs.asdec.tags.base.Container;
 import com.jpexs.asdec.tags.base.FontTag;
 import com.jpexs.asdec.types.GLYPHENTRY;
 import com.jpexs.asdec.types.MATRIX;
@@ -59,15 +48,19 @@ import com.jpexs.flashplayer.FlashPanel;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -86,6 +79,18 @@ public class TagPanel extends JPanel implements ListSelectionListener {
    final static String CARDIMAGEPANEL = "Image card";
    final static String CARDEMPTYPANEL = "Empty card";
    private JPEGTablesTag jtt;
+   private HashMap<Integer, CharacterTag> characters;
+
+   private void parseCharacters(List<Object> list) {
+      for (Object t : list) {
+         if (t instanceof CharacterTag) {
+            characters.put(((CharacterTag) t).getCharacterID(), (CharacterTag) t);
+         }
+         if (t instanceof Container) {
+            parseCharacters(((Container) t).getSubItems());
+         }
+      }
+   }
 
    public TagPanel(List<Tag> list, SWF swf) {
       this.swf = swf;
@@ -94,10 +99,13 @@ public class TagPanel extends JPanel implements ListSelectionListener {
             jtt = (JPEGTablesTag) t;
          }
       }
+      characters = new HashMap<Integer, CharacterTag>();
+      List<Object> list2 = new ArrayList<Object>();
+      list2.addAll(swf.tags);
+      parseCharacters(list2);
       tagList = new JList(list.toArray(new Tag[list.size()]));
       tagList.addListSelectionListener(this);
-      tagList.setPreferredSize(new Dimension(200, 1));
-      tagList.setSize(200, 1);
+
       setLayout(new BorderLayout());
       if (Main.FLASH_PLAYER) {
          flashPanel = new FlashPanel();
@@ -114,7 +122,7 @@ public class TagPanel extends JPanel implements ListSelectionListener {
 
       tagList.setBorder(BorderFactory.createLoweredBevelBorder());
       displayPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-      add(tagList, BorderLayout.WEST);
+      add(new JScrollPane(tagList), BorderLayout.WEST);
       add(displayPanel, BorderLayout.CENTER);
    }
    private File tempFile;
@@ -168,34 +176,25 @@ public class TagPanel extends JPanel implements ListSelectionListener {
             sos2.writeUI8(swf.frameRate);
             sos2.writeUI16(100); //framecnt
             sos2.writeTag(new SetBackgroundColorTag(new RGB(255, 255, 255)));
-
-            if (tagObj instanceof AloneTag) {
-               sos2.writeTag(tagObj);
+            if (tagObj instanceof DefineBitsTag) {
+               if (jtt != null) {
+                  sos2.writeTag(jtt);
+               }
+            } else if (tagObj instanceof AloneTag) {
             } else {
-               for (Tag tag : swf.tags) {
-                  if ((!(tag instanceof PlaceObjectTag))
-                          && (!(tag instanceof PlaceObject2Tag))
-                          && (!(tag instanceof PlaceObject3Tag))
-                          && (!(tag instanceof RemoveObjectTag))
-                          && (!(tag instanceof RemoveObject2Tag))
-                          && (!(tag instanceof DoActionTag))
-                          && (!(tag instanceof DoInitActionTag))
-                          && (!(tag instanceof DoABCTag))
-                          && (!(tag instanceof SymbolClassTag))
-                          && (!(tag instanceof ShowFrameTag))
-                          && (!(tag instanceof SetBackgroundColorTag))) {
-                     sos2.writeTag(tag);
-                  }
+               Set<Integer> needed = tagObj.getNeededCharacters();
+               for (int n : needed) {
+                  sos2.writeTag(characters.get(n));
                }
             }
 
+            sos2.writeTag(tagObj);
 
             int chtId = 0;
             if (tagObj instanceof CharacterTag) {
                chtId = ((CharacterTag) tagObj).getCharacterID();
             }
 
-            //sos2.writeTag((Tag) tagObj);
             MATRIX mat = new MATRIX();
             mat.hasRotate = false;
             mat.hasScale = false;
@@ -269,7 +268,7 @@ public class TagPanel extends JPanel implements ListSelectionListener {
             }
 
          } catch (Exception ex) {
-            
+            Logger.getLogger(TagPanel.class.getName()).log(Level.SEVERE, null, ex);
          }
 
       }

@@ -34,11 +34,11 @@ public class TagTreeModel implements TreeModel {
       list2.addAll(list);
       this.list = TagNode.createTagList(list2);
    }
-         
-   public List<TagNode> getNodeList(){
+
+   public List<TagNode> getNodeList() {
       return list;
    }
-   
+
    public Object getRoot() {
       return root;
    }

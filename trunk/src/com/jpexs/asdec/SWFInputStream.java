@@ -1931,7 +1931,7 @@ public class SWFInputStream extends InputStream {
       int glyphCount = readUI8();
       ret.glyphEntries = new GLYPHENTRY[glyphCount];
       for (int i = 0; i < glyphCount; i++) {
-         ret.glyphEntries[i] = readGLYPHENTRY(glyphBits, advanceBits);         
+         ret.glyphEntries[i] = readGLYPHENTRY(glyphBits, advanceBits);
       }
       alignByte();
       return ret;
@@ -2236,13 +2236,10 @@ public class SWFInputStream extends InputStream {
                dataLen += 4;
                pix24.add(readPIX24());
             }
-            dataLen++;
          }
-         x--;
-         while ((x % 4) != 0) {
+         while ((dataLen % 4) != 0) {
             dataLen++;
             readUI8();
-            x++;
          }
       }
       if (bitmapFormat == DefineBitsLosslessTag.FORMAT_15BIT_RGB) {

@@ -19,6 +19,7 @@ package com.jpexs.asdec.tags;
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.abc.CopyOutputStream;
+import com.jpexs.asdec.tags.base.CharacterTag;
 import com.jpexs.asdec.tags.base.FontTag;
 import com.jpexs.asdec.types.KERNINGRECORD;
 import com.jpexs.asdec.types.LANGCODE;
@@ -34,7 +35,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class DefineFont2Tag extends Tag implements FontTag {
+public class DefineFont2Tag extends CharacterTag implements FontTag {
 
    public int fontId;
    public boolean fontFlagsHasLayout;
@@ -207,7 +208,7 @@ public class DefineFont2Tag extends Tag implements FontTag {
          }
       }
    }
-   
+
    @Override
    public int getFontId() {
       return fontId;
@@ -216,5 +217,10 @@ public class DefineFont2Tag extends Tag implements FontTag {
    @Override
    public SHAPE[] getGlyphShapeTable() {
       return glyphShapeTable;
+   }
+
+   @Override
+   public int getCharacterID() {
+      return fontId;
    }
 }

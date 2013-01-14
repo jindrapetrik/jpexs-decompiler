@@ -24,6 +24,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Adds character to the display list
@@ -96,5 +98,12 @@ public class PlaceObjectTag extends Tag {
       this.depth = depth;
       this.matrix = matrix;
       this.colorTransform = colorTransform;
+   }
+
+   @Override
+   public Set<Integer> getNeededCharacters() {
+      Set<Integer> ret = new HashSet<Integer>();
+      ret.add(characterId);
+      return ret;
    }
 }

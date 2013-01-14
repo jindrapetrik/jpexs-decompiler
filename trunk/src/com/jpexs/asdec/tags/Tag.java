@@ -16,7 +16,9 @@
  */
 package com.jpexs.asdec.tags;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represents Tag inside SWF file
@@ -113,5 +115,9 @@ public class Tag {
 
    public long getPos() {
       return pos;
+   }
+
+   public Set<Integer> getNeededCharacters() {
+      return new HashSet<Integer>();
    }
 }

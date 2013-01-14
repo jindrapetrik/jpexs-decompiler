@@ -502,12 +502,12 @@ public class Action {
             }
             if (stripped.startsWith("continue ")) {
                if (loopStack.size() > 0) {
-                  int pos=loopStack.size()-1;
-                  String loopname="";
-                  do{
-                     loopname=loopStack.get(pos);                     
+                  int pos = loopStack.size() - 1;
+                  String loopname = "";
+                  do {
+                     loopname = loopStack.get(pos);
                      pos--;
-                  }while((pos>=0)&&(loopname.startsWith("loopswitch")));
+                  } while ((pos >= 0) && (loopname.startsWith("loopswitch")));
                   if (stripped.equals("continue " + loopname + ";")) {
                      parts[p] = parts[p].replace(" " + loopname, "");
                   }
@@ -591,7 +591,7 @@ public class Action {
 
          return treeToString(tree);
       } catch (Exception ex) {
-         Logger.getLogger(Action.class.getName()).log(Level.SEVERE,null,ex);
+         Logger.getLogger(Action.class.getName()).log(Level.SEVERE, null, ex);
          return "//Decompilation error :" + ex.getLocalizedMessage();
       }
    }
@@ -605,7 +605,7 @@ public class Action {
     * @return List of treeItems
     */
    public static List<TreeItem> actionsToTree(HashMap<Integer, String> regNames, List<Action> actions, int version) {
-      Stack<TreeItem> stack=new Stack<TreeItem>();
+      Stack<TreeItem> stack = new Stack<TreeItem>();
       return actionsToTree(regNames, new ArrayList<Long>(), new ArrayList<Loop>(), getActionsAllIfsOrJumps(actions), stack, new ConstantPool(), actions, 0, actions.size() - 1, version);
    }
 
@@ -641,35 +641,35 @@ public class Action {
          long addr = ip2adr(actions, ip, version);
          if (unknownJumps.contains(addr)) {
             unknownJumps.remove(new Long(addr));
-           /* boolean switchFound = false;
-            for (int i = output.size() - 1; i >= 0; i--) {
-               if (output.get(i) instanceof SwitchTreeItem) {
-                  if (((SwitchTreeItem) output.get(i)).defaultCommands == null) {
-                     List<ContinueTreeItem> continues = ((SwitchTreeItem) output.get(i)).getContinues();
-                     boolean breakFound = false;
-                     for (ContinueTreeItem cti : continues) {
-                        if (cti.loopPos == addr) {
-                           cti.isKnown = true;
-                           cti.isBreak = true;
-                           ((SwitchTreeItem) output.get(i)).loopBreak = addr;
-                           breakFound = true;
-                        }
-                     }
-                     if (breakFound) {
-                        switchFound = true;
-                        ((SwitchTreeItem) output.get(i)).defaultCommands = new ArrayList<TreeItem>();
-                        for (int k = i + 1; k < output.size(); k++) {
-                           ((SwitchTreeItem) output.get(i)).defaultCommands.add(output.remove(i + 1));
-                        }
-                     }
-                  }
-                  break;
-               }
-            }*/
-           /* if (!switchFound) {        
-               throw new UnknownJumpException(stack, addr, output);
-            }*/
-            
+            /* boolean switchFound = false;
+             for (int i = output.size() - 1; i >= 0; i--) {
+             if (output.get(i) instanceof SwitchTreeItem) {
+             if (((SwitchTreeItem) output.get(i)).defaultCommands == null) {
+             List<ContinueTreeItem> continues = ((SwitchTreeItem) output.get(i)).getContinues();
+             boolean breakFound = false;
+             for (ContinueTreeItem cti : continues) {
+             if (cti.loopPos == addr) {
+             cti.isKnown = true;
+             cti.isBreak = true;
+             ((SwitchTreeItem) output.get(i)).loopBreak = addr;
+             breakFound = true;
+             }
+             }
+             if (breakFound) {
+             switchFound = true;
+             ((SwitchTreeItem) output.get(i)).defaultCommands = new ArrayList<TreeItem>();
+             for (int k = i + 1; k < output.size(); k++) {
+             ((SwitchTreeItem) output.get(i)).defaultCommands.add(output.remove(i + 1));
+             }
+             }
+             }
+             break;
+             }
+             }*/
+            /* if (!switchFound) {        
+             throw new UnknownJumpException(stack, addr, output);
+             }*/
+
             throw new UnknownJumpException(stack, addr, output);
          }
          if (ip > end) {
@@ -965,7 +965,7 @@ public class Action {
                      }
                   }
                } while (ip < end);
-               loopList.add(new Loop(-1,ip2adr(actions,ip,version)));
+               loopList.add(new Loop(-1, ip2adr(actions, ip, version)));
                for (int i = 0; i < caseBodyIps.size(); i++) {
                   int caseEnd = ip - 1;
                   if (i < caseBodyIps.size() - 1) {

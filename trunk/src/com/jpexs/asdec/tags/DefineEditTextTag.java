@@ -69,7 +69,7 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag {
    public RECT getRect() {
       return bounds;
    }
-   
+
    @Override
    public int getCharacterID() {
       return characterID;

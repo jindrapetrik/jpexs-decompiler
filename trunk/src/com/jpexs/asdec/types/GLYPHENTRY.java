@@ -27,8 +27,6 @@ public class GLYPHENTRY {
 
    @Override
    public String toString() {
-      return "[GLYPHENTRY index="+glyphIndex+", advance="+glyphAdvance+"]";
+      return "[GLYPHENTRY index=" + glyphIndex + ", advance=" + glyphAdvance + "]";
    }
-   
-   
 }

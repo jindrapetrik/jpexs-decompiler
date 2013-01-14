@@ -36,6 +36,6 @@ public class ContinueTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return hilight(isBreak ? "break" : "continue") + " " + (isKnown ? "loop" : "unk") + loopPos+";";
+      return hilight(isBreak ? "break" : "continue") + " " + (isKnown ? "loop" : "unk") + loopPos + ";";
    }
 }

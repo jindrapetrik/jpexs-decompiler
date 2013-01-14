@@ -27,7 +27,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Defines a sprite character
@@ -125,5 +127,14 @@ public class DefineSpriteTag extends CharacterTag implements Container {
    @Override
    public List<Tag> getSubTags() {
       return subTags;
+   }
+
+   @Override
+   public Set<Integer> getNeededCharacters() {
+      Set<Integer> ret = new HashSet<Integer>();
+      for (Tag t : subTags) {
+         ret.addAll(t.getNeededCharacters());
+      }
+      return ret;
    }
 }
