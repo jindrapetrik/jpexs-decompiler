@@ -31,6 +31,7 @@ import com.jpexs.asdec.tags.DefineTextTag;
 import com.jpexs.asdec.tags.DoABCTag;
 import com.jpexs.asdec.tags.DoInitActionTag;
 import com.jpexs.asdec.tags.ExportAssetsTag;
+import com.jpexs.asdec.tags.JPEGTablesTag;
 import com.jpexs.asdec.tags.ShowFrameTag;
 import com.jpexs.asdec.tags.Tag;
 import com.jpexs.asdec.tags.base.ASMSource;
@@ -81,6 +82,13 @@ public class MainFrame extends JFrame implements ActionListener {
       }
       statusLabel.setText(s);
    }
+   private TagPanel imagesTagPanel;
+   private TagPanel shapesTagPanel;
+   private TagPanel morphshapesTagPanel;
+   private TagPanel spritesTagPanel;
+   private TagPanel textsTagPanel;
+   private TagPanel buttonsTagPanel;
+   private TagPanel fontsTagPanel;
 
    public MainFrame(SWF swf) {
       setSize(1000, 700);
@@ -124,8 +132,13 @@ public class MainFrame extends JFrame implements ActionListener {
       miExportAllPCode.setActionCommand("EXPORTPCODE");
       miExportAllPCode.addActionListener(this);
 
+      JMenuItem miExportImages = new JMenuItem("Images...");
+      miExportImages.setActionCommand("EXPORTIMAGES");
+      miExportImages.addActionListener(this);
+
       menuExportAll.add(miExportAllAS);
       menuExportAll.add(miExportAllPCode);
+      menuExportAll.add(miExportImages);
 
 
       JMenu menuExportSel = new JMenu("Export selection");
@@ -139,8 +152,13 @@ public class MainFrame extends JFrame implements ActionListener {
       miExportSelPCode.setActionCommand("EXPORTPCODESEL");
       miExportSelPCode.addActionListener(this);
 
+      JMenuItem miExportSelImages = new JMenuItem("Images...");
+      miExportSelImages.setActionCommand("EXPORTIMAGESSEL");
+      miExportSelImages.addActionListener(this);
+
       menuExportSel.add(miExportSelAS);
       menuExportSel.add(miExportSelPCode);
+      menuExportSel.add(miExportSelImages);
 
 
       menuFile.add(miOpen);
@@ -227,25 +245,25 @@ public class MainFrame extends JFrame implements ActionListener {
       }
 
       if (!shapes.isEmpty()) {
-         tabPane.addTab("Shapes", new TagPanel(shapes, swf));
+         tabPane.addTab("Shapes", shapesTagPanel = new TagPanel(shapes, swf));
       }
       if (!morphShapes.isEmpty()) {
-         tabPane.addTab("MorphShapes", new TagPanel(morphShapes, swf));
+         tabPane.addTab("MorphShapes", morphshapesTagPanel = new TagPanel(morphShapes, swf));
       }
       if (!images.isEmpty()) {
-         tabPane.addTab("Images", new TagPanel(images, swf));
+         tabPane.addTab("Images", imagesTagPanel = new TagPanel(images, swf));
       }
       if (!sprites.isEmpty()) {
-         tabPane.addTab("Sprites", new TagPanel(sprites, swf));
+         tabPane.addTab("Sprites", spritesTagPanel = new TagPanel(sprites, swf));
       }
       if (!fonts.isEmpty()) {
-         tabPane.addTab("Fonts", new TagPanel(fonts, swf));
+         tabPane.addTab("Fonts", fontsTagPanel = new TagPanel(fonts, swf));
       }
       if (!texts.isEmpty()) {
-         tabPane.addTab("Texts", new TagPanel(texts, swf));
+         tabPane.addTab("Texts", textsTagPanel = new TagPanel(texts, swf));
       }
       if (!buttons.isEmpty()) {
-         tabPane.addTab("Buttons", new TagPanel(buttons, swf));
+         tabPane.addTab("Buttons", buttonsTagPanel = new TagPanel(buttons, swf));
       }
       /*tabPane.addTab("Tags", new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(tagTree), new JScrollPane(fPanel)));*/
 
@@ -585,12 +603,32 @@ public class MainFrame extends JFrame implements ActionListener {
             Configuration.setConfig("lastExportDir", chooser.getSelectedFile().getParentFile().getAbsolutePath());
             final boolean isPcode = e.getActionCommand().startsWith("EXPORTPCODE");
             final boolean onlySel = e.getActionCommand().endsWith("SEL");
+            final boolean images = e.getActionCommand().startsWith("EXPORTIMAGES");
             (new Thread() {
                @Override
                public void run() {
                   try {
                      if (onlySel) {
-                        if (abcPanel != null) {
+                        if (images) {
+                           if (imagesTagPanel != null) {
+                              List<Tag> list = new ArrayList<Tag>();
+
+                              Object lob[] = imagesTagPanel.tagList.getSelectedValues();
+                              for (Object o : lob) {
+                                 if (o instanceof Tag) {
+                                    list.add((Tag) o);
+                                 }
+                              }
+                              JPEGTablesTag jtt = null;
+                              for (Tag t : swf.tags) {
+                                 if (t instanceof JPEGTablesTag) {
+                                    jtt = (JPEGTablesTag) t;
+                                    break;
+                                 }
+                              }
+                              SWF.exportImages(selFile, list, jtt);
+                           }
+                        } else if (abcPanel != null) {
                            List<TreeLeafScript> tlsList = abcPanel.classTree.getSelectedScripts();
                            if (tlsList.isEmpty()) {
                               JOptionPane.showMessageDialog(null, "No script selected!");
@@ -612,7 +650,11 @@ public class MainFrame extends JFrame implements ActionListener {
                            com.jpexs.asdec.action.TagNode.exportNode(allnodes, selFile, isPcode);
                         }
                      } else {
-                        Main.swf.exportActionScript(selFile, isPcode);
+                        if (images) {
+                           Main.swf.exportImages(selFile);
+                        } else {
+                           Main.swf.exportActionScript(selFile, isPcode);
+                        }
                      }
                   } catch (Exception ignored) {
                      JOptionPane.showMessageDialog(null, "Cannot write to the file");

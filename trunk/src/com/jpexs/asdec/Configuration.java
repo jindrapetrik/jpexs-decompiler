@@ -21,6 +21,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 public class Configuration {
 
@@ -128,12 +130,17 @@ public class Configuration {
    }
 
    public static void save() {
+      File f = new File(getASDecHome());
+      if (!f.exists()) {
+         f.mkdir();
+      }
       ObjectOutputStream oos = null;
       try {
          oos = new ObjectOutputStream(new FileOutputStream(getConfigFile()));
          oos.writeObject(config);
-      } catch (FileNotFoundException ex) {
       } catch (IOException ex) {
+         JOptionPane.showMessageDialog(null, "Cannot save configuration.\nPlease make application directory writable.", "Error", JOptionPane.ERROR_MESSAGE);
+         Logger.getLogger(SWFInputStream.class.getName()).severe("Configuration directory is read only.");
       } finally {
          if (oos != null) {
             try {

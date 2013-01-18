@@ -16,7 +16,6 @@
  */
 package com.jpexs.asdec.gui;
 
-import com.jpexs.asdec.Main;
 import com.jpexs.asdec.SWF;
 import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.tags.DefineBitsJPEG2Tag;
@@ -51,6 +50,7 @@ import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +58,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -80,6 +81,14 @@ public class TagPanel extends JPanel implements ListSelectionListener {
    final static String CARDEMPTYPANEL = "Empty card";
    private JPEGTablesTag jtt;
    private HashMap<Integer, CharacterTag> characters;
+
+   static {
+      try {
+         File.createTempFile("temp", ".swf").delete(); //First call to this is slow, so make it first
+      } catch (IOException ex) {
+         Logger.getLogger(TagPanel.class.getName()).log(Level.SEVERE, null, ex);
+      }
+   }
 
    private void parseCharacters(List<Object> list) {
       for (Object t : list) {
@@ -107,12 +116,19 @@ public class TagPanel extends JPanel implements ListSelectionListener {
       tagList.addListSelectionListener(this);
 
       setLayout(new BorderLayout());
-      if (Main.FLASH_PLAYER) {
+      try {
          flashPanel = new FlashPanel();
+      } catch (Error e) {
+         e.printStackTrace();
       }
       displayPanel = new JPanel(new CardLayout());
-      if (Main.FLASH_PLAYER) {
+      if (flashPanel != null) {
          displayPanel.add(flashPanel, CARDFLASHPANEL);
+      } else {
+         JPanel swtPanel = new JPanel(new BorderLayout());
+         swtPanel.add(new JLabel("<html><center>Preview of this object is not available on this platform. (Windows only)</center></html>", JLabel.CENTER), BorderLayout.CENTER);
+         swtPanel.setBackground(Color.white);
+         displayPanel.add(swtPanel, CARDFLASHPANEL);
       }
       imagePanel = new ImagePanel();
       CardLayout cl = (CardLayout) (displayPanel.getLayout());
@@ -263,8 +279,10 @@ public class TagPanel extends JPanel implements ListSelectionListener {
             sos.write(data);
             fos.close();
             showCard(CARDFLASHPANEL);
-            if (Main.FLASH_PLAYER) {
-               flashPanel.displaySWF(tempFile.getAbsolutePath());
+            if (flashPanel != null) {
+               if (flashPanel instanceof FlashPanel) {
+                  flashPanel.displaySWF(tempFile.getAbsolutePath());
+               }
             }
 
          } catch (Exception ex) {

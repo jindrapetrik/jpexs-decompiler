@@ -31,11 +31,11 @@ public class View {
    /**
     * Sets windows Look and Feel
     */
-   public static void setWinLookAndFeel() {
+   public static void setLookAndFeel() {
       try {
 
          UIManager.setLookAndFeel(
-                 "com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+                 UIManager.getSystemLookAndFeelClassName());
       } catch (UnsupportedLookAndFeelException ignored) {
       } catch (ClassNotFoundException ignored) {
       } catch (InstantiationException ignored) {

@@ -393,7 +393,7 @@ public class SWF {
       }
    }
 
-   private String getImageFormat(byte data[]) {
+   private static String getImageFormat(byte data[]) {
       if (hasErrorHeader(data)) {
          return "jpg";
       }
@@ -426,14 +426,7 @@ public class SWF {
       return false;
    }
 
-   public void exportImages(String outdir) throws IOException {
-      JPEGTablesTag jtt = null;
-      for (Tag t : tags) {
-         if (t instanceof JPEGTablesTag) {
-            jtt = (JPEGTablesTag) t;
-         }
-      }
-
+   public static void exportImages(String outdir, List<Tag> tags, JPEGTablesTag jtt) throws IOException {
       for (Tag t : tags) {
          if ((t instanceof DefineBitsJPEG2Tag) || (t instanceof DefineBitsJPEG3Tag) || (t instanceof DefineBitsJPEG4Tag)) {
             byte imageData[] = null;
@@ -495,5 +488,16 @@ public class SWF {
             }
          }
       }
+   }
+
+   public void exportImages(String outdir) throws IOException {
+      JPEGTablesTag jtt = null;
+      for (Tag t : tags) {
+         if (t instanceof JPEGTablesTag) {
+            jtt = (JPEGTablesTag) t;
+         }
+      }
+      exportImages(outdir, tags, jtt);
+
    }
 }

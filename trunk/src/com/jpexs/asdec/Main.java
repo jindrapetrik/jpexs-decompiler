@@ -29,7 +29,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.*;
+import java.lang.management.ManagementFactory;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
@@ -77,7 +79,6 @@ public class Main {
       return commandLineMode;
    }
    public static boolean DEBUG_COPY = false;
-   public static boolean FLASH_PLAYER = true;
    /**
     * Debug mode = throwing an error when comparing original file and recompiled
     */
@@ -414,12 +415,94 @@ public class Main {
       System.out.println("java -jar ASDec.jar -decompress myfiledec.swf myfile.swf");
    }
 
+   private static void copyFile(String from, String to) throws IOException {
+      FileInputStream fis = new FileInputStream(from);
+      FileOutputStream fos = new FileOutputStream(to);
+      byte buf[] = new byte[4096];
+      int cnt = 0;
+      while ((cnt = fis.read(buf)) > 0) {
+         fos.write(buf, 0, cnt);
+      }
+      fis.close();
+      fos.close();
+   }
+
+   public static void restartApplication2(String[] args) {
+      StringBuilder cmd = new StringBuilder();
+      cmd.append(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java ");
+      for (String jvmArg : ManagementFactory.getRuntimeMXBean().getInputArguments()) {
+         cmd.append(jvmArg + " ");
+      }
+      cmd.append("-cp ").append(ManagementFactory.getRuntimeMXBean().getClassPath()).append(" ");
+      cmd.append(Main.class.getName()).append(" ");
+      for (String arg : args) {
+         cmd.append(arg).append(" ");
+      }
+
+      try {
+         Runtime.getRuntime().exec(cmd.toString());
+      } catch (IOException ex) {
+      }
+      System.exit(0);
+   }
+
+   public static void restartApplication() {
+      try {
+         System.out.println("1");
+         final String javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
+         final File currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+
+         System.out.println("currentJar=" + currentJar);
+         /* is it a jar file? */
+         if (!currentJar.getName().endsWith(".jar")) {
+            return;
+         }
+
+         /* Build command: java -jar application.jar */
+         final ArrayList<String> command = new ArrayList<String>();
+         command.add(javaBin);
+         command.add("-jar");
+         command.add(currentJar.getPath());
+
+         final ProcessBuilder builder = new ProcessBuilder(command);
+         builder.start();
+      } catch (Exception ex) {
+         ex.printStackTrace();;
+      }
+      System.exit(0);
+   }
+
+   public static void checkSWT(String[] args) {
+      if (System.getProperty("os.name").toLowerCase().indexOf("win") == -1) {
+         return;
+      }
+      String lastBits = (String) Configuration.getConfig("bits", "-");
+      if ((!System.getProperty("sun.arch.data.model").equals(lastBits)) || (!(new File("lib/swt.jar")).exists())) {
+         try {
+            if (System.getProperty("sun.arch.data.model").equals("32")) {
+               copyFile("lib/swt32.jar", "lib/swt.jar");
+            } else if (System.getProperty("sun.arch.data.model").equals("64")) {
+               copyFile("lib/swt64.jar", "lib/swt.jar");
+            }
+         } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, "Cannot copy SWT library.\nPlease make application directory writeable.\n(Placing outside of Program files may help)", "Error", JOptionPane.ERROR_MESSAGE);
+            Logger.getLogger(SWFInputStream.class.getName()).severe("Cannot copy SWT library");
+            System.exit(1);
+         }
+         Configuration.setConfig("bits", System.getProperty("sun.arch.data.model"));
+         Configuration.save();
+         restartApplication2(args);
+      }
+   }
+
    /**
     * @param args the command line arguments
     */
    public static void main(String[] args) throws IOException {
-      View.setWinLookAndFeel();
+      View.setLookAndFeel();
       Configuration.load();
+      checkSWT(args);
+
       int pos = 0;
       if (args.length > 0) {
          if (args[0].equals("-debug")) {
