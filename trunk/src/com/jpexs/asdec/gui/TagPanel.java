@@ -130,12 +130,11 @@ public class TagPanel extends JPanel implements ListSelectionListener {
          swtPanel.setBackground(Color.white);
          displayPanel.add(swtPanel, CARDFLASHPANEL);
       }
-      imagePanel = new ImagePanel();
-      CardLayout cl = (CardLayout) (displayPanel.getLayout());
-      cl.show(displayPanel, CARDEMPTYPANEL);
+      imagePanel = new ImagePanel();     
       displayPanel.add(imagePanel, CARDIMAGEPANEL);
       displayPanel.add(new JPanel(), CARDEMPTYPANEL);
-
+      CardLayout cl = (CardLayout) (displayPanel.getLayout());
+      cl.show(displayPanel, CARDEMPTYPANEL);
       tagList.setBorder(BorderFactory.createLoweredBevelBorder());
       displayPanel.setBorder(BorderFactory.createLineBorder(Color.black));
       add(new JScrollPane(tagList), BorderLayout.WEST);
