@@ -131,7 +131,7 @@ public class MainFrame extends JFrame implements ActionListener {
       miSave.setActionCommand("SAVE");
       miSave.addActionListener(this);
       JMenuItem miSaveAs = new JMenuItem("Save as...");
-      miSaveAs.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/save16.png")));
+      miSaveAs.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/saveas16.png")));
       miSaveAs.setActionCommand("SAVEAS");
       miSaveAs.addActionListener(this);
       JMenu menuExportAll = new JMenu("Export all");
