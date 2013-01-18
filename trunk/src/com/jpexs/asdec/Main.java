@@ -139,10 +139,16 @@ public class Main {
    }
 
    public static void startWork(String name) {
+      startWork(name, -1);
+   }
+   public static void startWork(String name,int percent) {
       working = true;
       if (mainFrame != null) {
-         if (mainFrame.abcPanel != null) {
-            mainFrame.setStatus(name);
+         mainFrame.setStatus(name);
+         if(percent==-1){
+            mainFrame.hidePercent();
+         }else{
+            mainFrame.setPercent(percent);
          }
       }
       /*if (actionMainFrame != null) {
@@ -150,6 +156,11 @@ public class Main {
        }*/
       if (loadingDialog != null) {
          loadingDialog.setDetail(name);
+         if(percent==-1){
+            loadingDialog.hidePercent();
+         }else{
+            loadingDialog.setPercent(percent);
+         }
       }
       if (Main.isCommandLineMode()) {
          System.out.println(name);
@@ -163,9 +174,6 @@ public class Main {
             mainFrame.setStatus("");
          }
       }
-      /*if (actionMainFrame != null) {
-       actionMainFrame.setStatus("");
-       }*/
       if (loadingDialog != null) {
          loadingDialog.setDetail("");
       }
@@ -174,7 +182,13 @@ public class Main {
    public static SWF parseSWF(String file) throws Exception {
       FileInputStream fis = new FileInputStream(file);
       InputStream bis = new BufferedInputStream(fis);
-      SWF locswf = new SWF(bis);
+      SWF locswf = new SWF(bis, new PercentListener() {
+
+         @Override
+         public void percent(int p) {
+            startWork("Reading SWF",p);
+         }
+      });
       locswf.addEventListener(new EventListener() {
          public void handleEvent(String event, Object data) {
             if (event.equals("export")) {

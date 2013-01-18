@@ -57,6 +57,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JTabbedPane;
 import javax.swing.border.BevelBorder;
 
@@ -73,7 +74,19 @@ public class MainFrame extends JFrame implements ActionListener {
    public LoadingPanel loadingPanel = new LoadingPanel(20, 20);
    public JLabel statusLabel = new JLabel("");
    public JPanel statusPanel = new JPanel();
+   public JProgressBar progressBar = new JProgressBar(0, 100);
 
+   public void setPercent(int percent){
+      progressBar.setValue(percent);
+      progressBar.setVisible(true);
+   }
+   
+   public void hidePercent(){
+      if(progressBar.isVisible()){
+         progressBar.setVisible(false);
+      }
+   }
+   
    public void setStatus(String s) {
       if (s.equals("")) {
          loadingPanel.setVisible(false);
@@ -277,7 +290,7 @@ public class MainFrame extends JFrame implements ActionListener {
       statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
       statusPanel.setLayout(new BorderLayout());
       statusPanel.add(loadingPanel, BorderLayout.WEST);
-      statusPanel.add(statusLabel, BorderLayout.CENTER);
+      statusPanel.add(statusLabel, BorderLayout.CENTER);      
       loadingPanel.setVisible(false);
       add(statusPanel, BorderLayout.SOUTH);
       View.centerScreen(this);

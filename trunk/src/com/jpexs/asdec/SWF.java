@@ -174,13 +174,17 @@ public class SWF {
 
    }
 
+   public SWF(InputStream is) throws IOException {
+      this(is, null);
+   }
+
    /**
     * Construct SWF from stream
     *
     * @param is Stream to read SWF from
     * @throws IOException
     */
-   public SWF(InputStream is) throws IOException {
+   public SWF(InputStream is, PercentListener listener) throws IOException {
       byte hdr[] = new byte[3];
       is.read(hdr);
       String shdr = new String(hdr);
@@ -188,9 +192,9 @@ public class SWF {
          throw new IOException("Invalid SWF file");
       }
       version = is.read();
-      SWFInputStream sis = new SWFInputStream(is, version, 4);
+      SWFInputStream sis = new SWFInputStream(is, version, 4);      
       fileSize = sis.readUI32();
-
+      
       if (hdr[0] == 'C') {
          sis = new SWFInputStream(new InflaterInputStream(is), version, 8);
          compressed = true;
@@ -218,8 +222,10 @@ public class SWF {
       }
 
 
-
-
+      if (listener != null) {
+         sis.addPercentListener(listener);
+      }
+      sis.setPercentMax(fileSize);
       displayRect = sis.readRECT();
       // FIXED8 (16 bit fixed point) frameRate
       int tmpFirstByetOfFrameRate = sis.readUI8();

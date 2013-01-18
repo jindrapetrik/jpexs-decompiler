@@ -18,7 +18,7 @@ package com.jpexs.asdec;
 
 /**
  *
- * @author Jindra
+ * @author JPEXS
  */
 public interface EventListener {
 

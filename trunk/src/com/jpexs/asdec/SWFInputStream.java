@@ -52,6 +52,23 @@ public class SWFInputStream extends InputStream {
    private long pos;
    private int version;
    private static final Logger log = Logger.getLogger(SWFInputStream.class.getName());
+   private List<PercentListener> listeners = new ArrayList<PercentListener>();
+   private long percentMax;
+
+   public void addPercentListener(PercentListener listener) {
+      listeners.add(listener);
+   }
+
+   public void removePercentListener(PercentListener listener) {
+      int index = listeners.indexOf(listener);
+      if (index > -1) {
+         listeners.remove(index);
+      }
+   }
+   
+   public void setPercentMax(long percentMax){
+      this.percentMax=percentMax;
+   }
 
    /**
     * Constructor
@@ -92,9 +109,8 @@ public class SWFInputStream extends InputStream {
     */
    @Override
    public int read() throws IOException {
-      pos++;
       bitPos = 0;
-      return is.read();
+      return readNoBitReset();
    }
 
    @Override
@@ -108,9 +124,19 @@ public class SWFInputStream extends InputStream {
    private void alignByte() {
       bitPos = 0;
    }
+   private int lastPercent = -1;
 
    private int readNoBitReset() throws IOException {
-      pos++;
+      pos++;      
+      if(percentMax>0){
+         int percent = (int) (pos * 100 / percentMax);
+         if (lastPercent != percent) {
+            for (PercentListener pl : listeners) {
+               pl.percent(percent);
+            }
+            lastPercent = percent;
+         }
+      }
       return is.read();
    }
 

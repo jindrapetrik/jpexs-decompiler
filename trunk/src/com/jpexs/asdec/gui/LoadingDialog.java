@@ -24,6 +24,8 @@ import java.awt.event.WindowEvent;
 import java.awt.image.ImageObserver;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 
 /**
@@ -33,14 +35,26 @@ import javax.swing.SwingConstants;
  */
 public class LoadingDialog extends JFrame implements ImageObserver {
 
-   private JLabel loadingLabel = new JLabel("");
+   private JLabel loadingLabel = new JLabel("",JLabel.CENTER);
    private LoadingPanel loadingPanel;
    String load = "Loading, please wait...";
-
+   JProgressBar progressBar = new JProgressBar(0,100);
    public void setDetail(String d) {
       loadingLabel.setText("<html><center>" + load + "<br>" + d + "</center></html>");
+      loadingLabel.setHorizontalAlignment( SwingConstants.CENTER );
    }
 
+   public void setPercent(int percent){
+      progressBar.setValue(percent);
+      progressBar.setVisible(true);
+   }
+   
+   public void hidePercent(){
+      if(progressBar.isVisible()){
+         progressBar.setVisible(false);
+      }
+   }
+   
    /**
     * Constructor
     */
@@ -53,7 +67,17 @@ public class LoadingDialog extends JFrame implements ImageObserver {
       loadingPanel = new LoadingPanel(50, 50);
       loadingPanel.setPreferredSize(new Dimension(100, 100));
       add(loadingPanel, BorderLayout.WEST);
-      add(loadingLabel, BorderLayout.CENTER);
+      JPanel pan=new JPanel();
+      pan.setLayout(null);
+      pan.setPreferredSize(new Dimension(120,150));
+      loadingLabel.setBounds(0, 20, 125, 50);
+      progressBar.setBounds(0, 70, 125, 25);
+      pan.add(loadingLabel);
+      pan.add(progressBar);
+      add(pan, BorderLayout.CENTER);
+      progressBar.setVisible(false);
+      progressBar.setStringPainted(true);
+      //progressBar.setVisible(false);
       View.centerScreen(this);
       View.setWindowIcon(this);
       loadingLabel.setHorizontalAlignment(SwingConstants.LEFT);
