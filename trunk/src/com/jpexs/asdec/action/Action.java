@@ -641,36 +641,34 @@ public class Action {
          long addr = ip2adr(actions, ip, version);
          if (unknownJumps.contains(addr)) {
             unknownJumps.remove(new Long(addr));
-            /* boolean switchFound = false;
-             for (int i = output.size() - 1; i >= 0; i--) {
-             if (output.get(i) instanceof SwitchTreeItem) {
-             if (((SwitchTreeItem) output.get(i)).defaultCommands == null) {
-             List<ContinueTreeItem> continues = ((SwitchTreeItem) output.get(i)).getContinues();
-             boolean breakFound = false;
-             for (ContinueTreeItem cti : continues) {
-             if (cti.loopPos == addr) {
-             cti.isKnown = true;
-             cti.isBreak = true;
-             ((SwitchTreeItem) output.get(i)).loopBreak = addr;
-             breakFound = true;
-             }
-             }
-             if (breakFound) {
-             switchFound = true;
-             ((SwitchTreeItem) output.get(i)).defaultCommands = new ArrayList<TreeItem>();
-             for (int k = i + 1; k < output.size(); k++) {
-             ((SwitchTreeItem) output.get(i)).defaultCommands.add(output.remove(i + 1));
-             }
-             }
-             }
-             break;
-             }
-             }*/
-            /* if (!switchFound) {        
-             throw new UnknownJumpException(stack, addr, output);
-             }*/
-
-            throw new UnknownJumpException(stack, addr, output);
+            boolean switchFound = false;
+            for (int i = output.size() - 1; i >= 0; i--) {
+               if (output.get(i) instanceof SwitchTreeItem) {
+                  if (((SwitchTreeItem) output.get(i)).defaultCommands == null) {
+                     List<ContinueTreeItem> continues = ((SwitchTreeItem) output.get(i)).getContinues();
+                     boolean breakFound = false;
+                     for (ContinueTreeItem cti : continues) {
+                        if (cti.loopPos == addr) {
+                           cti.isKnown = true;
+                           cti.isBreak = true;
+                           ((SwitchTreeItem) output.get(i)).loopBreak = addr;
+                           breakFound = true;
+                        }
+                     }
+                     if (breakFound) {
+                        switchFound = true;
+                        ((SwitchTreeItem) output.get(i)).defaultCommands = new ArrayList<TreeItem>();
+                        for (int k = i + 1; k < output.size(); k++) {
+                           ((SwitchTreeItem) output.get(i)).defaultCommands.add(output.remove(i + 1));
+                        }
+                     }
+                  }
+                  break;
+               }
+            }
+            if (!switchFound) {
+               throw new UnknownJumpException(stack, addr, output);
+            }
          }
          if (ip > end) {
             break;
