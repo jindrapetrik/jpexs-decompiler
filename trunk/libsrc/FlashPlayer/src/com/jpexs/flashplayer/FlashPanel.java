@@ -2,6 +2,9 @@ package com.jpexs.flashplayer;
 
 import com.docuverse.swt.flash.FlashPlayer;
 import java.awt.Canvas;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -15,18 +18,19 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 public class FlashPanel extends Canvas {
-
+   
    private Thread swtThread;
    private FlashPlayer swtPlayer;
-   private boolean noFlash=false;
+   private boolean noFlash = false;
    private Shell shell;
+
    /**
     * Connect this canvas to a SWT shell with a Browser component and starts a
     * background thread to handle SWT events. This method waits until the
     * browser component is ready.
     */
    private void connect() {
-      if(noFlash){
+      if (noFlash) {
          return;
       }
       if (this.swtThread == null) {
@@ -37,10 +41,10 @@ public class FlashPanel extends Canvas {
                try {
                   Display display = new Display();
                   shell = SWT_AWT.new_Shell(display, canvas);
-                  shell.setLayout(new FillLayout());                  
+                  shell.setLayout(new FillLayout());
 
                   synchronized (this) {
-                     swtPlayer = new FlashPlayer(shell, SWT.NONE);                     
+                     swtPlayer = new FlashPlayer(shell, SWT.NONE);
                      this.notifyAll();
                   }
 
@@ -52,13 +56,20 @@ public class FlashPanel extends Canvas {
                   }
                   shell.dispose();
                   display.dispose();
-               } catch (SWTError e){
-                  noFlash=true;
+               } catch (SWTError e) {
+                  e.printStackTrace();
+                  noFlash = true;
                   interrupt();
                } catch (Exception e) {
+                  e.printStackTrace();
                   interrupt();
-               } catch (NoClassDefFoundError e){
-                  noFlash=true;
+               } catch (NoClassDefFoundError e) {
+                  e.printStackTrace();
+                  noFlash = true;
+                  interrupt();
+               } catch (UnsatisfiedLinkError e) {
+                  e.printStackTrace();
+                  noFlash = true;
                   interrupt();
                }
             }
@@ -69,7 +80,7 @@ public class FlashPanel extends Canvas {
       // Wait for the Browser instance to become ready
       synchronized (this.swtThread) {
          while (this.swtPlayer == null) {
-            if(noFlash){
+            if (noFlash) {
                break;
             }
             try {
@@ -87,7 +98,7 @@ public class FlashPanel extends Canvas {
     * Stops the swt background thread.
     */
    private void disconnect() {
-      if(noFlash){
+      if (noFlash) {
          return;
       }
       if (swtThread != null) {
@@ -105,7 +116,7 @@ public class FlashPanel extends Canvas {
    @Override
    public void removeNotify() {
       super.removeNotify();
-      if(noFlash){
+      if (noFlash) {
          return;
       }
       disconnect();
@@ -114,28 +125,31 @@ public class FlashPanel extends Canvas {
    @Override
    public void addNotify() {
       super.addNotify();
-      if(noFlash){
+      if (noFlash) {
          return;
       }
       connect();
    }
 
-   private void refresh()
-   {
-      setSize(getWidth()-1, getHeight()-1);
-      new Timer().schedule(new TimerTask(){public void run(){setSize(getWidth()+1, getHeight()+1);}},100);
-       
+   private void refresh() {
+      setSize(getWidth() - 1, getHeight() - 1);
+      new Timer().schedule(new TimerTask() {
+         public void run() {
+            setSize(getWidth() + 1, getHeight() + 1);
+         }
+      }, 100);
+
    }
-   
-   public void displaySWF(final String swf) {     
-      if(noFlash){
+
+   public void displaySWF(final String swf) {
+      if (noFlash) {
          return;
       }
       swtPlayer.getDisplay().syncExec(new Runnable() {
          @Override
-         public void run() {               
+         public void run() {
             swtPlayer.setMovie(swf);
-            swtPlayer.activate();                 
+            swtPlayer.activate();
          }
       });
       refresh();
