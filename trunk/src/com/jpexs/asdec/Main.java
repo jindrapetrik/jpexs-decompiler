@@ -151,9 +151,6 @@ public class Main {
             mainFrame.setPercent(percent);
          }
       }
-      /*if (actionMainFrame != null) {
-       actionMainFrame.setStatus(name);
-       }*/
       if (loadingDialog != null) {
          loadingDialog.setDetail(name);
          if(percent==-1){
@@ -244,9 +241,6 @@ public class Main {
       if (mainFrame != null) {
          mainFrame.setVisible(false);
       }
-      /*if (actionMainFrame != null) {
-       actionMainFrame.setVisible(false);
-       }*/
       Main.file = swfFile;
       if (Main.loadingDialog == null) {
          Main.loadingDialog = new LoadingDialog();
@@ -441,7 +435,7 @@ public class Main {
       fos.close();
    }
 
-   public static void restartApplication2(String[] args) {
+   public static void restartApplication(String[] args) {
       StringBuilder cmd = new StringBuilder();
       cmd.append(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java ");
       for (String jvmArg : ManagementFactory.getRuntimeMXBean().getInputArguments()) {
@@ -456,32 +450,6 @@ public class Main {
       try {
          Runtime.getRuntime().exec(cmd.toString());
       } catch (IOException ex) {
-      }
-      System.exit(0);
-   }
-
-   public static void restartApplication() {
-      try {
-         System.out.println("1");
-         final String javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
-         final File currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-
-         System.out.println("currentJar=" + currentJar);
-         /* is it a jar file? */
-         if (!currentJar.getName().endsWith(".jar")) {
-            return;
-         }
-
-         /* Build command: java -jar application.jar */
-         final ArrayList<String> command = new ArrayList<String>();
-         command.add(javaBin);
-         command.add("-jar");
-         command.add(currentJar.getPath());
-
-         final ProcessBuilder builder = new ProcessBuilder(command);
-         builder.start();
-      } catch (Exception ex) {
-         ex.printStackTrace();;
       }
       System.exit(0);
    }
@@ -505,7 +473,7 @@ public class Main {
          }
          Configuration.setConfig("bits", System.getProperty("sun.arch.data.model"));
          Configuration.save();
-         restartApplication2(args);
+         restartApplication(args);
       }
    }
 
