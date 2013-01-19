@@ -56,6 +56,7 @@ public class CSMTextSettingsTag extends Tag {
          sos.writeUB(3, 0);
          sos.writeFIXED(thickness); //TODO:write F32
          sos.writeFIXED(sharpness); //TODO:write F32
+         sos.writeUI8(0);
       } catch (IOException e) {
       }
       return baos.toByteArray();
