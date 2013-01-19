@@ -170,9 +170,7 @@ public class Main {
    public static void stopWork() {
       working = false;
       if (mainFrame != null) {
-         if (mainFrame.abcPanel != null) {
-            mainFrame.setStatus("");
-         }
+         mainFrame.setStatus("");
       }
       if (loadingDialog != null) {
          loadingDialog.setDetail("");

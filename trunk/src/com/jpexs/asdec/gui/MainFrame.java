@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec.gui;
 
 import com.jpexs.asdec.Configuration;
@@ -55,6 +53,7 @@ import com.jpexs.asdec.tags.Tag;
 import com.jpexs.asdec.tags.base.ASMSource;
 import com.jpexs.asdec.tags.base.Container;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -65,6 +64,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
@@ -77,6 +77,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.border.BevelBorder;
 
@@ -95,17 +96,28 @@ public class MainFrame extends JFrame implements ActionListener {
    public JPanel statusPanel = new JPanel();
    public JProgressBar progressBar = new JProgressBar(0, 100);
 
-   public void setPercent(int percent){
+   public void setPercent(int percent) {
       progressBar.setValue(percent);
       progressBar.setVisible(true);
    }
-   
-   public void hidePercent(){
-      if(progressBar.isVisible()){
+
+   public void hidePercent() {
+      if (progressBar.isVisible()) {
          progressBar.setVisible(false);
       }
    }
-   
+
+   private static void addTab(JTabbedPane tabbedPane, Component tab, String title, Icon icon) {
+      tabbedPane.add(tab);
+
+      JLabel lbl = new JLabel(title);
+      lbl.setIcon(icon);
+      lbl.setIconTextGap(5);
+      lbl.setHorizontalTextPosition(SwingConstants.RIGHT);
+
+      tabbedPane.setTabComponentAt(tabbedPane.getTabCount() - 1, lbl);
+   }
+
    public void setStatus(String s) {
       if (s.equals("")) {
          loadingPanel.setVisible(false);
@@ -155,16 +167,17 @@ public class MainFrame extends JFrame implements ActionListener {
       miSaveAs.addActionListener(this);
       JMenu menuExportAll = new JMenu("Export all");
       JMenuItem miExportAllAS = new JMenuItem("ActionScript...");
-      miExportAllAS.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/exportas16.png")));
+      miExportAllAS.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/as16.png")));
       miExportAllAS.setActionCommand("EXPORT");
       miExportAllAS.addActionListener(this);
 
       JMenuItem miExportAllPCode = new JMenuItem("PCode...");
-      miExportAllPCode.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/exportpc16.png")));
+      miExportAllPCode.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/pcode16.png")));
       miExportAllPCode.setActionCommand("EXPORTPCODE");
       miExportAllPCode.addActionListener(this);
 
       JMenuItem miExportImages = new JMenuItem("Images...");
+      miExportImages.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/image16.png")));
       miExportImages.setActionCommand("EXPORTIMAGES");
       miExportImages.addActionListener(this);
 
@@ -175,16 +188,17 @@ public class MainFrame extends JFrame implements ActionListener {
 
       JMenu menuExportSel = new JMenu("Export selection");
       JMenuItem miExportSelAS = new JMenuItem("ActionScript...");
-      miExportSelAS.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/exportas16.png")));
+      miExportSelAS.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/as16.png")));
       miExportSelAS.setActionCommand("EXPORTSEL");
       miExportSelAS.addActionListener(this);
 
       JMenuItem miExportSelPCode = new JMenuItem("PCode...");
-      miExportSelPCode.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/exportpc16.png")));
+      miExportSelPCode.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/pcode16.png")));
       miExportSelPCode.setActionCommand("EXPORTPCODESEL");
       miExportSelPCode.addActionListener(this);
 
       JMenuItem miExportSelImages = new JMenuItem("Images...");
+      miExportSelImages.setIcon(new ImageIcon(View.loadImage("com/jpexs/asdec/gui/graphics/image16.png")));
       miExportSelImages.setActionCommand("EXPORTIMAGESSEL");
       miExportSelImages.addActionListener(this);
 
@@ -267,39 +281,36 @@ public class MainFrame extends JFrame implements ActionListener {
       getContentPane().add(tabPane, BorderLayout.CENTER);
 
       if (!abcList.isEmpty()) {
-         tabPane.addTab("ActionScript3", abcPanel = new ABCPanel(abcList));
+         addTab(tabPane,abcPanel = new ABCPanel(abcList),"ActionScript3",new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/as16.png")));
       } else {
          actionPanel = new ActionPanel(swf.tags);
          if (actionPanel.tagTree.getRowCount() > 1) {
-            tabPane.addTab("ActionScript", actionPanel);
+            addTab(tabPane,actionPanel,"ActionScript",new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/as16.png")));
          }
          menuDeobfuscation.setEnabled(false);
       }
 
       if (!shapes.isEmpty()) {
-         tabPane.addTab("Shapes", shapesTagPanel = new TagPanel(shapes, swf));
+         addTab(tabPane,shapesTagPanel = new TagPanel(shapes, swf),"Shapes",new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/shape16.png")));
       }
       if (!morphShapes.isEmpty()) {
-         tabPane.addTab("MorphShapes", morphshapesTagPanel = new TagPanel(morphShapes, swf));
+         addTab(tabPane, morphshapesTagPanel = new TagPanel(morphShapes, swf),"MorphShapes",new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/morphshape16.png")));
       }
       if (!images.isEmpty()) {
-         tabPane.addTab("Images", imagesTagPanel = new TagPanel(images, swf));
+         addTab(tabPane,imagesTagPanel = new TagPanel(images, swf),"Images",new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/image16.png")));
       }
       if (!sprites.isEmpty()) {
-         tabPane.addTab("Sprites", spritesTagPanel = new TagPanel(sprites, swf));
+         addTab(tabPane, spritesTagPanel = new TagPanel(sprites, swf),"Sprites",new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/sprite16.png")));
       }
       if (!fonts.isEmpty()) {
-         tabPane.addTab("Fonts", fontsTagPanel = new TagPanel(fonts, swf));
+         addTab(tabPane,fontsTagPanel = new TagPanel(fonts, swf),"Fonts",new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/font16.png")));
       }
       if (!texts.isEmpty()) {
-         tabPane.addTab("Texts", textsTagPanel = new TagPanel(texts, swf));
+         addTab(tabPane,textsTagPanel = new TagPanel(texts, swf),"Texts",new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/text16.png")));
       }
       if (!buttons.isEmpty()) {
-         tabPane.addTab("Buttons", buttonsTagPanel = new TagPanel(buttons, swf));
+         addTab(tabPane, buttonsTagPanel = new TagPanel(buttons, swf),"Buttons",new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/button16.png")));
       }
-      /*tabPane.addTab("Tags", new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(tagTree), new JScrollPane(fPanel)));*/
-
-      //tabPane.setTabPlacement(JTabbedPane.TOP);
 
 
 
@@ -309,7 +320,7 @@ public class MainFrame extends JFrame implements ActionListener {
       statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
       statusPanel.setLayout(new BorderLayout());
       statusPanel.add(loadingPanel, BorderLayout.WEST);
-      statusPanel.add(statusLabel, BorderLayout.CENTER);      
+      statusPanel.add(statusLabel, BorderLayout.CENTER);
       loadingPanel.setVisible(false);
       add(statusPanel, BorderLayout.SOUTH);
       View.centerScreen(this);
@@ -706,10 +717,9 @@ public class MainFrame extends JFrame implements ActionListener {
       }
       if (e.getActionCommand().equals("RENAMEIDENTIFIERS")) {
          if (JOptionPane.showConfirmDialog(null, "Following procedure can damage SWF file which can be then unplayable.\r\nUSE IT ON YOUR OWN RISK. Do you want to continue?", "Warning", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
-            
-            Main.startWork("Renaming identifiers...");
-            new SwingWorker(){
 
+            Main.startWork("Renaming identifiers...");
+            new SwingWorker() {
                @Override
                protected Object doInBackground() throws Exception {
                   int cnt = 0;
@@ -718,14 +728,12 @@ public class MainFrame extends JFrame implements ActionListener {
                   }
                   Main.stopWork();
                   JOptionPane.showMessageDialog(null, "Identifiers renamed: " + cnt);
-                  abcPanel.reload();                  
+                  abcPanel.reload();
                   return true;
                }
-               
-            
             }.execute();
-            
-            
+
+
          }
       }
 

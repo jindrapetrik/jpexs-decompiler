@@ -53,7 +53,7 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
       addTreeSelectionListener(this);
       DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
       ClassLoader cldr = this.getClass().getClassLoader();
-      java.net.URL imageURL = cldr.getResource("com/jpexs/asdec/abc/gui/graphics/class.png");
+      java.net.URL imageURL = cldr.getResource("com/jpexs/asdec/gui/graphics/as16.png");
       ImageIcon leafIcon = new ImageIcon(imageURL);
       treeRenderer.setLeafIcon(leafIcon);
       setCellRenderer(treeRenderer);

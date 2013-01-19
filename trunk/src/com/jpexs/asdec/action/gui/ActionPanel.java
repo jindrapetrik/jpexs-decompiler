@@ -65,7 +65,7 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
 
       DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
       ClassLoader cldr = this.getClass().getClassLoader();
-      java.net.URL imageURL = cldr.getResource("com/jpexs/asdec/action/gui/graphics/class.png");
+      java.net.URL imageURL = cldr.getResource("com/jpexs/asdec/gui/graphics/as16.png");
       ImageIcon leafIcon = new ImageIcon(imageURL);
       treeRenderer.setLeafIcon(leafIcon);
       tagTree.setCellRenderer(treeRenderer);
