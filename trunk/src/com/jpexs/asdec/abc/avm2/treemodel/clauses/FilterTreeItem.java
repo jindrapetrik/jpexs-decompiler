@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012 JPEXS
+ *  Copyright (C) 2012-2013 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -14,6 +14,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+
 package com.jpexs.asdec.abc.avm2.treemodel.clauses;
 
 import com.jpexs.asdec.abc.avm2.ConstantPool;
