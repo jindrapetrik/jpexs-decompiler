@@ -778,7 +778,7 @@ public class Main {
                            }
                         }
                         if (desktop == null) {
-                           JOptionPane.showMessageDialog(null, "New version of " + shortApplicationName + " is available: " + downloadName + ".\r\nPlease go to", "New version", JOptionPane.INFORMATION_MESSAGE);
+                           JOptionPane.showMessageDialog(null, "New version of " + shortApplicationName + " is available: " + downloadName + ".\r\nPlease go to "+projectPage+" to download it.", "New version", JOptionPane.INFORMATION_MESSAGE);
                         }
 
                         Configuration.setConfig("lastUpdatesCheckDate", Calendar.getInstance());
