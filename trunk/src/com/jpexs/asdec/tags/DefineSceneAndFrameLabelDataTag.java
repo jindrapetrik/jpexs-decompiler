@@ -84,6 +84,8 @@ public class DefineSceneAndFrameLabelDataTag extends Tag {
          sceneNames[i] = sis.readString();
       }
       int frameLabelCount = (int) sis.readEncodedU32();
+      frameNums=new long[frameLabelCount];
+      frameNames=new String[frameLabelCount];
       for (int i = 0; i < frameLabelCount; i++) {
          frameNums[i] = sis.readEncodedU32();
          frameNames[i] = sis.readString();

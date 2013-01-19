@@ -18,6 +18,7 @@
 
 package com.jpexs.asdec.tags;
 
+import com.jpexs.asdec.Main;
 import com.jpexs.asdec.SWFInputStream;
 import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.abc.CopyOutputStream;
@@ -129,7 +130,9 @@ public class DefineFont3Tag extends CharacterTag implements FontTag {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       OutputStream os = baos;
       SWFOutputStream sos = new SWFOutputStream(os, version);
-      sos = new SWFOutputStream(new CopyOutputStream(sos, new ByteArrayInputStream(data)), 10);
+      if(Main.DEBUG_COPY){
+         sos = new SWFOutputStream(new CopyOutputStream(sos, new ByteArrayInputStream(data)), 10);
+      }
       try {
          sos.writeUI16(fontId);
          sos.writeUB(1, fontFlagsHasLayout ? 1 : 0);
