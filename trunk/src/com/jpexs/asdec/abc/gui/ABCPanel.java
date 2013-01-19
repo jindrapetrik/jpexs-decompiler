@@ -312,9 +312,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
       constantTypeList.addItemListener(this);
       panConstants.add(constantTypeList, BorderLayout.NORTH);
       panConstants.add(new JScrollPane(constantTable), BorderLayout.CENTER);
-      tabbedPane.addTab("Constants", panConstants);
-
-
+      tabbedPane.addTab("Constants", panConstants);      
    }
 
    public void doFilter() {

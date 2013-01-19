@@ -59,6 +59,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingWorker;
 import javax.swing.border.BevelBorder;
 
 /**
@@ -687,14 +688,26 @@ public class MainFrame extends JFrame implements ActionListener {
       }
       if (e.getActionCommand().equals("RENAMEIDENTIFIERS")) {
          if (JOptionPane.showConfirmDialog(null, "Following procedure can damage SWF file which can be then unplayable.\r\nUSE IT ON YOUR OWN RISK. Do you want to continue?", "Warning", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
-            int pocet = 0;
+            
             Main.startWork("Renaming identifiers...");
-            for (DoABCTag tag : abcPanel.list) {
-               pocet += tag.abc.deobfuscateIdentifiers();
-            }
-            JOptionPane.showMessageDialog(null, "Identifiers renamed: " + pocet);
-            abcPanel.reload();
-            Main.stopWork();
+            new SwingWorker(){
+
+               @Override
+               protected Object doInBackground() throws Exception {
+                  int cnt = 0;
+                  for (DoABCTag tag : abcPanel.list) {
+                     cnt += tag.abc.deobfuscateIdentifiers();
+                  }
+                  Main.stopWork();
+                  JOptionPane.showMessageDialog(null, "Identifiers renamed: " + cnt);
+                  abcPanel.reload();                  
+                  return true;
+               }
+               
+            
+            }.execute();
+            
+            
          }
       }
 

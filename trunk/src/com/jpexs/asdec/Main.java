@@ -141,21 +141,22 @@ public class Main {
    public static void startWork(String name) {
       startWork(name, -1);
    }
-   public static void startWork(String name,int percent) {
+
+   public static void startWork(String name, int percent) {
       working = true;
       if (mainFrame != null) {
          mainFrame.setStatus(name);
-         if(percent==-1){
+         if (percent == -1) {
             mainFrame.hidePercent();
-         }else{
+         } else {
             mainFrame.setPercent(percent);
          }
       }
       if (loadingDialog != null) {
          loadingDialog.setDetail(name);
-         if(percent==-1){
+         if (percent == -1) {
             loadingDialog.hidePercent();
-         }else{
+         } else {
             loadingDialog.setPercent(percent);
          }
       }
@@ -180,10 +181,9 @@ public class Main {
       FileInputStream fis = new FileInputStream(file);
       InputStream bis = new BufferedInputStream(fis);
       SWF locswf = new SWF(bis, new PercentListener() {
-
          @Override
          public void percent(int p) {
-            startWork("Reading SWF",p);
+            startWork("Reading SWF", p);
          }
       });
       locswf.addEventListener(new EventListener() {
@@ -312,7 +312,7 @@ public class Main {
     */
    public static void updateLicenseInDir(File dir) {
       int defaultStartYear = 2010;
-      int defaultFinalYear = 2011;
+      int defaultFinalYear = 2013;
       String defaultAuthor = "JPEXS";
       String defaultYearStr = "" + defaultStartYear;
       if (defaultFinalYear != defaultStartYear) {
@@ -746,18 +746,21 @@ public class Main {
             Node nod = contents.item(i);
             String cont = nod.getTextContent().trim();
             String parts[] = cont.split("\n");
-            boolean featured = false;
+            boolean isUpdate = false;
             for (String part : parts) {
-               if (part.trim().equals("Featured")) {
-                  featured = true;
+               if (part.trim().equals("Update")) {
+                  isUpdate = true;
                   break;
                }
             }
-            if ((parts.length > 4) && (featured)) {
+            if ((parts.length > 4) && (isUpdate)) {
                String downloadName = parts[1];
                String link = parts[parts.length - 2];
-               if (downloadName.startsWith(shortApplicationName + " version ")) {
-                  String downVersion = downloadName.substring((shortApplicationName + " version ").length());
+               if (isUpdate) {
+                  String downVersion = "NEW";
+                  if (downloadName.startsWith(shortApplicationName + " version ")) {
+                     downVersion = downloadName.substring((shortApplicationName + " version ").length());
+                  }
                   if (link.startsWith("<a href=\"")) {
                      link = link.substring(link.indexOf("\"") + 1);
                      link = link.substring(0, link.indexOf("\""));
@@ -766,8 +769,8 @@ public class Main {
                         if (java.awt.Desktop.isDesktopSupported()) {
                            desktop = java.awt.Desktop.getDesktop();
                            if (desktop.isSupported(java.awt.Desktop.Action.BROWSE)) {
-                              if (JOptionPane.showConfirmDialog(null, "New version of " + shortApplicationName + " is available: " + downloadName + ".\r\nDo you want to go to download page?", "New version", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.YES_OPTION) {
-                                 java.net.URI uri = new java.net.URI(link);
+                              if (JOptionPane.showConfirmDialog(null, "New version of " + shortApplicationName + " is available: " + downloadName + ".\r\nDo you want to go to project web page to download it?", "New version", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.YES_OPTION) {
+                                 java.net.URI uri = new java.net.URI(projectPage);
                                  desktop.browse(uri);
                               }
                            } else {

@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -71,8 +72,20 @@ public class ABC {
 
    public int deobfuscateIdentifiers() {
       int ret = 0;
+      for (int i = 1; i < instance_info.length; i++) {
+         if (instance_info[i].name_index != 0) {
+            if (deobfuscateName(constants.constant_multiname[instance_info[i].name_index].name_index, true)) {
+               ret++;
+            }
+         }
+         if (instance_info[i].super_index != 0) {
+            if (deobfuscateName(constants.constant_multiname[instance_info[i].super_index].name_index, true)) {
+               ret++;
+            }
+         }
+      }
       for (int i = 1; i < constants.constant_multiname.length; i++) {
-         if (deobfuscateName(constants.constant_multiname[i].name_index)) {
+         if (deobfuscateName(constants.constant_multiname[i].name_index, false)) {
             ret++;
          }
       }
@@ -562,10 +575,65 @@ public class ABC {
       "interface", "internal", "is", "native", "new", "null", "package", "private", "protected", "public",
       "return", "super", "switch", "this", "throw", "true", "try", "typeof", "use", "var", /*"void",*/ "while",
       "with", "dynamic", "default", "final", "in"};
-   public int unknownCount = 0;
    public static final String validFirstCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
    public static final String validNextCharacters = validFirstCharacters + "0123456789";
-   public static final String validNsCharacters = ".:";
+   public static final String validNsCharacters = ".:$";
+   public static final String fooCharacters = "bcdfghjklmnpqrstvwz";
+   public static final String fooJoinCharacters = "aeiouy";
+   private HashMap<String, String> deobfuscated = new HashMap<String, String>();
+   private Random rnd = new Random();
+   private final int DEFAULT_FOO_SIZE = 10;
+
+   private String fooString(String orig, boolean firstUppercase, int rndSize) {
+      boolean exists;
+      String ret;
+      loopfoo:
+      do {
+         exists = false;
+         int len = 3+rnd.nextInt(rndSize-3);
+         ret="";
+         for(int i=0;i<len;i++){
+            String c="";
+            if((i%2)==0){
+               c=""+fooCharacters.charAt(rnd.nextInt(fooCharacters.length()));
+            }else{
+               c=""+fooJoinCharacters.charAt(rnd.nextInt(fooJoinCharacters.length()));
+            }
+            if(i==0 && firstUppercase){
+               c=c.toUpperCase();
+            }
+            ret+=c;
+         }         
+         for (int i = 1; i < constants.constant_string.length; i++) {
+            if (constants.constant_string[i].equals(ret)) {
+               exists = true;
+               rndSize=rndSize+1;
+               continue loopfoo;
+            }
+         }
+         if (isReserved(ret)) {
+            exists = true;
+            rndSize=rndSize+1;
+            continue;
+         }
+         if (deobfuscated.containsValue(ret)) {
+            exists = true;
+            rndSize=rndSize+1;
+            continue;
+         }         
+      } while (exists);
+      deobfuscated.put(orig, ret);
+      return ret;
+   }
+
+   private boolean isReserved(String s) {
+      for (String rw : reservedWords) {
+         if (rw.equals(s.trim())) {
+            return true;
+         }
+      }
+      return false;
+   }
 
    public boolean deobfuscateNameSpace(int strIndex) {
       if (strIndex <= 0) {
@@ -573,14 +641,10 @@ public class ABC {
       }
       String s = constants.constant_string[strIndex];
       boolean isValid = true;
-      boolean isReserved = false;
-      for (String rw : reservedWords) {
-         if (rw.equals(s.trim())) {
-            isValid = false;
-            isReserved = true;
-            break;
-         }
+      if (isReserved(s)) {
+         isValid = false;
       }
+
       if (isValid) {
          for (int i = 0; i < s.length(); i++) {
             if (s.charAt(i) > 127) {
@@ -589,35 +653,26 @@ public class ABC {
             }
          }
       }
-      Pattern pat = Pattern.compile("^[" + Pattern.quote(validFirstCharacters) + "]" + "[" + Pattern.quote(validFirstCharacters + validNextCharacters + validNsCharacters) + "]*$");
+      Pattern pat = Pattern.compile("^([" + Pattern.quote(validFirstCharacters) + "]" + "[" + Pattern.quote(validFirstCharacters + validNextCharacters + validNsCharacters) + "]*)*$");
       if (!pat.matcher(s).matches()) {
          isValid = false;
       }
       if (!isValid) {
-         if (isReserved) {
-            constants.constant_string[strIndex] = "name_" + s.replace(" ", "_");
-         } else {
-            unknownCount++;
-            constants.constant_string[strIndex] = "_name" + unknownCount;
-         }
+         constants.constant_string[strIndex] = fooString(constants.constant_string[strIndex], false, DEFAULT_FOO_SIZE);
       }
       return !isValid;
    }
 
-   public boolean deobfuscateName(int strIndex) {
+   public boolean deobfuscateName(int strIndex, boolean firstUppercase) {
       if (strIndex <= 0) {
          return false;
       }
       String s = constants.constant_string[strIndex];
       boolean isValid = true;
-      boolean isReserved = false;
-      for (String rw : reservedWords) {
-         if (rw.equals(s.trim())) {
-            isValid = false;
-            isReserved = true;
-            break;
-         }
+      if (isReserved(s)) {
+         isValid = false;
       }
+
 
       Pattern pat = Pattern.compile("^[" + Pattern.quote(validFirstCharacters) + "]" + "[" + Pattern.quote(validFirstCharacters + validNextCharacters) + "]*$");
       if (!pat.matcher(s).matches()) {
@@ -633,12 +688,7 @@ public class ABC {
       }
 
       if (!isValid) {
-         if (isReserved) {
-            constants.constant_string[strIndex] = "name_" + s.replace(" ", "_");
-         } else {
-            unknownCount++;
-            constants.constant_string[strIndex] = "_name" + unknownCount;
-         }
+         constants.constant_string[strIndex] = fooString(constants.constant_string[strIndex], firstUppercase, DEFAULT_FOO_SIZE);
       }
       return !isValid;
    }
