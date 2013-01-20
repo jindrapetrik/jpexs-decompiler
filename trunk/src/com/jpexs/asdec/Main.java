@@ -483,7 +483,6 @@ public class Main {
     * @param args the command line arguments
     */
    public static void main(String[] args) throws IOException {
-      updateLicense();
       View.setLookAndFeel();
       Configuration.load();
       checkSWT(args);
