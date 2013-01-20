@@ -122,10 +122,8 @@ public abstract class SHAPERECORD implements Cloneable {
    }
 
    /**
-    * EXPERIMENTAL - convert shape to SVG
-    *
-    * TODO: Fix fill styles
-    *
+    * Convert shape to SVG
+    *    
     * @param shapeNum
     * @param fillStyles
     * @param lineStylesList

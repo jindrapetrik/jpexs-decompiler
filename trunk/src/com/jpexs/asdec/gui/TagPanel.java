@@ -154,7 +154,7 @@ public class TagPanel extends JPanel implements ListSelectionListener {
 
    @Override
    public void valueChanged(ListSelectionEvent e) {
-      Tag tagObj = (Tag) tagList.getSelectedValue();
+      Tag tagObj = (Tag) tagList.getSelectedValue();   
       if (tagObj instanceof DefineBitsTag) {
          showCard(CARDIMAGEPANEL);
          imagePanel.setImage(((DefineBitsTag) tagObj).getFullImageData(jtt));

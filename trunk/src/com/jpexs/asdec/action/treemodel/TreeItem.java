@@ -49,6 +49,10 @@ public abstract class TreeItem {
    }
 
    public abstract String toString(ConstantPool constants);
+   
+   public String toStringNoQuotes(ConstantPool constants){
+      return toString(constants);
+   }
 
    @Override
    public String toString() {

@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec.action;
 
 import com.jpexs.asdec.Main;
@@ -790,6 +788,15 @@ public class Action {
                if (onTrue.isEmpty() && trueStack.size() > 0) {
                   isTernar = true;
                }
+               int next = (hasElse ? jumpElseIp : jumpIp);
+               if (actions.size() > next) {
+                  Action nea = actions.get(next);
+                  if (nea instanceof ActionPop) {
+                     if (trueStack.size() > 0) {
+                        nea.translate(trueStack, constants, onTrue, registerNames);
+                     }
+                  }
+               }
             } catch (UnknownJumpException uje) {
                if ((adr2ip(actions, uje.addr, version) >= start) && (adr2ip(actions, uje.addr, version) <= end)) {
                   if (currentLoop == null) {
@@ -996,6 +1003,213 @@ public class Action {
             }
          }
       }
+      output = checkClass(output);
       return output;
+   }
+
+   public static TreeItem getWithoutGlobal(TreeItem ti) {
+      TreeItem t = ti;
+      if (!(t instanceof GetMemberTreeItem)) {
+         return ti;
+      }
+      GetMemberTreeItem lastMember = null;
+      while (((GetMemberTreeItem) t).object instanceof GetMemberTreeItem) {
+         lastMember = (GetMemberTreeItem) t;
+         t = ((GetMemberTreeItem) t).object;
+      }
+      if (((GetMemberTreeItem) t).object instanceof GetVariableTreeItem) {
+         GetVariableTreeItem v = (GetVariableTreeItem) ((GetMemberTreeItem) t).object;
+         if (v.value instanceof DirectValueTreeItem) {
+            if (((DirectValueTreeItem) v.value).value instanceof String) {
+               if (((DirectValueTreeItem) v.value).value.equals("_global")) {
+                  GetVariableTreeItem gvt = new GetVariableTreeItem(null, ((GetMemberTreeItem) t).functionName);
+                  if (lastMember == null) {
+                     return gvt;
+                  } else {
+                     lastMember.object = gvt;
+                  }
+               }
+            }
+         }
+      }
+      return ti;
+   }
+
+   private static List<TreeItem> checkClass(List<TreeItem> output) {
+      List<TreeItem> ret = new ArrayList<TreeItem>();
+      List<FunctionTreeItem> functions = new ArrayList<FunctionTreeItem>();
+      HashMap<TreeItem, TreeItem> vars = new HashMap<TreeItem, TreeItem>();
+      TreeItem className;
+      TreeItem extendsOp = null;
+      List<TreeItem> implementsOp = new ArrayList<TreeItem>();
+      boolean ok = true;
+      for (TreeItem t : output) {
+         if (t instanceof IfTreeItem) {
+            IfTreeItem it = (IfTreeItem) t;
+            if (it.expression instanceof NotTreeItem) {
+               NotTreeItem nti = (NotTreeItem) it.expression;
+               if (nti.value instanceof GetMemberTreeItem) {
+                  if (it.onFalse.isEmpty()) {
+                     if ((it.onTrue.size() == 1) && (it.onTrue.get(0) instanceof SetMemberTreeItem) && (((SetMemberTreeItem) it.onTrue.get(0)).value instanceof NewObjectTreeItem)) {
+                        //ignore
+                     } else {
+                        List<TreeItem> parts = it.onTrue;
+                        className = getWithoutGlobal((GetMemberTreeItem) nti.value);
+                        if (parts.size() >= 1) {
+                           if (parts.get(0) instanceof StoreRegisterTreeItem) {
+                              int firstReg = ((StoreRegisterTreeItem) parts.get(0)).register.number;
+                              if ((parts.size() >= 2) && (parts.get(1) instanceof SetMemberTreeItem)) {
+                                 TreeItem ti1 = ((SetMemberTreeItem) parts.get(1)).value;
+                                 TreeItem ti2 = ((StoreRegisterTreeItem) parts.get(0)).value;
+                                 if (ti1 == ti2) {
+                                    if (((SetMemberTreeItem) parts.get(1)).value instanceof FunctionTreeItem) {
+                                       ((FunctionTreeItem) ((SetMemberTreeItem) parts.get(1)).value).calculatedFunctionName = (className instanceof GetMemberTreeItem) ? ((GetMemberTreeItem) className).functionName : className;
+                                       functions.add((FunctionTreeItem) ((SetMemberTreeItem) parts.get(1)).value);
+                                       int pos = 2;
+                                       if (parts.size() <= pos) {
+                                          ok = false;
+                                          break;
+                                       }
+                                       if (parts.get(pos) instanceof ExtendsTreeItem) {
+                                          ExtendsTreeItem et = (ExtendsTreeItem) parts.get(pos);
+                                          extendsOp = getWithoutGlobal(et.superclass);
+                                          pos++;
+                                       }
+                                       if (parts.get(pos) instanceof StoreRegisterTreeItem) {
+                                          if (((StoreRegisterTreeItem) parts.get(pos)).value instanceof GetMemberTreeItem) {
+                                             TreeItem obj = ((GetMemberTreeItem) ((StoreRegisterTreeItem) parts.get(pos)).value).object;
+                                             if (obj instanceof DirectValueTreeItem) {
+                                                if (((DirectValueTreeItem) obj).value instanceof RegisterNumber) {
+                                                   if (((RegisterNumber) ((DirectValueTreeItem) obj).value).number == firstReg) {
+                                                      int secondReg = ((StoreRegisterTreeItem) parts.get(pos)).register.number;
+                                                      pos++;
+                                                      if (parts.size() <= pos) {
+                                                         ok = false;
+                                                         break;
+                                                      }
+                                                      if (parts.get(pos) instanceof ImplementsOpTreeItem) {
+                                                         ImplementsOpTreeItem io = (ImplementsOpTreeItem) parts.get(pos);
+                                                         implementsOp = io.superclasses;
+                                                         pos++;
+                                                      }
+                                                      while ((parts.size() > pos) && ok) {
+                                                         if (parts.get(pos) instanceof SetMemberTreeItem) {
+                                                            SetMemberTreeItem smt = (SetMemberTreeItem) parts.get(pos);
+                                                            if (smt.object instanceof DirectValueTreeItem) {
+                                                               if (((DirectValueTreeItem) smt.object).value instanceof RegisterNumber) {
+                                                                  if (((RegisterNumber) ((DirectValueTreeItem) smt.object).value).number == secondReg) {
+                                                                     if (smt.value instanceof FunctionTreeItem) {
+                                                                        ((FunctionTreeItem) smt.value).calculatedFunctionName = smt.objectName;
+                                                                        functions.add((FunctionTreeItem) smt.value);
+                                                                     } else {
+                                                                        vars.put(smt.objectName, smt.value);
+                                                                     }
+                                                                  } else {
+                                                                     ok = false;
+                                                                  }
+                                                               }
+                                                            } else {
+                                                               ok = false;
+                                                            }
+                                                         } else if (parts.get(pos) instanceof VoidTreeItem) {
+                                                            VoidTreeItem v = (VoidTreeItem) parts.get(pos);
+                                                            if (v.value instanceof CallFunctionTreeItem) {
+                                                               //if(((CallFunctionTreeItem)parts.get(pos)).functionName){
+                                                               if (((CallFunctionTreeItem) v.value).functionName instanceof DirectValueTreeItem) {
+                                                                  if (((DirectValueTreeItem) ((CallFunctionTreeItem) v.value).functionName).value.equals("ASSetPropFlags")) {
+                                                                  } else {
+                                                                     ok = false;
+                                                                  }
+                                                               } else {
+                                                                  ok = false;
+                                                               }
+                                                            } else {
+                                                               ok = false;
+                                                            }
+
+                                                         } else {
+                                                            ok = false;
+                                                            break;
+                                                         }
+                                                         pos++;
+                                                      }
+                                                      if (ok) {
+                                                         List<TreeItem> output2 = new ArrayList<TreeItem>();
+                                                         output2.add(new ClassTreeItem(className, extendsOp, implementsOp, functions, vars));
+                                                         return output2;
+                                                      }
+                                                   } else {
+                                                      ok = false;
+                                                   }
+                                                } else {
+                                                   ok = false;
+                                                }
+                                             } else {
+                                                ok = false;
+                                             }
+                                          } else {
+                                             ok = false;
+                                          }
+                                       } else {
+                                          ok = false;
+                                       }
+                                    }
+                                 } else {
+                                    ok = false;
+                                 }
+                              } else {
+                                 ok = false;
+                              }
+                           } else if (parts.get(0) instanceof SetMemberTreeItem) {
+                              SetMemberTreeItem sm = (SetMemberTreeItem) parts.get(0);
+                              if (sm.value instanceof FunctionTreeItem) {
+                                 FunctionTreeItem f = (FunctionTreeItem) sm.value;
+                                 if (f.actions.isEmpty()) {
+                                    
+                                    if(parts.size()==2){
+                                       if(parts.get(1) instanceof ImplementsOpTreeItem){
+                                          ImplementsOpTreeItem iot=(ImplementsOpTreeItem)parts.get(1);
+                                          implementsOp=iot.superclasses;
+                                       }else{
+                                          ok=false;
+                                          break;
+                                       }
+                                    }
+                                    List<TreeItem> output2 = new ArrayList<TreeItem>();
+                                    output2.add(new InterfaceTreeItem(sm.objectName,implementsOp));
+                                    return output2;
+                                 } else {
+                                    ok = false;
+                                 }
+                              } else {
+                                 ok = false;
+                              }
+                           } else {
+                              ok = false;
+                           }
+                        } else {
+                           ok = false;
+                        }
+                     }
+                  } else {
+                     ok = false;
+                  }
+               } else {
+                  ok = false;
+               }
+            } else {
+               ok = false;
+            }
+         } else {
+            ok = false;
+         }
+         if (!ok) {
+            break;
+         }
+      }
+      if (!ok) {
+         return output;
+      }
+      return ret;
    }
 }

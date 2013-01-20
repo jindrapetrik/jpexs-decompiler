@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
@@ -27,6 +25,7 @@ public class FunctionTreeItem extends TreeItem {
    public List<String> constants;
    public String functionName;
    public List<String> paramNames;
+   public TreeItem calculatedFunctionName;
 
    public FunctionTreeItem(Action instruction, String functionName, List<String> paramNames, List<TreeItem> actions, ConstantPool constants) {
       super(instruction, PRECEDENCE_PRIMARY);
@@ -39,7 +38,9 @@ public class FunctionTreeItem extends TreeItem {
    @Override
    public String toString(ConstantPool constants) {
       String ret = "function";
-      if (!functionName.equals("")) {
+      if (calculatedFunctionName != null) {
+         ret += " " + calculatedFunctionName.toStringNoQuotes(constants);
+      } else if (!functionName.equals("")) {
          ret += " " + functionName;
       }
       ret += "(";

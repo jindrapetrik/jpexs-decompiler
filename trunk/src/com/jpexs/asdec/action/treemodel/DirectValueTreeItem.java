@@ -34,6 +34,7 @@ public class DirectValueTreeItem extends TreeItem {
       this.value = value;
    }
 
+   @Override
    public String toStringNoQuotes(ConstantPool constants) {
       if (value instanceof Double) {
          if (Double.compare((double) (Double) value, 0) == 0) {
@@ -46,7 +47,7 @@ public class DirectValueTreeItem extends TreeItem {
          }
       }
       if (value instanceof String) {
-         return Helper.escapeString((String) value);
+         return (String)value;
       }
       if (value instanceof ConstantIndex) {
          return (this.constants.get(((ConstantIndex) value).index));
