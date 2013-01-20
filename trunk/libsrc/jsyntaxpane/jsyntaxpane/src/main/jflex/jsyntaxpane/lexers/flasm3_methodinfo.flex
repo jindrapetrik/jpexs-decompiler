@@ -88,6 +88,8 @@ StringCharacter = [^\r\n\"\\]
   /* string literal */
   \"                             {
                                     isMultiname=false;
+                                    tokenStart = yychar;
+                                    tokenLength = yylength();
                                     yybegin(STRING);
                                     string.setLength(0);
                                  }
