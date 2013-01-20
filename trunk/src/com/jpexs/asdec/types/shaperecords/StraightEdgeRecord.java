@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec.types.shaperecords;
 
 /**
@@ -35,5 +33,49 @@ public class StraightEdgeRecord extends SHAPERECORD {
    @Override
    public String toString() {
       return "[StraightEdgeRecord numBits=" + numBits + ", generalLineFlag=" + generalLineFlag + ", vertLineFlag=" + vertLineFlag + ", deltaX=" + deltaX + ", deltaY=" + deltaY + "]";
+   }
+
+   @Override
+   public String toSWG(int oldX,int oldY) {
+      if (generalLineFlag) {
+         return "L " + twipToPixel(oldX+deltaX) + " " + twipToPixel(oldY+deltaY);
+      } else if (vertLineFlag) {
+         return "V " + twipToPixel(oldY+deltaY);
+      } else {
+         return "H " + twipToPixel(oldX+deltaX);
+      }
+   }
+
+   @Override
+   public int changeX(int x) {
+      if (generalLineFlag) {
+         return x+deltaX;
+      } else if (vertLineFlag) {
+         return x;
+      } else {
+         return x+deltaX;
+      }
+   }
+
+   @Override
+   public int changeY(int y) {
+      if (generalLineFlag) {
+         return y+deltaY;
+      } else if (vertLineFlag) {
+         return y+deltaY;
+      } else {
+         return y;
+      }
+   }
+
+   @Override
+   public void flip() {
+      deltaX=-deltaX;
+      deltaY=-deltaY;
+   }
+   
+   @Override
+   public boolean isMove() {
+      return true;
    }
 }

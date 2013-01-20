@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec.types.shaperecords;
 
 import com.jpexs.asdec.types.FILLSTYLEARRAY;
@@ -49,5 +47,39 @@ public class StyleChangeRecord extends SHAPERECORD {
       return "[StyleChangeRecord stateNewStyles=" + stateNewStyles + ", stateLineStyle=" + stateLineStyle + ",stateFillStyle1=" + stateFillStyle1 + ","
               + " stateFillStyle0=" + stateFillStyle0 + ", stateMoveTo=" + stateMoveTo + ", moveBits=" + moveBits + ", moveDeltaX=" + moveDeltaX + ", moveDeltaY=" + moveDeltaY + ","
               + " fillStyle0=" + fillStyle0 + ", fillStyle1=" + fillStyle1 + ", lineStyle=" + lineStyle + ", fillStyles=" + fillStyles + ", lineStyles=" + lineStyles + ", numFillBits=" + numFillBits + ", numLineBits=" + numLineBits + "]";
+   }
+
+   @Override
+   public String toSWG(int oldX,int oldY) {
+      if (stateMoveTo) {
+         return "M " + twipToPixel(moveDeltaX) + " " + twipToPixel(moveDeltaY);
+      }
+      return "";
+   }
+
+   @Override
+   public int changeX(int x) {
+      if (stateMoveTo) {
+         return moveDeltaX;
+      }
+      return 0;
+   }
+
+   @Override
+   public int changeY(int y) {
+      if (stateMoveTo) {
+         return moveDeltaY;
+      }
+      return 0;
+   }
+
+   @Override
+   public void flip() {
+      
+   }
+   
+   @Override
+   public boolean isMove() {
+      return stateMoveTo;
    }
 }

@@ -26,27 +26,70 @@ import com.jpexs.asdec.types.RGB;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author JPEXS
  */
-public abstract class SHAPERECORD {
+public abstract class SHAPERECORD implements Cloneable {
 
    public static float twipToPixel(int twip) {
       return ((float) twip) / 20.0f;
    }
 
    private static class Path {
+
       public LINESTYLE lineStyle;
       public LINESTYLE2 lineStyle2;
       public boolean useLineStyle2;
       public FILLSTYLE fillStyle0;
       public FILLSTYLE fillStyle1;
-      public String points;
+      public List<SHAPERECORD> edges = new ArrayList<SHAPERECORD>();
+      
+      public boolean sameStyle(Path p){
+         return fillStyle0==p.fillStyle0 && ((useLineStyle2&&(p.lineStyle2==lineStyle2)) || ((!useLineStyle2)&&(p.lineStyle==lineStyle)));
+      }
+      
+      public String toSVG(int shapeNum){
+         String ret="";
+         String params = "";
+         String f = "";
+         if (fillStyle0 != null) {
+            if (fillStyle0.fillStyleType == FILLSTYLE.SOLID) {
+               f = " fill=\"" + ((shapeNum >= 3) ? fillStyle0.colorA.toHexRGB() : fillStyle0.color.toHexRGB()) + "\"";
+            }
+         }
+         params += f;
+         if ((!useLineStyle2) && lineStyle != null) {
+            params += " stroke=\"" + ((shapeNum >= 3) ? lineStyle.colorA.toHexRGB() : lineStyle.color.toHexRGB()) + "\"";
+         }
+         if (useLineStyle2 && lineStyle2 != null) {
+            params += " stroke-width=\"" + twipToPixel(lineStyle2.width) + "\" stroke=\"" + lineStyle2.color.toHexRGB() + "\"";
+         }
+         String points="";
+         int x=0;
+         int y=0;
+         for(SHAPERECORD r:edges){
+            points+=" "+r.toSWG(x,y);
+            x=r.changeX(x);
+            y=r.changeY(y);
+         }
+         ret += "<path" + params + " d=\"" + points + "\"/>";
+         return ret;
+      }
    }
+
+   public abstract String toSWG(int oldX,int oldY);
+
+   public abstract int changeX(int x);
+
+   public abstract int changeY(int y);
+
+   public abstract void flip();
    
-   public static RECT getBounds(List<SHAPERECORD> records){      
+   public static RECT getBounds(List<SHAPERECORD> records) {
       int x = 0;
       int y = 0;
       int max_x = 0;
@@ -55,39 +98,16 @@ public abstract class SHAPERECORD {
       int min_y = Integer.MAX_VALUE;
       boolean started = false;
       for (SHAPERECORD r : records) {
-         if (r instanceof StyleChangeRecord) {
-            StyleChangeRecord scr = (StyleChangeRecord) r;            
-            if (scr.stateMoveTo) {
-               x = scr.moveDeltaX;
-               y = scr.moveDeltaY;
-               started = true;
-            }
-         } 
-         if (r instanceof StraightEdgeRecord) {
-            StraightEdgeRecord ser = (StraightEdgeRecord) r;
-            if (ser.generalLineFlag) {
-               x += ser.deltaX;
-               y += ser.deltaY;
-               started = true;
-            } else if (ser.vertLineFlag) {
-               y += ser.deltaY;
-               started = true;
-            } else {
-               x += ser.deltaX;
-               started = true;
-            }
-         }
-         if (r instanceof CurvedEdgeRecord) {
-            CurvedEdgeRecord cer = (CurvedEdgeRecord) r;
-            x += cer.controlDeltaX + cer.anchorDeltaX;
-            y += cer.controlDeltaY + cer.anchorDeltaY;
-            started = true;
-         }
+         x = r.changeX(x);
+         y = r.changeY(y);
          if (x > max_x) {
             max_x = x;
          }
          if (y > max_y) {
             max_y = y;
+         }
+         if(r.isMove()){
+            started=true;
          }
          if (started) {
             if (y < min_y) {
@@ -98,14 +118,14 @@ public abstract class SHAPERECORD {
             }
          }
       }
-      return new RECT(min_x,max_x,min_y,max_y);
+      return new RECT(min_x, max_x, min_y, max_y);
    }
 
    /**
     * EXPERIMENTAL - convert shape to SVG
-    * 
+    *
     * TODO: Fix fill styles
-    * 
+    *
     * @param shapeNum
     * @param fillStyles
     * @param lineStylesList
@@ -118,7 +138,6 @@ public abstract class SHAPERECORD {
       String ret = "";
       List<Path> paths = new ArrayList<Path>();
       Path path = new Path();
-      boolean styleChanged = false;
       int x = 0;
       int y = 0;
       int max_x = 0;
@@ -129,6 +148,9 @@ public abstract class SHAPERECORD {
       for (SHAPERECORD r : records) {
          if (r instanceof StyleChangeRecord) {
             StyleChangeRecord scr = (StyleChangeRecord) r;
+            paths.add(path);
+            path = new Path();
+
             if (scr.stateNewStyles) {
                fillStyles = scr.fillStyles;
                lineStylesList = scr.lineStyles;
@@ -136,7 +158,6 @@ public abstract class SHAPERECORD {
                numLineBits = scr.numLineBits;
             }
             if (scr.stateFillStyle0) {
-               styleChanged = true;
                if (scr.fillStyle0 == 0) {
                   path.fillStyle0 = null;
                } else {
@@ -144,7 +165,6 @@ public abstract class SHAPERECORD {
                }
             }
             if (scr.stateFillStyle1) {
-               styleChanged = true;
                if (scr.fillStyle1 == 0) {
                   path.fillStyle1 = null;
                } else {
@@ -152,8 +172,7 @@ public abstract class SHAPERECORD {
                }
             }
             if (scr.stateLineStyle) {
-               styleChanged = true;
-               if (shapeNum>=4) {
+               if (shapeNum >= 4) {
                   path.useLineStyle2 = true;
                   if (scr.lineStyle == 0) {
                      path.lineStyle2 = null;
@@ -168,44 +187,13 @@ public abstract class SHAPERECORD {
                      path.lineStyle = lineStylesList.lineStyles[scr.lineStyle - 1];
                   }
                }
-            }
-            if (scr.stateMoveTo) {
-               ret += "M " + twipToPixel(scr.moveDeltaX) + " " + twipToPixel(scr.moveDeltaY);
-               x = scr.moveDeltaX;
-               y = scr.moveDeltaY;
-
-               started = true;
-            }
-         } else if (styleChanged) {
-            styleChanged = false;
-            path.points = ret;
-            ret = "M " + twipToPixel(x) + " " + twipToPixel(y);
-            paths.add(path);
-            path = new Path();
-         }
-         if (r instanceof StraightEdgeRecord) {
-            StraightEdgeRecord ser = (StraightEdgeRecord) r;
-            if (ser.generalLineFlag) {
-               ret += "l " + twipToPixel(ser.deltaX) + " " + twipToPixel(ser.deltaY);
-               x += ser.deltaX;
-               y += ser.deltaY;
-               started = true;
-            } else if (ser.vertLineFlag) {
-               ret += "v " + twipToPixel(ser.deltaY);
-               y += ser.deltaY;
-               started = true;
-            } else {
-               ret += "h " + twipToPixel(ser.deltaX);
-               x += ser.deltaX;
-               started = true;
-            }
-         }
-         if (r instanceof CurvedEdgeRecord) {
-            CurvedEdgeRecord cer = (CurvedEdgeRecord) r;
-            ret += "q " + twipToPixel(cer.controlDeltaX) + " " + twipToPixel(cer.controlDeltaY) + " " + twipToPixel(cer.controlDeltaX + cer.anchorDeltaX) + " " + twipToPixel(cer.controlDeltaY + cer.anchorDeltaY);
-            x += cer.controlDeltaX + cer.anchorDeltaX;
-            y += cer.controlDeltaY + cer.anchorDeltaY;
-            started = true;
+            }            
+         } 
+         path.edges.add(r); 
+         x=r.changeX(x);
+         y=r.changeY(y);
+         if(r.isMove()){
+            started=true;
          }
          if (x > max_x) {
             max_x = x;
@@ -222,42 +210,72 @@ public abstract class SHAPERECORD {
             }
          }
       }
-      path.points = ret;
       paths.add(path);
+      List<Path> paths2=new ArrayList<Path>();
+      for(Path p:paths){
+         if(p.fillStyle0!=null){
+            paths2.add(p);
+         }
+         if(p.fillStyle1!=null){
+            Path f=new Path();
+            f.edges=new ArrayList<SHAPERECORD>();
+            f.fillStyle0=p.fillStyle1;
+            f.lineStyle=p.lineStyle;
+            f.lineStyle2=p.lineStyle2;
+            f.useLineStyle2=p.useLineStyle2;   
+            x=0;
+            y=0;
+            for(SHAPERECORD r:p.edges){
+               x=r.changeX(x);
+               y=r.changeY(y);
+               SHAPERECORD r2=null;
+               try {
+                  r2 = (SHAPERECORD)r.clone();
+               } catch (CloneNotSupportedException ex) {
+                  Logger.getLogger(SHAPERECORD.class.getName()).log(Level.SEVERE, null, ex);
+               }
+               r2.flip();
+               f.edges.add(0,r2);
+            }
+            StyleChangeRecord scr=new StyleChangeRecord();
+            scr.stateMoveTo=true;
+            scr.moveDeltaX=x;
+            scr.moveDeltaY=y;
+            f.edges.add(0,scr);
+            paths2.add(f);               
+         }       
+      }
+      List<Path> paths3=new ArrayList<Path>();
+      for(Path p1:paths2){
+         boolean found=false;
+         for(Path p2:paths3){
+            if(p1==p2){
+               continue;
+            }
+            if(p1.sameStyle(p2)){
+               p2.edges.addAll(p1.edges);
+               found=true;
+               break;
+            }
+         }
+         if(!found){
+            paths3.add(p1);
+         }
+      }
       ret = "";
-      for (Path p : paths) {
-         String params = "";
-         String f = "";
-         if (p.fillStyle0 != null) {
-            if (p.fillStyle0.fillStyleType == FILLSTYLE.SOLID) {
-               f = " fill=\"" + ((shapeNum >= 3) ? p.fillStyle0.colorA.toHexRGB() : p.fillStyle0.color.toHexRGB()) + "\"";
-            }
-         } else if (p.fillStyle1 != null) {
-            if (p.fillStyle1.fillStyleType == FILLSTYLE.SOLID) {
-               f = " fill=\"" + ((shapeNum >= 3) ? p.fillStyle1.colorA.toHexRGB() : p.fillStyle1.color.toHexRGB()) + "\"";
-            }
-         }
-         if (p.fillStyle0 != null && p.fillStyle1 != null) {
-            Random rnd = new Random();
-            f = " fill=\"" + (new RGB(rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))).toHexRGB() + "\"";
-         }
-         params += f;
-         if ((!p.useLineStyle2) && p.lineStyle != null) {
-            params += " stroke=\"" + ((shapeNum >= 3) ? p.lineStyle.colorA.toHexRGB() : p.lineStyle.color.toHexRGB()) + "\"";
-         }
-         if (p.useLineStyle2 && p.lineStyle2 != null) {
-            params += " stroke-width=\"" + twipToPixel(p.lineStyle2.width) + "\" stroke=\"" + p.lineStyle2.color.toHexRGB() + "\"";
-         }
-         ret += "<path" + params + " d=\"" + p.points + "\"/>";
+      for (Path p : paths3) {
+         ret+=p.toSVG(shapeNum);
       }
       ret = "<?xml version='1.0' encoding='UTF-8' ?> \n"
               + "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\n"
               + "<svg width=\"" + (int) Math.ceil(twipToPixel(max_x)) + "\"\n"
               + "     height=\"" + (int) Math.ceil(twipToPixel(max_y)) + "\"\n"
-              + "     viewBox=\"" + (int) Math.ceil(twipToPixel(min_x)) + " " + (int) Math.ceil(twipToPixel(min_y)) + " " + (int) Math.ceil(twipToPixel(max_x)) + " " + (int) Math.ceil(twipToPixel(max_y) + 50) + "\"\n"
+              + "     viewBox=\"0 0 " + (int) Math.ceil(twipToPixel(max_x)) + " " + (int) Math.ceil(twipToPixel(max_y) + 50) + "\"\n"
               + "     xmlns=\"http://www.w3.org/2000/svg\"\n"
               + "     xmlns:xlink=\"http://www.w3.org/1999/xlink\">" + ret + ""
               + "</svg>";
       return ret;
    }
+   
+   public abstract boolean isMove();
 }

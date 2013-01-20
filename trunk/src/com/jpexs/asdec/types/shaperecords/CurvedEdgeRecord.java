@@ -36,4 +36,36 @@ public class CurvedEdgeRecord extends SHAPERECORD {
    public String toString() {
       return "[CurvedEdgeRecord numBits=" + numBits + ", controlDeltaX=" + controlDeltaX + ", controlDeltaY=" + controlDeltaY + ", anchorDeltaX=" + anchorDeltaX + ". anchorDeltaY=" + anchorDeltaY + "]";
    }
+
+   @Override
+   public String toSWG(int oldX,int oldY) {
+      return "Q " + twipToPixel(oldX+controlDeltaX) + " " + twipToPixel(oldY+controlDeltaY) + " " + twipToPixel(oldX+controlDeltaX + anchorDeltaX) + " " + twipToPixel(oldY+controlDeltaY + anchorDeltaY);
+            
+   }
+
+   @Override
+   public int changeX(int x) {
+      return x+(controlDeltaX+anchorDeltaX);
+   }
+
+   @Override
+   public int changeY(int y) {
+      return y+(controlDeltaY+anchorDeltaY);
+   }
+
+   @Override
+   public void flip() {
+      int tmp;
+      tmp=controlDeltaX;
+      controlDeltaX=-anchorDeltaX;
+      anchorDeltaX=-tmp;
+      tmp=controlDeltaY;
+      controlDeltaY=-anchorDeltaY;
+      anchorDeltaY=-tmp ;
+   }
+
+   @Override
+   public boolean isMove() {
+      return true;
+   }
 }

@@ -31,4 +31,29 @@ public class EndShapeRecord extends SHAPERECORD {
    public String toString() {
       return "[EndShapeRecord]";
    }
+
+   @Override
+   public String toSWG(int oldX,int oldY) {
+      return "";
+   }
+
+   @Override
+   public int changeX(int x) {
+      return x;
+   }
+
+   @Override
+   public int changeY(int y) {
+      return y;
+   }
+
+   @Override
+   public void flip() {
+      
+   }
+
+   @Override
+   public boolean isMove() {
+      return false;
+   }
 }
