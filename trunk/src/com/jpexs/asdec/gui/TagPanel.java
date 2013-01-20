@@ -220,13 +220,8 @@ public class TagPanel extends JPanel implements ListSelectionListener {
             mat.hasScale = false;
             mat.translateX = 0;
             mat.translateY = 0;
-            if ((tagObj instanceof BoundedTag) || (tagObj instanceof DefineSpriteTag)) {
-               RECT r = null;
-               if (tagObj instanceof DefineSpriteTag) {
-                  r = ((DefineSpriteTag) tagObj).getRect(characters);                  
-               } else {
-                  r = ((BoundedTag) tagObj).getRect();
-               }
+            if (tagObj instanceof BoundedTag) {
+               RECT r = ((BoundedTag) tagObj).getRect(characters);
                mat.translateX = -r.Xmin;
                mat.translateY = -r.Ymin;
                mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;

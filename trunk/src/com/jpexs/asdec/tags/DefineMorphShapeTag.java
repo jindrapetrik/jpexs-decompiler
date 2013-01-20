@@ -31,6 +31,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
 
 /**
  *
@@ -103,7 +104,7 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Alo
    }
 
    @Override
-   public RECT getRect() {
+   public RECT getRect(HashMap<Integer,CharacterTag> characters) {
       RECT rect = new RECT();
       rect.Xmin = Math.min(startBounds.Xmin, endBounds.Xmin);
       rect.Ymin = Math.min(startBounds.Ymin, endBounds.Ymin);

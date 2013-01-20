@@ -19,6 +19,7 @@
 package com.jpexs.asdec.tags.base;
 
 import com.jpexs.asdec.types.RECT;
+import java.util.HashMap;
 
 /**
  *
@@ -26,5 +27,5 @@ import com.jpexs.asdec.types.RECT;
  */
 public interface BoundedTag {
 
-   public RECT getRect();
+   public RECT getRect(HashMap<Integer,CharacterTag> characters);
 }

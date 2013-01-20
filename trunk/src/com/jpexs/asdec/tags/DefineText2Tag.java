@@ -30,6 +30,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -49,7 +50,7 @@ public class DefineText2Tag extends CharacterTag implements BoundedTag {
    public List<TEXTRECORD> textRecords;
 
    @Override
-   public RECT getRect() {
+   public RECT getRect(HashMap<Integer,CharacterTag> characters) {
       return textBounds;
    }
 

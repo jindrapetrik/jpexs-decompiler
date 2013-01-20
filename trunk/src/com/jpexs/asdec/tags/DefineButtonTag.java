@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.Main;
@@ -24,14 +22,19 @@ import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.abc.CopyOutputStream;
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.tags.base.ASMSource;
+import com.jpexs.asdec.tags.base.BoundedTag;
 import com.jpexs.asdec.tags.base.CharacterTag;
 import com.jpexs.asdec.types.BUTTONRECORD;
+import com.jpexs.asdec.types.RECT;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,7 +43,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class DefineButtonTag extends CharacterTag implements ASMSource {
+public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedTag {
 
    /**
     * ID for this character
@@ -154,5 +157,30 @@ public class DefineButtonTag extends CharacterTag implements ASMSource {
 
    public void setActionBytes(byte[] actionBytes) {
       this.actionBytes = actionBytes;
+   }
+
+   @Override
+   public Set<Integer> getNeededCharacters() {
+      HashSet<Integer> needed = new HashSet<Integer>();
+      for (BUTTONRECORD r : characters) {
+         needed.add(r.characterId);
+      }
+      return needed;
+   }
+
+   @Override
+   public RECT getRect(HashMap<Integer, CharacterTag> allCharacters) {
+      RECT rect = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
+      for (BUTTONRECORD r : characters) {
+         CharacterTag ch = allCharacters.get(r.characterId);
+         if (ch instanceof BoundedTag) {
+            RECT r2 = ((BoundedTag) ch).getRect(allCharacters);
+            rect.Xmin = Math.min(r2.Xmin, rect.Xmin);
+            rect.Ymin = Math.min(r2.Ymin, rect.Ymin);
+            rect.Xmax = Math.max(r2.Xmax, rect.Xmax);
+            rect.Ymax = Math.max(r2.Ymax, rect.Ymax);
+         }
+      }
+      return rect;
    }
 }

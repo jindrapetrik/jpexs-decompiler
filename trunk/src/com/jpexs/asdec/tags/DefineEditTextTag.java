@@ -28,6 +28,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -68,7 +71,7 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag {
    public String initialText;
 
    @Override
-   public RECT getRect() {
+   public RECT getRect(HashMap<Integer,CharacterTag> allCharacters) {
       return bounds;
    }
 
@@ -195,4 +198,15 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag {
       }
 
    }
+
+   @Override
+   public Set<Integer> getNeededCharacters() {
+      HashSet<Integer> needed= new HashSet<Integer>();
+      if(hasFont){
+         needed.add(fontId);
+      }
+      return needed;
+   }
+   
+   
 }

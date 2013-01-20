@@ -26,6 +26,7 @@ import com.jpexs.asdec.types.RECT;
 import com.jpexs.asdec.types.SHAPEWITHSTYLE;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 
 public class DefineShape3Tag extends CharacterTag implements BoundedTag, AloneTag {
 
@@ -34,7 +35,7 @@ public class DefineShape3Tag extends CharacterTag implements BoundedTag, AloneTa
    public SHAPEWITHSTYLE shapes;
 
    @Override
-   public RECT getRect() {
+   public RECT getRect(HashMap<Integer,CharacterTag> characters) {
       return shapeBounds;
    }
 

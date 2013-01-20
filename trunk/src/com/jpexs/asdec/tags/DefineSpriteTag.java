@@ -39,7 +39,7 @@ import java.util.Set;
 /**
  * Defines a sprite character
  */
-public class DefineSpriteTag extends CharacterTag implements Container {
+public class DefineSpriteTag extends CharacterTag implements Container, BoundedTag {
 
    /**
     * Character ID of sprite
@@ -66,9 +66,7 @@ public class DefineSpriteTag extends CharacterTag implements Container {
          Tag t = allCharacters.get(c);
          RECT r = null;
          if (t instanceof BoundedTag) {
-            r = ((BoundedTag) t).getRect();
-         } else if (t instanceof DefineSpriteTag) {
-            r = ((DefineSpriteTag) t).getRect(allCharacters);
+            r = ((BoundedTag) t).getRect(allCharacters);
          }
          if (r != null) {
             ret.Xmin = Math.min(r.Xmin, ret.Xmin);
