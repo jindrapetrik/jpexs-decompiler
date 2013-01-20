@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
@@ -49,8 +47,8 @@ public abstract class TreeItem {
    }
 
    public abstract String toString(ConstantPool constants);
-   
-   public String toStringNoQuotes(ConstantPool constants){
+
+   public String toStringNoQuotes(ConstantPool constants) {
       return toString(constants);
    }
 

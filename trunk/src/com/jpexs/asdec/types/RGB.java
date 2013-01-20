@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec.types;
 
 /**
@@ -46,20 +44,20 @@ public class RGB {
 
    public RGB() {
    }
-   
-   public String toHexRGB(){
-      String rh=Integer.toHexString(red);
-      if(rh.length()<2){
-         rh="0"+rh;
+
+   public String toHexRGB() {
+      String rh = Integer.toHexString(red);
+      if (rh.length() < 2) {
+         rh = "0" + rh;
       }
-      String gh=Integer.toHexString(green);
-      if(gh.length()<2){
-         gh="0"+gh;
+      String gh = Integer.toHexString(green);
+      if (gh.length() < 2) {
+         gh = "0" + gh;
       }
-      String bh=Integer.toHexString(blue);
-      if(bh.length()<2){
-         bh="0"+bh;
+      String bh = Integer.toHexString(blue);
+      if (bh.length() < 2) {
+         bh = "0" + bh;
       }
-      return "#"+rh+gh+bh;
+      return "#" + rh + gh + bh;
    }
 }

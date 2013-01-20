@@ -36,33 +36,33 @@ public class StraightEdgeRecord extends SHAPERECORD {
    }
 
    @Override
-   public String toSWG(int oldX,int oldY) {
+   public String toSWG(int oldX, int oldY) {
       if (generalLineFlag) {
-         return "L " + twipToPixel(oldX+deltaX) + " " + twipToPixel(oldY+deltaY);
+         return "L " + twipToPixel(oldX + deltaX) + " " + twipToPixel(oldY + deltaY);
       } else if (vertLineFlag) {
-         return "V " + twipToPixel(oldY+deltaY);
+         return "V " + twipToPixel(oldY + deltaY);
       } else {
-         return "H " + twipToPixel(oldX+deltaX);
+         return "H " + twipToPixel(oldX + deltaX);
       }
    }
 
    @Override
    public int changeX(int x) {
       if (generalLineFlag) {
-         return x+deltaX;
+         return x + deltaX;
       } else if (vertLineFlag) {
          return x;
       } else {
-         return x+deltaX;
+         return x + deltaX;
       }
    }
 
    @Override
    public int changeY(int y) {
       if (generalLineFlag) {
-         return y+deltaY;
+         return y + deltaY;
       } else if (vertLineFlag) {
-         return y+deltaY;
+         return y + deltaY;
       } else {
          return y;
       }
@@ -70,10 +70,10 @@ public class StraightEdgeRecord extends SHAPERECORD {
 
    @Override
    public void flip() {
-      deltaX=-deltaX;
-      deltaY=-deltaY;
+      deltaX = -deltaX;
+      deltaY = -deltaY;
    }
-   
+
    @Override
    public boolean isMove() {
       return true;

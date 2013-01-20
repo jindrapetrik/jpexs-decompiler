@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
@@ -44,7 +42,7 @@ public class DefineShape4Tag extends CharacterTag implements BoundedTag, AloneTa
    }
 
    @Override
-   public RECT getRect(HashMap<Integer,CharacterTag> characters) {
+   public RECT getRect(HashMap<Integer, CharacterTag> characters) {
       return shapeBounds;
    }
 

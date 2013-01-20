@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec.types.shaperecords;
 
 /**
@@ -38,30 +36,30 @@ public class CurvedEdgeRecord extends SHAPERECORD {
    }
 
    @Override
-   public String toSWG(int oldX,int oldY) {
-      return "Q " + twipToPixel(oldX+controlDeltaX) + " " + twipToPixel(oldY+controlDeltaY) + " " + twipToPixel(oldX+controlDeltaX + anchorDeltaX) + " " + twipToPixel(oldY+controlDeltaY + anchorDeltaY);
-            
+   public String toSWG(int oldX, int oldY) {
+      return "Q " + twipToPixel(oldX + controlDeltaX) + " " + twipToPixel(oldY + controlDeltaY) + " " + twipToPixel(oldX + controlDeltaX + anchorDeltaX) + " " + twipToPixel(oldY + controlDeltaY + anchorDeltaY);
+
    }
 
    @Override
    public int changeX(int x) {
-      return x+(controlDeltaX+anchorDeltaX);
+      return x + (controlDeltaX + anchorDeltaX);
    }
 
    @Override
    public int changeY(int y) {
-      return y+(controlDeltaY+anchorDeltaY);
+      return y + (controlDeltaY + anchorDeltaY);
    }
 
    @Override
    public void flip() {
       int tmp;
-      tmp=controlDeltaX;
-      controlDeltaX=-anchorDeltaX;
-      anchorDeltaX=-tmp;
-      tmp=controlDeltaY;
-      controlDeltaY=-anchorDeltaY;
-      anchorDeltaY=-tmp ;
+      tmp = controlDeltaX;
+      controlDeltaX = -anchorDeltaX;
+      anchorDeltaX = -tmp;
+      tmp = controlDeltaY;
+      controlDeltaY = -anchorDeltaY;
+      anchorDeltaY = -tmp;
    }
 
    @Override

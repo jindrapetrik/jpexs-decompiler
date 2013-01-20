@@ -65,7 +65,7 @@ public class ClassTreeItem extends TreeItem implements Block {
          ret += f.toString(constants) + "\r\n";
       }
       for (TreeItem v : vars.keySet()) {
-         ret += "var " + v.toStringNoQuotes(constants) + " = " + vars.get(v).toStringNoQuotes(constants)+";\r\n";
+         ret += "var " + v.toStringNoQuotes(constants) + " = " + vars.get(v).toStringNoQuotes(constants) + ";\r\n";
       }
       ret += "}\r\n";
       return ret;

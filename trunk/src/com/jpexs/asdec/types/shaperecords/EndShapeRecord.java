@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec.types.shaperecords;
 
 /**
@@ -33,7 +31,7 @@ public class EndShapeRecord extends SHAPERECORD {
    }
 
    @Override
-   public String toSWG(int oldX,int oldY) {
+   public String toSWG(int oldX, int oldY) {
       return "";
    }
 
@@ -49,7 +47,6 @@ public class EndShapeRecord extends SHAPERECORD {
 
    @Override
    public void flip() {
-      
    }
 
    @Override

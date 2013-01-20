@@ -281,35 +281,35 @@ public class MainFrame extends JFrame implements ActionListener {
       getContentPane().add(tabPane, BorderLayout.CENTER);
 
       if (!abcList.isEmpty()) {
-         addTab(tabPane,abcPanel = new ABCPanel(abcList),"ActionScript3",new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/as16.png")));
+         addTab(tabPane, abcPanel = new ABCPanel(abcList), "ActionScript3", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/as16.png")));
       } else {
          actionPanel = new ActionPanel(swf.tags);
          if (actionPanel.tagTree.getRowCount() > 1) {
-            addTab(tabPane,actionPanel,"ActionScript",new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/as16.png")));
+            addTab(tabPane, actionPanel, "ActionScript", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/as16.png")));
          }
          menuDeobfuscation.setEnabled(false);
       }
 
       if (!shapes.isEmpty()) {
-         addTab(tabPane,shapesTagPanel = new TagPanel(shapes, swf),"Shapes",new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/shape16.png")));
+         addTab(tabPane, shapesTagPanel = new TagPanel(shapes, swf), "Shapes", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/shape16.png")));
       }
       if (!morphShapes.isEmpty()) {
-         addTab(tabPane, morphshapesTagPanel = new TagPanel(morphShapes, swf),"MorphShapes",new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/morphshape16.png")));
+         addTab(tabPane, morphshapesTagPanel = new TagPanel(morphShapes, swf), "MorphShapes", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/morphshape16.png")));
       }
       if (!images.isEmpty()) {
-         addTab(tabPane,imagesTagPanel = new TagPanel(images, swf),"Images",new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/image16.png")));
+         addTab(tabPane, imagesTagPanel = new TagPanel(images, swf), "Images", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/image16.png")));
       }
       if (!sprites.isEmpty()) {
-         addTab(tabPane, spritesTagPanel = new TagPanel(sprites, swf),"Sprites",new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/sprite16.png")));
+         addTab(tabPane, spritesTagPanel = new TagPanel(sprites, swf), "Sprites", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/sprite16.png")));
       }
       if (!fonts.isEmpty()) {
-         addTab(tabPane,fontsTagPanel = new TagPanel(fonts, swf),"Fonts",new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/font16.png")));
+         addTab(tabPane, fontsTagPanel = new TagPanel(fonts, swf), "Fonts", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/font16.png")));
       }
       if (!texts.isEmpty()) {
-         addTab(tabPane,textsTagPanel = new TagPanel(texts, swf),"Texts",new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/text16.png")));
+         addTab(tabPane, textsTagPanel = new TagPanel(texts, swf), "Texts", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/text16.png")));
       }
       if (!buttons.isEmpty()) {
-         addTab(tabPane, buttonsTagPanel = new TagPanel(buttons, swf),"Buttons",new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/button16.png")));
+         addTab(tabPane, buttonsTagPanel = new TagPanel(buttons, swf), "Buttons", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/button16.png")));
       }
 
 

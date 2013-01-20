@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.Main;
@@ -180,28 +178,26 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
 
    @Override
    public Set<Integer> getNeededCharacters() {
-      HashSet<Integer> needed=new HashSet<Integer>();
-      for(BUTTONRECORD r:characters){
+      HashSet<Integer> needed = new HashSet<Integer>();
+      for (BUTTONRECORD r : characters) {
          needed.add(r.characterId);
       }
       return needed;
    }
 
    @Override
-   public RECT getRect(HashMap<Integer,CharacterTag> allCharacters) {
-      RECT rect=new RECT(Integer.MAX_VALUE,Integer.MIN_VALUE,Integer.MAX_VALUE,Integer.MIN_VALUE);
-      for(BUTTONRECORD r:characters){
-         CharacterTag ch=allCharacters.get(r.characterId);
-         if(ch instanceof BoundedTag){
-            RECT r2=((BoundedTag)ch).getRect(allCharacters);            
-            rect.Xmin=Math.min(r2.Xmin,rect.Xmin);         
-            rect.Ymin=Math.min(r2.Ymin,rect.Ymin);
-            rect.Xmax=Math.max(r2.Xmax,rect.Xmax);
-            rect.Ymax=Math.max(r2.Ymax,rect.Ymax);            
+   public RECT getRect(HashMap<Integer, CharacterTag> allCharacters) {
+      RECT rect = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
+      for (BUTTONRECORD r : characters) {
+         CharacterTag ch = allCharacters.get(r.characterId);
+         if (ch instanceof BoundedTag) {
+            RECT r2 = ((BoundedTag) ch).getRect(allCharacters);
+            rect.Xmin = Math.min(r2.Xmin, rect.Xmin);
+            rect.Ymin = Math.min(r2.Ymin, rect.Ymin);
+            rect.Xmax = Math.max(r2.Xmax, rect.Xmax);
+            rect.Ymax = Math.max(r2.Ymax, rect.Ymax);
          }
       }
       return rect;
    }
-   
-   
 }

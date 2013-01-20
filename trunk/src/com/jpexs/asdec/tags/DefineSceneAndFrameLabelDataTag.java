@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
@@ -84,8 +82,8 @@ public class DefineSceneAndFrameLabelDataTag extends Tag {
          sceneNames[i] = sis.readString();
       }
       int frameLabelCount = (int) sis.readEncodedU32();
-      frameNums=new long[frameLabelCount];
-      frameNames=new String[frameLabelCount];
+      frameNums = new long[frameLabelCount];
+      frameNames = new String[frameLabelCount];
       for (int i = 0; i < frameLabelCount; i++) {
          frameNums[i] = sis.readEncodedU32();
          frameNames[i] = sis.readString();

@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec.abc;
 
 import com.jpexs.asdec.EventListener;
@@ -592,37 +590,37 @@ public class ABC {
       loopfoo:
       do {
          exists = false;
-         int len = 3+rnd.nextInt(rndSize-3);
-         ret="";
-         for(int i=0;i<len;i++){
-            String c="";
-            if((i%2)==0){
-               c=""+fooCharacters.charAt(rnd.nextInt(fooCharacters.length()));
-            }else{
-               c=""+fooJoinCharacters.charAt(rnd.nextInt(fooJoinCharacters.length()));
+         int len = 3 + rnd.nextInt(rndSize - 3);
+         ret = "";
+         for (int i = 0; i < len; i++) {
+            String c = "";
+            if ((i % 2) == 0) {
+               c = "" + fooCharacters.charAt(rnd.nextInt(fooCharacters.length()));
+            } else {
+               c = "" + fooJoinCharacters.charAt(rnd.nextInt(fooJoinCharacters.length()));
             }
-            if(i==0 && firstUppercase){
-               c=c.toUpperCase();
+            if (i == 0 && firstUppercase) {
+               c = c.toUpperCase();
             }
-            ret+=c;
-         }         
+            ret += c;
+         }
          for (int i = 1; i < constants.constant_string.length; i++) {
             if (constants.constant_string[i].equals(ret)) {
                exists = true;
-               rndSize=rndSize+1;
+               rndSize = rndSize + 1;
                continue loopfoo;
             }
          }
          if (isReserved(ret)) {
             exists = true;
-            rndSize=rndSize+1;
+            rndSize = rndSize + 1;
             continue;
          }
          if (deobfuscated.containsValue(ret)) {
             exists = true;
-            rndSize=rndSize+1;
+            rndSize = rndSize + 1;
             continue;
-         }         
+         }
       } while (exists);
       deobfuscated.put(orig, ret);
       return ret;

@@ -47,13 +47,13 @@ public abstract class SHAPERECORD implements Cloneable {
       public FILLSTYLE fillStyle0;
       public FILLSTYLE fillStyle1;
       public List<SHAPERECORD> edges = new ArrayList<SHAPERECORD>();
-      
-      public boolean sameStyle(Path p){
-         return fillStyle0==p.fillStyle0 && ((useLineStyle2&&(p.lineStyle2==lineStyle2)) || ((!useLineStyle2)&&(p.lineStyle==lineStyle)));
+
+      public boolean sameStyle(Path p) {
+         return fillStyle0 == p.fillStyle0 && ((useLineStyle2 && (p.lineStyle2 == lineStyle2)) || ((!useLineStyle2) && (p.lineStyle == lineStyle)));
       }
-      
-      public String toSVG(int shapeNum){
-         String ret="";
+
+      public String toSVG(int shapeNum) {
+         String ret = "";
          String params = "";
          String f = "";
          if (fillStyle0 != null) {
@@ -68,27 +68,27 @@ public abstract class SHAPERECORD implements Cloneable {
          if (useLineStyle2 && lineStyle2 != null) {
             params += " stroke-width=\"" + twipToPixel(lineStyle2.width) + "\" stroke=\"" + lineStyle2.color.toHexRGB() + "\"";
          }
-         String points="";
-         int x=0;
-         int y=0;
-         for(SHAPERECORD r:edges){
-            points+=" "+r.toSWG(x,y);
-            x=r.changeX(x);
-            y=r.changeY(y);
+         String points = "";
+         int x = 0;
+         int y = 0;
+         for (SHAPERECORD r : edges) {
+            points += " " + r.toSWG(x, y);
+            x = r.changeX(x);
+            y = r.changeY(y);
          }
          ret += "<path" + params + " d=\"" + points + "\"/>";
          return ret;
       }
    }
 
-   public abstract String toSWG(int oldX,int oldY);
+   public abstract String toSWG(int oldX, int oldY);
 
    public abstract int changeX(int x);
 
    public abstract int changeY(int y);
 
    public abstract void flip();
-   
+
    public static RECT getBounds(List<SHAPERECORD> records) {
       int x = 0;
       int y = 0;
@@ -106,8 +106,8 @@ public abstract class SHAPERECORD implements Cloneable {
          if (y > max_y) {
             max_y = y;
          }
-         if(r.isMove()){
-            started=true;
+         if (r.isMove()) {
+            started = true;
          }
          if (started) {
             if (y < min_y) {
@@ -123,7 +123,7 @@ public abstract class SHAPERECORD implements Cloneable {
 
    /**
     * Convert shape to SVG
-    *    
+    *
     * @param shapeNum
     * @param fillStyles
     * @param lineStylesList
@@ -185,13 +185,13 @@ public abstract class SHAPERECORD implements Cloneable {
                      path.lineStyle = lineStylesList.lineStyles[scr.lineStyle - 1];
                   }
                }
-            }            
-         } 
-         path.edges.add(r); 
-         x=r.changeX(x);
-         y=r.changeY(y);
-         if(r.isMove()){
-            started=true;
+            }
+         }
+         path.edges.add(r);
+         x = r.changeX(x);
+         y = r.changeY(y);
+         if (r.isMove()) {
+            started = true;
          }
          if (x > max_x) {
             max_x = x;
@@ -209,60 +209,60 @@ public abstract class SHAPERECORD implements Cloneable {
          }
       }
       paths.add(path);
-      List<Path> paths2=new ArrayList<Path>();
-      for(Path p:paths){
-         if(p.fillStyle0!=null){
+      List<Path> paths2 = new ArrayList<Path>();
+      for (Path p : paths) {
+         if (p.fillStyle0 != null) {
             paths2.add(p);
          }
-         if(p.fillStyle1!=null){
-            Path f=new Path();
-            f.edges=new ArrayList<SHAPERECORD>();
-            f.fillStyle0=p.fillStyle1;
-            f.lineStyle=p.lineStyle;
-            f.lineStyle2=p.lineStyle2;
-            f.useLineStyle2=p.useLineStyle2;   
-            x=0;
-            y=0;
-            for(SHAPERECORD r:p.edges){
-               x=r.changeX(x);
-               y=r.changeY(y);
-               SHAPERECORD r2=null;
+         if (p.fillStyle1 != null) {
+            Path f = new Path();
+            f.edges = new ArrayList<SHAPERECORD>();
+            f.fillStyle0 = p.fillStyle1;
+            f.lineStyle = p.lineStyle;
+            f.lineStyle2 = p.lineStyle2;
+            f.useLineStyle2 = p.useLineStyle2;
+            x = 0;
+            y = 0;
+            for (SHAPERECORD r : p.edges) {
+               x = r.changeX(x);
+               y = r.changeY(y);
+               SHAPERECORD r2 = null;
                try {
-                  r2 = (SHAPERECORD)r.clone();
+                  r2 = (SHAPERECORD) r.clone();
                } catch (CloneNotSupportedException ex) {
                   Logger.getLogger(SHAPERECORD.class.getName()).log(Level.SEVERE, null, ex);
                }
                r2.flip();
-               f.edges.add(0,r2);
+               f.edges.add(0, r2);
             }
-            StyleChangeRecord scr=new StyleChangeRecord();
-            scr.stateMoveTo=true;
-            scr.moveDeltaX=x;
-            scr.moveDeltaY=y;
-            f.edges.add(0,scr);
-            paths2.add(f);               
-         }       
+            StyleChangeRecord scr = new StyleChangeRecord();
+            scr.stateMoveTo = true;
+            scr.moveDeltaX = x;
+            scr.moveDeltaY = y;
+            f.edges.add(0, scr);
+            paths2.add(f);
+         }
       }
-      List<Path> paths3=new ArrayList<Path>();
-      for(Path p1:paths2){
-         boolean found=false;
-         for(Path p2:paths3){
-            if(p1==p2){
+      List<Path> paths3 = new ArrayList<Path>();
+      for (Path p1 : paths2) {
+         boolean found = false;
+         for (Path p2 : paths3) {
+            if (p1 == p2) {
                continue;
             }
-            if(p1.sameStyle(p2)){
+            if (p1.sameStyle(p2)) {
                p2.edges.addAll(p1.edges);
-               found=true;
+               found = true;
                break;
             }
          }
-         if(!found){
+         if (!found) {
             paths3.add(p1);
          }
       }
       ret = "";
       for (Path p : paths3) {
-         ret+=p.toSVG(shapeNum);
+         ret += p.toSVG(shapeNum);
       }
       ret = "<?xml version='1.0' encoding='UTF-8' ?> \n"
               + "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\n"
@@ -274,6 +274,6 @@ public abstract class SHAPERECORD implements Cloneable {
               + "</svg>";
       return ret;
    }
-   
+
    public abstract boolean isMove();
 }

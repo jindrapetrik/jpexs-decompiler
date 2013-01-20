@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec;
 
 import com.jpexs.asdec.action.Action;
@@ -67,9 +65,9 @@ public class SWFInputStream extends InputStream {
          listeners.remove(index);
       }
    }
-   
-   public void setPercentMax(long percentMax){
-      this.percentMax=percentMax;
+
+   public void setPercentMax(long percentMax) {
+      this.percentMax = percentMax;
    }
 
    /**
@@ -129,8 +127,8 @@ public class SWFInputStream extends InputStream {
    private int lastPercent = -1;
 
    private int readNoBitReset() throws IOException {
-      pos++;      
-      if(percentMax>0){
+      pos++;
+      if (percentMax > 0) {
          int percent = (int) (pos * 100 / percentMax);
          if (lastPercent != percent) {
             for (PercentListener pl : listeners) {

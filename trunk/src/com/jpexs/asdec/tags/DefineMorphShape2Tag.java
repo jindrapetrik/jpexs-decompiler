@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.SWFInputStream;
@@ -53,7 +51,7 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Al
    public SHAPE endEdges;
 
    @Override
-   public RECT getRect(HashMap<Integer,CharacterTag> characters) {
+   public RECT getRect(HashMap<Integer, CharacterTag> characters) {
       RECT rect = new RECT();
       rect.Xmin = Math.min(startBounds.Xmin, endBounds.Xmin);
       rect.Ymin = Math.min(startBounds.Ymin, endBounds.Ymin);

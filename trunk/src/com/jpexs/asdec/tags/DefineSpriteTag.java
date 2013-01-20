@@ -61,7 +61,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
    }
 
    private RECT getCharacterBounds(HashMap<Integer, CharacterTag> allCharacters, Set<Integer> characters) {
-      RECT ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE,Integer.MIN_VALUE);
+      RECT ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
       for (int c : characters) {
          Tag t = allCharacters.get(c);
          RECT r = null;
@@ -79,10 +79,10 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
    }
 
    public RECT getRect(HashMap<Integer, CharacterTag> characters) {
-      RECT ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE,Integer.MIN_VALUE);
+      RECT ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
       for (Tag t : subTags) {
          Set<Integer> needed = t.getNeededCharacters();
-         if(needed.isEmpty()){
+         if (needed.isEmpty()) {
             continue;
          }
          RECT r = getCharacterBounds(characters, needed);
@@ -103,10 +103,10 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
          if (m != null) {
             Point topleft = m.apply(new Point(r.Xmin, r.Ymin));
             Point bottomright = m.apply(new Point(r.Xmax, r.Ymax));
-            r.Xmin=Math.min(topleft.x,bottomright.x);
-            r.Ymin=Math.min(topleft.y,bottomright.y);
-            r.Xmax=Math.max(topleft.x,bottomright.x);
-            r.Ymax=Math.max(topleft.y,bottomright.y);
+            r.Xmin = Math.min(topleft.x, bottomright.x);
+            r.Ymin = Math.min(topleft.y, bottomright.y);
+            r.Xmax = Math.max(topleft.x, bottomright.x);
+            r.Ymax = Math.max(topleft.y, bottomright.y);
          }
          ret.Xmin = Math.min(r.Xmin, ret.Xmin);
          ret.Ymin = Math.min(r.Ymin, ret.Ymin);

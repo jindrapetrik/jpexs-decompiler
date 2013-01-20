@@ -41,8 +41,8 @@ public class InterfaceTreeItem extends TreeItem {
       String ret = "";
       ret += "interface " + name.toStringNoQuotes(constants);
       boolean first = true;
-      if(!superInterfaces.isEmpty()){
-         ret+=" extends ";
+      if (!superInterfaces.isEmpty()) {
+         ret += " extends ";
       }
       for (TreeItem ti : superInterfaces) {
          if (!first) {

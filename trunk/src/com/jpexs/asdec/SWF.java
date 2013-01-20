@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec;
 
 import SevenZip.Compression.LZMA.Encoder;
@@ -194,9 +192,9 @@ public class SWF {
          throw new IOException("Invalid SWF file");
       }
       version = is.read();
-      SWFInputStream sis = new SWFInputStream(is, version, 4);      
+      SWFInputStream sis = new SWFInputStream(is, version, 4);
       fileSize = sis.readUI32();
-      
+
       if (hdr[0] == 'C') {
          sis = new SWFInputStream(new InflaterInputStream(is), version, 8);
          compressed = true;

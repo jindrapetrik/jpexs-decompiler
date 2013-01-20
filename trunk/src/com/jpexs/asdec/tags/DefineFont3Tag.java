@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec.tags;
 
 import com.jpexs.asdec.Main;
@@ -130,7 +128,7 @@ public class DefineFont3Tag extends CharacterTag implements FontTag {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       OutputStream os = baos;
       SWFOutputStream sos = new SWFOutputStream(os, version);
-      if(Main.DEBUG_COPY){
+      if (Main.DEBUG_COPY) {
          sos = new SWFOutputStream(new CopyOutputStream(sos, new ByteArrayInputStream(data)), 10);
       }
       try {

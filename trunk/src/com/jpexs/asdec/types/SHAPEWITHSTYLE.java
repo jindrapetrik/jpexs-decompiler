@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec.types;
 
 import com.jpexs.asdec.types.shaperecords.SHAPERECORD;
@@ -32,17 +30,18 @@ public class SHAPEWITHSTYLE {
    public int numFillBits;
    public int numLineBits;
    public List<SHAPERECORD> shapeRecords;
-   
+
    /**
     * EXPERIMENTAL
+    *
     * @param shapeNum
-    * @return 
+    * @return
     */
-   public String toSVG(int shapeNum){
-      return SHAPERECORD.shapeToSVG(shapeNum,fillStyles, lineStyles, numFillBits, numLineBits, shapeRecords);
+   public String toSVG(int shapeNum) {
+      return SHAPERECORD.shapeToSVG(shapeNum, fillStyles, lineStyles, numFillBits, numLineBits, shapeRecords);
    }
-   
-   public RECT getBounds(){
+
+   public RECT getBounds() {
       return SHAPERECORD.getBounds(shapeRecords);
    }
 }

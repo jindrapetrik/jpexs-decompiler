@@ -67,14 +67,14 @@ public class MATRIX {
       return "[MATRIX scale:" + scaleX + "," + scaleY + ", rotate:" + rotateSkew0 + "," + rotateSkew1 + ", translate:" + translateX + "," + translateY + "]";
    }
 
-   private float toFloat(int i){
-      return ((float)i)/(1<<16);
+   private float toFloat(int i) {
+      return ((float) i) / (1 << 16);
    }
-   
+
    public Point apply(Point p) {
       Point ret = new Point();
-      ret.x = (int)(p.x * (hasScale?toFloat(scaleX):1) + p.y * (hasRotate?toFloat(rotateSkew1):0) + translateX);
-      ret.y = (int) (p.x * (hasRotate?toFloat(rotateSkew0):0) + p.y * (hasScale?toFloat(scaleY):1) + translateY);
+      ret.x = (int) (p.x * (hasScale ? toFloat(scaleX) : 1) + p.y * (hasRotate ? toFloat(rotateSkew1) : 0) + translateX);
+      ret.y = (int) (p.x * (hasRotate ? toFloat(rotateSkew0) : 0) + p.y * (hasScale ? toFloat(scaleY) : 1) + translateY);
       return ret;
    }
 }

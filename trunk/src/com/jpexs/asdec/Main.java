@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec;
 
 import com.jpexs.asdec.abc.avm2.AVM2Code;
@@ -305,6 +303,10 @@ public class Main {
       modeFrame.setVisible(true);
    }
 
+   public static void updateLicense() {
+      updateLicenseInDir(new File(".\\src\\"));
+   }
+
    /**
     * Script for updating license header in java files :-)
     *
@@ -318,7 +320,7 @@ public class Main {
       if (defaultFinalYear != defaultStartYear) {
          defaultYearStr += "-" + defaultFinalYear;
       }
-      String license = "/*\r\n *  Copyright (C) {year} {author}\r\n * \r\n *  This program is free software: you can redistribute it and/or modify\r\n *  it under the terms of the GNU General Public License as published by\r\n *  the Free Software Foundation, either version 3 of the License, or\r\n *  (at your option) any later version.\r\n * \r\n *  This program is distributed in the hope that it will be useful,\r\n *  but WITHOUT ANY WARRANTY; without even the implied warranty of\r\n *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\r\n *  GNU General Public License for more details.\r\n * \r\n *  You should have received a copy of the GNU General Public License\r\n *  along with this program.  If not, see <http://www.gnu.org/licenses/>.\r\n */\r\n\r\n";
+      String license = "/*\r\n *  Copyright (C) {year} {author}\r\n * \r\n *  This program is free software: you can redistribute it and/or modify\r\n *  it under the terms of the GNU General Public License as published by\r\n *  the Free Software Foundation, either version 3 of the License, or\r\n *  (at your option) any later version.\r\n * \r\n *  This program is distributed in the hope that it will be useful,\r\n *  but WITHOUT ANY WARRANTY; without even the implied warranty of\r\n *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\r\n *  GNU General Public License for more details.\r\n * \r\n *  You should have received a copy of the GNU General Public License\r\n *  along with this program.  If not, see <http://www.gnu.org/licenses/>.\r\n */";
 
       File files[] = dir.listFiles();
       for (File f : files) {
@@ -481,6 +483,7 @@ public class Main {
     * @param args the command line arguments
     */
    public static void main(String[] args) throws IOException {
+      updateLicense();
       View.setLookAndFeel();
       Configuration.load();
       checkSWT(args);
@@ -778,7 +781,7 @@ public class Main {
                            }
                         }
                         if (desktop == null) {
-                           JOptionPane.showMessageDialog(null, "New version of " + shortApplicationName + " is available: " + downloadName + ".\r\nPlease go to "+projectPage+" to download it.", "New version", JOptionPane.INFORMATION_MESSAGE);
+                           JOptionPane.showMessageDialog(null, "New version of " + shortApplicationName + " is available: " + downloadName + ".\r\nPlease go to " + projectPage + " to download it.", "New version", JOptionPane.INFORMATION_MESSAGE);
                         }
 
                         Configuration.setConfig("lastUpdatesCheckDate", Calendar.getInstance());

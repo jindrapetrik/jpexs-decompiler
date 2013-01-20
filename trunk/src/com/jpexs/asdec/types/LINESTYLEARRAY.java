@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec.types;
 
 /**
@@ -23,7 +21,7 @@ package com.jpexs.asdec.types;
  * @author JPEXS
  */
 public class LINESTYLEARRAY {
-   
+
    public LINESTYLE lineStyles[];
    public LINESTYLE2 lineStyles2[];
 }

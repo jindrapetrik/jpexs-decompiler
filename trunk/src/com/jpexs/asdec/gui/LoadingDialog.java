@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec.gui;
 
 import com.jpexs.asdec.Main;
@@ -37,26 +35,27 @@ import javax.swing.SwingConstants;
  */
 public class LoadingDialog extends JFrame implements ImageObserver {
 
-   private JLabel loadingLabel = new JLabel("",JLabel.CENTER);
+   private JLabel loadingLabel = new JLabel("", JLabel.CENTER);
    private LoadingPanel loadingPanel;
    String load = "Loading, please wait...";
-   JProgressBar progressBar = new JProgressBar(0,100);
+   JProgressBar progressBar = new JProgressBar(0, 100);
+
    public void setDetail(String d) {
       loadingLabel.setText("<html><center>" + load + "<br>" + d + "</center></html>");
-      loadingLabel.setHorizontalAlignment( SwingConstants.CENTER );
+      loadingLabel.setHorizontalAlignment(SwingConstants.CENTER);
    }
 
-   public void setPercent(int percent){
+   public void setPercent(int percent) {
       progressBar.setValue(percent);
       progressBar.setVisible(true);
    }
-   
-   public void hidePercent(){
-      if(progressBar.isVisible()){
+
+   public void hidePercent() {
+      if (progressBar.isVisible()) {
          progressBar.setVisible(false);
       }
    }
-   
+
    /**
     * Constructor
     */
@@ -69,9 +68,9 @@ public class LoadingDialog extends JFrame implements ImageObserver {
       loadingPanel = new LoadingPanel(50, 50);
       loadingPanel.setPreferredSize(new Dimension(100, 100));
       add(loadingPanel, BorderLayout.WEST);
-      JPanel pan=new JPanel();
+      JPanel pan = new JPanel();
       pan.setLayout(null);
-      pan.setPreferredSize(new Dimension(120,150));
+      pan.setPreferredSize(new Dimension(120, 150));
       loadingLabel.setBounds(0, 20, 125, 50);
       progressBar.setBounds(0, 70, 125, 25);
       pan.add(loadingLabel);

@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.Main;
@@ -314,7 +312,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
       constantTypeList.addItemListener(this);
       panConstants.add(constantTypeList, BorderLayout.NORTH);
       panConstants.add(new JScrollPane(constantTable), BorderLayout.CENTER);
-      tabbedPane.addTab("Constants", panConstants);      
+      tabbedPane.addTab("Constants", panConstants);
    }
 
    public void doFilter() {

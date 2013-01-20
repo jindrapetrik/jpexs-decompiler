@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
@@ -47,7 +45,7 @@ public class DirectValueTreeItem extends TreeItem {
          }
       }
       if (value instanceof String) {
-         return (String)value;
+         return (String) value;
       }
       if (value instanceof ConstantIndex) {
          return (this.constants.get(((ConstantIndex) value).index));

@@ -50,7 +50,7 @@ public class StyleChangeRecord extends SHAPERECORD {
    }
 
    @Override
-   public String toSWG(int oldX,int oldY) {
+   public String toSWG(int oldX, int oldY) {
       if (stateMoveTo) {
          return "M " + twipToPixel(moveDeltaX) + " " + twipToPixel(moveDeltaY);
       }
@@ -75,9 +75,8 @@ public class StyleChangeRecord extends SHAPERECORD {
 
    @Override
    public void flip() {
-      
    }
-   
+
    @Override
    public boolean isMove() {
       return stateMoveTo;

@@ -1165,18 +1165,18 @@ public class Action {
                               if (sm.value instanceof FunctionTreeItem) {
                                  FunctionTreeItem f = (FunctionTreeItem) sm.value;
                                  if (f.actions.isEmpty()) {
-                                    
-                                    if(parts.size()==2){
-                                       if(parts.get(1) instanceof ImplementsOpTreeItem){
-                                          ImplementsOpTreeItem iot=(ImplementsOpTreeItem)parts.get(1);
-                                          implementsOp=iot.superclasses;
-                                       }else{
-                                          ok=false;
+
+                                    if (parts.size() == 2) {
+                                       if (parts.get(1) instanceof ImplementsOpTreeItem) {
+                                          ImplementsOpTreeItem iot = (ImplementsOpTreeItem) parts.get(1);
+                                          implementsOp = iot.superclasses;
+                                       } else {
+                                          ok = false;
                                           break;
                                        }
                                     }
                                     List<TreeItem> output2 = new ArrayList<TreeItem>();
-                                    output2.add(new InterfaceTreeItem(sm.objectName,implementsOp));
+                                    output2.add(new InterfaceTreeItem(sm.objectName, implementsOp));
                                     return output2;
                                  } else {
                                     ok = false;
