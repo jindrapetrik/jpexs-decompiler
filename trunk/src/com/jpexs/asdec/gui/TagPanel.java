@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec.gui;
 
 import com.jpexs.asdec.SWF;
@@ -28,6 +26,11 @@ import com.jpexs.asdec.tags.DefineBitsLosslessTag;
 import com.jpexs.asdec.tags.DefineBitsTag;
 import com.jpexs.asdec.tags.DefineMorphShape2Tag;
 import com.jpexs.asdec.tags.DefineMorphShapeTag;
+import com.jpexs.asdec.tags.DefineShape2Tag;
+import com.jpexs.asdec.tags.DefineShape3Tag;
+import com.jpexs.asdec.tags.DefineShape4Tag;
+import com.jpexs.asdec.tags.DefineShapeTag;
+import com.jpexs.asdec.tags.DefineSpriteTag;
 import com.jpexs.asdec.tags.DefineTextTag;
 import com.jpexs.asdec.tags.EndTag;
 import com.jpexs.asdec.tags.JPEGTablesTag;
@@ -132,7 +135,7 @@ public class TagPanel extends JPanel implements ListSelectionListener {
          swtPanel.setBackground(Color.white);
          displayPanel.add(swtPanel, CARDFLASHPANEL);
       }
-      imagePanel = new ImagePanel();     
+      imagePanel = new ImagePanel();
       displayPanel.add(imagePanel, CARDIMAGEPANEL);
       displayPanel.add(new JPanel(), CARDEMPTYPANEL);
       CardLayout cl = (CardLayout) (displayPanel.getLayout());
@@ -217,8 +220,13 @@ public class TagPanel extends JPanel implements ListSelectionListener {
             mat.hasScale = false;
             mat.translateX = 0;
             mat.translateY = 0;
-            if (tagObj instanceof BoundedTag) {
-               RECT r = ((BoundedTag) tagObj).getRect();
+            if ((tagObj instanceof BoundedTag) || (tagObj instanceof DefineSpriteTag)) {
+               RECT r = null;
+               if (tagObj instanceof DefineSpriteTag) {
+                  r = ((DefineSpriteTag) tagObj).getRect(characters);                  
+               } else {
+                  r = ((BoundedTag) tagObj).getRect();
+               }
                mat.translateX = -r.Xmin;
                mat.translateY = -r.Ymin;
                mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;

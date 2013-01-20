@@ -22,7 +22,7 @@ package com.jpexs.asdec.types.shaperecords;
  *
  * @author JPEXS
  */
-public class StraightEdgeRecord implements SHAPERECORD {
+public class StraightEdgeRecord extends SHAPERECORD {
 
    public int typeFlag = 1;
    public int straightFlag = 1;

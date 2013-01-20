@@ -25,7 +25,7 @@ import com.jpexs.asdec.types.LINESTYLEARRAY;
  *
  * @author JPEXS
  */
-public class StyleChangeRecord implements SHAPERECORD {
+public class StyleChangeRecord extends SHAPERECORD {
 
    public int typeFlag = 0;
    public boolean stateNewStyles;

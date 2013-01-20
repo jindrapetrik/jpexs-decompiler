@@ -14,9 +14,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package com.jpexs.asdec.types;
+
+import java.awt.Point;
 
 /**
  * Represents a standard 2x3 transformation matrix of the sort commonly used in
@@ -65,5 +65,16 @@ public class MATRIX {
    @Override
    public String toString() {
       return "[MATRIX scale:" + scaleX + "," + scaleY + ", rotate:" + rotateSkew0 + "," + rotateSkew1 + ", translate:" + translateX + "," + translateY + "]";
+   }
+
+   private float toFloat(int i){
+      return ((float)i)/(1<<16);
+   }
+   
+   public Point apply(Point p) {
+      Point ret = new Point();
+      ret.x = (int)(p.x * (hasScale?toFloat(scaleX):1) + p.y * (hasRotate?toFloat(rotateSkew1):0) + translateX);
+      ret.y = (int) (p.x * (hasRotate?toFloat(rotateSkew0):0) + p.y * (hasScale?toFloat(scaleY):1) + translateY);
+      return ret;
    }
 }

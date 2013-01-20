@@ -22,7 +22,7 @@ package com.jpexs.asdec.types.shaperecords;
  *
  * @author JPEXS
  */
-public class EndShapeRecord implements SHAPERECORD {
+public class EndShapeRecord extends SHAPERECORD {
 
    public int typeFlag = 0;
    public int endOfShape = 0;

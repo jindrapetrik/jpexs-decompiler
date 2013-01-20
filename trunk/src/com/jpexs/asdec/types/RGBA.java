@@ -41,4 +41,20 @@ public class RGBA {
     * Alpha value defining opacity
     */
    public int alpha;
+   
+   public String toHexRGB(){
+      String rh=Integer.toHexString(red);
+      if(rh.length()<2){
+         rh="0"+rh;
+      }
+      String gh=Integer.toHexString(green);
+      if(gh.length()<2){
+         gh="0"+gh;
+      }
+      String bh=Integer.toHexString(blue);
+      if(bh.length()<2){
+         bh="0"+bh;
+      }
+      return "#"+rh+gh+bh;
+   }
 }

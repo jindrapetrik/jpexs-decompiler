@@ -23,7 +23,7 @@ package com.jpexs.asdec.types;
  * @author JPEXS
  */
 public class LINESTYLEARRAY {
-
+   
    public LINESTYLE lineStyles[];
    public LINESTYLE2 lineStyles2[];
 }
