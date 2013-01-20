@@ -683,7 +683,7 @@ public class Action {
                      List<TreeItem> doBody = actionsToTree(registerNames, unknownJumps, loopList, jumpsOrIfs, stack, constants, actions, ip, adr2ip(actions, jif.getAddress(), version) - 1, version);
                      Loop currentLoop = new Loop(ip, adr2ip(actions, jif.getAddress(), version) + 1);
                      loopList.add(currentLoop);
-                     output.add(new DoWhileTreeItem(action, adr2ip(actions, jif.getAddress(), version) + 1, ip, doBody, stack.pop()));
+                     output.add(new DoWhileTreeItem(action, adr2ip(actions, jif.getAddress(), version) + 1, ip, doBody, stack.isEmpty()?new DirectValueTreeItem(null, new Boolean(true), constants):stack.pop()));
                      ip = adr2ip(actions, jif.getAddress(), version) + 1;
                      continue loopip;
                   }
@@ -1038,7 +1038,9 @@ public class Action {
    private static List<TreeItem> checkClass(List<TreeItem> output) {
       List<TreeItem> ret = new ArrayList<TreeItem>();
       List<FunctionTreeItem> functions = new ArrayList<FunctionTreeItem>();
+      List<FunctionTreeItem> staticFunctions = new ArrayList<FunctionTreeItem>();
       HashMap<TreeItem, TreeItem> vars = new HashMap<TreeItem, TreeItem>();
+      HashMap<TreeItem, TreeItem> staticVars = new HashMap<TreeItem, TreeItem>();
       TreeItem className;
       TreeItem extendsOp = null;
       List<TreeItem> implementsOp = new ArrayList<TreeItem>();
@@ -1057,7 +1059,7 @@ public class Action {
                         className = getWithoutGlobal((GetMemberTreeItem) nti.value);
                         if (parts.size() >= 1) {
                            if (parts.get(0) instanceof StoreRegisterTreeItem) {
-                              int firstReg = ((StoreRegisterTreeItem) parts.get(0)).register.number;
+                              int classReg = ((StoreRegisterTreeItem) parts.get(0)).register.number;
                               if ((parts.size() >= 2) && (parts.get(1) instanceof SetMemberTreeItem)) {
                                  TreeItem ti1 = ((SetMemberTreeItem) parts.get(1)).value;
                                  TreeItem ti2 = ((StoreRegisterTreeItem) parts.get(0)).value;
@@ -1080,8 +1082,8 @@ public class Action {
                                              TreeItem obj = ((GetMemberTreeItem) ((StoreRegisterTreeItem) parts.get(pos)).value).object;
                                              if (obj instanceof DirectValueTreeItem) {
                                                 if (((DirectValueTreeItem) obj).value instanceof RegisterNumber) {
-                                                   if (((RegisterNumber) ((DirectValueTreeItem) obj).value).number == firstReg) {
-                                                      int secondReg = ((StoreRegisterTreeItem) parts.get(pos)).register.number;
+                                                   if (((RegisterNumber) ((DirectValueTreeItem) obj).value).number == classReg) {
+                                                      int instanceReg = ((StoreRegisterTreeItem) parts.get(pos)).register.number;
                                                       pos++;
                                                       if (parts.size() <= pos) {
                                                          ok = false;
@@ -1097,14 +1099,21 @@ public class Action {
                                                             SetMemberTreeItem smt = (SetMemberTreeItem) parts.get(pos);
                                                             if (smt.object instanceof DirectValueTreeItem) {
                                                                if (((DirectValueTreeItem) smt.object).value instanceof RegisterNumber) {
-                                                                  if (((RegisterNumber) ((DirectValueTreeItem) smt.object).value).number == secondReg) {
+                                                                  if (((RegisterNumber) ((DirectValueTreeItem) smt.object).value).number == instanceReg) {
                                                                      if (smt.value instanceof FunctionTreeItem) {
                                                                         ((FunctionTreeItem) smt.value).calculatedFunctionName = smt.objectName;
                                                                         functions.add((FunctionTreeItem) smt.value);
                                                                      } else {
                                                                         vars.put(smt.objectName, smt.value);
                                                                      }
-                                                                  } else {
+                                                                  } else if (((RegisterNumber) ((DirectValueTreeItem) smt.object).value).number == classReg) {
+                                                                     if (smt.value instanceof FunctionTreeItem) {
+                                                                        ((FunctionTreeItem) smt.value).calculatedFunctionName = smt.objectName;
+                                                                        staticFunctions.add((FunctionTreeItem) smt.value);
+                                                                     } else {
+                                                                        staticVars.put(smt.objectName, smt.value);
+                                                                     }
+                                                                  }else{
                                                                      ok = false;
                                                                   }
                                                                }
@@ -1135,7 +1144,7 @@ public class Action {
                                                       }
                                                       if (ok) {
                                                          List<TreeItem> output2 = new ArrayList<TreeItem>();
-                                                         output2.add(new ClassTreeItem(className, extendsOp, implementsOp, functions, vars));
+                                                         output2.add(new ClassTreeItem(className, extendsOp, implementsOp, functions, vars,staticFunctions,staticVars));
                                                          return output2;
                                                       }
                                                    } else {

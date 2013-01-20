@@ -28,18 +28,22 @@ import java.util.List;
 public class ClassTreeItem extends TreeItem implements Block {
 
    public List<FunctionTreeItem> functions;
+   public List<FunctionTreeItem> staticFunctions;
    public TreeItem extendsOp;
    public List<TreeItem> implementsOp;
    public TreeItem className;
    public HashMap<TreeItem, TreeItem> vars;
+   public HashMap<TreeItem, TreeItem> staticVars;
 
-   public ClassTreeItem(TreeItem className, TreeItem extendsOp, List<TreeItem> implementsOp, List<FunctionTreeItem> functions, HashMap<TreeItem, TreeItem> vars) {
+   public ClassTreeItem(TreeItem className, TreeItem extendsOp, List<TreeItem> implementsOp, List<FunctionTreeItem> functions, HashMap<TreeItem, TreeItem> vars,List<FunctionTreeItem> staticFunctions,HashMap<TreeItem, TreeItem> staticVars) {
       super(null, NOPRECEDENCE);
       this.className = className;
       this.functions = functions;
       this.vars = vars;
       this.extendsOp = extendsOp;
       this.implementsOp = implementsOp;
+      this.staticFunctions=staticFunctions;
+      this.staticVars=staticVars;
    }
 
    @Override
