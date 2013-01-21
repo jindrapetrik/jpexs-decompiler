@@ -68,8 +68,14 @@ public class ClassTreeItem extends TreeItem implements Block {
       for (FunctionTreeItem f : functions) {
          ret += f.toString(constants) + "\r\n";
       }
+      for (FunctionTreeItem f : staticFunctions) {
+         ret += "static "+f.toString(constants) + "\r\n";
+      }
       for (TreeItem v : vars.keySet()) {
          ret += "var " + v.toStringNoQuotes(constants) + " = " + vars.get(v).toStringNoQuotes(constants) + ";\r\n";
+      }
+      for (TreeItem v : staticVars.keySet()) {
+         ret += "static var " + v.toStringNoQuotes(constants) + " = " + staticVars.get(v).toStringNoQuotes(constants) + ";\r\n";
       }
       ret += "}\r\n";
       return ret;
