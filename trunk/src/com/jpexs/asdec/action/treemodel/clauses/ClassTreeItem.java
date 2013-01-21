@@ -51,7 +51,7 @@ public class ClassTreeItem extends TreeItem implements Block {
       String ret;
       ret = "class " + className.toStringNoQuotes(constants);
       if (extendsOp != null) {
-         ret += " extends " + extendsOp.toString(constants);
+         ret += " extends " + extendsOp.toStringNoQuotes(constants);
       }
       if (!implementsOp.isEmpty()) {
          ret += " implements ";
