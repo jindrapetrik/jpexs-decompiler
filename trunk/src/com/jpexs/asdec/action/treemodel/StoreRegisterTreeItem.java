@@ -19,7 +19,7 @@ package com.jpexs.asdec.action.treemodel;
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.swf4.RegisterNumber;
 
-public class StoreRegisterTreeItem extends TreeItem {
+public class StoreRegisterTreeItem extends TreeItem implements SetTypeTreeItem {
 
    public RegisterNumber register;
    public TreeItem value;
@@ -33,5 +33,10 @@ public class StoreRegisterTreeItem extends TreeItem {
    @Override
    public String toString(ConstantPool constants) {
       return register.toString() + "=" + value.toString(constants) + ";";
+   }
+
+   @Override
+   public TreeItem getObject() {
+      return new DirectValueTreeItem(instruction, register, null);
    }
 }

@@ -28,7 +28,9 @@ public class DirectValueTreeItem extends TreeItem {
 
    public DirectValueTreeItem(Action instruction, Object value, ConstantPool constants) {
       super(instruction, PRECEDENCE_PRIMARY);
-      this.constants = constants.constants;
+      if (constants != null) {
+         this.constants = constants.constants;
+      }
       this.value = value;
    }
 

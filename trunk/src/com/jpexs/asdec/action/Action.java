@@ -769,7 +769,7 @@ public class Action {
             List<TreeItem> finalExpression = null;
 
             TreeItem variableName = null;
-            if (isForIn) {
+            /*if (isForIn) {
                for (int t = ip + 1; t <= end; t++) {
                   Action actionSV = actions.get(t);
                   actionSV.translate(stack, constants, output, registerNames);
@@ -780,7 +780,7 @@ public class Action {
                      break;
                   }
                }
-            }
+            }*/
 
             try {
 
@@ -834,6 +834,10 @@ public class Action {
                }
             }
             if (isForIn) {
+               variableName=onTrue.remove(0);
+               if(variableName instanceof SetTypeTreeItem){
+                  variableName=((SetTypeTreeItem)variableName).getObject();
+               }
                output.add(new ForInTreeItem(action, jumpIp, loopStart, variableName, inItem, onTrue));
             } else if (isFor) {
                output.add(new ForTreeItem(action, currentLoop.loopBreak, currentLoop.loopContinue, new ArrayList<TreeItem>(), expression, finalExpression, onTrue));

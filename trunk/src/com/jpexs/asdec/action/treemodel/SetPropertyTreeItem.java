@@ -18,7 +18,7 @@ package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
 
-public class SetPropertyTreeItem extends TreeItem {
+public class SetPropertyTreeItem extends TreeItem implements SetTypeTreeItem{
 
    public TreeItem target;
    public int propertyIndex;
@@ -38,4 +38,11 @@ public class SetPropertyTreeItem extends TreeItem {
       }
       return target.toString(constants) + "." + Action.propertyNames[propertyIndex] + "=" + value.toString(constants) + ";";
    }
+
+   @Override
+   public TreeItem getObject() {
+      return new GetPropertyTreeItem(instruction, target, propertyIndex);
+   }
+   
+   
 }

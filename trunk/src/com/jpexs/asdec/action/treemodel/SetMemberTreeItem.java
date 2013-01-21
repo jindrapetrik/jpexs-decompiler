@@ -18,7 +18,7 @@ package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
 
-public class SetMemberTreeItem extends TreeItem {
+public class SetMemberTreeItem extends TreeItem implements SetTypeTreeItem{
 
    public TreeItem object;
    public TreeItem objectName;
@@ -35,4 +35,11 @@ public class SetMemberTreeItem extends TreeItem {
    public String toString(ConstantPool constants) {
       return object.toString(constants) + "." + stripQuotes(objectName) + "=" + value.toString(constants) + ";";
    }
+
+   @Override
+   public TreeItem getObject() {
+      return new GetMemberTreeItem(instruction, object, objectName);
+   }
+   
+   
 }
