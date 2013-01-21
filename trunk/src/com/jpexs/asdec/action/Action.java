@@ -30,6 +30,7 @@ import com.jpexs.asdec.action.swf7.ActionTry;
 import com.jpexs.asdec.action.treemodel.*;
 import com.jpexs.asdec.action.treemodel.clauses.*;
 import com.jpexs.asdec.action.treemodel.operations.AndTreeItem;
+import com.jpexs.asdec.action.treemodel.operations.EqTreeItem;
 import com.jpexs.asdec.action.treemodel.operations.NotTreeItem;
 import com.jpexs.asdec.action.treemodel.operations.OrTreeItem;
 import com.jpexs.asdec.helpers.Helper;
@@ -683,7 +684,24 @@ public class Action {
                      List<TreeItem> doBody = actionsToTree(registerNames, unknownJumps, loopList, jumpsOrIfs, stack, constants, actions, ip, adr2ip(actions, jif.getAddress(), version) - 1, version);
                      Loop currentLoop = new Loop(ip, adr2ip(actions, jif.getAddress(), version) + 1);
                      loopList.add(currentLoop);
-                     output.add(new DoWhileTreeItem(action, adr2ip(actions, jif.getAddress(), version) + 1, ip, doBody, stack.isEmpty() ? new DirectValueTreeItem(null, new Boolean(true), constants) : stack.pop()));
+                     TreeItem expression = stack.pop();
+                     boolean isForInReturn = false;
+                     //Before return in for..in clause, stack must be emptied
+                     if (doBody.isEmpty()) {
+                        TreeItem e = expression;
+                        if (e instanceof NotTreeItem) {
+                           e = ((NotTreeItem) e).value;
+                           if (e instanceof EqTreeItem) {
+                              e = ((EqTreeItem) e).leftSide;
+                              if (e instanceof EnumerateTreeItem) {
+                                 isForInReturn = true;
+                              }
+                           }
+                        }
+                     }
+                     if (!isForInReturn) {
+                        output.add(new DoWhileTreeItem(action, adr2ip(actions, jif.getAddress(), version) + 1, ip, doBody, expression));
+                     }
                      ip = adr2ip(actions, jif.getAddress(), version) + 1;
                      continue loopip;
                   }
@@ -746,8 +764,8 @@ public class Action {
             List<TreeItem> onFalse = new ArrayList<TreeItem>();
             boolean hasElse = false;
             int jumpElseIp = 0;
-            Stack<TreeItem> falseStack = new Stack<TreeItem>();
-            Stack<TreeItem> trueStack = new Stack<TreeItem>();
+            Stack<TreeItem> falseStack = (Stack<TreeItem>) stack.clone();
+            Stack<TreeItem> trueStack = (Stack<TreeItem>) stack.clone();// new Stack<TreeItem>();
             //if (!isWhile) {
             if (actions.get(jumpIp - 1) instanceof ActionJump) {
                long ref = ((ActionJump) actions.get(jumpIp - 1)).getRef(version);
@@ -770,22 +788,23 @@ public class Action {
 
             TreeItem variableName = null;
             /*if (isForIn) {
-               for (int t = ip + 1; t <= end; t++) {
-                  Action actionSV = actions.get(t);
-                  actionSV.translate(stack, constants, output, registerNames);
-                  if (actionSV instanceof ActionSetVariable) {
-                     SetVariableTreeItem svt = (SetVariableTreeItem) output.remove(output.size() - 1);
-                     variableName = svt.name;
-                     ip = t;
-                     break;
-                  }
-               }
-            }*/
+             for (int t = ip + 1; t <= end; t++) {
+             Action actionSV = actions.get(t);
+             actionSV.translate(stack, constants, output, registerNames);
+             if (actionSV instanceof ActionSetVariable) {
+             SetVariableTreeItem svt = (SetVariableTreeItem) output.remove(output.size() - 1);
+             variableName = svt.name;
+             ip = t;
+             break;
+             }
+             }
+             }*/
 
             try {
 
+               int trueStackSizeBefore = trueStack.size();
                onTrue = actionsToTree(registerNames, unknownJumps, loopList, jumpsOrIfs, trueStack, constants, actions, ip + 1, jumpIp - 1 - (hasElse || isWhile || isForIn ? 1 : 0), version);
-               if (onTrue.isEmpty() && trueStack.size() > 0) {
+               if (onTrue.isEmpty() && trueStack.size() > trueStackSizeBefore) {
                   isTernar = true;
                }
                int next = (hasElse ? jumpElseIp : jumpIp);
@@ -834,9 +853,9 @@ public class Action {
                }
             }
             if (isForIn) {
-               variableName=onTrue.remove(0);
-               if(variableName instanceof SetTypeTreeItem){
-                  variableName=((SetTypeTreeItem)variableName).getObject();
+               variableName = onTrue.remove(0);
+               if (variableName instanceof SetTypeTreeItem) {
+                  variableName = ((SetTypeTreeItem) variableName).getObject();
                }
                output.add(new ForInTreeItem(action, jumpIp, loopStart, variableName, inItem, onTrue));
             } else if (isFor) {
@@ -856,8 +875,10 @@ public class Action {
          } else if ((action instanceof ActionEnumerate2) || (action instanceof ActionEnumerate)) {
             loopStart = ip + 1;
             isForIn = true;
-            inItem = stack.pop();
             ip += 4;
+            action.translate(stack, constants, output, registerNames);
+            EnumerateTreeItem en = (EnumerateTreeItem) stack.peek();
+            inItem = en.object;
             continue;
          } else if (action instanceof ActionTry) {
             ActionTry atry = (ActionTry) action;
@@ -993,6 +1014,7 @@ public class Action {
             try {
                action.translate(stack, constants, output, registerNames);
             } catch (EmptyStackException ese) {
+               Logger.getLogger(Action.class.getName()).log(Level.SEVERE, null, ese);
                output.add(new UnsupportedTreeItem(action, "Empty stack"));
             }
          }
@@ -1098,10 +1120,10 @@ public class Action {
 
                                              if (parts.get(pos + 1) instanceof SetMemberTreeItem) {
                                                 if (((SetMemberTreeItem) parts.get(pos + 1)).value == ((StoreRegisterTreeItem) parts.get(pos)).value) {
-                                                   instanceReg=((StoreRegisterTreeItem) parts.get(pos)).register.number;
-                                                   NewMethodTreeItem nm=(NewMethodTreeItem)((StoreRegisterTreeItem) parts.get(pos)).value;
-                                                   GetMemberTreeItem gm=new GetMemberTreeItem(null,nm.scriptObject,nm.methodName);
-                                                   extendsOp=gm;
+                                                   instanceReg = ((StoreRegisterTreeItem) parts.get(pos)).register.number;
+                                                   NewMethodTreeItem nm = (NewMethodTreeItem) ((StoreRegisterTreeItem) parts.get(pos)).value;
+                                                   GetMemberTreeItem gm = new GetMemberTreeItem(null, nm.scriptObject, nm.methodName);
+                                                   extendsOp = gm;
                                                 } else {
                                                    ok = false;
                                                    break;
