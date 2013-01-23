@@ -91,6 +91,8 @@ public class Action {
       "_ymouse"
    };
 
+   private static Logger logger=Logger.getLogger(Action.class.getName());
+   
    /**
     * Constructor
     *
@@ -627,9 +629,21 @@ public class Action {
          this.loopContinue = loopContinue;
          this.loopBreak = loopBreak;
       }
+
+      @Override
+      public String toString() {
+         return "[Loop continue:"+loopContinue+", break:"+loopBreak+"]";
+      }
+      
+      
    }
 
+   private static void log(String s){
+      logger.fine(s);
+   }
+   
    private static List<TreeItem> actionsToTree(HashMap<Integer, String> registerNames, List<Long> unknownJumps, List<Loop> loopList, List<Action> jumpsOrIfs, Stack<TreeItem> stack, ConstantPool constants, List<Action> actions, int start, int end, int version) {
+      log("Entering "+start+"-"+end+(actions.size()>0?(" ("+actions.get(start).toString()+" - " +actions.get(end==actions.size()?end-1:end) +")"):""));
       List<TreeItem> output = new ArrayList<TreeItem>();
       int ip = start;
       boolean isWhile = false;
@@ -675,6 +689,7 @@ public class Action {
             break;
          }
          Action action = actions.get(ip);
+        log(""+Helper.formatAddress(addr)+" ip:"+ip+" action:"+action);
          for (int j = 0; j < jumpsOrIfs.size(); j++) {
             Action jif = jumpsOrIfs.get(j);
             if (jif instanceof ActionIf) {
@@ -723,7 +738,6 @@ public class Action {
          }
          if (action instanceof ActionJump) {
             int jumpIp = adr2ip(actions, ((ActionJump) action).getRef(version), version);
-            //if (jumpIp > ip) {
             for (Loop l : loopList) {
                if (l.loopBreak == ((ActionJump) action).getRef(version)) {
                   output.add(new BreakTreeItem(action, l.loopBreak));
@@ -737,7 +751,6 @@ public class Action {
                   continue loopip;
                }
             }
-
             output.add(new ContinueTreeItem(action, ((ActionJump) action).getRef(version), false));
 
             if (!unknownJumps.contains(((ActionJump) action).getRef(version))) {
@@ -772,37 +785,27 @@ public class Action {
                int refIp = adr2ip(actions, ref, version);
                if ((refIp > jumpIp) && (refIp <= end + 1)) {
                   hasElse = true;
-                  jumpElseIp = adr2ip(actions, ((ActionJump) actions.get(jumpIp - 1)).getRef(version), version);
-                  onFalse = actionsToTree(registerNames, unknownJumps, loopList, jumpsOrIfs, falseStack, constants, actions, jumpIp, jumpElseIp - 1, version);
+                  jumpElseIp = adr2ip(actions, ((ActionJump) actions.get(jumpIp - 1)).getRef(version), version);                  
                }
             }
             //}
             Loop currentLoop = null;
             if (isWhile || isForIn) {
-               currentLoop = new Loop(loopStart, jumpIp);
-               loopList.add(currentLoop);
+               currentLoop = new Loop(ip2adr(actions, loopStart, version), ip2adr(actions, jumpIp, version));
+               loopList.add(currentLoop);               
             }
             boolean isFor = false;
             boolean isTernar = false;
             List<TreeItem> finalExpression = null;
 
-            TreeItem variableName = null;
-            /*if (isForIn) {
-             for (int t = ip + 1; t <= end; t++) {
-             Action actionSV = actions.get(t);
-             actionSV.translate(stack, constants, output, registerNames);
-             if (actionSV instanceof ActionSetVariable) {
-             SetVariableTreeItem svt = (SetVariableTreeItem) output.remove(output.size() - 1);
-             variableName = svt.name;
-             ip = t;
-             break;
-             }
-             }
-             }*/
-
+            TreeItem variableName = null;            
             try {
-
+               if(hasElse){
+                  log("Going to onfalse");
+                  onFalse = actionsToTree(registerNames, unknownJumps, loopList, jumpsOrIfs, falseStack, constants, actions, jumpIp, jumpElseIp - 1, version);
+               }
                int trueStackSizeBefore = trueStack.size();
+               log("Going to ontrue");
                onTrue = actionsToTree(registerNames, unknownJumps, loopList, jumpsOrIfs, trueStack, constants, actions, ip + 1, jumpIp - 1 - (hasElse || isWhile || isForIn ? 1 : 0), version);
                if (onTrue.isEmpty() && trueStack.size() > trueStackSizeBefore) {
                   isTernar = true;
@@ -985,7 +988,7 @@ public class Action {
                caseBodyIps.add(adr2ip(actions, ((ActionIf) actions.get(ip + 1)).getRef(version), version));
                ip++;
                do {
-                  ip++;
+                  ip++;                  
                   if ((actions.get(ip - 1) instanceof ActionStrictEquals) && (actions.get(ip) instanceof ActionIf)) {
                      caseValues.add(actionsToStackTree(registerNames, jumpsOrIfs, actions, constants, caseStart, ip - 2, version).pop());
                      caseStart = ip + 1;
@@ -1030,6 +1033,7 @@ public class Action {
          }
       }
       output = checkClass(output);
+      log("Leaving "+start+"-"+end);
       return output;
    }
 

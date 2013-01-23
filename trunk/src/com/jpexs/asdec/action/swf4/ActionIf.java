@@ -76,4 +76,11 @@ public class ActionIf extends Action {
       ret.add(this);
       return ret;
    }
+
+   @Override
+   public String toString() {
+      return "ActionIf";
+   }
+   
+   
 }

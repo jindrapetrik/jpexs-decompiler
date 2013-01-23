@@ -127,12 +127,12 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
             final ASMSource asm = (ASMSource) obj;
             (new Thread() {
                @Override
-               public void run() {
+               public void run() {                  
                   editor.setText(asm.getASMSource(SWF.DEFAULT_VERSION));
                   if (Main.DO_DECOMPILE) {
                      List<com.jpexs.asdec.action.Action> as = asm.getActions(SWF.DEFAULT_VERSION);
                      com.jpexs.asdec.action.Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
-
+                     decompiledEditor.setText("//Decompiling...");
                      decompiledEditor.setText(Highlighting.stripHilights(com.jpexs.asdec.action.Action.actionsToSource(as, SWF.DEFAULT_VERSION)));
                   }
                   Main.stopWork();

@@ -810,7 +810,7 @@ public class Main {
 
          if (debug) {
             ConsoleHandler conHan = new ConsoleHandler();
-            conHan.setFormatter(formatterTxt);
+            conHan.setFormatter(formatterTxt);            
             logger.addHandler(conHan);
          }
 
