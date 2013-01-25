@@ -61,6 +61,6 @@ public class NewMethodTreeItem extends TreeItem {
       if (blankMethod) {
          return scriptObject.toString(constants) + "(" + paramStr + ")";
       }
-      return "new " + scriptObject.toString(constants) + "." + methodNameStr + "(" + paramStr + ")";
+      return hilight("new ") + scriptObject.toString(constants) + hilight(".") + methodNameStr + hilight("(") + paramStr + hilight(")");
    }
 }

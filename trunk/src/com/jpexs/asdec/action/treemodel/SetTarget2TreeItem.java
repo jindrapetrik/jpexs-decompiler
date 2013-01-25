@@ -29,6 +29,6 @@ public class SetTarget2TreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return "tellTarget(" + target.toString(constants) + ");";
+      return hilight("tellTarget(") + target.toString(constants) + hilight(")") + ";";
    }
 }

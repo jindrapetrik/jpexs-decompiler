@@ -32,7 +32,7 @@ public class StoreRegisterTreeItem extends TreeItem implements SetTypeTreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return register.toString() + "=" + value.toString(constants) + ";";
+      return hilight(register.toString() + "=") + value.toString(constants) + ";";
    }
 
    @Override

@@ -29,6 +29,6 @@ public class RemoveSpriteTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return "removeMovieClip(" + target.toString(constants) + ");";
+      return hilight("removeMovieClip(") + target.toString(constants) + hilight(")") + ";";
    }
 }

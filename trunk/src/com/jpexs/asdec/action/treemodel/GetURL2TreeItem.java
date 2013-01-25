@@ -42,7 +42,7 @@ public class GetURL2TreeItem extends TreeItem {
          prefix = "loadMovie";
       }
 
-      return prefix + "(" + urlString.toString(constants) + "," + targetString.toString(constants) + methodStr + ");";
+      return hilight(prefix + "(") + urlString.toString(constants) + hilight(",") + targetString.toString(constants) + hilight(methodStr + ")") + ";";
    }
 
    public GetURL2TreeItem(Action instruction, TreeItem urlString, TreeItem targetString, int method, boolean loadTargetFlag, boolean loadVariablesFlag) {

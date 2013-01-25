@@ -81,6 +81,4 @@ public class ActionIf extends Action {
    public String toString() {
       return "ActionIf";
    }
-   
-   
 }

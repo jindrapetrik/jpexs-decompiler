@@ -30,6 +30,6 @@ public class GotoLabelTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return "gotoAndStop(\"" + Helper.escapeString(label) + "\");";
+      return hilight("gotoAndStop(\"") + Helper.escapeString(label) + hilight("\")") + ";";
    }
 }

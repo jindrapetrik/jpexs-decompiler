@@ -21,5 +21,6 @@ package com.jpexs.asdec.action.treemodel;
  * @author JPEXS
  */
 public interface SetTypeTreeItem {
+
    public TreeItem getObject();
 }

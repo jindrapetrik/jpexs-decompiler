@@ -39,6 +39,6 @@ public class NewObjectTreeItem extends TreeItem {
          }
          paramStr += arguments.get(t).toString(constants);
       }
-      return "new " + stripQuotes(objectName) + "(" + paramStr + ")";
+      return hilight("new ") + stripQuotes(objectName) + hilight("(") + paramStr + hilight(")");
    }
 }

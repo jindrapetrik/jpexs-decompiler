@@ -29,6 +29,6 @@ public class ThrowTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return "throw " + object.toString(constants) + ";";
+      return hilight("throw ") + object.toString(constants) + ";";
    }
 }

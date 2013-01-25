@@ -29,6 +29,6 @@ public class DecrementTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return object.toString(constants) + "-1";
+      return object.toString(constants) + hilight("-1");
    }
 }

@@ -233,7 +233,6 @@ public class MainFrame extends JFrame implements ActionListener {
       menuDeobfuscation.add(miRenameIdentifiers);
 
 
-
       JMenu menuTools = new JMenu("Tools");
       JMenuItem miProxy = new JMenuItem("Proxy");
       miProxy.setActionCommand("SHOWPROXY");
@@ -311,7 +310,6 @@ public class MainFrame extends JFrame implements ActionListener {
       if (!buttons.isEmpty()) {
          addTab(tabPane, buttonsTagPanel = new TagPanel(buttons, swf), "Buttons", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/button16.png")));
       }
-
 
 
       loadingPanel.setPreferredSize(new Dimension(30, 30));

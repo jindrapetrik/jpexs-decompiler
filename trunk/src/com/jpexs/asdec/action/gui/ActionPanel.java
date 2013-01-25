@@ -18,6 +18,7 @@ package com.jpexs.asdec.action.gui;
 
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.SWF;
+import com.jpexs.asdec.abc.gui.LineMarkedEditorPane;
 import com.jpexs.asdec.action.TagNode;
 import com.jpexs.asdec.action.parser.ASMParser;
 import com.jpexs.asdec.action.parser.ParseException;
@@ -34,17 +35,19 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
 
-public class ActionPanel extends JPanel implements TreeSelectionListener, ActionListener {
+public class ActionPanel extends JPanel implements TreeSelectionListener, ActionListener, CaretListener {
 
    public JTree tagTree;
-   public JEditorPane editor;
-   public JEditorPane decompiledEditor;
+   public LineMarkedEditorPane editor;
+   public LineMarkedEditorPane decompiledEditor;
    public List<Tag> list;
    public JSplitPane splitPane;
    public JSplitPane splitPane2;
@@ -53,12 +56,14 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
    public JButton loadHexButton = new JButton("Load hex");
    public JLabel asmLabel = new JLabel("P-code source (editable)");
    public JLabel decLabel = new JLabel("ActionScript source");
+   public List<Highlighting> decompiledHilights = new ArrayList<Highlighting>();
+   public List<Highlighting> disassembledHilights = new ArrayList<Highlighting>();
 
    public ActionPanel(List<Tag> list) {
       this.list = list;
       DefaultSyntaxKit.initKit();
-      editor = new JEditorPane();
-      decompiledEditor = new JEditorPane();
+      editor = new LineMarkedEditorPane();
+      decompiledEditor = new LineMarkedEditorPane();
       tagTree = new JTree(new TagTreeModel(list));
 
       DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
@@ -107,7 +112,7 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
       editor.setContentType("text/flasm");
       decompiledEditor.setContentType("text/actionscript");
       tagTree.addTreeSelectionListener(this);
-
+      decompiledEditor.addCaretListener(this);
    }
 
    public void initSplits() {
@@ -127,13 +132,17 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
             final ASMSource asm = (ASMSource) obj;
             (new Thread() {
                @Override
-               public void run() {                  
-                  editor.setText(asm.getASMSource(SWF.DEFAULT_VERSION));
+               public void run() {
+                  String disasm = asm.getASMSource(SWF.DEFAULT_VERSION);
+                  disassembledHilights = Highlighting.getInstrHighlights(disasm);
+                  editor.setText(Highlighting.stripHilights(disasm));
                   if (Main.DO_DECOMPILE) {
                      List<com.jpexs.asdec.action.Action> as = asm.getActions(SWF.DEFAULT_VERSION);
                      com.jpexs.asdec.action.Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
                      decompiledEditor.setText("//Decompiling...");
-                     decompiledEditor.setText(Highlighting.stripHilights(com.jpexs.asdec.action.Action.actionsToSource(as, SWF.DEFAULT_VERSION)));
+                     String s = com.jpexs.asdec.action.Action.actionsToSource(as, SWF.DEFAULT_VERSION);
+                     decompiledHilights = Highlighting.getInstrHighlights(s);
+                     decompiledEditor.setText(Highlighting.stripHilights(s));
                   }
                   Main.stopWork();
                }
@@ -174,6 +183,23 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
             } catch (ParseException ex) {
                JOptionPane.showMessageDialog(this, "" + ex.text + " on line " + ex.line, "Error", JOptionPane.ERROR_MESSAGE);
             }
+         }
+      }
+   }
+
+   @Override
+   public void caretUpdate(CaretEvent e) {
+      decompiledEditor.getCaret().setVisible(true);
+      int pos = decompiledEditor.getCaretPosition();
+      for (Highlighting h : decompiledHilights) {
+         if ((pos >= h.startPos) && (pos < h.startPos + h.len)) {
+            for (Highlighting h2 : disassembledHilights) {
+               if (h2.offset == h.offset) {
+                  editor.setCaretPosition(h2.startPos);
+                  break;
+               }
+            }
+            break;
          }
       }
    }

@@ -33,10 +33,10 @@ public class InitArrayTreeItem extends TreeItem {
       String arrStr = "";
       for (int i = 0; i < values.size(); i++) {
          if (i > 0) {
-            arrStr += ",";
+            arrStr += hilight(",");
          }
          arrStr += values.get(i).toString(constants);
       }
-      return "[" + arrStr + "]";
+      return hilight("[") + arrStr + hilight("]");
    }
 }

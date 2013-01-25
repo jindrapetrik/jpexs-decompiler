@@ -29,6 +29,6 @@ public class ReturnTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return "return " + value.toString(constants) + ";";
+      return hilight("return ") + value.toString(constants) + ";";
    }
 }

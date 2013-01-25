@@ -29,6 +29,6 @@ public class MBCharToAsciiTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return "mbchr(" + value.toString(constants) + ")";
+      return hilight("mbchr(") + value.toString(constants) + hilight(")");
    }
 }

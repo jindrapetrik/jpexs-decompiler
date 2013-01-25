@@ -33,6 +33,6 @@ public class CloneSpriteTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return "duplicateMovieClip(" + target.toString(constants) + "," + source.toString(constants) + "," + depth.toString(constants) + ");";
+      return hilight("duplicateMovieClip(") + target.toString(constants) + hilight(",") + source.toString(constants) + hilight(",") + depth.toString(constants) + hilight(")") + ";";
    }
 }

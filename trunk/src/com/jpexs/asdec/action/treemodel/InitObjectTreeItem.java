@@ -35,10 +35,10 @@ public class InitObjectTreeItem extends TreeItem {
       String objStr = "";
       for (int i = 0; i < values.size(); i++) {
          if (i > 0) {
-            objStr += ",";
+            objStr += hilight(",");
          }
-         objStr += names.get(i).toString(constants) + ":" + values.get(i).toString(constants);
+         objStr += names.get(i).toString(constants) + hilight(":") + values.get(i).toString(constants);
       }
-      return "{" + objStr + "}";
+      return hilight("{") + objStr + hilight("}");
    }
 }

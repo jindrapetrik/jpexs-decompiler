@@ -383,8 +383,8 @@ public class Action {
          if (importantOffsets.contains(offset)) {
             ret += "loc" + Helper.formatAddress(offset) + ":";
          }
+         ret += Highlighting.hilighOffset("", offset) + a.getASMSource(importantOffsets, constantPool, version) + "\r\n";
          offset += a.getBytes(version).length;
-         ret += a.getASMSource(importantOffsets, constantPool, version) + "\r\n";
       }
       if (importantOffsets.contains(offset)) {
          ret += "loc" + Helper.formatAddress(offset) + ":\r\n";

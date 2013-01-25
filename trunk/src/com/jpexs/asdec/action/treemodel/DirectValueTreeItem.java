@@ -38,41 +38,41 @@ public class DirectValueTreeItem extends TreeItem {
    public String toStringNoQuotes(ConstantPool constants) {
       if (value instanceof Double) {
          if (Double.compare((double) (Double) value, 0) == 0) {
-            return "0";
+            return hilight("0");
          }
       }
       if (value instanceof Float) {
          if (Float.compare((float) (Float) value, 0) == 0) {
-            return "0";
+            return hilight("0");
          }
       }
       if (value instanceof String) {
-         return (String) value;
+         return hilight((String) value);
       }
       if (value instanceof ConstantIndex) {
-         return (this.constants.get(((ConstantIndex) value).index));
+         return hilight(this.constants.get(((ConstantIndex) value).index));
       }
-      return value.toString();
+      return hilight(value.toString());
    }
 
    @Override
    public String toString(ConstantPool constants) {
       if (value instanceof Double) {
          if (Double.compare((double) (Double) value, 0) == 0) {
-            return "0";
+            return hilight("0");
          }
       }
       if (value instanceof Float) {
          if (Float.compare((float) (Float) value, 0) == 0) {
-            return "0";
+            return hilight("0");
          }
       }
       if (value instanceof String) {
-         return "\"" + Helper.escapeString((String) value) + "\"";
+         return hilight("\"" + Helper.escapeString((String) value) + "\"");
       }
       if (value instanceof ConstantIndex) {
-         return "\"" + Helper.escapeString(this.constants.get(((ConstantIndex) value).index)) + "\"";
+         return hilight("\"" + Helper.escapeString(this.constants.get(((ConstantIndex) value).index)) + "\"");
       }
-      return value.toString();
+      return hilight(value.toString());
    }
 }

@@ -32,8 +32,8 @@ public class GetPropertyTreeItem extends TreeItem {
    @Override
    public String toString(ConstantPool constants) {
       if (isEmptyString(target)) {
-         return Action.propertyNames[propertyIndex];
+         return hilight(Action.propertyNames[propertyIndex]);
       }
-      return target.toString(constants) + "." + Action.propertyNames[propertyIndex];
+      return target.toString(constants) + hilight("." + Action.propertyNames[propertyIndex]);
    }
 }

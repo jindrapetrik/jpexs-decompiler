@@ -30,6 +30,6 @@ public class SetTargetTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return "tellTarget(\"" + Helper.escapeString(target) + "\");";
+      return hilight("tellTarget(\"") + Helper.escapeString(target) + hilight("\")") + ";";
    }
 }

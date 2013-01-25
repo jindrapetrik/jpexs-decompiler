@@ -158,7 +158,7 @@ public class TagNode {
                   }
                   String ret;
                   if (isPcode) {
-                     ret = ((ASMSource) node.tag).getASMSource(SWF.DEFAULT_VERSION);
+                     ret = Highlighting.stripHilights(((ASMSource) node.tag).getASMSource(SWF.DEFAULT_VERSION));
                   } else {
                      List<com.jpexs.asdec.action.Action> as = ((ASMSource) node.tag).getActions(SWF.DEFAULT_VERSION);
                      com.jpexs.asdec.action.Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);

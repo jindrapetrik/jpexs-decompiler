@@ -29,6 +29,6 @@ public class GotoFrameTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return "gotoAndStop(" + frame + ");";
+      return hilight("gotoAndStop(") + frame + hilight(")") + ";";
    }
 }

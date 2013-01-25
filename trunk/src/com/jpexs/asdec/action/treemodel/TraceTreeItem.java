@@ -29,6 +29,6 @@ public class TraceTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return "trace(" + value.toString(constants) + ");";
+      return hilight("trace(") + value.toString(constants) + hilight(")") + ";";
    }
 }

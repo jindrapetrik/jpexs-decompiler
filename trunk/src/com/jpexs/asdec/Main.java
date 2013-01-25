@@ -31,7 +31,6 @@ import java.awt.event.MouseEvent;
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
@@ -810,7 +809,7 @@ public class Main {
 
          if (debug) {
             ConsoleHandler conHan = new ConsoleHandler();
-            conHan.setFormatter(formatterTxt);            
+            conHan.setFormatter(formatterTxt);
             logger.addHandler(conHan);
          }
 

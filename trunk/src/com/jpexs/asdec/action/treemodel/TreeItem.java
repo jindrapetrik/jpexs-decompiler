@@ -87,7 +87,7 @@ public abstract class TreeItem {
    protected String stripQuotes(TreeItem target) {
       if (target instanceof DirectValueTreeItem) {
          if (((DirectValueTreeItem) target).value instanceof String) {
-            return (String) ((DirectValueTreeItem) target).value;
+            return (String) ((DirectValueTreeItem) target).hilight((String) ((DirectValueTreeItem) target).value);
          }
       }
       if (target == null) {

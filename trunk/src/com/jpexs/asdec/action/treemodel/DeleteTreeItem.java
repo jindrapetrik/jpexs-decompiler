@@ -32,8 +32,8 @@ public class DeleteTreeItem extends TreeItem {
    @Override
    public String toString(ConstantPool constants) {
       if (object == null) {
-         return "delete " + propertyName.toString(constants);
+         return hilight("delete ") + propertyName.toString(constants);
       }
-      return "delete " + object.toString(constants) + "." + stripQuotes(propertyName);
+      return hilight("delete ") + object.toString(constants) + "." + stripQuotes(propertyName);
    }
 }

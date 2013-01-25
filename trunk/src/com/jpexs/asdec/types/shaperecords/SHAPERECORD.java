@@ -22,10 +22,8 @@ import com.jpexs.asdec.types.LINESTYLE;
 import com.jpexs.asdec.types.LINESTYLE2;
 import com.jpexs.asdec.types.LINESTYLEARRAY;
 import com.jpexs.asdec.types.RECT;
-import com.jpexs.asdec.types.RGB;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

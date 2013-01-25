@@ -39,6 +39,6 @@ public class GotoFrame2TreeItem extends TreeItem {
       if (playFlag) {
          prefix = "gotoAndPlay";
       }
-      return prefix + "(" + frame.toString(constants) + (sceneBiasFlag ? "," + sceneBias : "") + ");";
+      return hilight(prefix + "(") + frame.toString(constants) + (sceneBiasFlag ? "," + sceneBias : "") + hilight(")") + ";";
    }
 }

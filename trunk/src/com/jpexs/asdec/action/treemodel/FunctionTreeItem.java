@@ -37,20 +37,20 @@ public class FunctionTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      String ret = "function";
+      String ret = hilight("function");
       if (calculatedFunctionName != null) {
          ret += " " + calculatedFunctionName.toStringNoQuotes(constants);
       } else if (!functionName.equals("")) {
          ret += " " + functionName;
       }
-      ret += "(";
+      ret += hilight("(");
       for (int p = 0; p < paramNames.size(); p++) {
          if (p > 0) {
-            ret += ", ";
+            ret += hilight(", ");
          }
-         ret += paramNames.get(p);
+         ret += hilight(paramNames.get(p));
       }
-      ret += ")\r\n{\r\n" + Action.treeToString(actions) + "}";
+      ret += hilight(")") + "\r\n{\r\n" + Action.treeToString(actions) + "}";
       return ret;
    }
 }

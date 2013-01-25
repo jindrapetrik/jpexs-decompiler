@@ -29,6 +29,6 @@ public class ToIntegerTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return "int(" + value.toString(constants) + ")";
+      return hilight("int(") + value.toString(constants) + hilight(")");
    }
 }

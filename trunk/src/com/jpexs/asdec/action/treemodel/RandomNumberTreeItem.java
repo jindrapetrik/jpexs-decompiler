@@ -29,6 +29,6 @@ public class RandomNumberTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return "random(" + maximum.toString(constants) + ")";
+      return hilight("random(") + maximum.toString(constants) + hilight(")");
    }
 }

@@ -39,6 +39,6 @@ public class ImplementsOpTreeItem extends TreeItem {
          }
          impStr += superclasses.get(i).toString(constants);
       }
-      return subclass.toString(constants) + " implements " + impStr;
+      return subclass.toString(constants) + hilight(" implements ") + impStr;
    }
 }

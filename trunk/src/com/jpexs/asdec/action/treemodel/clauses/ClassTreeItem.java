@@ -35,26 +35,26 @@ public class ClassTreeItem extends TreeItem implements Block {
    public HashMap<TreeItem, TreeItem> vars;
    public HashMap<TreeItem, TreeItem> staticVars;
 
-   public ClassTreeItem(TreeItem className, TreeItem extendsOp, List<TreeItem> implementsOp, List<FunctionTreeItem> functions, HashMap<TreeItem, TreeItem> vars,List<FunctionTreeItem> staticFunctions,HashMap<TreeItem, TreeItem> staticVars) {
+   public ClassTreeItem(TreeItem className, TreeItem extendsOp, List<TreeItem> implementsOp, List<FunctionTreeItem> functions, HashMap<TreeItem, TreeItem> vars, List<FunctionTreeItem> staticFunctions, HashMap<TreeItem, TreeItem> staticVars) {
       super(null, NOPRECEDENCE);
       this.className = className;
       this.functions = functions;
       this.vars = vars;
       this.extendsOp = extendsOp;
       this.implementsOp = implementsOp;
-      this.staticFunctions=staticFunctions;
-      this.staticVars=staticVars;
+      this.staticFunctions = staticFunctions;
+      this.staticVars = staticVars;
    }
 
    @Override
    public String toString(ConstantPool constants) {
       String ret;
-      ret = "class " + className.toStringNoQuotes(constants);
+      ret = hilight("class ") + className.toStringNoQuotes(constants);
       if (extendsOp != null) {
-         ret += " extends " + extendsOp.toStringNoQuotes(constants);
+         ret += hilight(" extends ") + extendsOp.toStringNoQuotes(constants);
       }
       if (!implementsOp.isEmpty()) {
-         ret += " implements ";
+         ret += hilight(" implements ");
          boolean first = true;
          for (TreeItem t : implementsOp) {
             if (!first) {
@@ -69,7 +69,7 @@ public class ClassTreeItem extends TreeItem implements Block {
          ret += f.toString(constants) + "\r\n";
       }
       for (FunctionTreeItem f : staticFunctions) {
-         ret += "static "+f.toString(constants) + "\r\n";
+         ret += "static " + f.toString(constants) + "\r\n";
       }
       for (TreeItem v : vars.keySet()) {
          ret += "var " + v.toStringNoQuotes(constants) + " = " + vars.get(v).toStringNoQuotes(constants) + ";\r\n";

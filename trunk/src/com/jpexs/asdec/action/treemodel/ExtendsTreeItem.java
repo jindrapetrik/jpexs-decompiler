@@ -31,6 +31,6 @@ public class ExtendsTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return subclass.toString(constants) + " extends " + stripQuotes(superclass);
+      return subclass.toString(constants) + hilight(" extends ") + stripQuotes(superclass);
    }
 }

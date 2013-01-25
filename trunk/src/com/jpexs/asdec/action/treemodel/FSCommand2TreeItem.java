@@ -38,6 +38,6 @@ public class FSCommand2TreeItem extends TreeItem {
          paramStr += ",";
          paramStr += arguments.get(t).toString(constants);
       }
-      return "FSCommand2(" + command.toString(constants) + paramStr + ");";
+      return hilight("FSCommand2(") + command.toString(constants) + paramStr + hilight(")") + ";";
    }
 }

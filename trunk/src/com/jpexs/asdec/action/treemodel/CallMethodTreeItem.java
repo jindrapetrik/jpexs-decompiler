@@ -38,7 +38,7 @@ public class CallMethodTreeItem extends TreeItem {
       String paramStr = "";
       for (int t = 0; t < arguments.size(); t++) {
          if (t > 0) {
-            paramStr += ",";
+            paramStr += hilight(",");
          }
          paramStr += arguments.get(t).toString(constants);
       }
@@ -54,8 +54,8 @@ public class CallMethodTreeItem extends TreeItem {
          }
       }
       if (blankMethod) {
-         return scriptObject.toString(constants) + "(" + paramStr + ")";
+         return scriptObject.toString(constants) + hilight("(") + paramStr + hilight(")");
       }
-      return scriptObject.toString(constants) + "." + stripQuotes(methodName) + "(" + paramStr + ")";
+      return scriptObject.toString(constants) + hilight(".") + stripQuotes(methodName) + hilight("(") + paramStr + hilight(")");
    }
 }

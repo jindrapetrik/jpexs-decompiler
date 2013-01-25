@@ -35,10 +35,10 @@ public class CallFunctionTreeItem extends TreeItem {
       String paramStr = "";
       for (int t = 0; t < arguments.size(); t++) {
          if (t > 0) {
-            paramStr += ",";
+            paramStr += hilight(",");
          }
          paramStr += arguments.get(t).toString(constants);
       }
-      return stripQuotes(functionName) + "(" + paramStr + ")";
+      return stripQuotes(functionName) + hilight("(") + paramStr + hilight(")");
    }
 }

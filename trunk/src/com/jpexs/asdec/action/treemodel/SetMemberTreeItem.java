@@ -18,7 +18,7 @@ package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
 
-public class SetMemberTreeItem extends TreeItem implements SetTypeTreeItem{
+public class SetMemberTreeItem extends TreeItem implements SetTypeTreeItem {
 
    public TreeItem object;
    public TreeItem objectName;
@@ -40,6 +40,4 @@ public class SetMemberTreeItem extends TreeItem implements SetTypeTreeItem{
    public TreeItem getObject() {
       return new GetMemberTreeItem(instruction, object, objectName);
    }
-   
-   
 }

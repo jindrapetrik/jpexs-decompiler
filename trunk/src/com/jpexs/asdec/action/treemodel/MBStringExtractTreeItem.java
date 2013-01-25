@@ -33,6 +33,6 @@ public class MBStringExtractTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return "mbsubstring(" + value.toString(constants) + "," + index.toString(constants) + "," + count.toString(constants) + ")";
+      return hilight("mbsubstring(") + value.toString(constants) + hilight(",") + index.toString(constants) + hilight(",") + count.toString(constants) + hilight(")");
    }
 }

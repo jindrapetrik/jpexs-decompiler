@@ -31,6 +31,6 @@ public class WaitForFrameTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return "waitForFrame(" + frame + "," + skipCount + ");";
+      return hilight("waitForFrame(") + frame + "," + skipCount + hilight(")") + ";";
    }
 }

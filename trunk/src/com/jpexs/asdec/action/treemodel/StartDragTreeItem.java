@@ -54,6 +54,6 @@ public class StartDragTreeItem extends TreeItem {
             }
          }
       }
-      return "startDrag(" + target.toString(constants) + "," + lockCenter.toString(constants) + (hasConstrains ? "," + x1.toString(constants) + "," + y1.toString(constants) + "," + x2.toString(constants) + "," + y2.toString(constants) : "") + ")";
+      return hilight("startDrag(") + target.toString(constants) + hilight(",") + lockCenter.toString(constants) + (hasConstrains ? hilight(",") + x1.toString(constants) + hilight(",") + y1.toString(constants) + hilight(",") + x2.toString(constants) + hilight(",") + y2.toString(constants) : "") + hilight(")");
    }
 }
