@@ -45,8 +45,10 @@ public class UsageFrame extends JFrame implements ActionListener, MouseListener 
    private JList usageList;
    private UsageListModel usageListModel;
    private ABC abc;
+   private ABCPanel abcPanel;
 
-   public UsageFrame(List<DoABCTag> abcTags, ABC abc, int multinameIndex) {
+   public UsageFrame(List<DoABCTag> abcTags, ABC abc, int multinameIndex,ABCPanel abcPanel) {
+      this.abcPanel=abcPanel;
       List<MultinameUsage> usages = abc.findMultinameUsage(multinameIndex);
       this.abc = abc;
       usageListModel = new UsageListModel(abcTags, abc);
@@ -79,7 +81,7 @@ public class UsageFrame extends JFrame implements ActionListener, MouseListener 
          MultinameUsage usage = usageListModel.getUsage(usageList.getSelectedIndex());
          if (usage instanceof InsideClassMultinameUsage) {
             InsideClassMultinameUsage icu = (InsideClassMultinameUsage) usage;
-            Main.mainFrame.abcPanel.classTree.selectClass(icu.classIndex);
+            abcPanel.classTree.selectClass(icu.classIndex);
             try {
                Thread.sleep(100);
             } catch (InterruptedException ex) {
@@ -101,7 +103,7 @@ public class UsageFrame extends JFrame implements ActionListener, MouseListener 
                      traitIndex = abc.class_info[mmu.classIndex].static_traits.traits.length + abc.instance_info[mmu.classIndex].instance_traits.traits.length + (mmu.isStatic ? 1 : 0);
                   }
                }
-               Main.mainFrame.abcPanel.decompiledTextArea.gotoTrait(traitIndex);
+               abcPanel.decompiledTextArea.gotoTrait(traitIndex);
             }
          }
       }

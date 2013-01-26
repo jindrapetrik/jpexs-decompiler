@@ -39,16 +39,22 @@ public class DetailPanel extends JPanel implements ActionListener {
    public static final String UNSUPPORTED_TRAIT_CARD = "-";
    public static final String SLOT_CONST_TRAIT_CARD = "Slot/Const Trait";
    private JPanel innerPanel;
-   public JButton saveButton;
+   public JButton saveButton = new JButton("Save");
+   public JButton editButton = new JButton("Edit");
+   public JButton cancelButton = new JButton("Cancel");
    private HashMap<String, JComponent> cardMap = new HashMap<String, JComponent>();
    private String selectedCard;
    private JLabel selectedLabel;
+   private boolean editMode = false;
+   private JPanel buttonsPanel;
+   private ABCPanel abcPanel;
 
-   public DetailPanel() {
+   public DetailPanel(ABCPanel abcPanel) {
+      this.abcPanel=abcPanel;
       innerPanel = new JPanel();
       CardLayout layout = new CardLayout();
       innerPanel.setLayout(layout);
-      methodTraitPanel = new MethodTraitDetailPanel();
+      methodTraitPanel = new MethodTraitDetailPanel(abcPanel);
       cardMap.put(METHOD_TRAIT_CARD, methodTraitPanel);
 
       unsupportedTraitPanel = new JPanel(new BorderLayout());
@@ -67,17 +73,22 @@ public class DetailPanel extends JPanel implements ActionListener {
       setLayout(new BorderLayout());
       add(innerPanel, BorderLayout.CENTER);
 
-      JPanel buttonsPanel = new JPanel();
+      buttonsPanel = new JPanel();
       buttonsPanel.setLayout(new FlowLayout());
-      saveButton = new JButton("Save trait");
       saveButton.setActionCommand("SAVEDETAIL");
       saveButton.addActionListener(this);
+      editButton.setActionCommand("EDITDETAIL");
+      editButton.addActionListener(this);
+      cancelButton.setActionCommand("CANCELDETAIL");
+      cancelButton.addActionListener(this);
       buttonsPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
+      buttonsPanel.add(editButton);
       buttonsPanel.add(saveButton);
+      buttonsPanel.add(cancelButton);
       add(buttonsPanel, BorderLayout.SOUTH);
       selectedCard = UNSUPPORTED_TRAIT_CARD;
       layout.show(innerPanel, UNSUPPORTED_TRAIT_CARD);
-      saveButton.setVisible(false);
+      buttonsPanel.setVisible(false);
       selectedLabel = new JLabel("");
       selectedLabel.setText(selectedCard);
       selectedLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
@@ -85,21 +96,40 @@ public class DetailPanel extends JPanel implements ActionListener {
       add(selectedLabel, BorderLayout.NORTH);
    }
 
+   public void setEditMode(boolean val) {
+      slotConstTraitPanel.setEditMode(val);
+      methodTraitPanel.setEditMode(val);
+      saveButton.setVisible(val);
+      editButton.setVisible(!val);
+      cancelButton.setVisible(val);
+      editMode = val;
+   }
+
    public void showCard(String name) {
       CardLayout layout = (CardLayout) innerPanel.getLayout();
       layout.show(innerPanel, name);
-      saveButton.setVisible(cardMap.get(name) instanceof TraitDetail);
+      boolean b = cardMap.get(name) instanceof TraitDetail;
+      buttonsPanel.setVisible(b);
       selectedCard = name;
-      selectedLabel.setText(selectedCard);
+      selectedLabel.setText(selectedCard);      
    }
 
    public void actionPerformed(ActionEvent e) {
+      if (e.getActionCommand().equals("EDITDETAIL")) {
+         setEditMode(true);
+      }
+      if (e.getActionCommand().equals("CANCELDETAIL")) {
+         setEditMode(false);
+         abcPanel.decompiledTextArea.resetEditing();
+      }
       if (e.getActionCommand().equals("SAVEDETAIL")) {
          if (cardMap.get(selectedCard) instanceof TraitDetail) {
             if (((TraitDetail) cardMap.get(selectedCard)).save()) {
-               int lasttrait = Main.mainFrame.abcPanel.decompiledTextArea.lastTraitIndex;
-               Main.mainFrame.abcPanel.decompiledTextArea.reloadClass();
-               Main.mainFrame.abcPanel.decompiledTextArea.gotoTrait(lasttrait);
+               int lasttrait = abcPanel.decompiledTextArea.lastTraitIndex;
+               int lastclass = abcPanel.decompiledTextArea.getClassIndex();
+               abcPanel.decompiledTextArea.reloadClass();
+               abcPanel.decompiledTextArea.setClassIndex(lastclass);
+               abcPanel.decompiledTextArea.gotoTrait(lasttrait);
                JOptionPane.showMessageDialog(this, "Trait Successfully saved");
             }
          }

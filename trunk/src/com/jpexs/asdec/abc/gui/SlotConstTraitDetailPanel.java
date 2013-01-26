@@ -78,4 +78,9 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
       }
       return true;
    }
+
+   @Override
+   public void setEditMode(boolean val) {
+      slotConstEditor.setEditable(val);
+   }
 }

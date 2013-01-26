@@ -22,17 +22,48 @@ import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.flowgraph.Graph;
 import com.jpexs.asdec.abc.avm2.parser.ASM3Parser;
 import com.jpexs.asdec.abc.avm2.parser.ParseException;
+import com.jpexs.asdec.helpers.Highlighting;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 
-public class ASMSourceEditorPane extends LineMarkedEditorPane {
+public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretListener {
 
    public ABC abc;
    public int bodyIndex = -1;
+   private List<Highlighting> disassembledHilights = new ArrayList<Highlighting>();
+   private DecompiledEditorPane decompiledEditor;
+   private boolean ignoreCarret = false;
 
-   public ASMSourceEditorPane() {
+   public void setIgnoreCarret(boolean ignoreCarret) {
+      this.ignoreCarret = ignoreCarret;
+   }
+   
+   
+
+   public ASMSourceEditorPane(DecompiledEditorPane decompiledEditor) {
+      this.decompiledEditor = decompiledEditor;
+      addCaretListener(this);
+   }
+
+   public void hilighOffset(long offset) {
+      if(isEditable()){
+         return;
+      }
+      for (Highlighting h2 : disassembledHilights) {
+         if (h2.offset == offset) {
+            ignoreCarret = true;
+            setCaretPosition(h2.startPos);
+            getCaret().setVisible(true);
+            ignoreCarret = false;
+            break;
+         }
+      }
    }
 
    public void setBodyIndex(int bodyIndex, ABC abc) {
@@ -67,6 +98,12 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane {
          return false;
       }
       return true;
+   }
+
+   @Override
+   public void setText(String t) {
+      disassembledHilights = Highlighting.getInstrHighlights(t);
+      super.setText(Highlighting.stripHilights(t));
    }
 
    public void verify(ConstantPool constants, ABC abc) {
@@ -139,5 +176,25 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane {
       }
       select(lineStart, lineEnd);
       requestFocus();
+   }
+
+   @Override
+   public void caretUpdate(CaretEvent e) {
+      if(isEditable()){
+         return;
+      }
+      if (ignoreCarret) {
+         return;
+      }
+      getCaret().setVisible(true);
+      int pos = getCaretPosition();
+      Highlighting lastH = new Highlighting(0, 0, 0);
+      for (Highlighting h : disassembledHilights) {
+         if (pos < h.startPos) {
+            break;
+         }
+         lastH = h;
+      }
+      decompiledEditor.hilightOffset(lastH.offset);
    }
 }

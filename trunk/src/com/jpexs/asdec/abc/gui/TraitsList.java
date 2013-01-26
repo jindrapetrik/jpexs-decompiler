@@ -30,13 +30,14 @@ public class TraitsList extends JList implements ListSelectionListener {
    ABC abc;
    List<DoABCTag> abcTags;
    int classIndex = -1;
-
+   private ABCPanel abcPanel;
    public int getClassIndex() {
       return classIndex;
    }
 
-   public TraitsList() {
+   public TraitsList(ABCPanel abcPanel) {
       addListSelectionListener(this);
+      this.abcPanel=abcPanel;
       setCellRenderer(new IconListRenderer());
    }
 
@@ -62,7 +63,7 @@ public class TraitsList extends JList implements ListSelectionListener {
 
       int index = getSelectedIndex();
 
-      Main.mainFrame.abcPanel.decompiledTextArea.gotoTrait(index);
+      abcPanel.decompiledTextArea.gotoTrait(index);
 
    }
 }

@@ -55,6 +55,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.text.Highlighter;
 
 public class AVM2Code {
 
@@ -728,7 +729,7 @@ public class AVM2Code {
                ret += "exceptiontarget " + e + ":";
             }
          }
-         ret += ins.toStringNoAddress(constants, new ArrayList<String>()) + "\n";
+         ret += Highlighting.hilighOffset("", ofs) + ins.toStringNoAddress(constants, new ArrayList<String>()) + "\n";
          ofs += ins.getBytes().length;
       }
 

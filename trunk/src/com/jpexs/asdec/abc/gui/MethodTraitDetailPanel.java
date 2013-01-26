@@ -29,10 +29,12 @@ public class MethodTraitDetailPanel extends JTabbedPane implements TraitDetail {
    public MethodCodePanel methodCodePanel;
    public MethodBodyParamsPanel methodBodyParamsPanel;
    public MethodInfoPanel methodInfoPanel;
+   public ABCPanel abcPanel;
 
-   public MethodTraitDetailPanel() {
-      methodCodePanel = new MethodCodePanel();
-      methodBodyParamsPanel = new MethodBodyParamsPanel();
+   public MethodTraitDetailPanel(ABCPanel abcPanel) {
+      this.abcPanel=abcPanel;
+      methodCodePanel = new MethodCodePanel(abcPanel.decompiledTextArea);
+      methodBodyParamsPanel = new MethodBodyParamsPanel(abcPanel);
       methodInfoPanel = new MethodInfoPanel();
       addTab("MethodInfo", methodInfoPanel);
       addTab("MethodBody Code", methodCodePanel);
@@ -44,7 +46,7 @@ public class MethodTraitDetailPanel extends JTabbedPane implements TraitDetail {
       if (!methodInfoPanel.save()) {
          return false;
       }
-      if (!methodCodePanel.sourceTextArea.save(Main.mainFrame.abcPanel.abc.constants)) {
+      if (!methodCodePanel.save(abcPanel.abc.constants)) {
          return false;
       }
       if (!methodBodyParamsPanel.save()) {
@@ -52,5 +54,12 @@ public class MethodTraitDetailPanel extends JTabbedPane implements TraitDetail {
       }
 
       return true;
+   }
+
+   @Override
+   public void setEditMode(boolean val) {
+      methodCodePanel.setEditMode(val);
+      methodBodyParamsPanel.setEditMode(val);
+      methodInfoPanel.setEditMode(val);
    }
 }

@@ -42,9 +42,10 @@ public class MethodBodyParamsPanel extends JPanel implements ChangeListener {
    public MethodBody body;
    public JCheckBox autoFillCheckBox = new JCheckBox("Auto fill on code save (GLOBAL SETTING)");
    public JLabel experimentalLabel = new JLabel("...EXPERIMENTAL");
-
-   public MethodBodyParamsPanel() {
+   private ABCPanel abcPanel;
+   public MethodBodyParamsPanel(ABCPanel abcPanel) {
       setLayout(null);
+      this.abcPanel=abcPanel;
 
       maxStackLabel.setBounds(10, 10, 150, 25);
       maxStackField.setBounds(10 + 150 + 10, 10, 75, 25);
@@ -100,7 +101,7 @@ public class MethodBodyParamsPanel extends JPanel implements ChangeListener {
             body.max_regs = Integer.parseInt(localCountField.getText());
             body.max_scope_depth = Integer.parseInt(maxScopeDepthField.getText());
          } else {
-            if (!body.autoFillStats(Main.mainFrame.abcPanel.abc)) {
+            if (!body.autoFillStats(abcPanel.abc)) {
                JOptionPane.showMessageDialog(null, "Cannot get code stats for automatic body params.\r\nUncheck autofill to avoid this message.", "Warning", JOptionPane.WARNING_MESSAGE);
             }
          }
@@ -121,5 +122,13 @@ public class MethodBodyParamsPanel extends JPanel implements ChangeListener {
             maxStackField.setEnabled(true);
          }
       }
+   }
+
+   public void setEditMode(boolean val) {
+      maxStackField.setEditable(val);
+      localCountField.setEditable(val);
+      initScopeDepthField.setEditable(val);
+      maxScopeDepthField.setEditable(val);
+      autoFillCheckBox.setEnabled(val);
    }
 }

@@ -22,5 +22,7 @@ package com.jpexs.asdec.abc.gui;
  */
 public interface TraitDetail {
 
+   public void setEditMode(boolean val);
+
    public boolean save();
 }

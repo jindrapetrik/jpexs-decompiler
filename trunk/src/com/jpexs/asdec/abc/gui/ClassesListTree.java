@@ -35,6 +35,7 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
 
    private List<DoABCTag> abcList;
    private HashMap<String, TreeLeafScript> treeList;
+   private ABCPanel abcPanel;
 
    public void selectClass(int classIndex) {
       ClassesListTreeModel model = (ClassesListTreeModel) getModel();
@@ -44,9 +45,10 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
       scrollPathToVisible(treePath);
    }
 
-   public ClassesListTree(List<DoABCTag> list) {
+   public ClassesListTree(List<DoABCTag> list,ABCPanel abcPanel) {
       this.abcList = list;
       this.treeList = getTreeList(list);
+      this.abcPanel=abcPanel;
       setModel(new ClassesListTreeModel(this.treeList));
       addTreeSelectionListener(this);
       DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
@@ -138,12 +140,13 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
                         break;
                      }
                   }
-                  Main.mainFrame.abcPanel.navigator.setABC(abcList, scriptLeaf.abc);
-                  Main.mainFrame.abcPanel.navigator.setClassIndex(classIndex);
-                  Main.mainFrame.abcPanel.setAbc(scriptLeaf.abc);
-                  Main.mainFrame.abcPanel.decompiledTextArea.setScript(scriptLeaf.abc.script_info[scriptLeaf.scriptIndex], scriptLeaf.abc, abcList);
-                  Main.mainFrame.abcPanel.decompiledTextArea.setClassIndex(classIndex);
-                  Main.mainFrame.abcPanel.detailPanel.methodTraitPanel.methodCodePanel.sourceTextArea.setText("");
+                  abcPanel.navigator.setABC(abcList, scriptLeaf.abc);
+                  abcPanel.navigator.setClassIndex(classIndex);
+                  abcPanel.setAbc(scriptLeaf.abc);
+                  abcPanel.decompiledTextArea.setScript(scriptLeaf.abc.script_info[scriptLeaf.scriptIndex], scriptLeaf.abc, abcList);
+                  abcPanel.decompiledTextArea.setClassIndex(classIndex);
+                  abcPanel.decompiledTextArea.setNoTrait();
+                  abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setCode("");
                   Main.stopWork();
                }
             }).start();

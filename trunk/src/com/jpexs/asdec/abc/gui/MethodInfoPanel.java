@@ -114,4 +114,9 @@ public class MethodInfoPanel extends JPanel {
       }
       return true;
    }
+
+   public void setEditMode(boolean val) {
+      returnTypeEditor.setEditable(val);
+      paramEditor.setEditable(val);
+   }
 }

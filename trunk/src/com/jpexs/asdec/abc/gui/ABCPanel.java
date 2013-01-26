@@ -50,7 +50,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
    public JSplitPane splitPaneTreeNavVSDecompiledDetail;
    private JTable constantTable;
    public JComboBox constantTypeList;
-   public JLabel asmLabel = new JLabel("P-code source (editable)");
+   public JLabel asmLabel = new JLabel("P-code source");
    public JLabel decLabel = new JLabel("ActionScript source");
    public DetailPanel detailPanel;
    public JTextField filterField = new JTextField("");
@@ -183,11 +183,10 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
 
 
 
-      decompiledTextArea = new DecompiledEditorPane();
-
-      decompiledScrollPane = new JScrollPane(decompiledTextArea);
-
-      detailPanel = new DetailPanel();
+      
+      decompiledTextArea = new DecompiledEditorPane(this);
+      decompiledScrollPane = new JScrollPane(decompiledTextArea);      
+      detailPanel = new DetailPanel(this);
       JPanel panB = new JPanel();
       panB.setLayout(new BorderLayout());
       panB.add(decompiledScrollPane, BorderLayout.CENTER);
@@ -204,7 +203,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
       pan2.setLayout(new BorderLayout());
       pan2.add((abcComboBox = new JComboBox(new ABCComboBoxModel(list))), BorderLayout.NORTH);
 
-      navigator = new TraitsList();
+      navigator = new TraitsList(this);
       navigator.setABC(list, abc);
 
 
@@ -244,7 +243,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
 
       JPanel treePanel = new JPanel();
       treePanel.setLayout(new BorderLayout());
-      treePanel.add(new JScrollPane(classTree = new ClassesListTree(list)), BorderLayout.CENTER);
+      treePanel.add(new JScrollPane(classTree = new ClassesListTree(list,this)), BorderLayout.CENTER);
       JPanel searchPanel = new JPanel();
       searchPanel.setLayout(new BorderLayout());
       searchPanel.add(filterField, BorderLayout.CENTER);
@@ -290,7 +289,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
       constantTable.setAutoCreateRowSorter(true);
 
       final List<DoABCTag> inlist = list;
-
+      final ABCPanel t=this;
       constantTable.addMouseListener(new MouseAdapter() {
          @Override
          public void mouseClicked(MouseEvent e) {
@@ -302,7 +301,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
                   }
                   int multinameIndex = constantTable.convertRowIndexToModel(rowIndex);
                   if (multinameIndex > 0) {
-                     UsageFrame usageFrame = new UsageFrame(inlist, abc, multinameIndex);
+                     UsageFrame usageFrame = new UsageFrame(inlist, abc, multinameIndex,t);
                      usageFrame.setVisible(true);
                   }
                }

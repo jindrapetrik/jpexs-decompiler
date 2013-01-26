@@ -17,6 +17,8 @@
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.Main;
+import com.jpexs.asdec.abc.ABC;
+import com.jpexs.asdec.abc.avm2.ConstantPool;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -31,11 +33,35 @@ import javax.swing.JScrollPane;
  */
 public class MethodCodePanel extends JPanel implements ActionListener {
 
-   public ASMSourceEditorPane sourceTextArea;
+   private ASMSourceEditorPane sourceTextArea;
    public JPanel buttonsPanel;
+   
+   public void setIgnoreCarret(boolean ignoreCarret) {
+      sourceTextArea.setIgnoreCarret(ignoreCarret);
+   }
 
-   public MethodCodePanel() {
-      sourceTextArea = new ASMSourceEditorPane();
+   public void hilighOffset(long offset) {
+      sourceTextArea.hilighOffset(offset);
+   }
+
+   public void setBodyIndex(int bodyIndex, ABC abc) {
+      sourceTextArea.setBodyIndex(bodyIndex, abc);
+   }
+
+   public int getBodyIndex() {
+      return sourceTextArea.bodyIndex;
+   }
+
+   public void setCode(String text) {
+      sourceTextArea.setText(text);
+   }
+
+   public boolean save(ConstantPool constants) {
+      return sourceTextArea.save(constants);
+   }
+
+   public MethodCodePanel(DecompiledEditorPane decompiledEditor) {
+      sourceTextArea = new ASMSourceEditorPane(decompiledEditor);
 
       setLayout(new BorderLayout());
       add(new JScrollPane(sourceTextArea), BorderLayout.CENTER);
@@ -76,5 +102,10 @@ public class MethodCodePanel extends JPanel implements ActionListener {
       if (e.getActionCommand().equals("VERIFYBODY")) {
          sourceTextArea.verify(Main.mainFrame.abcPanel.abc.constants, Main.mainFrame.abcPanel.abc);
       }
+   }
+
+   public void setEditMode(boolean val) {
+      sourceTextArea.setEditable(val);
+      sourceTextArea.getCaret().setVisible(true);
    }
 }
