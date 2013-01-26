@@ -23,8 +23,10 @@ import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.avm2.treemodel.ConstructPropTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.ConstructTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.FullMultinameTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.XMLTreeItem;
 import com.jpexs.asdec.abc.types.MethodInfo;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,6 +65,16 @@ public class ConstructPropIns extends InstructionDefinition {
       FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
       TreeItem obj = (TreeItem) stack.pop();
 
+      if (multiname.isXML(constants, localRegNames, fullyQualifiedNames)) {
+         if (args.size() == 1) {
+            TreeItem arg = args.get(0);
+            List<TreeItem> xmlLines = new ArrayList<TreeItem>();
+            if (ConstructIns.walkXML(arg, xmlLines)) {
+               stack.push(new XMLTreeItem(ins, xmlLines));
+               return;
+            }
+         }
+      }
 
       stack.push(new ConstructPropTreeItem(ins, obj, multiname, args));
    }

@@ -26,6 +26,8 @@ import com.jpexs.asdec.abc.avm2.treemodel.ConstructTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.EscapeXAttrTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.EscapeXElemTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.FindPropertyTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.FullMultinameTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.GetLexTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.GetPropertyTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.StringTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
@@ -56,7 +58,7 @@ public class ConstructIns extends InstructionDefinition {
       //push new instance
    }
 
-   private boolean walkXML(TreeItem item, List<TreeItem> list) {
+   public static boolean walkXML(TreeItem item, List<TreeItem> list) {
       boolean ret = true;
       if (item instanceof StringTreeItem) {
          list.add(item);
@@ -79,22 +81,33 @@ public class ConstructIns extends InstructionDefinition {
          args.add(0, (TreeItem) stack.pop());
       }
       TreeItem obj = (TreeItem) stack.pop();
+
+      FullMultinameTreeItem xmlMult = null;
+      boolean isXML = false;
       if (obj instanceof GetPropertyTreeItem) {
          GetPropertyTreeItem gpt = (GetPropertyTreeItem) obj;
          if (gpt.object instanceof FindPropertyTreeItem) {
             FindPropertyTreeItem fpt = (FindPropertyTreeItem) gpt.object;
-            if (fpt.propertyName.isXML(constants, localRegNames, fullyQualifiedNames) && gpt.propertyName.isXML(constants, localRegNames, fullyQualifiedNames)) {
-               if (args.size() == 1) {
-                  TreeItem arg = args.get(0);
-                  List<TreeItem> xmlLines = new ArrayList<TreeItem>();
-                  if (walkXML(arg, xmlLines)) {
-                     stack.push(new XMLTreeItem(ins, xmlLines));
-                     return;
-                  }
-               }
+            xmlMult = fpt.propertyName;
+            isXML = xmlMult.isXML(constants, localRegNames, fullyQualifiedNames) && xmlMult.isXML(constants, localRegNames, fullyQualifiedNames);
+         }
+      }
+      if (obj instanceof GetLexTreeItem) {
+         GetLexTreeItem glt = (GetLexTreeItem) obj;
+         isXML = glt.propertyName.getName(constants, fullyQualifiedNames).equals("XML");
+      }
+
+      if (isXML) {
+         if (args.size() == 1) {
+            TreeItem arg = args.get(0);
+            List<TreeItem> xmlLines = new ArrayList<TreeItem>();
+            if (walkXML(arg, xmlLines)) {
+               stack.push(new XMLTreeItem(ins, xmlLines));
+               return;
             }
          }
       }
+
       stack.push(new ConstructTreeItem(ins, obj, args));
    }
 
