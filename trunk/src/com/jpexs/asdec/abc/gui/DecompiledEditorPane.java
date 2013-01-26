@@ -218,9 +218,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                      new Timer().schedule(new TimerTask() {
                         public void run() {
                            try {
-                              ignoreCarret=true;
-                            setCaretPosition(pos);
-                            ignoreCarret=false;
+                              setCaretPosition(pos);                           
                            } catch (IllegalArgumentException iae) {
                            }
                         }

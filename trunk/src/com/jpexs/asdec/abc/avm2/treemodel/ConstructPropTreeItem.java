@@ -46,7 +46,7 @@ public class ConstructPropTreeItem extends TreeItem {
       String objstr = object.toString(constants, localRegNames, fullyQualifiedNames);
       if (!objstr.equals("")) {
          objstr += ".";
-      }
+      }      
       return hilight("new ") + objstr + propertyName.toString(constants, localRegNames, fullyQualifiedNames) + hilight("(") + argStr + hilight(")");
 
    }

@@ -45,7 +45,6 @@ public class ConstructTreeItem extends TreeItem {
          return object.toString(constants, localRegNames, fullyQualifiedNames);
       }
       String obStr = object.toString(constants, localRegNames, fullyQualifiedNames);
-      obStr = "(" + obStr + ")";
       return hilight("new ") + obStr + hilight("(") + argStr + hilight(")");
 
    }
