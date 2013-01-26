@@ -43,7 +43,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
 
-public class ActionPanel extends JPanel implements TreeSelectionListener, ActionListener, CaretListener {
+public class ActionPanel extends JPanel implements TreeSelectionListener, ActionListener {
 
    public JTree tagTree;
    public LineMarkedEditorPane editor;
@@ -52,18 +52,25 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
    public JSplitPane splitPane;
    public JSplitPane splitPane2;
    public JButton saveButton = new JButton("Save");
+   public JButton editButton = new JButton("Edit");
+   public JButton cancelButton = new JButton("Cancel");
    public JButton saveHexButton = new JButton("Save hex");
    public JButton loadHexButton = new JButton("Load hex");
-   public JLabel asmLabel = new JLabel("P-code source (editable)");
+   public JLabel asmLabel = new JLabel("P-code source");
    public JLabel decLabel = new JLabel("ActionScript source");
    public List<Highlighting> decompiledHilights = new ArrayList<Highlighting>();
    public List<Highlighting> disassembledHilights = new ArrayList<Highlighting>();
 
+   private String lastDisasm="";
+   private boolean ignoreCarret=false;
+   private boolean editMode=false;
    public ActionPanel(List<Tag> list) {
       this.list = list;
       DefaultSyntaxKit.initKit();
       editor = new LineMarkedEditorPane();
+      editor.setEditable(false);
       decompiledEditor = new LineMarkedEditorPane();
+      decompiledEditor.setEditable(false);
       tagTree = new JTree(new TagTreeModel(list));
 
       DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
@@ -82,7 +89,9 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
 
       JPanel buttonsPan = new JPanel();
       buttonsPan.setLayout(new FlowLayout());
-      buttonsPan.add(saveButton);
+      buttonsPan.add(editButton);
+      buttonsPan.add(saveButton);      
+      buttonsPan.add(cancelButton);
       //buttonsPan.add(saveHexButton);
       //buttonsPan.add(loadHexButton);
       panB.add(buttonsPan, BorderLayout.SOUTH);
@@ -93,6 +102,13 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
       loadHexButton.setActionCommand("LOADHEXACTION");
       saveButton.addActionListener(this);
       saveButton.setActionCommand("SAVEACTION");
+      editButton.addActionListener(this);
+      editButton.setActionCommand("EDITACTION");
+      cancelButton.addActionListener(this);
+      cancelButton.setActionCommand("CANCELACTION");
+      saveButton.setVisible(false);
+      cancelButton.setVisible(false);
+      
 
       JPanel panA = new JPanel();
       panA.setLayout(new BorderLayout());
@@ -112,7 +128,68 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
       editor.setContentType("text/flasm");
       decompiledEditor.setContentType("text/actionscript");
       tagTree.addTreeSelectionListener(this);
-      decompiledEditor.addCaretListener(this);
+      editor.addCaretListener(new CaretListener() {
+         @Override
+         public void caretUpdate(CaretEvent e) {
+            if(ignoreCarret){
+               return;
+            }
+            editor.getCaret().setVisible(true);
+            int pos = editor.getCaretPosition();
+            Highlighting lastH = new Highlighting(0, 0, 0);
+            for (Highlighting h : disassembledHilights) {
+               if (pos < h.startPos) {
+                  for (Highlighting h2 : decompiledHilights) {
+                     if (h2.offset == lastH.offset) {
+                        ignoreCarret=true;
+                        decompiledEditor.setCaretPosition(h2.startPos);
+                        decompiledEditor.getCaret().setVisible(true);
+                        ignoreCarret=false;
+                        break;
+                     }
+                  }
+                  break;
+               }
+               lastH = h;
+            }
+            for (Highlighting h2 : decompiledHilights) {
+               if (h2.offset == lastH.offset) {
+                  ignoreCarret=true;
+                  decompiledEditor.setCaretPosition(h2.startPos);
+                  decompiledEditor.getCaret().setVisible(true);
+                  ignoreCarret=false;
+                  break;
+               }
+            }
+         }
+      });
+      decompiledEditor.addCaretListener(new CaretListener() {
+         @Override
+         public void caretUpdate(CaretEvent e) {
+            if(ignoreCarret){
+               return;
+            }
+            if(editMode){
+               return;
+            }
+            decompiledEditor.getCaret().setVisible(true);
+            int pos = decompiledEditor.getCaretPosition();
+            for (Highlighting h : decompiledHilights) {
+               if ((pos >= h.startPos) && (pos < h.startPos + h.len)) {
+                  for (Highlighting h2 : disassembledHilights) {
+                     if (h2.offset == h.offset) {
+                        ignoreCarret=true;
+                        editor.setCaretPosition(h2.startPos);
+                        editor.getCaret().setVisible(true);
+                        ignoreCarret=false;
+                        break;
+                     }
+                  }
+                  break;
+               }
+            }
+         }
+      });
    }
 
    public void initSplits() {
@@ -133,9 +210,10 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
             (new Thread() {
                @Override
                public void run() {
-                  String disasm = asm.getASMSource(SWF.DEFAULT_VERSION);
-                  disassembledHilights = Highlighting.getInstrHighlights(disasm);
-                  editor.setText(Highlighting.stripHilights(disasm));
+                  lastDisasm = asm.getASMSource(SWF.DEFAULT_VERSION);
+                  disassembledHilights = Highlighting.getInstrHighlights(lastDisasm);     
+                  lastDisasm=Highlighting.stripHilights(lastDisasm);
+                  editor.setText(lastDisasm);
                   if (Main.DO_DECOMPILE) {
                      List<com.jpexs.asdec.action.Action> as = asm.getActions(SWF.DEFAULT_VERSION);
                      com.jpexs.asdec.action.Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
@@ -144,6 +222,7 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
                      decompiledHilights = Highlighting.getInstrHighlights(s);
                      decompiledEditor.setText(Highlighting.stripHilights(s));
                   }
+                  setEditMode(false);
                   Main.stopWork();
                }
             }).start();
@@ -170,7 +249,31 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
       return ret;
    }
 
+   public void setEditMode(boolean val){
+      if(val){
+         editor.setEditable(true);
+         saveButton.setVisible(true);
+         editButton.setVisible(false);
+         cancelButton.setVisible(true);
+         editor.getCaret().setVisible(true);
+      }else{
+         editor.setEditable(false);
+         saveButton.setVisible(false);
+         editButton.setVisible(true);
+         cancelButton.setVisible(false);
+         editor.getCaret().setVisible(true);
+      }
+      editMode=val;
+   }
+   
    public void actionPerformed(ActionEvent e) {
+      if (e.getActionCommand().equals("EDITACTION")) {
+         setEditMode(true);
+      }else
+      if (e.getActionCommand().equals("CANCELACTION")) {
+         setEditMode(false);
+         editor.setText(lastDisasm);
+      }else
       if (e.getActionCommand().equals("SAVEACTION")) {
          TagNode ti = (TagNode) tagTree.getLastSelectedPathComponent();
          if (ti.tag instanceof ASMSource) {
@@ -184,23 +287,9 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
                JOptionPane.showMessageDialog(this, "" + ex.text + " on line " + ex.line, "Error", JOptionPane.ERROR_MESSAGE);
             }
          }
-      }
-   }
-
-   @Override
-   public void caretUpdate(CaretEvent e) {
-      decompiledEditor.getCaret().setVisible(true);
-      int pos = decompiledEditor.getCaretPosition();
-      for (Highlighting h : decompiledHilights) {
-         if ((pos >= h.startPos) && (pos < h.startPos + h.len)) {
-            for (Highlighting h2 : disassembledHilights) {
-               if (h2.offset == h.offset) {
-                  editor.setCaretPosition(h2.startPos);
-                  break;
-               }
-            }
-            break;
-         }
+         saveButton.setVisible(false);
+         editButton.setVisible(true);
+         editor.setEditable(false);
       }
    }
 }

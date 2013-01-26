@@ -24,7 +24,7 @@ public class SimpleActionTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return actionString;
+      return hilight(actionString);
    }
 
    public SimpleActionTreeItem(Action instruction, String actionString) {
