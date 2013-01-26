@@ -70,11 +70,14 @@ Identifier = [:jletter:][:jletterdigit:]*
 
 IdentifierNs = {Identifier} ":" {Identifier}
 
+TypeNameSpec = ".<" {Identifier} ">"
+
 /* XML */
 LetterColon = [:jletter] | ":"
 XMLIdentifier = {Identifier} | {IdentifierNs}
-XMLAttribute = {XMLIdentifier} " "* "=" " "* \" {InputCharacter}* \" " "*
-XMLBeginTag = "<" {XMLIdentifier}
+XMLAttribute = " "* {XMLIdentifier} " "* "=" " "* \" {InputCharacter}* \" " "*
+XMLBeginOneTag = "<" {XMLIdentifier} {XMLAttribute}* ">"
+XMLBeginTag = "<" {XMLIdentifier} " "
 XMLEndTag = "</" {XMLIdentifier} ">"
 
 /* integer literals */
@@ -165,7 +168,7 @@ SingleCharacter = [^\r\n\'\\]
   "]"                            { return token(TokenType.OPERATOR, -BRACKET); }
   ";"                            | 
   ","                            | 
-  "..."                          |
+  "..."                          |   
   "."                            | 
   "="                            | 
   ">"                            |  
@@ -245,8 +248,19 @@ SingleCharacter = [^\r\n\'\\]
   {Comment}                      { return token(TokenType.COMMENT); }
 
   /* whitespace */
-  {WhiteSpace}                   { }
- /* {XMLBeginTag}                  {  yybegin(XMLSTARTTAG); 
+  {WhiteSpace}                   { }  
+  {TypeNameSpec}                 { return token(TokenType.IDENTIFIER); }
+  {XMLBeginOneTag}                  {  yybegin(XML); 
+                                    tokenStart = yychar;
+                                    tokenLength = yylength(); 
+                                    String s=yytext();                                    
+                                    s=s.substring(1,s.length()-1);
+                                    if(s.contains(" ")){
+                                       s=s.substring(0,s.indexOf(" "));
+                                    }
+                                    xmlTagName = s;
+                                 }
+  /*{XMLBeginTag}                  {  yybegin(XMLSTARTTAG); 
                                     tokenStart = yychar;
                                     tokenLength = yylength(); 
                                     String s=yytext();                                    
@@ -262,7 +276,7 @@ SingleCharacter = [^\r\n\'\\]
    ">"                             { yybegin(XML);  tokenLength += yylength();}
 }
 <XML> {
-   {XMLBeginTag}                 { yybegin(XMLSTARTTAG); tokenLength += yylength();}
+   {XMLBeginOneTag}                 { tokenLength += yylength();}
    {XMLEndTag}                   { tokenLength += yylength();
                                    String endtagname=yytext();
                                    endtagname=endtagname.substring(2,endtagname.length()-1);                                   
@@ -271,7 +285,7 @@ SingleCharacter = [^\r\n\'\\]
                                        return token(TokenType.STRING, tokenStart, tokenLength);
                                    }
                                  }
-   .                             { tokenLength += yylength(); }
+   .|\n                          { tokenLength += yylength(); }
 }
 
 <STRING> {
