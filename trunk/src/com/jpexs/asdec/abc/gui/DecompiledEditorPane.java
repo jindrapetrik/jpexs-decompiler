@@ -24,6 +24,8 @@ import com.jpexs.asdec.abc.types.traits.Trait;
 import com.jpexs.asdec.abc.types.traits.TraitSlotConst;
 import com.jpexs.asdec.helpers.Highlighting;
 import com.jpexs.asdec.tags.DoABCTag;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -31,8 +33,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.swing.JScrollPane;
+import javax.swing.JViewport;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.text.Caret;
 
 public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretListener {
 
@@ -204,23 +209,22 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                if ((th.startPos > tc.startPos) && (th.startPos + th.len < tc.startPos + tc.len)) {
                   if (th.offset == traitId) {
                      try {
+                        ignoreCarret=true;
                         setCaretPosition(th.startPos + th.len - 1);
+                        ignoreCarret=false;
                      } catch (IllegalArgumentException iae) {
                      }
                      final int pos = th.startPos;
                      new Timer().schedule(new TimerTask() {
                         public void run() {
                            try {
-//                      setCaretPosition(pos);
+                              ignoreCarret=true;
+                            setCaretPosition(pos);
+                            ignoreCarret=false;
                            } catch (IllegalArgumentException iae) {
                            }
                         }
-                     }, 100);
-                     invalidate();
-                     getParent().validate();
-                     setCaretPosition(pos);
-
-
+                     }, 100);                    
                      return;
                   }
                }
