@@ -290,7 +290,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
       }
       setScript(script, abc, abcList);
       setNoTrait();
-      setClassIndex(classIndex);
+      setClassIndex(ci);
    }
 
    public int getClassIndex() {
