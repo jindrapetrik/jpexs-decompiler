@@ -236,11 +236,20 @@ public class MainFrame extends JFrame implements ActionListener {
       miRemoveDeadCodeAll.setActionCommand("REMOVEDEADCODEALL");
       miRemoveDeadCodeAll.addActionListener(this);
 
+      JMenuItem miTraps = new JMenuItem("Remove traps");
+      miTraps.setActionCommand("REMOVETRAPS");
+      miTraps.addActionListener(this);
+
+      JMenuItem miTrapsAll = new JMenuItem("Remove all traps");
+      miTrapsAll.setActionCommand("REMOVETRAPSALL");
+      miTrapsAll.addActionListener(this);
 
       menuDeobfuscation.add(miSubLimiter);
       menuDeobfuscation.add(miRenameIdentifiers);
       menuDeobfuscation.add(miRemoveDeadCode);
       menuDeobfuscation.add(miRemoveDeadCodeAll);
+      menuDeobfuscation.add(miTraps);
+      menuDeobfuscation.add(miTrapsAll);
 
 
       JMenu menuTools = new JMenu("Tools");
@@ -594,6 +603,10 @@ public class MainFrame extends JFrame implements ActionListener {
       return ret;
    }
 
+   public boolean confirmExperimental() {
+      return JOptionPane.showConfirmDialog(null, "Following procedure can damage SWF file which can be then unplayable.\r\nUSE IT ON YOUR OWN RISK. Do you want to continue?", "Warning", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION;
+   }
+
    public void actionPerformed(ActionEvent e) {
       if (e.getActionCommand().equals("EXIT")) {
          setVisible(false);
@@ -724,34 +737,64 @@ public class MainFrame extends JFrame implements ActionListener {
          }
       }
 
+      if (e.getActionCommand().startsWith("REMOVETRAPS")) {
+         Main.startWork("Removing traps...");
+         final boolean all = e.getActionCommand().endsWith("ALL");
+         if ((!all) || confirmExperimental()) {
+            new SwingWorker() {
+               @Override
+               protected Object doInBackground() throws Exception {
+                  int cnt = 0;
+                  if (all) {
+                     for (DoABCTag tag : abcPanel.list) {
+                        cnt += tag.abc.removeTraps();
+                     }
+                  } else {
+                     int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
+                     if (bi != -1) {
+                        cnt += abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants);
+                     }
+                     abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc);
+                  }
+                  Main.stopWork();
+                  JOptionPane.showMessageDialog(null, "Traps removed: " + cnt);
+                  abcPanel.reload();
+                  return true;
+               }
+            }.execute();
+         }
+      }
+
       if (e.getActionCommand().startsWith("REMOVEDEADCODE")) {
          Main.startWork("Removing dead code...");
          final boolean all = e.getActionCommand().endsWith("ALL");
-         new SwingWorker() {
-            @Override
-            protected Object doInBackground() throws Exception {
-               int cnt = 0;
-               if (all) {
-                  for (DoABCTag tag : abcPanel.list) {
-                     cnt += tag.abc.removeDeadCode();
+         if ((!all) || confirmExperimental()) {
+            new SwingWorker() {
+               @Override
+               protected Object doInBackground() throws Exception {
+                  int cnt = 0;
+                  if (all) {
+                     for (DoABCTag tag : abcPanel.list) {
+                        cnt += tag.abc.removeDeadCode();
+                     }
+                  } else {
+                     int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
+                     if (bi != -1) {
+                        cnt += abcPanel.abc.bodies[bi].removeDeadCode(abcPanel.abc.constants);
+                     }
+                     abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc);
                   }
-               }else{
-                  int bi=abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
-                  if(bi!=-1){
-                     cnt += abcPanel.abc.bodies[bi].removeDeadCode();
-                  }
-                  abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc);
+                  Main.stopWork();
+                  JOptionPane.showMessageDialog(null, "Instructions removed: " + cnt);
+                  abcPanel.reload();
+                  return true;
                }
-               Main.stopWork();
-               JOptionPane.showMessageDialog(null, "Instructions removed: " + cnt);
-               abcPanel.reload();
-               return true;
-            }
-         }.execute();
+            }.execute();
+         }
       }
 
       if (e.getActionCommand().equals("RENAMEIDENTIFIERS")) {
-         if (JOptionPane.showConfirmDialog(null, "Following procedure can damage SWF file which can be then unplayable.\r\nUSE IT ON YOUR OWN RISK. Do you want to continue?", "Warning", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
+         if (confirmExperimental()) {
 
             Main.startWork("Renaming identifiers...");
             new SwingWorker() {

@@ -245,8 +245,12 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
    }
    private List<DoABCTag> abcList;
 
-   public void setScript(ScriptInfo script, ABC abc, List<DoABCTag> abcList) {
-      setText("//Please wait...");
+   public void clearScriptCache()
+   {
+      bufferedClasses.clear();
+   }
+   
+   public void setScript(ScriptInfo script, ABC abc, List<DoABCTag> abcList) {      
       if (script == null) {
          highlights = new ArrayList<Highlighting>();
          traitHighlights = new ArrayList<Highlighting>();
@@ -254,6 +258,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
          this.script = null;
          return;
       }
+      setText("//Please wait...");
 
       String hilightedCode;
       if (!bufferedClasses.containsKey(script)) {
@@ -279,11 +284,13 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
    }
 
    public void reloadClass() {
+      int ci=classIndex;
       if (bufferedClasses.containsKey(script)) {
          bufferedClasses.remove(script);
       }
       setScript(script, abc, abcList);
       setNoTrait();
+      setClassIndex(classIndex);
    }
 
    public int getClassIndex() {

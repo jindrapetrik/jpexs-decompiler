@@ -74,7 +74,6 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
 
    public void graph() {
       Graph gr = new Graph(abc.bodies[bodyIndex].code);
-      //(new GraphTreeFrame(gr)).setVisible(true);
       (new GraphFrame(gr, "")).setVisible(true);
    }
 

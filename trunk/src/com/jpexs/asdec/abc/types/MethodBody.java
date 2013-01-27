@@ -48,8 +48,12 @@ public class MethodBody implements Cloneable {
       return s;
    }
    
-   public int removeDeadCode(){
-      return code.removeDeadCode(this);              
+   public int removeDeadCode(ConstantPool constants){
+      return code.removeDeadCode(constants,this);              
+   }
+   
+   public int removeTraps(ConstantPool constants){
+      return code.removeTraps(constants, this);
    }
 
    public HashMap<Integer, String> getLocalRegNames(ABC abc) {

@@ -85,7 +85,7 @@ public class MethodCodePanel extends JPanel implements ActionListener {
       execButton.setActionCommand("EXEC");
       execButton.addActionListener(this);
 
-      //buttonsPan.add(graphButton);
+      buttonsPanel.add(graphButton);
       // buttonsPanel.add(saveButton);
       // buttonsPan.add(execButton);
 

@@ -207,6 +207,12 @@ public class AVM2Instruction {
       return " ;" + comment;
    }
 
+   public boolean isIgnored() {
+      return ignored;
+   }
+   
+   
+
    public String toString(ConstantPool constants, List<String> fullyQualifiedNames) {
       String s = Helper.formatAddress(offset) + " " + Helper.padSpaceRight(Helper.byteArrToString(getBytes()), 30) + definition.instructionName;
       s += getParams(constants, fullyQualifiedNames) + getComment();
@@ -218,4 +224,6 @@ public class AVM2Instruction {
       s += getParams(constants, fullyQualifiedNames) + getComment();
       return s;
    }
+   
+   public List<AVM2Instruction> replaceWith;
 }

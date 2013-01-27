@@ -127,9 +127,7 @@ public class DetailPanel extends JPanel implements ActionListener {
          if (cardMap.get(selectedCard) instanceof TraitDetail) {
             if (((TraitDetail) cardMap.get(selectedCard)).save()) {
                int lasttrait = abcPanel.decompiledTextArea.lastTraitIndex;
-               int lastclass = abcPanel.decompiledTextArea.getClassIndex();
-               abcPanel.decompiledTextArea.reloadClass();
-               abcPanel.decompiledTextArea.setClassIndex(lastclass);
+               abcPanel.decompiledTextArea.reloadClass();               
                abcPanel.decompiledTextArea.gotoTrait(lasttrait);
                JOptionPane.showMessageDialog(this, "Trait Successfully saved");
             }

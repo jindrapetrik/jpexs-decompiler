@@ -70,10 +70,18 @@ public class ABC {
       }
    }
 
+   public int removeTraps() {
+      int rem=0;
+      for(MethodBody body:bodies){
+         rem+=body.removeTraps(constants);
+      }
+      return rem;
+   }
+   
    public int removeDeadCode() {
       int rem=0;
       for(MethodBody body:bodies){
-         rem+=body.removeDeadCode();
+         rem+=body.removeDeadCode(constants);
       }
       return rem;
    }
@@ -579,9 +587,9 @@ public class ABC {
    }
    public static final String[] reservedWords = {
       "as", "break", "case", "catch", "class", "const", "continue", "default", "delete", "do", "each", "else",
-      "extends", "false", "finally", "for", "function", "if", "implements", "import", "in", "instanceof",
-      "interface", "internal", "is", "native", "new", "null", "package", "private", "protected", "public",
-      "return", "super", "switch", "this", "throw", "true", "try", "typeof", "use", "var", /*"void",*/ "while",
+      "extends", "false", "finally", "for", "function", "get","if", "implements", "import", "in", "instanceof",
+      "interface", "internal", "is", "native", "new", "null","override", "package", "private", "protected", "public",
+      "return", "set","super", "switch", "this", "throw", "true", "try", "typeof", "use", "var", /*"void",*/ "while",
       "with", "dynamic", "default", "final", "in"};
    public static final String validFirstCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
    public static final String validNextCharacters = validFirstCharacters + "0123456789";

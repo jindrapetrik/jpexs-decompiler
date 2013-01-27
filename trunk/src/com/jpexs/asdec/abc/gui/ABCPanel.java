@@ -147,7 +147,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
          oneList.add(list.get(index));
          this.abc = list.get(index).abc;
          classTree.setDoABCTags(oneList);
-      }
+      }      
       updateConstList();
    }
 
@@ -319,7 +319,9 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
    }
 
    public void reload() {
-      switchAbc(listIndex - 1);
+      switchAbc(listIndex);
+      decompiledTextArea.clearScriptCache();
+      decompiledTextArea.reloadClass();
    }
 
    public void itemStateChanged(ItemEvent e) {
