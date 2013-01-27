@@ -117,6 +117,7 @@ public class DetailPanel extends JPanel implements ActionListener {
    public void actionPerformed(ActionEvent e) {
       if (e.getActionCommand().equals("EDITDETAIL")) {
          setEditMode(true);
+         methodTraitPanel.methodCodePanel.focusEditor();
       }
       if (e.getActionCommand().equals("CANCELDETAIL")) {
          setEditMode(false);

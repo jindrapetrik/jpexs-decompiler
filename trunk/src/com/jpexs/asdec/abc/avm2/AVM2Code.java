@@ -2463,4 +2463,70 @@ public class AVM2Code {
       }
       return stats;
    }
+
+   private void visitCode(int ip, boolean visited[]) {
+      while ((ip < visited.length) && (!visited[ip])) {
+         visited[ip] = true;
+         AVM2Instruction ins = code.get(ip);
+         if (ins.definition instanceof LookupSwitchIns) {
+            try {               
+               for(int i=2;i<ins.operands.length;i++){
+                  visitCode(adr2pos(pos2adr(ip) + ins.operands[i]), visited);
+               }
+               ip = adr2pos(pos2adr(ip) + ins.operands[0]);
+               continue;
+            } catch (ConvertException ex) {
+               
+            }
+         }
+         if (ins.definition instanceof JumpIns) {
+            try {
+               ip = adr2pos(pos2adr(ip) + ins.getBytes().length + ins.operands[0]);
+               continue;
+            } catch (ConvertException ex) {
+               Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, null, ex);
+            }
+         } else if (ins.definition instanceof IfTypeIns) {
+            try {
+               visitCode(adr2pos(pos2adr(ip) + ins.getBytes().length + ins.operands[0]), visited);
+            } catch (ConvertException ex) {
+               Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, null, ex);
+            }
+         }
+         ip++;
+      };
+   }
+
+   public int removeDeadCode(MethodBody body) {     
+      boolean visited[] = new boolean[code.size()];
+      for (int i = 0; i < visited.length; i++) {
+         visited[i] = false;
+      }
+      visitCode(0, visited);
+      for (ABCException e : body.exceptions) {
+         try {
+            visitCode(adr2pos(e.start), visited);
+            visitCode(adr2pos(e.target), visited);
+         } catch (ConvertException ex) {
+            Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, null, ex);
+         }
+      }
+      int cnt = 0;
+      for (int i = visited.length - 1; i >= 0; i--) {
+         if (!visited[i]) {
+            removeInstruction(i, body);
+            cnt++;
+         }
+      }
+      for (int i = code.size() - 1; i >= 0; i--) {
+         AVM2Instruction ins = code.get(i);
+         if (ins.definition instanceof JumpIns) {
+            if (ins.operands[0] == 0) {
+               removeInstruction(i, body);
+               cnt++;
+            }
+         }
+      }     
+      return cnt;
+   }
 }

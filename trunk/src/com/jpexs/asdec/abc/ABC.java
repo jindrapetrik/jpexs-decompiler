@@ -70,6 +70,14 @@ public class ABC {
       }
    }
 
+   public int removeDeadCode() {
+      int rem=0;
+      for(MethodBody body:bodies){
+         rem+=body.removeDeadCode();
+      }
+      return rem;
+   }
+   
    public int deobfuscateIdentifiers() {
       int ret = 0;
       for (int i = 1; i < instance_info.length; i++) {

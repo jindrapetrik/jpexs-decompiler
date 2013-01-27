@@ -228,9 +228,19 @@ public class MainFrame extends JFrame implements ActionListener {
       miRenameIdentifiers.setActionCommand("RENAMEIDENTIFIERS");
       miRenameIdentifiers.addActionListener(this);
 
+      JMenuItem miRemoveDeadCode = new JMenuItem("Remove dead code");
+      miRemoveDeadCode.setActionCommand("REMOVEDEADCODE");
+      miRemoveDeadCode.addActionListener(this);
+
+      JMenuItem miRemoveDeadCodeAll = new JMenuItem("Remove all dead code");
+      miRemoveDeadCodeAll.setActionCommand("REMOVEDEADCODEALL");
+      miRemoveDeadCodeAll.addActionListener(this);
+
 
       menuDeobfuscation.add(miSubLimiter);
       menuDeobfuscation.add(miRenameIdentifiers);
+      menuDeobfuscation.add(miRemoveDeadCode);
+      menuDeobfuscation.add(miRemoveDeadCodeAll);
 
 
       JMenu menuTools = new JMenu("Tools");
@@ -713,6 +723,33 @@ public class MainFrame extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(null, "No new version available.");
          }
       }
+
+      if (e.getActionCommand().startsWith("REMOVEDEADCODE")) {
+         Main.startWork("Removing dead code...");
+         final boolean all = e.getActionCommand().endsWith("ALL");
+         new SwingWorker() {
+            @Override
+            protected Object doInBackground() throws Exception {
+               int cnt = 0;
+               if (all) {
+                  for (DoABCTag tag : abcPanel.list) {
+                     cnt += tag.abc.removeDeadCode();
+                  }
+               }else{
+                  int bi=abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
+                  if(bi!=-1){
+                     cnt += abcPanel.abc.bodies[bi].removeDeadCode();
+                  }
+                  abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc);
+               }
+               Main.stopWork();
+               JOptionPane.showMessageDialog(null, "Instructions removed: " + cnt);
+               abcPanel.reload();
+               return true;
+            }
+         }.execute();
+      }
+
       if (e.getActionCommand().equals("RENAMEIDENTIFIERS")) {
          if (JOptionPane.showConfirmDialog(null, "Following procedure can damage SWF file which can be then unplayable.\r\nUSE IT ON YOUR OWN RISK. Do you want to continue?", "Warning", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
 

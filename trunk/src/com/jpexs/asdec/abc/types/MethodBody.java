@@ -47,6 +47,10 @@ public class MethodBody implements Cloneable {
       s += "\r\nCode:\r\n" + code.toString();
       return s;
    }
+   
+   public int removeDeadCode(){
+      return code.removeDeadCode(this);              
+   }
 
    public HashMap<Integer, String> getLocalRegNames(ABC abc) {
       HashMap<Integer, String> ret = new HashMap<Integer, String>();
