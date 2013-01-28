@@ -59,6 +59,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.text.Highlighter;
+import com.jpexs.asdec.abc.avm2.instructions.TagInstruction;
 
 public class AVM2Code {
 
@@ -718,7 +719,9 @@ public class AVM2Code {
       }
       long ofs = 0;
       for (AVM2Instruction ins : code) {
-         if (offsets.contains(ofs)) {
+         if (ins.labelname != null) {
+            ret += ins.labelname + ":";
+         } else if (offsets.contains(ofs)) {
             ret += "ofs" + Helper.formatAddress(ofs) + ":";
          }
          for (int e = 0; e < body.exceptions.length; e++) {
@@ -737,8 +740,13 @@ public class AVM2Code {
                if (ins2.isIgnored()) {
                   continue;
                }
-               if (ins2.definition instanceof JumpIns) {
-                  ret += "jump ofs" + Helper.formatAddress(pos2adr(ins2.operands[0])) + "\n";
+               if (ins2.definition instanceof TagInstruction) {
+                  if (ins2.definition.instructionName.equals("appendjump")) {
+                     ret += "jump ofs" + Helper.formatAddress(pos2adr(ins2.operands[0])) + "\n";
+                  }
+                  if (ins2.definition.instructionName.equals("mark")) {
+                     ret += "ofs" + Helper.formatAddress(pos2adr(ins2.operands[0])) + ":";
+                  }
                } else {
                   ret += Highlighting.hilighOffset("", ofs) + ins2.toStringNoAddress(constants, new ArrayList<String>()) + "\n";
                }
@@ -1734,7 +1742,7 @@ public class AVM2Code {
          if (ex instanceof UnknownJumpException) {
             throw (UnknownJumpException) ex;
          }
-         Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, null, ex);
+         Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
          throw new ConvertException(ex.getClass().getSimpleName(), ip);
       }
    }
@@ -1933,7 +1941,7 @@ public class AVM2Code {
 
          s = listToString(list, constants, localRegNames, fullyQualifiedNames);
       } catch (Exception ex) {
-         Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, null, ex);
+         Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
          s = "/*\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error Message: " + ex.getMessage() + "\r\n */";
          return s;
       }
@@ -2175,8 +2183,6 @@ public class AVM2Code {
       code.add(pos, instruction);
    }
 
-
-   
    public int removePushTrueFalseTraps(ConstantPool constants, MethodBody body) throws ConvertException {
       removeDeadCode(constants, body);
       boolean isSecure = true;
@@ -2328,8 +2334,8 @@ public class AVM2Code {
             }
          }
       }
-      int ret=isSecure ? 1 : 0;
-      ret+=visitCodeTrap(body, new int[code.size()]);
+      int ret = isSecure ? 1 : 0;
+      ret += visitCodeTrap(body, new int[code.size()]);
       removeIgnored(body);
       return ret;
    }
@@ -2358,11 +2364,11 @@ public class AVM2Code {
       int ret = 0;
       try {
          ret += removePushByteTraps(constants, body);
-         ret += removePushTrueFalseTraps(constants, body);        
+         ret += removePushTrueFalseTraps(constants, body);
       } catch (ConvertException ex) {
          ex.printStackTrace();
       }
-      restoreControlFlow(constants, body);
+
       return ret;
    }
 
@@ -2462,10 +2468,11 @@ public class AVM2Code {
       return stats;
    }
 
-   private void visitCode(int ip, int visited[]) {
-      while (ip < visited.length) {
-         visited[ip]++;
-         if (visited[ip] > 1) {
+   private void visitCode(int ip, int lastIp, HashMap<Integer, List<Integer>> refs) {
+      while (ip < code.size()) {
+         refs.get(ip).add(lastIp);
+         lastIp = ip;
+         if (refs.get(ip).size() > 1) {
             break;
          }
          AVM2Instruction ins = code.get(ip);
@@ -2481,7 +2488,7 @@ public class AVM2Code {
          if (ins.definition instanceof LookupSwitchIns) {
             try {
                for (int i = 2; i < ins.operands.length; i++) {
-                  visitCode(adr2pos(pos2adr(ip) + ins.operands[i]), visited);
+                  visitCode(adr2pos(pos2adr(ip) + ins.operands[i]), ip, refs);
                }
                ip = adr2pos(pos2adr(ip) + ins.operands[0]);
                continue;
@@ -2493,36 +2500,36 @@ public class AVM2Code {
                ip = adr2pos(pos2adr(ip) + ins.getBytes().length + ins.operands[0]);
                continue;
             } catch (ConvertException ex) {
-               Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, null, ex);
+               Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
             }
          } else if (ins.definition instanceof IfTypeIns) {
             try {
-               visitCode(adr2pos(pos2adr(ip) + ins.getBytes().length + ins.operands[0]), visited);
+               visitCode(adr2pos(pos2adr(ip) + ins.getBytes().length + ins.operands[0]), ip, refs);
             } catch (ConvertException ex) {
-               Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, null, ex);
+               Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
             }
          }
          ip++;
       };
    }
 
-   private void visitCode(MethodBody body, int visited[]) {
-      for (int i = 0; i < visited.length; i++) {
-         visited[i] = 0;
+   private void visitCode(MethodBody body, HashMap<Integer, List<Integer>> refs) {
+      for (int i = 0; i < code.size(); i++) {
+         refs.put(i, new ArrayList<Integer>());
       }
-      visitCode(0, visited);
+      visitCode(0, 0, refs);
       for (ABCException e : body.exceptions) {
          try {
-            visitCode(adr2pos(e.start), visited);
-            visitCode(adr2pos(e.target), visited);
+            visitCode(adr2pos(e.start), adr2pos(e.start), refs);
+            visitCode(adr2pos(e.target), adr2pos(e.target), refs);
          } catch (ConvertException ex) {
-            Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
          }
       }
    }
-   
-   private int visitCodeTrap(int ip, int visited[],AVM2Instruction prev) {
-      int ret=0;
+
+   private int visitCodeTrap(int ip, int visited[], AVM2Instruction prev) {
+      int ret = 0;
       while (ip < visited.length) {
          visited[ip]++;
          if (visited[ip] > 1) {
@@ -2541,10 +2548,10 @@ public class AVM2Code {
          if (ins.definition instanceof LookupSwitchIns) {
             try {
                for (int i = 2; i < ins.operands.length; i++) {
-                  ret+=visitCodeTrap(adr2pos(pos2adr(ip) + ins.operands[i]), visited,prev);
+                  ret += visitCodeTrap(adr2pos(pos2adr(ip) + ins.operands[i]), visited, prev);
                }
                ip = adr2pos(pos2adr(ip) + ins.operands[0]);
-               prev=ins;
+               prev = ins;
                continue;
             } catch (ConvertException ex) {
             }
@@ -2552,10 +2559,10 @@ public class AVM2Code {
          if (ins.definition instanceof JumpIns) {
             try {
                ip = adr2pos(pos2adr(ip) + ins.getBytes().length + ins.operands[0]);
-               prev=ins;
+               prev = ins;
                continue;
             } catch (ConvertException ex) {
-               Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, null, ex);
+               Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
             }
          } else if (ins.definition instanceof IfTypeIns) {
             if ((prev != null) && ins.definition instanceof IfTrueIns) {
@@ -2587,66 +2594,67 @@ public class AVM2Code {
                }
             }
             try {
-               ret+=visitCodeTrap(adr2pos(pos2adr(ip) + ins.getBytes().length + ins.operands[0]), visited,prev);
+               ret += visitCodeTrap(adr2pos(pos2adr(ip) + ins.getBytes().length + ins.operands[0]), visited, prev);
             } catch (ConvertException ex) {
-               Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, null, ex);
+               Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
             }
          }
          ip++;
-         prev=ins;
+         prev = ins;
       };
       return ret;
    }
 
    private int visitCodeTrap(MethodBody body, int visited[]) {
-      int ret=0;
+      int ret = 0;
       for (int i = 0; i < visited.length; i++) {
          visited[i] = 0;
       }
-      ret+=visitCodeTrap(0, visited,null);
+      ret += visitCodeTrap(0, visited, null);
       for (ABCException e : body.exceptions) {
          try {
-            ret+=visitCodeTrap(adr2pos(e.start), visited,null);
-            ret+=visitCodeTrap(adr2pos(e.target), visited,null);
+            ret += visitCodeTrap(adr2pos(e.start), visited, null);
+            ret += visitCodeTrap(adr2pos(e.target), visited, null);
          } catch (ConvertException ex) {
-            Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
          }
       }
       return ret;
    }
 
-   public void restoreControlFlow(int ip, int visited[], int visited2[], HashMap<Integer, List<AVM2Instruction>> appended) throws ConvertException {
+   public void restoreControlFlow(int ip, HashMap<Integer, List<Integer>> refs, int visited2[], HashMap<Integer, List<AVM2Instruction>> appended) throws ConvertException {
       List<AVM2Instruction> buf = new ArrayList<AVM2Instruction>();
       boolean cont = false;
       int continueip = 0;
       AVM2Instruction prev = null;
-      for (; ip < visited.length; ip++) {
+      for (; ip < code.size(); ip++) {
          AVM2Instruction ins = code.get(ip);
-         if (visited2[ip] > 0) {
-            break;
-         }
-         visited2[ip]++;
-         if (visited[ip] > 1) {
+
+         if ((refs.containsKey(ip) && refs.get(ip).size() > 1) || (visited2[ip] > 0)) {
             if (cont) {
-               buf.add(new AVM2Instruction(0, new JumpIns(), new int[]{ip}, new byte[0]));
+               buf.add(new AVM2Instruction(0, new TagInstruction("appendjump"), new int[]{ip}, new byte[0]));
             }
             cont = false;
+            if (visited2[ip] > 0) {
+               break;
+            }
          }
+         visited2[ip]++;
          if (ins.definition instanceof LookupSwitchIns) {
 
             if (cont) {
                buf.add(new AVM2Instruction(0, new JumpIns(), new int[]{ip}, new byte[0]));
             }
             cont = false;
-            restoreControlFlow(adr2pos(pos2adr(ip) + ins.operands[0]), visited, visited2, appended);
+            restoreControlFlow(adr2pos(pos2adr(ip) + ins.operands[0]), refs, visited2, appended);
             for (int i = 2; i < ins.operands.length; i++) {
-               restoreControlFlow(adr2pos(pos2adr(ip) + ins.operands[i]), visited, visited2, appended);
+               restoreControlFlow(adr2pos(pos2adr(ip) + ins.operands[i]), refs, visited2, appended);
             }
             break;
          }
          if (ins.definition instanceof JumpIns) {
             int newip = adr2pos(pos2adr(ip + 1) + ins.operands[0]);
-            if ((newip < visited.length) && (visited[newip] == 1)) {
+            if ((newip < code.size()) && (refs.containsKey(newip) && refs.get(newip).size() == 1)) {
                if (!cont) {
                   continueip = ip;
                   buf = new ArrayList<AVM2Instruction>();
@@ -2654,19 +2662,33 @@ public class AVM2Code {
                }
                cont = true;
             } else {
-               if (cont) {
-                  buf.add(new AVM2Instruction(0, new JumpIns(), new int[]{newip}, new byte[0]));
+               if (ip == code.size() - 1) {
+                  continueip = ip;
+                  buf = new ArrayList<AVM2Instruction>();
+                  appended.put(continueip, buf);
+                  for (int i : refs.get(newip)) {
+                     if (i != ip) {
+                        code.get(i).labelname = "nolabel" + ip;
+                     }
+                  }
+                  refs.get(newip).clear();
+                  buf.add(new AVM2Instruction(0, new TagInstruction("mark"), new int[]{newip}, new byte[0]));
+                  cont = true;
+               } else {
+                  if (cont) {
+                     buf.add(new AVM2Instruction(0, new TagInstruction("appendjump"), new int[]{ip}, new byte[0]));
+                  }
+                  cont = false;
                }
-               cont = false;
             }
             ip = newip - 1;
-         } else if (ins.definition instanceof IfTypeIns) {            
+         } else if (ins.definition instanceof IfTypeIns) {
             int newip = adr2pos(pos2adr(ip + 1) + ins.operands[0]);
             if (cont) {
-               buf.add(new AVM2Instruction(0, new JumpIns(), new int[]{ip}, new byte[0]));
+               buf.add(new AVM2Instruction(0, new TagInstruction("appendjump"), new int[]{ip}, new byte[0]));
             }
             cont = false;
-            restoreControlFlow(newip, visited, visited2, appended);
+            restoreControlFlow(newip, refs, visited2, appended);
          } else if ((ins.definition instanceof ReturnVoidIns) || (ins.definition instanceof ReturnValueIns) || (ins.definition instanceof ThrowIns)) {
             if (cont) {
                buf.add(ins);
@@ -2680,19 +2702,23 @@ public class AVM2Code {
 
    }
 
-   public void restoreControlFlow(ConstantPool constants, MethodBody body) {
+   private void restoreControlFlowPass(ConstantPool constants, MethodBody body, boolean secondpass) {
       try {
-         int visited[] = new int[code.size()];
+         HashMap<Integer, List<Integer>> refs = new HashMap<Integer, List<Integer>>();
          int visited2[] = new int[code.size()];
-         visitCode(body, visited);
+         visitCode(body, refs);
          HashMap<Integer, List<AVM2Instruction>> appended = new HashMap<Integer, List<AVM2Instruction>>();
-         restoreControlFlow(0, visited, visited2, appended);
-         for (ABCException e : body.exceptions) {
-            try {
-               restoreControlFlow(adr2pos(e.start), visited, visited2, appended);
-               restoreControlFlow(adr2pos(e.target), visited, visited2, appended);
-            } catch (ConvertException ex) {
-               Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, null, ex);
+         if (secondpass) {
+            restoreControlFlow(code.size() - 1, refs, visited2, appended);
+         } else {
+            restoreControlFlow(0, refs, visited2, appended);
+            for (ABCException e : body.exceptions) {
+               try {
+                  restoreControlFlow(adr2pos(e.start), refs, visited2, appended);
+                  restoreControlFlow(adr2pos(e.target), refs, visited2, appended);
+               } catch (ConvertException ex) {
+                  Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
+               }
             }
          }
          for (int ip : appended.keySet()) {
@@ -2702,18 +2728,20 @@ public class AVM2Code {
       }
       try {
          String src = Highlighting.stripHilights(toASMSource(constants, body));
-         FileOutputStream fos = new FileOutputStream("src.txt");
-         fos.write(src.getBytes());
-         fos.close();
          AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(src.getBytes()), constants, null, body);
          this.code = acode.code;
       } catch (IOException ex) {
          Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, null, ex);
       } catch (ParseException ex) {
-         Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, null, ex);
+         Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
       }
       invalidateCache();
       removeDeadCode(constants, body);
+   }
+
+   public void restoreControlFlow(ConstantPool constants, MethodBody body) {
+      restoreControlFlowPass(constants, body, false);
+      restoreControlFlowPass(constants, body, true);
    }
 
    private void removeIgnored(MethodBody body) {
@@ -2725,12 +2753,11 @@ public class AVM2Code {
    }
 
    public int removeDeadCode(ConstantPool constants, MethodBody body) {
-      int visited[] = new int[code.size()];
-
-      visitCode(body, visited);
+      HashMap<Integer, List<Integer>> refs = new HashMap<Integer, List<Integer>>();
+      visitCode(body, refs);
       int cnt = 0;
-      for (int i = visited.length - 1; i >= 0; i--) {
-         if (visited[i] == 0) {
+      for (int i = code.size() - 1; i >= 0; i--) {
+         if (refs.get(i).isEmpty()) {
             removeInstruction(i, body);
             cnt++;
          }

@@ -42,7 +42,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
    public ABC abc;
    public List<DoABCTag> list;
    public JComboBox abcComboBox;
-   public int listIndex = 0;
+   public int listIndex = -1;
    public DecompiledEditorPane decompiledTextArea;
    public JScrollPane decompiledScrollPane;
    public JSplitPane splitPaneDecompiledVSDetail;
@@ -175,7 +175,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
 
       this.list = list;
       if (list.size() > 0) {
-         this.abc = list.get(listIndex).abc;
+         this.abc = list.get(0).abc;
       }
       setLayout(new BorderLayout());
 

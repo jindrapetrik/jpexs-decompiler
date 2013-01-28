@@ -33,6 +33,7 @@ public class AVM2Instruction {
    public byte bytes[];
    public String comment;
    public boolean ignored = false;
+   public String labelname;
 
    public AVM2Instruction(long offset, InstructionDefinition definition, int[] operands, byte bytes[]) {
       this.definition = definition;

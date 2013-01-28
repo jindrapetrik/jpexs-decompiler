@@ -51,6 +51,9 @@ public class MethodBody implements Cloneable {
    public int removeDeadCode(ConstantPool constants){
       return code.removeDeadCode(constants,this);              
    }
+   public void restoreControlFlow(ConstantPool constants) {
+      code.restoreControlFlow(constants, this);
+   }
    
    public int removeTraps(ConstantPool constants){
       return code.removeTraps(constants, this);

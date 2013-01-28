@@ -86,6 +86,12 @@ public class ABC {
       return rem;
    }
    
+   public void restoreControlFlow() {
+      for(MethodBody body:bodies){
+         body.restoreControlFlow(constants);
+      }
+   }
+   
    public int deobfuscateIdentifiers() {
       int ret = 0;
       for (int i = 1; i < instance_info.length; i++) {

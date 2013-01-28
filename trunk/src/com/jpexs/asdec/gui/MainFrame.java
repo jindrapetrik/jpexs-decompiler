@@ -20,6 +20,7 @@ import com.jpexs.asdec.Configuration;
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.SWF;
 import com.jpexs.asdec.abc.gui.ABCPanel;
+import com.jpexs.asdec.abc.gui.DeobfuscationDialog;
 import com.jpexs.asdec.abc.gui.TreeLeafScript;
 import com.jpexs.asdec.action.gui.ActionPanel;
 import com.jpexs.asdec.tags.DefineBitsJPEG2Tag;
@@ -95,6 +96,7 @@ public class MainFrame extends JFrame implements ActionListener {
    public JLabel statusLabel = new JLabel("");
    public JPanel statusPanel = new JPanel();
    public JProgressBar progressBar = new JProgressBar(0, 100);
+   private DeobfuscationDialog deobfuscationDialog;
 
    public void setPercent(int percent) {
       progressBar.setValue(percent);
@@ -220,6 +222,14 @@ public class MainFrame extends JFrame implements ActionListener {
       menuFile.add(miClose);
       menuBar.add(menuFile);
       JMenu menuDeobfuscation = new JMenu("Deobfuscation");
+
+
+
+
+      JMenuItem miDeobfuscation = new JMenuItem("Deobfuscation...");
+      miDeobfuscation.setActionCommand("DEOBFUSCATE");
+      miDeobfuscation.addActionListener(this);
+
       JCheckBoxMenuItem miSubLimiter = new JCheckBoxMenuItem("Enable sub limiter");
       miSubLimiter.setActionCommand("SUBLIMITER");
       miSubLimiter.addActionListener(this);
@@ -244,14 +254,26 @@ public class MainFrame extends JFrame implements ActionListener {
       miTrapsAll.setActionCommand("REMOVETRAPSALL");
       miTrapsAll.addActionListener(this);
 
-      menuDeobfuscation.add(miSubLimiter);
+      JMenuItem miControlFlow = new JMenuItem("Restore control flow");
+      miControlFlow.setActionCommand("RESTORECONTROLFLOW");
+      miControlFlow.addActionListener(this);
+
+      JMenuItem miControlFlowAll = new JMenuItem("Restore all control flow");
+      miControlFlowAll.setActionCommand("RESTORECONTROLFLOWALL");
+      miControlFlowAll.addActionListener(this);
+
+      //menuDeobfuscation.add(miSubLimiter);
+      //menuDeobfuscation.add(miDeobfuscate);
+      /*menuDeobfuscation.add(miDeobfuscate);
+      menuDeobfuscation.addSeparator();
       menuDeobfuscation.add(miRenameIdentifiers);
       menuDeobfuscation.add(miRemoveDeadCode);
       menuDeobfuscation.add(miRemoveDeadCodeAll);
       menuDeobfuscation.add(miTraps);
       menuDeobfuscation.add(miTrapsAll);
-
-
+      menuDeobfuscation.add(miControlFlow);
+      menuDeobfuscation.add(miControlFlowAll);
+*/
       JMenu menuTools = new JMenu("Tools");
       JMenuItem miProxy = new JMenuItem("Proxy");
       miProxy.setActionCommand("SHOWPROXY");
@@ -259,7 +281,8 @@ public class MainFrame extends JFrame implements ActionListener {
       miProxy.addActionListener(this);
       menuTools.add(miProxy);
 
-      menuTools.add(menuDeobfuscation);
+      //menuTools.add(menuDeobfuscation);
+      menuTools.add(miDeobfuscation);
       menuBar.add(menuTools);
 
       JMenu menuHelp = new JMenu("Help");
@@ -305,7 +328,7 @@ public class MainFrame extends JFrame implements ActionListener {
          if (actionPanel.tagTree.getRowCount() > 1) {
             addTab(tabPane, actionPanel, "ActionScript", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/as16.png")));
          }
-         menuDeobfuscation.setEnabled(false);
+         miDeobfuscation.setEnabled(false);
       }
 
       if (!shapes.isEmpty()) {
@@ -737,6 +760,34 @@ public class MainFrame extends JFrame implements ActionListener {
          }
       }
 
+      if (e.getActionCommand().startsWith("RESTORECONTROLFLOW")) {
+         Main.startWork("Restoring control flow...");
+         final boolean all = e.getActionCommand().endsWith("ALL");
+         if ((!all) || confirmExperimental()) {
+            new SwingWorker() {
+               @Override
+               protected Object doInBackground() throws Exception {
+                  int cnt = 0;
+                  if (all) {
+                     for (DoABCTag tag : abcPanel.list) {
+                        tag.abc.restoreControlFlow();
+                     }
+                  } else {
+                     int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
+                     if (bi != -1) {
+                        abcPanel.abc.bodies[bi].restoreControlFlow(abcPanel.abc.constants);
+                     }
+                     abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc);
+                  }
+                  Main.stopWork();
+                  JOptionPane.showMessageDialog(null, "Control flow restored");
+                  abcPanel.reload();
+                  return true;
+               }
+            }.execute();
+         }
+      }
+
       if (e.getActionCommand().startsWith("REMOVETRAPS")) {
          Main.startWork("Removing traps...");
          final boolean all = e.getActionCommand().endsWith("ALL");
@@ -815,5 +866,51 @@ public class MainFrame extends JFrame implements ActionListener {
          }
       }
 
+      if (e.getActionCommand().startsWith("DEOBFUSCATE")) {         
+         if(deobfuscationDialog==null){
+            deobfuscationDialog = new DeobfuscationDialog();
+         }
+         deobfuscationDialog.setVisible(true);
+         if (deobfuscationDialog.ok) {
+            Main.startWork("Deobfuscating...");
+            new SwingWorker() {
+               @Override
+               protected Object doInBackground() throws Exception {
+                  if (deobfuscationDialog.processAllCheckbox.isSelected()) {
+                     for (DoABCTag tag : abcPanel.list) {
+                        if (deobfuscationDialog.renameIdentifiersCheckbox.isSelected()) {
+                           tag.abc.deobfuscateIdentifiers();
+                        }
+                        if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
+                           tag.abc.removeDeadCode();
+                        } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
+                           tag.abc.removeTraps();
+                        } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_RESTORE_CONTROL_FLOW) {
+                           tag.abc.removeTraps();
+                           tag.abc.restoreControlFlow();
+                        }
+                     }
+                  } else {
+                     int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
+                     if (bi != -1) {
+                        if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
+                           abcPanel.abc.bodies[bi].removeDeadCode(abcPanel.abc.constants);
+                        } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
+                           abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants);
+                        } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_RESTORE_CONTROL_FLOW) {
+                           abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants);
+                           abcPanel.abc.bodies[bi].restoreControlFlow(abcPanel.abc.constants);
+                        }
+                     }
+                     abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc);
+                  }
+                  Main.stopWork();
+                  JOptionPane.showMessageDialog(null, "Deobfuscation complete");
+                  abcPanel.reload();
+                  return true;
+               }
+            }.execute();
+         }
+      }
    }
 }
