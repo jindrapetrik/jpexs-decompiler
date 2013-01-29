@@ -27,6 +27,8 @@ import com.jpexs.asdec.helpers.Highlighting;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MethodBody implements Cloneable {
 
@@ -47,15 +49,16 @@ public class MethodBody implements Cloneable {
       s += "\r\nCode:\r\n" + code.toString();
       return s;
    }
-   
-   public int removeDeadCode(ConstantPool constants){
-      return code.removeDeadCode(constants,this);              
+
+   public int removeDeadCode(ConstantPool constants) {
+      return code.removeDeadCode(constants, this);
    }
+
    public void restoreControlFlow(ConstantPool constants) {
       code.restoreControlFlow(constants, this);
    }
-   
-   public int removeTraps(ConstantPool constants){
+
+   public int removeTraps(ConstantPool constants) {
       return code.removeTraps(constants, this);
    }
 
@@ -85,19 +88,18 @@ public class MethodBody implements Cloneable {
       return ret;
    }
 
-   /*public String toString(boolean pcode, boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], Stack<TreeItem> scopeStack, boolean isStaticInitializer) {
-    return toString(pcode, isStatic, classIndex, abc, constants, method_info, scopeStack, isStaticInitializer,false);
-    }*/
    public String toString(boolean pcode, boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], Stack<TreeItem> scopeStack, boolean isStaticInitializer, boolean hilight, List<String> fullyQualifiedNames, Traits initTraits) {
       String s = "";
-
-      //s+="method_info="+method_info+" max_stack="+max_stack+" max_regs="+max_regs+" scope_depth="+scope_depth+" max_scope="+max_scope;
-      //s+="\r\nCode:\r\n"+
       if (pcode) {
          s += code.toASMSource(constants, this);
       } else {
+         AVM2Code deobfuscated = null;
+         deobfuscated = code.deepCopy();
+         deobfuscated.markMappedOffsets();
+         deobfuscated.removeTraps(constants, this);
+         deobfuscated.restoreControlFlow(constants, this);
          try {
-            s += code.toSource(isStatic, classIndex, abc, constants, method_info, this, hilight, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
+            s += deobfuscated.toSource(isStatic, classIndex, abc, constants, method_info, this, hilight, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
             s = s.trim();
             if (hilight) {
                s = Highlighting.hilighMethod(s, this.method_info);
@@ -106,12 +108,6 @@ public class MethodBody implements Cloneable {
             s = "//error:" + ex.toString();
          }
       }
-      //s+="----------- ORIGINAL ------------\r\n";
-      //s+=code.toString(constants);
-        /*s+="Exceptions:";
-       for(int i=0;i<exceptions.length;i++){
-       s+="\r\n"+exceptions[i].toString(constants);
-       }*/
       return s;
    }
 

@@ -71,48 +71,48 @@ public class ABC {
    }
 
    public int removeTraps() {
-      int rem=0;
-      for(MethodBody body:bodies){
-         rem+=body.removeTraps(constants);
+      int rem = 0;
+      for (MethodBody body : bodies) {
+         rem += body.removeTraps(constants);
       }
       return rem;
    }
-   
+
    public int removeDeadCode() {
-      int rem=0;
-      for(MethodBody body:bodies){
-         rem+=body.removeDeadCode(constants);
+      int rem = 0;
+      for (MethodBody body : bodies) {
+         rem += body.removeDeadCode(constants);
       }
       return rem;
    }
-   
+
    public void restoreControlFlow() {
-      for(MethodBody body:bodies){
+      for (MethodBody body : bodies) {
          body.restoreControlFlow(constants);
       }
    }
-   
-   public int deobfuscateIdentifiers() {
+
+   public int deobfuscateIdentifiers(HashMap<String, String> namesMap) {
       int ret = 0;
       for (int i = 1; i < instance_info.length; i++) {
          if (instance_info[i].name_index != 0) {
-            if (deobfuscateName(constants.constant_multiname[instance_info[i].name_index].name_index, true)) {
+            if (deobfuscateName(namesMap, constants.constant_multiname[instance_info[i].name_index].name_index, true)) {
                ret++;
             }
          }
          if (instance_info[i].super_index != 0) {
-            if (deobfuscateName(constants.constant_multiname[instance_info[i].super_index].name_index, true)) {
+            if (deobfuscateName(namesMap, constants.constant_multiname[instance_info[i].super_index].name_index, true)) {
                ret++;
             }
          }
       }
       for (int i = 1; i < constants.constant_multiname.length; i++) {
-         if (deobfuscateName(constants.constant_multiname[i].name_index, false)) {
+         if (deobfuscateName(namesMap, constants.constant_multiname[i].name_index, false)) {
             ret++;
          }
       }
       for (int i = 1; i < constants.constant_namespace.length; i++) {
-         if (deobfuscateNameSpace(constants.constant_namespace[i].name_index)) {
+         if (deobfuscateNameSpace(namesMap, constants.constant_namespace[i].name_index)) {
             ret++;
          }
       }
@@ -593,9 +593,9 @@ public class ABC {
    }
    public static final String[] reservedWords = {
       "as", "break", "case", "catch", "class", "const", "continue", "default", "delete", "do", "each", "else",
-      "extends", "false", "finally", "for", "function", "get","if", "implements", "import", "in", "instanceof",
-      "interface", "internal", "is", "native", "new", "null","override", "package", "private", "protected", "public",
-      "return", "set","super", "switch", "this", "throw", "true", "try", "typeof", "use", "var", /*"void",*/ "while",
+      "extends", "false", "finally", "for", "function", "get", "if", "implements", "import", "in", "instanceof",
+      "interface", "internal", "is", "native", "new", "null", "override", "package", "private", "protected", "public",
+      "return", "set", "super", "switch", "this", "throw", "true", "try", "typeof", "use", "var", /*"void",*/ "while",
       "with", "dynamic", "default", "final", "in"};
    public static final String validFirstCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
    public static final String validNextCharacters = validFirstCharacters + "0123456789";
@@ -657,7 +657,7 @@ public class ABC {
       return false;
    }
 
-   public boolean deobfuscateNameSpace(int strIndex) {
+   public boolean deobfuscateNameSpace(HashMap<String, String> namesMap, int strIndex) {
       if (strIndex <= 0) {
          return false;
       }
@@ -680,12 +680,17 @@ public class ABC {
          isValid = false;
       }
       if (!isValid) {
-         constants.constant_string[strIndex] = fooString(constants.constant_string[strIndex], false, DEFAULT_FOO_SIZE);
+         if (namesMap.containsKey(s)) {
+            constants.constant_string[strIndex] = namesMap.get(s);
+         } else {
+            constants.constant_string[strIndex] = fooString(constants.constant_string[strIndex], false, DEFAULT_FOO_SIZE);
+            namesMap.put(s, constants.constant_string[strIndex]);
+         }
       }
       return !isValid;
    }
 
-   public boolean deobfuscateName(int strIndex, boolean firstUppercase) {
+   public boolean deobfuscateName(HashMap<String, String> namesMap, int strIndex, boolean firstUppercase) {
       if (strIndex <= 0) {
          return false;
       }
@@ -710,7 +715,12 @@ public class ABC {
       }
 
       if (!isValid) {
-         constants.constant_string[strIndex] = fooString(constants.constant_string[strIndex], firstUppercase, DEFAULT_FOO_SIZE);
+         if (namesMap.containsKey(s)) {
+            constants.constant_string[strIndex] = namesMap.get(s);
+         } else {
+            constants.constant_string[strIndex] = fooString(constants.constant_string[strIndex], firstUppercase, DEFAULT_FOO_SIZE);
+            namesMap.put(s, constants.constant_string[strIndex]);
+         }
       }
       return !isValid;
    }

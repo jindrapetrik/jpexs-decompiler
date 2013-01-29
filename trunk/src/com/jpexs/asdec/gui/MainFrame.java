@@ -62,6 +62,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -226,7 +227,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
 
 
-      JMenuItem miDeobfuscation = new JMenuItem("Deobfuscation...");
+      JMenuItem miDeobfuscation = new JMenuItem("PCode deobfuscation...");
       miDeobfuscation.setActionCommand("DEOBFUSCATE");
       miDeobfuscation.addActionListener(this);
 
@@ -263,11 +264,11 @@ public class MainFrame extends JFrame implements ActionListener {
       miControlFlowAll.addActionListener(this);
 
       //menuDeobfuscation.add(miSubLimiter);
-      //menuDeobfuscation.add(miDeobfuscate);
+      menuDeobfuscation.add(miDeobfuscation);
       /*menuDeobfuscation.add(miDeobfuscate);
-      menuDeobfuscation.addSeparator();
+      menuDeobfuscation.addSeparator();*/
       menuDeobfuscation.add(miRenameIdentifiers);
-      menuDeobfuscation.add(miRemoveDeadCode);
+      /*menuDeobfuscation.add(miRemoveDeadCode);
       menuDeobfuscation.add(miRemoveDeadCodeAll);
       menuDeobfuscation.add(miTraps);
       menuDeobfuscation.add(miTrapsAll);
@@ -282,7 +283,7 @@ public class MainFrame extends JFrame implements ActionListener {
       menuTools.add(miProxy);
 
       //menuTools.add(menuDeobfuscation);
-      menuTools.add(miDeobfuscation);
+      menuTools.add(menuDeobfuscation);
       menuBar.add(menuTools);
 
       JMenu menuHelp = new JMenu("Help");
@@ -852,8 +853,9 @@ public class MainFrame extends JFrame implements ActionListener {
                @Override
                protected Object doInBackground() throws Exception {
                   int cnt = 0;
+                  HashMap<String,String> namesMap=new HashMap<String,String>();
                   for (DoABCTag tag : abcPanel.list) {
-                     cnt += tag.abc.deobfuscateIdentifiers();
+                     cnt += tag.abc.deobfuscateIdentifiers(namesMap);
                   }
                   Main.stopWork();
                   JOptionPane.showMessageDialog(null, "Identifiers renamed: " + cnt);
@@ -878,9 +880,6 @@ public class MainFrame extends JFrame implements ActionListener {
                protected Object doInBackground() throws Exception {
                   if (deobfuscationDialog.processAllCheckbox.isSelected()) {
                      for (DoABCTag tag : abcPanel.list) {
-                        if (deobfuscationDialog.renameIdentifiersCheckbox.isSelected()) {
-                           tag.abc.deobfuscateIdentifiers();
-                        }
                         if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
                            tag.abc.removeDeadCode();
                         } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {

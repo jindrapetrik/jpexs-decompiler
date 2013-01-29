@@ -102,7 +102,8 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
    @Override
    public void setText(String t) {
       disassembledHilights = Highlighting.getInstrHighlights(t);
-      super.setText(Highlighting.stripHilights(t));
+      t=Highlighting.stripHilights(t);
+      super.setText(t);
    }
 
    public void verify(ConstantPool constants, ABC abc) {

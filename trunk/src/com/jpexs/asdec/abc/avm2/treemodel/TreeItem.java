@@ -68,7 +68,11 @@ public abstract class TreeItem {
       if (instruction == null) {
          return str;
       }
-      return Highlighting.hilighOffset(str, instruction.offset);
+      if(instruction.mappedOffset>=0){
+         return Highlighting.hilighOffset(str, instruction.mappedOffset);
+      }else{
+         return Highlighting.hilighOffset(str, instruction.offset);
+      }
    }
 
    public boolean isFalse() {

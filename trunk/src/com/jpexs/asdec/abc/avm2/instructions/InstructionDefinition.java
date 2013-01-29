@@ -24,11 +24,12 @@ import com.jpexs.asdec.abc.avm2.treemodel.FullMultinameTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.MethodInfo;
 import com.jpexs.asdec.helpers.Highlighting;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-public class InstructionDefinition {
+public class InstructionDefinition implements Serializable{
 
    protected String hilighOffset(String text, long offset) {
       return Highlighting.hilighOffset(text, offset);

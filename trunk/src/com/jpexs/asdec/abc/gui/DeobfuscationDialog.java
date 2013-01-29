@@ -41,11 +41,9 @@ import javax.swing.JSlider;
  */
 public class DeobfuscationDialog extends JDialog implements ActionListener {
 
-   public JCheckBox renameIdentifiersCheckbox = new JCheckBox("Rename identifiers");
    public JCheckBox processAllCheckbox = new JCheckBox("Process all classes");
    public JSlider codeProcessingLevel;
    public boolean ok = false;
-   public static final int LEVEL_NONE = 0;
    public static final int LEVEL_REMOVE_DEAD_CODE = 1;
    public static final int LEVEL_REMOVE_TRAPS = 2;
    public static final int LEVEL_RESTORE_CONTROL_FLOW = 3;
@@ -53,19 +51,19 @@ public class DeobfuscationDialog extends JDialog implements ActionListener {
    public DeobfuscationDialog() {
       setDefaultCloseOperation(HIDE_ON_CLOSE);
       setSize(new Dimension(300, 270));
-      setTitle("About");
-Container cp = getContentPane();
+      setTitle("PCode deobfuscation");
+      Container cp = getContentPane();
       cp.setLayout(null);
-      codeProcessingLevel = new JSlider(JSlider.VERTICAL, 0, 3, 3);
+      codeProcessingLevel = new JSlider(JSlider.VERTICAL, 1, 3, 3);
       codeProcessingLevel.setMajorTickSpacing(1);
       codeProcessingLevel.setPaintTicks(true);
       codeProcessingLevel.setMinorTickSpacing(1);
-      codeProcessingLevel.setSnapToTicks(true);           
-      JLabel lab1=new JLabel("Code deobfuscation level:");
-      lab1.setBounds(30, 0, getWidth()-60, 25);
+      codeProcessingLevel.setSnapToTicks(true);
+      JLabel lab1 = new JLabel("Code deobfuscation level:");
+      lab1.setBounds(30, 0, getWidth() - 60, 25);
       cp.add(lab1);
       Hashtable labelTable = new Hashtable();
-      labelTable.put(new Integer(LEVEL_NONE), new JLabel("None"));
+      //labelTable.put(new Integer(LEVEL_NONE), new JLabel("None"));
       labelTable.put(new Integer(LEVEL_REMOVE_DEAD_CODE), new JLabel("Remove dead code"));
       labelTable.put(new Integer(LEVEL_REMOVE_TRAPS), new JLabel("Remove traps"));
       labelTable.put(new Integer(LEVEL_RESTORE_CONTROL_FLOW), new JLabel("Restore control flow"));
@@ -75,42 +73,22 @@ Container cp = getContentPane();
       codeProcessingLevel.setAlignmentX(Component.CENTER_ALIGNMENT);
       codeProcessingLevel.setSize(300, 200);
 
-      renameIdentifiersCheckbox.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent e) {
-            if (renameIdentifiersCheckbox.isSelected()) {
-               processAllCheckbox.setSelected(true);
-            }
-         }
-      });
-      
-      processAllCheckbox.addActionListener(new ActionListener() {
 
-         @Override
-         public void actionPerformed(ActionEvent e) {
-            if(!processAllCheckbox.isSelected()){
-               renameIdentifiersCheckbox.setSelected(false);
-            }
-         }
-      });
 
-      codeProcessingLevel.setBounds(30,25,getWidth()-60,125);
-      
+      codeProcessingLevel.setBounds(30, 25, getWidth() - 60, 125);
+
       add(codeProcessingLevel);
-      processAllCheckbox.setBounds(50, 150, getWidth()-100, 25);
+      processAllCheckbox.setBounds(50, 150, getWidth() - 100, 25);
       add(processAllCheckbox);
-      renameIdentifiersCheckbox.setBounds(50, 175, getWidth()-100, 25);
-      add(renameIdentifiersCheckbox);
-      
+
       processAllCheckbox.setSelected(true);
-      renameIdentifiersCheckbox.setSelected(true);
-      
+
       JButton cancelButton = new JButton("Cancel");
       cancelButton.addActionListener(this);
       cancelButton.setActionCommand("CANCEL");
       JButton okButton = new JButton("OK");
       okButton.addActionListener(this);
-      okButton.setActionCommand("OK");      
+      okButton.setActionCommand("OK");
       okButton.setBounds(50, 200, 75, 25);
       cancelButton.setBounds(145, 200, 75, 25);
       cp.add(okButton);
@@ -134,11 +112,9 @@ Container cp = getContentPane();
 
    @Override
    public void setVisible(boolean b) {
-      if(b){
-         ok=false;
+      if (b) {
+         ok = false;
       }
       super.setVisible(b);
    }
-   
-   
 }

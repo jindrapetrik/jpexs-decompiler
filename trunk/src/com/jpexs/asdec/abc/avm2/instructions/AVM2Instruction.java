@@ -22,10 +22,11 @@ import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AVM2Instruction {
+public class AVM2Instruction  implements Serializable{
 
    public InstructionDefinition definition;
    public int operands[];
@@ -34,6 +35,7 @@ public class AVM2Instruction {
    public String comment;
    public boolean ignored = false;
    public String labelname;
+   public long mappedOffset=-1;
 
    public AVM2Instruction(long offset, InstructionDefinition definition, int[] operands, byte bytes[]) {
       this.definition = definition;
@@ -226,5 +228,5 @@ public class AVM2Instruction {
       return s;
    }
    
-   public List<AVM2Instruction> replaceWith;
+   public List replaceWith;
 }
