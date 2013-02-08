@@ -20,9 +20,10 @@ import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.ConvertException;
 import com.jpexs.asdec.helpers.Helper;
+import java.io.Serializable;
 import java.util.List;
 
-public class ABCException {
+public class ABCException implements Serializable{
 
    public int start;
    public int end;

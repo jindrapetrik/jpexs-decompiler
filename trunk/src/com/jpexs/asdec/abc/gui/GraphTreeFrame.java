@@ -38,7 +38,7 @@ public class GraphTreeFrame extends JFrame {
       setSize(400, 400);
       graphTree = new JTree(new TreeModel() {
          public Object getRoot() {
-            return graph.head;
+            return graph.heads.get(0);
          }
 
          public Object getChild(Object parent, int index) {

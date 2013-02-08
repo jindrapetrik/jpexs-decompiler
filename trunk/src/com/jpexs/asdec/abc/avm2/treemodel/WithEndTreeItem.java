@@ -14,19 +14,28 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.asdec.abc.avm2.treemodel.operations;
+package com.jpexs.asdec.abc.avm2.treemodel;
 
+import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
+import java.util.HashMap;
+import java.util.List;
 
-public class GtTreeItem extends BinaryOpTreeItem implements LogicalOp{
+public class WithEndTreeItem extends TreeItem {
 
-   public GtTreeItem(AVM2Instruction instruction, TreeItem leftSide, TreeItem rightSide) {
-      super(instruction, PRECEDENCE_RELATIONAL, leftSide, rightSide, ">");
+   public TreeItem scope;
+
+   public WithEndTreeItem(AVM2Instruction instruction, TreeItem scope) {
+      super(instruction, PRECEDENCE_PRIMARY);
+      this.scope = scope;
+   }
+
+   @Override
+   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+      return hilight("}");
    }
    
-   @Override
-   public TreeItem invert() {
-      return new LeTreeItem(instruction, leftSide, rightSide);
+   public boolean needsSemicolon() {
+      return false;
    }
 }

@@ -21,12 +21,18 @@ import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.UnknownInstructionCode;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.asdec.abc.avm2.parser.ASM3Parser;
+import com.jpexs.asdec.abc.avm2.parser.ParseException;
+import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.*;
 import com.jpexs.asdec.abc.types.traits.Trait;
+import com.jpexs.asdec.abc.types.traits.TraitClass;
 import com.jpexs.asdec.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.asdec.abc.types.traits.TraitSlotConst;
 import com.jpexs.asdec.abc.types.traits.Traits;
 import com.jpexs.asdec.abc.usages.*;
+import com.jpexs.asdec.helpers.Helper;
+import com.jpexs.asdec.helpers.Highlighting;
 import com.jpexs.asdec.tags.DoABCTag;
 import java.io.*;
 import java.util.ArrayList;
@@ -34,6 +40,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -263,7 +270,7 @@ public class ABC {
             mb.code = new AVM2Code(new ByteArrayInputStream(mb.codeBytes));
          } catch (UnknownInstructionCode re) {
             mb.code = new AVM2Code();
-            System.err.println(re.toString());
+            Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, re);            
          }
          mb.code.compact();
          int ex_count = ais.readU30();
@@ -287,7 +294,20 @@ public class ABC {
        System.out.println("--------------------------------------------");
        System.out.println(findBody(si.init_index).toString(true, false, -1, this, constants, method_info,new Stack<TreeItem>(),false,false));
        System.out.println("sitrait:"+si.traits.toString(this));
-       }*/
+       }*/            
+      /*try {
+         MethodBody body=new MethodBody();
+         AVM2Code code=ASM3Parser.parse(new FileInputStream("D:\\tst2.txt"), constants, body);
+         //code.removeTraps(constants, body);
+         code.restoreControlFlow(constants, body);
+         FileOutputStream fos=new FileOutputStream("D:\\tst3.txt");
+         fos.write(Highlighting.stripHilights(code.toASMSource(constants, body)).getBytes());
+         fos.close();
+         System.out.println(code.toSource(false, 0, this, constants, method_info, body, new HashMap<Integer,String>(), new Stack<TreeItem>(), false, null, null));
+         System.exit(0);
+      } catch (Exception ex) {
+         Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, ex);
+      }*/
    }
 
    public void saveToStream(OutputStream os) throws IOException {

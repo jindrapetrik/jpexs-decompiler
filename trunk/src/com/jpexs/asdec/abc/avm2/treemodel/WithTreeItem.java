@@ -43,10 +43,14 @@ public class WithTreeItem extends TreeItem {
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       String ret;
       ret = hilight("with(") + scope.toString(constants, localRegNames, fullyQualifiedNames) + hilight(")\r\n{\r\n");
-      for (TreeItem ti : items) {
+      /*for (TreeItem ti : items) {
          ret += ti.toString(constants, localRegNames, fullyQualifiedNames) + "\r\n";
       }
-      ret += hilight("}");
+      ret += hilight("}");*/
       return ret;
+   }
+   
+   public boolean needsSemicolon() {
+      return false;
    }
 }

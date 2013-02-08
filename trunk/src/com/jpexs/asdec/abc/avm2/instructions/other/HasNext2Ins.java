@@ -20,6 +20,7 @@ import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.asdec.abc.avm2.treemodel.HasNextTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.InTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.LocalRegTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
@@ -39,6 +40,6 @@ public class HasNext2Ins extends InstructionDefinition {
       int objectReg = ins.operands[0];
       int indexReg = ins.operands[1];
       //stack.push("_loc_" + objectReg + ".hasNext(cnt=_loc_" + indexReg + ")");
-      stack.push(new InTreeItem(ins, new LocalRegTreeItem(ins, indexReg, localRegs.get(indexReg)), localRegs.get(objectReg)));
+      stack.push(new HasNextTreeItem(ins, new LocalRegTreeItem(ins, indexReg, localRegs.get(indexReg)), localRegs.get(objectReg)));
    }
 }

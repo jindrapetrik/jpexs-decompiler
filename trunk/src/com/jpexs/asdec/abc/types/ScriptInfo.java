@@ -52,7 +52,7 @@ public class ScriptInfo {
    }
 
    public String convert(List<DoABCTag> abcTags, ABC abc, boolean pcode, boolean highlighting) {
-      return traits.convert(abcTags, abc, false, pcode, true, -1, highlighting, new ArrayList<String>());
+      return traits.convert("",abcTags, abc, false, pcode, true, -1, highlighting, new ArrayList<String>());
    }
 
    public void export(ABC abc, List<DoABCTag> abcList, String directory, boolean pcode) throws IOException {

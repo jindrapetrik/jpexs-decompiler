@@ -48,10 +48,10 @@ public abstract class MethodMultinameUsage extends TraitMultinameUsage {
               : "instance initializer")
               : ((parentTraitIndex > -1
               ? (isStatic
-              ? (((TraitMethodGetterSetter) abc.class_info[classIndex].static_traits.traits[parentTraitIndex]).convertHeader(abcTags, abc, isStatic, false, classIndex, false, new ArrayList<String>()))
-              : (((TraitMethodGetterSetter) abc.instance_info[classIndex].instance_traits.traits[parentTraitIndex]).convertHeader(abcTags, abc, isStatic, false, classIndex, false, new ArrayList<String>()))) + " "
+              ? (((TraitMethodGetterSetter) abc.class_info[classIndex].static_traits.traits[parentTraitIndex]).convertHeader("",abcTags, abc, isStatic, false, classIndex, false, new ArrayList<String>()))
+              : (((TraitMethodGetterSetter) abc.instance_info[classIndex].instance_traits.traits[parentTraitIndex]).convertHeader("",abcTags, abc, isStatic, false, classIndex, false, new ArrayList<String>()))) + " "
               : "")
-              + (((TraitMethodGetterSetter) traits.traits[traitIndex]).convertHeader(abcTags, abc, isStatic, false, classIndex, false, new ArrayList<String>()))));
+              + (((TraitMethodGetterSetter) traits.traits[traitIndex]).convertHeader("",abcTags, abc, isStatic, false, classIndex, false, new ArrayList<String>()))));
    }
 
    public int getTraitIndex() {

@@ -19,7 +19,7 @@ package com.jpexs.asdec.abc.avm2.treemodel.operations;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 
-public class NotTreeItem extends UnaryOpTreeItem {
+public class NotTreeItem extends UnaryOpTreeItem implements LogicalOp{
 
    public NotTreeItem(AVM2Instruction instruction, TreeItem value) {
       super(instruction, PRECEDENCE_UNARY, value, "!");
@@ -33,5 +33,10 @@ public class NotTreeItem extends UnaryOpTreeItem {
    @Override
    public boolean isFalse() {
       return !value.isFalse();
+   }
+   
+   @Override
+   public TreeItem invert() {
+      return value;
    }
 }

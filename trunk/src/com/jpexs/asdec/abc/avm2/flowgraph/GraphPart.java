@@ -31,18 +31,72 @@ public class GraphPart {
    public List<GraphPart> nextParts = new ArrayList<GraphPart>();
    public int posX = -1;
    public int posY = -1;
+   public String path="";
+   public List<GraphPart> refs=new ArrayList<GraphPart>();
+   public boolean ignored=false;
 
+   private boolean leadsTo(GraphPart part,List<GraphPart> visited,List<GraphPart> ignored){
+      if(visited.contains(this)){
+         return false;
+      }
+      if(ignored.contains(this)){
+         return false;
+      }
+      visited.add(this);
+      for(GraphPart p:nextParts){
+         if(p==part){
+            return true;
+         }else{
+            if(p.leadsTo(part,visited,ignored)){
+               return true;
+            }
+         }
+      }
+      return false;
+   }
+   public boolean leadsTo(GraphPart part,List<GraphPart> ignored){
+      
+      return leadsTo(part,new ArrayList<GraphPart>(),ignored);
+   }
+   
    public GraphPart(int start, int end) {
       this.start = start;
       this.end = end;
+   }
+   
+   
+   private GraphPart getNextPartPath(GraphPart original,String path,List<GraphPart> visited){
+      if(visited.contains(this)){
+         return null;
+      }
+      visited.add(this);
+      for(GraphPart p:nextParts){
+         if(p==original){
+            continue;
+         }
+         if(p.path.equals(path)){
+            return p;
+         }else if(p.path.length()>=path.length()){
+            GraphPart gp=p.getNextPartPath(original,path,visited);
+            if(gp!=null){
+               return gp;
+            }
+         }
+      }
+      return null;
+   }
+   public GraphPart getNextPartPath(List<GraphPart> ignored){
+      List<GraphPart> visited=new ArrayList<GraphPart>();
+      visited.addAll(ignored);
+      return getNextPartPath(this,path,visited);
    }
 
    @Override
    public String toString() {
       if (end < start) {
-         return "<->";
+         return "<-> "+(start+1)+"-"+(end+1);
       }
-      return "" + (start + 1) + "-" + (end + 1) + (instanceCount > 1 ? "(" + instanceCount + " links)" : "");
+      return "" + (start + 1) + "-" + (end + 1) + (instanceCount > 1 ? "(" + instanceCount + " links)" : "")+"  p"+path;
    }
 
    public boolean containsIP(int ip) {
@@ -65,6 +119,10 @@ public class GraphPart {
       return false;
    }
 
+   public int getHeight(){
+      return end-start+1;
+   }
+   
    public boolean containsPart(GraphPart what) {
       return containsPart(this, what, new ArrayList<GraphPart>());
    }

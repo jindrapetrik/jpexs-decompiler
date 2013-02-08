@@ -23,6 +23,7 @@ import com.jpexs.asdec.abc.gui.ABCPanel;
 import com.jpexs.asdec.abc.gui.DeobfuscationDialog;
 import com.jpexs.asdec.abc.gui.TreeLeafScript;
 import com.jpexs.asdec.action.gui.ActionPanel;
+import com.jpexs.asdec.helpers.Helper;
 import com.jpexs.asdec.tags.DefineBitsJPEG2Tag;
 import com.jpexs.asdec.tags.DefineBitsJPEG3Tag;
 import com.jpexs.asdec.tags.DefineBitsJPEG4Tag;
@@ -122,6 +123,9 @@ public class MainFrame extends JFrame implements ActionListener {
    }
 
    public void setStatus(String s) {
+      statusLabel.setText(s);
+   }
+   public void setWorkStatus(String s) {
       if (s.equals("")) {
          loadingPanel.setVisible(false);
       } else {
@@ -686,6 +690,7 @@ public class MainFrame extends JFrame implements ActionListener {
          chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
          chooser.setAcceptAllFileFilterUsed(false);
          if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            final long timeBefore=System.currentTimeMillis();
             Main.startWork("Exporting...");
             final String selFile = chooser.getSelectedFile().getAbsolutePath();
             Configuration.setConfig("lastExportDir", chooser.getSelectedFile().getParentFile().getAbsolutePath());
@@ -748,6 +753,21 @@ public class MainFrame extends JFrame implements ActionListener {
                      JOptionPane.showMessageDialog(null, "Cannot write to the file");
                   }
                   Main.stopWork();
+                  long timeAfter=System.currentTimeMillis();
+                  long timeMs=timeAfter-timeBefore;
+                  long timeS=timeMs/1000;
+                  timeMs=timeMs%1000;
+                  long timeM=timeS/60;
+                  timeS=timeS%60;
+                  long timeH=timeM/60;
+                  timeM=timeM%60;
+                  String timeStr="";
+                  if(timeH>0){
+                     timeStr+=Helper.padZeros(timeH, 2)+":";
+                  }
+                  timeStr+=Helper.padZeros(timeM, 2)+":";                  
+                  timeStr+=Helper.padZeros(timeS, 2)+"."+Helper.padZeros(timeMs,3);
+                  setStatus("Exported in "+timeStr);
                }
             }).start();
 

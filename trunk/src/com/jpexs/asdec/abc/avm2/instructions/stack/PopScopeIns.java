@@ -22,6 +22,7 @@ import com.jpexs.asdec.abc.avm2.LocalDataArea;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.WithEndTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.WithObjectTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.WithTreeItem;
 import com.jpexs.asdec.abc.types.MethodBody;
@@ -47,27 +48,8 @@ public class PopScopeIns extends InstructionDefinition {
       TreeItem scope = (TreeItem) scopeStack.pop();
       if (scope instanceof WithObjectTreeItem) {
          scope = ((WithObjectTreeItem) scope).scope;
-      }
-      for (int i = output.size() - 1; i >= 0; i--) {
-         if (output.get(i) instanceof WithTreeItem) {
-            WithTreeItem wti = (WithTreeItem) output.get(i);
-            if (wti.scope == scope) {
-               wti.items = new ArrayList<TreeItem>();
-               for (int k = i + 1; k < output.size(); k++) {
-                  //output.subList(i+1, output.size());
-                  wti.items.add(output.get(k));
-               }
-               while (output.size() > i + 1) {
-                  output.remove(i + 1);
-               }
-               /*int count=output.size()-1-(i+1);
-                for(int c=0;c<count;c++){
-                output.remove(i+1);
-                }*/
-               break;
-            }
-         }
-      }
+         output.add(new WithEndTreeItem(ins,scope));
+      }      
    }
 
    @Override

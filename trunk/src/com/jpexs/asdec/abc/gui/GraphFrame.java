@@ -39,20 +39,20 @@ public class GraphFrame extends JFrame {
 
       private static final int SPACE_VERTICAL = 10;
       private static final int SPACE_HORIZONTAL = 10;
-      private static final int BLOCK_WIDTH = 100;
+      private static final int BLOCK_WIDTH = 200;
       private static final int BLOCK_HEIGHT = 20;
       private Graph graph;
 
       public GraphPanel(Graph graph) {
          this.graph = graph;
-         setPreferredSize(new Dimension((BLOCK_WIDTH + SPACE_HORIZONTAL) * getPartWidth(graph.head, new HashSet<GraphPart>()), (BLOCK_HEIGHT + SPACE_VERTICAL) * getPartHeight(graph.head, new ArrayList<GraphPart>())));
+         setPreferredSize(new Dimension((BLOCK_WIDTH + SPACE_HORIZONTAL) * getPartWidth(graph.heads.get(0), new HashSet<GraphPart>()), (BLOCK_HEIGHT + SPACE_VERTICAL) * getPartHeight(graph.heads.get(0), new ArrayList<GraphPart>())));
       }
 
       @Override
       protected void paintComponent(Graphics g) {
          super.paintComponent(g);
          g.setColor(Color.black);
-         paintPart(g, graph.head, 0, getPartWidth(graph.head, new HashSet<GraphPart>()) * (BLOCK_WIDTH + SPACE_HORIZONTAL) / 2, new HashMap<GraphPart,Point>());
+         paintPart(g, graph.heads.get(0), 0, getPartWidth(graph.heads.get(0), new HashSet<GraphPart>()) * (BLOCK_WIDTH + SPACE_HORIZONTAL) / 2, new HashMap<GraphPart,Point>());
       }
 
       private void paintPart(Graphics g, GraphPart part, int y, int x, HashMap<GraphPart,Point> used) {

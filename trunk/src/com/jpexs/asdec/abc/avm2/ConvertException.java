@@ -16,7 +16,7 @@
  */
 package com.jpexs.asdec.abc.avm2;
 
-public class ConvertException extends Exception {
+public class ConvertException extends RuntimeException {
 
    public int line;
 

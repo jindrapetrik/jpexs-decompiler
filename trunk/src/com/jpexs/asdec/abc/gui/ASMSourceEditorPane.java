@@ -73,7 +73,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
    }
 
    public void graph() {
-      Graph gr = new Graph(abc.bodies[bodyIndex].code);
+      Graph gr = new Graph(abc.bodies[bodyIndex].code,abc,abc.bodies[bodyIndex]);
       (new GraphFrame(gr, "")).setVisible(true);
    }
 

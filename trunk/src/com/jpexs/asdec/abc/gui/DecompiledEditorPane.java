@@ -262,7 +262,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
 
       String hilightedCode;
       if (!bufferedClasses.containsKey(script)) {
-         hilightedCode = script.convert(abcList, abc, false, true);
+         hilightedCode = script.convert(abcList, abc, false, true);         
          highlights = Highlighting.getInstrHighlights(hilightedCode);
          traitHighlights = Highlighting.getTraitHighlights(hilightedCode);
          methodHighlights = Highlighting.getMethodHighlights(hilightedCode);

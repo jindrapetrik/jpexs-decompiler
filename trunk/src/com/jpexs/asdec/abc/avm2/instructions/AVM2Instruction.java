@@ -36,6 +36,7 @@ public class AVM2Instruction  implements Serializable{
    public boolean ignored = false;
    public String labelname;
    public long mappedOffset=-1;
+   public int changeJumpTo=-1;
 
    public AVM2Instruction(long offset, InstructionDefinition definition, int[] operands, byte bytes[]) {
       this.definition = definition;

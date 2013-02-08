@@ -16,6 +16,10 @@
  */
 package com.jpexs.asdec.helpers;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.List;
 
 /**
@@ -166,6 +170,14 @@ public class Helper {
       sb.append(ss);
       return sb.toString();
    }
+   
+   public static String padZeros(long number,int length){
+      String ret=""+number;
+      while(ret.length()<length){
+         ret="0"+ret;
+      }
+      return ret;
+   }
 
    public static String bytesToHexString(byte bytes[], int start) {
       StringBuilder sb = new StringBuilder();
@@ -234,5 +246,22 @@ public class Helper {
          ret += s;
       }
       return ret;
+   }
+
+   public static Object deepCopy(Object o) {
+      try {
+         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+         ObjectOutputStream oos = new ObjectOutputStream(baos);
+         oos.writeObject(o);
+         oos.flush();
+         oos.close();
+         ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));
+         Object copy = ois.readObject();
+         ois.close();
+         return copy;
+      } catch (Exception ex) {
+ex.printStackTrace();
+         return null;
+      }
    }
 }

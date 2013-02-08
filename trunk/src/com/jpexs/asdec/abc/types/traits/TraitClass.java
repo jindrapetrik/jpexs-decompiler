@@ -283,7 +283,7 @@ public class TraitClass extends Trait {
    }
 
    @Override
-   public String convert(List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+   public String convert(String path,List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
       if (!highlight) {
          Highlighting.doHighlight = false;
       }
@@ -295,12 +295,12 @@ public class TraitClass extends Trait {
       List<String> namesInThisPackage = new ArrayList<String>();
       for (DoABCTag tag : abcTags) {
          for (ScriptInfo si : tag.abc.script_info) {
-            String path = si.getPath(tag.abc);
+            String spath = si.getPath(tag.abc);
             String pkg = "";
-            String name = path;
-            if (path.contains(".")) {
-               pkg = path.substring(0, path.lastIndexOf("."));
-               name = path.substring(path.lastIndexOf(".") + 1);
+            String name = spath;
+            if (spath.contains(".")) {
+               pkg = spath.substring(0, spath.lastIndexOf("."));
+               name = spath.substring(spath.lastIndexOf(".") + 1);
             }
             if (pkg.equals(packageName)) {
                namesInThisPackage.add(name);
@@ -316,8 +316,8 @@ public class TraitClass extends Trait {
 
       List<String> importnames = new ArrayList<String>();
       importnames.addAll(namesInThisPackage);
-      for (String path : imports) {
-         String name = path;
+      for (String ipath : imports) {
+         String name = ipath;
          String pkg = "";
          if (name.contains(".")) {
             pkg = name.substring(0, name.lastIndexOf("."));
@@ -355,7 +355,7 @@ public class TraitClass extends Trait {
       }
       out.println();
 
-      //class header
+      //class header     
       String classHeader = abc.instance_info[class_info].getClassHeaderStr(abc, fullyQualifiedNames);
       if (classHeader.startsWith("private ")) {
          classHeader = classHeader.substring("private ".length());
@@ -371,7 +371,7 @@ public class TraitClass extends Trait {
       String bodyStr = "";
       bodyIndex = abc.findBodyIndex(abc.class_info[class_info].cinit_index);
       if (bodyIndex != -1) {
-         bodyStr = abc.bodies[bodyIndex].toString(pcode, true, class_info, abc, abc.constants, abc.method_info, new Stack<TreeItem>(), true, highlight, fullyQualifiedNames, abc.class_info[class_info].static_traits);
+         bodyStr = abc.bodies[bodyIndex].toString(packageName+"."+abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames)+".staticinitializer",pcode, true, class_info, abc, abc.constants, abc.method_info, new Stack<TreeItem>(), true, highlight, fullyQualifiedNames, abc.class_info[class_info].static_traits);
       }
       if (Highlighting.stripHilights(bodyStr).equals("")) {
          toPrint = ABC.addTabs(bodyStr, 3);
@@ -405,7 +405,7 @@ public class TraitClass extends Trait {
          bodyStr = "";
          bodyIndex = abc.findBodyIndex(abc.instance_info[class_info].iinit_index);
          if (bodyIndex != -1) {
-            bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(pcode, false, class_info, abc, abc.constants, abc.method_info, new Stack<TreeItem>(), false, highlight, fullyQualifiedNames, abc.instance_info[class_info].instance_traits), 3);
+            bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(packageName+"."+abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) +".initializer",pcode, false, class_info, abc, abc.constants, abc.method_info, new Stack<TreeItem>(), false, highlight, fullyQualifiedNames, abc.instance_info[class_info].instance_traits), 3);
             constructorParams = abc.method_info[abc.instance_info[class_info].iinit_index].getParamStr(abc.constants, abc.bodies[bodyIndex], abc, fullyQualifiedNames);
          } else {
             constructorParams = abc.method_info[abc.instance_info[class_info].iinit_index].getParamStr(abc.constants, null, abc, fullyQualifiedNames);
@@ -419,9 +419,9 @@ public class TraitClass extends Trait {
       //}
 
       //static variables,constants & methods
-      outTraits.add(abc.class_info[class_info].static_traits.convert(abcTags, abc, true, pcode, false, class_info, highlight, fullyQualifiedNames));
+      outTraits.add(abc.class_info[class_info].static_traits.convert(packageName+"."+abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames),abcTags, abc, true, pcode, false, class_info, highlight, fullyQualifiedNames));
 
-      outTraits.add(abc.instance_info[class_info].instance_traits.convert(abcTags, abc, false, pcode, false, class_info, highlight, fullyQualifiedNames));
+      outTraits.add(abc.instance_info[class_info].instance_traits.convert(packageName+"."+abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames),abcTags, abc, false, pcode, false, class_info, highlight, fullyQualifiedNames));
 
       out.println(Helper.joinStrings(outTraits, "\r\n\r\n"));
       out.println(ABC.IDENT_STRING + "}");//class

@@ -17,12 +17,16 @@
 package com.jpexs.asdec;
 
 import com.jpexs.asdec.abc.avm2.AVM2Code;
+import com.jpexs.asdec.abc.avm2.parser.ASM3Parser;
+import com.jpexs.asdec.abc.avm2.parser.ParseException;
+import com.jpexs.asdec.abc.types.MethodBody;
 import com.jpexs.asdec.gui.AboutDialog;
 import com.jpexs.asdec.gui.LoadingDialog;
 import com.jpexs.asdec.gui.MainFrame;
 import com.jpexs.asdec.gui.ModeFrame;
 import com.jpexs.asdec.gui.View;
 import com.jpexs.asdec.gui.proxy.ProxyFrame;
+import com.jpexs.asdec.helpers.Highlighting;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -140,11 +144,11 @@ public class Main {
    public static void startWork(String name) {
       startWork(name, -1);
    }
-
+      
    public static void startWork(String name, int percent) {
       working = true;
       if (mainFrame != null) {
-         mainFrame.setStatus(name);
+         mainFrame.setWorkStatus(name);
          if (percent == -1) {
             mainFrame.hidePercent();
          } else {
@@ -167,7 +171,7 @@ public class Main {
    public static void stopWork() {
       working = false;
       if (mainFrame != null) {
-         mainFrame.setStatus("");
+         mainFrame.setWorkStatus("");
       }
       if (loadingDialog != null) {
          loadingDialog.setDetail("");
@@ -478,6 +482,13 @@ public class Main {
       }
    }
 
+   public static final void printASM(AVM2Code code){
+      String s=Highlighting.stripHilights(code.toASMSource(null, new MethodBody()));
+         String ss[]=s.split("\n");         
+         for(int i=0;i<ss.length;i++){
+         System.out.println(""+i+":"+ss[i]);
+         }
+   }
    /**
     * @param args the command line arguments
     */
@@ -485,7 +496,7 @@ public class Main {
       View.setLookAndFeel();
       Configuration.load();
       checkSWT(args);
-
+            
       int pos = 0;
       if (args.length > 0) {
          if (args[0].equals("-debug")) {

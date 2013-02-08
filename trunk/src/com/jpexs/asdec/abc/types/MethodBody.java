@@ -21,16 +21,22 @@ import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.CodeStats;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
+import com.jpexs.asdec.abc.avm2.parser.ASM3Parser;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.traits.Traits;
+import com.jpexs.asdec.helpers.Helper;
 import com.jpexs.asdec.helpers.Highlighting;
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class MethodBody implements Cloneable {
+public class MethodBody implements Cloneable,Serializable {
 
    public int method_info;
    public int max_stack;
@@ -88,25 +94,26 @@ public class MethodBody implements Cloneable {
       return ret;
    }
 
-   public String toString(boolean pcode, boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], Stack<TreeItem> scopeStack, boolean isStaticInitializer, boolean hilight, List<String> fullyQualifiedNames, Traits initTraits) {
+   public String toString(String path,boolean pcode, boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], Stack<TreeItem> scopeStack, boolean isStaticInitializer, boolean hilight, List<String> fullyQualifiedNames, Traits initTraits) {
       String s = "";
       if (pcode) {
          s += code.toASMSource(constants, this);
       } else {
          AVM2Code deobfuscated = null;
-         deobfuscated = code.deepCopy();
+         MethodBody b=(MethodBody)Helper.deepCopy(this);
+         deobfuscated = b.code;
          deobfuscated.markMappedOffsets();
-         deobfuscated.removeTraps(constants, this);
-         deobfuscated.restoreControlFlow(constants, this);
+         deobfuscated.removeTraps(constants, b);
+         deobfuscated.restoreControlFlow(constants, b);    
          try {
-            s += deobfuscated.toSource(isStatic, classIndex, abc, constants, method_info, this, hilight, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
+            s += deobfuscated.toSource(path,isStatic, classIndex, abc, constants, method_info, b, hilight, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
             s = s.trim();
             if (hilight) {
                s = Highlighting.hilighMethod(s, this.method_info);
             }
          } catch (Exception ex) {
             s = "//error:" + ex.toString();
-         }
+         }         
       }
       return s;
    }

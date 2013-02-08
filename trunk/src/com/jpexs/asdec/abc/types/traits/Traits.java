@@ -19,9 +19,10 @@ package com.jpexs.asdec.abc.types.traits;
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.helpers.Highlighting;
 import com.jpexs.asdec.tags.DoABCTag;
+import java.io.Serializable;
 import java.util.List;
 
-public class Traits {
+public class Traits implements Serializable{
 
    public Trait traits[] = new Trait[0];
 
@@ -48,7 +49,7 @@ public class Traits {
       return s;
    }
 
-   public String convert(List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, boolean makePackages, int classIndex, boolean highlighting, List<String> fullyQualifiedNames) {
+   public String convert(String path,List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, boolean makePackages, int classIndex, boolean highlighting, List<String> fullyQualifiedNames) {
       String s = "";
       for (int t = 0; t < traits.length; t++) {
          if (t > 0) {
@@ -56,9 +57,9 @@ public class Traits {
          }
          String plus;
          if (makePackages) {
-            plus = traits[t].convertPackaged(abcTags, abc, isStatic, pcode, classIndex, highlighting, fullyQualifiedNames);
+            plus = traits[t].convertPackaged(path,abcTags, abc, isStatic, pcode, classIndex, highlighting, fullyQualifiedNames);
          } else {
-            plus = traits[t].convert(abcTags, abc, isStatic, pcode, classIndex, highlighting, fullyQualifiedNames);
+            plus = traits[t].convert(path,abcTags, abc, isStatic, pcode, classIndex, highlighting, fullyQualifiedNames);
          }
          if (highlighting) {
             int h = t;

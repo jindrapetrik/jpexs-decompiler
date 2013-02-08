@@ -47,6 +47,12 @@ public class ForInTreeItem extends LoopTreeItem implements Block {
       }
       this.expression = expression;
       this.commands = commands;
+      
+      if ((!commands.isEmpty()) && (commands.get(commands.size() - 1) instanceof ContinueTreeItem)) {
+         if (((ContinueTreeItem) commands.get(commands.size() - 1)).loopPos == loopBreak) {
+            commands.remove(commands.size() - 1);
+         }
+      }
    }
 
    @Override

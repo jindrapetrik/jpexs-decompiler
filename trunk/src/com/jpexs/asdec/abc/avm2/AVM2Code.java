@@ -16,9 +16,11 @@
  */
 package com.jpexs.asdec.abc.avm2;
 
+import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.ABCInputStream;
 import com.jpexs.asdec.abc.CopyOutputStream;
+import com.jpexs.asdec.abc.avm2.flowgraph.Graph;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
@@ -548,17 +550,6 @@ public class AVM2Code implements Serializable {
    public static final String IDENTOPEN = "/*IDENTOPEN*/";
    public static final String IDENTCLOSE = "/*IDENTCLOSE*/";
 
-   private class ConvertOutput {
-
-      public Stack<TreeItem> stack;
-      public List<TreeItem> output;
-
-      public ConvertOutput(Stack<TreeItem> stack, List<TreeItem> output) {
-         this.stack = stack;
-         this.output = output;
-      }
-   }
-
    public AVM2Code() {
    }
 
@@ -712,7 +703,9 @@ public class AVM2Code implements Serializable {
    }
 
    public String toASMSource(ConstantPool constants, MethodBody body, List<Integer> outputMap) {
+      invalidateCache();
       String ret = "";
+      String t = "";
       for (int e = 0; e < body.exceptions.length; e++) {
          ret += "exception " + e + " m[" + body.exceptions[e].name_index + "]\"" + Helper.escapeString(body.exceptions[e].getVarName(constants, new ArrayList<String>())) + "\" "
                  + "m[" + body.exceptions[e].type_index + "]\"" + Helper.escapeString(body.exceptions[e].getTypeName(constants, new ArrayList<String>())) + "\"\n";
@@ -720,6 +713,18 @@ public class AVM2Code implements Serializable {
       List<Long> offsets = new ArrayList<Long>();
       for (AVM2Instruction ins : code) {
          offsets.addAll(ins.getOffsets());
+      }
+      for (AVM2Instruction ins : code) {
+         if (ins.replaceWith != null) {
+            for (Object o : ins.replaceWith) {
+               if (o instanceof ControlFlowTag) {
+                  ControlFlowTag cft = (ControlFlowTag) o;
+                  if (cft.name.equals("appendjump")) {
+                     offsets.add((long) pos2adr(cft.value));
+                  }
+               }
+            }
+         }
       }
       long ofs = 0;
       int ip = 0;
@@ -747,12 +752,14 @@ public class AVM2Code implements Serializable {
                   if (ins2.isIgnored()) {
                      continue;
                   }
-                  ret += Highlighting.hilighOffset("", ofs) + ins2.toStringNoAddress(constants, new ArrayList<String>()) + "\n";
+                  t = Highlighting.hilighOffset("", ins2.mappedOffset>-1?ins2.mappedOffset:ofs) + ins2.toStringNoAddress(constants, new ArrayList<String>()) + " ;copy from " + Helper.formatAddress(pos2adr((Integer) o)) + "\n";
+                  ret += t;
                   outputMap.add((Integer) o);
                } else if (o instanceof ControlFlowTag) {
                   ControlFlowTag cft = (ControlFlowTag) o;
                   if (cft.name.equals("appendjump")) {
-                     ret += "jump ofs" + Helper.formatAddress(pos2adr(cft.value)) + "\n";
+                     t = "jump ofs" + Helper.formatAddress(pos2adr(cft.value)) + "\n";
+                     ret += t;
                      outputMap.add(-1);
                   }
                   if (cft.name.equals("mark")) {
@@ -762,7 +769,12 @@ public class AVM2Code implements Serializable {
             }
          } else {
             if (!ins.isIgnored()) {
-               ret += Highlighting.hilighOffset("", ofs) + ins.toStringNoAddress(constants, new ArrayList<String>()) + "\n";
+               String t1 = ins.toStringNoAddress(constants, new ArrayList<String>());
+               if (ins.changeJumpTo > -1) {
+                  t1 = ins.definition.instructionName + " ofs" + Helper.formatAddress(pos2adr(ins.changeJumpTo));
+               }
+               t = Highlighting.hilighOffset("", ins.mappedOffset>-1?ins.mappedOffset:ofs) + t1 + "\n";
+               ret += t;
                outputMap.add(ip);
             }
          }
@@ -792,7 +804,7 @@ public class AVM2Code implements Serializable {
       }
       int ret = posCache.indexOf(address);
       if (ret == -1) {
-         throw new ConvertException("Bad jump", -1);
+         throw new ConvertException("Bad jump try conver ofs" + Helper.formatAddress(address) + " ", -1);
       }
       return ret;
    }
@@ -808,7 +820,7 @@ public class AVM2Code implements Serializable {
       cacheActual = false;
    }
 
-   private static String listToString(List<TreeItem> stack, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+   public static String listToString(List<TreeItem> stack, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       String ret = "";
       for (int d = 0; d < stack.size(); d++) {
          TreeItem o = stack.get(d);
@@ -992,7 +1004,7 @@ public class AVM2Code implements Serializable {
       return localRegNames;
    }
 
-   public void clearTemporaryRegisters(List<TreeItem> output) {
+   public List<TreeItem> clearTemporaryRegisters(List<TreeItem> output) {
       for (int i = 0; i < output.size(); i++) {
          if (output.get(i) instanceof SetLocalTreeItem) {
             if (isKilled(((SetLocalTreeItem) output.get(i)).regIndex, 0, code.size() - 1)) {
@@ -1003,6 +1015,7 @@ public class AVM2Code implements Serializable {
             clearTemporaryRegisters(((WithTreeItem) output.get(i)).items);
          }
       }
+      return output;
    }
 
    private int fixIPAfterDebugLine(int ip) {
@@ -1015,11 +1028,11 @@ public class AVM2Code implements Serializable {
       return ip;
    }
 
-   private int fixAddrAfterDebugLine(int addr) throws ConvertException {
+   public int fixAddrAfterDebugLine(int addr) throws ConvertException {
       return pos2adr(fixIPAfterDebugLine(adr2pos(addr)));
    }
 
-   private ConvertOutput toSource(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, boolean visited[]) throws ConvertException {
+   public ConvertOutput toSourceOutput(boolean processJumps,boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, boolean visited[]) throws ConvertException {
       boolean debugMode = DEBUG_MODE;
       if (debugMode) {
          System.out.println("OPEN SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
@@ -1046,101 +1059,104 @@ public class AVM2Code implements Serializable {
                ip++;
                continue;
             }
+            boolean processTry = processJumps;
             addr = pos2adr(ip);
             int ipfix = fixIPAfterDebugLine(ip);
             int addrfix = pos2adr(ipfix);
             int maxend = -1;
-            List<ABCException> catchedExceptions = new ArrayList<ABCException>();
-            for (int e = 0; e < body.exceptions.length; e++) {
-               if (addrfix == fixAddrAfterDebugLine(body.exceptions[e].start)) {
-                  if (!body.exceptions[e].isFinally()) {
-                     if ((fixAddrAfterDebugLine(body.exceptions[e].end) > maxend) && (!parsedExceptions.contains(body.exceptions[e]))) {
-                        catchedExceptions.clear();
-                        maxend = fixAddrAfterDebugLine(body.exceptions[e].end);
-                        catchedExceptions.add(body.exceptions[e]);
-                     } else if (fixAddrAfterDebugLine(body.exceptions[e].end) == maxend) {
-                        catchedExceptions.add(body.exceptions[e]);
+            if (processTry) {
+               List<ABCException> catchedExceptions = new ArrayList<ABCException>();
+               for (int e = 0; e < body.exceptions.length; e++) {
+                  if (addrfix == fixAddrAfterDebugLine(body.exceptions[e].start)) {
+                     if (!body.exceptions[e].isFinally()) {
+                        if ((fixAddrAfterDebugLine(body.exceptions[e].end) > maxend) && (!parsedExceptions.contains(body.exceptions[e]))) {
+                           catchedExceptions.clear();
+                           maxend = fixAddrAfterDebugLine(body.exceptions[e].end);
+                           catchedExceptions.add(body.exceptions[e]);
+                        } else if (fixAddrAfterDebugLine(body.exceptions[e].end) == maxend) {
+                           catchedExceptions.add(body.exceptions[e]);
+                        }
                      }
                   }
                }
-            }
-            if (catchedExceptions.size() > 0) {
-               ip = ipfix;
-               addr = addrfix;
-               parsedExceptions.addAll(catchedExceptions);
-               int endpos = adr2pos(fixAddrAfterDebugLine(catchedExceptions.get(0).end));
+               if (catchedExceptions.size() > 0) {
+                  ip = ipfix;
+                  addr = addrfix;
+                  parsedExceptions.addAll(catchedExceptions);
+                  int endpos = adr2pos(fixAddrAfterDebugLine(catchedExceptions.get(0).end));
 
 
-               List<List<TreeItem>> catchedCommands = new ArrayList<List<TreeItem>>();
-               if (code.get(endpos).definition instanceof JumpIns) {
-                  int afterCatchAddr = pos2adr(endpos + 1) + code.get(endpos).operands[0];
-                  int afterCatchPos = adr2pos(afterCatchAddr);
-                  Collections.sort(catchedExceptions, new Comparator<ABCException>() {
-                     public int compare(ABCException o1, ABCException o2) {
-                        try {
-                           return fixAddrAfterDebugLine(o1.target) - fixAddrAfterDebugLine(o2.target);
-                        } catch (ConvertException ex) {
-                           return 0;
+                  List<List<TreeItem>> catchedCommands = new ArrayList<List<TreeItem>>();
+                  if (code.get(endpos).definition instanceof JumpIns) {
+                     int afterCatchAddr = pos2adr(endpos + 1) + code.get(endpos).operands[0];
+                     int afterCatchPos = adr2pos(afterCatchAddr);
+                     Collections.sort(catchedExceptions, new Comparator<ABCException>() {
+                        public int compare(ABCException o1, ABCException o2) {
+                           try {
+                              return fixAddrAfterDebugLine(o1.target) - fixAddrAfterDebugLine(o2.target);
+                           } catch (ConvertException ex) {
+                              return 0;
+                           }
                         }
-                     }
-                  });
+                     });
 
 
-                  List<TreeItem> finallyCommands = new ArrayList<TreeItem>();
-                  int returnPos = afterCatchPos;
-                  for (int e = 0; e < body.exceptions.length; e++) {
-                     if (body.exceptions[e].isFinally()) {
-                        if (addr == fixAddrAfterDebugLine(body.exceptions[e].start)) {
-                           if (afterCatchPos + 1 == adr2pos(fixAddrAfterDebugLine(body.exceptions[e].end))) {
-                              AVM2Instruction jmpIns = code.get(adr2pos(fixAddrAfterDebugLine(body.exceptions[e].end)));
-                              if (jmpIns.definition instanceof JumpIns) {
-                                 int finStart = adr2pos(fixAddrAfterDebugLine(body.exceptions[e].end) + jmpIns.getBytes().length + jmpIns.operands[0]);
-                                 finallyJumps.add(finStart);
-                                 if (unknownJumps.contains(finStart)) {
-                                    unknownJumps.remove((Integer) finStart);
-                                 }
-                                 for (int f = finStart; f <= end; f++) {
-                                    if (code.get(f).definition instanceof LookupSwitchIns) {
-                                       AVM2Instruction swins = code.get(f);
-                                       if (swins.operands.length >= 3) {
-                                          if (swins.operands[0] == swins.getBytes().length) {
-                                             if (adr2pos(pos2adr(f) + swins.operands[2]) < finStart) {
-                                                finallyCommands = toSource(isStatic, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, finStart, f - 1, localRegNames, fullyQualifiedNames, visited).output;
-                                                returnPos = f + 1;
-                                                break;
+                     List<TreeItem> finallyCommands = new ArrayList<TreeItem>();
+                     int returnPos = afterCatchPos;
+                     for (int e = 0; e < body.exceptions.length; e++) {
+                        if (body.exceptions[e].isFinally()) {
+                           if (addr == fixAddrAfterDebugLine(body.exceptions[e].start)) {
+                              if (afterCatchPos + 1 == adr2pos(fixAddrAfterDebugLine(body.exceptions[e].end))) {
+                                 AVM2Instruction jmpIns = code.get(adr2pos(fixAddrAfterDebugLine(body.exceptions[e].end)));
+                                 if (jmpIns.definition instanceof JumpIns) {
+                                    int finStart = adr2pos(fixAddrAfterDebugLine(body.exceptions[e].end) + jmpIns.getBytes().length + jmpIns.operands[0]);
+                                    finallyJumps.add(finStart);
+                                    if (unknownJumps.contains(finStart)) {
+                                       unknownJumps.remove((Integer) finStart);
+                                    }
+                                    for (int f = finStart; f <= end; f++) {
+                                       if (code.get(f).definition instanceof LookupSwitchIns) {
+                                          AVM2Instruction swins = code.get(f);
+                                          if (swins.operands.length >= 3) {
+                                             if (swins.operands[0] == swins.getBytes().length) {
+                                                if (adr2pos(pos2adr(f) + swins.operands[2]) < finStart) {
+                                                   finallyCommands = toSourceOutput(processJumps,isStatic, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, finStart, f - 1, localRegNames, fullyQualifiedNames, visited).output;
+                                                   returnPos = f + 1;
+                                                   break;
+                                                }
                                              }
                                           }
                                        }
                                     }
-                                 }
 
-                                 break;
+                                    break;
+                                 }
                               }
                            }
                         }
                      }
-                  }
 
-                  for (int e = 0; e < catchedExceptions.size(); e++) {
-                     int eendpos;
-                     if (e < catchedExceptions.size() - 1) {
-                        eendpos = adr2pos(fixAddrAfterDebugLine(catchedExceptions.get(e + 1).target)) - 2;
-                     } else {
-                        eendpos = afterCatchPos - 1;
+                     for (int e = 0; e < catchedExceptions.size(); e++) {
+                        int eendpos;
+                        if (e < catchedExceptions.size() - 1) {
+                           eendpos = adr2pos(fixAddrAfterDebugLine(catchedExceptions.get(e + 1).target)) - 2;
+                        } else {
+                           eendpos = afterCatchPos - 1;
+                        }
+                        Stack<TreeItem> substack = new Stack<TreeItem>();
+                        substack.add(new ExceptionTreeItem(catchedExceptions.get(e)));
+                        catchedCommands.add(toSourceOutput(processJumps,isStatic, classIndex, localRegs, substack, new Stack<TreeItem>(), abc, constants, method_info, body, adr2pos(fixAddrAfterDebugLine(catchedExceptions.get(e).target)), eendpos, localRegNames, fullyQualifiedNames, visited).output);
                      }
-                     Stack<TreeItem> substack = new Stack<TreeItem>();
-                     substack.add(new ExceptionTreeItem(catchedExceptions.get(e)));
-                     catchedCommands.add(toSource(isStatic, classIndex, localRegs, substack, new Stack<TreeItem>(), abc, constants, method_info, body, adr2pos(fixAddrAfterDebugLine(catchedExceptions.get(e).target)), eendpos, localRegNames, fullyQualifiedNames, visited).output);
+
+                     List<TreeItem> tryCommands = toSourceOutput(processJumps,isStatic, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, ip, endpos - 1, localRegNames, fullyQualifiedNames, visited).output;
+
+
+                     output.add(new TryTreeItem(tryCommands, catchedExceptions, catchedCommands, finallyCommands));
+                     ip = returnPos;
+                     addr = pos2adr(ip);
                   }
 
-                  List<TreeItem> tryCommands = toSource(isStatic, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, ip, endpos - 1, localRegNames, fullyQualifiedNames, visited).output;
-
-
-                  output.add(new TryTreeItem(tryCommands, catchedExceptions, catchedCommands, finallyCommands));
-                  ip = returnPos;
-                  addr = pos2adr(ip);
                }
-
             }
 
             if (ip > end) {
@@ -1151,8 +1167,12 @@ public class AVM2Code implements Serializable {
                unknownJumps.remove(new Integer(ip));
                throw new UnknownJumpException(stack, ip, output);
             }
+            //System.out.println("ip"+ip+" ofs"+Helper.formatAddress(pos2adr(ip)));
+            if (ip == 21) {
+               //System.out.println("hh");
+            }
             if (visited[ip]) {
-               Logger.getLogger(AVM2Code.class.getName()).warning("Code already visited");
+               Logger.getLogger(AVM2Code.class.getName()).warning("Code already visited, ofs:" + Helper.formatAddress(pos2adr(ip)) + ", ip:" + ip);
                break;
             }
             visited[ip] = true;
@@ -1302,7 +1322,7 @@ public class AVM2Code implements Serializable {
                         throw new ConvertException("Unknown pattern: no setlocal before lookupswitch", switchPos);
                      }
                      loopList.add(new Loop(ip, switchPos + 1));
-                     Stack<TreeItem> substack = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, jumpPos, evalTo - 1, localRegNames, fullyQualifiedNames, visited).stack;
+                     Stack<TreeItem> substack = toSourceOutput(processJumps,isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, jumpPos, evalTo - 1, localRegNames, fullyQualifiedNames, visited).stack;
                      TreeItem switchedValue = substack.pop();
                      //output.add("loop" + (switchPos + 1) + ":");
                      int switchBreak = switchPos + 1;
@@ -1337,7 +1357,7 @@ public class AVM2Code implements Serializable {
 
 
                         if (evalTo > -1) {
-                           substack = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, curPos, evalTo - 1, localRegNames, fullyQualifiedNames, visited).stack;
+                           substack = toSourceOutput(processJumps,isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, curPos, evalTo - 1, localRegNames, fullyQualifiedNames, visited).stack;
                            casesList.add(substack.pop());
                         }
                         int substart = adr2pos(code.get(switchPos).operands[2 + casePos] + pos2adr(switchPos));
@@ -1349,7 +1369,7 @@ public class AVM2Code implements Serializable {
                         if (evalTo == -1) {
                            subend--;
                         }
-                        List commands = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, substart, subend, localRegNames, fullyQualifiedNames, visited).output;
+                        List commands = toSourceOutput(processJumps,isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, substart, subend, localRegNames, fullyQualifiedNames, visited).output;
                         if ((evalTo == -1) && (casePos + 1 < code.get(switchPos).operands.length - 2)) {
                            if (commands.size() == 1) {
                               commands.remove(0);
@@ -1371,7 +1391,13 @@ public class AVM2Code implements Serializable {
                            break;
                         }
                      } while (true);
-                     output.add(new SwitchTreeItem(code.get(switchPos), switchBreak, switchedValue, casesList, caseCommands, defaultCommands));
+                     if(processJumps){
+                        List<Integer> valMapping=new ArrayList<Integer>();
+                        for(int i=0;i<casesList.size();i++){
+                           valMapping.add(i);
+                        }
+                     output.add(new SwitchTreeItem(code.get(switchPos), switchBreak, switchedValue, casesList, caseCommands, defaultCommands,valMapping));
+                     }
                      ip = switchPos + 1;
                      continue;
                   }
@@ -1392,8 +1418,10 @@ public class AVM2Code implements Serializable {
                   Loop currentLoop = new Loop(jumpPos, adr2pos(afterBackJumpAddr));
                   loopList.add(currentLoop);
 
-
-                  ConvertOutput co = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, jumpPos, adr2pos(afterBackJumpAddr) - 2, localRegNames, fullyQualifiedNames, visited);
+                  if (debugMode) {
+                     System.out.println("expression branch");
+                  }
+                  ConvertOutput co = toSourceOutput(processJumps,isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, jumpPos, adr2pos(afterBackJumpAddr) - 2, localRegNames, fullyQualifiedNames, visited);
                   Stack<TreeItem> substack = co.stack;
                   backJumpIns.definition.translate(isStatic, classIndex, localRegs, substack, scopeStack, constants, backJumpIns, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
 
@@ -1402,7 +1430,10 @@ public class AVM2Code implements Serializable {
                   boolean isFor = false;
                   List<TreeItem> finalExpression = new ArrayList<TreeItem>();
                   try {
-                     subins = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, adr2pos(secondAddr) + 1/*label*/, jumpPos - 1, localRegNames, fullyQualifiedNames, visited).output;
+                     if (debugMode) {
+                        System.out.println("subins branch");
+                     }
+                     subins = toSourceOutput(processJumps,isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, adr2pos(secondAddr) + 1/*label*/, jumpPos - 1, localRegNames, fullyQualifiedNames, visited).output;
                   } catch (UnknownJumpException uje) {
                      if ((uje.ip >= start) && (uje.ip <= end)) {
                         currentLoop.loopContinue = uje.ip;
@@ -1427,7 +1458,10 @@ public class AVM2Code implements Serializable {
                               }
                            }
                         }
-                        finalExpression = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, uje.ip, jumpPos - 1, localRegNames, fullyQualifiedNames, visited).output;
+                        if (debugMode) {
+                           System.out.println("final expression branch");
+                        }
+                        finalExpression = toSourceOutput(processJumps,isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, uje.ip, jumpPos - 1, localRegNames, fullyQualifiedNames, visited).output;
                         isFor = true;
                      } else {
                         throw new ConvertException("Unknown pattern: jump to nowhere", ip);
@@ -1560,12 +1594,12 @@ public class AVM2Code implements Serializable {
                      addr = pos2adr(ip);
                      insAfter = code.get(ip + 1);
                   }
-
+                  
                   boolean isAnd;
-                  if (insAfter.definition instanceof IfFalseIns) {
+                  if (processJumps && (insAfter.definition instanceof IfFalseIns)) {
                      //stack.add("(" + stack.pop() + ")&&");
                      isAnd = true;
-                  } else if (insAfter.definition instanceof IfTrueIns) {
+                  } else if (processJumps && (insAfter.definition instanceof IfTrueIns)) {
                      //stack.add("(" + stack.pop() + ")||");
                      isAnd = false;
                   } else if (insAfter.definition instanceof SetLocalTypeIns) {
@@ -1581,7 +1615,7 @@ public class AVM2Code implements Serializable {
                            if (((GetLocalTypeIns) code.get(t).definition).getRegisterId(code.get(t)) == reg) {
                               if (code.get(t + 1).definition instanceof KillIns) {
                                  if (code.get(t + 1).operands[0] == reg) {
-                                    ConvertOutput assignment = toSource(isStatic, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, ip + 2, t - 1, localRegNames, fullyQualifiedNames, visited);
+                                    ConvertOutput assignment = toSourceOutput(processJumps,isStatic, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, ip + 2, t - 1, localRegNames, fullyQualifiedNames, visited);
                                     stack.push(assignment.output.remove(assignment.output.size() - 1));
                                     ip = t + 2;
                                     continue iploop;
@@ -1612,16 +1646,18 @@ public class AVM2Code implements Serializable {
                      ip++;
                      break;
                      //throw new ConvertException("Unknown pattern after DUP:" + insComparsion.toString());
-                  }
-                  addr = addr + ins.getBytes().length + insAfter.getBytes().length + insAfter.operands[0];
-                  nextPos = adr2pos(addr) - 1;
-                  if (isAnd) {
-                     stack.add(new AndTreeItem(insAfter, stack.pop(), toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, ip + 3, nextPos, localRegNames, fullyQualifiedNames, visited).stack.pop()));
-                  } else {
-                     stack.add(new OrTreeItem(insAfter, stack.pop(), toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, ip + 3, nextPos, localRegNames, fullyQualifiedNames, visited).stack.pop()));
-                  }
-                  ins = code.get(nextPos + 1);
-                  ip = nextPos + 1;
+                  }                 
+                  if(processJumps){
+                     addr = addr + ins.getBytes().length + insAfter.getBytes().length + insAfter.operands[0];
+                     nextPos = adr2pos(addr) - 1;
+                     if (isAnd) {
+                        stack.add(new AndTreeItem(insAfter, stack.pop(), toSourceOutput(processJumps,isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, ip + 3, nextPos, localRegNames, fullyQualifiedNames, visited).stack.pop()));
+                     } else {
+                        stack.add(new OrTreeItem(insAfter, stack.pop(), toSourceOutput(processJumps,isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, ip + 3, nextPos, localRegNames, fullyQualifiedNames, visited).stack.pop()));
+                     }
+                     ins = code.get(nextPos + 1);
+                     ip = nextPos + 1;
+                  }                  
                } while (ins.definition instanceof DupIns);
             } else if (ins.definition instanceof IfTypeIns) {
                int targetAddr = pos2adr(ip) + ins.getBytes().length + ins.operands[0];
@@ -1675,13 +1711,19 @@ public class AVM2Code implements Serializable {
                      }
                   }
                }
-               ConvertOutput onTrue = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, ip + 1, targetIns - 1 - ((hasElse || hasReturn) ? 1 : 0), localRegNames, fullyQualifiedNames, visited);
+               if (debugMode) {
+                  System.out.println("true branch");
+               }
+               ConvertOutput onTrue = toSourceOutput(processJumps,isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, ip + 1, targetIns - 1 - ((hasElse || hasReturn) ? 1 : 0), localRegNames, fullyQualifiedNames, visited);
                ip = targetIns;
                ConvertOutput onFalse = new ConvertOutput(new Stack<TreeItem>(), new ArrayList<TreeItem>());
                if (hasElse) {
                   int finalAddr = targetAddr + code.get(targetIns - 1).operands[0];
                   int finalIns = adr2pos(finalAddr);
-                  onFalse = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, targetIns, finalIns - 1, localRegNames, fullyQualifiedNames, visited);
+                  if (debugMode) {
+                     System.out.println("false branch");
+                  }
+                  onFalse = toSourceOutput(processJumps,isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, targetIns, finalIns - 1, localRegNames, fullyQualifiedNames, visited);
                   ip = finalIns;
                }
                if ((onTrue.stack.size() > 0) && (onFalse != null) && (onFalse.stack.size() > 0)) {
@@ -1742,19 +1784,13 @@ public class AVM2Code implements Serializable {
          if (debugMode) {
             System.out.println("CLOSE SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
          }
-         if (hideTemporaryRegisters) {
+         /*if (hideTemporaryRegisters) {
             clearTemporaryRegisters(output);
-         }
+         }*/
          return new ConvertOutput(stack, output);
       } catch (ConvertException cex) {
          throw cex;
-      } catch (Exception ex) {
-         if (ex instanceof UnknownJumpException) {
-            throw (UnknownJumpException) ex;
-         }
-         Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
-         throw new ConvertException(ex.getClass().getSimpleName(), ip);
-      }
+      } 
    }
 
    public String tabString(int len) {
@@ -1765,24 +1801,10 @@ public class AVM2Code implements Serializable {
       return ret;
    }
 
-   public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames, Stack<TreeItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits) {
-      return toSource(isStatic, classIndex, abc, constants, method_info, body, false, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
+   public String toSource(String path,boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames, Stack<TreeItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits) {
+      return toSource(path,isStatic, classIndex, abc, constants, method_info, body, false, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
    }
 
-   public List<TreeItem> toTree(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      toSourceCount = 0;
-      loopList = new ArrayList<Loop>();
-      unknownJumps = new ArrayList<Integer>();
-      parsedExceptions = new ArrayList<ABCException>();
-      finallyJumps = new ArrayList<Integer>();
-      ignoredIns = new ArrayList<Integer>();
-      HashMap<Integer, TreeItem> localRegs = new HashMap<Integer, TreeItem>();
-      try {
-         return toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), new Stack<TreeItem>(), abc, constants, method_info, body, 0, code.size() - 1, localRegNames, fullyQualifiedNames, null).output;
-      } catch (ConvertException ex) {
-         return new ArrayList<TreeItem>();
-      }
-   }
 
    public int getRegisterCount() {
       int maxRegister = -1;
@@ -1845,13 +1867,17 @@ public class AVM2Code implements Serializable {
       }
    }
 
-   public String toSource(boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted, HashMap<Integer, String> localRegNames, Stack<TreeItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits) {
+   public void initToSource() {
       toSourceCount = 0;
       loopList = new ArrayList<Loop>();
       unknownJumps = new ArrayList<Integer>();
       finallyJumps = new ArrayList<Integer>();
       parsedExceptions = new ArrayList<ABCException>();
       ignoredIns = new ArrayList<Integer>();
+   }
+
+   public String toSource(String path,boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted, HashMap<Integer, String> localRegNames, Stack<TreeItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits) {
+      initToSource();
       List<TreeItem> list;
       String s;
       HashMap<Integer, TreeItem> localRegs = new HashMap<Integer, TreeItem>();
@@ -1866,8 +1892,18 @@ public class AVM2Code implements Serializable {
          }
       }
 
-      try {
-         list = toSource(isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, 0, code.size() - 1, localRegNames, fullyQualifiedNames, null).output;
+      //try {
+
+         try{
+               list = Graph.translateViaGraph(path,this, abc, body);
+            }catch(Exception ex2){
+               return "/*\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error Message: " + ex2.getMessage() + "\r\n */";         
+            }
+         /*try{
+            list=toSourceOutput(true,isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, 0, code.size() - 1, localRegNames, fullyQualifiedNames, null).output;
+         }catch(Exception ex){
+            
+         }*/
          if (initTraits != null) {
             for (int i = 0; i < list.size(); i++) {
                TreeItem ti = list.get(i);
@@ -1950,11 +1986,11 @@ public class AVM2Code implements Serializable {
          }
 
          s = listToString(list, constants, localRegNames, fullyQualifiedNames);
-      } catch (Exception ex) {
-         Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
-         s = "/*\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error Message: " + ex.getMessage() + "\r\n */";
+      /*} catch (Exception ex) {
+         Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, "Error in method "+path, ex);
+         s = "/ *\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error Message: " + ex.getMessage() + "\r\n * /";
          return s;
-      }
+      }*/
 
 
       String sub = "";
@@ -1962,31 +1998,34 @@ public class AVM2Code implements Serializable {
 
       String parts[] = s.split("\r\n");
 
+      boolean processLoops = true;
 
-      try {
-         Stack<String> loopStack = new Stack<String>();
-         for (int p = 0; p < parts.length; p++) {
-            String stripped = Highlighting.stripHilights(parts[p]);
-            if (stripped.endsWith(":") && (!stripped.startsWith("case ")) && (!stripped.equals("default:"))) {
-               loopStack.add(stripped.substring(0, stripped.length() - 1));
-            }
-            if (stripped.startsWith("break ")) {
-               if (stripped.equals("break " + loopStack.peek() + ";")) {
-                  parts[p] = parts[p].replace(" " + loopStack.peek(), "");
+      if (processLoops) {
+         try {
+            Stack<String> loopStack = new Stack<String>();
+            for (int p = 0; p < parts.length; p++) {
+               String stripped = Highlighting.stripHilights(parts[p]);
+               if (stripped.endsWith(":") && (!stripped.startsWith("case ")) && (!stripped.equals("default:"))) {
+                  loopStack.add(stripped.substring(0, stripped.length() - 1));
                }
-            }
-            if (stripped.startsWith("continue ")) {
-               if (loopStack.size() > 0) {
-                  if (stripped.equals("continue " + loopStack.peek() + ";")) {
+               if (stripped.startsWith("break ")) {
+                  if (stripped.equals("break " + loopStack.peek() + ";")) {
                      parts[p] = parts[p].replace(" " + loopStack.peek(), "");
                   }
                }
+               if (stripped.startsWith("continue ")) {
+                  if (loopStack.size() > 0) {
+                     if (stripped.equals("continue " + loopStack.peek() + ";")) {
+                        parts[p] = parts[p].replace(" " + loopStack.peek(), "");
+                     }
+                  }
+               }
+               if (stripped.startsWith(":")) {
+                  loopStack.pop();
+               }
             }
-            if (stripped.startsWith(":")) {
-               loopStack.pop();
-            }
+         } catch (Exception ex) {
          }
-      } catch (Exception ex) {
       }
       for (int p = 0; p < parts.length; p++) {
          if (p == parts.length - 1) {
@@ -1995,29 +2034,31 @@ public class AVM2Code implements Serializable {
             }
          }
          String strippedP = Highlighting.stripHilights(parts[p]).trim();
-         if (strippedP.endsWith(":") && (!strippedP.startsWith("case ")) && (!strippedP.equals("default:"))) {
-            String loopname = strippedP.substring(0, strippedP.length() - 1);
-            boolean dorefer = false;
-            for (int q = p + 1; q < parts.length; q++) {
-               String strippedQ = Highlighting.stripHilights(parts[q]);
-               if (strippedQ.equals("break " + loopname + ";")) {
-                  dorefer = true;
-                  break;
+         if (processLoops) {
+            if (strippedP.endsWith(":") && (!strippedP.startsWith("case ")) && (!strippedP.equals("default:"))) {
+               String loopname = strippedP.substring(0, strippedP.length() - 1);
+               boolean dorefer = false;
+               for (int q = p + 1; q < parts.length; q++) {
+                  String strippedQ = Highlighting.stripHilights(parts[q]);
+                  if (strippedQ.equals("break " + loopname + ";")) {
+                     dorefer = true;
+                     break;
+                  }
+                  if (strippedQ.equals("continue " + loopname + ";")) {
+                     dorefer = true;
+                     break;
+                  }
+                  if (strippedQ.equals(":" + loopname)) {
+                     break;
+                  }
                }
-               if (strippedQ.equals("continue " + loopname + ";")) {
-                  dorefer = true;
-                  break;
-               }
-               if (strippedQ.equals(":" + loopname)) {
-                  break;
+               if (!dorefer) {
+                  continue;
                }
             }
-            if (!dorefer) {
+            if (strippedP.startsWith(":")) {
                continue;
             }
-         }
-         if (strippedP.startsWith(":")) {
-            continue;
          }
          if (strippedP.equals(IDENTOPEN)) {
             level++;
@@ -2193,191 +2234,165 @@ public class AVM2Code implements Serializable {
       code.add(pos, instruction);
    }
 
-   public int removePushTrueFalseTraps(ConstantPool constants, MethodBody body) throws ConvertException {
+   public int removeTraps(ConstantPool constants, MethodBody body) {      
+      
       removeDeadCode(constants, body);
       boolean isSecure = true;
-      if (code.size() > 4) {
-         AVM2Instruction first = code.get(0);
-         AVM2Instruction second = code.get(1);
-         boolean firstValue = false;
-         boolean secondValue = false;
-         if (first.definition instanceof PushFalseIns) {
-            firstValue = false;
-         } else if (first.definition instanceof PushTrueIns) {
-            firstValue = true;
-         } else {
-            isSecure = false;
-         }
-         if (isSecure) {
-            if (second.definition instanceof PushFalseIns) {
-               secondValue = false;
-            } else if (second.definition instanceof PushTrueIns) {
-               secondValue = true;
+      try {
+         if (code.size() > 4) {
+            AVM2Instruction first = code.get(0);
+            AVM2Instruction second = code.get(1);
+            boolean firstValue = false;
+            boolean secondValue = false;
+            if (first.definition instanceof PushFalseIns) {
+               firstValue = false;
+            } else if (first.definition instanceof PushTrueIns) {
+               firstValue = true;
             } else {
                isSecure = false;
             }
             if (isSecure) {
-               int pos = 2;
-               AVM2Instruction third = code.get(pos);
-               if (third.definition instanceof SwapIns) {
-                  pos++;
-                  boolean dup = firstValue;
-                  firstValue = secondValue;
-                  secondValue = dup;
-                  third.ignored = true;
-               }
-               while (third.definition instanceof JumpIns) {
-                  pos = adr2pos(pos2adr(pos) + third.getBytes().length + third.operands[0]);
-                  third = code.get(pos);
-               }
-               AVM2Instruction firstSet = code.get(pos);
-               while (firstSet.definition instanceof JumpIns) {
-                  pos = adr2pos(pos2adr(pos) + firstSet.getBytes().length + firstSet.operands[0]);
-                  firstSet = code.get(pos);
-               }
-               pos++;
-               AVM2Instruction secondSet = code.get(pos);
-               while (secondSet.definition instanceof JumpIns) {
-                  pos = adr2pos(pos2adr(pos) + secondSet.getBytes().length + secondSet.operands[0]);
-                  secondSet = code.get(pos);
-               }
-               int trueIndex = -1;
-               int falseIndex = -1;
-               if (firstSet.definition instanceof SetLocalTypeIns) {
-                  if (secondValue == true) {
-                     trueIndex = ((SetLocalTypeIns) firstSet.definition).getRegisterId(firstSet);
-                  }
-                  if (secondValue == false) {
-                     falseIndex = ((SetLocalTypeIns) firstSet.definition).getRegisterId(firstSet);
-                  }
+               if (second.definition instanceof PushFalseIns) {
+                  secondValue = false;
+               } else if (second.definition instanceof PushTrueIns) {
+                  secondValue = true;
                } else {
                   isSecure = false;
                }
                if (isSecure) {
-                  if (secondSet.definition instanceof SetLocalTypeIns) {
-                     if (firstValue == true) {
-                        trueIndex = ((SetLocalTypeIns) secondSet.definition).getRegisterId(secondSet);
-                     }
-                     if (firstValue == false) {
-                        falseIndex = ((SetLocalTypeIns) secondSet.definition).getRegisterId(secondSet);
-                     }
-                     secondSet.ignored = true;
-                     firstSet.ignored = true;
-                     first.ignored = true;
-                     second.ignored = true;
-                     boolean found;
-                     do {
-                        found = false;
-                        for (int ip = 0; ip < code.size(); ip++) {
-                           if (code.get(ip).ignored) {
-                              continue;
-                           }
-                           if (code.get(ip).definition instanceof GetLocalTypeIns) {
-                              int regIndex = ((GetLocalTypeIns) code.get(ip).definition).getRegisterId(code.get(ip));
-                              if ((regIndex == trueIndex) || (regIndex == falseIndex)) {
-                                 found = true;
-                                 Stack<Boolean> myStack = new Stack<Boolean>();
-                                 do {
-                                    AVM2Instruction ins = code.get(ip);
-                                    /*if (ins.ignored) {
-                                     ip++;
-                                     continue;
-                                     } else*/ if (ins.definition instanceof GetLocalTypeIns) {
-                                       regIndex = ((GetLocalTypeIns) ins.definition).getRegisterId(ins);
-                                       if (regIndex == trueIndex) {
-                                          myStack.push(true);
-                                       }
-                                       if (regIndex == falseIndex) {
-                                          myStack.push(false);
-                                       }
-                                       ip++;
-                                       ins.ignored = true;
-                                    } else if (ins.definition instanceof DupIns) {
-                                       Boolean b = myStack.pop();
-                                       myStack.push(b);
-                                       myStack.push(b);
-                                       ins.ignored = true;
-                                       ip++;
-                                    } else if (ins.definition instanceof PopIns) {
-                                       myStack.pop();
-                                       ins.ignored = true;
-                                       ip++;
-                                    } else if (ins.definition instanceof IfTrueIns) {
-                                       boolean val = myStack.pop();
-                                       if (val) {
-                                          code.get(ip).definition = new JumpIns();
-                                          ip = adr2pos(pos2adr(ip + 1) + code.get(ip).operands[0]);
-                                       } else {
-                                          code.get(ip).ignored = true;
-                                          ip++;
-                                       }
-                                    } else if (ins.definition instanceof IfFalseIns) {
-                                       boolean val = myStack.pop();
-                                       if (!val) {
-                                          code.get(ip).definition = new JumpIns();
-                                          ip = adr2pos(pos2adr(ip + 1) + code.get(ip).operands[0]);
-                                       } else {
-                                          code.get(ip).ignored = true;
-                                          ip++;
-                                       }
-                                    } else if (ins.definition instanceof JumpIns) {
-                                       ip = adr2pos(pos2adr(ip + 1) + code.get(ip).operands[0]);
-                                    } else {
-                                       ip++;
-                                    }
-
-                                 } while (myStack.size() > 0);
-
-                                 break;
-                              }
-
-                           }
-                        }
-                     } while (found);
-                     removeIgnored(body);
-                     removeDeadCode(constants, body);
-                  } else {
-                     //isSecure = false;
+                  int pos = 2;
+                  AVM2Instruction third = code.get(pos);
+                  if (third.definition instanceof SwapIns) {
+                     pos++;
+                     boolean dup = firstValue;
+                     firstValue = secondValue;
+                     secondValue = dup;
+                     third.ignored = true;
                   }
-               }
+                  while (third.definition instanceof JumpIns) {
+                     pos = adr2pos(pos2adr(pos) + third.getBytes().length + third.operands[0]);
+                     third = code.get(pos);
+                  }
+                  AVM2Instruction firstSet = code.get(pos);
+                  while (firstSet.definition instanceof JumpIns) {
+                     pos = adr2pos(pos2adr(pos) + firstSet.getBytes().length + firstSet.operands[0]);
+                     firstSet = code.get(pos);
+                  }
+                  pos++;
+                  AVM2Instruction secondSet = code.get(pos);
+                  while (secondSet.definition instanceof JumpIns) {
+                     pos = adr2pos(pos2adr(pos) + secondSet.getBytes().length + secondSet.operands[0]);
+                     secondSet = code.get(pos);
+                  }
+                  int trueIndex = -1;
+                  int falseIndex = -1;
+                  if (firstSet.definition instanceof SetLocalTypeIns) {
+                     if (secondValue == true) {
+                        trueIndex = ((SetLocalTypeIns) firstSet.definition).getRegisterId(firstSet);
+                     }
+                     if (secondValue == false) {
+                        falseIndex = ((SetLocalTypeIns) firstSet.definition).getRegisterId(firstSet);
+                     }
+                  } else {
+                     isSecure = false;
+                  }
+                  if (isSecure) {
+                     if (secondSet.definition instanceof SetLocalTypeIns) {
+                        if (firstValue == true) {
+                           trueIndex = ((SetLocalTypeIns) secondSet.definition).getRegisterId(secondSet);
+                        }
+                        if (firstValue == false) {
+                           falseIndex = ((SetLocalTypeIns) secondSet.definition).getRegisterId(secondSet);
+                        }
+                        secondSet.ignored = true;
+                        firstSet.ignored = true;
+                        first.ignored = true;
+                        second.ignored = true;
+                        boolean found;
+                        do {
+                           found = false;
+                           for (int ip = 0; ip < code.size(); ip++) {
+                              if (code.get(ip).ignored) {
+                                 continue;
+                              }
+                              if (code.get(ip).definition instanceof GetLocalTypeIns) {
+                                 int regIndex = ((GetLocalTypeIns) code.get(ip).definition).getRegisterId(code.get(ip));
+                                 if ((regIndex == trueIndex) || (regIndex == falseIndex)) {
+                                    found = true;
+                                    Stack<Boolean> myStack = new Stack<Boolean>();
+                                    do {
+                                       AVM2Instruction ins = code.get(ip);
+                                       /*if (ins.ignored) {
+                                        ip++;
+                                        continue;
+                                        } else*/ if (ins.definition instanceof GetLocalTypeIns) {
+                                          regIndex = ((GetLocalTypeIns) ins.definition).getRegisterId(ins);
+                                          if (regIndex == trueIndex) {
+                                             myStack.push(true);
+                                          }
+                                          if (regIndex == falseIndex) {
+                                             myStack.push(false);
+                                          }
+                                          ip++;
+                                          ins.ignored = true;
+                                       } else if (ins.definition instanceof DupIns) {
+                                          Boolean b = myStack.pop();
+                                          myStack.push(b);
+                                          myStack.push(b);
+                                          ins.ignored = true;
+                                          ip++;
+                                       } else if (ins.definition instanceof PopIns) {
+                                          myStack.pop();
+                                          ins.ignored = true;
+                                          ip++;
+                                       } else if (ins.definition instanceof IfTrueIns) {
+                                          boolean val = myStack.pop();
+                                          if (val) {
+                                             code.get(ip).definition = new JumpIns();
+                                             ip = adr2pos(pos2adr(ip + 1) + code.get(ip).operands[0]);
+                                          } else {
+                                             code.get(ip).ignored = true;
+                                             ip++;
+                                          }
+                                       } else if (ins.definition instanceof IfFalseIns) {
+                                          boolean val = myStack.pop();
+                                          if (!val) {
+                                             code.get(ip).definition = new JumpIns();
+                                             ip = adr2pos(pos2adr(ip + 1) + code.get(ip).operands[0]);
+                                          } else {
+                                             code.get(ip).ignored = true;
+                                             ip++;
+                                          }
+                                       } else if (ins.definition instanceof JumpIns) {
+                                          ip = adr2pos(pos2adr(ip + 1) + code.get(ip).operands[0]);
+                                       } else {
+                                          ip++;
+                                       }
 
+                                    } while (myStack.size() > 0);
+
+                                    break;
+                                 }
+
+                              }
+                           }
+                        } while (found);
+                        removeIgnored(constants,body);
+                        removeDeadCode(constants, body);
+                     } else {
+                        //isSecure = false;
+                     }
+                  }
+
+               }
             }
          }
+      } catch (ConvertException cex) {
       }
       int ret = isSecure ? 1 : 0;
       ret += visitCodeTrap(body, new int[code.size()]);
-      removeIgnored(body);
-      return ret;
-   }
-
-   public int removePushByteTraps(ConstantPool constants, MethodBody body) throws ConvertException {
-      if (code.size() > 3) {
-         if (code.get(0).definition instanceof PushByteIns) {
-            if (code.get(1).definition instanceof PushByteIns) {
-               if (code.get(2).definition instanceof IfNeIns) {
-                  if (code.get(0).operands[0] != code.get(1).operands[0]) {
-                     int targetAddr = pos2adr(2) + code.get(2).getBytes().length + code.get(2).operands[0];
-                     int targetPos = adr2pos(targetAddr);
-                     for (int i = 0; i < targetPos; i++) {
-                        removeInstruction(0, body);
-                     }
-                     return 1;
-                  }
-               }
-            }
-         }
-      }
-      return 0;
-   }
-
-   public int removeTraps(ConstantPool constants, MethodBody body) {
-      int ret = 0;
-      try {
-         ret += removePushByteTraps(constants, body);
-         ret += removePushTrueFalseTraps(constants, body);
-      } catch (ConvertException ex) {
-         ex.printStackTrace();
-      }
+      removeIgnored(constants,body);
+      removeDeadCode(constants, body);
 
       return ret;
    }
@@ -2523,22 +2538,27 @@ public class AVM2Code implements Serializable {
       };
    }
 
-   private void visitCode(MethodBody body, HashMap<Integer, List<Integer>> refs) {
+   public HashMap<Integer, List<Integer>> visitCode(MethodBody body) {
+      HashMap<Integer, List<Integer>> refs = new HashMap<Integer, List<Integer>>();
       for (int i = 0; i < code.size(); i++) {
          refs.put(i, new ArrayList<Integer>());
       }
       visitCode(0, 0, refs);
+      int pos = 0;
       for (ABCException e : body.exceptions) {
+         pos++;
          try {
-            visitCode(adr2pos(e.start), adr2pos(e.start), refs);
-            visitCode(adr2pos(e.target), adr2pos(e.target), refs);
+            visitCode(adr2pos(e.start), -pos, refs);
+            visitCode(adr2pos(e.target), -pos, refs);
+            visitCode(adr2pos(e.end), -pos, refs);
          } catch (ConvertException ex) {
             Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
          }
       }
+      return refs;
    }
 
-   private int visitCodeTrap(int ip, int visited[], AVM2Instruction prev) {
+   private int visitCodeTrap(int ip, int visited[], AVM2Instruction prev, AVM2Instruction prev2) {
       int ret = 0;
       while (ip < visited.length) {
          visited[ip]++;
@@ -2558,9 +2578,10 @@ public class AVM2Code implements Serializable {
          if (ins.definition instanceof LookupSwitchIns) {
             try {
                for (int i = 2; i < ins.operands.length; i++) {
-                  ret += visitCodeTrap(adr2pos(pos2adr(ip) + ins.operands[i]), visited, prev);
+                  ret += visitCodeTrap(adr2pos(pos2adr(ip) + ins.operands[i]), visited, prev, prev2);
                }
                ip = adr2pos(pos2adr(ip) + ins.operands[0]);
+               prev2 = prev;
                prev = ins;
                continue;
             } catch (ConvertException ex) {
@@ -2569,23 +2590,55 @@ public class AVM2Code implements Serializable {
          if (ins.definition instanceof JumpIns) {
             try {
                ip = adr2pos(pos2adr(ip) + ins.getBytes().length + ins.operands[0]);
+               prev2 = prev;
                prev = ins;
                continue;
             } catch (ConvertException ex) {
                Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
             }
          } else if (ins.definition instanceof IfTypeIns) {
+            if ((prev != null) && (prev2 != null)) {
+               if ((prev.definition instanceof PushByteIns) && (prev2.definition instanceof PushByteIns)) {
+                  if (ins.definition instanceof IfEqIns) {
+                     prev.ignored = true;
+                     prev2.ignored = true;
+                     if (prev.operands[0] == prev2.operands[0]) {
+                        ins.definition = new JumpIns();
+                        visited[ip]--;
+                     } else {
+                        ins.ignored = true;
+                        ip++;
+                     }
+                     ret++;
+                     continue;
+                  }
+                  if (ins.definition instanceof IfNeIns) {
+                     prev.ignored = true;
+                     prev2.ignored = true;
+                     if (prev.operands[0] != prev2.operands[0]) {
+                        ins.definition = new JumpIns();
+                        visited[ip]--;
+                     } else {
+                        ins.ignored = true;
+                        ip++;
+                     }
+                     ret++;
+                     continue;
+                  }
+               }
+            }
             if ((prev != null) && ins.definition instanceof IfTrueIns) {
                if (prev.definition instanceof PushTrueIns) {
                   prev.ignored = true;
                   ins.definition = new JumpIns();
-                  ip--;
+                  visited[ip]--;
                   ret++;
                   continue;
                } else if (prev.definition instanceof PushFalseIns) {
                   prev.ignored = true;
                   ins.ignored = true;
                   ret++;
+                  ip++;
                   continue;
                }
             }
@@ -2593,23 +2646,25 @@ public class AVM2Code implements Serializable {
                if (prev.definition instanceof PushFalseIns) {
                   prev.ignored = true;
                   ins.definition = new JumpIns();
-                  ip--;
+                  visited[ip]--;
                   ret++;
                   continue;
                } else if (prev.definition instanceof PushTrueIns) {
                   prev.ignored = true;
                   ins.ignored = true;
                   ret++;
+                  ip++;
                   continue;
                }
             }
             try {
-               ret += visitCodeTrap(adr2pos(pos2adr(ip) + ins.getBytes().length + ins.operands[0]), visited, prev);
+               ret += visitCodeTrap(adr2pos(pos2adr(ip) + ins.getBytes().length + ins.operands[0]), visited, prev, prev2);
             } catch (ConvertException ex) {
                Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
             }
          }
          ip++;
+         prev2 = prev;
          prev = ins;
       };
       return ret;
@@ -2620,11 +2675,12 @@ public class AVM2Code implements Serializable {
       for (int i = 0; i < visited.length; i++) {
          visited[i] = 0;
       }
-      ret += visitCodeTrap(0, visited, null);
+      ret += visitCodeTrap(0, visited, null, null);
       for (ABCException e : body.exceptions) {
          try {
-            ret += visitCodeTrap(adr2pos(e.start), visited, null);
-            ret += visitCodeTrap(adr2pos(e.target), visited, null);
+            ret += visitCodeTrap(adr2pos(e.start), visited, null, null);
+            ret += visitCodeTrap(adr2pos(e.target), visited, null, null);
+            ret += visitCodeTrap(adr2pos(e.end), visited, null, null);
          } catch (ConvertException ex) {
             Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
          }
@@ -2675,6 +2731,28 @@ public class AVM2Code implements Serializable {
          }
          if (ins.definition instanceof JumpIns) {
             int newip = adr2pos(pos2adr(ip + 1) + ins.operands[0]);
+
+            boolean allJumpsOrIfs = true;
+            for (int ref : refs.get(ip)) {
+               if(ref<0) continue;
+               if (!(code.get(ref).definition instanceof JumpIns)) {
+                  if (!(code.get(ref).definition instanceof IfTypeIns)) {
+                     allJumpsOrIfs = false;
+                     break;
+                  } else {
+                     if (adr2pos(pos2adr(ref + 1) + code.get(ref).operands[0]) != ip) {
+                        allJumpsOrIfs = false;
+                        break;
+                     }
+                  }
+               }
+            }
+            if (allJumpsOrIfs) {
+               for (int ref : refs.get(ip)) {
+                  if(ref<0) continue;
+                  code.get(ref).changeJumpTo = newip;
+               }
+            }
             if ((newip < code.size()) && (refs.containsKey(newip) && refs.get(newip).size() == 1)) {
                if (!cont) {
                   continueip = ip;
@@ -2683,24 +2761,10 @@ public class AVM2Code implements Serializable {
                }
                cont = true;
             } else {
-               if (ip == code.size() - 1) {
-                  continueip = ip;
-                  buf = new ArrayList<AVM2Instruction>();
-                  appended.put(continueip, buf);
-                  for (int i : refs.get(newip)) {
-                     if (i != ip) {
-                        code.get(i).labelname = "nolabel" + ip;
-                     }
-                  }
-                  refs.get(newip).clear();
-                  buf.add(new ControlFlowTag("mark", newip));
-                  cont = true;
-               } else {
-                  if (cont) {
-                     buf.add(new ControlFlowTag("appendjump", ip));
-                  }
-                  cont = false;
+               if (cont) {
+                  buf.add(new ControlFlowTag("appendjump", newip));
                }
+               cont = false;
             }
             ip = newip - 1;
          } else if (ins.definition instanceof IfTypeIns) {
@@ -2725,18 +2789,19 @@ public class AVM2Code implements Serializable {
 
    private void restoreControlFlowPass(ConstantPool constants, MethodBody body, boolean secondpass) {
       try {
-         HashMap<Integer, List<Integer>> refs = new HashMap<Integer, List<Integer>>();
+         HashMap<Integer, List<Integer>> refs;
          int visited2[] = new int[code.size()];
-         visitCode(body, refs);
+         refs = visitCode(body);
          HashMap<Integer, List> appended = new HashMap<Integer, List>();
-         if (secondpass) {
-            restoreControlFlow(code.size() - 1, refs, visited2, appended);
-         } else {
+         /*if (secondpass) {
+          restoreControlFlow(code.size() - 1, refs, visited2, appended);
+          } else*/ {
             restoreControlFlow(0, refs, visited2, appended);
             for (ABCException e : body.exceptions) {
                try {
                   restoreControlFlow(adr2pos(e.start), refs, visited2, appended);
                   restoreControlFlow(adr2pos(e.target), refs, visited2, appended);
+                  restoreControlFlow(adr2pos(e.end), refs, visited2, appended);
                } catch (ConvertException ex) {
                   Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
                }
@@ -2746,23 +2811,24 @@ public class AVM2Code implements Serializable {
             code.get(ip).replaceWith = appended.get(ip);
          }
       } catch (ConvertException cex) {
+         cex.printStackTrace();
       }
       invalidateCache();
       try {
          List<Integer> outputMap = new ArrayList<Integer>();
          String src = Highlighting.stripHilights(toASMSource(constants, body, outputMap));
-         AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(src.getBytes()), constants, null, body);        
+
+         AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(src.getBytes()), constants, null, body);
          for (int i = 0; i < acode.code.size(); i++) {
             if (outputMap.size() > i) {
                int tpos = outputMap.get(i);
-               if(tpos==-1){
-                  
-               }else if (code.get(tpos).mappedOffset >= 0) {
-                  acode.code.get(i).mappedOffset = code.get(tpos).mappedOffset;                   
+               if (tpos == -1) {
+               } else if (code.get(tpos).mappedOffset >= 0) {
+                  acode.code.get(i).mappedOffset = code.get(tpos).mappedOffset;
                } else {
                   acode.code.get(i).mappedOffset = pos2adr(tpos);
                }
-               
+
             }
          }
          this.code = acode.code;
@@ -2776,48 +2842,75 @@ public class AVM2Code implements Serializable {
    }
 
    public void restoreControlFlow(ConstantPool constants, MethodBody body) {
-      restoreControlFlowPass(constants, body, false);
-      restoreControlFlowPass(constants, body, true);
+      //restoreControlFlowPass(constants, body, false);
+      //restoreControlFlowPass(constants, body, true);
    }
 
-   private void removeIgnored(MethodBody body) {
+   /*private void removeIgnored(MethodBody body) {
       for (int rem = code.size() - 1; rem >= 0; rem--) {
          if (code.get(rem).ignored) {
             removeInstruction(rem, body);
          }
-      }
+      }            
+   }*/
+   
+   public void removeIgnored(ConstantPool constants,MethodBody body){
+      try {
+         List<Integer> outputMap=new ArrayList<Integer>();
+         String src=toASMSource(constants, body,outputMap);
+         AVM2Code acode=ASM3Parser.parse(new ByteArrayInputStream(src.getBytes()), constants, body);
+         for (int i = 0; i < acode.code.size(); i++) {
+            if (outputMap.size() > i) {
+               int tpos = outputMap.get(i);
+               if (tpos == -1) {
+               } else if (code.get(tpos).mappedOffset >= 0) {
+                  acode.code.get(i).mappedOffset = code.get(tpos).mappedOffset;
+               } else {
+                  acode.code.get(i).mappedOffset = pos2adr(tpos);
+               }
+            }
+         }
+         this.code=acode.code;
+      } catch (Exception ex){
+      }      
+      invalidateCache();
    }
 
    public int removeDeadCode(ConstantPool constants, MethodBody body) {
-      HashMap<Integer, List<Integer>> refs = new HashMap<Integer, List<Integer>>();
-      visitCode(body, refs);
+      HashMap<Integer, List<Integer>> refs = visitCode(body);
+
       int cnt = 0;
       for (int i = code.size() - 1; i >= 0; i--) {
          if (refs.get(i).isEmpty()) {
-            removeInstruction(i, body);
+            code.get(i).ignored=true;
+            //removeInstruction(i, body);
             cnt++;
          }
       }
+      
+      removeIgnored(constants, body);
       for (int i = code.size() - 1; i >= 0; i--) {
          AVM2Instruction ins = code.get(i);
          if (ins.definition instanceof JumpIns) {
             if (ins.operands[0] == 0) {
-               removeInstruction(i, body);
+               code.get(i).ignored=true;
+               //removeInstruction(i, body);
                cnt++;
             }
          }
       }
+      removeIgnored(constants, body);
       return cnt;
    }
 
-   public void markMappedOffsets(){
-      int ofs=0;
-      for(int i=0;i<code.size();i++){
-         code.get(i).mappedOffset=ofs;
-         ofs+=code.get(i).getBytes().length;
+   public void markMappedOffsets() {
+      int ofs = 0;
+      for (int i = 0; i < code.size(); i++) {
+         code.get(i).mappedOffset = ofs;
+         ofs += code.get(i).getBytes().length;
       }
    }
-   
+
    public AVM2Code deepCopy() {
       try {
          ByteArrayOutputStream baos = new ByteArrayOutputStream();
