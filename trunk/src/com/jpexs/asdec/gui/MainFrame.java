@@ -267,11 +267,11 @@ public class MainFrame extends JFrame implements ActionListener {
       miControlFlowAll.setActionCommand("RESTORECONTROLFLOWALL");
       miControlFlowAll.addActionListener(this);
 
+      menuDeobfuscation.add(miRenameIdentifiers);
       //menuDeobfuscation.add(miSubLimiter);
       menuDeobfuscation.add(miDeobfuscation);
       /*menuDeobfuscation.add(miDeobfuscate);
-      menuDeobfuscation.addSeparator();*/
-      menuDeobfuscation.add(miRenameIdentifiers);
+      menuDeobfuscation.addSeparator();*/     
       /*menuDeobfuscation.add(miRemoveDeadCode);
       menuDeobfuscation.add(miRemoveDeadCodeAll);
       menuDeobfuscation.add(miTraps);

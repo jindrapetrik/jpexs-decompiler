@@ -89,7 +89,7 @@ public class MethodCodePanel extends JPanel implements ActionListener {
       // buttonsPanel.add(saveButton);
       // buttonsPan.add(execButton);
 
-      //add(buttonsPanel, BorderLayout.SOUTH);
+      add(buttonsPanel, BorderLayout.SOUTH);
    }
 
    public void actionPerformed(ActionEvent e) {
