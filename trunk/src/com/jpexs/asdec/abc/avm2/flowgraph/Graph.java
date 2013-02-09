@@ -804,12 +804,13 @@ public class Graph {
       }
       
       }catch(ForException fex){
+         ret.addAll(fex.output);
          fex.output=ret;
          throw fex;
       }
       code.clearTemporaryRegisters(ret);
       if(!part.forContinues.isEmpty()){
-         throw new ForException(null, ret,part);
+         throw new ForException(new ArrayList<TreeItem>(), ret,part);
       }
       return ret;
    }
