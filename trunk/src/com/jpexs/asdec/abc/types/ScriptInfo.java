@@ -18,6 +18,7 @@ package com.jpexs.asdec.abc.types;
 
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.types.traits.Trait;
+import com.jpexs.asdec.abc.types.traits.TraitClass;
 import com.jpexs.asdec.abc.types.traits.Traits;
 import com.jpexs.asdec.tags.DoABCTag;
 import java.io.File;
@@ -41,14 +42,24 @@ public class ScriptInfo {
    }
 
    public String getPath(ABC abc) {
+      String packageName="";
+      String scriptName="";
+      int classCount=0;
       for (Trait t : traits.traits) {
          Multiname name = t.getName(abc);
          Namespace ns = name.getNamespace(abc.constants);
          if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-            return ns.getName(abc.constants) + "." + name.getName(abc.constants, new ArrayList<String>());
+            packageName=ns.getName(abc.constants);
+            scriptName= name.getName(abc.constants, new ArrayList<String>());            
+            if(t instanceof TraitClass){
+               classCount++;
+            }
          }
       }
-      return "";
+      if(classCount>1){
+         scriptName = "[script]";
+      }
+      return packageName+"."+scriptName;
    }
 
    public String convert(List<DoABCTag> abcTags, ABC abc, boolean pcode, boolean highlighting) {
