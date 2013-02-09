@@ -118,7 +118,7 @@ public class ABC {
             ret++;
          }
       }
-      for (int i = 1; i < constants.constant_namespace.length; i++) {
+      for (int i = 1; i < constants.constant_namespace.length; i++) {         
          if (deobfuscateNameSpace(namesMap, constants.constant_namespace[i].name_index)) {
             ret++;
          }
@@ -270,7 +270,7 @@ public class ABC {
             mb.code = new AVM2Code(new ByteArrayInputStream(mb.codeBytes));
          } catch (UnknownInstructionCode re) {
             mb.code = new AVM2Code();
-            Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, re);            
+            Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, re);
          }
          mb.code.compact();
          int ex_count = ais.readU30();
@@ -294,20 +294,20 @@ public class ABC {
        System.out.println("--------------------------------------------");
        System.out.println(findBody(si.init_index).toString(true, false, -1, this, constants, method_info,new Stack<TreeItem>(),false,false));
        System.out.println("sitrait:"+si.traits.toString(this));
-       }*/            
+       }*/
       /*try {
-         MethodBody body=new MethodBody();
-         AVM2Code code=ASM3Parser.parse(new FileInputStream("D:\\tst2.txt"), constants, body);
-         //code.removeTraps(constants, body);
-         code.restoreControlFlow(constants, body);
-         FileOutputStream fos=new FileOutputStream("D:\\tst3.txt");
-         fos.write(Highlighting.stripHilights(code.toASMSource(constants, body)).getBytes());
-         fos.close();
-         System.out.println(code.toSource(false, 0, this, constants, method_info, body, new HashMap<Integer,String>(), new Stack<TreeItem>(), false, null, null));
-         System.exit(0);
-      } catch (Exception ex) {
-         Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, ex);
-      }*/
+       MethodBody body=new MethodBody();
+       AVM2Code code=ASM3Parser.parse(new FileInputStream("D:\\tst2.txt"), constants, body);
+       //code.removeTraps(constants, body);
+       code.restoreControlFlow(constants, body);
+       FileOutputStream fos=new FileOutputStream("D:\\tst3.txt");
+       fos.write(Highlighting.stripHilights(code.toASMSource(constants, body)).getBytes());
+       fos.close();
+       System.out.println(code.toSource(false, 0, this, constants, method_info, body, new HashMap<Integer,String>(), new Stack<TreeItem>(), false, null, null));
+       System.exit(0);
+       } catch (Exception ex) {
+       Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, ex);
+       }*/
    }
 
    public void saveToStream(OutputStream os) throws IOException {
@@ -677,16 +677,12 @@ public class ABC {
       return false;
    }
 
-   public boolean deobfuscateNameSpace(HashMap<String, String> namesMap, int strIndex) {
-      if (strIndex <= 0) {
-         return false;
-      }
-      String s = constants.constant_string[strIndex];
+   private boolean isValidNSPart(String s){
       boolean isValid = true;
       if (isReserved(s)) {
          isValid = false;
       }
-
+      
       if (isValid) {
          for (int i = 0; i < s.length(); i++) {
             if (s.charAt(i) > 127) {
@@ -695,15 +691,43 @@ public class ABC {
             }
          }
       }
-      Pattern pat = Pattern.compile("^([" + Pattern.quote(validFirstCharacters) + "]" + "[" + Pattern.quote(validFirstCharacters + validNextCharacters + validNsCharacters) + "]*)*$");
-      if (!pat.matcher(s).matches()) {
-         isValid = false;
+      if (isValid) {
+         Pattern pat = Pattern.compile("^([" + Pattern.quote(validFirstCharacters) + "]" + "[" + Pattern.quote(validFirstCharacters + validNextCharacters + validNsCharacters) + "]*)*$");
+         if (!pat.matcher(s).matches()) {
+            isValid = false;
+         }
       }
+      return isValid;
+   }
+   
+   public boolean deobfuscateNameSpace(HashMap<String, String> namesMap, int strIndex) {
+      if (strIndex <= 0) {
+         return false;
+      }
+      String s = constants.constant_string[strIndex];
+      boolean isValid = isValidNSPart(s);      
       if (!isValid) {
          if (namesMap.containsKey(s)) {
             constants.constant_string[strIndex] = namesMap.get(s);
          } else {
-            constants.constant_string[strIndex] = fooString(constants.constant_string[strIndex], false, DEFAULT_FOO_SIZE);
+            String parts[]=null;
+            if(s.contains(".")){
+               parts=s.split("\\.");
+            }else{
+               parts=new String[]{s};
+            }
+            String ret="";
+            for(int p=0;p<parts.length;p++){
+               if(p>0){
+                  ret+=".";
+               }
+               if(!isValidNSPart(parts[p])){
+                  ret+=fooString(constants.constant_string[strIndex], false, DEFAULT_FOO_SIZE);
+               }else{
+                  ret+=parts[p];
+               }
+            }
+            constants.constant_string[strIndex] = ret;
             namesMap.put(s, constants.constant_string[strIndex]);
          }
       }
@@ -720,17 +744,19 @@ public class ABC {
          isValid = false;
       }
 
-
-      Pattern pat = Pattern.compile("^[" + Pattern.quote(validFirstCharacters) + "]" + "[" + Pattern.quote(validFirstCharacters + validNextCharacters) + "]*$");
-      if (!pat.matcher(s).matches()) {
-         isValid = false;
-      }
       if (isValid) {
          for (int i = 0; i < s.length(); i++) {
             if (s.charAt(i) > 127) {
                isValid = false;
                break;
             }
+         }
+      }
+
+      if (isValid) {
+         Pattern pat = Pattern.compile("^[" + Pattern.quote(validFirstCharacters) + "]" + "[" + Pattern.quote(validFirstCharacters + validNextCharacters) + "]*$");
+         if (!pat.matcher(s).matches()) {
+            isValid = false;
          }
       }
 

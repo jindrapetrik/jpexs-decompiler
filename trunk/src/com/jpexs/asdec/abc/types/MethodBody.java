@@ -111,7 +111,7 @@ public class MethodBody implements Cloneable, Serializable {
          deobfuscated = b.code;
          deobfuscated.markMappedOffsets();
          deobfuscated.removeTraps(constants, b);
-         deobfuscated.restoreControlFlow(constants, b);
+         //deobfuscated.restoreControlFlow(constants, b);
          try {
             s += deobfuscated.toSource(path, isStatic, classIndex, abc, constants, method_info, b, hilight, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
             s = s.trim();

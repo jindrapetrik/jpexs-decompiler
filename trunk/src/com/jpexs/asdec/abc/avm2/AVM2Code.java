@@ -2851,7 +2851,7 @@ public class AVM2Code implements Serializable {
    }
 
    public void restoreControlFlow(ConstantPool constants, MethodBody body) {
-      //restoreControlFlowPass(constants, body, false);
+      restoreControlFlowPass(constants, body, false);
       //restoreControlFlowPass(constants, body, true);
    }
 
