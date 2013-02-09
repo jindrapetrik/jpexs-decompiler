@@ -257,6 +257,7 @@ public class Graph {
             if (isIf) {
                AVM2Instruction ins = code.code.get(end + 1);
                if ((stack.size() >= 2) && (ins.definition instanceof IfFalseIns) && (stack.get(stack.size() - 1) == stack.get(stack.size() - 2))) {
+                  ret.addAll(output);
                   printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, parent, part.nextParts.get(1), part.nextParts.get(0), loops, localRegs, body, ignoredSwitches);
                   TreeItem second = stack.pop();
                   TreeItem first = stack.pop();
@@ -264,6 +265,7 @@ public class Graph {
                   ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, parent, part.nextParts.get(0), stopPart, loops, localRegs, body, ignoredSwitches));
                   return ret;
                } else if ((stack.size() >= 2) && (ins.definition instanceof IfTrueIns) && (stack.get(stack.size() - 1) == stack.get(stack.size() - 2))) {
+                  ret.addAll(output);
                   printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, parent, part.nextParts.get(1), part.nextParts.get(0), loops, localRegs, body, ignoredSwitches);
                   TreeItem second = stack.pop();
                   TreeItem first = stack.pop();
