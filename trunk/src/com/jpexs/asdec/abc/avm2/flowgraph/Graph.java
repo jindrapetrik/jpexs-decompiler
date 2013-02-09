@@ -53,6 +53,7 @@ import com.jpexs.asdec.abc.avm2.treemodel.clauses.DoWhileTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.clauses.ExceptionTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.clauses.ForEachInTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.clauses.ForInTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.clauses.ForTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.clauses.IfTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.clauses.SwitchTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.clauses.TernarOpTreeItem;
@@ -197,9 +198,9 @@ public class Graph {
 
    private List<TreeItem> printGraph(String methodPath,Stack<TreeItem> stack, Stack<TreeItem> scopeStack, List<GraphPart> allParts, List<ABCException> parsedExceptions, List<Integer> finallyJumps, int level, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, HashMap<Integer, TreeItem> localRegs, MethodBody body, List<Integer> ignoredSwitches) {
       List<TreeItem> ret = new ArrayList<TreeItem>();
-      boolean debugMode = false;
-
-
+      boolean debugMode = false;      
+      
+      try{
       if (!doDecompile) {
          ret.add(new CommentTreeItem(null, "not decompiled"));
          return ret;
@@ -583,8 +584,27 @@ public class Graph {
          GraphPart next = part.getNextPartPath(loopContinues);
 
          if (loop && (!doWhile)) {
-            List<TreeItem> loopBody = printGraph(methodPath,stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, part, part.nextParts.get(0), stopPart, loops, localRegs, body, ignoredSwitches);
-            if ((expr instanceof HasNextTreeItem) && (!loopBody.isEmpty()) && (loopBody.get(0) instanceof SetTypeTreeItem) && (((SetTypeTreeItem) loopBody.get(0)).getValue().getNotCoerced() instanceof NextValueTreeItem)) {
+            List<TreeItem> loopBody = null;
+            List<TreeItem> finalCommands = null;
+            GraphPart finalPart=null;
+            boolean isFor=false;
+            try{
+               loopBody=printGraph(methodPath,stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, part, part.nextParts.get(0), stopPart, loops, localRegs, body, ignoredSwitches);
+            }catch(ForException fex){
+               loopBody=fex.output;               
+               finalCommands=fex.finalOutput;
+               if(!finalCommands.isEmpty()){
+                  finalCommands.remove(finalCommands.size()-1); //remove continue
+               }
+               finalPart=fex.continuePart;
+               isFor=true;
+               for(ContinueTreeItem cti:finalPart.forContinues){
+                  cti.loopPos=breakIp;
+               }
+            }
+            if(isFor){
+               ret.add(new ForTreeItem(null, breakIp, finalPart.start, new ArrayList<TreeItem>(), expr,finalCommands,loopBody));
+            } else if ((expr instanceof HasNextTreeItem) && (!loopBody.isEmpty()) && (loopBody.get(0) instanceof SetTypeTreeItem) && (((SetTypeTreeItem) loopBody.get(0)).getValue().getNotCoerced() instanceof NextValueTreeItem)) {
                TreeItem obj = ((SetTypeTreeItem) loopBody.get(0)).getObject();
                loopBody.remove(0);
                ret.add(new ForEachInTreeItem(null, breakIp, part.start, new InTreeItem(expr.instruction, obj, ((HasNextTreeItem) expr).collection), loopBody));
@@ -721,10 +741,13 @@ public class Graph {
          TreeItem lop = checkLoop(p, stopPart, loops);
          if (lop == null) {
             if (p.path.length() == part.path.length()) {
-               ret.addAll(printGraph(methodPath,stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, part, part.nextParts.get(0), stopPart, loops, localRegs, body, ignoredSwitches));
+               ret.addAll(printGraph(methodPath,stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, part, p, stopPart, loops, localRegs, body, ignoredSwitches));
             }else{
-               if(p!=stopPart){
-                  ret.add(new CommentTreeItem(null, "Jump to different path"));
+               if(p!=stopPart){     
+                  ContinueTreeItem cti=new ContinueTreeItem(null, -1);
+                  p.forContinues.add(cti);
+                  ret.add(cti);
+                  //ret.add(new CommentTreeItem(null, "Jump to different path"));
                }
             }
          } else {
@@ -779,7 +802,15 @@ public class Graph {
          }
             
       }
+      
+      }catch(ForException fex){
+         fex.output=ret;
+         throw fex;
+      }
       code.clearTemporaryRegisters(ret);
+      if(!part.forContinues.isEmpty()){
+         throw new ForException(null, ret,part);
+      }
       return ret;
    }
 

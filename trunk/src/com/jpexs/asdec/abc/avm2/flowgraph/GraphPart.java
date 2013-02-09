@@ -16,8 +16,11 @@
  */
 package com.jpexs.asdec.abc.avm2.flowgraph;
 
+import com.jpexs.asdec.abc.avm2.treemodel.ContinueTreeItem;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -34,6 +37,7 @@ public class GraphPart {
    public String path="";
    public List<GraphPart> refs=new ArrayList<GraphPart>();
    public boolean ignored=false;
+   public List<ContinueTreeItem> forContinues=new ArrayList<ContinueTreeItem>();
 
    private boolean leadsTo(GraphPart part,List<GraphPart> visited,List<GraphPart> ignored){
       if(visited.contains(this)){

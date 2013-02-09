@@ -119,6 +119,7 @@ public class MethodBody implements Cloneable, Serializable {
                s = Highlighting.hilighMethod(s, this.method_info);
             }
          } catch (Exception ex) {
+            ex.printStackTrace();
             s = "//error:" + ex.toString();
          }
       }
