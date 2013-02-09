@@ -31,6 +31,8 @@ import com.jpexs.asdec.abc.avm2.instructions.localregs.GetLocalTypeIns;
 import com.jpexs.asdec.abc.avm2.instructions.localregs.KillIns;
 import com.jpexs.asdec.abc.avm2.instructions.localregs.SetLocalTypeIns;
 import com.jpexs.asdec.abc.avm2.instructions.other.LabelIns;
+import com.jpexs.asdec.abc.avm2.instructions.other.NextNameIns;
+import com.jpexs.asdec.abc.avm2.instructions.other.NextValueIns;
 import com.jpexs.asdec.abc.avm2.instructions.other.ReturnValueIns;
 import com.jpexs.asdec.abc.avm2.instructions.other.ReturnVoidIns;
 import com.jpexs.asdec.abc.avm2.instructions.other.ThrowIns;
@@ -39,18 +41,23 @@ import com.jpexs.asdec.abc.avm2.treemodel.BooleanTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.BreakTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.CommentTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.ContinueTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.FilteredCheckTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.HasNextTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.InTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.IntegerValueTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.LocalRegTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.NextNameTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.NextValueTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.ReturnValueTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.ReturnVoidTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.SetLocalTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.SetPropertyTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.SetTypeTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.WithTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.clauses.DoWhileTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.clauses.ExceptionTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.clauses.FilterTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.clauses.ForEachInTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.clauses.ForInTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.clauses.ForTreeItem;
@@ -612,6 +619,29 @@ public class Graph {
                }
                if (isFor) {
                   ret.add(new ForTreeItem(null, breakIp, finalPart.start, new ArrayList<TreeItem>(), expr, finalCommands, loopBody));
+               } else if ((expr instanceof HasNextTreeItem) && ((HasNextTreeItem) expr).collection.getNotCoerced().getThroughRegister() instanceof FilteredCheckTreeItem) {
+                  TreeItem gti = ((HasNextTreeItem) expr).collection.getNotCoerced().getThroughRegister();
+                  boolean found = false;
+                  if ((loopBody.size() == 3) || (loopBody.size() == 4)) {
+                     TreeItem ft = loopBody.get(0);
+                     if (ft instanceof WithTreeItem) {
+                        ft = loopBody.get(1);
+                        if (ft instanceof IfTreeItem) {
+                           IfTreeItem ift = (IfTreeItem) ft;
+                           if (ift.onTrue.size() > 0) {
+                              ft = ift.onTrue.get(0);
+                              if (ft instanceof SetPropertyTreeItem) {
+                                 SetPropertyTreeItem spt = (SetPropertyTreeItem) ft;
+                                 if (spt.object instanceof LocalRegTreeItem) {
+                                    int regIndex = ((LocalRegTreeItem) spt.object).regIndex;
+                                    HasNextTreeItem iti = (HasNextTreeItem) expr;
+                                    localRegs.put(regIndex, new FilterTreeItem(null, iti.collection.getThroughRegister(), ift.expression));
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
                } else if ((expr instanceof HasNextTreeItem) && (!loopBody.isEmpty()) && (loopBody.get(0) instanceof SetTypeTreeItem) && (((SetTypeTreeItem) loopBody.get(0)).getValue().getNotCoerced() instanceof NextValueTreeItem)) {
                   TreeItem obj = ((SetTypeTreeItem) loopBody.get(0)).getObject();
                   loopBody.remove(0);
@@ -667,6 +697,7 @@ public class Graph {
                }
             }
             if (loop && (part.nextParts.size() > 1)) {
+               loops.remove(currentLoop); //remove loop so no break shows up
                ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, part, part.nextParts.get(1), stopPart, loops, localRegs, body, ignoredSwitches));
             }
 
