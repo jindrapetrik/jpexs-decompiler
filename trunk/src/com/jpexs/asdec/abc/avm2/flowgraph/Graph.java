@@ -331,18 +331,25 @@ public class Graph {
                }
 
                for (int i = 0; i < caseBodies.size(); i++) {
-                  List<TreeItem> cc = printGraph(methodPath,stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, switchLoc, caseBodies.get(i), next, loops, localRegs, body, ignoredSwitches);
+                  List<TreeItem> cc = new ArrayList<TreeItem>();
+                  GraphPart nextCase=null;
+                  nextCase=next;
                   if (next != null) {
                      if (i < caseBodies.size() - 1) {
                         if (!caseBodies.get(i).leadsTo(caseBodies.get(i + 1), ignored)) {
                            cc.add(new BreakTreeItem(null, next.start));
+                        }else{
+                           nextCase=caseBodies.get(i + 1);
                         }
                      } else if (hasDefault) {
                         if (!caseBodies.get(i).leadsTo(defaultPart, ignored)) {
                            cc.add(new BreakTreeItem(null, next.start));
+                        }else{
+                           nextCase=defaultPart;
                         }
                      }
                   }
+                  cc.addAll(0,printGraph(methodPath,stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, switchLoc, caseBodies.get(i), nextCase, loops, localRegs, body, ignoredSwitches));
                   caseCommands.add(cc);
                }
 
@@ -391,6 +398,7 @@ public class Graph {
       if (catchedExceptions.size() > 0) {
          parsedExceptions.addAll(catchedExceptions);
          int endpos = code.adr2pos(code.fixAddrAfterDebugLine(catchedExceptions.get(0).end));
+         int endposStartBlock=code.adr2pos(catchedExceptions.get(0).end);
 
 
          List<List<TreeItem>> catchedCommands = new ArrayList<List<TreeItem>>();
@@ -491,8 +499,9 @@ public class Graph {
             }
 
             GraphPart nepart = null;
+            
             for (GraphPart p : allParts) {
-               if (p.start == endpos) {
+               if (p.start == endposStartBlock) {
                   nepart = p;
                   break;
                }
@@ -605,7 +614,7 @@ public class Graph {
                if (debugMode) {
                   System.err.println("ONTRUE: (inside " + part + ")");
                }
-               onTrue = printGraph(methodPath,trueStack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, part, part.nextParts.get(1), stopPart, loops, localRegs, body, ignoredSwitches);
+               onTrue = printGraph(methodPath,trueStack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, part, part.nextParts.get(1),  next==null?stopPart:next, loops, localRegs, body, ignoredSwitches);
                if (debugMode) {
                   System.err.println("/ONTRUE (inside " + part + ")");
                }
@@ -617,7 +626,7 @@ public class Graph {
                if (debugMode) {
                   System.err.println("ONFALSE: (inside " + part + ")");
                }
-               onFalse = (((next == part.nextParts.get(0)) || (part.nextParts.get(0).path.equals(part.path) || part.nextParts.get(0).path.length() < part.path.length())) ? new ArrayList<TreeItem>() : printGraph(methodPath,falseStack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, part, part.nextParts.get(0), stopPart, loops, localRegs, body, ignoredSwitches));
+               onFalse = (((next == part.nextParts.get(0)) || (part.nextParts.get(0).path.equals(part.path) || part.nextParts.get(0).path.length() < part.path.length())) ? new ArrayList<TreeItem>() : printGraph(methodPath,falseStack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, part, part.nextParts.get(0), next==null?stopPart:next, loops, localRegs, body, ignoredSwitches));
                if (debugMode) {
                   System.err.println("/ONFALSE (inside " + part + ")");
                }
@@ -711,8 +720,12 @@ public class Graph {
          GraphPart p = part.nextParts.get(0);
          TreeItem lop = checkLoop(p, stopPart, loops);
          if (lop == null) {
-            if (part.nextParts.get(0).path.length() == part.path.length()) {
+            if (p.path.length() == part.path.length()) {
                ret.addAll(printGraph(methodPath,stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, part, part.nextParts.get(0), stopPart, loops, localRegs, body, ignoredSwitches));
+            }else{
+               if(p!=stopPart){
+                  ret.add(new CommentTreeItem(null, "Jump to different path"));
+               }
             }
          } else {
             ret.add(lop);
@@ -738,14 +751,20 @@ public class Graph {
          for(int i=0;i<part.nextParts.size()-1;i++){
             caseValues.add(new IntegerValueTreeItem(null, (Long)(long)i));
             valueMappings.add(i);
-            List<TreeItem> caseBody=printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, part, part.nextParts.get(1+i), stopPart, loops, localRegs, body, ignoredSwitches);
+            GraphPart nextCase=next;
+            List<TreeItem> caseBody=new ArrayList<TreeItem>();
             if(i<part.nextParts.size()-1-1){
                if(!part.nextParts.get(1+i).leadsTo(part.nextParts.get(1+i+1), new ArrayList<GraphPart>())){
                   caseBody.add(new BreakTreeItem(null, breakPos));
+               }else{
+                  nextCase=part.nextParts.get(1+i+1);
                }
             }else if(!part.nextParts.get(1+i).leadsTo(part.nextParts.get(0), new ArrayList<GraphPart>())){
                caseBody.add(new BreakTreeItem(null, breakPos));
+            }else{
+                nextCase=part.nextParts.get(0);
             }
+            caseBody.addAll(0,printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, part, part.nextParts.get(1+i), nextCase, loops, localRegs, body, ignoredSwitches));                        
             caseCommands.add(caseBody);
          }
          
