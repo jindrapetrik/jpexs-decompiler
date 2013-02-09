@@ -20,5 +20,12 @@ public class CommentTreeItem extends TreeItem {
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
      return "//"+comment;
    }
+
+   @Override
+   public boolean needsSemicolon() {
+      return false;
+   }
+   
+   
    
 }

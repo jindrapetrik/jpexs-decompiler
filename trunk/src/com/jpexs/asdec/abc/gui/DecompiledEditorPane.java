@@ -121,6 +121,9 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
    }
 
    public void caretUpdate(CaretEvent e) {
+      if(abc==null){
+         return;
+      }
       if (ignoreCarret) {
          return;
       }
@@ -281,10 +284,10 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
          methodHighlights = bc.methodHighlights;
          classHighlights = bc.classHighlights;
       }
-      setText(hilightedCode);
       this.abc = abc;
       this.abcList = abcList;
       this.script = script;
+      setText(hilightedCode);      
    }
 
    public void reloadClass() {
