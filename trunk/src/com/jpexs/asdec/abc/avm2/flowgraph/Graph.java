@@ -41,6 +41,7 @@ import com.jpexs.asdec.abc.avm2.treemodel.CommentTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.ContinueTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.HasNextTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.InTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.IntegerValueTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.NextNameTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.NextValueTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.ReturnValueTreeItem;
@@ -721,7 +722,43 @@ public class Graph {
          //}
       }
       if (isSwitch && (!ignoredSwitches.contains(part.end))) {
-         ret.add(new CommentTreeItem(code.code.get(part.end), "Switch not supported"));
+         //ret.add(new CommentTreeItem(code.code.get(part.end), "Switch not supported"));
+         TreeItem switchedObject = stack.pop();
+         List<TreeItem> caseValues=new ArrayList<TreeItem>();
+         List<Integer> valueMappings=new ArrayList<Integer>();
+         List<List<TreeItem>> caseCommands=new ArrayList<List<TreeItem>>();
+         
+         GraphPart next = part.getNextPartPath(loopContinues);         
+         int breakPos=-1;
+         if(next!=null){
+            breakPos=next.start;
+         }
+         List<TreeItem> defaultCommands=printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, part, part.nextParts.get(0), stopPart, loops, localRegs, body, ignoredSwitches);         
+         
+         for(int i=0;i<part.nextParts.size()-1;i++){
+            caseValues.add(new IntegerValueTreeItem(null, (Long)(long)i));
+            valueMappings.add(i);
+            List<TreeItem> caseBody=printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, part, part.nextParts.get(1+i), stopPart, loops, localRegs, body, ignoredSwitches);
+            if(i<part.nextParts.size()-1-1){
+               if(!part.nextParts.get(1+i).leadsTo(part.nextParts.get(1+i+1), new ArrayList<GraphPart>())){
+                  caseBody.add(new BreakTreeItem(null, breakPos));
+               }
+            }else if(!part.nextParts.get(1+i).leadsTo(part.nextParts.get(0), new ArrayList<GraphPart>())){
+               caseBody.add(new BreakTreeItem(null, breakPos));
+            }
+            caseCommands.add(caseBody);
+         }
+         
+         SwitchTreeItem swt=new SwitchTreeItem(null, breakPos, switchedObject, caseValues, caseCommands,defaultCommands, valueMappings);
+         ret.add(swt);
+         
+         TreeItem lopNext = checkLoop(next, stopPart, loops);
+         if(lopNext!=null){
+            ret.add(lopNext);
+         }else{
+            ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, part, next, stopPart, loops, localRegs, body, ignoredSwitches));
+         }
+            
       }
       code.clearTemporaryRegisters(ret);
       return ret;
