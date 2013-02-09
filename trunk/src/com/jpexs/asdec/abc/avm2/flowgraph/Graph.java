@@ -694,8 +694,20 @@ public class Graph {
 
                if (onTrue.isEmpty() && onFalse.isEmpty() && (trueStack.size() > stackSizeBefore) && (falseStack.size() > stackSizeBefore)) {
                   stack.push(new TernarOpTreeItem(null, expr, trueStack.pop(), falseStack.pop()));
-               } else {
+               } else {                  
                   ret.add(new IfTreeItem(null, expr, onTrue, onFalse));
+                  
+                  //Same continues in onTrue and onFalse gets continue on parent level
+                  if((!onTrue.isEmpty())&&(!onFalse.isEmpty())){
+                     if(onTrue.get(onTrue.size()-1) instanceof ContinueTreeItem){
+                        if(onFalse.get(onFalse.size()-1) instanceof ContinueTreeItem){
+                           if(((ContinueTreeItem)onTrue.get(onTrue.size()-1)).loopPos==((ContinueTreeItem)onFalse.get(onFalse.size()-1)).loopPos){
+                              onTrue.remove(onTrue.size()-1);
+                              ret.add(onFalse.remove(onFalse.size()-1));
+                           }
+                        }
+                     }
+                  }
                }
             }
             if (loop && (part.nextParts.size() > 1)) {
