@@ -477,17 +477,17 @@ public class ABC {
       if (!s.contains("\r\n")) {
          parts = s.split("\n");
       }
-      String ret = "";
+      StringBuilder ret = new StringBuilder();
       for (int i = 0; i < parts.length; i++) {
          for (int t = 0; t < tabs; t++) {
-            ret += IDENT_STRING;
+            ret.append(IDENT_STRING);
          }
-         ret += parts[i];
+         ret.append(parts[i]);
          if (i < parts.length - 1) {
-            ret += "\r\n";
+            ret.append("\r\n");
          }
       }
-      return ret;
+      return ret.toString();
    }
 
    public Trait findTraitByTraitId(int classIndex, int traitId) {

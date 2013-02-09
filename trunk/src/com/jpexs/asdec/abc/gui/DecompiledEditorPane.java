@@ -82,6 +82,9 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
    }
 
    private boolean displayMethod(int pos, int methodIndex) {
+      if(abc==null){
+         return false;
+      }
       int bi = abc.findBodyIndex(methodIndex);
       if (bi == -1) {
          return false;
@@ -134,11 +137,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                break;
             }
          }
-
-         if (classIndex == -1) {
-            setNoTrait();
-            return;
-         }
+         
          for (Highlighting tm : methodHighlights) {
             if ((pos >= tm.startPos) && (pos < tm.startPos + tm.len)) {
                displayMethod(pos, (int) tm.offset);
@@ -151,6 +150,11 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                }
                return;
             }
+         }
+         
+         if (classIndex == -1) {
+            setNoTrait();
+            return;
          }
          for (Highlighting th : traitHighlights) {
             if ((pos >= th.startPos) && (pos < th.startPos + th.len)) {

@@ -704,11 +704,11 @@ public class AVM2Code implements Serializable {
 
    public String toASMSource(ConstantPool constants, MethodBody body, List<Integer> outputMap) {
       invalidateCache();
-      String ret = "";
+      StringBuffer ret = new StringBuffer();
       String t = "";
       for (int e = 0; e < body.exceptions.length; e++) {
-         ret += "exception " + e + " m[" + body.exceptions[e].name_index + "]\"" + Helper.escapeString(body.exceptions[e].getVarName(constants, new ArrayList<String>())) + "\" "
-                 + "m[" + body.exceptions[e].type_index + "]\"" + Helper.escapeString(body.exceptions[e].getTypeName(constants, new ArrayList<String>())) + "\"\n";
+         ret.append("exception " + e + " m[" + body.exceptions[e].name_index + "]\"" + Helper.escapeString(body.exceptions[e].getVarName(constants, new ArrayList<String>())) + "\" "
+                 + "m[" + body.exceptions[e].type_index + "]\"" + Helper.escapeString(body.exceptions[e].getTypeName(constants, new ArrayList<String>())) + "\"\n");
       }
       List<Long> offsets = new ArrayList<Long>();
       for (AVM2Instruction ins : code) {
@@ -728,21 +728,23 @@ public class AVM2Code implements Serializable {
       }
       long ofs = 0;
       int ip = 0;
+      int largeLimit = 20000;
+      boolean markOffsets=code.size()<=largeLimit;
       for (AVM2Instruction ins : code) {
          if (ins.labelname != null) {
-            ret += ins.labelname + ":";
+            ret.append(ins.labelname + ":");
          } else if (offsets.contains(ofs)) {
-            ret += "ofs" + Helper.formatAddress(ofs) + ":";
+            ret.append("ofs" + Helper.formatAddress(ofs) + ":");
          }
          for (int e = 0; e < body.exceptions.length; e++) {
             if (body.exceptions[e].start == ofs) {
-               ret += "exceptionstart " + e + ":";
+               ret.append("exceptionstart " + e + ":");
             }
             if (body.exceptions[e].end == ofs) {
-               ret += "exceptionend " + e + ":";
+               ret.append("exceptionend " + e + ":");
             }
             if (body.exceptions[e].target == ofs) {
-               ret += "exceptiontarget " + e + ":";
+               ret.append("exceptiontarget " + e + ":");
             }
          }
          if (ins.replaceWith != null) {
@@ -753,36 +755,40 @@ public class AVM2Code implements Serializable {
                      continue;
                   }
                   t = Highlighting.hilighOffset("", ins2.mappedOffset>-1?ins2.mappedOffset:ofs) + ins2.toStringNoAddress(constants, new ArrayList<String>()) + " ;copy from " + Helper.formatAddress(pos2adr((Integer) o)) + "\n";
-                  ret += t;
+                  ret.append(t);
                   outputMap.add((Integer) o);
                } else if (o instanceof ControlFlowTag) {
                   ControlFlowTag cft = (ControlFlowTag) o;
                   if (cft.name.equals("appendjump")) {
                      t = "jump ofs" + Helper.formatAddress(pos2adr(cft.value)) + "\n";
-                     ret += t;
+                     ret.append(t);
                      outputMap.add(-1);
                   }
                   if (cft.name.equals("mark")) {
-                     ret += "ofs" + Helper.formatAddress(pos2adr(cft.value)) + ":";
+                     ret.append("ofs" + Helper.formatAddress(pos2adr(cft.value)) + ":");
                   }
                }
             }
          } else {
             if (!ins.isIgnored()) {
-               String t1 = ins.toStringNoAddress(constants, new ArrayList<String>());
+               t = ins.toStringNoAddress(constants, new ArrayList<String>());
                if (ins.changeJumpTo > -1) {
-                  t1 = ins.definition.instructionName + " ofs" + Helper.formatAddress(pos2adr(ins.changeJumpTo));
+                  t = ins.definition.instructionName + " ofs" + Helper.formatAddress(pos2adr(ins.changeJumpTo));
                }
-               t = Highlighting.hilighOffset("", ins.mappedOffset>-1?ins.mappedOffset:ofs) + t1 + "\n";
-               ret += t;
+               if(markOffsets){
+                  t = Highlighting.hilighOffset("", ins.mappedOffset>-1?ins.mappedOffset:ofs) + t + "\n";
+               }else{
+                  t = t + "\n";
+               }               
+               ret.append(t);
                outputMap.add(ip);
             }
          }
          ofs += ins.getBytes().length;
          ip++;
       }
-
-      return ret;
+      String r=ret.toString();
+      return r;
    }
    private boolean cacheActual = false;
    private List<Long> posCache;
@@ -821,12 +827,12 @@ public class AVM2Code implements Serializable {
    }
 
    public static String listToString(List<TreeItem> stack, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      String ret = "";
+      StringBuffer ret = new StringBuffer();
       for (int d = 0; d < stack.size(); d++) {
          TreeItem o = stack.get(d);
-         ret += o.toStringSemicoloned(constants, localRegNames, fullyQualifiedNames) + "\r\n";
+         ret.append(o.toStringSemicoloned(constants, localRegNames, fullyQualifiedNames) + "\r\n");
       }
-      return ret;
+      return ret.toString();
    }
 
    private static String innerStackToString(List stack) {
@@ -1897,6 +1903,7 @@ public class AVM2Code implements Serializable {
          try{
                list = Graph.translateViaGraph(path,this, abc, body);
             }catch(Exception ex2){
+               Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, "Decompilation error in "+path,ex2);
                return "/*\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error Message: " + ex2.getMessage() + "\r\n */";         
             }
          /*try{
@@ -1985,7 +1992,7 @@ public class AVM2Code implements Serializable {
             }
          }
 
-         s = listToString(list, constants, localRegNames, fullyQualifiedNames);
+         s = listToString(list, constants, localRegNames, fullyQualifiedNames);        
       /*} catch (Exception ex) {
          Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, "Error in method "+path, ex);
          s = "/ *\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error Message: " + ex.getMessage() + "\r\n * /";
@@ -1993,13 +2000,13 @@ public class AVM2Code implements Serializable {
       }*/
 
 
-      String sub = "";
+      StringBuffer sub = new StringBuffer();
       int level = 0;
 
       String parts[] = s.split("\r\n");
 
       boolean processLoops = true;
-
+      
       if (processLoops) {
          try {
             Stack<String> loopStack = new Stack<String>();
@@ -2066,20 +2073,22 @@ public class AVM2Code implements Serializable {
             level--;
          } else if (strippedP.equals("{")) {
             level++;
-            sub += tabString(level) + parts[p] + "\r\n";
+            sub.append(tabString(level) + parts[p] + "\r\n");
             level++;
          } else if (strippedP.equals("}") || strippedP.equals("};")) {
             level--;
-            sub += tabString(level) + parts[p] + "\r\n";
+            sub.append(tabString(level) + parts[p] + "\r\n");
             level--;
          } else {
-            sub += tabString(level) + parts[p] + "\r\n";
+            sub.append(tabString(level) + parts[p] + "\r\n");
          }
       }
       if (!hilighted) {
-         sub = Highlighting.stripHilights(sub);
+         return Highlighting.stripHilights(sub.toString());
       }
-      return sub;
+      String ret=sub.toString();
+      
+      return ret;
    }
 
    public static void main(String[] args) {

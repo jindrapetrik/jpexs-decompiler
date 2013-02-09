@@ -22,12 +22,14 @@ import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.avm2.instructions.SetTypeIns;
+import com.jpexs.asdec.abc.avm2.treemodel.ClassTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.DecrementTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.GetSlotTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.IncrementTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.PostDecrementTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.PostIncrementTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.SetSlotTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.ThisTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.clauses.ExceptionTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.operations.PreDecrementTreeItem;
@@ -50,24 +52,31 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
       int slotIndex = ins.operands[0];
       TreeItem value = (TreeItem) stack.pop();
       TreeItem obj = (TreeItem) stack.pop(); //scopeId
-
-      if (obj instanceof ExceptionTreeItem) {
-         return;
-      }
-      //if(value.startsWith("catched ")) return;
       Multiname slotname = null;
-      for (int t = 0; t < body.traits.traits.length; t++) {
-         if (body.traits.traits[t] instanceof TraitSlotConst) {
-            if (((TraitSlotConst) body.traits.traits[t]).slot_id == slotIndex) {
-               slotname = body.traits.traits[t].getName(abc);
-            }
-         }
+      if (obj instanceof ExceptionTreeItem) {
+         slotname = constants.constant_multiname[((ExceptionTreeItem) obj).exception.name_index];
+      } else if (obj instanceof ClassTreeItem) {
+         slotname = ((ClassTreeItem) obj).className;
+      } else if (obj instanceof ThisTreeItem) {
+         slotname = ((ThisTreeItem) obj).className;
+      } else {
+         //if(value.startsWith("catched ")) return;
 
+         for (int t = 0; t < body.traits.traits.length; t++) {
+            if (body.traits.traits[t] instanceof TraitSlotConst) {
+               if (((TraitSlotConst) body.traits.traits[t]).slot_id == slotIndex) {
+                  slotname = body.traits.traits[t].getName(abc);
+               }
+            }
+
+         }
       }
 
-      if (localRegNames.containsValue(slotname.getName(constants, fullyQualifiedNames))) {
-         return;
-      };
+      if (slotname != null) {
+         if (localRegNames.containsValue(slotname.getName(constants, fullyQualifiedNames))) {
+            return;
+         };
+      }
 
       if (value.getNotCoerced() instanceof IncrementTreeItem) {
          TreeItem inside = ((IncrementTreeItem) value.getNotCoerced()).object.getThroughRegister().getNotCoerced();

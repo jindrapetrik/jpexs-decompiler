@@ -283,6 +283,14 @@ public class TraitClass extends Trait {
    }
 
    @Override
+   public String convertHeader(String path, List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+     String classHeader = abc.instance_info[class_info].getClassHeaderStr(abc, fullyQualifiedNames);
+     return classHeader;
+   }
+
+   
+   
+   @Override
    public String convert(String path,List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
       if (!highlight) {
          Highlighting.doHighlight = false;

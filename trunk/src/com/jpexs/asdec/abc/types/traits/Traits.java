@@ -56,6 +56,7 @@ public class Traits implements Serializable{
             s += "\r\n\r\n";
          }
          String plus;
+         //System.out.println(path+":"+traits[t].convertHeader(path, abcTags, abc, isStatic, pcode, classIndex, highlighting, fullyQualifiedNames));
          if (makePackages) {
             plus = traits[t].convertPackaged(path,abcTags, abc, isStatic, pcode, classIndex, highlighting, fullyQualifiedNames);
          } else {

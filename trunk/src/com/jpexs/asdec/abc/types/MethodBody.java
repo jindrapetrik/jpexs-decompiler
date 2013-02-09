@@ -36,7 +36,7 @@ import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class MethodBody implements Cloneable,Serializable {
+public class MethodBody implements Cloneable, Serializable {
 
    public int method_info;
    public int max_stack;
@@ -94,26 +94,33 @@ public class MethodBody implements Cloneable,Serializable {
       return ret;
    }
 
-   public String toString(String path,boolean pcode, boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], Stack<TreeItem> scopeStack, boolean isStaticInitializer, boolean hilight, List<String> fullyQualifiedNames, Traits initTraits) {
+   public String toString(String path, boolean pcode, boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], Stack<TreeItem> scopeStack, boolean isStaticInitializer, boolean hilight, List<String> fullyQualifiedNames, Traits initTraits) {
       String s = "";
+      if (!Main.DO_DECOMPILE) {
+         s = "//NOT DECOMPILED";
+         if (hilight) {
+            s = Highlighting.hilighMethod(s, this.method_info);
+         }
+         return s;
+      }
       if (pcode) {
          s += code.toASMSource(constants, this);
       } else {
          AVM2Code deobfuscated = null;
-         MethodBody b=(MethodBody)Helper.deepCopy(this);
+         MethodBody b = (MethodBody) Helper.deepCopy(this);
          deobfuscated = b.code;
          deobfuscated.markMappedOffsets();
          deobfuscated.removeTraps(constants, b);
-         deobfuscated.restoreControlFlow(constants, b);    
+         deobfuscated.restoreControlFlow(constants, b);
          try {
-            s += deobfuscated.toSource(path,isStatic, classIndex, abc, constants, method_info, b, hilight, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
+            s += deobfuscated.toSource(path, isStatic, classIndex, abc, constants, method_info, b, hilight, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
             s = s.trim();
             if (hilight) {
                s = Highlighting.hilighMethod(s, this.method_info);
             }
          } catch (Exception ex) {
             s = "//error:" + ex.toString();
-         }         
+         }
       }
       return s;
    }
