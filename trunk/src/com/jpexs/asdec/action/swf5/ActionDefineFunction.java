@@ -23,12 +23,19 @@ import com.jpexs.asdec.action.parser.ASMParser;
 import com.jpexs.asdec.action.parser.FlasmLexer;
 import com.jpexs.asdec.action.parser.Label;
 import com.jpexs.asdec.action.parser.ParseException;
+import com.jpexs.asdec.action.swf4.ActionPush;
+import com.jpexs.asdec.action.swf7.ActionDefineFunction2;
+import com.jpexs.asdec.action.treemodel.ConstantPool;
+import com.jpexs.asdec.action.treemodel.FunctionTreeItem;
+import com.jpexs.asdec.action.treemodel.TreeItem;
 import com.jpexs.asdec.helpers.Helper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
 public class ActionDefineFunction extends Action {
 
@@ -36,9 +43,24 @@ public class ActionDefineFunction extends Action {
    public List<String> paramNames = new ArrayList<String>();
    public List<Action> code;
    public int codeSize;
+   private int version;
 
+   public void setConstantPool(List<String> constantPool){
+      for(Action a:code){
+         if(a instanceof ActionPush){
+            ((ActionPush)a).constantPool=constantPool;
+         }
+         if(a instanceof ActionDefineFunction2){
+            ((ActionDefineFunction2)a).setConstantPool(constantPool);
+         }
+         if(a instanceof ActionDefineFunction){
+            ((ActionDefineFunction)a).setConstantPool(constantPool);
+         }
+      }
+   }
    public ActionDefineFunction(int actionLength, SWFInputStream sis, int version) throws IOException {
       super(0x9B, actionLength);
+      this.version=version;
       //byte data[]=sis.readBytes(actionLength);
       //sis=new SWFInputStream(new ByteArrayInputStream(data),version);
       functionName = sis.readString();
@@ -126,5 +148,11 @@ public class ActionDefineFunction extends Action {
    @Override
    public List<Action> getAllIfsOrJumps() {
       return Action.getActionsAllIfsOrJumps(code);
+   }
+   
+   
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, HashMap<Integer, String> regNames) {
+      stack.push(new FunctionTreeItem(this, functionName, paramNames, Action.actionsToTree(regNames, code,version ), constants));
    }
 }

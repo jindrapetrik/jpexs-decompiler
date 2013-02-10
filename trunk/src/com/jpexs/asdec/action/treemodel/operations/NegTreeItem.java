@@ -24,4 +24,11 @@ public class NegTreeItem extends UnaryOpTreeItem {
    public NegTreeItem(Action instruction, TreeItem value) {
       super(instruction, PRECEDENCE_UNARY, value, "-");
    }
+
+   @Override
+   public double toNumber() {
+      return -value.toNumber();
+   }
+   
+   
 }

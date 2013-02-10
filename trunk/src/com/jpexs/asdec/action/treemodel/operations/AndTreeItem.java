@@ -24,4 +24,11 @@ public class AndTreeItem extends BinaryOpTreeItem {
    public AndTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
       super(instruction, PRECEDENCE_LOGICALAND, leftSide, rightSide, "&&");
    }
+
+   @Override
+   public boolean toBoolean() {
+      return leftSide.toBoolean()&&rightSide.toBoolean();
+   }
+   
+   
 }

@@ -24,4 +24,9 @@ public class GtTreeItem extends BinaryOpTreeItem {
    public GtTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
       super(instruction, PRECEDENCE_RELATIONAL, leftSide, rightSide, ">");
    }
+   
+   @Override
+   public boolean toBoolean() {
+      return leftSide.toNumber()>rightSide.toNumber();
+   }
 }

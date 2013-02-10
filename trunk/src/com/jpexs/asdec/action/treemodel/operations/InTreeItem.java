@@ -24,4 +24,11 @@ public class InTreeItem extends BinaryOpTreeItem {
    public InTreeItem(Action instruction, TreeItem name, TreeItem object) {
       super(instruction, PRECEDENCE_RELATIONAL, name, object, " in ");
    }
+
+   @Override
+   public boolean isCompileTime() {
+      return false;
+   }
+   
+   
 }

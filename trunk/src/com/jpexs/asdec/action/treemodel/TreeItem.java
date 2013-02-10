@@ -96,4 +96,17 @@ public abstract class TreeItem {
          return target.toString();
       }
    }
+   
+   public boolean isCompileTime(){
+      return false;
+   }
+   
+   
+   public double toNumber(){
+      return 0;
+   }
+   
+   public boolean toBoolean(){
+      return Double.compare(toNumber(),0.0)!=0;
+   }
 }

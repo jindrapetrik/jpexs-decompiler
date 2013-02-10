@@ -24,4 +24,9 @@ public class NeqTreeItem extends BinaryOpTreeItem {
    public NeqTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
       super(instruction, PRECEDENCE_EQUALITY, leftSide, rightSide, "!=");
    }
+   
+   @Override
+   public boolean toBoolean() {
+      return (leftSide.toNumber()!=rightSide.toNumber())||(leftSide.toBoolean()!=rightSide.toBoolean());
+   }
 }

@@ -24,4 +24,11 @@ public class BitNotTreeItem extends UnaryOpTreeItem {
    public BitNotTreeItem(Action instruction, TreeItem value) {
       super(instruction, PRECEDENCE_UNARY, value, "~");
    }
+
+   @Override
+   public double toNumber() {
+      return ~((int)value.toNumber());
+   }
+   
+   
 }

@@ -71,5 +71,5 @@ public class ActionGetURL extends Action {
    @Override
    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
       output.add(new GetURLTreeItem(this, urlString, targetString));
-   }
+   }   
 }

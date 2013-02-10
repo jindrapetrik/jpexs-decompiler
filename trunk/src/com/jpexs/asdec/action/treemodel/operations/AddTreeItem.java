@@ -24,4 +24,11 @@ public class AddTreeItem extends BinaryOpTreeItem {
    public AddTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
       super(instruction, PRECEDENCE_ADDITIVE, leftSide, rightSide, "+");
    }
+
+   @Override
+   public double toNumber() {
+      return leftSide.toNumber()+rightSide.toNumber();
+   }
+   
+   
 }

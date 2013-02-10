@@ -23,12 +23,19 @@ import com.jpexs.asdec.action.parser.ASMParser;
 import com.jpexs.asdec.action.parser.FlasmLexer;
 import com.jpexs.asdec.action.parser.Label;
 import com.jpexs.asdec.action.parser.ParseException;
+import com.jpexs.asdec.action.swf4.ActionPush;
+import com.jpexs.asdec.action.swf5.ActionDefineFunction;
+import com.jpexs.asdec.action.treemodel.ConstantPool;
+import com.jpexs.asdec.action.treemodel.FunctionTreeItem;
+import com.jpexs.asdec.action.treemodel.TreeItem;
 import com.jpexs.asdec.helpers.Helper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
 public class ActionDefineFunction2 extends Action {
 
@@ -47,9 +54,25 @@ public class ActionDefineFunction2 extends Action {
    public int registerCount;
    public int codeSize;
    public List<Action> code;
+   private int version;
 
+   public void setConstantPool(List<String> constantPool){
+      for(Action a:code){
+         if(a instanceof ActionPush){
+            ((ActionPush)a).constantPool=constantPool;
+         }
+         if(a instanceof ActionDefineFunction2){
+            ((ActionDefineFunction2)a).setConstantPool(constantPool);
+         }
+         if(a instanceof ActionDefineFunction){
+            ((ActionDefineFunction)a).setConstantPool(constantPool);
+         }
+      }
+   }
+   
    public ActionDefineFunction2(int actionLength, SWFInputStream sis, int version) throws IOException {
       super(0x8E, actionLength);
+      this.version=version;              
       functionName = sis.readString();
       int numParams = sis.readUI16();
       registerCount = sis.readUI8();
@@ -184,6 +207,18 @@ public class ActionDefineFunction2 extends Action {
               + " " + preloadThisFlag
               + " " + preloadGlobalFlag).trim() + " " + paramStr + " {\r\n" + Action.actionsToString(code, knownAddreses, constantPool, version) + "}";
    }
+
+   @Override
+   public String toString() {
+      return "DefineFunction2";
+   }
+
+   @Override
+   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, HashMap<Integer, String> regNames) {
+      stack.push(new FunctionTreeItem(this, functionName, paramNames, Action.actionsToTree(regNames, code,version ), constants));
+   }
+   
+   
 
    @Override
    public List<Long> getAllRefs(int version) {

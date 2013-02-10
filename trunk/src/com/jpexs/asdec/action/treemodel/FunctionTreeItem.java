@@ -30,7 +30,7 @@ public class FunctionTreeItem extends TreeItem {
    public FunctionTreeItem(Action instruction, String functionName, List<String> paramNames, List<TreeItem> actions, ConstantPool constants) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.actions = actions;
-      this.constants = constants.constants;
+      this.constants = constants==null?null:constants.constants;
       this.functionName = functionName;
       this.paramNames = paramNames;
    }

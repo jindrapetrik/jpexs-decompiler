@@ -24,4 +24,11 @@ public class IsTypeTreeItem extends BinaryOpTreeItem {
    public IsTypeTreeItem(Action instruction, TreeItem value, TreeItem type) {
       super(instruction, PRECEDENCE_RELATIONAL, value, type, " is ");
    }
+
+   @Override
+   public boolean isCompileTime() {
+      return false;
+   }
+   
+   
 }

@@ -31,4 +31,16 @@ public class IncrementTreeItem extends TreeItem {
    public String toString(ConstantPool constants) {
       return object.toString(constants) + hilight("+1");
    }
+   
+   @Override
+   public boolean isCompileTime(){
+      return object.isCompileTime();
+   }
+
+   @Override
+   public double toNumber() {
+      return object.toNumber()+1;
+   }
+   
+   
 }

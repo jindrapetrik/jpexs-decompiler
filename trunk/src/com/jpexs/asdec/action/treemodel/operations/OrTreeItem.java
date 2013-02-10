@@ -24,4 +24,11 @@ public class OrTreeItem extends BinaryOpTreeItem {
    public OrTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
       super(instruction, PRECEDENCE_LOGICALOR, leftSide, rightSide, "||");
    }
+
+   @Override
+   public boolean toBoolean() {
+      return leftSide.toBoolean()||rightSide.toBoolean();
+   }
+   
+   
 }

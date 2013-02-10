@@ -24,4 +24,11 @@ public class PreIncrementTreeItem extends UnaryOpTreeItem {
    public PreIncrementTreeItem(Action instruction, TreeItem object) {
       super(instruction, PRECEDENCE_UNARY, object, "++");
    }
+
+   @Override
+   public double toNumber() {
+      return value.toNumber()+1;
+   }
+   
+   
 }

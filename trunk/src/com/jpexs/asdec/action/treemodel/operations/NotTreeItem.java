@@ -34,4 +34,12 @@ public class NotTreeItem extends UnaryOpTreeItem {
    public boolean isFalse() {
       return !value.isFalse();
    }
+
+   @Override
+   public boolean toBoolean() {
+      boolean ret= !value.toBoolean();
+      return ret;
+   }
+   
+   
 }

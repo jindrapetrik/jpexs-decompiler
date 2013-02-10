@@ -16,13 +16,18 @@
  */
 package com.jpexs.asdec;
 
+import com.jpexs.asdec.abc.avm2.instructions.other.NopIns;
 import com.jpexs.asdec.action.Action;
+import com.jpexs.asdec.action.special.ActionNop;
 import com.jpexs.asdec.action.swf3.*;
 import com.jpexs.asdec.action.swf4.*;
 import com.jpexs.asdec.action.swf5.*;
 import com.jpexs.asdec.action.swf6.*;
 import com.jpexs.asdec.action.swf7.*;
+import com.jpexs.asdec.action.treemodel.ConstantPool;
+import com.jpexs.asdec.action.treemodel.TreeItem;
 import com.jpexs.asdec.helpers.Helper;
+import com.jpexs.asdec.helpers.Highlighting;
 import com.jpexs.asdec.tags.*;
 import com.jpexs.asdec.types.*;
 import com.jpexs.asdec.types.filters.*;
@@ -31,11 +36,13 @@ import com.jpexs.asdec.types.shaperecords.EndShapeRecord;
 import com.jpexs.asdec.types.shaperecords.SHAPERECORD;
 import com.jpexs.asdec.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.asdec.types.shaperecords.StyleChangeRecord;
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 import java.util.logging.Logger;
@@ -54,6 +61,31 @@ public class SWFInputStream extends InputStream {
    private static final Logger log = Logger.getLogger(SWFInputStream.class.getName());
    private List<PercentListener> listeners = new ArrayList<PercentListener>();
    private long percentMax;
+   private List<byte[]> buffered = new ArrayList<byte[]>();
+   private ByteArrayOutputStream buffer;
+
+   public int getBufferLength() {
+      return buffer.size();
+   }
+
+   public void startBuffer() {
+      stopBuffer();
+      buffer = new ByteArrayOutputStream();
+   }
+
+   public byte[] getBuffer() {
+      return buffer.toByteArray();
+   }
+
+   public byte[] stopBuffer() {
+      if (buffer != null) {
+         byte[] ret = buffer.toByteArray();
+         buffered.add(ret);
+         buffer = null;
+         return ret;
+      }
+      return null;
+   }
 
    public void addPercentListener(PercentListener listener) {
       listeners.add(listener);
@@ -448,12 +480,116 @@ public class SWFInputStream extends InputStream {
     * @throws IOException
     */
    public List<Action> readActionList() throws IOException {
+      List<Action> retdups = new ArrayList<Action>();
+      ConstantPool cpool = null;
+
+      Stack<TreeItem> stack = new Stack<TreeItem>();
+
+      ReReadableInputStream rri = new ReReadableInputStream(this);
+      SWFInputStream sis = new SWFInputStream(rri, version);
+      readActionListAtPos(stack, cpool, sis, rri, 0, retdups);
       List<Action> ret = new ArrayList<Action>();
-      Action a;
-      while ((a = readAction()) != null) {
-         ret.add(a);
+      Action last = null;
+      for (Action a : retdups) {
+         if (a != last) {
+            ret.add(a);
+         }
+         last = a;
       }
       return ret;
+   }
+
+   private void readActionListAtPos(Stack<TreeItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret) throws IOException {
+      rri.setPos(ip);
+      Action a;
+      List<TreeItem> output = new ArrayList<TreeItem>();
+      long filePos = rri.getPos();
+      while ((a = sis.readAction()) != null) {
+         if (a instanceof ActionPush) {
+            if (cpool != null) {
+               ((ActionPush) a).constantPool = cpool.constants;
+            }
+         }
+         if (a instanceof ActionDefineFunction) {
+            if (cpool != null) {
+               ((ActionDefineFunction) a).setConstantPool(cpool.constants);
+            }
+         }
+         if (a instanceof ActionDefineFunction2) {
+            if (cpool != null) {
+               ((ActionDefineFunction2) a).setConstantPool(cpool.constants);
+            }
+         }
+         long newFilePos = rri.getPos();
+         long actionLen = newFilePos - filePos;
+
+         ensureCapacity(ret, ip);
+         int newip = -1;
+         if (!(ret.get(ip) instanceof ActionNop)) {
+            break;
+         }
+
+         if (a instanceof ActionConstantPool) {
+            if (cpool == null) {
+               cpool = new ConstantPool();
+            }
+            cpool.constants = ((ActionConstantPool) a).constantPool;
+         }
+         Action beforeInsert = null;
+         ActionIf aif = null;
+         boolean goaif = false;
+         if (a instanceof ActionIf) {
+            aif = (ActionIf) a;
+            TreeItem top = stack.pop();
+            if (top.isCompileTime()) {
+               if (top.toBoolean()) {
+                  newip = rri.getPos() + aif.offset;
+                  rri.setPos(newip);
+                  a = new ActionJump(aif.offset);
+               } else {
+                  a = new ActionNop();
+               }
+               beforeInsert = new ActionPop();
+            } else {
+               goaif = true;
+            }
+         } else if (a instanceof ActionJump) {
+            newip = rri.getPos() + ((ActionJump) a).offset;
+            rri.setPos(newip);
+         } else {
+            a.translate(stack, cpool, output, new HashMap<Integer, String>());
+         }
+         for (int i = 0; i < actionLen; i++) {
+            ensureCapacity(ret, ip + i);
+            if (a instanceof ActionNop) {
+               a = new ActionNop();
+               if (i == 0) {
+                  a.beforeInsert = beforeInsert;
+               }
+            } else {
+               a.beforeInsert = beforeInsert;
+            }
+            ret.set(ip + i, a);
+         }
+
+         if (newip > -1) {
+            ip = newip;
+         } else {
+            ip = ip + (int) actionLen;
+         }
+         filePos = rri.getPos();
+         if (goaif) {
+            int oldPos = rri.getPos();
+            readActionListAtPos(stack, cpool, sis, rri, rri.getPos() + aif.offset, ret);
+            rri.setPos(oldPos);
+         }
+      }
+   }
+
+   private void ensureCapacity(List<Action> ret, int index) {
+      while (ret.size() <= index) {
+         ret.add(new ActionNop());
+      }
    }
 
    private static void dumpTag(PrintStream out, int version, Tag tag, int level) {

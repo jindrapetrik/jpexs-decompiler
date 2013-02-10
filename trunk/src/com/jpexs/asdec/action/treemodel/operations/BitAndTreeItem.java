@@ -24,4 +24,9 @@ public class BitAndTreeItem extends BinaryOpTreeItem {
    public BitAndTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
       super(instruction, PRECEDENCE_BITWISEAND, leftSide, rightSide, "&");
    }
+   
+   @Override
+   public double toNumber() {
+      return ((int)leftSide.toNumber())&((int)rightSide.toNumber());
+   }
 }

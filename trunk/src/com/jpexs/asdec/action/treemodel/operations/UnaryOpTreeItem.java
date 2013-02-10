@@ -39,4 +39,9 @@ public abstract class UnaryOpTreeItem extends TreeItem {
       }
       return hilight(operator) + s;
    }
+   
+   @Override
+   public boolean isCompileTime(){
+      return value.isCompileTime();
+   }
 }

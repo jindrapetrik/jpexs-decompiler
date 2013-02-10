@@ -21,6 +21,7 @@ import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.helpers.Highlighting;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
 public abstract class TreeItem {
 

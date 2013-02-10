@@ -24,4 +24,11 @@ public class StringEqTreeItem extends BinaryOpTreeItem {
    public StringEqTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
       super(instruction, PRECEDENCE_EQUALITY, leftSide, rightSide, "==");
    }
+
+   @Override
+   public boolean isCompileTime() {
+      return false;
+   }
+   
+   
 }

@@ -24,4 +24,9 @@ public class StrictEqTreeItem extends BinaryOpTreeItem {
    public StrictEqTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
       super(instruction, PRECEDENCE_EQUALITY, leftSide, rightSide, "===");
    }
+   
+   @Override
+   public boolean toBoolean() {
+      return (leftSide.toBoolean()==rightSide.toBoolean())&&(leftSide.toNumber()==rightSide.toNumber());
+   }
 }

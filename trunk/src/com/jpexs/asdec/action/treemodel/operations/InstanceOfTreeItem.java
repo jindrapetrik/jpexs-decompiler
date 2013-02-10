@@ -24,4 +24,11 @@ public class InstanceOfTreeItem extends BinaryOpTreeItem {
    public InstanceOfTreeItem(Action instruction, TreeItem value, TreeItem type) {
       super(instruction, PRECEDENCE_RELATIONAL, value, type, " instanceof ");
    }
+
+   @Override
+   public boolean isCompileTime() {
+      return false;
+   }
+   
+   
 }

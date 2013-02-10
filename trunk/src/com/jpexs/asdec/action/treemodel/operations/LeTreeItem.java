@@ -24,4 +24,9 @@ public class LeTreeItem extends BinaryOpTreeItem {
    public LeTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
       super(instruction, PRECEDENCE_RELATIONAL, leftSide, rightSide, "<=");
    }
+   
+   @Override
+   public boolean toBoolean() {
+      return leftSide.toNumber()<=rightSide.toNumber();
+   }
 }

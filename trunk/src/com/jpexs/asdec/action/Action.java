@@ -21,6 +21,7 @@ import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.action.parser.FlasmLexer;
 import com.jpexs.asdec.action.parser.ParseException;
 import com.jpexs.asdec.action.parser.ParsedSymbol;
+import com.jpexs.asdec.action.special.ActionNop;
 import com.jpexs.asdec.action.swf4.*;
 import com.jpexs.asdec.action.swf5.*;
 import com.jpexs.asdec.action.swf6.ActionEnumerate2;
@@ -46,6 +47,7 @@ import java.util.logging.Logger;
  */
 public class Action {
 
+   public Action beforeInsert;
    /**
     * Action type identifier
     */
@@ -361,29 +363,17 @@ public class Action {
       }
 
       offset = 0;
-      if (Main.LATEST_CONSTANTPOOL_HACK) {
-         for (Action a : list) {
-            if (a instanceof ActionConstantPool) {
-               constantPool.clear();
-               constantPool.addAll(((ActionConstantPool) a).constantPool);
-            }
-         }
-      }
-      for (Action a : list) {
-         if (!Main.LATEST_CONSTANTPOOL_HACK) {
-            if (a instanceof ActionConstantPool) {
-               constantPool.clear();
-               constantPool.addAll(((ActionConstantPool) a).constantPool);
-            }
-         }
-         if (a instanceof ActionPush) {
-            ((ActionPush) a).constantPool = constantPool;
-         }
+      for (Action a : list) {         
          offset = a.getAddress();
          if (importantOffsets.contains(offset)) {
             ret += "loc" + Helper.formatAddress(offset) + ":";
          }
-         ret += Highlighting.hilighOffset("", offset) + a.getASMSource(importantOffsets, constantPool, version) + "\r\n";
+         if(a.beforeInsert!=null){
+            ret+=a.beforeInsert.getASMSource(importantOffsets, constantPool, version) + "\r\n";
+         }
+         if(!(a instanceof ActionNop)){
+            ret += Highlighting.hilighOffset("", offset) + a.getASMSource(importantOffsets, constantPool, version) + "\r\n";
+         }
          offset += a.getBytes(version).length;
       }
       if (importantOffsets.contains(offset)) {

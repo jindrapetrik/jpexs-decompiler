@@ -49,4 +49,8 @@ public abstract class BinaryOpTreeItem extends TreeItem {
       }
       return ret;
    }
+   @Override
+   public boolean isCompileTime(){
+      return leftSide.isCompileTime()&&rightSide.isCompileTime();
+   }
 }

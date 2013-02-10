@@ -24,4 +24,11 @@ public class PreDecrementTreeItem extends UnaryOpTreeItem {
    public PreDecrementTreeItem(Action instruction, TreeItem object) {
       super(instruction, PRECEDENCE_UNARY, object, "--");
    }
+
+   @Override
+   public double toNumber() {
+      return value.toNumber()-1;
+   }
+   
+   
 }

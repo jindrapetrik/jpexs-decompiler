@@ -24,4 +24,11 @@ public class SubtractTreeItem extends BinaryOpTreeItem {
    public SubtractTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
       super(instruction, PRECEDENCE_ADDITIVE, leftSide, rightSide, "-");
    }
+
+   @Override
+   public double toNumber() {
+      return leftSide.toNumber()-rightSide.toNumber();
+   }
+   
+   
 }

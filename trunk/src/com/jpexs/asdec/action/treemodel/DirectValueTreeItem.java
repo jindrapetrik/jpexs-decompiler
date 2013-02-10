@@ -35,6 +35,29 @@ public class DirectValueTreeItem extends TreeItem {
    }
 
    @Override
+   public double toNumber() {
+      if(value instanceof Double){
+         return (Double)value;
+      }
+      if(value instanceof Float){
+         return (Float)value;
+      }
+      if(value instanceof Long){
+         return (Long)value;
+      }
+      return super.toNumber();
+   }
+
+   @Override
+   public boolean toBoolean() {
+      boolean ret=(value instanceof Boolean)?(Boolean)value:false;
+      return ret;
+   }
+   
+   
+   
+
+   @Override
    public String toStringNoQuotes(ConstantPool constants) {
       if (value instanceof Double) {
          if (Double.compare((double) (Double) value, 0) == 0) {
@@ -74,5 +97,10 @@ public class DirectValueTreeItem extends TreeItem {
          return hilight("\"" + Helper.escapeString(this.constants.get(((ConstantIndex) value).index)) + "\"");
       }
       return hilight(value.toString());
+   }
+   
+   @Override
+   public boolean isCompileTime(){
+      return (value instanceof Double)||(value instanceof Float)||(value instanceof Boolean)||(value instanceof Long);
    }
 }

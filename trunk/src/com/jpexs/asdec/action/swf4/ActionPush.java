@@ -201,7 +201,11 @@ public class ActionPush extends Action {
    public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
       for (Object o : values) {
          if (o instanceof ConstantIndex) {
-            o = constants.constants.get(((ConstantIndex) o).index);
+            if((constants==null)||(((ConstantIndex) o).index>=constants.constants.size())){
+               o="CONSTNOTFOUND";
+            }else{
+               o = constants.constants.get(((ConstantIndex) o).index);
+            }
          }
          if (o instanceof RegisterNumber) {
             if (regNames.containsKey(((RegisterNumber) o).number)) {
