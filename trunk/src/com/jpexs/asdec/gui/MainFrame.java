@@ -333,7 +333,7 @@ public class MainFrame extends JFrame implements ActionListener {
          if (actionPanel.tagTree.getRowCount() > 1) {
             addTab(tabPane, actionPanel, "ActionScript", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/asdec/gui/graphics/as16.png")));
          }
-         miDeobfuscation.setEnabled(false);
+         menuDeobfuscation.setEnabled(false);
       }
 
       if (!shapes.isEmpty()) {
