@@ -1,4 +1,4 @@
-package com.jpexs.asdec.abc.avm2.flowgraph;
+package com.jpexs.asdec.graph;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class GraphPartMulti extends GraphPart {
 
-   List<GraphPart> parts;
+   public List<GraphPart> parts;
 
    public GraphPartMulti(List<GraphPart> parts) {
       super(parts.get(0).start, parts.get(parts.size() - 1).end);

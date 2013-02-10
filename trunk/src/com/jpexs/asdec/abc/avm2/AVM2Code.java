@@ -20,7 +20,7 @@ import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.ABCInputStream;
 import com.jpexs.asdec.abc.CopyOutputStream;
-import com.jpexs.asdec.abc.avm2.flowgraph.Graph;
+import com.jpexs.asdec.abc.avm2.graph.AVM2Graph;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
@@ -1901,7 +1901,7 @@ public class AVM2Code implements Serializable {
       //try {
 
          try{
-               list = Graph.translateViaGraph(path,this, abc, body);
+               list = AVM2Graph.translateViaGraph(path,this, abc, body);
             }catch(Exception ex2){
                Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, "Decompilation error in "+path,ex2);
                return "/*\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error Message: " + ex2.getMessage() + "\r\n */";         

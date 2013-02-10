@@ -14,8 +14,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.asdec.abc.avm2.flowgraph;
+package com.jpexs.asdec.abc.avm2.graph;
 
+import com.jpexs.asdec.graph.Graph;
+import com.jpexs.asdec.graph.GraphPart;
+import com.jpexs.asdec.graph.Loop;
+import com.jpexs.asdec.graph.GraphPartMulti;
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConvertException;
@@ -85,69 +89,26 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class Graph {
+public class AVM2Graph extends Graph{
 
-   public List<GraphPart> heads;
    private AVM2Code code;
    private ABC abc;
    private MethodBody body;
 
-   public Graph(AVM2Code code, ABC abc, MethodBody body) {
+   public AVM2Graph(AVM2Code code, ABC abc, MethodBody body) {
       heads = makeGraph(code, new ArrayList<GraphPart>(), body);
       this.code = code;
       this.abc = abc;
       this.body = body;
       for (GraphPart head : heads) {
-         fixGraph(head);
-         //makeMulti(head, new ArrayList<GraphPart>());
+         fixGraph(head);         
       }
    }
 
-   private void makeMulti(GraphPart part, List<GraphPart> visited) {
-      if (visited.contains(part)) {
-         return;
-      }
-      visited.add(part);
-      GraphPart p = part;
-      List<GraphPart> multiList = new ArrayList<GraphPart>();
-      multiList.add(p);
-      while ((p.nextParts.size() == 1) && (p.nextParts.get(0).refs.size() == 1)) {
-         p = p.nextParts.get(0);
-         multiList.add(p);
-      }
-      if (multiList.size() > 1) {
-         GraphPartMulti gpm = new GraphPartMulti(multiList);
-         gpm.refs = part.refs;
-         GraphPart lastPart = multiList.get(multiList.size() - 1);
-         gpm.nextParts = lastPart.nextParts;
-         for (GraphPart next : gpm.nextParts) {
-            int index = next.refs.indexOf(lastPart);
-            if (index == -1) {
-
-               continue;
-            }
-            next.refs.remove(lastPart);
-            next.refs.add(index, gpm);
-         }
-         for (GraphPart parent : part.refs) {
-            if (parent.start == -1) {
-               continue;
-            }
-            int index = parent.nextParts.indexOf(part);
-            if (index == -1) {
-               continue;
-            }
-            parent.nextParts.remove(part);
-            parent.nextParts.add(index, gpm);
-         }
-      }
-      for (int i = 0; i < part.nextParts.size(); i++) {
-         makeMulti(part.nextParts.get(i), visited);
-      }
-   }
+  
 
    public static List<TreeItem> translateViaGraph(String path, AVM2Code code, ABC abc, MethodBody body) {
-      Graph g = new Graph(code, abc, body);
+      AVM2Graph g = new AVM2Graph(code, abc, body);
       List<GraphPart> allParts = new ArrayList<GraphPart>();
       for (GraphPart head : g.heads) {
          populateParts(head, allParts);
@@ -155,37 +116,7 @@ public class Graph {
       return g.printGraph(path, new Stack<TreeItem>(), new Stack<TreeItem>(), allParts, new ArrayList<ABCException>(), new ArrayList<Integer>(), 0, null, g.heads.get(0), null, new ArrayList<Loop>(), new HashMap<Integer, TreeItem>(), body, new ArrayList<Integer>());
    }
 
-   private static void populateParts(GraphPart part, List<GraphPart> allParts) {
-      if (allParts.contains(part)) {
-         return;
-      }
-      allParts.add(part);
-      for (GraphPart p : part.nextParts) {
-         populateParts(p, allParts);
-      }
-   }
-
-   private String strOfChars(int len, String chars) {
-      String ret = "";
-      for (int i = 0; i < len; i++) {
-         ret += chars;
-      }
-      return ret;
-   }
-   private static final String TAB = "   ";
-
-   private String printOutput(int level, List<TreeItem> output, List<String> fqn, HashMap<Integer, String> lrn) {
-      String s = Highlighting.stripHilights(code.listToString(output, abc.constants, lrn, fqn));
-      String parts[] = s.split("\n");
-      String ret = "";
-      for (String p : parts) {
-         if (p.trim().equals("")) {
-            continue;
-         }
-         ret += (strOfChars(level, TAB) + p.trim()) + "\r\n";
-      }
-      return ret;
-   }
+   
 
    private TreeItem checkLoop(GraphPart part, GraphPart stopPart, List<Loop> loops) {
       if (part == stopPart) {
@@ -394,7 +325,7 @@ public class Graph {
                //((IfTypeIns)ins.definition).translateInverted(new HashMap<Integer,TreeItem>(), co.stack, ins);
             }
          } catch (ConvertException ex) {
-            Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(AVM2Graph.class.getName()).log(Level.SEVERE, null, ex);
          }
 
          int ip = part.start;
@@ -615,8 +546,11 @@ public class Graph {
                   }
                   finalPart = fex.continuePart;
                   isFor = true;
-                  for (ContinueTreeItem cti : finalPart.forContinues) {
-                     cti.loopPos = breakIp;
+                  for (Object o : finalPart.forContinues) {
+                     if(o instanceof ContinueTreeItem)
+                     {
+                        ((ContinueTreeItem)o).loopPos = breakIp;
+                     }
                   }
                }
                if (isFor) {
@@ -867,135 +801,7 @@ public class Graph {
       return ret;
    }
 
-   private void fixGraph(GraphPart part) {
-      while (fixGraphOnce(part, new ArrayList<GraphPart>(), false)) {
-      }
-   }
-
-   private boolean fixGraphOnce(GraphPart part, List<GraphPart> visited, boolean doChildren) {
-      if (visited.contains(part)) {
-         return false;
-      }
-      visited.add(part);
-      boolean fixed = false;
-      /*System.out.print("Part " + part.start + "-" + part.end + " refs:");
-       for (GraphPart gp : part.refs) {
-       System.out.print(gp.path + " ");
-       }
-       System.out.println("");*/
-      int i = 1;
-      String lastpref = null;
-      boolean modify = true;
-      int prvni = -1;
-
-      if (!doChildren) {
-
-         List<GraphPart> uniqueRefs = new ArrayList<GraphPart>();
-         for (GraphPart r : part.refs) {
-            if (!uniqueRefs.contains(r)) {
-               uniqueRefs.add(r);
-            }
-         }
-         loopi:
-         for (; i <= part.path.length(); i++) {
-            lastpref = null;
-            int pos = -1;
-            for (GraphPart r : uniqueRefs) {
-               pos++;
-               if (r.path.startsWith("e")) {
-                  continue;
-               }
-               if (part.leadsTo(r, new ArrayList<GraphPart>())) {
-                  //modify=false;
-                  //continue;
-               }
-
-               prvni = pos;
-               if (i > r.path.length()) {
-                  i--;
-                  break loopi;
-               }
-               if (lastpref == null) {
-                  lastpref = r.path.substring(0, i);
-               } else {
-                  if (!r.path.startsWith(lastpref)) {
-                     i--;
-                     break loopi;
-                  }
-               }
-            }
-         }
-         if (i > part.path.length()) {
-            i = part.path.length();
-         }
-         if (modify && ((uniqueRefs.size() > 1) && (prvni >= 0))) {
-            String newpath = uniqueRefs.get(prvni).path.substring(0, i);
-            if (!part.path.equals(newpath)) {
-               if (part.path.startsWith(newpath)) {
-                  String origPath = part.path;
-                  GraphPart p = part;
-                  part.path = newpath;
-                  while (p.nextParts.size() == 1) {
-                     p = p.nextParts.get(0);
-                     if (!p.path.equals(origPath)) {
-                        break;
-                     }
-                     p.path = newpath;
-                  }
-                  fixGraphOnce(part, new ArrayList<GraphPart>(), true);
-                  fixed = true;
-               }
-            }
-         }
-      } else {
-
-         if (!fixed) {
-            if (part.nextParts.size() == 1) {
-               if (!(part.path.startsWith("e") && (!part.nextParts.get(0).path.startsWith("e")))) {
-                  if (part.nextParts.get(0).path.length() > part.path.length()) {
-                     part.nextParts.get(0).path = part.path;
-                     fixed = true;
-                  }
-               }
-            }
-            if (part.nextParts.size() > 1) {
-               for (int j = 0; j < part.nextParts.size(); j++) {
-                  GraphPart npart = part.nextParts.get(j);
-
-                  if (npart.path.length() > part.path.length() + 1) {
-                     npart.path = part.path + "" + j;
-                     fixed = true;
-                  }
-               }
-            }
-         }
-
-      }
-      /* if (part.nextParts.size() == 2) {
-       GraphPart left = part.nextParts.get(0);
-       GraphPart right = part.nextParts.get(1);
-       if ((left.nextParts.size() == 1) && (right.nextParts.size() == 1)) {
-       if (left.nextParts.get(0) == right.nextParts.get(0)) {
-       if (!left.nextParts.get(0).path.equals(part.path)) {
-       String origPath = left.nextParts.get(0).path;
-       GraphPart p = left;
-       while (p.nextParts.size() == 1) {
-       p = p.nextParts.get(0);
-       if (!p.path.equals(origPath)) {
-       break;
-       }
-       p.path = part.path;
-       }
-       fixed = true;
-       }
-       }
-       }
-       }*/
-      for (GraphPart p : part.nextParts) {
-         fixGraphOnce(p, visited, doChildren);
-      }
-      return fixed;
-   }
+   
 
    private List<GraphPart> makeGraph(AVM2Code code, List<GraphPart> allBlocks, MethodBody body) {
       HashMap<Integer, List<Integer>> refs = code.visitCode(body);

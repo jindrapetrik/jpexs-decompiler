@@ -1,4 +1,4 @@
-package com.jpexs.asdec.abc.avm2.flowgraph;
+package com.jpexs.asdec.graph;
 
 /**
  *

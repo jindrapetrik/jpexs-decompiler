@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.asdec.abc.avm2.flowgraph;
+package com.jpexs.asdec.graph;
 
 import com.jpexs.asdec.abc.avm2.treemodel.ContinueTreeItem;
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ public class GraphPart {
    public String path="";
    public List<GraphPart> refs=new ArrayList<GraphPart>();
    public boolean ignored=false;
-   public List<ContinueTreeItem> forContinues=new ArrayList<ContinueTreeItem>();
+   public List<Object> forContinues=new ArrayList<Object>();
 
    private boolean leadsTo(GraphPart part,List<GraphPart> visited,List<GraphPart> ignored){
       if(visited.contains(this)){

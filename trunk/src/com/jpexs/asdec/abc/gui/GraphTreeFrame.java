@@ -16,8 +16,8 @@
  */
 package com.jpexs.asdec.abc.gui;
 
-import com.jpexs.asdec.abc.avm2.flowgraph.Graph;
-import com.jpexs.asdec.abc.avm2.flowgraph.GraphPart;
+import com.jpexs.asdec.abc.avm2.graph.AVM2Graph;
+import com.jpexs.asdec.graph.GraphPart;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import javax.swing.JFrame;
@@ -34,7 +34,7 @@ public class GraphTreeFrame extends JFrame {
 
    public JTree graphTree;
 
-   public GraphTreeFrame(final Graph graph) {
+   public GraphTreeFrame(final AVM2Graph graph) {
       setSize(400, 400);
       graphTree = new JTree(new TreeModel() {
          public Object getRoot() {
