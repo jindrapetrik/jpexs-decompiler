@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-public class InstructionDefinition implements Serializable{
+public class InstructionDefinition implements Serializable {
 
    protected String hilighOffset(String text, long offset) {
       return Highlighting.hilighOffset(text, offset);

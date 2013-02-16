@@ -27,8 +27,6 @@ public class BitNotTreeItem extends UnaryOpTreeItem {
 
    @Override
    public double toNumber() {
-      return ~((int)value.toNumber());
+      return ~((int) value.toNumber());
    }
-   
-   
 }

@@ -43,8 +43,6 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
    public void setIgnoreCarret(boolean ignoreCarret) {
       this.ignoreCarret = ignoreCarret;
    }
-   
-   
 
    public ASMSourceEditorPane(DecompiledEditorPane decompiledEditor) {
       this.decompiledEditor = decompiledEditor;
@@ -52,7 +50,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
    }
 
    public void hilighOffset(long offset) {
-      if(isEditable()){
+      if (isEditable()) {
          return;
       }
       for (Highlighting h2 : disassembledHilights) {
@@ -73,7 +71,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
    }
 
    public void graph() {
-      AVM2Graph gr = new AVM2Graph(abc.bodies[bodyIndex].code,abc,abc.bodies[bodyIndex]);
+      AVM2Graph gr = new AVM2Graph(abc.bodies[bodyIndex].code, abc, abc.bodies[bodyIndex]);
       (new GraphFrame(gr, "")).setVisible(true);
    }
 
@@ -102,7 +100,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
    @Override
    public void setText(String t) {
       disassembledHilights = Highlighting.getInstrHighlights(t);
-      t=Highlighting.stripHilights(t);
+      t = Highlighting.stripHilights(t);
       super.setText(t);
    }
 
@@ -180,7 +178,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
 
    @Override
    public void caretUpdate(CaretEvent e) {
-      if(isEditable()){
+      if (isEditable()) {
          return;
       }
       if (ignoreCarret) {

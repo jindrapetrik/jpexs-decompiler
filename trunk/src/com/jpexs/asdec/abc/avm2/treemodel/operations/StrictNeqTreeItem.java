@@ -19,12 +19,12 @@ package com.jpexs.asdec.abc.avm2.treemodel.operations;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 
-public class StrictNeqTreeItem extends BinaryOpTreeItem implements LogicalOp{
+public class StrictNeqTreeItem extends BinaryOpTreeItem implements LogicalOp {
 
    public StrictNeqTreeItem(AVM2Instruction instruction, TreeItem leftSide, TreeItem rightSide) {
       super(instruction, PRECEDENCE_EQUALITY, leftSide, rightSide, "!==");
    }
-   
+
    @Override
    public TreeItem invert() {
       return new StrictEqTreeItem(instruction, leftSide, rightSide);

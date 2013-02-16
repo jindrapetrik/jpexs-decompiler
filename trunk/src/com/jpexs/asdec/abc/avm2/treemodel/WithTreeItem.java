@@ -44,12 +44,12 @@ public class WithTreeItem extends TreeItem {
       String ret;
       ret = hilight("with(") + scope.toString(constants, localRegNames, fullyQualifiedNames) + hilight(")\r\n{\r\n");
       /*for (TreeItem ti : items) {
-         ret += ti.toString(constants, localRegNames, fullyQualifiedNames) + "\r\n";
-      }
-      ret += hilight("}");*/
+       ret += ti.toString(constants, localRegNames, fullyQualifiedNames) + "\r\n";
+       }
+       ret += hilight("}");*/
       return ret;
    }
-   
+
    public boolean needsSemicolon() {
       return false;
    }

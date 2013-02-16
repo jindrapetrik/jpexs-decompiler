@@ -21,7 +21,6 @@ import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.parser.FlasmLexer;
 import com.jpexs.asdec.action.parser.ParseException;
-import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.GetURLTreeItem;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 import com.jpexs.asdec.helpers.Helper;
@@ -71,5 +70,5 @@ public class ActionGetURL extends Action {
    @Override
    public void translate(Stack<TreeItem> stack, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
       output.add(new GetURLTreeItem(this, urlString, targetString));
-   }   
+   }
 }

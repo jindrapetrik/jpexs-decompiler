@@ -170,11 +170,11 @@ public class Helper {
       sb.append(ss);
       return sb.toString();
    }
-   
-   public static String padZeros(long number,int length){
-      String ret=""+number;
-      while(ret.length()<length){
-         ret="0"+ret;
+
+   public static String padZeros(long number, int length) {
+      String ret = "" + number;
+      while (ret.length() < length) {
+         ret = "0" + ret;
       }
       return ret;
    }
@@ -260,7 +260,7 @@ public class Helper {
          ois.close();
          return copy;
       } catch (Exception ex) {
-ex.printStackTrace();
+         ex.printStackTrace();
          return null;
       }
    }

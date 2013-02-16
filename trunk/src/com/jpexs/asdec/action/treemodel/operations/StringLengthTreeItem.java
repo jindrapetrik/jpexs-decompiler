@@ -37,7 +37,7 @@ public class StringLengthTreeItem extends TreeItem {
       }
       return s + hilight(".length");
    }
-   
+
    @Override
    public boolean isCompileTime() {
       return false;

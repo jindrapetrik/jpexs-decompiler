@@ -18,7 +18,6 @@ package com.jpexs.asdec.action.swf5;
 
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.treemodel.CallFunctionTreeItem;
-import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 import java.util.ArrayList;
 import java.util.List;

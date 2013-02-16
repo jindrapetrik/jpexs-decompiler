@@ -24,7 +24,7 @@ public class StringLtTreeItem extends BinaryOpTreeItem {
    public StringLtTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
       super(instruction, PRECEDENCE_RELATIONAL, leftSide, rightSide, "<");
    }
-   
+
    @Override
    public boolean isCompileTime() {
       return false;

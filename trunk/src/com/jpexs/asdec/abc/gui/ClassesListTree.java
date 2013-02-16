@@ -45,10 +45,10 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
       scrollPathToVisible(treePath);
    }
 
-   public ClassesListTree(List<DoABCTag> list,ABCPanel abcPanel) {
+   public ClassesListTree(List<DoABCTag> list, ABCPanel abcPanel) {
       this.abcList = list;
       this.treeList = getTreeList(list);
-      this.abcPanel=abcPanel;
+      this.abcPanel = abcPanel;
       setModel(new ClassesListTreeModel(this.treeList));
       addTreeSelectionListener(this);
       DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();

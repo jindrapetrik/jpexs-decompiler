@@ -16,7 +16,6 @@
  */
 package com.jpexs.asdec.action;
 
-import com.jpexs.asdec.Main;
 import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.action.parser.FlasmLexer;
 import com.jpexs.asdec.action.parser.ParseException;
@@ -25,15 +24,11 @@ import com.jpexs.asdec.action.special.ActionNop;
 import com.jpexs.asdec.action.swf4.*;
 import com.jpexs.asdec.action.swf5.*;
 import com.jpexs.asdec.action.swf6.ActionEnumerate2;
-import com.jpexs.asdec.action.swf6.ActionStrictEquals;
 import com.jpexs.asdec.action.swf7.ActionDefineFunction2;
 import com.jpexs.asdec.action.swf7.ActionTry;
 import com.jpexs.asdec.action.treemodel.*;
 import com.jpexs.asdec.action.treemodel.clauses.*;
-import com.jpexs.asdec.action.treemodel.operations.AndTreeItem;
-import com.jpexs.asdec.action.treemodel.operations.EqTreeItem;
 import com.jpexs.asdec.action.treemodel.operations.NotTreeItem;
-import com.jpexs.asdec.action.treemodel.operations.OrTreeItem;
 import com.jpexs.asdec.helpers.Helper;
 import com.jpexs.asdec.helpers.Highlighting;
 import java.io.ByteArrayOutputStream;
@@ -48,7 +43,7 @@ import java.util.logging.Logger;
 public class Action {
 
    public Action beforeInsert;
-   public boolean ignored=false;
+   public boolean ignored = false;
    /**
     * Action type identifier
     */
@@ -125,7 +120,7 @@ public class Action {
       List<Long> ret = new ArrayList<Long>();
       return ret;
    }
-    
+
    /**
     * Gets all ActionIf or ActionJump actions from subactions
     *
@@ -369,20 +364,20 @@ public class Action {
          if (importantOffsets.contains(offset)) {
             ret += "loc" + Helper.formatAddress(offset) + ":";
          }
-         
-            if(a.ignored){
-               int len=a.getBytes(version).length;
-               for(int i=0;i<len;i++){
-                  ret+="Nop\r\n";
-               }
-            }else{
+
+         if (a.ignored) {
+            int len = a.getBytes(version).length;
+            for (int i = 0; i < len; i++) {
+               ret += "Nop\r\n";
+            }
+         } else {
             if (a.beforeInsert != null) {
                ret += a.beforeInsert.getASMSource(importantOffsets, constantPool, version) + "\r\n";
             }
             if (!(a instanceof ActionNop)) {
                ret += Highlighting.hilighOffset("", offset) + a.getASMSource(importantOffsets, constantPool, version) + "\r\n";
             }
-            }
+         }
          offset += a.getBytes(version).length;
       }
       if (importantOffsets.contains(offset)) {
@@ -698,9 +693,9 @@ public class Action {
             List<TreeItem> tryCommands = ActionGraph.translateViaGraph(registerNames, atry.tryBody, version);
             TreeItem catchName;
             if (atry.catchInRegisterFlag) {
-               catchName = new DirectValueTreeItem(atry,-1, new RegisterNumber(atry.catchRegister), new ArrayList<String>());
+               catchName = new DirectValueTreeItem(atry, -1, new RegisterNumber(atry.catchRegister), new ArrayList<String>());
             } else {
-               catchName = new DirectValueTreeItem(atry,-1, atry.catchName, new ArrayList<String>());
+               catchName = new DirectValueTreeItem(atry, -1, atry.catchName, new ArrayList<String>());
             }
             List<TreeItem> catchExceptions = new ArrayList<TreeItem>();
             catchExceptions.add(catchName);

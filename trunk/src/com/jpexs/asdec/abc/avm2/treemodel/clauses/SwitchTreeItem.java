@@ -34,13 +34,13 @@ public class SwitchTreeItem extends LoopTreeItem implements Block {
    public List<TreeItem> defaultCommands;
    public List<Integer> valuesMapping;
 
-   public SwitchTreeItem(AVM2Instruction instruction, int switchBreak, TreeItem switchedObject, List<TreeItem> caseValues, List<List<TreeItem>> caseCommands, List<TreeItem> defaultCommands,List<Integer> valuesMapping) {
+   public SwitchTreeItem(AVM2Instruction instruction, int switchBreak, TreeItem switchedObject, List<TreeItem> caseValues, List<List<TreeItem>> caseCommands, List<TreeItem> defaultCommands, List<Integer> valuesMapping) {
       super(instruction, switchBreak, -1);
       this.switchedObject = switchedObject;
       this.caseValues = caseValues;
       this.caseCommands = caseCommands;
       this.defaultCommands = defaultCommands;
-      this.valuesMapping=valuesMapping;
+      this.valuesMapping = valuesMapping;
    }
 
    @Override
@@ -49,9 +49,9 @@ public class SwitchTreeItem extends LoopTreeItem implements Block {
       ret += "loop" + loopBreak + ":\r\n";
       ret += hilight("switch(") + switchedObject.toString(constants, localRegNames, fullyQualifiedNames) + hilight(")") + "\r\n{\r\n";
       for (int i = 0; i < caseCommands.size(); i++) {
-         for(int k=0;k<valuesMapping.size();k++){
-            if(valuesMapping.get(k)==i){
-               ret += "case " + caseValues.get(k).toString(constants, localRegNames, fullyQualifiedNames) + ":\r\n";         
+         for (int k = 0; k < valuesMapping.size(); k++) {
+            if (valuesMapping.get(k) == i) {
+               ret += "case " + caseValues.get(k).toString(constants, localRegNames, fullyQualifiedNames) + ":\r\n";
             }
          }
          ret += AVM2Code.IDENTOPEN + "\r\n";
@@ -61,7 +61,7 @@ public class SwitchTreeItem extends LoopTreeItem implements Block {
          ret += AVM2Code.IDENTCLOSE + "\r\n";
       }
       if (defaultCommands.size() > 0) {
-         if(!((defaultCommands.size()==1)&&(defaultCommands.get(0) instanceof BreakTreeItem)&&(((BreakTreeItem)defaultCommands.get(0)).loopPos==loopBreak))){
+         if (!((defaultCommands.size() == 1) && (defaultCommands.get(0) instanceof BreakTreeItem) && (((BreakTreeItem) defaultCommands.get(0)).loopPos == loopBreak))) {
             ret += hilight("default") + ":\r\n";
             ret += AVM2Code.IDENTOPEN + "\r\n";
             for (int j = 0; j < defaultCommands.size(); j++) {
@@ -69,7 +69,7 @@ public class SwitchTreeItem extends LoopTreeItem implements Block {
             }
             ret += AVM2Code.IDENTCLOSE + "\r\n";
          }
-         
+
       }
       ret += hilight("}") + "\r\n";
       ret += ":loop" + loopBreak;

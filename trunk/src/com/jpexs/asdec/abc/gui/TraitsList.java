@@ -16,7 +16,6 @@
  */
 package com.jpexs.asdec.abc.gui;
 
-import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.tags.DoABCTag;
 import java.util.List;
@@ -31,13 +30,14 @@ public class TraitsList extends JList implements ListSelectionListener {
    List<DoABCTag> abcTags;
    int classIndex = -1;
    private ABCPanel abcPanel;
+
    public int getClassIndex() {
       return classIndex;
    }
 
    public TraitsList(ABCPanel abcPanel) {
       addListSelectionListener(this);
-      this.abcPanel=abcPanel;
+      this.abcPanel = abcPanel;
       setCellRenderer(new IconListRenderer());
    }
 

@@ -17,7 +17,7 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
-import java.util.HashMap; import java.util.List;
+import java.util.List;
 
 public class CharToAsciiTreeItem extends TreeItem {
 
@@ -32,10 +32,10 @@ public class CharToAsciiTreeItem extends TreeItem {
    public String toString(ConstantPool constants) {
       return hilight("chr(") + value.toString(constants) + hilight(")");
    }
-   
+
    @Override
-    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+   public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret = super.getNeededActions();
       ret.addAll(value.getNeededActions());
       return ret;
    }

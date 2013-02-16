@@ -19,7 +19,6 @@ package com.jpexs.asdec.action.treemodel.operations;
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.TreeItem;
-import java.util.HashMap;
 import java.util.List;
 
 public abstract class UnaryOpTreeItem extends TreeItem {
@@ -41,15 +40,15 @@ public abstract class UnaryOpTreeItem extends TreeItem {
       }
       return hilight(operator) + s;
    }
-   
+
    @Override
-   public boolean isCompileTime(){
+   public boolean isCompileTime() {
       return value.isCompileTime();
    }
-   
+
    @Override
-    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+   public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret = super.getNeededActions();
       ret.addAll(value.getNeededActions());
       return ret;
    }

@@ -1,7 +1,21 @@
+/*
+ *  Copyright (C) 2010-2013 JPEXS
+ * 
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.jpexs.asdec.graph;
 
-import com.jpexs.asdec.abc.gui.GraphFrame;
-import com.jpexs.asdec.helpers.Helper;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,8 +24,9 @@ import java.util.List;
  * @author JPEXS
  */
 public class Graph {
+
    public List<GraphPart> heads;
-   
+
    protected static void populateParts(GraphPart part, List<GraphPart> allParts) {
       if (allParts.contains(part)) {
          return;
@@ -21,7 +36,7 @@ public class Graph {
          populateParts(p, allParts);
       }
    }
-   
+
    protected void fixGraph(GraphPart part) {
       while (fixGraphOnce(part, new ArrayList<GraphPart>(), false)) {
       }
@@ -126,8 +141,8 @@ public class Graph {
       }
       return fixed;
    }
-   
-    protected void makeMulti(GraphPart part, List<GraphPart> visited) {
+
+   protected void makeMulti(GraphPart part, List<GraphPart> visited) {
       if (visited.contains(part)) {
          return;
       }
@@ -169,78 +184,78 @@ public class Graph {
          makeMulti(part.nextParts.get(i), visited);
       }
    }
-    
-    public GraphPart deepCopy(GraphPart part,List<GraphPart> visited,List<GraphPart> copies){
-       if(visited==null){
-          visited=new ArrayList<GraphPart>();
-       }
-       if(copies==null){
-          copies=new ArrayList<GraphPart>();
-       }
-       if(visited.contains(part)){
-          return copies.get(visited.indexOf(part));
-       }
-       visited.add(part);
-       GraphPart copy=new GraphPart(part.start,part.end);
-       copy.path=part.path;
-       copies.add(copy);
-       copy.nextParts=new ArrayList<GraphPart>();
-       for(int i=0;i<part.nextParts.size();i++){          
-          copy.nextParts.add(deepCopy(part.nextParts.get(i),visited,copies));
-       }       
-       for(int i=0;i<part.refs.size();i++){          
-          copy.refs.add(deepCopy(part.refs.get(i),visited,copies));
-       }
-       return copy;
-    }
-    
-    public void resetGraph(GraphPart part,List<GraphPart> visited){
-       if(visited.contains(part)){
-          return;
-       }
-       visited.add(part);
-       int pos=0;
-       for(GraphPart p:part.nextParts){   
-          if(!visited.contains(p)){
-            p.path=part.path+pos;
-          }          
-          resetGraph(p, visited);
-          pos++;
-       }
-    }
-    
-    public GraphPart getCommonPart(List<GraphPart> parts){
-       GraphPart head=new GraphPart(0, 0);       
-       head.nextParts.addAll(parts);
-       List<GraphPart> allVisited=new ArrayList<GraphPart>();
-       head=deepCopy(head,allVisited,null);
-       for(GraphPart g:head.nextParts){
-          for(GraphPart r:g.refs){
-             r.nextParts.remove(g);
-          }
-          g.refs.clear();
-          g.refs.add(head);
-       }
-       head.path="0";
-       resetGraph(head,new ArrayList<GraphPart>());             
-       fixGraph(head);
-       
-       /*Graph gr=new Graph();
+
+   public GraphPart deepCopy(GraphPart part, List<GraphPart> visited, List<GraphPart> copies) {
+      if (visited == null) {
+         visited = new ArrayList<GraphPart>();
+      }
+      if (copies == null) {
+         copies = new ArrayList<GraphPart>();
+      }
+      if (visited.contains(part)) {
+         return copies.get(visited.indexOf(part));
+      }
+      visited.add(part);
+      GraphPart copy = new GraphPart(part.start, part.end);
+      copy.path = part.path;
+      copies.add(copy);
+      copy.nextParts = new ArrayList<GraphPart>();
+      for (int i = 0; i < part.nextParts.size(); i++) {
+         copy.nextParts.add(deepCopy(part.nextParts.get(i), visited, copies));
+      }
+      for (int i = 0; i < part.refs.size(); i++) {
+         copy.refs.add(deepCopy(part.refs.get(i), visited, copies));
+      }
+      return copy;
+   }
+
+   public void resetGraph(GraphPart part, List<GraphPart> visited) {
+      if (visited.contains(part)) {
+         return;
+      }
+      visited.add(part);
+      int pos = 0;
+      for (GraphPart p : part.nextParts) {
+         if (!visited.contains(p)) {
+            p.path = part.path + pos;
+         }
+         resetGraph(p, visited);
+         pos++;
+      }
+   }
+
+   public GraphPart getCommonPart(List<GraphPart> parts) {
+      GraphPart head = new GraphPart(0, 0);
+      head.nextParts.addAll(parts);
+      List<GraphPart> allVisited = new ArrayList<GraphPart>();
+      head = deepCopy(head, allVisited, null);
+      for (GraphPart g : head.nextParts) {
+         for (GraphPart r : g.refs) {
+            r.nextParts.remove(g);
+         }
+         g.refs.clear();
+         g.refs.add(head);
+      }
+      head.path = "0";
+      resetGraph(head, new ArrayList<GraphPart>());
+      fixGraph(head);
+
+      /*Graph gr=new Graph();
        gr.heads=new ArrayList<GraphPart>();
        gr.heads.add(head);
        GraphFrame gf=new GraphFrame(gr, "");
        gf.setVisible(true);
        */
-       
-       GraphPart next=head.getNextPartPath(new ArrayList<GraphPart>());
-       if(next==null){
-          return null;
-       }
-       for(GraphPart g:allVisited){
-          if(g.start==next.start){
-             return g;
-          }
-       }
-       return null;
-    }
+
+      GraphPart next = head.getNextPartPath(new ArrayList<GraphPart>());
+      if (next == null) {
+         return null;
+      }
+      for (GraphPart g : allVisited) {
+         if (g.start == next.start) {
+            return g;
+         }
+      }
+      return null;
+   }
 }

@@ -16,22 +16,16 @@
  */
 package com.jpexs.asdec.action;
 
-import com.jpexs.asdec.graph.Graph;
-import com.jpexs.asdec.graph.GraphPart;
-import com.jpexs.asdec.graph.Loop;
-import com.jpexs.asdec.graph.GraphPartMulti;
 import com.jpexs.asdec.action.swf4.ActionIf;
 import com.jpexs.asdec.action.swf4.ActionJump;
 import com.jpexs.asdec.action.swf4.Null;
 import com.jpexs.asdec.action.swf5.ActionReturn;
-import com.jpexs.asdec.action.swf6.ActionStrictEquals;
 import com.jpexs.asdec.action.swf7.ActionThrow;
 import com.jpexs.asdec.action.treemodel.BreakTreeItem;
 import com.jpexs.asdec.action.treemodel.ContinueTreeItem;
 import com.jpexs.asdec.action.treemodel.DirectValueTreeItem;
 import com.jpexs.asdec.action.treemodel.StoreRegisterTreeItem;
 import com.jpexs.asdec.action.treemodel.TreeItem;
-import com.jpexs.asdec.action.treemodel.UnsupportedTreeItem;
 import com.jpexs.asdec.action.treemodel.clauses.DoWhileTreeItem;
 import com.jpexs.asdec.action.treemodel.clauses.ForTreeItem;
 import com.jpexs.asdec.action.treemodel.clauses.IfTreeItem;
@@ -43,15 +37,16 @@ import com.jpexs.asdec.action.treemodel.operations.LogicalOp;
 import com.jpexs.asdec.action.treemodel.operations.NotTreeItem;
 import com.jpexs.asdec.action.treemodel.operations.OrTreeItem;
 import com.jpexs.asdec.action.treemodel.operations.StrictEqTreeItem;
-import com.jpexs.asdec.helpers.Highlighting;
+import com.jpexs.asdec.graph.Graph;
+import com.jpexs.asdec.graph.GraphPart;
+import com.jpexs.asdec.graph.GraphPartMulti;
+import com.jpexs.asdec.graph.Loop;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -205,7 +200,7 @@ public class ActionGraph extends Graph {
                }
             }
             if (switchedObject == null) {
-               switchedObject = new DirectValueTreeItem(null,-1, new Null(), null);
+               switchedObject = new DirectValueTreeItem(null, -1, new Null(), null);
             }
             HashMap<Integer, TreeItem> caseValuesMap = new HashMap<Integer, TreeItem>();
 
@@ -289,7 +284,7 @@ public class ActionGraph extends Graph {
                if ((defaultPart2 != breakPart) && (defaultCommands.isEmpty())) {
                   defaultPart = defaultPart2;
                }
-               
+
 
                List<TreeItem> caseValues = new ArrayList<TreeItem>();
                for (int i = 0; i < caseBodyParts.size(); i++) {
@@ -430,7 +425,7 @@ public class ActionGraph extends Graph {
          }
          TreeItem expr = null;
          if ((code.get(part.end) instanceof ActionJump) || (!(code.get(part.end) instanceof ActionIf))) {
-            expr = new DirectValueTreeItem(null,-1, (Boolean) true, new ArrayList<String>());
+            expr = new DirectValueTreeItem(null, -1, (Boolean) true, new ArrayList<String>());
          } else {
             if (stack.isEmpty()) {
             }
@@ -584,7 +579,7 @@ public class ActionGraph extends Graph {
          } else {
             ret.add(lop);
          }
-      }           
+      }
       return ret;
    }
    private List<Integer> posCache;

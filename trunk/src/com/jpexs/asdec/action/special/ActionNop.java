@@ -17,8 +17,6 @@
 package com.jpexs.asdec.action.special;
 
 import com.jpexs.asdec.action.Action;
-import com.jpexs.asdec.action.treemodel.ConstantPool;
-import com.jpexs.asdec.action.treemodel.SimpleActionTreeItem;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 import java.util.List;
 import java.util.Stack;

@@ -17,7 +17,7 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
-import java.util.HashMap; import java.util.List;
+import java.util.List;
 
 public class IncrementTreeItem extends TreeItem {
 
@@ -32,23 +32,21 @@ public class IncrementTreeItem extends TreeItem {
    public String toString(ConstantPool constants) {
       return object.toString(constants) + hilight("+1");
    }
-   
+
    @Override
-   public boolean isCompileTime(){
+   public boolean isCompileTime() {
       return object.isCompileTime();
    }
 
    @Override
    public double toNumber() {
-      return object.toNumber()+1;
+      return object.toNumber() + 1;
    }
-   
+
    @Override
-    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+   public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret = super.getNeededActions();
       ret.addAll(object.getNeededActions());
       return ret;
    }
-   
-   
 }

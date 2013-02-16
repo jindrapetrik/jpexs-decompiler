@@ -19,53 +19,50 @@ package com.jpexs.asdec.action.treemodel;
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.swf4.ConstantIndex;
 import com.jpexs.asdec.helpers.Helper;
-import java.util.HashMap; import java.util.List;
+import java.util.List;
 
 public class DirectValueTreeItem extends TreeItem {
 
    public Object value;
    public List<String> constants;
 
-   public DirectValueTreeItem(Action instruction,int instructionPos, Object value, List<String> constants) {
+   public DirectValueTreeItem(Action instruction, int instructionPos, Object value, List<String> constants) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.constants = constants;
       this.value = value;
-      this.instructionPos=instructionPos;
+      this.instructionPos = instructionPos;
    }
 
    @Override
    public double toNumber() {
-      if(value instanceof Double){
-         return (Double)value;
+      if (value instanceof Double) {
+         return (Double) value;
       }
-      if(value instanceof Float){
-         return (Float)value;
+      if (value instanceof Float) {
+         return (Float) value;
       }
-      if(value instanceof Long){
-         return (Long)value;
+      if (value instanceof Long) {
+         return (Long) value;
       }
       return super.toNumber();
    }
 
    @Override
    public boolean toBoolean() {
-      if(value instanceof Boolean){
-         return (Boolean)value;
+      if (value instanceof Boolean) {
+         return (Boolean) value;
       }
-      if(value instanceof Double){
-         return Double.compare((Double)value,0.0)!=0;
+      if (value instanceof Double) {
+         return Double.compare((Double) value, 0.0) != 0;
       }
-      if(value instanceof Float){
-         return Float.compare((Float)value,0.0f)!=0;
+      if (value instanceof Float) {
+         return Float.compare((Float) value, 0.0f) != 0;
       }
-      if(value instanceof Long){
-         return ((Long)value)!=0;
+      if (value instanceof Long) {
+         return ((Long) value) != 0;
       }
       return false;
    }
-   
-   
-   
 
    @Override
    public String toStringNoQuotes(ConstantPool constants) {
@@ -108,9 +105,9 @@ public class DirectValueTreeItem extends TreeItem {
       }
       return hilight(value.toString());
    }
-   
+
    @Override
-   public boolean isCompileTime(){
-      return (value instanceof Double)||(value instanceof Float)||(value instanceof Boolean)||(value instanceof Long);
+   public boolean isCompileTime() {
+      return (value instanceof Double) || (value instanceof Float) || (value instanceof Boolean) || (value instanceof Long);
    }
 }

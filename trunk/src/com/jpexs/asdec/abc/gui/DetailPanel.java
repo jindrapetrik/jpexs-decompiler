@@ -16,7 +16,6 @@
  */
 package com.jpexs.asdec.abc.gui;
 
-import com.jpexs.asdec.Main;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.FlowLayout;
@@ -50,7 +49,7 @@ public class DetailPanel extends JPanel implements ActionListener {
    private ABCPanel abcPanel;
 
    public DetailPanel(ABCPanel abcPanel) {
-      this.abcPanel=abcPanel;
+      this.abcPanel = abcPanel;
       innerPanel = new JPanel();
       CardLayout layout = new CardLayout();
       innerPanel.setLayout(layout);
@@ -111,7 +110,7 @@ public class DetailPanel extends JPanel implements ActionListener {
       boolean b = cardMap.get(name) instanceof TraitDetail;
       buttonsPanel.setVisible(b);
       selectedCard = name;
-      selectedLabel.setText(selectedCard);      
+      selectedLabel.setText(selectedCard);
    }
 
    public void actionPerformed(ActionEvent e) {
@@ -127,7 +126,7 @@ public class DetailPanel extends JPanel implements ActionListener {
          if (cardMap.get(selectedCard) instanceof TraitDetail) {
             if (((TraitDetail) cardMap.get(selectedCard)).save()) {
                int lasttrait = abcPanel.decompiledTextArea.lastTraitIndex;
-               abcPanel.decompiledTextArea.reloadClass();               
+               abcPanel.decompiledTextArea.reloadClass();
                abcPanel.decompiledTextArea.gotoTrait(lasttrait);
                JOptionPane.showMessageDialog(this, "Trait Successfully saved");
             }

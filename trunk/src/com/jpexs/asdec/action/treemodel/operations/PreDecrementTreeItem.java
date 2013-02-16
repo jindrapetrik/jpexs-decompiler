@@ -27,8 +27,6 @@ public class PreDecrementTreeItem extends UnaryOpTreeItem {
 
    @Override
    public double toNumber() {
-      return value.toNumber()-1;
+      return value.toNumber() - 1;
    }
-   
-   
 }

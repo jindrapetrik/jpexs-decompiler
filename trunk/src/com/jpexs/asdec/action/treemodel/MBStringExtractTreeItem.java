@@ -17,7 +17,7 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
-import java.util.HashMap; import java.util.List;
+import java.util.List;
 
 public class MBStringExtractTreeItem extends TreeItem {
 
@@ -36,10 +36,10 @@ public class MBStringExtractTreeItem extends TreeItem {
    public String toString(ConstantPool constants) {
       return hilight("mbsubstring(") + value.toString(constants) + hilight(",") + index.toString(constants) + hilight(",") + count.toString(constants) + hilight(")");
    }
-   
+
    @Override
-    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+   public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret = super.getNeededActions();
       ret.addAll(value.getNeededActions());
       ret.addAll(index.getNeededActions());
       ret.addAll(count.getNeededActions());

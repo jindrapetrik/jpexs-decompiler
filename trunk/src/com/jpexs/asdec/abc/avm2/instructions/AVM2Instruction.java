@@ -26,7 +26,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AVM2Instruction  implements Serializable{
+public class AVM2Instruction implements Serializable {
 
    public InstructionDefinition definition;
    public int operands[];
@@ -35,8 +35,8 @@ public class AVM2Instruction  implements Serializable{
    public String comment;
    public boolean ignored = false;
    public String labelname;
-   public long mappedOffset=-1;
-   public int changeJumpTo=-1;
+   public long mappedOffset = -1;
+   public int changeJumpTo = -1;
 
    public AVM2Instruction(long offset, InstructionDefinition definition, int[] operands, byte bytes[]) {
       this.definition = definition;
@@ -214,8 +214,6 @@ public class AVM2Instruction  implements Serializable{
    public boolean isIgnored() {
       return ignored;
    }
-   
-   
 
    public String toString(ConstantPool constants, List<String> fullyQualifiedNames) {
       String s = Helper.formatAddress(offset) + " " + Helper.padSpaceRight(Helper.byteArrToString(getBytes()), 30) + definition.instructionName;
@@ -228,6 +226,5 @@ public class AVM2Instruction  implements Serializable{
       s += getParams(constants, fullyQualifiedNames) + getComment();
       return s;
    }
-   
    public List replaceWith;
 }

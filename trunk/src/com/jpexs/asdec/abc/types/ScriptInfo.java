@@ -42,28 +42,28 @@ public class ScriptInfo {
    }
 
    public String getPath(ABC abc) {
-      String packageName="";
-      String scriptName="";
-      int classCount=0;
+      String packageName = "";
+      String scriptName = "";
+      int classCount = 0;
       for (Trait t : traits.traits) {
          Multiname name = t.getName(abc);
          Namespace ns = name.getNamespace(abc.constants);
          if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-            packageName=ns.getName(abc.constants);
-            scriptName= name.getName(abc.constants, new ArrayList<String>());            
-            if(t instanceof TraitClass){
+            packageName = ns.getName(abc.constants);
+            scriptName = name.getName(abc.constants, new ArrayList<String>());
+            if (t instanceof TraitClass) {
                classCount++;
             }
          }
       }
-      if(classCount>1){
+      if (classCount > 1) {
          scriptName = "[script]";
       }
-      return packageName+"."+scriptName;
+      return packageName + "." + scriptName;
    }
 
    public String convert(List<DoABCTag> abcTags, ABC abc, boolean pcode, boolean highlighting) {
-      return traits.convert("",abcTags, abc, false, pcode, true, -1, highlighting, new ArrayList<String>());
+      return traits.convert("", abcTags, abc, false, pcode, true, -1, highlighting, new ArrayList<String>());
    }
 
    public void export(ABC abc, List<DoABCTag> abcList, String directory, boolean pcode) throws IOException {

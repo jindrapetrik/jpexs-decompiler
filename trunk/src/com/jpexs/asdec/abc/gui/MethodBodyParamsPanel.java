@@ -16,7 +16,6 @@
  */
 package com.jpexs.asdec.abc.gui;
 
-import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.types.MethodBody;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -43,9 +42,10 @@ public class MethodBodyParamsPanel extends JPanel implements ChangeListener {
    public JCheckBox autoFillCheckBox = new JCheckBox("Auto fill on code save (GLOBAL SETTING)");
    public JLabel experimentalLabel = new JLabel("...EXPERIMENTAL");
    private ABCPanel abcPanel;
+
    public MethodBodyParamsPanel(ABCPanel abcPanel) {
       setLayout(null);
-      this.abcPanel=abcPanel;
+      this.abcPanel = abcPanel;
 
       maxStackLabel.setBounds(10, 10, 150, 25);
       maxStackField.setBounds(10 + 150 + 10, 10, 75, 25);

@@ -125,6 +125,7 @@ public class MainFrame extends JFrame implements ActionListener {
    public void setStatus(String s) {
       statusLabel.setText(s);
    }
+
    public void setWorkStatus(String s) {
       if (s.equals("")) {
          loadingPanel.setVisible(false);
@@ -271,14 +272,14 @@ public class MainFrame extends JFrame implements ActionListener {
       //menuDeobfuscation.add(miSubLimiter);
       menuDeobfuscation.add(miDeobfuscation);
       /*menuDeobfuscation.add(miDeobfuscate);
-      menuDeobfuscation.addSeparator();*/     
+       menuDeobfuscation.addSeparator();*/
       /*menuDeobfuscation.add(miRemoveDeadCode);
-      menuDeobfuscation.add(miRemoveDeadCodeAll);
-      menuDeobfuscation.add(miTraps);
-      menuDeobfuscation.add(miTrapsAll);
-      menuDeobfuscation.add(miControlFlow);
-      menuDeobfuscation.add(miControlFlowAll);
-*/
+       menuDeobfuscation.add(miRemoveDeadCodeAll);
+       menuDeobfuscation.add(miTraps);
+       menuDeobfuscation.add(miTrapsAll);
+       menuDeobfuscation.add(miControlFlow);
+       menuDeobfuscation.add(miControlFlowAll);
+       */
       JMenu menuTools = new JMenu("Tools");
       JMenuItem miProxy = new JMenuItem("Proxy");
       miProxy.setActionCommand("SHOWPROXY");
@@ -690,7 +691,7 @@ public class MainFrame extends JFrame implements ActionListener {
          chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
          chooser.setAcceptAllFileFilterUsed(false);
          if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            final long timeBefore=System.currentTimeMillis();
+            final long timeBefore = System.currentTimeMillis();
             Main.startWork("Exporting...");
             final String selFile = chooser.getSelectedFile().getAbsolutePath();
             Configuration.setConfig("lastExportDir", chooser.getSelectedFile().getParentFile().getAbsolutePath());
@@ -753,21 +754,21 @@ public class MainFrame extends JFrame implements ActionListener {
                      JOptionPane.showMessageDialog(null, "Cannot write to the file");
                   }
                   Main.stopWork();
-                  long timeAfter=System.currentTimeMillis();
-                  long timeMs=timeAfter-timeBefore;
-                  long timeS=timeMs/1000;
-                  timeMs=timeMs%1000;
-                  long timeM=timeS/60;
-                  timeS=timeS%60;
-                  long timeH=timeM/60;
-                  timeM=timeM%60;
-                  String timeStr="";
-                  if(timeH>0){
-                     timeStr+=Helper.padZeros(timeH, 2)+":";
+                  long timeAfter = System.currentTimeMillis();
+                  long timeMs = timeAfter - timeBefore;
+                  long timeS = timeMs / 1000;
+                  timeMs = timeMs % 1000;
+                  long timeM = timeS / 60;
+                  timeS = timeS % 60;
+                  long timeH = timeM / 60;
+                  timeM = timeM % 60;
+                  String timeStr = "";
+                  if (timeH > 0) {
+                     timeStr += Helper.padZeros(timeH, 2) + ":";
                   }
-                  timeStr+=Helper.padZeros(timeM, 2)+":";                  
-                  timeStr+=Helper.padZeros(timeS, 2)+"."+Helper.padZeros(timeMs,3);
-                  setStatus("Exported in "+timeStr);
+                  timeStr += Helper.padZeros(timeM, 2) + ":";
+                  timeStr += Helper.padZeros(timeS, 2) + "." + Helper.padZeros(timeMs, 3);
+                  setStatus("Exported in " + timeStr);
                }
             }).start();
 
@@ -873,7 +874,7 @@ public class MainFrame extends JFrame implements ActionListener {
                @Override
                protected Object doInBackground() throws Exception {
                   int cnt = 0;
-                  HashMap<String,String> namesMap=new HashMap<String,String>();
+                  HashMap<String, String> namesMap = new HashMap<String, String>();
                   for (DoABCTag tag : abcPanel.list) {
                      cnt += tag.abc.deobfuscateIdentifiers(namesMap);
                   }
@@ -888,8 +889,8 @@ public class MainFrame extends JFrame implements ActionListener {
          }
       }
 
-      if (e.getActionCommand().startsWith("DEOBFUSCATE")) {         
-         if(deobfuscationDialog==null){
+      if (e.getActionCommand().startsWith("DEOBFUSCATE")) {
+         if (deobfuscationDialog == null) {
             deobfuscationDialog = new DeobfuscationDialog();
          }
          deobfuscationDialog.setVisible(true);

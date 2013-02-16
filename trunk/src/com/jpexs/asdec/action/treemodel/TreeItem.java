@@ -20,8 +20,7 @@ import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.IgnoredPair;
 import com.jpexs.asdec.helpers.Highlighting;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashMap; import java.util.List;
+import java.util.List;
 
 public abstract class TreeItem {
 
@@ -44,8 +43,8 @@ public abstract class TreeItem {
    public static final int NOPRECEDENCE = 16;
    public int precedence = NOPRECEDENCE;
    public Action instruction;
-   public int instructionPos=0;
-   public List<IgnoredPair> moreInstructions=new ArrayList<IgnoredPair>();
+   public int instructionPos = 0;
+   public List<IgnoredPair> moreInstructions = new ArrayList<IgnoredPair>();
 
    public TreeItem(Action instruction, int precedence) {
       this.instruction = instruction;
@@ -102,24 +101,23 @@ public abstract class TreeItem {
          return target.toString();
       }
    }
-   
-   public boolean isCompileTime(){
+
+   public boolean isCompileTime() {
       return false;
    }
-   
-   
-   public double toNumber(){
+
+   public double toNumber() {
       return 0;
    }
-   
-   public boolean toBoolean(){
-      return Double.compare(toNumber(),0.0)!=0;
+
+   public boolean toBoolean() {
+      return Double.compare(toNumber(), 0.0) != 0;
    }
-   
-   public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions(){
-      List<com.jpexs.asdec.action.IgnoredPair> ret=new ArrayList<com.jpexs.asdec.action.IgnoredPair>();
-      if(instruction!=null){
-         ret.add(new IgnoredPair(instruction,instructionPos));
+
+   public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret = new ArrayList<com.jpexs.asdec.action.IgnoredPair>();
+      if (instruction != null) {
+         ret.add(new IgnoredPair(instruction, instructionPos));
       }
       ret.addAll(moreInstructions);
       return ret;

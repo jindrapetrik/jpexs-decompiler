@@ -35,11 +35,11 @@ public class MethodCodePanel extends JPanel implements ActionListener {
 
    private ASMSourceEditorPane sourceTextArea;
    public JPanel buttonsPanel;
-   
-   public void focusEditor(){
+
+   public void focusEditor() {
       sourceTextArea.requestFocusInWindow();
    }
-   
+
    public void setIgnoreCarret(boolean ignoreCarret) {
       sourceTextArea.setIgnoreCarret(ignoreCarret);
    }

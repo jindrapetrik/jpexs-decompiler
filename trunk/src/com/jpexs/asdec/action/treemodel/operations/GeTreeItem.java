@@ -19,7 +19,7 @@ package com.jpexs.asdec.action.treemodel.operations;
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 
-public class GeTreeItem extends BinaryOpTreeItem implements LogicalOp{
+public class GeTreeItem extends BinaryOpTreeItem implements LogicalOp {
 
    public GeTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
       super(instruction, PRECEDENCE_RELATIONAL, leftSide, rightSide, ">=");
@@ -27,9 +27,9 @@ public class GeTreeItem extends BinaryOpTreeItem implements LogicalOp{
 
    @Override
    public boolean toBoolean() {
-      return leftSide.toNumber()>=rightSide.toNumber();
+      return leftSide.toNumber() >= rightSide.toNumber();
    }
-   
+
    @Override
    public TreeItem invert() {
       return new LtTreeItem(instruction, leftSide, rightSide);

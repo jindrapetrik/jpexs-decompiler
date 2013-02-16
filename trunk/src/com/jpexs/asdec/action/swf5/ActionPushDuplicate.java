@@ -18,7 +18,6 @@ package com.jpexs.asdec.action.swf5;
 
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.IgnoredPair;
-import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 import java.util.List;
 import java.util.Stack;
@@ -39,6 +38,6 @@ public class ActionPushDuplicate extends Action {
       TreeItem value = stack.pop();
       stack.push(value);
       stack.push(value);
-      value.moreInstructions.add(new IgnoredPair(this,0));
+      value.moreInstructions.add(new IgnoredPair(this, 0));
    }
 }

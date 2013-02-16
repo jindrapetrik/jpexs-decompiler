@@ -25,7 +25,6 @@ import com.jpexs.asdec.action.parser.Label;
 import com.jpexs.asdec.action.parser.ParseException;
 import com.jpexs.asdec.action.swf4.ActionPush;
 import com.jpexs.asdec.action.swf7.ActionDefineFunction2;
-import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.FunctionTreeItem;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 import com.jpexs.asdec.helpers.Helper;
@@ -46,23 +45,24 @@ public class ActionDefineFunction extends Action {
    private int version;
    public List<String> constantPool;
 
-   public void setConstantPool(List<String> constantPool){
-      this.constantPool=constantPool;
-      for(Action a:code){
-         if(a instanceof ActionPush){
-            ((ActionPush)a).constantPool=constantPool;
+   public void setConstantPool(List<String> constantPool) {
+      this.constantPool = constantPool;
+      for (Action a : code) {
+         if (a instanceof ActionPush) {
+            ((ActionPush) a).constantPool = constantPool;
          }
-         if(a instanceof ActionDefineFunction2){
-            ((ActionDefineFunction2)a).setConstantPool(constantPool);
+         if (a instanceof ActionDefineFunction2) {
+            ((ActionDefineFunction2) a).setConstantPool(constantPool);
          }
-         if(a instanceof ActionDefineFunction){
-            ((ActionDefineFunction)a).setConstantPool(constantPool);
+         if (a instanceof ActionDefineFunction) {
+            ((ActionDefineFunction) a).setConstantPool(constantPool);
          }
       }
    }
+
    public ActionDefineFunction(int actionLength, SWFInputStream sis, int version) throws IOException {
       super(0x9B, actionLength);
-      this.version=version;
+      this.version = version;
       //byte data[]=sis.readBytes(actionLength);
       //sis=new SWFInputStream(new ByteArrayInputStream(data),version);
       functionName = sis.readString();
@@ -151,17 +151,14 @@ public class ActionDefineFunction extends Action {
    public List<Action> getAllIfsOrJumps() {
       return Action.getActionsAllIfsOrJumps(code);
    }
-   
-   
+
    @Override
    public void translate(Stack<TreeItem> stack, List<TreeItem> output, HashMap<Integer, String> regNames) {
-      stack.push(new FunctionTreeItem(this, functionName, paramNames, Action.actionsToTree(regNames, code,version ), constantPool,1));
+      stack.push(new FunctionTreeItem(this, functionName, paramNames, Action.actionsToTree(regNames, code, version), constantPool, 1));
    }
 
    @Override
    public String toString() {
       return "DefineFunction";
    }
-   
-   
 }

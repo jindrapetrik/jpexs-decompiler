@@ -17,7 +17,7 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
-import java.util.HashMap; import java.util.List;
+import java.util.List;
 
 public class NewObjectTreeItem extends TreeItem {
 
@@ -41,12 +41,12 @@ public class NewObjectTreeItem extends TreeItem {
       }
       return hilight("new ") + stripQuotes(objectName) + hilight("(") + paramStr + hilight(")");
    }
-   
-    @Override
-    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+
+   @Override
+   public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret = super.getNeededActions();
       ret.addAll(objectName.getNeededActions());
-      for(TreeItem ti:arguments){
+      for (TreeItem ti : arguments) {
          ret.addAll(ti.getNeededActions());
       }
       return ret;

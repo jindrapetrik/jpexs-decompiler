@@ -22,7 +22,6 @@ import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.parser.FlasmLexer;
 import com.jpexs.asdec.action.parser.ParseException;
 import com.jpexs.asdec.action.parser.ParsedSymbol;
-import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.DirectValueTreeItem;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 import com.jpexs.asdec.helpers.Helper;
@@ -37,7 +36,7 @@ public class ActionPush extends Action {
 
    public List<Object> values;
    public List<String> constantPool;
-   public List<Integer> ignoredParts=new ArrayList<Integer>();
+   public List<Integer> ignoredParts = new ArrayList<Integer>();
 
    public ActionPush(int actionLength, SWFInputStream sis, int version) throws IOException {
       super(0x96, actionLength);
@@ -178,9 +177,9 @@ public class ActionPush extends Action {
    @Override
    public String toString() {
       String ret = "Push ";
-      int pos=0;
+      int pos = 0;
       for (int i = 0; i < values.size(); i++) {
-         if(ignoredParts.contains(i)){
+         if (ignoredParts.contains(i)) {
             continue;
          }
          if (pos > 0) {
@@ -205,12 +204,12 @@ public class ActionPush extends Action {
 
    @Override
    public void translate(Stack<TreeItem> stack, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
-      int pos=0;
+      int pos = 0;
       for (Object o : values) {
          if (o instanceof ConstantIndex) {
-            if((constantPool==null)||(((ConstantIndex) o).index>=constantPool.size())){
-               o="CONSTNOTFOUND";
-            }else{
+            if ((constantPool == null) || (((ConstantIndex) o).index >= constantPool.size())) {
+               o = "CONSTNOTFOUND";
+            } else {
                o = constantPool.get(((ConstantIndex) o).index);
             }
          }
@@ -219,7 +218,7 @@ public class ActionPush extends Action {
                ((RegisterNumber) o).name = regNames.get(((RegisterNumber) o).number);
             }
          }
-         stack.push(new DirectValueTreeItem(this, pos,o, constantPool));
+         stack.push(new DirectValueTreeItem(this, pos, o, constantPool));
          pos++;
       }
    }

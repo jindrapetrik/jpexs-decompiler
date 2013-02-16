@@ -17,7 +17,6 @@
 package com.jpexs.asdec.abc.types.traits;
 
 import com.jpexs.asdec.abc.ABC;
-import com.jpexs.asdec.abc.avm2.graph.AVM2Graph;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.MethodBody;
 import com.jpexs.asdec.helpers.Helper;
@@ -36,7 +35,7 @@ public class TraitMethodGetterSetter extends Trait {
    }
 
    @Override
-   public String convertHeader(String path,List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+   public String convertHeader(String path, List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
       String modifier = getModifiers(abcTags, abc, isStatic) + " ";
       if (modifier.equals(" ")) {
          modifier = "";
@@ -54,14 +53,14 @@ public class TraitMethodGetterSetter extends Trait {
    }
 
    @Override
-   public String convert(String path,List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
-      String header = convertHeader(path,abcTags, abc, isStatic, pcode, classIndex, highlight, fullyQualifiedNames);
+   public String convert(String path, List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+      String header = convertHeader(path, abcTags, abc, isStatic, pcode, classIndex, highlight, fullyQualifiedNames);
 
       String bodyStr = "";
       int bodyIndex = abc.findBodyIndex(method_info);
       if (bodyIndex != -1) {
-         bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(path+"."+getName(abc).getName(abc.constants, fullyQualifiedNames),pcode, isStatic, classIndex, abc, abc.constants, abc.method_info, new Stack<TreeItem>(), false, highlight, fullyQualifiedNames, null), 3);
+         bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames), pcode, isStatic, classIndex, abc, abc.constants, abc.method_info, new Stack<TreeItem>(), false, highlight, fullyQualifiedNames, null), 3);
       }
-      return ABC.IDENT_STRING + ABC.IDENT_STRING + header + ((classIndex!=-1 && abc.instance_info[classIndex].isInterface()) ? ";" : " {\r\n" + bodyStr + "\r\n" + ABC.IDENT_STRING + ABC.IDENT_STRING + "}");
+      return ABC.IDENT_STRING + ABC.IDENT_STRING + header + ((classIndex != -1 && abc.instance_info[classIndex].isInterface()) ? ";" : " {\r\n" + bodyStr + "\r\n" + ABC.IDENT_STRING + ABC.IDENT_STRING + "}");
    }
 }

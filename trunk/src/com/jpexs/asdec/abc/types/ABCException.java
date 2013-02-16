@@ -23,7 +23,7 @@ import com.jpexs.asdec.helpers.Helper;
 import java.io.Serializable;
 import java.util.List;
 
-public class ABCException implements Serializable{
+public class ABCException implements Serializable {
 
    public int start;
    public int end;

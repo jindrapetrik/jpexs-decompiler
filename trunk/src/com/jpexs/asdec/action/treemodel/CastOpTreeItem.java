@@ -17,7 +17,7 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
-import java.util.HashMap; import java.util.List;
+import java.util.List;
 
 public class CastOpTreeItem extends TreeItem {
 
@@ -34,10 +34,10 @@ public class CastOpTreeItem extends TreeItem {
    public String toString(ConstantPool constants) {
       return hilight("(") + stripQuotes(constructor) + hilight(")") + object.toString(constants);
    }
-   
+
    @Override
-    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+   public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret = super.getNeededActions();
       ret.addAll(constructor.getNeededActions());
       ret.addAll(object.getNeededActions());
       return ret;

@@ -17,9 +17,7 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
-import com.jpexs.asdec.action.treemodel.ConstantPool;
-import com.jpexs.asdec.action.treemodel.TreeItem;
-import java.util.HashMap; import java.util.List;
+import java.util.List;
 
 public class MBStringLengthTreeItem extends TreeItem {
 
@@ -38,10 +36,10 @@ public class MBStringLengthTreeItem extends TreeItem {
       }
       return hilight("mblength(") + s + ")";
    }
-   
+
    @Override
-    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+   public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret = super.getNeededActions();
       ret.addAll(value.getNeededActions());
       return ret;
    }

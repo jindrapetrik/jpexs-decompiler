@@ -16,7 +16,6 @@
  */
 package com.jpexs.asdec.abc.gui;
 
-import com.jpexs.asdec.Main;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
@@ -32,7 +31,7 @@ public class MethodTraitDetailPanel extends JTabbedPane implements TraitDetail {
    public ABCPanel abcPanel;
 
    public MethodTraitDetailPanel(ABCPanel abcPanel) {
-      this.abcPanel=abcPanel;
+      this.abcPanel = abcPanel;
       methodCodePanel = new MethodCodePanel(abcPanel.decompiledTextArea);
       methodBodyParamsPanel = new MethodBodyParamsPanel(abcPanel);
       methodInfoPanel = new MethodInfoPanel();

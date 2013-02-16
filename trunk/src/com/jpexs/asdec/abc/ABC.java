@@ -21,18 +21,12 @@ import com.jpexs.asdec.abc.avm2.AVM2Code;
 import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.UnknownInstructionCode;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.asdec.abc.avm2.parser.ASM3Parser;
-import com.jpexs.asdec.abc.avm2.parser.ParseException;
-import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.*;
 import com.jpexs.asdec.abc.types.traits.Trait;
-import com.jpexs.asdec.abc.types.traits.TraitClass;
 import com.jpexs.asdec.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.asdec.abc.types.traits.TraitSlotConst;
 import com.jpexs.asdec.abc.types.traits.Traits;
 import com.jpexs.asdec.abc.usages.*;
-import com.jpexs.asdec.helpers.Helper;
-import com.jpexs.asdec.helpers.Highlighting;
 import com.jpexs.asdec.tags.DoABCTag;
 import java.io.*;
 import java.util.ArrayList;
@@ -40,7 +34,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -118,7 +111,7 @@ public class ABC {
             ret++;
          }
       }
-      for (int i = 1; i < constants.constant_namespace.length; i++) {         
+      for (int i = 1; i < constants.constant_namespace.length; i++) {
          if (deobfuscateNameSpace(namesMap, constants.constant_namespace[i].name_index)) {
             ret++;
          }
@@ -677,12 +670,12 @@ public class ABC {
       return false;
    }
 
-   private boolean isValidNSPart(String s){
+   private boolean isValidNSPart(String s) {
       boolean isValid = true;
       if (isReserved(s)) {
          isValid = false;
       }
-      
+
       if (isValid) {
          for (int i = 0; i < s.length(); i++) {
             if (s.charAt(i) > 127) {
@@ -699,32 +692,32 @@ public class ABC {
       }
       return isValid;
    }
-   
+
    public boolean deobfuscateNameSpace(HashMap<String, String> namesMap, int strIndex) {
       if (strIndex <= 0) {
          return false;
       }
       String s = constants.constant_string[strIndex];
-      boolean isValid = isValidNSPart(s);      
+      boolean isValid = isValidNSPart(s);
       if (!isValid) {
          if (namesMap.containsKey(s)) {
             constants.constant_string[strIndex] = namesMap.get(s);
          } else {
-            String parts[]=null;
-            if(s.contains(".")){
-               parts=s.split("\\.");
-            }else{
-               parts=new String[]{s};
+            String parts[] = null;
+            if (s.contains(".")) {
+               parts = s.split("\\.");
+            } else {
+               parts = new String[]{s};
             }
-            String ret="";
-            for(int p=0;p<parts.length;p++){
-               if(p>0){
-                  ret+=".";
+            String ret = "";
+            for (int p = 0; p < parts.length; p++) {
+               if (p > 0) {
+                  ret += ".";
                }
-               if(!isValidNSPart(parts[p])){
-                  ret+=fooString(constants.constant_string[strIndex], false, DEFAULT_FOO_SIZE);
-               }else{
-                  ret+=parts[p];
+               if (!isValidNSPart(parts[p])) {
+                  ret += fooString(constants.constant_string[strIndex], false, DEFAULT_FOO_SIZE);
+               } else {
+                  ret += parts[p];
                }
             }
             constants.constant_string[strIndex] = ret;

@@ -16,28 +16,19 @@
  */
 package com.jpexs.asdec.abc.gui;
 
-import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
-import com.jpexs.asdec.abc.avm2.ConvertException;
 import com.jpexs.asdec.abc.types.ScriptInfo;
 import com.jpexs.asdec.abc.types.traits.Trait;
 import com.jpexs.asdec.abc.types.traits.TraitSlotConst;
 import com.jpexs.asdec.helpers.Highlighting;
 import com.jpexs.asdec.tags.DoABCTag;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import javax.swing.JScrollPane;
-import javax.swing.JViewport;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import javax.swing.text.Caret;
 
 public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretListener {
 
@@ -82,7 +73,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
    }
 
    private boolean displayMethod(int pos, int methodIndex) {
-      if(abc==null){
+      if (abc == null) {
          return false;
       }
       int bi = abc.findBodyIndex(methodIndex);
@@ -121,7 +112,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
    }
 
    public void caretUpdate(CaretEvent e) {
-      if(abc==null){
+      if (abc == null) {
          return;
       }
       if (ignoreCarret) {
@@ -140,7 +131,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                break;
             }
          }
-         
+
          for (Highlighting tm : methodHighlights) {
             if ((pos >= tm.startPos) && (pos < tm.startPos + tm.len)) {
                displayMethod(pos, (int) tm.offset);
@@ -154,7 +145,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                return;
             }
          }
-         
+
          if (classIndex == -1) {
             setNoTrait();
             return;
@@ -216,20 +207,20 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                if ((th.startPos > tc.startPos) && (th.startPos + th.len < tc.startPos + tc.len)) {
                   if (th.offset == traitId) {
                      try {
-                        ignoreCarret=true;
+                        ignoreCarret = true;
                         setCaretPosition(th.startPos + th.len - 1);
-                        ignoreCarret=false;
+                        ignoreCarret = false;
                      } catch (IllegalArgumentException iae) {
                      }
                      final int pos = th.startPos;
                      new Timer().schedule(new TimerTask() {
                         public void run() {
                            try {
-                              setCaretPosition(pos);                           
+                              setCaretPosition(pos);
                            } catch (IllegalArgumentException iae) {
                            }
                         }
-                     }, 100);                    
+                     }, 100);
                      return;
                   }
                }
@@ -242,7 +233,6 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
 
       setCaretPosition(0);
    }
-   
 
    public DecompiledEditorPane(ABCPanel abcPanel) {
       setEditable(false);
@@ -252,12 +242,11 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
    }
    private List<DoABCTag> abcList;
 
-   public void clearScriptCache()
-   {
+   public void clearScriptCache() {
       bufferedClasses.clear();
    }
-   
-   public void setScript(ScriptInfo script, ABC abc, List<DoABCTag> abcList) {      
+
+   public void setScript(ScriptInfo script, ABC abc, List<DoABCTag> abcList) {
       if (script == null) {
          highlights = new ArrayList<Highlighting>();
          traitHighlights = new ArrayList<Highlighting>();
@@ -269,7 +258,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
 
       String hilightedCode;
       if (!bufferedClasses.containsKey(script)) {
-         hilightedCode = script.convert(abcList, abc, false, true);         
+         hilightedCode = script.convert(abcList, abc, false, true);
          highlights = Highlighting.getInstrHighlights(hilightedCode);
          traitHighlights = Highlighting.getTraitHighlights(hilightedCode);
          methodHighlights = Highlighting.getMethodHighlights(hilightedCode);
@@ -287,11 +276,11 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
       this.abc = abc;
       this.abcList = abcList;
       this.script = script;
-      setText(hilightedCode);      
+      setText(hilightedCode);
    }
 
    public void reloadClass() {
-      int ci=classIndex;
+      int ci = classIndex;
       if (bufferedClasses.containsKey(script)) {
          bufferedClasses.remove(script);
       }

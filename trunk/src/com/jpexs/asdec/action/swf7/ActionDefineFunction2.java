@@ -25,7 +25,6 @@ import com.jpexs.asdec.action.parser.Label;
 import com.jpexs.asdec.action.parser.ParseException;
 import com.jpexs.asdec.action.swf4.ActionPush;
 import com.jpexs.asdec.action.swf5.ActionDefineFunction;
-import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.FunctionTreeItem;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 import com.jpexs.asdec.helpers.Helper;
@@ -240,7 +239,7 @@ public class ActionDefineFunction2 extends Action {
 
    @Override
    public void translate(Stack<TreeItem> stack, List<TreeItem> output, HashMap<Integer, String> regNames) {
-      stack.push(new FunctionTreeItem(this, functionName, paramNames, Action.actionsToTree(regNames, code, version), constantPool,getFirstRegister()));
+      stack.push(new FunctionTreeItem(this, functionName, paramNames, Action.actionsToTree(regNames, code, version), constantPool, getFirstRegister()));
    }
 
    @Override

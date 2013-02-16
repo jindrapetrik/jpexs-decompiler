@@ -24,9 +24,9 @@ public class MultiplyTreeItem extends BinaryOpTreeItem {
    public MultiplyTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
       super(instruction, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "*");
    }
-   
+
    @Override
    public double toNumber() {
-      return leftSide.toNumber()*rightSide.toNumber();
+      return leftSide.toNumber() * rightSide.toNumber();
    }
 }

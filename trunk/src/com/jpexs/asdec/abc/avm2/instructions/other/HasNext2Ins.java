@@ -21,7 +21,6 @@ import com.jpexs.asdec.abc.avm2.ConstantPool;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.avm2.treemodel.HasNextTreeItem;
-import com.jpexs.asdec.abc.avm2.treemodel.InTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.LocalRegTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.types.MethodInfo;

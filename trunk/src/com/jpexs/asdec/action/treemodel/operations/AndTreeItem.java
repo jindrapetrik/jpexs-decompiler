@@ -27,8 +27,6 @@ public class AndTreeItem extends BinaryOpTreeItem {
 
    @Override
    public boolean toBoolean() {
-      return leftSide.toBoolean()&&rightSide.toBoolean();
+      return leftSide.toBoolean() && rightSide.toBoolean();
    }
-   
-   
 }

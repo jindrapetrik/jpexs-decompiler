@@ -31,13 +31,13 @@ public class SwitchTreeItem extends LoopTreeItem implements Block {
    public List<TreeItem> defaultCommands;
    public List<Integer> valuesMapping;
 
-   public SwitchTreeItem(Action instruction, long switchBreak, TreeItem switchedObject, List<TreeItem> caseValues, List<List<TreeItem>> caseCommands, List<TreeItem> defaultCommands,List<Integer> valuesMapping) {
+   public SwitchTreeItem(Action instruction, long switchBreak, TreeItem switchedObject, List<TreeItem> caseValues, List<List<TreeItem>> caseCommands, List<TreeItem> defaultCommands, List<Integer> valuesMapping) {
       super(instruction, switchBreak, -1);
       this.switchedObject = switchedObject;
       this.caseValues = caseValues;
       this.caseCommands = caseCommands;
       this.defaultCommands = defaultCommands;
-      this.valuesMapping=valuesMapping;
+      this.valuesMapping = valuesMapping;
    }
 
    @Override
@@ -46,9 +46,9 @@ public class SwitchTreeItem extends LoopTreeItem implements Block {
       ret += "loopswitch" + loopBreak + ":\r\n";
       ret += hilight("switch(") + switchedObject.toString(constants) + hilight(")") + "\r\n{\r\n";
       for (int i = 0; i < caseCommands.size(); i++) {
-         for(int k=0;k<valuesMapping.size();k++){
-            if(valuesMapping.get(k)==i){
-               ret += "case " + caseValues.get(k).toString(constants) + ":\r\n";         
+         for (int k = 0; k < valuesMapping.size(); k++) {
+            if (valuesMapping.get(k) == i) {
+               ret += "case " + caseValues.get(k).toString(constants) + ":\r\n";
             }
          }
          ret += Action.INDENTOPEN + "\r\n";

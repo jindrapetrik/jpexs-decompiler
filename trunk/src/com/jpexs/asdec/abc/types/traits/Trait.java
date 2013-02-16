@@ -24,7 +24,7 @@ import com.jpexs.asdec.tags.DoABCTag;
 import java.io.Serializable;
 import java.util.List;
 
-public abstract class Trait implements Serializable{
+public abstract class Trait implements Serializable {
 
    public int name_index;
    public int kindType;
@@ -82,7 +82,7 @@ public abstract class Trait implements Serializable{
             }
          }
 
-         if ((!nsname.contains(":"))&&(!nsname.equals(""))) {
+         if ((!nsname.contains(":")) && (!nsname.equals(""))) {
             ret += " " + nsname;
          }
          if (ns != null) {
@@ -114,11 +114,11 @@ public abstract class Trait implements Serializable{
    }
 
    public String convertPackaged(String path, List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcod, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
-      return makePackageFromIndex(abc, name_index, convert(path,abcTags, abc, isStatic, pcod, classIndex, highlight, fullyQualifiedNames));
+      return makePackageFromIndex(abc, name_index, convert(path, abcTags, abc, isStatic, pcod, classIndex, highlight, fullyQualifiedNames));
    }
 
-   public String convertHeader(String path,List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
-      return convert(path,abcTags, abc, isStatic, pcode, classIndex, highlight, fullyQualifiedNames).trim();
+   public String convertHeader(String path, List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+      return convert(path, abcTags, abc, isStatic, pcode, classIndex, highlight, fullyQualifiedNames).trim();
    }
 
    protected String makePackageFromIndex(ABC abc, int name_index, String value) {

@@ -21,7 +21,6 @@ import com.jpexs.asdec.SWFOutputStream;
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.parser.FlasmLexer;
 import com.jpexs.asdec.action.parser.ParseException;
-import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.StrictModeTreeItem;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 import java.io.ByteArrayOutputStream;

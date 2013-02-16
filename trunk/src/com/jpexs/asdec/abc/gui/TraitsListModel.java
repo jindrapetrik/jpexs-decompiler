@@ -46,9 +46,9 @@ public class TraitsListModel implements ListModel {
 
    public Object getElementAt(int index) {
       if (index < abc.class_info[classIndex].static_traits.traits.length) {
-         return abc.class_info[classIndex].static_traits.traits[index].convertHeader("",abcTags, abc, true, false, classIndex, false, new ArrayList<String>());
+         return abc.class_info[classIndex].static_traits.traits[index].convertHeader("", abcTags, abc, true, false, classIndex, false, new ArrayList<String>());
       } else if (index < abc.class_info[classIndex].static_traits.traits.length + abc.instance_info[classIndex].instance_traits.traits.length) {
-         return abc.instance_info[classIndex].instance_traits.traits[index - abc.class_info[classIndex].static_traits.traits.length].convertHeader("",abcTags, abc, false, false, classIndex, false, new ArrayList<String>());
+         return abc.instance_info[classIndex].instance_traits.traits[index - abc.class_info[classIndex].static_traits.traits.length].convertHeader("", abcTags, abc, false, false, classIndex, false, new ArrayList<String>());
       } else if (index == abc.class_info[classIndex].static_traits.traits.length + abc.instance_info[classIndex].instance_traits.traits.length) {
          return STR_INSTANCE_INITIALIZER;
       } else {

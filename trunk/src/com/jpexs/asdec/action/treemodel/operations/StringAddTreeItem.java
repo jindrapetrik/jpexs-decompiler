@@ -24,7 +24,7 @@ public class StringAddTreeItem extends BinaryOpTreeItem {
    public StringAddTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
       super(instruction, PRECEDENCE_ADDITIVE, leftSide, rightSide, "+");
    }
-   
+
    @Override
    public boolean isCompileTime() {
       return false;

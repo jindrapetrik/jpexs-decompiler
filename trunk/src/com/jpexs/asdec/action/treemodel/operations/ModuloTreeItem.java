@@ -24,9 +24,9 @@ public class ModuloTreeItem extends BinaryOpTreeItem {
    public ModuloTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
       super(instruction, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "%");
    }
-   
+
    @Override
    public double toNumber() {
-      return ((int)leftSide.toNumber())%((int)rightSide.toNumber());
+      return ((int) leftSide.toNumber()) % ((int) rightSide.toNumber());
    }
 }

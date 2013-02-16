@@ -17,7 +17,6 @@
 package com.jpexs.asdec.action.swf4;
 
 import com.jpexs.asdec.action.Action;
-import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 import com.jpexs.asdec.action.treemodel.operations.EqTreeItem;
 import java.util.List;

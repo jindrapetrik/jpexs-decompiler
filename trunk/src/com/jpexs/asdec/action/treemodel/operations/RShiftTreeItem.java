@@ -24,9 +24,9 @@ public class RShiftTreeItem extends BinaryOpTreeItem {
    public RShiftTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
       super(instruction, PRECEDENCE_BITWISESHIFT, leftSide, rightSide, ">>");
    }
-   
+
    @Override
    public double toNumber() {
-      return ((int)leftSide.toNumber())>>((int)rightSide.toNumber());
+      return ((int) leftSide.toNumber()) >> ((int) rightSide.toNumber());
    }
 }

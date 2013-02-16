@@ -27,8 +27,6 @@ public class AddTreeItem extends BinaryOpTreeItem {
 
    @Override
    public double toNumber() {
-      return leftSide.toNumber()+rightSide.toNumber();
+      return leftSide.toNumber() + rightSide.toNumber();
    }
-   
-   
 }

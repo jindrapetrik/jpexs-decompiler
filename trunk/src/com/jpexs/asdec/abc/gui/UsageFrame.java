@@ -16,7 +16,6 @@
  */
 package com.jpexs.asdec.abc.gui;
 
-import com.jpexs.asdec.Main;
 import com.jpexs.asdec.abc.ABC;
 import com.jpexs.asdec.abc.usages.InsideClassMultinameUsage;
 import com.jpexs.asdec.abc.usages.MethodMultinameUsage;
@@ -47,8 +46,8 @@ public class UsageFrame extends JFrame implements ActionListener, MouseListener 
    private ABC abc;
    private ABCPanel abcPanel;
 
-   public UsageFrame(List<DoABCTag> abcTags, ABC abc, int multinameIndex,ABCPanel abcPanel) {
-      this.abcPanel=abcPanel;
+   public UsageFrame(List<DoABCTag> abcTags, ABC abc, int multinameIndex, ABCPanel abcPanel) {
+      this.abcPanel = abcPanel;
       List<MultinameUsage> usages = abc.findMultinameUsage(multinameIndex);
       this.abc = abc;
       usageListModel = new UsageListModel(abcTags, abc);

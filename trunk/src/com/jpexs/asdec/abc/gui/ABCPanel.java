@@ -147,7 +147,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
          oneList.add(list.get(index));
          this.abc = list.get(index).abc;
          classTree.setDoABCTags(oneList);
-      }      
+      }
       updateConstList();
    }
 
@@ -183,9 +183,9 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
 
 
 
-      
+
       decompiledTextArea = new DecompiledEditorPane(this);
-      decompiledScrollPane = new JScrollPane(decompiledTextArea);      
+      decompiledScrollPane = new JScrollPane(decompiledTextArea);
       detailPanel = new DetailPanel(this);
       JPanel panB = new JPanel();
       panB.setLayout(new BorderLayout());
@@ -243,7 +243,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
 
       JPanel treePanel = new JPanel();
       treePanel.setLayout(new BorderLayout());
-      treePanel.add(new JScrollPane(classTree = new ClassesListTree(list,this)), BorderLayout.CENTER);
+      treePanel.add(new JScrollPane(classTree = new ClassesListTree(list, this)), BorderLayout.CENTER);
       JPanel searchPanel = new JPanel();
       searchPanel.setLayout(new BorderLayout());
       searchPanel.add(filterField, BorderLayout.CENTER);
@@ -289,7 +289,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
       constantTable.setAutoCreateRowSorter(true);
 
       final List<DoABCTag> inlist = list;
-      final ABCPanel t=this;
+      final ABCPanel t = this;
       constantTable.addMouseListener(new MouseAdapter() {
          @Override
          public void mouseClicked(MouseEvent e) {
@@ -301,7 +301,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
                   }
                   int multinameIndex = constantTable.convertRowIndexToModel(rowIndex);
                   if (multinameIndex > 0) {
-                     UsageFrame usageFrame = new UsageFrame(inlist, abc, multinameIndex,t);
+                     UsageFrame usageFrame = new UsageFrame(inlist, abc, multinameIndex, t);
                      usageFrame.setVisible(true);
                   }
                }

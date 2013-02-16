@@ -17,7 +17,7 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
-import java.util.HashMap; import java.util.List;
+import java.util.List;
 
 public class CallTreeItem extends TreeItem {
 
@@ -32,11 +32,11 @@ public class CallTreeItem extends TreeItem {
    public String toString(ConstantPool constants) {
       return stripQuotes(value) + hilight("()");
    }
-   
+
    @Override
-    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
-      ret.addAll(value.getNeededActions());      
+   public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret = super.getNeededActions();
+      ret.addAll(value.getNeededActions());
       return ret;
    }
 }

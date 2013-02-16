@@ -16,7 +16,6 @@
  */
 package com.jpexs.asdec.abc.gui;
 
-import com.jpexs.asdec.abc.avm2.graph.AVM2Graph;
 import com.jpexs.asdec.graph.Graph;
 import com.jpexs.asdec.graph.GraphPart;
 import com.jpexs.asdec.gui.View;
@@ -25,7 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -53,27 +51,27 @@ public class GraphFrame extends JFrame {
       protected void paintComponent(Graphics g) {
          super.paintComponent(g);
          g.setColor(Color.black);
-         paintPart(g, graph.heads.get(0), 0, getPartWidth(graph.heads.get(0), new HashSet<GraphPart>()) * (BLOCK_WIDTH + SPACE_HORIZONTAL) / 2, new HashMap<GraphPart,Point>());
+         paintPart(g, graph.heads.get(0), 0, getPartWidth(graph.heads.get(0), new HashSet<GraphPart>()) * (BLOCK_WIDTH + SPACE_HORIZONTAL) / 2, new HashMap<GraphPart, Point>());
       }
 
-      private void paintPart(Graphics g, GraphPart part, int y, int x, HashMap<GraphPart,Point> used) {
-         HashMap<GraphPart,Point> l = new HashMap<GraphPart,Point>();
+      private void paintPart(Graphics g, GraphPart part, int y, int x, HashMap<GraphPart, Point> used) {
+         HashMap<GraphPart, Point> l = new HashMap<GraphPart, Point>();
          l.putAll(used);
-         HashSet<GraphPart> hs=new HashSet<GraphPart>();
+         HashSet<GraphPart> hs = new HashSet<GraphPart>();
          hs.addAll(l.keySet());
          int totalWidthParts = getPartWidth(part, hs);
          int totalWidth = totalWidthParts * (BLOCK_WIDTH + SPACE_HORIZONTAL);
-         
+
          if (used.containsKey(part)) {
             g.setColor(Color.black);
-            Point p=used.get(part);
+            Point p = used.get(part);
             g.drawLine(x, y, p.x, p.y);
             return;
          }
          g.drawRect(x - BLOCK_WIDTH / 2 - SPACE_HORIZONTAL / 2, y, BLOCK_WIDTH, BLOCK_HEIGHT);
          g.drawString(part.toString(), x - BLOCK_WIDTH / 2, y + BLOCK_HEIGHT);
-         
-         used.put(part,new Point(x,y));
+
+         used.put(part, new Point(x, y));
          if (part.nextParts.size() > 0) {
             int cx = x - totalWidth / 2;
             for (int p = 0; p < part.nextParts.size(); p++) {

@@ -21,7 +21,6 @@ import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.helpers.Highlighting;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 public abstract class TreeItem {
 
@@ -69,9 +68,9 @@ public abstract class TreeItem {
       if (instruction == null) {
          return str;
       }
-      if(instruction.mappedOffset>=0){
+      if (instruction.mappedOffset >= 0) {
          return Highlighting.hilighOffset(str, instruction.mappedOffset);
-      }else{
+      } else {
          return Highlighting.hilighOffset(str, instruction.offset);
       }
    }

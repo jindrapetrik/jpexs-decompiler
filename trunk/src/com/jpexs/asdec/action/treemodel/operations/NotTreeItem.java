@@ -19,7 +19,7 @@ package com.jpexs.asdec.action.treemodel.operations;
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 
-public class NotTreeItem extends UnaryOpTreeItem implements LogicalOp{
+public class NotTreeItem extends UnaryOpTreeItem implements LogicalOp {
 
    public NotTreeItem(Action instruction, TreeItem value) {
       super(instruction, PRECEDENCE_UNARY, value, "!");
@@ -37,10 +37,10 @@ public class NotTreeItem extends UnaryOpTreeItem implements LogicalOp{
 
    @Override
    public boolean toBoolean() {
-      boolean ret= !value.toBoolean();
+      boolean ret = !value.toBoolean();
       return ret;
    }
-   
+
    @Override
    public TreeItem invert() {
       return value;

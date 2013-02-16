@@ -25,7 +25,4 @@ public class TagInstruction extends InstructionDefinition {
    public TagInstruction(String tagName) {
       super(-1, tagName, new int[0]);
    }
-
-   
-   
 }

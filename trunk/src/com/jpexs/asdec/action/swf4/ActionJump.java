@@ -32,12 +32,11 @@ public class ActionJump extends Action {
    public int offset;
    public String identifier;
 
-   public ActionJump(int offset){
-      super(0x99,2);
-      this.offset=offset;
+   public ActionJump(int offset) {
+      super(0x99, 2);
+      this.offset = offset;
    }
-           
-   
+
    public ActionJump(SWFInputStream sis) throws IOException {
       super(0x99, 2);
       offset = sis.readSI16();
@@ -87,6 +86,4 @@ public class ActionJump extends Action {
    public String toString() {
       return "Jump";
    }
-   
-   
 }

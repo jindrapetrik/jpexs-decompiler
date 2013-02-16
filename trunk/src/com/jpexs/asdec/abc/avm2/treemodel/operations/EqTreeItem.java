@@ -24,7 +24,7 @@ public class EqTreeItem extends BinaryOpTreeItem implements LogicalOp {
    public EqTreeItem(AVM2Instruction instruction, TreeItem leftSide, TreeItem rightSide) {
       super(instruction, PRECEDENCE_EQUALITY, leftSide, rightSide, "==");
    }
-   
+
    @Override
    public TreeItem invert() {
       return new NeqTreeItem(instruction, leftSide, rightSide);

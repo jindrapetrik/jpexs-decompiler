@@ -29,6 +29,4 @@ public class AsTypeTreeItem extends BinaryOpTreeItem {
    public boolean isCompileTime() {
       return false;
    }
-   
-   
 }

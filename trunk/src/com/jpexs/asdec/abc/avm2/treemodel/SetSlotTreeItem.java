@@ -56,8 +56,8 @@ public class SetSlotTreeItem extends TreeItem implements SetTypeTreeItem, Assign
        }
        }
        }*/
-      if(slotName==null){
-         return ret+"/*UnknownSlot*/";
+      if (slotName == null) {
+         return ret + "/*UnknownSlot*/";
       }
       return ret + hilight(slotName.getName(constants, fullyQualifiedNames));
    }

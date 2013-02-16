@@ -34,7 +34,7 @@ public class WithEndTreeItem extends TreeItem {
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       return hilight("}");
    }
-   
+
    public boolean needsSemicolon() {
       return false;
    }

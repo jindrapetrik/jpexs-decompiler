@@ -17,9 +17,8 @@
 package com.jpexs.asdec.action.swf4;
 
 import com.jpexs.asdec.action.Action;
-import com.jpexs.asdec.action.treemodel.ConstantPool;
-import com.jpexs.asdec.action.treemodel.TreeItem;
 import com.jpexs.asdec.action.treemodel.MBStringLengthTreeItem;
+import com.jpexs.asdec.action.treemodel.TreeItem;
 import java.util.List;
 import java.util.Stack;
 

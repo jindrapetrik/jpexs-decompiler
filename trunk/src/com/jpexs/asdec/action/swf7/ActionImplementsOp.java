@@ -17,7 +17,6 @@
 package com.jpexs.asdec.action.swf7;
 
 import com.jpexs.asdec.action.Action;
-import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.ImplementsOpTreeItem;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 import java.util.ArrayList;

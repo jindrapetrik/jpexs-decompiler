@@ -29,6 +29,4 @@ public class StringEqTreeItem extends BinaryOpTreeItem {
    public boolean isCompileTime() {
       return false;
    }
-   
-   
 }

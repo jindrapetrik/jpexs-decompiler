@@ -18,7 +18,7 @@ package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.swf4.Undefined;
-import java.util.HashMap; import java.util.List;
+import java.util.List;
 
 public class NewMethodTreeItem extends TreeItem {
 
@@ -63,13 +63,13 @@ public class NewMethodTreeItem extends TreeItem {
       }
       return hilight("new ") + scriptObject.toString(constants) + hilight(".") + methodNameStr + hilight("(") + paramStr + hilight(")");
    }
-   
+
    @Override
-    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+   public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret = super.getNeededActions();
       ret.addAll(methodName.getNeededActions());
       ret.addAll(scriptObject.getNeededActions());
-      for(TreeItem ti:arguments){
+      for (TreeItem ti : arguments) {
          ret.addAll(ti.getNeededActions());
       }
       return ret;

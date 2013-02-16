@@ -24,9 +24,9 @@ public class BitOrTreeItem extends BinaryOpTreeItem {
    public BitOrTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
       super(instruction, PRECEDENCE_BITWISEOR, leftSide, rightSide, "|");
    }
-   
+
    @Override
    public double toNumber() {
-      return ((int)leftSide.toNumber())|((int)rightSide.toNumber());
+      return ((int) leftSide.toNumber()) | ((int) rightSide.toNumber());
    }
 }

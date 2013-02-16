@@ -16,7 +16,6 @@
  */
 package com.jpexs.asdec;
 
-import com.jpexs.asdec.abc.avm2.instructions.other.NopIns;
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.IgnoredPair;
 import com.jpexs.asdec.action.parser.ASMParser;
@@ -39,7 +38,6 @@ import com.jpexs.asdec.types.shaperecords.EndShapeRecord;
 import com.jpexs.asdec.types.shaperecords.SHAPERECORD;
 import com.jpexs.asdec.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.asdec.types.shaperecords.StyleChangeRecord;
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -512,7 +510,7 @@ public class SWFInputStream extends InputStream {
 
    private void readActionListAtPos(Stack<TreeItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret) throws IOException {
       boolean debugMode = false;
-      boolean displayCompiletime=false;
+      boolean displayCompiletime = false;
       rri.setPos(ip);
       Action a;
       List<TreeItem> output = new ArrayList<TreeItem>();
@@ -575,27 +573,25 @@ public class SWFInputStream extends InputStream {
                   }
                   a = new ActionNop();
                }
-               if(displayCompiletime){
+               if (displayCompiletime) {
                   beforeInsert = new ActionPop();
-               }
-               else{
-               List<IgnoredPair> needed=top.getNeededActions();
-               for(IgnoredPair ig:needed){
-                  if(ig.action instanceof ActionPush){
-                     if(!((ActionPush)ig.action).ignoredParts.contains(ig.pos)){
-                        ((ActionPush)ig.action).ignoredParts.add(ig.pos);
+               } else {
+                  List<IgnoredPair> needed = top.getNeededActions();
+                  for (IgnoredPair ig : needed) {
+                     if (ig.action instanceof ActionPush) {
+                        if (!((ActionPush) ig.action).ignoredParts.contains(ig.pos)) {
+                           ((ActionPush) ig.action).ignoredParts.add(ig.pos);
 
-                        if(((ActionPush)ig.action).ignoredParts.size()==((ActionPush)ig.action).values.size())
-                        {
-                           ig.action.ignored=true;
+                           if (((ActionPush) ig.action).ignoredParts.size() == ((ActionPush) ig.action).values.size()) {
+                              ig.action.ignored = true;
+                           }
                         }
+                     } else {
+                        ig.action.ignored = true;
                      }
-                  }else{
-                     ig.action.ignored=true;
                   }
                }
-               }
-               
+
             } else {
                goaif = true;
             }

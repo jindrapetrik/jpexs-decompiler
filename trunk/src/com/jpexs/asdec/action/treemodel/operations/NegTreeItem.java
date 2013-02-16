@@ -29,6 +29,4 @@ public class NegTreeItem extends UnaryOpTreeItem {
    public double toNumber() {
       return -value.toNumber();
    }
-   
-   
 }

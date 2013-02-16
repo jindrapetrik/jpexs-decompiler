@@ -17,7 +17,6 @@
 package com.jpexs.asdec.action.swf5;
 
 import com.jpexs.asdec.action.Action;
-import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.DeleteTreeItem;
 import com.jpexs.asdec.action.treemodel.DirectValueTreeItem;
 import com.jpexs.asdec.action.treemodel.TreeItem;
@@ -41,6 +40,6 @@ public class ActionDelete2 extends Action {
       TreeItem propertyName = stack.pop();
 
       output.add(new DeleteTreeItem(this, null, propertyName));
-      stack.push(new DirectValueTreeItem(this,-1, Boolean.TRUE, new ArrayList<String>()));
+      stack.push(new DirectValueTreeItem(this, -1, Boolean.TRUE, new ArrayList<String>()));
    }
 }

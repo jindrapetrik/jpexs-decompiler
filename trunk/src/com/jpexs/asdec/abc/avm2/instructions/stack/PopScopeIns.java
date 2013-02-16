@@ -24,10 +24,8 @@ import com.jpexs.asdec.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.asdec.abc.avm2.treemodel.TreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.WithEndTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.WithObjectTreeItem;
-import com.jpexs.asdec.abc.avm2.treemodel.WithTreeItem;
 import com.jpexs.asdec.abc.types.MethodBody;
 import com.jpexs.asdec.abc.types.MethodInfo;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -48,8 +46,8 @@ public class PopScopeIns extends InstructionDefinition {
       TreeItem scope = (TreeItem) scopeStack.pop();
       if (scope instanceof WithObjectTreeItem) {
          scope = ((WithObjectTreeItem) scope).scope;
-         output.add(new WithEndTreeItem(ins,scope));
-      }      
+         output.add(new WithEndTreeItem(ins, scope));
+      }
    }
 
    @Override

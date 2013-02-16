@@ -22,7 +22,6 @@ import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.parser.FlasmLexer;
 import com.jpexs.asdec.action.parser.ParseException;
 import com.jpexs.asdec.action.swf4.RegisterNumber;
-import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.StoreRegisterTreeItem;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 import java.io.ByteArrayOutputStream;
