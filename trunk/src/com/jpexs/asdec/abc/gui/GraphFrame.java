@@ -17,6 +17,7 @@
 package com.jpexs.asdec.abc.gui;
 
 import com.jpexs.asdec.abc.avm2.graph.AVM2Graph;
+import com.jpexs.asdec.graph.Graph;
 import com.jpexs.asdec.graph.GraphPart;
 import com.jpexs.asdec.gui.View;
 import java.awt.*;
@@ -41,9 +42,9 @@ public class GraphFrame extends JFrame {
       private static final int SPACE_HORIZONTAL = 10;
       private static final int BLOCK_WIDTH = 200;
       private static final int BLOCK_HEIGHT = 20;
-      private AVM2Graph graph;
+      private Graph graph;
 
-      public GraphPanel(AVM2Graph graph) {
+      public GraphPanel(Graph graph) {
          this.graph = graph;
          setPreferredSize(new Dimension((BLOCK_WIDTH + SPACE_HORIZONTAL) * getPartWidth(graph.heads.get(0), new HashSet<GraphPart>()), (BLOCK_HEIGHT + SPACE_VERTICAL) * getPartHeight(graph.heads.get(0), new ArrayList<GraphPart>())));
       }
@@ -121,7 +122,7 @@ public class GraphFrame extends JFrame {
       }
    }
 
-   public GraphFrame(AVM2Graph graph, String name) {
+   public GraphFrame(Graph graph, String name) {
       setSize(500, 500);
       Container cnt = getContentPane();
       cnt.setLayout(new BorderLayout());

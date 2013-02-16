@@ -17,6 +17,7 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
+import java.util.HashMap; import java.util.List;
 
 public class DefineLocalTreeItem extends TreeItem {
 
@@ -35,5 +36,13 @@ public class DefineLocalTreeItem extends TreeItem {
          return hilight("var ") + stripQuotes(name);
       }
       return hilight("var ") + stripQuotes(name) + hilight("=") + value.toString(constants);
+   }
+   
+   @Override
+    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+      ret.addAll(value.getNeededActions());
+      ret.addAll(name.getNeededActions());
+      return ret;
    }
 }

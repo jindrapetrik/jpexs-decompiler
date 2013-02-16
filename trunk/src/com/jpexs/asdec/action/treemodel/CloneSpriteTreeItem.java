@@ -17,6 +17,7 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
+import java.util.HashMap; import java.util.List;
 
 public class CloneSpriteTreeItem extends TreeItem {
 
@@ -34,5 +35,14 @@ public class CloneSpriteTreeItem extends TreeItem {
    @Override
    public String toString(ConstantPool constants) {
       return hilight("duplicateMovieClip(") + target.toString(constants) + hilight(",") + source.toString(constants) + hilight(",") + depth.toString(constants) + hilight(")") + ";";
+   }
+   
+   @Override
+    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+      ret.addAll(source.getNeededActions());
+      ret.addAll(target.getNeededActions());
+      ret.addAll(depth.getNeededActions());
+      return ret;
    }
 }

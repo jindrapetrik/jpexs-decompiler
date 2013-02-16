@@ -44,8 +44,10 @@ public class ActionDefineFunction extends Action {
    public List<Action> code;
    public int codeSize;
    private int version;
+   public List<String> constantPool;
 
    public void setConstantPool(List<String> constantPool){
+      this.constantPool=constantPool;
       for(Action a:code){
          if(a instanceof ActionPush){
             ((ActionPush)a).constantPool=constantPool;
@@ -152,7 +154,14 @@ public class ActionDefineFunction extends Action {
    
    
    @Override
-   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, HashMap<Integer, String> regNames) {
-      stack.push(new FunctionTreeItem(this, functionName, paramNames, Action.actionsToTree(regNames, code,version ), constants));
+   public void translate(Stack<TreeItem> stack, List<TreeItem> output, HashMap<Integer, String> regNames) {
+      stack.push(new FunctionTreeItem(this, functionName, paramNames, Action.actionsToTree(regNames, code,version ), constantPool,1));
    }
+
+   @Override
+   public String toString() {
+      return "DefineFunction";
+   }
+   
+   
 }

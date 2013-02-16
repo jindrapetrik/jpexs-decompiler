@@ -27,7 +27,7 @@ public class RegisterNumber {
 
    @Override
    public String toString() {
-      if (name == null) {
+      if (name == null || name.trim().equals("")) {
          return "register" + number;
       }
       return name;

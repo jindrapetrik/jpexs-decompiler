@@ -17,6 +17,7 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
+import java.util.HashMap; import java.util.List;
 
 public class EnumerateTreeItem extends TreeItem {
 
@@ -30,5 +31,12 @@ public class EnumerateTreeItem extends TreeItem {
    @Override
    public String toString(ConstantPool constants) {
       return "enumerate " + object.toString(constants);
+   }
+   
+   @Override
+    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+      ret.addAll(object.getNeededActions());
+      return ret;
    }
 }

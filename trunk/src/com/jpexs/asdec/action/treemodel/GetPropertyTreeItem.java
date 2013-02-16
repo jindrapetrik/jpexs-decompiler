@@ -17,6 +17,7 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
+import java.util.HashMap; import java.util.List;
 
 public class GetPropertyTreeItem extends TreeItem {
 
@@ -36,4 +37,11 @@ public class GetPropertyTreeItem extends TreeItem {
       }
       return target.toString(constants) + hilight("." + Action.propertyNames[propertyIndex]);
    }
+   
+  @Override
+    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+      ret.addAll(target.getNeededActions());
+      return ret;
+   } 
 }

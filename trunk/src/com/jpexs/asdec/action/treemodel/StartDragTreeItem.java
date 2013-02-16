@@ -17,6 +17,7 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
+import java.util.HashMap; import java.util.List;
 
 public class StartDragTreeItem extends TreeItem {
 
@@ -55,5 +56,17 @@ public class StartDragTreeItem extends TreeItem {
          }
       }
       return hilight("startDrag(") + target.toString(constants) + hilight(",") + lockCenter.toString(constants) + (hasConstrains ? hilight(",") + x1.toString(constants) + hilight(",") + y1.toString(constants) + hilight(",") + x2.toString(constants) + hilight(",") + y2.toString(constants) : "") + hilight(")");
+   }
+   
+   @Override
+    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+      ret.addAll(target.getNeededActions());
+      ret.addAll(constrain.getNeededActions());
+      ret.addAll(x1.getNeededActions());
+      ret.addAll(x2.getNeededActions());
+      ret.addAll(y1.getNeededActions());
+      ret.addAll(y2.getNeededActions());
+      return ret;
    }
 }

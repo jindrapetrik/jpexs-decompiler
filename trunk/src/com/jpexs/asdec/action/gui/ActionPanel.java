@@ -18,7 +18,9 @@ package com.jpexs.asdec.action.gui;
 
 import com.jpexs.asdec.Main;
 import com.jpexs.asdec.SWF;
+import com.jpexs.asdec.abc.gui.GraphFrame;
 import com.jpexs.asdec.abc.gui.LineMarkedEditorPane;
+import com.jpexs.asdec.action.ActionGraph;
 import com.jpexs.asdec.action.TagNode;
 import com.jpexs.asdec.action.parser.ASMParser;
 import com.jpexs.asdec.action.parser.ParseException;
@@ -54,6 +56,7 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
    public JButton saveButton = new JButton("Save");
    public JButton editButton = new JButton("Edit");
    public JButton cancelButton = new JButton("Cancel");
+   public JButton graphButton = new JButton("Graph");
    public JButton saveHexButton = new JButton("Save hex");
    public JButton loadHexButton = new JButton("Load hex");
    public JLabel asmLabel = new JLabel("P-code source");
@@ -63,6 +66,7 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
    private String lastDisasm = "";
    private boolean ignoreCarret = false;
    private boolean editMode = false;
+   private List<com.jpexs.asdec.action.Action> lastCode;
 
    public ActionPanel(List<Tag> list) {
       this.list = list;
@@ -92,10 +96,13 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
       buttonsPan.add(editButton);
       buttonsPan.add(saveButton);
       buttonsPan.add(cancelButton);
+      buttonsPan.add(graphButton);
       //buttonsPan.add(saveHexButton);
       //buttonsPan.add(loadHexButton);
       panB.add(buttonsPan, BorderLayout.SOUTH);
 
+      graphButton.addActionListener(this);
+      graphButton.setActionCommand("GRAPH");
       saveHexButton.addActionListener(this);
       saveHexButton.setActionCommand("SAVEHEXACTION");
       loadHexButton.addActionListener(this);
@@ -207,6 +214,7 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
                   editor.setText(lastDisasm);
                   if (Main.DO_DECOMPILE) {
                      List<com.jpexs.asdec.action.Action> as = asm.getActions(SWF.DEFAULT_VERSION);
+                     lastCode = as;
                      com.jpexs.asdec.action.Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
                      decompiledEditor.setText("//Decompiling...");
                      String s = com.jpexs.asdec.action.Action.actionsToSource(as, SWF.DEFAULT_VERSION);
@@ -258,7 +266,12 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
    }
 
    public void actionPerformed(ActionEvent e) {
-      if (e.getActionCommand().equals("EDITACTION")) {
+      if (e.getActionCommand().equals("GRAPH")) {
+         if (lastCode != null) {
+            GraphFrame gf = new GraphFrame(new ActionGraph(lastCode, SWF.DEFAULT_VERSION), "");
+            gf.setVisible(true);
+         }
+      } else if (e.getActionCommand().equals("EDITACTION")) {
          setEditMode(true);
       } else if (e.getActionCommand().equals("CANCELACTION")) {
          setEditMode(false);

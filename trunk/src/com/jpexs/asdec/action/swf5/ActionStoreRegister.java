@@ -62,7 +62,7 @@ public class ActionStoreRegister extends Action {
    }
 
    @Override
-   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+   public void translate(Stack<TreeItem> stack, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
       TreeItem item = stack.peek();
       RegisterNumber rn = new RegisterNumber(registerNumber);
       if (regNames.containsKey(registerNumber)) {

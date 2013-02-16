@@ -18,6 +18,9 @@ package com.jpexs.asdec;
 
 import com.jpexs.asdec.abc.avm2.instructions.other.NopIns;
 import com.jpexs.asdec.action.Action;
+import com.jpexs.asdec.action.IgnoredPair;
+import com.jpexs.asdec.action.parser.ASMParser;
+import com.jpexs.asdec.action.parser.ParseException;
 import com.jpexs.asdec.action.special.ActionNop;
 import com.jpexs.asdec.action.swf3.*;
 import com.jpexs.asdec.action.swf4.*;
@@ -37,6 +40,7 @@ import com.jpexs.asdec.types.shaperecords.SHAPERECORD;
 import com.jpexs.asdec.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.asdec.types.shaperecords.StyleChangeRecord;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,6 +49,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -496,15 +501,27 @@ public class SWFInputStream extends InputStream {
          }
          last = a;
       }
+      try {
+         String s = Highlighting.stripHilights(Action.actionsToString(ret, null, version));
+         ret = ASMParser.parse(new ByteArrayInputStream(s.getBytes()), SWF.DEFAULT_VERSION);
+      } catch (ParseException ex) {
+         Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error", ex);
+      }
       return ret;
    }
 
    private void readActionListAtPos(Stack<TreeItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret) throws IOException {
+      boolean debugMode = false;
+      boolean displayCompiletime=false;
       rri.setPos(ip);
       Action a;
       List<TreeItem> output = new ArrayList<TreeItem>();
       long filePos = rri.getPos();
       while ((a = sis.readAction()) != null) {
+         if (debugMode) {
+            System.out.println("ip: " + ip + " action: " + a + " stack:" + Highlighting.stripHilights(stack.toString()));
+         }
+
          if (a instanceof ActionPush) {
             if (cpool != null) {
                ((ActionPush) a).constantPool = cpool.constants;
@@ -542,14 +559,43 @@ public class SWFInputStream extends InputStream {
             aif = (ActionIf) a;
             TreeItem top = stack.pop();
             if (top.isCompileTime()) {
+               if (debugMode) {
+                  System.out.print("is compiletime -> ");
+               }
                if (top.toBoolean()) {
                   newip = rri.getPos() + aif.offset;
                   rri.setPos(newip);
                   a = new ActionJump(aif.offset);
+                  if (debugMode) {
+                     System.out.println("jump");
+                  }
                } else {
+                  if (debugMode) {
+                     System.out.println("ignore");
+                  }
                   a = new ActionNop();
                }
-               beforeInsert = new ActionPop();
+               if(displayCompiletime){
+                  beforeInsert = new ActionPop();
+               }
+               else{
+               List<IgnoredPair> needed=top.getNeededActions();
+               for(IgnoredPair ig:needed){
+                  if(ig.action instanceof ActionPush){
+                     if(!((ActionPush)ig.action).ignoredParts.contains(ig.pos)){
+                        ((ActionPush)ig.action).ignoredParts.add(ig.pos);
+
+                        if(((ActionPush)ig.action).ignoredParts.size()==((ActionPush)ig.action).values.size())
+                        {
+                           ig.action.ignored=true;
+                        }
+                     }
+                  }else{
+                     ig.action.ignored=true;
+                  }
+               }
+               }
+               
             } else {
                goaif = true;
             }
@@ -557,7 +603,7 @@ public class SWFInputStream extends InputStream {
             newip = rri.getPos() + ((ActionJump) a).offset;
             rri.setPos(newip);
          } else {
-            a.translate(stack, cpool, output, new HashMap<Integer, String>());
+            a.translate(stack, output, new HashMap<Integer, String>());
          }
          for (int i = 0; i < actionLen; i++) {
             ensureCapacity(ret, ip + i);

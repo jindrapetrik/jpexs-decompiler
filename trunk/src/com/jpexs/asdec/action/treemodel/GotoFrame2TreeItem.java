@@ -17,6 +17,7 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
+import java.util.HashMap; import java.util.List;
 
 public class GotoFrame2TreeItem extends TreeItem {
 
@@ -40,5 +41,12 @@ public class GotoFrame2TreeItem extends TreeItem {
          prefix = "gotoAndPlay";
       }
       return hilight(prefix + "(") + frame.toString(constants) + (sceneBiasFlag ? "," + sceneBias : "") + hilight(")") + ";";
+   }
+   
+   @Override
+    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+      ret.addAll(frame.getNeededActions());
+      return ret;
    }
 }

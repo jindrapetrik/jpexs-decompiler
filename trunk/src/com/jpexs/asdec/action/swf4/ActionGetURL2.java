@@ -73,7 +73,7 @@ public class ActionGetURL2 extends Action {
    }
 
    @Override
-   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+   public void translate(Stack<TreeItem> stack, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
       TreeItem targetString = stack.pop();
       TreeItem urlString = stack.pop();
       output.add(new GetURL2TreeItem(this, urlString, targetString, sendVarsMethod, loadTargetFlag, loadTargetFlag));

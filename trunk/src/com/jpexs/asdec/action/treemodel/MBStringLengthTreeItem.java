@@ -14,11 +14,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.asdec.action.treemodel.operations;
+package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.TreeItem;
+import java.util.HashMap; import java.util.List;
 
 public class MBStringLengthTreeItem extends TreeItem {
 
@@ -36,5 +37,12 @@ public class MBStringLengthTreeItem extends TreeItem {
          s = "(" + s + ")";
       }
       return hilight("mblength(") + s + ")";
+   }
+   
+   @Override
+    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+      ret.addAll(value.getNeededActions());
+      return ret;
    }
 }

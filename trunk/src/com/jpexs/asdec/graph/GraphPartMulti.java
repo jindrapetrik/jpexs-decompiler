@@ -1,5 +1,6 @@
 package com.jpexs.asdec.graph;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -41,4 +42,26 @@ public class GraphPartMulti extends GraphPart {
       }
       return ret;
    }
+
+   @Override
+   public int getPosAt(int offset) {
+      int ofs=0;
+      int pos=0;
+      for(GraphPart p:parts){
+         for(int i=0;i<p.getHeight();i++){
+            pos=p.start+i;
+            ofs+=1;
+            if(ofs==offset){
+               return pos;
+            }
+         }
+      }
+      return -1;
+   }
+   
+   @Override
+   public List<GraphPart> getSubParts(){     
+      return Collections.unmodifiableList(parts);
+   }
+   
 }

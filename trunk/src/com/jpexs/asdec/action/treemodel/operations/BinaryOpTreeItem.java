@@ -19,6 +19,8 @@ package com.jpexs.asdec.action.treemodel.operations;
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.TreeItem;
+import java.util.HashMap;
+import java.util.List;
 
 public abstract class BinaryOpTreeItem extends TreeItem {
 
@@ -52,5 +54,13 @@ public abstract class BinaryOpTreeItem extends TreeItem {
    @Override
    public boolean isCompileTime(){
       return leftSide.isCompileTime()&&rightSide.isCompileTime();
+   }
+   
+   @Override
+    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+      ret.addAll(leftSide.getNeededActions());
+      ret.addAll(rightSide.getNeededActions());
+      return ret;
    }
 }

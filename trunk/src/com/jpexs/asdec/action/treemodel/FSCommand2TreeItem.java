@@ -17,7 +17,8 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
-import java.util.List;
+import java.util.HashMap;
+import java.util.HashMap; import java.util.List;
 
 public class FSCommand2TreeItem extends TreeItem {
 
@@ -39,5 +40,15 @@ public class FSCommand2TreeItem extends TreeItem {
          paramStr += arguments.get(t).toString(constants);
       }
       return hilight("FSCommand2(") + command.toString(constants) + paramStr + hilight(")") + ";";
+   }
+   
+   @Override
+    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+      ret.addAll(command.getNeededActions());
+      for(TreeItem ti:arguments){
+         ret.addAll(ti.getNeededActions());
+      }
+      return ret;
    }
 }

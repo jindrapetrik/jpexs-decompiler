@@ -48,6 +48,7 @@ import java.util.logging.Logger;
 public class Action {
 
    public Action beforeInsert;
+   public boolean ignored=false;
    /**
     * Action type identifier
     */
@@ -124,7 +125,7 @@ public class Action {
       List<Long> ret = new ArrayList<Long>();
       return ret;
    }
-
+    
    /**
     * Gets all ActionIf or ActionJump actions from subactions
     *
@@ -363,17 +364,25 @@ public class Action {
       }
 
       offset = 0;
-      for (Action a : list) {         
+      for (Action a : list) {
          offset = a.getAddress();
          if (importantOffsets.contains(offset)) {
             ret += "loc" + Helper.formatAddress(offset) + ":";
          }
-         if(a.beforeInsert!=null){
-            ret+=a.beforeInsert.getASMSource(importantOffsets, constantPool, version) + "\r\n";
-         }
-         if(!(a instanceof ActionNop)){
-            ret += Highlighting.hilighOffset("", offset) + a.getASMSource(importantOffsets, constantPool, version) + "\r\n";
-         }
+         
+            if(a.ignored){
+               int len=a.getBytes(version).length;
+               for(int i=0;i<len;i++){
+                  ret+="Nop\r\n";
+               }
+            }else{
+            if (a.beforeInsert != null) {
+               ret += a.beforeInsert.getASMSource(importantOffsets, constantPool, version) + "\r\n";
+            }
+            if (!(a instanceof ActionNop)) {
+               ret += Highlighting.hilighOffset("", offset) + a.getASMSource(importantOffsets, constantPool, version) + "\r\n";
+            }
+            }
          offset += a.getBytes(version).length;
       }
       if (importantOffsets.contains(offset)) {
@@ -402,7 +411,7 @@ public class Action {
     * @param output Output
     * @param regNames Register names
     */
-   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+   public void translate(Stack<TreeItem> stack, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
    }
 
    /**
@@ -579,7 +588,9 @@ public class Action {
     */
    public static String actionsToSource(List<Action> actions, int version) {
       try {
+         //List<TreeItem> tree = actionsToTree(new HashMap<Integer, String>(), actions, version);
          List<TreeItem> tree = actionsToTree(new HashMap<Integer, String>(), actions, version);
+
 
          return treeToString(tree);
       } catch (Exception ex) {
@@ -597,14 +608,9 @@ public class Action {
     * @return List of treeItems
     */
    public static List<TreeItem> actionsToTree(HashMap<Integer, String> regNames, List<Action> actions, int version) {
-      Stack<TreeItem> stack = new Stack<TreeItem>();
-      return actionsToTree(regNames, new ArrayList<Long>(), new ArrayList<Loop>(), getActionsAllIfsOrJumps(actions), stack, new ConstantPool(), actions, 0, actions.size() - 1, version);
-   }
-
-   private static Stack<TreeItem> actionsToStackTree(HashMap<Integer, String> regNames, List<Action> jumpsOrIfs, List<Action> actions, ConstantPool constants, int start, int end, int version) {
-      Stack<TreeItem> ret = new Stack<TreeItem>();
-      actionsToTree(regNames, new ArrayList<Long>(), new ArrayList<Loop>(), jumpsOrIfs, ret, constants, actions, start, end, version);
-      return ret;
+      //Stack<TreeItem> stack = new Stack<TreeItem>();
+      return ActionGraph.translateViaGraph(regNames, actions, version);
+      //return actionsToTree(regNames,   stack, actions, 0, actions.size() - 1, version);
    }
 
    private static class Loop {
@@ -629,8 +635,10 @@ public class Action {
       logger.fine(s);
    }
 
-   private static List<TreeItem> actionsToTree(HashMap<Integer, String> registerNames, List<Long> unknownJumps, List<Loop> loopList, List<Action> jumpsOrIfs, Stack<TreeItem> stack, ConstantPool constants, List<Action> actions, int start, int end, int version) {
-      log("Entering " + start + "-" + end + (actions.size() > 0 ? (" (" + actions.get(start).toString() + " - " + actions.get(end == actions.size() ? end - 1 : end) + ")") : ""));
+   public static List<TreeItem> actionsPartToTree(HashMap<Integer, String> registerNames, Stack<TreeItem> stack, List<Action> actions, int start, int end, int version) {
+      if (start < actions.size() && (end > 0) && (start > 0)) {
+         log("Entering " + start + "-" + end + (actions.size() > 0 ? (" (" + actions.get(start).toString() + " - " + actions.get(end == actions.size() ? end - 1 : end) + ")") : ""));
+      }
       List<TreeItem> output = new ArrayList<TreeItem>();
       int ip = start;
       boolean isWhile = false;
@@ -641,259 +649,71 @@ public class Action {
       while (ip <= end + 1) {
 
          long addr = ip2adr(actions, ip, version);
-         if (unknownJumps.contains(addr)) {
-            unknownJumps.remove(new Long(addr));
-            boolean switchFound = false;
-            for (int i = output.size() - 1; i >= 0; i--) {
-               if (output.get(i) instanceof SwitchTreeItem) {
-                  if (((SwitchTreeItem) output.get(i)).defaultCommands == null) {
-                     List<ContinueTreeItem> continues = ((SwitchTreeItem) output.get(i)).getContinues();
-                     boolean breakFound = false;
-                     for (ContinueTreeItem cti : continues) {
-                        if (cti.loopPos == addr) {
-                           cti.isKnown = true;
-                           cti.isBreak = true;
-                           ((SwitchTreeItem) output.get(i)).loopBreak = addr;
-                           breakFound = true;
-                        }
-                     }
-                     if (breakFound) {
-                        switchFound = true;
-                        ((SwitchTreeItem) output.get(i)).defaultCommands = new ArrayList<TreeItem>();
-                        for (int k = i + 1; k < output.size(); k++) {
-                           ((SwitchTreeItem) output.get(i)).defaultCommands.add(output.remove(i + 1));
-                        }
-                     }
-                  }
-                  break;
-               }
-            }
-            if (!switchFound) {
-               throw new UnknownJumpException(stack, addr, output);
-            }
-         }
+         /*if (unknownJumps.contains(addr)) {
+          unknownJumps.remove(new Long(addr));
+          boolean switchFound = false;
+          for (int i = output.size() - 1; i >= 0; i--) {
+          if (output.get(i) instanceof SwitchTreeItem) {
+          if (((SwitchTreeItem) output.get(i)).defaultCommands == null) {
+          List<ContinueTreeItem> continues = ((SwitchTreeItem) output.get(i)).getContinues();
+          boolean breakFound = false;
+          for (ContinueTreeItem cti : continues) {
+          if (cti.loopPos == addr) {
+          cti.isKnown = true;
+          cti.isBreak = true;
+          ((SwitchTreeItem) output.get(i)).loopBreak = addr;
+          breakFound = true;
+          }
+          }
+          if (breakFound) {
+          switchFound = true;
+          ((SwitchTreeItem) output.get(i)).defaultCommands = new ArrayList<TreeItem>();
+          for (int k = i + 1; k < output.size(); k++) {
+          ((SwitchTreeItem) output.get(i)).defaultCommands.add(output.remove(i + 1));
+          }
+          }
+          }
+          break;
+          }
+          }
+          if (!switchFound) {
+          throw new UnknownJumpException(stack, addr, output);
+          }
+          }*/
          if (ip > end) {
             break;
          }
          Action action = actions.get(ip);
-         log("" + Helper.formatAddress(addr) + " ip:" + ip + " action:" + action);
-         for (int j = 0; j < jumpsOrIfs.size(); j++) {
-            Action jif = jumpsOrIfs.get(j);
-            if (jif instanceof ActionIf) {
-               if (((ActionIf) jif).getRef(version) == addr) {
-                  if (jif.getAddress() > addr) {
-                     jumpsOrIfs.remove(j);
-                     List<TreeItem> doBody = actionsToTree(registerNames, unknownJumps, loopList, jumpsOrIfs, stack, constants, actions, ip, adr2ip(actions, jif.getAddress(), version) - 1, version);
-                     Loop currentLoop = new Loop(ip, adr2ip(actions, jif.getAddress(), version) + 1);
-                     loopList.add(currentLoop);
-                     TreeItem expression = stack.pop();
-                     boolean isForInReturn = false;
-                     //Before return in for..in clause, stack must be emptied
-                     if (doBody.isEmpty()) {
-                        TreeItem e = expression;
-                        if (e instanceof NotTreeItem) {
-                           e = ((NotTreeItem) e).value;
-                           if (e instanceof EqTreeItem) {
-                              e = ((EqTreeItem) e).leftSide;
-                              if (e instanceof EnumerateTreeItem) {
-                                 isForInReturn = true;
-                              }
-                           }
-                        }
-                     }
-                     if (!isForInReturn) {
-                        output.add(new DoWhileTreeItem(action, adr2ip(actions, jif.getAddress(), version) + 1, ip, doBody, expression));
-                     }
-                     ip = adr2ip(actions, jif.getAddress(), version) + 1;
-                     continue loopip;
-                  }
-               }
-            }
-
-         }
-         for (int j = 0; j < jumpsOrIfs.size(); j++) {
-            Action jif = jumpsOrIfs.get(j);
-            if (jif instanceof ActionJump) {
-               if (((ActionJump) jif).getRef(version) == addr) {
-                  if (jif.getAddress() > addr) {
-                     isWhile = true;
-                     loopStart = ip;
-                     break;
-                  }
-               }
-            }
-         }
-         if (action instanceof ActionJump) {
-            int jumpIp = adr2ip(actions, ((ActionJump) action).getRef(version), version);
-            for (Loop l : loopList) {
-               if (l.loopBreak == ((ActionJump) action).getRef(version)) {
-                  output.add(new BreakTreeItem(action, l.loopBreak));
-                  ip = ip + 1;
-                  continue loopip;
-               }
-               if (l.loopContinue == ((ActionJump) action).getRef(version)) {
-                  l.continueCount++;
-                  output.add(new ContinueTreeItem(action, l.loopBreak));
-                  ip = ip + 1;
-                  continue loopip;
-               }
-            }
-            output.add(new ContinueTreeItem(action, ((ActionJump) action).getRef(version), false));
-
-            if (!unknownJumps.contains(((ActionJump) action).getRef(version))) {
-               unknownJumps.add(((ActionJump) action).getRef(version));
-            }
-            break;
-
-         } else if (action instanceof ActionIf) {
-            int jumpIp = adr2ip(actions, ((ActionIf) action).getRef(version), version);
-            if (jumpIp < ip) {
-               output.add(new UnsupportedTreeItem(action, "ActionIf to jump back"));
-               break;
-            }
-            TreeItem expression = null;
-            if (!isForIn) {
-               expression = stack.pop();
-               if (expression instanceof NotTreeItem) {
-                  expression = ((NotTreeItem) expression).value;
-               } else {
-                  expression = new NotTreeItem(action, expression);
-               }
-            }
-            List<TreeItem> onTrue = new ArrayList<TreeItem>();
-            List<TreeItem> onFalse = new ArrayList<TreeItem>();
-            boolean hasElse = false;
-            int jumpElseIp = 0;
-            Stack<TreeItem> falseStack = (Stack<TreeItem>) stack.clone();
-            Stack<TreeItem> trueStack = (Stack<TreeItem>) stack.clone();// new Stack<TreeItem>();
-            //if (!isWhile) {
-            if (actions.get(jumpIp - 1) instanceof ActionJump) {
-               long ref = ((ActionJump) actions.get(jumpIp - 1)).getRef(version);
-               int refIp = adr2ip(actions, ref, version);
-               if ((refIp > jumpIp) && (refIp <= end + 1)) {
-                  hasElse = true;
-                  jumpElseIp = adr2ip(actions, ((ActionJump) actions.get(jumpIp - 1)).getRef(version), version);
-               }
-            }
-            //}
-            Loop currentLoop = null;
-            if (isWhile || isForIn) {
-               currentLoop = new Loop(ip2adr(actions, loopStart, version), ip2adr(actions, jumpIp, version));
-               loopList.add(currentLoop);
-            }
-            boolean isFor = false;
-            boolean isTernar = false;
-            List<TreeItem> finalExpression = null;
-
-            TreeItem variableName = null;
-            try {
-               int falseStackSizeBefore = falseStack.size();
-               if (hasElse) {
-                  log("Going to onfalse");
-                  onFalse = actionsToTree(registerNames, unknownJumps, loopList, jumpsOrIfs, falseStack, constants, actions, jumpIp, jumpElseIp - 1, version);
-               }
-               int trueStackSizeBefore = trueStack.size();
-               log("Going to ontrue");
-               onTrue = actionsToTree(registerNames, unknownJumps, loopList, jumpsOrIfs, trueStack, constants, actions, ip + 1, jumpIp - 1 - (hasElse || isWhile || isForIn ? 1 : 0), version);
-               if (onTrue.isEmpty() && trueStack.size() > trueStackSizeBefore && onFalse.isEmpty() && falseStack.size() > falseStackSizeBefore) {
-                  isTernar = true;
-               }
-               int next = (hasElse ? jumpElseIp : jumpIp);
-               if (actions.size() > next) {
-                  if (!isTernar) {
-                     Action nea = actions.get(next);
-                     if (nea instanceof ActionPop) {
-                        if (trueStack.size() > 0) {
-                           nea.translate(trueStack, constants, onTrue, registerNames);
-                        }
-                     }
-                  }
-               }
-            } catch (UnknownJumpException uje) {
-               if ((adr2ip(actions, uje.addr, version) >= start) && (adr2ip(actions, uje.addr, version) <= end)) {
-                  if (currentLoop == null) {
-                     output.add(new UnsupportedTreeItem(action, "UnknownJump"));
-                  } else {
-                     currentLoop.loopContinue = uje.addr;
-                     onTrue = uje.output;
-                     List<ContinueTreeItem> contList = new ArrayList<ContinueTreeItem>();
-                     for (TreeItem ti : onTrue) {
-                        if (ti instanceof ContinueTreeItem) {
-                           contList.add((ContinueTreeItem) ti);
-                        }
-                        if (ti instanceof Block) {
-                           List<ContinueTreeItem> subcont = ((Block) ti).getContinues();
-                           for (int k = 0; k < subcont.size(); k++) {
-                              contList.add(subcont.get(k));
-                           }
-                        }
-                     }
-                     for (int u = 0; u < contList.size(); u++) {
-                        if (contList.get(u) instanceof ContinueTreeItem) {
-                           if (((ContinueTreeItem) contList.get(u)).loopPos == uje.addr) {
-                              if (!((ContinueTreeItem) contList.get(u)).isKnown) {
-                                 ((ContinueTreeItem) contList.get(u)).isKnown = true;
-                                 ((ContinueTreeItem) contList.get(u)).loopPos = currentLoop.loopBreak;
-                              }
-                           }
-                        }
-                     }
-                     finalExpression = actionsToTree(registerNames, unknownJumps, loopList, jumpsOrIfs, stack, constants, actions, adr2ip(actions, uje.addr, version), jumpIp - 2, version);
-                     isFor = true;
-                  }
-               } else {
-                  //throw new ConvertException("Unknown pattern: jump to nowhere", ip);
-               }
-            }
-            if (isForIn) {
-               variableName = onTrue.remove(0);
-               if (variableName instanceof SetTypeTreeItem) {
-                  variableName = ((SetTypeTreeItem) variableName).getObject();
-               }
-               output.add(new ForInTreeItem(action, jumpIp, loopStart, variableName, inItem, onTrue));
-            } else if (isFor) {
-               output.add(new ForTreeItem(action, currentLoop.loopBreak, currentLoop.loopContinue, new ArrayList<TreeItem>(), expression, finalExpression, onTrue));
-            } else if (isTernar) {
-               stack.push(new TernarOpTreeItem(action, expression, trueStack.pop(), falseStack.pop()));
-            } else if (isWhile) {
-               output.add(new WhileTreeItem(action, jumpIp, loopStart, expression, onTrue));
-            } else {
-               output.add(new IfTreeItem(action, expression, onTrue, onFalse));
-            }
-            ip = (hasElse ? jumpElseIp : jumpIp);
-            isWhile = false;
-            isFor = false;
-            isForIn = false;
-            continue;
-         } else if ((action instanceof ActionEnumerate2) || (action instanceof ActionEnumerate)) {
+         /*ActionJump && ActionIf removed*/
+         if ((action instanceof ActionEnumerate2) || (action instanceof ActionEnumerate)) {
             loopStart = ip + 1;
             isForIn = true;
             ip += 4;
-            action.translate(stack, constants, output, registerNames);
+            action.translate(stack, output, registerNames);
             EnumerateTreeItem en = (EnumerateTreeItem) stack.peek();
             inItem = en.object;
             continue;
          } else if (action instanceof ActionTry) {
             ActionTry atry = (ActionTry) action;
-            List<TreeItem> tryCommands = actionsToTree(registerNames, unknownJumps, loopList, jumpsOrIfs, new Stack<TreeItem>(), constants, atry.tryBody, 0, atry.tryBody.size() - 1, version);
+            List<TreeItem> tryCommands = ActionGraph.translateViaGraph(registerNames, atry.tryBody, version);
             TreeItem catchName;
             if (atry.catchInRegisterFlag) {
-               catchName = new DirectValueTreeItem(atry, new RegisterNumber(atry.catchRegister), constants);
+               catchName = new DirectValueTreeItem(atry,-1, new RegisterNumber(atry.catchRegister), new ArrayList<String>());
             } else {
-               catchName = new DirectValueTreeItem(atry, atry.catchName, constants);
+               catchName = new DirectValueTreeItem(atry,-1, atry.catchName, new ArrayList<String>());
             }
             List<TreeItem> catchExceptions = new ArrayList<TreeItem>();
             catchExceptions.add(catchName);
             List<List<TreeItem>> catchCommands = new ArrayList<List<TreeItem>>();
-            catchCommands.add(actionsToTree(registerNames, unknownJumps, loopList, jumpsOrIfs, new Stack<TreeItem>(), constants, atry.catchBody, 0, atry.catchBody.size() - 1, version));
-            List<TreeItem> finallyCommands = actionsToTree(registerNames, unknownJumps, loopList, jumpsOrIfs, new Stack<TreeItem>(), constants, atry.finallyBody, 0, atry.finallyBody.size() - 1, version);
+            catchCommands.add(ActionGraph.translateViaGraph(registerNames, atry.catchBody, version));
+            List<TreeItem> finallyCommands = ActionGraph.translateViaGraph(registerNames, atry.finallyBody, version);
             output.add(new TryTreeItem(tryCommands, catchExceptions, catchCommands, finallyCommands));
          } else if (action instanceof ActionWith) {
             ActionWith awith = (ActionWith) action;
-            List<TreeItem> withCommands = actionsToTree(registerNames, unknownJumps, loopList, jumpsOrIfs, new Stack<TreeItem>(), constants, awith.actions, 0, awith.actions.size() - 1, version);
+            List<TreeItem> withCommands = ActionGraph.translateViaGraph(registerNames, awith.actions, version);
             output.add(new WithTreeItem(action, stack.pop(), withCommands));
          } else if (action instanceof ActionDefineFunction) {
-            FunctionTreeItem fti = new FunctionTreeItem(action, ((ActionDefineFunction) action).functionName, ((ActionDefineFunction) action).paramNames, actionsToTree(registerNames, unknownJumps, loopList, jumpsOrIfs, new Stack<TreeItem>(), constants, ((ActionDefineFunction) action).code, 0, ((ActionDefineFunction) action).code.size() - 1, version), constants);
+            FunctionTreeItem fti = new FunctionTreeItem(action, ((ActionDefineFunction) action).functionName, ((ActionDefineFunction) action).paramNames, ActionGraph.translateViaGraph(registerNames, ((ActionDefineFunction) action).code, version), ((ActionDefineFunction) action).constantPool, 1);
             stack.push(fti);
          } else if (action instanceof ActionDefineFunction2) {
             HashMap<Integer, String> funcRegNames = (HashMap<Integer, String>) registerNames.clone();
@@ -929,87 +749,89 @@ public class Action {
                pos++;
             }
 
-            FunctionTreeItem fti = new FunctionTreeItem(action, ((ActionDefineFunction2) action).functionName, ((ActionDefineFunction2) action).paramNames, actionsToTree(funcRegNames, unknownJumps, loopList, jumpsOrIfs, new Stack<TreeItem>(), constants, ((ActionDefineFunction2) action).code, 0, ((ActionDefineFunction2) action).code.size() - 1, version), constants);
+            FunctionTreeItem fti = new FunctionTreeItem(action, ((ActionDefineFunction2) action).functionName, ((ActionDefineFunction2) action).paramNames, ActionGraph.translateViaGraph(funcRegNames, ((ActionDefineFunction2) action).code, version), ((ActionDefineFunction2) action).constantPool, ((ActionDefineFunction2) action).getFirstRegister());
             stack.push(fti);
-         } else if (action instanceof ActionPushDuplicate) {
-            do {
-               if (actions.get(ip + 1) instanceof ActionNot) {
-                  if (actions.get(ip + 2) instanceof ActionIf) {
-                     int nextPos = adr2ip(actions, ((ActionIf) actions.get(ip + 2)).getRef(version), version);
-                     stack.push(new AndTreeItem(action, stack.pop(), actionsToStackTree(registerNames, jumpsOrIfs, actions, constants, ip + 4 /*je tam pop*/, nextPos - 1, version).pop()));
-                     ip = nextPos;
-                  } else {
-                     output.add(new UnsupportedTreeItem(action, "ActionPushDuplicate with Not"));
-                     break;
-                  }
-               } else if (actions.get(ip + 1) instanceof ActionIf) {
-                  int nextPos = adr2ip(actions, ((ActionIf) actions.get(ip + 1)).getRef(version), version);
-                  stack.push(new OrTreeItem(action, stack.pop(), actionsToStackTree(registerNames, jumpsOrIfs, actions, constants, ip + 3, nextPos - 1, version).pop()));
-                  ip = nextPos;
-               } else {
-                  output.add(new UnsupportedTreeItem(action, "ActionPushDuplicate with no If"));
-                  break loopip;
-               }
-               action = actions.get(ip);
-            } while (action instanceof ActionPushDuplicate);
-            continue;
-         } else if (action instanceof ActionStoreRegister) {
+         } /*else if (action instanceof ActionPushDuplicate) {
+          do {
+          if (actions.get(ip + 1) instanceof ActionNot) {
+          if (actions.get(ip + 2) instanceof ActionIf) {
+          int nextPos = adr2ip(actions, ((ActionIf) actions.get(ip + 2)).getRef(version), version);
+          stack.push(new AndTreeItem(action, stack.pop(), actionsToStackTree(registerNames, actions, constants, ip + 4, nextPos - 1, version).pop()));
+          ip = nextPos;
+          } else {
+          output.add(new UnsupportedTreeItem(action, "ActionPushDuplicate with Not"));
+          break;
+          }
+          } else if (actions.get(ip + 1) instanceof ActionIf) {
+          int nextPos = adr2ip(actions, ((ActionIf) actions.get(ip + 1)).getRef(version), version);
+          stack.push(new OrTreeItem(action, stack.pop(), actionsToStackTree(registerNames,  actions, constants, ip + 3, nextPos - 1, version).pop()));
+          ip = nextPos;
+          } else {
+          output.add(new UnsupportedTreeItem(action, "ActionPushDuplicate with no If"));
+          break loopip;
+          }
+          action = actions.get(ip);
+          } while (action instanceof ActionPushDuplicate);
+          continue;
+          }*/ else if (action instanceof ActionStoreRegister) {
             if ((ip + 1 <= end) && (actions.get(ip + 1) instanceof ActionPop)) {
-               action.translate(stack, constants, output, registerNames);
+               action.translate(stack, output, registerNames);
                stack.pop();
                ip++;
             } else {
-               action.translate(stack, constants, output, registerNames);
+               action.translate(stack, output, registerNames);
             }
-         } else if (action instanceof ActionStrictEquals) {
-            if ((ip + 1 < actions.size()) && (actions.get(ip + 1) instanceof ActionIf)) {
-               List<TreeItem> caseValues = new ArrayList<TreeItem>();
-               List<List<TreeItem>> caseCommands = new ArrayList<List<TreeItem>>();
-               caseValues.add(stack.pop());
-               TreeItem switchedObject = stack.pop();
-               if (output.size() > 0) {
-                  if (output.get(output.size() - 1) instanceof StoreRegisterTreeItem) {
-                     output.remove(output.size() - 1);
-                  }
-               }
-               int caseStart = ip + 2;
-               List<Integer> caseBodyIps = new ArrayList<Integer>();
-               long defaultAddr = 0;
-               caseBodyIps.add(adr2ip(actions, ((ActionIf) actions.get(ip + 1)).getRef(version), version));
-               ip++;
-               do {
-                  ip++;
-                  if ((actions.get(ip - 1) instanceof ActionStrictEquals) && (actions.get(ip) instanceof ActionIf)) {
-                     caseValues.add(actionsToStackTree(registerNames, jumpsOrIfs, actions, constants, caseStart, ip - 2, version).pop());
-                     caseStart = ip + 1;
-                     caseBodyIps.add(adr2ip(actions, ((ActionIf) actions.get(ip)).getRef(version), version));
-                     if (actions.get(ip + 1) instanceof ActionJump) {
-                        defaultAddr = ((ActionJump) actions.get(ip + 1)).getRef(version);
-                        ip = adr2ip(actions, defaultAddr, version);
-                        break;
-                     }
-                  }
-               } while (ip < end);
-               loopList.add(new Loop(-1, ip2adr(actions, ip, version)));
-               for (int i = 0; i < caseBodyIps.size(); i++) {
-                  int caseEnd = ip - 1;
-                  if (i < caseBodyIps.size() - 1) {
-                     caseEnd = caseBodyIps.get(i + 1) - 1;
-                  }
-                  caseCommands.add(actionsToTree(registerNames, unknownJumps, loopList, jumpsOrIfs, stack, constants, actions, caseBodyIps.get(i), caseEnd, version));
-               }
-               output.add(new SwitchTreeItem(action, defaultAddr, switchedObject, caseValues, caseCommands, null));
-               continue;
-            } else {
-               action.translate(stack, constants, output, registerNames);
-            }
-         } else {
+         } /*else if (action instanceof ActionStrictEquals) {
+          if ((ip + 1 < actions.size()) && (actions.get(ip + 1) instanceof ActionIf)) {
+          List<TreeItem> caseValues = new ArrayList<TreeItem>();
+          List<List<TreeItem>> caseCommands = new ArrayList<List<TreeItem>>();
+          caseValues.add(stack.pop());
+          TreeItem switchedObject = stack.pop();
+          if (output.size() > 0) {
+          if (output.get(output.size() - 1) instanceof StoreRegisterTreeItem) {
+          output.remove(output.size() - 1);
+          }
+          }
+          int caseStart = ip + 2;
+          List<Integer> caseBodyIps = new ArrayList<Integer>();
+          long defaultAddr = 0;
+          caseBodyIps.add(adr2ip(actions, ((ActionIf) actions.get(ip + 1)).getRef(version), version));
+          ip++;
+          do {
+          ip++;
+          if ((actions.get(ip - 1) instanceof ActionStrictEquals) && (actions.get(ip) instanceof ActionIf)) {
+          caseValues.add(actionsToStackTree(registerNames, jumpsOrIfs, actions, constants, caseStart, ip - 2, version).pop());
+          caseStart = ip + 1;
+          caseBodyIps.add(adr2ip(actions, ((ActionIf) actions.get(ip)).getRef(version), version));
+          if (actions.get(ip + 1) instanceof ActionJump) {
+          defaultAddr = ((ActionJump) actions.get(ip + 1)).getRef(version);
+          ip = adr2ip(actions, defaultAddr, version);
+          break;
+          }
+          }
+          } while (ip < end);
+               
+          for (int i = 0; i < caseBodyIps.size(); i++) {
+          int caseEnd = ip - 1;
+          if (i < caseBodyIps.size() - 1) {
+          caseEnd = caseBodyIps.get(i + 1) - 1;
+          }
+          caseCommands.add(actionsToTree(registerNames, unknownJumps, loopList, jumpsOrIfs, stack, constants, actions, caseBodyIps.get(i), caseEnd, version));
+          }
+          output.add(new SwitchTreeItem(action, defaultAddr, switchedObject, caseValues, caseCommands, null));
+          continue;
+          } else {
+          action.translate(stack, constants, output, registerNames);
+          }
+          } */ else {
             try {
-               action.translate(stack, constants, output, registerNames);
+               action.translate(stack, output, registerNames);
             } catch (EmptyStackException ese) {
+               System.err.println("EMPTYSTACK===========================");
                Logger.getLogger(Action.class.getName()).log(Level.SEVERE, null, ese);
                output.add(new UnsupportedTreeItem(action, "Empty stack"));
             }
+
          }
 
          ip++;
@@ -1022,7 +844,7 @@ public class Action {
             }
          }
       }
-      output = checkClass(output);
+      //output = checkClass(output);
       log("Leaving " + start + "-" + end);
       return output;
    }
@@ -1042,7 +864,7 @@ public class Action {
          if (v.value instanceof DirectValueTreeItem) {
             if (((DirectValueTreeItem) v.value).value instanceof String) {
                if (((DirectValueTreeItem) v.value).value.equals("_global")) {
-                  GetVariableTreeItem gvt = new GetVariableTreeItem(null, ((GetMemberTreeItem) t).functionName);
+                  GetVariableTreeItem gvt = new GetVariableTreeItem(null, ((GetMemberTreeItem) t).memberName);
                   if (lastMember == null) {
                      return gvt;
                   } else {
@@ -1055,7 +877,7 @@ public class Action {
       return ti;
    }
 
-   private static List<TreeItem> checkClass(List<TreeItem> output) {
+   public static List<TreeItem> checkClass(List<TreeItem> output) {
       List<TreeItem> ret = new ArrayList<TreeItem>();
       List<FunctionTreeItem> functions = new ArrayList<FunctionTreeItem>();
       List<FunctionTreeItem> staticFunctions = new ArrayList<FunctionTreeItem>();
@@ -1071,7 +893,7 @@ public class Action {
             if (it.expression instanceof NotTreeItem) {
                NotTreeItem nti = (NotTreeItem) it.expression;
                if (nti.value instanceof GetMemberTreeItem) {
-                  if (it.onFalse.isEmpty()) {
+                  if (true) { //it.onFalse.isEmpty()){ //||(it.onFalse.get(0) instanceof UnsupportedTreeItem)) {
                      if ((it.onTrue.size() == 1) && (it.onTrue.get(0) instanceof SetMemberTreeItem) && (((SetMemberTreeItem) it.onTrue.get(0)).value instanceof NewObjectTreeItem)) {
                         //ignore
                      } else {
@@ -1085,7 +907,7 @@ public class Action {
                                  TreeItem ti2 = ((StoreRegisterTreeItem) parts.get(0)).value;
                                  if (ti1 == ti2) {
                                     if (((SetMemberTreeItem) parts.get(1)).value instanceof FunctionTreeItem) {
-                                       ((FunctionTreeItem) ((SetMemberTreeItem) parts.get(1)).value).calculatedFunctionName = (className instanceof GetMemberTreeItem) ? ((GetMemberTreeItem) className).functionName : className;
+                                       ((FunctionTreeItem) ((SetMemberTreeItem) parts.get(1)).value).calculatedFunctionName = (className instanceof GetMemberTreeItem) ? ((GetMemberTreeItem) className).memberName : className;
                                        functions.add((FunctionTreeItem) ((SetMemberTreeItem) parts.get(1)).value);
                                        int pos = 2;
                                        if (parts.size() <= pos) {
@@ -1171,15 +993,10 @@ public class Action {
                                                 } else {
                                                    ok = false;
                                                 }
-                                             } else if (parts.get(pos) instanceof VoidTreeItem) {
-                                                VoidTreeItem v = (VoidTreeItem) parts.get(pos);
-                                                if (v.value instanceof CallFunctionTreeItem) {
-                                                   //if(((CallFunctionTreeItem)parts.get(pos)).functionName){
-                                                   if (((CallFunctionTreeItem) v.value).functionName instanceof DirectValueTreeItem) {
-                                                      if (((DirectValueTreeItem) ((CallFunctionTreeItem) v.value).functionName).value.equals("ASSetPropFlags")) {
-                                                      } else {
-                                                         ok = false;
-                                                      }
+                                             } else if (parts.get(pos) instanceof CallFunctionTreeItem) {
+                                                //if(((CallFunctionTreeItem)parts.get(pos)).functionName){
+                                                if (((CallFunctionTreeItem) parts.get(pos)).functionName instanceof DirectValueTreeItem) {
+                                                   if (((DirectValueTreeItem) ((CallFunctionTreeItem) parts.get(pos)).functionName).value.equals("ASSetPropFlags")) {
                                                    } else {
                                                       ok = false;
                                                    }

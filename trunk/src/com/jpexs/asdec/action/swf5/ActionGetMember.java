@@ -35,7 +35,7 @@ public class ActionGetMember extends Action {
    }
 
    @Override
-   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+   public void translate(Stack<TreeItem> stack, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
       TreeItem functionName = stack.pop();
       TreeItem object = stack.pop();
       stack.push(new GetMemberTreeItem(this, object, functionName));

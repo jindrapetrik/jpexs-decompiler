@@ -17,6 +17,7 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
+import java.util.HashMap; import java.util.List;
 
 public class WaitForFrame2TreeItem extends TreeItem {
 
@@ -32,5 +33,12 @@ public class WaitForFrame2TreeItem extends TreeItem {
    @Override
    public String toString(ConstantPool constants) {
       return hilight("waitForFrame2(") + frame.toString(constants) + "," + skipCount + hilight(")") + ";";
+   }
+   
+   @Override
+    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+      ret.addAll(frame.getNeededActions());
+      return ret;
    }
 }

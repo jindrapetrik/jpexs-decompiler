@@ -65,7 +65,7 @@ public class ActionGoToLabel extends Action {
    }
 
    @Override
-   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+   public void translate(Stack<TreeItem> stack, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
       output.add(new GotoLabelTreeItem(this, label));
    }
 }

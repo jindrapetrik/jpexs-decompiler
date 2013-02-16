@@ -94,7 +94,34 @@ public class GraphPart {
       visited.addAll(ignored);
       return getNextPartPath(this,path,visited);
    }
+   
+   public GraphPart getNextSuperPartPath(List<GraphPart> ignored){
+      List<GraphPart> visited=new ArrayList<GraphPart>();
+      visited.addAll(ignored);
+      return getNextSuperPartPath(this,path,visited);
+   }
 
+   private GraphPart getNextSuperPartPath(GraphPart original,String path,List<GraphPart> visited){
+      if(visited.contains(this)){
+         return null;
+      }
+      visited.add(this);
+      for(GraphPart p:nextParts){
+         if(p==original){
+            continue;
+         }
+         if(p.path.length()<path.length()){
+            return p;
+         }else {
+            GraphPart gp=p.getNextSuperPartPath(original,path,visited);
+            if(gp!=null){
+               return gp;
+            }
+         } 
+      }
+      return null;
+   }
+   
    @Override
    public String toString() {
       if (end < start) {
@@ -127,7 +154,17 @@ public class GraphPart {
       return end-start+1;
    }
    
+   public int getPosAt(int offset){
+      return start+offset;
+   }
+   
    public boolean containsPart(GraphPart what) {
       return containsPart(this, what, new ArrayList<GraphPart>());
+   }
+   
+   public List<GraphPart> getSubParts(){
+      List<GraphPart> ret=new ArrayList<GraphPart>();
+      ret.add(this);
+      return  ret;
    }
 }

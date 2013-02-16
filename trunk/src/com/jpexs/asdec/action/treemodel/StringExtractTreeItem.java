@@ -17,6 +17,7 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
+import java.util.HashMap; import java.util.List;
 
 public class StringExtractTreeItem extends TreeItem {
 
@@ -34,5 +35,14 @@ public class StringExtractTreeItem extends TreeItem {
    @Override
    public String toString(ConstantPool constants) {
       return value.toString(constants) + ".substr(" + index.toString(constants) + "," + count.toString(constants) + ")";
+   }
+   
+   @Override
+    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+      ret.addAll(value.getNeededActions());
+      ret.addAll(index.getNeededActions());
+      ret.addAll(count.getNeededActions());
+      return ret;
    }
 }

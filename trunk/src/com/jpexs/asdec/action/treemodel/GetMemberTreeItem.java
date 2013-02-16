@@ -17,24 +17,33 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
+import java.util.HashMap; import java.util.List;
 
 public class GetMemberTreeItem extends TreeItem {
 
    public TreeItem object;
-   public TreeItem functionName;
+   public TreeItem memberName;
 
-   public GetMemberTreeItem(Action instruction, TreeItem object, TreeItem functionName) {
+   public GetMemberTreeItem(Action instruction, TreeItem object, TreeItem memberName) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.object = object;
-      this.functionName = functionName;
+      this.memberName = memberName;
    }
 
    @Override
    public String toString(ConstantPool constants) {
-      if (!((functionName instanceof DirectValueTreeItem) && (((DirectValueTreeItem) functionName).value instanceof String))) {
+      if (!((memberName instanceof DirectValueTreeItem) && (((DirectValueTreeItem) memberName).value instanceof String))) {
          //if(!(functionName instanceof GetVariableTreeItem))
-         return object.toString(constants) + "[" + stripQuotes(functionName) + "]";
+         return object.toString(constants) + "[" + stripQuotes(memberName) + "]";
       }
-      return object.toString(constants) + "." + stripQuotes(functionName);
+      return object.toString(constants) + "." + stripQuotes(memberName);
+   }
+   
+   @Override
+    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+      ret.addAll(object.getNeededActions());
+      ret.addAll(memberName.getNeededActions());
+      return ret;
    }
 }

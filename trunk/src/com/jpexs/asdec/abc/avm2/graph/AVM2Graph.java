@@ -486,8 +486,12 @@ public class AVM2Graph extends Graph{
             }
          }
          boolean loop = false;
+         boolean reversed=false;
          if ((!part.nextParts.isEmpty()) && part.nextParts.get(0).leadsTo(part, loopContinues)) {
             loop = true;
+         }else if ((part.nextParts.size()>1) && part.nextParts.get(1).leadsTo(part, loopContinues)) {
+            loop = true;
+            reversed=true;
          }
          if (((part.nextParts.size() == 2) || ((part.nextParts.size() == 1) && loop)) && (!isSwitch)) {
 
@@ -508,7 +512,7 @@ public class AVM2Graph extends Graph{
             }
 
             if (part.nextParts.size() > 1) {
-               currentLoop.loopBreak = part.nextParts.get(1);
+               currentLoop.loopBreak = part.nextParts.get(reversed?0:1);
             }
 
             int breakIp = -1;
@@ -537,7 +541,7 @@ public class AVM2Graph extends Graph{
                GraphPart finalPart = null;
                boolean isFor = false;
                try {
-                  loopBody = printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, part, part.nextParts.get(0), stopPart, loops, localRegs, body, ignoredSwitches);
+                  loopBody = printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, part, part.nextParts.get(reversed?1:0), stopPart, loops, localRegs, body, ignoredSwitches);
                } catch (ForException fex) {
                   loopBody = fex.output;
                   finalCommands = fex.finalOutput;
@@ -646,7 +650,7 @@ public class AVM2Graph extends Graph{
             }
             if (loop && (part.nextParts.size() > 1)) {
                loops.remove(currentLoop); //remove loop so no break shows up
-               ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, part, part.nextParts.get(1), stopPart, loops, localRegs, body, ignoredSwitches));
+               ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, part, part.nextParts.get(reversed?0:1), stopPart, loops, localRegs, body, ignoredSwitches));
             }
 
             if (next != null) {

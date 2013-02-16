@@ -36,7 +36,7 @@ public class ActionInitObject extends Action {
    }
 
    @Override
-   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+   public void translate(Stack<TreeItem> stack, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
       long numArgs = popLong(stack);
       List<TreeItem> values = new ArrayList<TreeItem>();
       List<TreeItem> names = new ArrayList<TreeItem>();

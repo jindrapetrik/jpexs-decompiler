@@ -17,6 +17,7 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
+import java.util.HashMap; import java.util.List;
 
 public class IncrementTreeItem extends TreeItem {
 
@@ -40,6 +41,13 @@ public class IncrementTreeItem extends TreeItem {
    @Override
    public double toNumber() {
       return object.toNumber()+1;
+   }
+   
+   @Override
+    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+      ret.addAll(object.getNeededActions());
+      return ret;
    }
    
    

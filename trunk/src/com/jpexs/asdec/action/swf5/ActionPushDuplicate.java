@@ -17,6 +17,7 @@
 package com.jpexs.asdec.action.swf5;
 
 import com.jpexs.asdec.action.Action;
+import com.jpexs.asdec.action.IgnoredPair;
 import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 import java.util.List;
@@ -34,9 +35,10 @@ public class ActionPushDuplicate extends Action {
    }
 
    @Override
-   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+   public void translate(Stack<TreeItem> stack, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
       TreeItem value = stack.pop();
       stack.push(value);
       stack.push(value);
+      value.moreInstructions.add(new IgnoredPair(this,0));
    }
 }

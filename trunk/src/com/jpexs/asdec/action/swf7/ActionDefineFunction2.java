@@ -55,24 +55,26 @@ public class ActionDefineFunction2 extends Action {
    public int codeSize;
    public List<Action> code;
    private int version;
+   public List<String> constantPool;
 
-   public void setConstantPool(List<String> constantPool){
-      for(Action a:code){
-         if(a instanceof ActionPush){
-            ((ActionPush)a).constantPool=constantPool;
+   public void setConstantPool(List<String> constantPool) {
+      this.constantPool = constantPool;
+      for (Action a : code) {
+         if (a instanceof ActionPush) {
+            ((ActionPush) a).constantPool = constantPool;
          }
-         if(a instanceof ActionDefineFunction2){
-            ((ActionDefineFunction2)a).setConstantPool(constantPool);
+         if (a instanceof ActionDefineFunction2) {
+            ((ActionDefineFunction2) a).setConstantPool(constantPool);
          }
-         if(a instanceof ActionDefineFunction){
-            ((ActionDefineFunction)a).setConstantPool(constantPool);
+         if (a instanceof ActionDefineFunction) {
+            ((ActionDefineFunction) a).setConstantPool(constantPool);
          }
       }
    }
-   
+
    public ActionDefineFunction2(int actionLength, SWFInputStream sis, int version) throws IOException {
       super(0x8E, actionLength);
-      this.version=version;              
+      this.version = version;
       functionName = sis.readString();
       int numParams = sis.readUI16();
       registerCount = sis.readUI8();
@@ -213,12 +215,33 @@ public class ActionDefineFunction2 extends Action {
       return "DefineFunction2";
    }
 
-   @Override
-   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, HashMap<Integer, String> regNames) {
-      stack.push(new FunctionTreeItem(this, functionName, paramNames, Action.actionsToTree(regNames, code,version ), constants));
+   public int getFirstRegister() {
+      int pos = 1;
+      if (preloadThisFlag) {
+         pos++;
+      }
+      if (preloadArgumentsFlag) {
+         pos++;
+      }
+      if (preloadSuperFlag) {
+         pos++;
+      }
+      if (preloadRootFlag) {
+         pos++;
+      }
+      if (preloadParentFlag) {
+         pos++;
+      }
+      if (preloadGlobalFlag) {
+         pos++;
+      }
+      return pos;
    }
-   
-   
+
+   @Override
+   public void translate(Stack<TreeItem> stack, List<TreeItem> output, HashMap<Integer, String> regNames) {
+      stack.push(new FunctionTreeItem(this, functionName, paramNames, Action.actionsToTree(regNames, code, version), constantPool,getFirstRegister()));
+   }
 
    @Override
    public List<Long> getAllRefs(int version) {

@@ -35,7 +35,7 @@ public class ActionStrictEquals extends Action {
    }
 
    @Override
-   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+   public void translate(Stack<TreeItem> stack, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
       TreeItem a = stack.pop();
       TreeItem b = stack.pop();
       stack.push(new StrictEqTreeItem(this, b, a));

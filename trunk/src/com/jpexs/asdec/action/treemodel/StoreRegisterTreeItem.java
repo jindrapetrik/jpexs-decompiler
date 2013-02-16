@@ -18,6 +18,7 @@ package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.swf4.RegisterNumber;
+import java.util.HashMap; import java.util.List;
 
 public class StoreRegisterTreeItem extends TreeItem implements SetTypeTreeItem {
 
@@ -37,6 +38,13 @@ public class StoreRegisterTreeItem extends TreeItem implements SetTypeTreeItem {
 
    @Override
    public TreeItem getObject() {
-      return new DirectValueTreeItem(instruction, register, null);
+      return new DirectValueTreeItem(instruction,-1, register, null);
+   }
+   
+   @Override
+    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+      ret.addAll(value.getNeededActions());
+      return ret;
    }
 }

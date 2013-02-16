@@ -17,6 +17,8 @@
 package com.jpexs.asdec.action.swf4;
 
 import com.jpexs.asdec.action.Action;
+import com.jpexs.asdec.action.treemodel.CallFunctionTreeItem;
+import com.jpexs.asdec.action.treemodel.CallMethodTreeItem;
 import com.jpexs.asdec.action.treemodel.ConstantPool;
 import com.jpexs.asdec.action.treemodel.DirectValueTreeItem;
 import com.jpexs.asdec.action.treemodel.TreeItem;
@@ -36,13 +38,16 @@ public class ActionPop extends Action {
    }
 
    @Override
-   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+   public void translate(Stack<TreeItem> stack, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
       if (stack.isEmpty()) {
          return;
       }
       TreeItem val = stack.pop();
-      if (!(val instanceof DirectValueTreeItem)) {
-         output.add(new VoidTreeItem(this, val));
+      if((val instanceof CallFunctionTreeItem)||(val instanceof CallMethodTreeItem)){
+         output.add(val);
       }
+      /*if (!(val instanceof DirectValueTreeItem)) {
+         output.add(new VoidTreeItem(this, val));
+      }*/
    }
 }

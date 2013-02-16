@@ -19,19 +19,18 @@ package com.jpexs.asdec.action.treemodel;
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.swf4.ConstantIndex;
 import com.jpexs.asdec.helpers.Helper;
-import java.util.List;
+import java.util.HashMap; import java.util.List;
 
 public class DirectValueTreeItem extends TreeItem {
 
    public Object value;
    public List<String> constants;
 
-   public DirectValueTreeItem(Action instruction, Object value, ConstantPool constants) {
+   public DirectValueTreeItem(Action instruction,int instructionPos, Object value, List<String> constants) {
       super(instruction, PRECEDENCE_PRIMARY);
-      if (constants != null) {
-         this.constants = constants.constants;
-      }
+      this.constants = constants;
       this.value = value;
+      this.instructionPos=instructionPos;
    }
 
    @Override
@@ -50,8 +49,19 @@ public class DirectValueTreeItem extends TreeItem {
 
    @Override
    public boolean toBoolean() {
-      boolean ret=(value instanceof Boolean)?(Boolean)value:false;
-      return ret;
+      if(value instanceof Boolean){
+         return (Boolean)value;
+      }
+      if(value instanceof Double){
+         return Double.compare((Double)value,0.0)!=0;
+      }
+      if(value instanceof Float){
+         return Float.compare((Float)value,0.0f)!=0;
+      }
+      if(value instanceof Long){
+         return ((Long)value)!=0;
+      }
+      return false;
    }
    
    

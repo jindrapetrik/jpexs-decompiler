@@ -17,7 +17,7 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
-import java.util.List;
+import java.util.HashMap; import java.util.List;
 
 public class FunctionTreeItem extends TreeItem {
 
@@ -26,13 +26,15 @@ public class FunctionTreeItem extends TreeItem {
    public String functionName;
    public List<String> paramNames;
    public TreeItem calculatedFunctionName;
+   private int regStart;
 
-   public FunctionTreeItem(Action instruction, String functionName, List<String> paramNames, List<TreeItem> actions, ConstantPool constants) {
+   public FunctionTreeItem(Action instruction, String functionName, List<String> paramNames, List<TreeItem> actions, List<String> constants,int regStart) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.actions = actions;
-      this.constants = constants==null?null:constants.constants;
+      this.constants = constants;
       this.functionName = functionName;
       this.paramNames = paramNames;
+      this.regStart = regStart;
    }
 
    @Override
@@ -48,9 +50,23 @@ public class FunctionTreeItem extends TreeItem {
          if (p > 0) {
             ret += hilight(", ");
          }
-         ret += hilight(paramNames.get(p));
+         String pname=paramNames.get(p);
+         if(pname==null || pname.equals("")){
+            pname="register"+(regStart+p);
+         }
+         ret += hilight(pname);
       }
       ret += hilight(")") + "\r\n{\r\n" + Action.treeToString(actions) + "}";
+      return ret;
+   }
+   
+  
+   @Override
+    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();      
+      for(TreeItem ti:actions){
+         ret.addAll(ti.getNeededActions());
+      }
       return ret;
    }
 }

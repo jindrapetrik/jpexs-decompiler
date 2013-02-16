@@ -17,6 +17,7 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
+import java.util.HashMap; import java.util.List;
 
 public class SetMemberTreeItem extends TreeItem implements SetTypeTreeItem {
 
@@ -39,5 +40,14 @@ public class SetMemberTreeItem extends TreeItem implements SetTypeTreeItem {
    @Override
    public TreeItem getObject() {
       return new GetMemberTreeItem(instruction, object, objectName);
+   }
+   
+   @Override
+    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+      ret.addAll(object.getNeededActions());
+      ret.addAll(objectName.getNeededActions());
+      ret.addAll(value.getNeededActions());
+      return ret;
    }
 }

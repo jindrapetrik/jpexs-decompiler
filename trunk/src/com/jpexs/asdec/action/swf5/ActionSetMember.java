@@ -35,7 +35,7 @@ public class ActionSetMember extends Action {
    }
 
    @Override
-   public void translate(Stack<TreeItem> stack, ConstantPool constants, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+   public void translate(Stack<TreeItem> stack, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
       TreeItem value = stack.pop();
       TreeItem objectName = stack.pop();
       TreeItem object = stack.pop();

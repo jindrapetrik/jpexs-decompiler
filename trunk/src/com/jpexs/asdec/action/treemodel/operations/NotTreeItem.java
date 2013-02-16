@@ -19,7 +19,7 @@ package com.jpexs.asdec.action.treemodel.operations;
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 
-public class NotTreeItem extends UnaryOpTreeItem {
+public class NotTreeItem extends UnaryOpTreeItem implements LogicalOp{
 
    public NotTreeItem(Action instruction, TreeItem value) {
       super(instruction, PRECEDENCE_UNARY, value, "!");
@@ -41,5 +41,8 @@ public class NotTreeItem extends UnaryOpTreeItem {
       return ret;
    }
    
-   
+   @Override
+   public TreeItem invert() {
+      return value;
+   }
 }

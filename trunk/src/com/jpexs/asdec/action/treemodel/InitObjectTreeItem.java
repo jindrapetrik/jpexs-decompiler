@@ -17,7 +17,7 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
-import java.util.List;
+import java.util.HashMap; import java.util.List;
 
 public class InitObjectTreeItem extends TreeItem {
 
@@ -40,5 +40,17 @@ public class InitObjectTreeItem extends TreeItem {
          objStr += names.get(i).toString(constants) + hilight(":") + values.get(i).toString(constants);
       }
       return hilight("{") + objStr + hilight("}");
+   }
+   
+   @Override
+    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+      for(TreeItem name:names){
+         ret.addAll(name.getNeededActions());
+      }
+      for(TreeItem value:values){
+         ret.addAll(value.getNeededActions());
+      }
+      return ret;
    }
 }

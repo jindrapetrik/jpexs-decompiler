@@ -17,7 +17,7 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
-import java.util.List;
+import java.util.HashMap; import java.util.List;
 
 public class ImplementsOpTreeItem extends TreeItem {
 
@@ -40,5 +40,15 @@ public class ImplementsOpTreeItem extends TreeItem {
          impStr += superclasses.get(i).toString(constants);
       }
       return subclass.toString(constants) + hilight(" implements ") + impStr;
+   }
+   
+   @Override
+    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+      ret.addAll(subclass.getNeededActions());
+      for(TreeItem ti:superclasses){
+         ret.addAll(ti.getNeededActions());
+      }
+      return ret;
    }
 }

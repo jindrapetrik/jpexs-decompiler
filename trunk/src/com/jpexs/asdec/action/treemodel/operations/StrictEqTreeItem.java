@@ -19,7 +19,7 @@ package com.jpexs.asdec.action.treemodel.operations;
 import com.jpexs.asdec.action.Action;
 import com.jpexs.asdec.action.treemodel.TreeItem;
 
-public class StrictEqTreeItem extends BinaryOpTreeItem {
+public class StrictEqTreeItem extends BinaryOpTreeItem implements LogicalOp{
 
    public StrictEqTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
       super(instruction, PRECEDENCE_EQUALITY, leftSide, rightSide, "===");
@@ -28,5 +28,10 @@ public class StrictEqTreeItem extends BinaryOpTreeItem {
    @Override
    public boolean toBoolean() {
       return (leftSide.toBoolean()==rightSide.toBoolean())&&(leftSide.toNumber()==rightSide.toNumber());
+   }
+   
+   @Override
+   public TreeItem invert() {
+      return new StrictNeqTreeItem(instruction, leftSide, rightSide);
    }
 }

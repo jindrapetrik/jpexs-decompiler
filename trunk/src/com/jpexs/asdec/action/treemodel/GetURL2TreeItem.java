@@ -17,6 +17,7 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
+import java.util.HashMap; import java.util.List;
 
 public class GetURL2TreeItem extends TreeItem {
 
@@ -52,5 +53,13 @@ public class GetURL2TreeItem extends TreeItem {
       this.method = method;
       this.loadTargetFlag = loadTargetFlag;
       this.loadVariablesFlag = loadVariablesFlag;
+   }
+   
+   @Override
+    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<com.jpexs.asdec.action.IgnoredPair> ret=super.getNeededActions();
+      ret.addAll(urlString.getNeededActions());
+      ret.addAll(targetString.getNeededActions());
+      return ret;
    }
 }

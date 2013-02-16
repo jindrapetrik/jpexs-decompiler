@@ -17,7 +17,9 @@
 package com.jpexs.asdec.action.treemodel;
 
 import com.jpexs.asdec.action.Action;
-import java.util.List;
+import com.jpexs.asdec.action.IgnoredPair;
+import com.sun.org.apache.xml.internal.security.utils.IgnoreAllErrorHandler;
+import java.util.HashMap; import java.util.List;
 
 public class InitArrayTreeItem extends TreeItem {
 
@@ -38,5 +40,14 @@ public class InitArrayTreeItem extends TreeItem {
          arrStr += values.get(i).toString(constants);
       }
       return hilight("[") + arrStr + hilight("]");
+   }
+
+   @Override
+    public List<com.jpexs.asdec.action.IgnoredPair> getNeededActions() {
+      List<IgnoredPair> ret = super.getNeededActions();
+      for (TreeItem value : values) {
+         ret.addAll(value.getNeededActions());
+      }
+      return ret;
    }
 }
