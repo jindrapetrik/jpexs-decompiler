@@ -124,7 +124,9 @@ public class AVM2Graph extends Graph {
    private List<GraphPart> getLoopsContinues(List<Loop> loops) {
       List<GraphPart> ret = new ArrayList<GraphPart>();
       for (Loop l : loops) {
-         ret.add(l.loopContinue);
+         if (l.loopContinue != null) {
+            ret.add(l.loopContinue);
+         }
       }
       return ret;
    }
@@ -310,14 +312,12 @@ public class AVM2Graph extends Graph {
                   List<List<TreeItem>> caseCommands = new ArrayList<List<TreeItem>>();
                   GraphPart next = null;
 
-                  List<GraphPart> loopContinues = new ArrayList<GraphPart>();
-                  for (Loop l : loops) {
-                     if (l.loopContinue != null) {
-                        loopContinues.add(l.loopContinue);
-                     }
-                  }
+                  List<GraphPart> loopContinues = getLoopsContinues(loops);
 
                   next = switchLoc.getNextPartPath(loopContinues);
+                  if (next == null) {
+                     next = switchLoc.getNextSuperPartPath(loopContinues);
+                  }
                   /*for (GraphPart p : allParts) {
                    if (p.start == switchLoc.end + 1) {
                    next = p;
@@ -326,7 +326,8 @@ public class AVM2Graph extends Graph {
                    }*/
 
                   TreeItem ti = checkLoop(next, stopPart, loops);
-                  loops.add(new Loop(null, next));
+                  Loop currentLoop = new Loop(null, next);
+                  loops.add(currentLoop);
                   //switchLoc.getNextPartPath(new ArrayList<GraphPart>());
                   List<Integer> valuesMapping = new ArrayList<Integer>();
                   List<GraphPart> caseBodies = new ArrayList<GraphPart>();
@@ -375,7 +376,7 @@ public class AVM2Graph extends Graph {
 
                   SwitchTreeItem sti = new SwitchTreeItem(null, next == null ? -1 : next.start, switchedObject, caseValues, caseCommands, defaultCommands, valuesMapping);
                   ret.add(sti);
-
+                  loops.remove(currentLoop);
                   if (next != null) {
                      if (ti != null) {
                         ret.add(ti);
@@ -539,9 +540,12 @@ public class AVM2Graph extends Graph {
          if (ip != part.start) {
             part = null;
             for (GraphPart p : allParts) {
-               if (p.start == ip) {
-                  part = p;
-                  break;
+               List<GraphPart> ps = p.getSubParts();
+               for (GraphPart p2 : ps) {
+                  if (p2.start == ip) {
+                     part = p2;
+                     break;
+                  }
                }
             }
             ret.addAll(output);
@@ -810,7 +814,8 @@ public class AVM2Graph extends Graph {
                } else {
                   if ((p != stopPart) && (p.refs.size() > 1)) {
                      ContinueTreeItem cti = new ContinueTreeItem(null, -1);
-                     p.forContinues.add(cti);
+                     //p.forContinues.add(cti);
+                     ret.add(new CommentTreeItem(null, "Unknown jump"));
                      ret.add(cti);
                   }
                }
