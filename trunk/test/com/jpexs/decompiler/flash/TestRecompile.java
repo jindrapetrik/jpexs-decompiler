@@ -1,10 +1,11 @@
-package com.jpexs.asdec;
+package com.jpexs.decompiler.flash;
 
-import com.jpexs.asdec.abc.NotSameException;
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.Main;
+import com.jpexs.decompiler.flash.abc.NotSameException;
+import java.io.*;
 import junit.framework.TestCase;
 import org.junit.Test;
-
-import java.io.*;
 
 public class TestRecompile extends TestCase {
     public static final String TESTDATADIR = "testdata";

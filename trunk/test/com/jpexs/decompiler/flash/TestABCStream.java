@@ -1,13 +1,12 @@
-package com.jpexs.asdec;
+package com.jpexs.decompiler.flash;
 
-import com.jpexs.asdec.abc.ABCInputStream;
-import com.jpexs.asdec.abc.ABCOutputStream;
-import junit.framework.TestCase;
-import org.junit.Test;
-
+import com.jpexs.decompiler.flash.abc.ABCInputStream;
+import com.jpexs.decompiler.flash.abc.ABCOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import junit.framework.TestCase;
+import org.junit.Test;
 
 public class TestABCStream extends TestCase {
     @Test

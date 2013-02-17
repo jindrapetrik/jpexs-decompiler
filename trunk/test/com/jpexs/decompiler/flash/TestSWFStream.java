@@ -1,11 +1,12 @@
-package com.jpexs.asdec;
+package com.jpexs.decompiler.flash;
 
-import junit.framework.TestCase;
-import org.junit.Test;
-
+import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import junit.framework.TestCase;
+import org.junit.Test;
 
 public class TestSWFStream extends TestCase {
 
