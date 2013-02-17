@@ -212,6 +212,7 @@ public class AVM2Graph extends Graph {
                   GraphPart sp1 = getNextNoJump(part.nextParts.get(1));
                   boolean reversed = false;
                   List<GraphPart> loopContinues = getLoopsContinues(loops);
+                  loopContinues.add(part);
                   if (sp1.leadsTo(sp0, loopContinues)) {
                   } else if (sp0.leadsTo(sp1, loopContinues)) {
                      reversed = true;
@@ -234,7 +235,9 @@ public class AVM2Graph extends Graph {
                   GraphPart sp1 = getNextNoJump(part.nextParts.get(1));
                   boolean reversed = false;
                   List<GraphPart> loopContinues = getLoopsContinues(loops);
+                  loopContinues.add(part);
                   if (sp1.leadsTo(sp0, loopContinues)) {
+                     
                   } else if (sp0.leadsTo(sp1, loopContinues)) {
                      reversed = true;
                   }
