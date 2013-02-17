@@ -190,6 +190,9 @@ public class TraitClass extends Trait {
    }
 
    private void parseImportsUsagesFromMethodInfo(List<DoABCTag> abcTags, ABC abc, int method_index, List<String> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames) {
+      if(method_index>abc.method_info.length){
+         return;
+      }
       if (abc.method_info[method_index].ret_type != 0) {
          parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[abc.method_info[method_index].ret_type], ignorePackage, fullyQualifiedNames);
       }
