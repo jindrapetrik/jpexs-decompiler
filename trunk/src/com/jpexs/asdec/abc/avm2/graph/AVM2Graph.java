@@ -23,6 +23,7 @@ import com.jpexs.asdec.abc.avm2.ConvertOutput;
 import com.jpexs.asdec.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.asdec.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.asdec.abc.avm2.instructions.jumps.IfFalseIns;
+import com.jpexs.asdec.abc.avm2.instructions.jumps.IfStrictEqIns;
 import com.jpexs.asdec.abc.avm2.instructions.jumps.IfStrictNeIns;
 import com.jpexs.asdec.abc.avm2.instructions.jumps.IfTrueIns;
 import com.jpexs.asdec.abc.avm2.instructions.jumps.JumpIns;
@@ -45,6 +46,7 @@ import com.jpexs.asdec.abc.avm2.treemodel.IntegerValueTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.LocalRegTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.NextNameTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.NextValueTreeItem;
+import com.jpexs.asdec.abc.avm2.treemodel.NullTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.ReturnValueTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.ReturnVoidTreeItem;
 import com.jpexs.asdec.abc.avm2.treemodel.SetLocalTreeItem;
@@ -98,7 +100,16 @@ public class AVM2Graph extends Graph {
       this.body = body;
       for (GraphPart head : heads) {
          fixGraph(head);
+         makeMulti(head, new ArrayList<GraphPart>());
       }
+
+   }
+
+   public GraphPart getNextNoJump(GraphPart part) {
+      while (code.code.get(part.start).definition instanceof JumpIns) {
+         part = part.getSubParts().get(0).nextParts.get(0);
+      }
+      return part;
    }
 
    public static List<TreeItem> translateViaGraph(String path, AVM2Code code, ABC abc, MethodBody body) {
@@ -108,6 +119,14 @@ public class AVM2Graph extends Graph {
          populateParts(head, allParts);
       }
       return g.printGraph(path, new Stack<TreeItem>(), new Stack<TreeItem>(), allParts, new ArrayList<ABCException>(), new ArrayList<Integer>(), 0, null, g.heads.get(0), null, new ArrayList<Loop>(), new HashMap<Integer, TreeItem>(), body, new ArrayList<Integer>());
+   }
+
+   private List<GraphPart> getLoopsContinues(List<Loop> loops) {
+      List<GraphPart> ret = new ArrayList<GraphPart>();
+      for (Loop l : loops) {
+         ret.add(l.loopContinue);
+      }
+      return ret;
    }
 
    private TreeItem checkLoop(GraphPart part, GraphPart stopPart, List<Loop> loops) {
@@ -128,6 +147,11 @@ public class AVM2Graph extends Graph {
 
    private List<TreeItem> printGraph(String methodPath, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, List<GraphPart> allParts, List<ABCException> parsedExceptions, List<Integer> finallyJumps, int level, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, HashMap<Integer, TreeItem> localRegs, MethodBody body, List<Integer> ignoredSwitches) {
       List<TreeItem> ret = new ArrayList<TreeItem>();
+      if (level > 50) {
+         //System.err.println(methodPath+": Level>50 :"+part);
+         //new Exception().printStackTrace();
+         //return ret;
+      }
       boolean debugMode = false;
 
       try {
@@ -181,43 +205,97 @@ public class AVM2Graph extends Graph {
                AVM2Instruction ins = code.code.get(end + 1);
                if ((stack.size() >= 2) && (ins.definition instanceof IfFalseIns) && (stack.get(stack.size() - 1) == stack.get(stack.size() - 2))) {
                   ret.addAll(output);
-                  printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, parent, part.nextParts.get(1), part.nextParts.get(0), loops, localRegs, body, ignoredSwitches);
+
+                  GraphPart sp0 = getNextNoJump(part.nextParts.get(0));
+                  GraphPart sp1 = getNextNoJump(part.nextParts.get(1));
+                  boolean reversed = false;
+                  List<GraphPart> loopContinues = getLoopsContinues(loops);
+                  if (sp1.leadsTo(sp0, loopContinues)) {
+                  } else if (sp0.leadsTo(sp1, loopContinues)) {
+                     reversed = true;
+                  }
+
+                  printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, parent, reversed ? sp0 : sp1, reversed ? sp1 : sp0, loops, localRegs, body, ignoredSwitches);
                   TreeItem second = stack.pop();
                   TreeItem first = stack.pop();
-                  stack.push(new AndTreeItem(ins, first, second));
-                  ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, parent, part.nextParts.get(0), stopPart, loops, localRegs, body, ignoredSwitches));
+                  if (reversed) {
+                     stack.push(new OrTreeItem(ins, first, second));
+                  } else {
+                     stack.push(new AndTreeItem(ins, first, second));
+                  }
+
+                  ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, parent, reversed ? sp1 : sp0, stopPart, loops, localRegs, body, ignoredSwitches));
                   return ret;
                } else if ((stack.size() >= 2) && (ins.definition instanceof IfTrueIns) && (stack.get(stack.size() - 1) == stack.get(stack.size() - 2))) {
                   ret.addAll(output);
-                  printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, parent, part.nextParts.get(1), part.nextParts.get(0), loops, localRegs, body, ignoredSwitches);
+                  GraphPart sp0 = getNextNoJump(part.nextParts.get(0));
+                  GraphPart sp1 = getNextNoJump(part.nextParts.get(1));
+                  boolean reversed = false;
+                  List<GraphPart> loopContinues = getLoopsContinues(loops);
+                  if (sp1.leadsTo(sp0, loopContinues)) {
+                  } else if (sp0.leadsTo(sp1, loopContinues)) {
+                     reversed = true;
+                  }
+
+                  printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, parent, reversed ? sp0 : sp1, reversed ? sp1 : sp0, loops, localRegs, body, ignoredSwitches);
                   TreeItem second = stack.pop();
                   TreeItem first = stack.pop();
-                  stack.push(new OrTreeItem(ins, first, second));
-                  ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, parent, part.nextParts.get(0), stopPart, loops, localRegs, body, ignoredSwitches));
+                  if (reversed) {
+                     stack.push(new AndTreeItem(ins, first, second));
+                  } else {
+                     stack.push(new OrTreeItem(ins, first, second));
+                  }
+                  ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, parent, reversed ? sp1 : sp0, stopPart, loops, localRegs, body, ignoredSwitches));
                   return ret;
-               } else if (((ins.definition instanceof IfStrictNeIns)) && ((part.nextParts.get(1).getHeight() == 2) && (code.code.get(part.nextParts.get(1).start).definition instanceof PushByteIns) && (code.code.get(part.nextParts.get(1).nextParts.get(0).end).definition instanceof LookupSwitchIns))) {
-
+               } else if ((((ins.definition instanceof IfStrictNeIns)) && ((part.nextParts.get(1).getHeight() == 2) && (code.code.get(part.nextParts.get(1).start).definition instanceof PushByteIns) && (code.code.get(part.nextParts.get(1).nextParts.get(0).end).definition instanceof LookupSwitchIns)))
+                       || (((ins.definition instanceof IfStrictEqIns)) && ((part.nextParts.get(0).getHeight() == 2) && (code.code.get(part.nextParts.get(0).start).definition instanceof PushByteIns) && (code.code.get(part.nextParts.get(0).nextParts.get(0).end).definition instanceof LookupSwitchIns)))) {
+                  ret.addAll(output);
+                  boolean reversed = false;
+                  if (ins.definition instanceof IfStrictEqIns) {
+                     reversed = true;
+                  }
                   TreeItem switchedObject = null;
                   if (!output.isEmpty()) {
                      if (output.get(output.size() - 1) instanceof SetLocalTreeItem) {
                         switchedObject = ((SetLocalTreeItem) output.get(output.size() - 1)).value;
                      }
                   }
+                  if (switchedObject == null) {
+                     switchedObject = new NullTreeItem(null);
+                  }
                   HashMap<Integer, TreeItem> caseValuesMap = new HashMap<Integer, TreeItem>();
 
                   stack.pop();
-                  caseValuesMap.put(code.code.get(part.nextParts.get(1).start).operands[0], stack.pop());
+                  caseValuesMap.put(code.code.get(part.nextParts.get(reversed ? 0 : 1).start).operands[0], stack.pop());
 
-                  GraphPart switchLoc = part.nextParts.get(1).nextParts.get(0);
+                  GraphPart switchLoc = part.nextParts.get(reversed ? 0 : 1).nextParts.get(0);
 
-                  while (code.code.get(part.nextParts.get(0).end).definition instanceof IfStrictNeIns) {
-                     part = part.nextParts.get(0);
-                     code.toSourceOutput(false, false, 0, localRegs, stack, scopeStack, abc, abc.constants, abc.method_info, body, part.start, part.end - 1, lrn, fqn, new boolean[code.code.size()]);
+
+                  while ((code.code.get(part.nextParts.get(reversed ? 1 : 0).end).definition instanceof IfStrictNeIns)
+                          || (code.code.get(part.nextParts.get(reversed ? 1 : 0).end).definition instanceof IfStrictEqIns)) {
+                     part = part.nextParts.get(reversed ? 1 : 0);
+                     List<GraphPart> ps = part.getSubParts();
+                     for (GraphPart p : ps) {
+                        code.toSourceOutput(false, false, 0, localRegs, stack, scopeStack, abc, abc.constants, abc.method_info, body, p.start, p.end - 1, lrn, fqn, new boolean[code.code.size()]);
+                     }
                      stack.pop();
-                     caseValuesMap.put(code.code.get(part.nextParts.get(1).start).operands[0], stack.pop());
+                     if (code.code.get(part.end).definition instanceof IfStrictNeIns) {
+                        reversed = false;
+                     } else {
+                        reversed = true;
+                     }
+                     caseValuesMap.put(code.code.get(part.nextParts.get(reversed ? 0 : 1).start).operands[0], stack.pop());
+
                   }
                   boolean hasDefault = false;
-                  if (code.code.get(part.nextParts.get(0).start).definition instanceof PushByteIns) {
+                  GraphPart dp = part.nextParts.get(reversed ? 1 : 0);
+                  while (code.code.get(dp.start).definition instanceof JumpIns) {
+                     if (dp instanceof GraphPartMulti) {
+                        dp = ((GraphPartMulti) dp).parts.get(0);
+                     }
+                     dp = dp.nextParts.get(0);
+                  }
+                  if (code.code.get(dp.start).definition instanceof PushByteIns) {
                      hasDefault = true;
                   }
                   List<TreeItem> caseValues = new ArrayList<TreeItem>();
@@ -264,7 +342,7 @@ public class AVM2Graph extends Graph {
                   GraphPart defaultPart = null;
                   if (hasDefault) {
                      defaultPart = switchLoc.nextParts.get(switchLoc.nextParts.size() - 1);
-                     defaultCommands = printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, switchLoc, defaultPart, next, loops, localRegs, body, ignoredSwitches);
+                     defaultCommands = printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, switchLoc, defaultPart, next, loops, localRegs, body, ignoredSwitches);
                   }
 
                   List<GraphPart> ignored = new ArrayList<GraphPart>();
@@ -291,7 +369,7 @@ public class AVM2Graph extends Graph {
                            }
                         }
                      }
-                     cc.addAll(0, printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, switchLoc, caseBodies.get(i), nextCase, loops, localRegs, body, ignoredSwitches));
+                     cc.addAll(0, printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, switchLoc, caseBodies.get(i), nextCase, loops, localRegs, body, ignoredSwitches));
                      caseCommands.add(cc);
                   }
 
@@ -302,7 +380,7 @@ public class AVM2Graph extends Graph {
                      if (ti != null) {
                         ret.add(ti);
                      } else {
-                        ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, null, next, stopPart, loops, localRegs, body, ignoredSwitches));
+                        ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, null, next, stopPart, loops, localRegs, body, ignoredSwitches));
                      }
                   }
                   return ret;
@@ -394,7 +472,7 @@ public class AVM2Graph extends Graph {
                                              }
                                              //code.code.get(f).ignored = true;
                                              ignoredSwitches.add(f);
-                                             finallyCommands = printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, parent, fpart, fepart, loops, localRegs, body, ignoredSwitches);
+                                             finallyCommands = printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, parent, fpart, fepart, loops, localRegs, body, ignoredSwitches);
                                              returnPos = f + 1;
                                              break;
                                           }
@@ -437,7 +515,7 @@ public class AVM2Graph extends Graph {
                      }
                   }
                   stack.add(new ExceptionTreeItem(catchedExceptions.get(e)));
-                  catchedCommands.add(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, parent, npart, nepart, loops, localRegs, body, ignoredSwitches));
+                  catchedCommands.add(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, parent, npart, nepart, loops, localRegs, body, ignoredSwitches));
                }
 
                GraphPart nepart = null;
@@ -448,7 +526,7 @@ public class AVM2Graph extends Graph {
                      break;
                   }
                }
-               List<TreeItem> tryCommands = printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, parent, part, nepart, loops, localRegs, body, ignoredSwitches);
+               List<TreeItem> tryCommands = printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, parent, part, nepart, loops, localRegs, body, ignoredSwitches);
 
                output.clear();
                output.add(new TryTreeItem(tryCommands, catchedExceptions, catchedCommands, finallyCommands));
@@ -467,7 +545,12 @@ public class AVM2Graph extends Graph {
                }
             }
             ret.addAll(output);
-            ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, null, part, stopPart, loops, localRegs, body, ignoredSwitches));
+            TreeItem lop = checkLoop(part, stopPart, loops);
+            if (lop == null) {
+               ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, null, part, stopPart, loops, localRegs, body, ignoredSwitches));
+            } else {
+               ret.add(lop);
+            }
             return ret;
          }
 
@@ -526,7 +609,9 @@ public class AVM2Graph extends Graph {
             }
 
             GraphPart next = part.getNextPartPath(loopContinues);
-
+            if (expr instanceof LogicalOp) {
+               expr = ((LogicalOp) expr).invert();
+            }
             if (loop && (!doWhile)) {
                List<TreeItem> loopBody = null;
                List<TreeItem> finalCommands = null;
@@ -585,9 +670,6 @@ public class AVM2Graph extends Graph {
                   ret.add(new WhileTreeItem(null, breakIp, part.start, expr, loopBody));
                }
             } else if (!loop) {
-               if (expr instanceof LogicalOp) {
-                  expr = ((LogicalOp) expr).invert();
-               }
                int stackSizeBefore = stack.size();
                Stack<TreeItem> trueStack = (Stack<TreeItem>) stack.clone();
                Stack<TreeItem> falseStack = (Stack<TreeItem>) stack.clone();
@@ -641,7 +723,8 @@ public class AVM2Graph extends Graph {
             }
             if (loop && (part.nextParts.size() > 1)) {
                loops.remove(currentLoop); //remove loop so no break shows up
-               ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, part, part.nextParts.get(reversed ? 0 : 1), stopPart, loops, localRegs, body, ignoredSwitches));
+               //ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, part, part.nextParts.get(reversed ? 0 : 1), stopPart, loops, localRegs, body, ignoredSwitches));
+               next = part.nextParts.get(reversed ? 0 : 1);
             }
 
             if (next != null) {
@@ -723,7 +806,7 @@ public class AVM2Graph extends Graph {
             TreeItem lop = checkLoop(p, stopPart, loops);
             if (lop == null) {
                if (p.path.length() == part.path.length()) {
-                  ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, part, p, stopPart, loops, localRegs, body, ignoredSwitches));
+                  ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, part, p, stopPart, loops, localRegs, body, ignoredSwitches));
                } else {
                   if ((p != stopPart) && (p.refs.size() > 1)) {
                      ContinueTreeItem cti = new ContinueTreeItem(null, -1);
@@ -750,7 +833,7 @@ public class AVM2Graph extends Graph {
             if (next != null) {
                breakPos = next.start;
             }
-            List<TreeItem> defaultCommands = printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, part, part.nextParts.get(0), stopPart, loops, localRegs, body, ignoredSwitches);
+            List<TreeItem> defaultCommands = printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, part, part.nextParts.get(0), stopPart, loops, localRegs, body, ignoredSwitches);
 
             for (int i = 0; i < part.nextParts.size() - 1; i++) {
                caseValues.add(new IntegerValueTreeItem(null, (Long) (long) i));
@@ -768,7 +851,7 @@ public class AVM2Graph extends Graph {
                } else {
                   nextCase = part.nextParts.get(0);
                }
-               caseBody.addAll(0, printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, part, part.nextParts.get(1 + i), nextCase, loops, localRegs, body, ignoredSwitches));
+               caseBody.addAll(0, printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, part, part.nextParts.get(1 + i), nextCase, loops, localRegs, body, ignoredSwitches));
                caseCommands.add(caseBody);
             }
 
@@ -779,7 +862,7 @@ public class AVM2Graph extends Graph {
             if (lopNext != null) {
                ret.add(lopNext);
             } else {
-               ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, part, next, stopPart, loops, localRegs, body, ignoredSwitches));
+               ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, part, next, stopPart, loops, localRegs, body, ignoredSwitches));
             }
 
          }
