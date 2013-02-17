@@ -20,13 +20,14 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 
-public class DefineShapeTag extends CharacterTag implements BoundedTag, AloneTag {
+public class DefineShapeTag extends CharacterTag implements BoundedTag, AloneTag,ShapeTag {
 
    public int shapeId;
    public RECT shapeBounds;
@@ -49,4 +50,10 @@ public class DefineShapeTag extends CharacterTag implements BoundedTag, AloneTag
    public int getCharacterID() {
       return shapeId;
    }
+
+   @Override
+   public String toSVG() {
+      return shapes.toSVG(1);
+   }
+   
 }

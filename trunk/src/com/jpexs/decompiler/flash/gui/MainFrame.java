@@ -54,6 +54,7 @@ import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.Container;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -188,11 +189,16 @@ public class MainFrame extends JFrame implements ActionListener {
       miExportImages.setIcon(new ImageIcon(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/image16.png")));
       miExportImages.setActionCommand("EXPORTIMAGES");
       miExportImages.addActionListener(this);
+      
+      JMenuItem miExportShapes = new JMenuItem("Shapes...");
+      miExportShapes.setIcon(new ImageIcon(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/shape16.png")));
+      miExportShapes.setActionCommand("EXPORTSHAPES");
+      miExportShapes.addActionListener(this);
 
       menuExportAll.add(miExportAllAS);
       menuExportAll.add(miExportAllPCode);
       menuExportAll.add(miExportImages);
-
+      menuExportAll.add(miExportShapes);
 
       JMenu menuExportSel = new JMenu("Export selection");
       JMenuItem miExportSelAS = new JMenuItem("ActionScript...");
@@ -209,11 +215,16 @@ public class MainFrame extends JFrame implements ActionListener {
       miExportSelImages.setIcon(new ImageIcon(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/image16.png")));
       miExportSelImages.setActionCommand("EXPORTIMAGESSEL");
       miExportSelImages.addActionListener(this);
+      
+      JMenuItem miExportSelShapes = new JMenuItem("Shapes...");
+      miExportSelShapes.setIcon(new ImageIcon(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/shape16.png")));
+      miExportSelShapes.setActionCommand("EXPORTSHAPESSEL");
+      miExportSelShapes.addActionListener(this);
 
       menuExportSel.add(miExportSelAS);
       menuExportSel.add(miExportSelPCode);
       menuExportSel.add(miExportSelImages);
-
+      menuExportSel.add(miExportSelShapes);
 
       menuFile.add(miOpen);
       menuFile.add(miSave);
@@ -698,6 +709,7 @@ public class MainFrame extends JFrame implements ActionListener {
             final boolean isPcode = e.getActionCommand().startsWith("EXPORTPCODE");
             final boolean onlySel = e.getActionCommand().endsWith("SEL");
             final boolean images = e.getActionCommand().startsWith("EXPORTIMAGES");
+            final boolean shapes = e.getActionCommand().startsWith("EXPORTSHAPES");
             (new Thread() {
                @Override
                public void run() {
@@ -722,6 +734,15 @@ public class MainFrame extends JFrame implements ActionListener {
                               }
                               SWF.exportImages(selFile, list, jtt);
                            }
+                        } else if(shapes){
+                              List<Tag> list = new ArrayList<Tag>();
+                              Object lob[] = shapesTagPanel.tagList.getSelectedValues();
+                              for (Object o : lob) {
+                                 if (o instanceof ShapeTag) {
+                                    list.add((Tag) o);
+                                 }
+                              }
+                              SWF.exportShapes(selFile, list);
                         } else if (abcPanel != null) {
                            List<TreeLeafScript> tlsList = abcPanel.classTree.getSelectedScripts();
                            if (tlsList.isEmpty()) {
@@ -746,11 +767,14 @@ public class MainFrame extends JFrame implements ActionListener {
                      } else {
                         if (images) {
                            Main.swf.exportImages(selFile);
+                        } else if(shapes) {
+                           Main.swf.exportShapes(selFile);
                         } else {
                            Main.swf.exportActionScript(selFile, isPcode);
                         }
                      }
                   } catch (Exception ignored) {
+                     ignored.printStackTrace();
                      JOptionPane.showMessageDialog(null, "Cannot write to the file");
                   }
                   Main.stopWork();

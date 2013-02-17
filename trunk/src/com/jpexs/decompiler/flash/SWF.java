@@ -27,6 +27,8 @@ import com.jpexs.decompiler.flash.tags.DefineBitsTag;
 import com.jpexs.decompiler.flash.tags.DoABCTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.RECT;
 import java.io.*;
 import java.util.ArrayList;
@@ -432,6 +434,30 @@ public class SWF {
       return false;
    }
 
+   public static void exportShapes(String outdir,List<Tag> tags) throws IOException{
+      for (Tag t : tags) {
+         if(t instanceof ShapeTag){
+             int characterID=0;
+             if(t instanceof CharacterTag){
+                characterID=((CharacterTag)t).getCharacterID();
+             }
+             FileOutputStream fos = null;
+             try {
+               fos = new FileOutputStream(outdir + File.separator + characterID + ".svg");
+               fos.write(((ShapeTag)t).toSVG().getBytes());
+            } finally {
+               if (fos != null) {
+                  try {
+                     fos.close();
+                  } catch (Exception ex) {
+                     //ignore
+                  }
+               }
+            }
+         }
+      }
+   }
+   
    public static void exportImages(String outdir, List<Tag> tags, JPEGTablesTag jtt) throws IOException {
       for (Tag t : tags) {
          if ((t instanceof DefineBitsJPEG2Tag) || (t instanceof DefineBitsJPEG3Tag) || (t instanceof DefineBitsJPEG4Tag)) {
@@ -504,6 +530,9 @@ public class SWF {
          }
       }
       exportImages(outdir, tags, jtt);
-
+   }
+   
+   public void exportShapes(String outdir) throws IOException {
+      exportShapes(outdir, tags);
    }
 }
