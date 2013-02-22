@@ -16,17 +16,17 @@
  */
 package com.jpexs.decompiler.flash;
 
-import com.jpexs.decompiler.flash.types.filters.GLOWFILTER;
+import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.types.*;
+import com.jpexs.decompiler.flash.types.filters.BEVELFILTER;
 import com.jpexs.decompiler.flash.types.filters.BLURFILTER;
 import com.jpexs.decompiler.flash.types.filters.COLORMATRIXFILTER;
 import com.jpexs.decompiler.flash.types.filters.CONVOLUTIONFILTER;
-import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.decompiler.flash.types.filters.DROPSHADOWFILTER;
-import com.jpexs.decompiler.flash.types.filters.GRADIENTGLOWFILTER;
-import com.jpexs.decompiler.flash.types.filters.BEVELFILTER;
+import com.jpexs.decompiler.flash.types.filters.FILTER;
+import com.jpexs.decompiler.flash.types.filters.GLOWFILTER;
 import com.jpexs.decompiler.flash.types.filters.GRADIENTBEVELFILTER;
-import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.types.*;
+import com.jpexs.decompiler.flash.types.filters.GRADIENTGLOWFILTER;
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;

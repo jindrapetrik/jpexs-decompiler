@@ -16,10 +16,9 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
-import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
@@ -102,11 +101,10 @@ public class TagPanel extends JPanel implements ListSelectionListener {
          }
       }
    }
-   
    private JFrame frame;
 
-   public TagPanel(JFrame frame,List<Tag> list, SWF swf) {
-      this.frame=frame;   
+   public TagPanel(JFrame frame, List<Tag> list, SWF swf) {
+      this.frame = frame;
       this.swf = swf;
       for (Tag t : swf.tags) {
          if (t instanceof JPEGTablesTag) {
@@ -124,7 +122,6 @@ public class TagPanel extends JPanel implements ListSelectionListener {
       try {
          flashPanel = new FlashPlayerPanel(frame);
       } catch (FlashUnsupportedException fue) {
-         
       }
       displayPanel = new JPanel(new CardLayout());
       if (flashPanel != null) {
@@ -151,16 +148,15 @@ public class TagPanel extends JPanel implements ListSelectionListener {
       CardLayout cl = (CardLayout) (displayPanel.getLayout());
       cl.show(displayPanel, card);
    }
-
    private Object oldValue;
-   
+
    @Override
    public void valueChanged(ListSelectionEvent e) {
       Tag tagObj = (Tag) tagList.getSelectedValue();
-      if(tagObj==oldValue){
+      if (tagObj == oldValue) {
          return;
       }
-      oldValue=tagObj;
+      oldValue = tagObj;
       if (tagObj instanceof DefineBitsTag) {
          showCard(CARDIMAGEPANEL);
          imagePanel.setImage(((DefineBitsTag) tagObj).getFullImageData(jtt));

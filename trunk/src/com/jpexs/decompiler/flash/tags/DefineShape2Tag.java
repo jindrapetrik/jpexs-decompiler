@@ -27,18 +27,17 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 
-public class DefineShape2Tag extends CharacterTag implements BoundedTag, AloneTag,ShapeTag {
+public class DefineShape2Tag extends CharacterTag implements BoundedTag, AloneTag, ShapeTag {
 
    public int shapeId;
    public RECT shapeBounds;
    public SHAPEWITHSTYLE shapes;
 
-   
    @Override
    public String toSVG() {
       return shapes.toSVG(2);
-   } 
-   
+   }
+
    @Override
    public int getCharacterID() {
       return shapeId;

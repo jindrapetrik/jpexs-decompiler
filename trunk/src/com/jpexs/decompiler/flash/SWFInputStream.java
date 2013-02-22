@@ -16,15 +16,6 @@
  */
 package com.jpexs.decompiler.flash;
 
-import com.jpexs.decompiler.flash.types.filters.GLOWFILTER;
-import com.jpexs.decompiler.flash.types.filters.BLURFILTER;
-import com.jpexs.decompiler.flash.types.filters.COLORMATRIXFILTER;
-import com.jpexs.decompiler.flash.types.filters.CONVOLUTIONFILTER;
-import com.jpexs.decompiler.flash.types.filters.FILTER;
-import com.jpexs.decompiler.flash.types.filters.DROPSHADOWFILTER;
-import com.jpexs.decompiler.flash.types.filters.GRADIENTGLOWFILTER;
-import com.jpexs.decompiler.flash.types.filters.BEVELFILTER;
-import com.jpexs.decompiler.flash.types.filters.GRADIENTBEVELFILTER;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.IgnoredPair;
 import com.jpexs.decompiler.flash.action.parser.ASMParser;
@@ -41,6 +32,15 @@ import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.*;
 import com.jpexs.decompiler.flash.types.*;
+import com.jpexs.decompiler.flash.types.filters.BEVELFILTER;
+import com.jpexs.decompiler.flash.types.filters.BLURFILTER;
+import com.jpexs.decompiler.flash.types.filters.COLORMATRIXFILTER;
+import com.jpexs.decompiler.flash.types.filters.CONVOLUTIONFILTER;
+import com.jpexs.decompiler.flash.types.filters.DROPSHADOWFILTER;
+import com.jpexs.decompiler.flash.types.filters.FILTER;
+import com.jpexs.decompiler.flash.types.filters.GLOWFILTER;
+import com.jpexs.decompiler.flash.types.filters.GRADIENTBEVELFILTER;
+import com.jpexs.decompiler.flash.types.filters.GRADIENTGLOWFILTER;
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;

@@ -19,11 +19,11 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.gui.AboutDialog;
-import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.LoadingDialog;
 import com.jpexs.decompiler.flash.gui.MainFrame;
 import com.jpexs.decompiler.flash.gui.ModeFrame;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.awt.*;
@@ -226,7 +226,7 @@ public class Main {
             return false;
          }
 
-         try {            
+         try {
             Main.startWork("Creating window...");
             mainFrame = new MainFrame(swf);
             loadingDialog.setVisible(false);
@@ -544,7 +544,7 @@ public class Main {
                } else if (exportFormat.equals("shape")) {
                   exfile.exportShapes(outDir.getAbsolutePath());
                   exportOK = true;
-               }else if (exportFormat.equals("as") || exportFormat.equals("pcode")) {
+               } else if (exportFormat.equals("as") || exportFormat.equals("pcode")) {
                   exportOK = exfile.exportActionScript(outDir.getAbsolutePath(), exportFormat.equals("pcode"));
                } else {
                   exportOK = false;
@@ -704,7 +704,7 @@ public class Main {
    public static void exit() {
       Configuration.save();
       FlashPlayerPanel.unload();
-      System.exit(0);      
+      System.exit(0);
    }
 
    public static void about() {

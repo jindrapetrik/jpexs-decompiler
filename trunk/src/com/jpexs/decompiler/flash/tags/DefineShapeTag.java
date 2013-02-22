@@ -27,7 +27,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 
-public class DefineShapeTag extends CharacterTag implements BoundedTag, AloneTag,ShapeTag {
+public class DefineShapeTag extends CharacterTag implements BoundedTag, AloneTag, ShapeTag {
 
    public int shapeId;
    public RECT shapeBounds;
@@ -55,5 +55,4 @@ public class DefineShapeTag extends CharacterTag implements BoundedTag, AloneTag
    public String toSVG() {
       return shapes.toSVG(1);
    }
-   
 }

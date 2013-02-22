@@ -13,25 +13,19 @@
 package com.jpexs.decompiler.flash.gui.player.jna.platform.win32;
 
 import com.sun.jna.Native;
-import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.WinDef.DWORD;
-import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.WinDef.HWND;
-import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.WinDef.INT_PTR;
-import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.WinNT.HANDLE;
-import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.WinNT.HRESULT;
-import com.sun.jna.ptr.PointerByReference;
 import com.sun.jna.win32.StdCallLibrary;
 import com.sun.jna.win32.W32APIOptions;
 
-/** 
+/**
  * Shell32.dll Interface.
  */
 public interface Shell32 extends StdCallLibrary {
-	
-    Shell32 INSTANCE = (Shell32) Native.loadLibrary("shell32", Shell32.class, 
-    		W32APIOptions.UNICODE_OPTIONS);
-       
-    /**
-     * @return true if successful. Otherwise false.
-     */
-    boolean ShellExecuteEx(SHELLEXECUTEINFO lpExecInfo);
+
+   Shell32 INSTANCE = (Shell32) Native.loadLibrary("shell32", Shell32.class,
+           W32APIOptions.UNICODE_OPTIONS);
+
+   /**
+    * @return true if successful. Otherwise false.
+    */
+   boolean ShellExecuteEx(SHELLEXECUTEINFO lpExecInfo);
 }

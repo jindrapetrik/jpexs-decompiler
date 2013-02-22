@@ -84,8 +84,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.border.BevelBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 /**
  *
@@ -191,7 +189,7 @@ public class MainFrame extends JFrame implements ActionListener {
       miExportImages.setIcon(new ImageIcon(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/image16.png")));
       miExportImages.setActionCommand("EXPORTIMAGES");
       miExportImages.addActionListener(this);
-      
+
       JMenuItem miExportShapes = new JMenuItem("Shapes...");
       miExportShapes.setIcon(new ImageIcon(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/shape16.png")));
       miExportShapes.setActionCommand("EXPORTSHAPES");
@@ -217,7 +215,7 @@ public class MainFrame extends JFrame implements ActionListener {
       miExportSelImages.setIcon(new ImageIcon(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/image16.png")));
       miExportSelImages.setActionCommand("EXPORTIMAGESSEL");
       miExportSelImages.addActionListener(this);
-      
+
       JMenuItem miExportSelShapes = new JMenuItem("Shapes...");
       miExportSelShapes.setIcon(new ImageIcon(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/shape16.png")));
       miExportSelShapes.setActionCommand("EXPORTSHAPESSEL");
@@ -346,27 +344,27 @@ public class MainFrame extends JFrame implements ActionListener {
          }
          menuDeobfuscation.setEnabled(false);
       }
-      
+
       if (!shapes.isEmpty()) {
-         addTab(tabPane, shapesTagPanel = new TagPanel(this,shapes, swf), "Shapes", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/shape16.png")));
+         addTab(tabPane, shapesTagPanel = new TagPanel(this, shapes, swf), "Shapes", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/shape16.png")));
       }
       if (!morphShapes.isEmpty()) {
-         addTab(tabPane, morphshapesTagPanel = new TagPanel(this,morphShapes, swf), "MorphShapes", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/morphshape16.png")));
+         addTab(tabPane, morphshapesTagPanel = new TagPanel(this, morphShapes, swf), "MorphShapes", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/morphshape16.png")));
       }
       if (!images.isEmpty()) {
-         addTab(tabPane, imagesTagPanel = new TagPanel(this,images, swf), "Images", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/image16.png")));
+         addTab(tabPane, imagesTagPanel = new TagPanel(this, images, swf), "Images", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/image16.png")));
       }
       if (!sprites.isEmpty()) {
-         addTab(tabPane, spritesTagPanel = new TagPanel(this,sprites, swf), "Sprites", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/sprite16.png")));
+         addTab(tabPane, spritesTagPanel = new TagPanel(this, sprites, swf), "Sprites", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/sprite16.png")));
       }
       if (!fonts.isEmpty()) {
-         addTab(tabPane, fontsTagPanel = new TagPanel(this,fonts, swf), "Fonts", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/font16.png")));
+         addTab(tabPane, fontsTagPanel = new TagPanel(this, fonts, swf), "Fonts", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/font16.png")));
       }
       if (!texts.isEmpty()) {
-         addTab(tabPane, textsTagPanel = new TagPanel(this,texts, swf), "Texts", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/text16.png")));
+         addTab(tabPane, textsTagPanel = new TagPanel(this, texts, swf), "Texts", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/text16.png")));
       }
       if (!buttons.isEmpty()) {
-         addTab(tabPane, buttonsTagPanel = new TagPanel(this,buttons, swf), "Buttons", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/button16.png")));
+         addTab(tabPane, buttonsTagPanel = new TagPanel(this, buttons, swf), "Buttons", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/button16.png")));
       }
 
       loadingPanel.setPreferredSize(new Dimension(30, 30));
@@ -379,7 +377,7 @@ public class MainFrame extends JFrame implements ActionListener {
       loadingPanel.setVisible(false);
       add(statusPanel, BorderLayout.SOUTH);
       View.centerScreen(this);
-      
+
 
    }
 
@@ -732,15 +730,15 @@ public class MainFrame extends JFrame implements ActionListener {
                               }
                               SWF.exportImages(selFile, list, jtt);
                            }
-                        } else if(shapes){
-                              List<Tag> list = new ArrayList<Tag>();
-                              Object lob[] = shapesTagPanel.tagList.getSelectedValues();
-                              for (Object o : lob) {
-                                 if (o instanceof ShapeTag) {
-                                    list.add((Tag) o);
-                                 }
+                        } else if (shapes) {
+                           List<Tag> list = new ArrayList<Tag>();
+                           Object lob[] = shapesTagPanel.tagList.getSelectedValues();
+                           for (Object o : lob) {
+                              if (o instanceof ShapeTag) {
+                                 list.add((Tag) o);
                               }
-                              SWF.exportShapes(selFile, list);
+                           }
+                           SWF.exportShapes(selFile, list);
                         } else if (abcPanel != null) {
                            List<TreeLeafScript> tlsList = abcPanel.classTree.getSelectedScripts();
                            if (tlsList.isEmpty()) {
@@ -765,7 +763,7 @@ public class MainFrame extends JFrame implements ActionListener {
                      } else {
                         if (images) {
                            Main.swf.exportImages(selFile);
-                        } else if(shapes) {
+                        } else if (shapes) {
                            Main.swf.exportShapes(selFile);
                         } else {
                            Main.swf.exportActionScript(selFile, isPcode);

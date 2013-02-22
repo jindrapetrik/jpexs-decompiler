@@ -255,7 +255,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
               treePanel,
               navPanel);
       splitPaneTreeVSNavigator.setResizeWeight(0.5);
-      splitPaneTreeVSNavigator.setContinuousLayout(true);      
+      splitPaneTreeVSNavigator.setContinuousLayout(true);
       JTabbedPane tabbedPane = new JTabbedPane();
       tabbedPane.addTab("Scripts", splitPaneTreeVSNavigator);
       //tabbedPane.setTabPlacement(JTabbedPane.BOTTOM);
