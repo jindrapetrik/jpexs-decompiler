@@ -62,10 +62,13 @@ public class ReReadableInputStream extends InputStream {
          return ret;
       }
       int i = is.read();
-      baos.write(i);
-      count++;
+      if(i>-1){
+         baos.write(i);
+         count++;         
+      }
       pos++;
       converted = null;
+      
       return i;
    }
 
