@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.gui.AboutDialog;
+import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.LoadingDialog;
 import com.jpexs.decompiler.flash.gui.MainFrame;
 import com.jpexs.decompiler.flash.gui.ModeFrame;
@@ -225,10 +226,12 @@ public class Main {
             return false;
          }
 
-         try {
+         try {            
+            Main.startWork("Creating window...");
             mainFrame = new MainFrame(swf);
             loadingDialog.setVisible(false);
             mainFrame.setVisible(true);
+            Main.stopWork();
          } catch (Exception ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
          }
@@ -457,29 +460,6 @@ public class Main {
       System.exit(0);
    }
 
-   public static void checkSWT(String[] args) {
-      if (System.getProperty("os.name").toLowerCase().indexOf("win") == -1) {
-         return;
-      }
-      String lastBits = (String) Configuration.getConfig("bits", "-");
-      if ((!System.getProperty("sun.arch.data.model").equals(lastBits)) || (!(new File("lib/swt.jar")).exists())) {
-         try {
-            if (System.getProperty("sun.arch.data.model").equals("32")) {
-               copyFile("lib/swt32.jar", "lib/swt.jar");
-            } else if (System.getProperty("sun.arch.data.model").equals("64")) {
-               copyFile("lib/swt64.jar", "lib/swt.jar");
-            }
-         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(null, "Cannot copy SWT library.\nPlease make application directory writeable.\n(Placing outside of Program files may help)", "Error", JOptionPane.ERROR_MESSAGE);
-            Logger.getLogger(SWFInputStream.class.getName()).severe("Cannot copy SWT library");
-            System.exit(1);
-         }
-         Configuration.setConfig("bits", System.getProperty("sun.arch.data.model"));
-         Configuration.save();
-         restartApplication(args);
-      }
-   }
-
    public static final void printASM(AVM2Code code) {
       String s = Highlighting.stripHilights(code.toASMSource(null, new MethodBody()));
       String ss[] = s.split("\n");
@@ -494,7 +474,6 @@ public class Main {
    public static void main(String[] args) throws IOException {
       View.setLookAndFeel();
       Configuration.load();
-      checkSWT(args);
 
       int pos = 0;
       if (args.length > 0) {
@@ -724,7 +703,8 @@ public class Main {
 
    public static void exit() {
       Configuration.save();
-      System.exit(0);
+      FlashPlayerPanel.unload();
+      System.exit(0);      
    }
 
    public static void about() {

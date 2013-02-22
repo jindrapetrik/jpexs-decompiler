@@ -84,6 +84,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  *
@@ -240,9 +242,6 @@ public class MainFrame extends JFrame implements ActionListener {
       menuBar.add(menuFile);
       JMenu menuDeobfuscation = new JMenu("Deobfuscation");
 
-
-
-
       JMenuItem miDeobfuscation = new JMenuItem("PCode deobfuscation...");
       miDeobfuscation.setActionCommand("DEOBFUSCATE");
       miDeobfuscation.addActionListener(this);
@@ -347,29 +346,28 @@ public class MainFrame extends JFrame implements ActionListener {
          }
          menuDeobfuscation.setEnabled(false);
       }
-
+      
       if (!shapes.isEmpty()) {
-         addTab(tabPane, shapesTagPanel = new TagPanel(shapes, swf), "Shapes", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/shape16.png")));
+         addTab(tabPane, shapesTagPanel = new TagPanel(this,shapes, swf), "Shapes", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/shape16.png")));
       }
       if (!morphShapes.isEmpty()) {
-         addTab(tabPane, morphshapesTagPanel = new TagPanel(morphShapes, swf), "MorphShapes", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/morphshape16.png")));
+         addTab(tabPane, morphshapesTagPanel = new TagPanel(this,morphShapes, swf), "MorphShapes", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/morphshape16.png")));
       }
       if (!images.isEmpty()) {
-         addTab(tabPane, imagesTagPanel = new TagPanel(images, swf), "Images", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/image16.png")));
+         addTab(tabPane, imagesTagPanel = new TagPanel(this,images, swf), "Images", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/image16.png")));
       }
       if (!sprites.isEmpty()) {
-         addTab(tabPane, spritesTagPanel = new TagPanel(sprites, swf), "Sprites", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/sprite16.png")));
+         addTab(tabPane, spritesTagPanel = new TagPanel(this,sprites, swf), "Sprites", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/sprite16.png")));
       }
       if (!fonts.isEmpty()) {
-         addTab(tabPane, fontsTagPanel = new TagPanel(fonts, swf), "Fonts", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/font16.png")));
+         addTab(tabPane, fontsTagPanel = new TagPanel(this,fonts, swf), "Fonts", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/font16.png")));
       }
       if (!texts.isEmpty()) {
-         addTab(tabPane, textsTagPanel = new TagPanel(texts, swf), "Texts", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/text16.png")));
+         addTab(tabPane, textsTagPanel = new TagPanel(this,texts, swf), "Texts", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/text16.png")));
       }
       if (!buttons.isEmpty()) {
-         addTab(tabPane, buttonsTagPanel = new TagPanel(buttons, swf), "Buttons", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/button16.png")));
+         addTab(tabPane, buttonsTagPanel = new TagPanel(this,buttons, swf), "Buttons", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/button16.png")));
       }
-
 
       loadingPanel.setPreferredSize(new Dimension(30, 30));
       statusPanel = new JPanel();
@@ -381,7 +379,7 @@ public class MainFrame extends JFrame implements ActionListener {
       loadingPanel.setVisible(false);
       add(statusPanel, BorderLayout.SOUTH);
       View.centerScreen(this);
-      Main.stopWork();
+      
 
    }
 

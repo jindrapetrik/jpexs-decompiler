@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
+import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
@@ -43,7 +45,6 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
-import com.jpexs.flashplayer.FlashPanel;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -58,6 +59,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -72,7 +74,7 @@ import javax.swing.event.ListSelectionListener;
 public class TagPanel extends JPanel implements ListSelectionListener {
 
    public JList tagList;
-   public FlashPanel flashPanel;
+   public FlashPlayerPanel flashPanel;
    public JPanel displayPanel;
    public ImagePanel imagePanel;
    private SWF swf;
@@ -100,8 +102,11 @@ public class TagPanel extends JPanel implements ListSelectionListener {
          }
       }
    }
+   
+   private JFrame frame;
 
-   public TagPanel(List<Tag> list, SWF swf) {
+   public TagPanel(JFrame frame,List<Tag> list, SWF swf) {
+      this.frame=frame;   
       this.swf = swf;
       for (Tag t : swf.tags) {
          if (t instanceof JPEGTablesTag) {
@@ -117,9 +122,9 @@ public class TagPanel extends JPanel implements ListSelectionListener {
 
       setLayout(new BorderLayout());
       try {
-         flashPanel = new FlashPanel();
-      } catch (Error e) {
-         e.printStackTrace();
+         flashPanel = new FlashPlayerPanel(frame);
+      } catch (FlashUnsupportedException fue) {
+         
       }
       displayPanel = new JPanel(new CardLayout());
       if (flashPanel != null) {
@@ -147,9 +152,15 @@ public class TagPanel extends JPanel implements ListSelectionListener {
       cl.show(displayPanel, card);
    }
 
+   private Object oldValue;
+   
    @Override
    public void valueChanged(ListSelectionEvent e) {
       Tag tagObj = (Tag) tagList.getSelectedValue();
+      if(tagObj==oldValue){
+         return;
+      }
+      oldValue=tagObj;
       if (tagObj instanceof DefineBitsTag) {
          showCard(CARDIMAGEPANEL);
          imagePanel.setImage(((DefineBitsTag) tagObj).getFullImageData(jtt));
@@ -279,7 +290,7 @@ public class TagPanel extends JPanel implements ListSelectionListener {
             fos.close();
             showCard(CARDFLASHPANEL);
             if (flashPanel != null) {
-               if (flashPanel instanceof FlashPanel) {
+               if (flashPanel instanceof FlashPlayerPanel) {
                   flashPanel.displaySWF(tempFile.getAbsolutePath());
                }
             }
