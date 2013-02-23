@@ -707,224 +707,229 @@ public class SWFInputStream extends InputStream {
       }
       byte data[] = readBytes((int) tagLength);
       Tag ret;
-      switch (tagID) {
-         case 0:
-            ret = new EndTag(data, version, pos);
-            break;
-         case 1:
-            ret = new ShowFrameTag(pos);
-            break;
-         case 2:
-            ret = new DefineShapeTag(data, version, pos);
-            break;
-         //case 3
-         case 4:
-            ret = new PlaceObjectTag(data, version, pos);
-            break;
-         case 5:
-            ret = new RemoveObjectTag(data, version, pos);
-            break;
-         case 6:
-            ret = new DefineBitsTag(data, version, pos);
-            break;
-         case 7:
-            ret = new DefineButtonTag(data, version, pos);
-            break;
-         case 8:
-            ret = new JPEGTablesTag(data, pos);
-            break;
-         case 9:
-            ret = new SetBackgroundColorTag(data, version, pos);
-            break;
-         case 10:
-            ret = new DefineFontTag(data, version, pos);
-            break;
-         case 11:
-            ret = new DefineTextTag(data, version, pos);
-            break;
-         case 12:
-            ret = new DoActionTag(data, version, pos);
-            break;
-         case 13:
-            ret = new DefineFontInfoTag(data, version, pos);
-            break;
-         case 14:
-            ret = new DefineSoundTag(data, version, pos);
-            break;
-         case 15:
-            ret = new StartSoundTag(data, version, pos);
-            break;
-         //case 16
-         case 17:
-            ret = new DefineButtonSoundTag(data, version, pos);
-            break;
-         case 18:
-            ret = new SoundStreamHeadTag(data, version, pos);
-            break;
-         case 19:
-            ret = new SoundStreamBlockTag(data, version, pos);
-            break;
-         case 21:
-            ret = new DefineBitsJPEG2Tag(data, version, pos);
-            break;
-         case 20:
-            ret = new DefineBitsLosslessTag(data, version, pos);
-            break;
-         case 22:
-            ret = new DefineShape2Tag(data, version, pos);
-            break;
-         case 23:
-            ret = new DefineButtonCxformTag(data, version, pos);
-            break;
-         case 24:
-            ret = new ProtectTag(data, version, pos);
-            break;
-         //case 25:
-         case 26:
-            ret = new PlaceObject2Tag(data, version, pos);
-            break;
-         //case 27: 
-         case 28:
-            ret = new RemoveObject2Tag(data, version, pos);
-            break;
-         //case 29:
-         //case 30:
-         //case 31: 
-         case 32:
-            ret = new DefineShape3Tag(data, version, pos);
-            break;
-         case 33:
-            ret = new DefineText2Tag(data, version, pos);
-            break;
-         case 34:
-            ret = new DefineButton2Tag(data, version, pos);
-            break;
-         case 35:
-            ret = new DefineBitsJPEG3Tag(data, version, pos);
-            break;
-         case 36:
-            ret = new DefineBitsLossless2Tag(data, version, pos);
-            break;
-         case 37:
-            ret = new DefineEditTextTag(data, version, pos);
-            break;
-         //case 38:
-         case 39:
-            ret = new DefineSpriteTag(data, version, level, pos);
-            break;
-         //case 40:
-         case 41:
-            ret = new ProductInfoTag(data, version, pos);
-            break;
-         //case 42:
-         case 43:
-            ret = new FrameLabelTag(data, version, pos);
-            break;
-         //case 44:
-         case 45:
-            ret = new SoundStreamHead2Tag(data, version, pos);
-            break;
-         case 46:
-            ret = new DefineMorphShapeTag(data, version, pos);
-            break;
-         //case 47:
-         case 48:
-            ret = new DefineFont2Tag(data, version, pos);
-            break;
-         //case 49-55:
-         case 56:
-            ret = new ExportAssetsTag(data, version, pos);
-            break;
-         case 57:
-            ret = new ImportAssetsTag(data, version, pos);
-            break;
-         case 58:
-            ret = new EnableDebuggerTag(data, version, pos);
-            break;
-         case 59:
-            ret = new DoInitActionTag(data, version, pos);
-            break;
-         case 60:
-            ret = new DefineVideoStreamTag(data, version, pos);
-            break;
-         case 61:
-            ret = new VideoFrameTag(data, version, pos);
-            break;
-         case 62:
-            ret = new DefineFontInfo2Tag(data, version, pos);
-            break;
-         case 63:
-            ret = new DebugIDTag(data, version, pos);
-            break;
-         case 64:
-            ret = new EnableDebugger2Tag(data, version, pos);
-            break;
-         case 65:
-            ret = new ScriptLimitsTag(data, version, pos);
-            break;
-         case 66:
-            ret = new SetTabIndexTag(data, version, pos);
-            break;
-         //case 67-68:
-         case 69:
-            ret = new FileAttributesTag(data, version, pos);
-            break;
-         case 70:
-            ret = new PlaceObject3Tag(data, version, pos);
-            break;
-         case 71:
-            ret = new ImportAssets2Tag(data, version, pos);
-            break;
-         //case 72:
-         case 73:
-            ret = new DefineFontAlignZonesTag(data, version, pos);
-            break;
-         case 74:
-            ret = new CSMTextSettingsTag(data, version, pos);
-            break;
-         case 75:
-            ret = new DefineFont3Tag(data, version, pos);
-            break;
-         case 76:
-            ret = new SymbolClassTag(data, version, pos);
-            break;
-         case 77:
-            ret = new MetadataTag(data, version, pos);
-            break;
-         case 78:
-            ret = new DefineScalingGridTag(data, version, pos);
-            break;
-         //case 79-81:
-         case 82:
-            ret = new DoABCTag(data, version, pos);
-            break;
-         case 83:
-            ret = new DefineShape4Tag(data, version, pos);
-            break;
-         case 84:
-            ret = new DefineMorphShape2Tag(data, version, pos);
-            break;
-         //case 85:
-         case 86:
-            ret = new DefineSceneAndFrameLabelDataTag(data, version, pos);
-            break;
-         case 87:
-            ret = new DefineBinaryDataTag(data, version, pos);
-            break;
-         case 88:
-            ret = new DefineFontNameTag(data, version, pos);
-            break;
-         case 89:
-            ret = new StartSound2Tag(data, version, pos);
-            break;
-         case 90:
-            ret = new DefineBitsJPEG4Tag(data, version, pos);
-            break;
-         case 91:
-            ret = new DefineFont4Tag(data, version, pos);
-            break;
-         default:
-            ret = new Tag(tagID, "Unknown", data, pos);
+      try {
+         switch (tagID) {
+            case 0:
+               ret = new EndTag(data, version, pos);
+               break;
+            case 1:
+               ret = new ShowFrameTag(pos);
+               break;
+            case 2:
+               ret = new DefineShapeTag(data, version, pos);
+               break;
+            //case 3
+            case 4:
+               ret = new PlaceObjectTag(data, version, pos);
+               break;
+            case 5:
+               ret = new RemoveObjectTag(data, version, pos);
+               break;
+            case 6:
+               ret = new DefineBitsTag(data, version, pos);
+               break;
+            case 7:
+               ret = new DefineButtonTag(data, version, pos);
+               break;
+            case 8:
+               ret = new JPEGTablesTag(data, pos);
+               break;
+            case 9:
+               ret = new SetBackgroundColorTag(data, version, pos);
+               break;
+            case 10:
+               ret = new DefineFontTag(data, version, pos);
+               break;
+            case 11:
+               ret = new DefineTextTag(data, version, pos);
+               break;
+            case 12:
+               ret = new DoActionTag(data, version, pos);
+               break;
+            case 13:
+               ret = new DefineFontInfoTag(data, version, pos);
+               break;
+            case 14:
+               ret = new DefineSoundTag(data, version, pos);
+               break;
+            case 15:
+               ret = new StartSoundTag(data, version, pos);
+               break;
+            //case 16
+            case 17:
+               ret = new DefineButtonSoundTag(data, version, pos);
+               break;
+            case 18:
+               ret = new SoundStreamHeadTag(data, version, pos);
+               break;
+            case 19:
+               ret = new SoundStreamBlockTag(data, version, pos);
+               break;
+            case 21:
+               ret = new DefineBitsJPEG2Tag(data, version, pos);
+               break;
+            case 20:
+               ret = new DefineBitsLosslessTag(data, version, pos);
+               break;
+            case 22:
+               ret = new DefineShape2Tag(data, version, pos);
+               break;
+            case 23:
+               ret = new DefineButtonCxformTag(data, version, pos);
+               break;
+            case 24:
+               ret = new ProtectTag(data, version, pos);
+               break;
+            //case 25:
+            case 26:
+               ret = new PlaceObject2Tag(data, version, pos);
+               break;
+            //case 27: 
+            case 28:
+               ret = new RemoveObject2Tag(data, version, pos);
+               break;
+            //case 29:
+            //case 30:
+            //case 31: 
+            case 32:
+               ret = new DefineShape3Tag(data, version, pos);
+               break;
+            case 33:
+               ret = new DefineText2Tag(data, version, pos);
+               break;
+            case 34:
+               ret = new DefineButton2Tag(data, version, pos);
+               break;
+            case 35:
+               ret = new DefineBitsJPEG3Tag(data, version, pos);
+               break;
+            case 36:
+               ret = new DefineBitsLossless2Tag(data, version, pos);
+               break;
+            case 37:
+               ret = new DefineEditTextTag(data, version, pos);
+               break;
+            //case 38:
+            case 39:
+               ret = new DefineSpriteTag(data, version, level, pos);
+               break;
+            //case 40:
+            case 41:
+               ret = new ProductInfoTag(data, version, pos);
+               break;
+            //case 42:
+            case 43:
+               ret = new FrameLabelTag(data, version, pos);
+               break;
+            //case 44:
+            case 45:
+               ret = new SoundStreamHead2Tag(data, version, pos);
+               break;
+            case 46:
+               ret = new DefineMorphShapeTag(data, version, pos);
+               break;
+            //case 47:
+            case 48:
+               ret = new DefineFont2Tag(data, version, pos);
+               break;
+            //case 49-55:
+            case 56:
+               ret = new ExportAssetsTag(data, version, pos);
+               break;
+            case 57:
+               ret = new ImportAssetsTag(data, version, pos);
+               break;
+            case 58:
+               ret = new EnableDebuggerTag(data, version, pos);
+               break;
+            case 59:
+               ret = new DoInitActionTag(data, version, pos);
+               break;
+            case 60:
+               ret = new DefineVideoStreamTag(data, version, pos);
+               break;
+            case 61:
+               ret = new VideoFrameTag(data, version, pos);
+               break;
+            case 62:
+               ret = new DefineFontInfo2Tag(data, version, pos);
+               break;
+            case 63:
+               ret = new DebugIDTag(data, version, pos);
+               break;
+            case 64:
+               ret = new EnableDebugger2Tag(data, version, pos);
+               break;
+            case 65:
+               ret = new ScriptLimitsTag(data, version, pos);
+               break;
+            case 66:
+               ret = new SetTabIndexTag(data, version, pos);
+               break;
+            //case 67-68:
+            case 69:
+               ret = new FileAttributesTag(data, version, pos);
+               break;
+            case 70:
+               ret = new PlaceObject3Tag(data, version, pos);
+               break;
+            case 71:
+               ret = new ImportAssets2Tag(data, version, pos);
+               break;
+            //case 72:
+            case 73:
+               ret = new DefineFontAlignZonesTag(data, version, pos);
+               break;
+            case 74:
+               ret = new CSMTextSettingsTag(data, version, pos);
+               break;
+            case 75:
+               ret = new DefineFont3Tag(data, version, pos);
+               break;
+            case 76:
+               ret = new SymbolClassTag(data, version, pos);
+               break;
+            case 77:
+               ret = new MetadataTag(data, version, pos);
+               break;
+            case 78:
+               ret = new DefineScalingGridTag(data, version, pos);
+               break;
+            //case 79-81:
+            case 82:
+               ret = new DoABCTag(data, version, pos);
+               break;
+            case 83:
+               ret = new DefineShape4Tag(data, version, pos);
+               break;
+            case 84:
+               ret = new DefineMorphShape2Tag(data, version, pos);
+               break;
+            //case 85:
+            case 86:
+               ret = new DefineSceneAndFrameLabelDataTag(data, version, pos);
+               break;
+            case 87:
+               ret = new DefineBinaryDataTag(data, version, pos);
+               break;
+            case 88:
+               ret = new DefineFontNameTag(data, version, pos);
+               break;
+            case 89:
+               ret = new StartSound2Tag(data, version, pos);
+               break;
+            case 90:
+               ret = new DefineBitsJPEG4Tag(data, version, pos);
+               break;
+            case 91:
+               ret = new DefineFont4Tag(data, version, pos);
+               break;
+            default:
+               ret = new Tag(tagID, "Unknown", data, pos);
+         }
+      } catch (Exception ex) {
+         Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "Error during tag reading", ex);
+         ret = new Tag(tagID, "ErrorTag", data, pos);
       }
       ret.forceWriteAsLong = readLong;
       byte dataNew[] = ret.getData(version);
@@ -2409,7 +2414,7 @@ public class SWFInputStream extends InputStream {
       COLORMAPDATA ret = new COLORMAPDATA();
       ret.colorTableRGB = new RGB[colorTableSize + 1];
       for (int i = 0; i < colorTableSize + 1; i++) {
-         ret.colorTableRGB[i] = readRGB();
+         ret.colorTableRGB[i] = readRGB();         
       }
       int dataLen = 0;
       for (int y = 0; y < bitmapHeight; y++) {
