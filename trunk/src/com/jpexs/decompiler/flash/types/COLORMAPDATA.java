@@ -17,8 +17,6 @@
 package com.jpexs.decompiler.flash.types;
 
 /**
- * Represents 32-bit alpha, red, green and blue value
- *
  * @author JPEXS
  */
 public class COLORMAPDATA {
