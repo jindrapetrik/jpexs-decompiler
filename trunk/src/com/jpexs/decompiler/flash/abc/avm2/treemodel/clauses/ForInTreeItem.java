@@ -28,8 +28,8 @@ public class ForInTreeItem extends LoopTreeItem implements Block {
    public InTreeItem expression;
    public List<TreeItem> commands;
 
-   public ForInTreeItem(AVM2Instruction instruction, int loopBreak, int loopContinue, InTreeItem expression, List<TreeItem> commands) {
-      super(instruction, loopBreak, loopContinue);
+   public ForInTreeItem(AVM2Instruction instruction, long loopId, int loopContinue, InTreeItem expression, List<TreeItem> commands) {
+      super(instruction, loopId, loopContinue);
       if (!commands.isEmpty()) {
          TreeItem firstAssign = commands.get(0);
          if (firstAssign instanceof SetTypeTreeItem) {
@@ -47,12 +47,6 @@ public class ForInTreeItem extends LoopTreeItem implements Block {
       }
       this.expression = expression;
       this.commands = commands;
-
-      if ((!commands.isEmpty()) && (commands.get(commands.size() - 1) instanceof ContinueTreeItem)) {
-         if (((ContinueTreeItem) commands.get(commands.size() - 1)).loopPos == loopBreak) {
-            commands.remove(commands.size() - 1);
-         }
-      }
    }
 
    @Override
@@ -63,13 +57,13 @@ public class ForInTreeItem extends LoopTreeItem implements Block {
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       String ret = "";
-      ret += "loop" + loopBreak + ":\r\n";
+      ret += "loop" + loopId + ":\r\n";
       ret += hilight("for (") + expression.toString(constants, localRegNames, fullyQualifiedNames) + hilight(")") + "\r\n{\r\n";
       for (TreeItem ti : commands) {
          ret += ti.toStringSemicoloned(constants, localRegNames, fullyQualifiedNames) + "\r\n";
       }
       ret += hilight("}") + "\r\n";
-      ret += ":loop" + loopBreak;
+      ret += ":loop" + loopId;
       return ret;
    }
 

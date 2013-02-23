@@ -137,23 +137,28 @@ public class AVM2Graph extends Graph {
       }
       for (Loop l : loops) {
          if (l.loopContinue == part) {
-            return (new ContinueTreeItem(null, l.loopBreak == null ? -1 : l.loopBreak.start));
+            return (new ContinueTreeItem(null, l.id));
          }
          if (l.loopBreak == part) {
-            return (new BreakTreeItem(null, part.start));
+            return (new BreakTreeItem(null, l.id));
          }
       }
       return null;
    }
    private boolean doDecompile = true;
 
+   private void checkContinueAtTheEnd(List<TreeItem> commands, Loop loop) {
+      if (!commands.isEmpty()) {
+         if (commands.get(commands.size() - 1) instanceof ContinueTreeItem) {
+            if (((ContinueTreeItem) commands.get(commands.size() - 1)).loopPos == loop.id) {
+               commands.remove(commands.size() - 1);
+            }
+         }
+      }
+   }
+
    private List<TreeItem> printGraph(String methodPath, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, List<GraphPart> allParts, List<ABCException> parsedExceptions, List<Integer> finallyJumps, int level, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, HashMap<Integer, TreeItem> localRegs, MethodBody body, List<Integer> ignoredSwitches) {
       List<TreeItem> ret = new ArrayList<TreeItem>();
-      if (level > 50) {
-         //System.err.println(methodPath+": Level>50 :"+part);
-         //new Exception().printStackTrace();
-         //return ret;
-      }
       boolean debugMode = false;
 
       try {
@@ -217,17 +222,42 @@ public class AVM2Graph extends Graph {
                   } else if (sp0.leadsTo(sp1, loopContinues)) {
                      reversed = true;
                   }
-
-                  printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, parent, reversed ? sp0 : sp1, reversed ? sp1 : sp0, loops, localRegs, body, ignoredSwitches);
-                  TreeItem second = stack.pop();
-                  TreeItem first = stack.pop();
-                  if (reversed) {
-                     stack.push(new OrTreeItem(ins, first, second));
+                  GraphPart next = reversed ? sp0 : sp1;
+                  TreeItem ti;
+                  if ((ti = checkLoop(next, stopPart, loops)) != null) {
+                     ret.add(ti);
                   } else {
-                     stack.push(new AndTreeItem(ins, first, second));
+                     printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, parent, next, reversed ? sp1 : sp0, loops, localRegs, body, ignoredSwitches);
+                     TreeItem second = stack.pop();
+                     TreeItem first = stack.pop();
+                     if (!reversed) {
+                        AndTreeItem a = new AndTreeItem(ins, first, second);
+                        stack.push(a);
+                        a.firstPart = part;
+                        if (second instanceof AndTreeItem) {
+                           a.firstPart = ((AndTreeItem) second).firstPart;
+                        }
+                        if (second instanceof OrTreeItem) {
+                           a.firstPart = ((AndTreeItem) second).firstPart;
+                        }
+                     } else {
+                        OrTreeItem o = new OrTreeItem(ins, first, second);
+                        stack.push(o);
+                        o.firstPart = part;
+                        if (second instanceof OrTreeItem) {
+                           o.firstPart = ((OrTreeItem) second).firstPart;
+                        }
+                        if (second instanceof OrTreeItem) {
+                           o.firstPart = ((OrTreeItem) second).firstPart;
+                        }
+                     }
+                     next = reversed ? sp1 : sp0;
+                     if ((ti = checkLoop(next, stopPart, loops)) != null) {
+                        ret.add(ti);
+                     } else {
+                        ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, parent, next, stopPart, loops, localRegs, body, ignoredSwitches));
+                     }
                   }
-
-                  ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, parent, reversed ? sp1 : sp0, stopPart, loops, localRegs, body, ignoredSwitches));
                   return ret;
                } else if ((stack.size() >= 2) && (ins.definition instanceof IfTrueIns) && (stack.get(stack.size() - 1) == stack.get(stack.size() - 2))) {
                   ret.addAll(output);
@@ -240,16 +270,44 @@ public class AVM2Graph extends Graph {
                   } else if (sp0.leadsTo(sp1, loopContinues)) {
                      reversed = true;
                   }
-
-                  printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, parent, reversed ? sp0 : sp1, reversed ? sp1 : sp0, loops, localRegs, body, ignoredSwitches);
-                  TreeItem second = stack.pop();
-                  TreeItem first = stack.pop();
-                  if (reversed) {
-                     stack.push(new AndTreeItem(ins, first, second));
+                  GraphPart next = reversed ? sp0 : sp1;
+                  TreeItem ti;
+                  if ((ti = checkLoop(next, stopPart, loops)) != null) {
+                     ret.add(ti);
                   } else {
-                     stack.push(new OrTreeItem(ins, first, second));
+                     printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, parent, next, reversed ? sp1 : sp0, loops, localRegs, body, ignoredSwitches);
+                     TreeItem second = stack.pop();
+                     TreeItem first = stack.pop();
+                     if (reversed) {
+                        AndTreeItem a = new AndTreeItem(ins, first, second);
+                        stack.push(a);
+                        a.firstPart = part;
+                        if (second instanceof AndTreeItem) {
+                           a.firstPart = ((AndTreeItem) second).firstPart;
+                        }
+                        if (second instanceof OrTreeItem) {
+                           a.firstPart = ((AndTreeItem) second).firstPart;
+                        }
+                     } else {
+                        OrTreeItem o = new OrTreeItem(ins, first, second);
+                        stack.push(o);
+                        o.firstPart = part;
+                        if (second instanceof OrTreeItem) {
+                           o.firstPart = ((OrTreeItem) second).firstPart;
+                        }
+                        if (second instanceof OrTreeItem) {
+                           o.firstPart = ((OrTreeItem) second).firstPart;
+                        }
+                     }
+
+                     next = reversed ? sp1 : sp0;
+                     if ((ti = checkLoop(next, stopPart, loops)) != null) {
+                        ret.add(ti);
+                     } else {
+                        ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, parent, next, stopPart, loops, localRegs, body, ignoredSwitches));
+                     }
                   }
-                  ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, parent, reversed ? sp1 : sp0, stopPart, loops, localRegs, body, ignoredSwitches));
+
                   return ret;
                } else if ((((ins.definition instanceof IfStrictNeIns)) && ((part.nextParts.get(1).getHeight() == 2) && (code.code.get(part.nextParts.get(1).start).definition instanceof PushByteIns) && (code.code.get(part.nextParts.get(1).nextParts.get(0).end).definition instanceof LookupSwitchIns)))
                        || (((ins.definition instanceof IfStrictEqIns)) && ((part.nextParts.get(0).getHeight() == 2) && (code.code.get(part.nextParts.get(0).start).definition instanceof PushByteIns) && (code.code.get(part.nextParts.get(0).nextParts.get(0).end).definition instanceof LookupSwitchIns)))) {
@@ -568,8 +626,21 @@ public class AVM2Graph extends Graph {
          }
          boolean loop = false;
          boolean reversed = false;
+         boolean whileTrue = false;
+         Loop whileTrueLoop = null;
          if ((!part.nextParts.isEmpty()) && part.nextParts.get(0).leadsTo(part, loopContinues)) {
-            loop = true;
+            if ((part.nextParts.size() > 1) && part.nextParts.get(1).leadsTo(part, loopContinues)) {
+               if (output.isEmpty()) {
+                  whileTrueLoop = new Loop(part, null);
+                  loops.add(whileTrueLoop);
+                  whileTrue = true;
+               } else {
+                  loop = true;//doWhile
+               }
+
+            } else {
+               loop = true;
+            }
          } else if ((part.nextParts.size() > 1) && part.nextParts.get(1).leadsTo(part, loopContinues)) {
             loop = true;
             reversed = true;
@@ -592,90 +663,43 @@ public class AVM2Graph extends Graph {
                }
             }
 
-            if (part.nextParts.size() > 1) {
+            if ((part.nextParts.size() > 1) && (!doWhile)) {
                currentLoop.loopBreak = part.nextParts.get(reversed ? 0 : 1);
             }
 
-            int breakIp = -1;
-            if (currentLoop.loopBreak != null) {
-               breakIp = currentLoop.loopBreak.start;
-            }
             TreeItem expr = null;
             if ((code.code.get(part.end).definition instanceof JumpIns) || (!(code.code.get(part.end).definition instanceof IfTypeIns))) {
                expr = new BooleanTreeItem(null, true);
             } else {
-               if (stack.isEmpty()) {
+               if (!stack.isEmpty()) {
+                  expr = stack.pop();
                }
-               expr = stack.pop();
             }
+            if (loop) {
+               if (expr instanceof AndTreeItem) {
+                  currentLoop.loopContinue = ((AndTreeItem) expr).firstPart;
+               }
+               if (expr instanceof OrTreeItem) {
+                  currentLoop.loopContinue = ((OrTreeItem) expr).firstPart;
+               }
+            }
+
             if (doWhile) {
-               ret.add(new DoWhileTreeItem(null, breakIp, part.start, output, expr));
+               //ret.add(new DoWhileTreeItem(null, currentLoop.id, part.start, output, expr));
             } else {
                ret.addAll(output);
             }
-
+            GraphPart loopBodyStart = null;
             GraphPart next = part.getNextPartPath(loopContinues);
-            if (expr instanceof LogicalOp) {
+            if (reversed && (expr instanceof LogicalOp)) {
                expr = ((LogicalOp) expr).invert();
             }
-            if (loop && (!doWhile)) {
-               List<TreeItem> loopBody = null;
-               List<TreeItem> finalCommands = null;
-               GraphPart finalPart = null;
-               boolean isFor = false;
-               try {
-                  loopBody = printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, part, part.nextParts.get(reversed ? 1 : 0), stopPart, loops, localRegs, body, ignoredSwitches);
-               } catch (ForException fex) {
-                  loopBody = fex.output;
-                  finalCommands = fex.finalOutput;
-                  if (!finalCommands.isEmpty()) {
-                     finalCommands.remove(finalCommands.size() - 1); //remove continue
-                  }
-                  finalPart = fex.continuePart;
-                  isFor = true;
-                  for (Object o : finalPart.forContinues) {
-                     if (o instanceof ContinueTreeItem) {
-                        ((ContinueTreeItem) o).loopPos = breakIp;
-                     }
-                  }
+            List<TreeItem> retx = ret;
+            if ((!loop) || (doWhile && (part.nextParts.size() > 1))) {
+               if (doWhile) {
+                  retx = output;
+
                }
-               if (isFor) {
-                  ret.add(new ForTreeItem(null, breakIp, finalPart.start, new ArrayList<TreeItem>(), expr, finalCommands, loopBody));
-               } else if ((expr instanceof HasNextTreeItem) && ((HasNextTreeItem) expr).collection.getNotCoerced().getThroughRegister() instanceof FilteredCheckTreeItem) {
-                  TreeItem gti = ((HasNextTreeItem) expr).collection.getNotCoerced().getThroughRegister();
-                  boolean found = false;
-                  if ((loopBody.size() == 3) || (loopBody.size() == 4)) {
-                     TreeItem ft = loopBody.get(0);
-                     if (ft instanceof WithTreeItem) {
-                        ft = loopBody.get(1);
-                        if (ft instanceof IfTreeItem) {
-                           IfTreeItem ift = (IfTreeItem) ft;
-                           if (ift.onTrue.size() > 0) {
-                              ft = ift.onTrue.get(0);
-                              if (ft instanceof SetPropertyTreeItem) {
-                                 SetPropertyTreeItem spt = (SetPropertyTreeItem) ft;
-                                 if (spt.object instanceof LocalRegTreeItem) {
-                                    int regIndex = ((LocalRegTreeItem) spt.object).regIndex;
-                                    HasNextTreeItem iti = (HasNextTreeItem) expr;
-                                    localRegs.put(regIndex, new FilterTreeItem(null, iti.collection.getThroughRegister(), ift.expression));
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-               } else if ((expr instanceof HasNextTreeItem) && (!loopBody.isEmpty()) && (loopBody.get(0) instanceof SetTypeTreeItem) && (((SetTypeTreeItem) loopBody.get(0)).getValue().getNotCoerced() instanceof NextValueTreeItem)) {
-                  TreeItem obj = ((SetTypeTreeItem) loopBody.get(0)).getObject();
-                  loopBody.remove(0);
-                  ret.add(new ForEachInTreeItem(null, breakIp, part.start, new InTreeItem(expr.instruction, obj, ((HasNextTreeItem) expr).collection), loopBody));
-               } else if ((expr instanceof HasNextTreeItem) && (!loopBody.isEmpty()) && (loopBody.get(0) instanceof SetTypeTreeItem) && (((SetTypeTreeItem) loopBody.get(0)).getValue().getNotCoerced() instanceof NextNameTreeItem)) {
-                  TreeItem obj = ((SetTypeTreeItem) loopBody.get(0)).getObject();
-                  loopBody.remove(0);
-                  ret.add(new ForInTreeItem(null, breakIp, part.start, new InTreeItem(expr.instruction, obj, ((HasNextTreeItem) expr).collection), loopBody));
-               } else {
-                  ret.add(new WhileTreeItem(null, breakIp, part.start, expr, loopBody));
-               }
-            } else if (!loop) {
                int stackSizeBefore = stack.size();
                Stack<TreeItem> trueStack = (Stack<TreeItem>) stack.clone();
                Stack<TreeItem> falseStack = (Stack<TreeItem>) stack.clone();
@@ -712,7 +736,14 @@ public class AVM2Graph extends Graph {
                if (onTrue.isEmpty() && onFalse.isEmpty() && (trueStack.size() > stackSizeBefore) && (falseStack.size() > stackSizeBefore)) {
                   stack.push(new TernarOpTreeItem(null, expr, trueStack.pop(), falseStack.pop()));
                } else {
-                  ret.add(new IfTreeItem(null, expr, onTrue, onFalse));
+                  List<TreeItem> retw = retx;
+                  if (whileTrue) {
+                     retw = new ArrayList<TreeItem>();
+                     retw.add(new IfTreeItem(null, expr, onTrue, onFalse));
+                     retx.add(new WhileTreeItem(null, whileTrueLoop.id, whileTrueLoop.loopContinue.start, new BooleanTreeItem(null, true), retw));
+                  } else {
+                     retx.add(new IfTreeItem(null, expr, onTrue, onFalse));
+                  }
 
                   //Same continues in onTrue and onFalse gets continue on parent level
                   if ((!onTrue.isEmpty()) && (!onFalse.isEmpty())) {
@@ -720,19 +751,125 @@ public class AVM2Graph extends Graph {
                         if (onFalse.get(onFalse.size() - 1) instanceof ContinueTreeItem) {
                            if (((ContinueTreeItem) onTrue.get(onTrue.size() - 1)).loopPos == ((ContinueTreeItem) onFalse.get(onFalse.size() - 1)).loopPos) {
                               onTrue.remove(onTrue.size() - 1);
-                              ret.add(onFalse.remove(onFalse.size() - 1));
+                              retw.add(onFalse.remove(onFalse.size() - 1));
                            }
                         }
                      }
                   }
+
+                  if ((!onTrue.isEmpty()) && (!onFalse.isEmpty())) {
+                     if (onTrue.get(onTrue.size() - 1) instanceof ReturnValueTreeItem || onTrue.get(onTrue.size() - 1) instanceof ReturnVoidTreeItem) {
+                        if (onFalse.get(onFalse.size() - 1) instanceof ContinueTreeItem) {
+                           retw.add(onFalse.remove(onFalse.size() - 1));
+                        }
+                     }
+                  }
+
+                  if ((!onTrue.isEmpty()) && (!onFalse.isEmpty())) {
+                     if (onFalse.get(onFalse.size() - 1) instanceof ReturnValueTreeItem || onFalse.get(onFalse.size() - 1) instanceof ReturnVoidTreeItem) {
+                        if (onTrue.get(onTrue.size() - 1) instanceof ContinueTreeItem) {
+                           retw.add(onTrue.remove(onTrue.size() - 1));
+                        }
+                     }
+                  }
+                  if (whileTrue) {
+                     checkContinueAtTheEnd(retw, whileTrueLoop);
+                  }
+               }
+               if (doWhile) {
+                  loopBodyStart = next;
                }
             }
-            if (loop && (part.nextParts.size() > 1)) {
+            if (loop) { // && (!doWhile)) {
+               List<TreeItem> loopBody = null;
+               List<TreeItem> finalCommands = null;
+               GraphPart finalPart = null;
+               boolean isFor = false;
+               try {
+                  loopBody = printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, part, loopBodyStart != null ? loopBodyStart : part.nextParts.get(reversed ? 1 : 0), stopPart, loops, localRegs, body, ignoredSwitches);
+                  checkContinueAtTheEnd(loopBody, currentLoop);
+               } catch (ForException fex) {
+                  loopBody = fex.output;
+                  finalCommands = fex.finalOutput;
+                  if (!finalCommands.isEmpty()) {
+                     finalCommands.remove(finalCommands.size() - 1); //remove continue
+                  }
+                  finalPart = fex.continuePart;
+                  isFor = true;
+                  for (Object o : finalPart.forContinues) {
+                     if (o instanceof ContinueTreeItem) {
+                        ((ContinueTreeItem) o).loopPos = currentLoop.id;
+                     }
+                  }
+               }
+               if (isFor) {
+                  ret.add(new ForTreeItem(null, currentLoop.id, finalPart.start, new ArrayList<TreeItem>(), expr, finalCommands, loopBody));
+               } else if ((expr instanceof HasNextTreeItem) && ((HasNextTreeItem) expr).collection.getNotCoerced().getThroughRegister() instanceof FilteredCheckTreeItem) {
+                  TreeItem gti = ((HasNextTreeItem) expr).collection.getNotCoerced().getThroughRegister();
+                  boolean found = false;
+                  if ((loopBody.size() == 3) || (loopBody.size() == 4)) {
+                     TreeItem ft = loopBody.get(0);
+                     if (ft instanceof WithTreeItem) {
+                        ft = loopBody.get(1);
+                        if (ft instanceof IfTreeItem) {
+                           IfTreeItem ift = (IfTreeItem) ft;
+                           if (ift.onTrue.size() > 0) {
+                              ft = ift.onTrue.get(0);
+                              if (ft instanceof SetPropertyTreeItem) {
+                                 SetPropertyTreeItem spt = (SetPropertyTreeItem) ft;
+                                 if (spt.object instanceof LocalRegTreeItem) {
+                                    int regIndex = ((LocalRegTreeItem) spt.object).regIndex;
+                                    HasNextTreeItem iti = (HasNextTreeItem) expr;
+                                    localRegs.put(regIndex, new FilterTreeItem(null, iti.collection.getThroughRegister(), ift.expression));
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+               } else if ((expr instanceof HasNextTreeItem) && (!loopBody.isEmpty()) && (loopBody.get(0) instanceof SetTypeTreeItem) && (((SetTypeTreeItem) loopBody.get(0)).getValue().getNotCoerced() instanceof NextValueTreeItem)) {
+                  TreeItem obj = ((SetTypeTreeItem) loopBody.get(0)).getObject();
+                  loopBody.remove(0);
+                  ret.add(new ForEachInTreeItem(null, currentLoop.id, part.start, new InTreeItem(expr.instruction, obj, ((HasNextTreeItem) expr).collection), loopBody));
+               } else if ((expr instanceof HasNextTreeItem) && (!loopBody.isEmpty()) && (loopBody.get(0) instanceof SetTypeTreeItem) && (((SetTypeTreeItem) loopBody.get(0)).getValue().getNotCoerced() instanceof NextNameTreeItem)) {
+                  TreeItem obj = ((SetTypeTreeItem) loopBody.get(0)).getObject();
+                  loopBody.remove(0);
+                  ret.add(new ForInTreeItem(null, currentLoop.id, part.start, new InTreeItem(expr.instruction, obj, ((HasNextTreeItem) expr).collection), loopBody));
+               } else {
+                  if (doWhile) {
+                     if (stack.isEmpty()) {
+                        expr = new BooleanTreeItem(null, true);
+                     } else {
+                        expr = stack.pop();
+                     }
+                     loopBody.addAll(0, output);
+                     checkContinueAtTheEnd(loopBody, currentLoop);
+
+                     List<TreeItem> addIf = new ArrayList<TreeItem>();
+                     if ((!loopBody.isEmpty()) && (loopBody.get(loopBody.size() - 1) instanceof IfTreeItem)) {
+                        IfTreeItem ift = (IfTreeItem) loopBody.get(loopBody.size() - 1);
+                        if (ift.onFalse.isEmpty()) {
+                           expr = ift.expression;
+                           addIf = ift.onTrue;
+                           loopBody.remove(loopBody.size() - 1);
+                        }
+                     }
+                     ret.add(new DoWhileTreeItem(null, currentLoop.id, part.start, loopBody, expr));
+                     ret.addAll(addIf);
+
+                  } else {
+                     ret.add(new WhileTreeItem(null, currentLoop.id, part.start, expr, loopBody));
+                  }
+               }
+            }
+            if ((!doWhile) && (!whileTrue) && loop && (part.nextParts.size() > 1)) {
                loops.remove(currentLoop); //remove loop so no break shows up
                //ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level, part, part.nextParts.get(reversed ? 0 : 1), stopPart, loops, localRegs, body, ignoredSwitches));
                next = part.nextParts.get(reversed ? 0 : 1);
             }
-
+            if (doWhile) {
+               next = null;
+            }
             if (next != null) {
                boolean finallyJump = false;
                for (int f : finallyJumps) {
@@ -817,7 +954,7 @@ public class AVM2Graph extends Graph {
                   if ((p != stopPart) && (p.refs.size() > 1)) {
                      ContinueTreeItem cti = new ContinueTreeItem(null, -1);
                      //p.forContinues.add(cti);
-                     ret.add(new CommentTreeItem(null, "Unknown jump"));
+                     ret.add(new CommentTreeItem(null, "Unknown jump to part " + p));
                      ret.add(cti);
                   }
                }
@@ -865,11 +1002,13 @@ public class AVM2Graph extends Graph {
             SwitchTreeItem swt = new SwitchTreeItem(null, breakPos, switchedObject, caseValues, caseCommands, defaultCommands, valueMappings);
             ret.add(swt);
 
-            TreeItem lopNext = checkLoop(next, stopPart, loops);
-            if (lopNext != null) {
-               ret.add(lopNext);
-            } else {
-               ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, part, next, stopPart, loops, localRegs, body, ignoredSwitches));
+            if (next != null) {
+               TreeItem lopNext = checkLoop(next, stopPart, loops);
+               if (lopNext != null) {
+                  ret.add(lopNext);
+               } else {
+                  ret.addAll(printGraph(methodPath, stack, scopeStack, allParts, parsedExceptions, finallyJumps, level + 1, part, next, stopPart, loops, localRegs, body, ignoredSwitches));
+               }
             }
 
          }

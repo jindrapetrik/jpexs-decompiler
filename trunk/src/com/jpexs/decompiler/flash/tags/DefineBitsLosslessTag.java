@@ -62,8 +62,8 @@ public class DefineBitsLosslessTag extends CharacterTag implements AloneTag {
       int pos = 0;
       for (int y = 0; y < bitmapHeight; y++) {
          for (int x = 0; x < bitmapWidth; x++) {
-            if (bitmapFormat == DefineBitsLosslessTag.FORMAT_8BIT_COLORMAPPED) {               
-               RGB color = colorMapData.colorTableRGB[colorMapData.colorMapPixelData[pos32aligned]&0xff];
+            if (bitmapFormat == DefineBitsLosslessTag.FORMAT_8BIT_COLORMAPPED) {
+               RGB color = colorMapData.colorTableRGB[colorMapData.colorMapPixelData[pos32aligned] & 0xff];
                g.setColor(new Color(color.red, color.green, color.blue));
             }
             if (bitmapFormat == DefineBitsLosslessTag.FORMAT_15BIT_RGB) {

@@ -67,7 +67,7 @@ public class GraphPart {
    }
 
    private GraphPart getNextPartPath(GraphPart original, String path, List<GraphPart> visited) {
-      if (visited.contains(this)) {
+      if (visited.contains(this) && (this != original)) {
          return null;
       }
       visited.add(this);

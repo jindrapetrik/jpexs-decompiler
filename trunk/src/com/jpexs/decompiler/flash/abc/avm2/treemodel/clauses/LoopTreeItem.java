@@ -21,12 +21,12 @@ import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
 
 public abstract class LoopTreeItem extends TreeItem {
 
-   public int loopBreak;
+   public long loopId;
    public int loopContinue;
 
-   public LoopTreeItem(AVM2Instruction instruction, int loopBreak, int loopContinue) {
+   public LoopTreeItem(AVM2Instruction instruction, long loopId, int loopContinue) {
       super(instruction, NOPRECEDENCE);
-      this.loopBreak = loopBreak;
+      this.loopId = loopId;
       this.loopContinue = loopContinue;
    }
 

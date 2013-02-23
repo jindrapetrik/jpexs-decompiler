@@ -2414,7 +2414,7 @@ public class SWFInputStream extends InputStream {
       COLORMAPDATA ret = new COLORMAPDATA();
       ret.colorTableRGB = new RGB[colorTableSize + 1];
       for (int i = 0; i < colorTableSize + 1; i++) {
-         ret.colorTableRGB[i] = readRGB();         
+         ret.colorTableRGB[i] = readRGB();
       }
       int dataLen = 0;
       for (int y = 0; y < bitmapHeight; y++) {

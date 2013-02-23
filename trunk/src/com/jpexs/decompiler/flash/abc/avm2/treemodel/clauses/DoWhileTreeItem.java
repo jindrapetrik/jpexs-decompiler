@@ -34,27 +34,22 @@ public class DoWhileTreeItem extends LoopTreeItem implements Block {
       return false;
    }
 
-   public DoWhileTreeItem(AVM2Instruction instruction, int loopBreak, int loopContinue, List<TreeItem> commands, TreeItem expression) {
-      super(instruction, loopBreak, loopContinue);
+   public DoWhileTreeItem(AVM2Instruction instruction, long loopId, int loopContinue, List<TreeItem> commands, TreeItem expression) {
+      super(instruction, loopId, loopContinue);
       this.expression = expression;
       this.commands = commands;
-      if ((!commands.isEmpty()) && (commands.get(commands.size() - 1) instanceof ContinueTreeItem)) {
-         if (((ContinueTreeItem) commands.get(commands.size() - 1)).loopPos == loopBreak) {
-            commands.remove(commands.size() - 1);
-         }
-      }
    }
 
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       String ret = "";
-      ret += "loop" + loopBreak + ":\r\n";
+      ret += "loop" + loopId + ":\r\n";
       ret += hilight("do\r\n{") + "\r\n";
       for (TreeItem ti : commands) {
          ret += ti.toStringSemicoloned(constants, localRegNames, fullyQualifiedNames) + "\r\n";
       }
       ret += hilight("}\r\nwhile(") + expression.toString(constants, localRegNames, fullyQualifiedNames) + hilight(");") + "\r\n";
-      ret += ":loop" + loopBreak;
+      ret += ":loop" + loopId;
 
       return ret;
    }

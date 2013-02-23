@@ -23,14 +23,14 @@ import java.util.List;
 
 public class BreakTreeItem extends TreeItem {
 
-   public int loopPos;
+   public long loopPos;
    public boolean isKnown;
 
-   public BreakTreeItem(AVM2Instruction instruction, int loopPos) {
+   public BreakTreeItem(AVM2Instruction instruction, long loopPos) {
       this(instruction, loopPos, true);
    }
 
-   public BreakTreeItem(AVM2Instruction instruction, int loopPos, boolean isKnown) {
+   public BreakTreeItem(AVM2Instruction instruction, long loopPos, boolean isKnown) {
       super(instruction, NOPRECEDENCE);
       this.loopPos = loopPos;
       this.isKnown = isKnown;

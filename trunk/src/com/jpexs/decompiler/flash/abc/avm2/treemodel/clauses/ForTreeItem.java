@@ -31,18 +31,12 @@ public class ForTreeItem extends LoopTreeItem implements Block {
    public List<TreeItem> finalCommands;
    public List<TreeItem> commands;
 
-   public ForTreeItem(AVM2Instruction instruction, int loopBreak, int loopContinue, List<TreeItem> firstCommands, TreeItem expression, List<TreeItem> finalCommands, List<TreeItem> commands) {
+   public ForTreeItem(AVM2Instruction instruction, long loopBreak, int loopContinue, List<TreeItem> firstCommands, TreeItem expression, List<TreeItem> finalCommands, List<TreeItem> commands) {
       super(instruction, loopBreak, loopContinue);
       this.firstCommands = firstCommands;
       this.expression = expression;
       this.finalCommands = finalCommands;
       this.commands = commands;
-
-      if ((!commands.isEmpty()) && (commands.get(commands.size() - 1) instanceof ContinueTreeItem)) {
-         if (((ContinueTreeItem) commands.get(commands.size() - 1)).loopPos == loopBreak) {
-            commands.remove(commands.size() - 1);
-         }
-      }
    }
 
    private String stripSemicolon(String s) {
@@ -55,7 +49,7 @@ public class ForTreeItem extends LoopTreeItem implements Block {
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       String ret = "";
-      ret += "loop" + loopBreak + ":\r\n";
+      ret += "loop" + loopId + ":\r\n";
       ret += hilight("for(");
       for (int i = 0; i < firstCommands.size(); i++) {
          if (i > 0) {
@@ -77,7 +71,7 @@ public class ForTreeItem extends LoopTreeItem implements Block {
          ret += ti.toStringSemicoloned(constants, localRegNames, fullyQualifiedNames) + "\r\n";
       }
       ret += hilight("}") + "\r\n";
-      ret += ":loop" + loopBreak;
+      ret += ":loop" + loopId;
       return ret;
    }
 

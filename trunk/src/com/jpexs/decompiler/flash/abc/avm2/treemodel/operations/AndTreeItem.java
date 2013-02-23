@@ -18,8 +18,11 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphPart;
 
 public class AndTreeItem extends BinaryOpTreeItem {
+
+   public GraphPart firstPart;
 
    public AndTreeItem(AVM2Instruction instruction, TreeItem leftSide, TreeItem rightSide) {
       super(instruction, PRECEDENCE_LOGICALAND, leftSide, rightSide, "&&");

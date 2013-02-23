@@ -23,14 +23,14 @@ import java.util.List;
 
 public class ContinueTreeItem extends TreeItem {
 
-   public int loopPos;
+   public long loopPos;
    public boolean isKnown;
 
-   public ContinueTreeItem(AVM2Instruction instruction, int loopPos) {
+   public ContinueTreeItem(AVM2Instruction instruction, long loopPos) {
       this(instruction, loopPos, true);
    }
 
-   public ContinueTreeItem(AVM2Instruction instruction, int loopPos, boolean isKnown) {
+   public ContinueTreeItem(AVM2Instruction instruction, long loopPos, boolean isKnown) {
       super(instruction, NOPRECEDENCE);
       this.loopPos = loopPos;
       this.isKnown = isKnown;
