@@ -16,20 +16,20 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 
 public class GotoLabelTreeItem extends TreeItem {
 
    public String label;
 
-   public GotoLabelTreeItem(Action instruction, String label) {
+   public GotoLabelTreeItem(GraphSourceItem instruction, String label) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.label = label;
    }
 
    @Override
    public String toString(ConstantPool constants) {
-      return hilight("gotoAndStop(\"") + Helper.escapeString(label) + hilight("\")") + ";";
+      return hilight("gotoAndStop(\"") + Helper.escapeString(label) + hilight("\")");
    }
 }

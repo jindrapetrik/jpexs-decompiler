@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.action.swf7;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.ImplementsOpTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -35,10 +35,10 @@ public class ActionImplementsOp extends Action {
    }
 
    @Override
-   public void translate(Stack<TreeItem> stack, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
-      TreeItem subclass = stack.pop();
+   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames) {
+      GraphTargetItem subclass = stack.pop();
       long inCount = popLong(stack);
-      List<TreeItem> superclasses = new ArrayList<TreeItem>();
+      List<GraphTargetItem> superclasses = new ArrayList<GraphTargetItem>();
       for (long l = 0; l < inCount; l++) {
          superclasses.add(stack.pop());
       }

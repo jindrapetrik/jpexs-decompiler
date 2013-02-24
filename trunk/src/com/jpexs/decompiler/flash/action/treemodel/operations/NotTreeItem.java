@@ -16,23 +16,15 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.operations;
 
-import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.LogicalOpItem;
+import com.jpexs.decompiler.flash.graph.NotItem;
 
-public class NotTreeItem extends UnaryOpTreeItem implements LogicalOp {
+public class NotTreeItem extends UnaryOpTreeItem implements LogicalOpItem, NotItem {
 
-   public NotTreeItem(Action instruction, TreeItem value) {
+   public NotTreeItem(GraphSourceItem instruction, GraphTargetItem value) {
       super(instruction, PRECEDENCE_UNARY, value, "!");
-   }
-
-   @Override
-   public boolean isTrue() {
-      return !value.isTrue();
-   }
-
-   @Override
-   public boolean isFalse() {
-      return !value.isFalse();
    }
 
    @Override
@@ -42,7 +34,12 @@ public class NotTreeItem extends UnaryOpTreeItem implements LogicalOp {
    }
 
    @Override
-   public TreeItem invert() {
+   public GraphTargetItem invert() {
+      return value;
+   }
+
+   @Override
+   public GraphTargetItem getOriginal() {
       return value;
    }
 }

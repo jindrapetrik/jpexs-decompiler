@@ -19,20 +19,22 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.AssignmentTreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
 
 public class PostIncrementTreeItem extends TreeItem implements AssignmentTreeItem {
 
-   public TreeItem object;
+   public GraphTargetItem object;
 
-   public PostIncrementTreeItem(AVM2Instruction instruction, TreeItem object) {
+   public PostIncrementTreeItem(AVM2Instruction instruction, GraphTargetItem object) {
       super(instruction, PRECEDENCE_POSTFIX);
       this.object = object;
    }
 
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return object.toString(constants, localRegNames, fullyQualifiedNames) + hilight("++");
+      return object.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + hilight("++");
    }
 }

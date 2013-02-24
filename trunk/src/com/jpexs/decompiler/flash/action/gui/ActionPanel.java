@@ -34,6 +34,7 @@ import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -268,7 +269,7 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
    public void actionPerformed(ActionEvent e) {
       if (e.getActionCommand().equals("GRAPH")) {
          if (lastCode != null) {
-            GraphFrame gf = new GraphFrame(new ActionGraph(lastCode, SWF.DEFAULT_VERSION), "");
+            GraphFrame gf = new GraphFrame(new ActionGraph(lastCode, new HashMap<Integer, String>(), SWF.DEFAULT_VERSION), "");
             gf.setVisible(true);
          }
       } else if (e.getActionCommand().equals("EDITACTION")) {

@@ -14,15 +14,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.action.treemodel.operations;
-
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+package com.jpexs.decompiler.flash.graph;
 
 /**
  *
  * @author JPEXS
  */
-public interface LogicalOp {
+public class GraphSourceItemPos {
 
-   public TreeItem invert();
+   public GraphSourceItem item;
+   public int pos;
+
+   public GraphSourceItemPos(GraphSourceItem item, int pos) {
+      this.item = item;
+      this.pos = pos;
+   }
 }

@@ -16,15 +16,16 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.operations;
 
-import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
 import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
 public class StringLengthTreeItem extends TreeItem {
 
-   public TreeItem value;
+   public GraphTargetItem value;
 
-   public StringLengthTreeItem(Action instruction, TreeItem value) {
+   public StringLengthTreeItem(GraphSourceItem instruction, GraphTargetItem value) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.value = value;
    }

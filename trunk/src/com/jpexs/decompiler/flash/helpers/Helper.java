@@ -20,6 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -263,5 +264,13 @@ public class Helper {
          ex.printStackTrace();
          return null;
       }
+   }
+
+   public static List toList(Object... rest) {
+      List ret = new ArrayList();
+      for (Object o : rest) {
+         ret.add(o);
+      }
+      return ret;
    }
 }

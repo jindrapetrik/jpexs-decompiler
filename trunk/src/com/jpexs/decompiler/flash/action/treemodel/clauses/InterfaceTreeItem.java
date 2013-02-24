@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.treemodel.clauses;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
 import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
 
 /**
@@ -27,10 +28,10 @@ import java.util.List;
  */
 public class InterfaceTreeItem extends TreeItem {
 
-   public TreeItem name;
-   public List<TreeItem> superInterfaces;
+   public GraphTargetItem name;
+   public List<GraphTargetItem> superInterfaces;
 
-   public InterfaceTreeItem(TreeItem name, List<TreeItem> superInterfaces) {
+   public InterfaceTreeItem(GraphTargetItem name, List<GraphTargetItem> superInterfaces) {
       super(null, NOPRECEDENCE);
       this.name = name;
       this.superInterfaces = superInterfaces;
@@ -44,7 +45,7 @@ public class InterfaceTreeItem extends TreeItem {
       if (!superInterfaces.isEmpty()) {
          ret += " extends ";
       }
-      for (TreeItem ti : superInterfaces) {
+      for (GraphTargetItem ti : superInterfaces) {
          if (!first) {
             ret += ", ";
          }

@@ -16,27 +16,29 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.List;
 
 public class EnumerateTreeItem extends TreeItem {
 
-   public TreeItem object;
+   public GraphTargetItem object;
 
-   public EnumerateTreeItem(Action instruction, TreeItem object) {
+   public EnumerateTreeItem(GraphSourceItem instruction, GraphTargetItem object) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.object = object;
    }
 
    @Override
    public String toString(ConstantPool constants) {
-      return "enumerate " + object.toString(constants);
+      return "enumerate " + object.toString(Helper.toList(constants));
    }
 
    @Override
-   public List<com.jpexs.decompiler.flash.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.decompiler.flash.action.IgnoredPair> ret = super.getNeededActions();
-      ret.addAll(object.getNeededActions());
+   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+      ret.addAll(object.getNeededSources());
       return ret;
    }
 }

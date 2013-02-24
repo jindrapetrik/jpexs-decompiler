@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.PreDecrementTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.PreIncrementTreeItem;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -45,23 +46,23 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
    }
 
    @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       int multinameIndex = ins.operands[0];
       TreeItem value = (TreeItem) stack.pop();
       FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
       TreeItem obj = (TreeItem) stack.pop();
       if (value.getThroughRegister() instanceof IncrementTreeItem) {
-         TreeItem inside = ((IncrementTreeItem) value.getThroughRegister()).object.getThroughRegister().getNotCoerced();
+         GraphTargetItem inside = ((IncrementTreeItem) value.getThroughRegister()).object.getThroughRegister().getNotCoerced();
          if (inside instanceof GetPropertyTreeItem) {
             GetPropertyTreeItem insideProp = ((GetPropertyTreeItem) inside);
             if (insideProp.propertyName.compareSame(multiname)) {
-               TreeItem insideObj = obj;
+               GraphTargetItem insideObj = obj;
                if (insideObj instanceof LocalRegTreeItem) {
                   insideObj = ((LocalRegTreeItem) insideObj).computedValue;
                }
                if (insideProp.object == insideObj) {
                   if (stack.size() > 0) {
-                     TreeItem top = stack.peek().getNotCoerced();
+                     GraphTargetItem top = stack.peek().getNotCoerced();
                      if (top == insideProp) {
                         stack.pop();
                         stack.push(new PostIncrementTreeItem(ins, insideProp));
@@ -81,17 +82,17 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
       }
 
       if (value.getThroughRegister() instanceof DecrementTreeItem) {
-         TreeItem inside = ((DecrementTreeItem) value.getThroughRegister()).object.getThroughRegister().getNotCoerced();
+         GraphTargetItem inside = ((DecrementTreeItem) value.getThroughRegister()).object.getThroughRegister().getNotCoerced();
          if (inside instanceof GetPropertyTreeItem) {
             GetPropertyTreeItem insideProp = ((GetPropertyTreeItem) inside);
             if (insideProp.propertyName.compareSame(multiname)) {
-               TreeItem insideObj = obj;
+               GraphTargetItem insideObj = obj;
                if (insideObj instanceof LocalRegTreeItem) {
                   insideObj = ((LocalRegTreeItem) insideObj).computedValue;
                }
                if (insideProp.object == insideObj) {
                   if (stack.size() > 0) {
-                     TreeItem top = stack.peek().getNotCoerced();
+                     GraphTargetItem top = stack.peek().getNotCoerced();
                      if (top == insideProp) {
                         stack.pop();
                         stack.push(new PostDecrementTreeItem(ins, insideProp));

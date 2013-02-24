@@ -16,13 +16,14 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
 
 public class GetURL2TreeItem extends TreeItem {
 
-   public TreeItem urlString;
-   public TreeItem targetString;
+   public GraphTargetItem urlString;
+   public GraphTargetItem targetString;
    public int method;
    public boolean loadTargetFlag;
    public boolean loadVariablesFlag;
@@ -43,10 +44,10 @@ public class GetURL2TreeItem extends TreeItem {
          prefix = "loadMovie";
       }
 
-      return hilight(prefix + "(") + urlString.toString(constants) + hilight(",") + targetString.toString(constants) + hilight(methodStr + ")") + ";";
+      return hilight(prefix + "(") + urlString.toString(constants) + hilight(",") + targetString.toString(constants) + hilight(methodStr + ")");
    }
 
-   public GetURL2TreeItem(Action instruction, TreeItem urlString, TreeItem targetString, int method, boolean loadTargetFlag, boolean loadVariablesFlag) {
+   public GetURL2TreeItem(GraphSourceItem instruction, GraphTargetItem urlString, GraphTargetItem targetString, int method, boolean loadTargetFlag, boolean loadVariablesFlag) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.urlString = urlString;
       this.targetString = targetString;
@@ -56,10 +57,10 @@ public class GetURL2TreeItem extends TreeItem {
    }
 
    @Override
-   public List<com.jpexs.decompiler.flash.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.decompiler.flash.action.IgnoredPair> ret = super.getNeededActions();
-      ret.addAll(urlString.getNeededActions());
-      ret.addAll(targetString.getNeededActions());
+   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+      ret.addAll(urlString.getNeededSources());
+      ret.addAll(targetString.getNeededSources());
       return ret;
    }
 }

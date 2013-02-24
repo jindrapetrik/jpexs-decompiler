@@ -16,12 +16,14 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.operations;
 
-import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.BinaryOpItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.LogicalOpItem;
 
-public class StrictEqTreeItem extends BinaryOpTreeItem implements LogicalOp {
+public class StrictEqTreeItem extends BinaryOpItem implements LogicalOpItem {
 
-   public StrictEqTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
+   public StrictEqTreeItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
       super(instruction, PRECEDENCE_EQUALITY, leftSide, rightSide, "===");
    }
 
@@ -31,7 +33,7 @@ public class StrictEqTreeItem extends BinaryOpTreeItem implements LogicalOp {
    }
 
    @Override
-   public TreeItem invert() {
-      return new StrictNeqTreeItem(instruction, leftSide, rightSide);
+   public GraphTargetItem invert() {
+      return new StrictNeqTreeItem(src, leftSide, rightSide);
    }
 }

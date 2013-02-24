@@ -19,15 +19,17 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
 
 public abstract class UnaryOpTreeItem extends TreeItem {
 
-   public TreeItem value;
+   public GraphTargetItem value;
    public String operator;
 
-   public UnaryOpTreeItem(AVM2Instruction instruction, int precedence, TreeItem value, String operator) {
+   public UnaryOpTreeItem(AVM2Instruction instruction, int precedence, GraphTargetItem value, String operator) {
       super(instruction, precedence);
       this.value = value;
       this.operator = operator;
@@ -35,7 +37,7 @@ public abstract class UnaryOpTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      String s = value.toString(constants, localRegNames, fullyQualifiedNames);
+      String s = value.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
       if (value.precedence > precedence) {
          s = "(" + s + ")";
       }

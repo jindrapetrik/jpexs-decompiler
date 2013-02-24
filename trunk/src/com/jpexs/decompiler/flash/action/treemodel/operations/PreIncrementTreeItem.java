@@ -16,12 +16,12 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.operations;
 
-import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 
 public class PreIncrementTreeItem extends UnaryOpTreeItem {
 
-   public PreIncrementTreeItem(Action instruction, TreeItem object) {
+   public PreIncrementTreeItem(GraphSourceItem instruction, TreeItem object) {
       super(instruction, PRECEDENCE_UNARY, object, "++");
    }
 

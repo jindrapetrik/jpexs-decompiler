@@ -16,12 +16,12 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.operations;
 
-import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 
 public class NegTreeItem extends UnaryOpTreeItem {
 
-   public NegTreeItem(Action instruction, TreeItem value) {
+   public NegTreeItem(GraphSourceItem instruction, TreeItem value) {
       super(instruction, PRECEDENCE_UNARY, value, "-");
    }
 

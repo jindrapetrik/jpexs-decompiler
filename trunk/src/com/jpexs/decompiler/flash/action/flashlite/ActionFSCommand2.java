@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.action.flashlite;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.FSCommand2TreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -35,10 +35,10 @@ public class ActionFSCommand2 extends Action {
    }
 
    @Override
-   public void translate(Stack<TreeItem> stack, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames) {
       long numArgs = popLong(stack);
-      TreeItem command = stack.pop();
-      List<TreeItem> args = new ArrayList<TreeItem>();
+      GraphTargetItem command = stack.pop();
+      List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
       for (long l = 0; l < numArgs; l++) {
          args.add(stack.pop());
       }

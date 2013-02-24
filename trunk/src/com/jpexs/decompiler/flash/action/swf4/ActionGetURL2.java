@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.treemodel.GetURL2TreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -72,9 +72,9 @@ public class ActionGetURL2 extends Action {
    }
 
    @Override
-   public void translate(Stack<TreeItem> stack, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
-      TreeItem targetString = stack.pop();
-      TreeItem urlString = stack.pop();
+   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames) {
+      GraphTargetItem targetString = stack.pop();
+      GraphTargetItem urlString = stack.pop();
       output.add(new GetURL2TreeItem(this, urlString, targetString, sendVarsMethod, loadTargetFlag, loadTargetFlag));
    }
 }

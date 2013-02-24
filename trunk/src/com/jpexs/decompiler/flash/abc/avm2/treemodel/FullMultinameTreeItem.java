@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 
@@ -95,12 +96,12 @@ public class FullMultinameTreeItem extends TreeItem {
       if (multinameIndex != other.multinameIndex) {
          return false;
       }
-      TreeItem tiName = name;
+      GraphTargetItem tiName = name;
       while (tiName instanceof LocalRegTreeItem) {
          tiName = ((LocalRegTreeItem) tiName).computedValue;
       }
 
-      TreeItem tiName2 = other.name;
+      GraphTargetItem tiName2 = other.name;
       while (tiName2 instanceof LocalRegTreeItem) {
          tiName2 = ((LocalRegTreeItem) tiName2).computedValue;
       }
@@ -108,12 +109,12 @@ public class FullMultinameTreeItem extends TreeItem {
          return false;
       }
 
-      TreeItem tiNameSpace = namespace;
+      GraphTargetItem tiNameSpace = namespace;
       while (tiNameSpace instanceof LocalRegTreeItem) {
          tiNameSpace = ((LocalRegTreeItem) tiNameSpace).computedValue;
       }
 
-      TreeItem tiNameSpace2 = other.namespace;
+      GraphTargetItem tiNameSpace2 = other.namespace;
       while (tiNameSpace2 instanceof LocalRegTreeItem) {
          tiNameSpace2 = ((LocalRegTreeItem) tiNameSpace2).computedValue;
       }

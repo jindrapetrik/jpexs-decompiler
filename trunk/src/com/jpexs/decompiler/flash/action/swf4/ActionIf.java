@@ -19,8 +19,10 @@ package com.jpexs.decompiler.flash.action.swf4;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.graph.GraphSource;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -80,5 +82,18 @@ public class ActionIf extends Action {
    @Override
    public String toString() {
       return "ActionIf";
+   }
+
+   @Override
+   public boolean isBranch() {
+      return true;
+   }
+
+   @Override
+   public List<Integer> getBranches(GraphSource code) {
+      List<Integer> ret = super.getBranches(code);
+      ret.add(code.adr2pos(getAddress() + getBytes(((ActionGraphSource) code).version).length + offset));
+      ret.add(code.adr2pos(getAddress() + getBytes(((ActionGraphSource) code).version).length));
+      return ret;
    }
 }

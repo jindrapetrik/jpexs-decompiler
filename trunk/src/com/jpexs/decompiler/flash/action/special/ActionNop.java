@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.action.special;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
 import java.util.List;
 import java.util.Stack;
 
@@ -33,7 +32,7 @@ public class ActionNop extends Action {
    }
 
    @Override
-   public void translate(Stack<TreeItem> stack, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+   public void translate(Stack<com.jpexs.decompiler.flash.graph.GraphTargetItem> stack, List<com.jpexs.decompiler.flash.graph.GraphTargetItem> output, java.util.HashMap<Integer, String> regNames) {
       //output.add(new SimpleActionTreeItem(this, "nop();"));
    }
 }

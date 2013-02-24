@@ -17,14 +17,16 @@
 package com.jpexs.decompiler.flash.action.treemodel;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
 
 public class GetPropertyTreeItem extends TreeItem {
 
-   public TreeItem target;
+   public GraphTargetItem target;
    public int propertyIndex;
 
-   public GetPropertyTreeItem(Action instruction, TreeItem target, int propertyIndex) {
+   public GetPropertyTreeItem(GraphSourceItem instruction, GraphTargetItem target, int propertyIndex) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.target = target;
       this.propertyIndex = propertyIndex;
@@ -39,9 +41,9 @@ public class GetPropertyTreeItem extends TreeItem {
    }
 
    @Override
-   public List<com.jpexs.decompiler.flash.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.decompiler.flash.action.IgnoredPair> ret = super.getNeededActions();
-      ret.addAll(target.getNeededActions());
+   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+      ret.addAll(target.getNeededSources());
       return ret;
    }
 }

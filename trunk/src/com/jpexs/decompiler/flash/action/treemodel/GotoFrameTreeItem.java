@@ -16,19 +16,19 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 
 public class GotoFrameTreeItem extends TreeItem {
 
    public int frame;
 
-   public GotoFrameTreeItem(Action instruction, int frame) {
+   public GotoFrameTreeItem(GraphSourceItem instruction, int frame) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.frame = frame;
    }
 
    @Override
    public String toString(ConstantPool constants) {
-      return hilight("gotoAndStop(") + frame + hilight(")") + ";";
+      return hilight("gotoAndStop(") + frame + hilight(")");
    }
 }

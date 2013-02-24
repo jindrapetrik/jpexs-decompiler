@@ -14,25 +14,20 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses;
+package com.jpexs.decompiler.flash.graph;
 
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.ContinueTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-public class ForTreeItem extends LoopTreeItem implements Block {
+public class ForTreeItem extends LoopItem implements Block {
 
-   public List<TreeItem> firstCommands;
-   public TreeItem expression;
-   public List<TreeItem> finalCommands;
-   public List<TreeItem> commands;
+   public List<GraphTargetItem> firstCommands;
+   public GraphTargetItem expression;
+   public List<GraphTargetItem> finalCommands;
+   public List<GraphTargetItem> commands;
 
-   public ForTreeItem(AVM2Instruction instruction, long loopBreak, int loopContinue, List<TreeItem> firstCommands, TreeItem expression, List<TreeItem> finalCommands, List<TreeItem> commands) {
-      super(instruction, loopBreak, loopContinue);
+   public ForTreeItem(GraphSourceItem src, Loop loop, List<GraphTargetItem> firstCommands, GraphTargetItem expression, List<GraphTargetItem> finalCommands, List<GraphTargetItem> commands) {
+      super(src, loop);
       this.firstCommands = firstCommands;
       this.expression = expression;
       this.finalCommands = finalCommands;
@@ -47,31 +42,31 @@ public class ForTreeItem extends LoopTreeItem implements Block {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+   public String toString(List localData) {
       String ret = "";
-      ret += "loop" + loopId + ":\r\n";
+      ret += "loop" + loop.id + ":\r\n";
       ret += hilight("for(");
       for (int i = 0; i < firstCommands.size(); i++) {
          if (i > 0) {
             ret += ",";
          }
-         ret += stripSemicolon(firstCommands.get(i).toString(constants, localRegNames, fullyQualifiedNames));
+         ret += stripSemicolon(firstCommands.get(i).toString(localData));
       }
       ret += ";";
-      ret += expression.toString(constants, localRegNames, fullyQualifiedNames);
+      ret += expression.toString(localData);
       ret += ";";
       for (int i = 0; i < finalCommands.size(); i++) {
          if (i > 0) {
             ret += ",";
          }
-         ret += stripSemicolon(finalCommands.get(i).toString(constants, localRegNames, fullyQualifiedNames));
+         ret += stripSemicolon(finalCommands.get(i).toString(localData));
       }
       ret += hilight(")") + "\r\n{\r\n";
-      for (TreeItem ti : commands) {
-         ret += ti.toStringSemicoloned(constants, localRegNames, fullyQualifiedNames) + "\r\n";
+      for (GraphTargetItem ti : commands) {
+         ret += ti.toStringSemicoloned(localData) + "\r\n";
       }
       ret += hilight("}") + "\r\n";
-      ret += ":loop" + loopId;
+      ret += ":loop" + loop.id;
       return ret;
    }
 
@@ -80,11 +75,12 @@ public class ForTreeItem extends LoopTreeItem implements Block {
       return false;
    }
 
-   public List<ContinueTreeItem> getContinues() {
-      List<ContinueTreeItem> ret = new ArrayList<ContinueTreeItem>();
-      for (TreeItem ti : commands) {
-         if (ti instanceof ContinueTreeItem) {
-            ret.add((ContinueTreeItem) ti);
+   @Override
+   public List<ContinueItem> getContinues() {
+      List<ContinueItem> ret = new ArrayList<ContinueItem>();
+      for (GraphTargetItem ti : commands) {
+         if (ti instanceof ContinueItem) {
+            ret.add((ContinueItem) ti);
          }
          if (ti instanceof Block) {
             ret.addAll(((Block) ti).getContinues());

@@ -14,25 +14,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.action.treemodel.clauses;
+package com.jpexs.decompiler.flash.graph;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
-import com.jpexs.decompiler.flash.action.treemodel.ContinueTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SwitchTreeItem extends LoopTreeItem implements Block {
+public class SwitchItem extends LoopItem implements Block {
 
-   public TreeItem switchedObject;
-   public List<TreeItem> caseValues;
-   public List<List<TreeItem>> caseCommands;
-   public List<TreeItem> defaultCommands;
+   public GraphTargetItem switchedObject;
+   public List<GraphTargetItem> caseValues;
+   public List<List<GraphTargetItem>> caseCommands;
+   public List<GraphTargetItem> defaultCommands;
    public List<Integer> valuesMapping;
 
-   public SwitchTreeItem(Action instruction, long switchBreak, TreeItem switchedObject, List<TreeItem> caseValues, List<List<TreeItem>> caseCommands, List<TreeItem> defaultCommands, List<Integer> valuesMapping) {
-      super(instruction, switchBreak, -1);
+   public SwitchItem(Action instruction, Loop loop, GraphTargetItem switchedObject, List<GraphTargetItem> caseValues, List<List<GraphTargetItem>> caseCommands, List<GraphTargetItem> defaultCommands, List<Integer> valuesMapping) {
+      super(instruction, loop);
       this.switchedObject = switchedObject;
       this.caseValues = caseValues;
       this.caseCommands = caseCommands;
@@ -41,19 +38,19 @@ public class SwitchTreeItem extends LoopTreeItem implements Block {
    }
 
    @Override
-   public String toString(ConstantPool constants) {
+   public String toString(List localData) {
       String ret = "";
-      ret += "loopswitch" + loopBreak + ":\r\n";
-      ret += hilight("switch(") + switchedObject.toString(constants) + hilight(")") + "\r\n{\r\n";
+      ret += "loopswitch" + loop.id + ":\r\n";
+      ret += hilight("switch(") + switchedObject.toString(localData) + hilight(")") + "\r\n{\r\n";
       for (int i = 0; i < caseCommands.size(); i++) {
          for (int k = 0; k < valuesMapping.size(); k++) {
             if (valuesMapping.get(k) == i) {
-               ret += "case " + caseValues.get(k).toString(constants) + ":\r\n";
+               ret += "case " + caseValues.get(k).toString(localData) + ":\r\n";
             }
          }
          ret += Action.INDENTOPEN + "\r\n";
          for (int j = 0; j < caseCommands.get(i).size(); j++) {
-            ret += caseCommands.get(i).get(j).toString(constants) + "\r\n";
+            ret += caseCommands.get(i).get(j).toStringSemicoloned(localData) + "\r\n";
          }
          ret += Action.INDENTCLOSE + "\r\n";
       }
@@ -62,23 +59,24 @@ public class SwitchTreeItem extends LoopTreeItem implements Block {
             ret += hilight("default") + ":\r\n";
             ret += Action.INDENTOPEN + "\r\n";
             for (int j = 0; j < defaultCommands.size(); j++) {
-               ret += defaultCommands.get(j).toString(constants) + "\r\n";
+               ret += defaultCommands.get(j).toStringSemicoloned(localData) + "\r\n";
             }
             ret += Action.INDENTCLOSE + "\r\n";
          }
       }
       ret += hilight("}") + "\r\n";
-      ret += ":loop" + loopBreak;
+      ret += ":loop" + loop.id;
       return ret;
    }
 
-   public List<ContinueTreeItem> getContinues() {
-      List<ContinueTreeItem> ret = new ArrayList<ContinueTreeItem>();
+   @Override
+   public List<ContinueItem> getContinues() {
+      List<ContinueItem> ret = new ArrayList<ContinueItem>();
 
-      for (List<TreeItem> onecase : caseCommands) {
-         for (TreeItem ti : onecase) {
-            if (ti instanceof ContinueTreeItem) {
-               ret.add((ContinueTreeItem) ti);
+      for (List<GraphTargetItem> onecase : caseCommands) {
+         for (GraphTargetItem ti : onecase) {
+            if (ti instanceof ContinueItem) {
+               ret.add((ContinueItem) ti);
             }
             if (ti instanceof Block) {
                ret.addAll(((Block) ti).getContinues());
@@ -86,9 +84,9 @@ public class SwitchTreeItem extends LoopTreeItem implements Block {
          }
       }
       if (defaultCommands != null) {
-         for (TreeItem ti : defaultCommands) {
-            if (ti instanceof ContinueTreeItem) {
-               ret.add((ContinueTreeItem) ti);
+         for (GraphTargetItem ti : defaultCommands) {
+            if (ti instanceof ContinueItem) {
+               ret.add((ContinueItem) ti);
             }
             if (ti instanceof Block) {
                ret.addAll(((Block) ti).getContinues());

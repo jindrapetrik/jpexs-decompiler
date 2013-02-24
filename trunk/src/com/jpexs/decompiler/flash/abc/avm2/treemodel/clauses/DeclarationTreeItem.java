@@ -22,6 +22,8 @@ import com.jpexs.decompiler.flash.abc.avm2.treemodel.ConvertTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.SetLocalTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.SetSlotTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,16 +33,16 @@ import java.util.List;
  */
 public class DeclarationTreeItem extends TreeItem {
 
-   public TreeItem assignment;
+   public GraphTargetItem assignment;
    public String type;
 
-   public DeclarationTreeItem(TreeItem assignment, String type) {
-      super(assignment.instruction, assignment.precedence);
+   public DeclarationTreeItem(GraphTargetItem assignment, String type) {
+      super(assignment.src, assignment.precedence);
       this.type = type;
       this.assignment = assignment;
    }
 
-   public DeclarationTreeItem(TreeItem assignment) {
+   public DeclarationTreeItem(GraphTargetItem assignment) {
       this(assignment, null);
    }
 
@@ -61,6 +63,6 @@ public class DeclarationTreeItem extends TreeItem {
          SetSlotTreeItem ssti = (SetSlotTreeItem) assignment;
          return "var " + ssti.getName(constants, localRegNames, fullyQualifiedNames) + ":" + type + hilight(" = ") + ssti.value.toString(constants, localRegNames, fullyQualifiedNames);
       }
-      return "var " + assignment.toString(constants, localRegNames, fullyQualifiedNames);
+      return "var " + assignment.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
    }
 }

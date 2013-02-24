@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.CallMethodTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -35,11 +35,11 @@ public class ActionCallMethod extends Action {
    }
 
    @Override
-   public void translate(Stack<TreeItem> stack, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
-      TreeItem methodName = stack.pop();
-      TreeItem scriptObject = stack.pop();
+   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames) {
+      GraphTargetItem methodName = stack.pop();
+      GraphTargetItem scriptObject = stack.pop();
       long numArgs = popLong(stack);
-      List<TreeItem> args = new ArrayList<TreeItem>();
+      List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
       for (long l = 0; l < numArgs; l++) {
          args.add(stack.pop());
       }

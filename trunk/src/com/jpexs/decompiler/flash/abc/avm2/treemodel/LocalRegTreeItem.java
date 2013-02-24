@@ -19,15 +19,17 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.FilterTreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
 
 public class LocalRegTreeItem extends TreeItem {
 
    public int regIndex;
-   public TreeItem computedValue;
+   public GraphTargetItem computedValue;
 
-   public LocalRegTreeItem(AVM2Instruction instruction, int regIndex, TreeItem computedValue) {
+   public LocalRegTreeItem(AVM2Instruction instruction, int regIndex, GraphTargetItem computedValue) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.regIndex = regIndex;
       if (computedValue == null) {
@@ -39,23 +41,13 @@ public class LocalRegTreeItem extends TreeItem {
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       if (computedValue instanceof FilterTreeItem) {
-         return computedValue.toString(constants, localRegNames, fullyQualifiedNames);
+         return computedValue.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
       }
       return hilight(localRegName(localRegNames, regIndex));
    }
 
    @Override
-   public boolean isFalse() {
-      return computedValue.isFalse();
-   }
-
-   @Override
-   public boolean isTrue() {
-      return computedValue.isTrue();
-   }
-
-   @Override
-   public TreeItem getThroughRegister() {
+   public GraphTargetItem getThroughRegister() {
       return computedValue.getThroughRegister();
    }
 }

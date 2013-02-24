@@ -22,9 +22,9 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.NewFunctionTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.util.HashMap;
 import java.util.List;
@@ -37,13 +37,13 @@ public class NewFunctionIns extends InstructionDefinition {
    }
 
    @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       int methodIndex = ins.operands[0];
       MethodBody mybody = abc.findBody(methodIndex);
       String bodyStr = "";
       String paramStr = "";
       if (mybody != null) {
-         bodyStr = Highlighting.hilighMethodEnd() + mybody.toString("", false, isStatic, classIndex, abc, constants, method_info, new Stack<TreeItem>()/*scopeStack*/, false, true, fullyQualifiedNames, null) + Highlighting.hilighMethodBegin(body.method_info);
+         bodyStr = Highlighting.hilighMethodEnd() + mybody.toString("", false, isStatic, classIndex, abc, constants, method_info, new Stack<GraphTargetItem>()/*scopeStack*/, false, true, fullyQualifiedNames, null) + Highlighting.hilighMethodBegin(body.method_info);
          paramStr = method_info[methodIndex].getParamStr(constants, mybody, abc, fullyQualifiedNames);
       }
 

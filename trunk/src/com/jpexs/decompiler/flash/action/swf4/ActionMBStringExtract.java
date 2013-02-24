@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.MBStringExtractTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
 import java.util.Stack;
 
@@ -34,10 +34,10 @@ public class ActionMBStringExtract extends Action {
    }
 
    @Override
-   public void translate(Stack<TreeItem> stack, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
-      TreeItem count = stack.pop();
-      TreeItem index = stack.pop();
-      TreeItem value = stack.pop();
+   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames) {
+      GraphTargetItem count = stack.pop();
+      GraphTargetItem index = stack.pop();
+      GraphTargetItem value = stack.pop();
       stack.push(new MBStringExtractTreeItem(this, value, index, count));
    }
 }

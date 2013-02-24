@@ -16,15 +16,17 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.List;
 
 public class ImplementsOpTreeItem extends TreeItem {
 
-   public TreeItem subclass;
-   public List<TreeItem> superclasses;
+   public GraphTargetItem subclass;
+   public List<GraphTargetItem> superclasses;
 
-   public ImplementsOpTreeItem(Action instruction, TreeItem subclass, List<TreeItem> superclasses) {
+   public ImplementsOpTreeItem(GraphSourceItem instruction, GraphTargetItem subclass, List<GraphTargetItem> superclasses) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.subclass = subclass;
       this.superclasses = superclasses;
@@ -37,17 +39,17 @@ public class ImplementsOpTreeItem extends TreeItem {
          if (i > 0) {
             impStr += ",";
          }
-         impStr += superclasses.get(i).toString(constants);
+         impStr += superclasses.get(i).toString(Helper.toList(constants));
       }
-      return subclass.toString(constants) + hilight(" implements ") + impStr;
+      return subclass.toString(Helper.toList(constants)) + hilight(" implements ") + impStr;
    }
 
    @Override
-   public List<com.jpexs.decompiler.flash.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.decompiler.flash.action.IgnoredPair> ret = super.getNeededActions();
-      ret.addAll(subclass.getNeededActions());
-      for (TreeItem ti : superclasses) {
-         ret.addAll(ti.getNeededActions());
+   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+      ret.addAll(subclass.getNeededSources());
+      for (GraphTargetItem ti : superclasses) {
+         ret.addAll(ti.getNeededSources());
       }
       return ret;
    }

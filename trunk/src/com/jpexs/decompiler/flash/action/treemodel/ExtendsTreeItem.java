@@ -16,15 +16,18 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExtendsTreeItem extends TreeItem {
 
-   public TreeItem subclass;
-   public TreeItem superclass;
+   public GraphTargetItem subclass;
+   public GraphTargetItem superclass;
 
-   public ExtendsTreeItem(Action instruction, TreeItem subclass, TreeItem superclass) {
+   public ExtendsTreeItem(GraphSourceItem instruction, GraphTargetItem subclass, GraphTargetItem superclass) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.subclass = subclass;
       this.superclass = superclass;
@@ -32,14 +35,16 @@ public class ExtendsTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return subclass.toString(constants) + hilight(" extends ") + stripQuotes(superclass);
+      List localData = new ArrayList();
+      localData.add(constants);
+      return subclass.toString(localData) + hilight(" extends ") + stripQuotes(superclass);
    }
 
    @Override
-   public List<com.jpexs.decompiler.flash.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.decompiler.flash.action.IgnoredPair> ret = super.getNeededActions();
-      ret.addAll(subclass.getNeededActions());
-      ret.addAll(superclass.getNeededActions());
+   public List<GraphSourceItemPos> getNeededSources() {
+      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+      ret.addAll(subclass.getNeededSources());
+      ret.addAll(superclass.getNeededSources());
       return ret;
    }
 }

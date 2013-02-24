@@ -16,14 +16,15 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
 
 public class RandomNumberTreeItem extends TreeItem {
 
-   private TreeItem maximum;
+   private GraphTargetItem maximum;
 
-   public RandomNumberTreeItem(Action instruction, TreeItem maximum) {
+   public RandomNumberTreeItem(GraphSourceItem instruction, GraphTargetItem maximum) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.maximum = maximum;
    }
@@ -34,9 +35,9 @@ public class RandomNumberTreeItem extends TreeItem {
    }
 
    @Override
-   public List<com.jpexs.decompiler.flash.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.decompiler.flash.action.IgnoredPair> ret = super.getNeededActions();
-      ret.addAll(maximum.getNeededActions());
+   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+      ret.addAll(maximum.getNeededSources());
       return ret;
    }
 }

@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,15 +29,15 @@ import java.util.List;
  */
 public class EscapeXElemTreeItem extends TreeItem {
 
-   public TreeItem expression;
+   public GraphTargetItem expression;
 
-   public EscapeXElemTreeItem(AVM2Instruction instruction, TreeItem expression) {
+   public EscapeXElemTreeItem(AVM2Instruction instruction, GraphTargetItem expression) {
       super(instruction, NOPRECEDENCE);
       this.expression = expression;
    }
 
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return hilight("{") + expression.toString(constants, localRegNames, fullyQualifiedNames) + hilight("}");
+      return hilight("{") + expression.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + hilight("}");
    }
 }

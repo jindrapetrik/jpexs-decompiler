@@ -16,15 +16,16 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.IgnoredPair;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
 
 public class InitArrayTreeItem extends TreeItem {
 
-   public List<TreeItem> values;
+   public List<GraphTargetItem> values;
 
-   public InitArrayTreeItem(Action instruction, List<TreeItem> values) {
+   public InitArrayTreeItem(GraphSourceItem instruction, List<GraphTargetItem> values) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.values = values;
    }
@@ -42,10 +43,10 @@ public class InitArrayTreeItem extends TreeItem {
    }
 
    @Override
-   public List<com.jpexs.decompiler.flash.action.IgnoredPair> getNeededActions() {
-      List<IgnoredPair> ret = super.getNeededActions();
-      for (TreeItem value : values) {
-         ret.addAll(value.getNeededActions());
+   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+      List<GraphSourceItemPos> ret = super.getNeededSources();
+      for (GraphTargetItem value : values) {
+         ret.addAll(value.getNeededSources());
       }
       return ret;
    }

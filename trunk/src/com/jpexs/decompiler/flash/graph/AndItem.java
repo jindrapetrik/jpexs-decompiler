@@ -14,27 +14,25 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.action.treemodel;
+package com.jpexs.decompiler.flash.graph;
 
-import com.jpexs.decompiler.flash.action.Action;
+import java.util.List;
 
-public class BreakTreeItem extends TreeItem {
+public class AndItem extends BinaryOpItem {
 
-   public long loopPos;
-   public boolean isKnown;
-
-   public BreakTreeItem(Action instruction, long loopPos) {
-      this(instruction, loopPos, true);
-   }
-
-   public BreakTreeItem(Action instruction, long loopPos, boolean isKnown) {
-      super(instruction, NOPRECEDENCE);
-      this.loopPos = loopPos;
-      this.isKnown = isKnown;
-   }
+   public GraphPart firstPart;
 
    @Override
-   public String toString(ConstantPool constants) {
-      return hilight("break") + " loop" + loopPos + ";";
+   public List<GraphSourceItemPos> getNeededSources() {
+      List<GraphSourceItemPos> ret = super.getNeededSources();
+      ret.addAll(leftSide.getNeededSources());
+      ret.addAll(rightSide.getNeededSources());
+      return ret;
+   }
+
+   public AndItem(GraphSourceItem src, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+      super(src, PRECEDENCE_LOGICALAND, leftSide, rightSide, "&&");
+      this.leftSide = leftSide;
+      this.rightSide = rightSide;
    }
 }

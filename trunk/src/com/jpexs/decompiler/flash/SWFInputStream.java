@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.IgnoredPair;
 import com.jpexs.decompiler.flash.action.parser.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.special.ActionNop;
@@ -27,7 +26,8 @@ import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf6.*;
 import com.jpexs.decompiler.flash.action.swf7.*;
 import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.*;
@@ -494,7 +494,7 @@ public class SWFInputStream extends InputStream {
       List<Action> retdups = new ArrayList<Action>();
       ConstantPool cpool = null;
 
-      Stack<TreeItem> stack = new Stack<TreeItem>();
+      Stack<GraphTargetItem> stack = new Stack<GraphTargetItem>();
 
       ReReadableInputStream rri = new ReReadableInputStream(this);
       SWFInputStream sis = new SWFInputStream(rri, version);
@@ -516,12 +516,12 @@ public class SWFInputStream extends InputStream {
       return ret;
    }
 
-   private void readActionListAtPos(Stack<TreeItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret) throws IOException {
+   private void readActionListAtPos(Stack<GraphTargetItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret) throws IOException {
       boolean debugMode = false;
       boolean displayCompiletime = false;
       rri.setPos(ip);
       Action a;
-      List<TreeItem> output = new ArrayList<TreeItem>();
+      List<GraphTargetItem> output = new ArrayList<GraphTargetItem>();
       long filePos = rri.getPos();
       while ((a = sis.readAction()) != null) {
          if (debugMode) {
@@ -563,7 +563,7 @@ public class SWFInputStream extends InputStream {
          boolean goaif = false;
          if (a instanceof ActionIf) {
             aif = (ActionIf) a;
-            TreeItem top = stack.pop();
+            GraphTargetItem top = stack.pop();
             if (top.isCompileTime()) {
                if (debugMode) {
                   System.out.print("is compiletime -> ");
@@ -584,18 +584,18 @@ public class SWFInputStream extends InputStream {
                if (displayCompiletime) {
                   beforeInsert = new ActionPop();
                } else {
-                  List<IgnoredPair> needed = top.getNeededActions();
-                  for (IgnoredPair ig : needed) {
-                     if (ig.action instanceof ActionPush) {
-                        if (!((ActionPush) ig.action).ignoredParts.contains(ig.pos)) {
-                           ((ActionPush) ig.action).ignoredParts.add(ig.pos);
+                  List<GraphSourceItemPos> needed = top.getNeededSources();
+                  for (GraphSourceItemPos ig : needed) {
+                     if (ig.item instanceof ActionPush) {
+                        if (!((ActionPush) ig.item).ignoredParts.contains(ig.pos)) {
+                           ((ActionPush) ig.item).ignoredParts.add(ig.pos);
 
-                           if (((ActionPush) ig.action).ignoredParts.size() == ((ActionPush) ig.action).values.size()) {
-                              ig.action.ignored = true;
+                           if (((ActionPush) ig.item).ignoredParts.size() == ((ActionPush) ig.item).values.size()) {
+                              ((Action) ig.item).ignored = true;
                            }
                         }
                      } else {
-                        ig.action.ignored = true;
+                        ((Action) ig.item).ignored = true;
                      }
                   }
                }
@@ -607,7 +607,7 @@ public class SWFInputStream extends InputStream {
             newip = rri.getPos() + ((ActionJump) a).offset;
             rri.setPos(newip);
          } else {
-            a.translate(stack, output, new HashMap<Integer, String>());
+            a.translate(Helper.toList(new HashMap<Integer, String>()), stack, output);
          }
          for (int i = 0; i < actionLen; i++) {
             ensureCapacity(ret, ip + i);

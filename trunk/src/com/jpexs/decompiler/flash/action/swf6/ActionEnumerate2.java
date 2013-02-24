@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.action.swf6;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.EnumerateTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
 import java.util.Stack;
 
@@ -34,8 +34,8 @@ public class ActionEnumerate2 extends Action {
    }
 
    @Override
-   public void translate(Stack<TreeItem> stack, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
-      TreeItem object = stack.pop();
+   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames) {
+      GraphTargetItem object = stack.pop();
       stack.push(new EnumerateTreeItem(this, object));
    }
 }

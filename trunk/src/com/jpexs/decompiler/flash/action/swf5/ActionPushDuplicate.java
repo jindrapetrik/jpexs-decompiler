@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.IgnoredPair;
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
 import java.util.Stack;
 
@@ -34,10 +34,10 @@ public class ActionPushDuplicate extends Action {
    }
 
    @Override
-   public void translate(Stack<TreeItem> stack, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
-      TreeItem value = stack.pop();
+   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames) {
+      GraphTargetItem value = stack.pop();
       stack.push(value);
       stack.push(value);
-      value.moreInstructions.add(new IgnoredPair(this, 0));
+      value.moreSrc.add(new GraphSourceItemPos(this, 0));
    }
 }

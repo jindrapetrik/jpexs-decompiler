@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 
 public class GetURLTreeItem extends TreeItem {
@@ -25,10 +25,10 @@ public class GetURLTreeItem extends TreeItem {
    public String targetString;
 
    public String toString(ConstantPool constants) {
-      return hilight("getUrl(\"") + Helper.escapeString(urlString) + "\", \"" + Helper.escapeString(targetString) + hilight("\")") + ";";
+      return hilight("getUrl(\"") + Helper.escapeString(urlString) + "\", \"" + Helper.escapeString(targetString) + hilight("\")");
    }
 
-   public GetURLTreeItem(Action instruction, String urlString, String targetString) {
+   public GetURLTreeItem(GraphSourceItem instruction, String urlString, String targetString) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.urlString = urlString;
       this.targetString = targetString;

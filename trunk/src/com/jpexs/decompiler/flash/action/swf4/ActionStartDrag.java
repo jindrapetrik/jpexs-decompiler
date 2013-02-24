@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.action.swf4;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.StartDragTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
 import java.util.Stack;
 
@@ -35,10 +35,10 @@ public class ActionStartDrag extends Action {
    }
 
    @Override
-   public void translate(Stack<TreeItem> stack, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
-      TreeItem target = stack.pop();
-      TreeItem lockCenter = stack.pop();
-      TreeItem constrain = stack.pop();
+   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames) {
+      GraphTargetItem target = stack.pop();
+      GraphTargetItem lockCenter = stack.pop();
+      GraphTargetItem constrain = stack.pop();
 
       boolean hasConstrains = true;
       if (constrain instanceof DirectValueTreeItem) {
@@ -53,10 +53,10 @@ public class ActionStartDrag extends Action {
             }
          }
       }
-      TreeItem x1 = null;
-      TreeItem y1 = null;
-      TreeItem x2 = null;
-      TreeItem y2 = null;
+      GraphTargetItem x1 = null;
+      GraphTargetItem y1 = null;
+      GraphTargetItem x2 = null;
+      GraphTargetItem y2 = null;
       if (hasConstrains) {
          y2 = stack.pop();
          x2 = stack.pop();

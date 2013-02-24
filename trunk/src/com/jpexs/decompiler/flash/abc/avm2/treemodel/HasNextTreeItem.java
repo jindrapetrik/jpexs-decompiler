@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,10 +29,10 @@ import java.util.List;
  */
 public class HasNextTreeItem extends TreeItem {
 
-   public TreeItem object;
-   public TreeItem collection;
+   public GraphTargetItem object;
+   public GraphTargetItem collection;
 
-   public HasNextTreeItem(AVM2Instruction instruction, TreeItem object, TreeItem collection) {
+   public HasNextTreeItem(AVM2Instruction instruction, GraphTargetItem object, GraphTargetItem collection) {
       super(instruction, NOPRECEDENCE);
       this.object = object;
       this.collection = collection;
@@ -38,6 +40,6 @@ public class HasNextTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return collection.toString(constants, localRegNames, fullyQualifiedNames) + " hasNext " + object.toString(constants, localRegNames, fullyQualifiedNames);
+      return collection.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + " hasNext " + object.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
    }
 }

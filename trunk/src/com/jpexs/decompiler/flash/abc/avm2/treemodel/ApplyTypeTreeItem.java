@@ -18,15 +18,17 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
 
 public class ApplyTypeTreeItem extends TreeItem {
 
-   public TreeItem object;
-   public List<TreeItem> params;
+   public GraphTargetItem object;
+   public List<GraphTargetItem> params;
 
-   public ApplyTypeTreeItem(AVM2Instruction instruction, TreeItem object, List<TreeItem> params) {
+   public ApplyTypeTreeItem(AVM2Instruction instruction, GraphTargetItem object, List<GraphTargetItem> params) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.params = params;
       this.object = object;
@@ -34,18 +36,18 @@ public class ApplyTypeTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      String ret = object.toString(constants, localRegNames, fullyQualifiedNames);
+      String ret = object.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
       if (!params.isEmpty()) {
          ret += hilight(".<");
          for (int i = 0; i < params.size(); i++) {
             if (i > 0) {
                ret += hilight(",");
             }
-            TreeItem p = params.get(i);
+            GraphTargetItem p = params.get(i);
             if (p instanceof NullTreeItem) {
                ret += "*";
             } else {
-               ret += p.toString(constants, localRegNames, fullyQualifiedNames);
+               ret += p.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
             }
          }
          ret += hilight(">");

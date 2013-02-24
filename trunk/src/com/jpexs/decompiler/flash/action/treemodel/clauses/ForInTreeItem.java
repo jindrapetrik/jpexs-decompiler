@@ -18,8 +18,11 @@ package com.jpexs.decompiler.flash.action.treemodel.clauses;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
-import com.jpexs.decompiler.flash.action.treemodel.ContinueTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.Block;
+import com.jpexs.decompiler.flash.graph.ContinueItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.Loop;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,8 +32,8 @@ public class ForInTreeItem extends LoopTreeItem implements Block {
    public TreeItem enumVariable;
    public List<TreeItem> commands;
 
-   public ForInTreeItem(Action instruction, int loopBreak, int loopContinue, TreeItem variableName, TreeItem enumVariable, List<TreeItem> commands) {
-      super(instruction, loopBreak, loopContinue);
+   public ForInTreeItem(Action instruction, Loop loop, TreeItem variableName, TreeItem enumVariable, List<TreeItem> commands) {
+      super(instruction, loop);
       this.variableName = variableName;
       this.enumVariable = enumVariable;
       this.commands = commands;
@@ -39,21 +42,22 @@ public class ForInTreeItem extends LoopTreeItem implements Block {
    @Override
    public String toString(ConstantPool constants) {
       String ret = "";
-      ret += "loop" + loopBreak + ":\r\n";
+      ret += "loop" + loop.id + ":\r\n";
       ret += hilight("for(") + stripQuotes(variableName) + " in " + enumVariable.toString(constants) + ")\r\n{\r\n";
       for (TreeItem ti : commands) {
          ret += ti.toString(constants) + "\r\n";
       }
       ret += hilight("}") + "\r\n";
-      ret += ":loop" + loopBreak;
+      ret += ":loop" + loop.id;
       return ret;
    }
 
-   public List<ContinueTreeItem> getContinues() {
-      List<ContinueTreeItem> ret = new ArrayList<ContinueTreeItem>();
-      for (TreeItem ti : commands) {
-         if (ti instanceof ContinueTreeItem) {
-            ret.add((ContinueTreeItem) ti);
+   @Override
+   public List<ContinueItem> getContinues() {
+      List<ContinueItem> ret = new ArrayList<ContinueItem>();
+      for (GraphTargetItem ti : commands) {
+         if (ti instanceof ContinueItem) {
+            ret.add((ContinueItem) ti);
          }
          if (ti instanceof Block) {
             ret.addAll(((Block) ti).getContinues());

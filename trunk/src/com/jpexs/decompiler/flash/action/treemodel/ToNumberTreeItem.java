@@ -16,27 +16,29 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.List;
 
 public class ToNumberTreeItem extends TreeItem {
 
-   private TreeItem value;
+   private GraphTargetItem value;
 
-   public ToNumberTreeItem(Action instruction, TreeItem value) {
+   public ToNumberTreeItem(GraphSourceItem instruction, GraphTargetItem value) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.value = value;
    }
 
    @Override
    public String toString(ConstantPool constants) {
-      return value.toString(constants) + hilight(".valueOf()");
+      return value.toString(Helper.toList(constants)) + hilight(".valueOf()");
    }
 
    @Override
-   public List<com.jpexs.decompiler.flash.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.decompiler.flash.action.IgnoredPair> ret = super.getNeededActions();
-      ret.addAll(value.getNeededActions());
+   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+      ret.addAll(value.getNeededSources());
       return ret;
    }
 }

@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,15 +29,15 @@ import java.util.List;
  */
 public class DefaultXMLNamespace extends TreeItem {
 
-   private TreeItem ns;
+   private GraphTargetItem ns;
 
-   public DefaultXMLNamespace(AVM2Instruction instruction, TreeItem ns) {
+   public DefaultXMLNamespace(AVM2Instruction instruction, GraphTargetItem ns) {
       super(instruction, NOPRECEDENCE);
       this.ns = ns;
    }
 
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return hilight("default xml namespace = ") + ns.toString(constants, localRegNames, fullyQualifiedNames);
+      return hilight("default xml namespace = ") + ns.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
    }
 }

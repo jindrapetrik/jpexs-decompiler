@@ -16,12 +16,12 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.operations;
 
-import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 
 public class BitNotTreeItem extends UnaryOpTreeItem {
 
-   public BitNotTreeItem(Action instruction, TreeItem value) {
+   public BitNotTreeItem(GraphSourceItem instruction, TreeItem value) {
       super(instruction, PRECEDENCE_UNARY, value, "~");
    }
 

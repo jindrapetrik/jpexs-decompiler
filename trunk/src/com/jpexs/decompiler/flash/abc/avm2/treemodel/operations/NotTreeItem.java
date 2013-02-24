@@ -17,26 +17,23 @@
 package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.LogicalOpItem;
+import com.jpexs.decompiler.flash.graph.NotItem;
 
-public class NotTreeItem extends UnaryOpTreeItem implements LogicalOp {
+public class NotTreeItem extends UnaryOpTreeItem implements LogicalOpItem, NotItem {
 
-   public NotTreeItem(AVM2Instruction instruction, TreeItem value) {
+   public NotTreeItem(AVM2Instruction instruction, GraphTargetItem value) {
       super(instruction, PRECEDENCE_UNARY, value, "!");
    }
 
    @Override
-   public boolean isTrue() {
-      return !value.isTrue();
+   public GraphTargetItem invert() {
+      return value;
    }
 
    @Override
-   public boolean isFalse() {
-      return !value.isFalse();
-   }
-
-   @Override
-   public TreeItem invert() {
+   public GraphTargetItem getOriginal() {
       return value;
    }
 }

@@ -17,12 +17,12 @@
 package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.AssignmentTreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
 public class PreDecrementTreeItem extends UnaryOpTreeItem implements AssignmentTreeItem {
 
-   public PreDecrementTreeItem(AVM2Instruction instruction, TreeItem object) {
+   public PreDecrementTreeItem(AVM2Instruction instruction, GraphTargetItem object) {
       super(instruction, PRECEDENCE_UNARY, object, "--");
    }
 }

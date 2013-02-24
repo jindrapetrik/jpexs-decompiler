@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 
 public class SimpleActionTreeItem extends TreeItem {
 
@@ -27,7 +27,7 @@ public class SimpleActionTreeItem extends TreeItem {
       return hilight(actionString);
    }
 
-   public SimpleActionTreeItem(Action instruction, String actionString) {
+   public SimpleActionTreeItem(GraphSourceItem instruction, String actionString) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.actionString = actionString;
    }

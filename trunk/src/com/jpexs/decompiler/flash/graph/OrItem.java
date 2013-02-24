@@ -14,12 +14,25 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.action.treemodel.clauses;
+package com.jpexs.decompiler.flash.graph;
 
-import com.jpexs.decompiler.flash.action.treemodel.ContinueTreeItem;
 import java.util.List;
 
-public interface Block {
+public class OrItem extends BinaryOpItem {
 
-   public List<ContinueTreeItem> getContinues();
+   public GraphPart firstPart;
+
+   public OrItem(GraphSourceItem src, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+      super(src, PRECEDENCE_LOGICALOR, leftSide, rightSide, "||");
+      this.leftSide = leftSide;
+      this.rightSide = rightSide;
+   }
+
+   @Override
+   public List<GraphSourceItemPos> getNeededSources() {
+      List<GraphSourceItemPos> ret = super.getNeededSources();
+      ret.addAll(leftSide.getNeededSources());
+      ret.addAll(rightSide.getNeededSources());
+      return ret;
+   }
 }

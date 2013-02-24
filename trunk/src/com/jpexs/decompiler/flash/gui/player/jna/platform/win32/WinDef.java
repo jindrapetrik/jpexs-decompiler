@@ -14,7 +14,6 @@ package com.jpexs.decompiler.flash.gui.player.jna.platform.win32;
 
 import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.BaseTSD.LONG_PTR;
 import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.WinNT.HANDLE;
-
 import com.sun.jna.IntegerType;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;

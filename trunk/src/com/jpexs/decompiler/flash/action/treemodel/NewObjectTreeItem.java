@@ -16,15 +16,16 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
 
 public class NewObjectTreeItem extends TreeItem {
 
-   public TreeItem objectName;
-   public List<TreeItem> arguments;
+   public GraphTargetItem objectName;
+   public List<GraphTargetItem> arguments;
 
-   public NewObjectTreeItem(Action instruction, TreeItem objectName, List<TreeItem> arguments) {
+   public NewObjectTreeItem(GraphSourceItem instruction, GraphTargetItem objectName, List<GraphTargetItem> arguments) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.objectName = objectName;
       this.arguments = arguments;
@@ -43,11 +44,11 @@ public class NewObjectTreeItem extends TreeItem {
    }
 
    @Override
-   public List<com.jpexs.decompiler.flash.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.decompiler.flash.action.IgnoredPair> ret = super.getNeededActions();
-      ret.addAll(objectName.getNeededActions());
-      for (TreeItem ti : arguments) {
-         ret.addAll(ti.getNeededActions());
+   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+      ret.addAll(objectName.getNeededSources());
+      for (GraphTargetItem ti : arguments) {
+         ret.addAll(ti.getNeededSources());
       }
       return ret;
    }

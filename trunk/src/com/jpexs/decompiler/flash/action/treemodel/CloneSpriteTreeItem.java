@@ -16,16 +16,17 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
 
 public class CloneSpriteTreeItem extends TreeItem {
 
-   public TreeItem source;
-   public TreeItem target;
-   public TreeItem depth;
+   public GraphTargetItem source;
+   public GraphTargetItem target;
+   public GraphTargetItem depth;
 
-   public CloneSpriteTreeItem(Action instruction, TreeItem source, TreeItem target, TreeItem depth) {
+   public CloneSpriteTreeItem(GraphSourceItem instruction, GraphTargetItem source, GraphTargetItem target, GraphTargetItem depth) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.source = source;
       this.target = target;
@@ -34,15 +35,15 @@ public class CloneSpriteTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return hilight("duplicateMovieClip(") + target.toString(constants) + hilight(",") + source.toString(constants) + hilight(",") + depth.toString(constants) + hilight(")") + ";";
+      return hilight("duplicateMovieClip(") + target.toString(constants) + hilight(",") + source.toString(constants) + hilight(",") + depth.toString(constants) + hilight(")");
    }
 
    @Override
-   public List<com.jpexs.decompiler.flash.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.decompiler.flash.action.IgnoredPair> ret = super.getNeededActions();
-      ret.addAll(source.getNeededActions());
-      ret.addAll(target.getNeededActions());
-      ret.addAll(depth.getNeededActions());
+   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+      ret.addAll(source.getNeededSources());
+      ret.addAll(target.getNeededSources());
+      ret.addAll(depth.getNeededSources());
       return ret;
    }
 }

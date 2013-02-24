@@ -16,8 +16,8 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.List;
 
@@ -26,7 +26,7 @@ public class DirectValueTreeItem extends TreeItem {
    public Object value;
    public List<String> constants;
 
-   public DirectValueTreeItem(Action instruction, int instructionPos, Object value, List<String> constants) {
+   public DirectValueTreeItem(GraphSourceItem instruction, int instructionPos, Object value, List<String> constants) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.constants = constants;
       this.value = value;
@@ -65,7 +65,7 @@ public class DirectValueTreeItem extends TreeItem {
    }
 
    @Override
-   public String toStringNoQuotes(ConstantPool constants) {
+   public String toStringNoQuotes(List localData) {
       if (value instanceof Double) {
          if (Double.compare((double) (Double) value, 0) == 0) {
             return hilight("0");

@@ -18,15 +18,14 @@ package com.jpexs.decompiler.flash.action.treemodel.clauses;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.Loop;
 
 public abstract class LoopTreeItem extends TreeItem {
 
-   public long loopBreak;
-   public long loopContinue;
+   public Loop loop;
 
-   public LoopTreeItem(Action instruction, long loopBreak, long loopContinue) {
+   public LoopTreeItem(Action instruction, Loop loop) {
       super(instruction, NOPRECEDENCE);
-      this.loopBreak = loopBreak;
-      this.loopContinue = loopContinue;
+      this.loop = loop;
    }
 }

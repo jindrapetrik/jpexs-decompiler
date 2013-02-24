@@ -41,8 +41,6 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.*;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.*;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.AndTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.OrTreeItem;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
@@ -50,6 +48,7 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.io.*;
@@ -820,11 +819,11 @@ public class AVM2Code implements Serializable {
       cacheActual = false;
    }
 
-   public static String listToString(List<TreeItem> stack, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+   public static String listToString(List<GraphTargetItem> stack, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       StringBuffer ret = new StringBuffer();
       for (int d = 0; d < stack.size(); d++) {
-         TreeItem o = stack.get(d);
-         ret.append(o.toStringSemicoloned(constants, localRegNames, fullyQualifiedNames) + "\r\n");
+         GraphTargetItem o = stack.get(d);
+         ret.append(o.toStringSemicoloned(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "\r\n");
       }
       return ret.toString();
    }
@@ -1032,7 +1031,7 @@ public class AVM2Code implements Serializable {
       return pos2adr(fixIPAfterDebugLine(adr2pos(addr)));
    }
 
-   public ConvertOutput toSourceOutput(boolean processJumps, boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, Stack<TreeItem> scopeStack, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, boolean visited[]) throws ConvertException {
+   public ConvertOutput toSourceOutput(boolean processJumps, boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, boolean visited[]) throws ConvertException {
       boolean debugMode = DEBUG_MODE;
       if (debugMode) {
          System.out.println("OPEN SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
@@ -1047,7 +1046,7 @@ public class AVM2Code implements Serializable {
             throw new ConvertException("Limit of subs(" + toSourceLimit + ") was reached", start);
          }
       }
-      List<TreeItem> output = new ArrayList();
+      List<GraphTargetItem> output = new ArrayList<GraphTargetItem>();
       String ret = "";
       int ip = start;
       try {
@@ -1086,7 +1085,7 @@ public class AVM2Code implements Serializable {
                   int endpos = adr2pos(fixAddrAfterDebugLine(catchedExceptions.get(0).end));
 
 
-                  List<List<TreeItem>> catchedCommands = new ArrayList<List<TreeItem>>();
+                  List<List<GraphTargetItem>> catchedCommands = new ArrayList<List<GraphTargetItem>>();
                   if (code.get(endpos).definition instanceof JumpIns) {
                      int afterCatchAddr = pos2adr(endpos + 1) + code.get(endpos).operands[0];
                      int afterCatchPos = adr2pos(afterCatchAddr);
@@ -1101,7 +1100,7 @@ public class AVM2Code implements Serializable {
                      });
 
 
-                     List<TreeItem> finallyCommands = new ArrayList<TreeItem>();
+                     List<GraphTargetItem> finallyCommands = new ArrayList<GraphTargetItem>();
                      int returnPos = afterCatchPos;
                      for (int e = 0; e < body.exceptions.length; e++) {
                         if (body.exceptions[e].isFinally()) {
@@ -1143,12 +1142,12 @@ public class AVM2Code implements Serializable {
                         } else {
                            eendpos = afterCatchPos - 1;
                         }
-                        Stack<TreeItem> substack = new Stack<TreeItem>();
+                        Stack<GraphTargetItem> substack = new Stack<GraphTargetItem>();
                         substack.add(new ExceptionTreeItem(catchedExceptions.get(e)));
-                        catchedCommands.add(toSourceOutput(processJumps, isStatic, classIndex, localRegs, substack, new Stack<TreeItem>(), abc, constants, method_info, body, adr2pos(fixAddrAfterDebugLine(catchedExceptions.get(e).target)), eendpos, localRegNames, fullyQualifiedNames, visited).output);
+                        catchedCommands.add(toSourceOutput(processJumps, isStatic, classIndex, localRegs, substack, new Stack<GraphTargetItem>(), abc, constants, method_info, body, adr2pos(fixAddrAfterDebugLine(catchedExceptions.get(e).target)), eendpos, localRegNames, fullyQualifiedNames, visited).output);
                      }
 
-                     List<TreeItem> tryCommands = toSourceOutput(processJumps, isStatic, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, ip, endpos - 1, localRegNames, fullyQualifiedNames, visited).output;
+                     List<GraphTargetItem> tryCommands = toSourceOutput(processJumps, isStatic, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, ip, endpos - 1, localRegNames, fullyQualifiedNames, visited).output;
 
 
                      output.add(new TryTreeItem(tryCommands, catchedExceptions, catchedCommands, finallyCommands));
@@ -1220,358 +1219,11 @@ public class AVM2Code implements Serializable {
                }
             }
 
-            if (ins.definition instanceof JumpIns) { //Ifs with multiple conditions
-               int secondAddr = addr + ins.getBytes().length;
-               int jumpAddr = secondAddr + ins.operands[0];
-               int jumpPos = adr2pos(jumpAddr);
-               if (ins.operands[0] == 0) {
-                  ip++;
-               } else if (ins.operands[0] > 0) {
-                  if (finallyJumps.contains(jumpPos)) {
-                     if (code.get(ip + 1).definition instanceof LabelIns) {
-                        if (code.get(ip + 2).definition instanceof PopIns) {
-                           if (code.get(ip + 3).definition instanceof LabelIns) {
-                              if (code.get(ip + 4).definition instanceof GetLocalTypeIns) {
-                                 if (code.get(ip - 1).definition instanceof PushByteIns) {
-                                    if (code.get(ip - 2).definition instanceof SetLocalTypeIns) {
-                                       if (((SetLocalTypeIns) code.get(ip - 2).definition).getRegisterId(code.get(ip - 2)) == ((GetLocalTypeIns) code.get(ip + 4).definition).getRegisterId(code.get(ip + 4))) {
-                                          SetLocalTreeItem ti = (SetLocalTreeItem) output.remove(output.size() - 1);
-                                          stack.add(ti.value);
-                                          ip = ip + 5;
-                                          continue;
-                                       }
-                                    }
-                                 }
-                              }
-                           }
-                        }
-                     }
-                     //continue;
-                     ip++;
-                     continue;
-                  }
-                  for (Loop l : loopList) {
-                     if (l.loopBreak == jumpPos) {
-                        output.add(new BreakTreeItem(ins, l.loopBreak));
-                        ip = ip + 1;
-                        continue iploop;
-                     }
-                     if (l.loopContinue == jumpPos) {
-                        l.continueCount++;
-                        output.add(new ContinueTreeItem(ins, l.loopBreak));
-                        ip = ip + 1;
-                        continue iploop;
-                     }
-                  }
-
-
-                  boolean backJumpFound = false;
-                  int afterBackJumpAddr = 0;
-                  AVM2Instruction backJumpIns = null;
-                  boolean isSwitch = false;
-                  int switchPos = 0;
-                  loopj:
-                  for (int j = jumpPos; j <= end; j++) {
-                     if (code.get(j).definition instanceof IfTypeIns) {
-                        afterBackJumpAddr = pos2adr(j + 1);
-
-                        if (afterBackJumpAddr + code.get(j).operands[0] == secondAddr) {
-                           backJumpFound = true;
-                           backJumpIns = code.get(j);
-                           break;
-                        }
-                     }
-                     if (code.get(j).definition instanceof LookupSwitchIns) {
-                        for (int h = 2; h < code.get(j).operands.length; h++) {
-                           int ofs = code.get(j).operands[h] + pos2adr(j);
-                           if (ofs == secondAddr) {
-                              isSwitch = true;
-                              switchPos = j;
-                              break loopj;
-                           }
-                        }
-                     }
-                  }
-                  if (isSwitch) {
-                     AVM2Instruction killIns = code.get(switchPos - 1);
-                     if (!(killIns.definition instanceof KillIns)) {
-                        throw new ConvertException("Unknown pattern: no kill before lookupswitch", switchPos - 1);
-                     }
-                     int userReg = killIns.operands[0];
-                     int evalTo = -1;
-                     for (int g = jumpPos; g < switchPos; g++) {
-                        if ((code.get(g).definition instanceof SetLocal0Ins) && (userReg == 0)) {
-                           evalTo = g;
-                           break;
-                        } else if ((code.get(g).definition instanceof SetLocal1Ins) && (userReg == 1)) {
-                           evalTo = g;
-                           break;
-                        } else if ((code.get(g).definition instanceof SetLocal2Ins) && (userReg == 2)) {
-                           evalTo = g;
-                           break;
-                        } else if ((code.get(g).definition instanceof SetLocal3Ins) && (userReg == 3)) {
-                           evalTo = g;
-                           break;
-                        }
-                        if ((code.get(g).definition instanceof SetLocalIns) && (userReg == code.get(g).operands[0])) {
-                           evalTo = g;
-                           break;
-                        }
-                     }
-                     if (evalTo == -1) {
-                        throw new ConvertException("Unknown pattern: no setlocal before lookupswitch", switchPos);
-                     }
-                     loopList.add(new Loop(ip, switchPos + 1));
-                     Stack<TreeItem> substack = toSourceOutput(processJumps, isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, jumpPos, evalTo - 1, localRegNames, fullyQualifiedNames, visited).stack;
-                     TreeItem switchedValue = substack.pop();
-                     //output.add("loop" + (switchPos + 1) + ":");
-                     int switchBreak = switchPos + 1;
-                     List<TreeItem> casesList = new ArrayList<TreeItem>();
-                     List<List<TreeItem>> caseCommands = new ArrayList<List<TreeItem>>();
-                     List<TreeItem> defaultCommands = new ArrayList<TreeItem>();
-                     //output.add("switch(" + switchedValue + ")");
-                     //output.add("{");
-                     int curPos = evalTo + 1;
-                     int casePos = 0;
-                     do {
-                        evalTo = -1;
-                        for (int g = curPos; g < switchPos; g++) {
-                           if ((code.get(g).definition instanceof GetLocal0Ins) && (userReg == 0)) {
-                              evalTo = g;
-                              break;
-                           } else if ((code.get(g).definition instanceof GetLocal1Ins) && (userReg == 1)) {
-                              evalTo = g;
-                              break;
-                           } else if ((code.get(g).definition instanceof GetLocal2Ins) && (userReg == 2)) {
-                              evalTo = g;
-                              break;
-                           } else if ((code.get(g).definition instanceof GetLocal3Ins) && (userReg == 3)) {
-                              evalTo = g;
-                              break;
-                           }
-                           if ((code.get(g).definition instanceof GetLocalIns) && (userReg == code.get(g).operands[0])) {
-                              evalTo = g;
-                              break;
-                           }
-                        }
-
-
-                        if (evalTo > -1) {
-                           substack = toSourceOutput(processJumps, isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, curPos, evalTo - 1, localRegNames, fullyQualifiedNames, visited).stack;
-                           casesList.add(substack.pop());
-                        }
-                        int substart = adr2pos(code.get(switchPos).operands[2 + casePos] + pos2adr(switchPos));
-                        int subend = jumpPos - 1;
-                        if (casePos + 1 < code.get(switchPos).operands.length - 2) {
-                           subend = adr2pos(code.get(switchPos).operands[2 + casePos + 1] + pos2adr(switchPos)) - 1;
-                        }
-
-                        if (evalTo == -1) {
-                           subend--;
-                        }
-                        List commands = toSourceOutput(processJumps, isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, substart, subend, localRegNames, fullyQualifiedNames, visited).output;
-                        if ((evalTo == -1) && (casePos + 1 < code.get(switchPos).operands.length - 2)) {
-                           if (commands.size() == 1) {
-                              commands.remove(0);
-                           }
-                           if (commands.size() > 0) {
-                              //hasDefault=true;
-                           }
-                        }
-                        List<TreeItem> caseCommandPart = new ArrayList<TreeItem>();
-                        if (evalTo == -1) {
-                           defaultCommands.addAll(commands);
-                        } else {
-                           caseCommandPart.addAll(commands);
-                           caseCommands.add(caseCommandPart);
-                        }
-                        curPos = evalTo + 4;
-                        casePos++;
-                        if (evalTo == -1) {
-                           break;
-                        }
-                     } while (true);
-                     if (processJumps) {
-                        List<Integer> valMapping = new ArrayList<Integer>();
-                        for (int i = 0; i < casesList.size(); i++) {
-                           valMapping.add(i);
-                        }
-                        output.add(new SwitchTreeItem(code.get(switchPos), switchBreak, switchedValue, casesList, caseCommands, defaultCommands, valMapping));
-                     }
-                     ip = switchPos + 1;
-                     continue;
-                  }
-
-                  if (!backJumpFound) {
-                     if (jumpPos <= end + 1) { //probably skipping catch
-                        ip = jumpPos;
-                        continue;
-                     }
-                     output.add(new ContinueTreeItem(ins, jumpPos, false));
-                     ip = ip + 1;
-                     if (!unknownJumps.contains(jumpPos)) {
-                        unknownJumps.add(jumpPos);
-                     }
-                     continue;
-                     //throw new ConvertException("Unknown pattern: forjump with no backjump");
-                  }
-                  Loop currentLoop = new Loop(jumpPos, adr2pos(afterBackJumpAddr));
-                  loopList.add(currentLoop);
-
-                  if (debugMode) {
-                     System.out.println("expression branch");
-                  }
-                  ConvertOutput co = toSourceOutput(processJumps, isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, jumpPos, adr2pos(afterBackJumpAddr) - 2, localRegNames, fullyQualifiedNames, visited);
-                  Stack<TreeItem> substack = co.stack;
-                  backJumpIns.definition.translate(isStatic, classIndex, localRegs, substack, scopeStack, constants, backJumpIns, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
-
-                  TreeItem expression = substack.pop();
-                  List<TreeItem> subins = new ArrayList<TreeItem>();
-                  boolean isFor = false;
-                  List<TreeItem> finalExpression = new ArrayList<TreeItem>();
-                  try {
-                     if (debugMode) {
-                        System.out.println("subins branch");
-                     }
-                     subins = toSourceOutput(processJumps, isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, adr2pos(secondAddr) + 1/*label*/, jumpPos - 1, localRegNames, fullyQualifiedNames, visited).output;
-                  } catch (UnknownJumpException uje) {
-                     if ((uje.ip >= start) && (uje.ip <= end)) {
-                        currentLoop.loopContinue = uje.ip;
-                        subins = uje.output;
-
-                        List<ContinueTreeItem> contList = new ArrayList<ContinueTreeItem>();
-                        for (TreeItem ti : subins) {
-                           if (ti instanceof ContinueTreeItem) {
-                              contList.add((ContinueTreeItem) ti);
-                           }
-                           if (ti instanceof Block) {
-                              contList.addAll(((Block) ti).getContinues());
-                           }
-                        }
-                        for (int u = 0; u < contList.size(); u++) {
-                           if (contList.get(u) instanceof ContinueTreeItem) {
-                              if (((ContinueTreeItem) contList.get(u)).loopPos == uje.ip) {
-                                 if (!((ContinueTreeItem) contList.get(u)).isKnown) {
-                                    ((ContinueTreeItem) contList.get(u)).isKnown = true;
-                                    ((ContinueTreeItem) contList.get(u)).loopPos = currentLoop.loopBreak;
-                                 }
-                              }
-                           }
-                        }
-                        if (debugMode) {
-                           System.out.println("final expression branch");
-                        }
-                        finalExpression = toSourceOutput(processJumps, isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, uje.ip, jumpPos - 1, localRegNames, fullyQualifiedNames, visited).output;
-                        isFor = true;
-                     } else {
-                        throw new ConvertException("Unknown pattern: jump to nowhere", ip);
-                     }
-                  }
-                  boolean isDoWhile = false;
-
-                  if (jumpPos == ip + 2) {
-                     if (code.get(ip + 1).definition instanceof LabelIns) {
-                        isDoWhile = true;
-                     }
-                  }
-                  if (!isDoWhile) {
-                     if (!isFor) {
-                        for (Loop l : loopList) {
-                           if (l.loopContinue == jumpPos) {
-                              if (l.continueCount == 0) {
-                                 //isFor = true;
-                                 //finalExpression = subins.remove(subins.size() - 1).toString();
-                              }
-                              break;
-                           }
-                        }
-                     }
-                  }
-
-                  String firstIns = "";
-                  if (isFor) {
-                     if (output.size() > 0) {
-                        //firstIns = output.remove(output.size() - 1).toString();
-                     }
-                  }
-
-                  List<TreeItem> loopBody = new ArrayList<TreeItem>();
-                  loopBody.addAll(co.output);
-                  loopBody.addAll(subins);
-
-                  if (isFor) {
-                     output.add(new ForTreeItem(ins, currentLoop.loopBreak, currentLoop.loopContinue, new ArrayList<TreeItem>(), expression, finalExpression, loopBody));
-                  } else if (isDoWhile) {
-                     output.add(new DoWhileTreeItem(ins, currentLoop.loopBreak, currentLoop.loopContinue, loopBody, expression));
-                  } else {
-                     if (expression instanceof InTreeItem) {
-                        TreeItem gti = ((InTreeItem) expression).collection.getNotCoerced().getThroughRegister();
-                        if (gti instanceof FilteredCheckTreeItem) {
-                           boolean found = false;
-                           if (loopBody.size() == 1) {
-                              TreeItem ft = loopBody.get(0);
-                              if (ft instanceof WithTreeItem) {
-                                 if (((WithTreeItem) ft).items.size() == 1) {
-                                    ft = ((WithTreeItem) ft).items.get(0);
-                                    if (ft instanceof IfTreeItem) {
-                                       IfTreeItem ift = (IfTreeItem) ft;
-                                       if (ift.onTrue.size() > 0) {
-                                          ft = ift.onTrue.get(0);
-                                          if (ft instanceof SetPropertyTreeItem) {
-                                             SetPropertyTreeItem spt = (SetPropertyTreeItem) ft;
-                                             if (spt.object instanceof LocalRegTreeItem) {
-                                                int regIndex = ((LocalRegTreeItem) spt.object).regIndex;
-                                                InTreeItem iti = (InTreeItem) expression;
-                                                localRegs.put(regIndex, new FilterTreeItem(ins, iti.collection.getThroughRegister(), ift.expression));
-                                                found = true;
-                                                addr = afterBackJumpAddr;
-                                                ip = adr2pos(addr);
-                                                continue iploop;
-                                             }
-                                          }
-                                       }
-                                    }
-                                 }
-                              }
-                           }
-                           if (!found) {
-                              throw new ConvertException("Unknown pattern: bad filter loop", ip);
-                           }
-                        }
-                        {
-                           boolean found = false;
-                           for (int g = ip + 1; g < jumpPos; g++) {
-                              if (code.get(g).definition instanceof NextValueIns) {
-                                 output.add(new ForEachInTreeItem(ins, currentLoop.loopBreak, currentLoop.loopContinue, (InTreeItem) expression, loopBody));
-                                 found = true;
-                                 break;
-                              }
-                              if (code.get(g).definition instanceof NextNameIns) {
-                                 output.add(new ForInTreeItem(ins, currentLoop.loopBreak, currentLoop.loopContinue, (InTreeItem) expression, loopBody));
-                                 found = true;
-                                 break;
-                              }
-                           }
-                           if (!found) {
-                              throw new ConvertException("Unknown pattern: hasnext without nextvalue/nextname", ip);
-                           }
-                        }
-
-
-                     } else {
-                        output.add(new WhileTreeItem(ins, currentLoop.loopBreak, currentLoop.loopContinue, expression, loopBody));
-                     }
-                  }
-                  addr = afterBackJumpAddr;
-                  ip = adr2pos(addr);
-               } else {
-                  throw new ConvertException("Unknown pattern: back jump ", ip);
-               }
-            } else if ((ins.definition instanceof SetLocalTypeIns) && (ip + 1 <= end) && (isKilled(((SetLocalTypeIns) ins.definition).getRegisterId(ins), ip, end))) { //set_local_x,get_local_x..kill x
+            if ((ins.definition instanceof SetLocalTypeIns) && (ip + 1 <= end) && (isKilled(((SetLocalTypeIns) ins.definition).getRegisterId(ins), ip, end))) { //set_local_x,get_local_x..kill x
 
                AVM2Instruction insAfter = code.get(ip + 1);
                if ((insAfter.definition instanceof GetLocalTypeIns) && (((GetLocalTypeIns) insAfter.definition).getRegisterId(insAfter) == ((SetLocalTypeIns) ins.definition).getRegisterId(ins))) {
-                  TreeItem before = stack.peek();
+                  GraphTargetItem before = stack.peek();
                   ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
                   stack.push(before);
                   ip += 2;
@@ -1647,91 +1299,7 @@ public class AVM2Code implements Serializable {
                      break;
                      //throw new ConvertException("Unknown pattern after DUP:" + insComparsion.toString());
                   }
-                  if (processJumps) {
-                     addr = addr + ins.getBytes().length + insAfter.getBytes().length + insAfter.operands[0];
-                     nextPos = adr2pos(addr) - 1;
-                     if (isAnd) {
-                        stack.add(new AndTreeItem(insAfter, stack.pop(), toSourceOutput(processJumps, isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, ip + 3, nextPos, localRegNames, fullyQualifiedNames, visited).stack.pop()));
-                     } else {
-                        stack.add(new OrTreeItem(insAfter, stack.pop(), toSourceOutput(processJumps, isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, ip + 3, nextPos, localRegNames, fullyQualifiedNames, visited).stack.pop()));
-                     }
-                     ins = code.get(nextPos + 1);
-                     ip = nextPos + 1;
-                  }
                } while (ins.definition instanceof DupIns);
-            } else if (ins.definition instanceof IfTypeIns) {
-               int targetAddr = pos2adr(ip) + ins.getBytes().length + ins.operands[0];
-               int targetIns = adr2pos(targetAddr);
-               ((IfTypeIns) ins.definition).translateInverted(localRegs, stack, ins);
-
-               TreeItem condition = stack.pop();
-
-               if (condition.isFalse()) {
-                  //ins.definition = new JumpIns();
-                  //continue;
-               }
-               if (condition.isTrue()) {
-                  //ip = targetIns;
-                  //continue;
-               }
-               //stack.add("if"+stack.pop());
-               //stack.add("{");
-               boolean hasElse = false;
-               boolean hasReturn = false;
-               if (code.get(targetIns - 1).definition instanceof JumpIns) {
-
-                  if ((targetIns - 2 > ip) && ((code.get(targetIns - 2).definition instanceof ReturnValueIns) || (code.get(targetIns - 2).definition instanceof ReturnVoidIns) || (code.get(targetIns - 2).definition instanceof ThrowIns))) {
-                     hasElse = false;
-                     hasReturn = true;
-                  } else {
-                     int jumpAddr = targetAddr + code.get(targetIns - 1).operands[0];
-                     int jumpPos = adr2pos(jumpAddr);
-                     hasElse = true;
-
-                     for (Loop l : loopList) {
-                        if (l.loopBreak == jumpPos) {
-                           hasElse = false;
-                           break;
-                        }
-                        if (l.loopContinue == jumpPos) {
-                           hasElse = false;
-                           break;
-                        }
-                     }
-
-                     if (jumpPos > ip && jumpPos < targetIns - 1) {
-                        hasElse = false;
-                     }
-
-                     if (hasElse) {
-                        if (adr2pos(jumpAddr) > end + 1) {
-                           hasElse = false;
-                           //throw new ConvertException("Unknown pattern: forward jump outside of the block");
-                        }
-                     }
-                  }
-               }
-               if (debugMode) {
-                  System.out.println("true branch");
-               }
-               ConvertOutput onTrue = toSourceOutput(processJumps, isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, ip + 1, targetIns - 1 - ((hasElse || hasReturn) ? 1 : 0), localRegNames, fullyQualifiedNames, visited);
-               ip = targetIns;
-               ConvertOutput onFalse = new ConvertOutput(new Stack<TreeItem>(), new ArrayList<TreeItem>());
-               if (hasElse) {
-                  int finalAddr = targetAddr + code.get(targetIns - 1).operands[0];
-                  int finalIns = adr2pos(finalAddr);
-                  if (debugMode) {
-                     System.out.println("false branch");
-                  }
-                  onFalse = toSourceOutput(processJumps, isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, targetIns, finalIns - 1, localRegNames, fullyQualifiedNames, visited);
-                  ip = finalIns;
-               }
-               if ((onTrue.stack.size() > 0) && (onFalse != null) && (onFalse.stack.size() > 0)) {
-                  stack.add(new TernarOpTreeItem(ins, condition, onTrue.stack.pop(), onFalse.stack.pop()));
-               } else {
-                  output.add(new IfTreeItem(ins, condition, onTrue.output, onFalse.output));
-               }
-
             } else if ((ins.definition instanceof ReturnValueIns) || (ins.definition instanceof ReturnVoidIns) || (ins.definition instanceof ThrowIns)) {
                ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
                ip = end + 1;
@@ -1801,7 +1369,7 @@ public class AVM2Code implements Serializable {
       return ret;
    }
 
-   public String toSource(String path, boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames, Stack<TreeItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits) {
+   public String toSource(String path, boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits) {
       return toSource(path, isStatic, classIndex, abc, constants, method_info, body, false, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
    }
 
@@ -1875,11 +1443,11 @@ public class AVM2Code implements Serializable {
       ignoredIns = new ArrayList<Integer>();
    }
 
-   public String toSource(String path, boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted, HashMap<Integer, String> localRegNames, Stack<TreeItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits) {
+   public String toSource(String path, boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted, HashMap<Integer, String> localRegNames, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits) {
       initToSource();
-      List<TreeItem> list;
+      List<GraphTargetItem> list;
       String s;
-      HashMap<Integer, TreeItem> localRegs = new HashMap<Integer, TreeItem>();
+      HashMap<Integer, GraphTargetItem> localRegs = new HashMap<Integer, GraphTargetItem>();
 
       int regCount = getRegisterCount();
       int paramCount;
@@ -1894,7 +1462,7 @@ public class AVM2Code implements Serializable {
       //try {
 
       try {
-         list = AVM2Graph.translateViaGraph(path, this, abc, body);
+         list = AVM2Graph.translateViaGraph(path, this, abc, body, isStatic, classIndex, localRegs, scopeStack, localRegNames, fullyQualifiedNames);
       } catch (Exception ex2) {
          Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, "Decompilation error in " + path, ex2);
          return "/*\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error Message: " + ex2.getMessage() + "\r\n */";
@@ -1906,7 +1474,7 @@ public class AVM2Code implements Serializable {
        }*/
       if (initTraits != null) {
          for (int i = 0; i < list.size(); i++) {
-            TreeItem ti = list.get(i);
+            GraphTargetItem ti = list.get(i);
             if ((ti instanceof InitPropertyTreeItem) || (ti instanceof SetPropertyTreeItem)) {
                int multinameIndex = 0;
                TreeItem value = null;
@@ -1937,8 +1505,8 @@ public class AVM2Code implements Serializable {
          }
       }
       if (isStaticInitializer) {
-         List<TreeItem> newList = new ArrayList<TreeItem>();
-         for (TreeItem ti : list) {
+         List<GraphTargetItem> newList = new ArrayList<GraphTargetItem>();
+         for (GraphTargetItem ti : list) {
             if (!(ti instanceof ReturnVoidTreeItem)) {
                if (!(ti instanceof InitPropertyTreeItem)) {
                   if (!(ti instanceof SetPropertyTreeItem)) {
@@ -1959,7 +1527,7 @@ public class AVM2Code implements Serializable {
       }
       List<Slot> declaredSlots = new ArrayList<Slot>();
       for (int i = 0; i < list.size(); i++) {
-         TreeItem ti = list.get(i);
+         GraphTargetItem ti = list.get(i);
          if (ti instanceof SetLocalTreeItem) {
             int reg = ((SetLocalTreeItem) ti).regIndex;
             if (!declaredRegisters[reg]) {

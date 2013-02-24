@@ -16,16 +16,17 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
 
 public class StoreRegisterTreeItem extends TreeItem implements SetTypeTreeItem {
 
    public RegisterNumber register;
-   public TreeItem value;
+   public GraphTargetItem value;
 
-   public StoreRegisterTreeItem(Action instruction, RegisterNumber register, TreeItem value) {
+   public StoreRegisterTreeItem(GraphSourceItem instruction, RegisterNumber register, GraphTargetItem value) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.value = value;
       this.register = register;
@@ -33,18 +34,18 @@ public class StoreRegisterTreeItem extends TreeItem implements SetTypeTreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return hilight(register.toString() + "=") + value.toString(constants) + ";";
+      return hilight(register.toString() + "=") + value.toString(constants);
    }
 
    @Override
    public TreeItem getObject() {
-      return new DirectValueTreeItem(instruction, -1, register, null);
+      return new DirectValueTreeItem(src, -1, register, null);
    }
 
    @Override
-   public List<com.jpexs.decompiler.flash.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.decompiler.flash.action.IgnoredPair> ret = super.getNeededActions();
-      ret.addAll(value.getNeededActions());
+   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+      ret.addAll(value.getNeededSources());
       return ret;
    }
 }

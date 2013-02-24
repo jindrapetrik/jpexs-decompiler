@@ -14,19 +14,25 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.action;
+package com.jpexs.decompiler.flash.graph;
 
-/**
- *
- * @author JPEXS
- */
-public class IgnoredPair {
+import java.util.List;
 
-   public Action action;
-   public int pos;
+public class TernarOpItem extends GraphTargetItem {
 
-   public IgnoredPair(Action action, int pos) {
-      this.action = action;
-      this.pos = pos;
+   public GraphTargetItem expression;
+   public GraphTargetItem onTrue;
+   public GraphTargetItem onFalse;
+
+   public TernarOpItem(GraphSourceItem src, GraphTargetItem expression, GraphTargetItem onTrue, GraphTargetItem onFalse) {
+      super(src, PRECEDENCE_CONDITIONAL);
+      this.expression = expression;
+      this.onTrue = onTrue;
+      this.onFalse = onFalse;
+   }
+
+   @Override
+   public String toString(List localData) {
+      return expression.toString(localData) + hilight("?") + onTrue.toString(localData) + hilight(":") + onFalse.toString(localData);
    }
 }

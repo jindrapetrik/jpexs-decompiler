@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2;
 
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
 import java.util.Stack;
 
@@ -24,9 +24,9 @@ public class UnknownJumpException extends RuntimeException {
 
    public Stack stack;
    public int ip;
-   public List<TreeItem> output;
+   public List<GraphTargetItem> output;
 
-   public UnknownJumpException(Stack stack, int ip, List<TreeItem> output) {
+   public UnknownJumpException(Stack stack, int ip, List<GraphTargetItem> output) {
       this.stack = stack;
       this.ip = ip;
       this.output = output;

@@ -16,14 +16,14 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 
 public class WaitForFrameTreeItem extends TreeItem {
 
    public int frame;
    public int skipCount;
 
-   public WaitForFrameTreeItem(Action instruction, int frame, int skipCount) {
+   public WaitForFrameTreeItem(GraphSourceItem instruction, int frame, int skipCount) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.frame = frame;
       this.skipCount = skipCount;
@@ -31,6 +31,6 @@ public class WaitForFrameTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return hilight("waitForFrame(") + frame + "," + skipCount + hilight(")") + ";";
+      return hilight("waitForFrame(") + frame + "," + skipCount + hilight(")");
    }
 }

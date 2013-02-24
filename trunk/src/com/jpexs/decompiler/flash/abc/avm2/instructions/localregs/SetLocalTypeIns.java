@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.PreDecrementTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.PreIncrementTreeItem;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -44,7 +45,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
    }
 
    @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       int regId = getRegisterId(ins);
       TreeItem value = (TreeItem) stack.pop();
       localRegs.put(regId, value);
@@ -55,11 +56,11 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
          return;
       }
       if (value.getNotCoerced() instanceof IncrementTreeItem) {
-         TreeItem inside = ((IncrementTreeItem) value.getNotCoerced()).object.getNotCoerced();
+         GraphTargetItem inside = ((IncrementTreeItem) value.getNotCoerced()).object.getNotCoerced();
          if (inside instanceof LocalRegTreeItem) {
             if (((LocalRegTreeItem) inside).regIndex == regId) {
                if (stack.size() > 0) {
-                  TreeItem top = stack.peek().getNotCoerced();
+                  GraphTargetItem top = stack.peek().getNotCoerced();
                   if (top == inside) {
                      stack.pop();
                      stack.push(new PostIncrementTreeItem(ins, inside));
@@ -78,11 +79,11 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
       }
 
       if (value.getNotCoerced() instanceof DecrementTreeItem) {
-         TreeItem inside = ((DecrementTreeItem) value.getNotCoerced()).object.getNotCoerced();
+         GraphTargetItem inside = ((DecrementTreeItem) value.getNotCoerced()).object.getNotCoerced();
          if (inside instanceof LocalRegTreeItem) {
             if (((LocalRegTreeItem) inside).regIndex == regId) {
                if (stack.size() > 0) {
-                  TreeItem top = stack.peek().getNotCoerced();
+                  GraphTargetItem top = stack.peek().getNotCoerced();
                   if (top == inside) {
                      stack.pop();
                      stack.push(new PostDecrementTreeItem(ins, inside));

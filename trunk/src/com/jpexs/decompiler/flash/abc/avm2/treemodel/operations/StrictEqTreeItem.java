@@ -18,15 +18,17 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.LogicalOpItem;
 
-public class StrictEqTreeItem extends BinaryOpTreeItem implements LogicalOp {
+public class StrictEqTreeItem extends BinaryOpTreeItem implements LogicalOpItem {
 
    public StrictEqTreeItem(AVM2Instruction instruction, TreeItem leftSide, TreeItem rightSide) {
       super(instruction, PRECEDENCE_EQUALITY, leftSide, rightSide, "===");
    }
 
    @Override
-   public TreeItem invert() {
+   public GraphTargetItem invert() {
       return new StrictNeqTreeItem(instruction, leftSide, rightSide);
    }
 }

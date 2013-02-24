@@ -16,12 +16,13 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.operations;
 
-import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.BinaryOpItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
-public class BitOrTreeItem extends BinaryOpTreeItem {
+public class BitOrTreeItem extends BinaryOpItem {
 
-   public BitOrTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
+   public BitOrTreeItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
       super(instruction, PRECEDENCE_BITWISEOR, leftSide, rightSide, "|");
    }
 

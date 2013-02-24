@@ -16,12 +16,13 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.operations;
 
-import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.BinaryOpItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
-public class AndTreeItem extends BinaryOpTreeItem {
+public class AndTreeItem extends BinaryOpItem {
 
-   public AndTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
+   public AndTreeItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
       super(instruction, PRECEDENCE_LOGICALAND, leftSide, rightSide, "&&");
    }
 

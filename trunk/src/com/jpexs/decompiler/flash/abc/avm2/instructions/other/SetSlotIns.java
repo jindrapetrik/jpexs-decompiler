@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.PreIncrementTree
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -48,7 +49,7 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
    }
 
    @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, java.util.Stack<TreeItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<TreeItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       int slotIndex = ins.operands[0];
       TreeItem value = (TreeItem) stack.pop();
       TreeItem obj = (TreeItem) stack.pop(); //scopeId
@@ -79,13 +80,13 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
       }
 
       if (value.getNotCoerced() instanceof IncrementTreeItem) {
-         TreeItem inside = ((IncrementTreeItem) value.getNotCoerced()).object.getThroughRegister().getNotCoerced();
+         GraphTargetItem inside = ((IncrementTreeItem) value.getNotCoerced()).object.getThroughRegister().getNotCoerced();
          if (inside instanceof GetSlotTreeItem) {
             GetSlotTreeItem slotItem = (GetSlotTreeItem) inside;
             if ((slotItem.scope.getThroughRegister() == obj.getThroughRegister())
                     && (slotItem.slotName == slotname)) {
                if (stack.size() > 0) {
-                  TreeItem top = stack.peek().getNotCoerced();
+                  GraphTargetItem top = stack.peek().getNotCoerced();
                   if (top == inside) {
                      stack.pop();
                      stack.push(new PostIncrementTreeItem(ins, inside));
@@ -104,13 +105,13 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
       }
 
       if (value.getNotCoerced() instanceof DecrementTreeItem) {
-         TreeItem inside = ((DecrementTreeItem) value.getNotCoerced()).object.getThroughRegister().getNotCoerced();
+         GraphTargetItem inside = ((DecrementTreeItem) value.getNotCoerced()).object.getThroughRegister().getNotCoerced();
          if (inside instanceof GetSlotTreeItem) {
             GetSlotTreeItem slotItem = (GetSlotTreeItem) inside;
             if ((slotItem.scope.getThroughRegister() == obj.getThroughRegister())
                     && (slotItem.slotName == slotname)) {
                if (stack.size() > 0) {
-                  TreeItem top = stack.peek().getNotCoerced();
+                  GraphTargetItem top = stack.peek().getNotCoerced();
                   if (top == inside) {
                      stack.pop();
                      stack.push(new PostDecrementTreeItem(ins, inside));

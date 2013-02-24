@@ -16,15 +16,16 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
 
 public class SetVariableTreeItem extends TreeItem implements SetTypeTreeItem {
 
-   public TreeItem name;
-   public TreeItem value;
+   public GraphTargetItem name;
+   public GraphTargetItem value;
 
-   public SetVariableTreeItem(Action instruction, TreeItem name, TreeItem value) {
+   public SetVariableTreeItem(GraphSourceItem instruction, GraphTargetItem name, GraphTargetItem value) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.name = name;
       this.value = value;
@@ -32,19 +33,19 @@ public class SetVariableTreeItem extends TreeItem implements SetTypeTreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return stripQuotes(name) + hilight("=") + value.toString(constants) + ";";
+      return stripQuotes(name) + hilight("=") + value.toString(constants);
    }
 
    @Override
    public TreeItem getObject() {
-      return new GetVariableTreeItem(instruction, value);
+      return new GetVariableTreeItem(src, value);
    }
 
    @Override
-   public List<com.jpexs.decompiler.flash.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.decompiler.flash.action.IgnoredPair> ret = super.getNeededActions();
-      ret.addAll(name.getNeededActions());
-      ret.addAll(value.getNeededActions());
+   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+      ret.addAll(name.getNeededSources());
+      ret.addAll(value.getNeededSources());
       return ret;
    }
 }

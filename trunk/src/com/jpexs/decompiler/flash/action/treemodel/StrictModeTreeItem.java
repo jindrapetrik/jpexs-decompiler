@@ -16,13 +16,13 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 
 public class StrictModeTreeItem extends TreeItem {
 
    public int mode;
 
-   public StrictModeTreeItem(Action instruction, int mode) {
+   public StrictModeTreeItem(GraphSourceItem instruction, int mode) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.mode = mode;
    }

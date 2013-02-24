@@ -19,6 +19,9 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.*;
+import com.jpexs.decompiler.flash.graph.Block;
+import com.jpexs.decompiler.flash.graph.ContinueItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -67,11 +70,11 @@ public class ForEachInTreeItem extends LoopTreeItem implements Block {
       return ret;
    }
 
-   public List<ContinueTreeItem> getContinues() {
-      List<ContinueTreeItem> ret = new ArrayList<ContinueTreeItem>();
-      for (TreeItem ti : commands) {
-         if (ti instanceof ContinueTreeItem) {
-            ret.add((ContinueTreeItem) ti);
+   public List<ContinueItem> getContinues() {
+      List<ContinueItem> ret = new ArrayList<ContinueItem>();
+      for (GraphTargetItem ti : commands) {
+         if (ti instanceof ContinueItem) {
+            ret.add((ContinueItem) ti);
          }
          if (ti instanceof Block) {
             ret.addAll(((Block) ti).getContinues());

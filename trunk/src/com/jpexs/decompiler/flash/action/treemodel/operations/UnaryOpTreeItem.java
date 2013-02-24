@@ -16,17 +16,19 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.operations;
 
-import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
 import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
 
 public abstract class UnaryOpTreeItem extends TreeItem {
 
-   public TreeItem value;
+   public GraphTargetItem value;
    public String operator;
 
-   public UnaryOpTreeItem(Action instruction, int precedence, TreeItem value, String operator) {
+   public UnaryOpTreeItem(GraphSourceItem instruction, int precedence, GraphTargetItem value, String operator) {
       super(instruction, precedence);
       this.value = value;
       this.operator = operator;
@@ -47,9 +49,9 @@ public abstract class UnaryOpTreeItem extends TreeItem {
    }
 
    @Override
-   public List<com.jpexs.decompiler.flash.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.decompiler.flash.action.IgnoredPair> ret = super.getNeededActions();
-      ret.addAll(value.getNeededActions());
+   public List<GraphSourceItemPos> getNeededSources() {
+      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+      ret.addAll(value.getNeededSources());
       return ret;
    }
 }

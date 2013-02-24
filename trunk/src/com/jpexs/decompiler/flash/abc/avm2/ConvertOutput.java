@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2;
 
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
 import java.util.Stack;
 
@@ -26,10 +26,10 @@ import java.util.Stack;
  */
 public class ConvertOutput {
 
-   public Stack<TreeItem> stack;
-   public List<TreeItem> output;
+   public Stack<GraphTargetItem> stack;
+   public List<GraphTargetItem> output;
 
-   public ConvertOutput(Stack<TreeItem> stack, List<TreeItem> output) {
+   public ConvertOutput(Stack<GraphTargetItem> stack, List<GraphTargetItem> output) {
       this.stack = stack;
       this.output = output;
    }

@@ -16,16 +16,17 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
 
 public class MBStringExtractTreeItem extends TreeItem {
 
-   public TreeItem value;
-   public TreeItem index;
-   public TreeItem count;
+   public GraphTargetItem value;
+   public GraphTargetItem index;
+   public GraphTargetItem count;
 
-   public MBStringExtractTreeItem(Action instruction, TreeItem value, TreeItem index, TreeItem count) {
+   public MBStringExtractTreeItem(GraphSourceItem instruction, GraphTargetItem value, GraphTargetItem index, GraphTargetItem count) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.value = value;
       this.index = index;
@@ -38,11 +39,11 @@ public class MBStringExtractTreeItem extends TreeItem {
    }
 
    @Override
-   public List<com.jpexs.decompiler.flash.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.decompiler.flash.action.IgnoredPair> ret = super.getNeededActions();
-      ret.addAll(value.getNeededActions());
-      ret.addAll(index.getNeededActions());
-      ret.addAll(count.getNeededActions());
+   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+      ret.addAll(value.getNeededSources());
+      ret.addAll(index.getNeededSources());
+      ret.addAll(count.getNeededSources());
       return ret;
    }
 }

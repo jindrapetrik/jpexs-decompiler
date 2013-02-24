@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,10 +29,10 @@ import java.util.List;
  */
 public class NextValueTreeItem extends TreeItem {
 
-   TreeItem index;
-   TreeItem obj;
+   GraphTargetItem index;
+   GraphTargetItem obj;
 
-   public NextValueTreeItem(AVM2Instruction instruction, TreeItem index, TreeItem obj) {
+   public NextValueTreeItem(AVM2Instruction instruction, GraphTargetItem index, GraphTargetItem obj) {
       super(instruction, NOPRECEDENCE);
       this.index = index;
       this.obj = obj;
@@ -38,6 +40,6 @@ public class NextValueTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return "nextValue(" + index.toString(constants, localRegNames, fullyQualifiedNames) + "," + obj.toString(constants, localRegNames, fullyQualifiedNames) + ")";
+      return "nextValue(" + index.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "," + obj.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + ")";
    }
 }

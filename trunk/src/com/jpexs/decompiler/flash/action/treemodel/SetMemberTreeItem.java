@@ -16,16 +16,17 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
 
 public class SetMemberTreeItem extends TreeItem implements SetTypeTreeItem {
 
-   public TreeItem object;
-   public TreeItem objectName;
-   public TreeItem value;
+   public GraphTargetItem object;
+   public GraphTargetItem objectName;
+   public GraphTargetItem value;
 
-   public SetMemberTreeItem(Action instruction, TreeItem object, TreeItem objectName, TreeItem value) {
+   public SetMemberTreeItem(GraphSourceItem instruction, GraphTargetItem object, GraphTargetItem objectName, GraphTargetItem value) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.object = object;
       this.objectName = objectName;
@@ -34,20 +35,20 @@ public class SetMemberTreeItem extends TreeItem implements SetTypeTreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
-      return object.toString(constants) + "." + stripQuotes(objectName) + "=" + value.toString(constants) + ";";
+      return object.toString(constants) + "." + stripQuotes(objectName) + "=" + value.toString(constants);
    }
 
    @Override
    public TreeItem getObject() {
-      return new GetMemberTreeItem(instruction, object, objectName);
+      return new GetMemberTreeItem(src, object, objectName);
    }
 
    @Override
-   public List<com.jpexs.decompiler.flash.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.decompiler.flash.action.IgnoredPair> ret = super.getNeededActions();
-      ret.addAll(object.getNeededActions());
-      ret.addAll(objectName.getNeededActions());
-      ret.addAll(value.getNeededActions());
+   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+      ret.addAll(object.getNeededSources());
+      ret.addAll(objectName.getNeededSources());
+      ret.addAll(value.getNeededSources());
       return ret;
    }
 }

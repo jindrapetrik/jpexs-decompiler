@@ -14,15 +14,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
+package com.jpexs.decompiler.flash.graph;
 
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
+public abstract class LoopItem extends GraphTargetItem {
 
-/**
- *
- * @author JPEXS
- */
-public interface LogicalOp {
+   public Loop loop;
 
-   public TreeItem invert();
+   public LoopItem(GraphSourceItem src, Loop loop) {
+      super(src, NOPRECEDENCE);
+      this.loop = loop;
+   }
 }

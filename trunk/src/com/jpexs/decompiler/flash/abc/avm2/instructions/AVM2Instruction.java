@@ -16,17 +16,30 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.instructions;
 
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCOutputStream;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.LookupSwitchIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnValueIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ThrowIns;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.abc.types.MethodInfo;
+import com.jpexs.decompiler.flash.graph.GraphSource;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
-public class AVM2Instruction implements Serializable {
+public class AVM2Instruction implements Serializable, GraphSourceItem {
 
    public InstructionDefinition definition;
    public int operands[];
@@ -227,4 +240,47 @@ public class AVM2Instruction implements Serializable {
       return s;
    }
    public List replaceWith;
+
+   @Override
+   public void translate(List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output) {
+      definition.translate((Boolean) localData.get(0), (Integer) localData.get(1), (HashMap<Integer, GraphTargetItem>) localData.get(2), stack, (Stack<GraphTargetItem>) localData.get(3), (ConstantPool) localData.get(4), this, (MethodInfo[]) localData.get(5), output, (MethodBody) localData.get(6), (ABC) localData.get(7), (HashMap<Integer, String>) localData.get(8), (List<String>) localData.get(8));
+   }
+
+   @Override
+   public boolean isJump() {
+      return (definition instanceof JumpIns);
+   }
+
+   @Override
+   public boolean isBranch() {
+      return (definition instanceof IfTypeIns) || (definition instanceof LookupSwitchIns);
+   }
+
+   @Override
+   public boolean isExit() {
+      return (definition instanceof ReturnValueIns) || (definition instanceof ReturnVoidIns) || (definition instanceof ThrowIns);
+   }
+
+   @Override
+   public long getOffset() {
+      return mappedOffset > -1 ? mappedOffset : offset;
+   }
+
+   @Override
+   public List<Integer> getBranches(GraphSource code) {
+      List<Integer> ret = new ArrayList<Integer>();
+      if (definition instanceof IfTypeIns) {
+         ret.add(code.adr2pos(offset + getBytes().length + operands[0]));
+         if (!(definition instanceof JumpIns)) {
+            ret.add(code.adr2pos(offset + getBytes().length));
+         }
+      }
+      if (definition instanceof LookupSwitchIns) {
+         ret.add(code.adr2pos(offset + operands[0]));
+         for (int k = 2; k < operands.length; k++) {
+            ret.add(code.adr2pos(offset + operands[k]));
+         }
+      }
+      return ret;
+   }
 }

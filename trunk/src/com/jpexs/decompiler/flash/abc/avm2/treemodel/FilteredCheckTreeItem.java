@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,15 +29,15 @@ import java.util.List;
  */
 public class FilteredCheckTreeItem extends TreeItem {
 
-   TreeItem object;
+   GraphTargetItem object;
 
-   public FilteredCheckTreeItem(AVM2Instruction instruction, TreeItem object) {
+   public FilteredCheckTreeItem(AVM2Instruction instruction, GraphTargetItem object) {
       super(instruction, NOPRECEDENCE);
       this.object = object;
    }
 
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return object.toString(constants, localRegNames, fullyQualifiedNames);
+      return object.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
    }
 }

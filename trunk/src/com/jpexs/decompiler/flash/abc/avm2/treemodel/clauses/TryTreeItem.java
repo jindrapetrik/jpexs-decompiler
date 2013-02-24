@@ -17,21 +17,24 @@
 package com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.ContinueTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
+import com.jpexs.decompiler.flash.graph.Block;
+import com.jpexs.decompiler.flash.graph.ContinueItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class TryTreeItem extends TreeItem implements Block {
 
-   public List<TreeItem> tryCommands;
+   public List<GraphTargetItem> tryCommands;
    public List<ABCException> catchExceptions;
-   public List<List<TreeItem>> catchCommands;
-   public List<TreeItem> finallyCommands;
+   public List<List<GraphTargetItem>> catchCommands;
+   public List<GraphTargetItem> finallyCommands;
 
-   public TryTreeItem(List<TreeItem> tryCommands, List<ABCException> catchExceptions, List<List<TreeItem>> catchCommands, List<TreeItem> finallyCommands) {
+   public TryTreeItem(List<GraphTargetItem> tryCommands, List<ABCException> catchExceptions, List<List<GraphTargetItem>> catchCommands, List<GraphTargetItem> finallyCommands) {
       super(null, NOPRECEDENCE);
       this.tryCommands = tryCommands;
       this.catchExceptions = catchExceptions;
@@ -43,52 +46,52 @@ public class TryTreeItem extends TreeItem implements Block {
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       String ret = "";
       ret += "try\r\n{\r\n";
-      for (TreeItem ti : tryCommands) {
-         ret += ti.toStringSemicoloned(constants, localRegNames, fullyQualifiedNames) + "\r\n";
+      for (GraphTargetItem ti : tryCommands) {
+         ret += ti.toStringSemicoloned(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "\r\n";
       }
       ret += "}";
       for (int e = 0; e < catchExceptions.size(); e++) {
          ret += "\r\ncatch(" + catchExceptions.get(e).getVarName(constants, fullyQualifiedNames) + ":" + catchExceptions.get(e).getTypeName(constants, fullyQualifiedNames) + ")\r\n{\r\n";
-         List<TreeItem> commands = catchCommands.get(e);
-         for (TreeItem ti : commands) {
-            ret += ti.toStringSemicoloned(constants, localRegNames, fullyQualifiedNames) + "\r\n";
+         List<GraphTargetItem> commands = catchCommands.get(e);
+         for (GraphTargetItem ti : commands) {
+            ret += ti.toStringSemicoloned(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "\r\n";
          }
          ret += "}";
       }
       if (finallyCommands.size() > 0) {
          ret += "\r\nfinally\r\n{\r\n";
-         for (TreeItem ti : finallyCommands) {
-            ret += ti.toStringSemicoloned(constants, localRegNames, fullyQualifiedNames) + "\r\n";
+         for (GraphTargetItem ti : finallyCommands) {
+            ret += ti.toStringSemicoloned(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "\r\n";
          }
          ret += "}";
       }
       return ret;
    }
 
-   public List<ContinueTreeItem> getContinues() {
-      List<ContinueTreeItem> ret = new ArrayList<ContinueTreeItem>();
-      for (TreeItem ti : tryCommands) {
-         if (ti instanceof ContinueTreeItem) {
-            ret.add((ContinueTreeItem) ti);
+   public List<ContinueItem> getContinues() {
+      List<ContinueItem> ret = new ArrayList<ContinueItem>();
+      for (GraphTargetItem ti : tryCommands) {
+         if (ti instanceof ContinueItem) {
+            ret.add((ContinueItem) ti);
          }
          if (ti instanceof Block) {
             ret.addAll(((Block) ti).getContinues());
          }
       }
       if (finallyCommands != null) {
-         for (TreeItem ti : finallyCommands) {
-            if (ti instanceof ContinueTreeItem) {
-               ret.add((ContinueTreeItem) ti);
+         for (GraphTargetItem ti : finallyCommands) {
+            if (ti instanceof ContinueItem) {
+               ret.add((ContinueItem) ti);
             }
             if (ti instanceof Block) {
                ret.addAll(((Block) ti).getContinues());
             }
          }
       }
-      for (List<TreeItem> commands : catchCommands) {
-         for (TreeItem ti : commands) {
-            if (ti instanceof ContinueTreeItem) {
-               ret.add((ContinueTreeItem) ti);
+      for (List<GraphTargetItem> commands : catchCommands) {
+         for (GraphTargetItem ti : commands) {
+            if (ti instanceof ContinueItem) {
+               ret.add((ContinueItem) ti);
             }
             if (ti instanceof Block) {
                ret.addAll(((Block) ti).getContinues());

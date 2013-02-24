@@ -19,15 +19,16 @@ package com.jpexs.decompiler.flash.action.treemodel.clauses;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
 import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.ArrayList;
 import java.util.List;
 
 public class WithTreeItem extends TreeItem {
 
-   public TreeItem scope;
-   public List<TreeItem> items;
+   public GraphTargetItem scope;
+   public List<GraphTargetItem> items;
 
-   public WithTreeItem(Action instruction, TreeItem scope, List<TreeItem> items) {
+   public WithTreeItem(Action instruction, GraphTargetItem scope, List<GraphTargetItem> items) {
       super(instruction, NOPRECEDENCE);
       this.scope = scope;
       this.items = items;
@@ -36,15 +37,17 @@ public class WithTreeItem extends TreeItem {
    public WithTreeItem(Action instruction, TreeItem scope) {
       super(instruction, NOPRECEDENCE);
       this.scope = scope;
-      this.items = new ArrayList<TreeItem>();
+      this.items = new ArrayList<GraphTargetItem>();
    }
 
    @Override
    public String toString(ConstantPool constants) {
       String ret;
-      ret = hilight("with(") + scope.toString(constants) + hilight(")\r\n{\r\n");
-      for (TreeItem ti : items) {
-         ret += ti.toString(constants) + "\r\n";
+      List localData = new ArrayList();
+      localData.add(constants);
+      ret = hilight("with(") + scope.toString(localData) + hilight(")\r\n{\r\n");
+      for (GraphTargetItem ti : items) {
+         ret += ti.toString(localData) + "\r\n";
       }
       ret += hilight("}");
       return ret;

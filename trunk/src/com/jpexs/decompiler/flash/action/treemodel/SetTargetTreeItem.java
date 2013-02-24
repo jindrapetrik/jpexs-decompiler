@@ -16,20 +16,20 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 
 public class SetTargetTreeItem extends TreeItem {
 
    public String target;
 
-   public SetTargetTreeItem(Action instruction, String target) {
+   public SetTargetTreeItem(GraphSourceItem instruction, String target) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.target = target;
    }
 
    @Override
    public String toString(ConstantPool constants) {
-      return hilight("tellTarget(\"") + Helper.escapeString(target) + hilight("\")") + ";";
+      return hilight("tellTarget(\"") + Helper.escapeString(target) + hilight("\")");
    }
 }

@@ -29,6 +29,10 @@ import com.jpexs.decompiler.flash.action.swf7.ActionTry;
 import com.jpexs.decompiler.flash.action.treemodel.*;
 import com.jpexs.decompiler.flash.action.treemodel.clauses.*;
 import com.jpexs.decompiler.flash.action.treemodel.operations.NotTreeItem;
+import com.jpexs.decompiler.flash.graph.GraphSource;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.IfItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.io.ByteArrayOutputStream;
@@ -40,7 +44,7 @@ import java.util.logging.Logger;
 /**
  * Represents one ACTIONRECORD, also has some static method to work with Actions
  */
-public class Action {
+public class Action implements GraphSourceItem {
 
    public Action beforeInsert;
    public boolean ignored = false;
@@ -406,7 +410,7 @@ public class Action {
     * @param output Output
     * @param regNames Register names
     */
-   public void translate(Stack<TreeItem> stack, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
+   public void translate(Stack<com.jpexs.decompiler.flash.graph.GraphTargetItem> stack, List<com.jpexs.decompiler.flash.graph.GraphTargetItem> output, java.util.HashMap<Integer, String> regNames) {
    }
 
    /**
@@ -415,8 +419,8 @@ public class Action {
     * @param stack Stack
     * @return long value
     */
-   protected long popLong(Stack<TreeItem> stack) {
-      TreeItem item = stack.pop();
+   protected long popLong(Stack<GraphTargetItem> stack) {
+      GraphTargetItem item = stack.pop();
       if (item instanceof DirectValueTreeItem) {
          if (((DirectValueTreeItem) item).value instanceof Long) {
             return (long) (Long) ((DirectValueTreeItem) item).value;
@@ -475,10 +479,11 @@ public class Action {
     * @param tree List of TreeItem
     * @return String
     */
-   public static String treeToString(List<TreeItem> tree) {
+   public static String treeToString(List<GraphTargetItem> tree) {
       String ret = "";
-      for (TreeItem ti : tree) {
-         ret += ti.toString() + "\r\n";
+      List localData = new ArrayList();
+      for (GraphTargetItem ti : tree) {
+         ret += ti.toStringSemicoloned(localData) + "\r\n";
       }
       String parts[] = ret.split("\r\n");
       ret = "";
@@ -584,7 +589,7 @@ public class Action {
    public static String actionsToSource(List<Action> actions, int version) {
       try {
          //List<TreeItem> tree = actionsToTree(new HashMap<Integer, String>(), actions, version);
-         List<TreeItem> tree = actionsToTree(new HashMap<Integer, String>(), actions, version);
+         List<GraphTargetItem> tree = actionsToTree(new HashMap<Integer, String>(), actions, version);
 
 
          return treeToString(tree);
@@ -602,10 +607,40 @@ public class Action {
     * @param version SWF version
     * @return List of treeItems
     */
-   public static List<TreeItem> actionsToTree(HashMap<Integer, String> regNames, List<Action> actions, int version) {
+   public static List<GraphTargetItem> actionsToTree(HashMap<Integer, String> regNames, List<Action> actions, int version) {
       //Stack<TreeItem> stack = new Stack<TreeItem>();
       return ActionGraph.translateViaGraph(regNames, actions, version);
       //return actionsToTree(regNames,   stack, actions, 0, actions.size() - 1, version);
+   }
+
+   @Override
+   public void translate(List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output) {
+      translate(stack, output, (HashMap<Integer, String>) localData.get(0));
+   }
+
+   @Override
+   public boolean isJump() {
+      return false;
+   }
+
+   @Override
+   public boolean isBranch() {
+      return false;
+   }
+
+   @Override
+   public boolean isExit() {
+      return false;
+   }
+
+   @Override
+   public long getOffset() {
+      return getAddress();
+   }
+
+   @Override
+   public List<Integer> getBranches(GraphSource code) {
+      return new ArrayList<Integer>();
    }
 
    private static class Loop {
@@ -630,15 +665,17 @@ public class Action {
       logger.fine(s);
    }
 
-   public static List<TreeItem> actionsPartToTree(HashMap<Integer, String> registerNames, Stack<TreeItem> stack, List<Action> actions, int start, int end, int version) {
+   public static List<GraphTargetItem> actionsPartToTree(HashMap<Integer, String> registerNames, Stack<GraphTargetItem> stack, List<Action> actions, int start, int end, int version) {
       if (start < actions.size() && (end > 0) && (start > 0)) {
          log("Entering " + start + "-" + end + (actions.size() > 0 ? (" (" + actions.get(start).toString() + " - " + actions.get(end == actions.size() ? end - 1 : end) + ")") : ""));
       }
-      List<TreeItem> output = new ArrayList<TreeItem>();
+      List localData = new ArrayList();
+      localData.add(registerNames);
+      List<GraphTargetItem> output = new ArrayList<GraphTargetItem>();
       int ip = start;
       boolean isWhile = false;
       boolean isForIn = false;
-      TreeItem inItem = null;
+      GraphTargetItem inItem = null;
       int loopStart = 0;
       loopip:
       while (ip <= end + 1) {
@@ -678,34 +715,37 @@ public class Action {
          if (ip > end) {
             break;
          }
+         if (ip >= actions.size()) {
+            break;
+         }
          Action action = actions.get(ip);
          /*ActionJump && ActionIf removed*/
          if ((action instanceof ActionEnumerate2) || (action instanceof ActionEnumerate)) {
             loopStart = ip + 1;
             isForIn = true;
             ip += 4;
-            action.translate(stack, output, registerNames);
+            action.translate(localData, stack, output);
             EnumerateTreeItem en = (EnumerateTreeItem) stack.peek();
             inItem = en.object;
             continue;
          } else if (action instanceof ActionTry) {
             ActionTry atry = (ActionTry) action;
-            List<TreeItem> tryCommands = ActionGraph.translateViaGraph(registerNames, atry.tryBody, version);
+            List<GraphTargetItem> tryCommands = ActionGraph.translateViaGraph(registerNames, atry.tryBody, version);
             TreeItem catchName;
             if (atry.catchInRegisterFlag) {
                catchName = new DirectValueTreeItem(atry, -1, new RegisterNumber(atry.catchRegister), new ArrayList<String>());
             } else {
                catchName = new DirectValueTreeItem(atry, -1, atry.catchName, new ArrayList<String>());
             }
-            List<TreeItem> catchExceptions = new ArrayList<TreeItem>();
+            List<GraphTargetItem> catchExceptions = new ArrayList<GraphTargetItem>();
             catchExceptions.add(catchName);
-            List<List<TreeItem>> catchCommands = new ArrayList<List<TreeItem>>();
+            List<List<GraphTargetItem>> catchCommands = new ArrayList<List<GraphTargetItem>>();
             catchCommands.add(ActionGraph.translateViaGraph(registerNames, atry.catchBody, version));
-            List<TreeItem> finallyCommands = ActionGraph.translateViaGraph(registerNames, atry.finallyBody, version);
+            List<GraphTargetItem> finallyCommands = ActionGraph.translateViaGraph(registerNames, atry.finallyBody, version);
             output.add(new TryTreeItem(tryCommands, catchExceptions, catchCommands, finallyCommands));
          } else if (action instanceof ActionWith) {
             ActionWith awith = (ActionWith) action;
-            List<TreeItem> withCommands = ActionGraph.translateViaGraph(registerNames, awith.actions, version);
+            List<GraphTargetItem> withCommands = ActionGraph.translateViaGraph(registerNames, awith.actions, version);
             output.add(new WithTreeItem(action, stack.pop(), withCommands));
          } else if (action instanceof ActionDefineFunction) {
             FunctionTreeItem fti = new FunctionTreeItem(action, ((ActionDefineFunction) action).functionName, ((ActionDefineFunction) action).paramNames, ActionGraph.translateViaGraph(registerNames, ((ActionDefineFunction) action).code, version), ((ActionDefineFunction) action).constantPool, 1);
@@ -770,11 +810,11 @@ public class Action {
           continue;
           }*/ else if (action instanceof ActionStoreRegister) {
             if ((ip + 1 <= end) && (actions.get(ip + 1) instanceof ActionPop)) {
-               action.translate(stack, output, registerNames);
+               action.translate(localData, stack, output);
                stack.pop();
                ip++;
             } else {
-               action.translate(stack, output, registerNames);
+               action.translate(localData, stack, output);
             }
          } /*else if (action instanceof ActionStrictEquals) {
           if ((ip + 1 < actions.size()) && (actions.get(ip + 1) instanceof ActionIf)) {
@@ -820,7 +860,7 @@ public class Action {
           }
           } */ else {
             try {
-               action.translate(stack, output, registerNames);
+               action.translate(localData, stack, output);
             } catch (EmptyStackException ese) {
                System.err.println("EMPTYSTACK===========================");
                Logger.getLogger(Action.class.getName()).log(Level.SEVERE, null, ese);
@@ -844,8 +884,8 @@ public class Action {
       return output;
    }
 
-   public static TreeItem getWithoutGlobal(TreeItem ti) {
-      TreeItem t = ti;
+   public static GraphTargetItem getWithoutGlobal(GraphTargetItem ti) {
+      GraphTargetItem t = ti;
       if (!(t instanceof GetMemberTreeItem)) {
          return ti;
       }
@@ -872,19 +912,19 @@ public class Action {
       return ti;
    }
 
-   public static List<TreeItem> checkClass(List<TreeItem> output) {
-      List<TreeItem> ret = new ArrayList<TreeItem>();
+   public static List<GraphTargetItem> checkClass(List<GraphTargetItem> output) {
+      List<GraphTargetItem> ret = new ArrayList<GraphTargetItem>();
       List<FunctionTreeItem> functions = new ArrayList<FunctionTreeItem>();
       List<FunctionTreeItem> staticFunctions = new ArrayList<FunctionTreeItem>();
-      HashMap<TreeItem, TreeItem> vars = new HashMap<TreeItem, TreeItem>();
-      HashMap<TreeItem, TreeItem> staticVars = new HashMap<TreeItem, TreeItem>();
-      TreeItem className;
-      TreeItem extendsOp = null;
-      List<TreeItem> implementsOp = new ArrayList<TreeItem>();
+      HashMap<GraphTargetItem, GraphTargetItem> vars = new HashMap<GraphTargetItem, GraphTargetItem>();
+      HashMap<GraphTargetItem, GraphTargetItem> staticVars = new HashMap<GraphTargetItem, GraphTargetItem>();
+      GraphTargetItem className;
+      GraphTargetItem extendsOp = null;
+      List<GraphTargetItem> implementsOp = new ArrayList<GraphTargetItem>();
       boolean ok = true;
-      for (TreeItem t : output) {
-         if (t instanceof IfTreeItem) {
-            IfTreeItem it = (IfTreeItem) t;
+      for (GraphTargetItem t : output) {
+         if (t instanceof IfItem) {
+            IfItem it = (IfItem) t;
             if (it.expression instanceof NotTreeItem) {
                NotTreeItem nti = (NotTreeItem) it.expression;
                if (nti.value instanceof GetMemberTreeItem) {
@@ -892,14 +932,14 @@ public class Action {
                      if ((it.onTrue.size() == 1) && (it.onTrue.get(0) instanceof SetMemberTreeItem) && (((SetMemberTreeItem) it.onTrue.get(0)).value instanceof NewObjectTreeItem)) {
                         //ignore
                      } else {
-                        List<TreeItem> parts = it.onTrue;
+                        List<GraphTargetItem> parts = it.onTrue;
                         className = getWithoutGlobal((GetMemberTreeItem) nti.value);
                         if (parts.size() >= 1) {
                            if (parts.get(0) instanceof StoreRegisterTreeItem) {
                               int classReg = ((StoreRegisterTreeItem) parts.get(0)).register.number;
                               if ((parts.size() >= 2) && (parts.get(1) instanceof SetMemberTreeItem)) {
-                                 TreeItem ti1 = ((SetMemberTreeItem) parts.get(1)).value;
-                                 TreeItem ti2 = ((StoreRegisterTreeItem) parts.get(0)).value;
+                                 GraphTargetItem ti1 = ((SetMemberTreeItem) parts.get(1)).value;
+                                 GraphTargetItem ti2 = ((StoreRegisterTreeItem) parts.get(0)).value;
                                  if (ti1 == ti2) {
                                     if (((SetMemberTreeItem) parts.get(1)).value instanceof FunctionTreeItem) {
                                        ((FunctionTreeItem) ((SetMemberTreeItem) parts.get(1)).value).calculatedFunctionName = (className instanceof GetMemberTreeItem) ? ((GetMemberTreeItem) className).memberName : className;
@@ -919,7 +959,7 @@ public class Action {
                                        if (parts.get(pos) instanceof StoreRegisterTreeItem) {
                                           int instanceReg = -1;
                                           if (((StoreRegisterTreeItem) parts.get(pos)).value instanceof GetMemberTreeItem) {
-                                             TreeItem obj = ((GetMemberTreeItem) ((StoreRegisterTreeItem) parts.get(pos)).value).object;
+                                             GraphTargetItem obj = ((GetMemberTreeItem) ((StoreRegisterTreeItem) parts.get(pos)).value).object;
                                              if (obj instanceof DirectValueTreeItem) {
                                                 if (((DirectValueTreeItem) obj).value instanceof RegisterNumber) {
                                                    if (((RegisterNumber) ((DirectValueTreeItem) obj).value).number == classReg) {
@@ -1006,7 +1046,7 @@ public class Action {
                                              pos++;
                                           }
                                           if (ok) {
-                                             List<TreeItem> output2 = new ArrayList<TreeItem>();
+                                             List<GraphTargetItem> output2 = new ArrayList<GraphTargetItem>();
                                              output2.add(new ClassTreeItem(className, extendsOp, implementsOp, functions, vars, staticFunctions, staticVars));
                                              return output2;
                                           }
@@ -1037,7 +1077,7 @@ public class Action {
                                           break;
                                        }
                                     }
-                                    List<TreeItem> output2 = new ArrayList<TreeItem>();
+                                    List<GraphTargetItem> output2 = new ArrayList<GraphTargetItem>();
                                     output2.add(new InterfaceTreeItem(sm.objectName, implementsOp));
                                     return output2;
                                  } else {

@@ -21,11 +21,12 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.CodeStats;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -41,6 +42,16 @@ public class MethodBody implements Cloneable, Serializable {
    public AVM2Code code;
    public ABCException exceptions[] = new ABCException[0];
    public Traits traits = new Traits();
+
+   public List<Integer> getExceptionEntries() {
+      List<Integer> ret = new ArrayList<Integer>();
+      for (ABCException e : exceptions) {
+         ret.add(code.adr2pos(e.start));
+         ret.add(code.adr2pos(e.end));
+         ret.add(code.adr2pos(e.target));
+      }
+      return ret;
+   }
 
    @Override
    public String toString() {
@@ -88,7 +99,7 @@ public class MethodBody implements Cloneable, Serializable {
       return ret;
    }
 
-   public String toString(String path, boolean pcode, boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], Stack<TreeItem> scopeStack, boolean isStaticInitializer, boolean hilight, List<String> fullyQualifiedNames, Traits initTraits) {
+   public String toString(String path, boolean pcode, boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, boolean hilight, List<String> fullyQualifiedNames, Traits initTraits) {
       String s = "";
       if (!Main.DO_DECOMPILE) {
          s = "//NOT DECOMPILED";

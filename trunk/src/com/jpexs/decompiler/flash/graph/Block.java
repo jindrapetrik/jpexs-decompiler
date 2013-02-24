@@ -14,12 +14,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses;
+package com.jpexs.decompiler.flash.graph;
 
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.ContinueTreeItem;
 import java.util.List;
 
 public interface Block {
 
-   public List<ContinueTreeItem> getContinues();
+   public List<ContinueItem> getContinues();
 }

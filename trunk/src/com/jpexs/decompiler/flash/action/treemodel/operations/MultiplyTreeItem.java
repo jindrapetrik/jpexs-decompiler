@@ -16,12 +16,13 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.operations;
 
-import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.BinaryOpItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
-public class MultiplyTreeItem extends BinaryOpTreeItem {
+public class MultiplyTreeItem extends BinaryOpItem {
 
-   public MultiplyTreeItem(Action instruction, TreeItem leftSide, TreeItem rightSide) {
+   public MultiplyTreeItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
       super(instruction, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "*");
    }
 

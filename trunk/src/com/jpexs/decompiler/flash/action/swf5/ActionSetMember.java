@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.SetMemberTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
 import java.util.Stack;
 
@@ -34,10 +34,10 @@ public class ActionSetMember extends Action {
    }
 
    @Override
-   public void translate(Stack<TreeItem> stack, List<TreeItem> output, java.util.HashMap<Integer, String> regNames) {
-      TreeItem value = stack.pop();
-      TreeItem objectName = stack.pop();
-      TreeItem object = stack.pop();
+   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames) {
+      GraphTargetItem value = stack.pop();
+      GraphTargetItem objectName = stack.pop();
+      GraphTargetItem object = stack.pop();
       output.add(new SetMemberTreeItem(this, object, objectName, value));
    }
 }

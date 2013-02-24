@@ -16,17 +16,18 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
 
 public class GotoFrame2TreeItem extends TreeItem {
 
-   public TreeItem frame;
+   public GraphTargetItem frame;
    public boolean sceneBiasFlag;
    public boolean playFlag;
    public int sceneBias;
 
-   public GotoFrame2TreeItem(Action instruction, TreeItem frame, boolean sceneBiasFlag, boolean playFlag, int sceneBias) {
+   public GotoFrame2TreeItem(GraphSourceItem instruction, GraphTargetItem frame, boolean sceneBiasFlag, boolean playFlag, int sceneBias) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.frame = frame;
       this.sceneBiasFlag = sceneBiasFlag;
@@ -40,13 +41,13 @@ public class GotoFrame2TreeItem extends TreeItem {
       if (playFlag) {
          prefix = "gotoAndPlay";
       }
-      return hilight(prefix + "(") + frame.toString(constants) + (sceneBiasFlag ? "," + sceneBias : "") + hilight(")") + ";";
+      return hilight(prefix + "(") + frame.toString(constants) + (sceneBiasFlag ? "," + sceneBias : "") + hilight(")");
    }
 
    @Override
-   public List<com.jpexs.decompiler.flash.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.decompiler.flash.action.IgnoredPair> ret = super.getNeededActions();
-      ret.addAll(frame.getNeededActions());
+   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+      ret.addAll(frame.getNeededSources());
       return ret;
    }
 }

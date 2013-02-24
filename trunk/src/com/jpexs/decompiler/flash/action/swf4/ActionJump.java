@@ -19,8 +19,10 @@ package com.jpexs.decompiler.flash.action.swf4;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.graph.GraphSource;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -85,5 +87,17 @@ public class ActionJump extends Action {
    @Override
    public String toString() {
       return "Jump";
+   }
+
+   @Override
+   public boolean isJump() {
+      return true;
+   }
+
+   @Override
+   public List<Integer> getBranches(GraphSource code) {
+      List<Integer> ret = super.getBranches(code);
+      ret.add(code.adr2pos(getAddress() + getBytes(((ActionGraphSource) code).version).length + offset));
+      return ret;
    }
 }

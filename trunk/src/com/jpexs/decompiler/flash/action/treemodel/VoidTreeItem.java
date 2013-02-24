@@ -16,19 +16,19 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 
 public class VoidTreeItem extends TreeItem {
 
    public TreeItem value;
 
-   public VoidTreeItem(Action instruction, TreeItem value) {
+   public VoidTreeItem(GraphSourceItem instruction, TreeItem value) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.value = value;
    }
 
    @Override
    public String toString(ConstantPool constants) {
-      return value.toString(constants) + ";";
+      return value.toString(constants);
    }
 }

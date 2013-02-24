@@ -16,20 +16,21 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
 
 public class StartDragTreeItem extends TreeItem {
 
-   public TreeItem target;
-   public TreeItem lockCenter;
-   public TreeItem constrain;
-   public TreeItem y2;
-   public TreeItem x2;
-   public TreeItem y1;
-   public TreeItem x1;
+   public GraphTargetItem target;
+   public GraphTargetItem lockCenter;
+   public GraphTargetItem constrain;
+   public GraphTargetItem y2;
+   public GraphTargetItem x2;
+   public GraphTargetItem y1;
+   public GraphTargetItem x1;
 
-   public StartDragTreeItem(Action instruction, TreeItem target, TreeItem lockCenter, TreeItem constrain, TreeItem x1, TreeItem y1, TreeItem x2, TreeItem y2) {
+   public StartDragTreeItem(GraphSourceItem instruction, GraphTargetItem target, GraphTargetItem lockCenter, GraphTargetItem constrain, GraphTargetItem x1, GraphTargetItem y1, GraphTargetItem x2, GraphTargetItem y2) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.target = target;
       this.lockCenter = lockCenter;
@@ -59,14 +60,14 @@ public class StartDragTreeItem extends TreeItem {
    }
 
    @Override
-   public List<com.jpexs.decompiler.flash.action.IgnoredPair> getNeededActions() {
-      List<com.jpexs.decompiler.flash.action.IgnoredPair> ret = super.getNeededActions();
-      ret.addAll(target.getNeededActions());
-      ret.addAll(constrain.getNeededActions());
-      ret.addAll(x1.getNeededActions());
-      ret.addAll(x2.getNeededActions());
-      ret.addAll(y1.getNeededActions());
-      ret.addAll(y2.getNeededActions());
+   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+      ret.addAll(target.getNeededSources());
+      ret.addAll(constrain.getNeededSources());
+      ret.addAll(x1.getNeededSources());
+      ret.addAll(x2.getNeededSources());
+      ret.addAll(y1.getNeededSources());
+      ret.addAll(y2.getNeededSources());
       return ret;
    }
 }
