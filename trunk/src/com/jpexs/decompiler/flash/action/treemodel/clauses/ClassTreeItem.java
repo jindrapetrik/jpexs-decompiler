@@ -89,4 +89,11 @@ public class ClassTreeItem extends TreeItem implements Block {
       List<ContinueItem> ret = new ArrayList<ContinueItem>();
       return ret;
    }
+
+   @Override
+   public boolean needsSemicolon() {
+      return false;
+   }
+   
+   
 }

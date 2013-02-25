@@ -842,11 +842,15 @@ public class Graph {
             }
          }
          if (loop) {
-            if (expr instanceof AndItem) {
-               currentLoop.loopContinue = ((AndItem) expr).firstPart;
+            GraphTargetItem expr2=expr;
+            if(expr2 instanceof NotItem){
+               expr2=((NotItem)expr2).getOriginal();
             }
-            if (expr instanceof OrItem) {
-               currentLoop.loopContinue = ((OrItem) expr).firstPart;
+            if (expr2 instanceof AndItem) {
+               currentLoop.loopContinue = ((AndItem) expr2).firstPart;
+            }
+            if (expr2 instanceof OrItem) {
+               currentLoop.loopContinue = ((OrItem) expr2).firstPart;
             }
          }
 

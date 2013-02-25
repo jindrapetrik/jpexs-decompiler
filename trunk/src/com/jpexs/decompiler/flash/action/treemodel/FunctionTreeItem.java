@@ -70,4 +70,11 @@ public class FunctionTreeItem extends TreeItem {
       }
       return ret;
    }
+
+   @Override
+   public boolean needsSemicolon() {
+      return false;
+   }
+   
+   
 }
