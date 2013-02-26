@@ -26,10 +26,10 @@ import java.util.List;
 public class FullMultinameTreeItem extends TreeItem {
 
    public int multinameIndex;
-   public TreeItem name;
-   public TreeItem namespace;
+   public GraphTargetItem name;
+   public GraphTargetItem namespace;
 
-   public FullMultinameTreeItem(AVM2Instruction instruction, int multinameIndex, TreeItem name) {
+   public FullMultinameTreeItem(AVM2Instruction instruction, int multinameIndex, GraphTargetItem name) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.multinameIndex = multinameIndex;
       this.name = name;
@@ -43,7 +43,7 @@ public class FullMultinameTreeItem extends TreeItem {
       this.namespace = null;
    }
 
-   public FullMultinameTreeItem(AVM2Instruction instruction, int multinameIndex, TreeItem name, TreeItem namespace) {
+   public FullMultinameTreeItem(AVM2Instruction instruction, int multinameIndex, GraphTargetItem name, GraphTargetItem namespace) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.multinameIndex = multinameIndex;
       this.name = name;

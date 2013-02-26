@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.FullMultinameTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.InitPropertyTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
@@ -40,9 +39,9 @@ public class InitPropertyIns extends InstructionDefinition {
    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       int multinameIndex = ins.operands[0];
 
-      TreeItem val = (TreeItem) stack.pop();
+      GraphTargetItem val = (GraphTargetItem) stack.pop();
       FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
-      TreeItem obj = (TreeItem) stack.pop();
+      GraphTargetItem obj = (GraphTargetItem) stack.pop();
       output.add(new InitPropertyTreeItem(ins, obj, multiname, val));
    }
 

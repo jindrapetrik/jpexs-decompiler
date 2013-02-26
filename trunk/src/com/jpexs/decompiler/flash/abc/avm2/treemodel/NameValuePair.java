@@ -17,16 +17,17 @@
 package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 
 public class NameValuePair extends TreeItem {
 
-   public TreeItem name;
-   public TreeItem value;
+   public GraphTargetItem name;
+   public GraphTargetItem value;
 
-   public NameValuePair(TreeItem name, TreeItem value) {
-      super(name.instruction, NOPRECEDENCE);
+   public NameValuePair(GraphTargetItem name, GraphTargetItem value) {
+      super(name.src, NOPRECEDENCE);
       this.name = name;
       this.value = value;
    }

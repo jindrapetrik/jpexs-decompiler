@@ -24,10 +24,10 @@ import java.util.List;
 
 public class ConvertTreeItem extends TreeItem {
 
-   public TreeItem value;
+   public GraphTargetItem value;
    public String type;
 
-   public ConvertTreeItem(AVM2Instruction instruction, TreeItem value, String type) {
+   public ConvertTreeItem(AVM2Instruction instruction, GraphTargetItem value, String type) {
       super(instruction, NOPRECEDENCE);
       this.value = value;
       this.type = type;

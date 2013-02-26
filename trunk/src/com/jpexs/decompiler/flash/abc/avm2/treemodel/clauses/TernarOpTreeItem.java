@@ -19,16 +19,17 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 
 public class TernarOpTreeItem extends TreeItem {
 
-   public TreeItem expression;
-   public TreeItem onTrue;
-   public TreeItem onFalse;
+   public GraphTargetItem expression;
+   public GraphTargetItem onTrue;
+   public GraphTargetItem onFalse;
 
-   public TernarOpTreeItem(AVM2Instruction instruction, TreeItem expression, TreeItem onTrue, TreeItem onFalse) {
+   public TernarOpTreeItem(AVM2Instruction instruction, GraphTargetItem expression, GraphTargetItem onTrue, GraphTargetItem onFalse) {
       super(instruction, PRECEDENCE_CONDITIONAL);
       this.expression = expression;
       this.onTrue = onTrue;

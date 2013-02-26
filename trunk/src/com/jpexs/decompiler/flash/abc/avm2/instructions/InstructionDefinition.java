@@ -76,13 +76,13 @@ public class InstructionDefinition implements Serializable {
    }
 
    protected FullMultinameTreeItem resolveMultiname(Stack<GraphTargetItem> stack, ConstantPool constants, int multinameIndex, AVM2Instruction ins) {
-      TreeItem ns = null;
-      TreeItem name = null;
+      GraphTargetItem ns = null;
+      GraphTargetItem name = null;
       if (constants.constant_multiname[multinameIndex].needsName()) {
-         name = (TreeItem) stack.pop();
+         name = (GraphTargetItem) stack.pop();
       }
       if (constants.constant_multiname[multinameIndex].needsNs()) {
-         ns = (TreeItem) stack.pop();
+         ns = (GraphTargetItem) stack.pop();
       }
       return new FullMultinameTreeItem(ins, multinameIndex, name, ns);
    }

@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.action.treemodel.clauses;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
-import com.jpexs.decompiler.flash.action.treemodel.FunctionTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.graph.Block;
 import com.jpexs.decompiler.flash.graph.ContinueItem;
@@ -30,15 +29,23 @@ import java.util.List;
 
 public class ClassTreeItem extends TreeItem implements Block {
 
-   public List<FunctionTreeItem> functions;
-   public List<FunctionTreeItem> staticFunctions;
+   public List<GraphTargetItem> functions;
+   public List<GraphTargetItem> staticFunctions;
    public GraphTargetItem extendsOp;
    public List<GraphTargetItem> implementsOp;
    public GraphTargetItem className;
    public HashMap<GraphTargetItem, GraphTargetItem> vars;
    public HashMap<GraphTargetItem, GraphTargetItem> staticVars;
 
-   public ClassTreeItem(GraphTargetItem className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, List<FunctionTreeItem> functions, HashMap<GraphTargetItem, GraphTargetItem> vars, List<FunctionTreeItem> staticFunctions, HashMap<GraphTargetItem, GraphTargetItem> staticVars) {
+   @Override
+   public List<List<GraphTargetItem>> getSubs() {
+      List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
+      ret.add(functions);
+      ret.add(staticFunctions);
+      return ret;
+   }
+
+   public ClassTreeItem(GraphTargetItem className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, List<GraphTargetItem> functions, HashMap<GraphTargetItem, GraphTargetItem> vars, List<GraphTargetItem> staticFunctions, HashMap<GraphTargetItem, GraphTargetItem> staticVars) {
       super(null, NOPRECEDENCE);
       this.className = className;
       this.functions = functions;
@@ -68,10 +75,10 @@ public class ClassTreeItem extends TreeItem implements Block {
          }
       }
       ret += "\r\n{\r\n";
-      for (FunctionTreeItem f : functions) {
+      for (GraphTargetItem f : functions) {
          ret += f.toString(constants) + "\r\n";
       }
-      for (FunctionTreeItem f : staticFunctions) {
+      for (GraphTargetItem f : staticFunctions) {
          ret += "static " + f.toString(constants) + "\r\n";
       }
       for (GraphTargetItem v : vars.keySet()) {
@@ -94,6 +101,4 @@ public class ClassTreeItem extends TreeItem implements Block {
    public boolean needsSemicolon() {
       return false;
    }
-   
-   
 }

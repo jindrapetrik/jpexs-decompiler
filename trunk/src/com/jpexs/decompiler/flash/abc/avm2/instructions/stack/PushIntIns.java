@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-public class PushIntIns extends InstructionDefinition {
+public class PushIntIns extends InstructionDefinition implements PushIntegerTypeIns {
 
    public PushIntIns() {
       super(0x2d, "pushint", new int[]{AVM2Code.DAT_INT_INDEX});

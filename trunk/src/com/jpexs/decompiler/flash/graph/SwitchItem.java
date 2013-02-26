@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.graph;
 
-import com.jpexs.decompiler.flash.action.Action;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +27,14 @@ public class SwitchItem extends LoopItem implements Block {
    public List<GraphTargetItem> defaultCommands;
    public List<Integer> valuesMapping;
 
-   public SwitchItem(Action instruction, Loop loop, GraphTargetItem switchedObject, List<GraphTargetItem> caseValues, List<List<GraphTargetItem>> caseCommands, List<GraphTargetItem> defaultCommands, List<Integer> valuesMapping) {
+   public List<List<GraphTargetItem>> getSubs() {
+      List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
+      ret.addAll(caseCommands);
+      ret.add(defaultCommands);
+      return ret;
+   }
+
+   public SwitchItem(GraphSourceItem instruction, Loop loop, GraphTargetItem switchedObject, List<GraphTargetItem> caseValues, List<List<GraphTargetItem>> caseCommands, List<GraphTargetItem> defaultCommands, List<Integer> valuesMapping) {
       super(instruction, loop);
       this.switchedObject = switchedObject;
       this.caseValues = caseValues;
@@ -48,20 +54,20 @@ public class SwitchItem extends LoopItem implements Block {
                ret += "case " + caseValues.get(k).toString(localData) + ":\r\n";
             }
          }
-         ret += Action.INDENTOPEN + "\r\n";
+         ret += Graph.INDENTOPEN + "\r\n";
          for (int j = 0; j < caseCommands.get(i).size(); j++) {
             ret += caseCommands.get(i).get(j).toStringSemicoloned(localData) + "\r\n";
          }
-         ret += Action.INDENTCLOSE + "\r\n";
+         ret += Graph.INDENTCLOSE + "\r\n";
       }
       if (defaultCommands != null) {
          if (defaultCommands.size() > 0) {
             ret += hilight("default") + ":\r\n";
-            ret += Action.INDENTOPEN + "\r\n";
+            ret += Graph.INDENTOPEN + "\r\n";
             for (int j = 0; j < defaultCommands.size(); j++) {
                ret += defaultCommands.get(j).toStringSemicoloned(localData) + "\r\n";
             }
-            ret += Action.INDENTCLOSE + "\r\n";
+            ret += Graph.INDENTCLOSE + "\r\n";
          }
       }
       ret += hilight("}") + "\r\n";

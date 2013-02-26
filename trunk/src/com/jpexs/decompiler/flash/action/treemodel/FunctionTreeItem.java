@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.Graph;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
@@ -58,7 +58,7 @@ public class FunctionTreeItem extends TreeItem {
          }
          ret += hilight(pname);
       }
-      ret += hilight(")") + "\r\n{\r\n" + Action.treeToString(actions) + "}";
+      ret += hilight(")") + "\r\n{\r\n" + Graph.graphToString(actions, constants) + "}";
       return ret;
    }
 
@@ -75,6 +75,4 @@ public class FunctionTreeItem extends TreeItem {
    public boolean needsSemicolon() {
       return false;
    }
-   
-   
 }

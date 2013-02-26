@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.NameValuePair;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.NewObjectTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.ArrayList;
@@ -42,8 +41,8 @@ public class NewObjectIns extends InstructionDefinition {
       int argCount = ins.operands[0];
       List<NameValuePair> args = new ArrayList<NameValuePair>();
       for (int a = 0; a < argCount; a++) {
-         TreeItem value = (TreeItem) stack.pop();
-         TreeItem name = (TreeItem) stack.pop();
+         GraphTargetItem value = (GraphTargetItem) stack.pop();
+         GraphTargetItem name = (GraphTargetItem) stack.pop();
          args.add(0, new NameValuePair(name, value));
       }
       stack.push(new NewObjectTreeItem(ins, args));

@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.action.treemodel.clauses;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
 import com.jpexs.decompiler.flash.action.treemodel.EachTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.graph.Block;
 import com.jpexs.decompiler.flash.graph.ContinueItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -30,9 +29,16 @@ import java.util.List;
 public class ForEachTreeItem extends LoopTreeItem implements Block {
 
    public EachTreeItem expression;
-   public List<TreeItem> commands;
+   public List<GraphTargetItem> commands;
 
-   public ForEachTreeItem(Action instruction, Loop loop, EachTreeItem expression, List<TreeItem> commands) {
+   @Override
+   public List<List<GraphTargetItem>> getSubs() {
+      List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
+      ret.add(commands);
+      return ret;
+   }
+
+   public ForEachTreeItem(Action instruction, Loop loop, EachTreeItem expression, List<GraphTargetItem> commands) {
       super(instruction, loop);
       this.expression = expression;
       this.commands = commands;
@@ -43,7 +49,7 @@ public class ForEachTreeItem extends LoopTreeItem implements Block {
       String ret = "";
       ret += "loop" + loop.id + ":\r\n";
       ret += hilight("for ") + expression.toString(constants) + "\r\n{\r\n";
-      for (TreeItem ti : commands) {
+      for (GraphTargetItem ti : commands) {
          ret += ti.toString(constants) + "\r\n";
       }
       ret += hilight("}") + "\r\n";

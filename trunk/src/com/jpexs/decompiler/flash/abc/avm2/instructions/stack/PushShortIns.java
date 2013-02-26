@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-public class PushShortIns extends InstructionDefinition {
+public class PushShortIns extends InstructionDefinition implements PushIntegerTypeIns {
 
    public PushShortIns() {
       super(0x25, "pushshort", new int[]{AVM2Code.OPT_U30});

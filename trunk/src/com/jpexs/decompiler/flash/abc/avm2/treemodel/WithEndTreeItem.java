@@ -18,14 +18,15 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 
 public class WithEndTreeItem extends TreeItem {
 
-   public TreeItem scope;
+   public GraphTargetItem scope;
 
-   public WithEndTreeItem(AVM2Instruction instruction, TreeItem scope) {
+   public WithEndTreeItem(AVM2Instruction instruction, GraphTargetItem scope) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.scope = scope;
    }

@@ -26,6 +26,14 @@ public class ForTreeItem extends LoopItem implements Block {
    public List<GraphTargetItem> finalCommands;
    public List<GraphTargetItem> commands;
 
+   public List<List<GraphTargetItem>> getSubs() {
+      List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
+      ret.add(firstCommands);
+      ret.add(commands);
+      ret.add(finalCommands);
+      return ret;
+   }
+
    public ForTreeItem(GraphSourceItem src, Loop loop, List<GraphTargetItem> firstCommands, GraphTargetItem expression, List<GraphTargetItem> finalCommands, List<GraphTargetItem> commands) {
       super(src, loop);
       this.firstCommands = firstCommands;

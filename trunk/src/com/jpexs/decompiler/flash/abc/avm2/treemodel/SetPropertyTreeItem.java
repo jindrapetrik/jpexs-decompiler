@@ -19,16 +19,17 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.AssignmentTreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 
 public class SetPropertyTreeItem extends TreeItem implements SetTypeTreeItem, AssignmentTreeItem {
 
-   public TreeItem object;
+   public GraphTargetItem object;
    public FullMultinameTreeItem propertyName;
-   public TreeItem value;
+   public GraphTargetItem value;
 
-   public SetPropertyTreeItem(AVM2Instruction instruction, TreeItem object, FullMultinameTreeItem propertyName, TreeItem value) {
+   public SetPropertyTreeItem(AVM2Instruction instruction, GraphTargetItem object, FullMultinameTreeItem propertyName, GraphTargetItem value) {
       super(instruction, PRECEDENCE_ASSIGMENT);
       this.object = object;
       this.propertyName = propertyName;
@@ -40,11 +41,11 @@ public class SetPropertyTreeItem extends TreeItem implements SetTypeTreeItem, As
       return formatProperty(constants, object, propertyName, localRegNames, fullyQualifiedNames) + hilight("=") + value.toString(constants, localRegNames, fullyQualifiedNames);
    }
 
-   public TreeItem getObject() {
+   public GraphTargetItem getObject() {
       return new GetPropertyTreeItem(instruction, object, propertyName);
    }
 
-   public TreeItem getValue() {
+   public GraphTargetItem getValue() {
       return value;
    }
 }

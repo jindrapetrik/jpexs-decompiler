@@ -55,7 +55,7 @@ public class InterfaceTreeItem extends TreeItem {
       ret += "\r\n{\r\n}\r\n";
       return ret;
    }
-   
+
    @Override
    public boolean needsSemicolon() {
       return false;

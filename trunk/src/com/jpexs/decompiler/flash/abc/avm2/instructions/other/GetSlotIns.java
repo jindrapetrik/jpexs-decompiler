@@ -24,7 +24,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.ClassTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.GetSlotTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.ThisTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.ExceptionTreeItem;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -43,7 +42,8 @@ public class GetSlotIns extends InstructionDefinition {
    @Override
    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       int slotIndex = ins.operands[0];
-      TreeItem obj = (TreeItem) stack.pop(); //scope
+      GraphTargetItem obj = (GraphTargetItem) stack.pop(); //scope
+      obj = obj.getThroughRegister();
       Multiname slotname = null;
       if (obj instanceof ExceptionTreeItem) {
          slotname = constants.constant_multiname[((ExceptionTreeItem) obj).exception.name_index];

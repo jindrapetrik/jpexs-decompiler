@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,9 +28,9 @@ import java.util.List;
  */
 public class XMLTreeItem extends TreeItem {
 
-   public List<TreeItem> parts;
+   public List<GraphTargetItem> parts;
 
-   public XMLTreeItem(AVM2Instruction instruction, List<TreeItem> parts) {
+   public XMLTreeItem(AVM2Instruction instruction, List<GraphTargetItem> parts) {
       super(instruction, NOPRECEDENCE);
       this.parts = parts;
    }
@@ -37,7 +38,7 @@ public class XMLTreeItem extends TreeItem {
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       String ret = "";
-      for (TreeItem part : parts) {
+      for (GraphTargetItem part : parts) {
          if (part instanceof StringTreeItem) {
             ret += ((StringTreeItem) part).value;
          } else {

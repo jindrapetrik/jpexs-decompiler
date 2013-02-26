@@ -29,6 +29,12 @@ public class DoWhileItem extends LoopItem implements Block {
       return false;
    }
 
+   public List<List<GraphTargetItem>> getSubs() {
+      List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
+      ret.add(commands);
+      return ret;
+   }
+
    public DoWhileItem(GraphSourceItem src, Loop loop, List<GraphTargetItem> commands, GraphTargetItem expression) {
       super(src, loop);
       this.expression = expression;

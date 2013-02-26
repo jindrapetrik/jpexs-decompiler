@@ -18,15 +18,16 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 
 public class GetPropertyTreeItem extends TreeItem {
 
-   public TreeItem object;
+   public GraphTargetItem object;
    public FullMultinameTreeItem propertyName;
 
-   public GetPropertyTreeItem(AVM2Instruction instruction, TreeItem object, FullMultinameTreeItem propertyName) {
+   public GetPropertyTreeItem(AVM2Instruction instruction, GraphTargetItem object, FullMultinameTreeItem propertyName) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.object = object;
       this.propertyName = propertyName;

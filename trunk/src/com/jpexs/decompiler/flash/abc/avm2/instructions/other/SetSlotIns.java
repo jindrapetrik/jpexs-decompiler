@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.treemodel.ClassTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.DecrementTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.GetSlotTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.IncrementTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.treemodel.NewActivationTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.PostDecrementTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.PostIncrementTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.SetSlotTreeItem;
@@ -51,9 +52,13 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
    @Override
    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       int slotIndex = ins.operands[0];
-      TreeItem value = (TreeItem) stack.pop();
-      TreeItem obj = (TreeItem) stack.pop(); //scopeId
+      GraphTargetItem value = (GraphTargetItem) stack.pop();
+      GraphTargetItem obj = (GraphTargetItem) stack.pop(); //scopeId
+      obj = obj.getThroughRegister();
       Multiname slotname = null;
+      if (obj instanceof NewActivationTreeItem) {
+         ((NewActivationTreeItem) obj).slots.put(slotIndex, value);
+      }
       if (obj instanceof ExceptionTreeItem) {
          slotname = constants.constant_multiname[((ExceptionTreeItem) obj).exception.name_index];
       } else if (obj instanceof ClassTreeItem) {
@@ -62,7 +67,6 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
          slotname = ((ThisTreeItem) obj).className;
       } else {
          //if(value.startsWith("catched ")) return;
-
          for (int t = 0; t < body.traits.traits.length; t++) {
             if (body.traits.traits[t] instanceof TraitSlotConst) {
                if (((TraitSlotConst) body.traits.traits[t]).slot_id == slotIndex) {

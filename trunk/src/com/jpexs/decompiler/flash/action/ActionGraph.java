@@ -57,19 +57,24 @@ public class ActionGraph extends Graph {
 
    public static List<GraphTargetItem> translateViaGraph(HashMap<Integer, String> registerNames, List<Action> code, int version) {
       ActionGraph g = new ActionGraph(code, registerNames, version);
-      List<GraphPart> allParts = new ArrayList<GraphPart>();
-      for (GraphPart head : g.heads) {
-         populateParts(head, allParts);
-      }
       List localData = new ArrayList();
       localData.add(registerNames);
-      List<GraphTargetItem> output = g.printGraph(localData, new Stack<GraphTargetItem>(), allParts, null, g.heads.get(0), null, new ArrayList<Loop>(), new HashMap<Loop, List<GraphTargetItem>>());
-      return Action.checkClass(output);
+      return g.translate(localData);
    }
 
-   protected List<GraphTargetItem> check(List localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart part, GraphPart stopPart, List<Loop> loops, List<GraphTargetItem> output, HashMap<Loop, List<GraphTargetItem>> forFinalCommands) {
+   @Override
+   protected void finalProcess(List<GraphTargetItem> list) {
+      List<GraphTargetItem> ret = Action.checkClass(list);
+      if (ret != list) {
+         list.clear();
+         list.addAll(ret);
+      }
+   }
+
+   @Override
+   protected List<GraphTargetItem> check(List localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, List<GraphTargetItem> output, HashMap<Loop, List<GraphTargetItem>> forFinalCommands) {
       List<GraphTargetItem> ret = null;
-      if (stack.peek() instanceof StrictEqTreeItem) {
+      if ((part.nextParts.size() == 2) && (stack.peek() instanceof StrictEqTreeItem)) {
 
          GraphTargetItem switchedObject = null;
          if (!output.isEmpty()) {

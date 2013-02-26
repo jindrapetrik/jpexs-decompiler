@@ -21,4 +21,6 @@ import java.util.List;
 public interface Block {
 
    public List<ContinueItem> getContinues();
+
+   public List<List<GraphTargetItem>> getSubs();
 }

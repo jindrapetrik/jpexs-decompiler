@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.graph;
 
+import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -281,14 +282,35 @@ public class Graph {
 
    public static List<GraphTargetItem> translateViaGraph(List localData, String path, GraphSource code, List<Integer> alternateEntries) {
       Graph g = new Graph(code, alternateEntries);
-      List<GraphPart> allParts = new ArrayList<GraphPart>();
-      for (GraphPart head : g.heads) {
-         populateParts(head, allParts);
-      }
-      return g.printGraph(localData, new Stack<GraphTargetItem>(), allParts, null, g.heads.get(0), null, new ArrayList<Loop>(), new HashMap<Loop, List<GraphTargetItem>>());
+      return g.translate(localData);
    }
 
-   private List<GraphPart> getLoopsContinues(List<Loop> loops) {
+   public List<GraphTargetItem> translate(List localData) {
+      List<GraphPart> allParts = new ArrayList<GraphPart>();
+      for (GraphPart head : heads) {
+         populateParts(head, allParts);
+      }
+      List<GraphTargetItem> ret = printGraph(localData, new Stack<GraphTargetItem>(), allParts, null, heads.get(0), null, new ArrayList<Loop>(), new HashMap<Loop, List<GraphTargetItem>>());
+      finalProcessAll(ret);
+      return ret;
+   }
+
+   private void finalProcessAll(List<GraphTargetItem> list) {
+      finalProcess(list);
+      for (GraphTargetItem item : list) {
+         if (item instanceof Block) {
+            List<List<GraphTargetItem>> subs = ((Block) item).getSubs();
+            for (List<GraphTargetItem> sub : subs) {
+               finalProcessAll(sub);
+            }
+         }
+      }
+   }
+
+   protected void finalProcess(List<GraphTargetItem> list) {
+   }
+
+   protected List<GraphPart> getLoopsContinues(List<Loop> loops) {
       List<GraphPart> ret = new ArrayList<GraphPart>();
       for (Loop l : loops) {
          if (l.loopContinue != null) {
@@ -323,8 +345,12 @@ public class Graph {
       }
    }
 
-   protected List<GraphTargetItem> check(List localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart part, GraphPart stopPart, List<Loop> loops, List<GraphTargetItem> output, HashMap<Loop, List<GraphTargetItem>> forFinalCommands) {
+   protected List<GraphTargetItem> check(List localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, List<GraphTargetItem> output, HashMap<Loop, List<GraphTargetItem>> forFinalCommands) {
       return null;
+   }
+
+   protected GraphPart checkPart(List localData, GraphPart part) {
+      return part;
    }
 
    protected GraphTargetItem translatePartGetStack(List localData, GraphPart part, Stack<GraphTargetItem> stack) {
@@ -366,6 +392,14 @@ public class Graph {
       if (part == stopPart) {
          return ret;
       }
+      if (part == null) {
+         //return ret;
+      }
+      part = checkPart(localData, part);
+      if (part == null) {
+         return ret;
+      }
+
       if (part.ignored) {
          return ret;
       }
@@ -395,7 +429,7 @@ public class Graph {
 
       }
       if (part.nextParts.size() == 2) {
-         List<GraphTargetItem> retChecked = null;
+
 
          if ((stack.size() >= 2) && (stack.get(stack.size() - 1) instanceof NotItem) && (((NotItem) (stack.get(stack.size() - 1))).getOriginal() == stack.get(stack.size() - 2))) {
             ret.addAll(output);
@@ -494,9 +528,6 @@ public class Graph {
                }
             }
 
-            return ret;
-         } else if ((retChecked = check(localData, allParts, stack, part, stopPart, loops, output, forFinalCommands)) != null) {
-            ret.addAll(retChecked);
             return ret;
          }   /*if ((((ins.definition instanceof IfStrictNeIns)) && ((part.nextParts.get(1).getHeight() == 2) && (code.code.get(part.nextParts.get(1).start).definition instanceof PushByteIns) && (code.code.get(part.nextParts.get(1).nextParts.get(0).end).definition instanceof LookupSwitchIns)))
           || (((ins.definition instanceof IfStrictEqIns)) && ((part.nextParts.get(0).getHeight() == 2) && (code.code.get(part.nextParts.get(0).start).definition instanceof PushByteIns) && (code.code.get(part.nextParts.get(0).nextParts.get(0).end).definition instanceof LookupSwitchIns)))) {
@@ -787,6 +818,11 @@ public class Graph {
        return ret;
        }*/
 
+      List<GraphTargetItem> retChecked = null;
+      if ((retChecked = check(localData, allParts, stack, parent, part, stopPart, loops, output, forFinalCommands)) != null) {
+         ret.addAll(retChecked);
+         return ret;
+      }
       List<GraphPart> loopContinues = getLoopsContinues(loops);
       boolean loop = false;
       boolean reversed = false;
@@ -842,9 +878,9 @@ public class Graph {
             }
          }
          if (loop) {
-            GraphTargetItem expr2=expr;
-            if(expr2 instanceof NotItem){
-               expr2=((NotItem)expr2).getOriginal();
+            GraphTargetItem expr2 = expr;
+            if (expr2 instanceof NotItem) {
+               expr2 = ((NotItem) expr2).getOriginal();
             }
             if (expr2 instanceof AndItem) {
                currentLoop.loopContinue = ((AndItem) expr2).firstPart;
@@ -955,9 +991,6 @@ public class Graph {
             List<GraphTargetItem> finalCommands = null;
             GraphPart finalPart = null;
             GraphTargetItem ti;
-            if (loopBodyStart != null) {
-               System.err.println("ji"); //TODO:
-            }
             if ((loopBodyStart != null) && ((ti = checkLoop(loopBodyStart, stopPart, loops)) != null)) {
                loopBody.add(ti);
             } else {
@@ -1037,27 +1070,19 @@ public class Graph {
             next = null;
          }
          if (next != null) {
-            boolean finallyJump = false;
-            /*for (int f : finallyJumps) {
-             if (next.start == f) {
-             finallyJump = true;
-             break;
-             }
-             }*/
-            if (!finallyJump) {
-               GraphTargetItem ti = checkLoop(next, stopPart, loops);
-               if (ti != null) {
-                  ret.add(ti);
-               } else {
-                  if (debugMode) {
-                     System.err.println("NEXT: (inside " + part + ")");
-                  }
-                  ret.addAll(printGraph(localData, stack, allParts, part, next, stopPart, loops, forFinalCommands));
-                  if (debugMode) {
-                     System.err.println("/NEXT: (inside " + part + ")");
-                  }
+            GraphTargetItem ti = checkLoop(next, stopPart, loops);
+            if (ti != null) {
+               ret.add(ti);
+            } else {
+               if (debugMode) {
+                  System.err.println("NEXT: (inside " + part + ")");
+               }
+               ret.addAll(printGraph(localData, stack, allParts, part, next, stopPart, loops, forFinalCommands));
+               if (debugMode) {
+                  System.err.println("/NEXT: (inside " + part + ")");
                }
             }
+
          }
       } else {
          ret.addAll(output);
@@ -1209,7 +1234,7 @@ public class Graph {
       for (int pos : alternateEntries) {
          GraphPart e1 = new GraphPart(-1, -1);
          e1.path = "e";
-         makeGraph(e1, "e", code, pos, pos, allBlocks, refs, visited);
+         ret.add(makeGraph(e1, "e", code, pos, pos, allBlocks, refs, visited));
       }
       return ret;
    }
@@ -1298,5 +1323,125 @@ public class Graph {
          }
       }
       return ret;
+   }
+   /**
+    * String used to indent line when converting to string
+    */
+   public static final String INDENTOPEN = "INDENTOPEN";
+   /**
+    * String used to unindent line when converting to string
+    */
+   public static final String INDENTCLOSE = "INDENTCLOSE";
+   private static final String INDENT_STRING = "   ";
+
+   private static String tabString(int len) {
+      String ret = "";
+      for (int i = 0; i < len; i++) {
+         ret += INDENT_STRING;
+      }
+      return ret;
+   }
+
+   /**
+    * Converts list of TreeItems to string
+    *
+    * @param tree List of TreeItem
+    * @return String
+    */
+   public static String graphToString(List<GraphTargetItem> tree, Object... localData) {
+      StringBuilder ret = new StringBuilder();
+      List localDataList = new ArrayList();
+      for (Object o : localData) {
+         localDataList.add(o);
+      }
+      for (GraphTargetItem ti : tree) {
+         ret.append(ti.toStringSemicoloned(localDataList));
+         ret.append("\r\n");
+      }
+      String parts[] = ret.toString().split("\r\n");
+      ret = new StringBuilder();
+
+
+      try {
+         Stack<String> loopStack = new Stack<String>();
+         for (int p = 0; p < parts.length; p++) {
+            String stripped = Highlighting.stripHilights(parts[p]);
+            if (stripped.endsWith(":") && (!stripped.startsWith("case ")) && (!stripped.equals("default:"))) {
+               loopStack.add(stripped.substring(0, stripped.length() - 1));
+            }
+            if (stripped.startsWith("break ")) {
+               if (stripped.equals("break " + loopStack.peek().replace("switch", "") + ";")) {
+                  parts[p] = parts[p].replace(" " + loopStack.peek().replace("switch", ""), "");
+               }
+            }
+            if (stripped.startsWith("continue ")) {
+               if (loopStack.size() > 0) {
+                  int pos = loopStack.size() - 1;
+                  String loopname = "";
+                  do {
+                     loopname = loopStack.get(pos);
+                     pos--;
+                  } while ((pos >= 0) && (loopname.startsWith("loopswitch")));
+                  if (stripped.equals("continue " + loopname + ";")) {
+                     parts[p] = parts[p].replace(" " + loopname, "");
+                  }
+               }
+            }
+            if (stripped.startsWith(":")) {
+               loopStack.pop();
+            }
+         }
+      } catch (Exception ex) {
+      }
+
+      int level = 0;
+      for (int p = 0; p < parts.length; p++) {
+         String strippedP = Highlighting.stripHilights(parts[p]).trim();
+         if (strippedP.endsWith(":") && (!strippedP.startsWith("case ")) && (!strippedP.equals("default:"))) {
+            String loopname = strippedP.substring(0, strippedP.length() - 1);
+            boolean dorefer = false;
+            for (int q = p + 1; q < parts.length; q++) {
+               String strippedQ = Highlighting.stripHilights(parts[q]).trim();
+               if (strippedQ.equals("break " + loopname + ";")) {
+                  dorefer = true;
+                  break;
+               }
+               if (strippedQ.equals("continue " + loopname + ";")) {
+                  dorefer = true;
+                  break;
+               }
+               if (strippedQ.equals(":" + loopname)) {
+                  break;
+               }
+            }
+            if (!dorefer) {
+               continue;
+            }
+         }
+         if (strippedP.startsWith(":")) {
+            continue;
+         }
+         if (Highlighting.stripHilights(parts[p]).equals(INDENTOPEN)) {
+            level++;
+            continue;
+         }
+         if (Highlighting.stripHilights(parts[p]).equals(INDENTCLOSE)) {
+            level--;
+            continue;
+         }
+         if (Highlighting.stripHilights(parts[p]).equals("}")) {
+            level--;
+         }
+         if (Highlighting.stripHilights(parts[p]).equals("};")) {
+            level--;
+         }
+         ret.append(tabString(level));
+         ret.append(parts[p]);
+         ret.append("\r\n");
+         if (Highlighting.stripHilights(parts[p]).equals("{")) {
+            level++;
+         }
+      }
+      return ret.toString();
    }
 }

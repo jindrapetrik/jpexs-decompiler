@@ -25,6 +25,14 @@ public class IfItem extends GraphTargetItem implements Block {
    public List<GraphTargetItem> onTrue;
    public List<GraphTargetItem> onFalse;
 
+   @Override
+   public List<List<GraphTargetItem>> getSubs() {
+      List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
+      ret.add(onTrue);
+      ret.add(onFalse);
+      return ret;
+   }
+
    public IfItem(GraphSourceItem src, GraphTargetItem expression, List<GraphTargetItem> onTrue, List<GraphTargetItem> onFalse) {
       super(src, NOPRECEDENCE);
       this.expression = expression;

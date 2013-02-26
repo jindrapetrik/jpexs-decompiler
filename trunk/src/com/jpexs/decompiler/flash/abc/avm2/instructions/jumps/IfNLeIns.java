@@ -39,14 +39,14 @@ public class IfNLeIns extends InstructionDefinition implements IfTypeIns {
 
    @Override
    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      TreeItem v2 = (TreeItem) stack.pop();
-      TreeItem v1 = (TreeItem) stack.pop();
+      GraphTargetItem v2 = (GraphTargetItem) stack.pop();
+      GraphTargetItem v1 = (GraphTargetItem) stack.pop();
       stack.push(new GtTreeItem(ins, v1, v2));
    }
 
    public void translateInverted(java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, AVM2Instruction ins) {
-      TreeItem v2 = (TreeItem) stack.pop();
-      TreeItem v1 = (TreeItem) stack.pop();
+      GraphTargetItem v2 = (GraphTargetItem) stack.pop();
+      GraphTargetItem v1 = (GraphTargetItem) stack.pop();
       stack.push(new LeTreeItem(ins, v1, v2));
    }
 

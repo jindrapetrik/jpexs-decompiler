@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.WithObjectTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.WithTreeItem;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
@@ -38,7 +37,7 @@ public class PushWithIns extends InstructionDefinition {
 
    @Override
    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      TreeItem w = (TreeItem) stack.pop();
+      GraphTargetItem w = (GraphTargetItem) stack.pop();
       WithObjectTreeItem wot = new WithObjectTreeItem(ins, w);
       scopeStack.push(wot);
       output.add(new WithTreeItem(ins, w));

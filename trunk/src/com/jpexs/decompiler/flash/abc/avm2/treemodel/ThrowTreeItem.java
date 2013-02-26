@@ -18,14 +18,15 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 
 public class ThrowTreeItem extends TreeItem {
 
-   public TreeItem value;
+   public GraphTargetItem value;
 
-   public ThrowTreeItem(AVM2Instruction instruction, TreeItem value) {
+   public ThrowTreeItem(AVM2Instruction instruction, GraphTargetItem value) {
       super(instruction, NOPRECEDENCE);
       this.value = value;
    }

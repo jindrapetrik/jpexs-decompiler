@@ -56,6 +56,14 @@ public abstract class GraphTargetItem {
       return toString(localData) + (needsSemicolon() ? ";" : "");
    }
 
+   public String toStringSemicoloned(Object... localData) {
+      List localData2 = new ArrayList();
+      for (Object o : localData) {
+         localData2.add(o);
+      }
+      return toStringSemicoloned(localData2);
+   }
+
    public boolean needsSemicolon() {
       return true;
    }
@@ -67,8 +75,12 @@ public abstract class GraphTargetItem {
 
    public abstract String toString(List localData);
 
-   public String toString(Object o) {
-      return toString(Helper.toList(o));
+   public String toString(Object... localData) {
+      List localData2 = new ArrayList();
+      for (Object o : localData) {
+         localData2.add(o);
+      }
+      return toString(localData2);
    }
 
    public int getPrecedence() {

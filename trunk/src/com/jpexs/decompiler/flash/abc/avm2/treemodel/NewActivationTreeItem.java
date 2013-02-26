@@ -18,10 +18,13 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 
 public class NewActivationTreeItem extends TreeItem {
+
+   public HashMap<Integer, GraphTargetItem> slots = new HashMap<Integer, GraphTargetItem>();
 
    public NewActivationTreeItem(AVM2Instruction instruction) {
       super(instruction, NOPRECEDENCE);

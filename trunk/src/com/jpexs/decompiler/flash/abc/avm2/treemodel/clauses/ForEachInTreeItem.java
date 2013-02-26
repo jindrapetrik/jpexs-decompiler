@@ -29,12 +29,19 @@ import java.util.List;
 public class ForEachInTreeItem extends LoopTreeItem implements Block {
 
    public InTreeItem expression;
-   public List<TreeItem> commands;
+   public List<GraphTargetItem> commands;
 
-   public ForEachInTreeItem(AVM2Instruction instruction, long loopId, int loopContinue, InTreeItem expression, List<TreeItem> commands) {
+   @Override
+   public List<List<GraphTargetItem>> getSubs() {
+      List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
+      ret.add(commands);
+      return ret;
+   }
+
+   public ForEachInTreeItem(AVM2Instruction instruction, long loopId, int loopContinue, InTreeItem expression, List<GraphTargetItem> commands) {
       super(instruction, loopId, loopContinue);
       if (!commands.isEmpty()) {
-         TreeItem firstAssign = commands.get(0);
+         GraphTargetItem firstAssign = commands.get(0);
          if (firstAssign instanceof SetTypeTreeItem) {
             if (expression.object instanceof LocalRegTreeItem) {
                if (((SetTypeTreeItem) firstAssign).getValue().getNotCoerced() instanceof LocalRegTreeItem) {
@@ -62,7 +69,7 @@ public class ForEachInTreeItem extends LoopTreeItem implements Block {
       String ret = "";
       ret += "loop" + loopId + ":\r\n";
       ret += hilight("for each (") + expression.toString(constants, localRegNames, fullyQualifiedNames) + ")\r\n{\r\n";
-      for (TreeItem ti : commands) {
+      for (GraphTargetItem ti : commands) {
          ret += ti.toStringSemicoloned(constants, localRegNames, fullyQualifiedNames) + "\r\n";
       }
       ret += hilight("}") + "\r\n";

@@ -19,16 +19,17 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 
 public abstract class BinaryOpTreeItem extends TreeItem {
 
-   public TreeItem leftSide;
-   public TreeItem rightSide;
+   public GraphTargetItem leftSide;
+   public GraphTargetItem rightSide;
    protected String operator = "";
 
-   public BinaryOpTreeItem(AVM2Instruction instruction, int precedence, TreeItem leftSide, TreeItem rightSide, String operator) {
+   public BinaryOpTreeItem(AVM2Instruction instruction, int precedence, GraphTargetItem leftSide, GraphTargetItem rightSide, String operator) {
       super(instruction, precedence);
       this.leftSide = leftSide;
       this.rightSide = rightSide;

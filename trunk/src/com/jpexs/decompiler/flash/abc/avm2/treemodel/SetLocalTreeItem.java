@@ -19,15 +19,16 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.AssignmentTreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 
 public class SetLocalTreeItem extends TreeItem implements SetTypeTreeItem, AssignmentTreeItem {
 
    public int regIndex;
-   public TreeItem value;
+   public GraphTargetItem value;
 
-   public SetLocalTreeItem(AVM2Instruction instruction, int regIndex, TreeItem value) {
+   public SetLocalTreeItem(AVM2Instruction instruction, int regIndex, GraphTargetItem value) {
       super(instruction, PRECEDENCE_ASSIGMENT);
       this.regIndex = regIndex;
       this.value = value;
@@ -38,11 +39,11 @@ public class SetLocalTreeItem extends TreeItem implements SetTypeTreeItem, Assig
       return hilight(localRegName(localRegNames, regIndex) + "=") + value.toString(constants, localRegNames, fullyQualifiedNames);
    }
 
-   public TreeItem getObject() {
+   public GraphTargetItem getObject() {
       return new LocalRegTreeItem(instruction, regIndex, null);
    }
 
-   public TreeItem getValue() {
+   public GraphTargetItem getValue() {
       return value;
    }
 }

@@ -18,32 +18,33 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class WithTreeItem extends TreeItem {
 
-   public TreeItem scope;
-   public List<TreeItem> items;
+   public GraphTargetItem scope;
+   public List<GraphTargetItem> items;
 
-   public WithTreeItem(AVM2Instruction instruction, TreeItem scope, List<TreeItem> items) {
+   public WithTreeItem(AVM2Instruction instruction, GraphTargetItem scope, List<GraphTargetItem> items) {
       super(instruction, NOPRECEDENCE);
       this.scope = scope;
       this.items = items;
    }
 
-   public WithTreeItem(AVM2Instruction instruction, TreeItem scope) {
+   public WithTreeItem(AVM2Instruction instruction, GraphTargetItem scope) {
       super(instruction, NOPRECEDENCE);
       this.scope = scope;
-      this.items = new ArrayList<TreeItem>();
+      this.items = new ArrayList<GraphTargetItem>();
    }
 
    @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       String ret;
       ret = hilight("with(") + scope.toString(constants, localRegNames, fullyQualifiedNames) + hilight(")\r\n{\r\n");
-      /*for (TreeItem ti : items) {
+      /*for (GraphTargetItem ti : items) {
        ret += ti.toString(constants, localRegNames, fullyQualifiedNames) + "\r\n";
        }
        ret += hilight("}");*/

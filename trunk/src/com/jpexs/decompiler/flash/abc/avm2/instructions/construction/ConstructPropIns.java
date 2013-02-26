@@ -24,7 +24,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.ConstructPropTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.FullMultinameTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.XMLTreeItem;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -58,17 +57,17 @@ public class ConstructPropIns extends InstructionDefinition {
    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       int multinameIndex = ins.operands[0];
       int argCount = ins.operands[1];
-      List<TreeItem> args = new ArrayList<TreeItem>();
+      List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
       for (int a = 0; a < argCount; a++) {
-         args.add(0, (TreeItem) stack.pop());
+         args.add(0, (GraphTargetItem) stack.pop());
       }
       FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
-      TreeItem obj = (TreeItem) stack.pop();
+      GraphTargetItem obj = (GraphTargetItem) stack.pop();
 
       if (multiname.isXML(constants, localRegNames, fullyQualifiedNames)) {
          if (args.size() == 1) {
-            TreeItem arg = args.get(0);
-            List<TreeItem> xmlLines = new ArrayList<TreeItem>();
+            GraphTargetItem arg = args.get(0);
+            List<GraphTargetItem> xmlLines = new ArrayList<GraphTargetItem>();
             if (ConstructIns.walkXML(arg, xmlLines)) {
                stack.push(new XMLTreeItem(ins, xmlLines));
                return;

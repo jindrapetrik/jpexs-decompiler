@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.WithEndTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.WithObjectTreeItem;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
@@ -44,7 +43,7 @@ public class PopScopeIns extends InstructionDefinition {
 
    @Override
    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      TreeItem scope = (TreeItem) scopeStack.pop();
+      GraphTargetItem scope = (GraphTargetItem) scopeStack.pop();
       if (scope instanceof WithObjectTreeItem) {
          scope = ((WithObjectTreeItem) scope).scope;
          output.add(new WithEndTreeItem(ins, scope));

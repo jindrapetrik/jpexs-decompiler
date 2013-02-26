@@ -17,13 +17,12 @@
 package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.graph.LogicalOpItem;
 
 public class NeqTreeItem extends BinaryOpTreeItem implements LogicalOpItem {
 
-   public NeqTreeItem(AVM2Instruction instruction, TreeItem leftSide, TreeItem rightSide) {
+   public NeqTreeItem(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
       super(instruction, PRECEDENCE_EQUALITY, leftSide, rightSide, "!=");
    }
 

@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.util.HashMap;
 import java.util.List;
@@ -71,8 +72,8 @@ public abstract class TreeItem extends GraphTargetItem {
       return false;
    }
 
-   protected String formatProperty(ConstantPool constants, TreeItem object, TreeItem propertyName, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      String obStr = object.toString(constants, localRegNames, fullyQualifiedNames);
+   protected String formatProperty(ConstantPool constants, GraphTargetItem object, GraphTargetItem propertyName, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+      String obStr = object.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
       if (object.precedence > PRECEDENCE_PRIMARY) {
          obStr = "(" + obStr + ")";
       }
@@ -82,16 +83,16 @@ public abstract class TreeItem extends GraphTargetItem {
          }
       }
       if (obStr.equals("")) {
-         return propertyName.toString(constants, localRegNames, fullyQualifiedNames);
+         return propertyName.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
       }
       if (propertyName instanceof FullMultinameTreeItem) {
          if (((FullMultinameTreeItem) propertyName).isRuntime()) {
-            return joinProperty(obStr, propertyName.toString(constants, localRegNames, fullyQualifiedNames));
+            return joinProperty(obStr, propertyName.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)));
          } else {
             return joinProperty(obStr, ((FullMultinameTreeItem) propertyName).toString(constants, localRegNames, fullyQualifiedNames));
          }
       } else {
-         return obStr + "[" + propertyName.toString(constants, localRegNames, fullyQualifiedNames) + "]";
+         return obStr + "[" + propertyName.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "]";
       }
    }
 

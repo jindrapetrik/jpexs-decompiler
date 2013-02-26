@@ -24,6 +24,13 @@ public class WhileItem extends LoopItem implements Block {
    public GraphTargetItem expression;
    public List<GraphTargetItem> commands;
 
+   @Override
+   public List<List<GraphTargetItem>> getSubs() {
+      List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
+      ret.add(commands);
+      return ret;
+   }
+
    public WhileItem(GraphSourceItem src, Loop loop, GraphTargetItem expression, List<GraphTargetItem> commands) {
       super(src, loop);
       this.expression = expression;

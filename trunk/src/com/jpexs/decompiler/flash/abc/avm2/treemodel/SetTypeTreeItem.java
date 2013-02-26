@@ -16,13 +16,15 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+
 /**
  *
  * @author JPEXS
  */
 public interface SetTypeTreeItem {
 
-   public TreeItem getObject();
+   public GraphTargetItem getObject();
 
-   public TreeItem getValue();
+   public GraphTargetItem getValue();
 }

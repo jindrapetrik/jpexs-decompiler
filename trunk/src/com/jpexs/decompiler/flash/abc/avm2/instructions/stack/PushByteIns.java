@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-public class PushByteIns extends InstructionDefinition {
+public class PushByteIns extends InstructionDefinition implements PushIntegerTypeIns {
 
    public PushByteIns() {
       super(0x24, "pushbyte", new int[]{AVM2Code.OPT_BYTE});

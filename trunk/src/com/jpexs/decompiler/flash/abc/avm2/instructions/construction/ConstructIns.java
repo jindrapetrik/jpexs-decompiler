@@ -30,7 +30,6 @@ import com.jpexs.decompiler.flash.abc.avm2.treemodel.FullMultinameTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.GetLexTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.GetPropertyTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.StringTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.XMLTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.AddTreeItem;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
@@ -59,7 +58,7 @@ public class ConstructIns extends InstructionDefinition {
       //push new instance
    }
 
-   public static boolean walkXML(TreeItem item, List<TreeItem> list) {
+   public static boolean walkXML(GraphTargetItem item, List<GraphTargetItem> list) {
       boolean ret = true;
       if (item instanceof StringTreeItem) {
          list.add(item);
@@ -77,11 +76,11 @@ public class ConstructIns extends InstructionDefinition {
    @Override
    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       int argCount = ins.operands[0];
-      List<TreeItem> args = new ArrayList<TreeItem>();
+      List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
       for (int a = 0; a < argCount; a++) {
-         args.add(0, (TreeItem) stack.pop());
+         args.add(0, (GraphTargetItem) stack.pop());
       }
-      TreeItem obj = (TreeItem) stack.pop();
+      GraphTargetItem obj = (GraphTargetItem) stack.pop();
 
       FullMultinameTreeItem xmlMult = null;
       boolean isXML = false;
@@ -100,8 +99,8 @@ public class ConstructIns extends InstructionDefinition {
 
       if (isXML) {
          if (args.size() == 1) {
-            TreeItem arg = args.get(0);
-            List<TreeItem> xmlLines = new ArrayList<TreeItem>();
+            GraphTargetItem arg = args.get(0);
+            List<GraphTargetItem> xmlLines = new ArrayList<GraphTargetItem>();
             if (walkXML(arg, xmlLines)) {
                stack.push(new XMLTreeItem(ins, xmlLines));
                return;

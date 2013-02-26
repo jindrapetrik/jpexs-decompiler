@@ -34,6 +34,15 @@ public class TryTreeItem extends TreeItem implements Block {
    public List<List<GraphTargetItem>> catchCommands;
    public List<GraphTargetItem> finallyCommands;
 
+   @Override
+   public List<List<GraphTargetItem>> getSubs() {
+      List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
+      ret.add(tryCommands);
+      ret.addAll(catchCommands);
+      ret.add(finallyCommands);
+      return ret;
+   }
+
    public TryTreeItem(List<GraphTargetItem> tryCommands, List<ABCException> catchExceptions, List<List<GraphTargetItem>> catchCommands, List<GraphTargetItem> finallyCommands) {
       super(null, NOPRECEDENCE);
       this.tryCommands = tryCommands;

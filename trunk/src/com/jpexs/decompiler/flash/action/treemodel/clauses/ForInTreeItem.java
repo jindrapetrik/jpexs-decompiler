@@ -30,9 +30,16 @@ public class ForInTreeItem extends LoopTreeItem implements Block {
 
    public TreeItem variableName;
    public TreeItem enumVariable;
-   public List<TreeItem> commands;
+   public List<GraphTargetItem> commands;
 
-   public ForInTreeItem(Action instruction, Loop loop, TreeItem variableName, TreeItem enumVariable, List<TreeItem> commands) {
+   @Override
+   public List<List<GraphTargetItem>> getSubs() {
+      List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
+      ret.add(commands);
+      return ret;
+   }
+
+   public ForInTreeItem(Action instruction, Loop loop, TreeItem variableName, TreeItem enumVariable, List<GraphTargetItem> commands) {
       super(instruction, loop);
       this.variableName = variableName;
       this.enumVariable = enumVariable;
@@ -44,7 +51,7 @@ public class ForInTreeItem extends LoopTreeItem implements Block {
       String ret = "";
       ret += "loop" + loop.id + ":\r\n";
       ret += hilight("for(") + stripQuotes(variableName) + " in " + enumVariable.toString(constants) + ")\r\n{\r\n";
-      for (TreeItem ti : commands) {
+      for (GraphTargetItem ti : commands) {
          ret += ti.toString(constants) + "\r\n";
       }
       ret += hilight("}") + "\r\n";

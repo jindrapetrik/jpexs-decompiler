@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.CallMethodTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.ArrayList;
@@ -54,11 +53,11 @@ public class CallMethodIns extends InstructionDefinition {
    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       int methodIndex = ins.operands[0];
       int argCount = ins.operands[1];
-      List<TreeItem> args = new ArrayList<TreeItem>();
+      List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
       for (int a = 0; a < argCount; a++) {
-         args.add(0, (TreeItem) stack.pop());
+         args.add(0, (GraphTargetItem) stack.pop());
       }
-      TreeItem receiver = (TreeItem) stack.pop();
+      GraphTargetItem receiver = (GraphTargetItem) stack.pop();
       String methodName = method_info[methodIndex].getName(constants);
       stack.push(new CallMethodTreeItem(ins, receiver, methodName, args));
    }

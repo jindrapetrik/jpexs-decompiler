@@ -18,13 +18,13 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 
 public class AddTreeItem extends BinaryOpTreeItem {
 
-   public AddTreeItem(AVM2Instruction instruction, TreeItem leftSide, TreeItem rightSide) {
+   public AddTreeItem(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
       super(instruction, PRECEDENCE_ADDITIVE, leftSide, rightSide, "+");
    }
 

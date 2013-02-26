@@ -18,10 +18,10 @@ package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.DoABCTag;
@@ -34,7 +34,7 @@ public class TraitSlotConst extends Trait {
    public int type_index;
    public int value_index;
    public int value_kind;
-   public TreeItem assignedValue;
+   public GraphTargetItem assignedValue;
 
    @Override
    public String toString(ABC abc, List<String> fullyQualifiedNames) {

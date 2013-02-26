@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 
@@ -28,10 +29,10 @@ import java.util.List;
  */
 public class FilterTreeItem extends TreeItem {
 
-   public TreeItem expression;
-   public TreeItem collection;
+   public GraphTargetItem expression;
+   public GraphTargetItem collection;
 
-   public FilterTreeItem(AVM2Instruction instruction, TreeItem collection, TreeItem expression) {
+   public FilterTreeItem(AVM2Instruction instruction, GraphTargetItem collection, GraphTargetItem expression) {
       super(instruction, NOPRECEDENCE);
       this.expression = expression;
       this.collection = collection;

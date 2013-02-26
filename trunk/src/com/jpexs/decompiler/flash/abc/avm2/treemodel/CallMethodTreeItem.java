@@ -18,16 +18,18 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
 
 public class CallMethodTreeItem extends TreeItem {
 
-   public TreeItem receiver;
+   public GraphTargetItem receiver;
    public String methodName;
-   public List<TreeItem> arguments;
+   public List<GraphTargetItem> arguments;
 
-   public CallMethodTreeItem(AVM2Instruction instruction, TreeItem receiver, String methodName, List<TreeItem> arguments) {
+   public CallMethodTreeItem(AVM2Instruction instruction, GraphTargetItem receiver, String methodName, List<GraphTargetItem> arguments) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.receiver = receiver;
       this.methodName = methodName;
@@ -43,6 +45,6 @@ public class CallMethodTreeItem extends TreeItem {
          }
          args = args + arguments.get(a).toString(constants, localRegNames, fullyQualifiedNames);
       }
-      return receiver.toString(constants, localRegNames, fullyQualifiedNames) + hilight(".") + methodName + hilight("(") + args + hilight(")");
+      return receiver.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + hilight(".") + methodName + hilight("(") + args + hilight(")");
    }
 }

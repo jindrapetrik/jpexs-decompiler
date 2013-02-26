@@ -48,6 +48,7 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.graph.Graph;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
@@ -819,15 +820,6 @@ public class AVM2Code implements Serializable {
       cacheActual = false;
    }
 
-   public static String listToString(List<GraphTargetItem> stack, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      StringBuffer ret = new StringBuffer();
-      for (int d = 0; d < stack.size(); d++) {
-         GraphTargetItem o = stack.get(d);
-         ret.append(o.toStringSemicoloned(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "\r\n");
-      }
-      return ret.toString();
-   }
-
    private static String innerStackToString(List stack) {
       String ret = "";
       for (int d = 0; d < stack.size(); d++) {
@@ -1003,7 +995,7 @@ public class AVM2Code implements Serializable {
       return localRegNames;
    }
 
-   public List<TreeItem> clearTemporaryRegisters(List<TreeItem> output) {
+   public List<GraphTargetItem> clearTemporaryRegisters(List<GraphTargetItem> output) {
       for (int i = 0; i < output.size(); i++) {
          if (output.get(i) instanceof SetLocalTreeItem) {
             if (isKilled(((SetLocalTreeItem) output.get(i)).regIndex, 0, code.size() - 1)) {
@@ -1017,7 +1009,7 @@ public class AVM2Code implements Serializable {
       return output;
    }
 
-   private int fixIPAfterDebugLine(int ip) {
+   public int fixIPAfterDebugLine(int ip) {
       if (ip >= code.size()) {
          return code.size() - 1;
       }
@@ -1209,15 +1201,15 @@ public class AVM2Code implements Serializable {
                }
             }
 
-            if ((ip + 2 < code.size()) && (ins.definition instanceof NewCatchIns)) { //Filling local register in catch clause
-               if (code.get(ip + 1).definition instanceof DupIns) {
-                  if (code.get(ip + 2).definition instanceof SetLocalTypeIns) {
-                     ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
-                     ip += 3;
-                     continue;
-                  }
-               }
-            }
+            /*if ((ip + 2 < code.size()) && (ins.definition instanceof NewCatchIns)) { //Filling local register in catch clause
+             if (code.get(ip + 1).definition instanceof DupIns) {
+             if (code.get(ip + 2).definition instanceof SetLocalTypeIns) {
+             ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
+             ip += 3;
+             continue;
+             }
+             }
+             }*/
 
             if ((ins.definition instanceof SetLocalTypeIns) && (ip + 1 <= end) && (isKilled(((SetLocalTypeIns) ins.definition).getRegisterId(ins), ip, end))) { //set_local_x,get_local_x..kill x
 
@@ -1408,10 +1400,10 @@ public class AVM2Code implements Serializable {
 
    private class Slot {
 
-      public TreeItem scope;
+      public GraphTargetItem scope;
       public Multiname multiname;
 
-      public Slot(TreeItem scope, Multiname multiname) {
+      public Slot(GraphTargetItem scope, Multiname multiname) {
          this.scope = scope;
          this.multiname = multiname;
       }
@@ -1477,7 +1469,7 @@ public class AVM2Code implements Serializable {
             GraphTargetItem ti = list.get(i);
             if ((ti instanceof InitPropertyTreeItem) || (ti instanceof SetPropertyTreeItem)) {
                int multinameIndex = 0;
-               TreeItem value = null;
+               GraphTargetItem value = null;
                if (ti instanceof InitPropertyTreeItem) {
                   multinameIndex = ((InitPropertyTreeItem) ti).propertyName.multinameIndex;
                   value = ((InitPropertyTreeItem) ti).value;
@@ -1553,103 +1545,12 @@ public class AVM2Code implements Serializable {
          }
       }
 
-      s = listToString(list, constants, localRegNames, fullyQualifiedNames);
-      /*} catch (Exception ex) {
-       Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, "Error in method "+path, ex);
-       s = "/ *\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error Message: " + ex.getMessage() + "\r\n * /";
-       return s;
-       }*/
-
-
-      StringBuffer sub = new StringBuffer();
-      int level = 0;
-
-      String parts[] = s.split("\r\n");
-
-      boolean processLoops = true;
-
-      if (processLoops) {
-         try {
-            Stack<String> loopStack = new Stack<String>();
-            for (int p = 0; p < parts.length; p++) {
-               String stripped = Highlighting.stripHilights(parts[p]);
-               if (stripped.endsWith(":") && (!stripped.startsWith("case ")) && (!stripped.equals("default:"))) {
-                  loopStack.add(stripped.substring(0, stripped.length() - 1));
-               }
-               if (stripped.startsWith("break ")) {
-                  if (stripped.equals("break " + loopStack.peek() + ";")) {
-                     parts[p] = parts[p].replace(" " + loopStack.peek(), "");
-                  }
-               }
-               if (stripped.startsWith("continue ")) {
-                  if (loopStack.size() > 0) {
-                     if (stripped.equals("continue " + loopStack.peek() + ";")) {
-                        parts[p] = parts[p].replace(" " + loopStack.peek(), "");
-                     }
-                  }
-               }
-               if (stripped.startsWith(":")) {
-                  loopStack.pop();
-               }
-            }
-         } catch (Exception ex) {
-         }
-      }
-      for (int p = 0; p < parts.length; p++) {
-         if (p == parts.length - 1) {
-            if (parts[p].equals("")) {
-               continue;
-            }
-         }
-         String strippedP = Highlighting.stripHilights(parts[p]).trim();
-         if (processLoops) {
-            if (strippedP.endsWith(":") && (!strippedP.startsWith("case ")) && (!strippedP.equals("default:"))) {
-               String loopname = strippedP.substring(0, strippedP.length() - 1);
-               boolean dorefer = false;
-               for (int q = p + 1; q < parts.length; q++) {
-                  String strippedQ = Highlighting.stripHilights(parts[q]);
-                  if (strippedQ.equals("break " + loopname + ";")) {
-                     dorefer = true;
-                     break;
-                  }
-                  if (strippedQ.equals("continue " + loopname + ";")) {
-                     dorefer = true;
-                     break;
-                  }
-                  if (strippedQ.equals(":" + loopname)) {
-                     break;
-                  }
-               }
-               if (!dorefer) {
-                  continue;
-               }
-            }
-            if (strippedP.startsWith(":")) {
-               continue;
-            }
-         }
-         if (strippedP.equals(IDENTOPEN)) {
-            level++;
-         } else if (strippedP.equals(IDENTCLOSE)) {
-            level--;
-         } else if (strippedP.equals("{")) {
-            level++;
-            sub.append(tabString(level) + parts[p] + "\r\n");
-            level++;
-         } else if (strippedP.equals("}") || strippedP.equals("};")) {
-            level--;
-            sub.append(tabString(level) + parts[p] + "\r\n");
-            level--;
-         } else {
-            sub.append(tabString(level) + parts[p] + "\r\n");
-         }
-      }
+      s = Graph.graphToString(list, constants, localRegNames, fullyQualifiedNames);
       if (!hilighted) {
-         return Highlighting.stripHilights(sub.toString());
+         return Highlighting.stripHilights(s);
       }
-      String ret = sub.toString();
 
-      return ret;
+      return s;
    }
 
    public void removeInstruction(int pos, MethodBody body) {

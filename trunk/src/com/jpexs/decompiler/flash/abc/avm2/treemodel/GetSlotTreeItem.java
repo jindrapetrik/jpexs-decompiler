@@ -19,15 +19,16 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 
 public class GetSlotTreeItem extends TreeItem {
 
    public Multiname slotName;
-   public TreeItem scope;
+   public GraphTargetItem scope;
 
-   public GetSlotTreeItem(AVM2Instruction instruction, TreeItem scope, Multiname slotName) {
+   public GetSlotTreeItem(AVM2Instruction instruction, GraphTargetItem scope, Multiname slotName) {
       super(instruction, PRECEDENCE_PRIMARY);
       this.slotName = slotName;
       this.scope = scope;

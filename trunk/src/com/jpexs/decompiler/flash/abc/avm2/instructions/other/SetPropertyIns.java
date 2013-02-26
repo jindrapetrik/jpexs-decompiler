@@ -48,9 +48,9 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
    @Override
    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       int multinameIndex = ins.operands[0];
-      TreeItem value = (TreeItem) stack.pop();
+      GraphTargetItem value = (GraphTargetItem) stack.pop();
       FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
-      TreeItem obj = (TreeItem) stack.pop();
+      GraphTargetItem obj = (GraphTargetItem) stack.pop();
       if (value.getThroughRegister() instanceof IncrementTreeItem) {
          GraphTargetItem inside = ((IncrementTreeItem) value.getThroughRegister()).object.getThroughRegister().getNotCoerced();
          if (inside instanceof GetPropertyTreeItem) {
@@ -116,7 +116,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
    public String getObject(Stack<TreeItem> stack, ABC abc, AVM2Instruction ins, List<TreeItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       int multinameIndex = ins.operands[0];
       String multiname = resolveMultinameNoPop(0, stack, abc.constants, multinameIndex, ins, fullyQualifiedNames);
-      TreeItem obj = stack.get(1 + resolvedCount(abc.constants, multinameIndex)); //pod vrcholem
+      GraphTargetItem obj = stack.get(1 + resolvedCount(abc.constants, multinameIndex)); //pod vrcholem
       if ((!obj.toString().equals(""))) {
          multiname = "." + multiname;
       }

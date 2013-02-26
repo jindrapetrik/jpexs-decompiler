@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.action.swf7.ActionTry;
 import com.jpexs.decompiler.flash.action.treemodel.*;
 import com.jpexs.decompiler.flash.action.treemodel.clauses.*;
 import com.jpexs.decompiler.flash.action.treemodel.operations.NotTreeItem;
+import com.jpexs.decompiler.flash.graph.Graph;
 import com.jpexs.decompiler.flash.graph.GraphSource;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -57,14 +58,6 @@ public class Action implements GraphSourceItem {
     */
    public int actionLength;
    private long address;
-   /**
-    * String used to indent line when converting to string
-    */
-   public static final String INDENTOPEN = "INDENTOPEN";
-   /**
-    * String used to unindent line when converting to string
-    */
-   public static final String INDENTCLOSE = "INDENTCLOSE";
    /**
     * Names of ActionScript properties
     */
@@ -474,112 +467,6 @@ public class Action implements GraphSourceItem {
    }
 
    /**
-    * Converts list of TreeItems to string
-    *
-    * @param tree List of TreeItem
-    * @return String
-    */
-   public static String treeToString(List<GraphTargetItem> tree) {
-      String ret = "";
-      List localData = new ArrayList();
-      for (GraphTargetItem ti : tree) {
-         ret += ti.toStringSemicoloned(localData) + "\r\n";
-      }
-      String parts[] = ret.split("\r\n");
-      ret = "";
-
-
-      try {
-         Stack<String> loopStack = new Stack<String>();
-         for (int p = 0; p < parts.length; p++) {
-            String stripped = Highlighting.stripHilights(parts[p]);
-            if (stripped.endsWith(":") && (!stripped.startsWith("case ")) && (!stripped.equals("default:"))) {
-               loopStack.add(stripped.substring(0, stripped.length() - 1));
-            }
-            if (stripped.startsWith("break ")) {
-               if (stripped.equals("break " + loopStack.peek().replace("switch", "") + ";")) {
-                  parts[p] = parts[p].replace(" " + loopStack.peek().replace("switch", ""), "");
-               }
-            }
-            if (stripped.startsWith("continue ")) {
-               if (loopStack.size() > 0) {
-                  int pos = loopStack.size() - 1;
-                  String loopname = "";
-                  do {
-                     loopname = loopStack.get(pos);
-                     pos--;
-                  } while ((pos >= 0) && (loopname.startsWith("loopswitch")));
-                  if (stripped.equals("continue " + loopname + ";")) {
-                     parts[p] = parts[p].replace(" " + loopname, "");
-                  }
-               }
-            }
-            if (stripped.startsWith(":")) {
-               loopStack.pop();
-            }
-         }
-      } catch (Exception ex) {
-      }
-
-      int level = 0;
-      for (int p = 0; p < parts.length; p++) {
-         String strippedP = Highlighting.stripHilights(parts[p]).trim();
-         if (strippedP.endsWith(":") && (!strippedP.startsWith("case ")) && (!strippedP.equals("default:"))) {
-            String loopname = strippedP.substring(0, strippedP.length() - 1);
-            boolean dorefer = false;
-            for (int q = p + 1; q < parts.length; q++) {
-               String strippedQ = Highlighting.stripHilights(parts[q]).trim();
-               if (strippedQ.equals("break " + loopname + ";")) {
-                  dorefer = true;
-                  break;
-               }
-               if (strippedQ.equals("continue " + loopname + ";")) {
-                  dorefer = true;
-                  break;
-               }
-               if (strippedQ.equals(":" + loopname)) {
-                  break;
-               }
-            }
-            if (!dorefer) {
-               continue;
-            }
-         }
-         if (strippedP.startsWith(":")) {
-            continue;
-         }
-         if (Highlighting.stripHilights(parts[p]).equals(INDENTOPEN)) {
-            level++;
-            continue;
-         }
-         if (Highlighting.stripHilights(parts[p]).equals(INDENTCLOSE)) {
-            level--;
-            continue;
-         }
-         if (Highlighting.stripHilights(parts[p]).equals("}")) {
-            level--;
-         }
-         if (Highlighting.stripHilights(parts[p]).equals("};")) {
-            level--;
-         }
-         ret += tabString(level) + parts[p] + "\r\n";
-         if (Highlighting.stripHilights(parts[p]).equals("{")) {
-            level++;
-         }
-      }
-      return ret;
-   }
-   private static final String INDENT_STRING = "   ";
-
-   private static String tabString(int len) {
-      String ret = "";
-      for (int i = 0; i < len; i++) {
-         ret += INDENT_STRING;
-      }
-      return ret;
-   }
-
-   /**
     * Converts list of actions to ActionScript source code
     *
     * @param actions List of actions
@@ -592,7 +479,7 @@ public class Action implements GraphSourceItem {
          List<GraphTargetItem> tree = actionsToTree(new HashMap<Integer, String>(), actions, version);
 
 
-         return treeToString(tree);
+         return Graph.graphToString(tree);
       } catch (Exception ex) {
          Logger.getLogger(Action.class.getName()).log(Level.SEVERE, null, ex);
          return "//Decompilation error :" + ex.getLocalizedMessage();
@@ -914,8 +801,8 @@ public class Action implements GraphSourceItem {
 
    public static List<GraphTargetItem> checkClass(List<GraphTargetItem> output) {
       List<GraphTargetItem> ret = new ArrayList<GraphTargetItem>();
-      List<FunctionTreeItem> functions = new ArrayList<FunctionTreeItem>();
-      List<FunctionTreeItem> staticFunctions = new ArrayList<FunctionTreeItem>();
+      List<GraphTargetItem> functions = new ArrayList<GraphTargetItem>();
+      List<GraphTargetItem> staticFunctions = new ArrayList<GraphTargetItem>();
       HashMap<GraphTargetItem, GraphTargetItem> vars = new HashMap<GraphTargetItem, GraphTargetItem>();
       HashMap<GraphTargetItem, GraphTargetItem> staticVars = new HashMap<GraphTargetItem, GraphTargetItem>();
       GraphTargetItem className;
