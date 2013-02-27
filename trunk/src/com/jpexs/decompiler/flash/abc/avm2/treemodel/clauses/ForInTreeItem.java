@@ -21,12 +21,15 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.*;
 import com.jpexs.decompiler.flash.graph.Block;
 import com.jpexs.decompiler.flash.graph.ContinueItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.Loop;
+import com.jpexs.decompiler.flash.graph.LoopItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ForInTreeItem extends LoopTreeItem implements Block {
+public class ForInTreeItem extends LoopItem implements Block {
 
    public InTreeItem expression;
    public List<GraphTargetItem> commands;
@@ -38,8 +41,8 @@ public class ForInTreeItem extends LoopTreeItem implements Block {
       return ret;
    }
 
-   public ForInTreeItem(AVM2Instruction instruction, long loopId, int loopContinue, InTreeItem expression, List<GraphTargetItem> commands) {
-      super(instruction, loopId, loopContinue);
+   public ForInTreeItem(GraphSourceItem instruction,Loop loop, InTreeItem expression, List<GraphTargetItem> commands) {
+      super(instruction, loop);
       if (!commands.isEmpty()) {
          GraphTargetItem firstAssign = commands.get(0);
          if (firstAssign instanceof SetTypeTreeItem) {
@@ -65,15 +68,15 @@ public class ForInTreeItem extends LoopTreeItem implements Block {
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+   public String toString(List localData) {
       String ret = "";
-      ret += "loop" + loopId + ":\r\n";
-      ret += hilight("for (") + expression.toString(constants, localRegNames, fullyQualifiedNames) + hilight(")") + "\r\n{\r\n";
+      ret += "loop" + loop.id + ":\r\n";
+      ret += hilight("for (") + expression.toString(localData) + hilight(")") + "\r\n{\r\n";
       for (GraphTargetItem ti : commands) {
-         ret += ti.toStringSemicoloned(constants, localRegNames, fullyQualifiedNames) + "\r\n";
+         ret += ti.toStringSemicoloned(localData) + "\r\n";
       }
       ret += hilight("}") + "\r\n";
-      ret += ":loop" + loopId;
+      ret += ":loop" + loop.id;
       return ret;
    }
 

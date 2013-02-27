@@ -27,11 +27,17 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalTypeIn
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.KillIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnValueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushIntegerTypeIns;
+import com.jpexs.decompiler.flash.abc.avm2.treemodel.HasNextTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.treemodel.InTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.treemodel.NextNameTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.treemodel.NextValueTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.NullTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.ReturnValueTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.SetLocalTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.SetTypeTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.ExceptionTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.ForEachInTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.ForInTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.TryTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.StrictEqTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.StrictNeqTreeItem;
@@ -44,6 +50,7 @@ import com.jpexs.decompiler.flash.graph.GraphPartMulti;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.graph.Loop;
 import com.jpexs.decompiler.flash.graph.SwitchItem;
+import com.jpexs.decompiler.flash.graph.WhileItem;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -1490,6 +1497,26 @@ public class AVM2Graph extends Graph {
 
    @Override
    protected void finalProcess(List<GraphTargetItem> list) {
+      for(int i=0;i<list.size();i++){
+         if(list.get(i) instanceof WhileItem){
+            WhileItem w=(WhileItem)list.get(i);
+            if(w.expression instanceof HasNextTreeItem){
+               if(!w.commands.isEmpty()){
+                  if(w.commands.get(0) instanceof SetTypeTreeItem){
+                     SetTypeTreeItem sti=(SetTypeTreeItem)w.commands.remove(0);                     
+                     GraphTargetItem gti=sti.getValue().getNotCoerced();
+                     if(gti instanceof NextValueTreeItem){
+                        list.set(i, new ForEachInTreeItem(w.src, w.loop,new InTreeItem(null,sti.getObject() , ((HasNextTreeItem)w.expression).collection), w.commands));
+                     }else if(gti instanceof NextNameTreeItem){
+                        list.set(i, new ForInTreeItem(w.src, w.loop,new InTreeItem(null,sti.getObject() , ((HasNextTreeItem)w.expression).collection), w.commands));
+                     }                     
+                  }
+               }
+            }
+         }
+      }
+      
+      
       List<GraphTargetItem> ret = code.clearTemporaryRegisters(list);
       if (ret != list) {
          list.clear();
