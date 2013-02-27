@@ -1496,7 +1496,7 @@ public class AVM2Graph extends Graph {
    }
 
    @Override
-   protected void finalProcess(List<GraphTargetItem> list) {
+   protected void finalProcess(List<GraphTargetItem> list) {      
       for(int i=0;i<list.size();i++){
          if(list.get(i) instanceof WhileItem){
             WhileItem w=(WhileItem)list.get(i);
