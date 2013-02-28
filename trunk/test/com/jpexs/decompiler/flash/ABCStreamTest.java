@@ -5,10 +5,14 @@ import com.jpexs.decompiler.flash.abc.ABCOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import junit.framework.TestCase;
-import org.junit.Test;
+import static org.testng.Assert.*;
+import org.testng.annotations.Test;
 
-public class TestABCStream extends TestCase {
+/**
+ *
+ * @author JPEXS
+ */
+public class ABCStreamTest {
     @Test
     public void testU30() {
         try {

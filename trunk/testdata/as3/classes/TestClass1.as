@@ -1,14 +1,19 @@
-﻿package classes{
-	public dynamic class TestClass1{
-		public var attrib:int=5;
-
-		public function testHello(){
+﻿package classes
+{
+	
+	public dynamic class TestClass1
+	{
+		public var attrib:int = 5;
+		public var sons:Array;
+		
+		public function testHello()
+		{
 			trace("hello2");
 		}
 		
-		public function metoda(i:int):int
+		public function method(i:int):int
 		{
-			trace("metoda");
+			trace("method");
 			return 7;
 		}
 	}

@@ -1,26 +1,28 @@
 package com.jpexs.decompiler.flash;
 
-import com.jpexs.decompiler.flash.SWFInputStream;
-import com.jpexs.decompiler.flash.SWFOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import junit.framework.TestCase;
-import org.junit.Test;
+import static org.testng.Assert.*;
+import org.testng.annotations.Test;
 
-public class TestSWFStream extends TestCase {
+/**
+ *
+ * @author JPEXS
+ */
+public class SWFStreamTest {
 
     @Test
     public void testNeededBits() {
-        assertEquals(2, SWFOutputStream.getNeededBitsU(3));
-        assertEquals(8, SWFOutputStream.getNeededBitsU(255));
-        assertEquals(3, SWFOutputStream.getNeededBitsS(3));
-        assertEquals(9, SWFOutputStream.getNeededBitsS(255));
-        assertEquals(2, SWFOutputStream.getNeededBitsS(-2));
-        assertEquals(11, SWFOutputStream.getNeededBitsS(-597));
-        assertEquals(21, SWFOutputStream.getNeededBitsF(15.5f));
-        assertEquals(14, SWFOutputStream.getNeededBitsF(0.1f));
-        assertEquals(19, SWFOutputStream.getNeededBitsF(-2.8891602f));
+        assertEquals(SWFOutputStream.getNeededBitsU(3),2);
+        assertEquals(SWFOutputStream.getNeededBitsU(255),8);
+        assertEquals(SWFOutputStream.getNeededBitsS(3),3);
+        assertEquals(SWFOutputStream.getNeededBitsS(255),9);
+        assertEquals(SWFOutputStream.getNeededBitsS(-2),3);
+        assertEquals(SWFOutputStream.getNeededBitsS(-597),11);
+        assertEquals(SWFOutputStream.getNeededBitsF(15.5f),21);
+        assertEquals(SWFOutputStream.getNeededBitsF(0.1f),17);
+        assertEquals(SWFOutputStream.getNeededBitsF(-2.8891602f),19);
     }
 
     @Test
