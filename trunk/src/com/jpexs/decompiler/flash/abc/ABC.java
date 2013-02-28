@@ -861,5 +861,32 @@ public class ABC {
       for (int i = 0; i < bodies.length; i++) {
          bodies[i].autoFillStats(this);
       }
+   }   
+   
+   public int findMethodBodyByName(int classId,String methodName){
+      if(classId>-1){
+         for(Trait t:instance_info[classId].instance_traits.traits){
+            if(t instanceof TraitMethodGetterSetter){
+               if(t.getName(this).getName(constants, new ArrayList<String>()).equals(methodName)){
+                  return findBodyIndex(((TraitMethodGetterSetter)t).method_info);
+               }
+            }
+         }
+      }
+      return -1;
+   }
+   public int findMethodBodyByName(String className,String methodName){
+      int classId=findClassByName(className);
+      return findMethodBodyByName(classId,methodName);
+   }
+   
+   public int findClassByName(String name){
+      for(int c=0;c<instance_info.length;c++){
+         String s=constants.constant_multiname[instance_info[c].name_index].getNameWithNamespace(constants);
+         if(name.equals(s)){
+            return c;
+         }
+      }
+      return -1;
    }
 }

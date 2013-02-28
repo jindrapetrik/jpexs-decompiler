@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.abc.avm2.treemodel.NextNameTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.NextValueTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.NullTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.ReturnValueTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.treemodel.ReturnVoidTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.SetLocalTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.SetTypeTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.ExceptionTreeItem;
@@ -1422,7 +1423,7 @@ public class AVM2Graph extends Graph {
          }
 
          GraphTargetItem ti = checkLoop(next, stopPart, loops);
-         Loop currentLoop = new Loop(null, next);
+         Loop currentLoop = new Loop(loops.size(),null, next);
          loops.add(currentLoop);
          //switchLoc.getNextPartPath(new ArrayList<GraphPart>());
          List<Integer> valuesMapping = new ArrayList<Integer>();
@@ -1496,7 +1497,14 @@ public class AVM2Graph extends Graph {
    }
 
    @Override
-   protected void finalProcess(List<GraphTargetItem> list) {      
+   protected void finalProcess(List<GraphTargetItem> list, int level) {     
+      if(level==0){
+         if(!list.isEmpty()){
+            if(list.get(list.size()-1) instanceof ReturnVoidTreeItem){
+               list.remove(list.size()-1);
+            }
+         }
+      }
       for(int i=0;i<list.size();i++){
          if(list.get(i) instanceof WhileItem){
             WhileItem w=(WhileItem)list.get(i);

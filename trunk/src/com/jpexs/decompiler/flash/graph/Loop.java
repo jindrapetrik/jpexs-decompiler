@@ -25,12 +25,10 @@ public class Loop {
    public GraphPart loopContinue;
    public GraphPart loopBreak;
    public long id;
-   static long maxLoopId = 0;
 
-   public Loop(GraphPart loopContinue, GraphPart loopBreak) {
+   public Loop(long id, GraphPart loopContinue, GraphPart loopBreak) {
       this.loopContinue = loopContinue;
       this.loopBreak = loopBreak;
-      id = maxLoopId;
-      maxLoopId++;
+      this.id=id;
    }
 }

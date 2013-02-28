@@ -291,23 +291,23 @@ public class Graph {
          populateParts(head, allParts);
       }
       List<GraphTargetItem> ret = printGraph(localData, new Stack<GraphTargetItem>(), allParts, null, heads.get(0), null, new ArrayList<Loop>(), new HashMap<Loop, List<GraphTargetItem>>());
-      finalProcessAll(ret);
+      finalProcessAll(ret,0);
       return ret;
    }
 
-   private void finalProcessAll(List<GraphTargetItem> list) {
-      finalProcess(list);
+   private void finalProcessAll(List<GraphTargetItem> list,int level) {
+      finalProcess(list,level);
       for (GraphTargetItem item : list) {
          if (item instanceof Block) {
             List<List<GraphTargetItem>> subs = ((Block) item).getSubs();
             for (List<GraphTargetItem> sub : subs) {
-               finalProcessAll(sub);
+               finalProcessAll(sub,level+1);
             }
          }
       }
    }
 
-   protected void finalProcess(List<GraphTargetItem> list) {
+   protected void finalProcess(List<GraphTargetItem> list,int level) {
    }
 
    protected List<GraphPart> getLoopsContinues(List<Loop> loops) {
@@ -831,7 +831,7 @@ public class Graph {
       if ((!part.nextParts.isEmpty()) && part.nextParts.get(0).leadsTo(part, loopContinues)) {
          if ((part.nextParts.size() > 1) && part.nextParts.get(1).leadsTo(part, loopContinues)) {
             if (output.isEmpty()) {
-               whileTrueLoop = new Loop(part, null);
+               whileTrueLoop = new Loop(loops.size(),part, null);
                loops.add(whileTrueLoop);
                whileTrue = true;
             } else {
@@ -851,8 +851,9 @@ public class Graph {
          if (loop && output.isEmpty()) {
             doWhile = false;
          }
-         Loop currentLoop = new Loop(part, null);
+         Loop currentLoop = null;
          if (loop) {
+            currentLoop=new Loop(loops.size(),part, null);
             loops.add(currentLoop);
          }
 
@@ -863,7 +864,7 @@ public class Graph {
             }
          }
 
-         if ((part.nextParts.size() > 1) && (!doWhile)) {
+         if (loop && (part.nextParts.size() > 1) && (!doWhile)) {
             currentLoop.loopBreak = part.nextParts.get(reversed ? 0 : 1);
          }
 
