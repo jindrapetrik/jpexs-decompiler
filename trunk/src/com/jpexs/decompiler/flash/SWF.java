@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash;
 
 import SevenZip.Compression.LZMA.Encoder;
-import com.jpexs.decompiler.flash.action.TagNode;
+import com.jpexs.decompiler.flash.gui.TagNode;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
@@ -381,7 +381,7 @@ public class SWF {
          list2.addAll(tags);
          List<TagNode> list = TagNode.createTagList(list2);
          TagNode.setExport(list, true);
-         return TagNode.exportNode(list, outdir, isPcode);
+         return TagNode.exportNodeAS(list, outdir, isPcode);
       }
       return asV3Found;
    }
@@ -435,6 +435,9 @@ public class SWF {
    }
 
    public static void exportShapes(String outdir, List<Tag> tags) throws IOException {
+      if (!(new File(outdir)).exists()) {
+         (new File(outdir)).mkdirs();
+      }
       for (Tag t : tags) {
          if (t instanceof ShapeTag) {
             int characterID = 0;
@@ -459,6 +462,9 @@ public class SWF {
    }
 
    public static void exportImages(String outdir, List<Tag> tags, JPEGTablesTag jtt) throws IOException {
+      if (!(new File(outdir)).exists()) {
+         (new File(outdir)).mkdirs();
+      }
       for (Tag t : tags) {
          if ((t instanceof DefineBitsJPEG2Tag) || (t instanceof DefineBitsJPEG3Tag) || (t instanceof DefineBitsJPEG4Tag)) {
             byte imageData[] = null;

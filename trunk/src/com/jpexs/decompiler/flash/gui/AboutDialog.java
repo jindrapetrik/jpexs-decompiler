@@ -94,7 +94,7 @@ public class AboutDialog extends JDialog {
             setVisible(false);
          }
       });
-
+      getRootPane().setDefaultButton(okButton);
       setModal(true);
       View.centerScreen(this);
       View.setWindowIcon(this);

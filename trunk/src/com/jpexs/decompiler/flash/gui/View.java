@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import java.awt.*;
 import java.util.ArrayList;
+import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
@@ -52,12 +53,11 @@ public class View {
    /**
     * Loads image from resources
     *
-    * @param path Path to image without starting slash
+    * @param name Name of the image
     * @return loaded Image
     */
-   public static Image loadImage(String path) {
-      ClassLoader cldr = (new Object()).getClass().getClassLoader();
-      java.net.URL imageURL = (new Object()).getClass().getResource("/" + path);
+   public static Image loadImage(String name) {
+      java.net.URL imageURL = View.class.getResource("/com/jpexs/decompiler/flash/gui/graphics/" + name + ".png");
       return Toolkit.getDefaultToolkit().createImage(imageURL);
    }
 
@@ -68,9 +68,9 @@ public class View {
     */
    public static void setWindowIcon(Window f) {
       java.util.List<Image> images = new ArrayList<Image>();
-      images.add(loadImage("com/jpexs/decompiler/flash/gui/graphics/icon16.png"));
-      images.add(loadImage("com/jpexs/decompiler/flash/gui/graphics/icon32.png"));
-      images.add(loadImage("com/jpexs/decompiler/flash/gui/graphics/icon48.png"));
+      images.add(loadImage("icon16"));
+      images.add(loadImage("icon32"));
+      images.add(loadImage("icon48"));
       f.setIconImages(images);
    }
 
@@ -84,5 +84,9 @@ public class View {
       Rectangle abounds = f.getBounds();
       f.setLocation((dim.width - abounds.width) / 2,
               (dim.height - abounds.height) / 2);
+   }
+
+   public static ImageIcon getIcon(String name) {
+      return new ImageIcon(View.class.getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/" + name + ".png"));
    }
 }

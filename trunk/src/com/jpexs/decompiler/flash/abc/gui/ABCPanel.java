@@ -55,6 +55,8 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
    public JLabel decLabel = new JLabel("ActionScript source");
    public DetailPanel detailPanel;
    public JTextField filterField = new JTextField("");
+   public JPanel navPanel;
+   public JTabbedPane tabbedPane;
 
    private JTable autoResizeColWidth(JTable table, TableModel model) {
       table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -153,13 +155,13 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
    }
 
    public void initSplits() {
-      splitPaneTreeVSNavigator.setDividerLocation(splitPaneTreeVSNavigator.getHeight() / 2);
+      //splitPaneTreeVSNavigator.setDividerLocation(splitPaneTreeVSNavigator.getHeight() / 2);
       try {
          Thread.sleep(100);
       } catch (InterruptedException ex) {
          Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
       }
-      splitPaneTreeNavVSDecompiledDetail.setDividerLocation(splitPaneTreeNavVSDecompiledDetail.getWidth() * 1 / 3);
+      //splitPaneTreeNavVSDecompiledDetail.setDividerLocation(splitPaneTreeNavVSDecompiledDetail.getWidth() * 1 / 3);
       try {
          Thread.sleep(100);
       } catch (InterruptedException ex) {
@@ -210,12 +212,12 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
       navigator.setABC(list, abc);
 
 
-      JPanel navPanel = new JPanel(new BorderLayout());
+      navPanel = new JPanel(new BorderLayout());
       JLabel traitsLabel = new JLabel("Traits");
       navPanel.add(traitsLabel, BorderLayout.NORTH);
 
       traitsLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
-      navPanel.add(new JScrollPane(navigator), BorderLayout.CENTER);
+      //navPanel.add(new JScrollPane(navigator), BorderLayout.CENTER);
 
       Main.startWork("Building script tree...");
 
@@ -250,7 +252,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
       JPanel searchPanel = new JPanel();
       searchPanel.setLayout(new BorderLayout());
       searchPanel.add(filterField, BorderLayout.CENTER);
-      JLabel picLabel = new JLabel(new ImageIcon(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/search.png")));
+      JLabel picLabel = new JLabel(View.getIcon("search16"));
       searchPanel.add(picLabel, BorderLayout.EAST);
       treePanel.add(searchPanel, BorderLayout.NORTH);
 
@@ -259,27 +261,27 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
               navPanel);
       splitPaneTreeVSNavigator.setResizeWeight(0.5);
       splitPaneTreeVSNavigator.setContinuousLayout(true);
-      JTabbedPane tabbedPane = new JTabbedPane();
-      tabbedPane.addTab("Scripts", splitPaneTreeVSNavigator);
+      tabbedPane = new JTabbedPane();
+      tabbedPane.addTab("Traits", new JScrollPane(navigator));
       //tabbedPane.setTabPlacement(JTabbedPane.BOTTOM);
 
-      pan2.add(tabbedPane, BorderLayout.CENTER);
+      //pan2.add(tabbedPane, BorderLayout.CENTER);
       abcComboBox.addItemListener(this);
+      /*
+
+       splitPaneTreeNavVSDecompiledDetail = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+       pan2,
+       splitPaneDecompiledVSDetail);
+       splitPaneTreeNavVSDecompiledDetail.setResizeWeight(0);
+       splitPaneTreeNavVSDecompiledDetail.setContinuousLayout(true);
+       //pan2.setPreferredSize(new Dimension(300, 200));
 
 
-      splitPaneTreeNavVSDecompiledDetail = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-              pan2,
-              splitPaneDecompiledVSDetail);
-      splitPaneTreeNavVSDecompiledDetail.setResizeWeight(0);
-      splitPaneTreeNavVSDecompiledDetail.setContinuousLayout(true);
-      //pan2.setPreferredSize(new Dimension(300, 200));
 
 
 
-
-
-      add(splitPaneTreeNavVSDecompiledDetail, BorderLayout.CENTER);
-
+       add(splitPaneTreeNavVSDecompiledDetail, BorderLayout.CENTER);*/
+      add(splitPaneDecompiledVSDetail, BorderLayout.CENTER);
 
       JPanel panConstants = new JPanel();
       panConstants.setLayout(new BorderLayout());

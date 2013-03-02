@@ -154,10 +154,10 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
          }
       });
       java.util.List<Image> images = new ArrayList<Image>();
-      images.add(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/proxy16.png"));
-      images.add(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/proxy24.png"));
-      images.add(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/proxy32.png"));
-      images.add(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/proxy48.png"));
+      images.add(View.loadImage("proxy16"));
+      images.add(View.loadImage("proxy24"));
+      images.add(View.loadImage("proxy32"));
+      images.add(View.loadImage("proxy48"));
       setIconImages(images);
    }
 

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.gui;
 
+import com.jpexs.decompiler.flash.gui.View;
 import java.awt.Component;
 import javax.swing.*;
 
@@ -33,9 +34,9 @@ public class IconListRenderer
    }
 
    public IconListRenderer() {
-      constIcon = loadIcon("com/jpexs/decompiler/flash/abc/gui/graphics/constant.png");
-      functionIcon = loadIcon("com/jpexs/decompiler/flash/abc/gui/graphics/function.png");
-      variableIcon = loadIcon("com/jpexs/decompiler/flash/abc/gui/graphics/variable.png");
+      constIcon = View.getIcon("constant");
+      functionIcon = View.getIcon("function");
+      variableIcon = View.getIcon("variable");
    }
 
    @Override

@@ -1312,7 +1312,7 @@ public class AVM2Graph extends Graph {
             if (part.getHeight() >= 3) {
                if (code.code.get(part.getPosAt(part.getHeight() - 2)).definition instanceof KillIns) {
                   if (code.code.get(part.getPosAt(part.getHeight() - 3)).definition instanceof GetLocalTypeIns) {
-                     if (!output.isEmpty()) {
+                     if (output.size() >= 2) {
                         if (output.get(output.size() - 2) instanceof SetLocalTreeItem) {
                            ret = new ArrayList<GraphTargetItem>();
                            ret.addAll(output);
@@ -1538,5 +1538,21 @@ public class AVM2Graph extends Graph {
             }
          }
       }
+   }
+
+   @Override
+   protected boolean isEmpty(List<GraphTargetItem> output) {
+      if (super.isEmpty(output)) {
+         return true;
+      }
+      for (GraphTargetItem i : output) {
+         if (i instanceof SetLocalTreeItem) {
+            if (code.isKilled(((SetLocalTreeItem) i).regIndex, 0, code.code.size() - 1)) {
+               continue;
+            }
+         }
+         return false;
+      }
+      return true;
    }
 }

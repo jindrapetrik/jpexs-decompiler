@@ -19,11 +19,11 @@ package com.jpexs.decompiler.flash.abc.gui;
 import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
+import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.DoABCTag;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import javax.swing.ImageIcon;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -53,9 +53,7 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
       addTreeSelectionListener(this);
       DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
       ClassLoader cldr = this.getClass().getClassLoader();
-      java.net.URL imageURL = cldr.getResource("com/jpexs/decompiler/flash/gui/graphics/as16.png");
-      ImageIcon leafIcon = new ImageIcon(imageURL);
-      treeRenderer.setLeafIcon(leafIcon);
+      treeRenderer.setLeafIcon(View.getIcon("as16"));
       setCellRenderer(treeRenderer);
    }
 

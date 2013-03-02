@@ -141,4 +141,9 @@ public class ClassesListTreeModel implements TreeModel {
 
    public void removeTreeModelListener(TreeModelListener l) {
    }
+
+   @Override
+   public String toString() {
+      return "scripts";
+   }
 }

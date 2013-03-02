@@ -42,7 +42,7 @@ public class LoadingPanel extends JPanel {
    public LoadingPanel(int iconWidth, int iconHeight) {
       this.iconWidth = iconWidth;
       this.iconHeight = iconHeight;
-      ImageIcon icon = (new ImageIcon(this.getClass().getResource("/com/jpexs/decompiler/flash/gui/graphics/loading.png")));
+      ImageIcon icon = View.getIcon("loading");
       animationImage = icon.getImage();
       java.util.Timer timer = new java.util.Timer();
       timer.schedule(new java.util.TimerTask() {

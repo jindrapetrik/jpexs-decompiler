@@ -19,10 +19,15 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.gui.ABCPanel;
 import com.jpexs.decompiler.flash.abc.gui.DeobfuscationDialog;
+import com.jpexs.decompiler.flash.abc.gui.TreeElement;
 import com.jpexs.decompiler.flash.abc.gui.TreeLeafScript;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.action.gui.ActionPanel;
+import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
@@ -48,28 +53,44 @@ import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.DoABCTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
+import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
+import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
+import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.tags.base.AloneTag;
+import com.jpexs.decompiler.flash.tags.base.BoundedTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
-import com.jpexs.decompiler.flash.tags.base.ShapeTag;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.types.GLYPHENTRY;
+import com.jpexs.decompiler.flash.types.MATRIX;
+import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.RGB;
+import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -80,16 +101,26 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 /**
  *
  * @author Jindra
  */
-public class MainFrame extends JFrame implements ActionListener {
+public class MainFrame extends JFrame implements ActionListener, TreeSelectionListener {
 
    private SWF swf;
    public ABCPanel abcPanel;
@@ -100,6 +131,22 @@ public class MainFrame extends JFrame implements ActionListener {
    public JPanel statusPanel = new JPanel();
    public JProgressBar progressBar = new JProgressBar(0, 100);
    private DeobfuscationDialog deobfuscationDialog;
+   public JTree tagTree;
+   public FlashPlayerPanel flashPanel;
+   public JPanel displayPanel;
+   public ImagePanel imagePanel;
+   final static String CARDFLASHPANEL = "Flash card";
+   final static String CARDIMAGEPANEL = "Image card";
+   final static String CARDEMPTYPANEL = "Empty card";
+   final static String CARDACTIONSCRIPTPANEL = "ActionScript card";
+   final static String DETAILCARDAS3NAVIGATOR = "Traits list";
+   final static String DETAILCARDEMPTYPANEL = "Empty card";
+   private JPEGTablesTag jtt;
+   private HashMap<Integer, CharacterTag> characters;
+   private List<DoABCTag> abcList;
+   JSplitPane splitPane1;
+   JSplitPane splitPane2;
+   private JPanel detailPanel;
 
    public void setPercent(int percent) {
       progressBar.setValue(percent);
@@ -109,6 +156,14 @@ public class MainFrame extends JFrame implements ActionListener {
    public void hidePercent() {
       if (progressBar.isVisible()) {
          progressBar.setVisible(false);
+      }
+   }
+
+   static {
+      try {
+         File.createTempFile("temp", ".swf").delete(); //First call to this is slow, so make it first
+      } catch (IOException ex) {
+         Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
       }
    }
 
@@ -135,13 +190,6 @@ public class MainFrame extends JFrame implements ActionListener {
       }
       statusLabel.setText(s);
    }
-   private TagPanel imagesTagPanel;
-   private TagPanel shapesTagPanel;
-   private TagPanel morphshapesTagPanel;
-   private TagPanel spritesTagPanel;
-   private TagPanel textsTagPanel;
-   private TagPanel buttonsTagPanel;
-   private TagPanel fontsTagPanel;
 
    public MainFrame(SWF swf) {
       setSize(1000, 700);
@@ -163,68 +211,27 @@ public class MainFrame extends JFrame implements ActionListener {
 
       JMenu menuFile = new JMenu("File");
       JMenuItem miOpen = new JMenuItem("Open...");
-      miOpen.setIcon(new ImageIcon(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/open16.png")));
+      miOpen.setIcon(View.getIcon("open16"));
       miOpen.setActionCommand("OPEN");
       miOpen.addActionListener(this);
       JMenuItem miSave = new JMenuItem("Save");
-      miSave.setIcon(new ImageIcon(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/save16.png")));
+      miSave.setIcon(View.getIcon("save16"));
       miSave.setActionCommand("SAVE");
       miSave.addActionListener(this);
       JMenuItem miSaveAs = new JMenuItem("Save as...");
-      miSaveAs.setIcon(new ImageIcon(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/saveas16.png")));
+      miSaveAs.setIcon(View.getIcon("saveas16"));
       miSaveAs.setActionCommand("SAVEAS");
       miSaveAs.addActionListener(this);
-      JMenu menuExportAll = new JMenu("Export all");
-      JMenuItem miExportAllAS = new JMenuItem("ActionScript...");
-      miExportAllAS.setIcon(new ImageIcon(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/as16.png")));
-      miExportAllAS.setActionCommand("EXPORT");
-      miExportAllAS.addActionListener(this);
+      JMenuItem menuExportAll = new JMenuItem("Export all");
+      menuExportAll.setActionCommand("EXPORT");
+      menuExportAll.addActionListener(this);
+      JMenuItem menuExportSel = new JMenuItem("Export selection");
+      menuExportSel.setActionCommand("EXPORTSEL");
+      menuExportSel.addActionListener(this);
+      menuExportAll.setIcon(View.getIcon("export16"));
+      menuExportSel.setIcon(View.getIcon("exportsel16"));
 
-      JMenuItem miExportAllPCode = new JMenuItem("PCode...");
-      miExportAllPCode.setIcon(new ImageIcon(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/pcode16.png")));
-      miExportAllPCode.setActionCommand("EXPORTPCODE");
-      miExportAllPCode.addActionListener(this);
 
-      JMenuItem miExportImages = new JMenuItem("Images...");
-      miExportImages.setIcon(new ImageIcon(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/image16.png")));
-      miExportImages.setActionCommand("EXPORTIMAGES");
-      miExportImages.addActionListener(this);
-
-      JMenuItem miExportShapes = new JMenuItem("Shapes...");
-      miExportShapes.setIcon(new ImageIcon(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/shape16.png")));
-      miExportShapes.setActionCommand("EXPORTSHAPES");
-      miExportShapes.addActionListener(this);
-
-      menuExportAll.add(miExportAllAS);
-      menuExportAll.add(miExportAllPCode);
-      menuExportAll.add(miExportImages);
-      menuExportAll.add(miExportShapes);
-
-      JMenu menuExportSel = new JMenu("Export selection");
-      JMenuItem miExportSelAS = new JMenuItem("ActionScript...");
-      miExportSelAS.setIcon(new ImageIcon(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/as16.png")));
-      miExportSelAS.setActionCommand("EXPORTSEL");
-      miExportSelAS.addActionListener(this);
-
-      JMenuItem miExportSelPCode = new JMenuItem("PCode...");
-      miExportSelPCode.setIcon(new ImageIcon(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/pcode16.png")));
-      miExportSelPCode.setActionCommand("EXPORTPCODESEL");
-      miExportSelPCode.addActionListener(this);
-
-      JMenuItem miExportSelImages = new JMenuItem("Images...");
-      miExportSelImages.setIcon(new ImageIcon(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/image16.png")));
-      miExportSelImages.setActionCommand("EXPORTIMAGESSEL");
-      miExportSelImages.addActionListener(this);
-
-      JMenuItem miExportSelShapes = new JMenuItem("Shapes...");
-      miExportSelShapes.setIcon(new ImageIcon(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/shape16.png")));
-      miExportSelShapes.setActionCommand("EXPORTSHAPESSEL");
-      miExportSelShapes.addActionListener(this);
-
-      menuExportSel.add(miExportSelAS);
-      menuExportSel.add(miExportSelPCode);
-      menuExportSel.add(miExportSelImages);
-      menuExportSel.add(miExportSelShapes);
 
       menuFile.add(miOpen);
       menuFile.add(miSave);
@@ -233,12 +240,13 @@ public class MainFrame extends JFrame implements ActionListener {
       menuFile.add(menuExportSel);
       menuFile.addSeparator();
       JMenuItem miClose = new JMenuItem("Exit");
-      miClose.setIcon(new ImageIcon(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/exit16.png")));
+      miClose.setIcon(View.getIcon("exit16"));
       miClose.setActionCommand("EXIT");
       miClose.addActionListener(this);
       menuFile.add(miClose);
       menuBar.add(menuFile);
       JMenu menuDeobfuscation = new JMenu("Deobfuscation");
+      menuDeobfuscation.setIcon(View.getIcon("deobfuscate16"));
 
       JMenuItem miDeobfuscation = new JMenuItem("PCode deobfuscation...");
       miDeobfuscation.setActionCommand("DEOBFUSCATE");
@@ -276,6 +284,7 @@ public class MainFrame extends JFrame implements ActionListener {
       miControlFlowAll.setActionCommand("RESTORECONTROLFLOWALL");
       miControlFlowAll.addActionListener(this);
 
+
       menuDeobfuscation.add(miRenameIdentifiers);
       //menuDeobfuscation.add(miSubLimiter);
       menuDeobfuscation.add(miDeobfuscation);
@@ -291,7 +300,7 @@ public class MainFrame extends JFrame implements ActionListener {
       JMenu menuTools = new JMenu("Tools");
       JMenuItem miProxy = new JMenuItem("Proxy");
       miProxy.setActionCommand("SHOWPROXY");
-      miProxy.setIcon(new ImageIcon(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/proxy16.png")));
+      miProxy.setIcon(View.getIcon("proxy16"));
       miProxy.addActionListener(this);
       menuTools.add(miProxy);
 
@@ -301,72 +310,97 @@ public class MainFrame extends JFrame implements ActionListener {
 
       JMenu menuHelp = new JMenu("Help");
       JMenuItem miAbout = new JMenuItem("About...");
+      miAbout.setIcon(View.getIcon("about16"));
+
       miAbout.setActionCommand("ABOUT");
       miAbout.addActionListener(this);
 
       JMenuItem miCheckUpdates = new JMenuItem("Check for updates...");
       miCheckUpdates.setActionCommand("CHECKUPDATES");
+      miCheckUpdates.setIcon(View.getIcon("update16"));
       miCheckUpdates.addActionListener(this);
-      menuHelp.add(miAbout);
+
+      JMenuItem miDonate = new JMenuItem("Donate...");
+      miDonate.setActionCommand("DONATE");
+      miDonate.setIcon(View.getIcon("donate16"));
+      miDonate.addActionListener(this);
+
+
       menuHelp.add(miCheckUpdates);
+      menuHelp.add(miDonate);
+      menuHelp.add(miAbout);
       menuBar.add(menuHelp);
 
       setJMenuBar(menuBar);
       List<Object> objs = new ArrayList<Object>();
       objs.addAll(swf.tags);
+
+
       this.swf = swf;
-      getContentPane().setLayout(new BorderLayout());
-      List<Tag> shapes = new ArrayList<Tag>();
-      List<Tag> images = new ArrayList<Tag>();
-      List<Tag> morphShapes = new ArrayList<Tag>();
-      List<Tag> sprites = new ArrayList<Tag>();
-      List<Tag> fonts = new ArrayList<Tag>();
-      List<Tag> texts = new ArrayList<Tag>();
-      List<Tag> buttons = new ArrayList<Tag>();
-      List<DoABCTag> abcList = new ArrayList<DoABCTag>();
-      getShapes(objs, shapes);
-      getImages(objs, images);
-      getMorphShapes(objs, morphShapes);
-      getSprites(objs, sprites);
-      getFonts(objs, fonts);
-      getTexts(objs, texts);
-      getButtons(objs, buttons);
+      java.awt.Container cnt = getContentPane();
+      cnt.setLayout(new BorderLayout());
+
+
+      detailPanel = new JPanel();
+      detailPanel.setLayout(new CardLayout());
+      JPanel whitePanel = new JPanel();
+      whitePanel.setBackground(Color.white);
+      detailPanel.add(whitePanel, DETAILCARDEMPTYPANEL);
+      CardLayout cl2 = (CardLayout) (detailPanel.getLayout());
+      cl2.show(detailPanel, DETAILCARDEMPTYPANEL);
+
+
+      abcList = new ArrayList<DoABCTag>();
       getActionScript3(objs, abcList);
-
-      getContentPane().add(tabPane, BorderLayout.CENTER);
-
       if (!abcList.isEmpty()) {
-         addTab(tabPane, abcPanel = new ABCPanel(abcList), "ActionScript3", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/as16.png")));
+         addTab(tabPane, abcPanel = new ABCPanel(abcList), "ActionScript3", View.getIcon("as16"));
+         detailPanel.add(abcPanel.tabbedPane, DETAILCARDAS3NAVIGATOR);
       } else {
-         actionPanel = new ActionPanel(swf.tags);
-         if (actionPanel.tagTree.getRowCount() > 1) {
-            addTab(tabPane, actionPanel, "ActionScript", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/as16.png")));
-         }
+         actionPanel = new ActionPanel();
+         addTab(tabPane, actionPanel, "ActionScript", View.getIcon("as16"));
+
          menuDeobfuscation.setEnabled(false);
       }
 
-      if (!shapes.isEmpty()) {
-         addTab(tabPane, shapesTagPanel = new TagPanel(this, shapes, swf), "Shapes", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/shape16.png")));
-      }
-      if (!morphShapes.isEmpty()) {
-         addTab(tabPane, morphshapesTagPanel = new TagPanel(this, morphShapes, swf), "MorphShapes", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/morphshape16.png")));
-      }
-      if (!images.isEmpty()) {
-         addTab(tabPane, imagesTagPanel = new TagPanel(this, images, swf), "Images", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/image16.png")));
-      }
-      if (!sprites.isEmpty()) {
-         addTab(tabPane, spritesTagPanel = new TagPanel(this, sprites, swf), "Sprites", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/sprite16.png")));
-      }
-      if (!fonts.isEmpty()) {
-         addTab(tabPane, fontsTagPanel = new TagPanel(this, fonts, swf), "Fonts", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/font16.png")));
-      }
-      if (!texts.isEmpty()) {
-         addTab(tabPane, textsTagPanel = new TagPanel(this, texts, swf), "Texts", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/text16.png")));
-      }
-      if (!buttons.isEmpty()) {
-         addTab(tabPane, buttonsTagPanel = new TagPanel(this, buttons, swf), "Buttons", new ImageIcon(this.getClass().getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/button16.png")));
-      }
 
+      tagTree = new JTree(new TagTreeModel(createTagList(objs, null), (new File(Main.file)).getName()));
+      tagTree.addTreeSelectionListener(this);
+      TreeCellRenderer tcr = new DefaultTreeCellRenderer() {
+         @Override
+         public Component getTreeCellRendererComponent(
+                 JTree tree,
+                 Object value,
+                 boolean sel,
+                 boolean expanded,
+                 boolean leaf,
+                 int row,
+                 boolean hasFocus) {
+
+            super.getTreeCellRendererComponent(
+                    tree, value, sel,
+                    expanded, leaf, row,
+                    hasFocus);
+            Object val = value;
+            if (val instanceof TagNode) {
+               val = ((TagNode) val).tag;
+            }
+            String type = getTagType(val);
+            if (row == 0) {
+               setIcon(View.getIcon("flash16"));
+            } else if (type != null) {
+               if (type.equals("folder") && expanded) {
+                  type = "folderopen";
+               }
+               setIcon(View.getIcon(type + "16"));
+               //setToolTipText("This book is in the Tutorial series.");
+            } else {
+               //setToolTipText(null); //no tool tip
+            }
+            return this;
+         }
+      };
+
+      tagTree.setCellRenderer(tcr);
       loadingPanel.setPreferredSize(new Dimension(30, 30));
       statusPanel = new JPanel();
       statusPanel.setPreferredSize(new Dimension(1, 30));
@@ -375,7 +409,48 @@ public class MainFrame extends JFrame implements ActionListener {
       statusPanel.add(loadingPanel, BorderLayout.WEST);
       statusPanel.add(statusLabel, BorderLayout.CENTER);
       loadingPanel.setVisible(false);
-      add(statusPanel, BorderLayout.SOUTH);
+      cnt.add(statusPanel, BorderLayout.SOUTH);
+
+      for (Tag t : swf.tags) {
+         if (t instanceof JPEGTablesTag) {
+            jtt = (JPEGTablesTag) t;
+         }
+      }
+      characters = new HashMap<Integer, CharacterTag>();
+      List<Object> list2 = new ArrayList<Object>();
+      list2.addAll(swf.tags);
+      parseCharacters(list2);
+
+      //setLayout(new BorderLayout());
+      try {
+         flashPanel = new FlashPlayerPanel(this);
+      } catch (FlashUnsupportedException fue) {
+      }
+      displayPanel = new JPanel(new CardLayout());
+      if (flashPanel != null) {
+         displayPanel.add(flashPanel, CARDFLASHPANEL);
+      } else {
+         JPanel swtPanel = new JPanel(new BorderLayout());
+         swtPanel.add(new JLabel("<html><center>Preview of this object is not available on this platform. (Windows only)</center></html>", JLabel.CENTER), BorderLayout.CENTER);
+         swtPanel.setBackground(Color.white);
+         displayPanel.add(swtPanel, CARDFLASHPANEL);
+      }
+      imagePanel = new ImagePanel();
+      displayPanel.add(imagePanel, CARDIMAGEPANEL);
+      displayPanel.add(new JPanel(), CARDEMPTYPANEL);
+      if (actionPanel != null) {
+         displayPanel.add(actionPanel, CARDACTIONSCRIPTPANEL);
+      }
+      if (abcPanel != null) {
+         displayPanel.add(abcPanel, CARDACTIONSCRIPTPANEL);
+      }
+      CardLayout cl = (CardLayout) (displayPanel.getLayout());
+      cl.show(displayPanel, CARDEMPTYPANEL);
+      //displayPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+      splitPane2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(tagTree), detailPanel);
+      splitPane1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitPane2, displayPanel);
+      cnt.add(splitPane1, BorderLayout.CENTER);
+      splitPane1.setDividerLocation(0.5);
       View.centerScreen(this);
 
 
@@ -390,6 +465,19 @@ public class MainFrame extends JFrame implements ActionListener {
          }
          if (actionPanel != null) {
             actionPanel.initSplits();
+         }
+         splitPane1.setDividerLocation(getWidth() / 3);
+         splitPane2.setDividerLocation(splitPane2.getHeight() * 3 / 5);
+      }
+   }
+
+   private void parseCharacters(List<Object> list) {
+      for (Object t : list) {
+         if (t instanceof CharacterTag) {
+            characters.put(((CharacterTag) t).getCharacterID(), (CharacterTag) t);
+         }
+         if (t instanceof Container) {
+            parseCharacters(((Container) t).getSubItems());
          }
       }
    }
@@ -495,79 +583,238 @@ public class MainFrame extends JFrame implements ActionListener {
       }
    }
 
-   public static List<TagNode> createTagList(List<Object> list) {
+   public static List<TagNode> createASTagList(List<Object> list, Object parent) {
       List<TagNode> ret = new ArrayList<TagNode>();
       int frame = 1;
       List<TagNode> frames = new ArrayList<TagNode>();
-      List<TagNode> shapes = new ArrayList<TagNode>();
-      List<TagNode> morphShapes = new ArrayList<TagNode>();
-      List<TagNode> sprites = new ArrayList<TagNode>();
-      List<TagNode> buttons = new ArrayList<TagNode>();
-      List<TagNode> images = new ArrayList<TagNode>();
-      List<TagNode> fonts = new ArrayList<TagNode>();
-      List<TagNode> texts = new ArrayList<TagNode>();
-
 
       List<ExportAssetsTag> exportAssetsTags = new ArrayList<ExportAssetsTag>();
       for (Object t : list) {
          if (t instanceof ExportAssetsTag) {
             exportAssetsTags.add((ExportAssetsTag) t);
          }
-         if ((t instanceof DefineFontTag)
-                 || (t instanceof DefineFont2Tag)
-                 || (t instanceof DefineFont3Tag)
-                 || (t instanceof DefineFont4Tag)) {
-            fonts.add(new TagNode(t));
-         }
-         if ((t instanceof DefineTextTag)
-                 || (t instanceof DefineText2Tag)
-                 || (t instanceof DefineEditTextTag)) {
-            texts.add(new TagNode(t));
-         }
-
-         if ((t instanceof DefineBitsTag)
-                 || (t instanceof DefineBitsJPEG2Tag)
-                 || (t instanceof DefineBitsJPEG3Tag)
-                 || (t instanceof DefineBitsJPEG4Tag)
-                 || (t instanceof DefineBitsLosslessTag)
-                 || (t instanceof DefineBitsLossless2Tag)) {
-            images.add(new TagNode(t));
-         }
-         if ((t instanceof DefineShapeTag)
-                 || (t instanceof DefineShape2Tag)
-                 || (t instanceof DefineShape3Tag)
-                 || (t instanceof DefineShape4Tag)) {
-            shapes.add(new TagNode(t));
-         }
-
-         if ((t instanceof DefineMorphShapeTag) || (t instanceof DefineMorphShape2Tag)) {
-            morphShapes.add(new TagNode(t));
-         }
-
-         if (t instanceof DefineSpriteTag) {
-            sprites.add(new TagNode(t));
-         }
-         if ((t instanceof DefineButtonTag) || (t instanceof DefineButton2Tag)) {
-            buttons.add(new TagNode(t));
-         }
          if (t instanceof ShowFrameTag) {
-            TagNode tti = new TagNode("frame" + frame);
+            TagNode tti = new TagNode(new FrameNode(frame, parent, false));
 
-            /*           for (int r = ret.size() - 1; r >= 0; r--) {
-             if (!(ret.get(r).tag instanceof DefineSpriteTag)) {
-             if (!(ret.get(r).tag instanceof DefineButtonTag)) {
-             if (!(ret.get(r).tag instanceof DefineButton2Tag)) {
-             if (!(ret.get(r).tag instanceof DoInitActionTag)) {
-             tti.subItems.add(ret.get(r));
-             ret.remove(r);
-             }
-             }
-             }
-             }
-             }*/
+            for (int r = ret.size() - 1; r >= 0; r--) {
+               if (!(ret.get(r).tag instanceof DefineSpriteTag)) {
+                  if (!(ret.get(r).tag instanceof DefineButtonTag)) {
+                     if (!(ret.get(r).tag instanceof DefineButton2Tag)) {
+                        if (!(ret.get(r).tag instanceof DoInitActionTag)) {
+                           tti.subItems.add(ret.get(r));
+                           ret.remove(r);
+                        }
+                     }
+                  }
+               }
+            }
             frame++;
             frames.add(tti);
-         } /*if (t instanceof ASMSource) {
+         } else if (t instanceof ASMSource) {
+            TagNode tti = new TagNode(t);
+            ret.add(tti);
+         } else if (t instanceof Container) {
+            if (((Container) t).getItemCount() > 0) {
+
+               TagNode tti = new TagNode(t);
+               List<Object> subItems = ((Container) t).getSubItems();
+
+               tti.subItems = createASTagList(subItems, t);
+               ret.add(tti);
+            }
+         }
+
+      }
+      ret.addAll(frames);
+      for (int i = ret.size() - 1; i >= 0; i--) {
+         if (ret.get(i).tag instanceof DefineSpriteTag) {
+            ((DefineSpriteTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
+         }
+         if (ret.get(i).tag instanceof DefineButtonTag) {
+            ((DefineButtonTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
+         }
+         if (ret.get(i).tag instanceof DefineButton2Tag) {
+            ((DefineButton2Tag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
+         }
+         if (ret.get(i).tag instanceof DoInitActionTag) {
+            ((DoInitActionTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
+         }
+         if (ret.get(i).tag instanceof ASMSource) {
+            ASMSource ass = (ASMSource) ret.get(i).tag;
+            if (ass.containsSource()) {
+               continue;
+            }
+         }
+         if (ret.get(i).subItems.isEmpty()) {
+            ret.remove(i);
+         }
+      }
+      return ret;
+   }
+
+   public List<TagNode> getSelectedNodes() {
+      List<TagNode> ret = new ArrayList<TagNode>();
+      TreePath tps[] = tagTree.getSelectionPaths();
+      if (tps == null) {
+         return ret;
+      }
+      for (TreePath tp : tps) {
+         TagNode te = (TagNode) tp.getLastPathComponent();
+         ret.add(te);
+      }
+      return ret;
+   }
+
+   public String getTagType(Object t) {
+      if ((t instanceof DefineFontTag)
+              || (t instanceof DefineFont2Tag)
+              || (t instanceof DefineFont3Tag)
+              || (t instanceof DefineFont4Tag)) {
+         return "font";
+      }
+      if ((t instanceof DefineTextTag)
+              || (t instanceof DefineText2Tag)
+              || (t instanceof DefineEditTextTag)) {
+         return "text";
+      }
+
+      if ((t instanceof DefineBitsTag)
+              || (t instanceof DefineBitsJPEG2Tag)
+              || (t instanceof DefineBitsJPEG3Tag)
+              || (t instanceof DefineBitsJPEG4Tag)
+              || (t instanceof DefineBitsLosslessTag)
+              || (t instanceof DefineBitsLossless2Tag)) {
+         return "image";
+      }
+      if ((t instanceof DefineShapeTag)
+              || (t instanceof DefineShape2Tag)
+              || (t instanceof DefineShape3Tag)
+              || (t instanceof DefineShape4Tag)) {
+         return "shape";
+      }
+
+      if ((t instanceof DefineMorphShapeTag) || (t instanceof DefineMorphShape2Tag)) {
+         return "morphshape";
+      }
+
+      if (t instanceof DefineSpriteTag) {
+         return "sprite";
+      }
+      if ((t instanceof DefineButtonTag) || (t instanceof DefineButton2Tag)) {
+         return "button";
+      }
+      if (t instanceof ASMSource) {
+         return "as";
+      }
+      if (t instanceof TreeElement) {
+         TreeElement te = (TreeElement) t;
+         if (te.getItem() instanceof TreeLeafScript) {
+            return "as";
+         } else {
+            return "package";
+         }
+      }
+      if (t instanceof FrameNode) {
+         return "frame";
+      }
+      if (t instanceof ShowFrameTag) {
+         return "showframe";
+      }
+      return "folder";
+   }
+
+   public List<Object> getTagsWithType(List<Object> list, String type) {
+      List<Object> ret = new ArrayList<Object>();
+      for (Object o : list) {
+         String ttype = getTagType(o);
+         if (type.equals(ttype)) {
+            ret.add(o);
+         }
+      }
+      return ret;
+   }
+
+   public List<TagNode> getTagNodesWithType(List<Object> list, String type, Object parent, boolean display) {
+      List<TagNode> ret = new ArrayList<TagNode>();
+      int frameCnt = 0;
+      for (Object o : list) {
+         String ttype = getTagType(o);
+         if ("showframe".equals(ttype) && "frame".equals(type)) {
+            frameCnt++;
+            ret.add(new TagNode(new FrameNode(frameCnt, parent, display)));
+         } else if (type.equals(ttype)) {
+            ret.add(new TagNode(o));
+         }
+      }
+      return ret;
+   }
+
+   public List<Object> getAllSubs(JTree tree, Object o) {
+      TreeModel tm = tree.getModel();
+      List<Object> ret = new ArrayList<Object>();
+      for (int i = 0; i < tm.getChildCount(o); i++) {
+         Object c = tm.getChild(o, i);
+         ret.add(c);
+         ret.addAll(getAllSubs(tree, c));
+      }
+      return ret;
+   }
+
+   public List<Object> getAllSelected(JTree tree) {
+      TreeSelectionModel tsm = tree.getSelectionModel();
+      TreePath tps[] = tsm.getSelectionPaths();
+      List<Object> ret = new ArrayList<Object>();
+      if (tps == null) {
+         return ret;
+      }
+
+      for (TreePath tp : tps) {
+         Object o = tp.getLastPathComponent();
+         ret.add(o);
+         ret.addAll(getAllSubs(tree, o));
+      }
+      return ret;
+   }
+
+   public TagNode getASTagNode(JTree tree) {
+      TreeModel tm = tree.getModel();
+      Object root = tm.getRoot();
+      for (int i = 0; i < tm.getChildCount(root); i++) {
+         Object node = tm.getChild(root, i);
+         if (node instanceof TagNode) {
+            Object tag = ((TagNode) tm.getChild(root, i)).tag;
+            if (tag != null) {
+               if (tag.equals("scripts")) {
+                  return (TagNode) node;
+               }
+            }
+         }
+      }
+      return null;
+   }
+
+   public List<TagNode> createTagList(List<Object> list, Object parent) {
+      List<TagNode> ret = new ArrayList<TagNode>();
+      List<TagNode> frames = getTagNodesWithType(list, "frame", parent, true);
+      List<TagNode> shapes = getTagNodesWithType(list, "shape", parent, true);
+      List<TagNode> morphShapes = getTagNodesWithType(list, "morphshape", parent, true);
+      List<TagNode> sprites = getTagNodesWithType(list, "sprite", parent, true);
+      List<TagNode> buttons = getTagNodesWithType(list, "button", parent, true);
+      List<TagNode> images = getTagNodesWithType(list, "image", parent, true);
+      List<TagNode> fonts = getTagNodesWithType(list, "font", parent, true);
+      List<TagNode> texts = getTagNodesWithType(list, "text", parent, true);
+      List<TagNode> actionScript = new ArrayList<TagNode>();
+
+      for (TagNode n : sprites) {
+         n.subItems = getTagNodesWithType(new ArrayList<Object>(((DefineSpriteTag) n.tag).subTags), "frame", n.tag, true);
+      }
+
+      List<ExportAssetsTag> exportAssetsTags = new ArrayList<ExportAssetsTag>();
+      for (Object t : list) {
+         if (t instanceof ExportAssetsTag) {
+            exportAssetsTags.add((ExportAssetsTag) t);
+         }
+         /*if (t instanceof ASMSource) {
           TagNode tti = new TagNode(t);
           ret.add(tti);
           } else */
@@ -575,12 +822,13 @@ public class MainFrame extends JFrame implements ActionListener {
             TagNode tti = new TagNode(t);
             if (((Container) t).getItemCount() > 0) {
                List<Object> subItems = ((Container) t).getSubItems();
-               tti.subItems = createTagList(subItems);
+               tti.subItems = createTagList(subItems, parent);
             }
             //ret.add(tti);
          }
       }
 
+      actionScript = createASTagList(list, null);
       TagNode textsNode = new TagNode("texts");
       textsNode.subItems.addAll(texts);
 
@@ -605,37 +853,44 @@ public class MainFrame extends JFrame implements ActionListener {
 
       TagNode framesNode = new TagNode("frames");
       framesNode.subItems.addAll(frames);
-      ret.add(shapesNode);
-      ret.add(morphShapesNode);;
-      ret.add(spritesNode);
-      ret.add(textsNode);
-      ret.add(imagesNode);
-      ret.add(buttonsNode);
-      ret.add(fontsNode);
-      ret.add(framesNode);
-      for (int i = ret.size() - 1; i >= 0; i--) {
-         if (ret.get(i).tag instanceof DefineSpriteTag) {
-            ((DefineSpriteTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
-         }
-         if (ret.get(i).tag instanceof DefineButtonTag) {
-            ((DefineButtonTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
-         }
-         if (ret.get(i).tag instanceof DefineButton2Tag) {
-            ((DefineButton2Tag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
-         }
-         if (ret.get(i).tag instanceof DoInitActionTag) {
-            ((DoInitActionTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
-         }
-         if (ret.get(i).tag instanceof ASMSource) {
-            ASMSource ass = (ASMSource) ret.get(i).tag;
-            if (ass.containsSource()) {
-               continue;
-            }
-         }
-         if (ret.get(i).subItems.isEmpty()) {
-            //ret.remove(i);
-         }
+
+      TagNode actionScriptNode = new TagNode("scripts");
+      actionScriptNode.subItems.addAll(actionScript);
+
+      if (!shapesNode.subItems.isEmpty()) {
+         ret.add(shapesNode);
       }
+      if (!morphShapesNode.subItems.isEmpty()) {
+         ret.add(morphShapesNode);
+      }
+      if (!spritesNode.subItems.isEmpty()) {
+         ret.add(spritesNode);
+      }
+      if (!textsNode.subItems.isEmpty()) {
+         ret.add(textsNode);
+      }
+      if (!imagesNode.subItems.isEmpty()) {
+         ret.add(imagesNode);
+      }
+      if (!buttonsNode.subItems.isEmpty()) {
+         ret.add(buttonsNode);
+      }
+      if (!fontsNode.subItems.isEmpty()) {
+         ret.add(fontsNode);
+      }
+      if (!framesNode.subItems.isEmpty()) {
+         ret.add(framesNode);
+      }
+
+
+      if (abcPanel != null) {
+         actionScriptNode.subItems.clear();
+         actionScriptNode.tag = abcPanel.classTree.getModel();
+      }
+      if ((!actionScriptNode.subItems.isEmpty()) || (abcPanel != null)) {
+         ret.add(actionScriptNode);
+      }
+
       return ret;
    }
 
@@ -692,113 +947,127 @@ public class MainFrame extends JFrame implements ActionListener {
       }
 
       if (e.getActionCommand().startsWith("EXPORT")) {
-         JFileChooser chooser = new JFileChooser();
-         chooser.setCurrentDirectory(new java.io.File((String) Configuration.getConfig("lastExportDir", ".")));
-         chooser.setDialogTitle("Select directory to export");
-         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-         chooser.setAcceptAllFileFilterUsed(false);
-         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            final long timeBefore = System.currentTimeMillis();
-            Main.startWork("Exporting...");
-            final String selFile = chooser.getSelectedFile().getAbsolutePath();
-            Configuration.setConfig("lastExportDir", chooser.getSelectedFile().getParentFile().getAbsolutePath());
-            final boolean isPcode = e.getActionCommand().startsWith("EXPORTPCODE");
-            final boolean onlySel = e.getActionCommand().endsWith("SEL");
-            final boolean images = e.getActionCommand().startsWith("EXPORTIMAGES");
-            final boolean shapes = e.getActionCommand().startsWith("EXPORTSHAPES");
-            (new Thread() {
-               @Override
-               public void run() {
-                  try {
-                     if (onlySel) {
-                        if (images) {
-                           if (imagesTagPanel != null) {
-                              List<Tag> list = new ArrayList<Tag>();
+         ExportDialog export = new ExportDialog();
+         export.setVisible(true);
+         if (!export.cancelled) {
+            JFileChooser chooser = new JFileChooser();
+            chooser.setCurrentDirectory(new java.io.File((String) Configuration.getConfig("lastExportDir", ".")));
+            chooser.setDialogTitle("Select directory to export");
+            chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            chooser.setAcceptAllFileFilterUsed(false);
+            if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+               final long timeBefore = System.currentTimeMillis();
+               Main.startWork("Exporting...");
+               final String selFile = chooser.getSelectedFile().getAbsolutePath();
+               Configuration.setConfig("lastExportDir", chooser.getSelectedFile().getParentFile().getAbsolutePath());
+               final boolean isPcode = export.actionScript.getSelectedIndex() == 1; //e.getActionCommand().startsWith("EXPORTPCODE");
+               final boolean onlySel = e.getActionCommand().endsWith("SEL");
+               //final boolean images = e.getActionCommand().startsWith("EXPORTIMAGES");
+               //final boolean shapes = e.getActionCommand().startsWith("EXPORTSHAPES");
+               (new Thread() {
+                  @Override
+                  public void run() {
+                     try {
+                        if (onlySel) {
+                           List<Object> sel = getAllSelected(tagTree);
 
-                              Object lob[] = imagesTagPanel.tagList.getSelectedValues();
-                              for (Object o : lob) {
-                                 if (o instanceof Tag) {
-                                    list.add((Tag) o);
+                           List<TreeLeafScript> tlsList = new ArrayList<TreeLeafScript>();
+                           JPEGTablesTag jtt = null;
+                           for (Tag t : swf.tags) {
+                              if (t instanceof JPEGTablesTag) {
+                                 jtt = (JPEGTablesTag) t;
+                                 break;
+                              }
+                           }
+                           List<Tag> images = new ArrayList<Tag>();
+                           List<Tag> shapes = new ArrayList<Tag>();
+                           List<TagNode> actionNodes = new ArrayList<TagNode>();
+                           for (Object d : sel) {
+                              if (d instanceof TagNode) {
+                                 TagNode n = (TagNode) d;
+                                 if ("image".equals(getTagType(n.tag))) {
+                                    images.add((Tag) n.tag);
+                                 }
+                                 if ("shape".equals(getTagType(n.tag))) {
+                                    shapes.add((Tag) n.tag);
+                                 }
+                                 if ("as".equals(getTagType(n.tag))) {
+                                    actionNodes.add(n);
                                  }
                               }
-                              JPEGTablesTag jtt = null;
-                              for (Tag t : swf.tags) {
-                                 if (t instanceof JPEGTablesTag) {
-                                    jtt = (JPEGTablesTag) t;
-                                    break;
+                              if (d instanceof TreeElement) {
+                                 if (((TreeElement) d).isLeaf()) {
+                                    tlsList.add((TreeLeafScript) ((TreeElement) d).getItem());
                                  }
                               }
-                              SWF.exportImages(selFile, list, jtt);
                            }
-                        } else if (shapes) {
-                           List<Tag> list = new ArrayList<Tag>();
-                           Object lob[] = shapesTagPanel.tagList.getSelectedValues();
-                           for (Object o : lob) {
-                              if (o instanceof ShapeTag) {
-                                 list.add((Tag) o);
+                           SWF.exportImages(selFile + File.separator + "images", images, jtt);
+                           SWF.exportShapes(selFile + File.separator + "shapes", shapes);
+                           if (abcPanel != null) {
+                              for (int i = 0; i < tlsList.size(); i++) {
+                                 TreeLeafScript tls = tlsList.get(i);
+                                 Main.startWork("Exporting " + (i + 1) + "/" + tlsList.size() + " " + tls.abc.script_info[tls.scriptIndex].getPath(tls.abc) + " ...");
+                                 tls.abc.script_info[tls.scriptIndex].export(tls.abc, abcPanel.list, selFile, isPcode);
+                              }
+                           } else {
+                              List<TagNode> allNodes = new ArrayList<TagNode>();
+                              TagNode asn = getASTagNode(tagTree);
+                              if (asn != null) {
+                                 allNodes.add(asn);
+                                 TagNode.setExport(allNodes, false);
+                                 TagNode.setExport(actionNodes, true);
+                                 TagNode.exportNodeAS(allNodes, selFile, isPcode);
                               }
                            }
-                           SWF.exportShapes(selFile, list);
-                        } else if (abcPanel != null) {
-                           List<TreeLeafScript> tlsList = abcPanel.classTree.getSelectedScripts();
-                           if (tlsList.isEmpty()) {
-                              JOptionPane.showMessageDialog(null, "No script selected!");
-                           }
-                           for (int i = 0; i < tlsList.size(); i++) {
-                              TreeLeafScript tls = tlsList.get(i);
-                              Main.startWork("Exporting " + (i + 1) + "/" + tlsList.size() + " " + tls.abc.script_info[tls.scriptIndex].getPath(tls.abc) + " ...");
-                              tls.abc.script_info[tls.scriptIndex].export(tls.abc, abcPanel.list, selFile, isPcode);
-                           }
-                        } else if (actionPanel != null) {
-                           List<com.jpexs.decompiler.flash.action.TagNode> nodes = actionPanel.getSelectedNodes();
-                           if (nodes.isEmpty()) {
-                              JOptionPane.showMessageDialog(null, "No nodes selected!");
-                           }
-                           com.jpexs.decompiler.flash.action.gui.TagTreeModel ttm = (com.jpexs.decompiler.flash.action.gui.TagTreeModel) actionPanel.tagTree.getModel();
-                           List<com.jpexs.decompiler.flash.action.TagNode> allnodes = ttm.getNodeList();
-                           com.jpexs.decompiler.flash.action.TagNode.setExport(allnodes, false);
-                           com.jpexs.decompiler.flash.action.TagNode.setExport(nodes, true);
-                           com.jpexs.decompiler.flash.action.TagNode.exportNode(allnodes, selFile, isPcode);
-                        }
-                     } else {
-                        if (images) {
-                           Main.swf.exportImages(selFile);
-                        } else if (shapes) {
-                           Main.swf.exportShapes(selFile);
                         } else {
+                           Main.swf.exportImages(selFile + File.separator + "images");
+                           Main.swf.exportShapes(selFile + File.separator + "shapes");
                            Main.swf.exportActionScript(selFile, isPcode);
                         }
+                     } catch (Exception ignored) {
+                        ignored.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "Cannot write to the file");
                      }
-                  } catch (Exception ignored) {
-                     ignored.printStackTrace();
-                     JOptionPane.showMessageDialog(null, "Cannot write to the file");
+                     Main.stopWork();
+                     long timeAfter = System.currentTimeMillis();
+                     long timeMs = timeAfter - timeBefore;
+                     long timeS = timeMs / 1000;
+                     timeMs = timeMs % 1000;
+                     long timeM = timeS / 60;
+                     timeS = timeS % 60;
+                     long timeH = timeM / 60;
+                     timeM = timeM % 60;
+                     String timeStr = "";
+                     if (timeH > 0) {
+                        timeStr += Helper.padZeros(timeH, 2) + ":";
+                     }
+                     timeStr += Helper.padZeros(timeM, 2) + ":";
+                     timeStr += Helper.padZeros(timeS, 2) + "." + Helper.padZeros(timeMs, 3);
+                     setStatus("Exported in " + timeStr);
                   }
-                  Main.stopWork();
-                  long timeAfter = System.currentTimeMillis();
-                  long timeMs = timeAfter - timeBefore;
-                  long timeS = timeMs / 1000;
-                  timeMs = timeMs % 1000;
-                  long timeM = timeS / 60;
-                  timeS = timeS % 60;
-                  long timeH = timeM / 60;
-                  timeM = timeM % 60;
-                  String timeStr = "";
-                  if (timeH > 0) {
-                     timeStr += Helper.padZeros(timeH, 2) + ":";
-                  }
-                  timeStr += Helper.padZeros(timeM, 2) + ":";
-                  timeStr += Helper.padZeros(timeS, 2) + "." + Helper.padZeros(timeMs, 3);
-                  setStatus("Exported in " + timeStr);
-               }
-            }).start();
+               }).start();
 
+            }
          }
-
       }
 
       if (e.getActionCommand().equals("CHECKUPDATES")) {
          if (!Main.checkForUpdates()) {
             JOptionPane.showMessageDialog(null, "No new version available.");
+         }
+      }
+
+      if (e.getActionCommand().equals("DONATE")) {
+         String donateURL = Main.projectPage + "/donate.html";
+         if (java.awt.Desktop.isDesktopSupported()) {
+            java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+            try {
+               java.net.URI uri = new java.net.URI(donateURL);
+               desktop.browse(uri);
+            } catch (Exception ex) {
+            }
+         } else {
+            JOptionPane.showMessageDialog(null, "Please visit\r\n" + donateURL + "\r\nfor details.");
          }
       }
 
@@ -951,6 +1220,255 @@ public class MainFrame extends JFrame implements ActionListener {
                }
             }.execute();
          }
+      }
+   }
+
+   public void showDetail(String card) {
+      CardLayout cl = (CardLayout) (detailPanel.getLayout());
+      cl.show(detailPanel, card);
+   }
+
+   public void showCard(String card) {
+      CardLayout cl = (CardLayout) (displayPanel.getLayout());
+      cl.show(displayPanel, card);
+   }
+   private Object oldValue;
+   private File tempFile;
+
+   @Override
+   public void valueChanged(TreeSelectionEvent e) {
+      Object tagObj = tagTree.getLastSelectedPathComponent();
+      if (tagObj == null) {
+         return;
+      }
+
+      if (tagObj instanceof TagNode) {
+         tagObj = ((TagNode) tagObj).tag;
+      }
+      if (tagObj instanceof TreeElement) {
+         tagObj = ((TreeElement) tagObj).getItem();
+      }
+
+      if (tagObj == oldValue) {
+         return;
+      }
+      oldValue = tagObj;
+
+      if (tagObj instanceof TreeLeafScript) {
+         final TreeLeafScript scriptLeaf = (TreeLeafScript) tagObj;
+         if (!Main.isWorking()) {
+            Main.startWork("Decompiling...");
+            (new Thread() {
+               @Override
+               public void run() {
+                  int classIndex = -1;
+                  for (Trait t : scriptLeaf.abc.script_info[scriptLeaf.scriptIndex].traits.traits) {
+                     if (t instanceof TraitClass) {
+                        classIndex = ((TraitClass) t).class_info;
+                        break;
+                     }
+                  }
+                  abcPanel.navigator.setABC(abcList, scriptLeaf.abc);
+                  abcPanel.navigator.setClassIndex(classIndex);
+                  abcPanel.setAbc(scriptLeaf.abc);
+                  abcPanel.decompiledTextArea.setScript(scriptLeaf.abc.script_info[scriptLeaf.scriptIndex], scriptLeaf.abc, abcList);
+                  abcPanel.decompiledTextArea.setClassIndex(classIndex);
+                  abcPanel.decompiledTextArea.setNoTrait();
+                  abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setCode("");
+                  Main.stopWork();
+               }
+            }).start();
+         }
+         showDetail(DETAILCARDAS3NAVIGATOR);
+         showCard(CARDACTIONSCRIPTPANEL);
+         return;
+      } else {
+         showDetail(DETAILCARDEMPTYPANEL);
+      }
+      if (tagObj instanceof ASMSource) {
+         showCard(CARDACTIONSCRIPTPANEL);
+         actionPanel.setSource((ASMSource) tagObj);
+      } else if (tagObj instanceof DefineBitsTag) {
+         showCard(CARDIMAGEPANEL);
+         imagePanel.setImage(((DefineBitsTag) tagObj).getFullImageData(jtt));
+      } else if (tagObj instanceof DefineBitsJPEG2Tag) {
+         showCard(CARDIMAGEPANEL);
+         imagePanel.setImage(((DefineBitsJPEG2Tag) tagObj).imageData);
+      } else if (tagObj instanceof DefineBitsJPEG3Tag) {
+         showCard(CARDIMAGEPANEL);
+         imagePanel.setImage(((DefineBitsJPEG3Tag) tagObj).imageData);
+      } else if (tagObj instanceof DefineBitsJPEG4Tag) {
+         showCard(CARDIMAGEPANEL);
+         imagePanel.setImage(((DefineBitsJPEG4Tag) tagObj).imageData);
+      } else if (tagObj instanceof DefineBitsLosslessTag) {
+         showCard(CARDIMAGEPANEL);
+         imagePanel.setImage(((DefineBitsLosslessTag) tagObj).getImage());
+      } else if (tagObj instanceof DefineBitsLossless2Tag) {
+         showCard(CARDIMAGEPANEL);
+         imagePanel.setImage(((DefineBitsLossless2Tag) tagObj).getImage());
+      } else if ((tagObj instanceof FrameNode && ((FrameNode) tagObj).isDisplayed()) || (((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag))) {
+         try {
+
+            if (tempFile != null) {
+               tempFile.delete();
+            }
+            tempFile = File.createTempFile("temp", ".swf");
+            tempFile.deleteOnExit();
+
+            FileOutputStream fos = new FileOutputStream(tempFile);
+            SWFOutputStream sos = new SWFOutputStream(fos, 10);
+            sos.write("FWS".getBytes());
+            sos.write(13);
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            SWFOutputStream sos2 = new SWFOutputStream(baos, 10);
+            int width = swf.displayRect.Xmax - swf.displayRect.Xmin;
+            int height = swf.displayRect.Ymax - swf.displayRect.Ymin;
+            sos2.writeRECT(swf.displayRect);
+            sos2.writeUI8(0);
+            sos2.writeUI8(swf.frameRate);
+            sos2.writeUI16(100); //framecnt
+            sos2.writeTag(new SetBackgroundColorTag(new RGB(255, 255, 255)));
+
+            if (tagObj instanceof FrameNode) {
+               FrameNode fn = (FrameNode) tagObj;
+               Object parent = fn.getParent();
+               List<Object> subs = new ArrayList<Object>();
+               if (parent == null) {
+                  subs.addAll(swf.tags);
+               } else {
+                  if (parent instanceof Container) {
+                     subs = ((Container) parent).getSubItems();
+                  }
+               }
+               List<Integer> doneCharacters = new ArrayList<Integer>();
+               int frameCnt = 1;
+               for (Object o : subs) {
+                  if (o instanceof ShowFrameTag) {
+                     frameCnt++;
+                     continue;
+                  }
+                  if (frameCnt > fn.getFrame()) {
+                     break;
+                  }
+                  Tag t = (Tag) o;
+                  if (frameCnt == fn.getFrame()) {
+                     Set<Integer> needed = t.getNeededCharacters();
+                     for (int n : needed) {
+                        if (!doneCharacters.contains(n)) {
+                           sos2.writeTag(characters.get(n));
+                           doneCharacters.add(n);
+                        }
+                     }
+                     if (t instanceof CharacterTag) {
+                        doneCharacters.add(((CharacterTag) t).getCharacterID());
+                     }
+                  }
+                  sos2.writeTag(t);
+               }
+               sos2.writeTag(new ShowFrameTag());
+            } else {
+
+               if (tagObj instanceof DefineBitsTag) {
+                  if (jtt != null) {
+                     sos2.writeTag(jtt);
+                  }
+               } else if (tagObj instanceof AloneTag) {
+               } else {
+                  Set<Integer> needed = ((Tag) tagObj).getNeededCharacters();
+                  for (int n : needed) {
+                     sos2.writeTag(characters.get(n));
+                  }
+               }
+
+               sos2.writeTag(((Tag) tagObj));
+
+               int chtId = 0;
+               if (tagObj instanceof CharacterTag) {
+                  chtId = ((CharacterTag) tagObj).getCharacterID();
+               }
+
+               MATRIX mat = new MATRIX();
+               mat.hasRotate = false;
+               mat.hasScale = false;
+               mat.translateX = 0;
+               mat.translateY = 0;
+               if (tagObj instanceof BoundedTag) {
+                  RECT r = ((BoundedTag) tagObj).getRect(characters);
+                  mat.translateX = -r.Xmin;
+                  mat.translateY = -r.Ymin;
+                  mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
+                  mat.translateY = mat.translateY + height / 2 - r.getHeight() / 2;
+               } else {
+                  mat.translateX = width / 4;
+                  mat.translateY = height / 4;
+               }
+               if (tagObj instanceof FontTag) {
+
+                  int countGlyphs = ((FontTag) tagObj).getGlyphShapeTable().length;
+                  int fontId = ((FontTag) tagObj).getFontId();
+                  int sloupcu = (int) Math.ceil(Math.sqrt(countGlyphs));
+                  int radku = (int) Math.ceil(((float) countGlyphs) / ((float) sloupcu));
+                  int x = 0;
+                  int y = 1;
+                  for (int f = 0; f < countGlyphs; f++) {
+                     if (x >= sloupcu) {
+                        x = 0;
+                        y++;
+                     }
+                     List<TEXTRECORD> rec = new ArrayList<TEXTRECORD>();
+                     TEXTRECORD tr = new TEXTRECORD();
+                     int textHeight = height / radku;
+                     tr.fontId = fontId;
+                     tr.styleFlagsHasFont = true;
+                     tr.textHeight = textHeight;
+                     tr.glyphEntries = new GLYPHENTRY[1];
+                     tr.styleFlagsHasColor = true;
+                     tr.textColor = new RGB(0, 0, 0);
+                     tr.glyphEntries[0] = new GLYPHENTRY();
+                     tr.glyphEntries[0].glyphAdvance = 0;
+                     tr.glyphEntries[0].glyphIndex = f;
+                     rec.add(tr);
+                     mat.translateX = x * width / sloupcu;
+                     mat.translateY = y * height / radku;
+                     sos2.writeTag(new DefineTextTag(999 + f, new RECT(0, width, 0, height), new MATRIX(), SWFOutputStream.getNeededBitsU(countGlyphs - 1), SWFOutputStream.getNeededBitsU(0), rec));
+                     sos2.writeTag(new PlaceObject2Tag(false, false, false, true, false, true, true, false, 1 + f, 999 + f, mat, null, 0, null, 0, null));
+                     x++;
+                  }
+                  sos2.writeTag(new ShowFrameTag());
+               } else if ((tagObj instanceof DefineMorphShapeTag) || (tagObj instanceof DefineMorphShape2Tag)) {
+                  sos2.writeTag(new PlaceObject2Tag(false, false, false, true, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null));
+                  sos2.writeTag(new ShowFrameTag());
+                  int numFrames = 100;
+                  for (int ratio = 0; ratio < 65536; ratio += 65536 / numFrames) {
+                     sos2.writeTag(new PlaceObject2Tag(false, false, false, true, false, true, false, true, 1, chtId, mat, null, ratio, null, 0, null));
+                     sos2.writeTag(new ShowFrameTag());
+                  }
+               } else {
+                  sos2.writeTag(new PlaceObject2Tag(false, false, false, true, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null));
+                  sos2.writeTag(new ShowFrameTag());
+               }
+            }//not showframe
+
+            sos2.writeTag(new EndTag());
+            byte data[] = baos.toByteArray();
+
+            sos.writeUI32(sos.getPos() + data.length + 4);
+            sos.write(data);
+            fos.close();
+            showCard(CARDFLASHPANEL);
+            if (flashPanel != null) {
+               if (flashPanel instanceof FlashPlayerPanel) {
+                  flashPanel.displaySWF(tempFile.getAbsolutePath());
+               }
+            }
+
+         } catch (Exception ex) {
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+         }
+
+      } else {
+         showCard(CARDEMPTYPANEL);
       }
    }
 }

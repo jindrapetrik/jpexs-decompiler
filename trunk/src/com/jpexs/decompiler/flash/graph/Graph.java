@@ -81,7 +81,7 @@ public class Graph {
             int pos = -1;
             for (GraphPart r : uniqueRefs) {
                pos++;
-               if (r.path.startsWith("e")) {
+               if (r.path.startsWith("e") && !part.path.startsWith("e")) {
                   continue;
                }
                if (part.leadsTo(r, new ArrayList<GraphPart>())) {
@@ -345,6 +345,13 @@ public class Graph {
       }
    }
 
+   protected boolean isEmpty(List<GraphTargetItem> output) {
+      if (output.isEmpty()) {
+         return true;
+      }
+      return false;
+   }
+
    protected List<GraphTargetItem> check(List localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, List<GraphTargetItem> output, HashMap<Loop, List<GraphTargetItem>> forFinalCommands) {
       return null;
    }
@@ -458,14 +465,14 @@ public class Graph {
                      a.firstPart = ((AndItem) second).firstPart;
                   }
                   if (second instanceof OrItem) {
-                     a.firstPart = ((AndItem) second).firstPart;
+                     a.firstPart = ((OrItem) second).firstPart;
                   }
                } else {
                   OrItem o = new OrItem(null, first, second);
                   stack.push(o);
                   o.firstPart = part;
-                  if (second instanceof OrItem) {
-                     o.firstPart = ((OrItem) second).firstPart;
+                  if (second instanceof AndItem) {
+                     o.firstPart = ((AndItem) second).firstPart;
                   }
                   if (second instanceof OrItem) {
                      o.firstPart = ((OrItem) second).firstPart;
@@ -939,8 +946,7 @@ public class Graph {
                   System.err.println("/ONFALSE (inside " + part + ")");
                }
             }
-
-            if (onTrue.isEmpty() && onFalse.isEmpty() && (trueStack.size() > stackSizeBefore) && (falseStack.size() > stackSizeBefore)) {
+            if (isEmpty(onTrue) && isEmpty(onFalse) && (trueStack.size() > stackSizeBefore) && (falseStack.size() > stackSizeBefore)) {
                stack.push(new TernarOpItem(null, expr, trueStack.pop(), falseStack.pop()));
             } else {
                List<GraphTargetItem> retw = retx;

@@ -645,7 +645,7 @@ public class Main {
       }
       if (SystemTray.isSupported()) {
          SystemTray tray = SystemTray.getSystemTray();
-         trayIcon = new TrayIcon(View.loadImage("com/jpexs/decompiler/flash/gui/graphics/proxy16.png"), "JP ASDec Proxy");
+         trayIcon = new TrayIcon(View.loadImage("proxy16"), "JP ASDec Proxy");
          trayIcon.setImageAutoSize(true);
          PopupMenu trayPopup = new PopupMenu();
 

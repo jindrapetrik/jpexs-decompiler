@@ -16,7 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.tags.*;
+import com.jpexs.decompiler.flash.abc.gui.ClassesListTreeModel;
+import com.jpexs.decompiler.flash.abc.gui.TreeElement;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.event.TreeModelListener;
@@ -28,10 +29,13 @@ public class TagTreeModel implements TreeModel {
    private String root = "";
    private List<TagNode> list = new ArrayList<TagNode>();
 
-   public TagTreeModel(List<Tag> list) {
-      List<Object> list2 = new ArrayList<Object>();
-      list2.addAll(list);
-      this.list = TagNode.createTagList(list2);
+   public TagTreeModel(List<TagNode> list, String rootName) {
+      this.root = rootName;
+      this.list = list;
+   }
+
+   public List<TagNode> getNodeList() {
+      return list;
    }
 
    public Object getRoot() {
@@ -39,6 +43,14 @@ public class TagTreeModel implements TreeModel {
    }
 
    public Object getChild(Object parent, int index) {
+      if (parent instanceof TagNode) {
+         if (((TagNode) parent).tag instanceof ClassesListTreeModel) {
+            ClassesListTreeModel clt = (ClassesListTreeModel) ((TagNode) parent).tag;
+            return clt.getChild(clt.getRoot(), index);
+         }
+      } else if (parent instanceof TreeElement) {
+         return ((TreeElement) parent).getChild(index);
+      }
       if (parent == root) {
          return list.get(index);
       } else {
@@ -50,7 +62,17 @@ public class TagTreeModel implements TreeModel {
       if (parent == root) {
          return list.size();
       } else {
-         return ((TagNode) parent).subItems.size();
+         if (parent instanceof TagNode) {
+            if (((TagNode) parent).tag instanceof ClassesListTreeModel) {
+               ClassesListTreeModel clt = (ClassesListTreeModel) ((TagNode) parent).tag;
+               return clt.getChildCount(clt.getRoot());
+            }
+            return ((TagNode) parent).subItems.size();
+         } else if (parent instanceof TreeElement) {
+            return ((TreeElement) parent).getChildCount();
+         }
+         return 0;
+
       }
    }
 
@@ -62,6 +84,12 @@ public class TagTreeModel implements TreeModel {
    }
 
    public int getIndexOfChild(Object parent, Object child) {
+      if (parent instanceof TagNode) {
+         if (((TagNode) parent).tag instanceof ClassesListTreeModel) {
+            ClassesListTreeModel clt = (ClassesListTreeModel) ((TagNode) parent).tag;
+            return clt.getIndexOfChild(clt.getRoot(), child);
+         }
+      }
       if (parent == root) {
          for (int t = 0; t < list.size(); t++) {
             if (list.get(t) == child) {
@@ -70,12 +98,18 @@ public class TagTreeModel implements TreeModel {
          }
          return -1;
       } else {
-         List<TagNode> subTags = ((TagNode) parent).subItems;
-         for (int t = 0; t < subTags.size(); t++) {
-            if (subTags.get(t) == child) {
-               return t;
+         if (parent instanceof TagNode) {
+            List<TagNode> subTags = ((TagNode) parent).subItems;
+            for (int t = 0; t < subTags.size(); t++) {
+               if (subTags.get(t) == child) {
+                  return t;
+               }
             }
          }
+         if (parent instanceof TreeElement) {
+            return ((TreeElement) parent).getIndexOfChild((TreeElement) child);
+         }
+
          return -1;
       }
    }

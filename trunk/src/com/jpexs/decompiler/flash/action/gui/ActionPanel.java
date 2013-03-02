@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.gui.GraphFrame;
 import com.jpexs.decompiler.flash.abc.gui.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.action.ActionGraph;
-import com.jpexs.decompiler.flash.action.TagNode;
 import com.jpexs.decompiler.flash.action.parser.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
@@ -41,15 +40,10 @@ import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
 
-public class ActionPanel extends JPanel implements TreeSelectionListener, ActionListener {
+public class ActionPanel extends JPanel implements ActionListener {
 
-   public JTree tagTree;
    public LineMarkedEditorPane editor;
    public LineMarkedEditorPane decompiledEditor;
    public List<Tag> list;
@@ -65,26 +59,47 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
    public JLabel decLabel = new JLabel("ActionScript source");
    public List<Highlighting> decompiledHilights = new ArrayList<Highlighting>();
    public List<Highlighting> disassembledHilights = new ArrayList<Highlighting>();
-   private String lastDisasm = "";
+   public String lastDisasm = "";
    private boolean ignoreCarret = false;
    private boolean editMode = false;
    private List<com.jpexs.decompiler.flash.action.Action> lastCode;
+   private ASMSource src;
 
-   public ActionPanel(List<Tag> list) {
+   public void setSource(ASMSource src) {
+      this.src = src;
+      Main.startWork("Decompiling...");
+      final ASMSource asm = (ASMSource) src;
+      (new Thread() {
+         @Override
+         public void run() {
+            lastDisasm = asm.getASMSource(SWF.DEFAULT_VERSION);
+            disassembledHilights = Highlighting.getInstrHighlights(lastDisasm);
+            lastDisasm = Highlighting.stripHilights(lastDisasm);
+            editor.setText(lastDisasm);
+            if (Main.DO_DECOMPILE) {
+               List<com.jpexs.decompiler.flash.action.Action> as = asm.getActions(SWF.DEFAULT_VERSION);
+               lastCode = as;
+               com.jpexs.decompiler.flash.action.Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
+               decompiledEditor.setText("//Decompiling...");
+               String s = com.jpexs.decompiler.flash.action.Action.actionsToSource(as, SWF.DEFAULT_VERSION);
+               decompiledHilights = Highlighting.getInstrHighlights(s);
+               decompiledEditor.setText(Highlighting.stripHilights(s));
+            }
+            setEditMode(false);
+            Main.stopWork();
+         }
+      }).start();
+   }
+
+   public ActionPanel() {
       this.list = list;
       DefaultSyntaxKit.initKit();
       editor = new LineMarkedEditorPane();
       editor.setEditable(false);
       decompiledEditor = new LineMarkedEditorPane();
       decompiledEditor.setEditable(false);
-      tagTree = new JTree(new TagTreeModel(list));
 
-      DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
-      ClassLoader cldr = this.getClass().getClassLoader();
-      java.net.URL imageURL = cldr.getResource("com/jpexs/decompiler/flash/gui/graphics/as16.png");
-      ImageIcon leafIcon = new ImageIcon(imageURL);
-      treeRenderer.setLeafIcon(leafIcon);
-      tagTree.setCellRenderer(treeRenderer);
+
 
       JPanel panB = new JPanel();
       panB.setLayout(new BorderLayout());
@@ -131,15 +146,16 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
 
 
       setLayout(new BorderLayout());
-      add(splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(tagTree), splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panA, panB)), BorderLayout.CENTER);
-      splitPane.setResizeWeight(0.5);
+      //add(splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(tagTree), splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panA, panB)), BorderLayout.CENTER);
+      add(splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panA, panB), BorderLayout.CENTER);
+//      splitPane.setResizeWeight(0.5);
       splitPane2.setResizeWeight(0.5);
       editor.setContentType("text/flasm");
       editor.setFont(new Font("Monospaced", Font.PLAIN, editor.getFont().getSize()));
       decompiledEditor.setContentType("text/actionscript");
       decompiledEditor.setFont(new Font("Monospaced", Font.PLAIN, decompiledEditor.getFont().getSize()));
 
-      tagTree.addTreeSelectionListener(this);
+      //tagTree.addTreeSelectionListener(this);
       editor.addCaretListener(new CaretListener() {
          @Override
          public void caretUpdate(CaretEvent e) {
@@ -196,61 +212,14 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
    }
 
    public void initSplits() {
-      splitPane.setDividerLocation(getWidth() / 3);
-      splitPane2.setDividerLocation(getWidth() / 3);
-   }
-
-   public void valueChanged(TreeSelectionEvent e) {
-      if (Main.isWorking()) {
-         return;
-      }
-      Object obj = tagTree.getLastSelectedPathComponent();
-      if (obj instanceof TagNode) {
-         obj = ((TagNode) obj).tag;
-         if (obj instanceof ASMSource) {
-            Main.startWork("Decompiling...");
-            final ASMSource asm = (ASMSource) obj;
-            (new Thread() {
-               @Override
-               public void run() {
-                  lastDisasm = asm.getASMSource(SWF.DEFAULT_VERSION);
-                  disassembledHilights = Highlighting.getInstrHighlights(lastDisasm);
-                  lastDisasm = Highlighting.stripHilights(lastDisasm);
-                  editor.setText(lastDisasm);
-                  if (Main.DO_DECOMPILE) {
-                     List<com.jpexs.decompiler.flash.action.Action> as = asm.getActions(SWF.DEFAULT_VERSION);
-                     lastCode = as;
-                     com.jpexs.decompiler.flash.action.Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
-                     decompiledEditor.setText("//Decompiling...");
-                     String s = com.jpexs.decompiler.flash.action.Action.actionsToSource(as, SWF.DEFAULT_VERSION);
-                     decompiledHilights = Highlighting.getInstrHighlights(s);
-                     decompiledEditor.setText(Highlighting.stripHilights(s));
-                  }
-                  setEditMode(false);
-                  Main.stopWork();
-               }
-            }).start();
-         }
-      }
+      //splitPane.setDividerLocation(getWidth() / 3);
+      splitPane2.setDividerLocation(getWidth() / 2);
    }
 
    public void display() {
       setVisible(true);
       splitPane.setDividerLocation(0.5);
       splitPane2.setDividerLocation(0.5);
-   }
-
-   public List<TagNode> getSelectedNodes() {
-      List<TagNode> ret = new ArrayList<TagNode>();
-      TreePath tps[] = tagTree.getSelectionPaths();
-      if (tps == null) {
-         return ret;
-      }
-      for (TreePath tp : tps) {
-         TagNode te = (TagNode) tp.getLastPathComponent();
-         ret.add(te);
-      }
-      return ret;
    }
 
    public void setEditMode(boolean val) {
@@ -282,17 +251,12 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
          setEditMode(false);
          editor.setText(lastDisasm);
       } else if (e.getActionCommand().equals("SAVEACTION")) {
-         TagNode ti = (TagNode) tagTree.getLastSelectedPathComponent();
-         if (ti.tag instanceof ASMSource) {
-            ASMSource dat = (ASMSource) ti.tag;
-            try {
-               dat.setActions(ASMParser.parse(new ByteArrayInputStream(editor.getText().getBytes()), SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION);
-               valueChanged(null);
-               JOptionPane.showMessageDialog(this, "Code successfully saved");
-            } catch (IOException ex) {
-            } catch (ParseException ex) {
-               JOptionPane.showMessageDialog(this, "" + ex.text + " on line " + ex.line, "Error", JOptionPane.ERROR_MESSAGE);
-            }
+         try {
+            src.setActions(ASMParser.parse(new ByteArrayInputStream(editor.getText().getBytes()), SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION);
+            JOptionPane.showMessageDialog(this, "Code successfully saved");
+         } catch (IOException ex) {
+         } catch (ParseException ex) {
+            JOptionPane.showMessageDialog(this, "" + ex.text + " on line " + ex.line, "Error", JOptionPane.ERROR_MESSAGE);
          }
          saveButton.setVisible(false);
          editButton.setVisible(true);
