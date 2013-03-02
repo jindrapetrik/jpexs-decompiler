@@ -34,7 +34,7 @@ import javax.swing.tree.TreeSelectionModel;
 public class ClassesListTree extends JTree implements TreeSelectionListener {
 
    private List<DoABCTag> abcList;
-   private HashMap<String, TreeLeafScript> treeList;
+   public HashMap<String, TreeLeafScript> treeList;
    private ABCPanel abcPanel;
 
    public void selectClass(int classIndex) {

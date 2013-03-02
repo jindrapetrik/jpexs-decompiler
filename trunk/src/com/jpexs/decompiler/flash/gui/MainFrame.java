@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.gui.ABCPanel;
+import com.jpexs.decompiler.flash.abc.gui.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.abc.gui.DeobfuscationDialog;
 import com.jpexs.decompiler.flash.abc.gui.TreeElement;
 import com.jpexs.decompiler.flash.abc.gui.TreeLeafScript;
@@ -78,6 +79,10 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.ByteArrayOutputStream;
@@ -91,6 +96,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -104,10 +110,13 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -147,6 +156,8 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
    JSplitPane splitPane1;
    JSplitPane splitPane2;
    private JPanel detailPanel;
+   private JTextField filterField = new JTextField("");
+   private JPanel searchPanel;
 
    public void setPercent(int percent) {
       progressBar.setValue(percent);
@@ -324,10 +335,16 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
       miDonate.setActionCommand("DONATE");
       miDonate.setIcon(View.getIcon("donate16"));
       miDonate.addActionListener(this);
+      
+      JMenuItem miHomepage = new JMenuItem("Visit homepage");
+      miHomepage.setActionCommand("HOMEPAGE");
+      miHomepage.setIcon(View.getIcon("homepage16"));
+      miHomepage.addActionListener(this);
 
 
       menuHelp.add(miCheckUpdates);
       menuHelp.add(miDonate);
+      menuHelp.add(miHomepage);
       menuHelp.add(miAbout);
       menuBar.add(menuHelp);
 
@@ -349,7 +366,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
       CardLayout cl2 = (CardLayout) (detailPanel.getLayout());
       cl2.show(detailPanel, DETAILCARDEMPTYPANEL);
 
-
+      
       abcList = new ArrayList<DoABCTag>();
       getActionScript3(objs, abcList);
       if (!abcList.isEmpty()) {
@@ -446,14 +463,82 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
       }
       CardLayout cl = (CardLayout) (displayPanel.getLayout());
       cl.show(displayPanel, CARDEMPTYPANEL);
+
+      searchPanel = new JPanel();
+      searchPanel.setLayout(new BorderLayout());
+      searchPanel.add(filterField, BorderLayout.CENTER);
+      searchPanel.add(new JLabel(View.getIcon("search16")), BorderLayout.WEST);
+      JLabel closeSearchButton=new JLabel(View.getIcon("cancel16"));
+      closeSearchButton.addMouseListener(new MouseAdapter() {
+
+         @Override
+         public void mouseClicked(MouseEvent e) {
+            filterField.setText("");
+            doFilter();
+            searchPanel.setVisible(false);
+         }
+      
+      });
+      searchPanel.add(closeSearchButton, BorderLayout.EAST);
+      JPanel pan1 = new JPanel(new BorderLayout());
+      pan1.add(new JScrollPane(tagTree), BorderLayout.CENTER);
+      pan1.add(searchPanel, BorderLayout.SOUTH);
+
+      filterField.setActionCommand("FILTERSCRIPT");
+      filterField.addActionListener(this);
+
+      searchPanel.setVisible(false);
+
+      filterField.getDocument().addDocumentListener(new DocumentListener() {
+         @Override
+         public void changedUpdate(DocumentEvent e) {
+            warn();
+         }
+
+         @Override
+         public void removeUpdate(DocumentEvent e) {
+            warn();
+         }
+
+         @Override
+         public void insertUpdate(DocumentEvent e) {
+            warn();
+         }
+
+         public void warn() {
+            doFilter();
+         }
+      });
+
       //displayPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-      splitPane2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(tagTree), detailPanel);
+      splitPane2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT, pan1, detailPanel);
       splitPane1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitPane2, displayPanel);
       cnt.add(splitPane1, BorderLayout.CENTER);
       splitPane1.setDividerLocation(0.5);
       View.centerScreen(this);
+      tagTree.addKeyListener(new KeyAdapter() {
 
+         @Override
+         public void keyPressed(KeyEvent e) {
+            if((e.getKeyCode()=='F')&&(e.isControlDown())){
+               searchPanel.setVisible(true);
+               filterField.requestFocusInWindow();
+            }
+         }
+      
+      });
+      detailPanel.setVisible(false);
 
+   }
+
+   public void doFilter() {
+      TagNode n = getASTagNode(tagTree);
+      if (n != null) {
+         if (n.tag instanceof ClassesListTreeModel) {
+            n.tag = new ClassesListTreeModel(abcPanel.classTree.treeList, filterField.getText());
+         }
+         tagTree.updateUI();
+      }
    }
 
    @Override
@@ -466,8 +551,9 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
          if (actionPanel != null) {
             actionPanel.initSplits();
          }
-         splitPane1.setDividerLocation(getWidth() / 3);
+         splitPane1.setDividerLocation(getWidth() / 3);         
          splitPane2.setDividerLocation(splitPane2.getHeight() * 3 / 5);
+         splitPos=splitPane2.getDividerLocation();
       }
    }
 
@@ -784,7 +870,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
          if (node instanceof TagNode) {
             Object tag = ((TagNode) tm.getChild(root, i)).tag;
             if (tag != null) {
-               if (tag.equals("scripts")) {
+               if (tag.toString().equals("scripts")) {
                   return (TagNode) node;
                }
             }
@@ -1070,6 +1156,20 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             JOptionPane.showMessageDialog(null, "Please visit\r\n" + donateURL + "\r\nfor details.");
          }
       }
+      
+      if (e.getActionCommand().equals("HOMEPAGE")) {
+         String homePageURL = Main.projectPage;
+         if (java.awt.Desktop.isDesktopSupported()) {
+            java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+            try {
+               java.net.URI uri = new java.net.URI(homePageURL);
+               desktop.browse(uri);
+            } catch (Exception ex) {
+            }
+         } else {
+            JOptionPane.showMessageDialog(null, "Visit homepage at: \r\n" + homePageURL);
+         }
+      }
 
       if (e.getActionCommand().startsWith("RESTORECONTROLFLOW")) {
          Main.startWork("Restoring control flow...");
@@ -1223,9 +1323,22 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
       }
    }
 
+   private int splitPos=0;
    public void showDetail(String card) {
       CardLayout cl = (CardLayout) (detailPanel.getLayout());
       cl.show(detailPanel, card);
+      if(card.equals(DETAILCARDEMPTYPANEL)){
+         if(detailPanel.isVisible()){
+            splitPos=splitPane2.getDividerLocation();
+            detailPanel.setVisible(false);
+         }
+      }else{
+         if(!detailPanel.isVisible()){
+            detailPanel.setVisible(true);
+            splitPane2.setDividerLocation(splitPos);
+         }
+      }
+     
    }
 
    public void showCard(String card) {
