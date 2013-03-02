@@ -51,11 +51,7 @@ public class GraphFrame extends JFrame {
       protected void paintComponent(Graphics g) {
          super.paintComponent(g);
          g.setColor(Color.black);
-         GraphPart h = graph.heads.get(0);
-         if (graph.heads.size() > 3) {
-            h = graph.heads.get(3);
-         }
-         paintPart(g, h, 0, getPartWidth(graph.heads.get(0), new HashSet<GraphPart>()) * (BLOCK_WIDTH + SPACE_HORIZONTAL) / 2, new HashMap<GraphPart, Point>());
+         paintPart(g, graph.heads.get(0), 0, getPartWidth(graph.heads.get(0), new HashSet<GraphPart>()) * (BLOCK_WIDTH + SPACE_HORIZONTAL) / 2, new HashMap<GraphPart, Point>());
       }
 
       private void paintPart(Graphics g, GraphPart part, int y, int x, HashMap<GraphPart, Point> used) {
