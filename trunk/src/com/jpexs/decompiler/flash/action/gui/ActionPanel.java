@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
@@ -134,7 +135,10 @@ public class ActionPanel extends JPanel implements TreeSelectionListener, Action
       splitPane.setResizeWeight(0.5);
       splitPane2.setResizeWeight(0.5);
       editor.setContentType("text/flasm");
+      editor.setFont(new Font("Monospaced", Font.PLAIN, editor.getFont().getSize()));
       decompiledEditor.setContentType("text/actionscript");
+      decompiledEditor.setFont(new Font("Monospaced", Font.PLAIN, decompiledEditor.getFont().getSize()));
+
       tagTree.addTreeSelectionListener(this);
       editor.addCaretListener(new CaretListener() {
          @Override

@@ -1209,12 +1209,12 @@ public class AVM2Code implements Serializable {
              continue;
              }
              }
-             }*/            
-            if((ins.definition instanceof GetLocalTypeIns)&&(!output.isEmpty())&&(output.get(output.size()-1) instanceof SetLocalTreeItem)&&(((SetLocalTreeItem)output.get(output.size()-1)).regIndex==((GetLocalTypeIns)ins.definition).getRegisterId(ins))&&isKilled(((SetLocalTreeItem)output.get(output.size()-1)).regIndex, start, end)){
-               SetLocalTreeItem slt=(SetLocalTreeItem)output.remove(output.size()-1);
+             }*/
+            if ((ins.definition instanceof GetLocalTypeIns) && (!output.isEmpty()) && (output.get(output.size() - 1) instanceof SetLocalTreeItem) && (((SetLocalTreeItem) output.get(output.size() - 1)).regIndex == ((GetLocalTypeIns) ins.definition).getRegisterId(ins)) && isKilled(((SetLocalTreeItem) output.get(output.size() - 1)).regIndex, start, end)) {
+               SetLocalTreeItem slt = (SetLocalTreeItem) output.remove(output.size() - 1);
                stack.push(slt.getValue());
                ip++;
-            }else  if ((ins.definition instanceof SetLocalTypeIns) && (ip + 1 <= end) && (isKilled(((SetLocalTypeIns) ins.definition).getRegisterId(ins), ip, end))) { //set_local_x,get_local_x..kill x
+            } else if ((ins.definition instanceof SetLocalTypeIns) && (ip + 1 <= end) && (isKilled(((SetLocalTypeIns) ins.definition).getRegisterId(ins), ip, end))) { //set_local_x,get_local_x..kill x
                AVM2Instruction insAfter = code.get(ip + 1);
                if ((insAfter.definition instanceof GetLocalTypeIns) && (((GetLocalTypeIns) insAfter.definition).getRegisterId(insAfter) == ((SetLocalTypeIns) ins.definition).getRegisterId(ins))) {
                   GraphTargetItem before = stack.peek();

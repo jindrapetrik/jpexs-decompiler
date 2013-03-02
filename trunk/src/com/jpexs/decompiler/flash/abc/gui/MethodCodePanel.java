@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
@@ -70,6 +71,7 @@ public class MethodCodePanel extends JPanel implements ActionListener {
       setLayout(new BorderLayout());
       add(new JScrollPane(sourceTextArea), BorderLayout.CENTER);
       sourceTextArea.setContentType("text/flasm3");
+      sourceTextArea.setFont(new Font("Monospaced", Font.PLAIN, sourceTextArea.getFont().getSize()));
 
       buttonsPanel = new JPanel();
       buttonsPanel.setLayout(new FlowLayout());

@@ -29,6 +29,6 @@ public class Loop {
    public Loop(long id, GraphPart loopContinue, GraphPart loopBreak) {
       this.loopContinue = loopContinue;
       this.loopBreak = loopBreak;
-      this.id=id;
+      this.id = id;
    }
 }

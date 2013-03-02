@@ -63,7 +63,7 @@ public class ActionGraph extends Graph {
    }
 
    @Override
-   protected void finalProcess(List<GraphTargetItem> list,int level) {
+   protected void finalProcess(List<GraphTargetItem> list, int level) {
       List<GraphTargetItem> ret = Action.checkClass(list);
       if (ret != list) {
          list.clear();
@@ -178,7 +178,7 @@ public class ActionGraph extends Graph {
             next = breakPart;
 
             GraphTargetItem ti = checkLoop(next, stopPart, loops);
-            Loop currentLoop = new Loop(loops.size(),null, next);
+            Loop currentLoop = new Loop(loops.size(), null, next);
             loops.add(currentLoop);
             //switchLoc.getNextPartPath(new ArrayList<GraphPart>());
             List<Integer> valuesMapping = new ArrayList<Integer>();

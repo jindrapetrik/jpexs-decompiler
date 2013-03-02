@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.DoABCTag;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -198,6 +199,8 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
       splitPaneDecompiledVSDetail.setResizeWeight(0.5);
       splitPaneDecompiledVSDetail.setContinuousLayout(true);
       decompiledTextArea.setContentType("text/actionscript");
+      decompiledTextArea.setFont(new Font("Monospaced", Font.PLAIN, decompiledTextArea.getFont().getSize()));
+
 
       JPanel pan2 = new JPanel();
       pan2.setLayout(new BorderLayout());

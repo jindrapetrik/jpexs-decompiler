@@ -16,8 +16,6 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses;
 
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.*;
 import com.jpexs.decompiler.flash.graph.Block;
 import com.jpexs.decompiler.flash.graph.ContinueItem;
@@ -26,7 +24,6 @@ import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.graph.Loop;
 import com.jpexs.decompiler.flash.graph.LoopItem;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class ForEachInTreeItem extends LoopItem implements Block {

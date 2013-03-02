@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.methodinfo_parser.ParseException;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.util.ArrayList;
 import javax.swing.*;
 import jsyntaxpane.syntaxkits.Flasm3MethodInfoSyntaxKit;
@@ -49,6 +50,9 @@ public class MethodInfoPanel extends JPanel {
       add(jsp);
       paramEditor.setContentType("text/flasm3_methodinfo");
       returnTypeEditor.setContentType("text/flasm3_methodinfo");
+      paramEditor.setFont(new Font("Monospaced", Font.PLAIN, paramEditor.getFont().getSize()));
+      returnTypeEditor.setFont(new Font("Monospaced", Font.PLAIN, returnTypeEditor.getFont().getSize()));
+
       jsp.setMaximumSize(new Dimension(1024, 25));
       Flasm3MethodInfoSyntaxKit sk = (Flasm3MethodInfoSyntaxKit) returnTypeEditor.getEditorKit();
       sk.deinstallComponent(returnTypeEditor, "jsyntaxpane.components.LineNumbersRuler");

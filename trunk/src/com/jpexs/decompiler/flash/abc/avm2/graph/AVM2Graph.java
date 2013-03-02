@@ -1423,7 +1423,7 @@ public class AVM2Graph extends Graph {
          }
 
          GraphTargetItem ti = checkLoop(next, stopPart, loops);
-         Loop currentLoop = new Loop(loops.size(),null, next);
+         Loop currentLoop = new Loop(loops.size(), null, next);
          loops.add(currentLoop);
          //switchLoc.getNextPartPath(new ArrayList<GraphPart>());
          List<Integer> valuesMapping = new ArrayList<Integer>();
@@ -1497,34 +1497,34 @@ public class AVM2Graph extends Graph {
    }
 
    @Override
-   protected void finalProcess(List<GraphTargetItem> list, int level) {     
-      if(level==0){
-         if(!list.isEmpty()){
-            if(list.get(list.size()-1) instanceof ReturnVoidTreeItem){
-               list.remove(list.size()-1);
+   protected void finalProcess(List<GraphTargetItem> list, int level) {
+      if (level == 0) {
+         if (!list.isEmpty()) {
+            if (list.get(list.size() - 1) instanceof ReturnVoidTreeItem) {
+               list.remove(list.size() - 1);
             }
          }
       }
-      for(int i=0;i<list.size();i++){
-         if(list.get(i) instanceof WhileItem){
-            WhileItem w=(WhileItem)list.get(i);
-            if(w.expression instanceof HasNextTreeItem){
-               if(!w.commands.isEmpty()){
-                  if(w.commands.get(0) instanceof SetTypeTreeItem){
-                     SetTypeTreeItem sti=(SetTypeTreeItem)w.commands.remove(0);                     
-                     GraphTargetItem gti=sti.getValue().getNotCoerced();
-                     if(gti instanceof NextValueTreeItem){
-                        list.set(i, new ForEachInTreeItem(w.src, w.loop,new InTreeItem(null,sti.getObject() , ((HasNextTreeItem)w.expression).collection), w.commands));
-                     }else if(gti instanceof NextNameTreeItem){
-                        list.set(i, new ForInTreeItem(w.src, w.loop,new InTreeItem(null,sti.getObject() , ((HasNextTreeItem)w.expression).collection), w.commands));
-                     }                     
+      for (int i = 0; i < list.size(); i++) {
+         if (list.get(i) instanceof WhileItem) {
+            WhileItem w = (WhileItem) list.get(i);
+            if (w.expression instanceof HasNextTreeItem) {
+               if (!w.commands.isEmpty()) {
+                  if (w.commands.get(0) instanceof SetTypeTreeItem) {
+                     SetTypeTreeItem sti = (SetTypeTreeItem) w.commands.remove(0);
+                     GraphTargetItem gti = sti.getValue().getNotCoerced();
+                     if (gti instanceof NextValueTreeItem) {
+                        list.set(i, new ForEachInTreeItem(w.src, w.loop, new InTreeItem(null, sti.getObject(), ((HasNextTreeItem) w.expression).collection), w.commands));
+                     } else if (gti instanceof NextNameTreeItem) {
+                        list.set(i, new ForInTreeItem(w.src, w.loop, new InTreeItem(null, sti.getObject(), ((HasNextTreeItem) w.expression).collection), w.commands));
+                     }
                   }
                }
             }
          }
       }
-      
-      
+
+
       List<GraphTargetItem> ret = code.clearTemporaryRegisters(list);
       if (ret != list) {
          list.clear();

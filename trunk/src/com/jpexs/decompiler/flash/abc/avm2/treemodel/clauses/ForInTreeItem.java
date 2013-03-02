@@ -16,8 +16,6 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses;
 
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.*;
 import com.jpexs.decompiler.flash.graph.Block;
 import com.jpexs.decompiler.flash.graph.ContinueItem;
@@ -26,7 +24,6 @@ import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.graph.Loop;
 import com.jpexs.decompiler.flash.graph.LoopItem;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class ForInTreeItem extends LoopItem implements Block {
@@ -41,7 +38,7 @@ public class ForInTreeItem extends LoopItem implements Block {
       return ret;
    }
 
-   public ForInTreeItem(GraphSourceItem instruction,Loop loop, InTreeItem expression, List<GraphTargetItem> commands) {
+   public ForInTreeItem(GraphSourceItem instruction, Loop loop, InTreeItem expression, List<GraphTargetItem> commands) {
       super(instruction, loop);
       if (!commands.isEmpty()) {
          GraphTargetItem firstAssign = commands.get(0);
