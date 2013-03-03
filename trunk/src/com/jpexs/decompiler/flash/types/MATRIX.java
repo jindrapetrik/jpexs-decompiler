@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.types;
 
 import java.awt.Point;
+import java.io.Serializable;
 
 /**
  * Represents a standard 2x3 transformation matrix of the sort commonly used in
@@ -24,7 +25,7 @@ import java.awt.Point;
  *
  * @author JPEXS
  */
-public class MATRIX {
+public class MATRIX implements Serializable {
 
    /**
     * Has scale values

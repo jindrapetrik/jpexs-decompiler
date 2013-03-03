@@ -80,26 +80,25 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
 
    public RECT getRect(HashMap<Integer, CharacterTag> characters) {
       RECT ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
+      HashMap<Integer,Integer> depthMap=new HashMap<Integer, Integer>();
       for (Tag t : subTags) {
-         Set<Integer> needed = t.getNeededCharacters();
+         Set<Integer> needed = t.getNeededCharacters();         
+         MATRIX m = null;        
+         if (t instanceof PlaceObjectTypeTag) {
+            PlaceObjectTypeTag pot=(PlaceObjectTypeTag) t;
+            m = pot.getMatrix();
+            int charId=pot.getCharacterId();
+            if(charId>-1){
+               depthMap.put(pot.getDepth(), charId);
+            }else{
+               needed.add(depthMap.get(pot.getDepth()));
+            }
+         }    
          if (needed.isEmpty()) {
             continue;
          }
          RECT r = getCharacterBounds(characters, needed);
-         MATRIX m = null;
-         if (t instanceof PlaceObjectTag) {
-            m = ((PlaceObjectTag) t).matrix;
-         }
-         if (t instanceof PlaceObject2Tag) {
-            if (((PlaceObject2Tag) t).placeFlagHasMatrix) {
-               m = ((PlaceObject2Tag) t).matrix;
-            }
-         }
-         if (t instanceof PlaceObject3Tag) {
-            if (((PlaceObject3Tag) t).placeFlagHasMatrix) {
-               m = ((PlaceObject3Tag) t).matrix;
-            }
-         }
+               
          if (m != null) {
             Point topleft = m.apply(new Point(r.Xmin, r.Ymin));
             Point bottomright = m.apply(new Point(r.Xmax, r.Ymax));

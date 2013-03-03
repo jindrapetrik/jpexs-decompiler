@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -119,5 +121,15 @@ public class Tag {
 
    public Set<Integer> getNeededCharacters() {
       return new HashSet<Integer>();
+   }
+   
+   public Set<Integer> getDeepNeededCharacters(HashMap<Integer, CharacterTag> characters){
+      Set<Integer> ret=new HashSet<Integer>();
+      Set<Integer> needed=getNeededCharacters();
+      ret.addAll(needed);
+      for(int ch:needed){
+         ret.addAll(characters.get(ch).getDeepNeededCharacters(characters));
+      }      
+      return ret;
    }
 }

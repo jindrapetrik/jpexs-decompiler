@@ -58,6 +58,9 @@ import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
+import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
+import com.jpexs.decompiler.flash.tags.PlaceObjectTag;
+import com.jpexs.decompiler.flash.tags.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -217,7 +220,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             Main.exit();
          }
       });
-      setTitle(Main.applicationName +(Main.DISPLAY_FILENAME?" - " + Main.getFileTitle():""));
+      setTitle(Main.applicationName + (Main.DISPLAY_FILENAME ? " - " + Main.getFileTitle() : ""));
       JMenuBar menuBar = new JMenuBar();
 
       JMenu menuFile = new JMenu("File");
@@ -335,7 +338,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
       miDonate.setActionCommand("DONATE");
       miDonate.setIcon(View.getIcon("donate16"));
       miDonate.addActionListener(this);
-      
+
       JMenuItem miHomepage = new JMenuItem("Visit homepage");
       miHomepage.setActionCommand("HOMEPAGE");
       miHomepage.setIcon(View.getIcon("homepage16"));
@@ -366,7 +369,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
       CardLayout cl2 = (CardLayout) (detailPanel.getLayout());
       cl2.show(detailPanel, DETAILCARDEMPTYPANEL);
 
-      
+
       abcList = new ArrayList<DoABCTag>();
       getActionScript3(objs, abcList);
       if (!abcList.isEmpty()) {
@@ -468,16 +471,14 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
       searchPanel.setLayout(new BorderLayout());
       searchPanel.add(filterField, BorderLayout.CENTER);
       searchPanel.add(new JLabel(View.getIcon("search16")), BorderLayout.WEST);
-      JLabel closeSearchButton=new JLabel(View.getIcon("cancel16"));
+      JLabel closeSearchButton = new JLabel(View.getIcon("cancel16"));
       closeSearchButton.addMouseListener(new MouseAdapter() {
-
          @Override
          public void mouseClicked(MouseEvent e) {
             filterField.setText("");
             doFilter();
             searchPanel.setVisible(false);
          }
-      
       });
       searchPanel.add(closeSearchButton, BorderLayout.EAST);
       JPanel pan1 = new JPanel(new BorderLayout());
@@ -517,15 +518,13 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
       splitPane1.setDividerLocation(0.5);
       View.centerScreen(this);
       tagTree.addKeyListener(new KeyAdapter() {
-
          @Override
          public void keyPressed(KeyEvent e) {
-            if((e.getKeyCode()=='F')&&(e.isControlDown())){
+            if ((e.getKeyCode() == 'F') && (e.isControlDown())) {
                searchPanel.setVisible(true);
                filterField.requestFocusInWindow();
             }
          }
-      
       });
       detailPanel.setVisible(false);
 
@@ -551,9 +550,9 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
          if (actionPanel != null) {
             actionPanel.initSplits();
          }
-         splitPane1.setDividerLocation(getWidth() / 3);         
+         splitPane1.setDividerLocation(getWidth() / 3);
          splitPane2.setDividerLocation(splitPane2.getHeight() * 3 / 5);
-         splitPos=splitPane2.getDividerLocation();
+         splitPos = splitPane2.getDividerLocation();
       }
    }
 
@@ -1024,7 +1023,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
       }
       if (e.getActionCommand().equals("SAVEAS")) {
          if (Main.saveFileDialog()) {
-            setTitle(Main.applicationName + (Main.DISPLAY_FILENAME?" - " + Main.getFileTitle():""));
+            setTitle(Main.applicationName + (Main.DISPLAY_FILENAME ? " - " + Main.getFileTitle() : ""));
          }
       }
       if (e.getActionCommand().equals("OPEN")) {
@@ -1156,7 +1155,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             JOptionPane.showMessageDialog(null, "Please visit\r\n" + donateURL + "\r\nfor details.");
          }
       }
-      
+
       if (e.getActionCommand().equals("HOMEPAGE")) {
          String homePageURL = Main.projectPage;
          if (java.awt.Desktop.isDesktopSupported()) {
@@ -1322,23 +1321,23 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
          }
       }
    }
+   private int splitPos = 0;
 
-   private int splitPos=0;
    public void showDetail(String card) {
       CardLayout cl = (CardLayout) (detailPanel.getLayout());
       cl.show(detailPanel, card);
-      if(card.equals(DETAILCARDEMPTYPANEL)){
-         if(detailPanel.isVisible()){
-            splitPos=splitPane2.getDividerLocation();
+      if (card.equals(DETAILCARDEMPTYPANEL)) {
+         if (detailPanel.isVisible()) {
+            splitPos = splitPane2.getDividerLocation();
             detailPanel.setVisible(false);
          }
-      }else{
-         if(!detailPanel.isVisible()){
+      } else {
+         if (!detailPanel.isVisible()) {
             detailPanel.setVisible(true);
             splitPane2.setDividerLocation(splitPos);
          }
       }
-     
+
    }
 
    public void showCard(String card) {
@@ -1427,7 +1426,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             }
             tempFile = File.createTempFile("temp", ".swf");
             tempFile.deleteOnExit();
-
+            
             FileOutputStream fos = new FileOutputStream(tempFile);
             SWFOutputStream sos = new SWFOutputStream(fos, 10);
             sos.write("FWS".getBytes());
@@ -1465,19 +1464,40 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                      break;
                   }
                   Tag t = (Tag) o;
-                  if (frameCnt == fn.getFrame()) {
-                     Set<Integer> needed = t.getNeededCharacters();
-                     for (int n : needed) {
-                        if (!doneCharacters.contains(n)) {
-                           sos2.writeTag(characters.get(n));
-                           doneCharacters.add(n);
-                        }
-                     }
-                     if (t instanceof CharacterTag) {
-                        doneCharacters.add(((CharacterTag) t).getCharacterID());
+                  Set<Integer> needed = t.getDeepNeededCharacters(characters);
+                  for (int n : needed) {
+                     if (!doneCharacters.contains(n)) {
+                        sos2.writeTag(characters.get(n));
+                        doneCharacters.add(n);
                      }
                   }
+                  if (t instanceof CharacterTag) {
+                     doneCharacters.add(((CharacterTag) t).getCharacterID());
+                  }
                   sos2.writeTag(t);
+
+                  if (parent != null) {
+                     if (t instanceof PlaceObjectTypeTag) {
+                        PlaceObjectTypeTag pot = (PlaceObjectTypeTag) t;
+                        int chid = pot.getCharacterId();
+                        int depth = pot.getDepth();
+                        MATRIX mat = pot.getMatrix();                        
+                        if (mat == null) {
+                           mat = new MATRIX();
+                        }
+                        mat=(MATRIX)Helper.deepCopy(mat);
+                        if(parent instanceof BoundedTag){
+                           RECT r=((BoundedTag)parent).getRect(characters);
+                           mat.translateX =  mat.translateX +width / 2 - r.getWidth()/2;
+                           mat.translateY = mat.translateY + height/2 - r.getHeight()/2;
+                        }else{
+                           mat.translateX = mat.translateX + width / 2;
+                           mat.translateY = mat.translateY + height / 2;
+                        }
+                        sos2.writeTag(new PlaceObject2Tag(false, false, false, false, false, true, false, true, depth, chid, mat, null, 0, null, 0, null));
+
+                     }
+                  }
                }
                sos2.writeTag(new ShowFrameTag());
             } else {
@@ -1488,7 +1508,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                   }
                } else if (tagObj instanceof AloneTag) {
                } else {
-                  Set<Integer> needed = ((Tag) tagObj).getNeededCharacters();
+                  Set<Integer> needed = ((Tag) tagObj).getDeepNeededCharacters(characters);
                   for (int n : needed) {
                      sos2.writeTag(characters.get(n));
                   }

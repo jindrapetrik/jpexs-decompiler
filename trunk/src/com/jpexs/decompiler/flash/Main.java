@@ -81,7 +81,7 @@ public class Main {
       return commandLineMode;
    }
    
-   public static final boolean DISPLAY_FILENAME=true;
+   public static final boolean DISPLAY_FILENAME=false;
    public static boolean DEBUG_COPY = false;
    /**
     * Debug mode = throwing an error when comparing original file and recompiled

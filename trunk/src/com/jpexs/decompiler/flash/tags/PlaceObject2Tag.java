@@ -38,7 +38,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class PlaceObject2Tag extends Tag implements Container {
+public class PlaceObject2Tag extends Tag implements Container, PlaceObjectTypeTag {
 
    /**
     * @since SWF 5 Has clip actions (sprite characters only)
@@ -254,4 +254,28 @@ public class PlaceObject2Tag extends Tag implements Container {
       }
       return ret;
    }
+
+   public int getCharacterId() {
+      if(placeFlagHasCharacter){
+         return characterId;
+      }else{
+         return -1;
+      }
+   }
+
+   public int getDepth() {
+      return depth;
+   }
+
+   public MATRIX getMatrix() {
+      if(placeFlagHasMatrix){
+         return matrix;
+      }else{
+         return null;
+      }
+   }
+   
+   
+   
+   
 }
