@@ -24,14 +24,18 @@ import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsLossless2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsLosslessTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsTag;
+import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoABCTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.RECT;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.zip.DeflaterOutputStream;
@@ -432,6 +436,101 @@ public class SWF {
          }
       }
       return false;
+   }
+
+   public void populateVideoFrames(int streamId, List<Object> tags, HashMap<Integer, VideoFrameTag> output) {
+      for (Object t : tags) {
+         if (t instanceof VideoFrameTag) {
+            output.put(((VideoFrameTag) t).frameNum, (VideoFrameTag) t);
+         }
+         if (t instanceof Container) {
+            populateVideoFrames(streamId, ((Container) t).getSubItems(), output);
+         }
+      }
+   }
+
+   public void exportVideos(String outdir) throws IOException {
+      exportVideos(outdir, tags);
+   }
+
+   public void exportVideos(String outdir, List<Tag> tags) throws IOException {
+      if (!(new File(outdir)).exists()) {
+         (new File(outdir)).mkdirs();
+      }
+      List<Object> os = new ArrayList<Object>(this.tags);
+      for (Tag t : tags) {
+         if (t instanceof DefineVideoStreamTag) {
+            DefineVideoStreamTag videoStream = (DefineVideoStreamTag) t;
+            HashMap<Integer, VideoFrameTag> frames = new HashMap<Integer, VideoFrameTag>();
+            populateVideoFrames(videoStream.characterID, os, frames);
+
+            FileOutputStream fos = null;
+            try {
+               fos = new FileOutputStream(outdir + File.separator + ((DefineVideoStreamTag) t).characterID + ".flv");
+               FLVOutputStream flv = new FLVOutputStream(fos);
+               flv.writeHeader(false, true);
+               int ms = (int) (1000.0f / ((float) frameRate));
+               for (int i = 0; i < frames.size(); i++) {
+                  if (i == 1000) {
+                     break;
+                  }
+                  long posBefore = flv.getPos();
+                  flv.writeUI8(9); //type video
+                  VideoFrameTag tag = frames.get(i);
+                  flv.writeUI24(1 + tag.videoData.length);
+                  long timeStamp = i * ms;
+                  long ts1 = timeStamp & 0xffffff;
+                  int ts2 = (int) (timeStamp >> 24);
+                  flv.writeUI24(ts1);
+                  flv.writeUI8(ts2);
+                  flv.writeUI24(0); //streamId
+                  int frameType = 0;
+                  if (videoStream.codecID == 2) { //H263
+                     SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(tag.videoData), SWF.DEFAULT_VERSION);
+                     sis.readUB(17);//pictureStartCode
+                     sis.readUB(5); //version
+                     sis.readUB(8); //temporalReference
+                     int pictureSize = (int) sis.readUB(3); //pictureSize
+                     if (pictureSize == 0) {
+                        sis.readUB(8); //customWidth
+                        sis.readUB(8); //customHeight
+                     }
+                     if (pictureSize == 1) {
+                        sis.readUB(16); //customWidth
+                        sis.readUB(16); //customHeight
+                     }
+                     int pictureType = (int) sis.readUB(2);
+                     switch (pictureType) {
+                        case 0: //intra
+                           frameType = 1; //keyframe
+                           break;
+                        case 1://inter
+                           frameType = 2;
+                           break;
+                        case 2: //disposable
+                           frameType = 3;
+                           break;
+                     }
+                  }
+                  flv.writeUB(4, frameType);
+                  flv.writeUB(4, videoStream.codecID);
+                  flv.write(tag.videoData);
+                  long posAfter = flv.getPos();
+                  flv.writeUI32(posAfter - posBefore);
+               }
+
+
+            } finally {
+               if (fos != null) {
+                  try {
+                     fos.close();
+                  } catch (Exception ex) {
+                     //ignore
+                  }
+               }
+            }
+         }
+      }
    }
 
    public static void exportShapes(String outdir, List<Tag> tags) throws IOException {

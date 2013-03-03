@@ -52,6 +52,7 @@ import com.jpexs.decompiler.flash.tags.DefineShapeTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
+import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoABCTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.EndTag;
@@ -805,6 +806,10 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
       if (t instanceof ShowFrameTag) {
          return "showframe";
       }
+
+      if (t instanceof DefineVideoStreamTag) {
+         return "movie";
+      }
       return "folder";
    }
 
@@ -888,6 +893,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
       List<TagNode> images = getTagNodesWithType(list, "image", parent, true);
       List<TagNode> fonts = getTagNodesWithType(list, "font", parent, true);
       List<TagNode> texts = getTagNodesWithType(list, "text", parent, true);
+      List<TagNode> movies = getTagNodesWithType(list, "movie", parent, true);
       List<TagNode> actionScript = new ArrayList<TagNode>();
 
       for (TagNode n : sprites) {
@@ -919,6 +925,9 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
       TagNode imagesNode = new TagNode("images");
       imagesNode.subItems.addAll(images);
+
+      TagNode moviesNode = new TagNode("movies");
+      moviesNode.subItems.addAll(movies);
 
       TagNode fontsNode = new TagNode("fonts");
       fontsNode.subItems.addAll(fonts);
@@ -957,6 +966,9 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
       if (!imagesNode.subItems.isEmpty()) {
          ret.add(imagesNode);
       }
+      if (!moviesNode.subItems.isEmpty()) {
+         ret.add(moviesNode);
+      }
       if (!buttonsNode.subItems.isEmpty()) {
          ret.add(buttonsNode);
       }
@@ -966,6 +978,8 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
       if (!framesNode.subItems.isEmpty()) {
          ret.add(framesNode);
       }
+
+
 
 
       if (abcPanel != null) {
@@ -1066,6 +1080,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                            }
                            List<Tag> images = new ArrayList<Tag>();
                            List<Tag> shapes = new ArrayList<Tag>();
+                           List<Tag> movies = new ArrayList<Tag>();
                            List<TagNode> actionNodes = new ArrayList<TagNode>();
                            for (Object d : sel) {
                               if (d instanceof TagNode) {
@@ -1079,6 +1094,9 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                  if ("as".equals(getTagType(n.tag))) {
                                     actionNodes.add(n);
                                  }
+                                 if ("movie".equals(getTagType(n.tag))) {
+                                    movies.add((Tag) n.tag);
+                                 }
                               }
                               if (d instanceof TreeElement) {
                                  if (((TreeElement) d).isLeaf()) {
@@ -1088,6 +1106,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                            }
                            SWF.exportImages(selFile + File.separator + "images", images, jtt);
                            SWF.exportShapes(selFile + File.separator + "shapes", shapes);
+                           swf.exportVideos(selFile + File.separator + "movies", movies);
                            if (abcPanel != null) {
                               for (int i = 0; i < tlsList.size(); i++) {
                                  TreeLeafScript tls = tlsList.get(i);
@@ -1107,6 +1126,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                         } else {
                            Main.swf.exportImages(selFile + File.separator + "images");
                            Main.swf.exportShapes(selFile + File.separator + "shapes");
+                           swf.exportVideos(selFile + File.separator + "movies");
                            Main.swf.exportActionScript(selFile, isPcode);
                         }
                      } catch (Exception ignored) {
@@ -1397,7 +1417,9 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
       } else {
          showDetail(DETAILCARDEMPTYPANEL);
       }
-      if (tagObj instanceof ASMSource) {
+      if (tagObj instanceof DefineVideoStreamTag) {
+         showCard(CARDEMPTYPANEL);
+      } else if (tagObj instanceof ASMSource) {
          showCard(CARDACTIONSCRIPTPANEL);
          actionPanel.setSource((ASMSource) tagObj);
       } else if (tagObj instanceof DefineBitsTag) {
@@ -1426,7 +1448,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             }
             tempFile = File.createTempFile("temp", ".swf");
             tempFile.deleteOnExit();
-            
+
             FileOutputStream fos = new FileOutputStream(tempFile);
             SWFOutputStream sos = new SWFOutputStream(fos, 10);
             sos.write("FWS".getBytes());
@@ -1481,16 +1503,16 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                         PlaceObjectTypeTag pot = (PlaceObjectTypeTag) t;
                         int chid = pot.getCharacterId();
                         int depth = pot.getDepth();
-                        MATRIX mat = pot.getMatrix();                        
+                        MATRIX mat = pot.getMatrix();
                         if (mat == null) {
                            mat = new MATRIX();
                         }
-                        mat=(MATRIX)Helper.deepCopy(mat);
-                        if(parent instanceof BoundedTag){
-                           RECT r=((BoundedTag)parent).getRect(characters);
-                           mat.translateX =  mat.translateX +width / 2 - r.getWidth()/2;
-                           mat.translateY = mat.translateY + height/2 - r.getHeight()/2;
-                        }else{
+                        mat = (MATRIX) Helper.deepCopy(mat);
+                        if (parent instanceof BoundedTag) {
+                           RECT r = ((BoundedTag) parent).getRect(characters);
+                           mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
+                           mat.translateY = mat.translateY + height / 2 - r.getHeight() / 2;
+                        } else {
                            mat.translateX = mat.translateX + width / 2;
                            mat.translateY = mat.translateY + height / 2;
                         }

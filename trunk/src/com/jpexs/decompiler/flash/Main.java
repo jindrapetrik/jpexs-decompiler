@@ -411,8 +411,8 @@ public class Main {
       System.out.println(" ...opens SWF file with the decompiler GUI");
       System.out.println(" 3) -proxy (-PXXX)");
       System.out.println("  ...auto start proxy in the tray. Optional parameter -P specifies port for proxy. Defaults to 55555. ");
-      System.out.println(" 4) -export (as|pcode|image|shape) outdirectory infile");
-      System.out.println("  ...export infile sources to outdirectory as AsctionScript code (\"as\" argument) or as PCode (\"pcode\" argument), images or shapes");
+      System.out.println(" 4) -export (as|pcode|image|shape|movie) outdirectory infile");
+      System.out.println("  ...export infile sources to outdirectory as AsctionScript code (\"as\" argument) or as PCode (\"pcode\" argument), images, shapes or movies");
       System.out.println(" 5) -dumpSWF infile");
       System.out.println("  ...dumps list of SWF tags to console");
       System.out.println(" 6) -compress infile outfile");
@@ -515,8 +515,10 @@ public class Main {
                if (!exportFormat.toLowerCase().equals("pcode")) {
                   if (!exportFormat.toLowerCase().equals("image")) {
                      if (!exportFormat.toLowerCase().equals("shape")) {
+                        if (!exportFormat.toLowerCase().equals("movie")) {
                         System.err.println("Invalid export format:" + exportFormat);
                         badArguments();
+                        }
                      }
                   }
                }
@@ -548,7 +550,10 @@ public class Main {
                   exportOK = true;
                } else if (exportFormat.equals("as") || exportFormat.equals("pcode")) {
                   exportOK = exfile.exportActionScript(outDir.getAbsolutePath(), exportFormat.equals("pcode"));
-               } else {
+               } else if (exportFormat.equals("movie")) {
+                  exfile.exportVideos(outDir.getAbsolutePath());
+                  exportOK=true;
+               }else {
                   exportOK = false;
                }
             } catch (Exception ex) {

@@ -210,7 +210,7 @@ public class SWFInputStream extends InputStream {
          baos.write(r);
       }
    }
-
+ 
    /**
     * Reads one UI32 (Unsigned 32bit integer) value from the stream
     *

@@ -47,6 +47,8 @@ public class SWFOutputStream extends OutputStream {
    private OutputStream os;
    private int version;
    private long pos = 0;
+   private int bitPos = 0;
+   private int tempByte = 0;
 
    public long getPos() {
       return pos;
@@ -104,7 +106,7 @@ public class SWFOutputStream extends OutputStream {
       write(value.getBytes("utf8"));
       write(0);
    }
-
+      
    /**
     * Writes UI32 (Unsigned 32bit integer) value to the stream
     *
@@ -256,8 +258,7 @@ public class SWFOutputStream extends OutputStream {
          value = value >> 7;
       } while (loop);
    }
-   private int bitPos = 0;
-   private int tempByte = 0;
+   
 
    /**
     * Flushes data to underlying stream

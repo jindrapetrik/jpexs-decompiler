@@ -19,6 +19,7 @@ public class ExportDialog extends JDialog {
    JComboBox images;
    JComboBox shapes;
    JComboBox actionScript;
+   JComboBox movies;
    boolean cancelled = false;
 
    public ExportDialog() {
@@ -29,7 +30,7 @@ public class ExportDialog extends JDialog {
             cancelled = true;
          }
       });
-      setSize(200, 175);
+      setSize(200, 200);
       setLayout(null);
       JLabel shapesLabel = new JLabel("Shapes");
       shapesLabel.setBounds(10, 10, 60, 25);
@@ -41,10 +42,15 @@ public class ExportDialog extends JDialog {
       images = new JComboBox(new String[]{"PNG/JPEG"});
       images.setBounds(75, 35, 95, 25);
 
+      JLabel moviesLabel = new JLabel("Movies");
+      moviesLabel.setBounds(10, 60, 60, 25);
+      movies = new JComboBox(new String[]{"FLV (No audio)"});
+      movies.setBounds(75, 60, 95, 25);
+      
       JLabel actionScriptLabel = new JLabel("ActionScript");
-      actionScriptLabel.setBounds(10, 60, 60, 25);
+      actionScriptLabel.setBounds(10, 85, 60, 25);
       actionScript = new JComboBox(new String[]{"AS", "PCODE"});
-      actionScript.setBounds(75, 60, 95, 25);
+      actionScript.setBounds(75, 85, 95, 25);
 
       JButton okButton = new JButton("OK");
       okButton.addActionListener(new ActionListener() {
@@ -53,7 +59,7 @@ public class ExportDialog extends JDialog {
             setVisible(false);
          }
       });
-      okButton.setBounds(20, 95, 75, 25);
+      okButton.setBounds(20, 120, 75, 25);
 
       JButton cancelButton = new JButton("Cancel");
       cancelButton.addActionListener(new ActionListener() {
@@ -63,12 +69,14 @@ public class ExportDialog extends JDialog {
             setVisible(false);
          }
       });
-      cancelButton.setBounds(95, 95, 75, 25);
+      cancelButton.setBounds(95, 120, 75, 25);
       Container cnt = getContentPane();
       cnt.add(shapes);
       cnt.add(shapesLabel);
       cnt.add(images);
       cnt.add(imagesLabel);
+      cnt.add(movies);
+      cnt.add(moviesLabel);
       cnt.add(actionScript);
       cnt.add(actionScriptLabel);
       cnt.add(okButton);
