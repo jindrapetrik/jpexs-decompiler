@@ -35,6 +35,6 @@ public class ActionStopSounds extends Action {
 
    @Override
    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames) {
-      output.add(new SimpleActionTreeItem(this, "stopAllSounds();"));
+      output.add(new SimpleActionTreeItem(this, "stopAllSounds()"));
    }
 }
