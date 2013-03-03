@@ -23,6 +23,8 @@ import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.DoABCTag;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -212,12 +214,21 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
       navigator.setABC(list, abc);
 
 
-      navPanel = new JPanel(new BorderLayout());
-      JLabel traitsLabel = new JLabel("Traits");
-      navPanel.add(traitsLabel, BorderLayout.NORTH);
+      navPanel = new JPanel(new BorderLayout());      
+      JPanel navIconsPanel=new JPanel();
+      navIconsPanel.setLayout(new BoxLayout(navIconsPanel, BoxLayout.X_AXIS));
+      final JToggleButton sortButton=new JToggleButton(View.getIcon("sort16"));
+      navIconsPanel.add(sortButton);          
+      navPanel.add(navIconsPanel,BorderLayout.SOUTH);
+      navPanel.add(new JScrollPane(navigator), BorderLayout.CENTER);
+      sortButton.addActionListener(new ActionListener() {
 
-      traitsLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
-      //navPanel.add(new JScrollPane(navigator), BorderLayout.CENTER);
+         @Override
+         public void actionPerformed(ActionEvent e) {
+            navigator.setSorted(sortButton.isSelected());
+            navigator.updateUI();
+         }
+      });
 
       Main.startWork("Building script tree...");
 
@@ -262,7 +273,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
       splitPaneTreeVSNavigator.setResizeWeight(0.5);
       splitPaneTreeVSNavigator.setContinuousLayout(true);
       tabbedPane = new JTabbedPane();
-      tabbedPane.addTab("Traits", new JScrollPane(navigator));
+      tabbedPane.addTab("Traits", navPanel);
       //tabbedPane.setTabPlacement(JTabbedPane.BOTTOM);
 
       //pan2.add(tabbedPane, BorderLayout.CENTER);

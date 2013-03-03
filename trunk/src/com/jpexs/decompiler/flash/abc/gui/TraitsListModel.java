@@ -19,41 +19,60 @@ package com.jpexs.decompiler.flash.abc.gui;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.tags.DoABCTag;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataListener;
 
 public class TraitsListModel implements ListModel {
 
-   ABC abc;
-   int classIndex;
-   public static final String STR_INSTANCE_INITIALIZER = "instance initializer";
-   public static final String STR_CLASS_INITIALIZER = "class initializer";
+   private List<TraitsListItem> items;
    private List<DoABCTag> abcTags;
+   private ABC abc;
+   private int classIndex;
 
-   public TraitsListModel(List<DoABCTag> abcTags, ABC abc, int classIndex) {
-      this.abc = abc;
+   public void setSorted(boolean sorted) {
+      if (sorted) {
+         Collections.sort(items, new Comparator<TraitsListItem>() {
+            @Override
+            public int compare(TraitsListItem o1, TraitsListItem o2) {
+               return o1.toStringName().compareTo(o2.toStringName());
+            }
+         });
+      } else {
+         reset();
+      }
+   }
+
+   private void reset() {
+      items = new ArrayList<TraitsListItem>();
+      for (int t = 0; t < abc.class_info[classIndex].static_traits.traits.length; t++) {
+         items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(abc.class_info[classIndex].static_traits.traits[t]), t, true, abcTags, abc, classIndex));
+      }
+      for (int t = 0; t < abc.instance_info[classIndex].instance_traits.traits.length; t++) {
+         items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(abc.instance_info[classIndex].instance_traits.traits[t]), t, false, abcTags, abc, classIndex));
+      }
+      items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, false, abcTags, abc, classIndex));
+      items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, true, abcTags, abc, classIndex));
+   }
+
+   public TraitsListModel(List<DoABCTag> abcTags, ABC abc, int classIndex,boolean sorted) {
       this.abcTags = abcTags;
+      this.abc = abc;
       this.classIndex = classIndex;
+      reset();
+      if(sorted){
+         setSorted(true);
+      }
    }
 
    public int getSize() {
-      int cnt = abc.class_info[classIndex].static_traits.traits.length + abc.instance_info[classIndex].instance_traits.traits.length;
-      //if(abc.instance_info[classIndex].iinit_index!=0) cnt++;
-      cnt += 2;
-      return cnt;
+      return items.size();
    }
 
    public Object getElementAt(int index) {
-      if (index < abc.class_info[classIndex].static_traits.traits.length) {
-         return abc.class_info[classIndex].static_traits.traits[index].convertHeader("", abcTags, abc, true, false, classIndex, false, new ArrayList<String>());
-      } else if (index < abc.class_info[classIndex].static_traits.traits.length + abc.instance_info[classIndex].instance_traits.traits.length) {
-         return abc.instance_info[classIndex].instance_traits.traits[index - abc.class_info[classIndex].static_traits.traits.length].convertHeader("", abcTags, abc, false, false, classIndex, false, new ArrayList<String>());
-      } else if (index == abc.class_info[classIndex].static_traits.traits.length + abc.instance_info[classIndex].instance_traits.traits.length) {
-         return STR_INSTANCE_INITIALIZER;
-      } else {
-         return STR_CLASS_INITIALIZER;
-      }
+      return items.get(index);
    }
 
    public void addListDataListener(ListDataListener l) {

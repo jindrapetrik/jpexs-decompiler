@@ -52,22 +52,20 @@ public class IconListRenderer
 
       // Get icon to use for the list item value
 
-      String modifiersRegex = "(public |static |final |override |private |protected |package )*";
-      if ((" " + value.toString()).contains(" const ")) {
+      TraitsListItem tli=(TraitsListItem)value;
+      
+      if (tli.getType()==TraitsListItem.Type.CONST) {
          label.setIcon(constIcon);
       }
-      if ((" " + value.toString()).contains(" var ")) {
+      if (tli.getType()==TraitsListItem.Type.VAR) {
          label.setIcon(variableIcon);
       }
-      if ((" " + value.toString()).contains(" function ")) {
+      if (tli.getType()==TraitsListItem.Type.METHOD) {
          label.setIcon(functionIcon);
       }
-      if (value.toString().equals(TraitsListModel.STR_CLASS_INITIALIZER)) {
+      if (tli.getType()==TraitsListItem.Type.INITIALIZER) {
          label.setIcon(functionIcon);
-      }
-      if (value.toString().equals(TraitsListModel.STR_INSTANCE_INITIALIZER)) {
-         label.setIcon(functionIcon);
-      }
+      }      
       return label;
    }
 }
