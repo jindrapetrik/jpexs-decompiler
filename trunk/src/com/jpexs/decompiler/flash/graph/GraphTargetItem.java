@@ -104,7 +104,7 @@ public abstract class GraphTargetItem {
    }
 
    public String toStringNoQuotes(Object o) {
-      return toString(Helper.toList(o));
+      return toStringNoQuotes(Helper.toList(o));
    }
 
    public GraphTargetItem getNotCoerced() {
