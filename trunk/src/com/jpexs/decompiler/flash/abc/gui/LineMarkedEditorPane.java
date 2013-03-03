@@ -48,6 +48,14 @@ public class LineMarkedEditorPane extends JEditorPane {
    }
 
    @Override
+   public void setText(String t) {
+      lastLine=-1;
+      super.setText(t);
+   }
+   
+   
+
+   @Override
    public void paint(Graphics g) {
       g.setColor(Color.white);
       g.fillRect(0, 0, getWidth(), getHeight());
