@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.abc.gui;
+package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
 import com.jpexs.decompiler.flash.graph.GraphPart;

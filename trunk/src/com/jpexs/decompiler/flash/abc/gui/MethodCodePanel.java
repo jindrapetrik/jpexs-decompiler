@@ -40,6 +40,10 @@ public class MethodCodePanel extends JPanel implements ActionListener {
    public void focusEditor() {
       sourceTextArea.requestFocusInWindow();
    }
+   
+   public String getTraitName(){
+      return sourceTextArea.getName();
+   }
 
    public void setIgnoreCarret(boolean ignoreCarret) {
       sourceTextArea.setIgnoreCarret(ignoreCarret);
@@ -50,7 +54,10 @@ public class MethodCodePanel extends JPanel implements ActionListener {
    }
 
    public void setBodyIndex(int bodyIndex, ABC abc) {
-      sourceTextArea.setBodyIndex(bodyIndex, abc);
+      sourceTextArea.setBodyIndex(bodyIndex, abc,sourceTextArea.getName());
+   }
+   public void setBodyIndex(int bodyIndex, ABC abc,String name) {
+      sourceTextArea.setBodyIndex(bodyIndex, abc,name);
    }
 
    public int getBodyIndex() {

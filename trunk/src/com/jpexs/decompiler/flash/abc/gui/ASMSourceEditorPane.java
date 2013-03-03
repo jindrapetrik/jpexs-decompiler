@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.gui;
 
+import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
@@ -41,7 +42,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
    private List<Highlighting> disassembledHilights = new ArrayList<Highlighting>();
    private DecompiledEditorPane decompiledEditor;
    private boolean ignoreCarret = false;
-
+   private String name;
    public void setIgnoreCarret(boolean ignoreCarret) {
       this.ignoreCarret = ignoreCarret;
    }
@@ -66,15 +67,22 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
       }
    }
 
-   public void setBodyIndex(int bodyIndex, ABC abc) {
+   @Override
+   public String getName() {
+      return super.getName();
+   }
+
+   
+   public void setBodyIndex(int bodyIndex, ABC abc,String name) {
       this.bodyIndex = bodyIndex;
       this.abc = abc;
+      this.name=name;
       setText(abc.bodies[bodyIndex].code.toASMSource(abc.constants, abc.bodies[bodyIndex]));
    }
 
    public void graph() {
       AVM2Graph gr = new AVM2Graph(abc.bodies[bodyIndex].code, abc, abc.bodies[bodyIndex], false, 0, new HashMap<Integer, GraphTargetItem>(), new Stack<GraphTargetItem>(), new HashMap<Integer, String>(), new ArrayList<String>());
-      (new GraphFrame(gr, "")).setVisible(true);
+      (new GraphFrame(gr, name)).setVisible(true);
    }
 
    public void exec() {

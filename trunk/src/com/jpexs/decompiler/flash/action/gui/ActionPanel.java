@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.action.gui;
 
 import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.abc.gui.GraphFrame;
+import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.abc.gui.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.parser.ASMParser;

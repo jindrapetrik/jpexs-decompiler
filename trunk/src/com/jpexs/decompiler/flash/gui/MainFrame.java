@@ -217,7 +217,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             Main.exit();
          }
       });
-      setTitle(Main.applicationName + " - " + Main.getFileTitle());
+      setTitle(Main.applicationName +(Main.DISPLAY_FILENAME?" - " + Main.getFileTitle():""));
       JMenuBar menuBar = new JMenuBar();
 
       JMenu menuFile = new JMenu("File");
@@ -1024,7 +1024,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
       }
       if (e.getActionCommand().equals("SAVEAS")) {
          if (Main.saveFileDialog()) {
-            setTitle(Main.applicationName + " - " + Main.getFileTitle());
+            setTitle(Main.applicationName + (Main.DISPLAY_FILENAME?" - " + Main.getFileTitle():""));
          }
       }
       if (e.getActionCommand().equals("OPEN")) {
