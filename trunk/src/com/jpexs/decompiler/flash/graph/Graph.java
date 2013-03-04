@@ -905,7 +905,7 @@ public class Graph {
          }
          GraphPart loopBodyStart = null;
          GraphPart next = part.getNextPartPath(loopContinues);
-         if (((!reversed) || loop) && (expr instanceof LogicalOpItem)) {
+         if ((reversed == loop) && (expr instanceof LogicalOpItem)) {
             expr = ((LogicalOpItem) expr).invert();
          }
          List<GraphTargetItem> retx = ret;

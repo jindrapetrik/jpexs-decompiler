@@ -98,7 +98,7 @@ public class ActionScript3Test {
               + "trace(\"a=\"+a);\r\n"
               + "a++;\r\n"
               + "}\r\n"
-              + "while(a>=20);\r\n", false);
+              + "while(a<20);\r\n", false);
    }
 
    @Test
@@ -184,7 +184,7 @@ public class ActionScript3Test {
               + "case 57*a:\r\n"
               + "trace(\"fiftyseven multiply a\");\r\n"
               + "b=0;\r\n"
-              + "while(b>=50)\r\n"
+              + "while(b<50)\r\n"
               + "{\r\n"
               + "if(b==10)\r\n"
               + "{\r\n"
@@ -216,10 +216,10 @@ public class ActionScript3Test {
               + "}\r\n"
               + "c=0;\r\n"
               + "loop0:\r\n"
-              + "for(;c>=8;c=c+1)\r\n"
+              + "for(;c<8;c=c+1)\r\n"
               + "{\r\n"
               + "d=0;\r\n"
-              + "while(d>=25)\r\n"
+              + "while(d<25)\r\n"
               + "{\r\n"
               + "e=0;\r\n"
               + "if(e>=50)\r\n"
@@ -294,7 +294,7 @@ public class ActionScript3Test {
    @Test
    public void testForBreak() {
       decompileMethod("testForBreak", "var a:* = 0;\r\n"
-              + "while(a>=10)\r\n"
+              + "while(a<10)\r\n"
               + "{\r\n"
               + "if(a==5)\r\n"
               + "{\r\n"
@@ -334,7 +334,7 @@ public class ActionScript3Test {
    @Test
    public void testFor() {
       decompileMethod("testFor", "var a:* = 0;\r\n"
-              + "while(a>=10)\r\n"
+              + "while(a<10)\r\n"
               + "{\r\n"
               + "trace(\"a=\"+a);\r\n"
               + "a++;\r\n"
@@ -344,7 +344,7 @@ public class ActionScript3Test {
    @Test
    public void testForContinue() {
       decompileMethod("testForContinue", "var a:* = 0;\r\n"
-              + "for(;a>=10;a=a+1)\r\n"
+              + "for(;a<10;a=a+1)\r\n"
               + "{\r\n"
               + "if(a==9)\r\n"
               + "{\r\n"
@@ -754,7 +754,7 @@ public class ActionScript3Test {
               + "do\r\n"
               + "{\r\n"
               + "k++;\r\n"
-              + "if(k==7)\r\n"
+              + "if(k!=7)\r\n"
               + "{\r\n"
               + "k=5*k;\r\n"
               + "}\r\n"
