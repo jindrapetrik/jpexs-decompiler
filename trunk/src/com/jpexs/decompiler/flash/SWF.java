@@ -524,7 +524,8 @@ public class SWF {
                if ((shead.getSoundFormat() == 2) && mp3) {
                   fos = new FileOutputStream(outdir + File.separator + id + ".mp3");
                   for (int b = 0; b < blocks.size(); b++) {
-                     fos.write(blocks.get(b).getData(SWF.DEFAULT_VERSION));
+                     byte data[] = blocks.get(b).getData(SWF.DEFAULT_VERSION);
+                     fos.write(data, 4, data.length - 4);
                   }
                } else {
                   fos = new FileOutputStream(outdir + File.separator + id + ".flv");
