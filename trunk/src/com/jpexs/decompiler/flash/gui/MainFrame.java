@@ -1074,7 +1074,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
       }
 
       if (e.getActionCommand().startsWith("EXPORT")) {
-         ExportDialog export = new ExportDialog();
+         final ExportDialog export = new ExportDialog();
          export.setVisible(true);
          if (!export.cancelled) {
             JFileChooser chooser = new JFileChooser();
@@ -1087,7 +1087,8 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                Main.startWork("Exporting...");
                final String selFile = chooser.getSelectedFile().getAbsolutePath();
                Configuration.setConfig("lastExportDir", chooser.getSelectedFile().getParentFile().getAbsolutePath());
-               final boolean isPcode = export.getOption(ExportDialog.OPTION_ACTIONSCRIPT) == 1; 
+               final boolean isPcode = export.getOption(ExportDialog.OPTION_ACTIONSCRIPT) == 1;
+               final boolean isMp3 = export.getOption(ExportDialog.OPTION_SOUNDS) == 0;
                final boolean onlySel = e.getActionCommand().endsWith("SEL");
                (new Thread() {
                   @Override
@@ -1137,7 +1138,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                            SWF.exportImages(selFile + File.separator + "images", images, jtt);
                            SWF.exportShapes(selFile + File.separator + "shapes", shapes);
                            swf.exportMovies(selFile + File.separator + "movies", movies);
-                           swf.exportSounds(selFile + File.separator + "sounds", sounds);
+                           swf.exportSounds(selFile + File.separator + "sounds", sounds, isMp3);
                            if (abcPanel != null) {
                               for (int i = 0; i < tlsList.size(); i++) {
                                  TreeLeafScript tls = tlsList.get(i);
@@ -1158,7 +1159,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                            swf.exportImages(selFile + File.separator + "images");
                            swf.exportShapes(selFile + File.separator + "shapes");
                            swf.exportMovies(selFile + File.separator + "movies");
-                           swf.exportSounds(selFile + File.separator + "sounds");
+                           swf.exportSounds(selFile + File.separator + "sounds", isMp3);
                            swf.exportActionScript(selFile, isPcode);
                         }
                      } catch (Exception ignored) {

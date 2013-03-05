@@ -555,7 +555,7 @@ public class Main {
                   exfile.exportMovies(outDir.getAbsolutePath());
                   exportOK = true;
                } else if (exportFormat.equals("sound")) {
-                  exfile.exportSounds(outDir.getAbsolutePath());
+                  exfile.exportSounds(outDir.getAbsolutePath(), true);
                   exportOK = true;
                } else {
                   exportOK = false;

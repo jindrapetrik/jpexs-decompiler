@@ -21,7 +21,7 @@ public class ExportDialog extends JDialog {
       {"SVG"},
       {"PNG/JPEG"},
       {"FLV (No audio)"},
-      {"FLV (Audio only)"},
+      {"MP3/FLV","FLV (Audio only)"},
       {"AS", "PCODE"}
    };
    String optionNames[] = {
