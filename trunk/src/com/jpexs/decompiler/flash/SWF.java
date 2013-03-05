@@ -490,6 +490,9 @@ public class SWF {
    }
 
    public void exportSounds(String outdir, List<Tag> tags, boolean mp3) throws IOException {
+      if(tags.isEmpty()){
+         return;
+      }
       if (!(new File(outdir)).exists()) {
          (new File(outdir)).mkdirs();
       }
@@ -556,6 +559,9 @@ public class SWF {
    }
 
    public void exportMovies(String outdir, List<Tag> tags) throws IOException {
+      if(tags.isEmpty()){
+         return;
+      }
       if (!(new File(outdir)).exists()) {
          (new File(outdir)).mkdirs();
       }
@@ -620,6 +626,9 @@ public class SWF {
    }
 
    public static void exportShapes(String outdir, List<Tag> tags) throws IOException {
+      if(tags.isEmpty()){
+         return;
+      }
       if (!(new File(outdir)).exists()) {
          (new File(outdir)).mkdirs();
       }
@@ -647,6 +656,9 @@ public class SWF {
    }
 
    public static void exportImages(String outdir, List<Tag> tags, JPEGTablesTag jtt) throws IOException {
+      if(tags.isEmpty()){
+         return;
+      }
       if (!(new File(outdir)).exists()) {
          (new File(outdir)).mkdirs();
       }
