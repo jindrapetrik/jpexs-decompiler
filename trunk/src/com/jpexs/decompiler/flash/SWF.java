@@ -16,7 +16,11 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.flv.FLVOutputStream;
 import SevenZip.Compression.LZMA.Encoder;
+import com.jpexs.decompiler.flash.flv.AUDIODATA;
+import com.jpexs.decompiler.flash.flv.FLVTAG;
+import com.jpexs.decompiler.flash.flv.VIDEODATA;
 import com.jpexs.decompiler.flash.gui.TagNode;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
@@ -24,9 +28,14 @@ import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsLossless2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsLosslessTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsTag;
+import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoABCTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
+import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
+import com.jpexs.decompiler.flash.tags.SoundStreamHead2Tag;
+import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
+import com.jpexs.decompiler.flash.tags.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -35,6 +44,7 @@ import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.RECT;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -438,6 +448,28 @@ public class SWF {
       return false;
    }
 
+   public static void populateSoundStreamBlocks(List<Object> tags, Tag head, List<SoundStreamBlockTag> output) {
+      boolean found = false;
+      for (Object t : tags) {
+         if (t == head) {
+            found = true;
+            continue;
+         }
+         if (!found) {
+            continue;
+         }
+         if (t instanceof SoundStreamBlockTag) {
+            output.add((SoundStreamBlockTag) t);
+         }
+         if (t instanceof SoundStreamHeadTypeTag) {
+            break;
+         }
+         if (t instanceof Container) {
+            populateSoundStreamBlocks(((Container) t).getSubItems(), head, output);
+         }
+      }
+   }
+
    public void populateVideoFrames(int streamId, List<Object> tags, HashMap<Integer, VideoFrameTag> output) {
       for (Object t : tags) {
          if (t instanceof VideoFrameTag) {
@@ -449,11 +481,61 @@ public class SWF {
       }
    }
 
-   public void exportVideos(String outdir) throws IOException {
-      exportVideos(outdir, tags);
+   public void exportMovies(String outdir) throws IOException {
+      exportMovies(outdir, tags);
    }
 
-   public void exportVideos(String outdir, List<Tag> tags) throws IOException {
+   public void exportSounds(String outdir) throws IOException {
+      exportSounds(outdir, tags);
+   }
+
+   public void exportSounds(String outdir, List<Tag> tags) throws IOException {
+      if (!(new File(outdir)).exists()) {
+         (new File(outdir)).mkdirs();
+      }
+      List<Object> os = new ArrayList<Object>(this.tags);
+      for (Tag t : tags) {
+         FileOutputStream fos = null;
+         try {
+            int id = 0;
+            if (t instanceof DefineSoundTag) {
+               id = ((DefineSoundTag) t).soundId;
+            }
+            fos = new FileOutputStream(outdir + File.separator + id + ".flv");
+            FLVOutputStream flv = new FLVOutputStream(fos);
+            flv.writeHeader(true, false);
+            if (t instanceof DefineSoundTag) {
+               DefineSoundTag st = (DefineSoundTag) t;
+               flv.writeTag(new FLVTAG(0, new AUDIODATA(st.soundFormat, st.soundRate, st.soundSize, st.soundType, st.soundData)));
+            }
+            if (t instanceof SoundStreamHeadTypeTag) {
+               SoundStreamHeadTypeTag shead = (SoundStreamHeadTypeTag) t;
+               List<SoundStreamBlockTag> blocks = new ArrayList<SoundStreamBlockTag>();
+               List<Object> objs = new ArrayList<Object>(this.tags);
+               populateSoundStreamBlocks(objs, t, blocks);
+               int ms = (int) (1000.0f / ((float) frameRate));
+               for (int b = 0; b < blocks.size(); b++) {
+                  byte data[] = blocks.get(b).getData(SWF.DEFAULT_VERSION);
+                  if (shead.getSoundFormat() == 2) { //MP3
+                     data = Arrays.copyOfRange(data, 4, data.length);
+                  }
+                  flv.writeTag(new FLVTAG(ms * b, new AUDIODATA(shead.getSoundFormat(), shead.getSoundRate(), shead.getSoundSize(), shead.getSoundType(), data)));
+               }
+            }
+         } finally {
+            if (fos != null) {
+               try {
+                  fos.close();
+               } catch (Exception ex) {
+                  //ignore
+               }
+            }
+         }
+
+      }
+   }
+
+   public void exportMovies(String outdir, List<Tag> tags) throws IOException {
       if (!(new File(outdir)).exists()) {
          (new File(outdir)).mkdirs();
       }
@@ -471,19 +553,7 @@ public class SWF {
                flv.writeHeader(false, true);
                int ms = (int) (1000.0f / ((float) frameRate));
                for (int i = 0; i < frames.size(); i++) {
-                  if (i == 1000) {
-                     break;
-                  }
-                  long posBefore = flv.getPos();
-                  flv.writeUI8(9); //type video
                   VideoFrameTag tag = frames.get(i);
-                  flv.writeUI24(1 + tag.videoData.length);
-                  long timeStamp = i * ms;
-                  long ts1 = timeStamp & 0xffffff;
-                  int ts2 = (int) (timeStamp >> 24);
-                  flv.writeUI24(ts1);
-                  flv.writeUI8(ts2);
-                  flv.writeUI24(0); //streamId
                   int frameType = 0;
                   if (videoStream.codecID == 2) { //H263
                      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(tag.videoData), SWF.DEFAULT_VERSION);
@@ -512,11 +582,7 @@ public class SWF {
                            break;
                      }
                   }
-                  flv.writeUB(4, frameType);
-                  flv.writeUB(4, videoStream.codecID);
-                  flv.write(tag.videoData);
-                  long posAfter = flv.getPos();
-                  flv.writeUI32(posAfter - posBefore);
+                  flv.writeTag(new FLVTAG(i * ms, new VIDEODATA(frameType, videoStream.codecID, tag.videoData)));
                }
 
 

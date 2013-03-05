@@ -80,8 +80,7 @@ public class Main {
    public static boolean isCommandLineMode() {
       return commandLineMode;
    }
-   
-   public static final boolean DISPLAY_FILENAME=true;
+   public static final boolean DISPLAY_FILENAME = true;
    public static boolean DEBUG_COPY = false;
    /**
     * Debug mode = throwing an error when comparing original file and recompiled
@@ -411,7 +410,7 @@ public class Main {
       System.out.println(" ...opens SWF file with the decompiler GUI");
       System.out.println(" 3) -proxy (-PXXX)");
       System.out.println("  ...auto start proxy in the tray. Optional parameter -P specifies port for proxy. Defaults to 55555. ");
-      System.out.println(" 4) -export (as|pcode|image|shape|movie) outdirectory infile");
+      System.out.println(" 4) -export (as|pcode|image|shape|movie|sound) outdirectory infile");
       System.out.println("  ...export infile sources to outdirectory as AsctionScript code (\"as\" argument) or as PCode (\"pcode\" argument), images, shapes or movies");
       System.out.println(" 5) -dumpSWF infile");
       System.out.println("  ...dumps list of SWF tags to console");
@@ -516,8 +515,10 @@ public class Main {
                   if (!exportFormat.toLowerCase().equals("image")) {
                      if (!exportFormat.toLowerCase().equals("shape")) {
                         if (!exportFormat.toLowerCase().equals("movie")) {
-                        System.err.println("Invalid export format:" + exportFormat);
-                        badArguments();
+                           if (!exportFormat.toLowerCase().equals("sound")) {
+                              System.err.println("Invalid export format:" + exportFormat);
+                              badArguments();
+                           }
                         }
                      }
                   }
@@ -551,9 +552,12 @@ public class Main {
                } else if (exportFormat.equals("as") || exportFormat.equals("pcode")) {
                   exportOK = exfile.exportActionScript(outDir.getAbsolutePath(), exportFormat.equals("pcode"));
                } else if (exportFormat.equals("movie")) {
-                  exfile.exportVideos(outDir.getAbsolutePath());
-                  exportOK=true;
-               }else {
+                  exfile.exportMovies(outDir.getAbsolutePath());
+                  exportOK = true;
+               } else if (exportFormat.equals("sound")) {
+                  exfile.exportSounds(outDir.getAbsolutePath());
+                  exportOK = true;
+               } else {
                   exportOK = false;
                }
             } catch (Exception ex) {

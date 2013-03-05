@@ -49,6 +49,7 @@ import com.jpexs.decompiler.flash.tags.DefineShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
 import com.jpexs.decompiler.flash.tags.DefineShapeTag;
+import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
@@ -64,6 +65,10 @@ import com.jpexs.decompiler.flash.tags.PlaceObjectTag;
 import com.jpexs.decompiler.flash.tags.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
+import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
+import com.jpexs.decompiler.flash.tags.SoundStreamHead2Tag;
+import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
+import com.jpexs.decompiler.flash.tags.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
@@ -810,6 +815,10 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
       if (t instanceof DefineVideoStreamTag) {
          return "movie";
       }
+
+      if ((t instanceof DefineSoundTag) || (t instanceof SoundStreamHeadTag) || (t instanceof SoundStreamHead2Tag)) {
+         return "sound";
+      }
       return "folder";
    }
 
@@ -894,7 +903,19 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
       List<TagNode> fonts = getTagNodesWithType(list, "font", parent, true);
       List<TagNode> texts = getTagNodesWithType(list, "text", parent, true);
       List<TagNode> movies = getTagNodesWithType(list, "movie", parent, true);
+      List<TagNode> sounds = getTagNodesWithType(list, "sound", parent, true);
       List<TagNode> actionScript = new ArrayList<TagNode>();
+
+      for (int i = 0; i < sounds.size(); i++) {
+         if (sounds.get(i).tag instanceof SoundStreamHeadTypeTag) {
+            List<SoundStreamBlockTag> blocks = new ArrayList<SoundStreamBlockTag>();
+            SWF.populateSoundStreamBlocks(list, (Tag) sounds.get(i).tag, blocks);
+            if (blocks.isEmpty()) {
+               sounds.remove(i);
+               i--;
+            }
+         }
+      }
 
       for (TagNode n : sprites) {
          n.subItems = getTagNodesWithType(new ArrayList<Object>(((DefineSpriteTag) n.tag).subTags), "frame", n.tag, true);
@@ -928,6 +949,10 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
       TagNode moviesNode = new TagNode("movies");
       moviesNode.subItems.addAll(movies);
+
+      TagNode soundsNode = new TagNode("sounds");
+      soundsNode.subItems.addAll(sounds);
+
 
       TagNode fontsNode = new TagNode("fonts");
       fontsNode.subItems.addAll(fonts);
@@ -968,6 +993,9 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
       }
       if (!moviesNode.subItems.isEmpty()) {
          ret.add(moviesNode);
+      }
+      if (!soundsNode.subItems.isEmpty()) {
+         ret.add(soundsNode);
       }
       if (!buttonsNode.subItems.isEmpty()) {
          ret.add(buttonsNode);
@@ -1059,10 +1087,8 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                Main.startWork("Exporting...");
                final String selFile = chooser.getSelectedFile().getAbsolutePath();
                Configuration.setConfig("lastExportDir", chooser.getSelectedFile().getParentFile().getAbsolutePath());
-               final boolean isPcode = export.actionScript.getSelectedIndex() == 1; //e.getActionCommand().startsWith("EXPORTPCODE");
+               final boolean isPcode = export.getOption(ExportDialog.OPTION_ACTIONSCRIPT) == 1; 
                final boolean onlySel = e.getActionCommand().endsWith("SEL");
-               //final boolean images = e.getActionCommand().startsWith("EXPORTIMAGES");
-               //final boolean shapes = e.getActionCommand().startsWith("EXPORTSHAPES");
                (new Thread() {
                   @Override
                   public void run() {
@@ -1081,6 +1107,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                            List<Tag> images = new ArrayList<Tag>();
                            List<Tag> shapes = new ArrayList<Tag>();
                            List<Tag> movies = new ArrayList<Tag>();
+                           List<Tag> sounds = new ArrayList<Tag>();
                            List<TagNode> actionNodes = new ArrayList<TagNode>();
                            for (Object d : sel) {
                               if (d instanceof TagNode) {
@@ -1097,6 +1124,9 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                  if ("movie".equals(getTagType(n.tag))) {
                                     movies.add((Tag) n.tag);
                                  }
+                                 if ("sound".equals(getTagType(n.tag))) {
+                                    sounds.add((Tag) n.tag);
+                                 }
                               }
                               if (d instanceof TreeElement) {
                                  if (((TreeElement) d).isLeaf()) {
@@ -1106,7 +1136,8 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                            }
                            SWF.exportImages(selFile + File.separator + "images", images, jtt);
                            SWF.exportShapes(selFile + File.separator + "shapes", shapes);
-                           swf.exportVideos(selFile + File.separator + "movies", movies);
+                           swf.exportMovies(selFile + File.separator + "movies", movies);
+                           swf.exportSounds(selFile + File.separator + "sounds", sounds);
                            if (abcPanel != null) {
                               for (int i = 0; i < tlsList.size(); i++) {
                                  TreeLeafScript tls = tlsList.get(i);
@@ -1124,10 +1155,11 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                               }
                            }
                         } else {
-                           Main.swf.exportImages(selFile + File.separator + "images");
-                           Main.swf.exportShapes(selFile + File.separator + "shapes");
-                           swf.exportVideos(selFile + File.separator + "movies");
-                           Main.swf.exportActionScript(selFile, isPcode);
+                           swf.exportImages(selFile + File.separator + "images");
+                           swf.exportShapes(selFile + File.separator + "shapes");
+                           swf.exportMovies(selFile + File.separator + "movies");
+                           swf.exportSounds(selFile + File.separator + "sounds");
+                           swf.exportActionScript(selFile, isPcode);
                         }
                      } catch (Exception ignored) {
                         ignored.printStackTrace();
@@ -1418,6 +1450,8 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
          showDetail(DETAILCARDEMPTYPANEL);
       }
       if (tagObj instanceof DefineVideoStreamTag) {
+         showCard(CARDEMPTYPANEL);
+      } else if ((tagObj instanceof DefineSoundTag) || (tagObj instanceof SoundStreamHeadTag) || (tagObj instanceof SoundStreamHead2Tag)) {
          showCard(CARDEMPTYPANEL);
       } else if (tagObj instanceof ASMSource) {
          showCard(CARDACTIONSCRIPTPANEL);

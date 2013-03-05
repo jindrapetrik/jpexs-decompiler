@@ -16,11 +16,31 @@ import javax.swing.JLabel;
  */
 public class ExportDialog extends JDialog {
 
-   JComboBox images;
-   JComboBox shapes;
-   JComboBox actionScript;
-   JComboBox movies;
    boolean cancelled = false;
+   String options[][] = {
+      {"SVG"},
+      {"PNG/JPEG"},
+      {"FLV (No audio)"},
+      {"FLV (Audio only)"},
+      {"AS", "PCODE"}
+   };
+   String optionNames[] = {
+      "Shapes",
+      "Images",
+      "Movies",
+      "Sounds",
+      "ActionScript"
+   };
+   public static final int OPTION_SHAPES = 0;
+   public static final int OPTION_IMAGES = 1;
+   public static final int OPTION_MOVIES = 2;
+   public static final int OPTION_SOUNDS = 3;
+   public static final int OPTION_ACTIONSCRIPT = 4;
+   private JComboBox combos[];
+
+   public int getOption(int index) {
+      return combos[index].getSelectedIndex();
+   }
 
    public ExportDialog() {
       setTitle("Export...");
@@ -30,27 +50,23 @@ public class ExportDialog extends JDialog {
             cancelled = true;
          }
       });
-      setSize(200, 200);
+
       setLayout(null);
-      JLabel shapesLabel = new JLabel("Shapes");
-      shapesLabel.setBounds(10, 10, 60, 25);
-      shapes = new JComboBox(new String[]{"SVG"});
-      shapes.setBounds(75, 10, 95, 25);
 
-      JLabel imagesLabel = new JLabel("Images");
-      imagesLabel.setBounds(10, 35, 60, 25);
-      images = new JComboBox(new String[]{"PNG/JPEG"});
-      images.setBounds(75, 35, 95, 25);
+      Container cnt = getContentPane();
+      combos = new JComboBox[optionNames.length];
+      int top = 10;
+      for (int i = 0; i < optionNames.length; i++) {
+         JLabel lab = new JLabel(optionNames[i]);
+         lab.setBounds(10, top, 60, 25);
+         cnt.add(lab);
+         combos[i] = new JComboBox(options[i]);
+         combos[i].setBounds(75, top, 105, 25);
+         cnt.add(combos[i]);
+         top += 25;
+      }
+      top += 10;
 
-      JLabel moviesLabel = new JLabel("Movies");
-      moviesLabel.setBounds(10, 60, 60, 25);
-      movies = new JComboBox(new String[]{"FLV (No audio)"});
-      movies.setBounds(75, 60, 95, 25);
-      
-      JLabel actionScriptLabel = new JLabel("ActionScript");
-      actionScriptLabel.setBounds(10, 85, 60, 25);
-      actionScript = new JComboBox(new String[]{"AS", "PCODE"});
-      actionScript.setBounds(75, 85, 95, 25);
 
       JButton okButton = new JButton("OK");
       okButton.addActionListener(new ActionListener() {
@@ -59,7 +75,7 @@ public class ExportDialog extends JDialog {
             setVisible(false);
          }
       });
-      okButton.setBounds(20, 120, 75, 25);
+      okButton.setBounds(25, top, 75, 25);
 
       JButton cancelButton = new JButton("Cancel");
       cancelButton.addActionListener(new ActionListener() {
@@ -69,18 +85,11 @@ public class ExportDialog extends JDialog {
             setVisible(false);
          }
       });
-      cancelButton.setBounds(95, 120, 75, 25);
-      Container cnt = getContentPane();
-      cnt.add(shapes);
-      cnt.add(shapesLabel);
-      cnt.add(images);
-      cnt.add(imagesLabel);
-      cnt.add(movies);
-      cnt.add(moviesLabel);
-      cnt.add(actionScript);
-      cnt.add(actionScriptLabel);
+      cancelButton.setBounds(100, top, 75, 25);
+
       cnt.add(okButton);
       cnt.add(cancelButton);
+      setSize(210, top + 70);
       View.centerScreen(this);
       View.setWindowIcon(this);
       getRootPane().setDefaultButton(okButton);

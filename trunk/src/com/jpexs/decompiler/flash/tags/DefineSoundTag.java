@@ -42,7 +42,8 @@ public class DefineSoundTag extends CharacterTag {
    public static final int FORMAT_NELLYMOSER = 6;
    public static final int FORMAT_SPEEX = 11;
    public int soundRate;
-   public boolean soundType;//true=stereo
+   public int soundSize;
+   public int soundType;
    public long soundSampleCount;
    public byte soundData[];
 
@@ -66,7 +67,8 @@ public class DefineSoundTag extends CharacterTag {
          sos.writeUI16(soundId);
          sos.writeUB(4, soundFormat);
          sos.writeUB(2, soundRate);
-         sos.writeUB(1, soundType ? 1 : 0);
+         sos.writeUB(1, soundSize);
+         sos.writeUB(1, soundType);
          sos.writeUI32(soundSampleCount);
          sos.write(soundData);
       } catch (IOException e) {
@@ -87,7 +89,8 @@ public class DefineSoundTag extends CharacterTag {
       soundId = sis.readUI16();
       soundFormat = (int) sis.readUB(4);
       soundRate = (int) sis.readUB(2);
-      soundType = sis.readUB(1) == 1;
+      soundSize = (int) sis.readUB(1);
+      soundType = (int) sis.readUB(1);
       soundSampleCount = sis.readUI32();
       soundData = sis.readBytes(sis.available());
    }

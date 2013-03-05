@@ -1,4 +1,4 @@
-package com.jpexs.decompiler.flash;
+package com.jpexs.decompiler.flash.flv;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -119,5 +119,19 @@ public class FLVOutputStream extends OutputStream {
       writeUB(1, video?1:0); //video present
       writeUI32(9);  //header size            
       writeUI32(0);
+   }
+   
+   public void writeTag(FLVTAG tag) throws IOException {
+      long posBefore=getPos();
+      writeUI8(tag.tagType);
+      byte data[]=tag.data.getBytes();
+      writeUI24(data.length);
+      writeUI24(tag.timeStamp&0xffffff);
+      writeUI8((int)((tag.timeStamp>>24) & 0xff));
+      writeUI24(0);
+      write(data);
+      long posAfter=getPos();
+      long size=posAfter-posBefore;
+      writeUI32(size);
    }
 }
