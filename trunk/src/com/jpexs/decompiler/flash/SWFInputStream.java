@@ -496,10 +496,10 @@ public class SWFInputStream extends InputStream {
    private static void getConstantPool(List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, int lastIp, List<ConstantPool> constantPools, List<Integer> visited) {
       boolean debugMode = false;
       while ((ip > -1) && ip < code.size()) {
-         /*if (visited.contains(ip)) {
+         if (visited.contains(ip)) {
           break;
-          }*/
-         visited.add(ip);
+          }
+         
          lastIp = ip;
          GraphSourceItem ins = code.get(ip);
          if (debugMode) {
@@ -528,6 +528,7 @@ public class SWFInputStream extends InputStream {
                stack.pop();
                getConstantPool(localData, stack, output, code, condition ? (code.adr2pos(((ActionIf) ins).getAddress() + ((ActionIf) ins).getBytes(code.version).length + ((ActionIf) ins).offset)) : ip + 1, ip, constantPools, visited);
             } else {
+               visited.add(ip);
                List<Integer> branches = ins.getBranches(code);
                for (int b : branches) {
                   if (b >= 0) {
@@ -595,7 +596,8 @@ public class SWFInputStream extends InputStream {
          last = a;
       }
 
-      List<ConstantPool> pools = getConstantPool(new ActionGraphSource(ret, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), ip);
+      List<ConstantPool> pools = new ArrayList<ConstantPool>();
+      pools= getConstantPool(new ActionGraphSource(ret, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), ip);
 
       if (pools.size() == 1) {
          Action.setConstantPool(ret, pools.get(0));
