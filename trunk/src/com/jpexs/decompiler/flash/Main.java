@@ -440,26 +440,7 @@ public class Main {
       }
       fis.close();
       fos.close();
-   }
-
-   public static void restartApplication(String[] args) {
-      StringBuilder cmd = new StringBuilder();
-      cmd.append(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java ");
-      for (String jvmArg : ManagementFactory.getRuntimeMXBean().getInputArguments()) {
-         cmd.append(jvmArg + " ");
-      }
-      cmd.append("-cp ").append(ManagementFactory.getRuntimeMXBean().getClassPath()).append(" ");
-      cmd.append(Main.class.getName()).append(" ");
-      for (String arg : args) {
-         cmd.append(arg).append(" ");
-      }
-
-      try {
-         Runtime.getRuntime().exec(cmd.toString());
-      } catch (IOException ex) {
-      }
-      System.exit(0);
-   }
+   }   
 
    public static final void printASM(AVM2Code code) {
       String s = Highlighting.stripHilights(code.toASMSource(null, new MethodBody()));
