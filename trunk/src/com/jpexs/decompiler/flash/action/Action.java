@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.action.parser.ParsedSymbol;
 import com.jpexs.decompiler.flash.action.swf4.*;
 import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf6.ActionEnumerate2;
+import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.action.swf7.ActionTry;
 import com.jpexs.decompiler.flash.action.treemodel.*;
 import com.jpexs.decompiler.flash.action.treemodel.clauses.*;
@@ -981,5 +982,25 @@ public class Action implements GraphSourceItem {
          Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error", ex);
       }
       return ret;
+   }
+   
+   public static void setConstantPool(List<Action> actions,ConstantPool cpool){
+      for(Action a:actions){
+      if (a instanceof ActionPush) {
+            if (cpool != null) {
+               ((ActionPush) a).constantPool = cpool.constants;
+            }
+         }
+         if (a instanceof ActionDefineFunction) {
+            if (cpool != null) {
+               ((ActionDefineFunction) a).setConstantPool(cpool.constants);
+            }
+         }
+         if (a instanceof ActionDefineFunction2) {
+            if (cpool != null) {
+               ((ActionDefineFunction2) a).setConstantPool(cpool.constants);
+            }
+         }
+      }
    }
 }

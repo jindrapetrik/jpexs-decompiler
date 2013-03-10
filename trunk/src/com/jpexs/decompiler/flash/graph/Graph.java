@@ -461,6 +461,15 @@ public class Graph {
          }
       }
       if (part.nextParts.size() == 2) {
+         if(part.nextParts.get(0)==part.nextParts.get(1)){
+            if(!stack.isEmpty()) {
+               stack.pop();
+            }
+            part.nextParts.remove(0);
+         }
+      }
+      
+      if (part.nextParts.size() == 2) {
 
          if ((stack.size() >= 2) && (stack.get(stack.size() - 1) instanceof NotItem) && (((NotItem) (stack.get(stack.size() - 1))).getOriginal() == stack.get(stack.size() - 2))) {
             ret.addAll(output);
@@ -849,10 +858,6 @@ public class Graph {
        return ret;
        }*/
 
-      if ((part.nextParts.size() == 1) && (!stack.isEmpty()) && (stack.peek() instanceof DirectValueTreeItem) && ((DirectValueTreeItem) stack.peek()).value instanceof Boolean) {
-         System.out.println("dd");
-      }
-
       List<GraphTargetItem> retChecked = null;
       if ((retChecked = check(code, localData, allParts, stack, parent, part, stopPart, loops, output, forFinalCommands)) != null) {
          ret.addAll(retChecked);
@@ -1182,7 +1187,7 @@ public class Graph {
          GraphPart p = part.nextParts.get(0);
          GraphTargetItem lop = checkLoop(p, stopPart, loops);
          if (lop == null) {
-            if (p.path.length() == part.path.length()) {
+            if (p.path.length() >= part.path.length()) {
                ret.addAll(printGraph(localData, stack, allParts, part, p, stopPart, loops, forFinalCommands));
             } else {
                if ((p != stopPart) && (p.refs.size() > 1)) {
@@ -1336,7 +1341,7 @@ public class Graph {
          } else if (ins.isBranch()) {
             part.end = ip;
             allBlocks.add(part);
-            List<Integer> branches = ins.getBranches(code);
+            List<Integer> branches = ins.getBranches(code);            
             for (int i = 0; i < branches.size(); i++) {
                part.nextParts.add(g = makeGraph(part, path + i, code, branches.get(i), ip, allBlocks, refs, visited2));
                g.refs.add(part);

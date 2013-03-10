@@ -101,6 +101,6 @@ public class ActionIf extends Action {
 
    @Override
    public boolean ignoredLoops() {
-      return compileTime;
+      return false; //compileTime;
    }
 }

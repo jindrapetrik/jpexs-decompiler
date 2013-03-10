@@ -499,7 +499,7 @@ public class SWFInputStream extends InputStream {
     */
    public static List<Action> readActionList(ReReadableInputStream rri, int version, int ip) throws IOException {
       List<Action> retdups = new ArrayList<Action>();
-      ConstantPool cpool = null;
+      ConstantPool cpool = new ConstantPool();
 
       Stack<GraphTargetItem> stack = new Stack<GraphTargetItem>();
 
@@ -530,9 +530,7 @@ public class SWFInputStream extends InputStream {
          last = a;
       }
       String s = null;
-      ByteArrayInputStream bais = new ByteArrayInputStream(Action.actionsToBytes(ret, false, version));
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      CopyOutputStream cos = new CopyOutputStream(baos, bais);
+      Action.setConstantPool(ret, cpool);
 
       try {
          s = Highlighting.stripHilights(Action.actionsToString(ret, null, version));
