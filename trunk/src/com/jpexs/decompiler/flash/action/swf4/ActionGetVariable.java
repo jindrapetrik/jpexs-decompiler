@@ -40,7 +40,7 @@ public class ActionGetVariable extends Action {
       GraphTargetItem name = stack.pop();
       GraphTargetItem computedVal = variables.get(Highlighting.stripHilights(name.toStringNoQuotes()));
       GetVariableTreeItem gvt = new GetVariableTreeItem(this, name);
-      gvt.computedValue = computedVal;
+      gvt.setComputedValue(computedVal);
       stack.push(gvt);
    }
 }

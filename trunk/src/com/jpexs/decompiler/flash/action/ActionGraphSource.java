@@ -49,11 +49,27 @@ public class ActionGraphSource extends GraphSource {
 
    @Override
    public int adr2pos(long adr) {
-      return Action.adr2ip(actions, adr, version);
+      int pos = 0;
+      long lastAddr = 0;
+      for (Action a : actions) {
+         lastAddr = a.getAddress();
+         if (lastAddr == adr) {
+            return pos;
+         }
+
+         pos++;
+      }
+      if (adr > lastAddr) {
+         return actions.size();
+      }
+      if (adr == 0) {
+         return 0;
+      }
+      return -1;
    }
 
    @Override
    public long pos2adr(int pos) {
-      return Action.ip2adr(actions, pos, version);
+      return actions.get(pos).getAddress();//Action.ip2adr(actions, pos, version);
    }
 }

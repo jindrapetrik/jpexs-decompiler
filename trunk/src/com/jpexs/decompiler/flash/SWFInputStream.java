@@ -16,8 +16,9 @@
  */
 package com.jpexs.decompiler.flash;
 
-import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionGraphSource;
+import com.jpexs.decompiler.flash.action.UnknownActionException;
 import com.jpexs.decompiler.flash.action.parser.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.special.ActionNop;
@@ -27,6 +28,7 @@ import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf6.*;
 import com.jpexs.decompiler.flash.action.swf7.*;
 import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
@@ -76,6 +78,7 @@ public class SWFInputStream extends InputStream {
    private long percentMax;
    private List<byte[]> buffered = new ArrayList<byte[]>();
    private ByteArrayOutputStream buffer;
+   private static boolean DEOBFUSCATION_ALL_CODE_IN_PREVIOUS_TAG = true;
 
    public int getBufferLength() {
       return buffer.size();
@@ -490,6 +493,68 @@ public class SWFInputStream extends InputStream {
       return readActionList(rri, version, 0);
    }
 
+   private static void getConstantPool(List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, int lastIp, List<ConstantPool> constantPools, List<Integer> visited) {
+      boolean debugMode = false;
+      while ((ip > -1) && ip < code.size()) {
+         /*if (visited.contains(ip)) {
+          break;
+          }*/
+         visited.add(ip);
+         lastIp = ip;
+         GraphSourceItem ins = code.get(ip);
+         if (debugMode) {
+            System.out.println("Visit " + ip + ": " + ins + " stack:" + Highlighting.stripHilights(stack.toString()));
+         }
+         if (ins instanceof ActionConstantPool) {
+            constantPools.add(new ConstantPool(((ActionConstantPool) ins).constantPool));
+         }
+
+         ins.translate(localData, stack, output);
+         if (ins.isExit()) {
+            break;
+         }
+
+         if (ins.isBranch() || ins.isJump()) {
+
+            if (ins instanceof ActionIf && !stack.isEmpty() && (stack.peek().isCompileTime())) {
+               boolean condition = stack.peek().toBoolean();
+               if (debugMode) {
+                  if (condition) {
+                     System.out.println("JUMP");
+                  } else {
+                     System.out.println("SKIP");
+                  }
+               }
+               stack.pop();
+               getConstantPool(localData, stack, output, code, condition ? (code.adr2pos(((ActionIf) ins).getAddress() + ((ActionIf) ins).getBytes(code.version).length + ((ActionIf) ins).offset)) : ip + 1, ip, constantPools, visited);
+            } else {
+               List<Integer> branches = ins.getBranches(code);
+               for (int b : branches) {
+                  if (b >= 0) {
+                     getConstantPool(localData, stack, output, code, b, ip, constantPools, visited);
+                  } else {
+                     if (debugMode) {
+                        System.out.println("Negative branch:" + b);
+                     }
+                  }
+               }
+            }
+            break;
+         }
+         ip++;
+      };
+      if (ip < 0) {
+         System.out.println("Visited Negative: " + ip);
+      }
+   }
+
+   public static List<ConstantPool> getConstantPool(ActionGraphSource code, int addr) {
+      List<ConstantPool> ret = new ArrayList<ConstantPool>();
+      List localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
+      getConstantPool(localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0, ret, new ArrayList<Integer>());
+      return ret;
+   }
+
    /**
     * Reads list of actions from the stream. Reading ends with ActionEndFlag(=0)
     * or end of the stream.
@@ -508,14 +573,14 @@ public class SWFInputStream extends InputStream {
 
       SWFInputStream sis = new SWFInputStream(rri, version);
       boolean goesPrev = false;
+      int method = 1;
       try {
          goesPrev = readActionListAtPos(false, localData, stack, cpool, sis, rri, ip, retdups, ip);
       } catch (Exception ex) {
+         method = 2;
          goesPrev = readActionListAtPos(true, localData, stack, cpool, sis, rri, ip, retdups, ip);
       }
       if (goesPrev) {
-         retdups.add(0, new ActionJump(ip));
-
       } else {
          for (int i = 0; i < ip; i++) {
             retdups.remove(0);
@@ -529,8 +594,22 @@ public class SWFInputStream extends InputStream {
          }
          last = a;
       }
+
+      List<ConstantPool> pools = getConstantPool(new ActionGraphSource(ret, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), ip);
+
+      if (pools.size() == 1) {
+         Action.setConstantPool(ret, pools.get(0));
+      }
+      if (goesPrev && (!DEOBFUSCATION_ALL_CODE_IN_PREVIOUS_TAG)) {
+         ActionJump aj = new ActionJump(ip);
+         int skip = aj.getBytes(version).length;
+         for (Action a : ret) {
+            a.setAddress(a.getAddress() + skip, version);
+         }
+         ret.add(0, aj);
+      }
       String s = null;
-      Action.setConstantPool(ret, cpool);
+      //Action.setConstantPool(ret, cpool);
 
       try {
          s = Highlighting.stripHilights(Action.actionsToString(ret, null, version));
@@ -540,7 +619,6 @@ public class SWFInputStream extends InputStream {
       }
       return ret;
    }
-   public static List<Boolean> dobranch = new ArrayList<Boolean>();
 
    private static boolean readActionListAtPos(boolean enableVariables, List localData, Stack<GraphTargetItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret, int startIp) throws IOException {
       boolean debugMode = false;
@@ -568,7 +646,7 @@ public class SWFInputStream extends InputStream {
          }
          if (debugMode) {
             //if(a instanceof ActionIf){
-            System.out.println(" rripos: " + rri.getPos() + " rricount:" + rri.getCount() + " ip: " + (ip - startIp) + " action(len " + a.actionLength + "): " + a + " stack:" + Highlighting.stripHilights(stack.toString()) + " " + Helper.byteArrToString(a.getBytes(SWF.DEFAULT_VERSION)));
+            System.out.println(" ip: " + (ip - startIp) + " action(len " + a.actionLength + "): " + a + " stack:" + Highlighting.stripHilights(stack.toString()) + " " + Helper.byteArrToString(a.getBytes(SWF.DEFAULT_VERSION)));
             //}
          }
          /*if(a instanceof ActionConstantPool){
@@ -577,16 +655,19 @@ public class SWFInputStream extends InputStream {
          if (a instanceof ActionPush) {
             if (cpool != null) {
                ((ActionPush) a).constantPool = cpool.constants;
+               cpool.count++;
             }
          }
          if (a instanceof ActionDefineFunction) {
             if (cpool != null) {
                ((ActionDefineFunction) a).setConstantPool(cpool.constants);
+               cpool.count++;
             }
          }
          if (a instanceof ActionDefineFunction2) {
             if (cpool != null) {
                ((ActionDefineFunction2) a).setConstantPool(cpool.constants);
+               cpool.count++;
             }
          }
          long newFilePos = rri.getPos();
@@ -602,7 +683,7 @@ public class SWFInputStream extends InputStream {
             if (cpool == null) {
                cpool = new ConstantPool();
             }
-            cpool.constants = ((ActionConstantPool) a).constantPool;
+            cpool.setNew(((ActionConstantPool) a).constantPool);
          }
          Action beforeInsert = null;
          ActionIf aif = null;
@@ -670,6 +751,9 @@ public class SWFInputStream extends InputStream {
                }
 
             } else {
+               if (debugMode) {
+                  System.out.println("goaif");
+               }
                //throw new RuntimeException("goaif");
                goaif = true;
             }
@@ -722,8 +806,11 @@ public class SWFInputStream extends InputStream {
    }
 
    private static void ensureCapacity(List<Action> ret, int index) {
+      int pos = ret.size();
       while (ret.size() <= index) {
-         ret.add(new ActionNop());
+         Action a = new ActionNop();
+         a.setAddress(pos++, SWF.DEFAULT_VERSION);
+         ret.add(a);
       }
    }
 
@@ -1283,8 +1370,8 @@ public class SWFInputStream extends InputStream {
                if (actionLength > 0) {
                   skip(actionLength);
                }
-               //throw new UnknownActionException(actionCode);
-               return new Action(actionCode, actionLength);
+               throw new UnknownActionException(actionCode);
+            //return new Action(actionCode, actionLength);
          }
       }
    }

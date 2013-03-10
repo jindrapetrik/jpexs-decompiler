@@ -983,10 +983,10 @@ public class Action implements GraphSourceItem {
       }
       return ret;
    }
-   
-   public static void setConstantPool(List<Action> actions,ConstantPool cpool){
-      for(Action a:actions){
-      if (a instanceof ActionPush) {
+
+   public static void setConstantPool(List<Action> actions, ConstantPool cpool) {
+      for (Action a : actions) {
+         if (a instanceof ActionPush) {
             if (cpool != null) {
                ((ActionPush) a).constantPool = cpool.constants;
             }

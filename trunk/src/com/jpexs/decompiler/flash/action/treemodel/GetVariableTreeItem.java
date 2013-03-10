@@ -23,7 +23,11 @@ import java.util.List;
 public class GetVariableTreeItem extends TreeItem {
 
    public GraphTargetItem name;
-   public GraphTargetItem computedValue;
+   private GraphTargetItem computedValue;
+   private double computedNumber = 0;
+   private boolean computedBool = false;
+   private boolean computedCompiletime = false;
+   private boolean computedVariableComputed = false;
 
    public GetVariableTreeItem(GraphSourceItem instruction, GraphTargetItem value) {
       super(instruction, PRECEDENCE_PRIMARY);
@@ -32,6 +36,9 @@ public class GetVariableTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
+      if (computedValue == null) {
+         //return "null";
+      }
       //return ""+computedValue.toNumber(); 
       return stripQuotes(name);
    }
@@ -53,7 +60,7 @@ public class GetVariableTreeItem extends TreeItem {
       if (computedValue == null) {
          return false;
       }
-      return computedValue.isCompileTime();
+      return computedCompiletime;
    }
 
    @Override
@@ -61,7 +68,7 @@ public class GetVariableTreeItem extends TreeItem {
       if (computedValue == null) {
          return false;
       }
-      return computedValue.toBoolean();
+      return computedBool;
    }
 
    @Override
@@ -69,6 +76,16 @@ public class GetVariableTreeItem extends TreeItem {
       if (computedValue == null) {
          return 0;
       }
-      return computedValue.toNumber();
+      return computedNumber;
+   }
+
+   public void setComputedValue(GraphTargetItem computedValue) {
+      this.computedValue = computedValue;
+      if (computedValue != null) {
+         computedNumber = computedValue.toNumber();
+         computedBool = computedValue.toBoolean();
+         computedCompiletime = computedValue.isCompileTime();
+         computedVariableComputed = computedValue.isVariableComputed();
+      }
    }
 }

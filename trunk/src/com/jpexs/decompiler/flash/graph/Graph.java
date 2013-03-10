@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.graph;
 
-import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -461,14 +460,14 @@ public class Graph {
          }
       }
       if (part.nextParts.size() == 2) {
-         if(part.nextParts.get(0)==part.nextParts.get(1)){
-            if(!stack.isEmpty()) {
+         if (part.nextParts.get(0) == part.nextParts.get(1)) {
+            if (!stack.isEmpty()) {
                stack.pop();
             }
             part.nextParts.remove(0);
          }
       }
-      
+
       if (part.nextParts.size() == 2) {
 
          if ((stack.size() >= 2) && (stack.get(stack.size() - 1) instanceof NotItem) && (((NotItem) (stack.get(stack.size() - 1))).getOriginal() == stack.get(stack.size() - 2))) {
@@ -1086,6 +1085,10 @@ public class Graph {
                      expr = stack.pop();
                   }
                   loopBody.addAll(0, output);
+                  if (part.nextParts.size() == 1) {
+                     loopBody.addAll(printGraph(localData, stack, allParts, part, part.nextParts.get(0), stopPart, loops, forFinalCommands));
+                  }
+
                   checkContinueAtTheEnd(loopBody, currentLoop);
 
                   List<GraphTargetItem> addIf = new ArrayList<GraphTargetItem>();
@@ -1111,11 +1114,7 @@ public class Graph {
             next = part.nextParts.get(reversed ? 0 : 1);
          }
          if (doWhile) {
-            if (part.nextParts.size() == 1) {
-               next = part.nextParts.get(0);
-            } else {
-               next = null;
-            }
+            next = null;
          }
          if (next != null) {
             GraphTargetItem ti = checkLoop(next, stopPart, loops);
@@ -1341,7 +1340,7 @@ public class Graph {
          } else if (ins.isBranch()) {
             part.end = ip;
             allBlocks.add(part);
-            List<Integer> branches = ins.getBranches(code);            
+            List<Integer> branches = ins.getBranches(code);
             for (int i = 0; i < branches.size(); i++) {
                part.nextParts.add(g = makeGraph(part, path + i, code, branches.get(i), ip, allBlocks, refs, visited2));
                g.refs.add(part);

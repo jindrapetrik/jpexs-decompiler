@@ -73,6 +73,10 @@ public class ActionPanel extends JPanel implements ActionListener {
       (new Thread() {
          @Override
          public void run() {
+            editor.setText("; Disassembling...");
+            if (Main.DO_DECOMPILE) {
+               decompiledEditor.setText("//Decompiling...");
+            }
             lastDisasm = asm.getASMSource(SWF.DEFAULT_VERSION);
             disassembledHilights = Highlighting.getInstrHighlights(lastDisasm);
             lastDisasm = Highlighting.stripHilights(lastDisasm);
@@ -81,7 +85,6 @@ public class ActionPanel extends JPanel implements ActionListener {
                List<com.jpexs.decompiler.flash.action.Action> as = asm.getActions(SWF.DEFAULT_VERSION);
                lastCode = as;
                com.jpexs.decompiler.flash.action.Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
-               decompiledEditor.setText("//Decompiling...");
                String s = com.jpexs.decompiler.flash.action.Action.actionsToSource(as, SWF.DEFAULT_VERSION);
                decompiledHilights = Highlighting.getInstrHighlights(s);
                decompiledEditor.setText(Highlighting.stripHilights(s));
