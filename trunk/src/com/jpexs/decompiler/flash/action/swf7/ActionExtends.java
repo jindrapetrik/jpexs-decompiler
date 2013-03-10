@@ -26,7 +26,7 @@ import java.util.Stack;
 public class ActionExtends extends Action {
 
    public ActionExtends() {
-      super(0x69, 0);
+      super(0x69, -1);
    }
 
    @Override

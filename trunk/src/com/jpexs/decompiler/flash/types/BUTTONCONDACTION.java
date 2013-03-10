@@ -133,7 +133,7 @@ public class BUTTONCONDACTION implements ASMSource {
    @Override
    public List<Action> getActions(int version) {
       try {
-         return SWFInputStream.readActionList(new ReReadableInputStream(new ByteArrayInputStream(actionBytes)), version, 0);
+         return Action.removeNops(SWFInputStream.readActionList(new ReReadableInputStream(new ByteArrayInputStream(actionBytes)), version, 0), version);
       } catch (IOException ex) {
          Logger.getLogger(BUTTONCONDACTION.class.getName()).log(Level.SEVERE, null, ex);
          return new ArrayList<Action>();

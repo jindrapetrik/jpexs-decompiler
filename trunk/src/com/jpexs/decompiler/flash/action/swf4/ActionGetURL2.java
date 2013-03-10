@@ -66,7 +66,7 @@ public class ActionGetURL2 extends Action {
    }
 
    public ActionGetURL2(FlasmLexer lexer) throws IOException, ParseException {
-      super(0x9A, 0);
+      super(0x9A, -1);
       sendVarsMethod = (int) lexLong(lexer);
       loadTargetFlag = lexBoolean(lexer);
       loadVariablesFlag = lexBoolean(lexer);

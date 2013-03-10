@@ -40,7 +40,7 @@ public class ActionStoreRegister extends Action {
    }
 
    public ActionStoreRegister(FlasmLexer lexer) throws IOException, ParseException {
-      super(0x87, 1);
+      super(0x87, -1);
       registerNumber = (int) lexLong(lexer);
    }
 

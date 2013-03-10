@@ -56,7 +56,7 @@ public class ActionGotoFrame extends Action {
    }
 
    public ActionGotoFrame(FlasmLexer lexer) throws IOException, ParseException {
-      super(0x81, 0);
+      super(0x81, -1);
       frame = (int) lexLong(lexer);
    }
 

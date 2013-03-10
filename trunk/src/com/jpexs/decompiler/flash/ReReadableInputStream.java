@@ -32,6 +32,10 @@ public class ReReadableInputStream extends InputStream {
    int pos = 0;
    int count = 0;
 
+   public int getCount() {
+      return count;
+   }
+
    public byte[] getAllRead() {
       return baos.toByteArray();
    }
@@ -46,6 +50,7 @@ public class ReReadableInputStream extends InputStream {
 
    public void setPos(int pos) throws IOException {
       if (pos > count) {
+         this.pos = count;
          skip(pos - count);
       }
       this.pos = pos;

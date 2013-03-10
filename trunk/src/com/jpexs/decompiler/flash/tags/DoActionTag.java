@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.ReReadableInputStream;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -110,7 +109,7 @@ public class DoActionTag extends Tag implements ASMSource {
          baos.write(actionBytes);
          ReReadableInputStream rri = new ReReadableInputStream(new ByteArrayInputStream(baos.toByteArray()));
          rri.setPos(prevLength);
-         return SWFInputStream.readActionList(rri, version, prevLength);
+         return Action.removeNops(SWFInputStream.readActionList(rri, version, prevLength), version);
       } catch (IOException ex) {
          Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex);
          return new ArrayList<Action>();

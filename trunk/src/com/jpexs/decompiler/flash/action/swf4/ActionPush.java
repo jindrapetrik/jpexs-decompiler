@@ -141,7 +141,7 @@ public class ActionPush extends Action {
    }
 
    public ActionPush(FlasmLexer lexer, List<String> constantPool) throws IOException, ParseException {
-      super(0x96, 0);
+      super(0x96, -1);
       this.constantPool = constantPool;
       values = new ArrayList<Object>();
       int count = 0;
@@ -204,9 +204,6 @@ public class ActionPush extends Action {
          } else {
             ret += values.get(i).toString();
          }
-      }
-      if (ret.equals("Push 138")) {
-         new Exception().printStackTrace();
       }
       return ret;
    }

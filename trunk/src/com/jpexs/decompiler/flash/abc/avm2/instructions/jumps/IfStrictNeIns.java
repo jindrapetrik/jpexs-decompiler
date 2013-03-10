@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.StrictEqTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.StrictNeqTreeItem;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
@@ -44,7 +43,8 @@ public class IfStrictNeIns extends InstructionDefinition implements IfTypeIns {
       stack.push(new StrictNeqTreeItem(ins, v1, v2));
    }
 
-   public void translateInverted(java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, AVM2Instruction ins) {
+   @Override
+   public void translateInverted(java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, AVM2Instruction ins) {
       GraphTargetItem v2 = (GraphTargetItem) stack.pop();
       GraphTargetItem v1 = (GraphTargetItem) stack.pop();
       stack.push(new StrictEqTreeItem(ins, v1, v2));

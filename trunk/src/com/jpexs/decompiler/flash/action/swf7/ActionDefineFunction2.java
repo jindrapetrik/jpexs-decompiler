@@ -98,8 +98,8 @@ public class ActionDefineFunction2 extends Action {
       code = (new SWFInputStream(new ByteArrayInputStream(sis.readBytes(codeSize)), version)).readActionList();
    }
 
-   public ActionDefineFunction2(List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
-      super(0x8E, 0);
+   public ActionDefineFunction2(boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
+      super(0x8E, -1);
       functionName = lexString(lexer);
       int numParams = (int) lexLong(lexer);
       registerCount = (int) lexLong(lexer);
@@ -117,7 +117,7 @@ public class ActionDefineFunction2 extends Action {
          paramNames.add(lexString(lexer));
       }
       lexBlockOpen(lexer);
-      code = ASMParser.parse(labels, address + getPreLen(version), lexer, constantPool, version);
+      code = ASMParser.parse(ignoreNops, labels, address + getPreLen(version), lexer, constantPool, version);
    }
 
    @Override

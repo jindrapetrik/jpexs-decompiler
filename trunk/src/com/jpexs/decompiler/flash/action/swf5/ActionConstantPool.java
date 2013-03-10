@@ -46,7 +46,7 @@ public class ActionConstantPool extends Action {
    }
 
    public ActionConstantPool(FlasmLexer lexer) throws IOException, ParseException {
-      super(0x88, 0);
+      super(0x88, -1);
       while (true) {
          ParsedSymbol symb = lexer.yylex();
          if (symb.type == ParsedSymbol.TYPE_STRING) {

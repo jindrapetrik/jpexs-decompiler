@@ -121,10 +121,10 @@ public class ActionTry extends Action {
       return surroundWithAction(baos.toByteArray(), version);
    }
 
-   public ActionTry(List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
+   public ActionTry(boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
       super(0x8F, 0);
       lexBlockOpen(lexer);
-      tryBody = ASMParser.parse(labels, address + 4 + 6, lexer, constantPool, version);
+      tryBody = ASMParser.parse(ignoreNops, labels, address + 4 + 6, lexer, constantPool, version);
       ParsedSymbol symb = lexer.yylex();
       catchBlockFlag = false;
       if (symb.type == ParsedSymbol.TYPE_INSTRUCTION_NAME) {
@@ -141,14 +141,14 @@ public class ActionTry extends Action {
                throw new ParseException("Catched name or register expected", lexer.yyline());
             }
             lexBlockOpen(lexer);
-            catchBody = ASMParser.parse(labels, address + 4 + 6 + Action.actionsToBytes(tryBody, false, version).length, lexer, constantPool, version);
+            catchBody = ASMParser.parse(ignoreNops, labels, address + 4 + 6 + Action.actionsToBytes(tryBody, false, version).length, lexer, constantPool, version);
             symb = lexer.yylex();
          }
          if (symb.type == ParsedSymbol.TYPE_INSTRUCTION_NAME) {
             if (((String) symb.value).toLowerCase().equals("finally")) {
                finallyBlockFlag = true;
                lexBlockOpen(lexer);
-               finallyBody = ASMParser.parse(labels, address + 4 + 6 + Action.actionsToBytes(tryBody, false, version).length + Action.actionsToBytes(catchBody, false, version).length, lexer, constantPool, version);
+               finallyBody = ASMParser.parse(ignoreNops, labels, address + 4 + 6 + Action.actionsToBytes(tryBody, false, version).length + Action.actionsToBytes(catchBody, false, version).length, lexer, constantPool, version);
             } else {
                finallyBlockFlag = false;
                lexer.yypushback(lexer.yylength());

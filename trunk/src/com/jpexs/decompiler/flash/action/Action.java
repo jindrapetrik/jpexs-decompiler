@@ -16,7 +16,10 @@
  */
 package com.jpexs.decompiler.flash.action;
 
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.action.parser.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.ParsedSymbol;
@@ -26,14 +29,15 @@ import com.jpexs.decompiler.flash.action.swf6.ActionEnumerate2;
 import com.jpexs.decompiler.flash.action.swf7.ActionTry;
 import com.jpexs.decompiler.flash.action.treemodel.*;
 import com.jpexs.decompiler.flash.action.treemodel.clauses.*;
-import com.jpexs.decompiler.flash.action.treemodel.operations.NotTreeItem;
 import com.jpexs.decompiler.flash.graph.Graph;
 import com.jpexs.decompiler.flash.graph.GraphSource;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.graph.IfItem;
+import com.jpexs.decompiler.flash.graph.NotItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
@@ -349,7 +353,7 @@ public class Action implements GraphSourceItem {
       String ret = "";
       long offset;
       if (importantOffsets == null) {
-         setActionsAddresses(list, 0, version);
+         //setActionsAddresses(list, 0, version);
          importantOffsets = getActionsAllRefs(list, version);
       }
 
@@ -370,7 +374,7 @@ public class Action implements GraphSourceItem {
                ret += a.beforeInsert.getASMSource(importantOffsets, constantPool, version) + "\r\n";
             }
             //if (!(a instanceof ActionNop)) {
-            ret += Highlighting.hilighOffset("", offset) + a.getASMSource(importantOffsets, constantPool, version) + "\r\n";
+            ret += Highlighting.hilighOffset("", offset) + a.getASMSource(importantOffsets, constantPool, version) + (a.ignored ? "; ignored" : "") + "\r\n";
             //}
          }
          offset += a.getBytes(version).length;
@@ -772,8 +776,8 @@ public class Action implements GraphSourceItem {
       for (GraphTargetItem t : output) {
          if (t instanceof IfItem) {
             IfItem it = (IfItem) t;
-            if (it.expression instanceof NotTreeItem) {
-               NotTreeItem nti = (NotTreeItem) it.expression;
+            if (it.expression instanceof NotItem) {
+               NotItem nti = (NotItem) it.expression;
                if (nti.value instanceof GetMemberTreeItem) {
                   if (true) { //it.onFalse.isEmpty()){ //||(it.onFalse.get(0) instanceof UnsupportedTreeItem)) {
                      if ((it.onTrue.size() == 1) && (it.onTrue.get(0) instanceof SetMemberTreeItem) && (((SetMemberTreeItem) it.onTrue.get(0)).value instanceof NewObjectTreeItem)) {
@@ -965,5 +969,17 @@ public class Action implements GraphSourceItem {
    @Override
    public boolean ignoredLoops() {
       return false;
+   }
+
+   public static List<Action> removeNops(List<Action> actions, int version) {
+      List<Action> ret = actions;
+      String s = null;
+      try {
+         s = Highlighting.stripHilights(Action.actionsToString(ret, null, version));
+         ret = ASMParser.parse(true, new ByteArrayInputStream(s.getBytes()), SWF.DEFAULT_VERSION);
+      } catch (Exception ex) {
+         Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error", ex);
+      }
+      return ret;
    }
 }

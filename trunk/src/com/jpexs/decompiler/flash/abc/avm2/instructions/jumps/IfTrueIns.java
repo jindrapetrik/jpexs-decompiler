@@ -22,10 +22,9 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.NotTreeItem;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.NotItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -42,9 +41,9 @@ public class IfTrueIns extends InstructionDefinition implements IfTypeIns {
       //stack.push("(" + v1 + ")");
    }
 
-   public void translateInverted(java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, AVM2Instruction ins) {
+   public void translateInverted(java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, AVM2Instruction ins) {
       GraphTargetItem v1 = (GraphTargetItem) stack.pop();
-      stack.push(new NotTreeItem(ins, v1));
+      stack.push(new NotItem(ins, v1));
    }
 
    @Override

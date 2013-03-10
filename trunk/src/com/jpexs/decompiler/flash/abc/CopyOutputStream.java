@@ -49,6 +49,7 @@ public class CopyOutputStream extends OutputStream {
             boolean output = true;
 
             if (output) {
+               System.out.println("Position: " + pos);
                System.out.print("Last written:");
                for (int i = 0; i < TEMPSIZE; i++) {
                   System.out.print("" + Integer.toHexString(temp[(tempPos + i) % TEMPSIZE]) + " ");

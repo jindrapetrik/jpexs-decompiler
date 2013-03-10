@@ -45,7 +45,7 @@ public class ActionGetURL extends Action {
    }
 
    public ActionGetURL(FlasmLexer lexer) throws IOException, ParseException {
-      super(0x83, 0);
+      super(0x83, -1);
       urlString = lexString(lexer);
       targetString = lexString(lexer);
    }

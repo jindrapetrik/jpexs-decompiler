@@ -76,15 +76,15 @@ public class ActionDefineFunction extends Action {
       code = (new SWFInputStream(new ByteArrayInputStream(sis.readBytes(codeSize)), version)).readActionList();
    }
 
-   public ActionDefineFunction(List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
-      super(0x9B, 0);
+   public ActionDefineFunction(boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
+      super(0x9B, -1);
       functionName = lexString(lexer);
       int numParams = (int) lexLong(lexer);
       for (int i = 0; i < numParams; i++) {
          paramNames.add(lexString(lexer));
       }
       lexBlockOpen(lexer);
-      code = ASMParser.parse(labels, address + getPreLen(version), lexer, constantPool, version);
+      code = ASMParser.parse(ignoreNops, labels, address + getPreLen(version), lexer, constantPool, version);
    }
 
    @Override

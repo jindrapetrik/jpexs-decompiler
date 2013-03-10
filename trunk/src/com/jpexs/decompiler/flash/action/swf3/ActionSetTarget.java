@@ -60,7 +60,7 @@ public class ActionSetTarget extends Action {
    }
 
    public ActionSetTarget(FlasmLexer lexer) throws IOException, ParseException {
-      super(0x8B, 0);
+      super(0x8B, -1);
       targetName = lexString(lexer);
    }
 

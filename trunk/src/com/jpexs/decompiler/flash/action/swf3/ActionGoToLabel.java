@@ -60,7 +60,7 @@ public class ActionGoToLabel extends Action {
    }
 
    public ActionGoToLabel(FlasmLexer lexer) throws IOException, ParseException {
-      super(0x8C, 0);
+      super(0x8C, -1);
       label = lexString(lexer);
    }
 

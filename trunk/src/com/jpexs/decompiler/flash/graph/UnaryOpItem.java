@@ -14,29 +14,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.action.treemodel.operations;
+package com.jpexs.decompiler.flash.graph;
 
-import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
-import com.jpexs.decompiler.flash.graph.GraphSourceItem;
-import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
 
-public abstract class UnaryOpTreeItem extends TreeItem {
+public abstract class UnaryOpItem extends GraphTargetItem {
 
    public GraphTargetItem value;
    public String operator;
 
-   public UnaryOpTreeItem(GraphSourceItem instruction, int precedence, GraphTargetItem value, String operator) {
+   public UnaryOpItem(GraphSourceItem instruction, int precedence, GraphTargetItem value, String operator) {
       super(instruction, precedence);
       this.value = value;
       this.operator = operator;
    }
 
    @Override
-   public String toString(ConstantPool constants) {
-      String s = value.toString(constants);
+   public String toString(List localData) {
+      String s = value.toString(localData);
       if (value.precedence > precedence) {
          s = "(" + s + ")";
       }

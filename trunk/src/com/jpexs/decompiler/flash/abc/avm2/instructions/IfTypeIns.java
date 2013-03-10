@@ -16,10 +16,10 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.instructions;
 
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.Stack;
 
 public interface IfTypeIns {
 
-   public abstract void translateInverted(java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, AVM2Instruction ins);
+   public abstract void translateInverted(java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, AVM2Instruction ins);
 }

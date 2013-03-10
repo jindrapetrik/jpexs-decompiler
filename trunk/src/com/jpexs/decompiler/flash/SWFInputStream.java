@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash;
 
-import com.jpexs.decompiler.flash.action.UnknownActionException;
+import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
@@ -506,7 +506,6 @@ public class SWFInputStream extends InputStream {
       List localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
 
 
-      //ReReadableInputStream rri = new ReReadableInputStream(this);
       SWFInputStream sis = new SWFInputStream(rri, version);
       boolean goesPrev = false;
       try {
@@ -517,6 +516,10 @@ public class SWFInputStream extends InputStream {
       if (goesPrev) {
          retdups.add(0, new ActionJump(ip));
 
+      } else {
+         for (int i = 0; i < ip; i++) {
+            retdups.remove(0);
+         }
       }
       List<Action> ret = new ArrayList<Action>();
       Action last = null;
@@ -527,9 +530,13 @@ public class SWFInputStream extends InputStream {
          last = a;
       }
       String s = null;
+      ByteArrayInputStream bais = new ByteArrayInputStream(Action.actionsToBytes(ret, false, version));
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      CopyOutputStream cos = new CopyOutputStream(baos, bais);
+
       try {
          s = Highlighting.stripHilights(Action.actionsToString(ret, null, version));
-         ret = ASMParser.parse(new ByteArrayInputStream(s.getBytes()), SWF.DEFAULT_VERSION);
+         ret = ASMParser.parse(false, new ByteArrayInputStream(s.getBytes()), SWF.DEFAULT_VERSION);
       } catch (ParseException ex) {
          Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error", ex);
       }
@@ -546,19 +553,24 @@ public class SWFInputStream extends InputStream {
       List<GraphTargetItem> output = new ArrayList<GraphTargetItem>();
       long filePos = rri.getPos();
       Scanner sc = new Scanner(System.in);
+      int prevIp = ip;
       while ((a = sis.readAction()) != null) {
-         /*int info=a.actionLength+1+((a.actionCode>0x80)?2:0);
-          int actual=a.getBytes(sis.version).length;
-          if(info!=actual){
-          if(!(a instanceof ActionDefineFunction)) if(!(a instanceof ActionDefineFunction2))
-          throw new RuntimeException("Lengths do not match "+a+" "+info+"<>"+actual);
-          }*/
+         a.setAddress(prevIp, SWF.DEFAULT_VERSION);
+         int info = a.actionLength + 1 + ((a.actionCode > 0x80) ? 2 : 0);
+         int actual = a.getBytes(sis.version).length;
+         if (info != actual) {
+            if (!(a instanceof ActionDefineFunction)) {
+               if (!(a instanceof ActionDefineFunction2)) {
+                  //throw new RuntimeException("Lengths do not match "+a+" "+info+"<>"+actual);
+               }
+            }
+         }
          if (ip < startIp) {
             retv = true;
          }
          if (debugMode) {
             //if(a instanceof ActionIf){
-            System.out.println(" ip: " + ip + " action(len " + a.actionLength + "): " + a + " stack:" + Highlighting.stripHilights(stack.toString()) + " " + Helper.byteArrToString(a.getBytes(SWF.DEFAULT_VERSION)));
+            System.out.println(" rripos: " + rri.getPos() + " rricount:" + rri.getCount() + " ip: " + (ip - startIp) + " action(len " + a.actionLength + "): " + a + " stack:" + Highlighting.stripHilights(stack.toString()) + " " + Helper.byteArrToString(a.getBytes(SWF.DEFAULT_VERSION)));
             //}
          }
          /*if(a instanceof ActionConstantPool){
@@ -628,6 +640,7 @@ public class SWFInputStream extends InputStream {
                   //rri.setPos(newip);
                   if (!enableVariables) {
                      a = new ActionJump(aif.offset);
+                     a.setAddress(aif.getAddress(), SWF.DEFAULT_VERSION);
                   }
                   if (debugMode) {
                      System.out.println("jump");
@@ -638,6 +651,7 @@ public class SWFInputStream extends InputStream {
                   }
                   if (!enableVariables) {
                      a = new ActionNop();
+                     a.setAddress(aif.getAddress(), SWF.DEFAULT_VERSION);
                   }
                }
                if (!enableVariables) {
@@ -669,10 +683,18 @@ public class SWFInputStream extends InputStream {
          } else {
             a.translate(localData, stack, output);
          }
+         int nopos = -1;
          for (int i = 0; i < actionLen; i++) {
             ensureCapacity(ret, ip + i);
             if (a instanceof ActionNop) {
+               int prevPos = (int) a.getAddress();
                a = new ActionNop();
+               a.setAddress(prevPos, SWF.DEFAULT_VERSION);
+               nopos++;
+               if (nopos > 0) {
+                  a.setAddress(a.getAddress() + 1, SWF.DEFAULT_VERSION);
+               }
+
                if (i == 0) {
                   a.beforeInsert = beforeInsert;
                }
@@ -696,6 +718,7 @@ public class SWFInputStream extends InputStream {
             }
             rri.setPos(oldPos);
          }
+         prevIp = ip;
       }
       return retv;
    }
@@ -1262,8 +1285,8 @@ public class SWFInputStream extends InputStream {
                if (actionLength > 0) {
                   skip(actionLength);
                }
-               throw new UnknownActionException(actionCode);
-            //return new Action(actionCode, actionLength);
+               //throw new UnknownActionException(actionCode);
+               return new Action(actionCode, actionLength);
          }
       }
    }

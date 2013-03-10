@@ -39,7 +39,7 @@ public class ActionWaitForFrame2 extends Action {
    }
 
    public ActionWaitForFrame2(FlasmLexer lexer) throws IOException, ParseException {
-      super(0x8D, 1);
+      super(0x8D, -1);
       skipCount = (int) lexLong(lexer);
    }
 

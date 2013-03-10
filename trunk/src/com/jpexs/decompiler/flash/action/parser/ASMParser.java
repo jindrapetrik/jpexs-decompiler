@@ -32,7 +32,7 @@ import java.util.List;
 
 public class ASMParser {
 
-   public static List<Action> parse(List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
+   public static List<Action> parse(boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
       List<Action> list = new ArrayList<Action>();
       while (true) {
          ParsedSymbol symb = lexer.yylex();
@@ -179,7 +179,7 @@ public class ASMParser {
             } else if (instructionName.equals("Decrement".toLowerCase())) {
                list.add(new ActionDecrement());
             } else if (instructionName.equals("DefineFunction".toLowerCase())) {
-               list.add(new ActionDefineFunction(labels, address, lexer, constantPool, version));
+               list.add(new ActionDefineFunction(ignoreNops, labels, address, lexer, constantPool, version));
             } else if (instructionName.equals("DefineLocal".toLowerCase())) {
                list.add(new ActionDefineLocal());
             } else if (instructionName.equals("DefineLocal2".toLowerCase())) {
@@ -227,7 +227,7 @@ public class ASMParser {
             } else if (instructionName.equals("TypeOf".toLowerCase())) {
                list.add(new ActionTypeOf());
             } else if (instructionName.equals("With".toLowerCase())) {
-               list.add(new ActionWith(labels, address, lexer, constantPool, version));
+               list.add(new ActionWith(ignoreNops, labels, address, lexer, constantPool, version));
             } else if (instructionName.equals("Enumerate2".toLowerCase())) {
                list.add(new ActionEnumerate2());
             } else if (instructionName.equals("Greater".toLowerCase())) {
@@ -241,7 +241,7 @@ public class ASMParser {
             } else if (instructionName.equals("CastOp".toLowerCase())) {
                list.add(new ActionCastOp());
             } else if (instructionName.equals("DefineFunction2".toLowerCase())) {
-               list.add(new ActionDefineFunction2(labels, address, lexer, constantPool, version));
+               list.add(new ActionDefineFunction2(ignoreNops, labels, address, lexer, constantPool, version));
             } else if (instructionName.equals("Extends".toLowerCase())) {
                list.add(new ActionExtends());
             } else if (instructionName.equals("ImplementsOp".toLowerCase())) {
@@ -249,17 +249,25 @@ public class ASMParser {
             } else if (instructionName.equals("Throw".toLowerCase())) {
                list.add(new ActionThrow());
             } else if (instructionName.equals("Try".toLowerCase())) {
-               list.add(new ActionTry(labels, address, lexer, constantPool, version));
+               list.add(new ActionTry(ignoreNops, labels, address, lexer, constantPool, version));
             } else if (instructionName.equals("FSCommand2".toLowerCase())) {
                list.add(new ActionFSCommand2());
             } else if (instructionName.equals("StrictMode".toLowerCase())) {
                list.add(new ActionStrictMode(lexer));
             } else if (instructionName.equals("Nop".toLowerCase())) {
-               list.add(new ActionNop());
+               if (!ignoreNops) {
+                  list.add(new ActionNop());
+               }
             } else {
                throw new ParseException("Unknown instruction name :" + instructionName, lexer.yyline());
             }
-            address += (list.get(list.size() - 1)).getBytes(version).length;
+            if (instructionName.equals("Nop".toLowerCase())) {
+               if (!ignoreNops) {
+                  address += 1;
+               }
+            } else {
+               address += (list.get(list.size() - 1)).getBytes(version).length;
+            }
          } else if (symb.type == ParsedSymbol.TYPE_EOL) {
          } else if ((symb.type == ParsedSymbol.TYPE_BLOCK_END) || (symb.type == ParsedSymbol.TYPE_EOF)) {
             return list;
@@ -269,25 +277,38 @@ public class ASMParser {
       }
    }
 
-   public static List<Action> parse(InputStream is, int version) throws IOException, ParseException {
+   public static List<Action> parse(boolean ignoreNops, InputStream is, int version) throws IOException, ParseException {
       FlasmLexer lexer = new FlasmLexer(is);
       List<Label> labels = new ArrayList<Label>();
-      List<Action> ret = parse(labels, 0, lexer, new ArrayList<String>(), version);
+      List<Action> ret = parse(ignoreNops, labels, 0, lexer, new ArrayList<String>(), version);
       List<Action> links = Action.getActionsAllIfsOrJumps(ret);
       Action.setActionsAddresses(ret, 0, version);
       for (Action link : links) {
+         boolean found = false;
+         String identifier = null;
          if (link instanceof ActionJump) {
+            identifier = ((ActionJump) link).identifier;
             for (Label label : labels) {
                if (((ActionJump) link).identifier.equals(label.name)) {
                   ((ActionJump) link).offset = (int) (label.address - (((ActionJump) link).getAddress() + ((ActionJump) link).getBytes(version).length));
+                  found = true;
+                  break;
                }
             }
          }
          if (link instanceof ActionIf) {
+            identifier = ((ActionIf) link).identifier;
             for (Label label : labels) {
                if (((ActionIf) link).identifier.equals(label.name)) {
                   ((ActionIf) link).offset = (int) (label.address - (((ActionIf) link).getAddress() + ((ActionIf) link).getBytes(version).length));
+                  found = true;
+                  break;
                }
+            }
+         }
+         if ((link instanceof ActionJump) || (link instanceof ActionIf)) {
+            if (!found) {
+               //System.err.println("TARGET NOT FOUND - identifier:" + identifier+" addr: ofs"+Helper.formatAddress(link.getAddress()));
             }
          }
       }

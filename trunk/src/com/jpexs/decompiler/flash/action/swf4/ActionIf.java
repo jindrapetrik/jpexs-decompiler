@@ -65,11 +65,12 @@ public class ActionIf extends Action {
 
    @Override
    public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version) {
-      return "If loc" + Helper.formatAddress(getAddress() + getBytes(version).length + offset) + (compileTime ? " ;compileTime" : "");
+      String ofsStr = Helper.formatAddress(getAddress() + getBytes(version).length + offset);
+      return "If loc" + ofsStr + (compileTime ? " ;compileTime" : "");
    }
 
    public ActionIf(FlasmLexer lexer) throws IOException, ParseException {
-      super(0x9D, 0);
+      super(0x9D, -1);
       identifier = lexIdentifier(lexer);
    }
 

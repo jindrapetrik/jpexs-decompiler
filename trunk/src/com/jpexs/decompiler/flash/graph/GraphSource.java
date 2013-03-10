@@ -36,7 +36,9 @@ public abstract class GraphSource {
          if (ins.isBranch() || ins.isJump()) {
             List<Integer> branches = ins.getBranches(this);
             for (int b : branches) {
-               visitCode(b, ip, refs);
+               if (b >= 0) {
+                  visitCode(b, ip, refs);
+               }
             }
             break;
          }

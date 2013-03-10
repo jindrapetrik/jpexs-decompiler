@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.BooleanTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
@@ -40,6 +39,6 @@ public class JumpIns extends InstructionDefinition implements IfTypeIns {
       stack.push(new BooleanTreeItem(ins, Boolean.TRUE));// + ins.operands[0]);
    }
 
-   public void translateInverted(java.util.HashMap<Integer, TreeItem> localRegs, Stack<TreeItem> stack, AVM2Instruction ins) {
+   public void translateInverted(java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, AVM2Instruction ins) {
    }
 }

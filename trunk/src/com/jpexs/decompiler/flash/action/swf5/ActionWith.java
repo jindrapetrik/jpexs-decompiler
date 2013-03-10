@@ -40,10 +40,10 @@ public class ActionWith extends Action {
       actions = (new SWFInputStream(new ByteArrayInputStream(sis.readBytes(size)), version)).readActionList();
    }
 
-   public ActionWith(List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
+   public ActionWith(boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
       super(0x94, 2);
       lexBlockOpen(lexer);
-      actions = ASMParser.parse(labels, address + 5, lexer, constantPool, version);
+      actions = ASMParser.parse(ignoreNops, labels, address + 5, lexer, constantPool, version);
    }
 
    @Override

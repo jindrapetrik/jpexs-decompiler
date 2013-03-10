@@ -933,8 +933,12 @@ public class Graph {
          }
          GraphPart loopBodyStart = null;
          GraphPart next = part.getNextPartPath(loopContinues);
-         if ((reversed == loop) && (expr instanceof LogicalOpItem)) {
-            expr = ((LogicalOpItem) expr).invert();
+         if (reversed == loop) {
+            if (expr instanceof LogicalOpItem) {
+               expr = ((LogicalOpItem) expr).invert();
+            } else {
+               expr = new NotItem(null, expr);
+            }
          }
          List<GraphTargetItem> retx = ret;
          if ((!loop) || (doWhile && (part.nextParts.size() > 1))) {

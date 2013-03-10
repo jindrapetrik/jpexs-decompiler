@@ -116,7 +116,7 @@ public class DoInitActionTag extends CharacterTag implements ASMSource {
          baos.write(actionBytes);
          ReReadableInputStream rri = new ReReadableInputStream(new ByteArrayInputStream(baos.toByteArray()));
          rri.setPos(prevLength);
-         return SWFInputStream.readActionList(rri, version, prevLength);
+         return Action.removeNops(SWFInputStream.readActionList(rri, version, prevLength), version);
       } catch (IOException ex) {
          Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex);
          return new ArrayList<Action>();

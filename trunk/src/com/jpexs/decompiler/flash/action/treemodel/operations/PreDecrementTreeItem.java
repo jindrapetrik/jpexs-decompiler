@@ -18,8 +18,9 @@ package com.jpexs.decompiler.flash.action.treemodel.operations;
 
 import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.UnaryOpItem;
 
-public class PreDecrementTreeItem extends UnaryOpTreeItem {
+public class PreDecrementTreeItem extends UnaryOpItem {
 
    public PreDecrementTreeItem(GraphSourceItem instruction, TreeItem object) {
       super(instruction, PRECEDENCE_UNARY, object, "--");

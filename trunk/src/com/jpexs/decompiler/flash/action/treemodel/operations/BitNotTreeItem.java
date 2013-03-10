@@ -18,8 +18,9 @@ package com.jpexs.decompiler.flash.action.treemodel.operations;
 
 import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.UnaryOpItem;
 
-public class BitNotTreeItem extends UnaryOpTreeItem {
+public class BitNotTreeItem extends UnaryOpItem {
 
    public BitNotTreeItem(GraphSourceItem instruction, TreeItem value) {
       super(instruction, PRECEDENCE_UNARY, value, "~");

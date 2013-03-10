@@ -68,7 +68,7 @@ public class ActionGotoFrame2 extends Action {
    }
 
    public ActionGotoFrame2(FlasmLexer lexer) throws IOException, ParseException {
-      super(0x9F, 0);
+      super(0x9F, -1);
       sceneBiasFlag = lexBoolean(lexer);
       playFlag = lexBoolean(lexer);
       if (sceneBiasFlag) {

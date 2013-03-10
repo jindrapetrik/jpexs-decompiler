@@ -69,11 +69,12 @@ public class ActionJump extends Action {
 
    @Override
    public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version) {
-      return "Jump loc" + Helper.formatAddress(getAddress() + getBytes(version).length + offset);
+      String ofsStr = Helper.formatAddress(getAddress() + getBytes(version).length + offset);
+      return "Jump loc" + ofsStr;
    }
 
    public ActionJump(FlasmLexer lexer) throws IOException, ParseException {
-      super(0x99, 0);
+      super(0x99, -1);
       identifier = lexIdentifier(lexer);
    }
 
