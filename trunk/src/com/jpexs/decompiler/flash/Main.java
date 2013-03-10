@@ -64,7 +64,7 @@ public class Main {
    public static String file;
    public static String maskURL;
    public static SWF swf;
-   public static final String version = "1.4.0u1";
+   public static final String version = "1.4.1";
    public static final String applicationName = "JPEXS Free Flash Decompiler v." + version;
    public static final String shortApplicationName = "FFDec";
    public static final String shortApplicationVerName = shortApplicationName + " v." + version;
