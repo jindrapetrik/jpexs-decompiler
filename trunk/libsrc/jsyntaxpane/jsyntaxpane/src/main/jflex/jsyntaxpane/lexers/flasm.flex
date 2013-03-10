@@ -101,6 +101,7 @@ Constant= constant{NumberLiteral}
   {InstructionName}                   { yybegin(PARAMETERS);
                                         return token(TokenType.KEYWORD);
                                       }
+  {Comment}                           {return token(TokenType.COMMENT);}
   {EndOfBlock}                        {   }
 }
 
