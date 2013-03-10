@@ -49,6 +49,11 @@ public abstract class UnaryOpTreeItem extends TreeItem {
    }
 
    @Override
+   public boolean isVariableComputed() {
+      return value.isVariableComputed();
+   }
+
+   @Override
    public List<GraphSourceItemPos> getNeededSources() {
       List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
       ret.addAll(value.getNeededSources());

@@ -106,7 +106,7 @@ public class SWFOutputStream extends OutputStream {
       write(value.getBytes("utf8"));
       write(0);
    }
-      
+
    /**
     * Writes UI32 (Unsigned 32bit integer) value to the stream
     *
@@ -258,7 +258,6 @@ public class SWFOutputStream extends OutputStream {
          value = value >> 7;
       } while (loop);
    }
-   
 
    /**
     * Flushes data to underlying stream
@@ -374,6 +373,27 @@ public class SWFOutputStream extends OutputStream {
       }
    }
 
+   public static byte[] getTagHeader(Tag tag, byte data[], int version) {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      try {
+
+         SWFOutputStream sos = new SWFOutputStream(baos, version);
+         int tagLength = data.length;
+         int tagID = tag.getId();
+         int tagIDLength = (tagID << 6);
+         if ((tagLength < 0x3f) && (!tag.forceWriteAsLong)) {
+            tagIDLength += tagLength;
+            sos.writeUI16(tagIDLength);
+         } else {
+            tagIDLength += 0x3f;
+            sos.writeUI16(tagIDLength);
+            sos.writeSI32(tagLength);
+         }
+      } catch (IOException iex) {
+      }
+      return baos.toByteArray();
+   }
+
    /**
     * Writes Tag value to the stream
     *
@@ -382,17 +402,7 @@ public class SWFOutputStream extends OutputStream {
     */
    public void writeTag(Tag tag) throws IOException {
       byte data[] = tag.getData(version);
-      int tagLength = data.length;
-      int tagID = tag.getId();
-      int tagIDLength = (tagID << 6);
-      if ((tagLength < 0x3f) && (!tag.forceWriteAsLong)) {
-         tagIDLength += tagLength;
-         writeUI16(tagIDLength);
-      } else {
-         tagIDLength += 0x3f;
-         writeUI16(tagIDLength);
-         writeSI32(tagLength);
-      }
+      write(getTagHeader(tag, data, version));
       write(data);
    }
 

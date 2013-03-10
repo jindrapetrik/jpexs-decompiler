@@ -29,6 +29,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
@@ -61,13 +62,20 @@ public class ActionPush extends Action {
                values.add(new RegisterNumber(sis.readUI8()));
                break;
             case 5:
-               values.add((Boolean) (sis.readUI8() == 1));
+               int b = sis.readUI8();
+               if (b == 0) {
+                  values.add((Boolean) false);
+               } else {
+                  values.add((Boolean) true);
+               }
+
                break;
             case 6:
                values.add(sis.readDOUBLE());
                break;
             case 7:
-               values.add((Long) sis.readUI32());
+               long el = sis.readSI32();
+               values.add((Long) el);
                break;
             case 8:
                values.add(new ConstantIndex(sis.readUI8()));
@@ -113,7 +121,7 @@ public class ActionPush extends Action {
             }
             if (o instanceof Long) {
                sos.writeUI8(7);
-               sos.writeUI32((Long) o);
+               sos.writeSI32((Long) o);
             }
             if (o instanceof ConstantIndex) {
                int cIndex = ((ConstantIndex) o).index;
@@ -191,19 +199,20 @@ public class ActionPush extends Action {
             ret += ((ConstantIndex) values.get(i)).toString();
          } else if (values.get(i) instanceof String) {
             ret += "\"" + Helper.escapeString((String) values.get(i)) + "\"";
-         } else if (values.get(i) instanceof Long) {
-            long l = (Long) values.get(i);
-            l = l & 0xffffffffL;
-            ret += l;
+         } else if (values.get(i) instanceof RegisterNumber) {
+            ret += ((RegisterNumber) values.get(i)).toStringNoName();
          } else {
             ret += values.get(i).toString();
          }
+      }
+      if (ret.equals("Push 138")) {
+         new Exception().printStackTrace();
       }
       return ret;
    }
 
    @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames) {
+   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
       int pos = 0;
       for (Object o : values) {
          if (o instanceof ConstantIndex) {

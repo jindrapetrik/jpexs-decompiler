@@ -17,15 +17,10 @@
 package com.jpexs.decompiler.flash.action.treemodel;
 
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
-import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class TreeItem extends GraphTargetItem {
-
-   public int instructionPos = 0;
-   public List<GraphSourceItemPos> moreInstructions = new ArrayList<GraphSourceItemPos>();
 
    public TreeItem(GraphSourceItem instruction, int precedence) {
       super(instruction, precedence);
@@ -62,11 +57,6 @@ public abstract class TreeItem extends GraphTargetItem {
       } else {
          return target.toString();
       }
-   }
-
-   @Override
-   public List<GraphSourceItemPos> getNeededSources() {
-      return getNeededSources();
    }
 
    @Override

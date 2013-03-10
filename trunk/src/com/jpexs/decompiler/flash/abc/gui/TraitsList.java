@@ -30,19 +30,14 @@ public class TraitsList extends JList implements ListSelectionListener {
    List<DoABCTag> abcTags;
    int classIndex = -1;
    private ABCPanel abcPanel;
-   
-   private boolean sorted=false;
+   private boolean sorted = false;
 
    public void setSorted(boolean sorted) {
-      if(getModel() instanceof TraitsListModel){
-         ((TraitsListModel)getModel()).setSorted(sorted);
+      if (getModel() instanceof TraitsListModel) {
+         ((TraitsListModel) getModel()).setSorted(sorted);
       }
-      this.sorted=sorted;      
+      this.sorted = sorted;
    }
-   
-   
-   
-   
 
    public int getClassIndex() {
       return classIndex;
@@ -67,21 +62,20 @@ public class TraitsList extends JList implements ListSelectionListener {
          setModel(new DefaultListModel());
       } else {
          if (abc != null) {
-            setModel(new TraitsListModel(abcTags, abc, classIndex,sorted));            
+            setModel(new TraitsListModel(abcTags, abc, classIndex, sorted));
          }
       }
    }
-   
-   private int lastSelected=-1;
+   private int lastSelected = -1;
 
    @Override
    public void valueChanged(ListSelectionEvent e) {
-      if(getSelectedIndex()==lastSelected){
+      if (getSelectedIndex() == lastSelected) {
          return;
       }
-      lastSelected=getSelectedIndex();
-      TraitsListItem sel = (TraitsListItem)getSelectedValue();
-      abcPanel.decompiledTextArea.gotoTrait(sel==null?-1:sel.getGlobalTraitId());
+      lastSelected = getSelectedIndex();
+      TraitsListItem sel = (TraitsListItem) getSelectedValue();
+      abcPanel.decompiledTextArea.gotoTrait(sel == null ? -1 : sel.getGlobalTraitId());
 
    }
 }

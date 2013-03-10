@@ -16,10 +16,14 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.ReReadableInputStream;
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,14 +51,7 @@ public class DoActionTag extends Tag implements ASMSource {
     */
    public DoActionTag(byte[] data, int version, long pos) {
       super(12, "DoAction", data, pos);
-      try {
-         ByteArrayInputStream bais = new ByteArrayInputStream(data);
-         SWFInputStream sis = new SWFInputStream(bais, version);
-         //actions = sis.readActionList();
-         actionBytes = sis.readBytes(sis.available());
-      } catch (IOException e) {
-         Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, e);
-      }
+      actionBytes = data;
    }
 
    /**
@@ -74,14 +71,9 @@ public class DoActionTag extends Tag implements ASMSource {
     * @param version SWF version
     * @return ASM source
     */
+   @Override
    public String getASMSource(int version) {
-      List<Action> actions = new ArrayList<Action>();
-      try {
-         actions = (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
-      } catch (IOException ex) {
-         Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex);
-      }
-      return Action.actionsToString(actions, null, version);
+      return Action.actionsToString(getActions(version), null, version);
    }
 
    /**
@@ -105,7 +97,20 @@ public class DoActionTag extends Tag implements ASMSource {
 
    public List<Action> getActions(int version) {
       try {
-         return (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
+         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+         int prevLength = 0;
+         if (previousTag != null) {
+            byte prevData[] = previousTag.getData(version);
+            baos.write(prevData);
+            prevLength = prevData.length;
+            byte header[] = SWFOutputStream.getTagHeader(this, data, version);
+            baos.write(header);
+            prevLength += header.length;
+         }
+         baos.write(actionBytes);
+         ReReadableInputStream rri = new ReReadableInputStream(new ByteArrayInputStream(baos.toByteArray()));
+         rri.setPos(prevLength);
+         return SWFInputStream.readActionList(rri, version, prevLength);
       } catch (IOException ex) {
          Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex);
          return new ArrayList<Action>();

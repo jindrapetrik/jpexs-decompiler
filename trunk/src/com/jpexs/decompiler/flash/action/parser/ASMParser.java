@@ -38,6 +38,16 @@ public class ASMParser {
          ParsedSymbol symb = lexer.yylex();
          if (symb.type == ParsedSymbol.TYPE_LABEL) {
             labels.add(new Label((String) symb.value, address));
+         } else if (symb.type == ParsedSymbol.TYPE_COMMENT) {
+            if (!list.isEmpty()) {
+               String cmt = (String) symb.value;
+               if (cmt.equals("compileTime")) {
+                  Action a = list.get(list.size() - 1);
+                  if (a instanceof ActionIf) {
+                     ((ActionIf) a).compileTime = true;
+                  }
+               }
+            }
          } else if (symb.type == ParsedSymbol.TYPE_INSTRUCTION_NAME) {
             String instructionName = ((String) symb.value).toLowerCase();
             if (instructionName.equals("GetURL".toLowerCase())) {

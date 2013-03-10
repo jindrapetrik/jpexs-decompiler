@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.action.treemodel.DeleteTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
@@ -36,7 +37,7 @@ public class ActionDelete extends Action {
    }
 
    @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames) {
+   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
       GraphTargetItem propertyName = stack.pop();
       GraphTargetItem object = stack.pop();
 

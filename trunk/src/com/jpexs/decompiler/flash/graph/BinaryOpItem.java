@@ -55,4 +55,14 @@ public abstract class BinaryOpItem extends GraphTargetItem {
       ret.addAll(rightSide.getNeededSources());
       return ret;
    }
+
+   @Override
+   public boolean isCompileTime() {
+      return leftSide.isCompileTime() && rightSide.isCompileTime();
+   }
+
+   @Override
+   public boolean isVariableComputed() {
+      return leftSide.isVariableComputed() || rightSide.isVariableComputed();
+   }
 }

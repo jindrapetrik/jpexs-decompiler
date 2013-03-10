@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.graph;
 
+import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -84,7 +85,7 @@ public class Graph {
                if (r.path.startsWith("e") && !part.path.startsWith("e")) {
                   continue;
                }
-               if (part.leadsTo(r, new ArrayList<GraphPart>())) {
+               if (part.leadsTo(code, r, new ArrayList<GraphPart>())) {
                   //modify=false;
                   //continue;
                }
@@ -352,7 +353,7 @@ public class Graph {
       return false;
    }
 
-   protected List<GraphTargetItem> check(List localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, List<GraphTargetItem> output, HashMap<Loop, List<GraphTargetItem>> forFinalCommands) {
+   protected List<GraphTargetItem> check(GraphSource code, List localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, List<GraphTargetItem> output, HashMap<Loop, List<GraphTargetItem>> forFinalCommands) {
       return null;
    }
 
@@ -432,11 +433,34 @@ public class Graph {
           end--;
           }*/
 
-         output.addAll(code.translatePart(localData, stack, start, end));
-
+         try {
+            output.addAll(code.translatePart(localData, stack, start, end));
+         } catch (Exception ex) {
+            //ex.printStackTrace();
+            return ret;
+         }
       }
       if (part.nextParts.size() == 2) {
-
+         if (!stack.isEmpty()) {
+            GraphTargetItem top = stack.peek();
+            if (false) { //top.isCompileTime()){               
+               stack.pop();
+               if (top.toBoolean()) {
+                  ret.addAll(output);
+                  ret.addAll(printGraph(localData, stack, allParts, parent, part.nextParts.get(0), stopPart, loops, forFinalCommands));
+                  return ret;
+               } else {
+                  ret.addAll(output);
+                  ret.addAll(printGraph(localData, stack, allParts, parent, part.nextParts.get(1), stopPart, loops, forFinalCommands));
+                  return ret;
+               }
+            } else {
+            }
+         } else {
+            //EMPTY STACK
+         }
+      }
+      if (part.nextParts.size() == 2) {
 
          if ((stack.size() >= 2) && (stack.get(stack.size() - 1) instanceof NotItem) && (((NotItem) (stack.get(stack.size() - 1))).getOriginal() == stack.get(stack.size() - 2))) {
             ret.addAll(output);
@@ -445,8 +469,8 @@ public class Graph {
             boolean reversed = false;
             List<GraphPart> loopContinues = getLoopsContinues(loops);
             loopContinues.add(part);
-            if (sp1.leadsTo(sp0, loopContinues)) {
-            } else if (sp0.leadsTo(sp1, loopContinues)) {
+            if (sp1.leadsTo(code, sp0, loopContinues)) {
+            } else if (sp0.leadsTo(code, sp1, loopContinues)) {
                reversed = true;
             }
             GraphPart next = reversed ? sp0 : sp1;
@@ -493,8 +517,8 @@ public class Graph {
             boolean reversed = false;
             List<GraphPart> loopContinues = getLoopsContinues(loops);
             loopContinues.add(part);
-            if (sp1.leadsTo(sp0, loopContinues)) {
-            } else if (sp0.leadsTo(sp1, loopContinues)) {
+            if (sp1.leadsTo(code, sp0, loopContinues)) {
+            } else if (sp0.leadsTo(code, sp1, loopContinues)) {
                reversed = true;
             }
             GraphPart next = reversed ? sp0 : sp1;
@@ -825,8 +849,12 @@ public class Graph {
        return ret;
        }*/
 
+      if ((part.nextParts.size() == 1) && (!stack.isEmpty()) && (stack.peek() instanceof DirectValueTreeItem) && ((DirectValueTreeItem) stack.peek()).value instanceof Boolean) {
+         System.out.println("dd");
+      }
+
       List<GraphTargetItem> retChecked = null;
-      if ((retChecked = check(localData, allParts, stack, parent, part, stopPart, loops, output, forFinalCommands)) != null) {
+      if ((retChecked = check(code, localData, allParts, stack, parent, part, stopPart, loops, output, forFinalCommands)) != null) {
          ret.addAll(retChecked);
          return ret;
       }
@@ -835,8 +863,8 @@ public class Graph {
       boolean reversed = false;
       boolean whileTrue = false;
       Loop whileTrueLoop = null;
-      if ((!part.nextParts.isEmpty()) && part.nextParts.get(0).leadsTo(part, loopContinues)) {
-         if ((part.nextParts.size() > 1) && part.nextParts.get(1).leadsTo(part, loopContinues)) {
+      if ((!part.nextParts.isEmpty()) && part.nextParts.get(0).leadsTo(code, part, loopContinues)) {
+         if ((part.nextParts.size() > 1) && part.nextParts.get(1).leadsTo(code, part, loopContinues)) {
             if (output.isEmpty()) {
                whileTrueLoop = new Loop(loops.size(), part, null);
                loops.add(whileTrueLoop);
@@ -848,7 +876,7 @@ public class Graph {
          } else {
             loop = true;
          }
-      } else if ((part.nextParts.size() > 1) && part.nextParts.get(1).leadsTo(part, loopContinues)) {
+      } else if ((part.nextParts.size() > 1) && part.nextParts.get(1).leadsTo(code, part, loopContinues)) {
          loop = true;
          reversed = true;
       }
@@ -1043,7 +1071,7 @@ public class Graph {
              ret.add(new ForInTreeItem(null, currentLoop.id, part.start, new InTreeItem(expr.instruction, obj, ((HasNextTreeItem) expr).collection), loopBody));
              }*/ else {
                if (doWhile) {
-                  if (stack.isEmpty()) {
+                  if (stack.isEmpty() || (part.nextParts.size() == 1)) {
                      expr = new TrueItem(null);
                   } else {
                      expr = stack.pop();
@@ -1074,7 +1102,11 @@ public class Graph {
             next = part.nextParts.get(reversed ? 0 : 1);
          }
          if (doWhile) {
-            next = null;
+            if (part.nextParts.size() == 1) {
+               next = part.nextParts.get(0);
+            } else {
+               next = null;
+            }
          }
          if (next != null) {
             GraphTargetItem ti = checkLoop(next, stopPart, loops);

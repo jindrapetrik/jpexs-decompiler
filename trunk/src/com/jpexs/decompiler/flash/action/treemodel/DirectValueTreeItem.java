@@ -30,7 +30,7 @@ public class DirectValueTreeItem extends TreeItem {
       super(instruction, PRECEDENCE_PRIMARY);
       this.constants = constants;
       this.value = value;
-      this.instructionPos = instructionPos;
+      this.pos = instructionPos;
    }
 
    @Override
@@ -43,6 +43,9 @@ public class DirectValueTreeItem extends TreeItem {
       }
       if (value instanceof Long) {
          return (Long) value;
+      }
+      if (value instanceof Boolean) {
+         return ((Boolean) value) ? 1 : 0;
       }
       return super.toNumber();
    }

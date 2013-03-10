@@ -28,8 +28,12 @@ public class RegisterNumber {
    @Override
    public String toString() {
       if (name == null || name.trim().equals("")) {
-         return "register" + number;
+         return toStringNoName();
       }
       return name;
+   }
+
+   public String toStringNoName() {
+      return "register" + number;
    }
 }

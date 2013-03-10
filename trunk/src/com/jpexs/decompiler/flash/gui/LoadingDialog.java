@@ -70,13 +70,13 @@ public class LoadingDialog extends JFrame implements ImageObserver {
       JPanel pan = new JPanel();
       pan.setLayout(null);
       pan.setPreferredSize(new Dimension(120, 150));
-      JLabel loadingLabel=new JLabel("Loading, please wait...");
+      JLabel loadingLabel = new JLabel("Loading, please wait...");
       loadingLabel.setBounds(0, 30, 125, 20);
       loadingLabel.setHorizontalAlignment(SwingConstants.CENTER);
-      detailLabel.setBounds(0, 45, 125,20);      
+      detailLabel.setBounds(0, 45, 125, 20);
       progressBar.setBounds(0, 70, 125, 25);
       pan.add(loadingLabel);
-      pan.add(detailLabel);      
+      pan.add(detailLabel);
       pan.add(progressBar);
       add(pan, BorderLayout.CENTER);
       progressBar.setVisible(false);

@@ -42,6 +42,7 @@ public class Tag {
    public boolean forceWriteAsLong = false;
    private final long pos;
    protected String name;
+   public Tag previousTag;
 
    public String getName() {
       return name;
@@ -122,14 +123,14 @@ public class Tag {
    public Set<Integer> getNeededCharacters() {
       return new HashSet<Integer>();
    }
-   
-   public Set<Integer> getDeepNeededCharacters(HashMap<Integer, CharacterTag> characters){
-      Set<Integer> ret=new HashSet<Integer>();
-      Set<Integer> needed=getNeededCharacters();
+
+   public Set<Integer> getDeepNeededCharacters(HashMap<Integer, CharacterTag> characters) {
+      Set<Integer> ret = new HashSet<Integer>();
+      Set<Integer> needed = getNeededCharacters();
       ret.addAll(needed);
-      for(int ch:needed){
+      for (int ch : needed) {
          ret.addAll(characters.get(ch).getDeepNeededCharacters(characters));
-      }      
+      }
       return ret;
    }
 }

@@ -74,6 +74,6 @@ public class ReReadableInputStream extends InputStream {
 
    @Override
    public int available() throws IOException {
-      return (pos < count ? count - pos : 0) + is.available();
+      return (count + is.available()) - pos;
    }
 }

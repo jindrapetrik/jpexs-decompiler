@@ -16,11 +16,15 @@ public class ActionGraphSource extends GraphSource {
    private List<Action> actions;
    public int version;
    private HashMap<Integer, String> registerNames;
+   private HashMap<String, GraphTargetItem> variables;
+   private HashMap<String, GraphTargetItem> functions;
 
-   public ActionGraphSource(List<Action> actions, int version, HashMap<Integer, String> registerNames) {
+   public ActionGraphSource(List<Action> actions, int version, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
       this.actions = actions;
       this.version = version;
       this.registerNames = registerNames;
+      this.variables = variables;
+      this.functions = functions;
    }
 
    @Override
@@ -40,7 +44,7 @@ public class ActionGraphSource extends GraphSource {
 
    @Override
    public List<GraphTargetItem> translatePart(List localData, Stack<GraphTargetItem> stack, int start, int end) {
-      return (Action.actionsPartToTree(registerNames, stack, actions, start, end, version));
+      return (Action.actionsPartToTree(registerNames, variables, functions, stack, actions, start, end, version));
    }
 
    @Override

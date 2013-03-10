@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.Main;
+import com.jpexs.decompiler.flash.ReReadableInputStream;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
@@ -115,13 +116,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     * @return ASM source
     */
    public String getASMSource(int version) {
-      List<Action> actions = new ArrayList<Action>();
-      try {
-         actions = (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
-      } catch (IOException ex) {
-         Logger.getLogger(DefineButtonTag.class.getName()).log(Level.SEVERE, null, ex);
-      }
-      return Action.actionsToString(actions, null, version);
+      return Action.actionsToString(getActions(version), null, version);
    }
 
    /**
@@ -141,8 +136,19 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     */
    public List<Action> getActions(int version) {
       try {
-         return (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
+         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+         int prevLength = 0;
+         if (previousTag != null) {
+            byte prevData[] = previousTag.getData(version);
+            baos.write(prevData);
+            prevLength = prevData.length;
+         }
+         baos.write(actionBytes);
+         ReReadableInputStream rri = new ReReadableInputStream(new ByteArrayInputStream(baos.toByteArray()));
+         rri.setPos(prevLength);
+         return SWFInputStream.readActionList(rri, version, prevLength);
       } catch (IOException ex) {
+         Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex);
          return new ArrayList<Action>();
       }
    }

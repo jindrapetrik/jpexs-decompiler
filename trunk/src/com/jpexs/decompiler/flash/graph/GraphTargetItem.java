@@ -1,6 +1,5 @@
 package com.jpexs.decompiler.flash.graph;
 
-import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,6 +90,10 @@ public abstract class GraphTargetItem {
       return false;
    }
 
+   public boolean isVariableComputed() {
+      return false;
+   }
+
    public double toNumber() {
       return 0;
    }
@@ -103,8 +106,12 @@ public abstract class GraphTargetItem {
       return toString(localData);
    }
 
-   public String toStringNoQuotes(Object o) {
-      return toStringNoQuotes(Helper.toList(o));
+   public String toStringNoQuotes(Object... localData) {
+      List localData2 = new ArrayList();
+      for (Object o : localData) {
+         localData2.add(o);
+      }
+      return toStringNoQuotes(localData2);
    }
 
    public GraphTargetItem getNotCoerced() {

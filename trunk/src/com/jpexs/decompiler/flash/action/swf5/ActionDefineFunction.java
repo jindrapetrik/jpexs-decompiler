@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.swf5;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.parser.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.Label;
@@ -153,8 +154,10 @@ public class ActionDefineFunction extends Action {
    }
 
    @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames) {
-      stack.push(new FunctionTreeItem(this, functionName, paramNames, Action.actionsToTree(regNames, code, version), constantPool, 1));
+   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+      FunctionTreeItem fti = new FunctionTreeItem(this, functionName, paramNames, ActionGraph.translateViaGraph(regNames, variables, functions, code, version), constantPool, 1);
+      stack.push(fti);
+      functions.put(functionName, fti);
    }
 
    @Override

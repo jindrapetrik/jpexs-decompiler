@@ -57,12 +57,12 @@ public class TraitsListModel implements ListModel {
       items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, true, abcTags, abc, classIndex));
    }
 
-   public TraitsListModel(List<DoABCTag> abcTags, ABC abc, int classIndex,boolean sorted) {
+   public TraitsListModel(List<DoABCTag> abcTags, ABC abc, int classIndex, boolean sorted) {
       this.abcTags = abcTags;
       this.abc = abc;
       this.classIndex = classIndex;
       reset();
-      if(sorted){
+      if (sorted) {
          setSorted(true);
       }
    }

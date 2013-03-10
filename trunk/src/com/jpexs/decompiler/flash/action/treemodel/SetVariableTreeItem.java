@@ -48,4 +48,9 @@ public class SetVariableTreeItem extends TreeItem implements SetTypeTreeItem {
       ret.addAll(value.getNeededSources());
       return ret;
    }
+
+   @Override
+   public boolean isCompileTime() {
+      return value.isCompileTime();
+   }
 }

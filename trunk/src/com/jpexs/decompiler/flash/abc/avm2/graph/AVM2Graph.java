@@ -48,6 +48,7 @@ import com.jpexs.decompiler.flash.graph.BreakItem;
 import com.jpexs.decompiler.flash.graph.Graph;
 import com.jpexs.decompiler.flash.graph.GraphPart;
 import com.jpexs.decompiler.flash.graph.GraphPartMulti;
+import com.jpexs.decompiler.flash.graph.GraphSource;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.graph.Loop;
 import com.jpexs.decompiler.flash.graph.SwitchItem;
@@ -1141,7 +1142,7 @@ public class AVM2Graph extends Graph {
     }*/
 
    @Override
-   protected List<GraphTargetItem> check(List localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, List<GraphTargetItem> output, HashMap<Loop, List<GraphTargetItem>> forFinalCommands) {
+   protected List<GraphTargetItem> check(GraphSource srcCode, List localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, List<GraphTargetItem> output, HashMap<Loop, List<GraphTargetItem>> forFinalCommands) {
       List<GraphTargetItem> ret = null;
 
 
@@ -1454,13 +1455,13 @@ public class AVM2Graph extends Graph {
             nextCase = next;
             if (next != null) {
                if (i < caseBodies.size() - 1) {
-                  if (!caseBodies.get(i).leadsTo(caseBodies.get(i + 1), ignored)) {
+                  if (!caseBodies.get(i).leadsTo(srcCode, caseBodies.get(i + 1), ignored)) {
                      cc.add(new BreakItem(null, currentLoop.id));
                   } else {
                      nextCase = caseBodies.get(i + 1);
                   }
                } else if (hasDefault) {
-                  if (!caseBodies.get(i).leadsTo(defaultPart, ignored)) {
+                  if (!caseBodies.get(i).leadsTo(srcCode, defaultPart, ignored)) {
                      cc.add(new BreakItem(null, currentLoop.id));
                   } else {
                      nextCase = defaultPart;

@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.action.treemodel.WaitForFrame2TreeItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
@@ -60,7 +61,7 @@ public class ActionWaitForFrame2 extends Action {
    }
 
    @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames) {
+   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
       GraphTargetItem frame = stack.pop();
       output.add(new WaitForFrame2TreeItem(this, frame, skipCount));
    }

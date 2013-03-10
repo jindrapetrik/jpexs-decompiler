@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.action.swf5;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.DefineLocalTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.helpers.Highlighting;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
@@ -34,9 +36,10 @@ public class ActionDefineLocal extends Action {
    }
 
    @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames) {
+   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
       GraphTargetItem value = stack.pop();
       GraphTargetItem name = stack.pop();
+      variables.put(Highlighting.stripHilights(name.toStringNoQuotes(regNames, variables, functions)), value);
       output.add(new DefineLocalTreeItem(this, name, value));
    }
 }

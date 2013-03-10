@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.ReReadableInputStream;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
@@ -111,13 +112,7 @@ public class BUTTONCONDACTION implements ASMSource {
     * @return ASM source
     */
    public String getASMSource(int version) {
-      List<Action> actions = new ArrayList<Action>();
-      try {
-         actions = (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
-      } catch (IOException ex) {
-         Logger.getLogger(BUTTONCONDACTION.class.getName()).log(Level.SEVERE, null, ex);
-      }
-      return Action.actionsToString(actions, null, version);
+      return Action.actionsToString(getActions(version), null, version);
    }
 
    /**
@@ -135,15 +130,17 @@ public class BUTTONCONDACTION implements ASMSource {
     * @param version Version
     * @return List of actions
     */
+   @Override
    public List<Action> getActions(int version) {
       try {
-         return (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
+         return SWFInputStream.readActionList(new ReReadableInputStream(new ByteArrayInputStream(actionBytes)), version, 0);
       } catch (IOException ex) {
          Logger.getLogger(BUTTONCONDACTION.class.getName()).log(Level.SEVERE, null, ex);
          return new ArrayList<Action>();
       }
    }
 
+   @Override
    public void setActions(List<Action> actions, int version) {
       actionBytes = Action.actionsToBytes(actions, true, version);
    }

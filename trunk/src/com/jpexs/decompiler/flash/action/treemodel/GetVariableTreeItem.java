@@ -22,22 +22,53 @@ import java.util.List;
 
 public class GetVariableTreeItem extends TreeItem {
 
-   public GraphTargetItem value;
+   public GraphTargetItem name;
+   public GraphTargetItem computedValue;
 
    public GetVariableTreeItem(GraphSourceItem instruction, GraphTargetItem value) {
       super(instruction, PRECEDENCE_PRIMARY);
-      this.value = value;
+      this.name = value;
    }
 
    @Override
    public String toString(ConstantPool constants) {
-      return stripQuotes(value);
+      //return ""+computedValue.toNumber(); 
+      return stripQuotes(name);
    }
 
    @Override
    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
       List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(value.getNeededSources());
+      ret.addAll(name.getNeededSources());
       return ret;
+   }
+
+   @Override
+   public boolean isVariableComputed() {
+      return true;
+   }
+
+   @Override
+   public boolean isCompileTime() {
+      if (computedValue == null) {
+         return false;
+      }
+      return computedValue.isCompileTime();
+   }
+
+   @Override
+   public boolean toBoolean() {
+      if (computedValue == null) {
+         return false;
+      }
+      return computedValue.toBoolean();
+   }
+
+   @Override
+   public double toNumber() {
+      if (computedValue == null) {
+         return 0;
+      }
+      return computedValue.toNumber();
    }
 }

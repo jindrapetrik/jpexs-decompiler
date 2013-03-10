@@ -26,6 +26,11 @@ public class IfItem extends GraphTargetItem implements Block {
    public List<GraphTargetItem> onFalse;
 
    @Override
+   public boolean isCompileTime() {
+      return expression.isCompileTime();
+   }
+
+   @Override
    public List<List<GraphTargetItem>> getSubs() {
       List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
       ret.add(onTrue);

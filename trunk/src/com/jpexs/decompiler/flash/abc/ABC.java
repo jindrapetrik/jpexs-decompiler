@@ -283,24 +283,6 @@ public class ABC {
          bodyIdxFromMethodIdx[mb.method_info] = i;
       }
       loadNamespaceMap();
-      /* for(ScriptInfo si:script_info){         
-       System.out.println("--------------------------------------------");
-       System.out.println(findBody(si.init_index).toString(true, false, -1, this, constants, method_info,new Stack<TreeItem>(),false,false));
-       System.out.println("sitrait:"+si.traits.toString(this));
-       }*/
-      /*try {
-       MethodBody body=new MethodBody();
-       AVM2Code code=ASM3Parser.parse(new FileInputStream("D:\\tst2.txt"), constants, body);
-       //code.removeTraps(constants, body);
-       code.restoreControlFlow(constants, body);
-       FileOutputStream fos=new FileOutputStream("D:\\tst3.txt");
-       fos.write(Highlighting.stripHilights(code.toASMSource(constants, body)).getBytes());
-       fos.close();
-       System.out.println(code.toSource(false, 0, this, constants, method_info, body, new HashMap<Integer,String>(), new Stack<TreeItem>(), false, null, null));
-       System.exit(0);
-       } catch (Exception ex) {
-       Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, ex);
-       }*/
    }
 
    public void saveToStream(OutputStream os) throws IOException {

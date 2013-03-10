@@ -114,24 +114,24 @@ public class FLVOutputStream extends OutputStream {
       write("FLV".getBytes());
       write(1); //version
       writeUB(5, 0); //must be 0
-      writeUB(1, audio?1:0); //audio present
+      writeUB(1, audio ? 1 : 0); //audio present
       writeUB(1, 0); //reserved
-      writeUB(1, video?1:0); //video present
+      writeUB(1, video ? 1 : 0); //video present
       writeUI32(9);  //header size            
       writeUI32(0);
    }
-   
+
    public void writeTag(FLVTAG tag) throws IOException {
-      long posBefore=getPos();
+      long posBefore = getPos();
       writeUI8(tag.tagType);
-      byte data[]=tag.data.getBytes();
+      byte data[] = tag.data.getBytes();
       writeUI24(data.length);
-      writeUI24(tag.timeStamp&0xffffff);
-      writeUI8((int)((tag.timeStamp>>24) & 0xff));
+      writeUI24(tag.timeStamp & 0xffffff);
+      writeUI8((int) ((tag.timeStamp >> 24) & 0xff));
       writeUI24(0);
       write(data);
-      long posAfter=getPos();
-      long size=posAfter-posBefore;
+      long posAfter = getPos();
+      long size = posAfter - posBefore;
       writeUI32(size);
    }
 }

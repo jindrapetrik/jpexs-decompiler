@@ -283,4 +283,9 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
       }
       return ret;
    }
+
+   @Override
+   public boolean ignoredLoops() {
+      return false;
+   }
 }

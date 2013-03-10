@@ -19,7 +19,9 @@ package com.jpexs.decompiler.flash.action.swf5;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.CallFunctionTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
@@ -35,13 +37,15 @@ public class ActionCallFunction extends Action {
    }
 
    @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames) {
+   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
       GraphTargetItem functionName = stack.pop();
       long numArgs = popLong(stack);
       List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
       for (long l = 0; l < numArgs; l++) {
          args.add(stack.pop());
       }
-      stack.push(new CallFunctionTreeItem(this, functionName, args));
+      CallFunctionTreeItem cft = new CallFunctionTreeItem(this, functionName, args);
+      cft.calculatedFunction = functions.get(Highlighting.stripHilights(functionName.toStringNoQuotes(variables, functions)));
+      stack.push(cft);
    }
 }

@@ -1158,10 +1158,6 @@ public class AVM2Code implements Serializable {
                unknownJumps.remove(new Integer(ip));
                throw new UnknownJumpException(stack, ip, output);
             }
-            //System.out.println("ip"+ip+" ofs"+Helper.formatAddress(pos2adr(ip)));
-            if (ip == 21) {
-               //System.out.println("hh");
-            }
             if (visited[ip]) {
                Logger.getLogger(AVM2Code.class.getName()).warning("Code already visited, ofs:" + Helper.formatAddress(pos2adr(ip)) + ", ip:" + ip);
                break;

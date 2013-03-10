@@ -19,5 +19,7 @@ public interface GraphSourceItem {
 
    public long getOffset();
 
+   public boolean ignoredLoops();
+
    public List<Integer> getBranches(GraphSource code);
 }

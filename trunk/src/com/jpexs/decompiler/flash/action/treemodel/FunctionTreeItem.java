@@ -41,6 +41,9 @@ public class FunctionTreeItem extends TreeItem {
 
    @Override
    public String toString(ConstantPool constants) {
+      if (true) {
+         //return "<func>";
+      }
       String ret = hilight("function");
       if (calculatedFunctionName != null) {
          ret += " " + calculatedFunctionName.toStringNoQuotes(constants);
@@ -74,5 +77,37 @@ public class FunctionTreeItem extends TreeItem {
    @Override
    public boolean needsSemicolon() {
       return false;
+   }
+
+   @Override
+   public boolean isCompileTime() {
+      for (GraphTargetItem a : actions) {
+         if (!a.isCompileTime()) {
+            return false;
+         }
+      }
+      return true;
+   }
+
+   @Override
+   public boolean toBoolean() {
+      if (!actions.isEmpty()) {
+         if (actions.get(actions.size() - 1) instanceof ReturnTreeItem) {
+            ReturnTreeItem r = (ReturnTreeItem) actions.get(actions.size() - 1);
+            return r.value.toBoolean();
+         }
+      }
+      return false;
+   }
+
+   @Override
+   public double toNumber() {
+      if (!actions.isEmpty()) {
+         if (actions.get(actions.size() - 1) instanceof ReturnTreeItem) {
+            ReturnTreeItem r = (ReturnTreeItem) actions.get(actions.size() - 1);
+            return r.value.toNumber();
+         }
+      }
+      return 0;
    }
 }

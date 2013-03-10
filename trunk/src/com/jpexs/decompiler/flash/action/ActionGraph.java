@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.graph.BreakItem;
 import com.jpexs.decompiler.flash.graph.ContinueItem;
 import com.jpexs.decompiler.flash.graph.Graph;
 import com.jpexs.decompiler.flash.graph.GraphPart;
+import com.jpexs.decompiler.flash.graph.GraphSource;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.graph.Loop;
 import com.jpexs.decompiler.flash.graph.SwitchItem;
@@ -44,8 +45,8 @@ public class ActionGraph extends Graph {
    private List<Action> code;
    //private int version;
 
-   public ActionGraph(List<Action> code, HashMap<Integer, String> registerNames, int version) {
-      super(new ActionGraphSource(code, version, registerNames), new ArrayList<Integer>());
+   public ActionGraph(List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version) {
+      super(new ActionGraphSource(code, version, registerNames, variables, functions), new ArrayList<Integer>());
       //this.version = version;
       this.code = code;
       /*heads = makeGraph(code, new ArrayList<GraphPart>());
@@ -55,8 +56,8 @@ public class ActionGraph extends Graph {
        }*/
    }
 
-   public static List<GraphTargetItem> translateViaGraph(HashMap<Integer, String> registerNames, List<Action> code, int version) {
-      ActionGraph g = new ActionGraph(code, registerNames, version);
+   public static List<GraphTargetItem> translateViaGraph(HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version) {
+      ActionGraph g = new ActionGraph(code, registerNames, variables, functions, version);
       List localData = new ArrayList();
       localData.add(registerNames);
       return g.translate(localData);
@@ -72,7 +73,7 @@ public class ActionGraph extends Graph {
    }
 
    @Override
-   protected List<GraphTargetItem> check(List localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, List<GraphTargetItem> output, HashMap<Loop, List<GraphTargetItem>> forFinalCommands) {
+   protected List<GraphTargetItem> check(GraphSource code, List localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, List<GraphTargetItem> output, HashMap<Loop, List<GraphTargetItem>> forFinalCommands) {
       List<GraphTargetItem> ret = null;
       if ((part.nextParts.size() == 2) && (stack.peek() instanceof StrictEqTreeItem)) {
 
@@ -139,7 +140,7 @@ public class ActionGraph extends Graph {
             List<GraphPart> breakParts = new ArrayList<GraphPart>();
             for (int g = 0; g < caseBodyParts.size(); g++) {
                if (g < caseBodyParts.size() - 1) {
-                  if (caseBodyParts.get(g).leadsTo(caseBodyParts.get(g + 1), loopContinues)) {
+                  if (caseBodyParts.get(g).leadsTo(code, caseBodyParts.get(g + 1), loopContinues)) {
                      continue;
                   }
                }
@@ -212,13 +213,13 @@ public class ActionGraph extends Graph {
                nextCase = next;
                if (next != null) {
                   if (i < caseBodies.size() - 1) {
-                     if (!caseBodies.get(i).leadsTo(caseBodies.get(i + 1), ignored)) {
+                     if (!caseBodies.get(i).leadsTo(code, caseBodies.get(i + 1), ignored)) {
                         cc.add(new BreakItem(null, currentLoop.id));
                      } else {
                         nextCase = caseBodies.get(i + 1);
                      }
                   } else if (!defaultCommands.isEmpty()) {
-                     if (!caseBodies.get(i).leadsTo(defaultPart, ignored)) {
+                     if (!caseBodies.get(i).leadsTo(code, defaultPart, ignored)) {
                         cc.add(new BreakItem(null, currentLoop.id));
                      } else {
                         nextCase = defaultPart;

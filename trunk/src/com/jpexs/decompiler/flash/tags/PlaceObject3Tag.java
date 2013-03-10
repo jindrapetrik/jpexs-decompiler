@@ -334,13 +334,12 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
    public int getDepth() {
       return depth;
    }
-   
+
    public MATRIX getMatrix() {
-      if(placeFlagHasMatrix){
+      if (placeFlagHasMatrix) {
          return matrix;
-      }else{
+      } else {
          return null;
       }
    }
-   
 }

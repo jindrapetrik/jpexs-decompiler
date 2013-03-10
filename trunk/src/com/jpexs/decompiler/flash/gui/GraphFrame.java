@@ -242,9 +242,9 @@ public class GraphFrame extends JFrame {
       gp = new GraphPanel(graph);
       setTitle("Graph " + name);
       cnt.add(new JScrollPane(gp));
-      
+
       View.setWindowIcon(this);
-      
+
    }
 
    @Override
@@ -255,21 +255,19 @@ public class GraphFrame extends JFrame {
       Dimension dim = new Dimension(0, 0);
       Dimension panDim = gp.getPreferredSize();
       if (panDim.width < screen.width) {
-         dim.width = panDim.width+10;
+         dim.width = panDim.width + 10;
       } else {
          dim.width = screen.width;
       }
       if (panDim.height < screen.height) {
-         dim.height = panDim.height+10;
+         dim.height = panDim.height + 10;
       } else {
          dim.height = screen.height;
-      }      
-      setVisibleSize(dim);      
+      }
+      setVisibleSize(dim);
       View.centerScreen(this);
    }
 
-   
-   
    private void setVisibleSize(Dimension dim) {
       Insets insets = this.getInsets();
       setSize(new Dimension(insets.left + insets.right + dim.width,

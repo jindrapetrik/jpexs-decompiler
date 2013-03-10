@@ -86,7 +86,7 @@ public class ActionJump extends Action {
 
    @Override
    public String toString() {
-      return "Jump";
+      return "Jump " + offset;
    }
 
    @Override

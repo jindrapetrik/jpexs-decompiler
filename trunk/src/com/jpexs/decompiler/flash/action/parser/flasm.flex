@@ -70,8 +70,11 @@ Undefined = "undefined"
 
 
 /* integer literals */
-NumberLiteral = 0 | [1-9][0-9]*
-   
+PositiveNumberLiteral = 0 | [1-9][0-9]*
+NegativeNumberLiteral = - {PositiveNumberLiteral}
+
+NumberLiteral = {PositiveNumberLiteral}|{NegativeNumberLiteral}
+
 /* floating point literals */        
 FloatLiteral = ({FLit1}|{FLit2}|{FLit3}) {Exponent}?
 
@@ -85,8 +88,8 @@ OctDigit          = [0-7]
 /* string and character literals */
 StringCharacter = [^\r\n\"\\]
 
-Register= register{NumberLiteral}
-Constant= constant{NumberLiteral}
+Register= register{PositiveNumberLiteral}
+Constant= constant{PositiveNumberLiteral}
 
 %state STRING,PARAMETERS
 

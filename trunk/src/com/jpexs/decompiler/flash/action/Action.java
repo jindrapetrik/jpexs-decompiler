@@ -20,11 +20,9 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.ParsedSymbol;
-import com.jpexs.decompiler.flash.action.special.ActionNop;
 import com.jpexs.decompiler.flash.action.swf4.*;
 import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf6.ActionEnumerate2;
-import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.action.swf7.ActionTry;
 import com.jpexs.decompiler.flash.action.treemodel.*;
 import com.jpexs.decompiler.flash.action.treemodel.clauses.*;
@@ -371,9 +369,9 @@ public class Action implements GraphSourceItem {
             if (a.beforeInsert != null) {
                ret += a.beforeInsert.getASMSource(importantOffsets, constantPool, version) + "\r\n";
             }
-            if (!(a instanceof ActionNop)) {
-               ret += Highlighting.hilighOffset("", offset) + a.getASMSource(importantOffsets, constantPool, version) + "\r\n";
-            }
+            //if (!(a instanceof ActionNop)) {
+            ret += Highlighting.hilighOffset("", offset) + a.getASMSource(importantOffsets, constantPool, version) + "\r\n";
+            //}
          }
          offset += a.getBytes(version).length;
       }
@@ -403,7 +401,7 @@ public class Action implements GraphSourceItem {
     * @param output Output
     * @param regNames Register names
     */
-   public void translate(Stack<com.jpexs.decompiler.flash.graph.GraphTargetItem> stack, List<com.jpexs.decompiler.flash.graph.GraphTargetItem> output, java.util.HashMap<Integer, String> regNames) {
+   public void translate(Stack<com.jpexs.decompiler.flash.graph.GraphTargetItem> stack, List<com.jpexs.decompiler.flash.graph.GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
    }
 
    /**
@@ -476,7 +474,7 @@ public class Action implements GraphSourceItem {
    public static String actionsToSource(List<Action> actions, int version) {
       try {
          //List<TreeItem> tree = actionsToTree(new HashMap<Integer, String>(), actions, version);
-         List<GraphTargetItem> tree = actionsToTree(new HashMap<Integer, String>(), actions, version);
+         List<GraphTargetItem> tree = actionsToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), actions, version);
 
 
          return Graph.graphToString(tree);
@@ -494,15 +492,15 @@ public class Action implements GraphSourceItem {
     * @param version SWF version
     * @return List of treeItems
     */
-   public static List<GraphTargetItem> actionsToTree(HashMap<Integer, String> regNames, List<Action> actions, int version) {
+   public static List<GraphTargetItem> actionsToTree(HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> actions, int version) {
       //Stack<TreeItem> stack = new Stack<TreeItem>();
-      return ActionGraph.translateViaGraph(regNames, actions, version);
+      return ActionGraph.translateViaGraph(regNames, variables, functions, actions, version);
       //return actionsToTree(regNames,   stack, actions, 0, actions.size() - 1, version);
    }
 
    @Override
    public void translate(List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output) {
-      translate(stack, output, (HashMap<Integer, String>) localData.get(0));
+      translate(stack, output, (HashMap<Integer, String>) localData.get(0), (HashMap<String, GraphTargetItem>) localData.get(1), (HashMap<String, GraphTargetItem>) localData.get(2));
    }
 
    @Override
@@ -552,12 +550,14 @@ public class Action implements GraphSourceItem {
       logger.fine(s);
    }
 
-   public static List<GraphTargetItem> actionsPartToTree(HashMap<Integer, String> registerNames, Stack<GraphTargetItem> stack, List<Action> actions, int start, int end, int version) {
+   public static List<GraphTargetItem> actionsPartToTree(HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, Stack<GraphTargetItem> stack, List<Action> actions, int start, int end, int version) {
       if (start < actions.size() && (end > 0) && (start > 0)) {
          log("Entering " + start + "-" + end + (actions.size() > 0 ? (" (" + actions.get(start).toString() + " - " + actions.get(end == actions.size() ? end - 1 : end) + ")") : ""));
       }
       List localData = new ArrayList();
       localData.add(registerNames);
+      localData.add(variables);
+      localData.add(functions);
       List<GraphTargetItem> output = new ArrayList<GraphTargetItem>();
       int ip = start;
       boolean isWhile = false;
@@ -617,7 +617,7 @@ public class Action implements GraphSourceItem {
             continue;
          } else if (action instanceof ActionTry) {
             ActionTry atry = (ActionTry) action;
-            List<GraphTargetItem> tryCommands = ActionGraph.translateViaGraph(registerNames, atry.tryBody, version);
+            List<GraphTargetItem> tryCommands = ActionGraph.translateViaGraph(registerNames, variables, functions, atry.tryBody, version);
             TreeItem catchName;
             if (atry.catchInRegisterFlag) {
                catchName = new DirectValueTreeItem(atry, -1, new RegisterNumber(atry.catchRegister), new ArrayList<String>());
@@ -627,53 +627,14 @@ public class Action implements GraphSourceItem {
             List<GraphTargetItem> catchExceptions = new ArrayList<GraphTargetItem>();
             catchExceptions.add(catchName);
             List<List<GraphTargetItem>> catchCommands = new ArrayList<List<GraphTargetItem>>();
-            catchCommands.add(ActionGraph.translateViaGraph(registerNames, atry.catchBody, version));
-            List<GraphTargetItem> finallyCommands = ActionGraph.translateViaGraph(registerNames, atry.finallyBody, version);
+            catchCommands.add(ActionGraph.translateViaGraph(registerNames, variables, functions, atry.catchBody, version));
+            List<GraphTargetItem> finallyCommands = ActionGraph.translateViaGraph(registerNames, variables, functions, atry.finallyBody, version);
             output.add(new TryTreeItem(tryCommands, catchExceptions, catchCommands, finallyCommands));
          } else if (action instanceof ActionWith) {
             ActionWith awith = (ActionWith) action;
-            List<GraphTargetItem> withCommands = ActionGraph.translateViaGraph(registerNames, awith.actions, version);
+            List<GraphTargetItem> withCommands = ActionGraph.translateViaGraph(registerNames, variables, functions, awith.actions, version);
             output.add(new WithTreeItem(action, stack.pop(), withCommands));
-         } else if (action instanceof ActionDefineFunction) {
-            FunctionTreeItem fti = new FunctionTreeItem(action, ((ActionDefineFunction) action).functionName, ((ActionDefineFunction) action).paramNames, ActionGraph.translateViaGraph(registerNames, ((ActionDefineFunction) action).code, version), ((ActionDefineFunction) action).constantPool, 1);
-            stack.push(fti);
-         } else if (action instanceof ActionDefineFunction2) {
-            HashMap<Integer, String> funcRegNames = (HashMap<Integer, String>) registerNames.clone();
-            for (int f = 0; f < ((ActionDefineFunction2) action).paramNames.size(); f++) {
-               int reg = ((ActionDefineFunction2) action).paramRegisters.get(f);
-               if (reg != 0) {
-                  funcRegNames.put(reg, ((ActionDefineFunction2) action).paramNames.get(f));
-               }
-            }
-            int pos = 1;
-            if (((ActionDefineFunction2) action).preloadThisFlag) {
-               funcRegNames.put(pos, "this");
-               pos++;
-            }
-            if (((ActionDefineFunction2) action).preloadArgumentsFlag) {
-               funcRegNames.put(pos, "arguments");
-               pos++;
-            }
-            if (((ActionDefineFunction2) action).preloadSuperFlag) {
-               funcRegNames.put(pos, "super");
-               pos++;
-            }
-            if (((ActionDefineFunction2) action).preloadRootFlag) {
-               funcRegNames.put(pos, "_root");
-               pos++;
-            }
-            if (((ActionDefineFunction2) action).preloadParentFlag) {
-               funcRegNames.put(pos, "_parent");
-               pos++;
-            }
-            if (((ActionDefineFunction2) action).preloadGlobalFlag) {
-               funcRegNames.put(pos, "_global");
-               pos++;
-            }
-
-            FunctionTreeItem fti = new FunctionTreeItem(action, ((ActionDefineFunction2) action).functionName, ((ActionDefineFunction2) action).paramNames, ActionGraph.translateViaGraph(funcRegNames, ((ActionDefineFunction2) action).code, version), ((ActionDefineFunction2) action).constantPool, ((ActionDefineFunction2) action).getFirstRegister());
-            stack.push(fti);
-         } /*else if (action instanceof ActionPushDuplicate) {
+         }/*else if (action instanceof ActionPushDuplicate) {
           do {
           if (actions.get(ip + 1) instanceof ActionNot) {
           if (actions.get(ip + 2) instanceof ActionIf) {
@@ -749,7 +710,6 @@ public class Action implements GraphSourceItem {
             try {
                action.translate(localData, stack, output);
             } catch (EmptyStackException ese) {
-               System.err.println("EMPTYSTACK===========================");
                Logger.getLogger(Action.class.getName()).log(Level.SEVERE, null, ese);
                output.add(new UnsupportedTreeItem(action, "Empty stack"));
             }
@@ -783,9 +743,9 @@ public class Action implements GraphSourceItem {
       }
       if (((GetMemberTreeItem) t).object instanceof GetVariableTreeItem) {
          GetVariableTreeItem v = (GetVariableTreeItem) ((GetMemberTreeItem) t).object;
-         if (v.value instanceof DirectValueTreeItem) {
-            if (((DirectValueTreeItem) v.value).value instanceof String) {
-               if (((DirectValueTreeItem) v.value).value.equals("_global")) {
+         if (v.name instanceof DirectValueTreeItem) {
+            if (((DirectValueTreeItem) v.name).value instanceof String) {
+               if (((DirectValueTreeItem) v.name).value.equals("_global")) {
                   GetVariableTreeItem gvt = new GetVariableTreeItem(null, ((GetMemberTreeItem) t).memberName);
                   if (lastMember == null) {
                      return gvt;
@@ -1000,5 +960,10 @@ public class Action implements GraphSourceItem {
          return output;
       }
       return ret;
+   }
+
+   @Override
+   public boolean ignoredLoops() {
+      return false;
    }
 }

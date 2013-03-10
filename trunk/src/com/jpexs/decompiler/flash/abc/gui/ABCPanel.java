@@ -23,8 +23,6 @@ import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.DoABCTag;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -214,15 +212,14 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
       navigator.setABC(list, abc);
 
 
-      navPanel = new JPanel(new BorderLayout());      
-      JPanel navIconsPanel=new JPanel();
+      navPanel = new JPanel(new BorderLayout());
+      JPanel navIconsPanel = new JPanel();
       navIconsPanel.setLayout(new BoxLayout(navIconsPanel, BoxLayout.X_AXIS));
-      final JToggleButton sortButton=new JToggleButton(View.getIcon("sort16"));
-      navIconsPanel.add(sortButton);          
-      navPanel.add(navIconsPanel,BorderLayout.SOUTH);
+      final JToggleButton sortButton = new JToggleButton(View.getIcon("sort16"));
+      navIconsPanel.add(sortButton);
+      navPanel.add(navIconsPanel, BorderLayout.SOUTH);
       navPanel.add(new JScrollPane(navigator), BorderLayout.CENTER);
       sortButton.addActionListener(new ActionListener() {
-
          @Override
          public void actionPerformed(ActionEvent e) {
             navigator.setSorted(sortButton.isSelected());

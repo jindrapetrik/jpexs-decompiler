@@ -18,11 +18,12 @@ package com.jpexs.decompiler.flash.action.gui;
 
 import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.abc.gui.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.parser.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
@@ -242,7 +243,7 @@ public class ActionPanel extends JPanel implements ActionListener {
    public void actionPerformed(ActionEvent e) {
       if (e.getActionCommand().equals("GRAPH")) {
          if (lastCode != null) {
-            GraphFrame gf = new GraphFrame(new ActionGraph(lastCode, new HashMap<Integer, String>(), SWF.DEFAULT_VERSION), "");
+            GraphFrame gf = new GraphFrame(new ActionGraph(lastCode, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), SWF.DEFAULT_VERSION), "");
             gf.setVisible(true);
          }
       } else if (e.getActionCommand().equals("EDITACTION")) {

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.ReReadableInputStream;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
@@ -91,21 +92,33 @@ public class DoInitActionTag extends CharacterTag implements ASMSource {
     * @param version SWF version
     * @return ASM source
     */
+   @Override
    public String getASMSource(int version) {
-      List<Action> actions = new ArrayList<Action>();
-      try {
-         actions = (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
-      } catch (IOException ex) {
-         Logger.getLogger(DoInitActionTag.class.getName()).log(Level.SEVERE, null, ex);
-      }
-      return Action.actionsToString(actions, null, version);
+      return Action.actionsToString(getActions(version), null, version);
    }
 
+   @Override
    public List<Action> getActions(int version) {
       try {
-         return (new SWFInputStream(new ByteArrayInputStream(actionBytes), version)).readActionList();
+         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+         int prevLength = 0;
+         if (previousTag != null) {
+            byte prevData[] = previousTag.getData(version);
+            baos.write(prevData);
+            prevLength = prevData.length;
+            baos.write(0);
+            baos.write(0);
+            prevLength += 2;
+            byte header[] = SWFOutputStream.getTagHeader(this, data, version);
+            baos.write(header);
+            prevLength += header.length;
+         }
+         baos.write(actionBytes);
+         ReReadableInputStream rri = new ReReadableInputStream(new ByteArrayInputStream(baos.toByteArray()));
+         rri.setPos(prevLength);
+         return SWFInputStream.readActionList(rri, version, prevLength);
       } catch (IOException ex) {
-         Logger.getLogger(DoInitActionTag.class.getName()).log(Level.SEVERE, null, ex);
+         Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex);
          return new ArrayList<Action>();
       }
    }

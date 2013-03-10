@@ -7,7 +7,8 @@ import java.io.IOException;
  *
  * @author JPEXS
  */
-public class VIDEODATA extends DATA{
+public class VIDEODATA extends DATA {
+
    public int frameType;
    public int codecId;
    public byte[] videoData;
@@ -18,17 +19,15 @@ public class VIDEODATA extends DATA{
       this.videoData = videoData;
    }
 
-   
-   
    @Override
    public byte[] getBytes() {
-      ByteArrayOutputStream baos=new ByteArrayOutputStream();
-      try{
-         FLVOutputStream flv=new FLVOutputStream(baos);
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      try {
+         FLVOutputStream flv = new FLVOutputStream(baos);
          flv.writeUB(4, frameType);
          flv.writeUB(4, codecId);
          flv.write(videoData);
-      }catch(IOException ex){
+      } catch (IOException ex) {
          //ignore
       }
       return baos.toByteArray();

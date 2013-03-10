@@ -24,6 +24,7 @@ public class CallFunctionTreeItem extends TreeItem {
 
    public GraphTargetItem functionName;
    public List<GraphTargetItem> arguments;
+   public GraphTargetItem calculatedFunction;
 
    public CallFunctionTreeItem(GraphSourceItem instruction, GraphTargetItem functionName, List<GraphTargetItem> arguments) {
       super(instruction, PRECEDENCE_PRIMARY);
@@ -51,5 +52,29 @@ public class CallFunctionTreeItem extends TreeItem {
          ret.addAll(ti.getNeededSources());
       }
       return ret;
+   }
+
+   @Override
+   public boolean isCompileTime() {
+      if (calculatedFunction == null) {
+         return false;
+      }
+      return calculatedFunction.isCompileTime();
+   }
+
+   @Override
+   public boolean toBoolean() {
+      if (calculatedFunction == null) {
+         return false;
+      }
+      return calculatedFunction.toBoolean();
+   }
+
+   @Override
+   public double toNumber() {
+      if (calculatedFunction == null) {
+         return 0;
+      }
+      return calculatedFunction.toNumber();
    }
 }

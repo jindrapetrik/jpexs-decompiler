@@ -256,9 +256,9 @@ public class PlaceObject2Tag extends Tag implements Container, PlaceObjectTypeTa
    }
 
    public int getCharacterId() {
-      if(placeFlagHasCharacter){
+      if (placeFlagHasCharacter) {
          return characterId;
-      }else{
+      } else {
          return -1;
       }
    }
@@ -268,14 +268,10 @@ public class PlaceObject2Tag extends Tag implements Container, PlaceObjectTypeTa
    }
 
    public MATRIX getMatrix() {
-      if(placeFlagHasMatrix){
+      if (placeFlagHasMatrix) {
          return matrix;
-      }else{
+      } else {
          return null;
       }
    }
-   
-   
-   
-   
 }

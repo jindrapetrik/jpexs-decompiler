@@ -136,7 +136,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             if ((pos >= tm.startPos) && (pos < tm.startPos + tm.len)) {
                String name = "";
                if (abc != null) {
-               name = abc.instance_info[classIndex].getName(abc.constants).getNameWithNamespace(abc.constants);                  
+                  name = abc.instance_info[classIndex].getName(abc.constants).getNameWithNamespace(abc.constants);
                }
                for (Highlighting th : traitHighlights) {
                   if ((pos >= th.startPos) && (pos < th.startPos + th.len)) {
@@ -144,7 +144,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                      if (abc != null) {
                         Trait t = abc.findTraitByTraitId(classIndex, lastTraitIndex);
                         if (t != null) {
-                           name += ":"+t.getName(abc).getName(abc.constants, new ArrayList<String>());
+                           name += ":" + t.getName(abc).getName(abc.constants, new ArrayList<String>());
                         }
                      }
                   }
@@ -180,7 +180,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                   name = abc.instance_info[classIndex].getName(abc.constants).getNameWithNamespace(abc.constants);
                   Trait t = abc.findTraitByTraitId(classIndex, lastTraitIndex);
                   if (t != null) {
-                     name+=":"+t.getName(abc).getName(abc.constants, new ArrayList<String>());
+                     name += ":" + t.getName(abc).getName(abc.constants, new ArrayList<String>());
                   }
                }
 

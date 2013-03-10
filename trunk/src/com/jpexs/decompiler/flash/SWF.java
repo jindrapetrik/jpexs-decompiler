@@ -16,9 +16,9 @@
  */
 package com.jpexs.decompiler.flash;
 
-import com.jpexs.decompiler.flash.flv.FLVOutputStream;
 import SevenZip.Compression.LZMA.Encoder;
 import com.jpexs.decompiler.flash.flv.AUDIODATA;
+import com.jpexs.decompiler.flash.flv.FLVOutputStream;
 import com.jpexs.decompiler.flash.flv.FLVTAG;
 import com.jpexs.decompiler.flash.flv.VIDEODATA;
 import com.jpexs.decompiler.flash.gui.TagNode;
@@ -33,8 +33,6 @@ import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoABCTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
-import com.jpexs.decompiler.flash.tags.SoundStreamHead2Tag;
-import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
@@ -490,7 +488,7 @@ public class SWF {
    }
 
    public void exportSounds(String outdir, List<Tag> tags, boolean mp3) throws IOException {
-      if(tags.isEmpty()){
+      if (tags.isEmpty()) {
          return;
       }
       if (!(new File(outdir)).exists()) {
@@ -559,7 +557,7 @@ public class SWF {
    }
 
    public void exportMovies(String outdir, List<Tag> tags) throws IOException {
-      if(tags.isEmpty()){
+      if (tags.isEmpty()) {
          return;
       }
       if (!(new File(outdir)).exists()) {
@@ -626,7 +624,7 @@ public class SWF {
    }
 
    public static void exportShapes(String outdir, List<Tag> tags) throws IOException {
-      if(tags.isEmpty()){
+      if (tags.isEmpty()) {
          return;
       }
       if (!(new File(outdir)).exists()) {
@@ -656,7 +654,7 @@ public class SWF {
    }
 
    public static void exportImages(String outdir, List<Tag> tags, JPEGTablesTag jtt) throws IOException {
-      if(tags.isEmpty()){
+      if (tags.isEmpty()) {
          return;
       }
       if (!(new File(outdir)).exists()) {

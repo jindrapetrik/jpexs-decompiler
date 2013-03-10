@@ -52,20 +52,20 @@ public class IconListRenderer
 
       // Get icon to use for the list item value
 
-      TraitsListItem tli=(TraitsListItem)value;
-      
-      if (tli.getType()==TraitsListItem.Type.CONST) {
+      TraitsListItem tli = (TraitsListItem) value;
+
+      if (tli.getType() == TraitsListItem.Type.CONST) {
          label.setIcon(constIcon);
       }
-      if (tli.getType()==TraitsListItem.Type.VAR) {
+      if (tli.getType() == TraitsListItem.Type.VAR) {
          label.setIcon(variableIcon);
       }
-      if (tli.getType()==TraitsListItem.Type.METHOD) {
+      if (tli.getType() == TraitsListItem.Type.METHOD) {
          label.setIcon(functionIcon);
       }
-      if (tli.getType()==TraitsListItem.Type.INITIALIZER) {
+      if (tli.getType() == TraitsListItem.Type.INITIALIZER) {
          label.setIcon(functionIcon);
-      }      
+      }
       return label;
    }
 }

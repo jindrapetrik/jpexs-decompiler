@@ -33,6 +33,7 @@ public class ActionIf extends Action {
 
    public int offset;
    public String identifier;
+   public boolean compileTime;
 
    public ActionIf(SWFInputStream sis) throws IOException {
       super(0x9D, 2);
@@ -64,7 +65,7 @@ public class ActionIf extends Action {
 
    @Override
    public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version) {
-      return "If loc" + Helper.formatAddress(getAddress() + getBytes(version).length + offset);
+      return "If loc" + Helper.formatAddress(getAddress() + getBytes(version).length + offset) + (compileTime ? " ;compileTime" : "");
    }
 
    public ActionIf(FlasmLexer lexer) throws IOException, ParseException {
@@ -95,5 +96,10 @@ public class ActionIf extends Action {
       ret.add(code.adr2pos(getAddress() + getBytes(((ActionGraphSource) code).version).length + offset));
       ret.add(code.adr2pos(getAddress() + getBytes(((ActionGraphSource) code).version).length));
       return ret;
+   }
+
+   @Override
+   public boolean ignoredLoops() {
+      return compileTime;
    }
 }

@@ -40,8 +40,8 @@ public class MethodCodePanel extends JPanel implements ActionListener {
    public void focusEditor() {
       sourceTextArea.requestFocusInWindow();
    }
-   
-   public String getTraitName(){
+
+   public String getTraitName() {
       return sourceTextArea.getName();
    }
 
@@ -54,10 +54,11 @@ public class MethodCodePanel extends JPanel implements ActionListener {
    }
 
    public void setBodyIndex(int bodyIndex, ABC abc) {
-      sourceTextArea.setBodyIndex(bodyIndex, abc,sourceTextArea.getName());
+      sourceTextArea.setBodyIndex(bodyIndex, abc, sourceTextArea.getName());
    }
-   public void setBodyIndex(int bodyIndex, ABC abc,String name) {
-      sourceTextArea.setBodyIndex(bodyIndex, abc,name);
+
+   public void setBodyIndex(int bodyIndex, ABC abc, String name) {
+      sourceTextArea.setBodyIndex(bodyIndex, abc, name);
    }
 
    public int getBodyIndex() {

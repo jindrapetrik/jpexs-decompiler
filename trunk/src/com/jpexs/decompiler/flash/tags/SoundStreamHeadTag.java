@@ -28,7 +28,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class SoundStreamHeadTag extends Tag implements SoundStreamHeadTypeTag{
+public class SoundStreamHeadTag extends Tag implements SoundStreamHeadTypeTag {
 
    public int playBackSoundRate;
    public int playBackSoundSize;

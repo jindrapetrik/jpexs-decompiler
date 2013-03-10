@@ -28,7 +28,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class SoundStreamHead2Tag extends Tag implements SoundStreamHeadTypeTag{
+public class SoundStreamHead2Tag extends Tag implements SoundStreamHeadTypeTag {
 
    public int playBackSoundRate;
    public int playBackSoundSize;
@@ -92,7 +92,7 @@ public class SoundStreamHead2Tag extends Tag implements SoundStreamHeadTypeTag{
          latencySeek = sis.readSI16();
       }
    }
-   
+
    @Override
    public int getSoundFormat() {
       return streamSoundCompression;

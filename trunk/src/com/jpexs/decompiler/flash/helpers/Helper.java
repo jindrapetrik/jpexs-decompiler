@@ -18,10 +18,15 @@ package com.jpexs.decompiler.flash.helpers;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class with helper method
@@ -272,5 +277,47 @@ public class Helper {
          ret.add(o);
       }
       return ret;
+   }
+
+   public static ByteArrayInputStream getInputStream(byte[]... data) {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+      try {
+         for (byte[] d : data) {
+            baos.write(d);
+         }
+      } catch (IOException iex) {
+      }
+      return new ByteArrayInputStream(baos.toByteArray());
+   }
+
+   public static byte[] readFile(String... file) {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      for (String f : file) {
+         try {
+            FileInputStream fis = new FileInputStream(f);
+            byte buf[] = new byte[4096];
+            int cnt = 0;
+            while ((cnt = fis.read(buf)) > 0) {
+               baos.write(buf, 0, cnt);
+            }
+            fis.close();
+         } catch (IOException ex) {
+            Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
+         }
+
+      }
+      return baos.toByteArray();
+   }
+
+   public static void writeFile(String file, byte[]... data) {
+      try {
+         FileOutputStream fos = new FileOutputStream(file);
+         for (byte d[] : data) {
+            fos.write(d);
+         }
+         fos.close();
+      } catch (Exception ex) {
+      }
    }
 }

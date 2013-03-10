@@ -32,7 +32,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class PlaceObjectTag extends Tag implements PlaceObjectTypeTag{
+public class PlaceObjectTag extends Tag implements PlaceObjectTypeTag {
 
    /**
     * ID of character to place
@@ -119,8 +119,4 @@ public class PlaceObjectTag extends Tag implements PlaceObjectTypeTag{
    public MATRIX getMatrix() {
       return matrix;
    }
-   
-   
-   
-   
 }

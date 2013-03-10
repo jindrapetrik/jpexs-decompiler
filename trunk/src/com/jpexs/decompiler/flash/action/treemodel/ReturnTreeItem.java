@@ -40,4 +40,9 @@ public class ReturnTreeItem extends TreeItem {
       ret.addAll(value.getNeededSources());
       return ret;
    }
+
+   @Override
+   public boolean isCompileTime() {
+      return true;
+   }
 }

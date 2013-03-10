@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.swf7;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.parser.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.Label;
@@ -238,8 +239,44 @@ public class ActionDefineFunction2 extends Action {
    }
 
    @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames) {
-      stack.push(new FunctionTreeItem(this, functionName, paramNames, Action.actionsToTree(regNames, code, version), constantPool, getFirstRegister()));
+   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+
+      HashMap<Integer, String> funcRegNames = (HashMap<Integer, String>) regNames.clone();
+      for (int f = 0; f < paramNames.size(); f++) {
+         int reg = paramRegisters.get(f);
+         if (reg != 0) {
+            funcRegNames.put(reg, paramNames.get(f));
+         }
+      }
+      int pos = 1;
+      if (preloadThisFlag) {
+         funcRegNames.put(pos, "this");
+         pos++;
+      }
+      if (preloadArgumentsFlag) {
+         funcRegNames.put(pos, "arguments");
+         pos++;
+      }
+      if (preloadSuperFlag) {
+         funcRegNames.put(pos, "super");
+         pos++;
+      }
+      if (preloadRootFlag) {
+         funcRegNames.put(pos, "_root");
+         pos++;
+      }
+      if (preloadParentFlag) {
+         funcRegNames.put(pos, "_parent");
+         pos++;
+      }
+      if (preloadGlobalFlag) {
+         funcRegNames.put(pos, "_global");
+         pos++;
+      }
+
+      FunctionTreeItem fti = new FunctionTreeItem(this, functionName, paramNames, ActionGraph.translateViaGraph(funcRegNames, variables, functions, code, version), constantPool, getFirstRegister());
+      functions.put(functionName, fti);
+      stack.push(fti);
    }
 
    @Override

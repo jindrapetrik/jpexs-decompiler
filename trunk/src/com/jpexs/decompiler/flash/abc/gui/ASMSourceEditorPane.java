@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.abc.gui;
 
-import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
@@ -24,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -43,6 +43,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
    private DecompiledEditorPane decompiledEditor;
    private boolean ignoreCarret = false;
    private String name;
+
    public void setIgnoreCarret(boolean ignoreCarret) {
       this.ignoreCarret = ignoreCarret;
    }
@@ -72,11 +73,10 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
       return super.getName();
    }
 
-   
-   public void setBodyIndex(int bodyIndex, ABC abc,String name) {
+   public void setBodyIndex(int bodyIndex, ABC abc, String name) {
       this.bodyIndex = bodyIndex;
       this.abc = abc;
-      this.name=name;
+      this.name = name;
       setText(abc.bodies[bodyIndex].code.toASMSource(abc.constants, abc.bodies[bodyIndex]));
    }
 

@@ -49,11 +49,9 @@ public class LineMarkedEditorPane extends JEditorPane {
 
    @Override
    public void setText(String t) {
-      lastLine=-1;
+      lastLine = -1;
       super.setText(t);
    }
-   
-   
 
    @Override
    public void paint(Graphics g) {

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.action.UnknownActionException;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
@@ -54,6 +55,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -210,7 +212,7 @@ public class SWFInputStream extends InputStream {
          baos.write(r);
       }
    }
- 
+
    /**
     * Reads one UI32 (Unsigned 32bit integer) value from the stream
     *
@@ -483,6 +485,11 @@ public class SWFInputStream extends InputStream {
       return ret;
    }
 
+   public List<Action> readActionList() throws IOException {
+      ReReadableInputStream rri = new ReReadableInputStream(this);
+      return readActionList(rri, version, 0);
+   }
+
    /**
     * Reads list of actions from the stream. Reading ends with ActionEndFlag(=0)
     * or end of the stream.
@@ -490,15 +497,27 @@ public class SWFInputStream extends InputStream {
     * @return List of actions
     * @throws IOException
     */
-   public List<Action> readActionList() throws IOException {
+   public static List<Action> readActionList(ReReadableInputStream rri, int version, int ip) throws IOException {
       List<Action> retdups = new ArrayList<Action>();
       ConstantPool cpool = null;
 
       Stack<GraphTargetItem> stack = new Stack<GraphTargetItem>();
 
-      ReReadableInputStream rri = new ReReadableInputStream(this);
+      List localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
+
+
+      //ReReadableInputStream rri = new ReReadableInputStream(this);
       SWFInputStream sis = new SWFInputStream(rri, version);
-      readActionListAtPos(stack, cpool, sis, rri, 0, retdups);
+      boolean goesPrev = false;
+      try {
+         goesPrev = readActionListAtPos(false, localData, stack, cpool, sis, rri, ip, retdups, ip);
+      } catch (Exception ex) {
+         goesPrev = readActionListAtPos(true, localData, stack, cpool, sis, rri, ip, retdups, ip);
+      }
+      if (goesPrev) {
+         retdups.add(0, new ActionJump(ip));
+
+      }
       List<Action> ret = new ArrayList<Action>();
       Action last = null;
       for (Action a : retdups) {
@@ -507,27 +526,44 @@ public class SWFInputStream extends InputStream {
          }
          last = a;
       }
+      String s = null;
       try {
-         String s = Highlighting.stripHilights(Action.actionsToString(ret, null, version));
+         s = Highlighting.stripHilights(Action.actionsToString(ret, null, version));
          ret = ASMParser.parse(new ByteArrayInputStream(s.getBytes()), SWF.DEFAULT_VERSION);
       } catch (ParseException ex) {
          Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error", ex);
       }
       return ret;
    }
+   public static List<Boolean> dobranch = new ArrayList<Boolean>();
 
-   private void readActionListAtPos(Stack<GraphTargetItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret) throws IOException {
+   private static boolean readActionListAtPos(boolean enableVariables, List localData, Stack<GraphTargetItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret, int startIp) throws IOException {
       boolean debugMode = false;
-      boolean displayCompiletime = false;
+      boolean decideBranch = false;
+      boolean retv = false;
       rri.setPos(ip);
       Action a;
       List<GraphTargetItem> output = new ArrayList<GraphTargetItem>();
       long filePos = rri.getPos();
+      Scanner sc = new Scanner(System.in);
       while ((a = sis.readAction()) != null) {
-         if (debugMode) {
-            System.out.println("ip: " + ip + " action: " + a + " stack:" + Highlighting.stripHilights(stack.toString()));
+         /*int info=a.actionLength+1+((a.actionCode>0x80)?2:0);
+          int actual=a.getBytes(sis.version).length;
+          if(info!=actual){
+          if(!(a instanceof ActionDefineFunction)) if(!(a instanceof ActionDefineFunction2))
+          throw new RuntimeException("Lengths do not match "+a+" "+info+"<>"+actual);
+          }*/
+         if (ip < startIp) {
+            retv = true;
          }
-
+         if (debugMode) {
+            //if(a instanceof ActionIf){
+            System.out.println(" ip: " + ip + " action(len " + a.actionLength + "): " + a + " stack:" + Highlighting.stripHilights(stack.toString()) + " " + Helper.byteArrToString(a.getBytes(SWF.DEFAULT_VERSION)));
+            //}
+         }
+         /*if(a instanceof ActionConstantPool){
+          throw new IllegalArgumentException("CP found");
+          }     */
          if (a instanceof ActionPush) {
             if (cpool != null) {
                ((ActionPush) a).constantPool = cpool.constants;
@@ -548,7 +584,7 @@ public class SWFInputStream extends InputStream {
 
          ensureCapacity(ret, ip);
          int newip = -1;
-         if (!(ret.get(ip) instanceof ActionNop)) {
+         if (!enableVariables && (!(ret.get(ip) instanceof ActionNop))) {
             break;
          }
 
@@ -564,14 +600,35 @@ public class SWFInputStream extends InputStream {
          if (a instanceof ActionIf) {
             aif = (ActionIf) a;
             GraphTargetItem top = stack.pop();
-            if (top.isCompileTime()) {
+            int nip = rri.getPos() + aif.offset;
+
+            if (decideBranch) {
+               System.out.print("newip " + nip + ", ");
+               System.out.print("Action: jump(j),ignore(i),compute(c)?");
+               String next = sc.next();
+               if (next.equals("j")) {
+                  newip = rri.getPos() + aif.offset;
+                  rri.setPos(newip);
+
+               } else if (next.equals("i")) {
+               } else if (next.equals("c")) {
+                  goaif = true;
+               }
+            } else if (top.isCompileTime() && ((!top.isVariableComputed()) || (top.isVariableComputed() && enableVariables))) {
+               //if(top.isCompileTime()) {
+               //if(false){
+               if (enableVariables) {
+                  ((ActionIf) a).compileTime = true;
+               }
                if (debugMode) {
                   System.out.print("is compiletime -> ");
                }
                if (top.toBoolean()) {
                   newip = rri.getPos() + aif.offset;
-                  rri.setPos(newip);
-                  a = new ActionJump(aif.offset);
+                  //rri.setPos(newip);
+                  if (!enableVariables) {
+                     a = new ActionJump(aif.offset);
+                  }
                   if (debugMode) {
                      System.out.println("jump");
                   }
@@ -579,11 +636,11 @@ public class SWFInputStream extends InputStream {
                   if (debugMode) {
                      System.out.println("ignore");
                   }
-                  a = new ActionNop();
+                  if (!enableVariables) {
+                     a = new ActionNop();
+                  }
                }
-               if (displayCompiletime) {
-                  beforeInsert = new ActionPop();
-               } else {
+               if (!enableVariables) {
                   List<GraphSourceItemPos> needed = top.getNeededSources();
                   for (GraphSourceItemPos ig : needed) {
                      if (ig.item instanceof ActionPush) {
@@ -601,13 +658,16 @@ public class SWFInputStream extends InputStream {
                }
 
             } else {
+               //throw new RuntimeException("goaif");
                goaif = true;
             }
          } else if (a instanceof ActionJump) {
             newip = rri.getPos() + ((ActionJump) a).offset;
-            rri.setPos(newip);
+            //if(newip>=0){
+            //rri.setPos(newip);
+            //}
          } else {
-            a.translate(Helper.toList(new HashMap<Integer, String>()), stack, output);
+            a.translate(localData, stack, output);
          }
          for (int i = 0; i < actionLen; i++) {
             ensureCapacity(ret, ip + i);
@@ -627,16 +687,20 @@ public class SWFInputStream extends InputStream {
          } else {
             ip = ip + (int) actionLen;
          }
+         rri.setPos(ip);
          filePos = rri.getPos();
          if (goaif) {
             int oldPos = rri.getPos();
-            readActionListAtPos(stack, cpool, sis, rri, rri.getPos() + aif.offset, ret);
+            if (readActionListAtPos(enableVariables, localData, stack, cpool, sis, rri, rri.getPos() + aif.offset, ret, startIp)) {
+               retv = true;
+            }
             rri.setPos(oldPos);
          }
       }
+      return retv;
    }
 
-   private void ensureCapacity(List<Action> ret, int index) {
+   private static void ensureCapacity(List<Action> ret, int index) {
       while (ret.size() <= index) {
          ret.add(new ActionNop());
       }
@@ -673,6 +737,7 @@ public class SWFInputStream extends InputStream {
    public List<Tag> readTagList(int level) throws IOException {
       List<Tag> tags = new ArrayList<Tag>();
       Tag tag;
+      Tag previousTag = null;
       while (true) {
          long pos = getPos();
          tag = readTag(level, pos);
@@ -683,6 +748,8 @@ public class SWFInputStream extends InputStream {
          if (Main.dump_tags && level == 0) {
             dumpTag(System.out, version, tag, level);
          }
+         tag.previousTag = previousTag;
+         previousTag = tag;
       }
       return tags;
    }
@@ -1195,7 +1262,8 @@ public class SWFInputStream extends InputStream {
                if (actionLength > 0) {
                   skip(actionLength);
                }
-               return new Action(actionCode, actionLength);
+               throw new UnknownActionException(actionCode);
+            //return new Action(actionCode, actionLength);
          }
       }
    }

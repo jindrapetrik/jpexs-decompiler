@@ -80,25 +80,25 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
 
    public RECT getRect(HashMap<Integer, CharacterTag> characters) {
       RECT ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
-      HashMap<Integer,Integer> depthMap=new HashMap<Integer, Integer>();
+      HashMap<Integer, Integer> depthMap = new HashMap<Integer, Integer>();
       for (Tag t : subTags) {
-         Set<Integer> needed = t.getNeededCharacters();         
-         MATRIX m = null;        
+         Set<Integer> needed = t.getNeededCharacters();
+         MATRIX m = null;
          if (t instanceof PlaceObjectTypeTag) {
-            PlaceObjectTypeTag pot=(PlaceObjectTypeTag) t;
+            PlaceObjectTypeTag pot = (PlaceObjectTypeTag) t;
             m = pot.getMatrix();
-            int charId=pot.getCharacterId();
-            if(charId>-1){
+            int charId = pot.getCharacterId();
+            if (charId > -1) {
                depthMap.put(pot.getDepth(), charId);
-            }else{
+            } else {
                needed.add(depthMap.get(pot.getDepth()));
             }
-         }    
+         }
          if (needed.isEmpty()) {
             continue;
          }
          RECT r = getCharacterBounds(characters, needed);
-               
+
          if (m != null) {
             Point topleft = m.apply(new Point(r.Xmin, r.Ymin));
             Point bottomright = m.apply(new Point(r.Xmax, r.Ymax));
