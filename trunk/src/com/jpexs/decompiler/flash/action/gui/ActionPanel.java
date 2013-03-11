@@ -258,7 +258,7 @@ public class ActionPanel extends JPanel implements ActionListener {
          try {
             src.setActions(ASMParser.parse(true, new ByteArrayInputStream(editor.getText().getBytes()), SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION);
             setSource(this.src);
-            JOptionPane.showMessageDialog(this, "Code successfully saved");            
+            JOptionPane.showMessageDialog(this, "Code successfully saved");
          } catch (IOException ex) {
          } catch (ParseException ex) {
             JOptionPane.showMessageDialog(this, "" + ex.text + " on line " + ex.line, "Error", JOptionPane.ERROR_MESSAGE);

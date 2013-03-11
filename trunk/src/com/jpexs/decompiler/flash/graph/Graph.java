@@ -29,11 +29,11 @@ import java.util.Stack;
 public class Graph {
 
    public List<GraphPart> heads;
-   private GraphSource code;
+   protected GraphSource code;
 
    public Graph(GraphSource code, List<Integer> alternateEntries) {
-      heads = makeGraph(code, new ArrayList<GraphPart>(), alternateEntries);
       this.code = code;
+      heads = makeGraph(code, new ArrayList<GraphPart>(), alternateEntries);
       for (GraphPart head : heads) {
          fixGraph(head);
          makeMulti(head, new ArrayList<GraphPart>());
@@ -1095,7 +1095,9 @@ public class Graph {
                   if ((!loopBody.isEmpty()) && (loopBody.get(loopBody.size() - 1) instanceof IfItem)) {
                      IfItem ift = (IfItem) loopBody.get(loopBody.size() - 1);
                      if (ift.onFalse.isEmpty() || ((ift.onFalse.size() == 1) && (ift.onFalse.get(0) instanceof ContinueItem) && (((ContinueItem) ift.onFalse.get(0)).loopId == currentLoop.id))) {
-                        expr = ift.expression;
+                        if (ift.expression != null) {
+                           expr = ift.expression;
+                        }
                         addIf = ift.onTrue;
                         loopBody.remove(loopBody.size() - 1);
                      }
@@ -1286,6 +1288,10 @@ public class Graph {
       return ret;
    }
 
+   protected int checkIp(int ip) {
+      return ip;
+   }
+
    private GraphPart makeGraph(GraphPart parent, String path, GraphSource code, int startip, int lastIp, List<GraphPart> allBlocks, HashMap<Integer, List<Integer>> refs, boolean visited2[]) {
 
       int ip = startip;
@@ -1324,6 +1330,7 @@ public class Graph {
                part = gp;
             }
          }
+         ip = checkIp(ip);
          lastIp = ip;
          GraphSourceItem ins = code.get(ip);
          if (ins.isExit()) {

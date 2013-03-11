@@ -16,19 +16,28 @@
  */
 package com.jpexs.decompiler.flash.action;
 
+import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
+import com.jpexs.decompiler.flash.action.swf4.ActionNot;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.Null;
+import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.EnumerateTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.StoreRegisterTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.clauses.ForInTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.operations.NeqTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.operations.StrictEqTreeItem;
 import com.jpexs.decompiler.flash.graph.BreakItem;
 import com.jpexs.decompiler.flash.graph.ContinueItem;
 import com.jpexs.decompiler.flash.graph.Graph;
 import com.jpexs.decompiler.flash.graph.GraphPart;
 import com.jpexs.decompiler.flash.graph.GraphSource;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.graph.Loop;
 import com.jpexs.decompiler.flash.graph.SwitchItem;
+import com.jpexs.decompiler.flash.graph.WhileItem;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -42,13 +51,9 @@ import java.util.Stack;
  */
 public class ActionGraph extends Graph {
 
-   private List<Action> code;
-   //private int version;
-
    public ActionGraph(List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version) {
       super(new ActionGraphSource(code, version, registerNames, variables, functions), new ArrayList<Integer>());
       //this.version = version;
-      this.code = code;
       /*heads = makeGraph(code, new ArrayList<GraphPart>());
        for (GraphPart head : heads) {
        fixGraph(head);
@@ -70,12 +75,44 @@ public class ActionGraph extends Graph {
          list.clear();
          list.addAll(ret);
       }
+      for (int t = 0; t < list.size(); t++) {
+         GraphTargetItem it = list.get(t);
+         if (it instanceof WhileItem) {
+            WhileItem wi = (WhileItem) it;
+            if ((!wi.commands.isEmpty()) && (wi.commands.get(0) instanceof StoreRegisterTreeItem)) {
+               StoreRegisterTreeItem srt = (StoreRegisterTreeItem) wi.commands.get(0);
+               if (wi.expression instanceof NeqTreeItem) {
+                  NeqTreeItem ne = (NeqTreeItem) wi.expression;
+                  if (ne.rightSide instanceof DirectValueTreeItem) {
+                     DirectValueTreeItem dv = (DirectValueTreeItem) ne.rightSide;
+                     if (dv.value instanceof Null) {
+                        if (ne.leftSide instanceof EnumerateTreeItem) {
+                           EnumerateTreeItem eti = (EnumerateTreeItem) ne.leftSide;
+                           list.remove(t);
+                           wi.commands.remove(0);
+                           list.add(t, new ForInTreeItem(null, wi.loop, new DirectValueTreeItem(null, 0, srt.register, new ArrayList<String>()), eti.object, wi.commands));
+                        }
+                     }
+                  }
+               }
+            }
+
+         }
+      }
    }
 
    @Override
    protected List<GraphTargetItem> check(GraphSource code, List localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, List<GraphTargetItem> output, HashMap<Loop, List<GraphTargetItem>> forFinalCommands) {
+      if (!output.isEmpty()) {
+         if (output.get(output.size() - 1) instanceof StoreRegisterTreeItem) {
+            StoreRegisterTreeItem str = (StoreRegisterTreeItem) output.get(output.size() - 1);
+            if (str.value instanceof EnumerateTreeItem) {
+               output.remove(output.size() - 1);
+            }
+         }
+      }
       List<GraphTargetItem> ret = null;
-      if ((part.nextParts.size() == 2) && (stack.peek() instanceof StrictEqTreeItem)) {
+      if ((part.nextParts.size() == 2) && (!stack.isEmpty()) && (stack.peek() instanceof StrictEqTreeItem)) {
 
          GraphTargetItem switchedObject = null;
          if (!output.isEmpty()) {
@@ -886,4 +923,26 @@ public class ActionGraph extends Graph {
     return ret;
     }
     */
+
+   @Override
+   protected int checkIp(int ip) {
+
+      //return in for..in
+      GraphSourceItem action = code.get(ip);
+      if ((action instanceof ActionPush) && (((ActionPush) action).values.size() == 1) && (((ActionPush) action).values.get(0) instanceof Null)) {
+         if (ip + 3 < code.size()) {
+            if ((code.get(ip + 1) instanceof ActionEquals) || (code.get(ip + 1) instanceof ActionEquals2)) {
+               if (code.get(ip + 2) instanceof ActionNot) {
+                  if (code.get(ip + 3) instanceof ActionIf) {
+                     ActionIf aif = (ActionIf) code.get(ip + 3);
+                     if (code.adr2pos(code.pos2adr(ip + 4) + aif.offset) == ip) {
+                        ip += 4;
+                     }
+                  }
+               }
+            }
+         }
+      }
+      return ip;
+   }
 }

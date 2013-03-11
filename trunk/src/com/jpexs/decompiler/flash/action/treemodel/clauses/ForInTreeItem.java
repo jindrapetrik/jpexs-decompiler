@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.action.treemodel.clauses;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.graph.Block;
 import com.jpexs.decompiler.flash.graph.ContinueItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -28,8 +27,8 @@ import java.util.List;
 
 public class ForInTreeItem extends LoopTreeItem implements Block {
 
-   public TreeItem variableName;
-   public TreeItem enumVariable;
+   public GraphTargetItem variableName;
+   public GraphTargetItem enumVariable;
    public List<GraphTargetItem> commands;
 
    @Override
@@ -39,7 +38,7 @@ public class ForInTreeItem extends LoopTreeItem implements Block {
       return ret;
    }
 
-   public ForInTreeItem(Action instruction, Loop loop, TreeItem variableName, TreeItem enumVariable, List<GraphTargetItem> commands) {
+   public ForInTreeItem(Action instruction, Loop loop, GraphTargetItem variableName, GraphTargetItem enumVariable, List<GraphTargetItem> commands) {
       super(instruction, loop);
       this.variableName = variableName;
       this.enumVariable = enumVariable;

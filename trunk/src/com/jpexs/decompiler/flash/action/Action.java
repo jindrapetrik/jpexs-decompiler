@@ -611,6 +611,24 @@ public class Action implements GraphSourceItem {
             break;
          }
          Action action = actions.get(ip);
+
+         //return in for..in
+         if ((action instanceof ActionPush) && (((ActionPush) action).values.size() == 1) && (((ActionPush) action).values.get(0) instanceof Null)) {
+            if (ip + 3 <= end) {
+               if ((actions.get(ip + 1) instanceof ActionEquals) || (actions.get(ip + 1) instanceof ActionEquals2)) {
+                  if (actions.get(ip + 2) instanceof ActionNot) {
+                     if (actions.get(ip + 3) instanceof ActionIf) {
+                        ActionIf aif = (ActionIf) actions.get(ip + 3);
+                        if (adr2ip(actions, ip2adr(actions, ip + 4, version) + aif.offset, version) == ip) {
+                           ip += 4;
+                           continue;
+                        }
+                     }
+                  }
+               }
+            }
+         }
+
          /*ActionJump && ActionIf removed*/
          if ((action instanceof ActionEnumerate2) || (action instanceof ActionEnumerate)) {
             loopStart = ip + 1;

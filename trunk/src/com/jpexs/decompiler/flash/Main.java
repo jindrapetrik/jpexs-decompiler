@@ -32,7 +32,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.*;
-import java.lang.management.ManagementFactory;
 import java.net.Socket;
 import java.util.Calendar;
 import java.util.logging.ConsoleHandler;
@@ -440,7 +439,7 @@ public class Main {
       }
       fis.close();
       fos.close();
-   }   
+   }
 
    public static final void printASM(AVM2Code code) {
       String s = Highlighting.stripHilights(code.toASMSource(null, new MethodBody()));

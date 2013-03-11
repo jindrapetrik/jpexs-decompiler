@@ -31,9 +31,11 @@ public abstract class UnaryOpItem extends GraphTargetItem {
 
    @Override
    public String toString(List localData) {
-      String s = value.toString(localData);
-      if (value.precedence > precedence) {
-         s = "(" + s + ")";
+      String s = (value == null ? "null" : value.toString(localData));
+      if (value != null) {
+         if (value.precedence > precedence) {
+            s = "(" + s + ")";
+         }
       }
       return hilight(operator) + s;
    }
