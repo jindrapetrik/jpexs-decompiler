@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.swf4;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.CallFunctionTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.CallMethodTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.NewMethodTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +42,7 @@ public class ActionPop extends Action {
          return;
       }
       GraphTargetItem val = stack.pop();
-      if ((val instanceof CallFunctionTreeItem) || (val instanceof CallMethodTreeItem)) {
+      if ((val instanceof CallFunctionTreeItem) || (val instanceof CallMethodTreeItem) || (val instanceof NewMethodTreeItem)) {
          output.add(val);
       }
       /*if (!(val instanceof DirectValueTreeItem)) {
