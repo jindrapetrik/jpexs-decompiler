@@ -38,7 +38,7 @@ public class StoreRegisterTreeItem extends TreeItem implements SetTypeTreeItem {
    }
 
    @Override
-   public TreeItem getObject() {
+   public GraphTargetItem getObject() {
       return new DirectValueTreeItem(src, -1, register, null);
    }
 

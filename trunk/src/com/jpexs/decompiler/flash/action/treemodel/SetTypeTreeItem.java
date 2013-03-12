@@ -16,11 +16,13 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+
 /**
  *
  * @author JPEXS
  */
 public interface SetTypeTreeItem {
 
-   public TreeItem getObject();
+   public GraphTargetItem getObject();
 }

@@ -43,7 +43,7 @@ public class SetPropertyTreeItem extends TreeItem implements SetTypeTreeItem {
    }
 
    @Override
-   public TreeItem getObject() {
+   public GraphTargetItem getObject() {
       return new GetPropertyTreeItem(src, target, propertyIndex);
    }
 

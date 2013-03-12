@@ -39,7 +39,7 @@ public class SetMemberTreeItem extends TreeItem implements SetTypeTreeItem {
    }
 
    @Override
-   public TreeItem getObject() {
+   public GraphTargetItem getObject() {
       return new GetMemberTreeItem(src, object, objectName);
    }
 

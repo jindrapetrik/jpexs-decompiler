@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.action.swf4.Null;
 import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.EnumerateTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.SetTypeTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.StoreRegisterTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.clauses.ForInTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.operations.NeqTreeItem;
@@ -79,8 +80,8 @@ public class ActionGraph extends Graph {
          GraphTargetItem it = list.get(t);
          if (it instanceof WhileItem) {
             WhileItem wi = (WhileItem) it;
-            if ((!wi.commands.isEmpty()) && (wi.commands.get(0) instanceof StoreRegisterTreeItem)) {
-               StoreRegisterTreeItem srt = (StoreRegisterTreeItem) wi.commands.get(0);
+            if ((!wi.commands.isEmpty()) && (wi.commands.get(0) instanceof SetTypeTreeItem)) {
+               SetTypeTreeItem sti = (SetTypeTreeItem) wi.commands.get(0);
                if (wi.expression instanceof NeqTreeItem) {
                   NeqTreeItem ne = (NeqTreeItem) wi.expression;
                   if (ne.rightSide instanceof DirectValueTreeItem) {
@@ -90,7 +91,7 @@ public class ActionGraph extends Graph {
                            EnumerateTreeItem eti = (EnumerateTreeItem) ne.leftSide;
                            list.remove(t);
                            wi.commands.remove(0);
-                           list.add(t, new ForInTreeItem(null, wi.loop, new DirectValueTreeItem(null, 0, srt.register, new ArrayList<String>()), eti.object, wi.commands));
+                           list.add(t, new ForInTreeItem(null, wi.loop, sti.getObject(), eti.object, wi.commands));
                         }
                      }
                   }

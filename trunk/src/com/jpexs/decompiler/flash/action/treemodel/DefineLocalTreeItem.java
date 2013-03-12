@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
 
-public class DefineLocalTreeItem extends TreeItem {
+public class DefineLocalTreeItem extends TreeItem implements SetTypeTreeItem{
 
    public GraphTargetItem name;
    public GraphTargetItem value;
@@ -45,5 +45,10 @@ public class DefineLocalTreeItem extends TreeItem {
       ret.addAll(value.getNeededSources());
       ret.addAll(name.getNeededSources());
       return ret;
+   }
+   
+   @Override
+   public GraphTargetItem getObject() {
+      return new DefineLocalTreeItem(src, name, null);
    }
 }

@@ -17,7 +17,9 @@
 package com.jpexs.decompiler.flash.action.treemodel.clauses;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
+import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
 import com.jpexs.decompiler.flash.graph.Block;
 import com.jpexs.decompiler.flash.graph.ContinueItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -49,9 +51,9 @@ public class ForInTreeItem extends LoopTreeItem implements Block {
    public String toString(ConstantPool constants) {
       String ret = "";
       ret += "loop" + loop.id + ":\r\n";
-      ret += hilight("for(") + stripQuotes(variableName) + " in " + enumVariable.toString(constants) + ")\r\n{\r\n";
+      ret += hilight("for(") + ((variableName instanceof DirectValueTreeItem)&&(((DirectValueTreeItem)variableName).value instanceof RegisterNumber)?"var ":"")+stripQuotes(variableName) + " in " + enumVariable.toString(constants) + ")\r\n{\r\n";
       for (GraphTargetItem ti : commands) {
-         ret += ti.toString(constants) + "\r\n";
+         ret += ti.toStringSemicoloned(constants) + "\r\n";
       }
       ret += hilight("}") + "\r\n";
       ret += ":loop" + loop.id;

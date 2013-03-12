@@ -37,7 +37,7 @@ public class SetVariableTreeItem extends TreeItem implements SetTypeTreeItem {
    }
 
    @Override
-   public TreeItem getObject() {
+   public GraphTargetItem getObject() {
       return new GetVariableTreeItem(src, value);
    }
 
