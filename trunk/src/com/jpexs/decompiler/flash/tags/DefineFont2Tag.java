@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.types.KERNINGRECORD;
@@ -28,7 +27,6 @@ import com.jpexs.decompiler.flash.types.SHAPE;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  *
@@ -68,8 +66,7 @@ public class DefineFont2Tag extends CharacterTag implements FontTag {
    @Override
    public byte[] getData(int version) {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = new CopyOutputStream(baos, new ByteArrayInputStream(data));
-      SWFOutputStream sos = new SWFOutputStream(os, version);
+      SWFOutputStream sos = new SWFOutputStream(baos, version);
       try {
          sos.writeUI16(fontId);
          sos.writeUB(1, fontFlagsHasLayout ? 1 : 0);
