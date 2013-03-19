@@ -529,11 +529,15 @@ public class SWFInputStream extends InputStream {
                stack.pop();
                getConstantPool(localData, stack, output, code, condition ? (code.adr2pos(((ActionIf) ins).getAddress() + ((ActionIf) ins).getBytes(code.version).length + ((ActionIf) ins).offset)) : ip + 1, ip, constantPools, visited);
             } else {
+               if(ins instanceof ActionIf){
+                  stack.pop();
+               }
                visited.add(ip);
                List<Integer> branches = ins.getBranches(code);
                for (int b : branches) {
+                  Stack<GraphTargetItem> brStack=(Stack<GraphTargetItem>)stack.clone();
                   if (b >= 0) {
-                     getConstantPool(localData, stack, output, code, b, ip, constantPools, visited);
+                     getConstantPool(localData, brStack, output, code, b, ip, constantPools, visited);
                   } else {
                      if (debugMode) {
                         System.out.println("Negative branch:" + b);
