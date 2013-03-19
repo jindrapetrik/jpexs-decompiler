@@ -64,6 +64,13 @@ public class ASM3Parser {
       return parse(is, constants, null, body);
    }
 
+   private static int checkMultinameIndex(ConstantPool constants, int index, int line) throws ParseException {
+      if ((index < 0) || (index >= constants.constant_multiname.length)) {
+         throw new ParseException("Invalid multiname index", line);
+      }
+      return index;
+   }
+
    public static AVM2Code parse(InputStream is, ConstantPool constants, MissingSymbolHandler missingHandler, MethodBody body) throws IOException, ParseException {
       AVM2Code code = new AVM2Code();
 
@@ -130,8 +137,9 @@ public class ASM3Parser {
                   throw new ParseException("Multiname expected", lexer.yyline());
                }
                ABCException ex = new ABCException();
-               ex.name_index = (int) (long) (Long) exName.value;
-               ex.type_index = (int) (long) (Long) exType.value;
+
+               ex.name_index = checkMultinameIndex(constants,(int) (long) (Long) exName.value,lexer.yyline());
+               ex.type_index = checkMultinameIndex(constants,(int) (long) (Long) exType.value,lexer.yyline());
                exceptions.add(ex);
                exceptionIndices.add((int) (long) (Long) exIndex.value);
                continue;
@@ -147,7 +155,7 @@ public class ASM3Parser {
                      switch (def.operands[i]) {
                         case AVM2Code.DAT_MULTINAME_INDEX:
                            if (parsedOperand.type == ParsedSymbol.TYPE_MULTINAME) {
-                              operandsList.add((int) (long) (Long) parsedOperand.value);
+                              operandsList.add(checkMultinameIndex(constants,(int) (long) (Long) parsedOperand.value,lexer.yyline()));
                            } else {
                               throw new ParseException("Multiname expected", lexer.yyline());
                            }
