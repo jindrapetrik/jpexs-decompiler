@@ -109,7 +109,7 @@ public class MethodBody implements Cloneable, Serializable {
          return s;
       }
       if (pcode) {
-         s += code.toASMSource(constants, this);
+         s += code.toASMSource(constants, this, false);
       } else {
          AVM2Code deobfuscated = null;
          MethodBody b = (MethodBody) Helper.deepCopy(this);

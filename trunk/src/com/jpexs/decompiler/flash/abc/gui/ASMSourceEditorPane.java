@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -43,6 +44,33 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
    private DecompiledEditorPane decompiledEditor;
    private boolean ignoreCarret = false;
    private String name;
+   private String textWithHex="";
+   private String textNoHex="";
+   private boolean hex=false;
+
+   public boolean isHex() {
+      return hex;
+   }
+
+   public void switchHex(){
+      setHex(!hex);
+   }
+   
+   public void setHex(boolean hex) {
+      if(this.hex==hex){
+         return;
+      }
+      this.hex = hex;
+      long oldOffset=getSelectedOffset();
+      if(hex){
+         setText(textWithHex);
+      }else{
+         setText(textNoHex);
+      }
+      hilighOffset(oldOffset);
+   }
+   
+   
 
    public void setIgnoreCarret(boolean ignoreCarret) {
       this.ignoreCarret = ignoreCarret;
@@ -77,7 +105,10 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
       this.bodyIndex = bodyIndex;
       this.abc = abc;
       this.name = name;
-      setText(abc.bodies[bodyIndex].code.toASMSource(abc.constants, abc.bodies[bodyIndex]));
+      String textWithHexTags=abc.bodies[bodyIndex].code.toASMSource(abc.constants, abc.bodies[bodyIndex],true);
+      textWithHex=Helper.hexToComments(textWithHexTags);
+      textNoHex=Helper.stripComments(textWithHexTags);
+      setText(hex?textWithHex:textNoHex);
    }
 
    public void graph() {
@@ -112,24 +143,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
       disassembledHilights = Highlighting.getInstrHighlights(t);
       t = Highlighting.stripHilights(t);
       super.setText(t);
-   }
-
-   public void verify(ConstantPool constants, ABC abc) {
-      try {
-         AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(getText().getBytes()), constants, new DialogMissingSymbolHandler(), abc.bodies[bodyIndex]);
-         //acode.clearSecureSWF(abc.constants, abc.bodies[bodyIndex]);
-         setText(acode.toASMSource(constants, abc.bodies[bodyIndex]));
-
-
-         //Main.mainFrame.decompiledTextArea.setBody(mb, abc);
-      } catch (IOException ex) {
-      } catch (ParseException ex) {
-         JOptionPane.showMessageDialog(this, (ex.text + " on line " + ex.line));
-         selectLine((int) ex.line);
-         return;
-      }
-      JOptionPane.showMessageDialog(this, ("Code OK"));
-   }
+   }   
 
    public void selectInstruction(int pos) {
       String text = getText();
@@ -186,6 +200,20 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
       requestFocus();
    }
 
+   
+   public long getSelectedOffset(){
+      int pos = getCaretPosition();
+      Highlighting lastH = new Highlighting(0, 0, 0);
+      for (Highlighting h : disassembledHilights) {
+         if (pos < h.startPos) {
+            break;
+         }
+         lastH = h;
+      }
+      return lastH.offset;
+   }
+   
+   
    @Override
    public void caretUpdate(CaretEvent e) {
       if (isEditable()) {
@@ -195,14 +223,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
          return;
       }
       getCaret().setVisible(true);
-      int pos = getCaretPosition();
-      Highlighting lastH = new Highlighting(0, 0, 0);
-      for (Highlighting h : disassembledHilights) {
-         if (pos < h.startPos) {
-            break;
-         }
-         lastH = h;
-      }
-      decompiledEditor.hilightOffset(lastH.offset);
+      
+      decompiledEditor.hilightOffset(getSelectedOffset());
    }
 }

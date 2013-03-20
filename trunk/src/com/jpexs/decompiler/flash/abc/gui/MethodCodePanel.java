@@ -19,14 +19,18 @@ package com.jpexs.decompiler.flash.abc.gui;
 import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
+import com.jpexs.decompiler.flash.gui.View;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JToggleButton;
 
 /**
  *
@@ -36,6 +40,7 @@ public class MethodCodePanel extends JPanel implements ActionListener {
 
    private ASMSourceEditorPane sourceTextArea;
    public JPanel buttonsPanel;
+   private JToggleButton hexButton;
 
    public void focusEditor() {
       sourceTextArea.requestFocusInWindow();
@@ -82,26 +87,37 @@ public class MethodCodePanel extends JPanel implements ActionListener {
       sourceTextArea.setFont(new Font("Monospaced", Font.PLAIN, sourceTextArea.getFont().getSize()));
 
       buttonsPanel = new JPanel();
-      buttonsPanel.setLayout(new FlowLayout());
+      buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
       JButton verifyButton = new JButton("Verify");
       verifyButton.setActionCommand("VERIFYBODY");
       verifyButton.addActionListener(this);
 
-      JButton graphButton = new JButton("Graph");
+      JButton graphButton = new JButton(View.getIcon("graph16"));
       graphButton.setActionCommand("GRAPH");
       graphButton.addActionListener(this);
+      graphButton.setToolTipText("View Graph");
+      graphButton.setMargin(new Insets(3, 3, 3, 3));
+
+      hexButton = new JToggleButton(View.getIcon("hex16"));
+      hexButton.setActionCommand("HEX");
+      hexButton.addActionListener(this);
+      hexButton.setToolTipText("View Hex");
+      hexButton.setMargin(new Insets(3, 3, 3, 3));
 
       JButton execButton = new JButton("Execute");
       execButton.setActionCommand("EXEC");
       execButton.addActionListener(this);
 
       buttonsPanel.add(graphButton);
+      buttonsPanel.add(hexButton);
+      buttonsPanel.add(new JPanel());
       // buttonsPanel.add(saveButton);
       // buttonsPan.add(execButton);
 
-      add(buttonsPanel, BorderLayout.SOUTH);
+      add(buttonsPanel, BorderLayout.NORTH);
    }
 
+   @Override
    public void actionPerformed(ActionEvent e) {
       if (Main.isWorking()) {
          return;
@@ -110,16 +126,26 @@ public class MethodCodePanel extends JPanel implements ActionListener {
          sourceTextArea.graph();
       }
 
+      if (e.getActionCommand().equals("HEX")) {
+         sourceTextArea.setHex(hexButton.isSelected());
+      }
+
       if (e.getActionCommand().equals("EXEC")) {
          sourceTextArea.exec();
-      }
-      if (e.getActionCommand().equals("VERIFYBODY")) {
-         sourceTextArea.verify(Main.mainFrame.abcPanel.abc.constants, Main.mainFrame.abcPanel.abc);
       }
    }
 
    public void setEditMode(boolean val) {
+      if (val) {
+         sourceTextArea.setHex(false);
+      } else {
+         if (hexButton.isSelected()) {
+            sourceTextArea.setHex(true);
+         }
+      }
+
       sourceTextArea.setEditable(val);
       sourceTextArea.getCaret().setVisible(true);
+      buttonsPanel.setVisible(!val);
    }
 }

@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.tags.DoABCTag;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Insets;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -216,6 +217,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
       JPanel navIconsPanel = new JPanel();
       navIconsPanel.setLayout(new BoxLayout(navIconsPanel, BoxLayout.X_AXIS));
       final JToggleButton sortButton = new JToggleButton(View.getIcon("sort16"));
+      sortButton.setMargin(new Insets(3, 3, 3, 3));
       navIconsPanel.add(sortButton);
       navPanel.add(navIconsPanel, BorderLayout.SOUTH);
       navPanel.add(new JScrollPane(navigator), BorderLayout.CENTER);

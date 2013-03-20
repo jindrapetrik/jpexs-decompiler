@@ -441,14 +441,6 @@ public class Main {
       fos.close();
    }
 
-   public static final void printASM(AVM2Code code) {
-      String s = Highlighting.stripHilights(code.toASMSource(null, new MethodBody()));
-      String ss[] = s.split("\n");
-      for (int i = 0; i < ss.length; i++) {
-         System.out.println("" + i + ":" + ss[i]);
-      }
-   }
-
    /**
     * @param args the command line arguments
     */

@@ -692,11 +692,11 @@ public class AVM2Code implements Serializable {
       return null;
    }
 
-   public String toASMSource(ConstantPool constants, MethodBody body) {
-      return toASMSource(constants, body, new ArrayList<Integer>());
+   public String toASMSource(ConstantPool constants, MethodBody body, boolean hex) {
+      return toASMSource(constants, body, new ArrayList<Integer>(), hex);
    }
 
-   public String toASMSource(ConstantPool constants, MethodBody body, List<Integer> outputMap) {
+   public String toASMSource(ConstantPool constants, MethodBody body, List<Integer> outputMap, boolean hex) {
       invalidateCache();
       StringBuffer ret = new StringBuffer();
       String t = "";
@@ -725,6 +725,11 @@ public class AVM2Code implements Serializable {
       int largeLimit = 20000;
       boolean markOffsets = code.size() <= largeLimit;
       for (AVM2Instruction ins : code) {
+         if(hex){
+            ret.append("<ffdec:hex>");
+            ret.append(Helper.bytesToHexString(ins.getBytes())); 
+            ret.append("</ffdec:hex>\n");
+         }
          if (ins.labelname != null) {
             ret.append(ins.labelname + ":");
          } else if (offsets.contains(ofs)) {
@@ -2252,7 +2257,7 @@ public class AVM2Code implements Serializable {
       invalidateCache();
       try {
          List<Integer> outputMap = new ArrayList<Integer>();
-         String src = Highlighting.stripHilights(toASMSource(constants, body, outputMap));
+         String src = Highlighting.stripHilights(toASMSource(constants, body, outputMap,false));
 
          AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(src.getBytes()), constants, null, body);
          for (int i = 0; i < acode.code.size(); i++) {
@@ -2292,7 +2297,7 @@ public class AVM2Code implements Serializable {
    public void removeIgnored(ConstantPool constants, MethodBody body) {
       try {
          List<Integer> outputMap = new ArrayList<Integer>();
-         String src = toASMSource(constants, body, outputMap);
+         String src = toASMSource(constants, body, outputMap,false);
          AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(src.getBytes()), constants, body);
          for (int i = 0; i < acode.code.size(); i++) {
             if (outputMap.size() > i) {
