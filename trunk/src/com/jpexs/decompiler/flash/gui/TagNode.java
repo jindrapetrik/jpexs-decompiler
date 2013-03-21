@@ -262,7 +262,7 @@ public class TagNode {
                   }
                   String ret;
                   if (isPcode) {
-                     ret = Highlighting.stripHilights(((ASMSource) node.tag).getASMSource(SWF.DEFAULT_VERSION));
+                     ret = Highlighting.stripHilights(((ASMSource) node.tag).getASMSource(SWF.DEFAULT_VERSION,false));
                   } else {
                      List<Action> as = ((ASMSource) node.tag).getActions(SWF.DEFAULT_VERSION);
                      Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);

@@ -23,19 +23,22 @@ import com.jpexs.decompiler.flash.action.parser.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.Label;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.special.ActionContainer;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-public class ActionWith extends Action {
+public class ActionWith extends Action implements ActionContainer{
 
    public List<Action> actions;
    public int size;
+   public int version;
 
    public ActionWith(SWFInputStream sis, int version) throws IOException {
       super(0x94, 2);
       size = sis.readUI16();
+      this.version = version;
       //actions = new ArrayList<Action>();
       actions = (new SWFInputStream(new ByteArrayInputStream(sis.readBytes(size)), version)).readActionList();
    }
@@ -53,6 +56,21 @@ public class ActionWith extends Action {
    }
 
    @Override
+   public byte[] getHeaderBytes() {
+      ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      SWFOutputStream sos = new SWFOutputStream(baos, version);
+      try {
+         byte codeBytes[] = Action.actionsToBytes(actions, false, version);
+         sos.writeUI16(codeBytes.length);
+         sos.close();
+         baos2.write(surroundWithAction(baos.toByteArray(), version));
+      } catch (IOException e) {
+      }
+      return baos2.toByteArray();
+   }
+   
+   @Override
    public byte[] getBytes(int version) {
       ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -69,8 +87,8 @@ public class ActionWith extends Action {
    }
 
    @Override
-   public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version) {
-      return "With {\r\n" + Action.actionsToString(actions, knownAddreses, constantPool, version) + "}";
+   public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+      return "With {\r\n" + Action.actionsToString(actions, knownAddreses, constantPool, version,hex) + "}";
    }
 
    @Override
@@ -82,4 +100,6 @@ public class ActionWith extends Action {
    public List<Action> getAllIfsOrJumps() {
       return Action.getActionsAllIfsOrJumps(actions);
    }
+
+   
 }

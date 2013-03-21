@@ -111,8 +111,8 @@ public class BUTTONCONDACTION implements ASMSource {
     * @param version SWF version
     * @return ASM source
     */
-   public String getASMSource(int version) {
-      return Action.actionsToString(getActions(version), null, version);
+   public String getASMSource(int version,boolean hex) {
+      return Action.actionsToString(getActions(version), null, version,hex);
    }
 
    /**

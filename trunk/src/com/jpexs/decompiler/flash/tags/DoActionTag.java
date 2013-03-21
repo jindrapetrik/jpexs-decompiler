@@ -71,8 +71,8 @@ public class DoActionTag extends Tag implements ASMSource {
     * @return ASM source
     */
    @Override
-   public String getASMSource(int version) {
-      return Action.actionsToString(getActions(version), null, version);
+   public String getASMSource(int version,boolean hex) {
+      return Action.actionsToString(getActions(version), null, version,hex);
    }
 
    /**

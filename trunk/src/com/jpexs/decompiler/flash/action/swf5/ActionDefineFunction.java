@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.action.parser.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.Label;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.special.ActionContainer;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.action.treemodel.FunctionTreeItem;
@@ -37,7 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-public class ActionDefineFunction extends Action {
+public class ActionDefineFunction extends Action implements ActionContainer {
 
    public String functionName;
    public List<String> paramNames = new ArrayList<String>();
@@ -88,6 +89,28 @@ public class ActionDefineFunction extends Action {
    }
 
    @Override
+   public byte[] getHeaderBytes() {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      SWFOutputStream sos = new SWFOutputStream(baos, version);
+      ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+      try {
+         sos.writeString(functionName);
+         sos.writeUI16(paramNames.size());
+         for (String s : paramNames) {
+            sos.writeString(s);
+         }
+         byte codeBytes[] = Action.actionsToBytes(code, false, version);
+         sos.writeUI16(codeBytes.length);
+         sos.close();
+
+
+         baos2.write(surroundWithAction(baos.toByteArray(), version));
+      } catch (IOException e) {
+      }
+      return baos2.toByteArray();
+   }
+
+   @Override
    public byte[] getBytes(int version) {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       SWFOutputStream sos = new SWFOutputStream(baos, version);
@@ -134,13 +157,13 @@ public class ActionDefineFunction extends Action {
    }
 
    @Override
-   public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version) {
+   public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
       String paramStr = "";
       for (int i = 0; i < paramNames.size(); i++) {
          paramStr += "\"" + Helper.escapeString(paramNames.get(i)) + "\"";
          paramStr += " ";
       }
-      return "DefineFunction \"" + Helper.escapeString(functionName) + "\" " + paramNames.size() + " " + paramStr + " {\r\n" + Action.actionsToString(code, knownAddreses, constantPool, version) + "}";
+      return "DefineFunction \"" + Helper.escapeString(functionName) + "\" " + paramNames.size() + " " + paramStr + " {\r\n" + Action.actionsToString(code, knownAddreses, constantPool, version, hex) + "}";
    }
 
    @Override

@@ -619,7 +619,7 @@ public class SWFInputStream extends InputStream {
       //Action.setConstantPool(ret, cpool);
 
       try {
-         s = Highlighting.stripHilights(Action.actionsToString(ret, null, version));
+         s = Highlighting.stripHilights(Action.actionsToString(ret, null, version,false));
          ret = ASMParser.parse(false, new ByteArrayInputStream(s.getBytes()), SWF.DEFAULT_VERSION);
       } catch (ParseException ex) {
          Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error", ex);

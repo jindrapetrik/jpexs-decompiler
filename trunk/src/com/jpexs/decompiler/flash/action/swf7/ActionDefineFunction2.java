@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.action.parser.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.Label;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.special.ActionContainer;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.treemodel.FunctionTreeItem;
@@ -37,7 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-public class ActionDefineFunction2 extends Action {
+public class ActionDefineFunction2 extends Action implements ActionContainer {
 
    public String functionName;
    public List<String> paramNames = new ArrayList<String>();
@@ -121,6 +122,40 @@ public class ActionDefineFunction2 extends Action {
    }
 
    @Override
+   public byte[] getHeaderBytes() {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      SWFOutputStream sos = new SWFOutputStream(baos, version);
+      ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+      try {
+         sos.writeString(functionName);
+         sos.writeUI16(paramNames.size());
+         sos.writeUI8(registerCount);
+         sos.writeUB(1, preloadParentFlag ? 1 : 0);
+         sos.writeUB(1, preloadRootFlag ? 1 : 0);
+         sos.writeUB(1, suppressSuperFlag ? 1 : 0);
+         sos.writeUB(1, preloadSuperFlag ? 1 : 0);
+         sos.writeUB(1, suppressArgumentsFlag ? 1 : 0);
+         sos.writeUB(1, preloadArgumentsFlag ? 1 : 0);
+         sos.writeUB(1, suppressThisFlag ? 1 : 0);
+         sos.writeUB(1, preloadThisFlag ? 1 : 0);
+         sos.writeUB(7, 0);
+         sos.writeUB(1, preloadGlobalFlag ? 1 : 0);
+         for (int i = 0; i < paramNames.size(); i++) {
+            sos.writeUI8(paramRegisters.get(i));
+            sos.writeString(paramNames.get(i));
+         }
+         byte codeBytes[] = Action.actionsToBytes(code, false, version);
+         sos.writeUI16(codeBytes.length);
+         sos.close();
+
+
+         baos2.write(surroundWithAction(baos.toByteArray(), version));
+      } catch (IOException e) {
+      }
+      return baos2.toByteArray();
+   }
+
+   @Override
    public byte[] getBytes(int version) {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       SWFOutputStream sos = new SWFOutputStream(baos, version);
@@ -191,7 +226,7 @@ public class ActionDefineFunction2 extends Action {
    }
 
    @Override
-   public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version) {
+   public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
       String paramStr = "";
       for (int i = 0; i < paramNames.size(); i++) {
          paramStr += paramRegisters.get(i) + " \"" + Helper.escapeString(paramNames.get(i)) + "\"";
@@ -207,7 +242,7 @@ public class ActionDefineFunction2 extends Action {
               + " " + preloadArgumentsFlag
               + " " + suppressThisFlag
               + " " + preloadThisFlag
-              + " " + preloadGlobalFlag).trim() + " " + paramStr + " {\r\n" + Action.actionsToString(code, knownAddreses, constantPool, version) + "}";
+              + " " + preloadGlobalFlag).trim() + " " + paramStr + " {\r\n" + Action.actionsToString(code, knownAddreses, constantPool, version, hex) + "}";
    }
 
    @Override

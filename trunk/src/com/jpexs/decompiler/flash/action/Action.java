@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.parser.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.ParsedSymbol;
+import com.jpexs.decompiler.flash.action.special.ActionContainer;
 import com.jpexs.decompiler.flash.action.swf4.*;
 import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf6.ActionEnumerate2;
@@ -335,10 +336,11 @@ public class Action implements GraphSourceItem {
     * @param list List of actions
     * @param importantOffsets List of important offsets to mark as labels
     * @param version SWF version
+    * @param hex Add hexadecimal?
     * @return ASM source as String
     */
-   public static String actionsToString(List<Action> list, List<Long> importantOffsets, int version) {
-      return actionsToString(list, importantOffsets, new ArrayList<String>(), version);
+   public static String actionsToString(List<Action> list, List<Long> importantOffsets, int version, boolean hex) {
+      return actionsToString(list, importantOffsets, new ArrayList<String>(), version,hex);
    }
 
    /**
@@ -348,9 +350,10 @@ public class Action implements GraphSourceItem {
     * @param importantOffsets List of important offsets to mark as labels
     * @param constantPool Constant pool
     * @param version SWF version
+    * @param hex Add hexadecimal?
     * @return ASM source as String
     */
-   public static String actionsToString(List<Action> list, List<Long> importantOffsets, List<String> constantPool, int version) {
+   public static String actionsToString(List<Action> list, List<Long> importantOffsets, List<String> constantPool, int version, boolean hex) {
       String ret = "";
       long offset;
       if (importantOffsets == null) {
@@ -360,6 +363,9 @@ public class Action implements GraphSourceItem {
 
       offset = 0;
       for (Action a : list) {
+         if(hex){
+            ret+="<ffdec:hex>"+Helper.bytesToHexString((a instanceof ActionContainer)?((ActionContainer)a).getHeaderBytes():a.getBytes(version))+"</ffdec:hex>\r\n";
+         }
          offset = a.getAddress();
          if (importantOffsets.contains(offset)) {
             ret += "loc" + Helper.formatAddress(offset) + ":";
@@ -372,10 +378,10 @@ public class Action implements GraphSourceItem {
             }
          } else {
             if (a.beforeInsert != null) {
-               ret += a.beforeInsert.getASMSource(importantOffsets, constantPool, version) + "\r\n";
+               ret += a.beforeInsert.getASMSource(importantOffsets, constantPool, version,hex) + "\r\n";
             }
             //if (!(a instanceof ActionNop)) {
-            ret += Highlighting.hilighOffset("", offset) + a.getASMSource(importantOffsets, constantPool, version) + (a.ignored ? "; ignored" : "") + "\r\n";
+            ret += Highlighting.hilighOffset("", offset) + a.getASMSource(importantOffsets, constantPool, version,hex) + (a.ignored ? "; ignored" : "") + "\r\n";
             //}
          }
          offset += a.getBytes(version).length;
@@ -392,9 +398,10 @@ public class Action implements GraphSourceItem {
     * @param knownAddreses List of important offsets to mark as labels
     * @param constantPool Constant pool
     * @param version SWF version
+    * @param hex Add hexadecimal
     * @return
     */
-   public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version) {
+   public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
       return toString();
    }
 
@@ -994,7 +1001,7 @@ public class Action implements GraphSourceItem {
       List<Action> ret = actions;
       String s = null;
       try {
-         s = Highlighting.stripHilights(Action.actionsToString(ret, null, version));
+         s = Highlighting.stripHilights(Action.actionsToString(ret, null, version,false));
          ret = ASMParser.parse(true, new ByteArrayInputStream(s.getBytes()), SWF.DEFAULT_VERSION);
       } catch (Exception ex) {
          Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error", ex);

@@ -24,12 +24,15 @@ import com.jpexs.decompiler.flash.action.parser.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
+import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
@@ -53,7 +56,7 @@ public class ActionPanel extends JPanel implements ActionListener {
    public JButton saveButton = new JButton("Save");
    public JButton editButton = new JButton("Edit");
    public JButton cancelButton = new JButton("Cancel");
-   public JButton graphButton = new JButton("Graph");
+   public JToggleButton hexButton;
    public JButton saveHexButton = new JButton("Save hex");
    public JButton loadHexButton = new JButton("Load hex");
    public JLabel asmLabel = new JLabel("P-code source");
@@ -65,6 +68,34 @@ public class ActionPanel extends JPanel implements ActionListener {
    private boolean editMode = false;
    private List<com.jpexs.decompiler.flash.action.Action> lastCode;
    private ASMSource src;
+   public JPanel topButtonsPan;
+   private String srcWithHex;
+   private String srcNoHex;
+
+   public void setText(String text){
+      int pos = editor.getCaretPosition();
+      Highlighting lastH = new Highlighting(0, 0, 0);
+      for (Highlighting h : disassembledHilights) {
+         if (pos < h.startPos) {
+            break;
+         }
+         lastH = h;
+      }
+      long offset=lastH.offset;
+      disassembledHilights = Highlighting.getInstrHighlights(text);
+      editor.setText(Highlighting.stripHilights(text));
+      for (Highlighting h : disassembledHilights) {
+         if (h.offset == offset) {
+            editor.setCaretPosition(h.startPos);
+            break;
+         }
+      }
+      
+   }
+   
+   public void setHex(boolean hex) {
+      setText(hex ? srcWithHex : srcNoHex);
+   }
 
    public void setSource(ASMSource src) {
       this.src = src;
@@ -77,10 +108,10 @@ public class ActionPanel extends JPanel implements ActionListener {
             if (Main.DO_DECOMPILE) {
                decompiledEditor.setText("//Decompiling...");
             }
-            lastDisasm = asm.getASMSource(SWF.DEFAULT_VERSION);
-            disassembledHilights = Highlighting.getInstrHighlights(lastDisasm);
-            lastDisasm = Highlighting.stripHilights(lastDisasm);
-            editor.setText(lastDisasm);
+            lastDisasm = asm.getASMSource(SWF.DEFAULT_VERSION, true);
+            srcWithHex = Helper.hexToComments(lastDisasm);
+            srcNoHex = Helper.stripComments(lastDisasm);
+            setHex(hexButton.isSelected());
             if (Main.DO_DECOMPILE) {
                List<com.jpexs.decompiler.flash.action.Action> as = asm.getActions(SWF.DEFAULT_VERSION);
                lastCode = as;
@@ -95,6 +126,9 @@ public class ActionPanel extends JPanel implements ActionListener {
       }).start();
    }
 
+   public void hilightOffset(long offset) {
+   }
+
    public ActionPanel() {
       this.list = list;
       DefaultSyntaxKit.initKit();
@@ -104,26 +138,46 @@ public class ActionPanel extends JPanel implements ActionListener {
       decompiledEditor.setEditable(false);
 
 
+       JButton graphButton = new JButton(View.getIcon("graph16"));
+      graphButton.setActionCommand("GRAPH");
+      graphButton.addActionListener(this);
+      graphButton.setToolTipText("View Graph");
+      graphButton.setMargin(new Insets(3, 3, 3, 3));
 
+      hexButton = new JToggleButton(View.getIcon("hex16"));
+      hexButton.setActionCommand("HEX");
+      hexButton.addActionListener(this);
+      hexButton.setToolTipText("View Hex");
+      hexButton.setMargin(new Insets(3, 3, 3, 3));
+
+      topButtonsPan = new JPanel();
+      topButtonsPan.setLayout(new BoxLayout(topButtonsPan, BoxLayout.X_AXIS));
+      topButtonsPan.add(graphButton);
+      topButtonsPan.add(hexButton);
+      JPanel panCode=new JPanel(new BorderLayout());
+      panCode.add(new JScrollPane(editor), BorderLayout.CENTER);
+      panCode.add(topButtonsPan, BorderLayout.NORTH);
+      
       JPanel panB = new JPanel();
       panB.setLayout(new BorderLayout());
       asmLabel.setHorizontalAlignment(SwingConstants.CENTER);
       asmLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
       panB.add(asmLabel, BorderLayout.NORTH);
-      panB.add(new JScrollPane(editor), BorderLayout.CENTER);
+      panB.add(panCode,BorderLayout.CENTER);
+      
+     
 
       JPanel buttonsPan = new JPanel();
       buttonsPan.setLayout(new FlowLayout());
       buttonsPan.add(editButton);
       buttonsPan.add(saveButton);
       buttonsPan.add(cancelButton);
-      buttonsPan.add(graphButton);
+
       //buttonsPan.add(saveHexButton);
       //buttonsPan.add(loadHexButton);
       panB.add(buttonsPan, BorderLayout.SOUTH);
+      
 
-      graphButton.addActionListener(this);
-      graphButton.setActionCommand("GRAPH");
       saveHexButton.addActionListener(this);
       saveHexButton.setActionCommand("SAVEHEXACTION");
       loadHexButton.addActionListener(this);
@@ -228,18 +282,21 @@ public class ActionPanel extends JPanel implements ActionListener {
 
    public void setEditMode(boolean val) {
       if (val) {
+         setText(srcNoHex);
          editor.setEditable(true);
          saveButton.setVisible(true);
          editButton.setVisible(false);
          cancelButton.setVisible(true);
          editor.getCaret().setVisible(true);
       } else {
+         setText(hexButton.isSelected()?srcWithHex:srcNoHex);
          editor.setEditable(false);
          saveButton.setVisible(false);
          editButton.setVisible(true);
          cancelButton.setVisible(false);
          editor.getCaret().setVisible(true);
       }
+      topButtonsPan.setVisible(!val);
       editMode = val;
    }
 
@@ -251,9 +308,11 @@ public class ActionPanel extends JPanel implements ActionListener {
          }
       } else if (e.getActionCommand().equals("EDITACTION")) {
          setEditMode(true);
+      } else if (e.getActionCommand().equals("HEX")) {
+         setHex(hexButton.isSelected());
       } else if (e.getActionCommand().equals("CANCELACTION")) {
          setEditMode(false);
-         editor.setText(lastDisasm);
+         setHex(hexButton.isSelected());
       } else if (e.getActionCommand().equals("SAVEACTION")) {
          try {
             src.setActions(ASMParser.parse(true, new ByteArrayInputStream(editor.getText().getBytes()), SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION);

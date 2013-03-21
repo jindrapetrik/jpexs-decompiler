@@ -163,10 +163,10 @@ public class ActionTry extends Action {
    }
 
    @Override
-   public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version) {
+   public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
       String ret = "";
       ret += "Try {";
-      ret += Action.actionsToString(tryBody, knownAddreses, constantPool, version);
+      ret += Action.actionsToString(tryBody, knownAddreses, constantPool, version,hex);
       ret += "}";
       if (catchBlockFlag) {
          ret += "\r\nCatch ";
@@ -176,12 +176,12 @@ public class ActionTry extends Action {
             ret += "\"" + Helper.escapeString(catchName) + "\"";
          }
          ret += " {\r\n";
-         ret += Action.actionsToString(catchBody, knownAddreses, constantPool, version);
+         ret += Action.actionsToString(catchBody, knownAddreses, constantPool, version,hex);
          ret += "}";
       }
       if (finallyBlockFlag) {
          ret += "\r\nFinally {\r\n";
-         ret += Action.actionsToString(finallyBody, knownAddreses, constantPool, version);
+         ret += Action.actionsToString(finallyBody, knownAddreses, constantPool, version,hex);
          ret += "}";
       }
       return ret;
