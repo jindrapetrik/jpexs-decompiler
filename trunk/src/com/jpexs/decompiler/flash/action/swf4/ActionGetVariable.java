@@ -38,7 +38,7 @@ public class ActionGetVariable extends Action {
    @Override
    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
       GraphTargetItem name = stack.pop();
-      GraphTargetItem computedVal = variables.get(Highlighting.stripHilights(name.toStringNoQuotes()));
+      GraphTargetItem computedVal = variables.get(Highlighting.stripHilights(name.toStringNoQuotes(null)));
       GetVariableTreeItem gvt = new GetVariableTreeItem(this, name);
       gvt.setComputedValue(computedVal);
       stack.push(gvt);

@@ -45,7 +45,7 @@ public class ActionCallFunction extends Action {
          args.add(stack.pop());
       }
       CallFunctionTreeItem cft = new CallFunctionTreeItem(this, functionName, args);
-      cft.calculatedFunction = functions.get(Highlighting.stripHilights(functionName.toStringNoQuotes(variables, functions)));
+      cft.calculatedFunction = functions.get(Highlighting.stripHilights(functionName.toStringNoQuotes(null)));
       stack.push(cft);
    }
 }

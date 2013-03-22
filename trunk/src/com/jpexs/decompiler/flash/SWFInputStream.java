@@ -588,8 +588,10 @@ public class SWFInputStream extends InputStream {
       }
       if (goesPrev) {
       } else {
-         for (int i = 0; i < ip; i++) {
-            retdups.remove(0);
+         if (!retdups.isEmpty()) {
+            for (int i = 0; i < ip; i++) {
+               retdups.remove(0);
+            }
          }
       }
       List<Action> ret = new ArrayList<Action>();

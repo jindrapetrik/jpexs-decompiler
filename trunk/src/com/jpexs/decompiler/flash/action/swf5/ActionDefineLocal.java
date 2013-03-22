@@ -39,7 +39,7 @@ public class ActionDefineLocal extends Action {
    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
       GraphTargetItem value = stack.pop();
       GraphTargetItem name = stack.pop();
-      variables.put(Highlighting.stripHilights(name.toStringNoQuotes(regNames, variables, functions)), value);
+      variables.put(Highlighting.stripHilights(name.toStringNoQuotes(null)), value);
       output.add(new DefineLocalTreeItem(this, name, value));
    }
 }

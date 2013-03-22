@@ -40,7 +40,7 @@ public class ActionSetVariable extends Action {
       GraphTargetItem value = stack.pop();
       GraphTargetItem name = stack.pop();
       SetVariableTreeItem svt = new SetVariableTreeItem(this, name, value);
-      variables.put(Highlighting.stripHilights(name.toStringNoQuotes(regNames, variables)), value);
+      variables.put(Highlighting.stripHilights(name.toStringNoQuotes(null)), value);
       output.add(svt);
    }
 }
