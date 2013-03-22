@@ -462,7 +462,13 @@ public class Graph {
       if (part.nextParts.size() == 2) {
          if (part.nextParts.get(0) == part.nextParts.get(1)) {
             if (!stack.isEmpty()) {
-               stack.pop();
+               GraphTargetItem expr = stack.pop();
+               if (expr instanceof LogicalOpItem) {
+                  expr = ((LogicalOpItem) expr).invert();
+               } else {
+                  expr = new NotItem(null, expr);
+               }
+               output.add(new IfItem(null, expr, new ArrayList<GraphTargetItem>(), new ArrayList<GraphTargetItem>()));
             }
             part.nextParts.remove(0);
          }
