@@ -50,4 +50,19 @@ public class LocalRegTreeItem extends TreeItem {
    public GraphTargetItem getThroughRegister() {
       return computedValue.getThroughRegister();
    }
+
+   @Override
+   public double toNumber() {
+      return computedValue.toNumber();
+   }
+
+   @Override
+   public boolean toBoolean() {
+      return computedValue.toBoolean();
+   }
+
+   @Override
+   public boolean isCompileTime() {
+      return computedValue.isCompileTime();
+   }
 }

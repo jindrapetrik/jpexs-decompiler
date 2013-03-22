@@ -38,8 +38,8 @@ public class FlashPlayerPanel extends Panel {
          IntByReference ibr = new IntByReference();
          Kernel32.INSTANCE.WriteFile(pipe, new byte[]{2}, 1, ibr, null);
          Kernel32.INSTANCE.WriteFile(pipe, new byte[]{
-                    (byte) (getWidth() / 256), (byte) (getWidth() % 256),
-                    (byte) (getHeight() / 256), (byte) (getHeight() % 256),}, 4, ibr, null);
+            (byte) (getWidth() / 256), (byte) (getWidth() % 256),
+            (byte) (getHeight() / 256), (byte) (getHeight() % 256),}, 4, ibr, null);
       }
    }
 

@@ -16,12 +16,18 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
 
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.UnaryOpItem;
 
-public class BitNotTreeItem extends UnaryOpTreeItem {
+public class BitNotTreeItem extends UnaryOpItem {
 
-   public BitNotTreeItem(AVM2Instruction instruction, GraphTargetItem value) {
+   public BitNotTreeItem(GraphSourceItem instruction, GraphTargetItem value) {
       super(instruction, PRECEDENCE_UNARY, value, "~");
+   }
+
+   @Override
+   public double toNumber() {
+      return ~((int) value.toNumber());
    }
 }

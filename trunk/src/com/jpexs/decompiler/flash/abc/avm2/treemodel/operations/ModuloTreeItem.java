@@ -17,11 +17,17 @@
 package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.graph.BinaryOpItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
-public class ModuloTreeItem extends BinaryOpTreeItem {
+public class ModuloTreeItem extends BinaryOpItem {
 
    public ModuloTreeItem(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
       super(instruction, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "%");
+   }
+
+   @Override
+   public double toNumber() {
+      return ((int) leftSide.toNumber()) % ((int) rightSide.toNumber());
    }
 }

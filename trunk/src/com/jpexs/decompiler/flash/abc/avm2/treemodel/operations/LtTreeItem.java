@@ -16,18 +16,24 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
 
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.graph.BinaryOpItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.graph.LogicalOpItem;
 
-public class LtTreeItem extends BinaryOpTreeItem implements LogicalOpItem {
+public class LtTreeItem extends BinaryOpItem implements LogicalOpItem {
 
-   public LtTreeItem(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+   public LtTreeItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
       super(instruction, PRECEDENCE_RELATIONAL, leftSide, rightSide, "<");
    }
 
    @Override
    public GraphTargetItem invert() {
-      return new GeTreeItem(instruction, leftSide, rightSide);
+      return new GeTreeItem(src, leftSide, rightSide);
+   }
+
+   @Override
+   public boolean toBoolean() {
+      return leftSide.toNumber() < rightSide.toNumber();
    }
 }

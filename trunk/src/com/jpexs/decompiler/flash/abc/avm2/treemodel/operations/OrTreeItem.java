@@ -17,14 +17,20 @@
 package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.graph.BinaryOpItem;
 import com.jpexs.decompiler.flash.graph.GraphPart;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
-public class OrTreeItem extends BinaryOpTreeItem {
+public class OrTreeItem extends BinaryOpItem {
 
    public GraphPart firstPart;
 
    public OrTreeItem(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
       super(instruction, PRECEDENCE_LOGICALOR, leftSide, rightSide, "||");
+   }
+
+   @Override
+   public boolean toBoolean() {
+      return leftSide.toBoolean() || rightSide.toBoolean();
    }
 }

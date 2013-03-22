@@ -69,8 +69,8 @@ public class MethodBody implements Cloneable, Serializable {
       code.restoreControlFlow(constants, this);
    }
 
-   public int removeTraps(ConstantPool constants) {
-      return code.removeTraps(constants, this);
+   public int removeTraps(ConstantPool constants, ABC abc) {
+      return code.removeTraps(constants, this, abc);
    }
 
    public HashMap<Integer, String> getLocalRegNames(ABC abc) {
@@ -115,7 +115,7 @@ public class MethodBody implements Cloneable, Serializable {
          MethodBody b = (MethodBody) Helper.deepCopy(this);
          deobfuscated = b.code;
          deobfuscated.markMappedOffsets();
-         deobfuscated.removeTraps(constants, b);
+         deobfuscated.removeTraps(constants, b, abc);
          //deobfuscated.restoreControlFlow(constants, b);
          try {
             s += deobfuscated.toSource(path, isStatic, classIndex, abc, constants, method_info, b, hilight, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);

@@ -185,9 +185,10 @@ public class Helper {
       return ret;
    }
 
-   public static String bytesToHexString(byte bytes[]){
-      return bytesToHexString(bytes,0);
+   public static String bytesToHexString(byte bytes[]) {
+      return bytesToHexString(bytes, 0);
    }
+
    public static String bytesToHexString(byte bytes[], int start) {
       StringBuilder sb = new StringBuilder();
       if (start < bytes.length) {
@@ -323,12 +324,12 @@ public class Helper {
       } catch (Exception ex) {
       }
    }
-   
-   public static String stripComments(String str){
+
+   public static String stripComments(String str) {
       return str.replaceAll("<ffdec:hex>[^\r\n]*</ffdec:hex>\r?\n", "");
    }
-   
-   public static String hexToComments(String str){
+
+   public static String hexToComments(String str) {
       return str.replaceAll("<ffdec:hex>([^\r\n]*)</ffdec:hex>(\r?\n)", "; $1$2");
    }
 }

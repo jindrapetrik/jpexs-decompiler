@@ -89,8 +89,8 @@ public interface WinUser extends StdCallLibrary, WinDef {
 
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"cbSize", "flags",
-                    "hwndActive", "hwndFocus", "hwndCapture", "hwndMenuOwner",
-                    "hwndMoveSize", "hwndCaret", "rcCaret"});
+            "hwndActive", "hwndFocus", "hwndCapture", "hwndMenuOwner",
+            "hwndMoveSize", "hwndCaret", "rcCaret"});
       }
    }
 
@@ -109,9 +109,9 @@ public interface WinUser extends StdCallLibrary, WinDef {
 
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"cbSize", "rcWindow",
-                    "rcClient", "dwStyle", "dwExStyle", "dwWindowStatus",
-                    "cxWindowBorders", "cyWindowBorders", "atomWindowType",
-                    "wCreatorVersion"});
+            "rcClient", "dwStyle", "dwExStyle", "dwWindowStatus",
+            "cxWindowBorders", "cyWindowBorders", "atomWindowType",
+            "wCreatorVersion"});
       }
    }
    int GWL_EXSTYLE = -20;
@@ -168,7 +168,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
 
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"hWnd", "message", "wParam",
-                    "lParam", "time", "pt"});
+            "lParam", "time", "pt"});
       }
    }
 
@@ -182,7 +182,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
 
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"cbSize", "hWnd", "dwFlags",
-                    "uCount", "dwTimeout"});
+            "uCount", "dwTimeout"});
       }
    }
 
@@ -232,7 +232,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
 
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"BlendOp", "BlendFlags",
-                    "SourceConstantAlpha", "AlphaFormat"});
+            "SourceConstantAlpha", "AlphaFormat"});
       }
    }
    int VK_SHIFT = 16;
@@ -332,7 +332,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
 
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"vkCode", "scanCode", "flags",
-                    "time", "dwExtraInfo"});
+            "time", "dwExtraInfo"});
       }
    }
    int SM_CXSCREEN = 0;
@@ -690,7 +690,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
 
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"wVk", "wScan", "dwFlags",
-                    "time", "dwExtraInfo"});
+            "time", "dwExtraInfo"});
       }
    }
 
@@ -726,7 +726,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
 
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"dx", "dy", "mouseData",
-                    "dwFlags", "time", "dwExtraInfo"});
+            "dwFlags", "time", "dwExtraInfo"});
       }
    }
 
@@ -834,9 +834,9 @@ public interface WinUser extends StdCallLibrary, WinDef {
       @Override
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"cbSize", "style",
-                    "lpfnWndProc", "cbClsExtra", "cbWndExtra", "hInstance",
-                    "hIcon", "hCursor", "hbrBackground", "lpszMenuName",
-                    "lpszClassName", "hIconSm"});
+            "lpfnWndProc", "cbClsExtra", "cbWndExtra", "hInstance",
+            "hIcon", "hCursor", "hbrBackground", "lpszMenuName",
+            "lpszClassName", "hIconSm"});
       }
    }
 

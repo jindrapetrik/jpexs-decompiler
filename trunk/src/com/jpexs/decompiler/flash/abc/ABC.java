@@ -73,7 +73,7 @@ public class ABC {
    public int removeTraps() {
       int rem = 0;
       for (MethodBody body : bodies) {
-         rem += body.removeTraps(constants);
+         rem += body.removeTraps(constants, this);
       }
       return rem;
    }

@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
+import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphSource;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
@@ -49,6 +50,8 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.graph.Graph;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
@@ -125,11 +128,11 @@ public class AVM2Code implements Serializable {
       new CoerceSIns(),
       new InstructionDefinition(0x88, "coerce_u", new int[]{}), //stack:-1+1
       new InstructionDefinition(0x9a, "concat", new int[]{}) {
- @Override
- public int getStackDelta(AVM2Instruction ins, ABC abc) {
-    return -2 + 1; //?
- }
-},
+         @Override
+         public int getStackDelta(AVM2Instruction ins, ABC abc) {
+            return -2 + 1; //?
+         }
+      },
       new ConstructIns(),
       new ConstructPropIns(),
       new ConstructSuperIns(),
@@ -141,11 +144,11 @@ public class AVM2Code implements Serializable {
       new ConvertSIns(),
       new InstructionDefinition(0x79, "convert_m", new int[]{}), //-1 +1
       new InstructionDefinition(0x7a, "convert_m_p", new int[]{AVM2Code.OPT_U30 /*param (?)*/}) {
- @Override
- public int getStackDelta(AVM2Instruction ins, ABC abc) {
-    throw new UnsupportedOperationException();
- }
-},
+         @Override
+         public int getStackDelta(AVM2Instruction ins, ABC abc) {
+            throw new UnsupportedOperationException();
+         }
+      },
       new DebugIns(),
       new DebugFileIns(),
       new DebugLineIns(),
@@ -725,9 +728,9 @@ public class AVM2Code implements Serializable {
       int largeLimit = 20000;
       boolean markOffsets = code.size() <= largeLimit;
       for (AVM2Instruction ins : code) {
-         if(hex){
+         if (hex) {
             ret.append("<ffdec:hex>");
-            ret.append(Helper.bytesToHexString(ins.getBytes())); 
+            ret.append(Helper.bytesToHexString(ins.getBytes()));
             ret.append("</ffdec:hex>\n");
          }
          if (ins.labelname != null) {
@@ -1671,163 +1674,184 @@ public class AVM2Code implements Serializable {
       code.add(pos, instruction);
    }
 
-   public int removeTraps(ConstantPool constants, MethodBody body) {
+   public int removeTraps(ConstantPool constants, MethodBody body, ABC abc) {
 
       removeDeadCode(constants, body);
-      boolean isSecure = true;
-      try {
-         if (code.size() > 4) {
-            AVM2Instruction first = code.get(0);
-            AVM2Instruction second = code.get(1);
-            boolean firstValue = false;
-            boolean secondValue = false;
-            if (first.definition instanceof PushFalseIns) {
-               firstValue = false;
-            } else if (first.definition instanceof PushTrueIns) {
-               firstValue = true;
-            } else {
-               isSecure = false;
-            }
-            if (isSecure) {
-               if (second.definition instanceof PushFalseIns) {
-                  secondValue = false;
-               } else if (second.definition instanceof PushTrueIns) {
-                  secondValue = true;
-               } else {
-                  isSecure = false;
-               }
-               if (isSecure) {
-                  int pos = 2;
-                  AVM2Instruction third = code.get(pos);
-                  if (third.definition instanceof SwapIns) {
-                     pos++;
-                     boolean dup = firstValue;
-                     firstValue = secondValue;
-                     secondValue = dup;
-                     third.ignored = true;
-                  }
-                  while (third.definition instanceof JumpIns) {
-                     pos = adr2pos(pos2adr(pos) + third.getBytes().length + third.operands[0]);
-                     third = code.get(pos);
-                  }
-                  AVM2Instruction firstSet = code.get(pos);
-                  while (firstSet.definition instanceof JumpIns) {
-                     pos = adr2pos(pos2adr(pos) + firstSet.getBytes().length + firstSet.operands[0]);
-                     firstSet = code.get(pos);
-                  }
-                  pos++;
-                  AVM2Instruction secondSet = code.get(pos);
-                  while (secondSet.definition instanceof JumpIns) {
-                     pos = adr2pos(pos2adr(pos) + secondSet.getBytes().length + secondSet.operands[0]);
-                     secondSet = code.get(pos);
-                  }
-                  int trueIndex = -1;
-                  int falseIndex = -1;
-                  if (firstSet.definition instanceof SetLocalTypeIns) {
-                     if (secondValue == true) {
-                        trueIndex = ((SetLocalTypeIns) firstSet.definition).getRegisterId(firstSet);
-                     }
-                     if (secondValue == false) {
-                        falseIndex = ((SetLocalTypeIns) firstSet.definition).getRegisterId(firstSet);
-                     }
-                  } else {
-                     isSecure = false;
-                  }
-                  if (isSecure) {
-                     if (secondSet.definition instanceof SetLocalTypeIns) {
-                        if (firstValue == true) {
-                           trueIndex = ((SetLocalTypeIns) secondSet.definition).getRegisterId(secondSet);
-                        }
-                        if (firstValue == false) {
-                           falseIndex = ((SetLocalTypeIns) secondSet.definition).getRegisterId(secondSet);
-                        }
-                        secondSet.ignored = true;
-                        firstSet.ignored = true;
-                        first.ignored = true;
-                        second.ignored = true;
-                        boolean found;
-                        do {
-                           found = false;
-                           for (int ip = 0; ip < code.size(); ip++) {
-                              if (code.get(ip).ignored) {
-                                 continue;
-                              }
-                              if (code.get(ip).definition instanceof GetLocalTypeIns) {
-                                 int regIndex = ((GetLocalTypeIns) code.get(ip).definition).getRegisterId(code.get(ip));
-                                 if ((regIndex == trueIndex) || (regIndex == falseIndex)) {
-                                    found = true;
-                                    Stack<Boolean> myStack = new Stack<Boolean>();
-                                    do {
-                                       AVM2Instruction ins = code.get(ip);
-                                       /*if (ins.ignored) {
-                                        ip++;
-                                        continue;
-                                        } else*/ if (ins.definition instanceof GetLocalTypeIns) {
-                                          regIndex = ((GetLocalTypeIns) ins.definition).getRegisterId(ins);
-                                          if (regIndex == trueIndex) {
-                                             myStack.push(true);
-                                          }
-                                          if (regIndex == falseIndex) {
-                                             myStack.push(false);
-                                          }
-                                          ip++;
-                                          ins.ignored = true;
-                                       } else if (ins.definition instanceof DupIns) {
-                                          Boolean b = myStack.pop();
-                                          myStack.push(b);
-                                          myStack.push(b);
-                                          ins.ignored = true;
-                                          ip++;
-                                       } else if (ins.definition instanceof PopIns) {
-                                          myStack.pop();
-                                          ins.ignored = true;
-                                          ip++;
-                                       } else if (ins.definition instanceof IfTrueIns) {
-                                          boolean val = myStack.pop();
-                                          if (val) {
-                                             code.get(ip).definition = new JumpIns();
-                                             ip = adr2pos(pos2adr(ip + 1) + code.get(ip).operands[0]);
-                                          } else {
-                                             code.get(ip).ignored = true;
-                                             ip++;
-                                          }
-                                       } else if (ins.definition instanceof IfFalseIns) {
-                                          boolean val = myStack.pop();
-                                          if (!val) {
-                                             code.get(ip).definition = new JumpIns();
-                                             ip = adr2pos(pos2adr(ip + 1) + code.get(ip).operands[0]);
-                                          } else {
-                                             code.get(ip).ignored = true;
-                                             ip++;
-                                          }
-                                       } else if (ins.definition instanceof JumpIns) {
-                                          ip = adr2pos(pos2adr(ip + 1) + code.get(ip).operands[0]);
-                                       } else {
-                                          ip++;
-                                       }
+      /* boolean isSecure = true;
+       try {
+       if (code.size() > 4) {
+       AVM2Instruction first = code.get(0);
+       AVM2Instruction second = code.get(1);
+       boolean firstValue = false;
+       boolean secondValue = false;
+       if (first.definition instanceof PushFalseIns) {
+       firstValue = false;
+       } else if (first.definition instanceof PushTrueIns) {
+       firstValue = true;
+       } else {
+       isSecure = false;
+       }
+       if (isSecure) {
+       if (second.definition instanceof PushFalseIns) {
+       secondValue = false;
+       } else if (second.definition instanceof PushTrueIns) {
+       secondValue = true;
+       } else {
+       isSecure = false;
+       }
+       if (isSecure) {
+       int pos = 2;
+       AVM2Instruction third = code.get(pos);
+       if (third.definition instanceof SwapIns) {
+       pos++;
+       boolean dup = firstValue;
+       firstValue = secondValue;
+       secondValue = dup;
+       third.ignored = true;
+       }
+       while (third.definition instanceof JumpIns) {
+       pos = adr2pos(pos2adr(pos) + third.getBytes().length + third.operands[0]);
+       third = code.get(pos);
+       }
+       AVM2Instruction firstSet = code.get(pos);
+       while (firstSet.definition instanceof JumpIns) {
+       pos = adr2pos(pos2adr(pos) + firstSet.getBytes().length + firstSet.operands[0]);
+       firstSet = code.get(pos);
+       }
+       pos++;
+       AVM2Instruction secondSet = code.get(pos);
+       while (secondSet.definition instanceof JumpIns) {
+       pos = adr2pos(pos2adr(pos) + secondSet.getBytes().length + secondSet.operands[0]);
+       secondSet = code.get(pos);
+       }
+       int trueIndex = -1;
+       int falseIndex = -1;
+       if (firstSet.definition instanceof SetLocalTypeIns) {
+       if (secondValue == true) {
+       trueIndex = ((SetLocalTypeIns) firstSet.definition).getRegisterId(firstSet);
+       }
+       if (secondValue == false) {
+       falseIndex = ((SetLocalTypeIns) firstSet.definition).getRegisterId(firstSet);
+       }
+       } else {
+       isSecure = false;
+       }
+       if (isSecure) {
+       if (secondSet.definition instanceof SetLocalTypeIns) {
+       if (firstValue == true) {
+       trueIndex = ((SetLocalTypeIns) secondSet.definition).getRegisterId(secondSet);
+       }
+       if (firstValue == false) {
+       falseIndex = ((SetLocalTypeIns) secondSet.definition).getRegisterId(secondSet);
+       }
+       secondSet.ignored = true;
+       firstSet.ignored = true;
+       first.ignored = true;
+       second.ignored = true;
+       boolean found;
+       do {
+       found = false;
+       for (int ip = 0; ip < code.size(); ip++) {
+       if (code.get(ip).ignored) {
+       continue;
+       }
+       if (code.get(ip).definition instanceof GetLocalTypeIns) {
+       int regIndex = ((GetLocalTypeIns) code.get(ip).definition).getRegisterId(code.get(ip));
+       if ((regIndex == trueIndex) || (regIndex == falseIndex)) {
+       found = true;
+       Stack<Boolean> myStack = new Stack<Boolean>();
+       do {
+       AVM2Instruction ins = code.get(ip);
+       if (ins.definition instanceof GetLocalTypeIns) {
+       regIndex = ((GetLocalTypeIns) ins.definition).getRegisterId(ins);
+       if (regIndex == trueIndex) {
+       myStack.push(true);
+       }
+       if (regIndex == falseIndex) {
+       myStack.push(false);
+       }
+       ip++;
+       ins.ignored = true;
+       } else if (ins.definition instanceof DupIns) {
+       Boolean b = myStack.pop();
+       myStack.push(b);
+       myStack.push(b);
+       ins.ignored = true;
+       ip++;
+       } else if (ins.definition instanceof PopIns) {
+       myStack.pop();
+       ins.ignored = true;
+       ip++;
+       } else if (ins.definition instanceof IfTrueIns) {
+       boolean val = myStack.pop();
+       if (val) {
+       code.get(ip).definition = new JumpIns();
+       ip = adr2pos(pos2adr(ip + 1) + code.get(ip).operands[0]);
+       } else {
+       code.get(ip).ignored = true;
+       ip++;
+       }
+       } else if (ins.definition instanceof IfFalseIns) {
+       boolean val = myStack.pop();
+       if (!val) {
+       code.get(ip).definition = new JumpIns();
+       ip = adr2pos(pos2adr(ip + 1) + code.get(ip).operands[0]);
+       } else {
+       code.get(ip).ignored = true;
+       ip++;
+       }
+       } else if (ins.definition instanceof JumpIns) {
+       ip = adr2pos(pos2adr(ip + 1) + code.get(ip).operands[0]);
+       } else {
+       ip++;
+       }
 
-                                    } while (myStack.size() > 0);
+       } while (myStack.size() > 0 && ip < code.size());
 
-                                    break;
-                                 }
+       break;
+       }
 
-                              }
-                           }
-                        } while (found);
-                        removeIgnored(constants, body);
-                        removeDeadCode(constants, body);
-                     } else {
-                        //isSecure = false;
-                     }
-                  }
+       }
+       }
+       } while (found);
+       removeIgnored(constants, body);
+       removeDeadCode(constants, body);
+       } else {
+       //isSecure = false;
+       }
+       }
 
-               }
-            }
-         }
-      } catch (ConvertException cex) {
-      }
-      int ret = isSecure ? 1 : 0;
-      ret += visitCodeTrap(body, new int[code.size()]);
+       }
+       }
+       }
+       } catch (ConvertException cex) {
+       }
+       int ret = isSecure ? 1 : 0;
+       ret += visitCodeTrap(body, new int[code.size()]);*/
+
+      //definition.translate((Boolean) localData.get(0), (Integer) localData.get(1),
+      //(HashMap<Integer, GraphTargetItem>) localData.get(2), stack, 
+      //(Stack<GraphTargetItem>) localData.get(3), (ConstantPool) localData.get(4), this,
+      //(MethodInfo[]) localData.get(5), output, 
+      //(MethodBody) localData.get(6), (ABC) localData.get(7),
+      //(HashMap<Integer, String>) localData.get(8), (List<String>) localData.get(8));
+
+      List localData = new ArrayList();
+      localData.add((Boolean) false); //isStatic
+      localData.add((Integer) 0); //classIndex
+      localData.add(new HashMap<Integer, GraphTargetItem>());
+      localData.add(new Stack<GraphTargetItem>());
+      localData.add(abc.constants);
+      localData.add(abc.method_info);
+      localData.add(body);
+      localData.add(abc);
+      localData.add(new HashMap<Integer, String>()); //localRegNames
+      localData.add(new ArrayList<String>());  //fullyQualifiedNames
+      localData.add(new ArrayList<ABCException>());
+      localData.add(new ArrayList<Integer>());
+      localData.add(new ArrayList<Integer>());
+      int ret = 0;
+      ret += removeTraps(localData, new AVM2GraphSource(this, false, 0, new HashMap<Integer, GraphTargetItem>(), new Stack<GraphTargetItem>(), abc, body, new HashMap<Integer, String>(), new ArrayList<String>()), 0);
       removeIgnored(constants, body);
       removeDeadCode(constants, body);
 
@@ -2257,7 +2281,7 @@ public class AVM2Code implements Serializable {
       invalidateCache();
       try {
          List<Integer> outputMap = new ArrayList<Integer>();
-         String src = Highlighting.stripHilights(toASMSource(constants, body, outputMap,false));
+         String src = Highlighting.stripHilights(toASMSource(constants, body, outputMap, false));
 
          AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(src.getBytes()), constants, null, body);
          for (int i = 0; i < acode.code.size(); i++) {
@@ -2297,7 +2321,7 @@ public class AVM2Code implements Serializable {
    public void removeIgnored(ConstantPool constants, MethodBody body) {
       try {
          List<Integer> outputMap = new ArrayList<Integer>();
-         String src = toASMSource(constants, body, outputMap,false);
+         String src = toASMSource(constants, body, outputMap, false);
          AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(src.getBytes()), constants, body);
          for (int i = 0; i < acode.code.size(); i++) {
             if (outputMap.size() > i) {
@@ -2366,5 +2390,79 @@ public class AVM2Code implements Serializable {
          ex.printStackTrace();
          return null;
       }
+   }
+
+   private static int removeTraps(List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, int lastIp, List<Integer> visited) {
+      boolean debugMode = false;
+      int ret = 0;
+      while ((ip > -1) && ip < code.size()) {
+         if (visited.contains(ip)) {
+            break;
+         }
+         visited.add(ip);
+         lastIp = ip;
+         GraphSourceItem ins = code.get(ip);
+         if (debugMode) {
+            System.out.println("Visit " + ip + ": " + ins + " stack:" + Highlighting.stripHilights(stack.toString()));
+         }
+         if ((ins instanceof AVM2Instruction) && (((AVM2Instruction) ins).definition instanceof NewFunctionIns)) {
+            stack.push(new BooleanTreeItem(null, true));
+         } else {
+            ins.translate(localData, stack, output);
+         }
+         if (ins.isExit()) {
+            break;
+         }
+
+         if (ins.isBranch() || ins.isJump()) {
+            List<Integer> branches = ins.getBranches(code);
+            if (ins.isBranch() && !stack.isEmpty() && (stack.peek().isCompileTime())) {
+               boolean condition = stack.peek().toBoolean();
+               if (debugMode) {
+                  if (condition) {
+                     System.out.println("JUMP");
+                  } else {
+                     System.out.println("SKIP");
+                  }
+               }
+               if (condition) {
+                  ((AVM2Instruction) ins).definition = new JumpIns();
+               } else {
+                  ins.setIgnored(true);
+               }
+               GraphTargetItem tar = stack.pop();
+               for (GraphSourceItemPos pos : tar.getNeededSources()) {
+                  pos.item.setIgnored(true);
+               }
+
+               ret += removeTraps(localData, stack, output, code, condition ? branches.get(0) : branches.get(1), ip, visited);
+            } else {
+               if (ins.isBranch()) {
+                  stack.pop();
+               }
+
+               for (int b : branches) {
+                  Stack<GraphTargetItem> brStack = (Stack<GraphTargetItem>) stack.clone();
+                  if (b >= 0) {
+                     ret += removeTraps(localData, brStack, output, code, b, ip, visited);
+                  } else {
+                     if (debugMode) {
+                        System.out.println("Negative branch:" + b);
+                     }
+                  }
+               }
+            }
+            break;
+         }
+         ip++;
+      };
+      if (ip < 0) {
+         System.out.println("Visited Negative: " + ip);
+      }
+      return ret;
+   }
+
+   public static int removeTraps(List localData, AVM2GraphSource code, int addr) {
+      return removeTraps(localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0, new ArrayList<Integer>());
    }
 }

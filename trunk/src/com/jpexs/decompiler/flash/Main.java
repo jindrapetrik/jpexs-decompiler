@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.gui.AboutDialog;
 import com.jpexs.decompiler.flash.gui.LoadingDialog;
 import com.jpexs.decompiler.flash.gui.MainFrame;
@@ -25,7 +24,6 @@ import com.jpexs.decompiler.flash.gui.ModeFrame;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
-import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

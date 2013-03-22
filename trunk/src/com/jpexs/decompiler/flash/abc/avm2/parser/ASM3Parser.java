@@ -138,8 +138,8 @@ public class ASM3Parser {
                }
                ABCException ex = new ABCException();
 
-               ex.name_index = checkMultinameIndex(constants,(int) (long) (Long) exName.value,lexer.yyline());
-               ex.type_index = checkMultinameIndex(constants,(int) (long) (Long) exType.value,lexer.yyline());
+               ex.name_index = checkMultinameIndex(constants, (int) (long) (Long) exName.value, lexer.yyline());
+               ex.type_index = checkMultinameIndex(constants, (int) (long) (Long) exType.value, lexer.yyline());
                exceptions.add(ex);
                exceptionIndices.add((int) (long) (Long) exIndex.value);
                continue;
@@ -155,7 +155,7 @@ public class ASM3Parser {
                      switch (def.operands[i]) {
                         case AVM2Code.DAT_MULTINAME_INDEX:
                            if (parsedOperand.type == ParsedSymbol.TYPE_MULTINAME) {
-                              operandsList.add(checkMultinameIndex(constants,(int) (long) (Long) parsedOperand.value,lexer.yyline()));
+                              operandsList.add(checkMultinameIndex(constants, (int) (long) (Long) parsedOperand.value, lexer.yyline()));
                            } else {
                               throw new ParseException("Multiname expected", lexer.yyline());
                            }

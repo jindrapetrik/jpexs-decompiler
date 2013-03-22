@@ -610,7 +610,7 @@ public interface WinDef extends StdCallLibrary {
        */
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"left", "top", "right",
-                    "bottom"});
+            "bottom"});
       }
 
       /**

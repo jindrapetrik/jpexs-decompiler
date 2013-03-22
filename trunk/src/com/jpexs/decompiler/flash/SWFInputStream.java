@@ -529,13 +529,13 @@ public class SWFInputStream extends InputStream {
                stack.pop();
                getConstantPool(localData, stack, output, code, condition ? (code.adr2pos(((ActionIf) ins).getAddress() + ((ActionIf) ins).getBytes(code.version).length + ((ActionIf) ins).offset)) : ip + 1, ip, constantPools, visited);
             } else {
-               if(ins instanceof ActionIf){
+               if (ins instanceof ActionIf) {
                   stack.pop();
                }
                visited.add(ip);
                List<Integer> branches = ins.getBranches(code);
                for (int b : branches) {
-                  Stack<GraphTargetItem> brStack=(Stack<GraphTargetItem>)stack.clone();
+                  Stack<GraphTargetItem> brStack = (Stack<GraphTargetItem>) stack.clone();
                   if (b >= 0) {
                      getConstantPool(localData, brStack, output, code, b, ip, constantPools, visited);
                   } else {
@@ -619,7 +619,7 @@ public class SWFInputStream extends InputStream {
       //Action.setConstantPool(ret, cpool);
 
       try {
-         s = Highlighting.stripHilights(Action.actionsToString(ret, null, version,false));
+         s = Highlighting.stripHilights(Action.actionsToString(ret, null, version, false));
          ret = ASMParser.parse(false, new ByteArrayInputStream(s.getBytes()), SWF.DEFAULT_VERSION);
       } catch (ParseException ex) {
          Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error", ex);

@@ -17,9 +17,10 @@
 package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.graph.BinaryOpItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
-public class InTreeItem extends BinaryOpTreeItem {
+public class InTreeItem extends BinaryOpItem {
 
    public InTreeItem(AVM2Instruction instruction, GraphTargetItem name, GraphTargetItem object) {
       super(instruction, PRECEDENCE_RELATIONAL, name, object, " in ");

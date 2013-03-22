@@ -72,7 +72,7 @@ public class ActionPanel extends JPanel implements ActionListener {
    private String srcWithHex;
    private String srcNoHex;
 
-   public void setText(String text){
+   public void setText(String text) {
       int pos = editor.getCaretPosition();
       Highlighting lastH = new Highlighting(0, 0, 0);
       for (Highlighting h : disassembledHilights) {
@@ -81,7 +81,7 @@ public class ActionPanel extends JPanel implements ActionListener {
          }
          lastH = h;
       }
-      long offset=lastH.offset;
+      long offset = lastH.offset;
       disassembledHilights = Highlighting.getInstrHighlights(text);
       editor.setText(Highlighting.stripHilights(text));
       for (Highlighting h : disassembledHilights) {
@@ -90,9 +90,9 @@ public class ActionPanel extends JPanel implements ActionListener {
             break;
          }
       }
-      
+
    }
-   
+
    public void setHex(boolean hex) {
       setText(hex ? srcWithHex : srcNoHex);
    }
@@ -138,7 +138,7 @@ public class ActionPanel extends JPanel implements ActionListener {
       decompiledEditor.setEditable(false);
 
 
-       JButton graphButton = new JButton(View.getIcon("graph16"));
+      JButton graphButton = new JButton(View.getIcon("graph16"));
       graphButton.setActionCommand("GRAPH");
       graphButton.addActionListener(this);
       graphButton.setToolTipText("View Graph");
@@ -154,18 +154,18 @@ public class ActionPanel extends JPanel implements ActionListener {
       topButtonsPan.setLayout(new BoxLayout(topButtonsPan, BoxLayout.X_AXIS));
       topButtonsPan.add(graphButton);
       topButtonsPan.add(hexButton);
-      JPanel panCode=new JPanel(new BorderLayout());
+      JPanel panCode = new JPanel(new BorderLayout());
       panCode.add(new JScrollPane(editor), BorderLayout.CENTER);
       panCode.add(topButtonsPan, BorderLayout.NORTH);
-      
+
       JPanel panB = new JPanel();
       panB.setLayout(new BorderLayout());
       asmLabel.setHorizontalAlignment(SwingConstants.CENTER);
       asmLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
       panB.add(asmLabel, BorderLayout.NORTH);
-      panB.add(panCode,BorderLayout.CENTER);
-      
-     
+      panB.add(panCode, BorderLayout.CENTER);
+
+
 
       JPanel buttonsPan = new JPanel();
       buttonsPan.setLayout(new FlowLayout());
@@ -176,7 +176,7 @@ public class ActionPanel extends JPanel implements ActionListener {
       //buttonsPan.add(saveHexButton);
       //buttonsPan.add(loadHexButton);
       panB.add(buttonsPan, BorderLayout.SOUTH);
-      
+
 
       saveHexButton.addActionListener(this);
       saveHexButton.setActionCommand("SAVEHEXACTION");
@@ -289,7 +289,7 @@ public class ActionPanel extends JPanel implements ActionListener {
          cancelButton.setVisible(true);
          editor.getCaret().setVisible(true);
       } else {
-         setText(hexButton.isSelected()?srcWithHex:srcNoHex);
+         setText(hexButton.isSelected() ? srcWithHex : srcNoHex);
          editor.setEditable(false);
          saveButton.setVisible(false);
          editButton.setVisible(true);

@@ -51,7 +51,7 @@ public class ForInTreeItem extends LoopTreeItem implements Block {
    public String toString(ConstantPool constants) {
       String ret = "";
       ret += "loop" + loop.id + ":\r\n";
-      ret += hilight("for(") + ((variableName instanceof DirectValueTreeItem)&&(((DirectValueTreeItem)variableName).value instanceof RegisterNumber)?"var ":"")+stripQuotes(variableName) + " in " + enumVariable.toString(constants) + ")\r\n{\r\n";
+      ret += hilight("for(") + ((variableName instanceof DirectValueTreeItem) && (((DirectValueTreeItem) variableName).value instanceof RegisterNumber) ? "var " : "") + stripQuotes(variableName) + " in " + enumVariable.toString(constants) + ")\r\n{\r\n";
       for (GraphTargetItem ti : commands) {
          ret += ti.toStringSemicoloned(constants) + "\r\n";
       }

@@ -18,8 +18,9 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.UnaryOpItem;
 
-public class PreIncrementTreeItem extends UnaryOpTreeItem {
+public class PreIncrementTreeItem extends UnaryOpItem {
 
    public PreIncrementTreeItem(AVM2Instruction instruction, GraphTargetItem object) {
       super(instruction, PRECEDENCE_UNARY, object, "++");

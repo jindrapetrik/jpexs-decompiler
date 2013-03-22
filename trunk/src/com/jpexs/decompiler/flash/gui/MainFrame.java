@@ -1263,7 +1263,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                   } else {
                      int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
                      if (bi != -1) {
-                        cnt += abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants);
+                        cnt += abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc);
                      }
                      abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc);
                   }
@@ -1319,6 +1319,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                   Main.stopWork();
                   JOptionPane.showMessageDialog(null, "Identifiers renamed: " + cnt);
                   abcPanel.reload();
+                  doFilter();
                   return true;
                }
             }.execute();
@@ -1354,9 +1355,9 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                         if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
                            abcPanel.abc.bodies[bi].removeDeadCode(abcPanel.abc.constants);
                         } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
-                           abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants);
+                           abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc);
                         } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_RESTORE_CONTROL_FLOW) {
-                           abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants);
+                           abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc);
                            abcPanel.abc.bodies[bi].restoreControlFlow(abcPanel.abc.constants);
                         }
                      }

@@ -22,4 +22,8 @@ public interface GraphSourceItem {
    public boolean ignoredLoops();
 
    public List<Integer> getBranches(GraphSource code);
+
+   public boolean isIgnored();
+
+   public void setIgnored(boolean ignored);
 }

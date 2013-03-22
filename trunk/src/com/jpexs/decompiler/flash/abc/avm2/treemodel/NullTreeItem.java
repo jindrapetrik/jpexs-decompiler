@@ -31,4 +31,19 @@ public class NullTreeItem extends TreeItem {
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       return hilight("null");
    }
+
+   @Override
+   public boolean isCompileTime() {
+      return true;
+   }
+
+   @Override
+   public double toNumber() {
+      return 0;
+   }
+
+   @Override
+   public boolean toBoolean() {
+      return false;
+   }
 }

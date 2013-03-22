@@ -189,10 +189,11 @@ public class TraitClass extends Trait {
       }
    }
 
-   private void parseImportsUsagesFromMethodInfo(List<DoABCTag> abcTags, ABC abc, int method_index, List<String> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames) {
+   private void parseImportsUsagesFromMethodInfo(List<DoABCTag> abcTags, ABC abc, int method_index, List<String> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames, List<Integer> visitedMethods) {
       if (method_index > abc.method_info.length) {
          return;
       }
+      visitedMethods.add(method_index);
       if (abc.method_info[method_index].ret_type != 0) {
          parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[abc.method_info[method_index].ret_type], ignorePackage, fullyQualifiedNames);
       }
@@ -209,7 +210,11 @@ public class TraitClass extends Trait {
          }
          for (AVM2Instruction ins : body.code.code) {
             if (ins.definition instanceof NewFunctionIns) {
-               parseImportsUsagesFromMethodInfo(abcTags, abc, ins.operands[0], imports, uses, ignorePackage, fullyQualifiedNames);
+               if (ins.operands[0] != method_index) {
+                  if (!visitedMethods.contains(ins.operands[0])) {
+                     parseImportsUsagesFromMethodInfo(abcTags, abc, ins.operands[0], imports, uses, ignorePackage, fullyQualifiedNames, visitedMethods);
+                  }
+               }
             }
             if ((ins.definition instanceof FindPropertyStrictIns)
                     || (ins.definition instanceof FindPropertyIns)
@@ -244,7 +249,7 @@ public class TraitClass extends Trait {
          TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
          parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[tm.name_index], ignorePackage, fullyQualifiedNames);
          if (tm.method_info != 0) {
-            parseImportsUsagesFromMethodInfo(abcTags, abc, tm.method_info, imports, uses, ignorePackage, fullyQualifiedNames);
+            parseImportsUsagesFromMethodInfo(abcTags, abc, tm.method_info, imports, uses, ignorePackage, fullyQualifiedNames, new ArrayList<Integer>());
          }
       }
       parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, t.getName(abc), ignorePackage, fullyQualifiedNames);
@@ -274,14 +279,14 @@ public class TraitClass extends Trait {
       parseImportsUsagesFromTraits(abcTags, abc, abc.class_info[class_info].static_traits, imports, uses, packageName, fullyQualifiedNames);
 
       //static initializer
-      parseImportsUsagesFromMethodInfo(abcTags, abc, abc.class_info[class_info].cinit_index, imports, uses, packageName, fullyQualifiedNames);
+      parseImportsUsagesFromMethodInfo(abcTags, abc, abc.class_info[class_info].cinit_index, imports, uses, packageName, fullyQualifiedNames, new ArrayList<Integer>());
 
       //instance
       parseImportsUsagesFromTraits(abcTags, abc, abc.instance_info[class_info].instance_traits, imports, uses, packageName, fullyQualifiedNames);
 
 
       //instance initializer
-      parseImportsUsagesFromMethodInfo(abcTags, abc, abc.instance_info[class_info].iinit_index, imports, uses, packageName, fullyQualifiedNames);
+      parseImportsUsagesFromMethodInfo(abcTags, abc, abc.instance_info[class_info].iinit_index, imports, uses, packageName, fullyQualifiedNames, new ArrayList<Integer>());
       return imports;
    }
 

@@ -18,10 +18,16 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.UnaryOpItem;
 
-public class NegTreeItem extends UnaryOpTreeItem {
+public class NegTreeItem extends UnaryOpItem {
 
    public NegTreeItem(AVM2Instruction instruction, GraphTargetItem value) {
       super(instruction, PRECEDENCE_UNARY, value, "-");
+   }
+
+   @Override
+   public double toNumber() {
+      return -value.toNumber();
    }
 }

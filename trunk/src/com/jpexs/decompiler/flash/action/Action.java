@@ -340,7 +340,7 @@ public class Action implements GraphSourceItem {
     * @return ASM source as String
     */
    public static String actionsToString(List<Action> list, List<Long> importantOffsets, int version, boolean hex) {
-      return actionsToString(list, importantOffsets, new ArrayList<String>(), version,hex);
+      return actionsToString(list, importantOffsets, new ArrayList<String>(), version, hex);
    }
 
    /**
@@ -363,8 +363,8 @@ public class Action implements GraphSourceItem {
 
       offset = 0;
       for (Action a : list) {
-         if(hex){
-            ret+="<ffdec:hex>"+Helper.bytesToHexString((a instanceof ActionContainer)?((ActionContainer)a).getHeaderBytes():a.getBytes(version))+"</ffdec:hex>\r\n";
+         if (hex) {
+            ret += "<ffdec:hex>" + Helper.bytesToHexString((a instanceof ActionContainer) ? ((ActionContainer) a).getHeaderBytes() : a.getBytes(version)) + "</ffdec:hex>\r\n";
          }
          offset = a.getAddress();
          if (importantOffsets.contains(offset)) {
@@ -378,10 +378,10 @@ public class Action implements GraphSourceItem {
             }
          } else {
             if (a.beforeInsert != null) {
-               ret += a.beforeInsert.getASMSource(importantOffsets, constantPool, version,hex) + "\r\n";
+               ret += a.beforeInsert.getASMSource(importantOffsets, constantPool, version, hex) + "\r\n";
             }
             //if (!(a instanceof ActionNop)) {
-            ret += Highlighting.hilighOffset("", offset) + a.getASMSource(importantOffsets, constantPool, version,hex) + (a.ignored ? "; ignored" : "") + "\r\n";
+            ret += Highlighting.hilighOffset("", offset) + a.getASMSource(importantOffsets, constantPool, version, hex) + (a.ignored ? "; ignored" : "") + "\r\n";
             //}
          }
          offset += a.getBytes(version).length;
@@ -538,6 +538,16 @@ public class Action implements GraphSourceItem {
    @Override
    public List<Integer> getBranches(GraphSource code) {
       return new ArrayList<Integer>();
+   }
+
+   @Override
+   public boolean isIgnored() {
+      return ignored;
+   }
+
+   @Override
+   public void setIgnored(boolean ignored) {
+      this.ignored = ignored;
    }
 
    private static class Loop {
@@ -1001,7 +1011,7 @@ public class Action implements GraphSourceItem {
       List<Action> ret = actions;
       String s = null;
       try {
-         s = Highlighting.stripHilights(Action.actionsToString(ret, null, version,false));
+         s = Highlighting.stripHilights(Action.actionsToString(ret, null, version, false));
          ret = ASMParser.parse(true, new ByteArrayInputStream(s.getBytes()), SWF.DEFAULT_VERSION);
       } catch (Exception ex) {
          Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error", ex);

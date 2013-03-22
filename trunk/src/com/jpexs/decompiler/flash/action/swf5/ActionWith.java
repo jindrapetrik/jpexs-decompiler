@@ -29,7 +29,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-public class ActionWith extends Action implements ActionContainer{
+public class ActionWith extends Action implements ActionContainer {
 
    public List<Action> actions;
    public int size;
@@ -69,7 +69,7 @@ public class ActionWith extends Action implements ActionContainer{
       }
       return baos2.toByteArray();
    }
-   
+
    @Override
    public byte[] getBytes(int version) {
       ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
@@ -88,7 +88,7 @@ public class ActionWith extends Action implements ActionContainer{
 
    @Override
    public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
-      return "With {\r\n" + Action.actionsToString(actions, knownAddreses, constantPool, version,hex) + "}";
+      return "With {\r\n" + Action.actionsToString(actions, knownAddreses, constantPool, version, hex) + "}";
    }
 
    @Override
@@ -100,6 +100,4 @@ public class ActionWith extends Action implements ActionContainer{
    public List<Action> getAllIfsOrJumps() {
       return Action.getActionsAllIfsOrJumps(actions);
    }
-
-   
 }

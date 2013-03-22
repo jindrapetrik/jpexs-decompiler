@@ -17,11 +17,17 @@
 package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.graph.BinaryOpItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
-public class BitAndTreeItem extends BinaryOpTreeItem {
+public class BitAndTreeItem extends BinaryOpItem {
 
    public BitAndTreeItem(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
       super(instruction, PRECEDENCE_BITWISEAND, leftSide, rightSide, "&");
+   }
+
+   @Override
+   public double toNumber() {
+      return ((int) leftSide.toNumber()) & ((int) rightSide.toNumber());
    }
 }

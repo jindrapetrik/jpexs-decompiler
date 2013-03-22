@@ -34,4 +34,14 @@ public class IntegerValueTreeItem extends NumberValueTreeItem {
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       return hilight("" + value);
    }
+
+   @Override
+   public double toNumber() {
+      return value;
+   }
+
+   @Override
+   public boolean isCompileTime() {
+      return true;
+   }
 }

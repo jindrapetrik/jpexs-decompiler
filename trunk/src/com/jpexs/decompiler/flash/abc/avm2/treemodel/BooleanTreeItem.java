@@ -44,4 +44,19 @@ public class BooleanTreeItem extends TreeItem {
    public boolean isTrue() {
       return value == true;
    }
+
+   @Override
+   public boolean toBoolean() {
+      return value;
+   }
+
+   @Override
+   public double toNumber() {
+      return value ? 1 : 0;
+   }
+
+   @Override
+   public boolean isCompileTime() {
+      return true;
+   }
 }

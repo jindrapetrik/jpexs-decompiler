@@ -16,32 +16,36 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
 
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.graph.BinaryOpItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
-import java.util.HashMap;
 import java.util.List;
 
-public class AddTreeItem extends BinaryOpTreeItem {
+public class AddTreeItem extends BinaryOpItem {
 
    public AddTreeItem(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
       super(instruction, PRECEDENCE_ADDITIVE, leftSide, rightSide, "+");
    }
 
    @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+   public String toString(List localData) {
       if (rightSide.precedence >= precedence) {
          String ret = "";
          if (leftSide.precedence > precedence) {
-            ret += "(" + leftSide.toString(constants, localRegNames, fullyQualifiedNames) + ")";
+            ret += "(" + leftSide.toString(localData) + ")";
          } else {
-            ret += leftSide.toString(constants, localRegNames, fullyQualifiedNames);
+            ret += leftSide.toString(localData);
          }
          ret += hilight(operator);
-         ret += "(" + rightSide.toString(constants, localRegNames, fullyQualifiedNames) + ")";
+         ret += "(" + rightSide.toString(localData) + ")";
          return ret;
       } else {
-         return super.toString(constants, localRegNames, fullyQualifiedNames);
+         return super.toString(localData);
       }
+   }
+
+   @Override
+   public double toNumber() {
+      return leftSide.toNumber() + rightSide.toNumber();
    }
 }
