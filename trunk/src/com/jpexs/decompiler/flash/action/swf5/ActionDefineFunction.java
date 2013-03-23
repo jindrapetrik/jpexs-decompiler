@@ -170,23 +170,21 @@ public class ActionDefineFunction extends Action implements ActionContainer {
 
    @Override
    public String getASMSourceReplaced(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
-      List<String> oldParamNames=paramNames;
-      if(replacedParamNames!=null){
-         paramNames=replacedParamNames;
+      List<String> oldParamNames = paramNames;
+      if (replacedParamNames != null) {
+         paramNames = replacedParamNames;
       }
-      String oldFunctionName=functionName;
-      if(replacedFunctionName!=null){
-         functionName=replacedFunctionName;
+      String oldFunctionName = functionName;
+      if (replacedFunctionName != null) {
+         functionName = replacedFunctionName;
       }
-      String ret=getASMSource(knownAddreses, constantPool, version, hex);
-      paramNames=oldParamNames;
-      functionName=oldFunctionName;
+      String ret = getASMSource(knownAddreses, constantPool, version, hex);
+      paramNames = oldParamNames;
+      functionName = oldFunctionName;
       return ret;
-      
+
    }
 
-   
-   
    @Override
    public List<Long> getAllRefs(int version) {
       return Action.getActionsAllRefs(code, version);

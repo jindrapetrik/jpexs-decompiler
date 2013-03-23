@@ -38,7 +38,6 @@ import com.jpexs.decompiler.flash.action.swf5.ActionNewObject;
 import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
-import com.jpexs.decompiler.flash.action.treemodel.DefineLocalTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
 import com.jpexs.decompiler.flash.flv.AUDIODATA;
 import com.jpexs.decompiler.flash.flv.FLVOutputStream;
@@ -791,8 +790,8 @@ public class SWF {
    public static final String validNextCharacters = validFirstCharacters + "0123456789";
    public static final String fooCharacters = "bcdfghjklmnpqrstvwz";
    public static final String fooJoinCharacters = "aeiouy";
-   private HashMap<DirectValueTreeItem,ConstantPool> allVariableNames = new HashMap<DirectValueTreeItem,ConstantPool>();
-   private HashSet<String> allVariableNamesStr=new HashSet<String>();
+   private HashMap<DirectValueTreeItem, ConstantPool> allVariableNames = new HashMap<DirectValueTreeItem, ConstantPool>();
+   private HashSet<String> allVariableNamesStr = new HashSet<String>();
    private List<GraphSourceItem> allFunctions = new ArrayList<GraphSourceItem>();
 
    private String fooString(String orig, boolean firstUppercase, int rndSize) {
@@ -868,7 +867,7 @@ public class SWF {
       return null;
    }
 
-   private static void getVariables(ConstantPool constantPool, List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, int lastIp, HashMap<DirectValueTreeItem,ConstantPool> variables,List<GraphSourceItem> functions, List<Integer> visited) {
+   private static void getVariables(ConstantPool constantPool, List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, int lastIp, HashMap<DirectValueTreeItem, ConstantPool> variables, List<GraphSourceItem> functions, List<Integer> visited) {
       boolean debugMode = false;
       while ((ip > -1) && ip < code.size()) {
          if (visited.contains(ip)) {
@@ -883,24 +882,23 @@ public class SWF {
 
          GraphTargetItem name = null;
          if ((ins instanceof ActionGetVariable)
-           ||(ins instanceof ActionGetMember)
-           ||(ins instanceof ActionDefineLocal2)
-           ||(ins instanceof ActionNewMethod)
-           ||(ins instanceof ActionNewObject)
-           ||(ins instanceof ActionCallMethod)
-           ||(ins instanceof ActionCallFunction)
-            ) {
+                 || (ins instanceof ActionGetMember)
+                 || (ins instanceof ActionDefineLocal2)
+                 || (ins instanceof ActionNewMethod)
+                 || (ins instanceof ActionNewObject)
+                 || (ins instanceof ActionCallMethod)
+                 || (ins instanceof ActionCallFunction)) {
             name = stack.peek();
          }
-         
-         if((ins instanceof ActionDefineFunction)||(ins instanceof ActionDefineFunction2)){
+
+         if ((ins instanceof ActionDefineFunction) || (ins instanceof ActionDefineFunction2)) {
             functions.add(ins);
          }
-         if ((ins instanceof ActionSetVariable)||(ins instanceof ActionSetMember)||(ins instanceof ActionDefineLocal)) {
+         if ((ins instanceof ActionSetVariable) || (ins instanceof ActionSetMember) || (ins instanceof ActionDefineLocal)) {
             name = stack.get(stack.size() - 2);
          }
          if (name instanceof DirectValueTreeItem) {
-            variables.put((DirectValueTreeItem)name,constantPool);
+            variables.put((DirectValueTreeItem) name, constantPool);
          }
 
          //for..in return
@@ -919,7 +917,7 @@ public class SWF {
 
          if (ins.isBranch() || ins.isJump()) {
 
-            if (false){ //ins instanceof ActionIf && !stack.isEmpty() && (stack.peek().isCompileTime())) {
+            if (false) { //ins instanceof ActionIf && !stack.isEmpty() && (stack.peek().isCompileTime())) {
                boolean condition = stack.peek().toBoolean();
                if (debugMode) {
                   if (condition) {
@@ -929,7 +927,7 @@ public class SWF {
                   }
                }
                stack.pop();
-               getVariables(constantPool, localData, stack, output, code, condition ? (code.adr2pos(((ActionIf) ins).getAddress() + ((ActionIf) ins).getBytes(code.version).length + ((ActionIf) ins).offset)) : ip + 1, ip, variables,functions, visited);
+               getVariables(constantPool, localData, stack, output, code, condition ? (code.adr2pos(((ActionIf) ins).getAddress() + ((ActionIf) ins).getBytes(code.version).length + ((ActionIf) ins).offset)) : ip + 1, ip, variables, functions, visited);
             } else {
                if (ins instanceof ActionIf) {
                   stack.pop();
@@ -939,7 +937,7 @@ public class SWF {
                for (int b : branches) {
                   Stack<GraphTargetItem> brStack = (Stack<GraphTargetItem>) stack.clone();
                   if (b >= 0) {
-                     getVariables(constantPool, localData, brStack, output, code, b, ip, variables, functions,visited);
+                     getVariables(constantPool, localData, brStack, output, code, b, ip, variables, functions, visited);
                   } else {
                      if (debugMode) {
                         System.out.println("Negative branch:" + b);
@@ -953,29 +951,28 @@ public class SWF {
       };
    }
 
-   private static void getVariables(HashMap<DirectValueTreeItem,ConstantPool> variables,List<GraphSourceItem> functions,ActionGraphSource code, int addr) {
+   private static void getVariables(HashMap<DirectValueTreeItem, ConstantPool> variables, List<GraphSourceItem> functions, ActionGraphSource code, int addr) {
       List localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
-      try{
-      getVariables(null, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0, variables,functions, new ArrayList<Integer>());
-      }catch(Exception ex){
-         Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Getting variables error",ex);
+      try {
+         getVariables(null, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0, variables, functions, new ArrayList<Integer>());
+      } catch (Exception ex) {
+         Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Getting variables error", ex);
       }
    }
 
-   private HashMap<DirectValueTreeItem,ConstantPool> getVariables(HashMap<DirectValueTreeItem,ConstantPool> variables,List<GraphSourceItem> functions,ASMSource src){     
-      HashMap<DirectValueTreeItem,ConstantPool> ret=new HashMap<DirectValueTreeItem,ConstantPool>();
+   private HashMap<DirectValueTreeItem, ConstantPool> getVariables(HashMap<DirectValueTreeItem, ConstantPool> variables, List<GraphSourceItem> functions, ASMSource src) {
+      HashMap<DirectValueTreeItem, ConstantPool> ret = new HashMap<DirectValueTreeItem, ConstantPool>();
       List<Action> actions = src.getActions(version);
       actionsMap.put(src, actions);
-      getVariables(variables,functions,new ActionGraphSource(actions, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()),0);
+      getVariables(variables, functions, new ActionGraphSource(actions, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0);
       return ret;
    }
-   
-   private HashMap<ASMSource,List<Action>> actionsMap=new HashMap<ASMSource, List<Action>>();
-   
+   private HashMap<ASMSource, List<Action>> actionsMap = new HashMap<ASMSource, List<Action>>();
+
    private void getVariables(List<Object> objs) {
       for (Object o : objs) {
          if (o instanceof ASMSource) {
-            getVariables(allVariableNames,allFunctions,(ASMSource) o);
+            getVariables(allVariableNames, allFunctions, (ASMSource) o);
          }
          if (o instanceof Container) {
             getVariables(((Container) o).getSubItems());
@@ -984,48 +981,48 @@ public class SWF {
    }
 
    public int deobfuscateAS2Identifiers() {
-      actionsMap=new HashMap<ASMSource, List<Action>>();
+      actionsMap = new HashMap<ASMSource, List<Action>>();
       allFunctions = new ArrayList<GraphSourceItem>();
-      allVariableNames=new HashMap<DirectValueTreeItem, ConstantPool>();
+      allVariableNames = new HashMap<DirectValueTreeItem, ConstantPool>();
       List<Object> objs = new ArrayList<Object>();
-      int ret=0;
+      int ret = 0;
       objs.addAll(tags);
-      getVariables(objs); 
-      for(GraphSourceItem fun:allFunctions){
-         if(fun instanceof ActionDefineFunction){
-            ActionDefineFunction f=(ActionDefineFunction)fun;
-            String changed=deobfuscateName(deobfuscated, f.functionName, false);
-            if(changed!=null){
-               f.replacedFunctionName=changed;
+      getVariables(objs);
+      for (GraphSourceItem fun : allFunctions) {
+         if (fun instanceof ActionDefineFunction) {
+            ActionDefineFunction f = (ActionDefineFunction) fun;
+            String changed = deobfuscateName(deobfuscated, f.functionName, false);
+            if (changed != null) {
+               f.replacedFunctionName = changed;
             }
          }
-         if(fun instanceof ActionDefineFunction2){
-            ActionDefineFunction2 f=(ActionDefineFunction2)fun;
-            String changed=deobfuscateName(deobfuscated, f.functionName, false);
-            if(changed!=null){
-               f.replacedFunctionName=changed;
+         if (fun instanceof ActionDefineFunction2) {
+            ActionDefineFunction2 f = (ActionDefineFunction2) fun;
+            String changed = deobfuscateName(deobfuscated, f.functionName, false);
+            if (changed != null) {
+               f.replacedFunctionName = changed;
             }
          }
       }
-      for(DirectValueTreeItem ti:allVariableNames.keySet()){
-         String name=ti.toStringNoH(allVariableNames.get(ti));
+      for (DirectValueTreeItem ti : allVariableNames.keySet()) {
+         String name = ti.toStringNoH(allVariableNames.get(ti));
          allVariableNamesStr.add(name);
       }
-      for(DirectValueTreeItem ti:allVariableNames.keySet()){
-         String name=ti.toStringNoH(allVariableNames.get(ti));
-         String changed=deobfuscateName(deobfuscated, name, false);
-         if(changed!=null){
-            ActionPush pu=(ActionPush)ti.src;
-            if(pu.replacement==null){
-               pu.replacement=new ArrayList<Object>();
+      for (DirectValueTreeItem ti : allVariableNames.keySet()) {
+         String name = ti.toStringNoH(allVariableNames.get(ti));
+         String changed = deobfuscateName(deobfuscated, name, false);
+         if (changed != null) {
+            ActionPush pu = (ActionPush) ti.src;
+            if (pu.replacement == null) {
+               pu.replacement = new ArrayList<Object>();
                pu.replacement.addAll(pu.values);
             }
-            pu.replacement.set(ti.pos,changed);
+            pu.replacement.set(ti.pos, changed);
             ret++;
-         }         
+         }
       }
-      for(ASMSource src:actionsMap.keySet()){
-         actionsMap.put(src,Action.removeNops(actionsMap.get(src), version));
+      for (ASMSource src : actionsMap.keySet()) {
+         actionsMap.put(src, Action.removeNops(actionsMap.get(src), version));
          src.setActions(actionsMap.get(src), version);
       }
       return ret;

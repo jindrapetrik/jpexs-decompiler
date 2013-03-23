@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.treemodel;
 
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
+import com.jpexs.decompiler.flash.action.swf4.Null;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.List;
@@ -107,7 +108,7 @@ public class DirectValueTreeItem extends TreeItem {
       }
       return value.toString();
    }
-   
+
    @Override
    public String toString(ConstantPool constants) {
       if (value instanceof Double) {
@@ -131,6 +132,6 @@ public class DirectValueTreeItem extends TreeItem {
 
    @Override
    public boolean isCompileTime() {
-      return (value instanceof Double) || (value instanceof Float) || (value instanceof Boolean) || (value instanceof Long);
+      return (value instanceof Double) || (value instanceof Float) || (value instanceof Boolean) || (value instanceof Long) || (value instanceof Null);
    }
 }

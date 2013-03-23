@@ -74,7 +74,7 @@ public class ActionJump extends Action {
    }
 
    public ActionJump(FlasmLexer lexer) throws IOException, ParseException {
-      super(0x99, -1);
+      super(0x99, 0);
       identifier = lexIdentifier(lexer);
    }
 

@@ -1322,7 +1322,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                   cnt = swf.deobfuscateAS2Identifiers();
                   Main.stopWork();
                   JOptionPane.showMessageDialog(null, "Identifiers renamed: " + cnt);
-                  if(abcPanel!=null){
+                  if (abcPanel != null) {
                      abcPanel.reload();
                   }
                   doFilter();
@@ -1406,10 +1406,11 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
    private File tempFile;
 
    @Override
-   public void valueChanged(TreeSelectionEvent e) {      
+   public void valueChanged(TreeSelectionEvent e) {
       reload(false);
    }
-   public void reload(boolean forceReload){
+
+   public void reload(boolean forceReload) {
       Object tagObj = tagTree.getLastSelectedPathComponent();
       if (tagObj == null) {
          return;
