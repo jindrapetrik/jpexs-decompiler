@@ -1413,10 +1413,14 @@ public class SWFInputStream extends InputStream {
                return new ActionThrow();
             default:
                if (actionLength > 0) {
-                  skip(actionLength);
+                  //skip(actionLength);
                }
-               throw new UnknownActionException(actionCode);
-            //return new Action(actionCode, actionLength);
+               //throw new UnknownActionException(actionCode);
+               Action r=new ActionNop();
+               r.actionCode=actionCode;
+               r.actionLength = actionLength;
+               return r;
+               //return new Action(actionCode, actionLength);
          }
       }
    }
