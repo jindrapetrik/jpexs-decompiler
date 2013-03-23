@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
-import com.jpexs.decompiler.flash.action.UnknownActionException;
 import com.jpexs.decompiler.flash.action.parser.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.special.ActionContainer;
@@ -511,10 +510,10 @@ public class SWFInputStream extends InputStream {
          if (ins instanceof ActionConstantPool) {
             constantPools.add(new ConstantPool(((ActionConstantPool) ins).constantPool));
          }
-         
+
          //for..in return
          if (((ins instanceof ActionEquals) || (ins instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueTreeItem)) {
-               stack.push(new DirectValueTreeItem(null, 0, new Null(), new ArrayList<String>()));
+            stack.push(new DirectValueTreeItem(null, 0, new Null(), new ArrayList<String>()));
          }
          ins.translate(localData, stack, output);
          if (ins.isExit()) {
@@ -608,13 +607,13 @@ public class SWFInputStream extends InputStream {
          }
          last = a;
       }
-      int len=retdups.size();
-      for(int i=0;i<retdups.size();i++){
-         Action a=retdups.get(i);
-         if(a instanceof ActionEnd){
-            if(i<retdups.size()-1){
-               ActionJump jmp=new ActionJump(0);
-               jmp.offset = retdups.size()-i-jmp.getBytes(version).length; 
+      int len = retdups.size();
+      for (int i = 0; i < retdups.size(); i++) {
+         Action a = retdups.get(i);
+         if (a instanceof ActionEnd) {
+            if (i < retdups.size() - 1) {
+               ActionJump jmp = new ActionJump(0);
+               jmp.offset = retdups.size() - i - jmp.getBytes(version).length;
                a.replaceWith = jmp;
             }
          }
@@ -656,22 +655,22 @@ public class SWFInputStream extends InputStream {
       long filePos = rri.getPos();
       Scanner sc = new Scanner(System.in);
       int prevIp = ip;
-      while ((a = sis.readAction()) != null) {   
+      while ((a = sis.readAction()) != null) {
          a.setAddress(prevIp, SWF.DEFAULT_VERSION);
          int info = a.actionLength + 1 + ((a.actionCode > 0x80) ? 2 : 0);
          int actual = 0;
-         if(a instanceof ActionContainer){
-            actual=((ActionContainer)a).getHeaderBytes().length;
-         }else{
-            actual=a.getBytes(sis.version).length;
+         if (a instanceof ActionContainer) {
+            actual = ((ActionContainer) a).getHeaderBytes().length;
+         } else {
+            actual = a.getBytes(sis.version).length;
          }
-         if(!(a instanceof ActionContainer)){
-            int change=info-(rri.getPos()-ip);
-            if(change > 0){
-               a.afterInsert=new ActionJump(change);
+         if (!(a instanceof ActionContainer)) {
+            int change = info - (rri.getPos() - ip);
+            if (change > 0) {
+               a.afterInsert = new ActionJump(change);
             }
-         }else{
-            info=rri.getPos()-ip;
+         } else {
+            info = rri.getPos() - ip;
          }
          if (ip < startIp) {
             retv = true;
@@ -828,7 +827,7 @@ public class SWFInputStream extends InputStream {
             ret.set(ip + i, a);
          }
 
-         if(a instanceof ActionEnd){
+         if (a instanceof ActionEnd) {
             break;
          }
          if (newip > -1) {
@@ -1416,11 +1415,11 @@ public class SWFInputStream extends InputStream {
                   //skip(actionLength);
                }
                //throw new UnknownActionException(actionCode);
-               Action r=new ActionNop();
-               r.actionCode=actionCode;
+               Action r = new ActionNop();
+               r.actionCode = actionCode;
                r.actionLength = actionLength;
                return r;
-               //return new Action(actionCode, actionLength);
+            //return new Action(actionCode, actionLength);
          }
       }
    }

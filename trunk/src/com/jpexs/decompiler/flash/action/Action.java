@@ -860,7 +860,7 @@ public class Action implements GraphSourceItem {
                                           for (int i = 0; i < prevCount; i++) {
                                              output2.add(output.get(i));
                                           }
-                                          output2.add(new ClassTreeItem(className, extendsOp, implementsOp, functions, vars, staticFunctions, staticVars));                                             
+                                          output2.add(new ClassTreeItem(className, extendsOp, implementsOp, functions, vars, staticFunctions, staticVars));
                                           return output2;
                                        }
                                        if (parts.get(pos) instanceof StoreRegisterTreeItem) {
@@ -957,7 +957,7 @@ public class Action implements GraphSourceItem {
                                              for (int i = 0; i < prevCount; i++) {
                                                 output2.add(output.get(i));
                                              }
-                                             output2.add(new ClassTreeItem(className, extendsOp, implementsOp, functions, vars, staticFunctions, staticVars));                                             
+                                             output2.add(new ClassTreeItem(className, extendsOp, implementsOp, functions, vars, staticFunctions, staticVars));
                                              return output2;
                                           }
                                        } else {

@@ -292,15 +292,14 @@ public class Graph {
       }
       Stack<GraphTargetItem> stack = new Stack<GraphTargetItem>();
       List<GraphTargetItem> ret = printGraph(localData, stack, allParts, null, heads.get(0), null, new ArrayList<Loop>(), new HashMap<Loop, List<GraphTargetItem>>());
-      finalProcessStack(stack,ret);      
+      finalProcessStack(stack, ret);
       finalProcessAll(ret, 0);
       return ret;
    }
 
-   public void finalProcessStack(Stack<GraphTargetItem> stack,List<GraphTargetItem> output){
-      
+   public void finalProcessStack(Stack<GraphTargetItem> stack, List<GraphTargetItem> output) {
    }
-   
+
    private void finalProcessAll(List<GraphTargetItem> list, int level) {
       finalProcess(list, level);
       for (GraphTargetItem item : list) {
