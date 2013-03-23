@@ -397,7 +397,8 @@ public class Action implements GraphSourceItem {
                ret += a.beforeInsert.getASMSource(importantOffsets, constantPool, version, hex) + "\r\n";
             }
             //if (!(a instanceof ActionNop)) {
-            ret += Highlighting.hilighOffset("", offset) + a.getASMSource(importantOffsets, constantPool, version, hex) + (a.ignored ? "; ignored" : "") + "\r\n";
+            ret += Highlighting.hilighOffset("", offset) + a.getASMSourceReplaced(importantOffsets, constantPool, version, hex) + (a.ignored ? "; ignored" : "") + "\r\n";
+            
             //}
             if (a.afterInsert != null) {
                ret += a.afterInsert.getASMSource(importantOffsets, constantPool, version, hex) + "\r\n";
@@ -1061,5 +1062,9 @@ public class Action implements GraphSourceItem {
             }
          }
       }
+   }
+   
+   public String getASMSourceReplaced(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {   
+      return getASMSource(knownAddreses, constantPool, version, hex);
    }
 }

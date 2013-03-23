@@ -562,7 +562,11 @@ public class SWFInputStream extends InputStream {
    public static List<ConstantPool> getConstantPool(ActionGraphSource code, int addr) {
       List<ConstantPool> ret = new ArrayList<ConstantPool>();
       List localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
+      try{
       getConstantPool(localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0, ret, new ArrayList<Integer>());
+      }catch(Exception ex){
+         log.log(Level.SEVERE, "Error during getting constantpool",ex);
+      }
       return ret;
    }
 
@@ -621,7 +625,7 @@ public class SWFInputStream extends InputStream {
 
       List<ConstantPool> pools = new ArrayList<ConstantPool>();
       pools = getConstantPool(new ActionGraphSource(ret, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), ip);
-
+      
       if (pools.size() == 1) {
          Action.setConstantPool(ret, pools.get(0));
       }
@@ -635,7 +639,7 @@ public class SWFInputStream extends InputStream {
       }
       String s = null;
       //Action.setConstantPool(ret, cpool);
-
+      
       try {
          s = Highlighting.stripHilights(Action.actionsToString(ret, null, version, false));
          ret = ASMParser.parse(false, new ByteArrayInputStream(s.getBytes()), SWF.DEFAULT_VERSION);

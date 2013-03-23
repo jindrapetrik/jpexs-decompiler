@@ -33,9 +33,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
+   
 public class ActionPush extends Action {
 
    public List<Object> values;
+   public List<Object> replacement;
    public List<String> constantPool;
    public List<Integer> ignoredParts = new ArrayList<Integer>();
 
@@ -182,6 +184,17 @@ public class ActionPush extends Action {
       }
    }
 
+   @Override
+   public String getASMSourceReplaced(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+      if(replacement == null || replacement.size()<values.size()){
+         return toString();
+      }
+      List<Object> oldVal=values;
+      values=replacement;
+      String ts=toString();
+      values=oldVal;
+      return ts;
+   }
    @Override
    public String toString() {
       String ret = "Push ";

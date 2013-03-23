@@ -41,7 +41,9 @@ import java.util.Stack;
 public class ActionDefineFunction2 extends Action implements ActionContainer {
 
    public String functionName;
+   public String replacedFunctionName;
    public List<String> paramNames = new ArrayList<String>();
+   public List<String> replacedParamNames;
    public List<Integer> paramRegisters = new ArrayList<Integer>();
    public boolean preloadParentFlag;
    public boolean preloadRootFlag;
@@ -223,6 +225,23 @@ public class ActionDefineFunction2 extends Action implements ActionContainer {
    public void setAddress(long address, int version) {
       super.setAddress(address, version);
       Action.setActionsAddresses(code, address + getPreLen(version), version);
+   }
+   
+   @Override
+   public String getASMSourceReplaced(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+      List<String> oldParamNames=paramNames;
+      if(replacedParamNames!=null){
+         paramNames=replacedParamNames;
+      }
+      String oldFunctionName=functionName;
+      if(replacedFunctionName!=null){
+         functionName=replacedFunctionName;
+      }
+      String ret=getASMSource(knownAddreses, constantPool, version, hex);
+      paramNames=oldParamNames;
+      functionName=oldFunctionName;
+      return ret;
+      
    }
 
    @Override

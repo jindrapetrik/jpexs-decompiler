@@ -382,7 +382,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
          actionPanel = new ActionPanel();
          addTab(tabPane, actionPanel, "ActionScript", View.getIcon("as16"));
 
-         menuDeobfuscation.setEnabled(false);
+         miDeobfuscation.setEnabled(false);
       }
 
 
@@ -1312,14 +1312,21 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                @Override
                protected Object doInBackground() throws Exception {
                   int cnt = 0;
-                  HashMap<String, String> namesMap = new HashMap<String, String>();
-                  for (DoABCTag tag : abcPanel.list) {
-                     cnt += tag.abc.deobfuscateIdentifiers(namesMap);
+
+                  if (abcPanel != null) {
+                     HashMap<String, String> namesMap = new HashMap<String, String>();
+                     for (DoABCTag tag : abcPanel.list) {
+                        cnt += tag.abc.deobfuscateIdentifiers(namesMap);
+                     }
                   }
+                  cnt = swf.deobfuscateAS2Identifiers();
                   Main.stopWork();
                   JOptionPane.showMessageDialog(null, "Identifiers renamed: " + cnt);
-                  abcPanel.reload();
+                  if(abcPanel!=null){
+                     abcPanel.reload();
+                  }
                   doFilter();
+                  reload(true);
                   return true;
                }
             }.execute();
@@ -1399,7 +1406,10 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
    private File tempFile;
 
    @Override
-   public void valueChanged(TreeSelectionEvent e) {
+   public void valueChanged(TreeSelectionEvent e) {      
+      reload(false);
+   }
+   public void reload(boolean forceReload){
       Object tagObj = tagTree.getLastSelectedPathComponent();
       if (tagObj == null) {
          return;
@@ -1412,11 +1422,10 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
          tagObj = ((TreeElement) tagObj).getItem();
       }
 
-      if (tagObj == oldValue) {
+      if (!forceReload && (tagObj == oldValue)) {
          return;
       }
       oldValue = tagObj;
-
       if (tagObj instanceof TreeLeafScript) {
          final TreeLeafScript scriptLeaf = (TreeLeafScript) tagObj;
          if (!Main.isWorking()) {

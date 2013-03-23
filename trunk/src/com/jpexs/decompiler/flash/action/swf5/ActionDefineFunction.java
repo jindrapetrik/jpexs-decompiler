@@ -41,7 +41,9 @@ import java.util.Stack;
 public class ActionDefineFunction extends Action implements ActionContainer {
 
    public String functionName;
+   public String replacedFunctionName;
    public List<String> paramNames = new ArrayList<String>();
+   public List<String> replacedParamNames;
    public List<Action> code;
    public int codeSize;
    private int version;
@@ -166,6 +168,25 @@ public class ActionDefineFunction extends Action implements ActionContainer {
       return "DefineFunction \"" + Helper.escapeString(functionName) + "\" " + paramNames.size() + " " + paramStr + " {\r\n" + Action.actionsToString(code, knownAddreses, constantPool, version, hex) + "}";
    }
 
+   @Override
+   public String getASMSourceReplaced(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+      List<String> oldParamNames=paramNames;
+      if(replacedParamNames!=null){
+         paramNames=replacedParamNames;
+      }
+      String oldFunctionName=functionName;
+      if(replacedFunctionName!=null){
+         functionName=replacedFunctionName;
+      }
+      String ret=getASMSource(knownAddreses, constantPool, version, hex);
+      paramNames=oldParamNames;
+      functionName=oldFunctionName;
+      return ret;
+      
+   }
+
+   
+   
    @Override
    public List<Long> getAllRefs(int version) {
       return Action.getActionsAllRefs(code, version);
