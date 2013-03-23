@@ -648,7 +648,7 @@ public class Action implements GraphSourceItem {
             break;
          }
          Action action = actions.get(ip);
-
+         //System.out.println(" ip "+ip+" "+action);
          //return in for..in
          if ((action instanceof ActionPush) && (((ActionPush) action).values.size() == 1) && (((ActionPush) action).values.get(0) instanceof Null)) {
             if (ip + 3 <= end) {
@@ -722,7 +722,11 @@ public class Action implements GraphSourceItem {
                stack.pop();
                ip++;
             } else {
-               action.translate(localData, stack, output);
+               try {
+                  action.translate(localData, stack, output);
+               } catch (Exception ex) {
+                  //ignore
+               }
             }
          } /*else if (action instanceof ActionStrictEquals) {
           if ((ip + 1 < actions.size()) && (actions.get(ip + 1) instanceof ActionIf)) {

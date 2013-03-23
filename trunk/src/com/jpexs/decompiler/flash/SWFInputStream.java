@@ -495,7 +495,7 @@ public class SWFInputStream extends InputStream {
       return readActionList(rri, version, 0);
    }
 
-   private static void getConstantPool(ConstantPool cpool, List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, int lastIp, List<ConstantPool> constantPools, List<Integer> visited) {
+   private static void getConstantPool(ConstantPool cpool, List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, int lastIp, List<ConstantPool> constantPools, List<Integer> visited, int version) {
       boolean debugMode = false;
       while ((ip > -1) && ip < code.size()) {
          if (visited.contains(ip)) {
@@ -504,6 +504,10 @@ public class SWFInputStream extends InputStream {
 
          lastIp = ip;
          GraphSourceItem ins = code.get(ip);
+         if (ins.isIgnored()) {
+            ip++;
+            continue;
+         }
 
          if (ins instanceof ActionPush) {
             if (cpool != null) {
@@ -546,6 +550,32 @@ public class SWFInputStream extends InputStream {
          if (ins.isBranch() || ins.isJump()) {
 
             if (ins instanceof ActionIf && !stack.isEmpty() && (stack.peek().isCompileTime())) {
+               ActionIf aif = (ActionIf) ins;
+               if (aif.ignoreUsed && (!aif.jumpUsed)) {
+                  ins.setIgnored(true);
+               }
+               if ((!aif.ignoreUsed) && aif.jumpUsed) {
+                  ActionJump jmpIns = new ActionJump(aif.offset);
+                  ((ActionJump) jmpIns).setAddress(aif.getAddress(), version);
+                  code.set(ip, (ActionJump) jmpIns);
+               }
+
+               if ((aif.ignoreUsed && (!aif.jumpUsed)) || ((!aif.ignoreUsed) && aif.jumpUsed)) {
+                  List<GraphSourceItemPos> needed = stack.peek().getNeededSources();
+                  for (GraphSourceItemPos ig : needed) {
+                     if (ig.item instanceof ActionPush) {
+                        if (!((ActionPush) ig.item).ignoredParts.contains(ig.pos)) {
+                           ((ActionPush) ig.item).ignoredParts.add(ig.pos);
+
+                           if (((ActionPush) ig.item).ignoredParts.size() == ((ActionPush) ig.item).values.size()) {
+                              ((Action) ig.item).ignored = true;
+                           }
+                        }
+                     } else {
+                        ((Action) ig.item).ignored = true;
+                     }
+                  }
+               }
                boolean condition = stack.peek().toBoolean();
                if (debugMode) {
                   if (condition) {
@@ -555,7 +585,7 @@ public class SWFInputStream extends InputStream {
                   }
                }
                stack.pop();
-               getConstantPool(cpool, localData, stack, output, code, condition ? (code.adr2pos(((ActionIf) ins).getAddress() + ((ActionIf) ins).getBytes(code.version).length + ((ActionIf) ins).offset)) : ip + 1, ip, constantPools, visited);
+               getConstantPool(cpool, localData, stack, output, code, condition ? (code.adr2pos(((ActionIf) ins).getAddress() + ((ActionIf) ins).getBytes(code.version).length + ((ActionIf) ins).offset)) : ip + 1, ip, constantPools, visited, version);
             } else {
                if (ins instanceof ActionIf) {
                   stack.pop();
@@ -565,7 +595,7 @@ public class SWFInputStream extends InputStream {
                for (int b : branches) {
                   Stack<GraphTargetItem> brStack = (Stack<GraphTargetItem>) stack.clone();
                   if (b >= 0) {
-                     getConstantPool(cpool, localData, brStack, output, code, b, ip, constantPools, visited);
+                     getConstantPool(cpool, localData, brStack, output, code, b, ip, constantPools, visited, version);
                   } else {
                      if (debugMode) {
                         System.out.println("Negative branch:" + b);
@@ -582,11 +612,11 @@ public class SWFInputStream extends InputStream {
       }
    }
 
-   public static List<ConstantPool> getConstantPool(ActionGraphSource code, int addr) {
+   public static List<ConstantPool> getConstantPool(ActionGraphSource code, int addr, int version) {
       List<ConstantPool> ret = new ArrayList<ConstantPool>();
       List localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
       try {
-         getConstantPool(null, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0, ret, new ArrayList<Integer>());
+         getConstantPool(null, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0, ret, new ArrayList<Integer>(), version);
       } catch (Exception ex) {
          log.log(Level.SEVERE, "Error during getting constantpool", ex);
       }
@@ -649,7 +679,7 @@ public class SWFInputStream extends InputStream {
       }
 
       List<ConstantPool> pools = new ArrayList<ConstantPool>();
-      pools = getConstantPool(new ActionGraphSource(ret, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), ip);
+      pools = getConstantPool(new ActionGraphSource(ret, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), ip, version);
 
       if (pools.size() == 1) {
          Action.setConstantPool(ret, pools.get(0));
@@ -685,6 +715,9 @@ public class SWFInputStream extends InputStream {
       Scanner sc = new Scanner(System.in);
       int prevIp = ip;
       while ((a = sis.readAction()) != null) {
+         if ((ip < ret.size()) && (!(ret.get(ip) instanceof ActionNop))) {
+            a = ret.get(ip);
+         }
          a.setAddress(prevIp, SWF.DEFAULT_VERSION);
          int info = a.actionLength + 1 + ((a.actionCode > 0x80) ? 2 : 0);
          int actual = 0;
@@ -780,25 +813,36 @@ public class SWFInputStream extends InputStream {
                   if (top.toBoolean()) {
                      newip = rri.getPos() + aif.offset;
                      //rri.setPos(newip);
-                     if (!enableVariables) {
+                     if (((!enableVariables) || (!top.isVariableComputed())) && (!aif.ignoreUsed)) {
                         a = new ActionJump(aif.offset);
                         a.setAddress(aif.getAddress(), SWF.DEFAULT_VERSION);
+                     }
+                     aif.jumpUsed = true;
+                     if (aif.ignoreUsed) {
+                        aif.compileTime = false;
                      }
                      if (debugMode) {
                         System.out.println("jump");
                      }
                   } else {
+                     aif.ignoreUsed = true;
+                     if (aif.jumpUsed) {
+                        aif.compileTime = false;
+                     }
                      if (debugMode) {
                         System.out.println("ignore");
                      }
-                     if (!enableVariables) {
+                     if (((!enableVariables) || (!top.isVariableComputed())) && (!aif.jumpUsed)) {
                         a = new ActionNop();
                         a.setAddress(aif.getAddress(), SWF.DEFAULT_VERSION);
                      }
                   }
-                  if (!enableVariables) {
+                  if (((!enableVariables) || (!top.isVariableComputed())) && (!(aif.jumpUsed && aif.ignoreUsed))) {
                      List<GraphSourceItemPos> needed = top.getNeededSources();
                      for (GraphSourceItemPos ig : needed) {
+                        if (ig.item == null) {
+                           continue;
+                        }
                         if (ig.item instanceof ActionPush) {
                            if (!((ActionPush) ig.item).ignoredParts.contains(ig.pos)) {
                               ((ActionPush) ig.item).ignoredParts.add(ig.pos);
@@ -874,6 +918,8 @@ public class SWFInputStream extends InputStream {
          rri.setPos(ip);
          filePos = rri.getPos();
          if (goaif) {
+            aif.ignoreUsed = true;
+            aif.jumpUsed = true;
             int oldPos = rri.getPos();
             Stack<GraphTargetItem> substack = (Stack<GraphTargetItem>) stack.clone();
             if (readActionListAtPos(enableVariables, localData, substack, cpool, sis, rri, rri.getPos() + aif.offset, ret, startIp)) {

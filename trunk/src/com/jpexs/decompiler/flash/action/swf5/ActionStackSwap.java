@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
@@ -39,5 +40,7 @@ public class ActionStackSwap extends Action {
       GraphTargetItem b = stack.pop();
       stack.push(a);
       stack.push(b);
+      a.moreSrc.add(new GraphSourceItemPos(this, 0));
+      b.moreSrc.add(new GraphSourceItemPos(this, 0));
    }
 }

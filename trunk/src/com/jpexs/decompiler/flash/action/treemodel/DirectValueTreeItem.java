@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.treemodel;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.action.swf4.Null;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class DirectValueTreeItem extends TreeItem {
 
    public Object value;
    public List<String> constants;
+   public GraphTargetItem computedRegValue;
 
    public DirectValueTreeItem(GraphSourceItem instruction, int instructionPos, Object value, List<String> constants) {
       super(instruction, PRECEDENCE_PRIMARY);
@@ -35,7 +37,18 @@ public class DirectValueTreeItem extends TreeItem {
    }
 
    @Override
+   public boolean isVariableComputed() {
+      if (computedRegValue != null) {
+         return true;
+      }
+      return false;
+   }
+
+   @Override
    public double toNumber() {
+      if (computedRegValue != null) {
+         return computedRegValue.toNumber();
+      }
       if (value instanceof Double) {
          return (Double) value;
       }
@@ -53,6 +66,9 @@ public class DirectValueTreeItem extends TreeItem {
 
    @Override
    public boolean toBoolean() {
+      if (computedRegValue != null) {
+         return computedRegValue.toBoolean();
+      }
       if (value instanceof Boolean) {
          return (Boolean) value;
       }
@@ -132,6 +148,6 @@ public class DirectValueTreeItem extends TreeItem {
 
    @Override
    public boolean isCompileTime() {
-      return (value instanceof Double) || (value instanceof Float) || (value instanceof Boolean) || (value instanceof Long) || (value instanceof Null);
+      return (value instanceof Double) || (value instanceof Float) || (value instanceof Boolean) || (value instanceof Long) || (value instanceof Null) || (computedRegValue != null && computedRegValue.isCompileTime());
    }
 }

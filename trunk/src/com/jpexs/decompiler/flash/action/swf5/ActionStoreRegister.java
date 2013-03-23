@@ -68,6 +68,7 @@ public class ActionStoreRegister extends Action {
       if (regNames.containsKey(registerNumber)) {
          rn.name = regNames.get(registerNumber);
       }
+      variables.put("__register" + registerNumber, item);
       output.add(new StoreRegisterTreeItem(this, rn, item));
    }
 }

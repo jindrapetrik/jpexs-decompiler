@@ -34,6 +34,8 @@ public class ActionIf extends Action {
    public int offset;
    public String identifier;
    public boolean compileTime;
+   public boolean jumpUsed = false;
+   public boolean ignoreUsed = false;
 
    public ActionIf(SWFInputStream sis) throws IOException {
       super(0x9D, 2);

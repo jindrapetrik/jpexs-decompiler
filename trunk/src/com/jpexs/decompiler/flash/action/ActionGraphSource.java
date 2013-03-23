@@ -37,6 +37,10 @@ public class ActionGraphSource extends GraphSource {
       return actions.get(pos);
    }
 
+   public void set(int pos, Action t) {
+      actions.set(pos, t);
+   }
+
    @Override
    public boolean isEmpty() {
       return actions.isEmpty();

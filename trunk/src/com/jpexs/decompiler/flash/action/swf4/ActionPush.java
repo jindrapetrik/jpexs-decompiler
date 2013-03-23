@@ -237,7 +237,11 @@ public class ActionPush extends Action {
                ((RegisterNumber) o).name = regNames.get(((RegisterNumber) o).number);
             }
          }
-         stack.push(new DirectValueTreeItem(this, pos, o, constantPool));
+         DirectValueTreeItem dvt = new DirectValueTreeItem(this, pos, o, constantPool);
+         stack.push(dvt);
+         if (o instanceof RegisterNumber) {
+            dvt.computedRegValue = variables.get("__register" + ((RegisterNumber) o).number);
+         }
          pos++;
       }
    }

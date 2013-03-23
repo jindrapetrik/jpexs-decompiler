@@ -291,6 +291,12 @@ public class ActionGraph extends Graph {
                caseCommands.add(cc);
             }
             ret = new ArrayList<GraphTargetItem>();
+            if (!output.isEmpty()) {
+               if (output.get(output.size() - 1) instanceof StoreRegisterTreeItem) {
+                  output.remove(output.size() - 1);
+               }
+            }
+            ret.addAll(output);
             SwitchItem sti = new SwitchItem(null, currentLoop, switchedObject, caseValues, caseCommands, defaultCommands, valuesMapping);
             ret.add(sti);
 
