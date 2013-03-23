@@ -290,11 +290,17 @@ public class Graph {
       for (GraphPart head : heads) {
          populateParts(head, allParts);
       }
-      List<GraphTargetItem> ret = printGraph(localData, new Stack<GraphTargetItem>(), allParts, null, heads.get(0), null, new ArrayList<Loop>(), new HashMap<Loop, List<GraphTargetItem>>());
+      Stack<GraphTargetItem> stack = new Stack<GraphTargetItem>();
+      List<GraphTargetItem> ret = printGraph(localData, stack, allParts, null, heads.get(0), null, new ArrayList<Loop>(), new HashMap<Loop, List<GraphTargetItem>>());
+      finalProcessStack(stack,ret);      
       finalProcessAll(ret, 0);
       return ret;
    }
 
+   public void finalProcessStack(Stack<GraphTargetItem> stack,List<GraphTargetItem> output){
+      
+   }
+   
    private void finalProcessAll(List<GraphTargetItem> list, int level) {
       finalProcess(list, level);
       for (GraphTargetItem item : list) {

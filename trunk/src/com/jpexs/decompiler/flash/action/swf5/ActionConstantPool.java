@@ -38,7 +38,7 @@ public class ActionConstantPool extends Action {
 
    public ActionConstantPool(int actionLength, SWFInputStream sis, int version) throws IOException {
       super(0x88, actionLength);
-      sis = new SWFInputStream(new ByteArrayInputStream(sis.readBytes(actionLength)), version);
+      //sis = new SWFInputStream(new ByteArrayInputStream(sis.readBytes(actionLength)), version);
       int count = sis.readUI16();
       for (int i = 0; i < count; i++) {
          constantPool.add(sis.readString());

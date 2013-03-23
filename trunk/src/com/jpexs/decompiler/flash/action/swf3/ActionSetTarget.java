@@ -37,8 +37,8 @@ public class ActionSetTarget extends Action {
 
    public ActionSetTarget(int actionLength, SWFInputStream sis, int version) throws IOException {
       super(0x8B, actionLength);
-      byte data[] = sis.readBytes(actionLength);
-      sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+      //byte data[] = sis.readBytes(actionLength);
+      //sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       targetName = sis.readString();
    }
 

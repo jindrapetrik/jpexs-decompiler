@@ -52,6 +52,8 @@ import java.util.logging.Logger;
 public class Action implements GraphSourceItem {
 
    public Action beforeInsert;
+   public Action afterInsert;
+   public Action replaceWith;
    public boolean ignored = false;
    /**
     * Action type identifier
@@ -157,8 +159,20 @@ public class Action implements GraphSourceItem {
    public static List<Long> getActionsAllRefs(List<Action> list, int version) {
       List<Long> ret = new ArrayList<Long>();
       for (Action a : list) {
+         if (a.replaceWith != null) {
+            a.replaceWith.setAddress(a.getAddress(), version);
+            ret.addAll(a.replaceWith.getAllRefs(version));
+         }
+         if (a.beforeInsert != null) {
+            a.beforeInsert.setAddress(a.getAddress(), version);
+            ret.addAll(a.beforeInsert.getAllRefs(version));
+         }
          List<Long> part = a.getAllRefs(version);
          ret.addAll(part);
+         if (a.afterInsert != null) {
+            a.afterInsert.setAddress(a.getAddress(), version);
+            ret.addAll(a.afterInsert.getAllRefs(version));
+         }
       }
       return ret;
    }
@@ -371,7 +385,9 @@ public class Action implements GraphSourceItem {
             ret += "loc" + Helper.formatAddress(offset) + ":";
          }
 
-         if (a.ignored) {
+         if (a.replaceWith != null) {
+            ret += Highlighting.hilighOffset("", offset) + a.replaceWith.getASMSource(importantOffsets, constantPool, version, hex) + "\r\n";
+         } else if (a.ignored) {
             int len = a.getBytes(version).length;
             for (int i = 0; i < len; i++) {
                ret += "Nop\r\n";
@@ -383,6 +399,9 @@ public class Action implements GraphSourceItem {
             //if (!(a instanceof ActionNop)) {
             ret += Highlighting.hilighOffset("", offset) + a.getASMSource(importantOffsets, constantPool, version, hex) + (a.ignored ? "; ignored" : "") + "\r\n";
             //}
+            if (a.afterInsert != null) {
+               ret += a.afterInsert.getASMSource(importantOffsets, constantPool, version, hex) + "\r\n";
+            }
          }
          offset += a.getBytes(version).length;
       }
@@ -758,14 +777,6 @@ public class Action implements GraphSourceItem {
 
          ip++;
       }
-      if (stack.size() > 0) {
-         for (int i = stack.size() - 1; i >= 0; i--) {
-            if (stack.get(i) instanceof FunctionTreeItem) {
-               output.add(0, stack.get(i));
-               stack.remove(i);
-            }
-         }
-      }
       //output = checkClass(output);
       log("Leaving " + start + "-" + end);
       return output;
@@ -809,6 +820,7 @@ public class Action implements GraphSourceItem {
       GraphTargetItem extendsOp = null;
       List<GraphTargetItem> implementsOp = new ArrayList<GraphTargetItem>();
       boolean ok = true;
+      int prevCount = 0;
       for (GraphTargetItem t : output) {
          if (t instanceof IfItem) {
             IfItem it = (IfItem) t;
@@ -843,6 +855,14 @@ public class Action implements GraphSourceItem {
                                           pos++;
                                        }
 
+                                       if (parts.size() <= pos) {
+                                          List<GraphTargetItem> output2 = new ArrayList<GraphTargetItem>();
+                                          for (int i = 0; i < prevCount; i++) {
+                                             output2.add(output.get(i));
+                                          }
+                                          output2.add(new ClassTreeItem(className, extendsOp, implementsOp, functions, vars, staticFunctions, staticVars));                                             
+                                          return output2;
+                                       }
                                        if (parts.get(pos) instanceof StoreRegisterTreeItem) {
                                           int instanceReg = -1;
                                           if (((StoreRegisterTreeItem) parts.get(pos)).value instanceof GetMemberTreeItem) {
@@ -934,7 +954,10 @@ public class Action implements GraphSourceItem {
                                           }
                                           if (ok) {
                                              List<GraphTargetItem> output2 = new ArrayList<GraphTargetItem>();
-                                             output2.add(new ClassTreeItem(className, extendsOp, implementsOp, functions, vars, staticFunctions, staticVars));
+                                             for (int i = 0; i < prevCount; i++) {
+                                                output2.add(output.get(i));
+                                             }
+                                             output2.add(new ClassTreeItem(className, extendsOp, implementsOp, functions, vars, staticFunctions, staticVars));                                             
                                              return output2;
                                           }
                                        } else {
@@ -965,6 +988,9 @@ public class Action implements GraphSourceItem {
                                        }
                                     }
                                     List<GraphTargetItem> output2 = new ArrayList<GraphTargetItem>();
+                                    for (int i = 0; i < prevCount; i++) {
+                                       output2.add(output.get(i));
+                                    }
                                     output2.add(new InterfaceTreeItem(sm.objectName, implementsOp));
                                     return output2;
                                  } else {
@@ -990,16 +1016,14 @@ public class Action implements GraphSourceItem {
                ok = false;
             }
          } else {
-            ok = false;
+            prevCount++;
+            //ok = false;
          }
          if (!ok) {
             break;
          }
       }
-      if (!ok) {
-         return output;
-      }
-      return ret;
+      return output;
    }
 
    @Override

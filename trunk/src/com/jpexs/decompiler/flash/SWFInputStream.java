@@ -21,6 +21,8 @@ import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.UnknownActionException;
 import com.jpexs.decompiler.flash.action.parser.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.special.ActionContainer;
+import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.special.ActionNop;
 import com.jpexs.decompiler.flash.action.swf3.*;
 import com.jpexs.decompiler.flash.action.swf4.*;
@@ -509,7 +511,11 @@ public class SWFInputStream extends InputStream {
          if (ins instanceof ActionConstantPool) {
             constantPools.add(new ConstantPool(((ActionConstantPool) ins).constantPool));
          }
-
+         
+         //for..in return
+         if (((ins instanceof ActionEquals) || (ins instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueTreeItem)) {
+               stack.push(new DirectValueTreeItem(null, 0, new Null(), new ArrayList<String>()));
+         }
          ins.translate(localData, stack, output);
          if (ins.isExit()) {
             break;
@@ -602,6 +608,17 @@ public class SWFInputStream extends InputStream {
          }
          last = a;
       }
+      int len=retdups.size();
+      for(int i=0;i<retdups.size();i++){
+         Action a=retdups.get(i);
+         if(a instanceof ActionEnd){
+            if(i<retdups.size()-1){
+               ActionJump jmp=new ActionJump(0);
+               jmp.offset = retdups.size()-i-jmp.getBytes(version).length; 
+               a.replaceWith = jmp;
+            }
+         }
+      }
 
       List<ConstantPool> pools = new ArrayList<ConstantPool>();
       pools = getConstantPool(new ActionGraphSource(ret, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), ip);
@@ -639,16 +656,22 @@ public class SWFInputStream extends InputStream {
       long filePos = rri.getPos();
       Scanner sc = new Scanner(System.in);
       int prevIp = ip;
-      while ((a = sis.readAction()) != null) {
+      while ((a = sis.readAction()) != null) {   
          a.setAddress(prevIp, SWF.DEFAULT_VERSION);
          int info = a.actionLength + 1 + ((a.actionCode > 0x80) ? 2 : 0);
-         int actual = a.getBytes(sis.version).length;
-         if (info != actual) {
-            if (!(a instanceof ActionDefineFunction)) {
-               if (!(a instanceof ActionDefineFunction2)) {
-                  //throw new RuntimeException("Lengths do not match "+a+" "+info+"<>"+actual);
-               }
+         int actual = 0;
+         if(a instanceof ActionContainer){
+            actual=((ActionContainer)a).getHeaderBytes().length;
+         }else{
+            actual=a.getBytes(sis.version).length;
+         }
+         if(!(a instanceof ActionContainer)){
+            int change=info-(rri.getPos()-ip);
+            if(change > 0){
+               a.afterInsert=new ActionJump(change);
             }
+         }else{
+            info=rri.getPos()-ip;
          }
          if (ip < startIp) {
             retv = true;
@@ -805,10 +828,13 @@ public class SWFInputStream extends InputStream {
             ret.set(ip + i, a);
          }
 
+         if(a instanceof ActionEnd){
+            break;
+         }
          if (newip > -1) {
             ip = newip;
          } else {
-            ip = ip + (int) actionLen;
+            ip = ip + info; //(int) actionLen;
          }
          rri.setPos(ip);
          filePos = rri.getPos();
@@ -1172,7 +1198,7 @@ public class SWFInputStream extends InputStream {
       {
          int actionCode = readUI8();
          if (actionCode == 0) {
-            return null;
+            return new ActionEnd();
          }
          if (actionCode == -1) {
             return null;

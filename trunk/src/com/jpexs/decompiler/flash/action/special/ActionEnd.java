@@ -14,31 +14,28 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.action.swf5;
+package com.jpexs.decompiler.flash.action.special;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.SetMemberTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-public class ActionSetMember extends Action {
+public class ActionEnd extends Action {
 
-   public ActionSetMember() {
-      super(0x4F, 0);
+   public ActionEnd() {
+      super(0, 0);
+      ignored = true;
    }
 
    @Override
    public String toString() {
-      return "SetMember";
+      return "End";
    }
 
    @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem value = stack.pop();      
-      GraphTargetItem objectName = stack.pop();
-      GraphTargetItem object = stack.pop();
-      output.add(new SetMemberTreeItem(this, object, objectName, value));
+   public void translate(Stack<com.jpexs.decompiler.flash.graph.GraphTargetItem> stack, List<com.jpexs.decompiler.flash.graph.GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+      //output.add(new SimpleActionTreeItem(this, "end()"));
    }
 }

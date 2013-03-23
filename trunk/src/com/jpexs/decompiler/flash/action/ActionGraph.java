@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.action.swf4.Null;
 import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.EnumerateTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.FunctionTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.SetTypeTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.StoreRegisterTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.clauses.ForInTreeItem;
@@ -68,6 +69,23 @@ public class ActionGraph extends Graph {
       localData.add(registerNames);
       return g.translate(localData);
    }
+
+   @Override
+   public void finalProcessStack(Stack<GraphTargetItem> stack,List<GraphTargetItem> output) {
+      if (stack.size() > 0) {
+         for (int i = stack.size() - 1; i >= 0; i--) {
+            //System.err.println(stack.get(i));
+            if (stack.get(i) instanceof FunctionTreeItem) {
+               FunctionTreeItem f=(FunctionTreeItem)stack.remove(i);
+               if(!output.contains(f)){
+                  output.add(0, f);
+               }
+            }
+         }
+      }
+   }
+   
+   
 
    @Override
    protected void finalProcess(List<GraphTargetItem> list, int level) {

@@ -37,8 +37,8 @@ public class ActionGoToLabel extends Action {
 
    public ActionGoToLabel(int actionLength, SWFInputStream sis, int version) throws IOException {
       super(0x8C, actionLength);
-      byte data[] = sis.readBytes(actionLength);
-      sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+      //byte data[] = sis.readBytes(actionLength);
+      //sis = new SWFInputStream(new ByteArrayInputStream(data), version);
       label = sis.readString();
    }
 
