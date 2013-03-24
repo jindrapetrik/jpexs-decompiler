@@ -740,6 +740,9 @@ public class Main {
                   String downVersion = "NEW";
                   if (downloadName.startsWith(shortApplicationName + " version ")) {
                      downVersion = downloadName.substring((shortApplicationName + " version ").length());
+                     if (downVersion.contains(" ")) {
+                        downVersion = downVersion.substring(0, downVersion.indexOf(" "));
+                     }
                   }
                   if (link.startsWith("<a href=\"")) {
                      link = link.substring(link.indexOf("\"") + 1);
@@ -780,7 +783,7 @@ public class Main {
       try {
          Logger logger = Logger.getLogger("");
          logger.setLevel(debug ? Level.CONFIG : Level.WARNING);
-         FileHandler fileTxt = new FileHandler(Configuration.getASDecHome()+File.separator+"log.txt");
+         FileHandler fileTxt = new FileHandler(Configuration.getASDecHome() + File.separator + "log.txt");
 
          SimpleFormatter formatterTxt = new SimpleFormatter();
          fileTxt.setFormatter(formatterTxt);
