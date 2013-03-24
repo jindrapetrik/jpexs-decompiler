@@ -91,10 +91,11 @@ public class CLIPACTIONRECORD implements ASMSource {
       return true;
    }
 
+   @Override
    public List<Action> getActions(int version) {
       try {
          return Action.removeNops(SWFInputStream.readActionList(new ReReadableInputStream(new ByteArrayInputStream(actionBytes)), version, 0), version);
-      } catch (IOException ex) {
+      } catch (Exception ex) {
          Logger.getLogger(BUTTONCONDACTION.class.getName()).log(Level.SEVERE, null, ex);
          return new ArrayList<Action>();
       }

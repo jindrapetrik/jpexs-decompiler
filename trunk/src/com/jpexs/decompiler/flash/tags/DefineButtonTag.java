@@ -147,7 +147,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
          ReReadableInputStream rri = new ReReadableInputStream(new ByteArrayInputStream(baos.toByteArray()));
          rri.setPos(prevLength);
          return Action.removeNops(SWFInputStream.readActionList(rri, version, prevLength), version);
-      } catch (IOException ex) {
+      } catch (Exception ex) {
          Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex);
          return new ArrayList<Action>();
       }
