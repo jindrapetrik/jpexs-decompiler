@@ -542,7 +542,11 @@ public class SWFInputStream extends InputStream {
          if (((ins instanceof ActionEquals) || (ins instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueTreeItem)) {
             stack.push(new DirectValueTreeItem(null, 0, new Null(), new ArrayList<String>()));
          }
-         ins.translate(localData, stack, output);
+         try {
+            ins.translate(localData, stack, output);
+         } catch (Exception ex) {
+            //ignore
+         }
          if (ins.isExit()) {
             break;
          }

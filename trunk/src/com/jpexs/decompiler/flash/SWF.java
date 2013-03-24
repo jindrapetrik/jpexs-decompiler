@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash;
 import SevenZip.Compression.LZMA.Encoder;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
+import com.jpexs.decompiler.flash.action.special.ActionContainer;
 import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
 import com.jpexs.decompiler.flash.action.swf4.ActionGetVariable;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
@@ -891,9 +892,15 @@ public class SWF {
             name = stack.peek();
          }
 
+
          if ((ins instanceof ActionDefineFunction) || (ins instanceof ActionDefineFunction2)) {
             functions.add(ins);
          }
+
+         if (ins instanceof ActionContainer) {
+            getVariables(variables, functions, new ActionGraphSource(((ActionContainer) ins).getActions(), code.version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0);
+         }
+
          if ((ins instanceof ActionSetVariable) || (ins instanceof ActionSetMember) || (ins instanceof ActionDefineLocal)) {
             name = stack.get(stack.size() - 2);
          }
@@ -910,7 +917,11 @@ public class SWF {
             constantPool = new ConstantPool(((ActionConstantPool) ins).constantPool);
          }
 
-         ins.translate(localData, stack, output);
+         try {
+            ins.translate(localData, stack, output);
+         } catch (Exception ex) {
+            //ignore
+         }
          if (ins.isExit()) {
             break;
          }

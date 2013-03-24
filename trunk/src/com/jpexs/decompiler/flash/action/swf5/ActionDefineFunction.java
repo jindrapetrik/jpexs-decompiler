@@ -49,6 +49,11 @@ public class ActionDefineFunction extends Action implements ActionContainer {
    private int version;
    public List<String> constantPool;
 
+   @Override
+   public List<Action> getActions() {
+      return code;
+   }
+
    public void setConstantPool(List<String> constantPool) {
       this.constantPool = constantPool;
       for (Action a : code) {

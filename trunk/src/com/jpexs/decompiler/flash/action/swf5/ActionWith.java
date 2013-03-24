@@ -35,6 +35,11 @@ public class ActionWith extends Action implements ActionContainer {
    public int size;
    public int version;
 
+   @Override
+   public List<Action> getActions() {
+      return actions;
+   }
+
    public ActionWith(SWFInputStream sis, int version) throws IOException {
       super(0x94, 2);
       size = sis.readUI16();
