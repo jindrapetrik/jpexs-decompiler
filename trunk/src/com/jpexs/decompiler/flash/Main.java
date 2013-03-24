@@ -504,9 +504,9 @@ public class Main {
             boolean exportOK;
             try {
                printHeader();
-               dump_tags = true;
                SWF exfile = new SWF(new FileInputStream(inFile));
                exfile.addEventListener(new EventListener() {
+                  @Override
                   public void handleEvent(String event, Object data) {
                      if (event.equals("export")) {
                         System.out.println((String) data);

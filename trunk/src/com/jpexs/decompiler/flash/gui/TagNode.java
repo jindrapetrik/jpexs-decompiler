@@ -233,8 +233,12 @@ public class TagNode {
       return exportNodeAS(nodeList, outdir, isPcode, null);
    }
 
-   public static boolean exportNodeAS(List<TagNode> nodeList, String outdir, boolean isPcode, EventListener ev) {
+   public static boolean exportNodeAS(List<TagNode> nodeList, String outdir, boolean isPcode, EventListener ev) {            
       File dir = new File(outdir);
+      
+      if(!outdir.endsWith(File.separator)){
+         outdir=outdir + File.separator;
+      }
       List<String> existingNames = new ArrayList<String>();
       for (TagNode node : nodeList) {
          String name = "";
@@ -256,7 +260,7 @@ public class TagNode {
                   dir.mkdirs();
                }
                try {
-                  String f = outdir + File.separatorChar + name + ".as";
+                  String f = outdir + name + ".as";
                   if (ev != null) {
                      ev.handleEvent("export", "Exporting " + f + " ...");
                   }
@@ -277,7 +281,7 @@ public class TagNode {
                }
             }
          } else {
-            exportNodeAS(node.subItems, outdir + File.separatorChar + name, isPcode, ev);
+            exportNodeAS(node.subItems, outdir+name, isPcode, ev);
          }
 
       }

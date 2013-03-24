@@ -64,7 +64,7 @@ public abstract class SHAPERECORD implements Cloneable {
             params += " stroke=\"" + ((shapeNum >= 3) ? lineStyle.colorA.toHexRGB() : lineStyle.color.toHexRGB()) + "\"";
          }
          if (useLineStyle2 && lineStyle2 != null) {
-            params += " stroke-width=\"" + twipToPixel(lineStyle2.width) + "\" stroke=\"" + lineStyle2.color.toHexRGB() + "\"";
+            params += " stroke-width=\"" + twipToPixel(lineStyle2.width) + "\""+(lineStyle2.color!=null?" stroke=\"" + lineStyle2.color.toHexRGB() + "\"":"");
          }
          String points = "";
          int x = 0;

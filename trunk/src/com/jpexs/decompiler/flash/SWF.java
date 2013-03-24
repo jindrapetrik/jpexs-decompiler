@@ -46,6 +46,7 @@ import com.jpexs.decompiler.flash.flv.FLVTAG;
 import com.jpexs.decompiler.flash.flv.VIDEODATA;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.gui.FrameNode;
 import com.jpexs.decompiler.flash.gui.TagNode;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
@@ -55,10 +56,16 @@ import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsLossless2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsLosslessTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsTag;
+import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
+import com.jpexs.decompiler.flash.tags.DefineButtonTag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
+import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.DoInitActionTag;
+import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
+import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -418,18 +425,91 @@ public class SWF {
          t.abc.addEventListener(evl);
          t.abc.export(outdir, isPcode, abcTags, "tag " + (i + 1) + "/" + abcTags.size() + " ");
       }
-      for (DoABCTag t : abcTags) {
-      }
 
       if (!asV3Found) {
          List<Object> list2 = new ArrayList<Object>();
          list2.addAll(tags);
-         List<TagNode> list = TagNode.createTagList(list2);
+         List<TagNode> list = createASTagList(list2, null);
+
          TagNode.setExport(list, true);
-         return TagNode.exportNodeAS(list, outdir, isPcode);
+         if(!outdir.endsWith(File.separator)){
+         outdir+=File.separator;
+         }
+         outdir += "scripts" + File.separator;
+         return TagNode.exportNodeAS(list, outdir, isPcode,evl);
       }
       return asV3Found;
    }
+   
+   public static List<TagNode> createASTagList(List<Object> list, Object parent) {
+      List<TagNode> ret = new ArrayList<TagNode>();
+      int frame = 1;
+      List<TagNode> frames = new ArrayList<TagNode>();
+
+      List<ExportAssetsTag> exportAssetsTags = new ArrayList<ExportAssetsTag>();
+      for (Object t : list) {
+         if (t instanceof ExportAssetsTag) {
+            exportAssetsTags.add((ExportAssetsTag) t);
+         }
+         if (t instanceof ShowFrameTag) {
+            TagNode tti = new TagNode(new FrameNode(frame, parent, false));
+
+            for (int r = ret.size() - 1; r >= 0; r--) {
+               if (!(ret.get(r).tag instanceof DefineSpriteTag)) {
+                  if (!(ret.get(r).tag instanceof DefineButtonTag)) {
+                     if (!(ret.get(r).tag instanceof DefineButton2Tag)) {
+                        if (!(ret.get(r).tag instanceof DoInitActionTag)) {
+                           tti.subItems.add(ret.get(r));
+                           ret.remove(r);
+                        }
+                     }
+                  }
+               }
+            }
+            frame++;
+            frames.add(tti);
+         } else if (t instanceof ASMSource) {
+            TagNode tti = new TagNode(t);
+            ret.add(tti);
+         } else if (t instanceof Container) {
+            if (((Container) t).getItemCount() > 0) {
+
+               TagNode tti = new TagNode(t);
+               List<Object> subItems = ((Container) t).getSubItems();
+
+               tti.subItems = createASTagList(subItems, t);
+               ret.add(tti);
+            }
+         }
+
+      }
+      ret.addAll(frames);
+      for (int i = ret.size() - 1; i >= 0; i--) {
+         if (ret.get(i).tag instanceof DefineSpriteTag) {
+            ((DefineSpriteTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
+         }
+         if (ret.get(i).tag instanceof DefineButtonTag) {
+            ((DefineButtonTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
+         }
+         if (ret.get(i).tag instanceof DefineButton2Tag) {
+            ((DefineButton2Tag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
+         }
+         if (ret.get(i).tag instanceof DoInitActionTag) {
+            ((DoInitActionTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
+         }
+         if (ret.get(i).tag instanceof ASMSource) {
+            ASMSource ass = (ASMSource) ret.get(i).tag;
+            if (ass.containsSource()) {
+               continue;
+            }
+         }
+         if (ret.get(i).subItems.isEmpty()) {
+            ret.remove(i);
+         }
+      }
+      return ret;
+   }
+   
    protected HashSet<EventListener> listeners = new HashSet<EventListener>();
 
    public void addEventListener(EventListener listener) {

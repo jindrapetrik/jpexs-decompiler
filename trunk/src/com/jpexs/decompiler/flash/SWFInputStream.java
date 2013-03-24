@@ -652,7 +652,7 @@ public class SWFInputStream extends InputStream {
        method = 2;
        goesPrev = readActionListAtPos(true, localData, stack, cpool, sis, rri, ip, retdups, ip);
        }*/
-      goesPrev = readActionListAtPos(true, localData, stack, cpool, sis, rri, ip, retdups, ip);
+      goesPrev = readActionListAtPos(false,true, localData, stack, cpool, sis, rri, ip, retdups, ip);
 
       if (goesPrev) {
       } else {
@@ -708,7 +708,7 @@ public class SWFInputStream extends InputStream {
       return ret;
    }
 
-   private static boolean readActionListAtPos(boolean enableVariables, List localData, Stack<GraphTargetItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret, int startIp) throws IOException {
+   private static boolean readActionListAtPos(boolean notCompileTime,boolean enableVariables, List localData, Stack<GraphTargetItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret, int startIp) throws IOException {
       boolean debugMode = false;
       boolean decideBranch = false;
       boolean retv = false;
@@ -805,7 +805,7 @@ public class SWFInputStream extends InputStream {
                   } else if (next.equals("c")) {
                      goaif = true;
                   }
-               } else if (top.isCompileTime() && ((!top.isVariableComputed()) || (top.isVariableComputed() && enableVariables))) {
+               } else if (top.isCompileTime() && ((!top.isVariableComputed()) || (top.isVariableComputed() && enableVariables && (!notCompileTime)))) {
                   //if(top.isCompileTime()) {
                   //if(false){
                   if (enableVariables) {
@@ -922,14 +922,18 @@ public class SWFInputStream extends InputStream {
          rri.setPos(ip);
          filePos = rri.getPos();
          if (goaif) {
+            if(aif.ignoreUsed && aif.jumpUsed){
+               break;
+            }
             aif.ignoreUsed = true;
             aif.jumpUsed = true;
             int oldPos = rri.getPos();
             Stack<GraphTargetItem> substack = (Stack<GraphTargetItem>) stack.clone();
-            if (readActionListAtPos(enableVariables, localData, substack, cpool, sis, rri, rri.getPos() + aif.offset, ret, startIp)) {
+            if (readActionListAtPos(true,enableVariables, localData, substack, cpool, sis, rri, rri.getPos() + aif.offset, ret, startIp)) {
                retv = true;
             }
             rri.setPos(oldPos);
+            notCompileTime = true;
          }
          prevIp = ip;
       }

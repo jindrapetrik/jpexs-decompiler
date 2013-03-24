@@ -671,74 +671,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
       }
    }
 
-   public static List<TagNode> createASTagList(List<Object> list, Object parent) {
-      List<TagNode> ret = new ArrayList<TagNode>();
-      int frame = 1;
-      List<TagNode> frames = new ArrayList<TagNode>();
-
-      List<ExportAssetsTag> exportAssetsTags = new ArrayList<ExportAssetsTag>();
-      for (Object t : list) {
-         if (t instanceof ExportAssetsTag) {
-            exportAssetsTags.add((ExportAssetsTag) t);
-         }
-         if (t instanceof ShowFrameTag) {
-            TagNode tti = new TagNode(new FrameNode(frame, parent, false));
-
-            for (int r = ret.size() - 1; r >= 0; r--) {
-               if (!(ret.get(r).tag instanceof DefineSpriteTag)) {
-                  if (!(ret.get(r).tag instanceof DefineButtonTag)) {
-                     if (!(ret.get(r).tag instanceof DefineButton2Tag)) {
-                        if (!(ret.get(r).tag instanceof DoInitActionTag)) {
-                           tti.subItems.add(ret.get(r));
-                           ret.remove(r);
-                        }
-                     }
-                  }
-               }
-            }
-            frame++;
-            frames.add(tti);
-         } else if (t instanceof ASMSource) {
-            TagNode tti = new TagNode(t);
-            ret.add(tti);
-         } else if (t instanceof Container) {
-            if (((Container) t).getItemCount() > 0) {
-
-               TagNode tti = new TagNode(t);
-               List<Object> subItems = ((Container) t).getSubItems();
-
-               tti.subItems = createASTagList(subItems, t);
-               ret.add(tti);
-            }
-         }
-
-      }
-      ret.addAll(frames);
-      for (int i = ret.size() - 1; i >= 0; i--) {
-         if (ret.get(i).tag instanceof DefineSpriteTag) {
-            ((DefineSpriteTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
-         }
-         if (ret.get(i).tag instanceof DefineButtonTag) {
-            ((DefineButtonTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
-         }
-         if (ret.get(i).tag instanceof DefineButton2Tag) {
-            ((DefineButton2Tag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
-         }
-         if (ret.get(i).tag instanceof DoInitActionTag) {
-            ((DoInitActionTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
-         }
-         if (ret.get(i).tag instanceof ASMSource) {
-            ASMSource ass = (ASMSource) ret.get(i).tag;
-            if (ass.containsSource()) {
-               continue;
-            }
-         }
-         if (ret.get(i).subItems.isEmpty()) {
-            ret.remove(i);
-         }
-      }
-      return ret;
-   }
+   
 
    public List<TagNode> getSelectedNodes() {
       List<TagNode> ret = new ArrayList<TagNode>();
@@ -937,7 +870,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
          }
       }
 
-      actionScript = createASTagList(list, null);
+      actionScript = SWF.createASTagList(list, null);
       TagNode textsNode = new TagNode("texts");
       textsNode.subItems.addAll(texts);
 
