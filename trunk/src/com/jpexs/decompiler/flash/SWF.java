@@ -432,15 +432,15 @@ public class SWF {
          List<TagNode> list = createASTagList(list2, null);
 
          TagNode.setExport(list, true);
-         if(!outdir.endsWith(File.separator)){
-         outdir+=File.separator;
+         if (!outdir.endsWith(File.separator)) {
+            outdir += File.separator;
          }
          outdir += "scripts" + File.separator;
-         return TagNode.exportNodeAS(list, outdir, isPcode,evl);
+         return TagNode.exportNodeAS(list, outdir, isPcode, evl);
       }
       return asV3Found;
    }
-   
+
    public static List<TagNode> createASTagList(List<Object> list, Object parent) {
       List<TagNode> ret = new ArrayList<TagNode>();
       int frame = 1;
@@ -509,7 +509,6 @@ public class SWF {
       }
       return ret;
    }
-   
    protected HashSet<EventListener> listeners = new HashSet<EventListener>();
 
    public void addEventListener(EventListener listener) {
@@ -1000,42 +999,29 @@ public class SWF {
          try {
             ins.translate(localData, stack, output);
          } catch (Exception ex) {
-            Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Error during getting variables", ex);            
+            Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Error during getting variables", ex);
          }
          if (ins.isExit()) {
             break;
          }
 
          if (ins.isBranch() || ins.isJump()) {
-
-            if (false) { //ins instanceof ActionIf && !stack.isEmpty() && (stack.peek().isCompileTime())) {
-               boolean condition = stack.peek().toBoolean();
-               if (debugMode) {
-                  if (condition) {
-                     System.out.println("JUMP");
-                  } else {
-                     System.out.println("SKIP");
-                  }
-               }
+            if (ins instanceof ActionIf) {
                stack.pop();
-               getVariables(constantPool, localData, stack, output, code, condition ? (code.adr2pos(((ActionIf) ins).getAddress() + ((ActionIf) ins).getBytes(code.version).length + ((ActionIf) ins).offset)) : ip + 1, ip, variables, functions, visited);
-            } else {
-               if (ins instanceof ActionIf) {
-                  stack.pop();
-               }
-               visited.add(ip);
-               List<Integer> branches = ins.getBranches(code);
-               for (int b : branches) {
-                  Stack<GraphTargetItem> brStack = (Stack<GraphTargetItem>) stack.clone();
-                  if (b >= 0) {
-                     getVariables(constantPool, localData, brStack, output, code, b, ip, variables, functions, visited);
-                  } else {
-                     if (debugMode) {
-                        System.out.println("Negative branch:" + b);
-                     }
+            }
+            visited.add(ip);
+            List<Integer> branches = ins.getBranches(code);
+            for (int b : branches) {
+               Stack<GraphTargetItem> brStack = (Stack<GraphTargetItem>) stack.clone();
+               if (b >= 0) {
+                  getVariables(constantPool, localData, brStack, output, code, b, ip, variables, functions, visited);
+               } else {
+                  if (debugMode) {
+                     System.out.println("Negative branch:" + b);
                   }
                }
             }
+
             break;
          }
          ip++;

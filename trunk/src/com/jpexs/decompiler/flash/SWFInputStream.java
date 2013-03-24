@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.action.swf6.*;
 import com.jpexs.decompiler.flash.action.swf7.*;
 import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
 import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.SetVariableTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -652,7 +653,7 @@ public class SWFInputStream extends InputStream {
        method = 2;
        goesPrev = readActionListAtPos(true, localData, stack, cpool, sis, rri, ip, retdups, ip);
        }*/
-      goesPrev = readActionListAtPos(false,true, localData, stack, cpool, sis, rri, ip, retdups, ip);
+      goesPrev = readActionListAtPos(false, true, localData, stack, cpool, sis, rri, ip, retdups, ip);
 
       if (goesPrev) {
       } else {
@@ -708,7 +709,7 @@ public class SWFInputStream extends InputStream {
       return ret;
    }
 
-   private static boolean readActionListAtPos(boolean notCompileTime,boolean enableVariables, List localData, Stack<GraphTargetItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret, int startIp) throws IOException {
+   private static boolean readActionListAtPos(boolean notCompileTime, boolean enableVariables, List localData, Stack<GraphTargetItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret, int startIp) throws IOException {
       boolean debugMode = false;
       boolean decideBranch = false;
       boolean retv = false;
@@ -743,7 +744,7 @@ public class SWFInputStream extends InputStream {
          }
          if (debugMode) {
             //if(a instanceof ActionIf){
-            System.out.println("readActionListAtPos ip: " + (ip - startIp) + " action(len " + a.actionLength + "): " + a + " stack:" + Highlighting.stripHilights(stack.toString()) + " " + Helper.byteArrToString(a.getBytes(SWF.DEFAULT_VERSION)));
+            System.out.println("readActionListAtPos ip: " + (ip - startIp) + " action(len " + a.actionLength + "): " + a + (a.isIgnored()?" (ignored)":"") + " stack:" + Highlighting.stripHilights(stack.toString()) + " " + Helper.byteArrToString(a.getBytes(SWF.DEFAULT_VERSION)));
             //}
          }
          /*if(a instanceof ActionConstantPool){
@@ -785,110 +786,113 @@ public class SWFInputStream extends InputStream {
          Action beforeInsert = null;
          ActionIf aif = null;
          boolean goaif = false;
-         try {
-            if (a instanceof ActionIf) {
-               aif = (ActionIf) a;
-               GraphTargetItem top = null;
-               top = stack.pop();
+         if (!a.isIgnored()) {
+            try {
+               if (a instanceof ActionIf) {
+                  aif = (ActionIf) a;
+                  GraphTargetItem top = null;
+                  top = stack.pop();
 
-               int nip = rri.getPos() + aif.offset;
+                  int nip = rri.getPos() + aif.offset;
 
-               if (decideBranch) {
-                  System.out.print("newip " + nip + ", ");
-                  System.out.print("Action: jump(j),ignore(i),compute(c)?");
-                  String next = sc.next();
-                  if (next.equals("j")) {
-                     newip = rri.getPos() + aif.offset;
-                     rri.setPos(newip);
+                  if (decideBranch) {
+                     System.out.print("newip " + nip + ", ");
+                     System.out.print("Action: jump(j),ignore(i),compute(c)?");
+                     String next = sc.next();
+                     if (next.equals("j")) {
+                        newip = rri.getPos() + aif.offset;
+                        rri.setPos(newip);
 
-                  } else if (next.equals("i")) {
-                  } else if (next.equals("c")) {
+                     } else if (next.equals("i")) {
+                     } else if (next.equals("c")) {
+                        goaif = true;
+                     }
+                  } else if (top.isCompileTime() && ((!top.isVariableComputed()) || (top.isVariableComputed() && enableVariables && (!notCompileTime)))) {
+                     //if(top.isCompileTime()) {
+                     //if(false){
+                     if (enableVariables) {
+                        ((ActionIf) a).compileTime = true;
+                     }
+                     if (debugMode) {
+                        System.out.print("is compiletime -> ");
+                     }
+                     if (top.toBoolean()) {
+                        newip = rri.getPos() + aif.offset;
+                        //rri.setPos(newip);
+                        if (((!enableVariables) || (!top.isVariableComputed())) && (!aif.ignoreUsed)) {
+                           a = new ActionJump(aif.offset);
+                           a.setAddress(aif.getAddress(), SWF.DEFAULT_VERSION);
+                        }
+                        aif.jumpUsed = true;
+                        if (aif.ignoreUsed) {
+                           aif.compileTime = false;
+                        }
+                        if (debugMode) {
+                           System.out.println("jump");
+                        }
+                     } else {
+                        aif.ignoreUsed = true;
+                        if (aif.jumpUsed) {
+                           aif.compileTime = false;
+                        }
+                        if (debugMode) {
+                           System.out.println("ignore");
+                        }
+                        if (((!enableVariables) || (!top.isVariableComputed())) && (!aif.jumpUsed)) {
+                           //a = new ActionNop();
+                           aif.setIgnored(true);
+                           //a.setAddress(aif.getAddress(), SWF.DEFAULT_VERSION);
+                        }
+                     }
+                     if (((!enableVariables) || (!top.isVariableComputed())) && (!(aif.jumpUsed && aif.ignoreUsed))) {
+                        List<GraphSourceItemPos> needed = top.getNeededSources();
+                        for (GraphSourceItemPos ig : needed) {
+                           if (ig.item == null) {
+                              continue;
+                           }
+                           if (ig.item instanceof ActionPush) {
+                              if (!((ActionPush) ig.item).ignoredParts.contains(ig.pos)) {
+                                 ((ActionPush) ig.item).ignoredParts.add(ig.pos);
+
+                                 if (((ActionPush) ig.item).ignoredParts.size() == ((ActionPush) ig.item).values.size()) {
+                                    ((Action) ig.item).ignored = true;
+                                 }
+                              }
+                           } else {
+                              ((Action) ig.item).ignored = true;
+                           }
+                        }
+                     }
+
+                  } else {
+                     if (debugMode) {
+                        System.out.println("goaif");
+                     }
+                     //throw new RuntimeException("goaif");
                      goaif = true;
                   }
-               } else if (top.isCompileTime() && ((!top.isVariableComputed()) || (top.isVariableComputed() && enableVariables && (!notCompileTime)))) {
-                  //if(top.isCompileTime()) {
-                  //if(false){
-                  if (enableVariables) {
-                     ((ActionIf) a).compileTime = true;
-                  }
-                  if (debugMode) {
-                     System.out.print("is compiletime -> ");
-                  }
-                  if (top.toBoolean()) {
-                     newip = rri.getPos() + aif.offset;
-                     //rri.setPos(newip);
-                     if (((!enableVariables) || (!top.isVariableComputed())) && (!aif.ignoreUsed)) {
-                        a = new ActionJump(aif.offset);
-                        a.setAddress(aif.getAddress(), SWF.DEFAULT_VERSION);
-                     }
-                     aif.jumpUsed = true;
-                     if (aif.ignoreUsed) {
-                        aif.compileTime = false;
-                     }
-                     if (debugMode) {
-                        System.out.println("jump");
-                     }
-                  } else {
-                     aif.ignoreUsed = true;
-                     if (aif.jumpUsed) {
-                        aif.compileTime = false;
-                     }
-                     if (debugMode) {
-                        System.out.println("ignore");
-                     }
-                     if (((!enableVariables) || (!top.isVariableComputed())) && (!aif.jumpUsed)) {
-                        a = new ActionNop();
-                        a.setAddress(aif.getAddress(), SWF.DEFAULT_VERSION);
-                     }
-                  }
-                  if (((!enableVariables) || (!top.isVariableComputed())) && (!(aif.jumpUsed && aif.ignoreUsed))) {
-                     List<GraphSourceItemPos> needed = top.getNeededSources();
-                     for (GraphSourceItemPos ig : needed) {
-                        if (ig.item == null) {
-                           continue;
-                        }
-                        if (ig.item instanceof ActionPush) {
-                           if (!((ActionPush) ig.item).ignoredParts.contains(ig.pos)) {
-                              ((ActionPush) ig.item).ignoredParts.add(ig.pos);
-
-                              if (((ActionPush) ig.item).ignoredParts.size() == ((ActionPush) ig.item).values.size()) {
-                                 ((Action) ig.item).ignored = true;
-                              }
-                           }
-                        } else {
-                           ((Action) ig.item).ignored = true;
-                        }
-                     }
-                  }
-
+               } else if (a instanceof ActionJump) {
+                  newip = rri.getPos() + ((ActionJump) a).offset;
+                  //if(newip>=0){
+                  //rri.setPos(newip);
+                  //}
                } else {
-                  if (debugMode) {
-                     System.out.println("goaif");
+                  //return in for..in,   TODO:Handle this better way
+                  if (((a instanceof ActionEquals) || (a instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueTreeItem)) {
+                     stack.push(new DirectValueTreeItem(null, 0, new Null(), new ArrayList<String>()));
                   }
-                  //throw new RuntimeException("goaif");
-                  goaif = true;
+                  if ((a instanceof ActionStoreRegister) && stack.isEmpty()) {
+                     stack.push(new DirectValueTreeItem(null, 0, new Null(), new ArrayList<String>()));
+                  }
+                  a.translate(localData, stack, output);
                }
-            } else if (a instanceof ActionJump) {
-               newip = rri.getPos() + ((ActionJump) a).offset;
-               //if(newip>=0){
-               //rri.setPos(newip);
-               //}
-            } else {
-               //return in for..in,   TODO:Handle this better way
-               if (((a instanceof ActionEquals) || (a instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueTreeItem)) {
-                  stack.push(new DirectValueTreeItem(null, 0, new Null(), new ArrayList<String>()));
+            } catch (RuntimeException ex) {
+               if (!enableVariables) {
+                  throw ex;
                }
-               if ((a instanceof ActionStoreRegister) && stack.isEmpty()) {
-                  stack.push(new DirectValueTreeItem(null, 0, new Null(), new ArrayList<String>()));
-               }
-               a.translate(localData, stack, output);
+               log.log(Level.SEVERE, "Disassembly exception", ex);
+               break;
             }
-         } catch (RuntimeException ex) {
-            if (!enableVariables) {
-               throw ex;
-            }
-            log.log(Level.SEVERE, "Disassembly exception", ex);
-            break;
          }
          int nopos = -1;
          for (int i = 0; i < actionLen; i++) {
@@ -922,14 +926,14 @@ public class SWFInputStream extends InputStream {
          rri.setPos(ip);
          filePos = rri.getPos();
          if (goaif) {
-            if(aif.ignoreUsed && aif.jumpUsed){
+            if (aif.ignoreUsed && aif.jumpUsed) {
                break;
             }
             aif.ignoreUsed = true;
             aif.jumpUsed = true;
             int oldPos = rri.getPos();
             Stack<GraphTargetItem> substack = (Stack<GraphTargetItem>) stack.clone();
-            if (readActionListAtPos(true,enableVariables, localData, substack, cpool, sis, rri, rri.getPos() + aif.offset, ret, startIp)) {
+            if (readActionListAtPos(true, enableVariables, localData, substack, cpool, sis, rri, rri.getPos() + aif.offset, ret, startIp)) {
                retv = true;
             }
             rri.setPos(oldPos);

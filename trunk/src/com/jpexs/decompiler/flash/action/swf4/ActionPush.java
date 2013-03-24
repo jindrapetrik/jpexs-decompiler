@@ -225,6 +225,9 @@ public class ActionPush extends Action {
    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
       int pos = 0;
       for (Object o : values) {
+         if (ignoredParts.contains(pos)) {
+            continue;
+         }
          if (o instanceof ConstantIndex) {
             if ((constantPool == null) || (((ConstantIndex) o).index >= constantPool.size())) {
                o = "CONSTANT" + ((ConstantIndex) o).index;
