@@ -1159,9 +1159,9 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                            swf.exportSounds(selFile + File.separator + "sounds", isMp3);
                            swf.exportActionScript(selFile, isPcode);
                         }
-                     } catch (Exception ignored) {
-                        ignored.printStackTrace();
-                        JOptionPane.showMessageDialog(null, "Cannot write to the file");
+                     } catch (Exception ex) {
+                        Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Error during export", ex);
+                        JOptionPane.showMessageDialog(null, "Error during export");
                      }
                      Main.stopWork();
                      long timeAfter = System.currentTimeMillis();
