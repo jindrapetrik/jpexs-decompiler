@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.proxy.Replacement;
 import java.io.*;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,17 +28,85 @@ import javax.swing.JOptionPane;
 
 public class Configuration {
 
-   private static final String CONFIG_NAME = "asdec.cfg";
-   private static final String REPLACEMENTS_NAME = "replacements.ini";
+   private static final String CONFIG_NAME = "config.bin";
+   private static final String REPLACEMENTS_NAME = "replacements.cfg";
    private static HashMap<String, Object> config = new HashMap<String, Object>();
+   private static final File unspecifiedFile = new File("unspecified");
+   private static File directory = unspecifiedFile;
+
+   private enum OSId {
+
+      WINDOWS, OSX, UNIX
+   }
+
+   private static OSId getOSId() {
+      PrivilegedAction<String> doGetOSName = new PrivilegedAction<String>() {
+         @Override
+         public String run() {
+            return System.getProperty("os.name");
+         }
+      };
+      OSId id = OSId.UNIX;
+      String osName = AccessController.doPrivileged(doGetOSName);
+      if (osName != null) {
+         if (osName.toLowerCase().startsWith("mac os x")) {
+            id = OSId.OSX;
+         } else if (osName.contains("Windows")) {
+            id = OSId.WINDOWS;
+         }
+      }
+      return id;
+   }
 
    public static String getASDecHome() {
-      String dir = ".";//System.getProperty("user.home");
-      if (!dir.endsWith(File.separator)) {
-         dir += File.separator;
+      if (directory == unspecifiedFile) {
+         directory = null;
+         String userHome = null;
+         try {
+            userHome = System.getProperty("user.home");
+         } catch (SecurityException ignore) {
+         }
+         if (userHome != null) {
+            String applicationId = Main.shortApplicationName;
+            OSId osId = getOSId();
+            if (osId == OSId.WINDOWS) {
+               File appDataDir = null;
+               try {
+                  String appDataEV = System.getenv("APPDATA");
+                  if ((appDataEV != null) && (appDataEV.length() > 0)) {
+                     appDataDir = new File(appDataEV);
+                  }
+               } catch (SecurityException ignore) {
+               }
+               String vendorId = Main.vendor;
+               if ((appDataDir != null) && appDataDir.isDirectory()) {
+                  // ${APPDATA}\{vendorId}\${applicationId}
+                  String path = vendorId + "\\" + applicationId + "\\";
+                  directory = new File(appDataDir, path);
+               } else {
+                  // ${userHome}\Application Data\${vendorId}\${applicationId}
+                  String path = "Application Data\\" + vendorId + "\\" + applicationId + "\\";
+                  directory = new File(userHome, path);
+               }
+            } else if (osId == OSId.OSX) {
+               // ${userHome}/Library/Application Support/${applicationId}
+               String path = "Library/Application Support/" + applicationId + "/";
+               directory = new File(userHome, path);
+            } else {
+               // ${userHome}/.${applicationId}/
+               String path = "." + applicationId + "/";
+               directory = new File(userHome, path);
+            }
+         }
       }
-      dir += "config" + File.separator;
-      return dir;
+      if(!directory.exists()){
+         directory.mkdirs();
+      }
+      String ret=directory.getAbsolutePath();
+      if(!ret.endsWith(File.separator)){
+         ret+=File.separator;
+      }      
+      return ret;
    }
 
    private static String getReplacementsFile() {
@@ -139,7 +209,7 @@ public class Configuration {
          oos = new ObjectOutputStream(new FileOutputStream(getConfigFile()));
          oos.writeObject(config);
       } catch (IOException ex) {
-         JOptionPane.showMessageDialog(null, "Cannot save configuration.\nPlease make application directory writable.", "Error", JOptionPane.ERROR_MESSAGE);
+         JOptionPane.showMessageDialog(null, "Cannot save configuration.", "Error", JOptionPane.ERROR_MESSAGE);
          Logger.getLogger(SWFInputStream.class.getName()).severe("Configuration directory is read only.");
       } finally {
          if (oos != null) {

@@ -66,6 +66,7 @@ public class Main {
    public static final String shortApplicationName = "FFDec";
    public static final String shortApplicationVerName = shortApplicationName + " v." + version;
    public static final String projectPage = "http://www.free-decompiler.com/flash";
+   public static final String vendor = "JPEXS";
    public static LoadingDialog loadingDialog;
    public static ModeFrame modeFrame;
    private static boolean working = false;
@@ -779,7 +780,7 @@ public class Main {
       try {
          Logger logger = Logger.getLogger("");
          logger.setLevel(debug ? Level.CONFIG : Level.WARNING);
-         FileHandler fileTxt = new FileHandler("log.txt");
+         FileHandler fileTxt = new FileHandler(Configuration.getASDecHome()+File.separator+"log.txt");
 
          SimpleFormatter formatterTxt = new SimpleFormatter();
          fileTxt.setFormatter(formatterTxt);
