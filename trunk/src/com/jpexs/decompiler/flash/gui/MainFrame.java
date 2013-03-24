@@ -1252,8 +1252,9 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                      for (DoABCTag tag : abcPanel.list) {
                         cnt += tag.abc.deobfuscateIdentifiers(namesMap);
                      }
+                  }else{
+                     cnt = swf.deobfuscateAS2Identifiers();
                   }
-                  cnt = swf.deobfuscateAS2Identifiers();
                   Main.stopWork();
                   JOptionPane.showMessageDialog(null, "Identifiers renamed: " + cnt);
                   if (abcPanel != null) {
