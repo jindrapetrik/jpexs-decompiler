@@ -955,6 +955,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
       return JOptionPane.showConfirmDialog(null, "Following procedure can damage SWF file which can be then unplayable.\r\nUSE IT ON YOUR OWN RISK. Do you want to continue?", "Warning", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION;
    }
 
+   @Override
    public void actionPerformed(ActionEvent e) {
       if (e.getActionCommand().equals("EXIT")) {
          setVisible(false);

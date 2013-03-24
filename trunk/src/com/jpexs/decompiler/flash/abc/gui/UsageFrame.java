@@ -108,6 +108,7 @@ public class UsageFrame extends JFrame implements ActionListener, MouseListener 
       }
    }
 
+   @Override
    public void actionPerformed(ActionEvent e) {
       if (e.getActionCommand().equals("GOTO")) {
          gotoUsage();
@@ -118,21 +119,26 @@ public class UsageFrame extends JFrame implements ActionListener, MouseListener 
       }
    }
 
+   @Override
    public void mouseClicked(MouseEvent e) {
       if (e.getClickCount() == 2) {
          gotoUsage();
       }
    }
 
+   @Override
    public void mousePressed(MouseEvent e) {
    }
 
+   @Override
    public void mouseReleased(MouseEvent e) {
    }
 
+   @Override
    public void mouseEntered(MouseEvent e) {
    }
 
+   @Override
    public void mouseExited(MouseEvent e) {
    }
 }

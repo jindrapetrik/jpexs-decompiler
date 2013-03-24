@@ -338,6 +338,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
       decompiledTextArea.reloadClass();
    }
 
+   @Override
    public void itemStateChanged(ItemEvent e) {
       if (e.getSource() == abcComboBox) {
          int index = ((JComboBox) e.getSource()).getSelectedIndex();

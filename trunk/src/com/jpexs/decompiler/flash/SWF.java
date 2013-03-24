@@ -407,6 +407,7 @@ public class SWF {
    public boolean exportActionScript(String outdir, boolean isPcode) throws Exception {
       boolean asV3Found = false;
       final EventListener evl = new EventListener() {
+         @Override
          public void handleEvent(String event, Object data) {
             if (event.equals("export")) {
                informListeners(event, data);

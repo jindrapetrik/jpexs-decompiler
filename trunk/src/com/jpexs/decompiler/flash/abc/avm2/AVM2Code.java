@@ -1090,6 +1090,7 @@ public class AVM2Code implements Serializable {
                      int afterCatchAddr = pos2adr(endpos + 1) + code.get(endpos).operands[0];
                      int afterCatchPos = adr2pos(afterCatchAddr);
                      Collections.sort(catchedExceptions, new Comparator<ABCException>() {
+                        @Override
                         public int compare(ABCException o1, ABCException o2) {
                            try {
                               return fixAddrAfterDebugLine(o1.target) - fixAddrAfterDebugLine(o2.target);

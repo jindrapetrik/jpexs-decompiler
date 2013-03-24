@@ -41,6 +41,7 @@ public class SetGlobalSlotIns extends InstructionDefinition implements SetTypeIn
       output.add(new SetGlobalSlotTreeItem(ins, ins.operands[0], (GraphTargetItem) stack.pop()));
    }
 
+   @Override
    public String getObject(Stack<TreeItem> stack, ABC abc, AVM2Instruction ins, List<TreeItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       return "globalslot" + ins.operands[0];
    }

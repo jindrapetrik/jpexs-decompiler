@@ -41,6 +41,7 @@ public class MethodTraitDetailPanel extends JTabbedPane implements TraitDetail {
       setSelectedIndex(1);
    }
 
+   @Override
    public boolean save() {
       if (!methodInfoPanel.save()) {
          return false;

@@ -67,6 +67,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
       slotConstEditor.setText(s);
    }
 
+   @Override
    public boolean save() {
       try {
          if (!MethodInfoParser.parseSlotConst(slotConstEditor.getText(), trait, abc)) {

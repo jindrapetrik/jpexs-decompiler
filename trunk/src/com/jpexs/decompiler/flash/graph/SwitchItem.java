@@ -27,6 +27,7 @@ public class SwitchItem extends LoopItem implements Block {
    public List<GraphTargetItem> defaultCommands;
    public List<Integer> valuesMapping;
 
+   @Override
    public List<List<GraphTargetItem>> getSubs() {
       List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
       ret.addAll(caseCommands);

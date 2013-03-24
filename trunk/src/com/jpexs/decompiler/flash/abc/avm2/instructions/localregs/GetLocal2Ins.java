@@ -44,6 +44,7 @@ public class GetLocal2Ins extends InstructionDefinition implements GetLocalTypeI
       stack.push(new LocalRegTreeItem(ins, 2, localRegs.get(2)));
    }
 
+   @Override
    public int getRegisterId(AVM2Instruction par0) {
       return 2;
    }

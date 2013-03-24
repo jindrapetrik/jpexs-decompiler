@@ -113,6 +113,7 @@ public class DetailPanel extends JPanel implements ActionListener {
       selectedLabel.setText(selectedCard);
    }
 
+   @Override
    public void actionPerformed(ActionEvent e) {
       if (e.getActionCommand().equals("EDITDETAIL")) {
          setEditMode(true);

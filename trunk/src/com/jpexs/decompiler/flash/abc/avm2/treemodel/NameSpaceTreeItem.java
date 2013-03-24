@@ -30,6 +30,7 @@ public class NameSpaceTreeItem extends TreeItem {
       this.namespaceIndex = namespaceIndex;
    }
 
+   @Override
    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       if (namespaceIndex == 0) {
          return "*";

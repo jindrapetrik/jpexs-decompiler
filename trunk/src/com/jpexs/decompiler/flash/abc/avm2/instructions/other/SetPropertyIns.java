@@ -113,6 +113,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
       output.add(new SetPropertyTreeItem(ins, obj, multiname, value));
    }
 
+   @Override
    public String getObject(Stack<TreeItem> stack, ABC abc, AVM2Instruction ins, List<TreeItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       int multinameIndex = ins.operands[0];
       String multiname = resolveMultinameNoPop(0, stack, abc.constants, multinameIndex, ins, fullyQualifiedNames);

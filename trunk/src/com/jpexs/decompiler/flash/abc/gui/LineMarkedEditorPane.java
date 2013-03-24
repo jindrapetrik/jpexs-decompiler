@@ -35,6 +35,7 @@ public class LineMarkedEditorPane extends JEditorPane {
    public LineMarkedEditorPane() {
       setOpaque(false);
       addCaretListener(new CaretListener() {
+         @Override
          public void caretUpdate(CaretEvent e) {
             int caretPosition = getCaretPosition();
             Element root = getDocument().getDefaultRootElement();

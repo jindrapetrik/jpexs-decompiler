@@ -78,6 +78,7 @@ public class CLIPACTIONRECORD implements ASMSource {
     * @param version SWF version
     * @return ASM source
     */
+   @Override
    public String getASMSource(int version, boolean hex) {
       return Action.actionsToString(getActions(version), null, version, hex);
    }
@@ -87,6 +88,7 @@ public class CLIPACTIONRECORD implements ASMSource {
     *
     * @return True when contains
     */
+   @Override
    public boolean containsSource() {
       return true;
    }
@@ -101,14 +103,17 @@ public class CLIPACTIONRECORD implements ASMSource {
       }
    }
 
+   @Override
    public void setActions(List<Action> actions, int version) {
       actionBytes = Action.actionsToBytes(actions, true, version);
    }
 
+   @Override
    public byte[] getActionBytes() {
       return actionBytes;
    }
 
+   @Override
    public void setActionBytes(byte[] actionBytes) {
       this.actionBytes = actionBytes;
    }

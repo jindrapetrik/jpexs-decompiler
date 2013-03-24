@@ -294,6 +294,7 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
     *
     * @return List of sub-items
     */
+   @Override
    public List<Object> getSubItems() {
       List<Object> ret = new ArrayList<Object>();
       if (placeFlagHasClipActions) {
@@ -307,6 +308,7 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
     *
     * @return Number of sub-items
     */
+   @Override
    public int getItemCount() {
       if (!placeFlagHasClipActions) {
          return 0;
@@ -323,6 +325,7 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
       return ret;
    }
 
+   @Override
    public int getCharacterId() {
       if (placeFlagHasCharacter) {
          return characterId;
@@ -331,10 +334,12 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
       }
    }
 
+   @Override
    public int getDepth() {
       return depth;
    }
 
+   @Override
    public MATRIX getMatrix() {
       if (placeFlagHasMatrix) {
          return matrix;

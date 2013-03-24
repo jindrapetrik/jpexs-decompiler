@@ -43,6 +43,7 @@ public class IfNGtIns extends InstructionDefinition implements IfTypeIns {
       stack.push(new LeTreeItem(ins, v1, v2));
    }
 
+   @Override
    public void translateInverted(java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, AVM2Instruction ins) {
       GraphTargetItem v2 = (GraphTargetItem) stack.pop();
       GraphTargetItem v1 = (GraphTargetItem) stack.pop();

@@ -24,6 +24,7 @@ public class GetURLTreeItem extends TreeItem {
    public String urlString;
    public String targetString;
 
+   @Override
    public String toString(ConstantPool constants) {
       return hilight("getUrl(\"") + Helper.escapeString(urlString) + "\", \"" + Helper.escapeString(targetString) + hilight("\")");
    }

@@ -37,32 +37,40 @@ public class GraphTreeFrame extends JFrame {
    public GraphTreeFrame(final AVM2Graph graph) {
       setSize(400, 400);
       graphTree = new JTree(new TreeModel() {
+         @Override
          public Object getRoot() {
             return graph.heads.get(0);
          }
 
+         @Override
          public Object getChild(Object parent, int index) {
             return ((GraphPart) parent).nextParts.get(index);
          }
 
+         @Override
          public int getChildCount(Object parent) {
             return ((GraphPart) parent).nextParts.size();
          }
 
+         @Override
          public boolean isLeaf(Object node) {
             return getChildCount(node) == 0;
          }
 
+         @Override
          public void valueForPathChanged(TreePath path, Object newValue) {
          }
 
+         @Override
          public int getIndexOfChild(Object parent, Object child) {
             return ((GraphPart) parent).nextParts.indexOf(child);
          }
 
+         @Override
          public void addTreeModelListener(TreeModelListener l) {
          }
 
+         @Override
          public void removeTreeModelListener(TreeModelListener l) {
          }
       });

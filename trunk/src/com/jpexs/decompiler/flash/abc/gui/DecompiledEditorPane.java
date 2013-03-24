@@ -111,6 +111,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
       reset = false;
    }
 
+   @Override
    public void caretUpdate(CaretEvent e) {
       if (abc == null) {
          return;
@@ -235,6 +236,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                      }
                      final int pos = th.startPos;
                      new Timer().schedule(new TimerTask() {
+                        @Override
                         public void run() {
                            try {
                               setCaretPosition(pos);

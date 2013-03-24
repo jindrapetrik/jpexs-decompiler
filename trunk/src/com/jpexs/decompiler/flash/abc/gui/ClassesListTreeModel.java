@@ -32,6 +32,7 @@ class ClassIndexVisitor implements TreeVisitor {
       this.classIndex = classIndex;
    }
 
+   @Override
    public void onBranch(TreeElement branch) {
       Object o = branch.getItem();
       if (o == null) {
@@ -48,6 +49,7 @@ class ClassIndexVisitor implements TreeVisitor {
       }
    }
 
+   @Override
    public void onLeaf(TreeElement leaf) {
       Object o = leaf.getItem();
       if (o == null) {
@@ -107,38 +109,46 @@ public class ClassesListTreeModel implements TreeModel {
       return civ.getFound();
    }
 
+   @Override
    public Object getRoot() {
       return classTree.getRoot();
    }
 
+   @Override
    public Object getChild(Object parent, int index) {
       TreeElement pte = (TreeElement) parent;
       TreeElement te = pte.getChild(index);
       return te;
    }
 
+   @Override
    public int getChildCount(Object parent) {
       TreeElement te = (TreeElement) parent;
       return te.getChildCount();
    }
 
+   @Override
    public boolean isLeaf(Object node) {
       TreeElement te = (TreeElement) node;
       return te.isLeaf();
    }
 
+   @Override
    public void valueForPathChanged(TreePath path, Object newValue) {
    }
 
+   @Override
    public int getIndexOfChild(Object parent, Object child) {
       TreeElement te1 = (TreeElement) parent;
       TreeElement te2 = (TreeElement) child;
       return te1.getIndexOfChild(te2);
    }
 
+   @Override
    public void addTreeModelListener(TreeModelListener l) {
    }
 
+   @Override
    public void removeTreeModelListener(TreeModelListener l) {
    }
 

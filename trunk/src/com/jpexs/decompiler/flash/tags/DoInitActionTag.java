@@ -82,6 +82,7 @@ public class DoInitActionTag extends CharacterTag implements ASMSource {
     *
     * @return True when contains
     */
+   @Override
    public boolean containsSource() {
       return true;
    }
@@ -123,14 +124,17 @@ public class DoInitActionTag extends CharacterTag implements ASMSource {
       }
    }
 
+   @Override
    public void setActions(List<Action> actions, int version) {
       actionBytes = Action.actionsToBytes(actions, true, version);
    }
 
+   @Override
    public byte[] getActionBytes() {
       return actionBytes;
    }
 
+   @Override
    public void setActionBytes(byte[] actionBytes) {
       this.actionBytes = actionBytes;
    }

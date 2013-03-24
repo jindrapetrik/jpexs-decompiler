@@ -136,6 +136,7 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
       output.add(new SetSlotTreeItem(ins, obj, slotname, value));
    }
 
+   @Override
    public String getObject(Stack<TreeItem> stack, ABC abc, AVM2Instruction ins, List<TreeItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
       int slotIndex = ins.operands[0];
       ////String obj = stack.get(1);

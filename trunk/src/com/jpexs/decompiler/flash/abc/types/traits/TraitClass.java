@@ -444,6 +444,7 @@ public class TraitClass extends Trait {
       return baos.toString();
    }
 
+   @Override
    public Multiname getName(ABC abc) {
       return abc.constants.constant_multiname[abc.instance_info[class_info].name_index];
    }

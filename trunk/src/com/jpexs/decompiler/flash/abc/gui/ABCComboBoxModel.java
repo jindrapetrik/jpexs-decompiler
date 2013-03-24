@@ -33,10 +33,12 @@ public class ABCComboBoxModel implements ComboBoxModel {
       Collections.sort(this.list);
    }
 
+   @Override
    public int getSize() {
       return 1 + list.size();
    }
 
+   @Override
    public Object getElementAt(int index) {
       if (index == 0) {
          return ROOT;
@@ -44,12 +46,15 @@ public class ABCComboBoxModel implements ComboBoxModel {
       return list.get(index - 1);
    }
 
+   @Override
    public void addListDataListener(ListDataListener l) {
    }
 
+   @Override
    public void removeListDataListener(ListDataListener l) {
    }
 
+   @Override
    public void setSelectedItem(Object anItem) {
       if (anItem == ROOT) {
          itemIndex = 0;
@@ -58,6 +63,7 @@ public class ABCComboBoxModel implements ComboBoxModel {
       }
    }
 
+   @Override
    public Object getSelectedItem() {
       return getElementAt(itemIndex);
    }

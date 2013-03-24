@@ -46,6 +46,7 @@ public class GetLocalIns extends InstructionDefinition implements GetLocalTypeIn
       stack.push(new LocalRegTreeItem(ins, regIndex, localRegs.get(regIndex)));
    }
 
+   @Override
    public int getRegisterId(AVM2Instruction ins) {
       return ins.operands[0];
    }

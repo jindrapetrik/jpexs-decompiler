@@ -160,6 +160,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
     *
     * @return List of sub-items
     */
+   @Override
    public List<Object> getSubItems() {
       List<Object> ret = new ArrayList<Object>();
       ret.addAll(actions);

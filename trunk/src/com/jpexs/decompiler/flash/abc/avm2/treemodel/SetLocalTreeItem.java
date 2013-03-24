@@ -39,10 +39,12 @@ public class SetLocalTreeItem extends TreeItem implements SetTypeTreeItem, Assig
       return hilight(localRegName(localRegNames, regIndex) + "=") + value.toString(constants, localRegNames, fullyQualifiedNames);
    }
 
+   @Override
    public GraphTargetItem getObject() {
       return new LocalRegTreeItem(instruction, regIndex, null);
    }
 
+   @Override
    public GraphTargetItem getValue() {
       return value;
    }

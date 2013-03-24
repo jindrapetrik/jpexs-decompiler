@@ -47,6 +47,7 @@ public class CoerceIns extends InstructionDefinition implements CoerceOrConvertT
       stack.push(new CoerceTreeItem(ins, (GraphTargetItem) stack.pop(), constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames)));
    }
 
+   @Override
    public String getTargetType(ConstantPool constants, AVM2Instruction ins, List<String> fullyQualifiedNames) {
       int multinameIndex = ins.operands[0];
       return constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames);

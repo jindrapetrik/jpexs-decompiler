@@ -46,6 +46,7 @@ public class LoadingPanel extends JPanel {
       animationImage = icon.getImage();
       java.util.Timer timer = new java.util.Timer();
       timer.schedule(new java.util.TimerTask() {
+         @Override
          public void run() {
             pos = (pos + 1) % 12;
             repaint();

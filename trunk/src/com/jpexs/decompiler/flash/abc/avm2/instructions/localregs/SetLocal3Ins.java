@@ -24,6 +24,7 @@ public class SetLocal3Ins extends SetLocalTypeIns {
       super(0xd7, "setlocal_3", new int[]{});
    }
 
+   @Override
    public int getRegisterId(AVM2Instruction ins) {
       return 3;
    }

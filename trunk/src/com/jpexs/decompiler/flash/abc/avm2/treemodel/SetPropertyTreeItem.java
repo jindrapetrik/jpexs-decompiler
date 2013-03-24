@@ -41,10 +41,12 @@ public class SetPropertyTreeItem extends TreeItem implements SetTypeTreeItem, As
       return formatProperty(constants, object, propertyName, localRegNames, fullyQualifiedNames) + hilight("=") + value.toString(constants, localRegNames, fullyQualifiedNames);
    }
 
+   @Override
    public GraphTargetItem getObject() {
       return new GetPropertyTreeItem(instruction, object, propertyName);
    }
 
+   @Override
    public GraphTargetItem getValue() {
       return value;
    }

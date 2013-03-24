@@ -39,6 +39,7 @@ public class UIntTableModel implements TableModel {
     * @return the number of rows in the model
     * @see #getColumnCount
     */
+   @Override
    public int getRowCount() {
       if (abc == null) {
          return 0;
@@ -54,6 +55,7 @@ public class UIntTableModel implements TableModel {
     * @return the number of columns in the model
     * @see #getRowCount
     */
+   @Override
    public int getColumnCount() {
       return 2;
    }
@@ -67,6 +69,7 @@ public class UIntTableModel implements TableModel {
     * @param columnIndex the index of the column
     * @return the name of the column
     */
+   @Override
    public String getColumnName(int columnIndex) {
       return columnNames[columnIndex];
    }
@@ -80,6 +83,7 @@ public class UIntTableModel implements TableModel {
     * @param columnIndex the index of the column
     * @return the common ancestor class of the object values in the model.
     */
+   @Override
    public Class<?> getColumnClass(int columnIndex) {
       return classes[columnIndex];
    }
@@ -96,6 +100,7 @@ public class UIntTableModel implements TableModel {
     * @return true if the cell is editable
     * @see #setValueAt
     */
+   @Override
    public boolean isCellEditable(int rowIndex, int columnIndex) {
       return false;
    }
@@ -109,6 +114,7 @@ public class UIntTableModel implements TableModel {
     * @param columnIndex the column whose value is to be queried
     * @return the value Object at the specified cell
     */
+   @Override
    public Object getValueAt(int rowIndex, int columnIndex) {
       if (columnIndex == 0) {
          return rowIndex;
@@ -129,6 +135,7 @@ public class UIntTableModel implements TableModel {
     * @see #getValueAt
     * @see #isCellEditable
     */
+   @Override
    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
    }
 
@@ -138,6 +145,7 @@ public class UIntTableModel implements TableModel {
     *
     * @param l the TableModelListener
     */
+   @Override
    public void addTableModelListener(TableModelListener l) {
    }
 
@@ -147,6 +155,7 @@ public class UIntTableModel implements TableModel {
     *
     * @param l the TableModelListener
     */
+   @Override
    public void removeTableModelListener(TableModelListener l) {
    }
 }

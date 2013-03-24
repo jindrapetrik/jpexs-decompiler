@@ -112,10 +112,12 @@ public class PlaceObjectTag extends Tag implements PlaceObjectTypeTag {
       return characterId;
    }
 
+   @Override
    public int getDepth() {
       return depth;
    }
 
+   @Override
    public MATRIX getMatrix() {
       return matrix;
    }

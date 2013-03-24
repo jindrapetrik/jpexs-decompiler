@@ -300,6 +300,7 @@ public class ActionPanel extends JPanel implements ActionListener {
       editMode = val;
    }
 
+   @Override
    public void actionPerformed(ActionEvent e) {
       if (e.getActionCommand().equals("GRAPH")) {
          if (lastCode != null) {

@@ -110,6 +110,7 @@ public class MethodBodyParamsPanel extends JPanel implements ChangeListener {
       return false;
    }
 
+   @Override
    public void stateChanged(ChangeEvent e) {
       if (e.getSource() == autoFillCheckBox) {
          if (autoFillCheckBox.isSelected()) {

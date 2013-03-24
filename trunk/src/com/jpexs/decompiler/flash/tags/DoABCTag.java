@@ -90,6 +90,7 @@ public class DoABCTag extends Tag implements Comparable<DoABCTag> {
       return new byte[0];
    }
 
+   @Override
    public int compareTo(DoABCTag n) {
       int lastCmp = name.compareTo(n.name);
       return (lastCmp != 0 ? lastCmp

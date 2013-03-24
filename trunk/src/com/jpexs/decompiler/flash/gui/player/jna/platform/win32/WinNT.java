@@ -226,6 +226,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
        */
       public DWORD Attributes;
 
+      @Override
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"Luid", "Attributes"});
       }
@@ -255,6 +256,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
        */
       public LUID_AND_ATTRIBUTES Privileges[];
 
+      @Override
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"PrivilegeCount", "Privileges"});
       }
@@ -464,6 +466,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
       // filename is not nul-terminated, so we can't use a String/WString
       public char[] FileName = new char[1];
 
+      @Override
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"NextEntryOffset", "Action", "FileNameLength", "FileName"});
       }
@@ -487,6 +490,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
          return new String(FileName, 0, FileNameLength / 2);
       }
 
+      @Override
       public void read() {
          // avoid reading filename until we know how long it is
          FileName = new char[0];
@@ -694,6 +698,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
       public int LowPart;
       public int HighPart;
 
+      @Override
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"LowPart", "HighPart"});
       }
@@ -713,6 +718,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
          public DWORD LowPart;
          public DWORD HighPart;
 
+         @Override
          protected List getFieldOrder() {
             return Arrays.asList(new String[]{"LowPart", "HighPart"});
          }
@@ -725,6 +731,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
       }
       public UNION u;
 
+      @Override
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"u"});
       }
@@ -776,6 +783,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
       /**
        * Override to the appropriate object for INVALID_HANDLE_VALUE.
        */
+      @Override
       public Object fromNative(Object nativeValue, FromNativeContext context) {
          Object o = super.fromNative(nativeValue, context);
          if (WinBase.INVALID_HANDLE_VALUE.equals(o)) {
@@ -784,6 +792,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
          return o;
       }
 
+      @Override
       public void setPointer(Pointer p) {
          if (immutable) {
             throw new UnsupportedOperationException("immutable reference");
@@ -1222,6 +1231,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
        */
       public char szCSDVersion[];
 
+      @Override
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"dwOSVersionInfoSize", "dwMajorVersion", "dwMinorVersion", "dwBuildNumber", "dwPlatformId", "szCSDVersion"});
       }
@@ -1296,6 +1306,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
        */
       public byte wReserved;
 
+      @Override
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"dwOSVersionInfoSize", "dwMajorVersion", "dwMinorVersion", "dwBuildNumber", "dwPlatformId", "szCSDVersion", "wServicePackMajor", "wServicePackMinor", "wSuiteMask", "wProductType", "wReserved"});
       }
@@ -1472,6 +1483,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
        */
       public DWORD DataOffset;
 
+      @Override
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"Length", "Reserved", "RecordNumber", "TimeGenerated", "TimeWritten", "EventID", "EventType", "NumStrings", "EventCategory", "ReservedFlags", "ClosingRecordNumber", "StringOffset", "UserSidLength", "UserSidOffset", "DataLength", "DataOffset"});
       }
@@ -1570,6 +1582,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
       }
       public byte[] data;
 
+      @Override
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"data"});
       }

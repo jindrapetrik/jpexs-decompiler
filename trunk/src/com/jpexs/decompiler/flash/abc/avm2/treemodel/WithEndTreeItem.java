@@ -36,6 +36,7 @@ public class WithEndTreeItem extends TreeItem {
       return hilight("}");
    }
 
+   @Override
    public boolean needsSemicolon() {
       return false;
    }

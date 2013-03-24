@@ -115,6 +115,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     * @param version SWF version
     * @return ASM source
     */
+   @Override
    public String getASMSource(int version, boolean hex) {
       return Action.actionsToString(getActions(version), null, version, hex);
    }
@@ -124,6 +125,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     *
     * @return True when contains
     */
+   @Override
    public boolean containsSource() {
       return true;
    }
@@ -134,6 +136,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     * @param version Version
     * @return List of actions
     */
+   @Override
    public List<Action> getActions(int version) {
       try {
          ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -153,14 +156,17 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
       }
    }
 
+   @Override
    public void setActions(List<Action> actions, int version) {
       actionBytes = Action.actionsToBytes(actions, true, version);
    }
 
+   @Override
    public byte[] getActionBytes() {
       return actionBytes;
    }
 
+   @Override
    public void setActionBytes(byte[] actionBytes) {
       this.actionBytes = actionBytes;
    }

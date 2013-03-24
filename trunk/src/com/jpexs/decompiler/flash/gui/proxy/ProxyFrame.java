@@ -174,6 +174,7 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
     *
     * @param e event
     */
+   @Override
    public void actionPerformed(ActionEvent e) {
       if (e.getActionCommand().equals("OPEN")) {
          open();
@@ -260,6 +261,7 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
     *
     * @param e event
     */
+   @Override
    public void mouseClicked(MouseEvent e) {
       if (e.getSource() == swfList) {
          if (e.getClickCount() == 2) {
@@ -273,6 +275,7 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
     *
     * @param e event
     */
+   @Override
    public void mousePressed(MouseEvent e) {
    }
 
@@ -281,6 +284,7 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
     *
     * @param e event
     */
+   @Override
    public void mouseReleased(MouseEvent e) {
    }
 
@@ -289,6 +293,7 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
     *
     * @param e event
     */
+   @Override
    public void mouseEntered(MouseEvent e) {
    }
 
@@ -297,6 +302,7 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
     *
     * @param e event
     */
+   @Override
    public void mouseExited(MouseEvent e) {
    }
 
@@ -307,6 +313,7 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
     * @param url URL of the method
     * @param data Data stream
     */
+   @Override
    public void catched(String contentType, String url, InputStream data) {
       boolean swfOnly = false;
       if (contentType.contains(";")) {
@@ -376,6 +383,7 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
       super.setVisible(b);
    }
 
+   @Override
    public void replaced(Replacement replacement, String url, String contentType) {
       listModel.dataChanged(listModel.indexOf(replacement));
    }

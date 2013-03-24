@@ -49,6 +49,7 @@ public class GetLocal0Ins extends InstructionDefinition implements GetLocalTypeI
       }
    }
 
+   @Override
    public int getRegisterId(AVM2Instruction par0) {
       return 0;
    }

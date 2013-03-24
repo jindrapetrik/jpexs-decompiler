@@ -41,6 +41,7 @@ public class IfTrueIns extends InstructionDefinition implements IfTypeIns {
       //stack.push("(" + v1 + ")");
    }
 
+   @Override
    public void translateInverted(java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, AVM2Instruction ins) {
       GraphTargetItem v1 = (GraphTargetItem) stack.pop();
       stack.push(new NotItem(ins, v1));

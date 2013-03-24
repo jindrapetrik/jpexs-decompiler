@@ -63,10 +63,12 @@ public class SetSlotTreeItem extends TreeItem implements SetTypeTreeItem, Assign
       return ret + hilight(slotName.getName(constants, fullyQualifiedNames));
    }
 
+   @Override
    public GraphTargetItem getObject() {
       return new GetSlotTreeItem(instruction, scope, slotName);
    }
 
+   @Override
    public GraphTargetItem getValue() {
       return value;
    }

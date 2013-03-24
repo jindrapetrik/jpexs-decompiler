@@ -51,6 +51,7 @@ public class WithTreeItem extends TreeItem {
       return ret;
    }
 
+   @Override
    public boolean needsSemicolon() {
       return false;
    }

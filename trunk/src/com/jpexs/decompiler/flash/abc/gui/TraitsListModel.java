@@ -67,17 +67,21 @@ public class TraitsListModel implements ListModel {
       }
    }
 
+   @Override
    public int getSize() {
       return items.size();
    }
 
+   @Override
    public Object getElementAt(int index) {
       return items.get(index);
    }
 
+   @Override
    public void addListDataListener(ListDataListener l) {
    }
 
+   @Override
    public void removeListDataListener(ListDataListener l) {
    }
 }

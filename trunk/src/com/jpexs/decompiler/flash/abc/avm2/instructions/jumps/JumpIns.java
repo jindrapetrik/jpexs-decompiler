@@ -39,6 +39,7 @@ public class JumpIns extends InstructionDefinition implements IfTypeIns {
       stack.push(new BooleanTreeItem(ins, Boolean.TRUE));// + ins.operands[0]);
    }
 
+   @Override
    public void translateInverted(java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, AVM2Instruction ins) {
    }
 }

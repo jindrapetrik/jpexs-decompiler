@@ -171,6 +171,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
       public int dwLowDateTime;
       public int dwHighDateTime;
 
+      @Override
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"dwLowDateTime", "dwHighDateTime"});
       }
@@ -248,6 +249,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
          return toDate().getTime();
       }
 
+      @Override
       public String toString() {
          return super.toString() + ": " + toDate().toString(); //$NON-NLS-1$
       }
@@ -295,6 +297,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
       // The millisecond. The valid values for this member are 0 through 999.
       public short wMilliseconds;
 
+      @Override
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"wYear", "wMonth", "wDayOfWeek", "wDay", "wHour", "wMinute", "wSecond", "wMilliseconds"});
       }
@@ -389,6 +392,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
       public int OffsetHigh;
       public HANDLE hEvent;
 
+      @Override
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"Internal", "InternalHigh", "Offset", "OffsetHigh", "hEvent"});
       }
@@ -422,6 +426,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
           */
          public WORD wReserved;
 
+         @Override
          protected List getFieldOrder() {
             return Arrays.asList(new String[]{"wProcessorArchitecture", "wReserved"});
          }
@@ -501,6 +506,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
        */
       public WORD wProcessorRevision;
 
+      @Override
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"processorArchitecture", "dwPageSize", "lpMinimumApplicationAddress", "lpMaximumApplicationAddress", "dwActiveProcessorMask", "dwNumberOfProcessors", "dwProcessorType", "dwAllocationGranularity", "wProcessorLevel", "wProcessorRevision"});
       }
@@ -561,6 +567,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
        */
       public DWORDLONG ullAvailExtendedVirtual;
 
+      @Override
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"dwLength", "dwMemoryLoad", "ullTotalPhys", "ullAvailPhys", "ullTotalPageFile", "ullAvailPageFile", "ullTotalVirtual", "ullAvailVirtual", "ullAvailExtendedVirtual"});
       }
@@ -594,6 +601,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
        */
       public boolean bInheritHandle;
 
+      @Override
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"dwLength", "lpSecurityDescriptor", "bInheritHandle"});
       }
@@ -752,6 +760,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
        */
       public HANDLE hStdError;
 
+      @Override
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"cb", "lpReserved", "lpDesktop", "lpTitle", "dwX", "dwY", "dwXSize", "dwYSize", "dwXCountChars", "dwYCountChars", "dwFillAttribute", "dwFlags", "wShowWindow", "cbReserved2", "lpReserved2", "hStdInput", "hStdOutput", "hStdError"});
       }
@@ -795,6 +804,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
        */
       public DWORD dwThreadId;
 
+      @Override
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"hProcess", "hThread", "dwProcessId", "dwThreadId"});
       }

@@ -77,6 +77,7 @@ public class TryTreeItem extends TreeItem implements Block {
       return ret;
    }
 
+   @Override
    public List<ContinueItem> getContinues() {
       List<ContinueItem> ret = new ArrayList<ContinueItem>();
       for (GraphTargetItem ti : tryCommands) {

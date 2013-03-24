@@ -608,6 +608,7 @@ public interface WinDef extends StdCallLibrary {
        *
        * @see com.sun.jna.Structure#getFieldOrder()
        */
+      @Override
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"left", "top", "right",
             "bottom"});
@@ -627,6 +628,7 @@ public interface WinDef extends StdCallLibrary {
        *
        * @see com.sun.jna.Structure#toString()
        */
+      @Override
       public String toString() {
          return "[(" + left + "," + top + ")(" + right + "," + bottom + ")]";
       }
@@ -867,6 +869,7 @@ public interface WinDef extends StdCallLibrary {
        *
        * @see com.sun.jna.Structure#getFieldOrder()
        */
+      @Override
       protected List getFieldOrder() {
          return Arrays.asList(new String[]{"x", "y"});
       }

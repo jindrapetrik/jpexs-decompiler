@@ -77,6 +77,7 @@ public class ModeFrame extends JFrame implements ActionListener {
     *
     * @param e event
     */
+   @Override
    public void actionPerformed(ActionEvent e) {
       if (e.getActionCommand().equals("OPEN")) {
          setVisible(false);

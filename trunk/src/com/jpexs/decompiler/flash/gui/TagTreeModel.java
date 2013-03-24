@@ -38,10 +38,12 @@ public class TagTreeModel implements TreeModel {
       return list;
    }
 
+   @Override
    public Object getRoot() {
       return root;
    }
 
+   @Override
    public Object getChild(Object parent, int index) {
       if (parent instanceof TagNode) {
          if (((TagNode) parent).tag instanceof ClassesListTreeModel) {
@@ -58,6 +60,7 @@ public class TagTreeModel implements TreeModel {
       }
    }
 
+   @Override
    public int getChildCount(Object parent) {
       if (parent == root) {
          return list.size();
@@ -76,13 +79,16 @@ public class TagTreeModel implements TreeModel {
       }
    }
 
+   @Override
    public boolean isLeaf(Object node) {
       return (getChildCount(node) == 0);
    }
 
+   @Override
    public void valueForPathChanged(TreePath path, Object newValue) {
    }
 
+   @Override
    public int getIndexOfChild(Object parent, Object child) {
       if (parent instanceof TagNode) {
          if (((TagNode) parent).tag instanceof ClassesListTreeModel) {
@@ -114,9 +120,11 @@ public class TagTreeModel implements TreeModel {
       }
    }
 
+   @Override
    public void addTreeModelListener(TreeModelListener l) {
    }
 
+   @Override
    public void removeTreeModelListener(TreeModelListener l) {
    }
 }

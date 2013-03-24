@@ -25,6 +25,7 @@ public class SetLocalIns extends SetLocalTypeIns {
       super(0x63, "setlocal", new int[]{AVM2Code.DAT_LOCAL_REG_INDEX});
    }
 
+   @Override
    public int getRegisterId(AVM2Instruction ins) {
       return ins.operands[0];
    }

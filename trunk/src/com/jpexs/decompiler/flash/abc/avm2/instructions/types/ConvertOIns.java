@@ -49,6 +49,7 @@ public class ConvertOIns extends InstructionDefinition implements CoerceOrConver
       return -1 + 1;
    }
 
+   @Override
    public String getTargetType(ConstantPool constants, AVM2Instruction ins, List<String> fullyQualifiedNames) {
       return "Object";
    }
