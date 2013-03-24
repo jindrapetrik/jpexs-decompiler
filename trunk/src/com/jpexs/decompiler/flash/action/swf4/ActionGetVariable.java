@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
 import com.jpexs.decompiler.flash.action.treemodel.GetVariableTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
@@ -38,7 +39,7 @@ public class ActionGetVariable extends Action {
    @Override
    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
       GraphTargetItem name = stack.pop();
-      GraphTargetItem computedVal = variables.get(Highlighting.stripHilights(name.toStringNoQuotes(null)));
+      GraphTargetItem computedVal = variables.get(Highlighting.stripHilights(name.toStringNoQuotes((ConstantPool)null)));
       GetVariableTreeItem gvt = new GetVariableTreeItem(this, name);
       gvt.setComputedValue(computedVal);
       stack.push(gvt);

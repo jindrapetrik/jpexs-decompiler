@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
 import com.jpexs.decompiler.flash.action.treemodel.SetVariableTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
@@ -40,7 +41,7 @@ public class ActionSetVariable extends Action {
       GraphTargetItem value = stack.pop();
       GraphTargetItem name = stack.pop();
       SetVariableTreeItem svt = new SetVariableTreeItem(this, name, value);
-      variables.put(Highlighting.stripHilights(name.toStringNoQuotes(null)), value);
+      variables.put(Highlighting.stripHilights(name.toStringNoQuotes((ConstantPool)null)), value);
       output.add(svt);
    }
 }

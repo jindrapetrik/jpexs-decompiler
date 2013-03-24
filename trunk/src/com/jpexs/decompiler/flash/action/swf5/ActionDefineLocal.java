@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
 import com.jpexs.decompiler.flash.action.treemodel.DefineLocalTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
@@ -39,7 +40,7 @@ public class ActionDefineLocal extends Action {
    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
       GraphTargetItem value = stack.pop();
       GraphTargetItem name = stack.pop();
-      variables.put(Highlighting.stripHilights(name.toStringNoQuotes(null)), value);
+      variables.put(Highlighting.stripHilights(name.toStringNoQuotes((ConstantPool)null)), value);
       output.add(new DefineLocalTreeItem(this, name, value));
    }
 }

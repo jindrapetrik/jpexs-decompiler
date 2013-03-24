@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.CallFunctionTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public class ActionCallFunction extends Action {
          args.add(stack.pop());
       }
       CallFunctionTreeItem cft = new CallFunctionTreeItem(this, functionName, args);
-      cft.calculatedFunction = functions.get(Highlighting.stripHilights(functionName.toStringNoQuotes(null)));
+      cft.calculatedFunction = functions.get(Highlighting.stripHilights(functionName.toStringNoQuotes((ConstantPool)null)));
       stack.push(cft);
    }
 }
