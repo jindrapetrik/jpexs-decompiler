@@ -920,7 +920,7 @@ public class SWF {
          try {
             ins.translate(localData, stack, output);
          } catch (Exception ex) {
-            //ignore
+            Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Error during getting variables", ex);            
          }
          if (ins.isExit()) {
             break;

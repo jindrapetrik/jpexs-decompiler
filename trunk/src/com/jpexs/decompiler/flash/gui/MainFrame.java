@@ -1131,7 +1131,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                     tlsList.add((TreeLeafScript) ((TreeElement) d).getItem());
                                  }
                               }
-                           }
+                           }                          
                            SWF.exportImages(selFile + File.separator + "images", images, jtt);
                            SWF.exportShapes(selFile + File.separator + "shapes", shapes);
                            swf.exportMovies(selFile + File.separator + "movies", movies);

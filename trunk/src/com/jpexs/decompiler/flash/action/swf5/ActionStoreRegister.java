@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.treemodel.StoreRegisterTreeItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -68,6 +69,7 @@ public class ActionStoreRegister extends Action {
       if (regNames.containsKey(registerNumber)) {
          rn.name = regNames.get(registerNumber);
       }
+      item.moreSrc.add(new GraphSourceItemPos(this, 0));
       variables.put("__register" + registerNumber, item);
       output.add(new StoreRegisterTreeItem(this, rn, item));
    }

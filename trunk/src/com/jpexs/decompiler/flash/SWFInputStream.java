@@ -545,7 +545,7 @@ public class SWFInputStream extends InputStream {
          try {
             ins.translate(localData, stack, output);
          } catch (Exception ex) {
-            //ignore
+            Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "Error during getting constantpool", ex);
          }
          if (ins.isExit()) {
             break;
