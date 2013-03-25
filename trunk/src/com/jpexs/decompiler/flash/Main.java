@@ -61,11 +61,12 @@ public class Main {
    public static String file;
    public static String maskURL;
    public static SWF swf;
-   public static final String version = "1.4.2";
+   public static final String version = "1.4.2u1";
    public static final String applicationName = "JPEXS Free Flash Decompiler v." + version;
    public static final String shortApplicationName = "FFDec";
    public static final String shortApplicationVerName = shortApplicationName + " v." + version;
    public static final String projectPage = "http://www.free-decompiler.com/flash";
+   public static final String updatePage = "http://www.free-decompiler.com/flash/?update="+version;
    public static final String vendor = "JPEXS";
    public static LoadingDialog loadingDialog;
    public static ModeFrame modeFrame;
@@ -753,7 +754,7 @@ public class Main {
                            desktop = java.awt.Desktop.getDesktop();
                            if (desktop.isSupported(java.awt.Desktop.Action.BROWSE)) {
                               if (JOptionPane.showConfirmDialog(null, "New version of " + shortApplicationName + " is available: " + downloadName + ".\r\nDo you want to go to project web page to download it?", "New version", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.YES_OPTION) {
-                                 java.net.URI uri = new java.net.URI(projectPage);
+                                 java.net.URI uri = new java.net.URI(updatePage);
                                  desktop.browse(uri);
                               }
                            } else {
