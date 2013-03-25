@@ -22,6 +22,8 @@ import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +47,7 @@ public class DupIns extends InstructionDefinition {
       GraphTargetItem v = stack.pop();
       stack.push(v);
       stack.push(v);
+      v.moreSrc.add(new GraphSourceItemPos(ins, 0));
 
    }
 

@@ -1173,7 +1173,17 @@ public class AVM2Code implements Serializable {
             }
             visited[ip] = true;
             AVM2Instruction ins = code.get(ip);
-
+            if(debugMode){
+               System.out.println("translating ip "+ip+" ins "+ins.toString()+" stack:"+Highlighting.stripHilights(stack.toString())+" scopeStack:"+Highlighting.stripHilights(scopeStack.toString()));
+            }
+            if(ins.definition instanceof NewFunctionIns){
+               if(ip+1<=end){
+                  if(code.get(ip+1).definition instanceof PopIns){
+                     ip+=2;
+                     continue;
+                  }
+               }
+            }
             if ((ip + 8 < code.size())) { //return in finally clause
                if (ins.definition instanceof SetLocalTypeIns) {
                   if (code.get(ip + 1).definition instanceof PushByteIns) {
@@ -2417,7 +2427,8 @@ public class AVM2Code implements Serializable {
 
          if (ins.isBranch() || ins.isJump()) {
             List<Integer> branches = ins.getBranches(code);
-            if (ins.isBranch() && !stack.isEmpty() && (stack.peek().isCompileTime())) {
+            if ((ins instanceof AVM2Instruction)&&((AVM2Instruction)ins).definition instanceof IfTypeIns
+                    && (!(((AVM2Instruction)ins).definition instanceof JumpIns)) && (!stack.isEmpty()) && (stack.peek().isCompileTime())) {
                boolean condition = stack.peek().toBoolean();
                if (debugMode) {
                   if (condition) {
@@ -2433,7 +2444,9 @@ public class AVM2Code implements Serializable {
                }
                GraphTargetItem tar = stack.pop();
                for (GraphSourceItemPos pos : tar.getNeededSources()) {
-                  pos.item.setIgnored(true);
+                  if(pos.item!=ins){
+                     pos.item.setIgnored(true);
+                  }
                }
 
                ret += removeTraps(localData, stack, output, code, condition ? branches.get(0) : branches.get(1), ip, visited);

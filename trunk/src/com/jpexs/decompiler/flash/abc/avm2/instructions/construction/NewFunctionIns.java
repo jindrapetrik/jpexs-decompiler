@@ -29,6 +29,8 @@ import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class NewFunctionIns extends InstructionDefinition {
 
@@ -43,7 +45,11 @@ public class NewFunctionIns extends InstructionDefinition {
       String bodyStr = "";
       String paramStr = "";
       if (mybody != null) {
+         try{
          bodyStr = Highlighting.hilighMethodEnd() + mybody.toString("", false, isStatic, classIndex, abc, constants, method_info, new Stack<GraphTargetItem>()/*scopeStack*/, false, true, fullyQualifiedNames, null) + Highlighting.hilighMethodBegin(body.method_info);
+         }catch(Exception ex){
+            Logger.getLogger(NewFunctionIns.class.getName()).log(Level.SEVERE, "error during newfunction", ex);
+         }
          paramStr = method_info[methodIndex].getParamStr(constants, mybody, abc, fullyQualifiedNames);
       }
 

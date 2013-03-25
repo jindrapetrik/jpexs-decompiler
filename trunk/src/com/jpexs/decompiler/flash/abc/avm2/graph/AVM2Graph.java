@@ -1556,4 +1556,17 @@ public class AVM2Graph extends Graph {
       }
       return true;
    }
+
+   @Override
+   public List prepareBranchLocalData(List localData) {
+      List ret=new ArrayList();
+      ret.addAll(localData);
+      Stack<GraphTargetItem> scopeStack=(Stack<GraphTargetItem>)ret.get(DATA_SCOPESTACK);
+      Stack<GraphTargetItem> copyScopeStack=new Stack<GraphTargetItem>();
+      copyScopeStack.addAll(scopeStack);
+      ret.set(DATA_SCOPESTACK, copyScopeStack);
+      return ret;
+   }
+   
+   
 }

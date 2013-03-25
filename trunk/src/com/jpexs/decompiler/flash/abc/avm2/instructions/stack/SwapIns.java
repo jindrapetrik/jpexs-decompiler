@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
+import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +50,8 @@ public class SwapIns extends InstructionDefinition {
       GraphTargetItem o2 = stack.pop();
       stack.push(o1);
       stack.push(o2);
-
+      o1.moreSrc.add(new GraphSourceItemPos(ins, 0));
+      o2.moreSrc.add(new GraphSourceItemPos(ins, 0));
    }
 
    @Override

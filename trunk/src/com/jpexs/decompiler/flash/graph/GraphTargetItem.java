@@ -69,7 +69,7 @@ public abstract class GraphTargetItem {
 
    @Override
    public String toString() {
-      return toString(new ArrayList());
+      return this.getClass().getName();
    }
 
    public abstract String toString(List localData);

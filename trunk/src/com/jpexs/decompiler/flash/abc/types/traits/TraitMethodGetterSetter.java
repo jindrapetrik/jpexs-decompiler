@@ -54,6 +54,9 @@ public class TraitMethodGetterSetter extends Trait {
 
    @Override
    public String convert(String path, List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+      if(debugMode){
+         System.out.println("Decompiling "+path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames));
+      }
       String header = convertHeader(path, abcTags, abc, isStatic, pcode, classIndex, highlight, fullyQualifiedNames);
 
       String bodyStr = "";

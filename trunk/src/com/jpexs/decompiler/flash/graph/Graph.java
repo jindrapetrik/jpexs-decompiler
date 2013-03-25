@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -440,6 +442,7 @@ public class Graph {
          try {
             output.addAll(code.translatePart(localData, stack, start, end));
          } catch (Exception ex) {
+            Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, "error during printgraph", ex);
             //ex.printStackTrace();
             return ret;
          }
@@ -976,7 +979,7 @@ public class Graph {
                if (debugMode) {
                   System.err.println("ONTRUE: (inside " + part + ")");
                }
-               onTrue = printGraph(localData, trueStack, allParts, part, part.nextParts.get(1), next == null ? stopPart : next, loops, forFinalCommands);
+               onTrue = printGraph(prepareBranchLocalData(localData), trueStack, allParts, part, part.nextParts.get(1), next == null ? stopPart : next, loops, forFinalCommands);
                if (debugMode) {
                   System.err.println("/ONTRUE (inside " + part + ")");
                }
@@ -988,7 +991,7 @@ public class Graph {
                if (debugMode) {
                   System.err.println("ONFALSE: (inside " + part + ")");
                }
-               onFalse = (((next == part.nextParts.get(0)) || (part.nextParts.get(0).path.equals(part.path) || part.nextParts.get(0).path.length() < part.path.length())) ? new ArrayList<GraphTargetItem>() : printGraph(localData, falseStack, allParts, part, part.nextParts.get(0), next == null ? stopPart : next, loops, forFinalCommands));
+               onFalse = (((next == part.nextParts.get(0)) || (part.nextParts.get(0).path.equals(part.path) || part.nextParts.get(0).path.length() < part.path.length())) ? new ArrayList<GraphTargetItem>() : printGraph(prepareBranchLocalData(localData), falseStack, allParts, part, part.nextParts.get(0), next == null ? stopPart : next, loops, forFinalCommands));
                if (debugMode) {
                   System.err.println("/ONFALSE (inside " + part + ")");
                }
@@ -1048,47 +1051,15 @@ public class Graph {
             if ((loopBodyStart != null) && ((ti = checkLoop(loopBodyStart, stopPart, loops)) != null)) {
                loopBody.add(ti);
             } else {
-               if (!(doWhile && (loopBodyStart == null))) {
-                  loopBody = printGraph(localData, stack, allParts, part, loopBodyStart != null ? loopBodyStart : part.nextParts.get(reversed ? 1 : 0), stopPart, loops, forFinalCommands);
-
+               if (!(doWhile && (loopBodyStart == null))) {                  
+                  loopBody = printGraph(prepareBranchLocalData(localData), stack, allParts, part, loopBodyStart != null ? loopBodyStart : part.nextParts.get(reversed ? 1 : 0), stopPart, loops, forFinalCommands);
                }
             }
             checkContinueAtTheEnd(loopBody, currentLoop);
             finalCommands = forFinalCommands.get(currentLoop);
             if (!finalCommands.isEmpty()) {
                ret.add(new ForTreeItem(null, currentLoop, new ArrayList<GraphTargetItem>(), expr, finalCommands, loopBody));
-            } /*else if ((expr instanceof HasNextTreeItem) && ((HasNextTreeItem) expr).collection.getNotCoerced().getThroughRegister() instanceof FilteredCheckTreeItem) {
-             TreeItem gti = ((HasNextTreeItem) expr).collection.getNotCoerced().getThroughRegister();
-             boolean found = false;
-             if ((loopBody.size() == 3) || (loopBody.size() == 4)) {
-             TreeItem ft = loopBody.get(0);
-             if (ft instanceof WithTreeItem) {
-             ft = loopBody.get(1);
-             if (ft instanceof IfItem) {
-             IfItem ift = (IfItem) ft;
-             if (ift.onTrue.size() > 0) {
-             ft = ift.onTrue.get(0);
-             if (ft instanceof SetPropertyTreeItem) {
-             SetPropertyTreeItem spt = (SetPropertyTreeItem) ft;
-             if (spt.object instanceof LocalRegTreeItem) {
-             int regIndex = ((LocalRegTreeItem) spt.object).regIndex;
-             HasNextTreeItem iti = (HasNextTreeItem) expr;
-             localRegs.put(regIndex, new FilterTreeItem(null, iti.collection.getThroughRegister(), ift.expression));
-             }
-             }
-             }
-             }
-             }
-             }
-             } else if ((expr instanceof HasNextTreeItem) && (!loopBody.isEmpty()) && (loopBody.get(0) instanceof SetTypeTreeItem) && (((SetTypeTreeItem) loopBody.get(0)).getValue().getNotCoerced() instanceof NextValueTreeItem)) {
-             TreeItem obj = ((SetTypeTreeItem) loopBody.get(0)).getObject();
-             loopBody.remove(0);
-             ret.add(new ForEachInTreeItem(null, currentLoop.id, part.start, new InTreeItem(expr.instruction, obj, ((HasNextTreeItem) expr).collection), loopBody));
-             } else if ((expr instanceof HasNextTreeItem) && (!loopBody.isEmpty()) && (loopBody.get(0) instanceof SetTypeTreeItem) && (((SetTypeTreeItem) loopBody.get(0)).getValue().getNotCoerced() instanceof NextNameTreeItem)) {
-             TreeItem obj = ((SetTypeTreeItem) loopBody.get(0)).getObject();
-             loopBody.remove(0);
-             ret.add(new ForInTreeItem(null, currentLoop.id, part.start, new InTreeItem(expr.instruction, obj, ((HasNextTreeItem) expr).collection), loopBody));
-             }*/ else {
+            } else {
                if (doWhile) {
                   if (stack.isEmpty() || (part.nextParts.size() == 1)) {
                      expr = new TrueItem(null);
@@ -1097,7 +1068,7 @@ public class Graph {
                   }
                   loopBody.addAll(0, output);
                   if (part.nextParts.size() == 1) {
-                     loopBody.addAll(printGraph(localData, stack, allParts, part, part.nextParts.get(0), stopPart, loops, forFinalCommands));
+                     loopBody.addAll(printGraph(prepareBranchLocalData(localData), stack, allParts, part, part.nextParts.get(0), stopPart, loops, forFinalCommands));
                   }
 
                   checkContinueAtTheEnd(loopBody, currentLoop);
@@ -1508,5 +1479,9 @@ public class Graph {
          }
       }
       return ret.toString();
+   }
+   
+   public List prepareBranchLocalData(List localData){
+      return localData;
    }
 }
