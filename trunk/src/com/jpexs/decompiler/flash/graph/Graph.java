@@ -443,7 +443,6 @@ public class Graph {
             output.addAll(code.translatePart(localData, stack, start, end));
          } catch (Exception ex) {
             Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, "error during printgraph", ex);
-            //ex.printStackTrace();
             return ret;
          }
       }

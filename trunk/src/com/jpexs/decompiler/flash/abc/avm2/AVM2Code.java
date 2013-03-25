@@ -1288,7 +1288,7 @@ public class AVM2Code implements Serializable {
                      if (!isKilled(reg, 0, end)) {
                         for (int i = ip; i >= start; i--) {
                            if (code.get(i).definition instanceof DupIns) {
-                              TreeItem v = (TreeItem) stack.pop();
+                              GraphTargetItem v = stack.pop();
                               stack.push(new LocalRegTreeItem(ins, reg, v));
                               stack.push(v);
                            } else {
@@ -1509,7 +1509,8 @@ public class AVM2Code implements Serializable {
                   }
                }
             } else {
-               break;
+               //In obfuscated code, SetLocal instructions comes first
+               //break;  
             }
          }
       }
