@@ -25,32 +25,32 @@ import java.io.OutputStream;
 
 public class ScriptLimitsTag extends Tag {
 
-   public int maxRecursionDepth;
-   public int scriptTimeoutSeconds;
+    public int maxRecursionDepth;
+    public int scriptTimeoutSeconds;
 
-   public ScriptLimitsTag(byte[] data, int version, long pos) throws IOException {
-      super(65, "ScriptLimits", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      maxRecursionDepth = sis.readUI16();
-      scriptTimeoutSeconds = sis.readUI16();
-   }
+    public ScriptLimitsTag(byte[] data, int version, long pos) throws IOException {
+        super(65, "ScriptLimits", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        maxRecursionDepth = sis.readUI16();
+        scriptTimeoutSeconds = sis.readUI16();
+    }
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         sos.writeUI16(maxRecursionDepth);
-         sos.writeUI16(scriptTimeoutSeconds);
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            sos.writeUI16(maxRecursionDepth);
+            sos.writeUI16(scriptTimeoutSeconds);
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 }

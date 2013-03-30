@@ -24,17 +24,17 @@ import java.util.List;
 
 public class GetDescendantsTreeItem extends TreeItem {
 
-   public GraphTargetItem object;
-   public FullMultinameTreeItem multiname;
+    public GraphTargetItem object;
+    public FullMultinameTreeItem multiname;
 
-   public GetDescendantsTreeItem(AVM2Instruction instruction, GraphTargetItem object, FullMultinameTreeItem multiname) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.object = object;
-      this.multiname = multiname;
-   }
+    public GetDescendantsTreeItem(AVM2Instruction instruction, GraphTargetItem object, FullMultinameTreeItem multiname) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.object = object;
+        this.multiname = multiname;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return object.toString(constants, localRegNames, fullyQualifiedNames) + hilight("..") + multiname.toString(constants, localRegNames, fullyQualifiedNames);
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return object.toString(constants, localRegNames, fullyQualifiedNames) + hilight("..") + multiname.toString(constants, localRegNames, fullyQualifiedNames);
+    }
 }

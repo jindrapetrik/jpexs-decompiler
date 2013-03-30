@@ -31,25 +31,25 @@ import java.util.Stack;
 
 public class PushWithIns extends InstructionDefinition {
 
-   public PushWithIns() {
-      super(0x1c, "pushwith", new int[]{});
-   }
+    public PushWithIns() {
+        super(0x1c, "pushwith", new int[]{});
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      GraphTargetItem w = (GraphTargetItem) stack.pop();
-      WithObjectTreeItem wot = new WithObjectTreeItem(ins, w);
-      scopeStack.push(wot);
-      output.add(new WithTreeItem(ins, w));
-   }
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        GraphTargetItem w = (GraphTargetItem) stack.pop();
+        WithObjectTreeItem wot = new WithObjectTreeItem(ins, w);
+        scopeStack.push(wot);
+        output.add(new WithTreeItem(ins, w));
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -1;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return -1;
+    }
 
-   @Override
-   public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-      return 1;
-   }
+    @Override
+    public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
+        return 1;
+    }
 }

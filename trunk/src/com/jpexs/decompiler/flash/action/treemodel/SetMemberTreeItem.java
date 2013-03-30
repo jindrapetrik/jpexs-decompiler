@@ -22,33 +22,33 @@ import java.util.List;
 
 public class SetMemberTreeItem extends TreeItem implements SetTypeTreeItem {
 
-   public GraphTargetItem object;
-   public GraphTargetItem objectName;
-   public GraphTargetItem value;
+    public GraphTargetItem object;
+    public GraphTargetItem objectName;
+    public GraphTargetItem value;
 
-   public SetMemberTreeItem(GraphSourceItem instruction, GraphTargetItem object, GraphTargetItem objectName, GraphTargetItem value) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.object = object;
-      this.objectName = objectName;
-      this.value = value;
-   }
+    public SetMemberTreeItem(GraphSourceItem instruction, GraphTargetItem object, GraphTargetItem objectName, GraphTargetItem value) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.object = object;
+        this.objectName = objectName;
+        this.value = value;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return object.toString(constants) + "." + stripQuotes(objectName) + "=" + value.toString(constants);
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return object.toString(constants) + "." + stripQuotes(objectName) + "=" + value.toString(constants);
+    }
 
-   @Override
-   public GraphTargetItem getObject() {
-      return new GetMemberTreeItem(src, object, objectName);
-   }
+    @Override
+    public GraphTargetItem getObject() {
+        return new GetMemberTreeItem(src, object, objectName);
+    }
 
-   @Override
-   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(object.getNeededSources());
-      ret.addAll(objectName.getNeededSources());
-      ret.addAll(value.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(object.getNeededSources());
+        ret.addAll(objectName.getNeededSources());
+        ret.addAll(value.getNeededSources());
+        return ret;
+    }
 }

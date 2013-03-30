@@ -18,11 +18,11 @@ package com.jpexs.decompiler.flash.action.parser;
 
 public class Label {
 
-   public String name;
-   public long address;
+    public String name;
+    public long address;
 
-   public Label(String name, long address) {
-      this.name = name;
-      this.address = address;
-   }
+    public Label(String name, long address) {
+        this.name = name;
+        this.address = address;
+    }
 }

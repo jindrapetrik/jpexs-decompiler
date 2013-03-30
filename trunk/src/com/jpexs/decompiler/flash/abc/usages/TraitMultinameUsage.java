@@ -24,16 +24,16 @@ import com.jpexs.decompiler.flash.abc.types.traits.Traits;
  */
 public abstract class TraitMultinameUsage extends InsideClassMultinameUsage {
 
-   public int traitIndex;
-   public boolean isStatic;
-   public Traits traits;
-   public int parentTraitIndex;
+    public int traitIndex;
+    public boolean isStatic;
+    public Traits traits;
+    public int parentTraitIndex;
 
-   public TraitMultinameUsage(int multinameIndex, int classIndex, int traitIndex, boolean isStatic, Traits traits, int parentTraitIndex) {
-      super(multinameIndex, classIndex);
-      this.traitIndex = traitIndex;
-      this.isStatic = isStatic;
-      this.traits = traits;
-      this.parentTraitIndex = parentTraitIndex;
-   }
+    public TraitMultinameUsage(int multinameIndex, int classIndex, int traitIndex, boolean isStatic, Traits traits, int parentTraitIndex) {
+        super(multinameIndex, classIndex);
+        this.traitIndex = traitIndex;
+        this.isStatic = isStatic;
+        this.traits = traits;
+        this.parentTraitIndex = parentTraitIndex;
+    }
 }

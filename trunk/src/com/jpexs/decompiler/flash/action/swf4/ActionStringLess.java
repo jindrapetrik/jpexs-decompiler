@@ -25,19 +25,19 @@ import java.util.Stack;
 
 public class ActionStringLess extends Action {
 
-   public ActionStringLess() {
-      super(0x29, 0);
-   }
+    public ActionStringLess() {
+        super(0x29, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "StringLess";
-   }
+    @Override
+    public String toString() {
+        return "StringLess";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem a = stack.pop();
-      GraphTargetItem b = stack.pop();
-      stack.push(new StringLtTreeItem(this, b, a));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem a = stack.pop();
+        GraphTargetItem b = stack.pop();
+        stack.push(new StringLtTreeItem(this, b, a));
+    }
 }

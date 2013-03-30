@@ -21,52 +21,52 @@ import java.util.List;
 
 public class DoWhileItem extends LoopItem implements Block {
 
-   public List<GraphTargetItem> commands;
-   public GraphTargetItem expression;
+    public List<GraphTargetItem> commands;
+    public GraphTargetItem expression;
 
-   @Override
-   public boolean needsSemicolon() {
-      return false;
-   }
+    @Override
+    public boolean needsSemicolon() {
+        return false;
+    }
 
-   @Override
-   public List<List<GraphTargetItem>> getSubs() {
-      List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
-      ret.add(commands);
-      return ret;
-   }
+    @Override
+    public List<List<GraphTargetItem>> getSubs() {
+        List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
+        ret.add(commands);
+        return ret;
+    }
 
-   public DoWhileItem(GraphSourceItem src, Loop loop, List<GraphTargetItem> commands, GraphTargetItem expression) {
-      super(src, loop);
-      this.expression = expression;
-      this.commands = commands;
-   }
+    public DoWhileItem(GraphSourceItem src, Loop loop, List<GraphTargetItem> commands, GraphTargetItem expression) {
+        super(src, loop);
+        this.expression = expression;
+        this.commands = commands;
+    }
 
-   @Override
-   public String toString(List localData) {
-      String ret = "";
-      ret += "loop" + loop.id + ":\r\n";
-      ret += hilight("do\r\n{") + "\r\n";
-      for (GraphTargetItem ti : commands) {
-         ret += ti.toStringSemicoloned(localData) + "\r\n";
-      }
-      ret += hilight("}\r\nwhile(") + expression.toString(localData) + hilight(");") + "\r\n";
-      ret += ":loop" + loop.id;
+    @Override
+    public String toString(List localData) {
+        String ret = "";
+        ret += "loop" + loop.id + ":\r\n";
+        ret += hilight("do\r\n{") + "\r\n";
+        for (GraphTargetItem ti : commands) {
+            ret += ti.toStringSemicoloned(localData) + "\r\n";
+        }
+        ret += hilight("}\r\nwhile(") + expression.toString(localData) + hilight(");") + "\r\n";
+        ret += ":loop" + loop.id;
 
-      return ret;
-   }
+        return ret;
+    }
 
-   @Override
-   public List<ContinueItem> getContinues() {
-      List<ContinueItem> ret = new ArrayList<ContinueItem>();
-      for (GraphTargetItem ti : commands) {
-         if (ti instanceof ContinueItem) {
-            ret.add((ContinueItem) ti);
-         }
-         if (ti instanceof Block) {
-            ret.addAll(((Block) ti).getContinues());
-         }
-      }
-      return ret;
-   }
+    @Override
+    public List<ContinueItem> getContinues() {
+        List<ContinueItem> ret = new ArrayList<ContinueItem>();
+        for (GraphTargetItem ti : commands) {
+            if (ti instanceof ContinueItem) {
+                ret.add((ContinueItem) ti);
+            }
+            if (ti instanceof Block) {
+                ret.addAll(((Block) ti).getContinues());
+            }
+        }
+        return ret;
+    }
 }

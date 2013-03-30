@@ -22,32 +22,32 @@ import java.util.List;
 
 public class IncrementTreeItem extends TreeItem {
 
-   public GraphTargetItem object;
+    public GraphTargetItem object;
 
-   public IncrementTreeItem(GraphSourceItem instruction, GraphTargetItem object) {
-      super(instruction, PRECEDENCE_ADDITIVE);
-      this.object = object;
-   }
+    public IncrementTreeItem(GraphSourceItem instruction, GraphTargetItem object) {
+        super(instruction, PRECEDENCE_ADDITIVE);
+        this.object = object;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return object.toString(constants) + hilight("+1");
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return object.toString(constants) + hilight("+1");
+    }
 
-   @Override
-   public boolean isCompileTime() {
-      return object.isCompileTime();
-   }
+    @Override
+    public boolean isCompileTime() {
+        return object.isCompileTime();
+    }
 
-   @Override
-   public double toNumber() {
-      return object.toNumber() + 1;
-   }
+    @Override
+    public double toNumber() {
+        return object.toNumber() + 1;
+    }
 
-   @Override
-   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(object.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(object.getNeededSources());
+        return ret;
+    }
 }

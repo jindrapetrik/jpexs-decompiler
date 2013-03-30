@@ -26,24 +26,24 @@ import java.util.Stack;
 
 public class ActionCallMethod extends Action {
 
-   public ActionCallMethod() {
-      super(0x52, 0);
-   }
+    public ActionCallMethod() {
+        super(0x52, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "CallMethod";
-   }
+    @Override
+    public String toString() {
+        return "CallMethod";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem methodName = stack.pop();
-      GraphTargetItem scriptObject = stack.pop();
-      long numArgs = popLong(stack);
-      List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
-      for (long l = 0; l < numArgs; l++) {
-         args.add(stack.pop());
-      }
-      stack.push(new CallMethodTreeItem(this, scriptObject, methodName, args));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem methodName = stack.pop();
+        GraphTargetItem scriptObject = stack.pop();
+        long numArgs = popLong(stack);
+        List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
+        for (long l = 0; l < numArgs; l++) {
+            args.add(stack.pop());
+        }
+        stack.push(new CallMethodTreeItem(this, scriptObject, methodName, args));
+    }
 }

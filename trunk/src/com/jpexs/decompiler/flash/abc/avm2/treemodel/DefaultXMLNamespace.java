@@ -29,15 +29,15 @@ import java.util.List;
  */
 public class DefaultXMLNamespace extends TreeItem {
 
-   private GraphTargetItem ns;
+    private GraphTargetItem ns;
 
-   public DefaultXMLNamespace(AVM2Instruction instruction, GraphTargetItem ns) {
-      super(instruction, NOPRECEDENCE);
-      this.ns = ns;
-   }
+    public DefaultXMLNamespace(AVM2Instruction instruction, GraphTargetItem ns) {
+        super(instruction, NOPRECEDENCE);
+        this.ns = ns;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return hilight("default xml namespace = ") + ns.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return hilight("default xml namespace = ") + ns.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
+    }
 }

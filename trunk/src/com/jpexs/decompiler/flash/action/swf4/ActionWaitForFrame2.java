@@ -31,38 +31,38 @@ import java.util.Stack;
 
 public class ActionWaitForFrame2 extends Action {
 
-   public int skipCount;
+    public int skipCount;
 
-   public ActionWaitForFrame2(SWFInputStream sis) throws IOException {
-      super(0x8D, 1);
-      skipCount = sis.readUI8();
-   }
+    public ActionWaitForFrame2(SWFInputStream sis) throws IOException {
+        super(0x8D, 1);
+        skipCount = sis.readUI8();
+    }
 
-   public ActionWaitForFrame2(FlasmLexer lexer) throws IOException, ParseException {
-      super(0x8D, -1);
-      skipCount = (int) lexLong(lexer);
-   }
+    public ActionWaitForFrame2(FlasmLexer lexer) throws IOException, ParseException {
+        super(0x8D, -1);
+        skipCount = (int) lexLong(lexer);
+    }
 
-   @Override
-   public byte[] getBytes(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      SWFOutputStream sos = new SWFOutputStream(baos, version);
-      try {
-         sos.writeUI8(skipCount);
-         sos.close();
-      } catch (IOException e) {
-      }
-      return surroundWithAction(baos.toByteArray(), version);
-   }
+    @Override
+    public byte[] getBytes(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SWFOutputStream sos = new SWFOutputStream(baos, version);
+        try {
+            sos.writeUI8(skipCount);
+            sos.close();
+        } catch (IOException e) {
+        }
+        return surroundWithAction(baos.toByteArray(), version);
+    }
 
-   @Override
-   public String toString() {
-      return "WaitForFrame2 " + skipCount;
-   }
+    @Override
+    public String toString() {
+        return "WaitForFrame2 " + skipCount;
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem frame = stack.pop();
-      output.add(new WaitForFrame2TreeItem(this, frame, skipCount));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem frame = stack.pop();
+        output.add(new WaitForFrame2TreeItem(this, frame, skipCount));
+    }
 }

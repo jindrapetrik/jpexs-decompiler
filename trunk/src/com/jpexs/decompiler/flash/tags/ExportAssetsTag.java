@@ -32,52 +32,52 @@ import java.util.List;
  */
 public class ExportAssetsTag extends Tag {
 
-   /**
-    * HashMap with assets
-    */
-   public List<Integer> tags;
-   public List<String> names;
+    /**
+     * HashMap with assets
+     */
+    public List<Integer> tags;
+    public List<String> names;
 
-   /**
-    * Constructor
-    *
-    * @param data Data bytes
-    * @param version SWF version
-    * @throws IOException
-    */
-   public ExportAssetsTag(byte[] data, int version, long pos) throws IOException {
-      super(56, "ExportAssets", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      int count = sis.readUI16();
-      tags = new ArrayList<Integer>();
-      names = new ArrayList<String>();
-      for (int i = 0; i < count; i++) {
-         int characterId = sis.readUI16();
-         tags.add(characterId);
-         String name = sis.readString();
-         names.add(name);
-      }
-   }
+    /**
+     * Constructor
+     *
+     * @param data Data bytes
+     * @param version SWF version
+     * @throws IOException
+     */
+    public ExportAssetsTag(byte[] data, int version, long pos) throws IOException {
+        super(56, "ExportAssets", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        int count = sis.readUI16();
+        tags = new ArrayList<Integer>();
+        names = new ArrayList<String>();
+        for (int i = 0; i < count; i++) {
+            int characterId = sis.readUI16();
+            tags.add(characterId);
+            String name = sis.readString();
+            names.add(name);
+        }
+    }
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         sos.writeUI16(tags.size());
-         for (int i = 0; i < tags.size(); i++) {
-            sos.writeUI16(tags.get(i));
-            sos.writeString(names.get(i));
-         }
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            sos.writeUI16(tags.size());
+            for (int i = 0; i < tags.size(); i++) {
+                sos.writeUI16(tags.get(i));
+                sos.writeString(names.get(i));
+            }
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 }

@@ -24,15 +24,15 @@ import java.util.List;
 
 public class ExceptionTreeItem extends TreeItem {
 
-   public ABCException exception;
+    public ABCException exception;
 
-   public ExceptionTreeItem(ABCException exception) {
-      super(null, NOPRECEDENCE);
-      this.exception = exception;
-   }
+    public ExceptionTreeItem(ABCException exception) {
+        super(null, NOPRECEDENCE);
+        this.exception = exception;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return exception.getVarName(constants, fullyQualifiedNames);
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return exception.getVarName(constants, fullyQualifiedNames);
+    }
 }

@@ -23,6 +23,6 @@ package com.jpexs.decompiler.flash.types;
  */
 public class ALPHACOLORMAPDATA {
 
-   public RGBA colorTableRGB[];
-   public byte colorMapPixelData[];
+    public RGBA colorTableRGB[];
+    public byte colorMapPixelData[];
 }

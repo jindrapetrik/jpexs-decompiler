@@ -22,12 +22,12 @@ import com.jpexs.decompiler.flash.graph.UnaryOpItem;
 
 public class BitNotTreeItem extends UnaryOpItem {
 
-   public BitNotTreeItem(GraphSourceItem instruction, TreeItem value) {
-      super(instruction, PRECEDENCE_UNARY, value, "~");
-   }
+    public BitNotTreeItem(GraphSourceItem instruction, TreeItem value) {
+        super(instruction, PRECEDENCE_UNARY, value, "~");
+    }
 
-   @Override
-   public double toNumber() {
-      return ~((int) value.toNumber());
-   }
+    @Override
+    public double toNumber() {
+        return ~((int) value.toNumber());
+    }
 }

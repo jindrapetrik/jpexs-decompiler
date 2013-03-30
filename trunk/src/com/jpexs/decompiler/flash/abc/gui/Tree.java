@@ -20,31 +20,31 @@ import java.util.StringTokenizer;
 
 public class Tree {
 
-   private final TreeElement ROOT = new TreeElement("", "", null, null);
+    private final TreeElement ROOT = new TreeElement("", "", null, null);
 
-   public void add(String name, String path, Object item) {
-      StringTokenizer st = new StringTokenizer(path, ".");
-      TreeElement parent = ROOT;
-      while (st.hasMoreTokens()) {
-         String pathElement = st.nextToken();
-         parent = parent.getBranch(pathElement);
-      }
-      parent.addLeaf(name, item);
-   }
+    public void add(String name, String path, Object item) {
+        StringTokenizer st = new StringTokenizer(path, ".");
+        TreeElement parent = ROOT;
+        while (st.hasMoreTokens()) {
+            String pathElement = st.nextToken();
+            parent = parent.getBranch(pathElement);
+        }
+        parent.addLeaf(name, item);
+    }
 
-   public TreeElement getRoot() {
-      return ROOT;
-   }
+    public TreeElement getRoot() {
+        return ROOT;
+    }
 
-   public void visit(TreeVisitor visitor) {
-      ROOT.visitLeafs(visitor);
-      ROOT.visitBranches(visitor);
-   }
+    public void visit(TreeVisitor visitor) {
+        ROOT.visitLeafs(visitor);
+        ROOT.visitBranches(visitor);
+    }
 
-   public TreeElement get(String fullPath) {
-      if ("".equals(fullPath)) {
-         return ROOT;
-      }
-      return ROOT.getByPath(fullPath);
-   }
+    public TreeElement get(String fullPath) {
+        if ("".equals(fullPath)) {
+            return ROOT;
+        }
+        return ROOT.getByPath(fullPath);
+    }
 }

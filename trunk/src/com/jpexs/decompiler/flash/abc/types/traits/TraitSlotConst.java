@@ -30,94 +30,94 @@ import java.util.List;
 
 public class TraitSlotConst extends Trait {
 
-   public int slot_id;
-   public int type_index;
-   public int value_index;
-   public int value_kind;
-   public GraphTargetItem assignedValue;
+    public int slot_id;
+    public int type_index;
+    public int value_index;
+    public int value_kind;
+    public GraphTargetItem assignedValue;
 
-   @Override
-   public String toString(ABC abc, List<String> fullyQualifiedNames) {
-      String typeStr = "*";
-      if (type_index > 0) {
-         typeStr = abc.constants.constant_multiname[type_index].toString(abc.constants, fullyQualifiedNames);
-      }
-      return "0x" + Helper.formatAddress(fileOffset) + " " + Helper.byteArrToString(bytes) + " SlotConst " + abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " type=" + typeStr + " value=" + (new ValueKind(value_index, value_kind)).toString(abc.constants) + " metadata=" + Helper.intArrToString(metadata);
-   }
+    @Override
+    public String toString(ABC abc, List<String> fullyQualifiedNames) {
+        String typeStr = "*";
+        if (type_index > 0) {
+            typeStr = abc.constants.constant_multiname[type_index].toString(abc.constants, fullyQualifiedNames);
+        }
+        return "0x" + Helper.formatAddress(fileOffset) + " " + Helper.byteArrToString(bytes) + " SlotConst " + abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " type=" + typeStr + " value=" + (new ValueKind(value_index, value_kind)).toString(abc.constants) + " metadata=" + Helper.intArrToString(metadata);
+    }
 
-   public String getType(ConstantPool constants, List<String> fullyQualifiedNames) {
-      String typeStr = "*";
-      if (type_index > 0) {
-         typeStr = constants.constant_multiname[type_index].getName(constants, fullyQualifiedNames);
-      }
-      return typeStr;
-   }
+    public String getType(ConstantPool constants, List<String> fullyQualifiedNames) {
+        String typeStr = "*";
+        if (type_index > 0) {
+            typeStr = constants.constant_multiname[type_index].getName(constants, fullyQualifiedNames);
+        }
+        return typeStr;
+    }
 
-   public String getNameValueStr(ABC abc, List<String> fullyQualifiedNames) {
+    public String getNameValueStr(ABC abc, List<String> fullyQualifiedNames) {
 
-      String typeStr = getType(abc.constants, fullyQualifiedNames);
-      if (typeStr.equals("*")) {
-         typeStr = "";
-      } else {
-         typeStr = ":" + typeStr;
-      }
-      String valueStr = "";
-      ValueKind val = null;
-      if (value_kind != 0) {
-         val = new ValueKind(value_index, value_kind);
-         valueStr = " = " + val.toString(abc.constants);
-      }
+        String typeStr = getType(abc.constants, fullyQualifiedNames);
+        if (typeStr.equals("*")) {
+            typeStr = "";
+        } else {
+            typeStr = ":" + typeStr;
+        }
+        String valueStr = "";
+        ValueKind val = null;
+        if (value_kind != 0) {
+            val = new ValueKind(value_index, value_kind);
+            valueStr = " = " + val.toString(abc.constants);
+        }
 
-      if (assignedValue != null) {
-         valueStr = " = " + Highlighting.stripHilights(assignedValue.toString(abc.constants, new HashMap<Integer, String>(), fullyQualifiedNames));
-      }
-      String slotconst = "var";
-      if (kindType == TRAIT_CONST) {
-         slotconst = "const";
-      }
-      if (val != null && val.isNamespace()) {
-         slotconst = "namespace";
-      }
-      return slotconst + " " + getName(abc).getName(abc.constants, fullyQualifiedNames) + typeStr + valueStr + ";";
-   }
+        if (assignedValue != null) {
+            valueStr = " = " + Highlighting.stripHilights(assignedValue.toString(abc.constants, new HashMap<Integer, String>(), fullyQualifiedNames));
+        }
+        String slotconst = "var";
+        if (kindType == TRAIT_CONST) {
+            slotconst = "const";
+        }
+        if (val != null && val.isNamespace()) {
+            slotconst = "namespace";
+        }
+        return slotconst + " " + getName(abc).getName(abc.constants, fullyQualifiedNames) + typeStr + valueStr + ";";
+    }
 
-   public boolean isNamespace() {
-      if (value_kind != 0) {
-         ValueKind val = new ValueKind(value_index, value_kind);
-         return val.isNamespace();
-      }
-      return false;
-   }
+    public boolean isNamespace() {
+        if (value_kind != 0) {
+            ValueKind val = new ValueKind(value_index, value_kind);
+            return val.isNamespace();
+        }
+        return false;
+    }
 
-   @Override
-   public String convert(String path, List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
-      String modifier = getModifiers(abcTags, abc, isStatic) + " ";
-      if (modifier.equals(" ")) {
-         modifier = "";
-      }
-      Multiname n = getName(abc);
-      boolean showModifier = true;
-      if ((classIndex == -1) && (n != null)) {
-         Namespace ns = n.getNamespace(abc.constants);
-         if (ns == null) {
-            showModifier = false;
-         } else {
-            if ((ns.kind != Namespace.KIND_PACKAGE) && (ns.kind != Namespace.KIND_PACKAGE_INTERNAL)) {
-               showModifier = false;
+    @Override
+    public String convert(String path, List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+        String modifier = getModifiers(abcTags, abc, isStatic) + " ";
+        if (modifier.equals(" ")) {
+            modifier = "";
+        }
+        Multiname n = getName(abc);
+        boolean showModifier = true;
+        if ((classIndex == -1) && (n != null)) {
+            Namespace ns = n.getNamespace(abc.constants);
+            if (ns == null) {
+                showModifier = false;
+            } else {
+                if ((ns.kind != Namespace.KIND_PACKAGE) && (ns.kind != Namespace.KIND_PACKAGE_INTERNAL)) {
+                    showModifier = false;
+                }
             }
-         }
-      }
-      if (!showModifier) {
-         modifier = "";
-      }
-      return ABC.IDENT_STRING + ABC.IDENT_STRING + modifier + getNameValueStr(abc, fullyQualifiedNames);
-   }
+        }
+        if (!showModifier) {
+            modifier = "";
+        }
+        return ABC.IDENT_STRING + ABC.IDENT_STRING + modifier + getNameValueStr(abc, fullyQualifiedNames);
+    }
 
-   public boolean isConst() {
-      return kindType == TRAIT_CONST;
-   }
+    public boolean isConst() {
+        return kindType == TRAIT_CONST;
+    }
 
-   public boolean isVar() {
-      return kindType == TRAIT_SLOT;
-   }
+    public boolean isVar() {
+        return kindType == TRAIT_SLOT;
+    }
 }

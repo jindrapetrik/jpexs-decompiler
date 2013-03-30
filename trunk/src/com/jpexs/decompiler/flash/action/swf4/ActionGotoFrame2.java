@@ -31,54 +31,54 @@ import java.util.Stack;
 
 public class ActionGotoFrame2 extends Action {
 
-   boolean sceneBiasFlag;
-   boolean playFlag;
-   public int sceneBias;
+    boolean sceneBiasFlag;
+    boolean playFlag;
+    public int sceneBias;
 
-   public ActionGotoFrame2(int actionLength, SWFInputStream sis) throws IOException {
-      super(0x9F, actionLength);
-      sis.readUB(6); //reserved
-      sceneBiasFlag = sis.readUB(1) == 1;
-      playFlag = sis.readUB(1) == 1;
-      if (sceneBiasFlag) {
-         sceneBias = sis.readUI16();
-      }
-   }
+    public ActionGotoFrame2(int actionLength, SWFInputStream sis) throws IOException {
+        super(0x9F, actionLength);
+        sis.readUB(6); //reserved
+        sceneBiasFlag = sis.readUB(1) == 1;
+        playFlag = sis.readUB(1) == 1;
+        if (sceneBiasFlag) {
+            sceneBias = sis.readUI16();
+        }
+    }
 
-   @Override
-   public byte[] getBytes(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      SWFOutputStream sos = new SWFOutputStream(baos, version);
-      try {
-         sos.writeUB(6, 0);
-         sos.writeUB(1, sceneBiasFlag ? 1 : 0);
-         sos.writeUB(1, playFlag ? 1 : 0);
-         if (sceneBiasFlag) {
-            sos.writeUI16(sceneBias);
-         }
-         sos.close();
-      } catch (IOException e) {
-      }
-      return surroundWithAction(baos.toByteArray(), version);
-   }
+    @Override
+    public byte[] getBytes(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SWFOutputStream sos = new SWFOutputStream(baos, version);
+        try {
+            sos.writeUB(6, 0);
+            sos.writeUB(1, sceneBiasFlag ? 1 : 0);
+            sos.writeUB(1, playFlag ? 1 : 0);
+            if (sceneBiasFlag) {
+                sos.writeUI16(sceneBias);
+            }
+            sos.close();
+        } catch (IOException e) {
+        }
+        return surroundWithAction(baos.toByteArray(), version);
+    }
 
-   @Override
-   public String toString() {
-      return "GotoFrame2 " + sceneBiasFlag + " " + playFlag + " " + (sceneBiasFlag ? " " + sceneBias : "");
-   }
+    @Override
+    public String toString() {
+        return "GotoFrame2 " + sceneBiasFlag + " " + playFlag + " " + (sceneBiasFlag ? " " + sceneBias : "");
+    }
 
-   public ActionGotoFrame2(FlasmLexer lexer) throws IOException, ParseException {
-      super(0x9F, -1);
-      sceneBiasFlag = lexBoolean(lexer);
-      playFlag = lexBoolean(lexer);
-      if (sceneBiasFlag) {
-         sceneBias = (int) lexLong(lexer);
-      }
-   }
+    public ActionGotoFrame2(FlasmLexer lexer) throws IOException, ParseException {
+        super(0x9F, -1);
+        sceneBiasFlag = lexBoolean(lexer);
+        playFlag = lexBoolean(lexer);
+        if (sceneBiasFlag) {
+            sceneBias = (int) lexLong(lexer);
+        }
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem frame = stack.pop();
-      output.add(new GotoFrame2TreeItem(this, frame, sceneBiasFlag, playFlag, sceneBias));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem frame = stack.pop();
+        output.add(new GotoFrame2TreeItem(this, frame, sceneBiasFlag, playFlag, sceneBias));
+    }
 }

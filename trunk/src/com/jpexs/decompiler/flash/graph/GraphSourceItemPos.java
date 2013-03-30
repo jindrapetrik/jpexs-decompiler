@@ -22,11 +22,11 @@ package com.jpexs.decompiler.flash.graph;
  */
 public class GraphSourceItemPos {
 
-   public GraphSourceItem item;
-   public int pos;
+    public GraphSourceItem item;
+    public int pos;
 
-   public GraphSourceItemPos(GraphSourceItem item, int pos) {
-      this.item = item;
-      this.pos = pos;
-   }
+    public GraphSourceItemPos(GraphSourceItem item, int pos) {
+        this.item = item;
+        this.pos = pos;
+    }
 }

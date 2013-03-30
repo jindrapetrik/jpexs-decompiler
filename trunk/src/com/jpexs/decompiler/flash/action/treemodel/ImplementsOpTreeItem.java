@@ -23,34 +23,34 @@ import java.util.List;
 
 public class ImplementsOpTreeItem extends TreeItem {
 
-   public GraphTargetItem subclass;
-   public List<GraphTargetItem> superclasses;
+    public GraphTargetItem subclass;
+    public List<GraphTargetItem> superclasses;
 
-   public ImplementsOpTreeItem(GraphSourceItem instruction, GraphTargetItem subclass, List<GraphTargetItem> superclasses) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.subclass = subclass;
-      this.superclasses = superclasses;
-   }
+    public ImplementsOpTreeItem(GraphSourceItem instruction, GraphTargetItem subclass, List<GraphTargetItem> superclasses) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.subclass = subclass;
+        this.superclasses = superclasses;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      String impStr = "";
-      for (int i = 0; i < superclasses.size(); i++) {
-         if (i > 0) {
-            impStr += ",";
-         }
-         impStr += superclasses.get(i).toString(Helper.toList(constants));
-      }
-      return subclass.toString(Helper.toList(constants)) + hilight(" implements ") + impStr;
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        String impStr = "";
+        for (int i = 0; i < superclasses.size(); i++) {
+            if (i > 0) {
+                impStr += ",";
+            }
+            impStr += superclasses.get(i).toString(Helper.toList(constants));
+        }
+        return subclass.toString(Helper.toList(constants)) + hilight(" implements ") + impStr;
+    }
 
-   @Override
-   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(subclass.getNeededSources());
-      for (GraphTargetItem ti : superclasses) {
-         ret.addAll(ti.getNeededSources());
-      }
-      return ret;
-   }
+    @Override
+    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(subclass.getNeededSources());
+        for (GraphTargetItem ti : superclasses) {
+            ret.addAll(ti.getNeededSources());
+        }
+        return ret;
+    }
 }

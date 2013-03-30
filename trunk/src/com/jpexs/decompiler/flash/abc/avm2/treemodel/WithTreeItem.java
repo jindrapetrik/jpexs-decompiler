@@ -25,34 +25,34 @@ import java.util.List;
 
 public class WithTreeItem extends TreeItem {
 
-   public GraphTargetItem scope;
-   public List<GraphTargetItem> items;
+    public GraphTargetItem scope;
+    public List<GraphTargetItem> items;
 
-   public WithTreeItem(AVM2Instruction instruction, GraphTargetItem scope, List<GraphTargetItem> items) {
-      super(instruction, NOPRECEDENCE);
-      this.scope = scope;
-      this.items = items;
-   }
+    public WithTreeItem(AVM2Instruction instruction, GraphTargetItem scope, List<GraphTargetItem> items) {
+        super(instruction, NOPRECEDENCE);
+        this.scope = scope;
+        this.items = items;
+    }
 
-   public WithTreeItem(AVM2Instruction instruction, GraphTargetItem scope) {
-      super(instruction, NOPRECEDENCE);
-      this.scope = scope;
-      this.items = new ArrayList<GraphTargetItem>();
-   }
+    public WithTreeItem(AVM2Instruction instruction, GraphTargetItem scope) {
+        super(instruction, NOPRECEDENCE);
+        this.scope = scope;
+        this.items = new ArrayList<GraphTargetItem>();
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      String ret;
-      ret = hilight("with(") + scope.toString(constants, localRegNames, fullyQualifiedNames) + hilight(")\r\n{\r\n");
-      /*for (GraphTargetItem ti : items) {
-       ret += ti.toString(constants, localRegNames, fullyQualifiedNames) + "\r\n";
-       }
-       ret += hilight("}");*/
-      return ret;
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        String ret;
+        ret = hilight("with(") + scope.toString(constants, localRegNames, fullyQualifiedNames) + hilight(")\r\n{\r\n");
+        /*for (GraphTargetItem ti : items) {
+         ret += ti.toString(constants, localRegNames, fullyQualifiedNames) + "\r\n";
+         }
+         ret += hilight("}");*/
+        return ret;
+    }
 
-   @Override
-   public boolean needsSemicolon() {
-      return false;
-   }
+    @Override
+    public boolean needsSemicolon() {
+        return false;
+    }
 }

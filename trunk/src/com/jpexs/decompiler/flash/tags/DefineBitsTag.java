@@ -27,65 +27,65 @@ import java.io.OutputStream;
 
 public class DefineBitsTag extends CharacterTag {
 
-   public int characterID;
-   public byte jpegData[];
+    public int characterID;
+    public byte jpegData[];
 
-   public DefineBitsTag(byte[] data, int version, long pos) throws IOException {
-      super(6, "DefineBits", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      characterID = sis.readUI16();
-      jpegData = sis.readBytes(sis.available());
-   }
+    public DefineBitsTag(byte[] data, int version, long pos) throws IOException {
+        super(6, "DefineBits", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        characterID = sis.readUI16();
+        jpegData = sis.readBytes(sis.available());
+    }
 
-   public byte[] getFullImageData(JPEGTablesTag jtt) {
-      if ((jtt != null)) {
-         ByteArrayOutputStream baos = null;
+    public byte[] getFullImageData(JPEGTablesTag jtt) {
+        if ((jtt != null)) {
+            ByteArrayOutputStream baos = null;
 
-         try {
-            baos = new ByteArrayOutputStream();
-            byte jttdata[] = jtt.getData(10);
-            if (jttdata.length != 0) {
-               baos.write(jttdata, SWF.hasErrorHeader(jttdata) ? 4 : 0, jttdata.length - (SWF.hasErrorHeader(jttdata) ? 6 : 2));
-               baos.write(jpegData, SWF.hasErrorHeader(jpegData) ? 6 : 2, jpegData.length - (SWF.hasErrorHeader(jttdata) ? 6 : 2));
-            } else {
-               baos.write(jpegData, 0, jpegData.length);
+            try {
+                baos = new ByteArrayOutputStream();
+                byte jttdata[] = jtt.getData(10);
+                if (jttdata.length != 0) {
+                    baos.write(jttdata, SWF.hasErrorHeader(jttdata) ? 4 : 0, jttdata.length - (SWF.hasErrorHeader(jttdata) ? 6 : 2));
+                    baos.write(jpegData, SWF.hasErrorHeader(jpegData) ? 6 : 2, jpegData.length - (SWF.hasErrorHeader(jttdata) ? 6 : 2));
+                } else {
+                    baos.write(jpegData, 0, jpegData.length);
+                }
+
+            } finally {
+                if (baos != null) {
+                    try {
+                        baos.close();
+                    } catch (Exception ex) {
+                        //ignore
+                    }
+                }
             }
+            return baos.toByteArray();
+        }
+        return null;
+    }
 
-         } finally {
-            if (baos != null) {
-               try {
-                  baos.close();
-               } catch (Exception ex) {
-                  //ignore
-               }
-            }
-         }
-         return baos.toByteArray();
-      }
-      return null;
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            sos.writeUI16(characterID);
+            sos.write(jpegData);
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         sos.writeUI16(characterID);
-         sos.write(jpegData);
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
-
-   @Override
-   public int getCharacterID() {
-      return characterID;
-   }
+    @Override
+    public int getCharacterID() {
+        return characterID;
+    }
 }

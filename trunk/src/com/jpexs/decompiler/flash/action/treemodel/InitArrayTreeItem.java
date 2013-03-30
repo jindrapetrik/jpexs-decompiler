@@ -23,31 +23,31 @@ import java.util.List;
 
 public class InitArrayTreeItem extends TreeItem {
 
-   public List<GraphTargetItem> values;
+    public List<GraphTargetItem> values;
 
-   public InitArrayTreeItem(GraphSourceItem instruction, List<GraphTargetItem> values) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.values = values;
-   }
+    public InitArrayTreeItem(GraphSourceItem instruction, List<GraphTargetItem> values) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.values = values;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      String arrStr = "";
-      for (int i = 0; i < values.size(); i++) {
-         if (i > 0) {
-            arrStr += hilight(",");
-         }
-         arrStr += values.get(i).toString(constants);
-      }
-      return hilight("[") + arrStr + hilight("]");
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        String arrStr = "";
+        for (int i = 0; i < values.size(); i++) {
+            if (i > 0) {
+                arrStr += hilight(",");
+            }
+            arrStr += values.get(i).toString(constants);
+        }
+        return hilight("[") + arrStr + hilight("]");
+    }
 
-   @Override
-   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-      List<GraphSourceItemPos> ret = super.getNeededSources();
-      for (GraphTargetItem value : values) {
-         ret.addAll(value.getNeededSources());
-      }
-      return ret;
-   }
+    @Override
+    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+        List<GraphSourceItemPos> ret = super.getNeededSources();
+        for (GraphTargetItem value : values) {
+            ret.addAll(value.getNeededSources());
+        }
+        return ret;
+    }
 }

@@ -35,101 +35,101 @@ import java.util.logging.Logger;
  */
 public class DoActionTag extends Tag implements ASMSource {
 
-   /**
-    * List of actions to perform
-    */
-   //public List<Action> actions = new ArrayList<Action>();
-   public byte[] actionBytes;
+    /**
+     * List of actions to perform
+     */
+    //public List<Action> actions = new ArrayList<Action>();
+    public byte[] actionBytes;
 
-   /**
-    * Constructor
-    *
-    * @param data Data bytes
-    * @param version SWF version
-    * @throws IOException
-    */
-   public DoActionTag(byte[] data, int version, long pos) {
-      super(12, "DoAction", data, pos);
-      actionBytes = data;
-   }
+    /**
+     * Constructor
+     *
+     * @param data Data bytes
+     * @param version SWF version
+     * @throws IOException
+     */
+    public DoActionTag(byte[] data, int version, long pos) {
+        super(12, "DoAction", data, pos);
+        actionBytes = data;
+    }
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      return actionBytes;//Action.actionsToBytes(actions, true, version);
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        return actionBytes;//Action.actionsToBytes(actions, true, version);
+    }
 
-   /**
-    * Converts actions to ASM source
-    *
-    * @param version SWF version
-    * @return ASM source
-    */
-   @Override
-   public String getASMSource(int version, boolean hex) {
-      return Action.actionsToString(getActions(version), null, version, hex);
-   }
+    /**
+     * Converts actions to ASM source
+     *
+     * @param version SWF version
+     * @return ASM source
+     */
+    @Override
+    public String getASMSource(int version, boolean hex) {
+        return Action.actionsToString(getActions(version), null, version, hex);
+    }
 
-   /**
-    * Whether or not this object contains ASM source
-    *
-    * @return True when contains
-    */
-   @Override
-   public boolean containsSource() {
-      return true;
-   }
+    /**
+     * Whether or not this object contains ASM source
+     *
+     * @return True when contains
+     */
+    @Override
+    public boolean containsSource() {
+        return true;
+    }
 
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
-   public String toString() {
-      return "DoAction";
-   }
+    /**
+     * Returns string representation of the object
+     *
+     * @return String representation of the object
+     */
+    @Override
+    public String toString() {
+        return "DoAction";
+    }
 
-   @Override
-   public List<Action> getActions(int version) {
-      try {
-         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-         int prevLength = 0;
-         if (previousTag != null) {
-            byte prevData[] = previousTag.getData(version);
-            baos.write(prevData);
-            prevLength = prevData.length;
-            byte header[] = SWFOutputStream.getTagHeader(this, data, version);
-            baos.write(header);
-            prevLength += header.length;
-         }
-         baos.write(actionBytes);
-         ReReadableInputStream rri = new ReReadableInputStream(new ByteArrayInputStream(baos.toByteArray()));
-         rri.setPos(prevLength);
-         return Action.removeNops(SWFInputStream.readActionList(rri, version, prevLength), version);
-      } catch (Exception ex) {
-         Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex);
-         return new ArrayList<Action>();
-      }
-   }
+    @Override
+    public List<Action> getActions(int version) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            int prevLength = 0;
+            if (previousTag != null) {
+                byte prevData[] = previousTag.getData(version);
+                baos.write(prevData);
+                prevLength = prevData.length;
+                byte header[] = SWFOutputStream.getTagHeader(this, data, version);
+                baos.write(header);
+                prevLength += header.length;
+            }
+            baos.write(actionBytes);
+            ReReadableInputStream rri = new ReReadableInputStream(new ByteArrayInputStream(baos.toByteArray()));
+            rri.setPos(prevLength);
+            return Action.removeNops(SWFInputStream.readActionList(rri, version, prevLength), version);
+        } catch (Exception ex) {
+            Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex);
+            return new ArrayList<Action>();
+        }
+    }
 
-   @Override
-   public void setActions(List<Action> actions, int version) {
-      actionBytes = Action.actionsToBytes(actions, true, version);
-   }
+    @Override
+    public void setActions(List<Action> actions, int version) {
+        actionBytes = Action.actionsToBytes(actions, true, version);
+    }
 
-   @Override
-   public byte[] getActionBytes() {
-      return actionBytes;
-   }
+    @Override
+    public byte[] getActionBytes() {
+        return actionBytes;
+    }
 
-   @Override
-   public void setActionBytes(byte[] actionBytes) {
-      this.actionBytes = actionBytes;
-   }
+    @Override
+    public void setActionBytes(byte[] actionBytes) {
+        this.actionBytes = actionBytes;
+    }
 }

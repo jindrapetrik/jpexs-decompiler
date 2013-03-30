@@ -22,12 +22,12 @@ import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
 public class URShiftTreeItem extends BinaryOpItem {
 
-   public URShiftTreeItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-      super(instruction, PRECEDENCE_BITWISESHIFT, leftSide, rightSide, ">>>");
-   }
+    public URShiftTreeItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, PRECEDENCE_BITWISESHIFT, leftSide, rightSide, ">>>");
+    }
 
-   @Override
-   public double toNumber() {
-      return ((int) leftSide.toNumber()) >>> ((int) rightSide.toNumber());
-   }
+    @Override
+    public double toNumber() {
+        return ((int) leftSide.toNumber()) >>> ((int) rightSide.toNumber());
+    }
 }

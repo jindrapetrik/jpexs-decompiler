@@ -24,15 +24,15 @@ import java.util.List;
 
 public class ThrowTreeItem extends TreeItem {
 
-   public GraphTargetItem value;
+    public GraphTargetItem value;
 
-   public ThrowTreeItem(AVM2Instruction instruction, GraphTargetItem value) {
-      super(instruction, NOPRECEDENCE);
-      this.value = value;
-   }
+    public ThrowTreeItem(AVM2Instruction instruction, GraphTargetItem value) {
+        super(instruction, NOPRECEDENCE);
+        this.value = value;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return hilight("throw ") + value.toString(constants, localRegNames, fullyQualifiedNames);
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return hilight("throw ") + value.toString(constants, localRegNames, fullyQualifiedNames);
+    }
 }

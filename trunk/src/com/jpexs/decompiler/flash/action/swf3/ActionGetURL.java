@@ -32,43 +32,43 @@ import java.util.Stack;
 
 public class ActionGetURL extends Action {
 
-   public String urlString;
-   public String targetString;
+    public String urlString;
+    public String targetString;
 
-   public ActionGetURL(int actionLength, SWFInputStream sis, int version) throws IOException {
-      super(0x83, actionLength);
-      //byte data[] = sis.readBytes(actionLength);
-      //sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      urlString = sis.readString();
-      targetString = sis.readString();
-   }
+    public ActionGetURL(int actionLength, SWFInputStream sis, int version) throws IOException {
+        super(0x83, actionLength);
+        //byte data[] = sis.readBytes(actionLength);
+        //sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        urlString = sis.readString();
+        targetString = sis.readString();
+    }
 
-   public ActionGetURL(FlasmLexer lexer) throws IOException, ParseException {
-      super(0x83, 0);
-      urlString = lexString(lexer);
-      targetString = lexString(lexer);
-   }
+    public ActionGetURL(FlasmLexer lexer) throws IOException, ParseException {
+        super(0x83, 0);
+        urlString = lexString(lexer);
+        targetString = lexString(lexer);
+    }
 
-   @Override
-   public byte[] getBytes(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      SWFOutputStream sos = new SWFOutputStream(baos, version);
-      try {
-         sos.writeString(urlString);
-         sos.writeString(targetString);
-         sos.close();
-      } catch (IOException e) {
-      }
-      return surroundWithAction(baos.toByteArray(), version);
-   }
+    @Override
+    public byte[] getBytes(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SWFOutputStream sos = new SWFOutputStream(baos, version);
+        try {
+            sos.writeString(urlString);
+            sos.writeString(targetString);
+            sos.close();
+        } catch (IOException e) {
+        }
+        return surroundWithAction(baos.toByteArray(), version);
+    }
 
-   @Override
-   public String toString() {
-      return "GetUrl \"" + Helper.escapeString(urlString) + "\" \"" + Helper.escapeString(targetString) + "\"";
-   }
+    @Override
+    public String toString() {
+        return "GetUrl \"" + Helper.escapeString(urlString) + "\" \"" + Helper.escapeString(targetString) + "\"";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      output.add(new GetURLTreeItem(this, urlString, targetString));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        output.add(new GetURLTreeItem(this, urlString, targetString));
+    }
 }

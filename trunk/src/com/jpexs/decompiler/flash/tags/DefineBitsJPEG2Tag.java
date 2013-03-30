@@ -24,18 +24,18 @@ import java.io.IOException;
 
 public class DefineBitsJPEG2Tag extends CharacterTag implements AloneTag {
 
-   public int characterID;
-   public byte[] imageData;
+    public int characterID;
+    public byte[] imageData;
 
-   @Override
-   public int getCharacterID() {
-      return characterID;
-   }
+    @Override
+    public int getCharacterID() {
+        return characterID;
+    }
 
-   public DefineBitsJPEG2Tag(byte[] data, int version, long pos) throws IOException {
-      super(21, "DefineBitsJPEG2", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      characterID = sis.readUI16();
-      imageData = sis.readBytes(sis.available());
-   }
+    public DefineBitsJPEG2Tag(byte[] data, int version, long pos) throws IOException {
+        super(21, "DefineBitsJPEG2", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        characterID = sis.readUI16();
+        imageData = sis.readBytes(sis.available());
+    }
 }

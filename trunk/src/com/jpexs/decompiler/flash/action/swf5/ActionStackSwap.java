@@ -25,22 +25,22 @@ import java.util.Stack;
 
 public class ActionStackSwap extends Action {
 
-   public ActionStackSwap() {
-      super(0x4D, 0);
-   }
+    public ActionStackSwap() {
+        super(0x4D, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "StackSwap";
-   }
+    @Override
+    public String toString() {
+        return "StackSwap";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem a = stack.pop();
-      GraphTargetItem b = stack.pop();
-      stack.push(a);
-      stack.push(b);
-      a.moreSrc.add(new GraphSourceItemPos(this, 0));
-      b.moreSrc.add(new GraphSourceItemPos(this, 0));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem a = stack.pop();
+        GraphTargetItem b = stack.pop();
+        stack.push(a);
+        stack.push(b);
+        a.moreSrc.add(new GraphSourceItemPos(this, 0));
+        b.moreSrc.add(new GraphSourceItemPos(this, 0));
+    }
 }

@@ -23,12 +23,12 @@ package com.jpexs.decompiler.flash.types;
  */
 public class KERNINGRECORD {
 
-   public int fontKerningCode1;
-   public int fontKerningCode2;
-   public int fontKerningAdjustment;
+    public int fontKerningCode1;
+    public int fontKerningCode2;
+    public int fontKerningAdjustment;
 
-   @Override
-   public String toString() {
-      return "[KERNINGRECORD fontKerningCode1=" + fontKerningCode1 + ", fontKerningCode2=" + fontKerningCode2 + ", fontKerningAdjustment=" + fontKerningAdjustment + "]";
-   }
+    @Override
+    public String toString() {
+        return "[KERNINGRECORD fontKerningCode1=" + fontKerningCode1 + ", fontKerningCode2=" + fontKerningCode2 + ", fontKerningAdjustment=" + fontKerningAdjustment + "]";
+    }
 }

@@ -23,29 +23,29 @@ import java.util.List;
 
 public class AddTreeItem extends BinaryOpItem {
 
-   public AddTreeItem(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-      super(instruction, PRECEDENCE_ADDITIVE, leftSide, rightSide, "+");
-   }
+    public AddTreeItem(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, PRECEDENCE_ADDITIVE, leftSide, rightSide, "+");
+    }
 
-   @Override
-   public String toString(List localData) {
-      if (rightSide.precedence >= precedence) {
-         String ret = "";
-         if (leftSide.precedence > precedence) {
-            ret += "(" + leftSide.toString(localData) + ")";
-         } else {
-            ret += leftSide.toString(localData);
-         }
-         ret += hilight(operator);
-         ret += "(" + rightSide.toString(localData) + ")";
-         return ret;
-      } else {
-         return super.toString(localData);
-      }
-   }
+    @Override
+    public String toString(List localData) {
+        if (rightSide.precedence >= precedence) {
+            String ret = "";
+            if (leftSide.precedence > precedence) {
+                ret += "(" + leftSide.toString(localData) + ")";
+            } else {
+                ret += leftSide.toString(localData);
+            }
+            ret += hilight(operator);
+            ret += "(" + rightSide.toString(localData) + ")";
+            return ret;
+        } else {
+            return super.toString(localData);
+        }
+    }
 
-   @Override
-   public double toNumber() {
-      return leftSide.toNumber() + rightSide.toNumber();
-   }
+    @Override
+    public double toNumber() {
+        return leftSide.toNumber() + rightSide.toNumber();
+    }
 }

@@ -26,22 +26,22 @@ import java.util.Stack;
 
 public class ActionInitArray extends Action {
 
-   public ActionInitArray() {
-      super(0x42, 0);
-   }
+    public ActionInitArray() {
+        super(0x42, 0);
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      long numArgs = popLong(stack);
-      List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
-      for (int l = 0; l < numArgs; l++) {
-         args.add(stack.pop());
-      }
-      stack.push(new InitArrayTreeItem(this, args));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        long numArgs = popLong(stack);
+        List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
+        for (int l = 0; l < numArgs; l++) {
+            args.add(stack.pop());
+        }
+        stack.push(new InitArrayTreeItem(this, args));
+    }
 
-   @Override
-   public String toString() {
-      return "InitArray";
-   }
+    @Override
+    public String toString() {
+        return "InitArray";
+    }
 }

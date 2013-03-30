@@ -25,18 +25,18 @@ import java.util.Stack;
 
 public class ActionTrace extends Action {
 
-   public ActionTrace() {
-      super(0x26, 0);
-   }
+    public ActionTrace() {
+        super(0x26, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "Trace";
-   }
+    @Override
+    public String toString() {
+        return "Trace";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem value = stack.pop();
-      output.add(new TraceTreeItem(this, value));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem value = stack.pop();
+        output.add(new TraceTreeItem(this, value));
+    }
 }

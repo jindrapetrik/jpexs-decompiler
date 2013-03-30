@@ -22,28 +22,28 @@ import java.util.List;
 
 public class MBStringExtractTreeItem extends TreeItem {
 
-   public GraphTargetItem value;
-   public GraphTargetItem index;
-   public GraphTargetItem count;
+    public GraphTargetItem value;
+    public GraphTargetItem index;
+    public GraphTargetItem count;
 
-   public MBStringExtractTreeItem(GraphSourceItem instruction, GraphTargetItem value, GraphTargetItem index, GraphTargetItem count) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.value = value;
-      this.index = index;
-      this.count = count;
-   }
+    public MBStringExtractTreeItem(GraphSourceItem instruction, GraphTargetItem value, GraphTargetItem index, GraphTargetItem count) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.value = value;
+        this.index = index;
+        this.count = count;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return hilight("mbsubstring(") + value.toString(constants) + hilight(",") + index.toString(constants) + hilight(",") + count.toString(constants) + hilight(")");
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return hilight("mbsubstring(") + value.toString(constants) + hilight(",") + index.toString(constants) + hilight(",") + count.toString(constants) + hilight(")");
+    }
 
-   @Override
-   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(value.getNeededSources());
-      ret.addAll(index.getNeededSources());
-      ret.addAll(count.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(value.getNeededSources());
+        ret.addAll(index.getNeededSources());
+        ret.addAll(count.getNeededSources());
+        return ret;
+    }
 }

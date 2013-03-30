@@ -24,5 +24,5 @@ import com.jpexs.decompiler.flash.graph.GraphTargetItem;
  */
 public interface SetTypeTreeItem {
 
-   public GraphTargetItem getObject();
+    public GraphTargetItem getObject();
 }

@@ -25,23 +25,23 @@ import java.util.Stack;
 
 public class ActionThrow extends Action {
 
-   public ActionThrow() {
-      super(0x2A, 0);
-   }
+    public ActionThrow() {
+        super(0x2A, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "Throw";
-   }
+    @Override
+    public String toString() {
+        return "Throw";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem object = stack.pop();
-      output.add(new ThrowTreeItem(this, object));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem object = stack.pop();
+        output.add(new ThrowTreeItem(this, object));
+    }
 
-   @Override
-   public boolean isExit() {
-      return true;
-   }
+    @Override
+    public boolean isExit() {
+        return true;
+    }
 }

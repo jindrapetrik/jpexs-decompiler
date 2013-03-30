@@ -23,14 +23,14 @@ import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
 public class OrTreeItem extends BinaryOpItem {
 
-   public GraphPart firstPart;
+    public GraphPart firstPart;
 
-   public OrTreeItem(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-      super(instruction, PRECEDENCE_LOGICALOR, leftSide, rightSide, "||");
-   }
+    public OrTreeItem(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, PRECEDENCE_LOGICALOR, leftSide, rightSide, "||");
+    }
 
-   @Override
-   public boolean toBoolean() {
-      return leftSide.toBoolean() || rightSide.toBoolean();
-   }
+    @Override
+    public boolean toBoolean() {
+        return leftSide.toBoolean() || rightSide.toBoolean();
+    }
 }

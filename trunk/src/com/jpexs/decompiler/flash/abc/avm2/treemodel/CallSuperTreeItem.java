@@ -25,32 +25,32 @@ import java.util.List;
 
 public class CallSuperTreeItem extends TreeItem {
 
-   public GraphTargetItem receiver;
-   public FullMultinameTreeItem multiname;
-   public List<GraphTargetItem> arguments;
-   public boolean isVoid;
+    public GraphTargetItem receiver;
+    public FullMultinameTreeItem multiname;
+    public List<GraphTargetItem> arguments;
+    public boolean isVoid;
 
-   public CallSuperTreeItem(AVM2Instruction instruction, boolean isVoid, GraphTargetItem receiver, FullMultinameTreeItem multiname, List<GraphTargetItem> arguments) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.receiver = receiver;
-      this.multiname = multiname;
-      this.arguments = arguments;
-      this.isVoid = isVoid;
-   }
+    public CallSuperTreeItem(AVM2Instruction instruction, boolean isVoid, GraphTargetItem receiver, FullMultinameTreeItem multiname, List<GraphTargetItem> arguments) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.receiver = receiver;
+        this.multiname = multiname;
+        this.arguments = arguments;
+        this.isVoid = isVoid;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      String args = "";
-      for (int a = 0; a < arguments.size(); a++) {
-         if (a > 0) {
-            args = args + ",";
-         }
-         args = args + arguments.get(a).toString(constants, localRegNames, fullyQualifiedNames);
-      }
-      String calee = receiver.toString(constants, localRegNames, fullyQualifiedNames) + ".";
-      if (Highlighting.stripHilights(calee).equals("this.")) {
-         calee = "";
-      }
-      return calee + hilight("super.") + multiname.toString(constants, localRegNames, fullyQualifiedNames) + hilight("(") + args + hilight(")");
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        String args = "";
+        for (int a = 0; a < arguments.size(); a++) {
+            if (a > 0) {
+                args = args + ",";
+            }
+            args = args + arguments.get(a).toString(constants, localRegNames, fullyQualifiedNames);
+        }
+        String calee = receiver.toString(constants, localRegNames, fullyQualifiedNames) + ".";
+        if (Highlighting.stripHilights(calee).equals("this.")) {
+            calee = "";
+        }
+        return calee + hilight("super.") + multiname.toString(constants, localRegNames, fullyQualifiedNames) + hilight("(") + args + hilight(")");
+    }
 }

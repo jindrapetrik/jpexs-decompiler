@@ -33,44 +33,44 @@ import java.util.Stack;
 
 public class ActionStoreRegister extends Action {
 
-   public int registerNumber;
+    public int registerNumber;
 
-   public ActionStoreRegister(SWFInputStream sis) throws IOException {
-      super(0x87, 1);
-      registerNumber = sis.readUI8();
-   }
+    public ActionStoreRegister(SWFInputStream sis) throws IOException {
+        super(0x87, 1);
+        registerNumber = sis.readUI8();
+    }
 
-   public ActionStoreRegister(FlasmLexer lexer) throws IOException, ParseException {
-      super(0x87, 0);
-      registerNumber = (int) lexLong(lexer);
-   }
+    public ActionStoreRegister(FlasmLexer lexer) throws IOException, ParseException {
+        super(0x87, 0);
+        registerNumber = (int) lexLong(lexer);
+    }
 
-   @Override
-   public byte[] getBytes(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      SWFOutputStream sos = new SWFOutputStream(baos, version);
-      try {
-         sos.writeUI8(registerNumber);
-         sos.close();
-      } catch (IOException e) {
-      }
-      return surroundWithAction(baos.toByteArray(), version);
-   }
+    @Override
+    public byte[] getBytes(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SWFOutputStream sos = new SWFOutputStream(baos, version);
+        try {
+            sos.writeUI8(registerNumber);
+            sos.close();
+        } catch (IOException e) {
+        }
+        return surroundWithAction(baos.toByteArray(), version);
+    }
 
-   @Override
-   public String toString() {
-      return "StoreRegister " + registerNumber;
-   }
+    @Override
+    public String toString() {
+        return "StoreRegister " + registerNumber;
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem item = stack.peek();
-      RegisterNumber rn = new RegisterNumber(registerNumber);
-      if (regNames.containsKey(registerNumber)) {
-         rn.name = regNames.get(registerNumber);
-      }
-      item.moreSrc.add(new GraphSourceItemPos(this, 0));
-      variables.put("__register" + registerNumber, item);
-      output.add(new StoreRegisterTreeItem(this, rn, item));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem item = stack.peek();
+        RegisterNumber rn = new RegisterNumber(registerNumber);
+        if (regNames.containsKey(registerNumber)) {
+            rn.name = regNames.get(registerNumber);
+        }
+        item.moreSrc.add(new GraphSourceItemPos(this, 0));
+        variables.put("__register" + registerNumber, item);
+        output.add(new StoreRegisterTreeItem(this, rn, item));
+    }
 }

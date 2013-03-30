@@ -23,25 +23,25 @@ import java.util.List;
 
 public class FloatValueTreeItem extends NumberValueTreeItem {
 
-   public Double value;
+    public Double value;
 
-   public FloatValueTreeItem(AVM2Instruction instruction, Double value) {
-      super(instruction);
-      this.value = value;
-   }
+    public FloatValueTreeItem(AVM2Instruction instruction, Double value) {
+        super(instruction);
+        this.value = value;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return hilight("" + value);
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return hilight("" + value);
+    }
 
-   @Override
-   public double toNumber() {
-      return value;
-   }
+    @Override
+    public double toNumber() {
+        return value;
+    }
 
-   @Override
-   public boolean isCompileTime() {
-      return true;
-   }
+    @Override
+    public boolean isCompileTime() {
+        return true;
+    }
 }

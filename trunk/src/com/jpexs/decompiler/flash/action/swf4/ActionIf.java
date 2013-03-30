@@ -31,78 +31,78 @@ import java.util.List;
 
 public class ActionIf extends Action {
 
-   public int offset;
-   public String identifier;
-   public boolean compileTime;
-   public boolean jumpUsed = false;
-   public boolean ignoreUsed = false;
+    public int offset;
+    public String identifier;
+    public boolean compileTime;
+    public boolean jumpUsed = false;
+    public boolean ignoreUsed = false;
 
-   public ActionIf(SWFInputStream sis) throws IOException {
-      super(0x9D, 2);
-      offset = sis.readSI16();
-   }
+    public ActionIf(SWFInputStream sis) throws IOException {
+        super(0x9D, 2);
+        offset = sis.readSI16();
+    }
 
-   @Override
-   public List<Long> getAllRefs(int version) {
-      List<Long> ret = new ArrayList<Long>();
-      ret.add(getRef(version));
-      return ret;
-   }
+    @Override
+    public List<Long> getAllRefs(int version) {
+        List<Long> ret = new ArrayList<Long>();
+        ret.add(getRef(version));
+        return ret;
+    }
 
-   public long getRef(int version) {
-      return getAddress() + getBytes(version).length + offset;
-   }
+    public long getRef(int version) {
+        return getAddress() + getBytes(version).length + offset;
+    }
 
-   @Override
-   public byte[] getBytes(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      SWFOutputStream sos = new SWFOutputStream(baos, version);
-      try {
-         sos.writeSI16(offset);
-         sos.close();
-      } catch (IOException e) {
-      }
-      return surroundWithAction(baos.toByteArray(), version);
-   }
+    @Override
+    public byte[] getBytes(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SWFOutputStream sos = new SWFOutputStream(baos, version);
+        try {
+            sos.writeSI16(offset);
+            sos.close();
+        } catch (IOException e) {
+        }
+        return surroundWithAction(baos.toByteArray(), version);
+    }
 
-   @Override
-   public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
-      String ofsStr = Helper.formatAddress(getAddress() + getBytes(version).length + offset);
-      return "If loc" + ofsStr + (compileTime ? " ;compileTime" : "");
-   }
+    @Override
+    public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+        String ofsStr = Helper.formatAddress(getAddress() + getBytes(version).length + offset);
+        return "If loc" + ofsStr + (compileTime ? " ;compileTime" : "");
+    }
 
-   public ActionIf(FlasmLexer lexer) throws IOException, ParseException {
-      super(0x9D, -1);
-      identifier = lexIdentifier(lexer);
-   }
+    public ActionIf(FlasmLexer lexer) throws IOException, ParseException {
+        super(0x9D, -1);
+        identifier = lexIdentifier(lexer);
+    }
 
-   @Override
-   public List<Action> getAllIfsOrJumps() {
-      List<Action> ret = new ArrayList<Action>();
-      ret.add(this);
-      return ret;
-   }
+    @Override
+    public List<Action> getAllIfsOrJumps() {
+        List<Action> ret = new ArrayList<Action>();
+        ret.add(this);
+        return ret;
+    }
 
-   @Override
-   public String toString() {
-      return "ActionIf";
-   }
+    @Override
+    public String toString() {
+        return "ActionIf";
+    }
 
-   @Override
-   public boolean isBranch() {
-      return true;
-   }
+    @Override
+    public boolean isBranch() {
+        return true;
+    }
 
-   @Override
-   public List<Integer> getBranches(GraphSource code) {
-      List<Integer> ret = super.getBranches(code);
-      ret.add(code.adr2pos(getAddress() + getBytes(((ActionGraphSource) code).version).length + offset));
-      ret.add(code.adr2pos(getAddress() + getBytes(((ActionGraphSource) code).version).length));
-      return ret;
-   }
+    @Override
+    public List<Integer> getBranches(GraphSource code) {
+        List<Integer> ret = super.getBranches(code);
+        ret.add(code.adr2pos(getAddress() + getBytes(((ActionGraphSource) code).version).length + offset));
+        ret.add(code.adr2pos(getAddress() + getBytes(((ActionGraphSource) code).version).length));
+        return ret;
+    }
 
-   @Override
-   public boolean ignoredLoops() {
-      return false; //compileTime;
-   }
+    @Override
+    public boolean ignoredLoops() {
+        return false; //compileTime;
+    }
 }

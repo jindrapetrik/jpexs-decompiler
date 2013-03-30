@@ -25,21 +25,21 @@ import java.util.List;
  */
 public class SHAPE {
 
-   public int numFillBits;
-   public int numLineBits;
-   public List<SHAPERECORD> shapeRecords;
+    public int numFillBits;
+    public int numLineBits;
+    public List<SHAPERECORD> shapeRecords;
 
-   /**
-    * EXPERIMENTAL
-    *
-    * @param shapeNum
-    * @return
-    */
-   public String toSVG(int shapeNum) {
-      return SHAPERECORD.shapeToSVG(shapeNum, null, null, numFillBits, numLineBits, shapeRecords);
-   }
+    /**
+     * EXPERIMENTAL
+     *
+     * @param shapeNum
+     * @return
+     */
+    public String toSVG(int shapeNum) {
+        return SHAPERECORD.shapeToSVG(shapeNum, null, null, numFillBits, numLineBits, shapeRecords);
+    }
 
-   public RECT getBounds() {
-      return SHAPERECORD.getBounds(shapeRecords);
-   }
+    public RECT getBounds() {
+        return SHAPERECORD.getBounds(shapeRecords);
+    }
 }

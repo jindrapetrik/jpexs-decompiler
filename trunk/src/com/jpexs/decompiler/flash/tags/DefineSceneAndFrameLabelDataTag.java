@@ -30,64 +30,64 @@ import java.io.OutputStream;
  */
 public class DefineSceneAndFrameLabelDataTag extends Tag {
 
-   public long sceneOffsets[];
-   public String sceneNames[];
-   public long frameNums[];
-   public String frameNames[];
+    public long sceneOffsets[];
+    public String sceneNames[];
+    public long frameNums[];
+    public String frameNames[];
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         int sceneCount = sceneOffsets.length;
-         sos.writeEncodedU32(sceneCount);
-         for (int i = 0; i < sceneCount; i++) {
-            sos.writeEncodedU32(sceneOffsets[i]);
-            sos.writeString(sceneNames[i]);
-         }
-         int frameLabelCount = frameNums.length;
-         sos.writeEncodedU32(frameLabelCount);
-         for (int i = 0; i < frameLabelCount; i++) {
-            sos.writeEncodedU32(frameNums[i]);
-            sos.writeString(frameNames[i]);
-         }
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            int sceneCount = sceneOffsets.length;
+            sos.writeEncodedU32(sceneCount);
+            for (int i = 0; i < sceneCount; i++) {
+                sos.writeEncodedU32(sceneOffsets[i]);
+                sos.writeString(sceneNames[i]);
+            }
+            int frameLabelCount = frameNums.length;
+            sos.writeEncodedU32(frameLabelCount);
+            for (int i = 0; i < frameLabelCount; i++) {
+                sos.writeEncodedU32(frameNums[i]);
+                sos.writeString(frameNames[i]);
+            }
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 
-   /**
-    * Constructor
-    *
-    * @param data Data bytes
-    * @param version SWF version
-    * @throws IOException
-    */
-   public DefineSceneAndFrameLabelDataTag(byte data[], int version, long pos) throws IOException {
-      super(86, "DefineSceneAndFrameLabelData", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      int sceneCount = (int) sis.readEncodedU32();
-      sceneOffsets = new long[sceneCount];
-      sceneNames = new String[sceneCount];
-      for (int i = 0; i < sceneCount; i++) {
-         sceneOffsets[i] = sis.readEncodedU32();
-         sceneNames[i] = sis.readString();
-      }
-      int frameLabelCount = (int) sis.readEncodedU32();
-      frameNums = new long[frameLabelCount];
-      frameNames = new String[frameLabelCount];
-      for (int i = 0; i < frameLabelCount; i++) {
-         frameNums[i] = sis.readEncodedU32();
-         frameNames[i] = sis.readString();
-      }
+    /**
+     * Constructor
+     *
+     * @param data Data bytes
+     * @param version SWF version
+     * @throws IOException
+     */
+    public DefineSceneAndFrameLabelDataTag(byte data[], int version, long pos) throws IOException {
+        super(86, "DefineSceneAndFrameLabelData", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        int sceneCount = (int) sis.readEncodedU32();
+        sceneOffsets = new long[sceneCount];
+        sceneNames = new String[sceneCount];
+        for (int i = 0; i < sceneCount; i++) {
+            sceneOffsets[i] = sis.readEncodedU32();
+            sceneNames[i] = sis.readString();
+        }
+        int frameLabelCount = (int) sis.readEncodedU32();
+        frameNums = new long[frameLabelCount];
+        frameNames = new String[frameLabelCount];
+        for (int i = 0; i < frameLabelCount; i++) {
+            frameNums[i] = sis.readEncodedU32();
+            frameNames[i] = sis.readString();
+        }
 
-   }
+    }
 }

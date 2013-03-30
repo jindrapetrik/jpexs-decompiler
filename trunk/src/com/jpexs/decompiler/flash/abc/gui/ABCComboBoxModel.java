@@ -24,47 +24,47 @@ import javax.swing.event.ListDataListener;
 
 public class ABCComboBoxModel implements ComboBoxModel {
 
-   public List<DoABCTag> list;
-   public int itemIndex = 0;
-   public static final String ROOT = " - all - ";
+    public List<DoABCTag> list;
+    public int itemIndex = 0;
+    public static final String ROOT = " - all - ";
 
-   public ABCComboBoxModel(List<DoABCTag> list) {
-      this.list = list;
-      Collections.sort(this.list);
-   }
+    public ABCComboBoxModel(List<DoABCTag> list) {
+        this.list = list;
+        Collections.sort(this.list);
+    }
 
-   @Override
-   public int getSize() {
-      return 1 + list.size();
-   }
+    @Override
+    public int getSize() {
+        return 1 + list.size();
+    }
 
-   @Override
-   public Object getElementAt(int index) {
-      if (index == 0) {
-         return ROOT;
-      }
-      return list.get(index - 1);
-   }
+    @Override
+    public Object getElementAt(int index) {
+        if (index == 0) {
+            return ROOT;
+        }
+        return list.get(index - 1);
+    }
 
-   @Override
-   public void addListDataListener(ListDataListener l) {
-   }
+    @Override
+    public void addListDataListener(ListDataListener l) {
+    }
 
-   @Override
-   public void removeListDataListener(ListDataListener l) {
-   }
+    @Override
+    public void removeListDataListener(ListDataListener l) {
+    }
 
-   @Override
-   public void setSelectedItem(Object anItem) {
-      if (anItem == ROOT) {
-         itemIndex = 0;
-      } else {
-         itemIndex = 1 + list.indexOf(anItem);
-      }
-   }
+    @Override
+    public void setSelectedItem(Object anItem) {
+        if (anItem == ROOT) {
+            itemIndex = 0;
+        } else {
+            itemIndex = 1 + list.indexOf(anItem);
+        }
+    }
 
-   @Override
-   public Object getSelectedItem() {
-      return getElementAt(itemIndex);
-   }
+    @Override
+    public Object getSelectedItem() {
+        return getElementAt(itemIndex);
+    }
 }

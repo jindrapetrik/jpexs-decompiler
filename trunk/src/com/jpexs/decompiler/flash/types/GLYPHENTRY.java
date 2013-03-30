@@ -22,11 +22,11 @@ package com.jpexs.decompiler.flash.types;
  */
 public class GLYPHENTRY {
 
-   public int glyphIndex;
-   public int glyphAdvance;
+    public int glyphIndex;
+    public int glyphAdvance;
 
-   @Override
-   public String toString() {
-      return "[GLYPHENTRY index=" + glyphIndex + ", advance=" + glyphAdvance + "]";
-   }
+    @Override
+    public String toString() {
+        return "[GLYPHENTRY index=" + glyphIndex + ", advance=" + glyphAdvance + "]";
+    }
 }

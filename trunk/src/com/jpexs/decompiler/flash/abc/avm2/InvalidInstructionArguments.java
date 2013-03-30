@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2;
 
 public class InvalidInstructionArguments extends RuntimeException {
 
-   public InvalidInstructionArguments() {
-      super("Invalid method arguments");
-   }
+    public InvalidInstructionArguments() {
+        super("Invalid method arguments");
+    }
 }

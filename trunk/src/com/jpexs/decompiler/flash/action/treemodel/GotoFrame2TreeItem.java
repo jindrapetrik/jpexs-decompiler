@@ -22,32 +22,32 @@ import java.util.List;
 
 public class GotoFrame2TreeItem extends TreeItem {
 
-   public GraphTargetItem frame;
-   public boolean sceneBiasFlag;
-   public boolean playFlag;
-   public int sceneBias;
+    public GraphTargetItem frame;
+    public boolean sceneBiasFlag;
+    public boolean playFlag;
+    public int sceneBias;
 
-   public GotoFrame2TreeItem(GraphSourceItem instruction, GraphTargetItem frame, boolean sceneBiasFlag, boolean playFlag, int sceneBias) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.frame = frame;
-      this.sceneBiasFlag = sceneBiasFlag;
-      this.playFlag = playFlag;
-      this.sceneBias = sceneBias;
-   }
+    public GotoFrame2TreeItem(GraphSourceItem instruction, GraphTargetItem frame, boolean sceneBiasFlag, boolean playFlag, int sceneBias) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.frame = frame;
+        this.sceneBiasFlag = sceneBiasFlag;
+        this.playFlag = playFlag;
+        this.sceneBias = sceneBias;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      String prefix = "gotoAndStop";
-      if (playFlag) {
-         prefix = "gotoAndPlay";
-      }
-      return hilight(prefix + "(") + frame.toString(constants) + (sceneBiasFlag ? "," + sceneBias : "") + hilight(")");
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        String prefix = "gotoAndStop";
+        if (playFlag) {
+            prefix = "gotoAndPlay";
+        }
+        return hilight(prefix + "(") + frame.toString(constants) + (sceneBiasFlag ? "," + sceneBias : "") + hilight(")");
+    }
 
-   @Override
-   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(frame.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(frame.getNeededSources());
+        return ret;
+    }
 }

@@ -30,38 +30,38 @@ import java.util.Stack;
 
 public class ConvertBIns extends InstructionDefinition implements CoerceOrConvertTypeIns {
 
-   public ConvertBIns() {
-      super(0x76, "convert_b", new int[]{});
-   }
+    public ConvertBIns() {
+        super(0x76, "convert_b", new int[]{});
+    }
 
-   @Override
-   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-      Object value = lda.operandStack.pop();
-      boolean bval;
-      if (value instanceof Boolean) {
-         bval = (Boolean) value;
-      } else if (value instanceof Long) {
-         bval = ((Long) value).longValue() != 0;
-      } else if (value instanceof String) {
-         bval = !((String) value).equals("");
-      } else {
-         bval = true;
-      }
-      lda.operandStack.push((Boolean) bval);
-   }
+    @Override
+    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        Object value = lda.operandStack.pop();
+        boolean bval;
+        if (value instanceof Boolean) {
+            bval = (Boolean) value;
+        } else if (value instanceof Long) {
+            bval = ((Long) value).longValue() != 0;
+        } else if (value instanceof String) {
+            bval = !((String) value).equals("");
+        } else {
+            bval = true;
+        }
+        lda.operandStack.push((Boolean) bval);
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      stack.push(new ConvertTreeItem(ins, (GraphTargetItem) stack.pop(), getTargetType(constants, ins, fullyQualifiedNames)));
-   }
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        stack.push(new ConvertTreeItem(ins, (GraphTargetItem) stack.pop(), getTargetType(constants, ins, fullyQualifiedNames)));
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -1 + 1;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return -1 + 1;
+    }
 
-   @Override
-   public String getTargetType(ConstantPool constants, AVM2Instruction ins, List<String> fullyQualifiedNames) {
-      return "Boolean";
-   }
+    @Override
+    public String getTargetType(ConstantPool constants, AVM2Instruction ins, List<String> fullyQualifiedNames) {
+        return "Boolean";
+    }
 }

@@ -25,17 +25,17 @@ import java.util.Stack;
 
 public class ActionToggleQuality extends Action {
 
-   public ActionToggleQuality() {
-      super(0x08, 0);
-   }
+    public ActionToggleQuality() {
+        super(0x08, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "ToggleQuality";
-   }
+    @Override
+    public String toString() {
+        return "ToggleQuality";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      output.add(new SimpleActionTreeItem(this, "toggleHighQuality()"));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        output.add(new SimpleActionTreeItem(this, "toggleHighQuality()"));
+    }
 }

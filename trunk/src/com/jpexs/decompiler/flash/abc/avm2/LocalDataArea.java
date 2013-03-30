@@ -21,7 +21,7 @@ import java.util.Stack;
 
 public class LocalDataArea {
 
-   public Stack operandStack = new Stack();
-   public Stack scopeStack = new Stack();
-   public HashMap localRegisters = new HashMap<Integer, Object>();
+    public Stack operandStack = new Stack();
+    public Stack scopeStack = new Stack();
+    public HashMap localRegisters = new HashMap<Integer, Object>();
 }

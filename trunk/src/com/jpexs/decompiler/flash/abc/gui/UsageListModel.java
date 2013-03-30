@@ -28,25 +28,25 @@ import javax.swing.DefaultListModel;
  */
 public class UsageListModel extends DefaultListModel {
 
-   private ABC abc;
-   private List<DoABCTag> abcTags;
+    private ABC abc;
+    private List<DoABCTag> abcTags;
 
-   public UsageListModel(List<DoABCTag> abcTags, ABC abc) {
-      this.abc = abc;
-      this.abcTags = abcTags;
-   }
+    public UsageListModel(List<DoABCTag> abcTags, ABC abc) {
+        this.abc = abc;
+        this.abcTags = abcTags;
+    }
 
-   @Override
-   public Object get(int index) {
-      return ((MultinameUsage) super.get(index)).toString(abcTags, abc);
-   }
+    @Override
+    public Object get(int index) {
+        return ((MultinameUsage) super.get(index)).toString(abcTags, abc);
+    }
 
-   @Override
-   public Object getElementAt(int index) {
-      return ((MultinameUsage) super.getElementAt(index)).toString(abcTags, abc);
-   }
+    @Override
+    public Object getElementAt(int index) {
+        return ((MultinameUsage) super.getElementAt(index)).toString(abcTags, abc);
+    }
 
-   public MultinameUsage getUsage(int index) {
-      return ((MultinameUsage) super.getElementAt(index));
-   }
+    public MultinameUsage getUsage(int index) {
+        return ((MultinameUsage) super.getElementAt(index));
+    }
 }

@@ -22,22 +22,22 @@ import java.util.List;
 
 public class CharToAsciiTreeItem extends TreeItem {
 
-   private GraphTargetItem value;
+    private GraphTargetItem value;
 
-   public CharToAsciiTreeItem(GraphSourceItem instruction, GraphTargetItem value) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.value = value;
-   }
+    public CharToAsciiTreeItem(GraphSourceItem instruction, GraphTargetItem value) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.value = value;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return hilight("chr(") + value.toString(constants) + hilight(")");
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return hilight("chr(") + value.toString(constants) + hilight(")");
+    }
 
-   @Override
-   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(value.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(value.getNeededSources());
+        return ret;
+    }
 }

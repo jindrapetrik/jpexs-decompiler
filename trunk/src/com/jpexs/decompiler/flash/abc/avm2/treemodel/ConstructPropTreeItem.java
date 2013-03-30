@@ -24,31 +24,31 @@ import java.util.List;
 
 public class ConstructPropTreeItem extends TreeItem {
 
-   public GraphTargetItem object;
-   public FullMultinameTreeItem propertyName;
-   public List<GraphTargetItem> args;
+    public GraphTargetItem object;
+    public FullMultinameTreeItem propertyName;
+    public List<GraphTargetItem> args;
 
-   public ConstructPropTreeItem(AVM2Instruction instruction, GraphTargetItem object, FullMultinameTreeItem propertyName, List<GraphTargetItem> args) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.object = object;
-      this.propertyName = propertyName;
-      this.args = args;
-   }
+    public ConstructPropTreeItem(AVM2Instruction instruction, GraphTargetItem object, FullMultinameTreeItem propertyName, List<GraphTargetItem> args) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.object = object;
+        this.propertyName = propertyName;
+        this.args = args;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      String argStr = "";
-      for (int a = 0; a < args.size(); a++) {
-         if (a > 0) {
-            argStr = argStr + ",";
-         }
-         argStr = argStr + args.get(a).toString(constants, localRegNames, fullyQualifiedNames);
-      }
-      String objstr = object.toString(constants, localRegNames, fullyQualifiedNames);
-      if (!objstr.equals("")) {
-         objstr += ".";
-      }
-      return hilight("new ") + objstr + propertyName.toString(constants, localRegNames, fullyQualifiedNames) + hilight("(") + argStr + hilight(")");
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        String argStr = "";
+        for (int a = 0; a < args.size(); a++) {
+            if (a > 0) {
+                argStr = argStr + ",";
+            }
+            argStr = argStr + args.get(a).toString(constants, localRegNames, fullyQualifiedNames);
+        }
+        String objstr = object.toString(constants, localRegNames, fullyQualifiedNames);
+        if (!objstr.equals("")) {
+            objstr += ".";
+        }
+        return hilight("new ") + objstr + propertyName.toString(constants, localRegNames, fullyQualifiedNames) + hilight("(") + argStr + hilight(")");
 
-   }
+    }
 }

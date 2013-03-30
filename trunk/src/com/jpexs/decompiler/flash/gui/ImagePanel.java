@@ -24,21 +24,21 @@ import javax.swing.JPanel;
 
 public class ImagePanel extends JPanel {
 
-   public JLabel label = new JLabel();
+    public JLabel label = new JLabel();
 
-   public ImagePanel() {
-      super(new BorderLayout());
-      label.setHorizontalAlignment(JLabel.CENTER);
-      add(label, BorderLayout.CENTER);
-   }
+    public ImagePanel() {
+        super(new BorderLayout());
+        label.setHorizontalAlignment(JLabel.CENTER);
+        add(label, BorderLayout.CENTER);
+    }
 
-   public void setImage(byte data[]) {
-      ImageIcon icon = new ImageIcon(data);
-      label.setIcon(icon);
-   }
+    public void setImage(byte data[]) {
+        ImageIcon icon = new ImageIcon(data);
+        label.setIcon(icon);
+    }
 
-   public void setImage(Image image) {
-      ImageIcon icon = new ImageIcon(image);
-      label.setIcon(icon);
-   }
+    public void setImage(Image image) {
+        ImageIcon icon = new ImageIcon(image);
+        label.setIcon(icon);
+    }
 }

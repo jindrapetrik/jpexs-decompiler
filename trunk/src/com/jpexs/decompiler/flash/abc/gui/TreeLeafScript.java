@@ -24,11 +24,11 @@ import com.jpexs.decompiler.flash.abc.ABC;
  */
 public class TreeLeafScript {
 
-   public ABC abc;
-   public int scriptIndex;
+    public ABC abc;
+    public int scriptIndex;
 
-   public TreeLeafScript(ABC abc, int scriptIndex) {
-      this.abc = abc;
-      this.scriptIndex = scriptIndex;
-   }
+    public TreeLeafScript(ABC abc, int scriptIndex) {
+        this.abc = abc;
+        this.scriptIndex = scriptIndex;
+    }
 }

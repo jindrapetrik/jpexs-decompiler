@@ -33,36 +33,36 @@ import java.util.List;
  */
 public class DeclarationTreeItem extends TreeItem {
 
-   public GraphTargetItem assignment;
-   public String type;
+    public GraphTargetItem assignment;
+    public String type;
 
-   public DeclarationTreeItem(GraphTargetItem assignment, String type) {
-      super(assignment.src, assignment.precedence);
-      this.type = type;
-      this.assignment = assignment;
-   }
+    public DeclarationTreeItem(GraphTargetItem assignment, String type) {
+        super(assignment.src, assignment.precedence);
+        this.type = type;
+        this.assignment = assignment;
+    }
 
-   public DeclarationTreeItem(GraphTargetItem assignment) {
-      this(assignment, null);
-   }
+    public DeclarationTreeItem(GraphTargetItem assignment) {
+        this(assignment, null);
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      if (assignment instanceof SetLocalTreeItem) {
-         SetLocalTreeItem lti = (SetLocalTreeItem) assignment;
-         String type = "*";
-         if (lti.value instanceof CoerceTreeItem) {
-            type = ((CoerceTreeItem) lti.value).type;
-         }
-         if (lti.value instanceof ConvertTreeItem) {
-            type = ((ConvertTreeItem) lti.value).type;
-         }
-         return "var " + hilight(localRegName(localRegNames, lti.regIndex) + ":" + type + " = ") + lti.value.toString(constants, localRegNames, fullyQualifiedNames);
-      }
-      if (assignment instanceof SetSlotTreeItem) {
-         SetSlotTreeItem ssti = (SetSlotTreeItem) assignment;
-         return "var " + ssti.getName(constants, localRegNames, fullyQualifiedNames) + ":" + type + hilight(" = ") + ssti.value.toString(constants, localRegNames, fullyQualifiedNames);
-      }
-      return "var " + assignment.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        if (assignment instanceof SetLocalTreeItem) {
+            SetLocalTreeItem lti = (SetLocalTreeItem) assignment;
+            String type = "*";
+            if (lti.value instanceof CoerceTreeItem) {
+                type = ((CoerceTreeItem) lti.value).type;
+            }
+            if (lti.value instanceof ConvertTreeItem) {
+                type = ((ConvertTreeItem) lti.value).type;
+            }
+            return "var " + hilight(localRegName(localRegNames, lti.regIndex) + ":" + type + " = ") + lti.value.toString(constants, localRegNames, fullyQualifiedNames);
+        }
+        if (assignment instanceof SetSlotTreeItem) {
+            SetSlotTreeItem ssti = (SetSlotTreeItem) assignment;
+            return "var " + ssti.getName(constants, localRegNames, fullyQualifiedNames) + ":" + type + hilight(" = ") + ssti.value.toString(constants, localRegNames, fullyQualifiedNames);
+        }
+        return "var " + assignment.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
+    }
 }

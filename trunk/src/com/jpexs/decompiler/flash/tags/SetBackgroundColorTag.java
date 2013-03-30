@@ -25,27 +25,27 @@ import java.io.IOException;
 
 public class SetBackgroundColorTag extends Tag {
 
-   public RGB backgroundColor;
+    public RGB backgroundColor;
 
-   public SetBackgroundColorTag(byte[] data, int version, long pos) throws IOException {
-      super(9, "SetBackgroundColor", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      backgroundColor = sis.readRGB();
-   }
+    public SetBackgroundColorTag(byte[] data, int version, long pos) throws IOException {
+        super(9, "SetBackgroundColor", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        backgroundColor = sis.readRGB();
+    }
 
-   public SetBackgroundColorTag(RGB backgroundColor) {
-      super(9, "SetBackgroundColor", new byte[0], 0);
-      this.backgroundColor = backgroundColor;
-   }
+    public SetBackgroundColorTag(RGB backgroundColor) {
+        super(9, "SetBackgroundColor", new byte[0], 0);
+        this.backgroundColor = backgroundColor;
+    }
 
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      SWFOutputStream sos = new SWFOutputStream(baos, version);
-      try {
-         sos.writeRGB(backgroundColor);
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SWFOutputStream sos = new SWFOutputStream(baos, version);
+        try {
+            sos.writeRGB(backgroundColor);
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 }

@@ -23,12 +23,12 @@ import java.util.List;
 
 public class UndefinedTreeItem extends TreeItem {
 
-   public UndefinedTreeItem(AVM2Instruction instruction) {
-      super(instruction, PRECEDENCE_PRIMARY);
-   }
+    public UndefinedTreeItem(AVM2Instruction instruction) {
+        super(instruction, PRECEDENCE_PRIMARY);
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return hilight("undefined");
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return hilight("undefined");
+    }
 }

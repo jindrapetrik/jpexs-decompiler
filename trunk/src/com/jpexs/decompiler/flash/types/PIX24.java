@@ -23,21 +23,21 @@ package com.jpexs.decompiler.flash.types;
  */
 public class PIX24 {
 
-   /**
-    * Red color value
-    */
-   public int red;
-   /**
-    * Green color value
-    */
-   public int green;
-   /**
-    * Blue color value
-    */
-   public int blue;
+    /**
+     * Red color value
+     */
+    public int red;
+    /**
+     * Green color value
+     */
+    public int green;
+    /**
+     * Blue color value
+     */
+    public int blue;
 
-   @Override
-   public String toString() {
-      return "[PIX24 red:" + red + ", green:" + green + ", blue:" + blue + "]";
-   }
+    @Override
+    public String toString() {
+        return "[PIX24 red:" + red + ", green:" + green + ", blue:" + blue + "]";
+    }
 }

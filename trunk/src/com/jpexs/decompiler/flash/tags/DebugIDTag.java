@@ -30,36 +30,36 @@ import java.io.OutputStream;
  */
 public class DebugIDTag extends Tag {
 
-   public byte debugId[];
+    public byte debugId[];
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         sos.write(debugId);
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            sos.write(debugId);
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 
-   /**
-    * Constructor
-    *
-    * @param data Data bytes
-    * @param version SWF version
-    * @throws IOException
-    */
-   public DebugIDTag(byte data[], int version, long pos) throws IOException {
-      super(63, "DebugID", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      debugId = sis.readBytes(16);
-   }
+    /**
+     * Constructor
+     *
+     * @param data Data bytes
+     * @param version SWF version
+     * @throws IOException
+     */
+    public DebugIDTag(byte data[], int version, long pos) throws IOException {
+        super(63, "DebugID", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        debugId = sis.readBytes(16);
+    }
 }

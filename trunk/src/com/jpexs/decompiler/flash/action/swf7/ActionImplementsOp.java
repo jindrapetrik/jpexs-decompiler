@@ -26,23 +26,23 @@ import java.util.Stack;
 
 public class ActionImplementsOp extends Action {
 
-   public ActionImplementsOp() {
-      super(0x2C, 0);
-   }
+    public ActionImplementsOp() {
+        super(0x2C, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "ImplementsOp";
-   }
+    @Override
+    public String toString() {
+        return "ImplementsOp";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem subclass = stack.pop();
-      long inCount = popLong(stack);
-      List<GraphTargetItem> superclasses = new ArrayList<GraphTargetItem>();
-      for (long l = 0; l < inCount; l++) {
-         superclasses.add(stack.pop());
-      }
-      output.add(new ImplementsOpTreeItem(this, subclass, superclasses));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem subclass = stack.pop();
+        long inCount = popLong(stack);
+        List<GraphTargetItem> superclasses = new ArrayList<GraphTargetItem>();
+        for (long l = 0; l < inCount; l++) {
+            superclasses.add(stack.pop());
+        }
+        output.add(new ImplementsOpTreeItem(this, subclass, superclasses));
+    }
 }

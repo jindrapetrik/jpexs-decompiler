@@ -25,5 +25,5 @@ import java.util.HashMap;
  */
 public interface BoundedTag {
 
-   public RECT getRect(HashMap<Integer, CharacterTag> characters);
+    public RECT getRect(HashMap<Integer, CharacterTag> characters);
 }

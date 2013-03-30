@@ -55,236 +55,236 @@ import java.util.List;
 
 public class TagNode {
 
-   public List<TagNode> subItems;
-   public Object tag;
-   public boolean export = false;
+    public List<TagNode> subItems;
+    public Object tag;
+    public boolean export = false;
 
-   public List<TagNode> getAllSubs() {
-      List<TagNode> ret = new ArrayList<TagNode>();
-      ret.addAll(subItems);
-      for (TagNode n : subItems) {
-         ret.addAll(n.getAllSubs());
-      }
-      return ret;
-   }
+    public List<TagNode> getAllSubs() {
+        List<TagNode> ret = new ArrayList<TagNode>();
+        ret.addAll(subItems);
+        for (TagNode n : subItems) {
+            ret.addAll(n.getAllSubs());
+        }
+        return ret;
+    }
 
-   public TagNode(Object tag) {
-      this.tag = tag;
-      this.subItems = new ArrayList<TagNode>();
-   }
+    public TagNode(Object tag) {
+        this.tag = tag;
+        this.subItems = new ArrayList<TagNode>();
+    }
 
-   @Override
-   public String toString() {
-      return tag.toString();
-   }
+    @Override
+    public String toString() {
+        return tag.toString();
+    }
 
-   public static List<TagNode> createTagList(List<Object> list) {
-      List<TagNode> ret = new ArrayList<TagNode>();
-      int frame = 1;
-      List<TagNode> frames = new ArrayList<TagNode>();
-      List<TagNode> shapes = new ArrayList<TagNode>();
-      List<TagNode> morphShapes = new ArrayList<TagNode>();
-      List<TagNode> sprites = new ArrayList<TagNode>();
-      List<TagNode> buttons = new ArrayList<TagNode>();
-      List<TagNode> images = new ArrayList<TagNode>();
-      List<TagNode> fonts = new ArrayList<TagNode>();
-      List<TagNode> texts = new ArrayList<TagNode>();
+    public static List<TagNode> createTagList(List<Object> list) {
+        List<TagNode> ret = new ArrayList<TagNode>();
+        int frame = 1;
+        List<TagNode> frames = new ArrayList<TagNode>();
+        List<TagNode> shapes = new ArrayList<TagNode>();
+        List<TagNode> morphShapes = new ArrayList<TagNode>();
+        List<TagNode> sprites = new ArrayList<TagNode>();
+        List<TagNode> buttons = new ArrayList<TagNode>();
+        List<TagNode> images = new ArrayList<TagNode>();
+        List<TagNode> fonts = new ArrayList<TagNode>();
+        List<TagNode> texts = new ArrayList<TagNode>();
 
 
-      List<ExportAssetsTag> exportAssetsTags = new ArrayList<ExportAssetsTag>();
-      for (Object t : list) {
-         if (t instanceof ExportAssetsTag) {
-            exportAssetsTags.add((ExportAssetsTag) t);
-         }
-         if ((t instanceof DefineFontTag)
-                 || (t instanceof DefineFont2Tag)
-                 || (t instanceof DefineFont3Tag)
-                 || (t instanceof DefineFont4Tag)) {
-            fonts.add(new TagNode(t));
-         }
-         if ((t instanceof DefineTextTag)
-                 || (t instanceof DefineText2Tag)
-                 || (t instanceof DefineEditTextTag)) {
-            texts.add(new TagNode(t));
-         }
-
-         if ((t instanceof DefineBitsTag)
-                 || (t instanceof DefineBitsJPEG2Tag)
-                 || (t instanceof DefineBitsJPEG3Tag)
-                 || (t instanceof DefineBitsJPEG4Tag)
-                 || (t instanceof DefineBitsLosslessTag)
-                 || (t instanceof DefineBitsLossless2Tag)) {
-            images.add(new TagNode(t));
-         }
-         if ((t instanceof DefineShapeTag)
-                 || (t instanceof DefineShape2Tag)
-                 || (t instanceof DefineShape3Tag)
-                 || (t instanceof DefineShape4Tag)) {
-            shapes.add(new TagNode(t));
-         }
-
-         if ((t instanceof DefineMorphShapeTag) || (t instanceof DefineMorphShape2Tag)) {
-            morphShapes.add(new TagNode(t));
-         }
-
-         if (t instanceof DefineSpriteTag) {
-            sprites.add(new TagNode(t));
-         }
-         if ((t instanceof DefineButtonTag) || (t instanceof DefineButton2Tag)) {
-            buttons.add(new TagNode(t));
-         }
-         if (t instanceof ShowFrameTag) {
-            TagNode tti = new TagNode("frame" + frame);
-
-            /*           for (int r = ret.size() - 1; r >= 0; r--) {
-             if (!(ret.get(r).tag instanceof DefineSpriteTag)) {
-             if (!(ret.get(r).tag instanceof DefineButtonTag)) {
-             if (!(ret.get(r).tag instanceof DefineButton2Tag)) {
-             if (!(ret.get(r).tag instanceof DoInitActionTag)) {
-             tti.subItems.add(ret.get(r));
-             ret.remove(r);
-             }
-             }
-             }
-             }
-             }*/
-            frame++;
-            frames.add(tti);
-         } /*if (t instanceof ASMSource) {
-          TagNode tti = new TagNode(t);
-          ret.add(tti);
-          } else */
-         if (t instanceof Container) {
-            TagNode tti = new TagNode(t);
-            if (((Container) t).getItemCount() > 0) {
-               List<Object> subItems = ((Container) t).getSubItems();
-               tti.subItems = createTagList(subItems);
+        List<ExportAssetsTag> exportAssetsTags = new ArrayList<ExportAssetsTag>();
+        for (Object t : list) {
+            if (t instanceof ExportAssetsTag) {
+                exportAssetsTags.add((ExportAssetsTag) t);
             }
-            //ret.add(tti);
-         }
-      }
-
-      TagNode textsNode = new TagNode("texts");
-      textsNode.subItems.addAll(texts);
-
-      TagNode imagesNode = new TagNode("images");
-      imagesNode.subItems.addAll(images);
-
-      TagNode fontsNode = new TagNode("fonts");
-      fontsNode.subItems.addAll(fonts);
-
-
-      TagNode spritesNode = new TagNode("sprites");
-      spritesNode.subItems.addAll(sprites);
-
-      TagNode shapesNode = new TagNode("shapes");
-      shapesNode.subItems.addAll(shapes);
-
-      TagNode morphShapesNode = new TagNode("morphshapes");
-      morphShapesNode.subItems.addAll(morphShapes);
-
-      TagNode buttonsNode = new TagNode("buttons");
-      buttonsNode.subItems.addAll(buttons);
-
-      TagNode framesNode = new TagNode("frames");
-      framesNode.subItems.addAll(frames);
-      ret.add(shapesNode);
-      ret.add(morphShapesNode);;
-      ret.add(spritesNode);
-      ret.add(textsNode);
-      ret.add(imagesNode);
-      ret.add(buttonsNode);
-      ret.add(fontsNode);
-      ret.add(framesNode);
-      for (int i = ret.size() - 1; i >= 0; i--) {
-         if (ret.get(i).tag instanceof DefineSpriteTag) {
-            ((DefineSpriteTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
-         }
-         if (ret.get(i).tag instanceof DefineButtonTag) {
-            ((DefineButtonTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
-         }
-         if (ret.get(i).tag instanceof DefineButton2Tag) {
-            ((DefineButton2Tag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
-         }
-         if (ret.get(i).tag instanceof DoInitActionTag) {
-            ((DoInitActionTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
-         }
-         if (ret.get(i).tag instanceof ASMSource) {
-            ASMSource ass = (ASMSource) ret.get(i).tag;
-            if (ass.containsSource()) {
-               continue;
+            if ((t instanceof DefineFontTag)
+                    || (t instanceof DefineFont2Tag)
+                    || (t instanceof DefineFont3Tag)
+                    || (t instanceof DefineFont4Tag)) {
+                fonts.add(new TagNode(t));
             }
-         }
-         if (ret.get(i).subItems.isEmpty()) {
-            //ret.remove(i);
-         }
-      }
-      return ret;
-   }
-
-   public static void setExport(List<TagNode> nodeList, boolean export) {
-      for (TagNode node : nodeList) {
-         node.export = export;
-         setExport(node.subItems, export);
-      }
-   }
-
-   public static boolean exportNodeAS(List<TagNode> nodeList, String outdir, boolean isPcode) {
-      return exportNodeAS(nodeList, outdir, isPcode, null);
-   }
-
-   public static boolean exportNodeAS(List<TagNode> nodeList, String outdir, boolean isPcode, EventListener ev) {            
-      File dir = new File(outdir);
-      
-      if(!outdir.endsWith(File.separator)){
-         outdir=outdir + File.separator;
-      }
-      List<String> existingNames = new ArrayList<String>();
-      for (TagNode node : nodeList) {
-         String name = "";
-         if (node.tag instanceof Tag) {
-            name = ((Tag) node.tag).getExportName();
-         } else {
-            name = node.tag.toString();
-         }
-         int i = 1;
-         String baseName = name;
-         while (existingNames.contains(name)) {
-            i++;
-            name = baseName + "_" + i;
-         }
-         existingNames.add(name);
-         if (node.subItems.isEmpty()) {
-            if ((node.tag instanceof ASMSource) && (node.export)) {
-               if (!dir.exists()) {
-                  dir.mkdirs();
-               }
-               try {
-                  String f = outdir + name + ".as";
-                  if (ev != null) {
-                     ev.handleEvent("export", "Exporting " + f + " ...");
-                  }
-                  String ret;
-                  if (isPcode) {
-                     ret = Highlighting.stripHilights(((ASMSource) node.tag).getASMSource(SWF.DEFAULT_VERSION, false));
-                  } else {
-                     List<Action> as = ((ASMSource) node.tag).getActions(SWF.DEFAULT_VERSION);
-                     Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
-                     ret = (Highlighting.stripHilights(Action.actionsToSource(as, SWF.DEFAULT_VERSION)));
-                  }
-
-
-                  FileOutputStream fos = new FileOutputStream(f);
-                  fos.write(ret.getBytes());
-                  fos.close();
-               } catch (Exception ex) {
-               }
+            if ((t instanceof DefineTextTag)
+                    || (t instanceof DefineText2Tag)
+                    || (t instanceof DefineEditTextTag)) {
+                texts.add(new TagNode(t));
             }
-         } else {
-            exportNodeAS(node.subItems, outdir+name, isPcode, ev);
-         }
 
-      }
-      return true;
-   }
+            if ((t instanceof DefineBitsTag)
+                    || (t instanceof DefineBitsJPEG2Tag)
+                    || (t instanceof DefineBitsJPEG3Tag)
+                    || (t instanceof DefineBitsJPEG4Tag)
+                    || (t instanceof DefineBitsLosslessTag)
+                    || (t instanceof DefineBitsLossless2Tag)) {
+                images.add(new TagNode(t));
+            }
+            if ((t instanceof DefineShapeTag)
+                    || (t instanceof DefineShape2Tag)
+                    || (t instanceof DefineShape3Tag)
+                    || (t instanceof DefineShape4Tag)) {
+                shapes.add(new TagNode(t));
+            }
+
+            if ((t instanceof DefineMorphShapeTag) || (t instanceof DefineMorphShape2Tag)) {
+                morphShapes.add(new TagNode(t));
+            }
+
+            if (t instanceof DefineSpriteTag) {
+                sprites.add(new TagNode(t));
+            }
+            if ((t instanceof DefineButtonTag) || (t instanceof DefineButton2Tag)) {
+                buttons.add(new TagNode(t));
+            }
+            if (t instanceof ShowFrameTag) {
+                TagNode tti = new TagNode("frame" + frame);
+
+                /*           for (int r = ret.size() - 1; r >= 0; r--) {
+                 if (!(ret.get(r).tag instanceof DefineSpriteTag)) {
+                 if (!(ret.get(r).tag instanceof DefineButtonTag)) {
+                 if (!(ret.get(r).tag instanceof DefineButton2Tag)) {
+                 if (!(ret.get(r).tag instanceof DoInitActionTag)) {
+                 tti.subItems.add(ret.get(r));
+                 ret.remove(r);
+                 }
+                 }
+                 }
+                 }
+                 }*/
+                frame++;
+                frames.add(tti);
+            } /*if (t instanceof ASMSource) {
+             TagNode tti = new TagNode(t);
+             ret.add(tti);
+             } else */
+            if (t instanceof Container) {
+                TagNode tti = new TagNode(t);
+                if (((Container) t).getItemCount() > 0) {
+                    List<Object> subItems = ((Container) t).getSubItems();
+                    tti.subItems = createTagList(subItems);
+                }
+                //ret.add(tti);
+            }
+        }
+
+        TagNode textsNode = new TagNode("texts");
+        textsNode.subItems.addAll(texts);
+
+        TagNode imagesNode = new TagNode("images");
+        imagesNode.subItems.addAll(images);
+
+        TagNode fontsNode = new TagNode("fonts");
+        fontsNode.subItems.addAll(fonts);
+
+
+        TagNode spritesNode = new TagNode("sprites");
+        spritesNode.subItems.addAll(sprites);
+
+        TagNode shapesNode = new TagNode("shapes");
+        shapesNode.subItems.addAll(shapes);
+
+        TagNode morphShapesNode = new TagNode("morphshapes");
+        morphShapesNode.subItems.addAll(morphShapes);
+
+        TagNode buttonsNode = new TagNode("buttons");
+        buttonsNode.subItems.addAll(buttons);
+
+        TagNode framesNode = new TagNode("frames");
+        framesNode.subItems.addAll(frames);
+        ret.add(shapesNode);
+        ret.add(morphShapesNode);;
+        ret.add(spritesNode);
+        ret.add(textsNode);
+        ret.add(imagesNode);
+        ret.add(buttonsNode);
+        ret.add(fontsNode);
+        ret.add(framesNode);
+        for (int i = ret.size() - 1; i >= 0; i--) {
+            if (ret.get(i).tag instanceof DefineSpriteTag) {
+                ((DefineSpriteTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
+            }
+            if (ret.get(i).tag instanceof DefineButtonTag) {
+                ((DefineButtonTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
+            }
+            if (ret.get(i).tag instanceof DefineButton2Tag) {
+                ((DefineButton2Tag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
+            }
+            if (ret.get(i).tag instanceof DoInitActionTag) {
+                ((DoInitActionTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
+            }
+            if (ret.get(i).tag instanceof ASMSource) {
+                ASMSource ass = (ASMSource) ret.get(i).tag;
+                if (ass.containsSource()) {
+                    continue;
+                }
+            }
+            if (ret.get(i).subItems.isEmpty()) {
+                //ret.remove(i);
+            }
+        }
+        return ret;
+    }
+
+    public static void setExport(List<TagNode> nodeList, boolean export) {
+        for (TagNode node : nodeList) {
+            node.export = export;
+            setExport(node.subItems, export);
+        }
+    }
+
+    public static boolean exportNodeAS(List<TagNode> nodeList, String outdir, boolean isPcode) {
+        return exportNodeAS(nodeList, outdir, isPcode, null);
+    }
+
+    public static boolean exportNodeAS(List<TagNode> nodeList, String outdir, boolean isPcode, EventListener ev) {
+        File dir = new File(outdir);
+
+        if (!outdir.endsWith(File.separator)) {
+            outdir = outdir + File.separator;
+        }
+        List<String> existingNames = new ArrayList<String>();
+        for (TagNode node : nodeList) {
+            String name = "";
+            if (node.tag instanceof Tag) {
+                name = ((Tag) node.tag).getExportName();
+            } else {
+                name = node.tag.toString();
+            }
+            int i = 1;
+            String baseName = name;
+            while (existingNames.contains(name)) {
+                i++;
+                name = baseName + "_" + i;
+            }
+            existingNames.add(name);
+            if (node.subItems.isEmpty()) {
+                if ((node.tag instanceof ASMSource) && (node.export)) {
+                    if (!dir.exists()) {
+                        dir.mkdirs();
+                    }
+                    try {
+                        String f = outdir + name + ".as";
+                        if (ev != null) {
+                            ev.handleEvent("export", "Exporting " + f + " ...");
+                        }
+                        String ret;
+                        if (isPcode) {
+                            ret = Highlighting.stripHilights(((ASMSource) node.tag).getASMSource(SWF.DEFAULT_VERSION, false));
+                        } else {
+                            List<Action> as = ((ASMSource) node.tag).getActions(SWF.DEFAULT_VERSION);
+                            Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
+                            ret = (Highlighting.stripHilights(Action.actionsToSource(as, SWF.DEFAULT_VERSION)));
+                        }
+
+
+                        FileOutputStream fos = new FileOutputStream(f);
+                        fos.write(ret.getBytes());
+                        fos.close();
+                    } catch (Exception ex) {
+                    }
+                }
+            } else {
+                exportNodeAS(node.subItems, outdir + name, isPcode, ev);
+            }
+
+        }
+        return true;
+    }
 }

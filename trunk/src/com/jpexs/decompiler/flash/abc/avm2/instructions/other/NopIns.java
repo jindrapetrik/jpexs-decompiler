@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 public class NopIns extends InstructionDefinition {
 
-   public NopIns() {
-      super(0x02, "nop", new int[]{});
-   }
+    public NopIns() {
+        super(0x02, "nop", new int[]{});
+    }
 }

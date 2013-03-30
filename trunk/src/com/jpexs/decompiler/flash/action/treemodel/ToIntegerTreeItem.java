@@ -22,22 +22,22 @@ import java.util.List;
 
 public class ToIntegerTreeItem extends TreeItem {
 
-   private GraphTargetItem value;
+    private GraphTargetItem value;
 
-   public ToIntegerTreeItem(GraphSourceItem instruction, GraphTargetItem value) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.value = value;
-   }
+    public ToIntegerTreeItem(GraphSourceItem instruction, GraphTargetItem value) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.value = value;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return hilight("int(") + value.toString(constants) + hilight(")");
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return hilight("int(") + value.toString(constants) + hilight(")");
+    }
 
-   @Override
-   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(value.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(value.getNeededSources());
+        return ret;
+    }
 }

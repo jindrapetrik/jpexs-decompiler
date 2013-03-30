@@ -23,15 +23,15 @@ import java.util.List;
 
 public class IncLocalTreeItem extends TreeItem {
 
-   public int regIndex;
+    public int regIndex;
 
-   public IncLocalTreeItem(AVM2Instruction instruction, int regIndex) {
-      super(instruction, PRECEDENCE_POSTFIX);
-      this.regIndex = regIndex;
-   }
+    public IncLocalTreeItem(AVM2Instruction instruction, int regIndex) {
+        super(instruction, PRECEDENCE_POSTFIX);
+        this.regIndex = regIndex;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return localRegName(localRegNames, regIndex) + hilight("++");
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return localRegName(localRegNames, regIndex) + hilight("++");
+    }
 }

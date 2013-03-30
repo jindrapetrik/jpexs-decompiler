@@ -23,35 +23,35 @@ import java.util.List;
 
 public class SetPropertyTreeItem extends TreeItem implements SetTypeTreeItem {
 
-   public GraphTargetItem target;
-   public int propertyIndex;
-   public GraphTargetItem value;
+    public GraphTargetItem target;
+    public int propertyIndex;
+    public GraphTargetItem value;
 
-   public SetPropertyTreeItem(GraphSourceItem instruction, GraphTargetItem target, int propertyIndex, GraphTargetItem value) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.target = target;
-      this.propertyIndex = propertyIndex;
-      this.value = value;
-   }
+    public SetPropertyTreeItem(GraphSourceItem instruction, GraphTargetItem target, int propertyIndex, GraphTargetItem value) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.target = target;
+        this.propertyIndex = propertyIndex;
+        this.value = value;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      if (isEmptyString(target)) {
-         return hilight(Action.propertyNames[propertyIndex] + "=") + value.toString(constants);
-      }
-      return target.toString(constants) + hilight("." + Action.propertyNames[propertyIndex] + "=") + value.toString(constants);
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        if (isEmptyString(target)) {
+            return hilight(Action.propertyNames[propertyIndex] + "=") + value.toString(constants);
+        }
+        return target.toString(constants) + hilight("." + Action.propertyNames[propertyIndex] + "=") + value.toString(constants);
+    }
 
-   @Override
-   public GraphTargetItem getObject() {
-      return new GetPropertyTreeItem(src, target, propertyIndex);
-   }
+    @Override
+    public GraphTargetItem getObject() {
+        return new GetPropertyTreeItem(src, target, propertyIndex);
+    }
 
-   @Override
-   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(target.getNeededSources());
-      ret.addAll(value.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(target.getNeededSources());
+        ret.addAll(value.getNeededSources());
+        return ret;
+    }
 }

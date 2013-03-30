@@ -30,45 +30,45 @@ import java.io.OutputStream;
  */
 public class RemoveObjectTag extends Tag {
 
-   /**
-    * ID of character to place
-    */
-   public int characterId;
-   /**
-    * Depth of character
-    */
-   public int depth;
+    /**
+     * ID of character to place
+     */
+    public int characterId;
+    /**
+     * Depth of character
+     */
+    public int depth;
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         sos.writeUI16(characterId);
-         sos.writeUI16(depth);
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            sos.writeUI16(characterId);
+            sos.writeUI16(depth);
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 
-   /**
-    * Constructor
-    *
-    * @param data Data bytes
-    * @param version SWF version
-    * @throws IOException
-    */
-   public RemoveObjectTag(byte data[], int version, long pos) throws IOException {
-      super(5, "RemoveObject", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      characterId = sis.readUI16();
-      depth = sis.readUI16();
-   }
+    /**
+     * Constructor
+     *
+     * @param data Data bytes
+     * @param version SWF version
+     * @throws IOException
+     */
+    public RemoveObjectTag(byte data[], int version, long pos) throws IOException {
+        super(5, "RemoveObject", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        characterId = sis.readUI16();
+        depth = sis.readUI16();
+    }
 }

@@ -26,23 +26,23 @@ import java.util.Stack;
 
 public class ActionFSCommand2 extends Action {
 
-   public ActionFSCommand2() {
-      super(0x2D, 0);
-   }
+    public ActionFSCommand2() {
+        super(0x2D, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "FSCommand2";
-   }
+    @Override
+    public String toString() {
+        return "FSCommand2";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      long numArgs = popLong(stack);
-      GraphTargetItem command = stack.pop();
-      List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
-      for (long l = 0; l < numArgs; l++) {
-         args.add(stack.pop());
-      }
-      stack.push(new FSCommand2TreeItem(this, command, args));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        long numArgs = popLong(stack);
+        GraphTargetItem command = stack.pop();
+        List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
+        for (long l = 0; l < numArgs; l++) {
+            args.add(stack.pop());
+        }
+        stack.push(new FSCommand2TreeItem(this, command, args));
+    }
 }

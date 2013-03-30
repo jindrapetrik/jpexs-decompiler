@@ -20,15 +20,15 @@ import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 
 public class UnsupportedTreeItem extends TreeItem {
 
-   public String value;
+    public String value;
 
-   public UnsupportedTreeItem(GraphSourceItem instruction, String value) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.value = value;
-   }
+    public UnsupportedTreeItem(GraphSourceItem instruction, String value) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.value = value;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return "//Unsupported by decompiler:" + value;
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return "//Unsupported by decompiler:" + value;
+    }
 }

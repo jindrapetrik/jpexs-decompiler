@@ -30,16 +30,16 @@ import java.util.Stack;
 
 public class JumpIns extends InstructionDefinition implements IfTypeIns {
 
-   public JumpIns() {
-      super(0x10, "jump", new int[]{AVM2Code.DAT_OFFSET});
-   }
+    public JumpIns() {
+        super(0x10, "jump", new int[]{AVM2Code.DAT_OFFSET});
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      stack.push(new BooleanTreeItem(ins, Boolean.TRUE));// + ins.operands[0]);
-   }
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        stack.push(new BooleanTreeItem(ins, Boolean.TRUE));// + ins.operands[0]);
+    }
 
-   @Override
-   public void translateInverted(java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, AVM2Instruction ins) {
-   }
+    @Override
+    public void translateInverted(java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, AVM2Instruction ins) {
+    }
 }

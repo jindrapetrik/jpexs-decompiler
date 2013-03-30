@@ -8,12 +8,12 @@ import java.util.List;
  */
 public class TrueItem extends GraphTargetItem {
 
-   public TrueItem(GraphSourceItem src) {
-      super(src, PRECEDENCE_PRIMARY);
-   }
+    public TrueItem(GraphSourceItem src) {
+        super(src, PRECEDENCE_PRIMARY);
+    }
 
-   @Override
-   public String toString(List localData) {
-      return "true";
-   }
+    @Override
+    public String toString(List localData) {
+        return "true";
+    }
 }

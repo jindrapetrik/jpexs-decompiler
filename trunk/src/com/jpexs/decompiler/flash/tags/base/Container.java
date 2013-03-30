@@ -25,17 +25,17 @@ import java.util.List;
  */
 public interface Container {
 
-   /**
-    * Returns all sub-items
-    *
-    * @return List of sub-items
-    */
-   public List<Object> getSubItems();
+    /**
+     * Returns all sub-items
+     *
+     * @return List of sub-items
+     */
+    public List<Object> getSubItems();
 
-   /**
-    * Returns number of sub-items
-    *
-    * @return Number of sub-items
-    */
-   public int getItemCount();
+    /**
+     * Returns number of sub-items
+     *
+     * @return Number of sub-items
+     */
+    public int getItemCount();
 }

@@ -32,24 +32,24 @@ import java.util.Stack;
 
 public class NewObjectIns extends InstructionDefinition {
 
-   public NewObjectIns() {
-      super(0x55, "newobject", new int[]{AVM2Code.DAT_ARG_COUNT});
-   }
+    public NewObjectIns() {
+        super(0x55, "newobject", new int[]{AVM2Code.DAT_ARG_COUNT});
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      int argCount = ins.operands[0];
-      List<NameValuePair> args = new ArrayList<NameValuePair>();
-      for (int a = 0; a < argCount; a++) {
-         GraphTargetItem value = (GraphTargetItem) stack.pop();
-         GraphTargetItem name = (GraphTargetItem) stack.pop();
-         args.add(0, new NameValuePair(name, value));
-      }
-      stack.push(new NewObjectTreeItem(ins, args));
-   }
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        int argCount = ins.operands[0];
+        List<NameValuePair> args = new ArrayList<NameValuePair>();
+        for (int a = 0; a < argCount; a++) {
+            GraphTargetItem value = (GraphTargetItem) stack.pop();
+            GraphTargetItem name = (GraphTargetItem) stack.pop();
+            args.add(0, new NameValuePair(name, value));
+        }
+        stack.push(new NewObjectTreeItem(ins, args));
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -ins.operands[0] * 2 + 1;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return -ins.operands[0] * 2 + 1;
+    }
 }

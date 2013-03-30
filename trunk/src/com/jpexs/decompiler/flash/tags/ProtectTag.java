@@ -30,43 +30,43 @@ import java.io.OutputStream;
  */
 public class ProtectTag extends Tag {
 
-   /**
-    * MD5 hash of password
-    */
-   public String passwordHash;
+    /**
+     * MD5 hash of password
+     */
+    public String passwordHash;
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         if (passwordHash != null) {
-            sos.writeString(passwordHash);
-         }
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            if (passwordHash != null) {
+                sos.writeString(passwordHash);
+            }
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 
-   /**
-    * Constructor
-    *
-    * @param data Data bytes
-    * @param version SWF version
-    * @throws IOException
-    */
-   public ProtectTag(byte data[], int version, long pos) throws IOException {
-      super(24, "Protect", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      if (sis.available() > 0) {
-         passwordHash = sis.readString();
-      }
-   }
+    /**
+     * Constructor
+     *
+     * @param data Data bytes
+     * @param version SWF version
+     * @throws IOException
+     */
+    public ProtectTag(byte data[], int version, long pos) throws IOException {
+        super(24, "Protect", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        if (sis.available() > 0) {
+            passwordHash = sis.readString();
+        }
+    }
 }

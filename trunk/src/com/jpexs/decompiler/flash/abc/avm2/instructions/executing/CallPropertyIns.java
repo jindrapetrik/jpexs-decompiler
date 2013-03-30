@@ -33,50 +33,50 @@ import java.util.Stack;
 
 public class CallPropertyIns extends InstructionDefinition {
 
-   public CallPropertyIns() {
-      super(0x46, "callproperty", new int[]{AVM2Code.DAT_MULTINAME_INDEX, AVM2Code.DAT_ARG_COUNT});
-   }
+    public CallPropertyIns() {
+        super(0x46, "callproperty", new int[]{AVM2Code.DAT_MULTINAME_INDEX, AVM2Code.DAT_ARG_COUNT});
+    }
 
-   @Override
-   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-      /*int multinameIndex = (int) ((Long) arguments.get(0)).longValue();
-       int argCount = (int) ((Long) arguments.get(1)).longValue();
-       List passArguments = new ArrayList();
-       for (int i = argCount - 1; i >= 0; i--) {
-       passArguments.set(i, lda.operandStack.pop());
-       }
-       //if multiname[multinameIndex] is runtime
-       //pop(name) pop(ns)
-       Object obj = lda.operandStack.pop();*/
-      throw new RuntimeException("Call to unknown property");
-      //push(result)
-   }
+    @Override
+    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        /*int multinameIndex = (int) ((Long) arguments.get(0)).longValue();
+         int argCount = (int) ((Long) arguments.get(1)).longValue();
+         List passArguments = new ArrayList();
+         for (int i = argCount - 1; i >= 0; i--) {
+         passArguments.set(i, lda.operandStack.pop());
+         }
+         //if multiname[multinameIndex] is runtime
+         //pop(name) pop(ns)
+         Object obj = lda.operandStack.pop();*/
+        throw new RuntimeException("Call to unknown property");
+        //push(result)
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      int multinameIndex = ins.operands[0];
-      int argCount = ins.operands[1];
-      List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
-      for (int a = 0; a < argCount; a++) {
-         args.add(0, (GraphTargetItem) stack.pop());
-      }
-      FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        int multinameIndex = ins.operands[0];
+        int argCount = ins.operands[1];
+        List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
+        for (int a = 0; a < argCount; a++) {
+            args.add(0, (GraphTargetItem) stack.pop());
+        }
+        FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
 
-      GraphTargetItem receiver = (GraphTargetItem) stack.pop();
+        GraphTargetItem receiver = (GraphTargetItem) stack.pop();
 
-      stack.push(new CallPropertyTreeItem(ins, false, receiver, multiname, args));
-   }
+        stack.push(new CallPropertyTreeItem(ins, false, receiver, multiname, args));
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      int ret = -ins.operands[1] - 1 + 1;
-      int multinameIndex = ins.operands[0];
-      if (abc.constants.constant_multiname[multinameIndex].needsName()) {
-         ret--;
-      }
-      if (abc.constants.constant_multiname[multinameIndex].needsNs()) {
-         ret--;
-      }
-      return ret;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        int ret = -ins.operands[1] - 1 + 1;
+        int multinameIndex = ins.operands[0];
+        if (abc.constants.constant_multiname[multinameIndex].needsName()) {
+            ret--;
+        }
+        if (abc.constants.constant_multiname[multinameIndex].needsNs()) {
+            ret--;
+        }
+        return ret;
+    }
 }

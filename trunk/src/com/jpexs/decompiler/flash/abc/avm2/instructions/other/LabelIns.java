@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class LabelIns extends InstructionDefinition {
 //this can be target of branch
 
-   public LabelIns() {
-      super(0x09, "label", new int[]{});
-   }
+    public LabelIns() {
+        super(0x09, "label", new int[]{});
+    }
 }

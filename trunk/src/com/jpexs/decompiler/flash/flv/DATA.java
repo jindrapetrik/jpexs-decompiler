@@ -6,5 +6,5 @@ package com.jpexs.decompiler.flash.flv;
  */
 public abstract class DATA {
 
-   public abstract byte[] getBytes();
+    public abstract byte[] getBytes();
 }

@@ -23,5 +23,5 @@ package com.jpexs.decompiler.flash.types;
  */
 public class ALPHABITMAPDATA {
 
-   public ARGB bitmapPixelData[];
+    public ARGB bitmapPixelData[];
 }

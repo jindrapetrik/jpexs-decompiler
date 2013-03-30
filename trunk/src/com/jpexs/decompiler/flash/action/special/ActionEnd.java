@@ -24,18 +24,18 @@ import java.util.Stack;
 
 public class ActionEnd extends Action {
 
-   public ActionEnd() {
-      super(0, 0);
-      ignored = true;
-   }
+    public ActionEnd() {
+        super(0, 0);
+        ignored = true;
+    }
 
-   @Override
-   public String toString() {
-      return "End";
-   }
+    @Override
+    public String toString() {
+        return "End";
+    }
 
-   @Override
-   public void translate(Stack<com.jpexs.decompiler.flash.graph.GraphTargetItem> stack, List<com.jpexs.decompiler.flash.graph.GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      //output.add(new SimpleActionTreeItem(this, "end()"));
-   }
+    @Override
+    public void translate(Stack<com.jpexs.decompiler.flash.graph.GraphTargetItem> stack, List<com.jpexs.decompiler.flash.graph.GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        //output.add(new SimpleActionTreeItem(this, "end()"));
+    }
 }

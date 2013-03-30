@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 
 public abstract class NumberValueTreeItem extends TreeItem {
 
-   public NumberValueTreeItem(AVM2Instruction instruction) {
-      super(instruction, PRECEDENCE_PRIMARY);
-   }
+    public NumberValueTreeItem(AVM2Instruction instruction) {
+        super(instruction, PRECEDENCE_PRIMARY);
+    }
 }

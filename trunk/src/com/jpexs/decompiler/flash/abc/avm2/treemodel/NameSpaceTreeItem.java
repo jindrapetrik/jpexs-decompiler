@@ -23,18 +23,18 @@ import java.util.List;
 
 public class NameSpaceTreeItem extends TreeItem {
 
-   public int namespaceIndex;
+    public int namespaceIndex;
 
-   public NameSpaceTreeItem(AVM2Instruction instruction, int namespaceIndex) {
-      super(instruction, NOPRECEDENCE);
-      this.namespaceIndex = namespaceIndex;
-   }
+    public NameSpaceTreeItem(AVM2Instruction instruction, int namespaceIndex) {
+        super(instruction, NOPRECEDENCE);
+        this.namespaceIndex = namespaceIndex;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      if (namespaceIndex == 0) {
-         return "*";
-      }
-      return hilight(constants.constant_namespace[namespaceIndex].toString(constants));
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        if (namespaceIndex == 0) {
+            return "*";
+        }
+        return hilight(constants.constant_namespace[namespaceIndex].toString(constants));
+    }
 }

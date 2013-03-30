@@ -21,15 +21,15 @@ import com.jpexs.decompiler.flash.helpers.Helper;
 
 public class SetTargetTreeItem extends TreeItem {
 
-   public String target;
+    public String target;
 
-   public SetTargetTreeItem(GraphSourceItem instruction, String target) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.target = target;
-   }
+    public SetTargetTreeItem(GraphSourceItem instruction, String target) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.target = target;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return hilight("tellTarget(\"") + Helper.escapeString(target) + hilight("\")");
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return hilight("tellTarget(\"") + Helper.escapeString(target) + hilight("\")");
+    }
 }

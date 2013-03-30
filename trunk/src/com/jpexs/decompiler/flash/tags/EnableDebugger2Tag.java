@@ -30,43 +30,43 @@ import java.io.OutputStream;
  */
 public class EnableDebugger2Tag extends Tag {
 
-   public int reserved;
-   /**
-    * MD5 hash of password
-    */
-   public String passwordHash;
+    public int reserved;
+    /**
+     * MD5 hash of password
+     */
+    public String passwordHash;
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         sos.writeUI16(reserved);
-         sos.writeString(passwordHash);
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            sos.writeUI16(reserved);
+            sos.writeString(passwordHash);
 
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 
-   /**
-    * Constructor
-    *
-    * @param data Data bytes
-    * @param version SWF version
-    * @throws IOException
-    */
-   public EnableDebugger2Tag(byte data[], int version, long pos) throws IOException {
-      super(64, "EnableDebugger2", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      reserved = sis.readUI16();
-      passwordHash = sis.readString();
-   }
+    /**
+     * Constructor
+     *
+     * @param data Data bytes
+     * @param version SWF version
+     * @throws IOException
+     */
+    public EnableDebugger2Tag(byte data[], int version, long pos) throws IOException {
+        super(64, "EnableDebugger2", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        reserved = sis.readUI16();
+        passwordHash = sis.readString();
+    }
 }

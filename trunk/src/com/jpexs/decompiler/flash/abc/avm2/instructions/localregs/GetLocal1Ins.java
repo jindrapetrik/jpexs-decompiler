@@ -30,27 +30,27 @@ import java.util.Stack;
 
 public class GetLocal1Ins extends InstructionDefinition implements GetLocalTypeIns {
 
-   public GetLocal1Ins() {
-      super(0xd1, "getlocal_1", new int[]{});
-   }
+    public GetLocal1Ins() {
+        super(0xd1, "getlocal_1", new int[]{});
+    }
 
-   @Override
-   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-      lda.operandStack.push(lda.localRegisters.get(1));
-   }
+    @Override
+    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        lda.operandStack.push(lda.localRegisters.get(1));
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      stack.push(new LocalRegTreeItem(ins, 1, localRegs.get(1)));
-   }
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        stack.push(new LocalRegTreeItem(ins, 1, localRegs.get(1)));
+    }
 
-   @Override
-   public int getRegisterId(AVM2Instruction par0) {
-      return 1;
-   }
+    @Override
+    public int getRegisterId(AVM2Instruction par0) {
+        return 1;
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return 1;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return 1;
+    }
 }

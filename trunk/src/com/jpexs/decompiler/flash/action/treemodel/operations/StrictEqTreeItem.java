@@ -23,17 +23,17 @@ import com.jpexs.decompiler.flash.graph.LogicalOpItem;
 
 public class StrictEqTreeItem extends BinaryOpItem implements LogicalOpItem {
 
-   public StrictEqTreeItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-      super(instruction, PRECEDENCE_EQUALITY, leftSide, rightSide, "===");
-   }
+    public StrictEqTreeItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, PRECEDENCE_EQUALITY, leftSide, rightSide, "===");
+    }
 
-   @Override
-   public boolean toBoolean() {
-      return (leftSide.toBoolean() == rightSide.toBoolean()) && (leftSide.toNumber() == rightSide.toNumber());
-   }
+    @Override
+    public boolean toBoolean() {
+        return (leftSide.toBoolean() == rightSide.toBoolean()) && (leftSide.toNumber() == rightSide.toNumber());
+    }
 
-   @Override
-   public GraphTargetItem invert() {
-      return new StrictNeqTreeItem(src, leftSide, rightSide);
-   }
+    @Override
+    public GraphTargetItem invert() {
+        return new StrictNeqTreeItem(src, leftSide, rightSide);
+    }
 }

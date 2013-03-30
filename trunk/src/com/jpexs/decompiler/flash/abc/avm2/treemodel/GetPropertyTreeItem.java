@@ -24,17 +24,17 @@ import java.util.List;
 
 public class GetPropertyTreeItem extends TreeItem {
 
-   public GraphTargetItem object;
-   public FullMultinameTreeItem propertyName;
+    public GraphTargetItem object;
+    public FullMultinameTreeItem propertyName;
 
-   public GetPropertyTreeItem(AVM2Instruction instruction, GraphTargetItem object, FullMultinameTreeItem propertyName) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.object = object;
-      this.propertyName = propertyName;
-   }
+    public GetPropertyTreeItem(AVM2Instruction instruction, GraphTargetItem object, FullMultinameTreeItem propertyName) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.object = object;
+        this.propertyName = propertyName;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return formatProperty(constants, object, propertyName, localRegNames, fullyQualifiedNames);
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return formatProperty(constants, object, propertyName, localRegNames, fullyQualifiedNames);
+    }
 }

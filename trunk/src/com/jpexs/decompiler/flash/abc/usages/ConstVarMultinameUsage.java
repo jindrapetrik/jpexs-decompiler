@@ -30,26 +30,26 @@ import java.util.List;
  */
 public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {
 
-   public ConstVarMultinameUsage(int multinameIndex, int classIndex, int traitIndex, boolean isStatic, Traits traits, int parentTraitIndex) {
-      super(multinameIndex, classIndex, traitIndex, isStatic, traits, parentTraitIndex);
-   }
+    public ConstVarMultinameUsage(int multinameIndex, int classIndex, int traitIndex, boolean isStatic, Traits traits, int parentTraitIndex) {
+        super(multinameIndex, classIndex, traitIndex, isStatic, traits, parentTraitIndex);
+    }
 
-   @Override
-   public String toString(List<DoABCTag> abcTags, ABC abc) {
-      return super.toString(abcTags, abc) + " "
-              + (parentTraitIndex > -1
-              ? (isStatic
-              ? (((TraitMethodGetterSetter) abc.class_info[classIndex].static_traits.traits[parentTraitIndex]).convertHeader("", abcTags, abc, isStatic, false, classIndex, false, new ArrayList<String>()))
-              : (((TraitMethodGetterSetter) abc.instance_info[classIndex].instance_traits.traits[parentTraitIndex]).convertHeader("", abcTags, abc, isStatic, false, classIndex, false, new ArrayList<String>())))
-              : "")
-              + ((TraitSlotConst) traits.traits[traitIndex]).convertHeader("", abcTags, abc, isStatic, false, classIndex, false, new ArrayList<String>());
-   }
+    @Override
+    public String toString(List<DoABCTag> abcTags, ABC abc) {
+        return super.toString(abcTags, abc) + " "
+                + (parentTraitIndex > -1
+                ? (isStatic
+                ? (((TraitMethodGetterSetter) abc.class_info[classIndex].static_traits.traits[parentTraitIndex]).convertHeader("", abcTags, abc, isStatic, false, classIndex, false, new ArrayList<String>()))
+                : (((TraitMethodGetterSetter) abc.instance_info[classIndex].instance_traits.traits[parentTraitIndex]).convertHeader("", abcTags, abc, isStatic, false, classIndex, false, new ArrayList<String>())))
+                : "")
+                + ((TraitSlotConst) traits.traits[traitIndex]).convertHeader("", abcTags, abc, isStatic, false, classIndex, false, new ArrayList<String>());
+    }
 
-   public int getTraitIndex() {
-      return traitIndex;
-   }
+    public int getTraitIndex() {
+        return traitIndex;
+    }
 
-   public boolean isStatic() {
-      return isStatic;
-   }
+    public boolean isStatic() {
+        return isStatic;
+    }
 }

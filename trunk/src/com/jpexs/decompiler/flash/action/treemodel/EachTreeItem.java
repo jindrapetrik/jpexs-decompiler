@@ -21,25 +21,25 @@ import java.util.List;
 
 public class EachTreeItem extends TreeItem {
 
-   public TreeItem object;
-   public TreeItem collection;
+    public TreeItem object;
+    public TreeItem collection;
 
-   public EachTreeItem(GraphSourceItem instruction, TreeItem object, TreeItem collection) {
-      super(instruction, NOPRECEDENCE);
-      this.object = object;
-      this.collection = collection;
-   }
+    public EachTreeItem(GraphSourceItem instruction, TreeItem object, TreeItem collection) {
+        super(instruction, NOPRECEDENCE);
+        this.object = object;
+        this.collection = collection;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return hilight("each (") + object.toString(constants) + hilight(" in ") + collection.toString(constants) + ")";
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return hilight("each (") + object.toString(constants) + hilight(" in ") + collection.toString(constants) + ")";
+    }
 
-   @Override
-   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(object.getNeededSources());
-      ret.addAll(collection.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(object.getNeededSources());
+        ret.addAll(collection.getNeededSources());
+        return ret;
+    }
 }

@@ -31,37 +31,37 @@ import java.util.Stack;
 
 public class ActionStrictMode extends Action {
 
-   public int mode;
+    public int mode;
 
-   public ActionStrictMode(SWFInputStream sis) throws IOException {
-      super(0x89, 1);
-      mode = sis.readUI8();
-   }
+    public ActionStrictMode(SWFInputStream sis) throws IOException {
+        super(0x89, 1);
+        mode = sis.readUI8();
+    }
 
-   public ActionStrictMode(FlasmLexer lexer) throws IOException, ParseException {
-      super(0x89, 1);
-      mode = (int) lexLong(lexer);
-   }
+    public ActionStrictMode(FlasmLexer lexer) throws IOException, ParseException {
+        super(0x89, 1);
+        mode = (int) lexLong(lexer);
+    }
 
-   @Override
-   public byte[] getBytes(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      SWFOutputStream sos = new SWFOutputStream(baos, version);
-      try {
-         sos.writeUI8(mode);
-         sos.close();
-      } catch (IOException e) {
-      }
-      return surroundWithAction(baos.toByteArray(), version);
-   }
+    @Override
+    public byte[] getBytes(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SWFOutputStream sos = new SWFOutputStream(baos, version);
+        try {
+            sos.writeUI8(mode);
+            sos.close();
+        } catch (IOException e) {
+        }
+        return surroundWithAction(baos.toByteArray(), version);
+    }
 
-   @Override
-   public String toString() {
-      return "StrictMode " + mode;
-   }
+    @Override
+    public String toString() {
+        return "StrictMode " + mode;
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      output.add(new StrictModeTreeItem(this, mode));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        output.add(new StrictModeTreeItem(this, mode));
+    }
 }

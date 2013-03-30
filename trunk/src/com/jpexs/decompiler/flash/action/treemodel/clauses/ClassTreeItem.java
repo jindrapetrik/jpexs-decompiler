@@ -29,76 +29,76 @@ import java.util.List;
 
 public class ClassTreeItem extends TreeItem implements Block {
 
-   private List<GraphTargetItem> functions;
-   public List<GraphTargetItem> staticFunctions;
-   public GraphTargetItem extendsOp;
-   public List<GraphTargetItem> implementsOp;
-   public GraphTargetItem className;
-   public HashMap<GraphTargetItem, GraphTargetItem> vars;
-   public HashMap<GraphTargetItem, GraphTargetItem> staticVars;
+    private List<GraphTargetItem> functions;
+    public List<GraphTargetItem> staticFunctions;
+    public GraphTargetItem extendsOp;
+    public List<GraphTargetItem> implementsOp;
+    public GraphTargetItem className;
+    public HashMap<GraphTargetItem, GraphTargetItem> vars;
+    public HashMap<GraphTargetItem, GraphTargetItem> staticVars;
 
-   @Override
-   public List<List<GraphTargetItem>> getSubs() {
-      List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
-      ret.add(functions);
-      ret.add(staticFunctions);
-      return ret;
-   }
+    @Override
+    public List<List<GraphTargetItem>> getSubs() {
+        List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
+        ret.add(functions);
+        ret.add(staticFunctions);
+        return ret;
+    }
 
-   public ClassTreeItem(GraphTargetItem className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, List<GraphTargetItem> functions, HashMap<GraphTargetItem, GraphTargetItem> vars, List<GraphTargetItem> staticFunctions, HashMap<GraphTargetItem, GraphTargetItem> staticVars) {
-      super(null, NOPRECEDENCE);
-      this.className = className;
-      this.functions = functions;
-      this.vars = vars;
-      this.extendsOp = extendsOp;
-      this.implementsOp = implementsOp;
-      this.staticFunctions = staticFunctions;
-      this.staticVars = staticVars;
-   }
+    public ClassTreeItem(GraphTargetItem className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, List<GraphTargetItem> functions, HashMap<GraphTargetItem, GraphTargetItem> vars, List<GraphTargetItem> staticFunctions, HashMap<GraphTargetItem, GraphTargetItem> staticVars) {
+        super(null, NOPRECEDENCE);
+        this.className = className;
+        this.functions = functions;
+        this.vars = vars;
+        this.extendsOp = extendsOp;
+        this.implementsOp = implementsOp;
+        this.staticFunctions = staticFunctions;
+        this.staticVars = staticVars;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      String ret;
-      ret = hilight("class ") + className.toStringNoQuotes(Helper.toList(constants));
-      if (extendsOp != null) {
-         ret += hilight(" extends ") + extendsOp.toStringNoQuotes(Helper.toList(constants));
-      }
-      if (!implementsOp.isEmpty()) {
-         ret += hilight(" implements ");
-         boolean first = true;
-         for (GraphTargetItem t : implementsOp) {
-            if (!first) {
-               ret += ", ";
+    @Override
+    public String toString(ConstantPool constants) {
+        String ret;
+        ret = hilight("class ") + className.toStringNoQuotes(Helper.toList(constants));
+        if (extendsOp != null) {
+            ret += hilight(" extends ") + extendsOp.toStringNoQuotes(Helper.toList(constants));
+        }
+        if (!implementsOp.isEmpty()) {
+            ret += hilight(" implements ");
+            boolean first = true;
+            for (GraphTargetItem t : implementsOp) {
+                if (!first) {
+                    ret += ", ";
+                }
+                first = false;
+                ret += Action.getWithoutGlobal(t).toString(constants);
             }
-            first = false;
-            ret += Action.getWithoutGlobal(t).toString(constants);
-         }
-      }
-      ret += "\r\n{\r\n";
-      for (GraphTargetItem f : functions) {
-         ret += f.toString(constants) + "\r\n";
-      }
-      for (GraphTargetItem f : staticFunctions) {
-         ret += "static " + f.toString(constants) + "\r\n";
-      }
-      for (GraphTargetItem v : vars.keySet()) {
-         ret += "var " + v.toStringNoQuotes(constants) + " = " + vars.get(v).toStringNoQuotes(constants) + ";\r\n";
-      }
-      for (GraphTargetItem v : staticVars.keySet()) {
-         ret += "static var " + v.toStringNoQuotes(constants) + " = " + staticVars.get(v).toStringNoQuotes(constants) + ";\r\n";
-      }
-      ret += "}\r\n";
-      return ret;
-   }
+        }
+        ret += "\r\n{\r\n";
+        for (GraphTargetItem f : functions) {
+            ret += f.toString(constants) + "\r\n";
+        }
+        for (GraphTargetItem f : staticFunctions) {
+            ret += "static " + f.toString(constants) + "\r\n";
+        }
+        for (GraphTargetItem v : vars.keySet()) {
+            ret += "var " + v.toStringNoQuotes(constants) + " = " + vars.get(v).toStringNoQuotes(constants) + ";\r\n";
+        }
+        for (GraphTargetItem v : staticVars.keySet()) {
+            ret += "static var " + v.toStringNoQuotes(constants) + " = " + staticVars.get(v).toStringNoQuotes(constants) + ";\r\n";
+        }
+        ret += "}\r\n";
+        return ret;
+    }
 
-   @Override
-   public List<ContinueItem> getContinues() {
-      List<ContinueItem> ret = new ArrayList<ContinueItem>();
-      return ret;
-   }
+    @Override
+    public List<ContinueItem> getContinues() {
+        List<ContinueItem> ret = new ArrayList<ContinueItem>();
+        return ret;
+    }
 
-   @Override
-   public boolean needsSemicolon() {
-      return false;
-   }
+    @Override
+    public boolean needsSemicolon() {
+        return false;
+    }
 }

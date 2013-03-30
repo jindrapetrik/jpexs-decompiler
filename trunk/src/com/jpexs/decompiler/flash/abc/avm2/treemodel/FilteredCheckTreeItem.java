@@ -29,15 +29,15 @@ import java.util.List;
  */
 public class FilteredCheckTreeItem extends TreeItem {
 
-   GraphTargetItem object;
+    GraphTargetItem object;
 
-   public FilteredCheckTreeItem(AVM2Instruction instruction, GraphTargetItem object) {
-      super(instruction, NOPRECEDENCE);
-      this.object = object;
-   }
+    public FilteredCheckTreeItem(AVM2Instruction instruction, GraphTargetItem object) {
+        super(instruction, NOPRECEDENCE);
+        this.object = object;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return object.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return object.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
+    }
 }

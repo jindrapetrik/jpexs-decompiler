@@ -24,23 +24,23 @@ import java.util.List;
 
 public class ConvertTreeItem extends TreeItem {
 
-   public GraphTargetItem value;
-   public String type;
+    public GraphTargetItem value;
+    public String type;
 
-   public ConvertTreeItem(AVM2Instruction instruction, GraphTargetItem value, String type) {
-      super(instruction, NOPRECEDENCE);
-      this.value = value;
-      this.type = type;
-   }
+    public ConvertTreeItem(AVM2Instruction instruction, GraphTargetItem value, String type) {
+        super(instruction, NOPRECEDENCE);
+        this.value = value;
+        this.type = type;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      //return hilight("("+type+")")+
-      return value.toString(constants, localRegNames, fullyQualifiedNames);
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        //return hilight("("+type+")")+
+        return value.toString(constants, localRegNames, fullyQualifiedNames);
+    }
 
-   @Override
-   public GraphTargetItem getNotCoerced() {
-      return value;
-   }
+    @Override
+    public GraphTargetItem getNotCoerced() {
+        return value;
+    }
 }

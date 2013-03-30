@@ -22,15 +22,15 @@ import java.util.List;
 
 public class ClassInfo {
 
-   public int cinit_index; //MethodInfo - static initializer
-   public Traits static_traits;
+    public int cinit_index; //MethodInfo - static initializer
+    public Traits static_traits;
 
-   @Override
-   public String toString() {
-      return "method_index=" + cinit_index + "\r\n" + static_traits.toString();
-   }
+    @Override
+    public String toString() {
+        return "method_index=" + cinit_index + "\r\n" + static_traits.toString();
+    }
 
-   public String toString(ABC abc, List<String> fullyQualifiedNames) {
-      return "method_index=" + cinit_index + "\r\n" + static_traits.toString(abc, fullyQualifiedNames);
-   }
+    public String toString(ABC abc, List<String> fullyQualifiedNames) {
+        return "method_index=" + cinit_index + "\r\n" + static_traits.toString(abc, fullyQualifiedNames);
+    }
 }

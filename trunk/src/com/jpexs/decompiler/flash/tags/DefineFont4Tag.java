@@ -26,51 +26,51 @@ import java.io.OutputStream;
 
 public class DefineFont4Tag extends CharacterTag {
 
-   public int fontID;
-   public boolean fontFlagsHasFontData;
-   public boolean fontFlagsItalic;
-   public boolean fontFlagsBold;
-   public String fontName;
-   public byte fontData[];
+    public int fontID;
+    public boolean fontFlagsHasFontData;
+    public boolean fontFlagsItalic;
+    public boolean fontFlagsBold;
+    public String fontName;
+    public byte fontData[];
 
-   @Override
-   public int getCharacterID() {
-      return fontID;
-   }
+    @Override
+    public int getCharacterID() {
+        return fontID;
+    }
 
-   public DefineFont4Tag(byte[] data, int version, long pos) throws IOException {
-      super(91, "DefineFont4", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      fontID = sis.readUI16();
-      sis.readUB(5);
-      fontFlagsHasFontData = sis.readUB(1) == 1;
-      fontFlagsItalic = sis.readUB(1) == 1;
-      fontFlagsBold = sis.readUB(1) == 1;
-      fontName = sis.readString();
-      fontData = sis.readBytes(sis.available());
-   }
+    public DefineFont4Tag(byte[] data, int version, long pos) throws IOException {
+        super(91, "DefineFont4", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        fontID = sis.readUI16();
+        sis.readUB(5);
+        fontFlagsHasFontData = sis.readUB(1) == 1;
+        fontFlagsItalic = sis.readUB(1) == 1;
+        fontFlagsBold = sis.readUB(1) == 1;
+        fontName = sis.readString();
+        fontData = sis.readBytes(sis.available());
+    }
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         sos.writeUI16(fontID);
-         sos.writeUB(5, 0);
-         sos.writeUB(1, fontFlagsHasFontData ? 1 : 0);
-         sos.writeUB(1, fontFlagsItalic ? 1 : 0);
-         sos.writeUB(1, fontFlagsBold ? 1 : 0);
-         sos.writeString(fontName);
-         sos.write(fontData);
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            sos.writeUI16(fontID);
+            sos.writeUB(5, 0);
+            sos.writeUB(1, fontFlagsHasFontData ? 1 : 0);
+            sos.writeUB(1, fontFlagsItalic ? 1 : 0);
+            sos.writeUB(1, fontFlagsBold ? 1 : 0);
+            sos.writeString(fontName);
+            sos.write(fontData);
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 }

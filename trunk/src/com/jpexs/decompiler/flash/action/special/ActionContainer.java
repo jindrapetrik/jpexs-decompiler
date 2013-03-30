@@ -9,7 +9,7 @@ import java.util.List;
  */
 public interface ActionContainer {
 
-   public byte[] getHeaderBytes();
+    public byte[] getHeaderBytes();
 
-   public List<Action> getActions();
+    public List<Action> getActions();
 }

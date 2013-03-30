@@ -23,41 +23,41 @@ package com.jpexs.decompiler.flash.types;
  */
 public class RGB {
 
-   /**
-    * Red color value
-    */
-   public int red;
-   /**
-    * Green color value
-    */
-   public int green;
-   /**
-    * Blue color value
-    */
-   public int blue;
+    /**
+     * Red color value
+     */
+    public int red;
+    /**
+     * Green color value
+     */
+    public int green;
+    /**
+     * Blue color value
+     */
+    public int blue;
 
-   public RGB(int red, int green, int blue) {
-      this.red = red;
-      this.green = green;
-      this.blue = blue;
-   }
+    public RGB(int red, int green, int blue) {
+        this.red = red;
+        this.green = green;
+        this.blue = blue;
+    }
 
-   public RGB() {
-   }
+    public RGB() {
+    }
 
-   public String toHexRGB() {
-      String rh = Integer.toHexString(red);
-      if (rh.length() < 2) {
-         rh = "0" + rh;
-      }
-      String gh = Integer.toHexString(green);
-      if (gh.length() < 2) {
-         gh = "0" + gh;
-      }
-      String bh = Integer.toHexString(blue);
-      if (bh.length() < 2) {
-         bh = "0" + bh;
-      }
-      return "#" + rh + gh + bh;
-   }
+    public String toHexRGB() {
+        String rh = Integer.toHexString(red);
+        if (rh.length() < 2) {
+            rh = "0" + rh;
+        }
+        String gh = Integer.toHexString(green);
+        if (gh.length() < 2) {
+            gh = "0" + gh;
+        }
+        String bh = Integer.toHexString(blue);
+        if (bh.length() < 2) {
+            bh = "0" + bh;
+        }
+        return "#" + rh + gh + bh;
+    }
 }

@@ -30,17 +30,17 @@ import java.util.Stack;
 
 public class ThrowIns extends InstructionDefinition {
 
-   public ThrowIns() {
-      super(0x03, "throw", new int[]{});
-   }
+    public ThrowIns() {
+        super(0x03, "throw", new int[]{});
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      output.add(new ThrowTreeItem(ins, (GraphTargetItem) stack.pop()));
-   }
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        output.add(new ThrowTreeItem(ins, (GraphTargetItem) stack.pop()));
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -1;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return -1;
+    }
 }

@@ -27,42 +27,42 @@ import java.io.OutputStream;
 
 public class DefineBitsJPEG3Tag extends CharacterTag implements AloneTag {
 
-   public int characterID;
-   public byte imageData[];
-   public byte bitmapAlphaData[];
+    public int characterID;
+    public byte imageData[];
+    public byte bitmapAlphaData[];
 
-   @Override
-   public int getCharacterID() {
-      return characterID;
-   }
+    @Override
+    public int getCharacterID() {
+        return characterID;
+    }
 
-   public DefineBitsJPEG3Tag(byte[] data, int version, long pos) throws IOException {
-      super(35, "DefineBitsJPEG3", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      characterID = sis.readUI16();
-      long alphaDataOffset = sis.readUI32();
-      imageData = sis.readBytes(alphaDataOffset);
-      bitmapAlphaData = sis.readBytes(sis.available());
-   }
+    public DefineBitsJPEG3Tag(byte[] data, int version, long pos) throws IOException {
+        super(35, "DefineBitsJPEG3", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        characterID = sis.readUI16();
+        long alphaDataOffset = sis.readUI32();
+        imageData = sis.readBytes(alphaDataOffset);
+        bitmapAlphaData = sis.readBytes(sis.available());
+    }
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         sos.writeUI16(characterID);
-         sos.writeUI32(imageData.length);
-         sos.write(imageData);
-         sos.write(bitmapAlphaData);
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            sos.writeUI16(characterID);
+            sos.writeUI32(imageData.length);
+            sos.write(imageData);
+            sos.write(bitmapAlphaData);
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 }

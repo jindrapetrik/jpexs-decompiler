@@ -22,20 +22,20 @@ package com.jpexs.decompiler.flash.types;
  */
 public class MORPHFILLSTYLE {
 
-   public int fillStyleType;
-   public static final int SOLID = 0x0;
-   public static final int LINEAR_GRADIENT = 0x10;
-   public static final int RADIAL_GRADIENT = 0x12;
-   public static final int REPEATING_BITMAP = 0x40;
-   public static final int CLIPPED_BITMAP = 0x41;
-   public static final int NON_SMOOTHED_REPEATING_BITMAP = 0x42;
-   public static final int NON_SMOOTHED_CLIPPED_BITMAP = 0x43;
-   public RGBA startColor;
-   public RGBA endColor;
-   public MATRIX startGradientMatrix;
-   public MATRIX endGradientMatrix;
-   public MORPHGRADIENT gradient;
-   public int bitmapId;
-   public MATRIX startBitmapMatrix;
-   public MATRIX endBitmapMatrix;
+    public int fillStyleType;
+    public static final int SOLID = 0x0;
+    public static final int LINEAR_GRADIENT = 0x10;
+    public static final int RADIAL_GRADIENT = 0x12;
+    public static final int REPEATING_BITMAP = 0x40;
+    public static final int CLIPPED_BITMAP = 0x41;
+    public static final int NON_SMOOTHED_REPEATING_BITMAP = 0x42;
+    public static final int NON_SMOOTHED_CLIPPED_BITMAP = 0x43;
+    public RGBA startColor;
+    public RGBA endColor;
+    public MATRIX startGradientMatrix;
+    public MATRIX endGradientMatrix;
+    public MORPHGRADIENT gradient;
+    public int bitmapId;
+    public MATRIX startBitmapMatrix;
+    public MATRIX endBitmapMatrix;
 }

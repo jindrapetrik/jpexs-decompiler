@@ -22,12 +22,12 @@ import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
 public class InstanceOfTreeItem extends BinaryOpItem {
 
-   public InstanceOfTreeItem(GraphSourceItem instruction, GraphTargetItem value, GraphTargetItem type) {
-      super(instruction, PRECEDENCE_RELATIONAL, value, type, " instanceof ");
-   }
+    public InstanceOfTreeItem(GraphSourceItem instruction, GraphTargetItem value, GraphTargetItem type) {
+        super(instruction, PRECEDENCE_RELATIONAL, value, type, " instanceof ");
+    }
 
-   @Override
-   public boolean isCompileTime() {
-      return false;
-   }
+    @Override
+    public boolean isCompileTime() {
+        return false;
+    }
 }

@@ -30,32 +30,32 @@ import java.util.Stack;
 
 public class DecLocalIns extends InstructionDefinition {
 
-   public DecLocalIns() {
-      super(0x94, "declocal", new int[]{AVM2Code.DAT_LOCAL_REG_INDEX});
-   }
+    public DecLocalIns() {
+        super(0x94, "declocal", new int[]{AVM2Code.DAT_LOCAL_REG_INDEX});
+    }
 
-   @Override
-   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-      int locRegIndex = (int) ((Long) arguments.get(0)).longValue();
-      Object obj = lda.localRegisters.get(locRegIndex);
-      if (obj instanceof Long) {
-         Long obj2 = ((Long) obj).longValue() - 1;
-         lda.localRegisters.put(locRegIndex, obj2);
-      } else if (obj instanceof Double) {
-         Double obj2 = ((Double) obj).doubleValue() - 1;
-         lda.localRegisters.put(locRegIndex, obj2);
-      }
-      if (obj instanceof String) {
-         Double obj2 = Double.parseDouble((String) obj) - 1;
-         lda.localRegisters.put(locRegIndex, obj2);
-      } else {
-         throw new RuntimeException("Cannot decrement local register");
-      }
-   }
+    @Override
+    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        int locRegIndex = (int) ((Long) arguments.get(0)).longValue();
+        Object obj = lda.localRegisters.get(locRegIndex);
+        if (obj instanceof Long) {
+            Long obj2 = ((Long) obj).longValue() - 1;
+            lda.localRegisters.put(locRegIndex, obj2);
+        } else if (obj instanceof Double) {
+            Double obj2 = ((Double) obj).doubleValue() - 1;
+            lda.localRegisters.put(locRegIndex, obj2);
+        }
+        if (obj instanceof String) {
+            Double obj2 = Double.parseDouble((String) obj) - 1;
+            lda.localRegisters.put(locRegIndex, obj2);
+        } else {
+            throw new RuntimeException("Cannot decrement local register");
+        }
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      int regIndex = ins.operands[0];
-      output.add(new DecLocalTreeItem(ins, regIndex));
-   }
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        int regIndex = ins.operands[0];
+        output.add(new DecLocalTreeItem(ins, regIndex));
+    }
 }

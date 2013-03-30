@@ -29,20 +29,20 @@ import java.util.Stack;
 
 public class HasNextIns extends InstructionDefinition {
 
-   public HasNextIns() {
-      super(0x1f, "hasnext", new int[]{});
-   }
+    public HasNextIns() {
+        super(0x1f, "hasnext", new int[]{});
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      GraphTargetItem curIndex = (GraphTargetItem) stack.pop();
-      GraphTargetItem obj = (GraphTargetItem) stack.pop();
-      stack.push(new HasNextTreeItem(ins, curIndex, obj));
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        GraphTargetItem curIndex = (GraphTargetItem) stack.pop();
+        GraphTargetItem obj = (GraphTargetItem) stack.pop();
+        stack.push(new HasNextTreeItem(ins, curIndex, obj));
 
-   }
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -2 + 1;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return -2 + 1;
+    }
 }

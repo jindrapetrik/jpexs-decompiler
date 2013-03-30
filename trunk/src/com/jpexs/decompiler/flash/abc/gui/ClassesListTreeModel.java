@@ -25,135 +25,135 @@ import javax.swing.tree.TreePath;
 
 class ClassIndexVisitor implements TreeVisitor {
 
-   private TreeElement found = null;
-   private int classIndex = 0;
+    private TreeElement found = null;
+    private int classIndex = 0;
 
-   public ClassIndexVisitor(int classIndex) {
-      this.classIndex = classIndex;
-   }
+    public ClassIndexVisitor(int classIndex) {
+        this.classIndex = classIndex;
+    }
 
-   @Override
-   public void onBranch(TreeElement branch) {
-      Object o = branch.getItem();
-      if (o == null) {
-         return;
-      }
-      TreeLeafScript sc = (TreeLeafScript) o;
-      for (Trait t : sc.abc.script_info[sc.scriptIndex].traits.traits) {
-         if (t instanceof TraitClass) {
-            if (((TraitClass) t).class_info == classIndex) {
-               found = branch;
-               return;
+    @Override
+    public void onBranch(TreeElement branch) {
+        Object o = branch.getItem();
+        if (o == null) {
+            return;
+        }
+        TreeLeafScript sc = (TreeLeafScript) o;
+        for (Trait t : sc.abc.script_info[sc.scriptIndex].traits.traits) {
+            if (t instanceof TraitClass) {
+                if (((TraitClass) t).class_info == classIndex) {
+                    found = branch;
+                    return;
+                }
             }
-         }
-      }
-   }
+        }
+    }
 
-   @Override
-   public void onLeaf(TreeElement leaf) {
-      Object o = leaf.getItem();
-      if (o == null) {
-         return;
-      }
-      TreeLeafScript sc = (TreeLeafScript) o;
-      for (Trait t : sc.abc.script_info[sc.scriptIndex].traits.traits) {
-         if (t instanceof TraitClass) {
-            if (((TraitClass) t).class_info == classIndex) {
-               found = leaf;
-               return;
+    @Override
+    public void onLeaf(TreeElement leaf) {
+        Object o = leaf.getItem();
+        if (o == null) {
+            return;
+        }
+        TreeLeafScript sc = (TreeLeafScript) o;
+        for (Trait t : sc.abc.script_info[sc.scriptIndex].traits.traits) {
+            if (t instanceof TraitClass) {
+                if (((TraitClass) t).class_info == classIndex) {
+                    found = leaf;
+                    return;
+                }
             }
-         }
-      }
-   }
+        }
+    }
 
-   public TreeElement getFound() {
-      return found;
-   }
+    public TreeElement getFound() {
+        return found;
+    }
 }
 
 public class ClassesListTreeModel implements TreeModel {
 
-   private Tree classTree = new Tree();
+    private Tree classTree = new Tree();
 
-   public ClassesListTreeModel(HashMap<String, TreeLeafScript> list) {
-      this(list, null);
-   }
+    public ClassesListTreeModel(HashMap<String, TreeLeafScript> list) {
+        this(list, null);
+    }
 
-   public ClassesListTreeModel(HashMap<String, TreeLeafScript> list, String filter) {
-      for (String path : list.keySet()) {
-         if (filter != null) {
-            if (!filter.equals("")) {
-               if (!path.contains(filter)) {
-                  continue;
-               }
+    public ClassesListTreeModel(HashMap<String, TreeLeafScript> list, String filter) {
+        for (String path : list.keySet()) {
+            if (filter != null) {
+                if (!filter.equals("")) {
+                    if (!path.contains(filter)) {
+                        continue;
+                    }
+                }
             }
-         }
-         String nsName = path.substring(path.lastIndexOf(".") + 1);
-         String packageName = path.substring(0, path.lastIndexOf("."));
-         classTree.add(nsName, packageName, list.get(path));
-      }
+            String nsName = path.substring(path.lastIndexOf(".") + 1);
+            String packageName = path.substring(0, path.lastIndexOf("."));
+            classTree.add(nsName, packageName, list.get(path));
+        }
 
-   }
+    }
 
-   public Object getItemByPath(String fullPath) {
-      TreeElement elem = classTree.get(fullPath);
-      if (elem == null) {
-         return -1;
-      }
-      return elem.getItem();
-   }
+    public Object getItemByPath(String fullPath) {
+        TreeElement elem = classTree.get(fullPath);
+        if (elem == null) {
+            return -1;
+        }
+        return elem.getItem();
+    }
 
-   public TreeElement getElementByClassIndex(int classIndex) {
-      ClassIndexVisitor civ = new ClassIndexVisitor(classIndex);
-      classTree.visit(civ);
-      return civ.getFound();
-   }
+    public TreeElement getElementByClassIndex(int classIndex) {
+        ClassIndexVisitor civ = new ClassIndexVisitor(classIndex);
+        classTree.visit(civ);
+        return civ.getFound();
+    }
 
-   @Override
-   public Object getRoot() {
-      return classTree.getRoot();
-   }
+    @Override
+    public Object getRoot() {
+        return classTree.getRoot();
+    }
 
-   @Override
-   public Object getChild(Object parent, int index) {
-      TreeElement pte = (TreeElement) parent;
-      TreeElement te = pte.getChild(index);
-      return te;
-   }
+    @Override
+    public Object getChild(Object parent, int index) {
+        TreeElement pte = (TreeElement) parent;
+        TreeElement te = pte.getChild(index);
+        return te;
+    }
 
-   @Override
-   public int getChildCount(Object parent) {
-      TreeElement te = (TreeElement) parent;
-      return te.getChildCount();
-   }
+    @Override
+    public int getChildCount(Object parent) {
+        TreeElement te = (TreeElement) parent;
+        return te.getChildCount();
+    }
 
-   @Override
-   public boolean isLeaf(Object node) {
-      TreeElement te = (TreeElement) node;
-      return te.isLeaf();
-   }
+    @Override
+    public boolean isLeaf(Object node) {
+        TreeElement te = (TreeElement) node;
+        return te.isLeaf();
+    }
 
-   @Override
-   public void valueForPathChanged(TreePath path, Object newValue) {
-   }
+    @Override
+    public void valueForPathChanged(TreePath path, Object newValue) {
+    }
 
-   @Override
-   public int getIndexOfChild(Object parent, Object child) {
-      TreeElement te1 = (TreeElement) parent;
-      TreeElement te2 = (TreeElement) child;
-      return te1.getIndexOfChild(te2);
-   }
+    @Override
+    public int getIndexOfChild(Object parent, Object child) {
+        TreeElement te1 = (TreeElement) parent;
+        TreeElement te2 = (TreeElement) child;
+        return te1.getIndexOfChild(te2);
+    }
 
-   @Override
-   public void addTreeModelListener(TreeModelListener l) {
-   }
+    @Override
+    public void addTreeModelListener(TreeModelListener l) {
+    }
 
-   @Override
-   public void removeTreeModelListener(TreeModelListener l) {
-   }
+    @Override
+    public void removeTreeModelListener(TreeModelListener l) {
+    }
 
-   @Override
-   public String toString() {
-      return "scripts";
-   }
+    @Override
+    public String toString() {
+        return "scripts";
+    }
 }

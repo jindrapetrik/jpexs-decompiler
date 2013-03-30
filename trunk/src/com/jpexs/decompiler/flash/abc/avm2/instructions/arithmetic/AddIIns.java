@@ -28,20 +28,20 @@ import java.util.Stack;
 
 public class AddIIns extends AddIns {
 
-   public AddIIns() {
-      instructionName = "add_i";
-      instructionCode = 0xc5;
-   }
+    public AddIIns() {
+        instructionName = "add_i";
+        instructionCode = 0xc5;
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      GraphTargetItem v2 = (GraphTargetItem) stack.pop();
-      GraphTargetItem v1 = (GraphTargetItem) stack.pop();
-      stack.push(new AddTreeItem(ins, v1, v2));
-   }
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        GraphTargetItem v2 = (GraphTargetItem) stack.pop();
+        GraphTargetItem v1 = (GraphTargetItem) stack.pop();
+        stack.push(new AddTreeItem(ins, v1, v2));
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -2 + 1;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return -2 + 1;
+    }
 }

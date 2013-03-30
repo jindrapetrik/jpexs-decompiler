@@ -20,7 +20,7 @@ import java.util.List;
 
 public interface Block {
 
-   public List<ContinueItem> getContinues();
+    public List<ContinueItem> getContinues();
 
-   public List<List<GraphTargetItem>> getSubs();
+    public List<List<GraphTargetItem>> getSubs();
 }

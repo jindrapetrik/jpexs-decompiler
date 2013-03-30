@@ -24,14 +24,14 @@ import java.util.List;
 
 public class NewActivationTreeItem extends TreeItem {
 
-   public HashMap<Integer, GraphTargetItem> slots = new HashMap<Integer, GraphTargetItem>();
+    public HashMap<Integer, GraphTargetItem> slots = new HashMap<Integer, GraphTargetItem>();
 
-   public NewActivationTreeItem(AVM2Instruction instruction) {
-      super(instruction, NOPRECEDENCE);
-   }
+    public NewActivationTreeItem(AVM2Instruction instruction) {
+        super(instruction, NOPRECEDENCE);
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return hilight("newactivation()");
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return hilight("newactivation()");
+    }
 }

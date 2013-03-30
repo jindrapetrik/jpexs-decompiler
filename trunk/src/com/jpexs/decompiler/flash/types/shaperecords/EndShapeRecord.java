@@ -22,35 +22,35 @@ package com.jpexs.decompiler.flash.types.shaperecords;
  */
 public class EndShapeRecord extends SHAPERECORD {
 
-   public int typeFlag = 0;
-   public int endOfShape = 0;
+    public int typeFlag = 0;
+    public int endOfShape = 0;
 
-   @Override
-   public String toString() {
-      return "[EndShapeRecord]";
-   }
+    @Override
+    public String toString() {
+        return "[EndShapeRecord]";
+    }
 
-   @Override
-   public String toSWG(int oldX, int oldY) {
-      return "";
-   }
+    @Override
+    public String toSWG(int oldX, int oldY) {
+        return "";
+    }
 
-   @Override
-   public int changeX(int x) {
-      return x;
-   }
+    @Override
+    public int changeX(int x) {
+        return x;
+    }
 
-   @Override
-   public int changeY(int y) {
-      return y;
-   }
+    @Override
+    public int changeY(int y) {
+        return y;
+    }
 
-   @Override
-   public void flip() {
-   }
+    @Override
+    public void flip() {
+    }
 
-   @Override
-   public boolean isMove() {
-      return false;
-   }
+    @Override
+    public boolean isMove() {
+        return false;
+    }
 }

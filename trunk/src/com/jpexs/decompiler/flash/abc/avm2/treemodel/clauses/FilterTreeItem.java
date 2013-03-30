@@ -29,17 +29,17 @@ import java.util.List;
  */
 public class FilterTreeItem extends TreeItem {
 
-   public GraphTargetItem expression;
-   public GraphTargetItem collection;
+    public GraphTargetItem expression;
+    public GraphTargetItem collection;
 
-   public FilterTreeItem(AVM2Instruction instruction, GraphTargetItem collection, GraphTargetItem expression) {
-      super(instruction, NOPRECEDENCE);
-      this.expression = expression;
-      this.collection = collection;
-   }
+    public FilterTreeItem(AVM2Instruction instruction, GraphTargetItem collection, GraphTargetItem expression) {
+        super(instruction, NOPRECEDENCE);
+        this.expression = expression;
+        this.collection = collection;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return collection.toString(constants, localRegNames, fullyQualifiedNames) + hilight(".(") + expression.toString(constants, localRegNames, fullyQualifiedNames) + hilight(")");
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return collection.toString(constants, localRegNames, fullyQualifiedNames) + hilight(".(") + expression.toString(constants, localRegNames, fullyQualifiedNames) + hilight(")");
+    }
 }

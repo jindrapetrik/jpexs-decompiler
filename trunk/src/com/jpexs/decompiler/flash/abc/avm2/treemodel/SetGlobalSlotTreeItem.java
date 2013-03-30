@@ -24,17 +24,17 @@ import java.util.List;
 
 public class SetGlobalSlotTreeItem extends TreeItem {
 
-   public int slotId;
-   public GraphTargetItem value;
+    public int slotId;
+    public GraphTargetItem value;
 
-   public SetGlobalSlotTreeItem(AVM2Instruction instruction, int slotId, GraphTargetItem value) {
-      super(instruction, PRECEDENCE_ASSIGMENT);
-      this.slotId = slotId;
-      this.value = value;
-   }
+    public SetGlobalSlotTreeItem(AVM2Instruction instruction, int slotId, GraphTargetItem value) {
+        super(instruction, PRECEDENCE_ASSIGMENT);
+        this.slotId = slotId;
+        this.value = value;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return hilight("setglobalslot(" + slotId + ",") + value.toString(constants, localRegNames, fullyQualifiedNames) + hilight(")");
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return hilight("setglobalslot(" + slotId + ",") + value.toString(constants, localRegNames, fullyQualifiedNames) + hilight(")");
+    }
 }

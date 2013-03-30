@@ -24,22 +24,22 @@ import java.util.List;
 
 public class ThrowTreeItem extends TreeItem {
 
-   public GraphTargetItem object;
+    public GraphTargetItem object;
 
-   public ThrowTreeItem(GraphSourceItem instruction, GraphTargetItem object) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.object = object;
-   }
+    public ThrowTreeItem(GraphSourceItem instruction, GraphTargetItem object) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.object = object;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return hilight("throw ") + object.toString(Helper.toList(constants));
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return hilight("throw ") + object.toString(Helper.toList(constants));
+    }
 
-   @Override
-   public List<GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(object.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(object.getNeededSources());
+        return ret;
+    }
 }

@@ -18,8 +18,8 @@ package com.jpexs.decompiler.flash.action.swf4;
 
 public class Null {
 
-   @Override
-   public String toString() {
-      return "null";
-   }
+    @Override
+    public String toString() {
+        return "null";
+    }
 }

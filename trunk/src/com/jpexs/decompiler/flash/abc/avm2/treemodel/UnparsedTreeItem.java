@@ -23,15 +23,15 @@ import java.util.List;
 
 public class UnparsedTreeItem extends TreeItem {
 
-   public String value;
+    public String value;
 
-   public UnparsedTreeItem(AVM2Instruction instruction, String value) {
-      super(instruction, NOPRECEDENCE);
-      this.value = value;
-   }
+    public UnparsedTreeItem(AVM2Instruction instruction, String value) {
+        super(instruction, NOPRECEDENCE);
+        this.value = value;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return value;
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return value;
+    }
 }

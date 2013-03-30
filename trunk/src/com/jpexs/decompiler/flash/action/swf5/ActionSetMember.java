@@ -25,20 +25,20 @@ import java.util.Stack;
 
 public class ActionSetMember extends Action {
 
-   public ActionSetMember() {
-      super(0x4F, 0);
-   }
+    public ActionSetMember() {
+        super(0x4F, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "SetMember";
-   }
+    @Override
+    public String toString() {
+        return "SetMember";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem value = stack.pop();
-      GraphTargetItem objectName = stack.pop();
-      GraphTargetItem object = stack.pop();
-      output.add(new SetMemberTreeItem(this, object, objectName, value));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem value = stack.pop();
+        GraphTargetItem objectName = stack.pop();
+        GraphTargetItem object = stack.pop();
+        output.add(new SetMemberTreeItem(this, object, objectName, value));
+    }
 }

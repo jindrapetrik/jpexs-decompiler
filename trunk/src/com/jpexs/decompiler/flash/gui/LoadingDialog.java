@@ -35,61 +35,61 @@ import javax.swing.SwingConstants;
  */
 public class LoadingDialog extends JFrame implements ImageObserver {
 
-   private JLabel detailLabel = new JLabel("", JLabel.CENTER);
-   private LoadingPanel loadingPanel;
-   JProgressBar progressBar = new JProgressBar(0, 100);
+    private JLabel detailLabel = new JLabel("", JLabel.CENTER);
+    private LoadingPanel loadingPanel;
+    JProgressBar progressBar = new JProgressBar(0, 100);
 
-   public void setDetail(String d) {
-      detailLabel.setText(d);
-      detailLabel.setHorizontalAlignment(SwingConstants.CENTER);
-   }
+    public void setDetail(String d) {
+        detailLabel.setText(d);
+        detailLabel.setHorizontalAlignment(SwingConstants.CENTER);
+    }
 
-   public void setPercent(int percent) {
-      progressBar.setValue(percent);
-      progressBar.setVisible(true);
-   }
+    public void setPercent(int percent) {
+        progressBar.setValue(percent);
+        progressBar.setVisible(true);
+    }
 
-   public void hidePercent() {
-      if (progressBar.isVisible()) {
-         progressBar.setVisible(false);
-      }
-   }
+    public void hidePercent() {
+        if (progressBar.isVisible()) {
+            progressBar.setVisible(false);
+        }
+    }
 
-   /**
-    * Constructor
-    */
-   public LoadingDialog() {
-      setResizable(false);
-      setTitle(Main.shortApplicationVerName);
-      setSize(250, 150);
-      setLayout(new BorderLayout());
+    /**
+     * Constructor
+     */
+    public LoadingDialog() {
+        setResizable(false);
+        setTitle(Main.shortApplicationVerName);
+        setSize(250, 150);
+        setLayout(new BorderLayout());
 
-      loadingPanel = new LoadingPanel(50, 50);
-      loadingPanel.setPreferredSize(new Dimension(100, 100));
-      add(loadingPanel, BorderLayout.WEST);
-      JPanel pan = new JPanel();
-      pan.setLayout(null);
-      pan.setPreferredSize(new Dimension(120, 150));
-      JLabel loadingLabel = new JLabel("Loading, please wait...");
-      loadingLabel.setBounds(0, 30, 125, 20);
-      loadingLabel.setHorizontalAlignment(SwingConstants.CENTER);
-      detailLabel.setBounds(0, 45, 125, 20);
-      progressBar.setBounds(0, 70, 125, 25);
-      pan.add(loadingLabel);
-      pan.add(detailLabel);
-      pan.add(progressBar);
-      add(pan, BorderLayout.CENTER);
-      progressBar.setVisible(false);
-      progressBar.setStringPainted(true);
-      //progressBar.setVisible(false);
-      View.centerScreen(this);
-      View.setWindowIcon(this);
-      detailLabel.setHorizontalAlignment(SwingConstants.LEFT);
-      addWindowListener(new WindowAdapter() {
-         @Override
-         public void windowClosing(WindowEvent e) {
-            System.exit(0);
-         }
-      });
-   }
+        loadingPanel = new LoadingPanel(50, 50);
+        loadingPanel.setPreferredSize(new Dimension(100, 100));
+        add(loadingPanel, BorderLayout.WEST);
+        JPanel pan = new JPanel();
+        pan.setLayout(null);
+        pan.setPreferredSize(new Dimension(120, 150));
+        JLabel loadingLabel = new JLabel("Loading, please wait...");
+        loadingLabel.setBounds(0, 30, 125, 20);
+        loadingLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        detailLabel.setBounds(0, 45, 125, 20);
+        progressBar.setBounds(0, 70, 125, 25);
+        pan.add(loadingLabel);
+        pan.add(detailLabel);
+        pan.add(progressBar);
+        add(pan, BorderLayout.CENTER);
+        progressBar.setVisible(false);
+        progressBar.setStringPainted(true);
+        //progressBar.setVisible(false);
+        View.centerScreen(this);
+        View.setWindowIcon(this);
+        detailLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                System.exit(0);
+            }
+        });
+    }
 }

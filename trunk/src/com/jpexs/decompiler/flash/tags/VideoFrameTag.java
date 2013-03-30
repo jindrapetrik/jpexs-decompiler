@@ -30,42 +30,42 @@ import java.io.OutputStream;
  */
 public class VideoFrameTag extends Tag {
 
-   public int streamID;
-   public int frameNum;
-   public byte[] videoData;
+    public int streamID;
+    public int frameNum;
+    public byte[] videoData;
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         sos.writeUI16(streamID);
-         sos.writeUI16(frameNum);
-         sos.write(videoData);
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            sos.writeUI16(streamID);
+            sos.writeUI16(frameNum);
+            sos.write(videoData);
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 
-   /**
-    * Constructor
-    *
-    * @param data Data bytes
-    * @param version SWF version
-    * @throws IOException
-    */
-   public VideoFrameTag(byte data[], int version, long pos) throws IOException {
-      super(61, "VideoFrame", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      streamID = sis.readUI16();
-      frameNum = sis.readUI16();
-      videoData = sis.readBytes(sis.available()); //TODO: Parse video packets
-   }
+    /**
+     * Constructor
+     *
+     * @param data Data bytes
+     * @param version SWF version
+     * @throws IOException
+     */
+    public VideoFrameTag(byte data[], int version, long pos) throws IOException {
+        super(61, "VideoFrame", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        streamID = sis.readUI16();
+        frameNum = sis.readUI16();
+        videoData = sis.readBytes(sis.available()); //TODO: Parse video packets
+    }
 }

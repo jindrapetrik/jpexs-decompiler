@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
@@ -31,28 +30,28 @@ import java.util.Stack;
 
 public class DupIns extends InstructionDefinition {
 
-   public DupIns() {
-      super(0x2a, "dup", new int[]{});
-   }
+    public DupIns() {
+        super(0x2a, "dup", new int[]{});
+    }
 
-   @Override
-   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-      Object obj = lda.operandStack.pop();
-      lda.operandStack.push(obj);
-      lda.operandStack.push(obj);
-   }
+    @Override
+    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        Object obj = lda.operandStack.pop();
+        lda.operandStack.push(obj);
+        lda.operandStack.push(obj);
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      GraphTargetItem v = stack.pop();
-      stack.push(v);
-      stack.push(v);
-      v.moreSrc.add(new GraphSourceItemPos(ins, 0));
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        GraphTargetItem v = stack.pop();
+        stack.push(v);
+        stack.push(v);
+        v.moreSrc.add(new GraphSourceItemPos(ins, 0));
 
-   }
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -1 + 2;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return -1 + 2;
+    }
 }

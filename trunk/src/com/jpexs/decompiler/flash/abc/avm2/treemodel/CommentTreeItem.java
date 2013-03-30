@@ -27,20 +27,20 @@ import java.util.List;
  */
 public class CommentTreeItem extends TreeItem {
 
-   public String comment;
+    public String comment;
 
-   public CommentTreeItem(AVM2Instruction instruction, String comment) {
-      super(instruction, NOPRECEDENCE);
-      this.comment = comment;
-   }
+    public CommentTreeItem(AVM2Instruction instruction, String comment) {
+        super(instruction, NOPRECEDENCE);
+        this.comment = comment;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return "//" + comment;
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return "//" + comment;
+    }
 
-   @Override
-   public boolean needsSemicolon() {
-      return false;
-   }
+    @Override
+    public boolean needsSemicolon() {
+        return false;
+    }
 }

@@ -25,18 +25,18 @@ import java.util.Stack;
 
 public class ActionRemoveSprite extends Action {
 
-   public ActionRemoveSprite() {
-      super(0x25, 0);
-   }
+    public ActionRemoveSprite() {
+        super(0x25, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "RemoveSprite";
-   }
+    @Override
+    public String toString() {
+        return "RemoveSprite";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem target = stack.pop();
-      output.add(new RemoveSpriteTreeItem(this, target));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem target = stack.pop();
+        output.add(new RemoveSpriteTreeItem(this, target));
+    }
 }

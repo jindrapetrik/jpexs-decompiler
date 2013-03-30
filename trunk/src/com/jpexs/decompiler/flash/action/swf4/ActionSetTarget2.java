@@ -25,18 +25,18 @@ import java.util.Stack;
 
 public class ActionSetTarget2 extends Action {
 
-   public ActionSetTarget2() {
-      super(0x20, 0);
-   }
+    public ActionSetTarget2() {
+        super(0x20, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "SetTarget2";
-   }
+    @Override
+    public String toString() {
+        return "SetTarget2";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem target = stack.pop();
-      output.add(new SetTarget2TreeItem(this, target));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem target = stack.pop();
+        output.add(new SetTarget2TreeItem(this, target));
+    }
 }

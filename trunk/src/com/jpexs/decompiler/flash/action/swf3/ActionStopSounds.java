@@ -25,17 +25,17 @@ import java.util.Stack;
 
 public class ActionStopSounds extends Action {
 
-   public ActionStopSounds() {
-      super(0x09, 0);
-   }
+    public ActionStopSounds() {
+        super(0x09, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "StopSounds";
-   }
+    @Override
+    public String toString() {
+        return "StopSounds";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      output.add(new SimpleActionTreeItem(this, "stopAllSounds()"));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        output.add(new SimpleActionTreeItem(this, "stopAllSounds()"));
+    }
 }

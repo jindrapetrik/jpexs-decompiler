@@ -29,39 +29,39 @@ import java.util.HashMap;
 
 public class DefineShape4Tag extends CharacterTag implements BoundedTag, AloneTag, ShapeTag {
 
-   public int shapeId;
-   public RECT shapeBounds;
-   public RECT edgeBounds;
-   public boolean usesFillWindingRule;
-   public boolean usesNonScalingStrokes;
-   public boolean usesScalingStrokes;
-   public SHAPEWITHSTYLE shapes;
+    public int shapeId;
+    public RECT shapeBounds;
+    public RECT edgeBounds;
+    public boolean usesFillWindingRule;
+    public boolean usesNonScalingStrokes;
+    public boolean usesScalingStrokes;
+    public SHAPEWITHSTYLE shapes;
 
-   @Override
-   public String toSVG() {
-      return shapes.toSVG(4);
-   }
+    @Override
+    public String toSVG() {
+        return shapes.toSVG(4);
+    }
 
-   @Override
-   public int getCharacterID() {
-      return shapeId;
-   }
+    @Override
+    public int getCharacterID() {
+        return shapeId;
+    }
 
-   @Override
-   public RECT getRect(HashMap<Integer, CharacterTag> characters) {
-      return shapeBounds;
-   }
+    @Override
+    public RECT getRect(HashMap<Integer, CharacterTag> characters) {
+        return shapeBounds;
+    }
 
-   public DefineShape4Tag(byte[] data, int version, long pos) throws IOException {
-      super(83, "DefineShape4", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      shapeId = sis.readUI16();
-      shapeBounds = sis.readRECT();
-      edgeBounds = sis.readRECT();
-      sis.readUB(5);
-      usesFillWindingRule = sis.readUB(1) == 1;
-      usesNonScalingStrokes = sis.readUB(1) == 1;
-      usesScalingStrokes = sis.readUB(1) == 1;
-      shapes = sis.readSHAPEWITHSTYLE(4);
-   }
+    public DefineShape4Tag(byte[] data, int version, long pos) throws IOException {
+        super(83, "DefineShape4", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        shapeId = sis.readUI16();
+        shapeBounds = sis.readRECT();
+        edgeBounds = sis.readRECT();
+        sis.readUB(5);
+        usesFillWindingRule = sis.readUB(1) == 1;
+        usesNonScalingStrokes = sis.readUB(1) == 1;
+        usesScalingStrokes = sis.readUB(1) == 1;
+        shapes = sis.readSHAPEWITHSTYLE(4);
+    }
 }

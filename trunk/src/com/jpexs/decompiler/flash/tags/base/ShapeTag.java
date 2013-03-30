@@ -22,5 +22,5 @@ package com.jpexs.decompiler.flash.tags.base;
  */
 public interface ShapeTag {
 
-   public String toSVG();
+    public String toSVG();
 }

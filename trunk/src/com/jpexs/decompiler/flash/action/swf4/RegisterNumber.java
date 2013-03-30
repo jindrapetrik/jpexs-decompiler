@@ -18,22 +18,22 @@ package com.jpexs.decompiler.flash.action.swf4;
 
 public class RegisterNumber {
 
-   public int number;
-   public String name = null;
+    public int number;
+    public String name = null;
 
-   public RegisterNumber(int number) {
-      this.number = number;
-   }
+    public RegisterNumber(int number) {
+        this.number = number;
+    }
 
-   @Override
-   public String toString() {
-      if (name == null || name.trim().equals("")) {
-         return toStringNoName();
-      }
-      return name;
-   }
+    @Override
+    public String toString() {
+        if (name == null || name.trim().equals("")) {
+            return toStringNoName();
+        }
+        return name;
+    }
 
-   public String toStringNoName() {
-      return "register" + number;
-   }
+    public String toStringNoName() {
+        return "register" + number;
+    }
 }

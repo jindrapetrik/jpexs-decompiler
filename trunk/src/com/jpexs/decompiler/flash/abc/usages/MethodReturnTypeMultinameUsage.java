@@ -27,12 +27,12 @@ import java.util.List;
  */
 public class MethodReturnTypeMultinameUsage extends MethodMultinameUsage {
 
-   public MethodReturnTypeMultinameUsage(int multinameIndex, int classIndex, int traitIndex, boolean isStatic, boolean isInitializer, Traits traits, int parentTraitIndex) {
-      super(multinameIndex, classIndex, traitIndex, isStatic, isInitializer, traits, parentTraitIndex);
-   }
+    public MethodReturnTypeMultinameUsage(int multinameIndex, int classIndex, int traitIndex, boolean isStatic, boolean isInitializer, Traits traits, int parentTraitIndex) {
+        super(multinameIndex, classIndex, traitIndex, isStatic, isInitializer, traits, parentTraitIndex);
+    }
 
-   @Override
-   public String toString(List<DoABCTag> abcTags, ABC abc) {
-      return super.toString(abcTags, abc) + " return type";
-   }
+    @Override
+    public String toString(List<DoABCTag> abcTags, ABC abc) {
+        return super.toString(abcTags, abc) + " return type";
+    }
 }

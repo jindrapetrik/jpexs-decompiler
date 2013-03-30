@@ -23,17 +23,17 @@ package com.jpexs.decompiler.flash.types.filters;
  */
 public class FILTER {
 
-   /**
-    * Identificator of type of the filter
-    */
-   public int id;
+    /**
+     * Identificator of type of the filter
+     */
+    public int id;
 
-   /**
-    * Constructor
-    *
-    * @param id Type identificator
-    */
-   public FILTER(int id) {
-      this.id = id;
-   }
+    /**
+     * Constructor
+     *
+     * @param id Type identificator
+     */
+    public FILTER(int id) {
+        this.id = id;
+    }
 }

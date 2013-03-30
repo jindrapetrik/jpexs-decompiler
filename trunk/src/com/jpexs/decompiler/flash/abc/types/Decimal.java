@@ -22,14 +22,14 @@ package com.jpexs.decompiler.flash.abc.types;
  */
 public class Decimal {
 
-   public byte data[];
+    public byte data[];
 
-   public Decimal(byte data[]) {
-      this.data = data;
-   }
+    public Decimal(byte data[]) {
+        this.data = data;
+    }
 
-   @Override
-   public String toString() {
-      return new String(data);
-   }
+    @Override
+    public String toString() {
+        return new String(data);
+    }
 }

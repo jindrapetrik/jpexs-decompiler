@@ -21,17 +21,17 @@ import com.jpexs.decompiler.flash.helpers.Helper;
 
 public class GetURLTreeItem extends TreeItem {
 
-   public String urlString;
-   public String targetString;
+    public String urlString;
+    public String targetString;
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return hilight("getUrl(\"") + Helper.escapeString(urlString) + "\", \"" + Helper.escapeString(targetString) + hilight("\")");
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return hilight("getUrl(\"") + Helper.escapeString(urlString) + "\", \"" + Helper.escapeString(targetString) + hilight("\")");
+    }
 
-   public GetURLTreeItem(GraphSourceItem instruction, String urlString, String targetString) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.urlString = urlString;
-      this.targetString = targetString;
-   }
+    public GetURLTreeItem(GraphSourceItem instruction, String urlString, String targetString) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.urlString = urlString;
+        this.targetString = targetString;
+    }
 }

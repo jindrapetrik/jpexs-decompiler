@@ -23,40 +23,40 @@ import java.util.List;
 
 public class BooleanTreeItem extends TreeItem {
 
-   public Boolean value;
+    public Boolean value;
 
-   public BooleanTreeItem(AVM2Instruction instruction, Boolean value) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.value = value;
-   }
+    public BooleanTreeItem(AVM2Instruction instruction, Boolean value) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.value = value;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return value.toString();
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return value.toString();
+    }
 
-   @Override
-   public boolean isFalse() {
-      return value == false;
-   }
+    @Override
+    public boolean isFalse() {
+        return value == false;
+    }
 
-   @Override
-   public boolean isTrue() {
-      return value == true;
-   }
+    @Override
+    public boolean isTrue() {
+        return value == true;
+    }
 
-   @Override
-   public boolean toBoolean() {
-      return value;
-   }
+    @Override
+    public boolean toBoolean() {
+        return value;
+    }
 
-   @Override
-   public double toNumber() {
-      return value ? 1 : 0;
-   }
+    @Override
+    public double toNumber() {
+        return value ? 1 : 0;
+    }
 
-   @Override
-   public boolean isCompileTime() {
-      return true;
-   }
+    @Override
+    public boolean isCompileTime() {
+        return true;
+    }
 }

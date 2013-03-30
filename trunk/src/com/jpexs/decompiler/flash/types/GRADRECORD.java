@@ -22,8 +22,8 @@ package com.jpexs.decompiler.flash.types;
  */
 public class GRADRECORD {
 
-   public int ratio;
-   public boolean inShape3;
-   public RGB color;
-   public RGBA colorA;
+    public int ratio;
+    public boolean inShape3;
+    public RGB color;
+    public RGBA colorA;
 }

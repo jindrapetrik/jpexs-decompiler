@@ -25,19 +25,19 @@ import java.util.Stack;
 
 public class ActionExtends extends Action {
 
-   public ActionExtends() {
-      super(0x69, 0);
-   }
+    public ActionExtends() {
+        super(0x69, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "Extends";
-   }
+    @Override
+    public String toString() {
+        return "Extends";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem superclass = stack.pop();
-      GraphTargetItem subclass = stack.pop();
-      output.add(new ExtendsTreeItem(this, subclass, superclass));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem superclass = stack.pop();
+        GraphTargetItem subclass = stack.pop();
+        output.add(new ExtendsTreeItem(this, subclass, superclass));
+    }
 }

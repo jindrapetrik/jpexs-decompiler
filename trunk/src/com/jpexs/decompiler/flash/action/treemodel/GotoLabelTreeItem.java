@@ -21,15 +21,15 @@ import com.jpexs.decompiler.flash.helpers.Helper;
 
 public class GotoLabelTreeItem extends TreeItem {
 
-   public String label;
+    public String label;
 
-   public GotoLabelTreeItem(GraphSourceItem instruction, String label) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.label = label;
-   }
+    public GotoLabelTreeItem(GraphSourceItem instruction, String label) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.label = label;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return hilight("gotoAndStop(\"") + Helper.escapeString(label) + hilight("\")");
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return hilight("gotoAndStop(\"") + Helper.escapeString(label) + hilight("\")");
+    }
 }

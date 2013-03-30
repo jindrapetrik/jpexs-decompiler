@@ -20,49 +20,49 @@ import java.util.List;
 
 public abstract class BinaryOpItem extends GraphTargetItem {
 
-   public GraphTargetItem leftSide;
-   public GraphTargetItem rightSide;
-   protected String operator = "";
+    public GraphTargetItem leftSide;
+    public GraphTargetItem rightSide;
+    protected String operator = "";
 
-   public BinaryOpItem(GraphSourceItem instruction, int precedence, GraphTargetItem leftSide, GraphTargetItem rightSide, String operator) {
-      super(instruction, precedence);
-      this.leftSide = leftSide;
-      this.rightSide = rightSide;
-      this.operator = operator;
-   }
+    public BinaryOpItem(GraphSourceItem instruction, int precedence, GraphTargetItem leftSide, GraphTargetItem rightSide, String operator) {
+        super(instruction, precedence);
+        this.leftSide = leftSide;
+        this.rightSide = rightSide;
+        this.operator = operator;
+    }
 
-   @Override
-   public String toString(List localData) {
-      String ret = "";
-      if (leftSide.getPrecedence() > precedence) {
-         ret += "(" + leftSide.toString(localData) + ")";
-      } else {
-         ret += leftSide.toString(localData);
-      }
-      ret += hilight(operator);
-      if (rightSide.getPrecedence() > precedence) {
-         ret += "(" + rightSide.toString(localData) + ")";
-      } else {
-         ret += rightSide.toString(localData);
-      }
-      return ret;
-   }
+    @Override
+    public String toString(List localData) {
+        String ret = "";
+        if (leftSide.getPrecedence() > precedence) {
+            ret += "(" + leftSide.toString(localData) + ")";
+        } else {
+            ret += leftSide.toString(localData);
+        }
+        ret += hilight(operator);
+        if (rightSide.getPrecedence() > precedence) {
+            ret += "(" + rightSide.toString(localData) + ")";
+        } else {
+            ret += rightSide.toString(localData);
+        }
+        return ret;
+    }
 
-   @Override
-   public List<GraphSourceItemPos> getNeededSources() {
-      List<GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(leftSide.getNeededSources());
-      ret.addAll(rightSide.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<GraphSourceItemPos> getNeededSources() {
+        List<GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(leftSide.getNeededSources());
+        ret.addAll(rightSide.getNeededSources());
+        return ret;
+    }
 
-   @Override
-   public boolean isCompileTime() {
-      return leftSide.isCompileTime() && rightSide.isCompileTime();
-   }
+    @Override
+    public boolean isCompileTime() {
+        return leftSide.isCompileTime() && rightSide.isCompileTime();
+    }
 
-   @Override
-   public boolean isVariableComputed() {
-      return leftSide.isVariableComputed() || rightSide.isVariableComputed();
-   }
+    @Override
+    public boolean isVariableComputed() {
+        return leftSide.isVariableComputed() || rightSide.isVariableComputed();
+    }
 }

@@ -24,27 +24,27 @@ import java.util.List;
 
 public class ExtendsTreeItem extends TreeItem {
 
-   public GraphTargetItem subclass;
-   public GraphTargetItem superclass;
+    public GraphTargetItem subclass;
+    public GraphTargetItem superclass;
 
-   public ExtendsTreeItem(GraphSourceItem instruction, GraphTargetItem subclass, GraphTargetItem superclass) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.subclass = subclass;
-      this.superclass = superclass;
-   }
+    public ExtendsTreeItem(GraphSourceItem instruction, GraphTargetItem subclass, GraphTargetItem superclass) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.subclass = subclass;
+        this.superclass = superclass;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      List localData = new ArrayList();
-      localData.add(constants);
-      return subclass.toString(localData) + hilight(" extends ") + stripQuotes(superclass);
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        List localData = new ArrayList();
+        localData.add(constants);
+        return subclass.toString(localData) + hilight(" extends ") + stripQuotes(superclass);
+    }
 
-   @Override
-   public List<GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(subclass.getNeededSources());
-      ret.addAll(superclass.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(subclass.getNeededSources());
+        ret.addAll(superclass.getNeededSources());
+        return ret;
+    }
 }

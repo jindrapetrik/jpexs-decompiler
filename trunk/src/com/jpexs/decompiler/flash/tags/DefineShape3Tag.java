@@ -29,30 +29,30 @@ import java.util.HashMap;
 
 public class DefineShape3Tag extends CharacterTag implements BoundedTag, AloneTag, ShapeTag {
 
-   public int shapeId;
-   public RECT shapeBounds;
-   public SHAPEWITHSTYLE shapes;
+    public int shapeId;
+    public RECT shapeBounds;
+    public SHAPEWITHSTYLE shapes;
 
-   @Override
-   public RECT getRect(HashMap<Integer, CharacterTag> characters) {
-      return shapeBounds;
-   }
+    @Override
+    public RECT getRect(HashMap<Integer, CharacterTag> characters) {
+        return shapeBounds;
+    }
 
-   @Override
-   public String toSVG() {
-      return shapes.toSVG(3);
-   }
+    @Override
+    public String toSVG() {
+        return shapes.toSVG(3);
+    }
 
-   @Override
-   public int getCharacterID() {
-      return shapeId;
-   }
+    @Override
+    public int getCharacterID() {
+        return shapeId;
+    }
 
-   public DefineShape3Tag(byte[] data, int version, long pos) throws IOException {
-      super(32, "DefineShape3", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      shapeId = sis.readUI16();
-      shapeBounds = sis.readRECT();
-      shapes = sis.readSHAPEWITHSTYLE(3);
-   }
+    public DefineShape3Tag(byte[] data, int version, long pos) throws IOException {
+        super(32, "DefineShape3", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        shapeId = sis.readUI16();
+        shapeBounds = sis.readRECT();
+        shapes = sis.readSHAPEWITHSTYLE(3);
+    }
 }

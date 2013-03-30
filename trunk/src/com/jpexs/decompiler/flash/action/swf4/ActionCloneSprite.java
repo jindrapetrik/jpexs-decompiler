@@ -25,20 +25,20 @@ import java.util.Stack;
 
 public class ActionCloneSprite extends Action {
 
-   public ActionCloneSprite() {
-      super(0x24, 0);
-   }
+    public ActionCloneSprite() {
+        super(0x24, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "CloneSprite";
-   }
+    @Override
+    public String toString() {
+        return "CloneSprite";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem depth = stack.pop();
-      GraphTargetItem target = stack.pop();
-      GraphTargetItem source = stack.pop();
-      output.add(new CloneSpriteTreeItem(this, source, target, depth));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem depth = stack.pop();
+        GraphTargetItem target = stack.pop();
+        GraphTargetItem source = stack.pop();
+        output.add(new CloneSpriteTreeItem(this, source, target, depth));
+    }
 }

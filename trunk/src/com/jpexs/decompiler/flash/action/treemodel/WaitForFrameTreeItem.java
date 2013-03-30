@@ -20,17 +20,17 @@ import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 
 public class WaitForFrameTreeItem extends TreeItem {
 
-   public int frame;
-   public int skipCount;
+    public int frame;
+    public int skipCount;
 
-   public WaitForFrameTreeItem(GraphSourceItem instruction, int frame, int skipCount) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.frame = frame;
-      this.skipCount = skipCount;
-   }
+    public WaitForFrameTreeItem(GraphSourceItem instruction, int frame, int skipCount) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.frame = frame;
+        this.skipCount = skipCount;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return hilight("waitForFrame(") + frame + "," + skipCount + hilight(")");
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return hilight("waitForFrame(") + frame + "," + skipCount + hilight(")");
+    }
 }

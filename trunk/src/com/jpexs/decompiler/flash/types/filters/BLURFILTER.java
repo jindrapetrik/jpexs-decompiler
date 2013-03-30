@@ -23,20 +23,20 @@ package com.jpexs.decompiler.flash.types.filters;
  */
 public class BLURFILTER extends FILTER {
 
-   /**
-    * Horizontal blur amount
-    */
-   public double blurX;
-   /**
-    * Vertical blur amount
-    */
-   public double blurY;
-   /**
-    * Number of blur passes
-    */
-   public int passes;
+    /**
+     * Horizontal blur amount
+     */
+    public double blurX;
+    /**
+     * Vertical blur amount
+     */
+    public double blurY;
+    /**
+     * Number of blur passes
+     */
+    public int passes;
 
-   public BLURFILTER() {
-      super(1);
-   }
+    public BLURFILTER() {
+        super(1);
+    }
 }

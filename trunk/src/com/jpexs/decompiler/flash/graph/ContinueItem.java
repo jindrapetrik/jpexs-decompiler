@@ -8,15 +8,15 @@ import java.util.List;
  */
 public class ContinueItem extends GraphTargetItem {
 
-   public long loopId;
+    public long loopId;
 
-   public ContinueItem(GraphSourceItem src, long loopId) {
-      super(src, NOPRECEDENCE);
-      this.loopId = loopId;
-   }
+    public ContinueItem(GraphSourceItem src, long loopId) {
+        super(src, NOPRECEDENCE);
+        this.loopId = loopId;
+    }
 
-   @Override
-   public String toString(List localData) {
-      return hilight("continue") + " " + "loop" + loopId;
-   }
+    @Override
+    public String toString(List localData) {
+        return hilight("continue") + " " + "loop" + loopId;
+    }
 }

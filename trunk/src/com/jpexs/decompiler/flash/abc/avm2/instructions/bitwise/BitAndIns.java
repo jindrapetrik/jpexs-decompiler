@@ -30,27 +30,27 @@ import java.util.Stack;
 
 public class BitAndIns extends InstructionDefinition {
 
-   public BitAndIns() {
-      super(0xa8, "bitand", new int[]{});
-   }
+    public BitAndIns() {
+        super(0xa8, "bitand", new int[]{});
+    }
 
-   @Override
-   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-      Long value2 = (Long) lda.operandStack.pop();
-      Long value1 = (Long) lda.operandStack.pop();
-      Long value3 = value1 & value2;
-      lda.operandStack.push(value3);
-   }
+    @Override
+    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        Long value2 = (Long) lda.operandStack.pop();
+        Long value1 = (Long) lda.operandStack.pop();
+        Long value3 = value1 & value2;
+        lda.operandStack.push(value3);
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      GraphTargetItem v2 = (GraphTargetItem) stack.pop();
-      GraphTargetItem v1 = (GraphTargetItem) stack.pop();
-      stack.push(new BitAndTreeItem(ins, v1, v2));
-   }
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        GraphTargetItem v2 = (GraphTargetItem) stack.pop();
+        GraphTargetItem v1 = (GraphTargetItem) stack.pop();
+        stack.push(new BitAndTreeItem(ins, v1, v2));
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -2 + 1;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return -2 + 1;
+    }
 }

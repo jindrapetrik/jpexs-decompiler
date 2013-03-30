@@ -22,6 +22,6 @@ package com.jpexs.decompiler.flash.types;
  */
 public class MORPHGRADIENT {
 
-   public int numGradients;
-   public MORPHGRADRECORD gradientRecords[];
+    public int numGradients;
+    public MORPHGRADRECORD gradientRecords[];
 }

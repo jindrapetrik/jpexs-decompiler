@@ -22,7 +22,7 @@ package com.jpexs.decompiler.flash.types;
  */
 public class LINESTYLE {
 
-   public int width;
-   public RGB color;
-   public RGBA colorA;
+    public int width;
+    public RGB color;
+    public RGBA colorA;
 }

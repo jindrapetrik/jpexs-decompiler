@@ -25,17 +25,17 @@ import java.util.Stack;
 
 public class ActionStop extends Action {
 
-   public ActionStop() {
-      super(0x07, 0);
-   }
+    public ActionStop() {
+        super(0x07, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "Stop";
-   }
+    @Override
+    public String toString() {
+        return "Stop";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      output.add(new SimpleActionTreeItem(this, "stop()"));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        output.add(new SimpleActionTreeItem(this, "stop()"));
+    }
 }

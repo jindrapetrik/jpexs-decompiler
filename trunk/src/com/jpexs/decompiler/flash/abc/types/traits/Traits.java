@@ -24,59 +24,59 @@ import java.util.List;
 
 public class Traits implements Serializable {
 
-   public Trait traits[] = new Trait[0];
+    public Trait traits[] = new Trait[0];
 
-   @Override
-   public String toString() {
-      String s = "";
-      for (int t = 0; t < traits.length; t++) {
-         if (t > 0) {
-            s += "\r\n";
-         }
-         s += traits[t].toString();
-      }
-      return s;
-   }
-
-   public String toString(ABC abc, List<String> fullyQualifiedNames) {
-      String s = "";
-      for (int t = 0; t < traits.length; t++) {
-         if (t > 0) {
-            s += "\r\n";
-         }
-         s += traits[t].toString(abc, fullyQualifiedNames);
-      }
-      return s;
-   }
-
-   public String convert(String path, List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, boolean makePackages, int classIndex, boolean highlighting, List<String> fullyQualifiedNames) {
-      String s = "";
-      for (int t = 0; t < traits.length; t++) {
-         if (t > 0) {
-            s += "\r\n\r\n";
-         }
-         String plus;
-         //System.out.println(path+":"+traits[t].convertHeader(path, abcTags, abc, isStatic, pcode, classIndex, highlighting, fullyQualifiedNames));
-         if (makePackages) {
-            plus = traits[t].convertPackaged(path, abcTags, abc, isStatic, pcode, classIndex, highlighting, fullyQualifiedNames);
-         } else {
-            plus = traits[t].convert(path, abcTags, abc, isStatic, pcode, classIndex, highlighting, fullyQualifiedNames);
-         }
-         if (highlighting) {
-            int h = t;
-            if (classIndex != -1) {
-               if (!isStatic) {
-                  h = h + abc.class_info[classIndex].static_traits.traits.length;
-               }
+    @Override
+    public String toString() {
+        String s = "";
+        for (int t = 0; t < traits.length; t++) {
+            if (t > 0) {
+                s += "\r\n";
             }
-            if (traits[t] instanceof TraitClass) {
-               plus = Highlighting.hilighClass(plus, ((TraitClass) traits[t]).class_info);
+            s += traits[t].toString();
+        }
+        return s;
+    }
+
+    public String toString(ABC abc, List<String> fullyQualifiedNames) {
+        String s = "";
+        for (int t = 0; t < traits.length; t++) {
+            if (t > 0) {
+                s += "\r\n";
+            }
+            s += traits[t].toString(abc, fullyQualifiedNames);
+        }
+        return s;
+    }
+
+    public String convert(String path, List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, boolean makePackages, int classIndex, boolean highlighting, List<String> fullyQualifiedNames) {
+        String s = "";
+        for (int t = 0; t < traits.length; t++) {
+            if (t > 0) {
+                s += "\r\n\r\n";
+            }
+            String plus;
+            //System.out.println(path+":"+traits[t].convertHeader(path, abcTags, abc, isStatic, pcode, classIndex, highlighting, fullyQualifiedNames));
+            if (makePackages) {
+                plus = traits[t].convertPackaged(path, abcTags, abc, isStatic, pcode, classIndex, highlighting, fullyQualifiedNames);
             } else {
-               plus = Highlighting.hilighTrait(plus, h);
+                plus = traits[t].convert(path, abcTags, abc, isStatic, pcode, classIndex, highlighting, fullyQualifiedNames);
             }
-         }
-         s += plus;
-      }
-      return s;
-   }
+            if (highlighting) {
+                int h = t;
+                if (classIndex != -1) {
+                    if (!isStatic) {
+                        h = h + abc.class_info[classIndex].static_traits.traits.length;
+                    }
+                }
+                if (traits[t] instanceof TraitClass) {
+                    plus = Highlighting.hilighClass(plus, ((TraitClass) traits[t]).class_info);
+                } else {
+                    plus = Highlighting.hilighTrait(plus, h);
+                }
+            }
+            s += plus;
+        }
+        return s;
+    }
 }

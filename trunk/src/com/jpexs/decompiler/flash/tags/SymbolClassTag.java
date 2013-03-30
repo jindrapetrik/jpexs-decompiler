@@ -25,43 +25,43 @@ import java.io.OutputStream;
 
 public class SymbolClassTag extends Tag {
 
-   public int tagIDs[];
-   public String classNames[];
+    public int tagIDs[];
+    public String classNames[];
 
-   public SymbolClassTag(byte[] data, int version, long pos) throws IOException {
-      super(76, "SymbolClass", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      int numSymbols = sis.readUI16();
-      tagIDs = new int[numSymbols];
-      classNames = new String[numSymbols];
-      for (int ii = 0; ii < numSymbols; ii++) {
-         int tagID = sis.readUI16();
-         String className = sis.readString();
-         tagIDs[ii] = tagID;
-         classNames[ii] = className;
-      }
-   }
+    public SymbolClassTag(byte[] data, int version, long pos) throws IOException {
+        super(76, "SymbolClass", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        int numSymbols = sis.readUI16();
+        tagIDs = new int[numSymbols];
+        classNames = new String[numSymbols];
+        for (int ii = 0; ii < numSymbols; ii++) {
+            int tagID = sis.readUI16();
+            String className = sis.readString();
+            tagIDs[ii] = tagID;
+            classNames[ii] = className;
+        }
+    }
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         int numSymbols = tagIDs.length;
-         sos.writeUI16(numSymbols);
-         for (int ii = 0; ii < numSymbols; ii++) {
-            sos.writeUI16(tagIDs[ii]);
-            sos.writeString(classNames[ii]);
-         }
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            int numSymbols = tagIDs.length;
+            sos.writeUI16(numSymbols);
+            for (int ii = 0; ii < numSymbols; ii++) {
+                sos.writeUI16(tagIDs[ii]);
+                sos.writeString(classNames[ii]);
+            }
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 }

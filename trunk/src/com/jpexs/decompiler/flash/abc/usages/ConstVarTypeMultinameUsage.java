@@ -27,12 +27,12 @@ import java.util.List;
  */
 public class ConstVarTypeMultinameUsage extends ConstVarMultinameUsage {
 
-   public ConstVarTypeMultinameUsage(int multinameIndex, int classIndex, int traitIndex, boolean isStatic, Traits traits, int parentTraitIndex) {
-      super(multinameIndex, classIndex, traitIndex, isStatic, traits, parentTraitIndex);
-   }
+    public ConstVarTypeMultinameUsage(int multinameIndex, int classIndex, int traitIndex, boolean isStatic, Traits traits, int parentTraitIndex) {
+        super(multinameIndex, classIndex, traitIndex, isStatic, traits, parentTraitIndex);
+    }
 
-   @Override
-   public String toString(List<DoABCTag> abcTags, ABC abc) {
-      return super.toString(abcTags, abc) + " type";
-   }
+    @Override
+    public String toString(List<DoABCTag> abcTags, ABC abc) {
+        return super.toString(abcTags, abc) + " type";
+    }
 }

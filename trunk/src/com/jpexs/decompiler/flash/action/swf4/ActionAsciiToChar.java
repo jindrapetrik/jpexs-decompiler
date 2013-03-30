@@ -25,18 +25,18 @@ import java.util.Stack;
 
 public class ActionAsciiToChar extends Action {
 
-   public ActionAsciiToChar() {
-      super(0x33, 0);
-   }
+    public ActionAsciiToChar() {
+        super(0x33, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "AsciiToChar";
-   }
+    @Override
+    public String toString() {
+        return "AsciiToChar";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem a = stack.pop();
-      stack.push(new AsciiToCharTreeItem(this, a));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem a = stack.pop();
+        stack.push(new AsciiToCharTreeItem(this, a));
+    }
 }

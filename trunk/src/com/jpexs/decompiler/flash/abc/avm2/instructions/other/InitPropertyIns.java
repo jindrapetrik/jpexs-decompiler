@@ -31,30 +31,30 @@ import java.util.Stack;
 
 public class InitPropertyIns extends InstructionDefinition {
 
-   public InitPropertyIns() {
-      super(0x68, "initproperty", new int[]{AVM2Code.DAT_MULTINAME_INDEX});
-   }
+    public InitPropertyIns() {
+        super(0x68, "initproperty", new int[]{AVM2Code.DAT_MULTINAME_INDEX});
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      int multinameIndex = ins.operands[0];
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        int multinameIndex = ins.operands[0];
 
-      GraphTargetItem val = (GraphTargetItem) stack.pop();
-      FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
-      GraphTargetItem obj = (GraphTargetItem) stack.pop();
-      output.add(new InitPropertyTreeItem(ins, obj, multiname, val));
-   }
+        GraphTargetItem val = (GraphTargetItem) stack.pop();
+        FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
+        GraphTargetItem obj = (GraphTargetItem) stack.pop();
+        output.add(new InitPropertyTreeItem(ins, obj, multiname, val));
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      int ret = -2;
-      int multinameIndex = ins.operands[0];
-      if (abc.constants.constant_multiname[multinameIndex].needsName()) {
-         ret--;
-      }
-      if (abc.constants.constant_multiname[multinameIndex].needsNs()) {
-         ret--;
-      }
-      return ret;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        int ret = -2;
+        int multinameIndex = ins.operands[0];
+        if (abc.constants.constant_multiname[multinameIndex].needsName()) {
+            ret--;
+        }
+        if (abc.constants.constant_multiname[multinameIndex].needsNs()) {
+            ret--;
+        }
+        return ret;
+    }
 }

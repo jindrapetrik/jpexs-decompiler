@@ -25,19 +25,19 @@ import java.util.Stack;
 
 public class ActionGetMember extends Action {
 
-   public ActionGetMember() {
-      super(0x4E, 0);
-   }
+    public ActionGetMember() {
+        super(0x4E, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "GetMember";
-   }
+    @Override
+    public String toString() {
+        return "GetMember";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem functionName = stack.pop();
-      GraphTargetItem object = stack.pop();
-      stack.push(new GetMemberTreeItem(this, object, functionName));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem functionName = stack.pop();
+        GraphTargetItem object = stack.pop();
+        stack.push(new GetMemberTreeItem(this, object, functionName));
+    }
 }

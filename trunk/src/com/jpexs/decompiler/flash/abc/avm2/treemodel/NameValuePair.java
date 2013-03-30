@@ -23,20 +23,20 @@ import java.util.List;
 
 public class NameValuePair extends TreeItem {
 
-   public GraphTargetItem name;
-   public GraphTargetItem value;
+    public GraphTargetItem name;
+    public GraphTargetItem value;
 
-   public NameValuePair(GraphTargetItem name, GraphTargetItem value) {
-      super(name.src, NOPRECEDENCE);
-      this.name = name;
-      this.value = value;
-   }
+    public NameValuePair(GraphTargetItem name, GraphTargetItem value) {
+        super(name.src, NOPRECEDENCE);
+        this.name = name;
+        this.value = value;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      if (name instanceof StringTreeItem) {
-         return ((StringTreeItem) name).value + ":" + value.toString(constants, localRegNames, fullyQualifiedNames);
-      }
-      return name.toString(constants, localRegNames, fullyQualifiedNames) + ":" + value.toString(constants, localRegNames, fullyQualifiedNames);
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        if (name instanceof StringTreeItem) {
+            return ((StringTreeItem) name).value + ":" + value.toString(constants, localRegNames, fullyQualifiedNames);
+        }
+        return name.toString(constants, localRegNames, fullyQualifiedNames) + ":" + value.toString(constants, localRegNames, fullyQualifiedNames);
+    }
 }

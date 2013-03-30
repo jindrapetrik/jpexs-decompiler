@@ -26,43 +26,43 @@ import java.util.List;
 
 public class LocalRegTreeItem extends TreeItem {
 
-   public int regIndex;
-   public GraphTargetItem computedValue;
+    public int regIndex;
+    public GraphTargetItem computedValue;
 
-   public LocalRegTreeItem(AVM2Instruction instruction, int regIndex, GraphTargetItem computedValue) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.regIndex = regIndex;
-      if (computedValue == null) {
-         computedValue = new UndefinedTreeItem(instruction);
-      }
-      this.computedValue = computedValue;
-   }
+    public LocalRegTreeItem(AVM2Instruction instruction, int regIndex, GraphTargetItem computedValue) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.regIndex = regIndex;
+        if (computedValue == null) {
+            computedValue = new UndefinedTreeItem(instruction);
+        }
+        this.computedValue = computedValue;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      if (computedValue instanceof FilterTreeItem) {
-         return computedValue.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
-      }
-      return hilight(localRegName(localRegNames, regIndex));
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        if (computedValue instanceof FilterTreeItem) {
+            return computedValue.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
+        }
+        return hilight(localRegName(localRegNames, regIndex));
+    }
 
-   @Override
-   public GraphTargetItem getThroughRegister() {
-      return computedValue.getThroughRegister();
-   }
+    @Override
+    public GraphTargetItem getThroughRegister() {
+        return computedValue.getThroughRegister();
+    }
 
-   @Override
-   public double toNumber() {
-      return computedValue.toNumber();
-   }
+    @Override
+    public double toNumber() {
+        return computedValue.toNumber();
+    }
 
-   @Override
-   public boolean toBoolean() {
-      return computedValue.toBoolean();
-   }
+    @Override
+    public boolean toBoolean() {
+        return computedValue.toBoolean();
+    }
 
-   @Override
-   public boolean isCompileTime() {
-      return computedValue.isCompileTime();
-   }
+    @Override
+    public boolean isCompileTime() {
+        return computedValue.isCompileTime();
+    }
 }

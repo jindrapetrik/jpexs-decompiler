@@ -22,7 +22,7 @@ package com.jpexs.decompiler.flash.types;
  */
 public class SOUNDENVELOPE {
 
-   public long pos44;
-   public int leftLevel;
-   public int rightLevel;
+    public long pos44;
+    public int leftLevel;
+    public int rightLevel;
 }

@@ -22,5 +22,5 @@ package com.jpexs.decompiler.flash;
  */
 public interface EventListener {
 
-   public void handleEvent(String event, Object data);
+    public void handleEvent(String event, Object data);
 }

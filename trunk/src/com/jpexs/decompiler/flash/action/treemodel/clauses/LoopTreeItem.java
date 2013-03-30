@@ -22,10 +22,10 @@ import com.jpexs.decompiler.flash.graph.Loop;
 
 public abstract class LoopTreeItem extends TreeItem {
 
-   public Loop loop;
+    public Loop loop;
 
-   public LoopTreeItem(Action instruction, Loop loop) {
-      super(instruction, NOPRECEDENCE);
-      this.loop = loop;
-   }
+    public LoopTreeItem(Action instruction, Loop loop) {
+        super(instruction, NOPRECEDENCE);
+        this.loop = loop;
+    }
 }

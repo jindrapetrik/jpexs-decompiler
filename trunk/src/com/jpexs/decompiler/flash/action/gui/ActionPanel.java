@@ -48,284 +48,284 @@ import jsyntaxpane.DefaultSyntaxKit;
 
 public class ActionPanel extends JPanel implements ActionListener {
 
-   public LineMarkedEditorPane editor;
-   public LineMarkedEditorPane decompiledEditor;
-   public List<Tag> list;
-   public JSplitPane splitPane;
-   public JSplitPane splitPane2;
-   public JButton saveButton = new JButton("Save");
-   public JButton editButton = new JButton("Edit");
-   public JButton cancelButton = new JButton("Cancel");
-   public JToggleButton hexButton;
-   public JButton saveHexButton = new JButton("Save hex");
-   public JButton loadHexButton = new JButton("Load hex");
-   public JLabel asmLabel = new JLabel("P-code source");
-   public JLabel decLabel = new JLabel("ActionScript source");
-   public List<Highlighting> decompiledHilights = new ArrayList<Highlighting>();
-   public List<Highlighting> disassembledHilights = new ArrayList<Highlighting>();
-   public String lastDisasm = "";
-   private boolean ignoreCarret = false;
-   private boolean editMode = false;
-   private List<com.jpexs.decompiler.flash.action.Action> lastCode;
-   private ASMSource src;
-   public JPanel topButtonsPan;
-   private String srcWithHex;
-   private String srcNoHex;
+    public LineMarkedEditorPane editor;
+    public LineMarkedEditorPane decompiledEditor;
+    public List<Tag> list;
+    public JSplitPane splitPane;
+    public JSplitPane splitPane2;
+    public JButton saveButton = new JButton("Save");
+    public JButton editButton = new JButton("Edit");
+    public JButton cancelButton = new JButton("Cancel");
+    public JToggleButton hexButton;
+    public JButton saveHexButton = new JButton("Save hex");
+    public JButton loadHexButton = new JButton("Load hex");
+    public JLabel asmLabel = new JLabel("P-code source");
+    public JLabel decLabel = new JLabel("ActionScript source");
+    public List<Highlighting> decompiledHilights = new ArrayList<Highlighting>();
+    public List<Highlighting> disassembledHilights = new ArrayList<Highlighting>();
+    public String lastDisasm = "";
+    private boolean ignoreCarret = false;
+    private boolean editMode = false;
+    private List<com.jpexs.decompiler.flash.action.Action> lastCode;
+    private ASMSource src;
+    public JPanel topButtonsPan;
+    private String srcWithHex;
+    private String srcNoHex;
 
-   public void setText(String text) {
-      int pos = editor.getCaretPosition();
-      Highlighting lastH = new Highlighting(0, 0, 0);
-      for (Highlighting h : disassembledHilights) {
-         if (pos < h.startPos) {
-            break;
-         }
-         lastH = h;
-      }
-      long offset = lastH.offset;
-      disassembledHilights = Highlighting.getInstrHighlights(text);
-      editor.setText(Highlighting.stripHilights(text));
-      for (Highlighting h : disassembledHilights) {
-         if (h.offset == offset) {
-            editor.setCaretPosition(h.startPos);
-            break;
-         }
-      }
-
-   }
-
-   public void setHex(boolean hex) {
-      setText(hex ? srcWithHex : srcNoHex);
-   }
-
-   public void setSource(ASMSource src) {
-      this.src = src;
-      Main.startWork("Decompiling...");
-      final ASMSource asm = (ASMSource) src;
-      (new Thread() {
-         @Override
-         public void run() {
-            editor.setText("; Disassembling...");
-            if (Main.DO_DECOMPILE) {
-               decompiledEditor.setText("//Decompiling...");
+    public void setText(String text) {
+        int pos = editor.getCaretPosition();
+        Highlighting lastH = new Highlighting(0, 0, 0);
+        for (Highlighting h : disassembledHilights) {
+            if (pos < h.startPos) {
+                break;
             }
-            lastDisasm = asm.getASMSource(SWF.DEFAULT_VERSION, true);
-            srcWithHex = Helper.hexToComments(lastDisasm);
-            srcNoHex = Helper.stripComments(lastDisasm);
-            setHex(hexButton.isSelected());
-            if (Main.DO_DECOMPILE) {
-               List<com.jpexs.decompiler.flash.action.Action> as = asm.getActions(SWF.DEFAULT_VERSION);
-               lastCode = as;
-               com.jpexs.decompiler.flash.action.Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
-               String s = com.jpexs.decompiler.flash.action.Action.actionsToSource(as, SWF.DEFAULT_VERSION);
-               decompiledHilights = Highlighting.getInstrHighlights(s);
-               decompiledEditor.setText(Highlighting.stripHilights(s));
+            lastH = h;
+        }
+        long offset = lastH.offset;
+        disassembledHilights = Highlighting.getInstrHighlights(text);
+        editor.setText(Highlighting.stripHilights(text));
+        for (Highlighting h : disassembledHilights) {
+            if (h.offset == offset) {
+                editor.setCaretPosition(h.startPos);
+                break;
             }
-            setEditMode(false);
-            Main.stopWork();
-         }
-      }).start();
-   }
+        }
 
-   public void hilightOffset(long offset) {
-   }
+    }
 
-   public ActionPanel() {
-      this.list = list;
-      DefaultSyntaxKit.initKit();
-      editor = new LineMarkedEditorPane();
-      editor.setEditable(false);
-      decompiledEditor = new LineMarkedEditorPane();
-      decompiledEditor.setEditable(false);
+    public void setHex(boolean hex) {
+        setText(hex ? srcWithHex : srcNoHex);
+    }
 
+    public void setSource(ASMSource src) {
+        this.src = src;
+        Main.startWork("Decompiling...");
+        final ASMSource asm = (ASMSource) src;
+        (new Thread() {
+            @Override
+            public void run() {
+                editor.setText("; Disassembling...");
+                if (Main.DO_DECOMPILE) {
+                    decompiledEditor.setText("//Decompiling...");
+                }
+                lastDisasm = asm.getASMSource(SWF.DEFAULT_VERSION, true);
+                srcWithHex = Helper.hexToComments(lastDisasm);
+                srcNoHex = Helper.stripComments(lastDisasm);
+                setHex(hexButton.isSelected());
+                if (Main.DO_DECOMPILE) {
+                    List<com.jpexs.decompiler.flash.action.Action> as = asm.getActions(SWF.DEFAULT_VERSION);
+                    lastCode = as;
+                    com.jpexs.decompiler.flash.action.Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
+                    String s = com.jpexs.decompiler.flash.action.Action.actionsToSource(as, SWF.DEFAULT_VERSION);
+                    decompiledHilights = Highlighting.getInstrHighlights(s);
+                    decompiledEditor.setText(Highlighting.stripHilights(s));
+                }
+                setEditMode(false);
+                Main.stopWork();
+            }
+        }).start();
+    }
 
-      JButton graphButton = new JButton(View.getIcon("graph16"));
-      graphButton.setActionCommand("GRAPH");
-      graphButton.addActionListener(this);
-      graphButton.setToolTipText("View Graph");
-      graphButton.setMargin(new Insets(3, 3, 3, 3));
+    public void hilightOffset(long offset) {
+    }
 
-      hexButton = new JToggleButton(View.getIcon("hex16"));
-      hexButton.setActionCommand("HEX");
-      hexButton.addActionListener(this);
-      hexButton.setToolTipText("View Hex");
-      hexButton.setMargin(new Insets(3, 3, 3, 3));
-
-      topButtonsPan = new JPanel();
-      topButtonsPan.setLayout(new BoxLayout(topButtonsPan, BoxLayout.X_AXIS));
-      topButtonsPan.add(graphButton);
-      topButtonsPan.add(hexButton);
-      JPanel panCode = new JPanel(new BorderLayout());
-      panCode.add(new JScrollPane(editor), BorderLayout.CENTER);
-      panCode.add(topButtonsPan, BorderLayout.NORTH);
-
-      JPanel panB = new JPanel();
-      panB.setLayout(new BorderLayout());
-      asmLabel.setHorizontalAlignment(SwingConstants.CENTER);
-      asmLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
-      panB.add(asmLabel, BorderLayout.NORTH);
-      panB.add(panCode, BorderLayout.CENTER);
-
-
-
-      JPanel buttonsPan = new JPanel();
-      buttonsPan.setLayout(new FlowLayout());
-      buttonsPan.add(editButton);
-      buttonsPan.add(saveButton);
-      buttonsPan.add(cancelButton);
-
-      //buttonsPan.add(saveHexButton);
-      //buttonsPan.add(loadHexButton);
-      panB.add(buttonsPan, BorderLayout.SOUTH);
+    public ActionPanel() {
+        this.list = list;
+        DefaultSyntaxKit.initKit();
+        editor = new LineMarkedEditorPane();
+        editor.setEditable(false);
+        decompiledEditor = new LineMarkedEditorPane();
+        decompiledEditor.setEditable(false);
 
 
-      saveHexButton.addActionListener(this);
-      saveHexButton.setActionCommand("SAVEHEXACTION");
-      loadHexButton.addActionListener(this);
-      loadHexButton.setActionCommand("LOADHEXACTION");
-      saveButton.addActionListener(this);
-      saveButton.setActionCommand("SAVEACTION");
-      editButton.addActionListener(this);
-      editButton.setActionCommand("EDITACTION");
-      cancelButton.addActionListener(this);
-      cancelButton.setActionCommand("CANCELACTION");
-      saveButton.setVisible(false);
-      cancelButton.setVisible(false);
+        JButton graphButton = new JButton(View.getIcon("graph16"));
+        graphButton.setActionCommand("GRAPH");
+        graphButton.addActionListener(this);
+        graphButton.setToolTipText("View Graph");
+        graphButton.setMargin(new Insets(3, 3, 3, 3));
 
+        hexButton = new JToggleButton(View.getIcon("hex16"));
+        hexButton.setActionCommand("HEX");
+        hexButton.addActionListener(this);
+        hexButton.setToolTipText("View Hex");
+        hexButton.setMargin(new Insets(3, 3, 3, 3));
 
-      JPanel panA = new JPanel();
-      panA.setLayout(new BorderLayout());
-      panA.add(new JScrollPane(decompiledEditor), BorderLayout.CENTER);
-      panA.add(decLabel, BorderLayout.NORTH);
-      decLabel.setHorizontalAlignment(SwingConstants.CENTER);
-      decLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        topButtonsPan = new JPanel();
+        topButtonsPan.setLayout(new BoxLayout(topButtonsPan, BoxLayout.X_AXIS));
+        topButtonsPan.add(graphButton);
+        topButtonsPan.add(hexButton);
+        JPanel panCode = new JPanel(new BorderLayout());
+        panCode.add(new JScrollPane(editor), BorderLayout.CENTER);
+        panCode.add(topButtonsPan, BorderLayout.NORTH);
+
+        JPanel panB = new JPanel();
+        panB.setLayout(new BorderLayout());
+        asmLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        asmLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        panB.add(asmLabel, BorderLayout.NORTH);
+        panB.add(panCode, BorderLayout.CENTER);
 
 
 
+        JPanel buttonsPan = new JPanel();
+        buttonsPan.setLayout(new FlowLayout());
+        buttonsPan.add(editButton);
+        buttonsPan.add(saveButton);
+        buttonsPan.add(cancelButton);
+
+        //buttonsPan.add(saveHexButton);
+        //buttonsPan.add(loadHexButton);
+        panB.add(buttonsPan, BorderLayout.SOUTH);
 
 
-      setLayout(new BorderLayout());
-      //add(splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(tagTree), splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panA, panB)), BorderLayout.CENTER);
-      add(splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panA, panB), BorderLayout.CENTER);
+        saveHexButton.addActionListener(this);
+        saveHexButton.setActionCommand("SAVEHEXACTION");
+        loadHexButton.addActionListener(this);
+        loadHexButton.setActionCommand("LOADHEXACTION");
+        saveButton.addActionListener(this);
+        saveButton.setActionCommand("SAVEACTION");
+        editButton.addActionListener(this);
+        editButton.setActionCommand("EDITACTION");
+        cancelButton.addActionListener(this);
+        cancelButton.setActionCommand("CANCELACTION");
+        saveButton.setVisible(false);
+        cancelButton.setVisible(false);
+
+
+        JPanel panA = new JPanel();
+        panA.setLayout(new BorderLayout());
+        panA.add(new JScrollPane(decompiledEditor), BorderLayout.CENTER);
+        panA.add(decLabel, BorderLayout.NORTH);
+        decLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        decLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
+
+
+
+
+
+        setLayout(new BorderLayout());
+        //add(splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(tagTree), splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panA, panB)), BorderLayout.CENTER);
+        add(splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panA, panB), BorderLayout.CENTER);
 //      splitPane.setResizeWeight(0.5);
-      splitPane2.setResizeWeight(0.5);
-      editor.setContentType("text/flasm");
-      editor.setFont(new Font("Monospaced", Font.PLAIN, editor.getFont().getSize()));
-      decompiledEditor.setContentType("text/actionscript");
-      decompiledEditor.setFont(new Font("Monospaced", Font.PLAIN, decompiledEditor.getFont().getSize()));
+        splitPane2.setResizeWeight(0.5);
+        editor.setContentType("text/flasm");
+        editor.setFont(new Font("Monospaced", Font.PLAIN, editor.getFont().getSize()));
+        decompiledEditor.setContentType("text/actionscript");
+        decompiledEditor.setFont(new Font("Monospaced", Font.PLAIN, decompiledEditor.getFont().getSize()));
 
-      //tagTree.addTreeSelectionListener(this);
-      editor.addCaretListener(new CaretListener() {
-         @Override
-         public void caretUpdate(CaretEvent e) {
-            if (ignoreCarret) {
-               return;
-            }
-            editor.getCaret().setVisible(true);
-            int pos = editor.getCaretPosition();
-            Highlighting lastH = new Highlighting(0, 0, 0);
-            for (Highlighting h : disassembledHilights) {
-               if (pos < h.startPos) {
-                  break;
-               }
-               lastH = h;
-            }
-            for (Highlighting h2 : decompiledHilights) {
-               if (h2.offset == lastH.offset) {
-                  ignoreCarret = true;
-                  decompiledEditor.setCaretPosition(h2.startPos);
-                  decompiledEditor.getCaret().setVisible(true);
-                  ignoreCarret = false;
-                  break;
-               }
-            }
-         }
-      });
-      decompiledEditor.addCaretListener(new CaretListener() {
-         @Override
-         public void caretUpdate(CaretEvent e) {
-            if (ignoreCarret) {
-               return;
-            }
-            if (editMode) {
-               return;
-            }
-            decompiledEditor.getCaret().setVisible(true);
-            int pos = decompiledEditor.getCaretPosition();
-            for (Highlighting h : decompiledHilights) {
-               if ((pos >= h.startPos) && (pos < h.startPos + h.len)) {
-                  for (Highlighting h2 : disassembledHilights) {
-                     if (h2.offset == h.offset) {
+        //tagTree.addTreeSelectionListener(this);
+        editor.addCaretListener(new CaretListener() {
+            @Override
+            public void caretUpdate(CaretEvent e) {
+                if (ignoreCarret) {
+                    return;
+                }
+                editor.getCaret().setVisible(true);
+                int pos = editor.getCaretPosition();
+                Highlighting lastH = new Highlighting(0, 0, 0);
+                for (Highlighting h : disassembledHilights) {
+                    if (pos < h.startPos) {
+                        break;
+                    }
+                    lastH = h;
+                }
+                for (Highlighting h2 : decompiledHilights) {
+                    if (h2.offset == lastH.offset) {
                         ignoreCarret = true;
-                        editor.setCaretPosition(h2.startPos);
-                        editor.getCaret().setVisible(true);
+                        decompiledEditor.setCaretPosition(h2.startPos);
+                        decompiledEditor.getCaret().setVisible(true);
                         ignoreCarret = false;
                         break;
-                     }
-                  }
-                  break;
-               }
+                    }
+                }
             }
-         }
-      });
-   }
+        });
+        decompiledEditor.addCaretListener(new CaretListener() {
+            @Override
+            public void caretUpdate(CaretEvent e) {
+                if (ignoreCarret) {
+                    return;
+                }
+                if (editMode) {
+                    return;
+                }
+                decompiledEditor.getCaret().setVisible(true);
+                int pos = decompiledEditor.getCaretPosition();
+                for (Highlighting h : decompiledHilights) {
+                    if ((pos >= h.startPos) && (pos < h.startPos + h.len)) {
+                        for (Highlighting h2 : disassembledHilights) {
+                            if (h2.offset == h.offset) {
+                                ignoreCarret = true;
+                                editor.setCaretPosition(h2.startPos);
+                                editor.getCaret().setVisible(true);
+                                ignoreCarret = false;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        });
+    }
 
-   public void initSplits() {
-      //splitPane.setDividerLocation(getWidth() / 3);
-      splitPane2.setDividerLocation(getWidth() / 2);
-   }
+    public void initSplits() {
+        //splitPane.setDividerLocation(getWidth() / 3);
+        splitPane2.setDividerLocation(getWidth() / 2);
+    }
 
-   public void display() {
-      setVisible(true);
-      splitPane.setDividerLocation(0.5);
-      splitPane2.setDividerLocation(0.5);
-   }
+    public void display() {
+        setVisible(true);
+        splitPane.setDividerLocation(0.5);
+        splitPane2.setDividerLocation(0.5);
+    }
 
-   public void setEditMode(boolean val) {
-      if (val) {
-         setText(srcNoHex);
-         editor.setEditable(true);
-         saveButton.setVisible(true);
-         editButton.setVisible(false);
-         cancelButton.setVisible(true);
-         editor.getCaret().setVisible(true);
-      } else {
-         setText(hexButton.isSelected() ? srcWithHex : srcNoHex);
-         editor.setEditable(false);
-         saveButton.setVisible(false);
-         editButton.setVisible(true);
-         cancelButton.setVisible(false);
-         editor.getCaret().setVisible(true);
-      }
-      topButtonsPan.setVisible(!val);
-      editMode = val;
-   }
+    public void setEditMode(boolean val) {
+        if (val) {
+            setText(srcNoHex);
+            editor.setEditable(true);
+            saveButton.setVisible(true);
+            editButton.setVisible(false);
+            cancelButton.setVisible(true);
+            editor.getCaret().setVisible(true);
+        } else {
+            setText(hexButton.isSelected() ? srcWithHex : srcNoHex);
+            editor.setEditable(false);
+            saveButton.setVisible(false);
+            editButton.setVisible(true);
+            cancelButton.setVisible(false);
+            editor.getCaret().setVisible(true);
+        }
+        topButtonsPan.setVisible(!val);
+        editMode = val;
+    }
 
-   @Override
-   public void actionPerformed(ActionEvent e) {
-      if (e.getActionCommand().equals("GRAPH")) {
-         if (lastCode != null) {
-            GraphFrame gf = new GraphFrame(new ActionGraph(lastCode, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), SWF.DEFAULT_VERSION), "");
-            gf.setVisible(true);
-         }
-      } else if (e.getActionCommand().equals("EDITACTION")) {
-         setEditMode(true);
-      } else if (e.getActionCommand().equals("HEX")) {
-         setHex(hexButton.isSelected());
-      } else if (e.getActionCommand().equals("CANCELACTION")) {
-         setEditMode(false);
-         setHex(hexButton.isSelected());
-      } else if (e.getActionCommand().equals("SAVEACTION")) {
-         try {
-            src.setActions(ASMParser.parse(true, new ByteArrayInputStream(editor.getText().getBytes()), SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION);
-            setSource(this.src);
-            JOptionPane.showMessageDialog(this, "Code successfully saved");
-         } catch (IOException ex) {
-         } catch (ParseException ex) {
-            JOptionPane.showMessageDialog(this, "" + ex.text + " on line " + ex.line, "Error", JOptionPane.ERROR_MESSAGE);
-         }
-         saveButton.setVisible(false);
-         editButton.setVisible(true);
-         editor.setEditable(false);
-      }
-   }
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getActionCommand().equals("GRAPH")) {
+            if (lastCode != null) {
+                GraphFrame gf = new GraphFrame(new ActionGraph(lastCode, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), SWF.DEFAULT_VERSION), "");
+                gf.setVisible(true);
+            }
+        } else if (e.getActionCommand().equals("EDITACTION")) {
+            setEditMode(true);
+        } else if (e.getActionCommand().equals("HEX")) {
+            setHex(hexButton.isSelected());
+        } else if (e.getActionCommand().equals("CANCELACTION")) {
+            setEditMode(false);
+            setHex(hexButton.isSelected());
+        } else if (e.getActionCommand().equals("SAVEACTION")) {
+            try {
+                src.setActions(ASMParser.parse(true, new ByteArrayInputStream(editor.getText().getBytes()), SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION);
+                setSource(this.src);
+                JOptionPane.showMessageDialog(this, "Code successfully saved");
+            } catch (IOException ex) {
+            } catch (ParseException ex) {
+                JOptionPane.showMessageDialog(this, "" + ex.text + " on line " + ex.line, "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            saveButton.setVisible(false);
+            editButton.setVisible(true);
+            editor.setEditable(false);
+        }
+    }
 }

@@ -25,19 +25,19 @@ import java.util.Stack;
 
 public class ActionBitAnd extends Action {
 
-   public ActionBitAnd() {
-      super(0x60, 0);
-   }
+    public ActionBitAnd() {
+        super(0x60, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "BitAnd";
-   }
+    @Override
+    public String toString() {
+        return "BitAnd";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem a = stack.pop();
-      GraphTargetItem b = stack.pop();
-      stack.push(new BitAndTreeItem(this, b, a));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem a = stack.pop();
+        GraphTargetItem b = stack.pop();
+        stack.push(new BitAndTreeItem(this, b, a));
+    }
 }

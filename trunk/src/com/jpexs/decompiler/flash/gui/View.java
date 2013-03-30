@@ -31,62 +31,62 @@ import javax.swing.UnsupportedLookAndFeelException;
  */
 public class View {
 
-   /**
-    * Sets windows Look and Feel
-    */
-   public static void setLookAndFeel() {
-      try {
+    /**
+     * Sets windows Look and Feel
+     */
+    public static void setLookAndFeel() {
+        try {
 
-         UIManager.setLookAndFeel(
-                 UIManager.getSystemLookAndFeelClassName());
-      } catch (UnsupportedLookAndFeelException ignored) {
-      } catch (ClassNotFoundException ignored) {
-      } catch (InstantiationException ignored) {
-      } catch (IllegalAccessException ignored) {
-      }
+            UIManager.setLookAndFeel(
+                    UIManager.getSystemLookAndFeelClassName());
+        } catch (UnsupportedLookAndFeelException ignored) {
+        } catch (ClassNotFoundException ignored) {
+        } catch (InstantiationException ignored) {
+        } catch (IllegalAccessException ignored) {
+        }
 
 
-      JFrame.setDefaultLookAndFeelDecorated(true);
-      JDialog.setDefaultLookAndFeelDecorated(true);
-   }
+        JFrame.setDefaultLookAndFeelDecorated(true);
+        JDialog.setDefaultLookAndFeelDecorated(true);
+    }
 
-   /**
-    * Loads image from resources
-    *
-    * @param name Name of the image
-    * @return loaded Image
-    */
-   public static Image loadImage(String name) {
-      java.net.URL imageURL = View.class.getResource("/com/jpexs/decompiler/flash/gui/graphics/" + name + ".png");
-      return Toolkit.getDefaultToolkit().createImage(imageURL);
-   }
+    /**
+     * Loads image from resources
+     *
+     * @param name Name of the image
+     * @return loaded Image
+     */
+    public static Image loadImage(String name) {
+        java.net.URL imageURL = View.class.getResource("/com/jpexs/decompiler/flash/gui/graphics/" + name + ".png");
+        return Toolkit.getDefaultToolkit().createImage(imageURL);
+    }
 
-   /**
-    * Sets icon of specified frame to ASDec icon
-    *
-    * @param f Frame to set icon in
-    */
-   public static void setWindowIcon(Window f) {
-      java.util.List<Image> images = new ArrayList<Image>();
-      images.add(loadImage("icon16"));
-      images.add(loadImage("icon32"));
-      images.add(loadImage("icon48"));
-      f.setIconImages(images);
-   }
+    /**
+     * Sets icon of specified frame to ASDec icon
+     *
+     * @param f Frame to set icon in
+     */
+    public static void setWindowIcon(Window f) {
+        java.util.List<Image> images = new ArrayList<Image>();
+        images.add(loadImage("icon16"));
+        images.add(loadImage("icon32"));
+        images.add(loadImage("icon48"));
+        f.setIconImages(images);
+    }
 
-   /**
-    * Centers specified frame on the screen
-    *
-    * @param f Frame to center on the screen
-    */
-   public static void centerScreen(Window f) {
-      Dimension dim = f.getToolkit().getScreenSize();
-      Rectangle abounds = f.getBounds();
-      f.setLocation((dim.width - abounds.width) / 2,
-              (dim.height - abounds.height) / 2);
-   }
+    /**
+     * Centers specified frame on the screen
+     *
+     * @param f Frame to center on the screen
+     */
+    public static void centerScreen(Window f) {
+        Dimension dim = f.getToolkit().getScreenSize();
+        Rectangle abounds = f.getBounds();
+        f.setLocation((dim.width - abounds.width) / 2,
+                (dim.height - abounds.height) / 2);
+    }
 
-   public static ImageIcon getIcon(String name) {
-      return new ImageIcon(View.class.getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/" + name + ".png"));
-   }
+    public static ImageIcon getIcon(String name) {
+        return new ImageIcon(View.class.getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/" + name + ".png"));
+    }
 }

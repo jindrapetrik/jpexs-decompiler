@@ -26,26 +26,26 @@ import java.util.Stack;
 
 public class ActionSetProperty extends Action {
 
-   public ActionSetProperty() {
-      super(0x23, 0);
-   }
+    public ActionSetProperty() {
+        super(0x23, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "SetProperty";
-   }
+    @Override
+    public String toString() {
+        return "SetProperty";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem value = stack.pop();
-      GraphTargetItem index = stack.pop();
-      GraphTargetItem target = stack.pop();
-      int indexInt = 0;
-      if (index instanceof DirectValueTreeItem) {
-         if (((DirectValueTreeItem) index).value instanceof Long) {
-            indexInt = (int) (long) (Long) ((DirectValueTreeItem) index).value;
-         }
-      }
-      output.add(new SetPropertyTreeItem(this, target, indexInt, value));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem value = stack.pop();
+        GraphTargetItem index = stack.pop();
+        GraphTargetItem target = stack.pop();
+        int indexInt = 0;
+        if (index instanceof DirectValueTreeItem) {
+            if (((DirectValueTreeItem) index).value instanceof Long) {
+                indexInt = (int) (long) (Long) ((DirectValueTreeItem) index).value;
+            }
+        }
+        output.add(new SetPropertyTreeItem(this, target, indexInt, value));
+    }
 }

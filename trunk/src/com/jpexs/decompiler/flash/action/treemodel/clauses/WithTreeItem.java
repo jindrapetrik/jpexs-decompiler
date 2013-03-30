@@ -25,31 +25,31 @@ import java.util.List;
 
 public class WithTreeItem extends TreeItem {
 
-   public GraphTargetItem scope;
-   public List<GraphTargetItem> items;
+    public GraphTargetItem scope;
+    public List<GraphTargetItem> items;
 
-   public WithTreeItem(Action instruction, GraphTargetItem scope, List<GraphTargetItem> items) {
-      super(instruction, NOPRECEDENCE);
-      this.scope = scope;
-      this.items = items;
-   }
+    public WithTreeItem(Action instruction, GraphTargetItem scope, List<GraphTargetItem> items) {
+        super(instruction, NOPRECEDENCE);
+        this.scope = scope;
+        this.items = items;
+    }
 
-   public WithTreeItem(Action instruction, TreeItem scope) {
-      super(instruction, NOPRECEDENCE);
-      this.scope = scope;
-      this.items = new ArrayList<GraphTargetItem>();
-   }
+    public WithTreeItem(Action instruction, TreeItem scope) {
+        super(instruction, NOPRECEDENCE);
+        this.scope = scope;
+        this.items = new ArrayList<GraphTargetItem>();
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      String ret;
-      List localData = new ArrayList();
-      localData.add(constants);
-      ret = hilight("with(") + scope.toString(localData) + hilight(")\r\n{\r\n");
-      for (GraphTargetItem ti : items) {
-         ret += ti.toString(localData) + "\r\n";
-      }
-      ret += hilight("}");
-      return ret;
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        String ret;
+        List localData = new ArrayList();
+        localData.add(constants);
+        ret = hilight("with(") + scope.toString(localData) + hilight(")\r\n{\r\n");
+        for (GraphTargetItem ti : items) {
+            ret += ti.toString(localData) + "\r\n";
+        }
+        ret += hilight("}");
+        return ret;
+    }
 }

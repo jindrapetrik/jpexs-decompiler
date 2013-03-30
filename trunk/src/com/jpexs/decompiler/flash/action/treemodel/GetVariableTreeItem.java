@@ -22,70 +22,70 @@ import java.util.List;
 
 public class GetVariableTreeItem extends TreeItem {
 
-   public GraphTargetItem name;
-   private GraphTargetItem computedValue;
-   private double computedNumber = 0;
-   private boolean computedBool = false;
-   private boolean computedCompiletime = false;
-   private boolean computedVariableComputed = false;
+    public GraphTargetItem name;
+    private GraphTargetItem computedValue;
+    private double computedNumber = 0;
+    private boolean computedBool = false;
+    private boolean computedCompiletime = false;
+    private boolean computedVariableComputed = false;
 
-   public GetVariableTreeItem(GraphSourceItem instruction, GraphTargetItem value) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.name = value;
-   }
+    public GetVariableTreeItem(GraphSourceItem instruction, GraphTargetItem value) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.name = value;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      if (computedValue == null) {
-         //return "null";
-      }
-      //return ""+computedValue.toNumber(); 
-      return stripQuotes(name);
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        if (computedValue == null) {
+            //return "null";
+        }
+        //return ""+computedValue.toNumber(); 
+        return stripQuotes(name);
+    }
 
-   @Override
-   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(name.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(name.getNeededSources());
+        return ret;
+    }
 
-   @Override
-   public boolean isVariableComputed() {
-      return true;
-   }
+    @Override
+    public boolean isVariableComputed() {
+        return true;
+    }
 
-   @Override
-   public boolean isCompileTime() {
-      if (computedValue == null) {
-         return false;
-      }
-      return computedCompiletime;
-   }
+    @Override
+    public boolean isCompileTime() {
+        if (computedValue == null) {
+            return false;
+        }
+        return computedCompiletime;
+    }
 
-   @Override
-   public boolean toBoolean() {
-      if (computedValue == null) {
-         return false;
-      }
-      return computedBool;
-   }
+    @Override
+    public boolean toBoolean() {
+        if (computedValue == null) {
+            return false;
+        }
+        return computedBool;
+    }
 
-   @Override
-   public double toNumber() {
-      if (computedValue == null) {
-         return 0;
-      }
-      return computedNumber;
-   }
+    @Override
+    public double toNumber() {
+        if (computedValue == null) {
+            return 0;
+        }
+        return computedNumber;
+    }
 
-   public void setComputedValue(GraphTargetItem computedValue) {
-      this.computedValue = computedValue;
-      if (computedValue != null) {
-         computedNumber = computedValue.toNumber();
-         computedBool = computedValue.toBoolean();
-         computedCompiletime = computedValue.isCompileTime();
-         computedVariableComputed = computedValue.isVariableComputed();
-      }
-   }
+    public void setComputedValue(GraphTargetItem computedValue) {
+        this.computedValue = computedValue;
+        if (computedValue != null) {
+            computedNumber = computedValue.toNumber();
+            computedBool = computedValue.toBoolean();
+            computedCompiletime = computedValue.isCompileTime();
+            computedVariableComputed = computedValue.isVariableComputed();
+        }
+    }
 }

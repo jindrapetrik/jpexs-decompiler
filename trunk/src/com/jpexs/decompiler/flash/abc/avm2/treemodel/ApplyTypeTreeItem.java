@@ -25,33 +25,33 @@ import java.util.List;
 
 public class ApplyTypeTreeItem extends TreeItem {
 
-   public GraphTargetItem object;
-   public List<GraphTargetItem> params;
+    public GraphTargetItem object;
+    public List<GraphTargetItem> params;
 
-   public ApplyTypeTreeItem(AVM2Instruction instruction, GraphTargetItem object, List<GraphTargetItem> params) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.params = params;
-      this.object = object;
-   }
+    public ApplyTypeTreeItem(AVM2Instruction instruction, GraphTargetItem object, List<GraphTargetItem> params) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.params = params;
+        this.object = object;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      String ret = object.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
-      if (!params.isEmpty()) {
-         ret += hilight(".<");
-         for (int i = 0; i < params.size(); i++) {
-            if (i > 0) {
-               ret += hilight(",");
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        String ret = object.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
+        if (!params.isEmpty()) {
+            ret += hilight(".<");
+            for (int i = 0; i < params.size(); i++) {
+                if (i > 0) {
+                    ret += hilight(",");
+                }
+                GraphTargetItem p = params.get(i);
+                if (p instanceof NullTreeItem) {
+                    ret += "*";
+                } else {
+                    ret += p.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
+                }
             }
-            GraphTargetItem p = params.get(i);
-            if (p instanceof NullTreeItem) {
-               ret += "*";
-            } else {
-               ret += p.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
-            }
-         }
-         ret += hilight(">");
-      }
-      return ret;
-   }
+            ret += hilight(">");
+        }
+        return ret;
+    }
 }

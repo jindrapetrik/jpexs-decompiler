@@ -30,42 +30,42 @@ import javax.swing.text.Element;
  */
 public class LineMarkedEditorPane extends JEditorPane {
 
-   int lastLine = -1;
+    int lastLine = -1;
 
-   public LineMarkedEditorPane() {
-      setOpaque(false);
-      addCaretListener(new CaretListener() {
-         @Override
-         public void caretUpdate(CaretEvent e) {
-            int caretPosition = getCaretPosition();
-            Element root = getDocument().getDefaultRootElement();
-            int currentLine = root.getElementIndex(caretPosition);
-            if (currentLine != lastLine) {
-               lastLine = currentLine;
-               repaint();
+    public LineMarkedEditorPane() {
+        setOpaque(false);
+        addCaretListener(new CaretListener() {
+            @Override
+            public void caretUpdate(CaretEvent e) {
+                int caretPosition = getCaretPosition();
+                Element root = getDocument().getDefaultRootElement();
+                int currentLine = root.getElementIndex(caretPosition);
+                if (currentLine != lastLine) {
+                    lastLine = currentLine;
+                    repaint();
+                }
             }
-         }
-      });
-   }
+        });
+    }
 
-   @Override
-   public void setText(String t) {
-      lastLine = -1;
-      super.setText(t);
-   }
+    @Override
+    public void setText(String t) {
+        lastLine = -1;
+        super.setText(t);
+    }
 
-   @Override
-   public void paint(Graphics g) {
-      g.setColor(Color.white);
-      g.fillRect(0, 0, getWidth(), getHeight());
-      FontMetrics fontMetrics = g.getFontMetrics();
-      int lh = fontMetrics.getHeight();
-      int a = fontMetrics.getAscent();
-      int d = fontMetrics.getDescent();
-      int h = a + d;
-      int rH = h;
-      g.setColor(new Color(0xee, 0xee, 0xee));
-      g.fillRect(0, d + lh * lastLine - 1, getWidth(), lh);
-      super.paint(g);
-   }
+    @Override
+    public void paint(Graphics g) {
+        g.setColor(Color.white);
+        g.fillRect(0, 0, getWidth(), getHeight());
+        FontMetrics fontMetrics = g.getFontMetrics();
+        int lh = fontMetrics.getHeight();
+        int a = fontMetrics.getAscent();
+        int d = fontMetrics.getDescent();
+        int h = a + d;
+        int rH = h;
+        g.setColor(new Color(0xee, 0xee, 0xee));
+        g.fillRect(0, d + lh * lastLine - 1, getWidth(), lh);
+        super.paint(g);
+    }
 }

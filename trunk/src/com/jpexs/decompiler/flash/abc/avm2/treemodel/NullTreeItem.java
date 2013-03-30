@@ -23,27 +23,27 @@ import java.util.List;
 
 public class NullTreeItem extends TreeItem {
 
-   public NullTreeItem(AVM2Instruction instruction) {
-      super(instruction, PRECEDENCE_PRIMARY);
-   }
+    public NullTreeItem(AVM2Instruction instruction) {
+        super(instruction, PRECEDENCE_PRIMARY);
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return hilight("null");
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return hilight("null");
+    }
 
-   @Override
-   public boolean isCompileTime() {
-      return true;
-   }
+    @Override
+    public boolean isCompileTime() {
+        return true;
+    }
 
-   @Override
-   public double toNumber() {
-      return 0;
-   }
+    @Override
+    public double toNumber() {
+        return 0;
+    }
 
-   @Override
-   public boolean toBoolean() {
-      return false;
-   }
+    @Override
+    public boolean toBoolean() {
+        return false;
+    }
 }

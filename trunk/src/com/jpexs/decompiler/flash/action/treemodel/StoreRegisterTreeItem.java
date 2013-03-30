@@ -23,29 +23,29 @@ import java.util.List;
 
 public class StoreRegisterTreeItem extends TreeItem implements SetTypeTreeItem {
 
-   public RegisterNumber register;
-   public GraphTargetItem value;
+    public RegisterNumber register;
+    public GraphTargetItem value;
 
-   public StoreRegisterTreeItem(GraphSourceItem instruction, RegisterNumber register, GraphTargetItem value) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.value = value;
-      this.register = register;
-   }
+    public StoreRegisterTreeItem(GraphSourceItem instruction, RegisterNumber register, GraphTargetItem value) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.value = value;
+        this.register = register;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return hilight(register.toString() + "=") + value.toString(constants);
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return hilight(register.toString() + "=") + value.toString(constants);
+    }
 
-   @Override
-   public GraphTargetItem getObject() {
-      return new DirectValueTreeItem(src, -1, register, null);
-   }
+    @Override
+    public GraphTargetItem getObject() {
+        return new DirectValueTreeItem(src, -1, register, null);
+    }
 
-   @Override
-   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(value.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(value.getNeededSources());
+        return ret;
+    }
 }

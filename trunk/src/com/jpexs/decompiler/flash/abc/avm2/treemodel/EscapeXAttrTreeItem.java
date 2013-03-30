@@ -29,15 +29,15 @@ import java.util.List;
  */
 public class EscapeXAttrTreeItem extends TreeItem {
 
-   public GraphTargetItem expression;
+    public GraphTargetItem expression;
 
-   public EscapeXAttrTreeItem(AVM2Instruction instruction, GraphTargetItem expression) {
-      super(instruction, NOPRECEDENCE);
-      this.expression = expression;
-   }
+    public EscapeXAttrTreeItem(AVM2Instruction instruction, GraphTargetItem expression) {
+        super(instruction, NOPRECEDENCE);
+        this.expression = expression;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return hilight("{") + expression.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + hilight("}");
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return hilight("{") + expression.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + hilight("}");
+    }
 }

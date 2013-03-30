@@ -25,19 +25,19 @@ import java.util.Stack;
 
 public class ActionInstanceOf extends Action {
 
-   public ActionInstanceOf() {
-      super(0x54, 0);
-   }
+    public ActionInstanceOf() {
+        super(0x54, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "InstanceOf";
-   }
+    @Override
+    public String toString() {
+        return "InstanceOf";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem a = stack.pop();
-      GraphTargetItem b = stack.pop();
-      stack.push(new InstanceOfTreeItem(this, b, a));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem a = stack.pop();
+        GraphTargetItem b = stack.pop();
+        stack.push(new InstanceOfTreeItem(this, b, a));
+    }
 }

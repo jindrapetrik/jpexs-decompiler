@@ -22,24 +22,24 @@ import java.util.List;
 
 public class WaitForFrame2TreeItem extends TreeItem {
 
-   public GraphTargetItem frame;
-   public int skipCount;
+    public GraphTargetItem frame;
+    public int skipCount;
 
-   public WaitForFrame2TreeItem(GraphSourceItem instruction, GraphTargetItem frame, int skipCount) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.frame = frame;
-      this.skipCount = skipCount;
-   }
+    public WaitForFrame2TreeItem(GraphSourceItem instruction, GraphTargetItem frame, int skipCount) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.frame = frame;
+        this.skipCount = skipCount;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return hilight("waitForFrame2(") + frame.toString(constants) + "," + skipCount + hilight(")");
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return hilight("waitForFrame2(") + frame.toString(constants) + "," + skipCount + hilight(")");
+    }
 
-   @Override
-   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(frame.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(frame.getNeededSources());
+        return ret;
+    }
 }

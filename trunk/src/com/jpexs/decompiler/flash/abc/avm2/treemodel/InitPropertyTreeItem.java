@@ -25,29 +25,29 @@ import java.util.List;
 
 public class InitPropertyTreeItem extends TreeItem implements SetTypeTreeItem, AssignmentTreeItem {
 
-   public GraphTargetItem object;
-   public FullMultinameTreeItem propertyName;
-   public GraphTargetItem value;
+    public GraphTargetItem object;
+    public FullMultinameTreeItem propertyName;
+    public GraphTargetItem value;
 
-   public InitPropertyTreeItem(AVM2Instruction instruction, GraphTargetItem object, FullMultinameTreeItem propertyName, GraphTargetItem value) {
-      super(instruction, PRECEDENCE_ASSIGMENT);
-      this.object = object;
-      this.propertyName = propertyName;
-      this.value = value;
-   }
+    public InitPropertyTreeItem(AVM2Instruction instruction, GraphTargetItem object, FullMultinameTreeItem propertyName, GraphTargetItem value) {
+        super(instruction, PRECEDENCE_ASSIGMENT);
+        this.object = object;
+        this.propertyName = propertyName;
+        this.value = value;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return formatProperty(constants, object, propertyName, localRegNames, fullyQualifiedNames) + hilight("=") + value.toString(constants, localRegNames, fullyQualifiedNames);
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return formatProperty(constants, object, propertyName, localRegNames, fullyQualifiedNames) + hilight("=") + value.toString(constants, localRegNames, fullyQualifiedNames);
+    }
 
-   @Override
-   public GraphTargetItem getObject() {
-      return new GetPropertyTreeItem(instruction, object, propertyName);
-   }
+    @Override
+    public GraphTargetItem getObject() {
+        return new GetPropertyTreeItem(instruction, object, propertyName);
+    }
 
-   @Override
-   public GraphTargetItem getValue() {
-      return value;
-   }
+    @Override
+    public GraphTargetItem getValue() {
+        return value;
+    }
 }

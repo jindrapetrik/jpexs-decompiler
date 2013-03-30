@@ -25,26 +25,26 @@ import java.util.List;
 
 public class CallStaticTreeItem extends TreeItem {
 
-   public GraphTargetItem receiver;
-   public String methodName;
-   public List<GraphTargetItem> arguments;
+    public GraphTargetItem receiver;
+    public String methodName;
+    public List<GraphTargetItem> arguments;
 
-   public CallStaticTreeItem(AVM2Instruction instruction, GraphTargetItem receiver, String methodName, List<GraphTargetItem> arguments) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.receiver = receiver;
-      this.methodName = methodName;
-      this.arguments = arguments;
-   }
+    public CallStaticTreeItem(AVM2Instruction instruction, GraphTargetItem receiver, String methodName, List<GraphTargetItem> arguments) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.receiver = receiver;
+        this.methodName = methodName;
+        this.arguments = arguments;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      String args = "";
-      for (int a = 0; a < arguments.size(); a++) {
-         if (a > 0) {
-            args = args + ",";
-         }
-         args = args + arguments.get(a).toString(constants, localRegNames, fullyQualifiedNames);
-      }
-      return receiver.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + hilight(".") + methodName + hilight("(") + args + hilight(")");
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        String args = "";
+        for (int a = 0; a < arguments.size(); a++) {
+            if (a > 0) {
+                args = args + ",";
+            }
+            args = args + arguments.get(a).toString(constants, localRegNames, fullyQualifiedNames);
+        }
+        return receiver.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + hilight(".") + methodName + hilight("(") + args + hilight(")");
+    }
 }

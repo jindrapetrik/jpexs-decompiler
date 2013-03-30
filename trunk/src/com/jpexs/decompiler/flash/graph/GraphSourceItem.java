@@ -9,21 +9,21 @@ import java.util.Stack;
  */
 public interface GraphSourceItem {
 
-   public void translate(List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output);
+    public void translate(List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output);
 
-   public boolean isJump();
+    public boolean isJump();
 
-   public boolean isBranch();
+    public boolean isBranch();
 
-   public boolean isExit();
+    public boolean isExit();
 
-   public long getOffset();
+    public long getOffset();
 
-   public boolean ignoredLoops();
+    public boolean ignoredLoops();
 
-   public List<Integer> getBranches(GraphSource code);
+    public List<Integer> getBranches(GraphSource code);
 
-   public boolean isIgnored();
+    public boolean isIgnored();
 
-   public void setIgnored(boolean ignored);
+    public void setIgnored(boolean ignored);
 }

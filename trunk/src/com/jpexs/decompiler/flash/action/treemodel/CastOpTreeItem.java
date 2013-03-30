@@ -23,25 +23,25 @@ import java.util.List;
 
 public class CastOpTreeItem extends TreeItem {
 
-   public GraphTargetItem constructor;
-   public GraphTargetItem object;
+    public GraphTargetItem constructor;
+    public GraphTargetItem object;
 
-   public CastOpTreeItem(GraphSourceItem instruction, GraphTargetItem constructor, GraphTargetItem object) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.constructor = constructor;
-      this.object = object;
-   }
+    public CastOpTreeItem(GraphSourceItem instruction, GraphTargetItem constructor, GraphTargetItem object) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.constructor = constructor;
+        this.object = object;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return hilight("(") + stripQuotes(constructor) + hilight(")") + object.toString(Helper.toList(constants));
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return hilight("(") + stripQuotes(constructor) + hilight(")") + object.toString(Helper.toList(constants));
+    }
 
-   @Override
-   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(constructor.getNeededSources());
-      ret.addAll(object.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(constructor.getNeededSources());
+        ret.addAll(object.getNeededSources());
+        return ret;
+    }
 }

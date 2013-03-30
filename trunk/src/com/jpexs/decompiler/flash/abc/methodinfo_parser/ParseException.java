@@ -18,12 +18,12 @@ package com.jpexs.decompiler.flash.abc.methodinfo_parser;
 
 public class ParseException extends Exception {
 
-   public long line;
-   public String text;
+    public long line;
+    public String text;
 
-   public ParseException(String text, long line) {
-      super("ParseException:" + text + " on line " + line);
-      this.line = line;
-      this.text = text;
-   }
+    public ParseException(String text, long line) {
+        super("ParseException:" + text + " on line " + line);
+        this.line = line;
+        this.text = text;
+    }
 }

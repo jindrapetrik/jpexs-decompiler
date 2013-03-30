@@ -27,55 +27,55 @@ import java.io.Serializable;
  */
 public class MATRIX implements Serializable {
 
-   /**
-    * Has scale values
-    */
-   public boolean hasScale;
-   /**
-    * X scale value
-    */
-   public int scaleX;
-   /**
-    * Y scale value
-    */
-   public int scaleY;
-   /**
-    * Has rotate and skew values
-    */
-   public boolean hasRotate;
-   /**
-    * First rotate and skew value
-    */
-   public int rotateSkew0;
-   /**
-    * Second rotate and skew value
-    */
-   public int rotateSkew1;
-   /**
-    * X translate value in twips
-    */
-   public int translateX;
-   /**
-    * Y translate value in twips
-    */
-   public int translateY;
-   public int bitsTranslate;
-   public int bitsRotate;
-   public int bitsScale;
+    /**
+     * Has scale values
+     */
+    public boolean hasScale;
+    /**
+     * X scale value
+     */
+    public int scaleX;
+    /**
+     * Y scale value
+     */
+    public int scaleY;
+    /**
+     * Has rotate and skew values
+     */
+    public boolean hasRotate;
+    /**
+     * First rotate and skew value
+     */
+    public int rotateSkew0;
+    /**
+     * Second rotate and skew value
+     */
+    public int rotateSkew1;
+    /**
+     * X translate value in twips
+     */
+    public int translateX;
+    /**
+     * Y translate value in twips
+     */
+    public int translateY;
+    public int bitsTranslate;
+    public int bitsRotate;
+    public int bitsScale;
 
-   @Override
-   public String toString() {
-      return "[MATRIX scale:" + scaleX + "," + scaleY + ", rotate:" + rotateSkew0 + "," + rotateSkew1 + ", translate:" + translateX + "," + translateY + "]";
-   }
+    @Override
+    public String toString() {
+        return "[MATRIX scale:" + scaleX + "," + scaleY + ", rotate:" + rotateSkew0 + "," + rotateSkew1 + ", translate:" + translateX + "," + translateY + "]";
+    }
 
-   private float toFloat(int i) {
-      return ((float) i) / (1 << 16);
-   }
+    private float toFloat(int i) {
+        return ((float) i) / (1 << 16);
+    }
 
-   public Point apply(Point p) {
-      Point ret = new Point();
-      ret.x = (int) (p.x * (hasScale ? toFloat(scaleX) : 1) + p.y * (hasRotate ? toFloat(rotateSkew1) : 0) + translateX);
-      ret.y = (int) (p.x * (hasRotate ? toFloat(rotateSkew0) : 0) + p.y * (hasScale ? toFloat(scaleY) : 1) + translateY);
-      return ret;
-   }
+    public Point apply(Point p) {
+        Point ret = new Point();
+        ret.x = (int) (p.x * (hasScale ? toFloat(scaleX) : 1) + p.y * (hasRotate ? toFloat(rotateSkew1) : 0) + translateX);
+        ret.y = (int) (p.x * (hasRotate ? toFloat(rotateSkew0) : 0) + p.y * (hasScale ? toFloat(scaleY) : 1) + translateY);
+        return ret;
+    }
 }

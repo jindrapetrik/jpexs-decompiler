@@ -25,17 +25,17 @@ import java.util.Stack;
 
 public class ActionPrevFrame extends Action {
 
-   public ActionPrevFrame() {
-      super(0x05, 0);
-   }
+    public ActionPrevFrame() {
+        super(0x05, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "PrevFrame";
-   }
+    @Override
+    public String toString() {
+        return "PrevFrame";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      output.add(new SimpleActionTreeItem(this, "prevFrame()"));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        output.add(new SimpleActionTreeItem(this, "prevFrame()"));
+    }
 }

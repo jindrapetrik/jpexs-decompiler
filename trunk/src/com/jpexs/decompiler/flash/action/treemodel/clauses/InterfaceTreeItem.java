@@ -28,36 +28,36 @@ import java.util.List;
  */
 public class InterfaceTreeItem extends TreeItem {
 
-   public GraphTargetItem name;
-   public List<GraphTargetItem> superInterfaces;
+    public GraphTargetItem name;
+    public List<GraphTargetItem> superInterfaces;
 
-   public InterfaceTreeItem(GraphTargetItem name, List<GraphTargetItem> superInterfaces) {
-      super(null, NOPRECEDENCE);
-      this.name = name;
-      this.superInterfaces = superInterfaces;
-   }
+    public InterfaceTreeItem(GraphTargetItem name, List<GraphTargetItem> superInterfaces) {
+        super(null, NOPRECEDENCE);
+        this.name = name;
+        this.superInterfaces = superInterfaces;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      String ret = "";
-      ret += "interface " + name.toStringNoQuotes(constants);
-      boolean first = true;
-      if (!superInterfaces.isEmpty()) {
-         ret += " extends ";
-      }
-      for (GraphTargetItem ti : superInterfaces) {
-         if (!first) {
-            ret += ", ";
-         }
-         first = false;
-         ret += Action.getWithoutGlobal(ti).toStringNoQuotes(constants);
-      }
-      ret += "\r\n{\r\n}\r\n";
-      return ret;
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        String ret = "";
+        ret += "interface " + name.toStringNoQuotes(constants);
+        boolean first = true;
+        if (!superInterfaces.isEmpty()) {
+            ret += " extends ";
+        }
+        for (GraphTargetItem ti : superInterfaces) {
+            if (!first) {
+                ret += ", ";
+            }
+            first = false;
+            ret += Action.getWithoutGlobal(ti).toStringNoQuotes(constants);
+        }
+        ret += "\r\n{\r\n}\r\n";
+        return ret;
+    }
 
-   @Override
-   public boolean needsSemicolon() {
-      return false;
-   }
+    @Override
+    public boolean needsSemicolon() {
+        return false;
+    }
 }

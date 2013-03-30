@@ -25,102 +25,102 @@ import java.util.List;
 
 public class FullMultinameTreeItem extends TreeItem {
 
-   public int multinameIndex;
-   public GraphTargetItem name;
-   public GraphTargetItem namespace;
+    public int multinameIndex;
+    public GraphTargetItem name;
+    public GraphTargetItem namespace;
 
-   public FullMultinameTreeItem(AVM2Instruction instruction, int multinameIndex, GraphTargetItem name) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.multinameIndex = multinameIndex;
-      this.name = name;
-      this.namespace = null;
-   }
+    public FullMultinameTreeItem(AVM2Instruction instruction, int multinameIndex, GraphTargetItem name) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.multinameIndex = multinameIndex;
+        this.name = name;
+        this.namespace = null;
+    }
 
-   public FullMultinameTreeItem(AVM2Instruction instruction, int multinameIndex) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.multinameIndex = multinameIndex;
-      this.name = null;
-      this.namespace = null;
-   }
+    public FullMultinameTreeItem(AVM2Instruction instruction, int multinameIndex) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.multinameIndex = multinameIndex;
+        this.name = null;
+        this.namespace = null;
+    }
 
-   public FullMultinameTreeItem(AVM2Instruction instruction, int multinameIndex, GraphTargetItem name, GraphTargetItem namespace) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.multinameIndex = multinameIndex;
-      this.name = name;
-      this.namespace = namespace;
-   }
+    public FullMultinameTreeItem(AVM2Instruction instruction, int multinameIndex, GraphTargetItem name, GraphTargetItem namespace) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.multinameIndex = multinameIndex;
+        this.name = name;
+        this.namespace = namespace;
+    }
 
-   public boolean isRuntime() {
-      return (name != null) || (namespace != null);
-   }
+    public boolean isRuntime() {
+        return (name != null) || (namespace != null);
+    }
 
-   public boolean isXML(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      String cname;
-      if (name != null) {
-         cname = name.toString(constants, localRegNames, fullyQualifiedNames);
-      } else {
-         cname = (constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames));
-      }
-      String cns = "";
-      if (namespace != null) {
-         cns = namespace.toString(constants, localRegNames, fullyQualifiedNames);
-      } else {
-         Namespace ns = constants.constant_multiname[multinameIndex].getNamespace(constants);
-         if ((ns != null) && (ns.name_index != 0)) {
-            cns = ns.getName(constants);
-         }
-      }
-      return cname.equals("XML") && cns.equals("");
-   }
+    public boolean isXML(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        String cname;
+        if (name != null) {
+            cname = name.toString(constants, localRegNames, fullyQualifiedNames);
+        } else {
+            cname = (constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames));
+        }
+        String cns = "";
+        if (namespace != null) {
+            cns = namespace.toString(constants, localRegNames, fullyQualifiedNames);
+        } else {
+            Namespace ns = constants.constant_multiname[multinameIndex].getNamespace(constants);
+            if ((ns != null) && (ns.name_index != 0)) {
+                cns = ns.getName(constants);
+            }
+        }
+        return cname.equals("XML") && cns.equals("");
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      String ret = "";
-      if (name != null) {
-         ret = "[" + name.toString(constants, localRegNames, fullyQualifiedNames) + "]";
-      } else {
-         ret = hilight(constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames));
-      }
-      if (namespace != null) {
-         ret = namespace.toString(constants, localRegNames, fullyQualifiedNames) + "::" + ret;
-      } else {
-         /*Namespace ns = constants.constant_multiname[multinameIndex].getNamespace(constants);
-          if ((ns != null)&&(ns.name_index!=0)) {
-          ret =  hilight(ns.getName(constants) + "::")+ret;
-          }*/
-      }
-      return ret;
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        String ret = "";
+        if (name != null) {
+            ret = "[" + name.toString(constants, localRegNames, fullyQualifiedNames) + "]";
+        } else {
+            ret = hilight(constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames));
+        }
+        if (namespace != null) {
+            ret = namespace.toString(constants, localRegNames, fullyQualifiedNames) + "::" + ret;
+        } else {
+            /*Namespace ns = constants.constant_multiname[multinameIndex].getNamespace(constants);
+             if ((ns != null)&&(ns.name_index!=0)) {
+             ret =  hilight(ns.getName(constants) + "::")+ret;
+             }*/
+        }
+        return ret;
+    }
 
-   public boolean compareSame(FullMultinameTreeItem other) {
-      if (multinameIndex != other.multinameIndex) {
-         return false;
-      }
-      GraphTargetItem tiName = name;
-      while (tiName instanceof LocalRegTreeItem) {
-         tiName = ((LocalRegTreeItem) tiName).computedValue;
-      }
+    public boolean compareSame(FullMultinameTreeItem other) {
+        if (multinameIndex != other.multinameIndex) {
+            return false;
+        }
+        GraphTargetItem tiName = name;
+        while (tiName instanceof LocalRegTreeItem) {
+            tiName = ((LocalRegTreeItem) tiName).computedValue;
+        }
 
-      GraphTargetItem tiName2 = other.name;
-      while (tiName2 instanceof LocalRegTreeItem) {
-         tiName2 = ((LocalRegTreeItem) tiName2).computedValue;
-      }
-      if (tiName != tiName2) {
-         return false;
-      }
+        GraphTargetItem tiName2 = other.name;
+        while (tiName2 instanceof LocalRegTreeItem) {
+            tiName2 = ((LocalRegTreeItem) tiName2).computedValue;
+        }
+        if (tiName != tiName2) {
+            return false;
+        }
 
-      GraphTargetItem tiNameSpace = namespace;
-      while (tiNameSpace instanceof LocalRegTreeItem) {
-         tiNameSpace = ((LocalRegTreeItem) tiNameSpace).computedValue;
-      }
+        GraphTargetItem tiNameSpace = namespace;
+        while (tiNameSpace instanceof LocalRegTreeItem) {
+            tiNameSpace = ((LocalRegTreeItem) tiNameSpace).computedValue;
+        }
 
-      GraphTargetItem tiNameSpace2 = other.namespace;
-      while (tiNameSpace2 instanceof LocalRegTreeItem) {
-         tiNameSpace2 = ((LocalRegTreeItem) tiNameSpace2).computedValue;
-      }
-      if (tiNameSpace != tiNameSpace2) {
-         return false;
-      }
-      return true;
-   }
+        GraphTargetItem tiNameSpace2 = other.namespace;
+        while (tiNameSpace2 instanceof LocalRegTreeItem) {
+            tiNameSpace2 = ((LocalRegTreeItem) tiNameSpace2).computedValue;
+        }
+        if (tiNameSpace != tiNameSpace2) {
+            return false;
+        }
+        return true;
+    }
 }

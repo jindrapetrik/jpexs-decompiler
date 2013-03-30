@@ -25,23 +25,23 @@ import java.util.Stack;
 
 public class ActionReturn extends Action {
 
-   public ActionReturn() {
-      super(0x3E, 0);
-   }
+    public ActionReturn() {
+        super(0x3E, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "Return";
-   }
+    @Override
+    public String toString() {
+        return "Return";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem value = stack.pop();
-      output.add(new ReturnTreeItem(this, value));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem value = stack.pop();
+        output.add(new ReturnTreeItem(this, value));
+    }
 
-   @Override
-   public boolean isExit() {
-      return true;
-   }
+    @Override
+    public boolean isExit() {
+        return true;
+    }
 }

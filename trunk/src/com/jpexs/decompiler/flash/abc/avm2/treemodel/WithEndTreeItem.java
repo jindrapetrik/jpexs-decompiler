@@ -24,20 +24,20 @@ import java.util.List;
 
 public class WithEndTreeItem extends TreeItem {
 
-   public GraphTargetItem scope;
+    public GraphTargetItem scope;
 
-   public WithEndTreeItem(AVM2Instruction instruction, GraphTargetItem scope) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.scope = scope;
-   }
+    public WithEndTreeItem(AVM2Instruction instruction, GraphTargetItem scope) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.scope = scope;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return hilight("}");
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return hilight("}");
+    }
 
-   @Override
-   public boolean needsSemicolon() {
-      return false;
-   }
+    @Override
+    public boolean needsSemicolon() {
+        return false;
+    }
 }

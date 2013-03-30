@@ -25,19 +25,19 @@ import java.util.Stack;
 
 public class ActionGreater extends Action {
 
-   public ActionGreater() {
-      super(0x67, 0);
-   }
+    public ActionGreater() {
+        super(0x67, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "Greater";
-   }
+    @Override
+    public String toString() {
+        return "Greater";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem a = stack.pop();
-      GraphTargetItem b = stack.pop();
-      stack.push(new GtTreeItem(this, b, a));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem a = stack.pop();
+        GraphTargetItem b = stack.pop();
+        stack.push(new GtTreeItem(this, b, a));
+    }
 }

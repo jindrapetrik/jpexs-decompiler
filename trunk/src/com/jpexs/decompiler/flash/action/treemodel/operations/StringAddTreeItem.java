@@ -22,12 +22,12 @@ import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
 public class StringAddTreeItem extends BinaryOpItem {
 
-   public StringAddTreeItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-      super(instruction, PRECEDENCE_ADDITIVE, leftSide, rightSide, "+");
-   }
+    public StringAddTreeItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, PRECEDENCE_ADDITIVE, leftSide, rightSide, "+");
+    }
 
-   @Override
-   public boolean isCompileTime() {
-      return false;
-   }
+    @Override
+    public boolean isCompileTime() {
+        return false;
+    }
 }

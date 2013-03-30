@@ -22,11 +22,11 @@ import java.io.IOException;
 
 public class RemoveObject2Tag extends Tag {
 
-   public int depth;
+    public int depth;
 
-   public RemoveObject2Tag(byte[] data, int version, long pos) throws IOException {
-      super(28, "RemoveObject2", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      depth = sis.readUI16();
-   }
+    public RemoveObject2Tag(byte[] data, int version, long pos) throws IOException {
+        super(28, "RemoveObject2", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        depth = sis.readUI16();
+    }
 }

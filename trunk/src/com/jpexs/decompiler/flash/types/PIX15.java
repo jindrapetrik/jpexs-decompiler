@@ -23,16 +23,16 @@ package com.jpexs.decompiler.flash.types;
  */
 public class PIX15 {
 
-   /**
-    * Red color value
-    */
-   public int red;
-   /**
-    * Green color value
-    */
-   public int green;
-   /**
-    * Blue color value
-    */
-   public int blue;
+    /**
+     * Red color value
+     */
+    public int red;
+    /**
+     * Green color value
+     */
+    public int green;
+    /**
+     * Blue color value
+     */
+    public int blue;
 }

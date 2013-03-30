@@ -40,81 +40,81 @@ import java.util.Stack;
 
 public abstract class SetLocalTypeIns extends InstructionDefinition implements SetTypeIns {
 
-   public SetLocalTypeIns(int instructionCode, String instructionName, int[] operands) {
-      super(instructionCode, instructionName, operands);
-   }
+    public SetLocalTypeIns(int instructionCode, String instructionName, int[] operands) {
+        super(instructionCode, instructionName, operands);
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      int regId = getRegisterId(ins);
-      GraphTargetItem value = (GraphTargetItem) stack.pop();
-      localRegs.put(regId, value);
-      if (value instanceof NewActivationTreeItem) {
-         return;
-      }
-      if (value instanceof FindPropertyTreeItem) {
-         return;
-      }
-      if (value.getNotCoerced() instanceof IncrementTreeItem) {
-         GraphTargetItem inside = ((IncrementTreeItem) value.getNotCoerced()).object.getNotCoerced();
-         if (inside instanceof LocalRegTreeItem) {
-            if (((LocalRegTreeItem) inside).regIndex == regId) {
-               if (stack.size() > 0) {
-                  GraphTargetItem top = stack.peek().getNotCoerced();
-                  if (top == inside) {
-                     stack.pop();
-                     stack.push(new PostIncrementTreeItem(ins, inside));
-                  } else if ((top instanceof IncrementTreeItem) && (((IncrementTreeItem) top).object == inside)) {
-                     stack.pop();
-                     stack.push(new PreIncrementTreeItem(ins, inside));
-                  } else {
-                     output.add(new PostIncrementTreeItem(ins, inside));
-                  }
-               } else {
-                  output.add(new PostIncrementTreeItem(ins, inside));
-               }
-               return;
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        int regId = getRegisterId(ins);
+        GraphTargetItem value = (GraphTargetItem) stack.pop();
+        localRegs.put(regId, value);
+        if (value instanceof NewActivationTreeItem) {
+            return;
+        }
+        if (value instanceof FindPropertyTreeItem) {
+            return;
+        }
+        if (value.getNotCoerced() instanceof IncrementTreeItem) {
+            GraphTargetItem inside = ((IncrementTreeItem) value.getNotCoerced()).object.getNotCoerced();
+            if (inside instanceof LocalRegTreeItem) {
+                if (((LocalRegTreeItem) inside).regIndex == regId) {
+                    if (stack.size() > 0) {
+                        GraphTargetItem top = stack.peek().getNotCoerced();
+                        if (top == inside) {
+                            stack.pop();
+                            stack.push(new PostIncrementTreeItem(ins, inside));
+                        } else if ((top instanceof IncrementTreeItem) && (((IncrementTreeItem) top).object == inside)) {
+                            stack.pop();
+                            stack.push(new PreIncrementTreeItem(ins, inside));
+                        } else {
+                            output.add(new PostIncrementTreeItem(ins, inside));
+                        }
+                    } else {
+                        output.add(new PostIncrementTreeItem(ins, inside));
+                    }
+                    return;
+                }
             }
-         }
-      }
+        }
 
-      if (value.getNotCoerced() instanceof DecrementTreeItem) {
-         GraphTargetItem inside = ((DecrementTreeItem) value.getNotCoerced()).object.getNotCoerced();
-         if (inside instanceof LocalRegTreeItem) {
-            if (((LocalRegTreeItem) inside).regIndex == regId) {
-               if (stack.size() > 0) {
-                  GraphTargetItem top = stack.peek().getNotCoerced();
-                  if (top == inside) {
-                     stack.pop();
-                     stack.push(new PostDecrementTreeItem(ins, inside));
-                  } else if ((top instanceof DecrementTreeItem) && (((DecrementTreeItem) top).object == inside)) {
-                     stack.pop();
-                     stack.push(new PreDecrementTreeItem(ins, inside));
-                  } else {
-                     output.add(new PostDecrementTreeItem(ins, inside));
-                  }
-               } else {
-                  output.add(new PostDecrementTreeItem(ins, inside));
-               }
-               return;
+        if (value.getNotCoerced() instanceof DecrementTreeItem) {
+            GraphTargetItem inside = ((DecrementTreeItem) value.getNotCoerced()).object.getNotCoerced();
+            if (inside instanceof LocalRegTreeItem) {
+                if (((LocalRegTreeItem) inside).regIndex == regId) {
+                    if (stack.size() > 0) {
+                        GraphTargetItem top = stack.peek().getNotCoerced();
+                        if (top == inside) {
+                            stack.pop();
+                            stack.push(new PostDecrementTreeItem(ins, inside));
+                        } else if ((top instanceof DecrementTreeItem) && (((DecrementTreeItem) top).object == inside)) {
+                            stack.pop();
+                            stack.push(new PreDecrementTreeItem(ins, inside));
+                        } else {
+                            output.add(new PostDecrementTreeItem(ins, inside));
+                        }
+                    } else {
+                        output.add(new PostDecrementTreeItem(ins, inside));
+                    }
+                    return;
+                }
             }
-         }
-      }
+        }
 
-      //if(val.startsWith("catchscope ")) return;
-      //if(val.startsWith("newactivation()")) return;
-      output.add(new SetLocalTreeItem(ins, regId, value));
-   }
+        //if(val.startsWith("catchscope ")) return;
+        //if(val.startsWith("newactivation()")) return;
+        output.add(new SetLocalTreeItem(ins, regId, value));
+    }
 
-   @Override
-   public String getObject(Stack<TreeItem> stack, ABC abc, AVM2Instruction ins, List<TreeItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return TreeItem.localRegName(localRegNames, getRegisterId(ins));
-   }
+    @Override
+    public String getObject(Stack<TreeItem> stack, ABC abc, AVM2Instruction ins, List<TreeItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return TreeItem.localRegName(localRegNames, getRegisterId(ins));
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -1;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return -1;
+    }
 
-   public abstract int getRegisterId(AVM2Instruction ins);
+    public abstract int getRegisterId(AVM2Instruction ins);
 }

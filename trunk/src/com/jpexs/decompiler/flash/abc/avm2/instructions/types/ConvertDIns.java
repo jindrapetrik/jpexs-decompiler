@@ -30,46 +30,46 @@ import java.util.Stack;
 
 public class ConvertDIns extends InstructionDefinition implements CoerceOrConvertTypeIns {
 
-   public ConvertDIns() {
-      super(0x75, "convert_d", new int[]{});
-   }
+    public ConvertDIns() {
+        super(0x75, "convert_d", new int[]{});
+    }
 
-   @Override
-   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-      Object value = lda.operandStack.pop();
-      double ret;
-      if (value == null) {
-         ret = 0;
-      } else if (value instanceof Boolean) {
-         if (((Boolean) value).booleanValue()) {
-            ret = 1;
-         } else {
+    @Override
+    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        Object value = lda.operandStack.pop();
+        double ret;
+        if (value == null) {
             ret = 0;
-         }
-      } else if (value instanceof Long) {
-         ret = ((Long) value).longValue();
-      } else if (value instanceof Double) {
-         ret = ((Double) value).doubleValue();
-      } else if (value instanceof String) {
-         ret = Double.parseDouble((String) value);
-      } else {
-         ret = 1; //must call toPrimitive
-      }
-      lda.operandStack.push(new Double(ret));
-   }
+        } else if (value instanceof Boolean) {
+            if (((Boolean) value).booleanValue()) {
+                ret = 1;
+            } else {
+                ret = 0;
+            }
+        } else if (value instanceof Long) {
+            ret = ((Long) value).longValue();
+        } else if (value instanceof Double) {
+            ret = ((Double) value).doubleValue();
+        } else if (value instanceof String) {
+            ret = Double.parseDouble((String) value);
+        } else {
+            ret = 1; //must call toPrimitive
+        }
+        lda.operandStack.push(new Double(ret));
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      stack.push(new ConvertTreeItem(ins, (GraphTargetItem) stack.pop(), getTargetType(constants, ins, fullyQualifiedNames)));
-   }
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        stack.push(new ConvertTreeItem(ins, (GraphTargetItem) stack.pop(), getTargetType(constants, ins, fullyQualifiedNames)));
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -1 + 1;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return -1 + 1;
+    }
 
-   @Override
-   public String getTargetType(ConstantPool constants, AVM2Instruction ins, List<String> fullyQualifiedNames) {
-      return "Number";
-   }
+    @Override
+    public String getTargetType(ConstantPool constants, AVM2Instruction ins, List<String> fullyQualifiedNames) {
+        return "Number";
+    }
 }

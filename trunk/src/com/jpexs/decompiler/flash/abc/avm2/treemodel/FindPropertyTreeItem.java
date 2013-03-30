@@ -23,15 +23,15 @@ import java.util.List;
 
 public class FindPropertyTreeItem extends TreeItem {
 
-   public FullMultinameTreeItem propertyName;
+    public FullMultinameTreeItem propertyName;
 
-   public FindPropertyTreeItem(AVM2Instruction instruction, FullMultinameTreeItem propertyName) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.propertyName = propertyName;
-   }
+    public FindPropertyTreeItem(AVM2Instruction instruction, FullMultinameTreeItem propertyName) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.propertyName = propertyName;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return "";
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return "";
+    }
 }

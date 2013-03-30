@@ -23,9 +23,9 @@ import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
 public class AndTreeItem extends BinaryOpItem {
 
-   public GraphPart firstPart;
+    public GraphPart firstPart;
 
-   public AndTreeItem(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-      super(instruction, PRECEDENCE_LOGICALAND, leftSide, rightSide, "&&");
-   }
+    public AndTreeItem(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, PRECEDENCE_LOGICALAND, leftSide, rightSide, "&&");
+    }
 }

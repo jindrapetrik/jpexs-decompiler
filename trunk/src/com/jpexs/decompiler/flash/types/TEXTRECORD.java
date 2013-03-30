@@ -22,15 +22,15 @@ package com.jpexs.decompiler.flash.types;
  */
 public class TEXTRECORD {
 
-   public boolean styleFlagsHasFont;
-   public boolean styleFlagsHasColor;
-   public boolean styleFlagsHasYOffset;
-   public boolean styleFlagsHasXOffset;
-   public int fontId;
-   public RGB textColor;
-   public RGBA textColorA;
-   public int xOffset;
-   public int yOffset;
-   public int textHeight;
-   public GLYPHENTRY glyphEntries[];
+    public boolean styleFlagsHasFont;
+    public boolean styleFlagsHasColor;
+    public boolean styleFlagsHasYOffset;
+    public boolean styleFlagsHasXOffset;
+    public int fontId;
+    public RGB textColor;
+    public RGBA textColorA;
+    public int xOffset;
+    public int yOffset;
+    public int textHeight;
+    public GLYPHENTRY glyphEntries[];
 }

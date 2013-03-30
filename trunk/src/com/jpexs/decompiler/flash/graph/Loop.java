@@ -22,13 +22,13 @@ package com.jpexs.decompiler.flash.graph;
  */
 public class Loop {
 
-   public GraphPart loopContinue;
-   public GraphPart loopBreak;
-   public long id;
+    public GraphPart loopContinue;
+    public GraphPart loopBreak;
+    public long id;
 
-   public Loop(long id, GraphPart loopContinue, GraphPart loopBreak) {
-      this.loopContinue = loopContinue;
-      this.loopBreak = loopBreak;
-      this.id = id;
-   }
+    public Loop(long id, GraphPart loopContinue, GraphPart loopBreak) {
+        this.loopContinue = loopContinue;
+        this.loopBreak = loopBreak;
+        this.id = id;
+    }
 }

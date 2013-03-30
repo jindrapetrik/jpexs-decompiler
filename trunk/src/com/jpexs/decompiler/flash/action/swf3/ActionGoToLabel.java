@@ -32,39 +32,39 @@ import java.util.Stack;
 
 public class ActionGoToLabel extends Action {
 
-   public String label;
+    public String label;
 
-   public ActionGoToLabel(int actionLength, SWFInputStream sis, int version) throws IOException {
-      super(0x8C, actionLength);
-      //byte data[] = sis.readBytes(actionLength);
-      //sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      label = sis.readString();
-   }
+    public ActionGoToLabel(int actionLength, SWFInputStream sis, int version) throws IOException {
+        super(0x8C, actionLength);
+        //byte data[] = sis.readBytes(actionLength);
+        //sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        label = sis.readString();
+    }
 
-   @Override
-   public String toString() {
-      return "GoToLabel \"" + Helper.escapeString(label) + "\"";
-   }
+    @Override
+    public String toString() {
+        return "GoToLabel \"" + Helper.escapeString(label) + "\"";
+    }
 
-   @Override
-   public byte[] getBytes(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      SWFOutputStream sos = new SWFOutputStream(baos, version);
-      try {
-         sos.writeString(label);
-         sos.close();
-      } catch (IOException e) {
-      }
-      return surroundWithAction(baos.toByteArray(), version);
-   }
+    @Override
+    public byte[] getBytes(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SWFOutputStream sos = new SWFOutputStream(baos, version);
+        try {
+            sos.writeString(label);
+            sos.close();
+        } catch (IOException e) {
+        }
+        return surroundWithAction(baos.toByteArray(), version);
+    }
 
-   public ActionGoToLabel(FlasmLexer lexer) throws IOException, ParseException {
-      super(0x8C, -1);
-      label = lexString(lexer);
-   }
+    public ActionGoToLabel(FlasmLexer lexer) throws IOException, ParseException {
+        super(0x8C, -1);
+        label = lexString(lexer);
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      output.add(new GotoLabelTreeItem(this, label));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        output.add(new GotoLabelTreeItem(this, label));
+    }
 }

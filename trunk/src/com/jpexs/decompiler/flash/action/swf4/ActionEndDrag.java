@@ -25,17 +25,17 @@ import java.util.Stack;
 
 public class ActionEndDrag extends Action {
 
-   public ActionEndDrag() {
-      super(0x28, 0);
-   }
+    public ActionEndDrag() {
+        super(0x28, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "EndDrag";
-   }
+    @Override
+    public String toString() {
+        return "EndDrag";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      output.add(new SimpleActionTreeItem(this, "stopDrag()"));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        output.add(new SimpleActionTreeItem(this, "stopDrag()"));
+    }
 }

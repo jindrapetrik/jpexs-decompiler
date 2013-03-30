@@ -35,301 +35,301 @@ import java.util.logging.Logger;
  */
 public class Helper {
 
-   /**
-    * Converts array of int values to string
-    *
-    * @param array Array of int values
-    * @return String representation of the array
-    */
-   public static String intArrToString(int array[]) {
-      String s = "[";
-      for (int i = 0; i < array.length; i++) {
-         if (i > 0) {
-            s += ",";
-         }
-         s = s + array[i];
-      }
-      s += "]";
-      return s;
-   }
-
-   /**
-    * Converts array of byte values to string
-    *
-    * @param array Array of byte values
-    * @return String representation of the array
-    */
-   public static String byteArrToString(byte array[]) {
-      String s = "[";
-      for (int i = 0; i < array.length; i++) {
-         if (i > 0) {
-            s += " ";
-         }
-         s = s + padZeros(Integer.toHexString(array[i] & 0xff), 2);
-      }
-      s += "]";
-      return s;
-   }
-
-   /**
-    * Adds zeros to beginning of the number to fill specified length. Returns as
-    * string
-    *
-    * @param number Number as string
-    * @param length Length of new string
-    * @return Number with added zeros
-    */
-   public static String padZeros(String number, int length) {
-      int count = length - number.length();
-      for (int i = 0; i < count; i++) {
-         number = "0" + number;
-      }
-      return number;
-   }
-
-   /**
-    * Formats specified address to four numbers xxxx
-    *
-    * @param number Address to format
-    * @return String representation of the address
-    */
-   public static String formatAddress(long number) {
-      return padZeros(Long.toHexString(number), 4);
-   }
-
-   /**
-    * Adds space to text to fill specified width
-    *
-    * @param text Text to add spaces to
-    * @param width New width
-    * @return Text with appended spaces
-    */
-   public static String padSpaceRight(String text, int width) {
-      int oldLen = text.length();
-      for (int i = oldLen; i < width; i++) {
-         text += " ";
-      }
-      return text;
-   }
-
-   /**
-    * Escapes string by adding backslashes
-    *
-    * @param s String to escape
-    * @return Escaped string
-    */
-   public static String escapeString(String s) {
-      String ret = "";
-      for (int i = 0; i < s.length(); i++) {
-         char c = s.charAt(i);
-         if (c == '\n') {
-            ret += "\\n";
-         } else if (c == '\r') {
-            ret += "\\r";
-         } else if (c == '\t') {
-            ret += "\\t";
-         } else if (c == '\b') {
-            ret += "\\b";
-         } else if (c == '\t') {
-            ret += "\\t";
-         } else if (c == '\f') {
-            ret += "\\f";
-         } else if (c == '\\') {
-            ret += "\\\\";
-         } else if (c == '"') {
-            ret += "\\\"";
-         } else if (c == '\'') {
-            ret += "\\'";
-         } else {
-            ret += c;
-         }
-
-      }
-      return ret;
-   }
-   private final static String SPACES12 = "            ";
-   private final static String ZEROS8 = "00000000";
-
-   public static String formatHex(int value, int width) {
-      StringBuilder sb = new StringBuilder();
-      sb.append(Integer.toHexString(value));
-      if (width > sb.length()) {
-         sb.insert(0, ZEROS8, 0, width - sb.length());
-      }
-      return sb.toString();
-   }
-
-   public static String formatInt(int value, int width) {
-      StringBuilder sb = new StringBuilder();
-      sb.append(value);
-      if (width > sb.length()) {
-         sb.insert(0, SPACES12, 0, width - sb.length());
-      }
-      return sb.toString();
-   }
-
-   public static String indent(int level, String ss) {
-      StringBuilder sb = new StringBuilder();
-      for (int ii = 0; ii < level * 2; ii++) {
-         sb.append(' ');
-      }
-      sb.append(ss);
-      return sb.toString();
-   }
-
-   public static String padZeros(long number, int length) {
-      String ret = "" + number;
-      while (ret.length() < length) {
-         ret = "0" + ret;
-      }
-      return ret;
-   }
-
-   public static String bytesToHexString(byte bytes[]) {
-      return bytesToHexString(bytes, 0);
-   }
-
-   public static String bytesToHexString(byte bytes[], int start) {
-      StringBuilder sb = new StringBuilder();
-      if (start < bytes.length) {
-         for (int ii = start; ii < bytes.length; ii++) {
-            sb.append(formatHex(bytes[ii] & 0xff, 2));
-            sb.append(' ');
-         }
-         sb.setLength(sb.length() - 1);
-      }
-      return sb.toString();
-   }
-
-   public static String bytesToHexString(int maxByteCountInString, byte bytes[], int start) {
-      if (bytes.length - start <= maxByteCountInString) {
-         return bytesToHexString(bytes, start);
-      }
-      byte trailingBytes[] = new byte[maxByteCountInString / 2];
-      byte headingBytes[] = new byte[maxByteCountInString - trailingBytes.length];
-      System.arraycopy(bytes, start, headingBytes, 0, headingBytes.length);
-      int startOfTrailingBytes = bytes.length - trailingBytes.length;
-      System.arraycopy(bytes, startOfTrailingBytes, trailingBytes, 0, trailingBytes.length);
-      StringBuilder sb = new StringBuilder();
-      sb.append(bytesToHexString(headingBytes, 0));
-      if (trailingBytes.length > 0) {
-         sb.append(" ... ");
-         sb.append(bytesToHexString(trailingBytes, 0));
-      }
-      return sb.toString();
-   }
-
-   public static String format(String str, int len) {
-      if (len <= str.length()) {
-         return str;
-      }
-      StringBuilder sb = new StringBuilder(str);
-      for (int ii = str.length(); ii < len; ii++) {
-         sb.append(' ');
-      }
-      return sb.toString();
-   }
-
-   public static String joinStrings(List<String> arr, String glue) {
-      String ret = "";
-      boolean first = true;
-      for (String s : arr) {
-         if (!first) {
-            ret += glue;
-         } else {
-            first = false;
-         }
-         ret += s;
-      }
-      return ret;
-   }
-
-   public static String joinStrings(String arr[], String glue) {
-      String ret = "";
-      boolean first = true;
-      for (String s : arr) {
-         if (!first) {
-            ret += glue;
-         } else {
-            first = false;
-         }
-         ret += s;
-      }
-      return ret;
-   }
-
-   public static Object deepCopy(Object o) {
-      try {
-         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-         ObjectOutputStream oos = new ObjectOutputStream(baos);
-         oos.writeObject(o);
-         oos.flush();
-         oos.close();
-         ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));
-         Object copy = ois.readObject();
-         ois.close();
-         return copy;
-      } catch (Exception ex) {
-         ex.printStackTrace();
-         return null;
-      }
-   }
-
-   public static List toList(Object... rest) {
-      List ret = new ArrayList();
-      for (Object o : rest) {
-         ret.add(o);
-      }
-      return ret;
-   }
-
-   public static ByteArrayInputStream getInputStream(byte[]... data) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-      try {
-         for (byte[] d : data) {
-            baos.write(d);
-         }
-      } catch (IOException iex) {
-      }
-      return new ByteArrayInputStream(baos.toByteArray());
-   }
-
-   public static byte[] readFile(String... file) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      for (String f : file) {
-         try {
-            FileInputStream fis = new FileInputStream(f);
-            byte buf[] = new byte[4096];
-            int cnt = 0;
-            while ((cnt = fis.read(buf)) > 0) {
-               baos.write(buf, 0, cnt);
+    /**
+     * Converts array of int values to string
+     *
+     * @param array Array of int values
+     * @return String representation of the array
+     */
+    public static String intArrToString(int array[]) {
+        String s = "[";
+        for (int i = 0; i < array.length; i++) {
+            if (i > 0) {
+                s += ",";
             }
-            fis.close();
-         } catch (IOException ex) {
-            Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
-         }
+            s = s + array[i];
+        }
+        s += "]";
+        return s;
+    }
 
-      }
-      return baos.toByteArray();
-   }
+    /**
+     * Converts array of byte values to string
+     *
+     * @param array Array of byte values
+     * @return String representation of the array
+     */
+    public static String byteArrToString(byte array[]) {
+        String s = "[";
+        for (int i = 0; i < array.length; i++) {
+            if (i > 0) {
+                s += " ";
+            }
+            s = s + padZeros(Integer.toHexString(array[i] & 0xff), 2);
+        }
+        s += "]";
+        return s;
+    }
 
-   public static void writeFile(String file, byte[]... data) {
-      try {
-         FileOutputStream fos = new FileOutputStream(file);
-         for (byte d[] : data) {
-            fos.write(d);
-         }
-         fos.close();
-      } catch (Exception ex) {
-      }
-   }
+    /**
+     * Adds zeros to beginning of the number to fill specified length. Returns
+     * as string
+     *
+     * @param number Number as string
+     * @param length Length of new string
+     * @return Number with added zeros
+     */
+    public static String padZeros(String number, int length) {
+        int count = length - number.length();
+        for (int i = 0; i < count; i++) {
+            number = "0" + number;
+        }
+        return number;
+    }
 
-   public static String stripComments(String str) {
-      return str.replaceAll("<ffdec:hex>[^\r\n]*</ffdec:hex>\r?\n", "");
-   }
+    /**
+     * Formats specified address to four numbers xxxx
+     *
+     * @param number Address to format
+     * @return String representation of the address
+     */
+    public static String formatAddress(long number) {
+        return padZeros(Long.toHexString(number), 4);
+    }
 
-   public static String hexToComments(String str) {
-      return str.replaceAll("<ffdec:hex>([^\r\n]*)</ffdec:hex>(\r?\n)", "; $1$2");
-   }
+    /**
+     * Adds space to text to fill specified width
+     *
+     * @param text Text to add spaces to
+     * @param width New width
+     * @return Text with appended spaces
+     */
+    public static String padSpaceRight(String text, int width) {
+        int oldLen = text.length();
+        for (int i = oldLen; i < width; i++) {
+            text += " ";
+        }
+        return text;
+    }
+
+    /**
+     * Escapes string by adding backslashes
+     *
+     * @param s String to escape
+     * @return Escaped string
+     */
+    public static String escapeString(String s) {
+        String ret = "";
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '\n') {
+                ret += "\\n";
+            } else if (c == '\r') {
+                ret += "\\r";
+            } else if (c == '\t') {
+                ret += "\\t";
+            } else if (c == '\b') {
+                ret += "\\b";
+            } else if (c == '\t') {
+                ret += "\\t";
+            } else if (c == '\f') {
+                ret += "\\f";
+            } else if (c == '\\') {
+                ret += "\\\\";
+            } else if (c == '"') {
+                ret += "\\\"";
+            } else if (c == '\'') {
+                ret += "\\'";
+            } else {
+                ret += c;
+            }
+
+        }
+        return ret;
+    }
+    private final static String SPACES12 = "            ";
+    private final static String ZEROS8 = "00000000";
+
+    public static String formatHex(int value, int width) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(Integer.toHexString(value));
+        if (width > sb.length()) {
+            sb.insert(0, ZEROS8, 0, width - sb.length());
+        }
+        return sb.toString();
+    }
+
+    public static String formatInt(int value, int width) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(value);
+        if (width > sb.length()) {
+            sb.insert(0, SPACES12, 0, width - sb.length());
+        }
+        return sb.toString();
+    }
+
+    public static String indent(int level, String ss) {
+        StringBuilder sb = new StringBuilder();
+        for (int ii = 0; ii < level * 2; ii++) {
+            sb.append(' ');
+        }
+        sb.append(ss);
+        return sb.toString();
+    }
+
+    public static String padZeros(long number, int length) {
+        String ret = "" + number;
+        while (ret.length() < length) {
+            ret = "0" + ret;
+        }
+        return ret;
+    }
+
+    public static String bytesToHexString(byte bytes[]) {
+        return bytesToHexString(bytes, 0);
+    }
+
+    public static String bytesToHexString(byte bytes[], int start) {
+        StringBuilder sb = new StringBuilder();
+        if (start < bytes.length) {
+            for (int ii = start; ii < bytes.length; ii++) {
+                sb.append(formatHex(bytes[ii] & 0xff, 2));
+                sb.append(' ');
+            }
+            sb.setLength(sb.length() - 1);
+        }
+        return sb.toString();
+    }
+
+    public static String bytesToHexString(int maxByteCountInString, byte bytes[], int start) {
+        if (bytes.length - start <= maxByteCountInString) {
+            return bytesToHexString(bytes, start);
+        }
+        byte trailingBytes[] = new byte[maxByteCountInString / 2];
+        byte headingBytes[] = new byte[maxByteCountInString - trailingBytes.length];
+        System.arraycopy(bytes, start, headingBytes, 0, headingBytes.length);
+        int startOfTrailingBytes = bytes.length - trailingBytes.length;
+        System.arraycopy(bytes, startOfTrailingBytes, trailingBytes, 0, trailingBytes.length);
+        StringBuilder sb = new StringBuilder();
+        sb.append(bytesToHexString(headingBytes, 0));
+        if (trailingBytes.length > 0) {
+            sb.append(" ... ");
+            sb.append(bytesToHexString(trailingBytes, 0));
+        }
+        return sb.toString();
+    }
+
+    public static String format(String str, int len) {
+        if (len <= str.length()) {
+            return str;
+        }
+        StringBuilder sb = new StringBuilder(str);
+        for (int ii = str.length(); ii < len; ii++) {
+            sb.append(' ');
+        }
+        return sb.toString();
+    }
+
+    public static String joinStrings(List<String> arr, String glue) {
+        String ret = "";
+        boolean first = true;
+        for (String s : arr) {
+            if (!first) {
+                ret += glue;
+            } else {
+                first = false;
+            }
+            ret += s;
+        }
+        return ret;
+    }
+
+    public static String joinStrings(String arr[], String glue) {
+        String ret = "";
+        boolean first = true;
+        for (String s : arr) {
+            if (!first) {
+                ret += glue;
+            } else {
+                first = false;
+            }
+            ret += s;
+        }
+        return ret;
+    }
+
+    public static Object deepCopy(Object o) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(o);
+            oos.flush();
+            oos.close();
+            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));
+            Object copy = ois.readObject();
+            ois.close();
+            return copy;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    public static List toList(Object... rest) {
+        List ret = new ArrayList();
+        for (Object o : rest) {
+            ret.add(o);
+        }
+        return ret;
+    }
+
+    public static ByteArrayInputStream getInputStream(byte[]... data) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        try {
+            for (byte[] d : data) {
+                baos.write(d);
+            }
+        } catch (IOException iex) {
+        }
+        return new ByteArrayInputStream(baos.toByteArray());
+    }
+
+    public static byte[] readFile(String... file) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        for (String f : file) {
+            try {
+                FileInputStream fis = new FileInputStream(f);
+                byte buf[] = new byte[4096];
+                int cnt = 0;
+                while ((cnt = fis.read(buf)) > 0) {
+                    baos.write(buf, 0, cnt);
+                }
+                fis.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+        return baos.toByteArray();
+    }
+
+    public static void writeFile(String file, byte[]... data) {
+        try {
+            FileOutputStream fos = new FileOutputStream(file);
+            for (byte d[] : data) {
+                fos.write(d);
+            }
+            fos.close();
+        } catch (Exception ex) {
+        }
+    }
+
+    public static String stripComments(String str) {
+        return str.replaceAll("<ffdec:hex>[^\r\n]*</ffdec:hex>\r?\n", "");
+    }
+
+    public static String hexToComments(String str) {
+        return str.replaceAll("<ffdec:hex>([^\r\n]*)</ffdec:hex>(\r?\n)", "; $1$2");
+    }
 }

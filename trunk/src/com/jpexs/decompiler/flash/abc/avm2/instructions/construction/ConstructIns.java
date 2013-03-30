@@ -41,78 +41,78 @@ import java.util.Stack;
 
 public class ConstructIns extends InstructionDefinition {
 
-   public ConstructIns() {
-      super(0x42, "construct", new int[]{AVM2Code.DAT_ARG_COUNT});
-   }
+    public ConstructIns() {
+        super(0x42, "construct", new int[]{AVM2Code.DAT_ARG_COUNT});
+    }
 
-   @Override
-   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-      /*int argCount = (int) ((Long) arguments.get(0)).longValue();
-       List passArguments = new ArrayList();
-       for (int i = argCount - 1; i >= 0; i--) {
-       passArguments.set(i, lda.operandStack.pop());
-       }
-       Object obj = lda.operandStack.pop();*/
-      throw new RuntimeException("Cannot call constructor");
-      //call construct property of obj
-      //push new instance
-   }
-
-   public static boolean walkXML(GraphTargetItem item, List<GraphTargetItem> list) {
-      boolean ret = true;
-      if (item instanceof StringTreeItem) {
-         list.add(item);
-      } else if (item instanceof AddTreeItem) {
-         ret = ret && walkXML(((AddTreeItem) item).leftSide, list);
-         ret = ret && walkXML(((AddTreeItem) item).rightSide, list);
-      } else if ((item instanceof EscapeXElemTreeItem) || (item instanceof EscapeXAttrTreeItem)) {
-         list.add(item);
-      } else {
-         return false;
-      }
-      return ret;
-   }
-
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      int argCount = ins.operands[0];
-      List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
-      for (int a = 0; a < argCount; a++) {
-         args.add(0, (GraphTargetItem) stack.pop());
-      }
-      GraphTargetItem obj = (GraphTargetItem) stack.pop();
-
-      FullMultinameTreeItem xmlMult = null;
-      boolean isXML = false;
-      if (obj instanceof GetPropertyTreeItem) {
-         GetPropertyTreeItem gpt = (GetPropertyTreeItem) obj;
-         if (gpt.object instanceof FindPropertyTreeItem) {
-            FindPropertyTreeItem fpt = (FindPropertyTreeItem) gpt.object;
-            xmlMult = fpt.propertyName;
-            isXML = xmlMult.isXML(constants, localRegNames, fullyQualifiedNames) && xmlMult.isXML(constants, localRegNames, fullyQualifiedNames);
+    @Override
+    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        /*int argCount = (int) ((Long) arguments.get(0)).longValue();
+         List passArguments = new ArrayList();
+         for (int i = argCount - 1; i >= 0; i--) {
+         passArguments.set(i, lda.operandStack.pop());
          }
-      }
-      if (obj instanceof GetLexTreeItem) {
-         GetLexTreeItem glt = (GetLexTreeItem) obj;
-         isXML = glt.propertyName.getName(constants, fullyQualifiedNames).equals("XML");
-      }
+         Object obj = lda.operandStack.pop();*/
+        throw new RuntimeException("Cannot call constructor");
+        //call construct property of obj
+        //push new instance
+    }
 
-      if (isXML) {
-         if (args.size() == 1) {
-            GraphTargetItem arg = args.get(0);
-            List<GraphTargetItem> xmlLines = new ArrayList<GraphTargetItem>();
-            if (walkXML(arg, xmlLines)) {
-               stack.push(new XMLTreeItem(ins, xmlLines));
-               return;
+    public static boolean walkXML(GraphTargetItem item, List<GraphTargetItem> list) {
+        boolean ret = true;
+        if (item instanceof StringTreeItem) {
+            list.add(item);
+        } else if (item instanceof AddTreeItem) {
+            ret = ret && walkXML(((AddTreeItem) item).leftSide, list);
+            ret = ret && walkXML(((AddTreeItem) item).rightSide, list);
+        } else if ((item instanceof EscapeXElemTreeItem) || (item instanceof EscapeXAttrTreeItem)) {
+            list.add(item);
+        } else {
+            return false;
+        }
+        return ret;
+    }
+
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        int argCount = ins.operands[0];
+        List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
+        for (int a = 0; a < argCount; a++) {
+            args.add(0, (GraphTargetItem) stack.pop());
+        }
+        GraphTargetItem obj = (GraphTargetItem) stack.pop();
+
+        FullMultinameTreeItem xmlMult = null;
+        boolean isXML = false;
+        if (obj instanceof GetPropertyTreeItem) {
+            GetPropertyTreeItem gpt = (GetPropertyTreeItem) obj;
+            if (gpt.object instanceof FindPropertyTreeItem) {
+                FindPropertyTreeItem fpt = (FindPropertyTreeItem) gpt.object;
+                xmlMult = fpt.propertyName;
+                isXML = xmlMult.isXML(constants, localRegNames, fullyQualifiedNames) && xmlMult.isXML(constants, localRegNames, fullyQualifiedNames);
             }
-         }
-      }
+        }
+        if (obj instanceof GetLexTreeItem) {
+            GetLexTreeItem glt = (GetLexTreeItem) obj;
+            isXML = glt.propertyName.getName(constants, fullyQualifiedNames).equals("XML");
+        }
 
-      stack.push(new ConstructTreeItem(ins, obj, args));
-   }
+        if (isXML) {
+            if (args.size() == 1) {
+                GraphTargetItem arg = args.get(0);
+                List<GraphTargetItem> xmlLines = new ArrayList<GraphTargetItem>();
+                if (walkXML(arg, xmlLines)) {
+                    stack.push(new XMLTreeItem(ins, xmlLines));
+                    return;
+                }
+            }
+        }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -ins.operands[0] - 1 + 1;
-   }
+        stack.push(new ConstructTreeItem(ins, obj, args));
+    }
+
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return -ins.operands[0] - 1 + 1;
+    }
 }

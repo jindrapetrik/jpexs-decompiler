@@ -23,25 +23,25 @@ package com.jpexs.decompiler.flash.types;
  */
 public class ARGB {
 
-   /**
-    * Alpha value defining opacity
-    */
-   public int alpha;
-   /**
-    * Red color value
-    */
-   public int red;
-   /**
-    * Green color value
-    */
-   public int green;
-   /**
-    * Blue color value
-    */
-   public int blue;
+    /**
+     * Alpha value defining opacity
+     */
+    public int alpha;
+    /**
+     * Red color value
+     */
+    public int red;
+    /**
+     * Green color value
+     */
+    public int green;
+    /**
+     * Blue color value
+     */
+    public int blue;
 
-   @Override
-   public String toString() {
-      return "[ARGB a=" + alpha + ",r=" + red + ",g=" + green + ",b=" + blue + "]";
-   }
+    @Override
+    public String toString() {
+        return "[ARGB a=" + alpha + ",r=" + red + ",g=" + green + ",b=" + blue + "]";
+    }
 }

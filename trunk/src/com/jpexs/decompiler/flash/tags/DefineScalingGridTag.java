@@ -29,32 +29,32 @@ import java.io.OutputStream;
  */
 public class DefineScalingGridTag extends Tag {
 
-   private int characterId;
-   private RECT splitter;
+    private int characterId;
+    private RECT splitter;
 
-   public DefineScalingGridTag(byte[] data, int version, long pos) throws IOException {
-      super(78, "DefineScalingGrid", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      characterId = sis.readUI16();
-      splitter = sis.readRECT();
-   }
+    public DefineScalingGridTag(byte[] data, int version, long pos) throws IOException {
+        super(78, "DefineScalingGrid", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        characterId = sis.readUI16();
+        splitter = sis.readRECT();
+    }
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         sos.writeUI16(characterId);
-         sos.writeRECT(splitter);
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            sos.writeUI16(characterId);
+            sos.writeRECT(splitter);
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 }

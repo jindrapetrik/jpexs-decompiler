@@ -22,8 +22,8 @@ package com.jpexs.decompiler.flash.types;
  */
 public class FOCALGRADIENT {
 
-   public int spreadMode;
-   public int interPolationMode;
-   public GRADRECORD gradientRecords[];
-   public float focalPoint;
+    public int spreadMode;
+    public int interPolationMode;
+    public GRADRECORD gradientRecords[];
+    public float focalPoint;
 }

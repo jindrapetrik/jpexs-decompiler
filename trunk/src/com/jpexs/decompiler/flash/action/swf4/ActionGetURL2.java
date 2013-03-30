@@ -31,51 +31,51 @@ import java.util.Stack;
 
 public class ActionGetURL2 extends Action {
 
-   public int sendVarsMethod;
-   public static final int GET = 1;
-   public static final int POST = 2;
-   public boolean loadTargetFlag;
-   public boolean loadVariablesFlag;
+    public int sendVarsMethod;
+    public static final int GET = 1;
+    public static final int POST = 2;
+    public boolean loadTargetFlag;
+    public boolean loadVariablesFlag;
 
-   public ActionGetURL2(SWFInputStream sis) throws IOException {
-      super(0x9A, 1);
-      sendVarsMethod = (int) sis.readUB(2);
-      sis.readUB(4); //reserved
-      loadTargetFlag = sis.readUB(1) == 1;
-      loadVariablesFlag = sis.readUB(1) == 1;
-   }
+    public ActionGetURL2(SWFInputStream sis) throws IOException {
+        super(0x9A, 1);
+        sendVarsMethod = (int) sis.readUB(2);
+        sis.readUB(4); //reserved
+        loadTargetFlag = sis.readUB(1) == 1;
+        loadVariablesFlag = sis.readUB(1) == 1;
+    }
 
-   @Override
-   public String toString() {
-      return "GetURL2 " + sendVarsMethod + " " + loadTargetFlag + " " + loadVariablesFlag;
-   }
+    @Override
+    public String toString() {
+        return "GetURL2 " + sendVarsMethod + " " + loadTargetFlag + " " + loadVariablesFlag;
+    }
 
-   @Override
-   public byte[] getBytes(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      SWFOutputStream sos = new SWFOutputStream(baos, version);
-      try {
-         sos.writeUB(2, sendVarsMethod);
-         sos.writeUB(4, 0);
-         sos.writeUB(1, loadTargetFlag ? 1 : 0);
-         sos.writeUB(1, loadVariablesFlag ? 1 : 0);
-         sos.close();
-      } catch (IOException e) {
-      }
-      return surroundWithAction(baos.toByteArray(), version);
-   }
+    @Override
+    public byte[] getBytes(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SWFOutputStream sos = new SWFOutputStream(baos, version);
+        try {
+            sos.writeUB(2, sendVarsMethod);
+            sos.writeUB(4, 0);
+            sos.writeUB(1, loadTargetFlag ? 1 : 0);
+            sos.writeUB(1, loadVariablesFlag ? 1 : 0);
+            sos.close();
+        } catch (IOException e) {
+        }
+        return surroundWithAction(baos.toByteArray(), version);
+    }
 
-   public ActionGetURL2(FlasmLexer lexer) throws IOException, ParseException {
-      super(0x9A, -1);
-      sendVarsMethod = (int) lexLong(lexer);
-      loadTargetFlag = lexBoolean(lexer);
-      loadVariablesFlag = lexBoolean(lexer);
-   }
+    public ActionGetURL2(FlasmLexer lexer) throws IOException, ParseException {
+        super(0x9A, -1);
+        sendVarsMethod = (int) lexLong(lexer);
+        loadTargetFlag = lexBoolean(lexer);
+        loadVariablesFlag = lexBoolean(lexer);
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem targetString = stack.pop();
-      GraphTargetItem urlString = stack.pop();
-      output.add(new GetURL2TreeItem(this, urlString, targetString, sendVarsMethod, loadTargetFlag, loadTargetFlag));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem targetString = stack.pop();
+        GraphTargetItem urlString = stack.pop();
+        output.add(new GetURL2TreeItem(this, urlString, targetString, sendVarsMethod, loadTargetFlag, loadTargetFlag));
+    }
 }

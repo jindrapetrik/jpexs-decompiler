@@ -22,22 +22,22 @@ import java.util.List;
 
 public class TraceTreeItem extends TreeItem {
 
-   private GraphTargetItem value;
+    private GraphTargetItem value;
 
-   public TraceTreeItem(GraphSourceItem instruction, GraphTargetItem value) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.value = value;
-   }
+    public TraceTreeItem(GraphSourceItem instruction, GraphTargetItem value) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.value = value;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return hilight("trace(") + value.toString(constants) + hilight(")");
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return hilight("trace(") + value.toString(constants) + hilight(")");
+    }
 
-   @Override
-   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(value.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(value.getNeededSources());
+        return ret;
+    }
 }

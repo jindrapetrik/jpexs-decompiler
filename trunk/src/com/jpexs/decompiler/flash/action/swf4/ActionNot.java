@@ -25,18 +25,18 @@ import java.util.Stack;
 
 public class ActionNot extends Action {
 
-   public ActionNot() {
-      super(0x12, 0);
-   }
+    public ActionNot() {
+        super(0x12, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "Not";
-   }
+    @Override
+    public String toString() {
+        return "Not";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem a = stack.pop();
-      stack.push(new NotItem(this, a));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem a = stack.pop();
+        stack.push(new NotItem(this, a));
+    }
 }

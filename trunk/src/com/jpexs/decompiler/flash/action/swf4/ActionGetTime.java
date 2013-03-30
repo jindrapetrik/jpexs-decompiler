@@ -25,17 +25,17 @@ import java.util.Stack;
 
 public class ActionGetTime extends Action {
 
-   public ActionGetTime() {
-      super(0x34, 0);
-   }
+    public ActionGetTime() {
+        super(0x34, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "GetTime";
-   }
+    @Override
+    public String toString() {
+        return "GetTime";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      stack.push(new SimpleActionTreeItem(this, "getTimer()"));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        stack.push(new SimpleActionTreeItem(this, "getTimer()"));
+    }
 }

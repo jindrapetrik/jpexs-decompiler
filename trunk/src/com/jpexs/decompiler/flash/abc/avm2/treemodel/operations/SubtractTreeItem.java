@@ -22,12 +22,12 @@ import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
 public class SubtractTreeItem extends BinaryOpItem {
 
-   public SubtractTreeItem(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-      super(instruction, PRECEDENCE_ADDITIVE, leftSide, rightSide, "-");
-   }
+    public SubtractTreeItem(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, PRECEDENCE_ADDITIVE, leftSide, rightSide, "-");
+    }
 
-   @Override
-   public double toNumber() {
-      return leftSide.toNumber() - rightSide.toNumber();
-   }
+    @Override
+    public double toNumber() {
+        return leftSide.toNumber() - rightSide.toNumber();
+    }
 }

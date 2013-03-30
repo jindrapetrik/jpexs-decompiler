@@ -22,5 +22,5 @@ package com.jpexs.decompiler.flash;
  */
 public interface PercentListener {
 
-   public void percent(int p);
+    public void percent(int p);
 }

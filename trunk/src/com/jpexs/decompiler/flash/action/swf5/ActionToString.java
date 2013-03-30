@@ -25,18 +25,18 @@ import java.util.Stack;
 
 public class ActionToString extends Action {
 
-   public ActionToString() {
-      super(0x4B, 0);
-   }
+    public ActionToString() {
+        super(0x4B, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "ToString";
-   }
+    @Override
+    public String toString() {
+        return "ToString";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem object = stack.pop();
-      stack.push(new ToStringTreeItem(this, object));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem object = stack.pop();
+        stack.push(new ToStringTreeItem(this, object));
+    }
 }

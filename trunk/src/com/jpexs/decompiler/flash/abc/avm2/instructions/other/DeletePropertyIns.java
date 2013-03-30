@@ -33,40 +33,40 @@ import java.util.Stack;
 
 public class DeletePropertyIns extends InstructionDefinition {
 
-   public DeletePropertyIns() {
-      super(0x6a, "deleteproperty", new int[]{AVM2Code.DAT_MULTINAME_INDEX});
-   }
+    public DeletePropertyIns() {
+        super(0x6a, "deleteproperty", new int[]{AVM2Code.DAT_MULTINAME_INDEX});
+    }
 
-   @Override
-   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-      int multiIndex = (int) ((Long) arguments.get(0)).longValue();
-      //if multiname[multinameIndex] is runtime
-      //pop(name) pop(ns)
-      Object obj = lda.operandStack.pop();
-      //push true if removed
-      throw new RuntimeException("Cannot remove property");
+    @Override
+    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        int multiIndex = (int) ((Long) arguments.get(0)).longValue();
+        //if multiname[multinameIndex] is runtime
+        //pop(name) pop(ns)
+        Object obj = lda.operandStack.pop();
+        //push true if removed
+        throw new RuntimeException("Cannot remove property");
 
-   }
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      int multinameIndex = ins.operands[0];
-      FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
-      GraphTargetItem obj = (GraphTargetItem) stack.pop();
-      stack.add(new BooleanTreeItem(ins, Boolean.TRUE));//property successfully deleted
-      output.add(new DeletePropertyTreeItem(ins, obj, multiname));
-   }
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        int multinameIndex = ins.operands[0];
+        FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
+        GraphTargetItem obj = (GraphTargetItem) stack.pop();
+        stack.add(new BooleanTreeItem(ins, Boolean.TRUE));//property successfully deleted
+        output.add(new DeletePropertyTreeItem(ins, obj, multiname));
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      int ret = -1 + 1;
-      int multinameIndex = ins.operands[0];
-      if (abc.constants.constant_multiname[multinameIndex].needsName()) {
-         ret--;
-      }
-      if (abc.constants.constant_multiname[multinameIndex].needsNs()) {
-         ret--;
-      }
-      return ret;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        int ret = -1 + 1;
+        int multinameIndex = ins.operands[0];
+        if (abc.constants.constant_multiname[multinameIndex].needsName()) {
+            ret--;
+        }
+        if (abc.constants.constant_multiname[multinameIndex].needsNs()) {
+            ret--;
+        }
+        return ret;
+    }
 }

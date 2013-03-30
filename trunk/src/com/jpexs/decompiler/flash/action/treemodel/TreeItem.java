@@ -22,49 +22,49 @@ import java.util.List;
 
 public abstract class TreeItem extends GraphTargetItem {
 
-   public TreeItem(GraphSourceItem instruction, int precedence) {
-      super(instruction, precedence);
-   }
+    public TreeItem(GraphSourceItem instruction, int precedence) {
+        super(instruction, precedence);
+    }
 
-   public abstract String toString(ConstantPool constants);
+    public abstract String toString(ConstantPool constants);
 
-   @Override
-   public String toString() {
-      ConstantPool c = null;
-      return toString(c);
-   }
+    @Override
+    public String toString() {
+        ConstantPool c = null;
+        return toString(c);
+    }
 
-   protected boolean isEmptyString(GraphTargetItem target) {
-      if (target instanceof DirectValueTreeItem) {
-         if (((DirectValueTreeItem) target).value instanceof String) {
+    protected boolean isEmptyString(GraphTargetItem target) {
+        if (target instanceof DirectValueTreeItem) {
+            if (((DirectValueTreeItem) target).value instanceof String) {
 
-            if (((DirectValueTreeItem) target).value.equals("")) {
-               return true;
+                if (((DirectValueTreeItem) target).value.equals("")) {
+                    return true;
+                }
             }
-         }
-      }
-      return false;
-   }
+        }
+        return false;
+    }
 
-   protected String stripQuotes(GraphTargetItem target) {
-      if (target instanceof DirectValueTreeItem) {
-         if (((DirectValueTreeItem) target).value instanceof String) {
-            return (String) ((DirectValueTreeItem) target).hilight((String) ((DirectValueTreeItem) target).value);
-         }
-      }
-      if (target == null) {
-         return "";
-      } else {
-         return target.toString();
-      }
-   }
+    protected String stripQuotes(GraphTargetItem target) {
+        if (target instanceof DirectValueTreeItem) {
+            if (((DirectValueTreeItem) target).value instanceof String) {
+                return (String) ((DirectValueTreeItem) target).hilight((String) ((DirectValueTreeItem) target).value);
+            }
+        }
+        if (target == null) {
+            return "";
+        } else {
+            return target.toString();
+        }
+    }
 
-   @Override
-   public String toString(List localData) {
-      if (localData.isEmpty()) {
-         ConstantPool c = null;
-         return toString(c);
-      }
-      return toString((ConstantPool) localData.get(0));
-   }
+    @Override
+    public String toString(List localData) {
+        if (localData.isEmpty()) {
+            ConstantPool c = null;
+            return toString(c);
+        }
+        return toString((ConstantPool) localData.get(0));
+    }
 }

@@ -25,38 +25,38 @@ import java.io.OutputStream;
 
 public class FrameLabelTag extends Tag {
 
-   private String name;
-   private boolean namedAnchor = false;
+    private String name;
+    private boolean namedAnchor = false;
 
-   public FrameLabelTag(byte[] data, int version, long pos) throws IOException {
-      super(43, "FrameLabel", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      name = sis.readString();
-      if (sis.available() > 0) {
-         if (sis.readUI8() == 1) {
-            namedAnchor = true;
-         }
-      }
-   }
+    public FrameLabelTag(byte[] data, int version, long pos) throws IOException {
+        super(43, "FrameLabel", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        name = sis.readString();
+        if (sis.available() > 0) {
+            if (sis.readUI8() == 1) {
+                namedAnchor = true;
+            }
+        }
+    }
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         sos.writeString(name);
-         if (namedAnchor) {
-            sos.writeUI8(1);
-         }
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            sos.writeString(name);
+            if (namedAnchor) {
+                sos.writeUI8(1);
+            }
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 }

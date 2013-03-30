@@ -26,39 +26,39 @@ import java.util.List;
  */
 public interface ASMSource {
 
-   /**
-    * Converts actions to ASM source
-    *
-    * @param version SWF version
-    * @param hex Add hexadecimal?
-    * @return ASM source
-    */
-   public String getASMSource(int version, boolean hex);
+    /**
+     * Converts actions to ASM source
+     *
+     * @param version SWF version
+     * @param hex Add hexadecimal?
+     * @return ASM source
+     */
+    public String getASMSource(int version, boolean hex);
 
-   /**
-    * Whether or not this object contains ASM source
-    *
-    * @return True when contains
-    */
-   public boolean containsSource();
+    /**
+     * Whether or not this object contains ASM source
+     *
+     * @return True when contains
+     */
+    public boolean containsSource();
 
-   /**
-    * Returns actions associated with this object
-    *
-    * @param version Version
-    * @return List of actions
-    */
-   public List<Action> getActions(int version);
+    /**
+     * Returns actions associated with this object
+     *
+     * @param version Version
+     * @return List of actions
+     */
+    public List<Action> getActions(int version);
 
-   /**
-    * Sets actions associated with this object
-    *
-    * @param version Version
-    * @param actions Action list
-    */
-   public void setActions(List<Action> actions, int version);
+    /**
+     * Sets actions associated with this object
+     *
+     * @param version Version
+     * @param actions Action list
+     */
+    public void setActions(List<Action> actions, int version);
 
-   public byte[] getActionBytes();
+    public byte[] getActionBytes();
 
-   public void setActionBytes(byte actionBytes[]);
+    public void setActionBytes(byte actionBytes[]);
 }

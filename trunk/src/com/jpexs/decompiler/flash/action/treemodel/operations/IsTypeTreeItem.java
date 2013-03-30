@@ -22,12 +22,12 @@ import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 
 public class IsTypeTreeItem extends BinaryOpItem {
 
-   public IsTypeTreeItem(GraphSourceItem instruction, TreeItem value, TreeItem type) {
-      super(instruction, PRECEDENCE_RELATIONAL, value, type, " is ");
-   }
+    public IsTypeTreeItem(GraphSourceItem instruction, TreeItem value, TreeItem type) {
+        super(instruction, PRECEDENCE_RELATIONAL, value, type, " is ");
+    }
 
-   @Override
-   public boolean isCompileTime() {
-      return false;
-   }
+    @Override
+    public boolean isCompileTime() {
+        return false;
+    }
 }

@@ -23,24 +23,24 @@ import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
 public class StringLengthTreeItem extends TreeItem {
 
-   public GraphTargetItem value;
+    public GraphTargetItem value;
 
-   public StringLengthTreeItem(GraphSourceItem instruction, GraphTargetItem value) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.value = value;
-   }
+    public StringLengthTreeItem(GraphSourceItem instruction, GraphTargetItem value) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.value = value;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      String s = value.toString(constants);
-      if (value.precedence > precedence) {
-         s = "(" + s + ")";
-      }
-      return s + hilight(".length");
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        String s = value.toString(constants);
+        if (value.precedence > precedence) {
+            s = "(" + s + ")";
+        }
+        return s + hilight(".length");
+    }
 
-   @Override
-   public boolean isCompileTime() {
-      return false;
-   }
+    @Override
+    public boolean isCompileTime() {
+        return false;
+    }
 }

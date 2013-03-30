@@ -23,11 +23,11 @@ package com.jpexs.decompiler.flash.types;
  */
 public class ZONEDATA {
 
-   public int alignmentCoordinate;
-   public int range;
+    public int alignmentCoordinate;
+    public int range;
 
-   @Override
-   public String toString() {
-      return "[ZONEDATA alignmentCoordinate=" + alignmentCoordinate + ", range=" + range + "]";
-   }
+    @Override
+    public String toString() {
+        return "[ZONEDATA alignmentCoordinate=" + alignmentCoordinate + ", range=" + range + "]";
+    }
 }

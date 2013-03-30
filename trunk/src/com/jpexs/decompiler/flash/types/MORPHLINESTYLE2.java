@@ -22,24 +22,24 @@ package com.jpexs.decompiler.flash.types;
  */
 public class MORPHLINESTYLE2 {
 
-   public int startWidth;
-   public int endWidth;
-   public int startCapStyle;
-   public int joinStyle;
-   public static final int ROUND_JOIN = 0;
-   public static final int BEVEL_JOIN = 1;
-   public static final int MITER_JOIN = 2;
-   public boolean hasFillFlag;
-   public boolean noHScaleFlag;
-   public boolean noVScaleFlag;
-   public boolean pixelHintingFlag;
-   public boolean noClose;
-   public int endCapStyle;
-   public static final int ROUND_CAP = 0;
-   public static final int NO_CAP = 1;
-   public static final int SQUARE_CAP = 2;
-   public int miterLimitFactor;
-   public RGBA startColor;
-   public RGBA endColor;
-   public MORPHFILLSTYLE fillType;
+    public int startWidth;
+    public int endWidth;
+    public int startCapStyle;
+    public int joinStyle;
+    public static final int ROUND_JOIN = 0;
+    public static final int BEVEL_JOIN = 1;
+    public static final int MITER_JOIN = 2;
+    public boolean hasFillFlag;
+    public boolean noHScaleFlag;
+    public boolean noVScaleFlag;
+    public boolean pixelHintingFlag;
+    public boolean noClose;
+    public int endCapStyle;
+    public static final int ROUND_CAP = 0;
+    public static final int NO_CAP = 1;
+    public static final int SQUARE_CAP = 2;
+    public int miterLimitFactor;
+    public RGBA startColor;
+    public RGBA endColor;
+    public MORPHFILLSTYLE fillType;
 }

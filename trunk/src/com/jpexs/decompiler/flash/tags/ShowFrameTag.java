@@ -23,25 +23,25 @@ package com.jpexs.decompiler.flash.tags;
  */
 public class ShowFrameTag extends Tag {
 
-   /**
-    * Constructor
-    */
-   public ShowFrameTag(long pos) {
-      super(1, "ShowFrame", new byte[0], pos);
-   }
+    /**
+     * Constructor
+     */
+    public ShowFrameTag(long pos) {
+        super(1, "ShowFrame", new byte[0], pos);
+    }
 
-   public ShowFrameTag() {
-      super(1, "ShowFrame", new byte[0], 0);
-   }
+    public ShowFrameTag() {
+        super(1, "ShowFrame", new byte[0], 0);
+    }
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      return super.getData(version);
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        return super.getData(version);
+    }
 }

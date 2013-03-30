@@ -33,20 +33,20 @@ import java.util.Stack;
 
 public class DXNSIns extends InstructionDefinition {
 
-   public DXNSIns() {
-      super(0x06, "dxns", new int[]{AVM2Code.DAT_STRING_INDEX});
-   }
+    public DXNSIns() {
+        super(0x06, "dxns", new int[]{AVM2Code.DAT_STRING_INDEX});
+    }
 
-   @Override
-   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-      int strIndex = (int) ((Long) arguments.get(0)).longValue();
-      String s = constants.constant_string[strIndex];
-      System.out.println("Set default XML space " + s);
+    @Override
+    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        int strIndex = (int) ((Long) arguments.get(0)).longValue();
+        String s = constants.constant_string[strIndex];
+        System.out.println("Set default XML space " + s);
 
-   }
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      output.add(new DefaultXMLNamespace(ins, new StringTreeItem(ins, constants.constant_string[ins.operands[0]])));
-   }
+    @Override
+    public void translate(boolean isStatic, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        output.add(new DefaultXMLNamespace(ins, new StringTreeItem(ins, constants.constant_string[ins.operands[0]])));
+    }
 }

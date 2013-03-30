@@ -25,60 +25,60 @@ import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
  */
 public class StyleChangeRecord extends SHAPERECORD {
 
-   public int typeFlag = 0;
-   public boolean stateNewStyles;
-   public boolean stateLineStyle;
-   public boolean stateFillStyle1;
-   public boolean stateFillStyle0;
-   public boolean stateMoveTo;
-   public int moveBits;
-   public int moveDeltaX;
-   public int moveDeltaY;
-   public int fillStyle0;
-   public int fillStyle1;
-   public int lineStyle;
-   public FILLSTYLEARRAY fillStyles;
-   public LINESTYLEARRAY lineStyles;
-   public int numFillBits;
-   public int numLineBits;
+    public int typeFlag = 0;
+    public boolean stateNewStyles;
+    public boolean stateLineStyle;
+    public boolean stateFillStyle1;
+    public boolean stateFillStyle0;
+    public boolean stateMoveTo;
+    public int moveBits;
+    public int moveDeltaX;
+    public int moveDeltaY;
+    public int fillStyle0;
+    public int fillStyle1;
+    public int lineStyle;
+    public FILLSTYLEARRAY fillStyles;
+    public LINESTYLEARRAY lineStyles;
+    public int numFillBits;
+    public int numLineBits;
 
-   @Override
-   public String toString() {
-      return "[StyleChangeRecord stateNewStyles=" + stateNewStyles + ", stateLineStyle=" + stateLineStyle + ",stateFillStyle1=" + stateFillStyle1 + ","
-              + " stateFillStyle0=" + stateFillStyle0 + ", stateMoveTo=" + stateMoveTo + ", moveBits=" + moveBits + ", moveDeltaX=" + moveDeltaX + ", moveDeltaY=" + moveDeltaY + ","
-              + " fillStyle0=" + fillStyle0 + ", fillStyle1=" + fillStyle1 + ", lineStyle=" + lineStyle + ", fillStyles=" + fillStyles + ", lineStyles=" + lineStyles + ", numFillBits=" + numFillBits + ", numLineBits=" + numLineBits + "]";
-   }
+    @Override
+    public String toString() {
+        return "[StyleChangeRecord stateNewStyles=" + stateNewStyles + ", stateLineStyle=" + stateLineStyle + ",stateFillStyle1=" + stateFillStyle1 + ","
+                + " stateFillStyle0=" + stateFillStyle0 + ", stateMoveTo=" + stateMoveTo + ", moveBits=" + moveBits + ", moveDeltaX=" + moveDeltaX + ", moveDeltaY=" + moveDeltaY + ","
+                + " fillStyle0=" + fillStyle0 + ", fillStyle1=" + fillStyle1 + ", lineStyle=" + lineStyle + ", fillStyles=" + fillStyles + ", lineStyles=" + lineStyles + ", numFillBits=" + numFillBits + ", numLineBits=" + numLineBits + "]";
+    }
 
-   @Override
-   public String toSWG(int oldX, int oldY) {
-      if (stateMoveTo) {
-         return "M " + twipToPixel(moveDeltaX) + " " + twipToPixel(moveDeltaY);
-      }
-      return "";
-   }
+    @Override
+    public String toSWG(int oldX, int oldY) {
+        if (stateMoveTo) {
+            return "M " + twipToPixel(moveDeltaX) + " " + twipToPixel(moveDeltaY);
+        }
+        return "";
+    }
 
-   @Override
-   public int changeX(int x) {
-      if (stateMoveTo) {
-         return moveDeltaX;
-      }
-      return 0;
-   }
+    @Override
+    public int changeX(int x) {
+        if (stateMoveTo) {
+            return moveDeltaX;
+        }
+        return 0;
+    }
 
-   @Override
-   public int changeY(int y) {
-      if (stateMoveTo) {
-         return moveDeltaY;
-      }
-      return 0;
-   }
+    @Override
+    public int changeY(int y) {
+        if (stateMoveTo) {
+            return moveDeltaY;
+        }
+        return 0;
+    }
 
-   @Override
-   public void flip() {
-   }
+    @Override
+    public void flip() {
+    }
 
-   @Override
-   public boolean isMove() {
-      return stateMoveTo;
-   }
+    @Override
+    public boolean isMove() {
+        return stateMoveTo;
+    }
 }

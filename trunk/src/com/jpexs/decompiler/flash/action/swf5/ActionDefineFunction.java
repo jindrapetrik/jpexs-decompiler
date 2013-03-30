@@ -40,175 +40,175 @@ import java.util.Stack;
 
 public class ActionDefineFunction extends Action implements ActionContainer {
 
-   public String functionName;
-   public String replacedFunctionName;
-   public List<String> paramNames = new ArrayList<String>();
-   public List<String> replacedParamNames;
-   public List<Action> code;
-   public int codeSize;
-   private int version;
-   public List<String> constantPool;
+    public String functionName;
+    public String replacedFunctionName;
+    public List<String> paramNames = new ArrayList<String>();
+    public List<String> replacedParamNames;
+    public List<Action> code;
+    public int codeSize;
+    private int version;
+    public List<String> constantPool;
 
-   @Override
-   public List<Action> getActions() {
-      return code;
-   }
+    @Override
+    public List<Action> getActions() {
+        return code;
+    }
 
-   public void setConstantPool(List<String> constantPool) {
-      this.constantPool = constantPool;
-      for (Action a : code) {
-         if (a instanceof ActionPush) {
-            ((ActionPush) a).constantPool = constantPool;
-         }
-         if (a instanceof ActionDefineFunction2) {
-            ((ActionDefineFunction2) a).setConstantPool(constantPool);
-         }
-         if (a instanceof ActionDefineFunction) {
-            ((ActionDefineFunction) a).setConstantPool(constantPool);
-         }
-      }
-   }
+    public void setConstantPool(List<String> constantPool) {
+        this.constantPool = constantPool;
+        for (Action a : code) {
+            if (a instanceof ActionPush) {
+                ((ActionPush) a).constantPool = constantPool;
+            }
+            if (a instanceof ActionDefineFunction2) {
+                ((ActionDefineFunction2) a).setConstantPool(constantPool);
+            }
+            if (a instanceof ActionDefineFunction) {
+                ((ActionDefineFunction) a).setConstantPool(constantPool);
+            }
+        }
+    }
 
-   public ActionDefineFunction(int actionLength, SWFInputStream sis, int version) throws IOException {
-      super(0x9B, actionLength);
-      this.version = version;
-      //byte data[]=sis.readBytes(actionLength);
-      //sis=new SWFInputStream(new ByteArrayInputStream(data),version);
-      functionName = sis.readString();
-      int numParams = sis.readUI16();
-      for (int i = 0; i < numParams; i++) {
-         paramNames.add(sis.readString());
-      }
-      codeSize = sis.readUI16();
-      //code = new ArrayList<Action>();
-      code = (new SWFInputStream(new ByteArrayInputStream(sis.readBytes(codeSize)), version)).readActionList();
-   }
+    public ActionDefineFunction(int actionLength, SWFInputStream sis, int version) throws IOException {
+        super(0x9B, actionLength);
+        this.version = version;
+        //byte data[]=sis.readBytes(actionLength);
+        //sis=new SWFInputStream(new ByteArrayInputStream(data),version);
+        functionName = sis.readString();
+        int numParams = sis.readUI16();
+        for (int i = 0; i < numParams; i++) {
+            paramNames.add(sis.readString());
+        }
+        codeSize = sis.readUI16();
+        //code = new ArrayList<Action>();
+        code = (new SWFInputStream(new ByteArrayInputStream(sis.readBytes(codeSize)), version)).readActionList();
+    }
 
-   public ActionDefineFunction(boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
-      super(0x9B, -1);
-      functionName = lexString(lexer);
-      int numParams = (int) lexLong(lexer);
-      for (int i = 0; i < numParams; i++) {
-         paramNames.add(lexString(lexer));
-      }
-      lexBlockOpen(lexer);
-      code = ASMParser.parse(ignoreNops, labels, address + getPreLen(version), lexer, constantPool, version);
-   }
+    public ActionDefineFunction(boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
+        super(0x9B, -1);
+        functionName = lexString(lexer);
+        int numParams = (int) lexLong(lexer);
+        for (int i = 0; i < numParams; i++) {
+            paramNames.add(lexString(lexer));
+        }
+        lexBlockOpen(lexer);
+        code = ASMParser.parse(ignoreNops, labels, address + getPreLen(version), lexer, constantPool, version);
+    }
 
-   @Override
-   public byte[] getHeaderBytes() {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      SWFOutputStream sos = new SWFOutputStream(baos, version);
-      ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-      try {
-         sos.writeString(functionName);
-         sos.writeUI16(paramNames.size());
-         for (String s : paramNames) {
-            sos.writeString(s);
-         }
-         byte codeBytes[] = Action.actionsToBytes(code, false, version);
-         sos.writeUI16(codeBytes.length);
-         sos.close();
-
-
-         baos2.write(surroundWithAction(baos.toByteArray(), version));
-      } catch (IOException e) {
-      }
-      return baos2.toByteArray();
-   }
-
-   @Override
-   public byte[] getBytes(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      SWFOutputStream sos = new SWFOutputStream(baos, version);
-      ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-      try {
-         sos.writeString(functionName);
-         sos.writeUI16(paramNames.size());
-         for (String s : paramNames) {
-            sos.writeString(s);
-         }
-         byte codeBytes[] = Action.actionsToBytes(code, false, version);
-         sos.writeUI16(codeBytes.length);
-         sos.close();
+    @Override
+    public byte[] getHeaderBytes() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SWFOutputStream sos = new SWFOutputStream(baos, version);
+        ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+        try {
+            sos.writeString(functionName);
+            sos.writeUI16(paramNames.size());
+            for (String s : paramNames) {
+                sos.writeString(s);
+            }
+            byte codeBytes[] = Action.actionsToBytes(code, false, version);
+            sos.writeUI16(codeBytes.length);
+            sos.close();
 
 
-         baos2.write(surroundWithAction(baos.toByteArray(), version));
-         baos2.write(codeBytes);
-      } catch (IOException e) {
-      }
-      return baos2.toByteArray();
-   }
+            baos2.write(surroundWithAction(baos.toByteArray(), version));
+        } catch (IOException e) {
+        }
+        return baos2.toByteArray();
+    }
 
-   private long getPreLen(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      SWFOutputStream sos = new SWFOutputStream(baos, version);
-      try {
-         sos.writeString(functionName);
-         sos.writeUI16(paramNames.size());
-         for (String s : paramNames) {
-            sos.writeString(s);
-         }
-         sos.writeUI16(0);
-         sos.close();
-      } catch (IOException e) {
-      }
+    @Override
+    public byte[] getBytes(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SWFOutputStream sos = new SWFOutputStream(baos, version);
+        ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+        try {
+            sos.writeString(functionName);
+            sos.writeUI16(paramNames.size());
+            for (String s : paramNames) {
+                sos.writeString(s);
+            }
+            byte codeBytes[] = Action.actionsToBytes(code, false, version);
+            sos.writeUI16(codeBytes.length);
+            sos.close();
 
-      return surroundWithAction(baos.toByteArray(), version).length;
-   }
 
-   @Override
-   public void setAddress(long address, int version) {
-      super.setAddress(address, version);
-      Action.setActionsAddresses(code, address + getPreLen(version), version);
-   }
+            baos2.write(surroundWithAction(baos.toByteArray(), version));
+            baos2.write(codeBytes);
+        } catch (IOException e) {
+        }
+        return baos2.toByteArray();
+    }
 
-   @Override
-   public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
-      String paramStr = "";
-      for (int i = 0; i < paramNames.size(); i++) {
-         paramStr += "\"" + Helper.escapeString(paramNames.get(i)) + "\"";
-         paramStr += " ";
-      }
-      return "DefineFunction \"" + Helper.escapeString(functionName) + "\" " + paramNames.size() + " " + paramStr + " {\r\n" + Action.actionsToString(code, knownAddreses, constantPool, version, hex) + "}";
-   }
+    private long getPreLen(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SWFOutputStream sos = new SWFOutputStream(baos, version);
+        try {
+            sos.writeString(functionName);
+            sos.writeUI16(paramNames.size());
+            for (String s : paramNames) {
+                sos.writeString(s);
+            }
+            sos.writeUI16(0);
+            sos.close();
+        } catch (IOException e) {
+        }
 
-   @Override
-   public String getASMSourceReplaced(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
-      List<String> oldParamNames = paramNames;
-      if (replacedParamNames != null) {
-         paramNames = replacedParamNames;
-      }
-      String oldFunctionName = functionName;
-      if (replacedFunctionName != null) {
-         functionName = replacedFunctionName;
-      }
-      String ret = getASMSource(knownAddreses, constantPool, version, hex);
-      paramNames = oldParamNames;
-      functionName = oldFunctionName;
-      return ret;
+        return surroundWithAction(baos.toByteArray(), version).length;
+    }
 
-   }
+    @Override
+    public void setAddress(long address, int version) {
+        super.setAddress(address, version);
+        Action.setActionsAddresses(code, address + getPreLen(version), version);
+    }
 
-   @Override
-   public List<Long> getAllRefs(int version) {
-      return Action.getActionsAllRefs(code, version);
-   }
+    @Override
+    public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+        String paramStr = "";
+        for (int i = 0; i < paramNames.size(); i++) {
+            paramStr += "\"" + Helper.escapeString(paramNames.get(i)) + "\"";
+            paramStr += " ";
+        }
+        return "DefineFunction \"" + Helper.escapeString(functionName) + "\" " + paramNames.size() + " " + paramStr + " {\r\n" + Action.actionsToString(code, knownAddreses, constantPool, version, hex) + "}";
+    }
 
-   @Override
-   public List<Action> getAllIfsOrJumps() {
-      return Action.getActionsAllIfsOrJumps(code);
-   }
+    @Override
+    public String getASMSourceReplaced(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+        List<String> oldParamNames = paramNames;
+        if (replacedParamNames != null) {
+            paramNames = replacedParamNames;
+        }
+        String oldFunctionName = functionName;
+        if (replacedFunctionName != null) {
+            functionName = replacedFunctionName;
+        }
+        String ret = getASMSource(knownAddreses, constantPool, version, hex);
+        paramNames = oldParamNames;
+        functionName = oldFunctionName;
+        return ret;
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      FunctionTreeItem fti = new FunctionTreeItem(this, functionName, paramNames, ActionGraph.translateViaGraph(regNames, variables, functions, code, version), constantPool, 1);
-      stack.push(fti);
-      functions.put(functionName, fti);
-   }
+    }
 
-   @Override
-   public String toString() {
-      return "DefineFunction";
-   }
+    @Override
+    public List<Long> getAllRefs(int version) {
+        return Action.getActionsAllRefs(code, version);
+    }
+
+    @Override
+    public List<Action> getAllIfsOrJumps() {
+        return Action.getActionsAllIfsOrJumps(code);
+    }
+
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        FunctionTreeItem fti = new FunctionTreeItem(this, functionName, paramNames, ActionGraph.translateViaGraph(regNames, variables, functions, code, version), constantPool, 1);
+        stack.push(fti);
+        functions.put(functionName, fti);
+    }
+
+    @Override
+    public String toString() {
+        return "DefineFunction";
+    }
 }

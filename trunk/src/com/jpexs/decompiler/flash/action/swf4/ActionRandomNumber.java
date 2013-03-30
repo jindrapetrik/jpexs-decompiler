@@ -25,18 +25,18 @@ import java.util.Stack;
 
 public class ActionRandomNumber extends Action {
 
-   public ActionRandomNumber() {
-      super(0x30, 0);
-   }
+    public ActionRandomNumber() {
+        super(0x30, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "RandomNumber";
-   }
+    @Override
+    public String toString() {
+        return "RandomNumber";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem maximum = stack.pop();
-      stack.push(new RandomNumberTreeItem(this, maximum));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem maximum = stack.pop();
+        stack.push(new RandomNumberTreeItem(this, maximum));
+    }
 }

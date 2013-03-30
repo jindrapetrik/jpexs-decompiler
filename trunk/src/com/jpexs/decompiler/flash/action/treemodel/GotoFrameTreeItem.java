@@ -20,15 +20,15 @@ import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 
 public class GotoFrameTreeItem extends TreeItem {
 
-   public int frame;
+    public int frame;
 
-   public GotoFrameTreeItem(GraphSourceItem instruction, int frame) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.frame = frame;
-   }
+    public GotoFrameTreeItem(GraphSourceItem instruction, int frame) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.frame = frame;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return hilight("gotoAndStop(") + frame + hilight(")");
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return hilight("gotoAndStop(") + frame + hilight(")");
+    }
 }

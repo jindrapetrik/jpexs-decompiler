@@ -23,21 +23,21 @@ import java.util.List;
 
 public class NewFunctionTreeItem extends TreeItem {
 
-   public String paramStr;
-   public String returnStr;
-   public String functionBody;
-   public String functionName;
+    public String paramStr;
+    public String returnStr;
+    public String functionBody;
+    public String functionName;
 
-   public NewFunctionTreeItem(AVM2Instruction instruction, String functionName, String paramStr, String returnStr, String functionBody) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.paramStr = paramStr;
-      this.returnStr = returnStr;
-      this.functionBody = functionBody;
-      this.functionName = functionName;
-   }
+    public NewFunctionTreeItem(AVM2Instruction instruction, String functionName, String paramStr, String returnStr, String functionBody) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.paramStr = paramStr;
+        this.returnStr = returnStr;
+        this.functionBody = functionBody;
+        this.functionName = functionName;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return hilight("new function" + (!functionName.equals("") ? " " + functionName : "") + "(" + paramStr + "):" + returnStr + "\r\n{\r\n") + functionBody + "\r\n" + hilight("}");
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return hilight("new function" + (!functionName.equals("") ? " " + functionName : "") + "(" + paramStr + "):" + returnStr + "\r\n{\r\n") + functionBody + "\r\n" + hilight("}");
+    }
 }

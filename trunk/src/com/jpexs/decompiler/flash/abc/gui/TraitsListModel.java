@@ -27,61 +27,61 @@ import javax.swing.event.ListDataListener;
 
 public class TraitsListModel implements ListModel {
 
-   private List<TraitsListItem> items;
-   private List<DoABCTag> abcTags;
-   private ABC abc;
-   private int classIndex;
+    private List<TraitsListItem> items;
+    private List<DoABCTag> abcTags;
+    private ABC abc;
+    private int classIndex;
 
-   public void setSorted(boolean sorted) {
-      if (sorted) {
-         Collections.sort(items, new Comparator<TraitsListItem>() {
-            @Override
-            public int compare(TraitsListItem o1, TraitsListItem o2) {
-               return o1.toStringName().compareTo(o2.toStringName());
-            }
-         });
-      } else {
-         reset();
-      }
-   }
+    public void setSorted(boolean sorted) {
+        if (sorted) {
+            Collections.sort(items, new Comparator<TraitsListItem>() {
+                @Override
+                public int compare(TraitsListItem o1, TraitsListItem o2) {
+                    return o1.toStringName().compareTo(o2.toStringName());
+                }
+            });
+        } else {
+            reset();
+        }
+    }
 
-   private void reset() {
-      items = new ArrayList<TraitsListItem>();
-      for (int t = 0; t < abc.class_info[classIndex].static_traits.traits.length; t++) {
-         items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(abc.class_info[classIndex].static_traits.traits[t]), t, true, abcTags, abc, classIndex));
-      }
-      for (int t = 0; t < abc.instance_info[classIndex].instance_traits.traits.length; t++) {
-         items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(abc.instance_info[classIndex].instance_traits.traits[t]), t, false, abcTags, abc, classIndex));
-      }
-      items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, false, abcTags, abc, classIndex));
-      items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, true, abcTags, abc, classIndex));
-   }
+    private void reset() {
+        items = new ArrayList<TraitsListItem>();
+        for (int t = 0; t < abc.class_info[classIndex].static_traits.traits.length; t++) {
+            items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(abc.class_info[classIndex].static_traits.traits[t]), t, true, abcTags, abc, classIndex));
+        }
+        for (int t = 0; t < abc.instance_info[classIndex].instance_traits.traits.length; t++) {
+            items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(abc.instance_info[classIndex].instance_traits.traits[t]), t, false, abcTags, abc, classIndex));
+        }
+        items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, false, abcTags, abc, classIndex));
+        items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, true, abcTags, abc, classIndex));
+    }
 
-   public TraitsListModel(List<DoABCTag> abcTags, ABC abc, int classIndex, boolean sorted) {
-      this.abcTags = abcTags;
-      this.abc = abc;
-      this.classIndex = classIndex;
-      reset();
-      if (sorted) {
-         setSorted(true);
-      }
-   }
+    public TraitsListModel(List<DoABCTag> abcTags, ABC abc, int classIndex, boolean sorted) {
+        this.abcTags = abcTags;
+        this.abc = abc;
+        this.classIndex = classIndex;
+        reset();
+        if (sorted) {
+            setSorted(true);
+        }
+    }
 
-   @Override
-   public int getSize() {
-      return items.size();
-   }
+    @Override
+    public int getSize() {
+        return items.size();
+    }
 
-   @Override
-   public Object getElementAt(int index) {
-      return items.get(index);
-   }
+    @Override
+    public Object getElementAt(int index) {
+        return items.get(index);
+    }
 
-   @Override
-   public void addListDataListener(ListDataListener l) {
-   }
+    @Override
+    public void addListDataListener(ListDataListener l) {
+    }
 
-   @Override
-   public void removeListDataListener(ListDataListener l) {
-   }
+    @Override
+    public void removeListDataListener(ListDataListener l) {
+    }
 }

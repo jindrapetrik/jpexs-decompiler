@@ -25,19 +25,19 @@ import java.util.Stack;
 
 public class ActionModulo extends Action {
 
-   public ActionModulo() {
-      super(0x3F, 0);
-   }
+    public ActionModulo() {
+        super(0x3F, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "Modulo";
-   }
+    @Override
+    public String toString() {
+        return "Modulo";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem a = stack.pop();
-      GraphTargetItem b = stack.pop();
-      stack.push(new ModuloTreeItem(this, b, a));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem a = stack.pop();
+        GraphTargetItem b = stack.pop();
+        stack.push(new ModuloTreeItem(this, b, a));
+    }
 }

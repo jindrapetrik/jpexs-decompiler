@@ -31,61 +31,61 @@ import java.io.OutputStream;
  */
 public class DefineVideoStreamTag extends CharacterTag {
 
-   public int characterID;
-   public int numFrames;
-   public int width;
-   public int height;
-   public int videoFlagsDeblocking;
-   public boolean videoFlagsSmoothing;
-   public int codecID;
+    public int characterID;
+    public int numFrames;
+    public int width;
+    public int height;
+    public int videoFlagsDeblocking;
+    public boolean videoFlagsSmoothing;
+    public int codecID;
 
-   @Override
-   public int getCharacterID() {
-      return characterID;
-   }
+    @Override
+    public int getCharacterID() {
+        return characterID;
+    }
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         sos.writeUI16(characterID);
-         sos.writeUI16(numFrames);
-         sos.writeUI16(width);
-         sos.writeUI16(height);
-         sos.writeUB(4, 0);
-         sos.writeUB(3, videoFlagsDeblocking);
-         sos.writeUB(1, videoFlagsSmoothing ? 1 : 0);
-         sos.writeUI8(codecID);
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            sos.writeUI16(characterID);
+            sos.writeUI16(numFrames);
+            sos.writeUI16(width);
+            sos.writeUI16(height);
+            sos.writeUB(4, 0);
+            sos.writeUB(3, videoFlagsDeblocking);
+            sos.writeUB(1, videoFlagsSmoothing ? 1 : 0);
+            sos.writeUI8(codecID);
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 
-   /**
-    * Constructor
-    *
-    * @param data Data bytes
-    * @param version SWF version
-    * @throws IOException
-    */
-   public DefineVideoStreamTag(byte data[], int version, long pos) throws IOException {
-      super(60, "DefineVideoStream", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      characterID = sis.readUI16();
-      numFrames = sis.readUI16();
-      width = sis.readUI16();
-      height = sis.readUI16();
-      sis.readUB(4);
-      videoFlagsDeblocking = (int) sis.readUB(3);
-      videoFlagsSmoothing = sis.readUB(1) == 1;
-      codecID = sis.readUI8();
-   }
+    /**
+     * Constructor
+     *
+     * @param data Data bytes
+     * @param version SWF version
+     * @throws IOException
+     */
+    public DefineVideoStreamTag(byte data[], int version, long pos) throws IOException {
+        super(60, "DefineVideoStream", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        characterID = sis.readUI16();
+        numFrames = sis.readUI16();
+        width = sis.readUI16();
+        height = sis.readUI16();
+        sis.readUB(4);
+        videoFlagsDeblocking = (int) sis.readUB(3);
+        videoFlagsSmoothing = sis.readUB(1) == 1;
+        codecID = sis.readUI8();
+    }
 }

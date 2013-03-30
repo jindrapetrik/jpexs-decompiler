@@ -20,19 +20,19 @@ import java.util.List;
 
 public class TernarOpItem extends GraphTargetItem {
 
-   public GraphTargetItem expression;
-   public GraphTargetItem onTrue;
-   public GraphTargetItem onFalse;
+    public GraphTargetItem expression;
+    public GraphTargetItem onTrue;
+    public GraphTargetItem onFalse;
 
-   public TernarOpItem(GraphSourceItem src, GraphTargetItem expression, GraphTargetItem onTrue, GraphTargetItem onFalse) {
-      super(src, PRECEDENCE_CONDITIONAL);
-      this.expression = expression;
-      this.onTrue = onTrue;
-      this.onFalse = onFalse;
-   }
+    public TernarOpItem(GraphSourceItem src, GraphTargetItem expression, GraphTargetItem onTrue, GraphTargetItem onFalse) {
+        super(src, PRECEDENCE_CONDITIONAL);
+        this.expression = expression;
+        this.onTrue = onTrue;
+        this.onFalse = onFalse;
+    }
 
-   @Override
-   public String toString(List localData) {
-      return expression.toString(localData) + hilight("?") + onTrue.toString(localData) + hilight(":") + onFalse.toString(localData);
-   }
+    @Override
+    public String toString(List localData) {
+        return expression.toString(localData) + hilight("?") + onTrue.toString(localData) + hilight(":") + onFalse.toString(localData);
+    }
 }

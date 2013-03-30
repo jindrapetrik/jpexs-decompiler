@@ -32,29 +32,29 @@ import java.util.Stack;
 
 public class AsTypeIns extends InstructionDefinition {
 
-   public AsTypeIns() {
-      super(0x86, "astype", new int[]{AVM2Code.DAT_MULTINAME_INDEX});
-   }
+    public AsTypeIns() {
+        super(0x86, "astype", new int[]{AVM2Code.DAT_MULTINAME_INDEX});
+    }
 
-   @Override
-   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-      Long typeIndex = (Long) arguments.get(0);
-      Object obj = lda.operandStack.pop();
-      //if multiname[typeIndex]==obj
-      lda.operandStack.push(obj);
-      //else push null
+    @Override
+    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        Long typeIndex = (Long) arguments.get(0);
+        Object obj = lda.operandStack.pop();
+        //if multiname[typeIndex]==obj
+        lda.operandStack.push(obj);
+        //else push null
 
-   }
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      GraphTargetItem val = (GraphTargetItem) stack.pop();
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        GraphTargetItem val = (GraphTargetItem) stack.pop();
 
-      stack.push(new AsTypeTreeItem(ins, val, new FullMultinameTreeItem(ins, ins.operands[0])));
-   }
+        stack.push(new AsTypeTreeItem(ins, val, new FullMultinameTreeItem(ins, ins.operands[0])));
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -1 + 1;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return -1 + 1;
+    }
 }

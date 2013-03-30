@@ -25,30 +25,30 @@ import java.io.IOException;
  */
 public class EndTag extends Tag {
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      return new byte[0];
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        return new byte[0];
+    }
 
-   /**
-    * Constructor
-    *
-    * @param data Data bytes
-    * @param version SWF version
-    * @throws IOException
-    */
-   public EndTag(byte data[], int version, long pos) throws IOException {
-      super(0, "End", data, pos);
+    /**
+     * Constructor
+     *
+     * @param data Data bytes
+     * @param version SWF version
+     * @throws IOException
+     */
+    public EndTag(byte data[], int version, long pos) throws IOException {
+        super(0, "End", data, pos);
 
-   }
+    }
 
-   public EndTag() {
-      super(0, "End", new byte[0], 0);
-   }
+    public EndTag() {
+        super(0, "End", new byte[0], 0);
+    }
 }

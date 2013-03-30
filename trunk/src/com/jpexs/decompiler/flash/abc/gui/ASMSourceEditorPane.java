@@ -38,188 +38,188 @@ import javax.swing.event.CaretListener;
 
 public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretListener {
 
-   public ABC abc;
-   public int bodyIndex = -1;
-   private List<Highlighting> disassembledHilights = new ArrayList<Highlighting>();
-   private DecompiledEditorPane decompiledEditor;
-   private boolean ignoreCarret = false;
-   private String name;
-   private String textWithHex = "";
-   private String textNoHex = "";
-   private boolean hex = false;
+    public ABC abc;
+    public int bodyIndex = -1;
+    private List<Highlighting> disassembledHilights = new ArrayList<Highlighting>();
+    private DecompiledEditorPane decompiledEditor;
+    private boolean ignoreCarret = false;
+    private String name;
+    private String textWithHex = "";
+    private String textNoHex = "";
+    private boolean hex = false;
 
-   public boolean isHex() {
-      return hex;
-   }
+    public boolean isHex() {
+        return hex;
+    }
 
-   public void switchHex() {
-      setHex(!hex);
-   }
+    public void switchHex() {
+        setHex(!hex);
+    }
 
-   public void setHex(boolean hex) {
-      if (this.hex == hex) {
-         return;
-      }
-      this.hex = hex;
-      long oldOffset = getSelectedOffset();
-      if (hex) {
-         setText(textWithHex);
-      } else {
-         setText(textNoHex);
-      }
-      hilighOffset(oldOffset);
-   }
+    public void setHex(boolean hex) {
+        if (this.hex == hex) {
+            return;
+        }
+        this.hex = hex;
+        long oldOffset = getSelectedOffset();
+        if (hex) {
+            setText(textWithHex);
+        } else {
+            setText(textNoHex);
+        }
+        hilighOffset(oldOffset);
+    }
 
-   public void setIgnoreCarret(boolean ignoreCarret) {
-      this.ignoreCarret = ignoreCarret;
-   }
+    public void setIgnoreCarret(boolean ignoreCarret) {
+        this.ignoreCarret = ignoreCarret;
+    }
 
-   public ASMSourceEditorPane(DecompiledEditorPane decompiledEditor) {
-      this.decompiledEditor = decompiledEditor;
-      addCaretListener(this);
-   }
+    public ASMSourceEditorPane(DecompiledEditorPane decompiledEditor) {
+        this.decompiledEditor = decompiledEditor;
+        addCaretListener(this);
+    }
 
-   public void hilighOffset(long offset) {
-      if (isEditable()) {
-         return;
-      }
-      for (Highlighting h2 : disassembledHilights) {
-         if (h2.offset == offset) {
-            ignoreCarret = true;
-            setCaretPosition(h2.startPos);
-            getCaret().setVisible(true);
-            ignoreCarret = false;
-            break;
-         }
-      }
-   }
-
-   @Override
-   public String getName() {
-      return super.getName();
-   }
-
-   public void setBodyIndex(int bodyIndex, ABC abc, String name) {
-      this.bodyIndex = bodyIndex;
-      this.abc = abc;
-      this.name = name;
-      String textWithHexTags = abc.bodies[bodyIndex].code.toASMSource(abc.constants, abc.bodies[bodyIndex], true);
-      textWithHex = Helper.hexToComments(textWithHexTags);
-      textNoHex = Helper.stripComments(textWithHexTags);
-      setText(hex ? textWithHex : textNoHex);
-   }
-
-   public void graph() {
-      AVM2Graph gr = new AVM2Graph(abc.bodies[bodyIndex].code, abc, abc.bodies[bodyIndex], false, 0, new HashMap<Integer, GraphTargetItem>(), new Stack<GraphTargetItem>(), new HashMap<Integer, String>(), new ArrayList<String>());
-      (new GraphFrame(gr, name)).setVisible(true);
-   }
-
-   public void exec() {
-      HashMap args = new HashMap();
-      args.put(0, new Object()); //object "this"
-      args.put(1, new Long(466561)); //param1
-      Object o = abc.bodies[bodyIndex].code.execute(args, abc.constants);
-      JOptionPane.showMessageDialog(this, "Returned object:" + o.toString());
-   }
-
-   public boolean save(ConstantPool constants) {
-      try {
-         AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(getText().getBytes()), constants, new DialogMissingSymbolHandler(), abc.bodies[bodyIndex]);
-         acode.getBytes(abc.bodies[bodyIndex].codeBytes);
-         abc.bodies[bodyIndex].code = acode;
-      } catch (IOException ex) {
-      } catch (ParseException ex) {
-         JOptionPane.showMessageDialog(this, (ex.text + " on line " + ex.line));
-         selectLine((int) ex.line);
-         return false;
-      }
-      return true;
-   }
-
-   @Override
-   public void setText(String t) {
-      disassembledHilights = Highlighting.getInstrHighlights(t);
-      t = Highlighting.stripHilights(t);
-      super.setText(t);
-   }
-
-   public void selectInstruction(int pos) {
-      String text = getText();
-      int lineCnt = 1;
-      int lineStart = 0;
-      int lineEnd;
-      int instrCount = 0;
-      int dot = -2;
-      for (int i = 0; i < text.length(); i++) {
-         if (text.charAt(i) == '\n') {
-
-            lineCnt++;
-            lineEnd = i;
-            String ins = text.substring(lineStart, lineEnd).trim();
-            if (!((i > 0) && (text.charAt(i - 1) == ':'))) {
-               if (!ins.startsWith("exception ")) {
-                  instrCount++;
-               }
+    public void hilighOffset(long offset) {
+        if (isEditable()) {
+            return;
+        }
+        for (Highlighting h2 : disassembledHilights) {
+            if (h2.offset == offset) {
+                ignoreCarret = true;
+                setCaretPosition(h2.startPos);
+                getCaret().setVisible(true);
+                ignoreCarret = false;
+                break;
             }
-            if (instrCount == pos + 1) {
-               break;
+        }
+    }
+
+    @Override
+    public String getName() {
+        return super.getName();
+    }
+
+    public void setBodyIndex(int bodyIndex, ABC abc, String name) {
+        this.bodyIndex = bodyIndex;
+        this.abc = abc;
+        this.name = name;
+        String textWithHexTags = abc.bodies[bodyIndex].code.toASMSource(abc.constants, abc.bodies[bodyIndex], true);
+        textWithHex = Helper.hexToComments(textWithHexTags);
+        textNoHex = Helper.stripComments(textWithHexTags);
+        setText(hex ? textWithHex : textNoHex);
+    }
+
+    public void graph() {
+        AVM2Graph gr = new AVM2Graph(abc.bodies[bodyIndex].code, abc, abc.bodies[bodyIndex], false, 0, new HashMap<Integer, GraphTargetItem>(), new Stack<GraphTargetItem>(), new HashMap<Integer, String>(), new ArrayList<String>());
+        (new GraphFrame(gr, name)).setVisible(true);
+    }
+
+    public void exec() {
+        HashMap args = new HashMap();
+        args.put(0, new Object()); //object "this"
+        args.put(1, new Long(466561)); //param1
+        Object o = abc.bodies[bodyIndex].code.execute(args, abc.constants);
+        JOptionPane.showMessageDialog(this, "Returned object:" + o.toString());
+    }
+
+    public boolean save(ConstantPool constants) {
+        try {
+            AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(getText().getBytes("UTF-8")), constants, new DialogMissingSymbolHandler(), abc.bodies[bodyIndex]);
+            acode.getBytes(abc.bodies[bodyIndex].codeBytes);
+            abc.bodies[bodyIndex].code = acode;
+        } catch (IOException ex) {
+        } catch (ParseException ex) {
+            JOptionPane.showMessageDialog(this, (ex.text + " on line " + ex.line));
+            selectLine((int) ex.line);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void setText(String t) {
+        disassembledHilights = Highlighting.getInstrHighlights(t);
+        t = Highlighting.stripHilights(t);
+        super.setText(t);
+    }
+
+    public void selectInstruction(int pos) {
+        String text = getText();
+        int lineCnt = 1;
+        int lineStart = 0;
+        int lineEnd;
+        int instrCount = 0;
+        int dot = -2;
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) == '\n') {
+
+                lineCnt++;
+                lineEnd = i;
+                String ins = text.substring(lineStart, lineEnd).trim();
+                if (!((i > 0) && (text.charAt(i - 1) == ':'))) {
+                    if (!ins.startsWith("exception ")) {
+                        instrCount++;
+                    }
+                }
+                if (instrCount == pos + 1) {
+                    break;
+                }
+                lineStart = i + 1;
             }
-            lineStart = i + 1;
-         }
-      }
-      if (lineCnt == -1) {
-         //lineEnd = text.length() - 1;
-      }
-      //select(lineStart, lineEnd);
-      setCaretPosition(lineStart);
-      //requestFocus();
-   }
+        }
+        if (lineCnt == -1) {
+            //lineEnd = text.length() - 1;
+        }
+        //select(lineStart, lineEnd);
+        setCaretPosition(lineStart);
+        //requestFocus();
+    }
 
-   public void selectLine(int line) {
-      String text = getText();
-      int lineCnt = 1;
-      int lineStart = 0;
-      int lineEnd = -1;
-      for (int i = 0; i < text.length(); i++) {
-         if (text.charAt(i) == '\n') {
-            lineCnt++;
-            if (lineCnt == line) {
-               lineStart = i;
+    public void selectLine(int line) {
+        String text = getText();
+        int lineCnt = 1;
+        int lineStart = 0;
+        int lineEnd = -1;
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) == '\n') {
+                lineCnt++;
+                if (lineCnt == line) {
+                    lineStart = i;
+                }
+                if (lineCnt == line + 1) {
+                    lineEnd = i;
+                }
             }
-            if (lineCnt == line + 1) {
-               lineEnd = i;
+        }
+        if (lineCnt == -1) {
+            lineEnd = text.length() - 1;
+        }
+        select(lineStart, lineEnd);
+        requestFocus();
+    }
+
+    public long getSelectedOffset() {
+        int pos = getCaretPosition();
+        Highlighting lastH = new Highlighting(0, 0, 0);
+        for (Highlighting h : disassembledHilights) {
+            if (pos < h.startPos) {
+                break;
             }
-         }
-      }
-      if (lineCnt == -1) {
-         lineEnd = text.length() - 1;
-      }
-      select(lineStart, lineEnd);
-      requestFocus();
-   }
+            lastH = h;
+        }
+        return lastH.offset;
+    }
 
-   public long getSelectedOffset() {
-      int pos = getCaretPosition();
-      Highlighting lastH = new Highlighting(0, 0, 0);
-      for (Highlighting h : disassembledHilights) {
-         if (pos < h.startPos) {
-            break;
-         }
-         lastH = h;
-      }
-      return lastH.offset;
-   }
+    @Override
+    public void caretUpdate(CaretEvent e) {
+        if (isEditable()) {
+            return;
+        }
+        if (ignoreCarret) {
+            return;
+        }
+        getCaret().setVisible(true);
 
-   @Override
-   public void caretUpdate(CaretEvent e) {
-      if (isEditable()) {
-         return;
-      }
-      if (ignoreCarret) {
-         return;
-      }
-      getCaret().setVisible(true);
-
-      decompiledEditor.hilightOffset(getSelectedOffset());
-   }
+        decompiledEditor.hilightOffset(getSelectedOffset());
+    }
 }

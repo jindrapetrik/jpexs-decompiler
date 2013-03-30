@@ -25,32 +25,32 @@ import java.io.OutputStream;
 
 public class MetadataTag extends Tag {
 
-   public String xmlMetadata;
+    public String xmlMetadata;
 
-   public MetadataTag(byte[] data, int version, long pos) {
-      super(77, "Metadata", data, pos);
-      try {
-         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-         xmlMetadata = sis.readString();
-      } catch (IOException ex) {
-      }
-   }
+    public MetadataTag(byte[] data, int version, long pos) {
+        super(77, "Metadata", data, pos);
+        try {
+            SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+            xmlMetadata = sis.readString();
+        } catch (IOException ex) {
+        }
+    }
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         sos.writeString(xmlMetadata);
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            sos.writeString(xmlMetadata);
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 }

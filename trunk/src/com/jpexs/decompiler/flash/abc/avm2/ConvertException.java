@@ -18,10 +18,10 @@ package com.jpexs.decompiler.flash.abc.avm2;
 
 public class ConvertException extends RuntimeException {
 
-   public int line;
+    public int line;
 
-   public ConvertException(String s, int line) {
-      super(s + " on line " + line);
-      this.line = line;
-   }
+    public ConvertException(String s, int line) {
+        super(s + " on line " + line);
+        this.line = line;
+    }
 }

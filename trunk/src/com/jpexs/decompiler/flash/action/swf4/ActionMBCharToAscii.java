@@ -25,18 +25,18 @@ import java.util.Stack;
 
 public class ActionMBCharToAscii extends Action {
 
-   public ActionMBCharToAscii() {
-      super(0x36, 0);
-   }
+    public ActionMBCharToAscii() {
+        super(0x36, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "MBCharToAscii";
-   }
+    @Override
+    public String toString() {
+        return "MBCharToAscii";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem a = stack.pop();
-      stack.push(new MBCharToAsciiTreeItem(this, a));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem a = stack.pop();
+        stack.push(new MBCharToAsciiTreeItem(this, a));
+    }
 }

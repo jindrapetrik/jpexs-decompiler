@@ -25,18 +25,18 @@ import java.util.Stack;
 
 public class ActionTargetPath extends Action {
 
-   public ActionTargetPath() {
-      super(0x45, 0);
-   }
+    public ActionTargetPath() {
+        super(0x45, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "TargetPath";
-   }
+    @Override
+    public String toString() {
+        return "TargetPath";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem object = stack.pop();
-      stack.push(new TargetPathTreeItem(this, object));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem object = stack.pop();
+        stack.push(new TargetPathTreeItem(this, object));
+    }
 }

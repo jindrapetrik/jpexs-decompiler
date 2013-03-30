@@ -31,22 +31,22 @@ import java.util.Stack;
 
 public class PushUIntIns extends InstructionDefinition implements PushIntegerTypeIns {
 
-   public PushUIntIns() {
-      super(0x2e, "pushuint", new int[]{AVM2Code.DAT_UINT_INDEX});
-   }
+    public PushUIntIns() {
+        super(0x2e, "pushuint", new int[]{AVM2Code.DAT_UINT_INDEX});
+    }
 
-   @Override
-   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-      lda.operandStack.push(arguments.get(0));
-   }
+    @Override
+    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        lda.operandStack.push(arguments.get(0));
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      stack.push(new IntegerValueTreeItem(ins, constants.constant_uint[ins.operands[0]]));
-   }
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        stack.push(new IntegerValueTreeItem(ins, constants.constant_uint[ins.operands[0]]));
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return 1;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return 1;
+    }
 }

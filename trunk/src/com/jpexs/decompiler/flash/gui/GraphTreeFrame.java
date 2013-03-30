@@ -32,51 +32,51 @@ import javax.swing.tree.TreePath;
  */
 public class GraphTreeFrame extends JFrame {
 
-   public JTree graphTree;
+    public JTree graphTree;
 
-   public GraphTreeFrame(final AVM2Graph graph) {
-      setSize(400, 400);
-      graphTree = new JTree(new TreeModel() {
-         @Override
-         public Object getRoot() {
-            return graph.heads.get(0);
-         }
+    public GraphTreeFrame(final AVM2Graph graph) {
+        setSize(400, 400);
+        graphTree = new JTree(new TreeModel() {
+            @Override
+            public Object getRoot() {
+                return graph.heads.get(0);
+            }
 
-         @Override
-         public Object getChild(Object parent, int index) {
-            return ((GraphPart) parent).nextParts.get(index);
-         }
+            @Override
+            public Object getChild(Object parent, int index) {
+                return ((GraphPart) parent).nextParts.get(index);
+            }
 
-         @Override
-         public int getChildCount(Object parent) {
-            return ((GraphPart) parent).nextParts.size();
-         }
+            @Override
+            public int getChildCount(Object parent) {
+                return ((GraphPart) parent).nextParts.size();
+            }
 
-         @Override
-         public boolean isLeaf(Object node) {
-            return getChildCount(node) == 0;
-         }
+            @Override
+            public boolean isLeaf(Object node) {
+                return getChildCount(node) == 0;
+            }
 
-         @Override
-         public void valueForPathChanged(TreePath path, Object newValue) {
-         }
+            @Override
+            public void valueForPathChanged(TreePath path, Object newValue) {
+            }
 
-         @Override
-         public int getIndexOfChild(Object parent, Object child) {
-            return ((GraphPart) parent).nextParts.indexOf(child);
-         }
+            @Override
+            public int getIndexOfChild(Object parent, Object child) {
+                return ((GraphPart) parent).nextParts.indexOf(child);
+            }
 
-         @Override
-         public void addTreeModelListener(TreeModelListener l) {
-         }
+            @Override
+            public void addTreeModelListener(TreeModelListener l) {
+            }
 
-         @Override
-         public void removeTreeModelListener(TreeModelListener l) {
-         }
-      });
+            @Override
+            public void removeTreeModelListener(TreeModelListener l) {
+            }
+        });
 
-      Container cnt = getContentPane();
-      cnt.setLayout(new BorderLayout());
-      cnt.add(graphTree, BorderLayout.CENTER);
-   }
+        Container cnt = getContentPane();
+        cnt.setLayout(new BorderLayout());
+        cnt.add(graphTree, BorderLayout.CENTER);
+    }
 }

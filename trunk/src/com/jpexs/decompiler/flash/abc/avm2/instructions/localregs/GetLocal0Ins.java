@@ -31,31 +31,31 @@ import java.util.Stack;
 
 public class GetLocal0Ins extends InstructionDefinition implements GetLocalTypeIns {
 
-   public GetLocal0Ins() {
-      super(0xd0, "getlocal_0", new int[]{});
-   }
+    public GetLocal0Ins() {
+        super(0xd0, "getlocal_0", new int[]{});
+    }
 
-   @Override
-   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-      lda.operandStack.push(lda.localRegisters.get(0));
-   }
+    @Override
+    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        lda.operandStack.push(lda.localRegisters.get(0));
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      if (isStatic) {
-         stack.push(new ClassTreeItem(abc.instance_info[classIndex].getName(constants)));
-      } else {
-         stack.push(new ThisTreeItem(abc.instance_info[classIndex].getName(constants)));
-      }
-   }
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        if (isStatic) {
+            stack.push(new ClassTreeItem(abc.instance_info[classIndex].getName(constants)));
+        } else {
+            stack.push(new ThisTreeItem(abc.instance_info[classIndex].getName(constants)));
+        }
+    }
 
-   @Override
-   public int getRegisterId(AVM2Instruction par0) {
-      return 0;
-   }
+    @Override
+    public int getRegisterId(AVM2Instruction par0) {
+        return 0;
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return 1;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return 1;
+    }
 }

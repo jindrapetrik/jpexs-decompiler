@@ -20,15 +20,15 @@ import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 
 public class StrictModeTreeItem extends TreeItem {
 
-   public int mode;
+    public int mode;
 
-   public StrictModeTreeItem(GraphSourceItem instruction, int mode) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.mode = mode;
-   }
+    public StrictModeTreeItem(GraphSourceItem instruction, int mode) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.mode = mode;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return "StrictMode(" + mode + ");"; //I still don't know how AS source of Strict Mode instruction looks like, assuming this...
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return "StrictMode(" + mode + ");"; //I still don't know how AS source of Strict Mode instruction looks like, assuming this...
+    }
 }

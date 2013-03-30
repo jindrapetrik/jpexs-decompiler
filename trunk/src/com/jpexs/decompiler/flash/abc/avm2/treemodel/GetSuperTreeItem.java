@@ -25,21 +25,21 @@ import java.util.List;
 
 public class GetSuperTreeItem extends TreeItem {
 
-   public GraphTargetItem object;
-   public FullMultinameTreeItem propertyName;
+    public GraphTargetItem object;
+    public FullMultinameTreeItem propertyName;
 
-   public GetSuperTreeItem(AVM2Instruction instruction, GraphTargetItem object, FullMultinameTreeItem propertyName) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.object = object;
-      this.propertyName = propertyName;
-   }
+    public GetSuperTreeItem(AVM2Instruction instruction, GraphTargetItem object, FullMultinameTreeItem propertyName) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.object = object;
+        this.propertyName = propertyName;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      String calee = object.toString(constants, localRegNames, fullyQualifiedNames) + ".";
-      if (Highlighting.stripHilights(calee).equals("this.")) {
-         calee = "";
-      }
-      return calee + hilight("super.") + propertyName.toString(constants, localRegNames, fullyQualifiedNames);
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        String calee = object.toString(constants, localRegNames, fullyQualifiedNames) + ".";
+        if (Highlighting.stripHilights(calee).equals("this.")) {
+            calee = "";
+        }
+        return calee + hilight("super.") + propertyName.toString(constants, localRegNames, fullyQualifiedNames);
+    }
 }

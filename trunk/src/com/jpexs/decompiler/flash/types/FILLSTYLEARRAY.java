@@ -22,5 +22,5 @@ package com.jpexs.decompiler.flash.types;
  */
 public class FILLSTYLEARRAY {
 
-   public FILLSTYLE fillStyles[];
+    public FILLSTYLE fillStyles[];
 }

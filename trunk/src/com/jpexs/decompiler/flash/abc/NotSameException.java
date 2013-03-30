@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.helpers.Helper;
 
 public class NotSameException extends RuntimeException {
 
-   public NotSameException(long pos) {
-      super("Streams are not the same at pos " + Helper.formatHex((int) pos, 8));
-   }
+    public NotSameException(long pos) {
+        super("Streams are not the same at pos " + Helper.formatHex((int) pos, 8));
+    }
 }

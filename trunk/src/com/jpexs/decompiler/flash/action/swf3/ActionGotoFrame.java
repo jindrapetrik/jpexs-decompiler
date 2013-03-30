@@ -31,37 +31,37 @@ import java.util.Stack;
 
 public class ActionGotoFrame extends Action {
 
-   public int frame;
+    public int frame;
 
-   public ActionGotoFrame(SWFInputStream sis) throws IOException {
-      super(0x81, 2);
-      frame = sis.readUI16();
-   }
+    public ActionGotoFrame(SWFInputStream sis) throws IOException {
+        super(0x81, 2);
+        frame = sis.readUI16();
+    }
 
-   @Override
-   public String toString() {
-      return "GotoFrame " + frame;
-   }
+    @Override
+    public String toString() {
+        return "GotoFrame " + frame;
+    }
 
-   @Override
-   public byte[] getBytes(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      SWFOutputStream sos = new SWFOutputStream(baos, version);
-      try {
-         sos.writeUI16(frame);
-         sos.close();
-      } catch (IOException e) {
-      }
-      return surroundWithAction(baos.toByteArray(), version);
-   }
+    @Override
+    public byte[] getBytes(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SWFOutputStream sos = new SWFOutputStream(baos, version);
+        try {
+            sos.writeUI16(frame);
+            sos.close();
+        } catch (IOException e) {
+        }
+        return surroundWithAction(baos.toByteArray(), version);
+    }
 
-   public ActionGotoFrame(FlasmLexer lexer) throws IOException, ParseException {
-      super(0x81, 0);
-      frame = (int) lexLong(lexer);
-   }
+    public ActionGotoFrame(FlasmLexer lexer) throws IOException, ParseException {
+        super(0x81, 0);
+        frame = (int) lexLong(lexer);
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      output.add(new GotoFrameTreeItem(this, frame));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        output.add(new GotoFrameTreeItem(this, frame));
+    }
 }

@@ -24,17 +24,17 @@ import java.util.List;
 
 public class InTreeItem extends TreeItem {
 
-   public GraphTargetItem object;
-   public GraphTargetItem collection;
+    public GraphTargetItem object;
+    public GraphTargetItem collection;
 
-   public InTreeItem(AVM2Instruction instruction, GraphTargetItem object, GraphTargetItem collection) {
-      super(instruction, NOPRECEDENCE);
-      this.object = object;
-      this.collection = collection;
-   }
+    public InTreeItem(AVM2Instruction instruction, GraphTargetItem object, GraphTargetItem collection) {
+        super(instruction, NOPRECEDENCE);
+        this.object = object;
+        this.collection = collection;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return object.toString(constants, localRegNames, fullyQualifiedNames) + hilight(" in ") + collection.toString(constants, localRegNames, fullyQualifiedNames);
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return object.toString(constants, localRegNames, fullyQualifiedNames) + hilight(" in ") + collection.toString(constants, localRegNames, fullyQualifiedNames);
+    }
 }

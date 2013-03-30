@@ -20,19 +20,19 @@ import java.util.List;
 
 public class OrItem extends BinaryOpItem {
 
-   public GraphPart firstPart;
+    public GraphPart firstPart;
 
-   public OrItem(GraphSourceItem src, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-      super(src, PRECEDENCE_LOGICALOR, leftSide, rightSide, "||");
-      this.leftSide = leftSide;
-      this.rightSide = rightSide;
-   }
+    public OrItem(GraphSourceItem src, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(src, PRECEDENCE_LOGICALOR, leftSide, rightSide, "||");
+        this.leftSide = leftSide;
+        this.rightSide = rightSide;
+    }
 
-   @Override
-   public List<GraphSourceItemPos> getNeededSources() {
-      List<GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(leftSide.getNeededSources());
-      ret.addAll(rightSide.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<GraphSourceItemPos> getNeededSources() {
+        List<GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(leftSide.getNeededSources());
+        ret.addAll(rightSide.getNeededSources());
+        return ret;
+    }
 }

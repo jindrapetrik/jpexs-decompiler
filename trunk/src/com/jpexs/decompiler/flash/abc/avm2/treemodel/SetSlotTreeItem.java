@@ -26,50 +26,50 @@ import java.util.List;
 
 public class SetSlotTreeItem extends TreeItem implements SetTypeTreeItem, AssignmentTreeItem {
 
-   public Multiname slotName;
-   public GraphTargetItem value;
-   public GraphTargetItem scope;
+    public Multiname slotName;
+    public GraphTargetItem value;
+    public GraphTargetItem scope;
 
-   public SetSlotTreeItem(AVM2Instruction instruction, GraphTargetItem scope, Multiname slotName, GraphTargetItem value) {
-      super(instruction, PRECEDENCE_ASSIGMENT);
-      this.slotName = slotName;
-      this.value = value;
-      this.scope = scope;
-   }
+    public SetSlotTreeItem(AVM2Instruction instruction, GraphTargetItem scope, Multiname slotName, GraphTargetItem value) {
+        super(instruction, PRECEDENCE_ASSIGMENT);
+        this.slotName = slotName;
+        this.value = value;
+        this.scope = scope;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
 
-      return getName(constants, localRegNames, fullyQualifiedNames) + hilight("=") + value.toString(constants, localRegNames, fullyQualifiedNames);
-   }
+        return getName(constants, localRegNames, fullyQualifiedNames) + hilight("=") + value.toString(constants, localRegNames, fullyQualifiedNames);
+    }
 
-   public String getName(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      String ret = "";
+    public String getName(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        String ret = "";
 
-      /*ret = scope.toString(constants, localRegNames) + ".";
-       if (!(scope instanceof NewActivationTreeItem)) {
-       ret = scope.toString(constants, localRegNames) + ".";
-       }
-       if (scope instanceof LocalRegTreeItem) {
-       if (((LocalRegTreeItem) scope).computedValue != null) {
-       if (((LocalRegTreeItem) scope).computedValue instanceof NewActivationTreeItem) {
-       ret = "";
-       }
-       }
-       }*/
-      if (slotName == null) {
-         return ret + "/*UnknownSlot*/";
-      }
-      return ret + hilight(slotName.getName(constants, fullyQualifiedNames));
-   }
+        /*ret = scope.toString(constants, localRegNames) + ".";
+         if (!(scope instanceof NewActivationTreeItem)) {
+         ret = scope.toString(constants, localRegNames) + ".";
+         }
+         if (scope instanceof LocalRegTreeItem) {
+         if (((LocalRegTreeItem) scope).computedValue != null) {
+         if (((LocalRegTreeItem) scope).computedValue instanceof NewActivationTreeItem) {
+         ret = "";
+         }
+         }
+         }*/
+        if (slotName == null) {
+            return ret + "/*UnknownSlot*/";
+        }
+        return ret + hilight(slotName.getName(constants, fullyQualifiedNames));
+    }
 
-   @Override
-   public GraphTargetItem getObject() {
-      return new GetSlotTreeItem(instruction, scope, slotName);
-   }
+    @Override
+    public GraphTargetItem getObject() {
+        return new GetSlotTreeItem(instruction, scope, slotName);
+    }
 
-   @Override
-   public GraphTargetItem getValue() {
-      return value;
-   }
+    @Override
+    public GraphTargetItem getValue() {
+        return value;
+    }
 }

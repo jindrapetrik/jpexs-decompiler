@@ -31,73 +31,73 @@ import javax.swing.SwingConstants;
  */
 public class AboutDialog extends JDialog {
 
-   public AboutDialog() {
-      setDefaultCloseOperation(HIDE_ON_CLOSE);
-      setSize(new Dimension(300, 270));
-      setTitle("About");
+    public AboutDialog() {
+        setDefaultCloseOperation(HIDE_ON_CLOSE);
+        setSize(new Dimension(300, 270));
+        setTitle("About");
 
 
-      Container cp = getContentPane();
-      cp.setLayout(new FlowLayout());
+        Container cp = getContentPane();
+        cp.setLayout(new FlowLayout());
 
-      JLabel jpLabel = new JLabel("JPEXS");
-      jpLabel.setForeground(new Color(0, 0, 160));
-      jpLabel.setFont(new Font("Tahoma", Font.BOLD, 25));
-      jpLabel.setHorizontalAlignment(SwingConstants.CENTER);
-      cp.add(jpLabel);
+        JLabel jpLabel = new JLabel("JPEXS");
+        jpLabel.setForeground(new Color(0, 0, 160));
+        jpLabel.setFont(new Font("Tahoma", Font.BOLD, 25));
+        jpLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        cp.add(jpLabel);
 
-      JLabel asLabel = new JLabel("Free Flash");
-      asLabel.setFont(new Font("Tahoma", Font.BOLD, 25));
-      asLabel.setHorizontalAlignment(SwingConstants.CENTER);
-      cp.add(asLabel);
+        JLabel asLabel = new JLabel("Free Flash");
+        asLabel.setFont(new Font("Tahoma", Font.BOLD, 25));
+        asLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        cp.add(asLabel);
 
-      JLabel decLabel = new JLabel("Decompiler");
-      decLabel.setForeground(Color.red);
-      decLabel.setFont(new Font("Tahoma", Font.BOLD, 25));
-      decLabel.setHorizontalAlignment(SwingConstants.CENTER);
-      cp.add(decLabel);
+        JLabel decLabel = new JLabel("Decompiler");
+        decLabel.setForeground(Color.red);
+        decLabel.setFont(new Font("Tahoma", Font.BOLD, 25));
+        decLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        cp.add(decLabel);
 
-      JLabel verLabel = new JLabel("version " + Main.version);
-      verLabel.setPreferredSize(new Dimension(300, 15));
-      verLabel.setFont(new Font("Tahoma", Font.BOLD, 15));
-      verLabel.setHorizontalAlignment(SwingConstants.CENTER);
-      cp.add(verLabel);
+        JLabel verLabel = new JLabel("version " + Main.version);
+        verLabel.setPreferredSize(new Dimension(300, 15));
+        verLabel.setFont(new Font("Tahoma", Font.BOLD, 15));
+        verLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        cp.add(verLabel);
 
 
-      JLabel byLabel = new JLabel("by");
-      byLabel.setPreferredSize(new Dimension(300, 15));
-      byLabel.setHorizontalAlignment(SwingConstants.CENTER);
-      cp.add(byLabel);
+        JLabel byLabel = new JLabel("by");
+        byLabel.setPreferredSize(new Dimension(300, 15));
+        byLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        cp.add(byLabel);
 
-      JLabel jpexsLabel = new JLabel("JPEXS");
-      jpexsLabel.setForeground(new Color(0, 0, 160));
-      jpexsLabel.setFont(new Font("Tahoma", Font.BOLD, 20));
-      jpexsLabel.setPreferredSize(new Dimension(300, 25));
-      jpexsLabel.setHorizontalAlignment(SwingConstants.CENTER);
-      cp.add(jpexsLabel);
+        JLabel jpexsLabel = new JLabel("JPEXS");
+        jpexsLabel.setForeground(new Color(0, 0, 160));
+        jpexsLabel.setFont(new Font("Tahoma", Font.BOLD, 20));
+        jpexsLabel.setPreferredSize(new Dimension(300, 25));
+        jpexsLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        cp.add(jpexsLabel);
 
-      JLabel dateLabel = new JLabel("2010-2013");
-      dateLabel.setPreferredSize(new Dimension(300, 10));
-      dateLabel.setHorizontalAlignment(SwingConstants.CENTER);
-      cp.add(dateLabel);
+        JLabel dateLabel = new JLabel("2010-2013");
+        dateLabel.setPreferredSize(new Dimension(300, 10));
+        dateLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        cp.add(dateLabel);
 
-      LinkLabel wwwLabel = new LinkLabel(Main.projectPage);
-      wwwLabel.setForeground(Color.blue);
-      wwwLabel.setPreferredSize(new Dimension(300, 25));
-      wwwLabel.setHorizontalAlignment(SwingConstants.CENTER);
-      cp.add(wwwLabel);
+        LinkLabel wwwLabel = new LinkLabel(Main.projectPage);
+        wwwLabel.setForeground(Color.blue);
+        wwwLabel.setPreferredSize(new Dimension(300, 25));
+        wwwLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        cp.add(wwwLabel);
 
-      JButton okButton = new JButton("OK");
-      cp.add(okButton);
-      okButton.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent e) {
-            setVisible(false);
-         }
-      });
-      getRootPane().setDefaultButton(okButton);
-      setModal(true);
-      View.centerScreen(this);
-      View.setWindowIcon(this);
-   }
+        JButton okButton = new JButton("OK");
+        cp.add(okButton);
+        okButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setVisible(false);
+            }
+        });
+        getRootPane().setDefaultButton(okButton);
+        setModal(true);
+        View.centerScreen(this);
+        View.setWindowIcon(this);
+    }
 }

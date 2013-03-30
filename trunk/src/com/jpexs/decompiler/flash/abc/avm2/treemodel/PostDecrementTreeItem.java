@@ -26,15 +26,15 @@ import java.util.List;
 
 public class PostDecrementTreeItem extends TreeItem implements AssignmentTreeItem {
 
-   public GraphTargetItem object;
+    public GraphTargetItem object;
 
-   public PostDecrementTreeItem(AVM2Instruction instruction, GraphTargetItem object) {
-      super(instruction, PRECEDENCE_POSTFIX);
-      this.object = object;
-   }
+    public PostDecrementTreeItem(AVM2Instruction instruction, GraphTargetItem object) {
+        super(instruction, PRECEDENCE_POSTFIX);
+        this.object = object;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return object.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + hilight("--");
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return object.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + hilight("--");
+    }
 }

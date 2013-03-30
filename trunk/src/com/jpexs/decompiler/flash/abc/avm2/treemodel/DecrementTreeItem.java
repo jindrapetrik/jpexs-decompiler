@@ -24,15 +24,15 @@ import java.util.List;
 
 public class DecrementTreeItem extends TreeItem {
 
-   public GraphTargetItem object;
+    public GraphTargetItem object;
 
-   public DecrementTreeItem(AVM2Instruction instruction, GraphTargetItem object) {
-      super(instruction, PRECEDENCE_ADDITIVE);
-      this.object = object;
-   }
+    public DecrementTreeItem(AVM2Instruction instruction, GraphTargetItem object) {
+        super(instruction, PRECEDENCE_ADDITIVE);
+        this.object = object;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return object.toString(constants, localRegNames, fullyQualifiedNames) + hilight("-1");
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return object.toString(constants, localRegNames, fullyQualifiedNames) + hilight("-1");
+    }
 }

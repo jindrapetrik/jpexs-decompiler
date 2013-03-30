@@ -22,15 +22,15 @@ package com.jpexs.decompiler.flash.types;
  */
 public class GRADIENT {
 
-   public int spreadMode;
-   public static final int SPREAD_PAD_MODE = 0;
-   public static final int SPREAD_REFLECT_MODE = 1;
-   public static final int SPREAD_REPAT_MODE = 2;
-   public static final int SPREAD_RESERVED = 3;
-   public int interPolationMode;
-   public static final int INTERPOLATION_RGB_MODE = 0;
-   public static final int INTERPOLATION_LINEAR_RGB_MODE = 1;
-   public static final int INTERPOLATION_RESERVED1 = 2;
-   public static final int INTERPOLATION_RESERVED2 = 3;
-   public GRADRECORD gradientRecords[];
+    public int spreadMode;
+    public static final int SPREAD_PAD_MODE = 0;
+    public static final int SPREAD_REFLECT_MODE = 1;
+    public static final int SPREAD_REPAT_MODE = 2;
+    public static final int SPREAD_RESERVED = 3;
+    public int interPolationMode;
+    public static final int INTERPOLATION_RGB_MODE = 0;
+    public static final int INTERPOLATION_LINEAR_RGB_MODE = 1;
+    public static final int INTERPOLATION_RESERVED1 = 2;
+    public static final int INTERPOLATION_RESERVED2 = 3;
+    public GRADRECORD gradientRecords[];
 }

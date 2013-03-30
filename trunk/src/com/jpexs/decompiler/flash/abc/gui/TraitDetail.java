@@ -22,7 +22,7 @@ package com.jpexs.decompiler.flash.abc.gui;
  */
 public interface TraitDetail {
 
-   public void setEditMode(boolean val);
+    public void setEditMode(boolean val);
 
-   public boolean save();
+    public boolean save();
 }

@@ -40,79 +40,79 @@ import java.util.Set;
  */
 public class DefineText2Tag extends CharacterTag implements BoundedTag {
 
-   public int characterID;
-   public RECT textBounds;
-   public MATRIX textMatrix;
-   public int glyphBits;
-   public int advanceBits;
-   public List<TEXTRECORD> textRecords;
+    public int characterID;
+    public RECT textBounds;
+    public MATRIX textMatrix;
+    public int glyphBits;
+    public int advanceBits;
+    public List<TEXTRECORD> textRecords;
 
-   @Override
-   public RECT getRect(HashMap<Integer, CharacterTag> characters) {
-      return textBounds;
-   }
+    @Override
+    public RECT getRect(HashMap<Integer, CharacterTag> characters) {
+        return textBounds;
+    }
 
-   @Override
-   public int getCharacterID() {
-      return characterID;
-   }
+    @Override
+    public int getCharacterID() {
+        return characterID;
+    }
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         sos.writeUI16(characterID);
-         sos.writeRECT(textBounds);
-         sos.writeMatrix(textMatrix);
-         sos.writeUI8(glyphBits);
-         sos.writeUI8(advanceBits);
-         for (TEXTRECORD tr : textRecords) {
-            sos.writeTEXTRECORD(tr, true, glyphBits, advanceBits);
-         }
-         sos.writeUI8(0);
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            sos.writeUI16(characterID);
+            sos.writeRECT(textBounds);
+            sos.writeMatrix(textMatrix);
+            sos.writeUI8(glyphBits);
+            sos.writeUI8(advanceBits);
+            for (TEXTRECORD tr : textRecords) {
+                sos.writeTEXTRECORD(tr, true, glyphBits, advanceBits);
+            }
+            sos.writeUI8(0);
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 
-   /**
-    * Constructor
-    *
-    * @param data Data bytes
-    * @param version SWF version
-    * @throws IOException
-    */
-   public DefineText2Tag(byte data[], int version, long pos) throws IOException {
-      super(33, "DefineText2", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      characterID = sis.readUI16();
-      textBounds = sis.readRECT();
-      textMatrix = sis.readMatrix();
-      glyphBits = sis.readUI8();
-      advanceBits = sis.readUI8();
-      textRecords = new ArrayList<TEXTRECORD>();
-      TEXTRECORD tr;
-      while ((tr = sis.readTEXTRECORD(true, glyphBits, advanceBits)) != null) {
-         textRecords.add(tr);
-      }
-   }
+    /**
+     * Constructor
+     *
+     * @param data Data bytes
+     * @param version SWF version
+     * @throws IOException
+     */
+    public DefineText2Tag(byte data[], int version, long pos) throws IOException {
+        super(33, "DefineText2", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        characterID = sis.readUI16();
+        textBounds = sis.readRECT();
+        textMatrix = sis.readMatrix();
+        glyphBits = sis.readUI8();
+        advanceBits = sis.readUI8();
+        textRecords = new ArrayList<TEXTRECORD>();
+        TEXTRECORD tr;
+        while ((tr = sis.readTEXTRECORD(true, glyphBits, advanceBits)) != null) {
+            textRecords.add(tr);
+        }
+    }
 
-   @Override
-   public Set<Integer> getNeededCharacters() {
-      Set<Integer> ret = new HashSet<Integer>();
-      for (TEXTRECORD tr : textRecords) {
-         if (tr.styleFlagsHasFont) {
-            ret.add(tr.fontId);
-         }
-      }
-      return ret;
-   }
+    @Override
+    public Set<Integer> getNeededCharacters() {
+        Set<Integer> ret = new HashSet<Integer>();
+        for (TEXTRECORD tr : textRecords) {
+            if (tr.styleFlagsHasFont) {
+                ret.add(tr.fontId);
+            }
+        }
+        return ret;
+    }
 }

@@ -30,35 +30,35 @@ import java.util.Stack;
 
 public class DecrementIIns extends InstructionDefinition {
 
-   public DecrementIIns() {
-      super(0xc1, "decrement_i", new int[]{});
-   }
+    public DecrementIIns() {
+        super(0xc1, "decrement_i", new int[]{});
+    }
 
-   @Override
-   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-      Object obj = lda.operandStack.pop();
-      if (obj instanceof Long) {
-         Long obj2 = ((Long) obj).longValue() - 1;
-         lda.operandStack.push(obj2);
-      } else if (obj instanceof Double) {
-         Double obj2 = ((Double) obj).doubleValue() - 1;
-         lda.operandStack.push(obj2);
-      }
-      if (obj instanceof String) {
-         Double obj2 = Double.parseDouble((String) obj) - 1;
-         lda.operandStack.push(obj2);
-      } else {
-         throw new RuntimeException("Cannot decrement local register");
-      }
-   }
+    @Override
+    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        Object obj = lda.operandStack.pop();
+        if (obj instanceof Long) {
+            Long obj2 = ((Long) obj).longValue() - 1;
+            lda.operandStack.push(obj2);
+        } else if (obj instanceof Double) {
+            Double obj2 = ((Double) obj).doubleValue() - 1;
+            lda.operandStack.push(obj2);
+        }
+        if (obj instanceof String) {
+            Double obj2 = Double.parseDouble((String) obj) - 1;
+            lda.operandStack.push(obj2);
+        } else {
+            throw new RuntimeException("Cannot decrement local register");
+        }
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      stack.push(new DecrementTreeItem(ins, (GraphTargetItem) stack.pop()));
-   }
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        stack.push(new DecrementTreeItem(ins, (GraphTargetItem) stack.pop()));
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -1 + 1;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return -1 + 1;
+    }
 }

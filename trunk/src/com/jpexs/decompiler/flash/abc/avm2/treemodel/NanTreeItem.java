@@ -23,12 +23,12 @@ import java.util.List;
 
 public class NanTreeItem extends TreeItem {
 
-   public NanTreeItem(AVM2Instruction instruction) {
-      super(instruction, NOPRECEDENCE);
-   }
+    public NanTreeItem(AVM2Instruction instruction) {
+        super(instruction, NOPRECEDENCE);
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return hilight("NaN");
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return hilight("NaN");
+    }
 }

@@ -31,72 +31,72 @@ import java.io.OutputStream;
  */
 public class DefineFontInfo2Tag extends Tag {
 
-   public int fontID;
-   public String fontName;
-   public boolean fontFlagsSmallText;
-   public boolean fontFlagsShiftJIS;
-   public boolean fontFlagsANSI;
-   public boolean fontFlagsItalic;
-   public boolean fontFlagsBold;
-   public boolean fontFlagsWideCodes;
-   public LANGCODE languageCode;
-   public int codeTable[];
+    public int fontID;
+    public String fontName;
+    public boolean fontFlagsSmallText;
+    public boolean fontFlagsShiftJIS;
+    public boolean fontFlagsANSI;
+    public boolean fontFlagsItalic;
+    public boolean fontFlagsBold;
+    public boolean fontFlagsWideCodes;
+    public LANGCODE languageCode;
+    public int codeTable[];
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         sos.writeUI16(fontID);
-         sos.writeUI8(fontName.getBytes().length);
-         sos.write(fontName.getBytes());
-         sos.writeUB(2, 0);
-         sos.writeUB(1, fontFlagsSmallText ? 1 : 0);
-         sos.writeUB(1, fontFlagsShiftJIS ? 1 : 0);
-         sos.writeUB(1, fontFlagsANSI ? 1 : 0);
-         sos.writeUB(1, fontFlagsItalic ? 1 : 0);
-         sos.writeUB(1, fontFlagsBold ? 1 : 0);
-         sos.writeUB(1, fontFlagsWideCodes ? 1 : 0);
-         sos.writeLANGCODE(languageCode);
-         for (int i = 0; i < codeTable.length; i++) {
-            sos.writeUI16(codeTable[i]);
-         }
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            sos.writeUI16(fontID);
+            sos.writeUI8(fontName.getBytes().length);
+            sos.write(fontName.getBytes());
+            sos.writeUB(2, 0);
+            sos.writeUB(1, fontFlagsSmallText ? 1 : 0);
+            sos.writeUB(1, fontFlagsShiftJIS ? 1 : 0);
+            sos.writeUB(1, fontFlagsANSI ? 1 : 0);
+            sos.writeUB(1, fontFlagsItalic ? 1 : 0);
+            sos.writeUB(1, fontFlagsBold ? 1 : 0);
+            sos.writeUB(1, fontFlagsWideCodes ? 1 : 0);
+            sos.writeLANGCODE(languageCode);
+            for (int i = 0; i < codeTable.length; i++) {
+                sos.writeUI16(codeTable[i]);
+            }
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 
-   /**
-    * Constructor
-    *
-    * @param data Data bytes
-    * @param version SWF version
-    * @throws IOException
-    */
-   public DefineFontInfo2Tag(byte data[], int version, long pos) throws IOException {
-      super(62, "DefineFontInfo2", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      fontID = sis.readUI16();
-      int fontNameLen = sis.readUI8();
-      fontName = new String(sis.readBytes(fontNameLen));
-      sis.readUB(2);//reserved
-      fontFlagsSmallText = sis.readUB(1) == 1;
-      fontFlagsShiftJIS = sis.readUB(1) == 1;
-      fontFlagsANSI = sis.readUB(1) == 1;
-      fontFlagsItalic = sis.readUB(1) == 1;
-      fontFlagsBold = sis.readUB(1) == 1;
-      fontFlagsWideCodes = sis.readUB(1) == 1;
-      languageCode = sis.readLANGCODE();
-      codeTable = new int[sis.available() / 2];
-      for (int i = 0; i < codeTable.length; i++) {
-         codeTable[i] = sis.readUI16();
-      }
-   }
+    /**
+     * Constructor
+     *
+     * @param data Data bytes
+     * @param version SWF version
+     * @throws IOException
+     */
+    public DefineFontInfo2Tag(byte data[], int version, long pos) throws IOException {
+        super(62, "DefineFontInfo2", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        fontID = sis.readUI16();
+        int fontNameLen = sis.readUI8();
+        fontName = new String(sis.readBytes(fontNameLen));
+        sis.readUB(2);//reserved
+        fontFlagsSmallText = sis.readUB(1) == 1;
+        fontFlagsShiftJIS = sis.readUB(1) == 1;
+        fontFlagsANSI = sis.readUB(1) == 1;
+        fontFlagsItalic = sis.readUB(1) == 1;
+        fontFlagsBold = sis.readUB(1) == 1;
+        fontFlagsWideCodes = sis.readUB(1) == 1;
+        languageCode = sis.readLANGCODE();
+        codeTable = new int[sis.available() / 2];
+        for (int i = 0; i < codeTable.length; i++) {
+            codeTable[i] = sis.readUI16();
+        }
+    }
 }

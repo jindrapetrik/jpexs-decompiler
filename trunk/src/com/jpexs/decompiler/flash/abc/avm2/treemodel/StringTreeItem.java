@@ -24,15 +24,15 @@ import java.util.List;
 
 public class StringTreeItem extends TreeItem {
 
-   public String value;
+    public String value;
 
-   public StringTreeItem(AVM2Instruction instruction, String value) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.value = value;
-   }
+    public StringTreeItem(AVM2Instruction instruction, String value) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.value = value;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return hilight("\"" + Helper.escapeString(value) + "\"");
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return hilight("\"" + Helper.escapeString(value) + "\"");
+    }
 }

@@ -27,20 +27,20 @@ import java.util.Stack;
 
 public class ActionDelete2 extends Action {
 
-   public ActionDelete2() {
-      super(0x3B, 0);
-   }
+    public ActionDelete2() {
+        super(0x3B, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "Delete2";
-   }
+    @Override
+    public String toString() {
+        return "Delete2";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem propertyName = stack.pop();
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem propertyName = stack.pop();
 
-      output.add(new DeleteTreeItem(this, null, propertyName));
-      stack.push(new DirectValueTreeItem(this, -1, Boolean.TRUE, new ArrayList<String>()));
-   }
+        output.add(new DeleteTreeItem(this, null, propertyName));
+        stack.push(new DirectValueTreeItem(this, -1, Boolean.TRUE, new ArrayList<String>()));
+    }
 }

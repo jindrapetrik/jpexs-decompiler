@@ -29,36 +29,36 @@ import java.util.List;
  */
 public abstract class MethodMultinameUsage extends TraitMultinameUsage {
 
-   public boolean isInitializer;
+    public boolean isInitializer;
 
-   public MethodMultinameUsage(int multinameIndex, int classIndex, int traitIndex, boolean isStatic, boolean isInitializer, Traits traits, int parentTraitIndex) {
-      super(multinameIndex, classIndex, traitIndex, isStatic, traits, parentTraitIndex);
-      this.isInitializer = isInitializer;
-   }
+    public MethodMultinameUsage(int multinameIndex, int classIndex, int traitIndex, boolean isStatic, boolean isInitializer, Traits traits, int parentTraitIndex) {
+        super(multinameIndex, classIndex, traitIndex, isStatic, traits, parentTraitIndex);
+        this.isInitializer = isInitializer;
+    }
 
-   public boolean isInitializer() {
-      return isInitializer;
-   }
+    public boolean isInitializer() {
+        return isInitializer;
+    }
 
-   @Override
-   public String toString(List<DoABCTag> abcTags, ABC abc) {
-      return super.toString(abcTags, abc) + " " + (isInitializer
-              ? (isStatic
-              ? "class initializer"
-              : "instance initializer")
-              : ((parentTraitIndex > -1
-              ? (isStatic
-              ? (((TraitMethodGetterSetter) abc.class_info[classIndex].static_traits.traits[parentTraitIndex]).convertHeader("", abcTags, abc, isStatic, false, classIndex, false, new ArrayList<String>()))
-              : (((TraitMethodGetterSetter) abc.instance_info[classIndex].instance_traits.traits[parentTraitIndex]).convertHeader("", abcTags, abc, isStatic, false, classIndex, false, new ArrayList<String>()))) + " "
-              : "")
-              + (((TraitMethodGetterSetter) traits.traits[traitIndex]).convertHeader("", abcTags, abc, isStatic, false, classIndex, false, new ArrayList<String>()))));
-   }
+    @Override
+    public String toString(List<DoABCTag> abcTags, ABC abc) {
+        return super.toString(abcTags, abc) + " " + (isInitializer
+                ? (isStatic
+                ? "class initializer"
+                : "instance initializer")
+                : ((parentTraitIndex > -1
+                ? (isStatic
+                ? (((TraitMethodGetterSetter) abc.class_info[classIndex].static_traits.traits[parentTraitIndex]).convertHeader("", abcTags, abc, isStatic, false, classIndex, false, new ArrayList<String>()))
+                : (((TraitMethodGetterSetter) abc.instance_info[classIndex].instance_traits.traits[parentTraitIndex]).convertHeader("", abcTags, abc, isStatic, false, classIndex, false, new ArrayList<String>()))) + " "
+                : "")
+                + (((TraitMethodGetterSetter) traits.traits[traitIndex]).convertHeader("", abcTags, abc, isStatic, false, classIndex, false, new ArrayList<String>()))));
+    }
 
-   public int getTraitIndex() {
-      return traitIndex;
-   }
+    public int getTraitIndex() {
+        return traitIndex;
+    }
 
-   public boolean isStatic() {
-      return isStatic;
-   }
+    public boolean isStatic() {
+        return isStatic;
+    }
 }

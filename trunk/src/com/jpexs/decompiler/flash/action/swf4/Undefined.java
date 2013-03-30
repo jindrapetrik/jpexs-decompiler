@@ -18,8 +18,8 @@ package com.jpexs.decompiler.flash.action.swf4;
 
 public class Undefined {
 
-   @Override
-   public String toString() {
-      return "undefined";
-   }
+    @Override
+    public String toString() {
+        return "undefined";
+    }
 }

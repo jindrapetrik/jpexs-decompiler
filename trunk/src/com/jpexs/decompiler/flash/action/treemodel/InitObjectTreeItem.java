@@ -22,36 +22,36 @@ import java.util.List;
 
 public class InitObjectTreeItem extends TreeItem {
 
-   public List<GraphTargetItem> names;
-   public List<GraphTargetItem> values;
+    public List<GraphTargetItem> names;
+    public List<GraphTargetItem> values;
 
-   public InitObjectTreeItem(GraphSourceItem instruction, List<GraphTargetItem> names, List<GraphTargetItem> values) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.values = values;
-      this.names = names;
-   }
+    public InitObjectTreeItem(GraphSourceItem instruction, List<GraphTargetItem> names, List<GraphTargetItem> values) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.values = values;
+        this.names = names;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      String objStr = "";
-      for (int i = 0; i < values.size(); i++) {
-         if (i > 0) {
-            objStr += hilight(",");
-         }
-         objStr += names.get(i).toString(constants) + hilight(":") + values.get(i).toString(constants);
-      }
-      return hilight("{") + objStr + hilight("}");
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        String objStr = "";
+        for (int i = 0; i < values.size(); i++) {
+            if (i > 0) {
+                objStr += hilight(",");
+            }
+            objStr += names.get(i).toString(constants) + hilight(":") + values.get(i).toString(constants);
+        }
+        return hilight("{") + objStr + hilight("}");
+    }
 
-   @Override
-   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      for (GraphTargetItem name : names) {
-         ret.addAll(name.getNeededSources());
-      }
-      for (GraphTargetItem value : values) {
-         ret.addAll(value.getNeededSources());
-      }
-      return ret;
-   }
+    @Override
+    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        for (GraphTargetItem name : names) {
+            ret.addAll(name.getNeededSources());
+        }
+        for (GraphTargetItem value : values) {
+            ret.addAll(value.getNeededSources());
+        }
+        return ret;
+    }
 }

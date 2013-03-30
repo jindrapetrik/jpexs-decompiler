@@ -30,106 +30,106 @@ import javax.swing.event.ChangeListener;
  */
 public class MethodBodyParamsPanel extends JPanel implements ChangeListener {
 
-   public JLabel maxStackLabel = new JLabel("Max stack:", SwingConstants.RIGHT);
-   public JFormattedTextField maxStackField = new JFormattedTextField(NumberFormat.getNumberInstance());
-   public JLabel localCountLabel = new JLabel("Local registers count:", SwingConstants.RIGHT);
-   public JFormattedTextField localCountField = new JFormattedTextField(NumberFormat.getNumberInstance());
-   public JLabel initScopeDepthLabel = new JLabel("Minimum scope depth:", SwingConstants.RIGHT);
-   public JFormattedTextField initScopeDepthField = new JFormattedTextField(NumberFormat.getNumberInstance());
-   public JLabel maxScopeDepthLabel = new JLabel("Maximum scope depth:", SwingConstants.RIGHT);
-   public JFormattedTextField maxScopeDepthField = new JFormattedTextField(NumberFormat.getNumberInstance());
-   public MethodBody body;
-   public JCheckBox autoFillCheckBox = new JCheckBox("Auto fill on code save (GLOBAL SETTING)");
-   public JLabel experimentalLabel = new JLabel("...EXPERIMENTAL");
-   private ABCPanel abcPanel;
+    public JLabel maxStackLabel = new JLabel("Max stack:", SwingConstants.RIGHT);
+    public JFormattedTextField maxStackField = new JFormattedTextField(NumberFormat.getNumberInstance());
+    public JLabel localCountLabel = new JLabel("Local registers count:", SwingConstants.RIGHT);
+    public JFormattedTextField localCountField = new JFormattedTextField(NumberFormat.getNumberInstance());
+    public JLabel initScopeDepthLabel = new JLabel("Minimum scope depth:", SwingConstants.RIGHT);
+    public JFormattedTextField initScopeDepthField = new JFormattedTextField(NumberFormat.getNumberInstance());
+    public JLabel maxScopeDepthLabel = new JLabel("Maximum scope depth:", SwingConstants.RIGHT);
+    public JFormattedTextField maxScopeDepthField = new JFormattedTextField(NumberFormat.getNumberInstance());
+    public MethodBody body;
+    public JCheckBox autoFillCheckBox = new JCheckBox("Auto fill on code save (GLOBAL SETTING)");
+    public JLabel experimentalLabel = new JLabel("...EXPERIMENTAL");
+    private ABCPanel abcPanel;
 
-   public MethodBodyParamsPanel(ABCPanel abcPanel) {
-      setLayout(null);
-      this.abcPanel = abcPanel;
+    public MethodBodyParamsPanel(ABCPanel abcPanel) {
+        setLayout(null);
+        this.abcPanel = abcPanel;
 
-      maxStackLabel.setBounds(10, 10, 150, 25);
-      maxStackField.setBounds(10 + 150 + 10, 10, 75, 25);
-      add(maxStackLabel);
-      add(maxStackField);
+        maxStackLabel.setBounds(10, 10, 150, 25);
+        maxStackField.setBounds(10 + 150 + 10, 10, 75, 25);
+        add(maxStackLabel);
+        add(maxStackField);
 
-      localCountLabel.setBounds(10, 10 + 30, 150, 25);
-      localCountField.setBounds(10 + 150 + 10, 10 + 30, 75, 25);
-      add(localCountLabel);
-      add(localCountField);
+        localCountLabel.setBounds(10, 10 + 30, 150, 25);
+        localCountField.setBounds(10 + 150 + 10, 10 + 30, 75, 25);
+        add(localCountLabel);
+        add(localCountField);
 
-      initScopeDepthLabel.setBounds(10, 10 + 30 + 30, 150, 25);
-      initScopeDepthField.setBounds(10 + 150 + 10, 10 + 30 + 30, 75, 25);
-      add(initScopeDepthLabel);
-      add(initScopeDepthField);
+        initScopeDepthLabel.setBounds(10, 10 + 30 + 30, 150, 25);
+        initScopeDepthField.setBounds(10 + 150 + 10, 10 + 30 + 30, 75, 25);
+        add(initScopeDepthLabel);
+        add(initScopeDepthField);
 
-      maxScopeDepthLabel.setBounds(10, 10 + 30 + 30 + 30, 150, 25);
-      maxScopeDepthField.setBounds(10 + 150 + 10, 10 + 30 + 30 + 30, 75, 25);
-      add(maxScopeDepthLabel);
-      add(maxScopeDepthField);
+        maxScopeDepthLabel.setBounds(10, 10 + 30 + 30 + 30, 150, 25);
+        maxScopeDepthField.setBounds(10 + 150 + 10, 10 + 30 + 30 + 30, 75, 25);
+        add(maxScopeDepthLabel);
+        add(maxScopeDepthField);
 
-      autoFillCheckBox.setBounds(30, 10 + 30 + 30 + 30 + 30, 230, 25);
-      add(autoFillCheckBox);
-      autoFillCheckBox.addChangeListener(this);
+        autoFillCheckBox.setBounds(30, 10 + 30 + 30 + 30 + 30, 230, 25);
+        add(autoFillCheckBox);
+        autoFillCheckBox.addChangeListener(this);
 
-      experimentalLabel.setForeground(Color.red);
-      experimentalLabel.setBounds(250, 10 + 30 + 30 + 30 + 30, 100, 25);
-      add(experimentalLabel);
+        experimentalLabel.setForeground(Color.red);
+        experimentalLabel.setBounds(250, 10 + 30 + 30 + 30 + 30, 100, 25);
+        add(experimentalLabel);
 
-      setPreferredSize(new Dimension(300, 150));
-   }
+        setPreferredSize(new Dimension(300, 150));
+    }
 
-   public void loadFromBody(MethodBody body) {
-      this.body = body;
-      if (body == null) {
-         maxStackField.setText("0");
-         localCountField.setText("0");
-         initScopeDepthField.setText("0");
-         maxScopeDepthField.setText("0");
-         return;
-      }
-      maxStackField.setText("" + body.max_stack);
-      localCountField.setText("" + body.max_regs);
-      initScopeDepthField.setText("" + body.init_scope_depth);
-      maxScopeDepthField.setText("" + body.max_scope_depth);
-   }
+    public void loadFromBody(MethodBody body) {
+        this.body = body;
+        if (body == null) {
+            maxStackField.setText("0");
+            localCountField.setText("0");
+            initScopeDepthField.setText("0");
+            maxScopeDepthField.setText("0");
+            return;
+        }
+        maxStackField.setText("" + body.max_stack);
+        localCountField.setText("" + body.max_regs);
+        initScopeDepthField.setText("" + body.init_scope_depth);
+        maxScopeDepthField.setText("" + body.max_scope_depth);
+    }
 
-   public boolean save() {
-      if (body != null) {
-         body.init_scope_depth = Integer.parseInt(initScopeDepthField.getText());
-         if (!autoFillCheckBox.isSelected()) {
-            body.max_stack = Integer.parseInt(maxStackField.getText());
-            body.max_regs = Integer.parseInt(localCountField.getText());
-            body.max_scope_depth = Integer.parseInt(maxScopeDepthField.getText());
-         } else {
-            if (!body.autoFillStats(abcPanel.abc)) {
-               JOptionPane.showMessageDialog(null, "Cannot get code stats for automatic body params.\r\nUncheck autofill to avoid this message.", "Warning", JOptionPane.WARNING_MESSAGE);
+    public boolean save() {
+        if (body != null) {
+            body.init_scope_depth = Integer.parseInt(initScopeDepthField.getText());
+            if (!autoFillCheckBox.isSelected()) {
+                body.max_stack = Integer.parseInt(maxStackField.getText());
+                body.max_regs = Integer.parseInt(localCountField.getText());
+                body.max_scope_depth = Integer.parseInt(maxScopeDepthField.getText());
+            } else {
+                if (!body.autoFillStats(abcPanel.abc)) {
+                    JOptionPane.showMessageDialog(null, "Cannot get code stats for automatic body params.\r\nUncheck autofill to avoid this message.", "Warning", JOptionPane.WARNING_MESSAGE);
+                }
             }
-         }
-         return true;
-      }
-      return false;
-   }
+            return true;
+        }
+        return false;
+    }
 
-   @Override
-   public void stateChanged(ChangeEvent e) {
-      if (e.getSource() == autoFillCheckBox) {
-         if (autoFillCheckBox.isSelected()) {
-            localCountField.setEnabled(false);
-            maxScopeDepthField.setEnabled(false);
-            maxStackField.setEnabled(false);
-         } else {
-            localCountField.setEnabled(true);
-            maxScopeDepthField.setEnabled(true);
-            maxStackField.setEnabled(true);
-         }
-      }
-   }
+    @Override
+    public void stateChanged(ChangeEvent e) {
+        if (e.getSource() == autoFillCheckBox) {
+            if (autoFillCheckBox.isSelected()) {
+                localCountField.setEnabled(false);
+                maxScopeDepthField.setEnabled(false);
+                maxStackField.setEnabled(false);
+            } else {
+                localCountField.setEnabled(true);
+                maxScopeDepthField.setEnabled(true);
+                maxStackField.setEnabled(true);
+            }
+        }
+    }
 
-   public void setEditMode(boolean val) {
-      maxStackField.setEditable(val);
-      localCountField.setEditable(val);
-      initScopeDepthField.setEditable(val);
-      maxScopeDepthField.setEditable(val);
-      autoFillCheckBox.setEnabled(val);
-   }
+    public void setEditMode(boolean val) {
+        maxStackField.setEditable(val);
+        localCountField.setEditable(val);
+        initScopeDepthField.setEditable(val);
+        maxScopeDepthField.setEditable(val);
+        autoFillCheckBox.setEnabled(val);
+    }
 }

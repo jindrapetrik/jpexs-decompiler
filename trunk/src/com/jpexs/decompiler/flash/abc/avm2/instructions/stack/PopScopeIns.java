@@ -32,26 +32,26 @@ import java.util.Stack;
 
 public class PopScopeIns extends InstructionDefinition {
 
-   public PopScopeIns() {
-      super(0x1d, "popscope", new int[]{});
-   }
+    public PopScopeIns() {
+        super(0x1d, "popscope", new int[]{});
+    }
 
-   @Override
-   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-      lda.scopeStack.pop();
-   }
+    @Override
+    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        lda.scopeStack.pop();
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      GraphTargetItem scope = (GraphTargetItem) scopeStack.pop();
-      if (scope instanceof WithObjectTreeItem) {
-         scope = ((WithObjectTreeItem) scope).scope;
-         output.add(new WithEndTreeItem(ins, scope));
-      }
-   }
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        GraphTargetItem scope = (GraphTargetItem) scopeStack.pop();
+        if (scope instanceof WithObjectTreeItem) {
+            scope = ((WithObjectTreeItem) scope).scope;
+            output.add(new WithEndTreeItem(ins, scope));
+        }
+    }
 
-   @Override
-   public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-      return -1;
-   }
+    @Override
+    public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
+        return -1;
+    }
 }

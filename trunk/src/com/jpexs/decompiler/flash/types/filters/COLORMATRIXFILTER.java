@@ -23,15 +23,15 @@ package com.jpexs.decompiler.flash.types.filters;
  */
 public class COLORMATRIXFILTER extends FILTER {
 
-   /**
-    * Color matrix values
-    */
-   public float matrix[] = new float[20];
+    /**
+     * Color matrix values
+     */
+    public float matrix[] = new float[20];
 
-   /**
-    * Constructor
-    */
-   public COLORMATRIXFILTER() {
-      super(6);
-   }
+    /**
+     * Constructor
+     */
+    public COLORMATRIXFILTER() {
+        super(6);
+    }
 }

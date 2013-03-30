@@ -25,14 +25,14 @@ import java.io.IOException;
  */
 public class SoundStreamBlockTag extends Tag {
 
-   /**
-    * Constructor
-    *
-    * @param data Data bytes
-    * @param version SWF version
-    * @throws IOException
-    */
-   public SoundStreamBlockTag(byte data[], int version, long pos) throws IOException {
-      super(19, "SoundStreamBlock", data, pos);      //all data is streamSoundData
-   }
+    /**
+     * Constructor
+     *
+     * @param data Data bytes
+     * @param version SWF version
+     * @throws IOException
+     */
+    public SoundStreamBlockTag(byte data[], int version, long pos) throws IOException {
+        super(19, "SoundStreamBlock", data, pos);      //all data is streamSoundData
+    }
 }

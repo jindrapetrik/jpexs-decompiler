@@ -23,15 +23,15 @@ import java.util.List;
 
 public class ClassTreeItem extends TreeItem {
 
-   public Multiname className;
+    public Multiname className;
 
-   public ClassTreeItem(Multiname className) {
-      super(null, PRECEDENCE_PRIMARY);
-      this.className = className;
-   }
+    public ClassTreeItem(Multiname className) {
+        super(null, PRECEDENCE_PRIMARY);
+        this.className = className;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return className.getName(constants, fullyQualifiedNames);
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return className.getName(constants, fullyQualifiedNames);
+    }
 }

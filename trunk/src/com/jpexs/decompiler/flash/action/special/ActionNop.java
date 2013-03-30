@@ -24,17 +24,17 @@ import java.util.Stack;
 
 public class ActionNop extends Action {
 
-   public ActionNop() {
-      super(-1, 0);
-   }
+    public ActionNop() {
+        super(-1, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "Nop";
-   }
+    @Override
+    public String toString() {
+        return "Nop";
+    }
 
-   @Override
-   public void translate(Stack<com.jpexs.decompiler.flash.graph.GraphTargetItem> stack, List<com.jpexs.decompiler.flash.graph.GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      //output.add(new SimpleActionTreeItem(this, "nop();"));
-   }
+    @Override
+    public void translate(Stack<com.jpexs.decompiler.flash.graph.GraphTargetItem> stack, List<com.jpexs.decompiler.flash.graph.GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        //output.add(new SimpleActionTreeItem(this, "nop();"));
+    }
 }

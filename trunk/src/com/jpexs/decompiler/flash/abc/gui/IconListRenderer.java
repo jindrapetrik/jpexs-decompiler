@@ -23,49 +23,49 @@ import javax.swing.*;
 public class IconListRenderer
         extends DefaultListCellRenderer {
 
-   private Icon constIcon;
-   private Icon functionIcon;
-   private Icon variableIcon;
+    private Icon constIcon;
+    private Icon functionIcon;
+    private Icon variableIcon;
 
-   private Icon loadIcon(String path) {
-      ClassLoader cldr = this.getClass().getClassLoader();
-      java.net.URL imageURL = cldr.getResource(path);
-      return new ImageIcon(imageURL);
-   }
+    private Icon loadIcon(String path) {
+        ClassLoader cldr = this.getClass().getClassLoader();
+        java.net.URL imageURL = cldr.getResource(path);
+        return new ImageIcon(imageURL);
+    }
 
-   public IconListRenderer() {
-      constIcon = View.getIcon("constant");
-      functionIcon = View.getIcon("function");
-      variableIcon = View.getIcon("variable");
-   }
+    public IconListRenderer() {
+        constIcon = View.getIcon("constant");
+        functionIcon = View.getIcon("function");
+        variableIcon = View.getIcon("variable");
+    }
 
-   @Override
-   public Component getListCellRendererComponent(
-           JList list, Object value, int index,
-           boolean isSelected, boolean cellHasFocus) {
+    @Override
+    public Component getListCellRendererComponent(
+            JList list, Object value, int index,
+            boolean isSelected, boolean cellHasFocus) {
 
-      // Get the renderer component from parent class
+        // Get the renderer component from parent class
 
-      JLabel label =
-              (JLabel) super.getListCellRendererComponent(list,
-              value, index, isSelected, cellHasFocus);
+        JLabel label =
+                (JLabel) super.getListCellRendererComponent(list,
+                value, index, isSelected, cellHasFocus);
 
-      // Get icon to use for the list item value
+        // Get icon to use for the list item value
 
-      TraitsListItem tli = (TraitsListItem) value;
+        TraitsListItem tli = (TraitsListItem) value;
 
-      if (tli.getType() == TraitsListItem.Type.CONST) {
-         label.setIcon(constIcon);
-      }
-      if (tli.getType() == TraitsListItem.Type.VAR) {
-         label.setIcon(variableIcon);
-      }
-      if (tli.getType() == TraitsListItem.Type.METHOD) {
-         label.setIcon(functionIcon);
-      }
-      if (tli.getType() == TraitsListItem.Type.INITIALIZER) {
-         label.setIcon(functionIcon);
-      }
-      return label;
-   }
+        if (tli.getType() == TraitsListItem.Type.CONST) {
+            label.setIcon(constIcon);
+        }
+        if (tli.getType() == TraitsListItem.Type.VAR) {
+            label.setIcon(variableIcon);
+        }
+        if (tli.getType() == TraitsListItem.Type.METHOD) {
+            label.setIcon(functionIcon);
+        }
+        if (tli.getType() == TraitsListItem.Type.INITIALIZER) {
+            label.setIcon(functionIcon);
+        }
+        return label;
+    }
 }

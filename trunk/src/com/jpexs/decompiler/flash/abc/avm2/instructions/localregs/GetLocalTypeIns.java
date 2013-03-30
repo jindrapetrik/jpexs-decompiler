@@ -20,5 +20,5 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 
 public interface GetLocalTypeIns {
 
-   public abstract int getRegisterId(AVM2Instruction ins);
+    public abstract int getRegisterId(AVM2Instruction ins);
 }

@@ -22,60 +22,60 @@ package com.jpexs.decompiler.flash.types.shaperecords;
  */
 public class StraightEdgeRecord extends SHAPERECORD {
 
-   public int typeFlag = 1;
-   public int straightFlag = 1;
-   public int numBits;
-   public boolean generalLineFlag;
-   public boolean vertLineFlag;
-   public int deltaX;
-   public int deltaY;
+    public int typeFlag = 1;
+    public int straightFlag = 1;
+    public int numBits;
+    public boolean generalLineFlag;
+    public boolean vertLineFlag;
+    public int deltaX;
+    public int deltaY;
 
-   @Override
-   public String toString() {
-      return "[StraightEdgeRecord numBits=" + numBits + ", generalLineFlag=" + generalLineFlag + ", vertLineFlag=" + vertLineFlag + ", deltaX=" + deltaX + ", deltaY=" + deltaY + "]";
-   }
+    @Override
+    public String toString() {
+        return "[StraightEdgeRecord numBits=" + numBits + ", generalLineFlag=" + generalLineFlag + ", vertLineFlag=" + vertLineFlag + ", deltaX=" + deltaX + ", deltaY=" + deltaY + "]";
+    }
 
-   @Override
-   public String toSWG(int oldX, int oldY) {
-      if (generalLineFlag) {
-         return "L " + twipToPixel(oldX + deltaX) + " " + twipToPixel(oldY + deltaY);
-      } else if (vertLineFlag) {
-         return "V " + twipToPixel(oldY + deltaY);
-      } else {
-         return "H " + twipToPixel(oldX + deltaX);
-      }
-   }
+    @Override
+    public String toSWG(int oldX, int oldY) {
+        if (generalLineFlag) {
+            return "L " + twipToPixel(oldX + deltaX) + " " + twipToPixel(oldY + deltaY);
+        } else if (vertLineFlag) {
+            return "V " + twipToPixel(oldY + deltaY);
+        } else {
+            return "H " + twipToPixel(oldX + deltaX);
+        }
+    }
 
-   @Override
-   public int changeX(int x) {
-      if (generalLineFlag) {
-         return x + deltaX;
-      } else if (vertLineFlag) {
-         return x;
-      } else {
-         return x + deltaX;
-      }
-   }
+    @Override
+    public int changeX(int x) {
+        if (generalLineFlag) {
+            return x + deltaX;
+        } else if (vertLineFlag) {
+            return x;
+        } else {
+            return x + deltaX;
+        }
+    }
 
-   @Override
-   public int changeY(int y) {
-      if (generalLineFlag) {
-         return y + deltaY;
-      } else if (vertLineFlag) {
-         return y + deltaY;
-      } else {
-         return y;
-      }
-   }
+    @Override
+    public int changeY(int y) {
+        if (generalLineFlag) {
+            return y + deltaY;
+        } else if (vertLineFlag) {
+            return y + deltaY;
+        } else {
+            return y;
+        }
+    }
 
-   @Override
-   public void flip() {
-      deltaX = -deltaX;
-      deltaY = -deltaY;
-   }
+    @Override
+    public void flip() {
+        deltaX = -deltaX;
+        deltaY = -deltaY;
+    }
 
-   @Override
-   public boolean isMove() {
-      return true;
-   }
+    @Override
+    public boolean isMove() {
+        return true;
+    }
 }

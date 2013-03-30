@@ -28,25 +28,25 @@ import java.util.Stack;
 
 public class ActionCallFunction extends Action {
 
-   public ActionCallFunction() {
-      super(0x3D, 0);
-   }
+    public ActionCallFunction() {
+        super(0x3D, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "CallFunction";
-   }
+    @Override
+    public String toString() {
+        return "CallFunction";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem functionName = stack.pop();
-      long numArgs = popLong(stack);
-      List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
-      for (long l = 0; l < numArgs; l++) {
-         args.add(stack.pop());
-      }
-      CallFunctionTreeItem cft = new CallFunctionTreeItem(this, functionName, args);
-      cft.calculatedFunction = functions.get(Highlighting.stripHilights(functionName.toStringNoQuotes((ConstantPool)null)));
-      stack.push(cft);
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem functionName = stack.pop();
+        long numArgs = popLong(stack);
+        List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
+        for (long l = 0; l < numArgs; l++) {
+            args.add(stack.pop());
+        }
+        CallFunctionTreeItem cft = new CallFunctionTreeItem(this, functionName, args);
+        cft.calculatedFunction = functions.get(Highlighting.stripHilights(functionName.toStringNoQuotes((ConstantPool) null)));
+        stack.push(cft);
+    }
 }

@@ -22,28 +22,28 @@ import java.util.List;
 
 public class StringExtractTreeItem extends TreeItem {
 
-   public GraphTargetItem value;
-   public GraphTargetItem index;
-   public GraphTargetItem count;
+    public GraphTargetItem value;
+    public GraphTargetItem index;
+    public GraphTargetItem count;
 
-   public StringExtractTreeItem(GraphSourceItem instruction, GraphTargetItem value, GraphTargetItem index, GraphTargetItem count) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.value = value;
-      this.index = index;
-      this.count = count;
-   }
+    public StringExtractTreeItem(GraphSourceItem instruction, GraphTargetItem value, GraphTargetItem index, GraphTargetItem count) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.value = value;
+        this.index = index;
+        this.count = count;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return value.toString(constants) + ".substr(" + index.toString(constants) + "," + count.toString(constants) + ")";
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return value.toString(constants) + ".substr(" + index.toString(constants) + "," + count.toString(constants) + ")";
+    }
 
-   @Override
-   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(value.getNeededSources());
-      ret.addAll(index.getNeededSources());
-      ret.addAll(count.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(value.getNeededSources());
+        ret.addAll(index.getNeededSources());
+        ret.addAll(count.getNeededSources());
+        return ret;
+    }
 }

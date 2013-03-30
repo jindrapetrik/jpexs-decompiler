@@ -25,19 +25,19 @@ import java.util.Stack;
 
 public class ActionEquals2 extends Action {
 
-   public ActionEquals2() {
-      super(0x49, 0);
-   }
+    public ActionEquals2() {
+        super(0x49, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "Equals2";
-   }
+    @Override
+    public String toString() {
+        return "Equals2";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem a = stack.pop();
-      GraphTargetItem b = stack.pop();
-      stack.push(new EqTreeItem(this, b, a));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem a = stack.pop();
+        GraphTargetItem b = stack.pop();
+        stack.push(new EqTreeItem(this, b, a));
+    }
 }

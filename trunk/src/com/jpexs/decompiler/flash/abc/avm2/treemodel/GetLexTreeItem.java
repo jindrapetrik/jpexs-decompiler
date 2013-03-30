@@ -24,15 +24,15 @@ import java.util.List;
 
 public class GetLexTreeItem extends TreeItem {
 
-   public Multiname propertyName;
+    public Multiname propertyName;
 
-   public GetLexTreeItem(AVM2Instruction instruction, Multiname propertyName) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.propertyName = propertyName;
-   }
+    public GetLexTreeItem(AVM2Instruction instruction, Multiname propertyName) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.propertyName = propertyName;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return hilight(propertyName.getName(constants, fullyQualifiedNames));
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return hilight(propertyName.getName(constants, fullyQualifiedNames));
+    }
 }

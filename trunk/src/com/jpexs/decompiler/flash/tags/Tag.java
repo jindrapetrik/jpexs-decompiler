@@ -27,110 +27,110 @@ import java.util.Set;
  */
 public class Tag {
 
-   /**
-    * Identifier of tag type
-    */
-   protected int id;
-   /**
-    * Data in the tag
-    */
-   protected byte data[];
-   /**
-    * If true, then Tag is written to the stream as longer than 0x3f even if it
-    * is not
-    */
-   public boolean forceWriteAsLong = false;
-   private final long pos;
-   protected String name;
-   public Tag previousTag;
+    /**
+     * Identifier of tag type
+     */
+    protected int id;
+    /**
+     * Data in the tag
+     */
+    protected byte data[];
+    /**
+     * If true, then Tag is written to the stream as longer than 0x3f even if it
+     * is not
+     */
+    public boolean forceWriteAsLong = false;
+    private final long pos;
+    protected String name;
+    public Tag previousTag;
 
-   public String getName() {
-      return name;
-   }
+    public String getName() {
+        return name;
+    }
 
-   public String getExportName() {
-      return getName();
-   }
+    public String getExportName() {
+        return getName();
+    }
 
-   /**
-    * Returns identifier of tag type
-    *
-    * @return Identifier of tag type
-    */
-   public int getId() {
-      return id;
-   }
+    /**
+     * Returns identifier of tag type
+     *
+     * @return Identifier of tag type
+     */
+    public int getId() {
+        return id;
+    }
 
-   /**
-    * Constructor
-    *
-    * @param id Tag type identifier
-    * @param name Tag name
-    * @param data Bytes of data
-    */
-   public Tag(int id, String name, byte[] data, long pos) {
-      this.id = id;
-      this.name = name;
-      this.data = data;
-      this.pos = pos;
-   }
+    /**
+     * Constructor
+     *
+     * @param id Tag type identifier
+     * @param name Tag name
+     * @param data Bytes of data
+     */
+    public Tag(int id, String name, byte[] data, long pos) {
+        this.id = id;
+        this.name = name;
+        this.data = data;
+        this.pos = pos;
+    }
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   public byte[] getData(int version) {
-      return data;
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    public byte[] getData(int version) {
+        return data;
+    }
 
-   /**
-    * Gets original read data
-    *
-    * @return Bytes of data
-    */
-   public byte[] getOriginalData() {
-      return data;
-   }
+    /**
+     * Gets original read data
+     *
+     * @return Bytes of data
+     */
+    public byte[] getOriginalData() {
+        return data;
+    }
 
-   /**
-    * Returns string representation of the object
-    *
-    * @return String representation of the object
-    */
-   @Override
-   public String toString() {
-      return getName();
-   }
+    /**
+     * Returns string representation of the object
+     *
+     * @return String representation of the object
+     */
+    @Override
+    public String toString() {
+        return getName();
+    }
 
-   public final long getOrigDataLength() {
-      return data.length;
-   }
+    public final long getOrigDataLength() {
+        return data.length;
+    }
 
-   public boolean hasSubTags() {
-      return false;
-   }
+    public boolean hasSubTags() {
+        return false;
+    }
 
-   public List<Tag> getSubTags() {
-      return null;
-   }
+    public List<Tag> getSubTags() {
+        return null;
+    }
 
-   public long getPos() {
-      return pos;
-   }
+    public long getPos() {
+        return pos;
+    }
 
-   public Set<Integer> getNeededCharacters() {
-      return new HashSet<Integer>();
-   }
+    public Set<Integer> getNeededCharacters() {
+        return new HashSet<Integer>();
+    }
 
-   public Set<Integer> getDeepNeededCharacters(HashMap<Integer, CharacterTag> characters) {
-      Set<Integer> ret = new HashSet<Integer>();
-      Set<Integer> needed = getNeededCharacters();
-      ret.addAll(needed);
-      for (int ch : needed) {
-         ret.addAll(characters.get(ch).getDeepNeededCharacters(characters));
-      }
-      return ret;
-   }
+    public Set<Integer> getDeepNeededCharacters(HashMap<Integer, CharacterTag> characters) {
+        Set<Integer> ret = new HashSet<Integer>();
+        Set<Integer> needed = getNeededCharacters();
+        ret.addAll(needed);
+        for (int ch : needed) {
+            ret.addAll(characters.get(ch).getDeepNeededCharacters(characters));
+        }
+        return ret;
+    }
 }

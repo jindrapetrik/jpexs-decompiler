@@ -22,28 +22,28 @@ import java.util.List;
 
 public class CloneSpriteTreeItem extends TreeItem {
 
-   public GraphTargetItem source;
-   public GraphTargetItem target;
-   public GraphTargetItem depth;
+    public GraphTargetItem source;
+    public GraphTargetItem target;
+    public GraphTargetItem depth;
 
-   public CloneSpriteTreeItem(GraphSourceItem instruction, GraphTargetItem source, GraphTargetItem target, GraphTargetItem depth) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.source = source;
-      this.target = target;
-      this.depth = depth;
-   }
+    public CloneSpriteTreeItem(GraphSourceItem instruction, GraphTargetItem source, GraphTargetItem target, GraphTargetItem depth) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.source = source;
+        this.target = target;
+        this.depth = depth;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return hilight("duplicateMovieClip(") + target.toString(constants) + hilight(",") + source.toString(constants) + hilight(",") + depth.toString(constants) + hilight(")");
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return hilight("duplicateMovieClip(") + target.toString(constants) + hilight(",") + source.toString(constants) + hilight(",") + depth.toString(constants) + hilight(")");
+    }
 
-   @Override
-   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(source.getNeededSources());
-      ret.addAll(target.getNeededSources());
-      ret.addAll(depth.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(source.getNeededSources());
+        ret.addAll(target.getNeededSources());
+        ret.addAll(depth.getNeededSources());
+        return ret;
+    }
 }

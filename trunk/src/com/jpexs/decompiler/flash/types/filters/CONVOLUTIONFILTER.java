@@ -25,43 +25,43 @@ import com.jpexs.decompiler.flash.types.RGBA;
  */
 public class CONVOLUTIONFILTER extends FILTER {
 
-   /**
-    * Horizontal matrix size
-    */
-   public int matrixX;
-   /**
-    * Vertical matrix size
-    */
-   public int matrixY;
-   /**
-    * Divisor applied to the matrix values
-    */
-   public float divisor;
-   /**
-    * Bias applied to the matrix values
-    */
-   public float bias;
-   /**
-    * Matrix values
-    */
-   public float matrix[][];
-   /**
-    * Default color for pixels outside the image
-    */
-   public RGBA defaultColor;
-   /**
-    * Clamp mode
-    */
-   public boolean clamp;
-   /**
-    * Preserve the alpha
-    */
-   public boolean preserveAlpha;
+    /**
+     * Horizontal matrix size
+     */
+    public int matrixX;
+    /**
+     * Vertical matrix size
+     */
+    public int matrixY;
+    /**
+     * Divisor applied to the matrix values
+     */
+    public float divisor;
+    /**
+     * Bias applied to the matrix values
+     */
+    public float bias;
+    /**
+     * Matrix values
+     */
+    public float matrix[][];
+    /**
+     * Default color for pixels outside the image
+     */
+    public RGBA defaultColor;
+    /**
+     * Clamp mode
+     */
+    public boolean clamp;
+    /**
+     * Preserve the alpha
+     */
+    public boolean preserveAlpha;
 
-   /**
-    * Constructor
-    */
-   public CONVOLUTIONFILTER() {
-      super(5);
-   }
+    /**
+     * Constructor
+     */
+    public CONVOLUTIONFILTER() {
+        super(5);
+    }
 }

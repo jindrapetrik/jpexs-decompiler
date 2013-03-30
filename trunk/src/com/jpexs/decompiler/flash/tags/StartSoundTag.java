@@ -31,39 +31,39 @@ import java.io.OutputStream;
  */
 public class StartSoundTag extends Tag {
 
-   public int soundId;
-   public SOUNDINFO soundInfo;
+    public int soundId;
+    public SOUNDINFO soundInfo;
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         sos.writeUI16(soundId);
-         sos.writeSOUNDINFO(soundInfo);
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            sos.writeUI16(soundId);
+            sos.writeSOUNDINFO(soundInfo);
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 
-   /**
-    * Constructor
-    *
-    * @param data Data bytes
-    * @param version SWF version
-    * @throws IOException
-    */
-   public StartSoundTag(byte data[], int version, long pos) throws IOException {
-      super(15, "StartSound", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      soundId = sis.readUI16();
-      soundInfo = sis.readSOUNDINFO();
-   }
+    /**
+     * Constructor
+     *
+     * @param data Data bytes
+     * @param version SWF version
+     * @throws IOException
+     */
+    public StartSoundTag(byte data[], int version, long pos) throws IOException {
+        super(15, "StartSound", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        soundId = sis.readUI16();
+        soundInfo = sis.readSOUNDINFO();
+    }
 }

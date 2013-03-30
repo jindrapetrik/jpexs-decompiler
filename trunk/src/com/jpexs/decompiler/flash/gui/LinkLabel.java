@@ -29,59 +29,59 @@ import javax.swing.JLabel;
  */
 public class LinkLabel extends JLabel {
 
-   /**
-    * The normal text set by the user.
-    */
-   private String text;
+    /**
+     * The normal text set by the user.
+     */
+    private String text;
 
-   /**
-    * Creates a new LinkLabel with the given text.
-    */
-   public LinkLabel(String text) {
-      super(text);
+    /**
+     * Creates a new LinkLabel with the given text.
+     */
+    public LinkLabel(String text) {
+        super(text);
 
-      setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-      enableEvents(MouseEvent.MOUSE_EVENT_MASK);
-   }
+        enableEvents(MouseEvent.MOUSE_EVENT_MASK);
+    }
 
-   /**
-    * Sets the text of the label.
-    */
-   @Override
-   public void setText(String text) {
-      super.setText("<html><font color=\"#0000CF\"><u>" + text + "</u></font></html>");
-      this.text = text;
-   }
+    /**
+     * Sets the text of the label.
+     */
+    @Override
+    public void setText(String text) {
+        super.setText("<html><font color=\"#0000CF\"><u>" + text + "</u></font></html>");
+        this.text = text;
+    }
 
-   /**
-    * Returns the text set by the user.
-    */
-   public String getNormalText() {
-      return text;
-   }
+    /**
+     * Returns the text set by the user.
+     */
+    public String getNormalText() {
+        return text;
+    }
 
-   /**
-    * Processes mouse events and responds to clicks.
-    */
-   @Override
-   protected void processMouseEvent(MouseEvent evt) {
-      super.processMouseEvent(evt);
-      if (evt.getID() == MouseEvent.MOUSE_CLICKED) {
-         clicked();
-      }
-   }
+    /**
+     * Processes mouse events and responds to clicks.
+     */
+    @Override
+    protected void processMouseEvent(MouseEvent evt) {
+        super.processMouseEvent(evt);
+        if (evt.getID() == MouseEvent.MOUSE_CLICKED) {
+            clicked();
+        }
+    }
 
-   protected void clicked() {
-      if (java.awt.Desktop.isDesktopSupported()) {
-         java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
-         try {
-            java.net.URI uri = new java.net.URI(getNormalText());
-            desktop.browse(uri);
-         } catch (Exception e) {
+    protected void clicked() {
+        if (java.awt.Desktop.isDesktopSupported()) {
+            java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+            try {
+                java.net.URI uri = new java.net.URI(getNormalText());
+                desktop.browse(uri);
+            } catch (Exception e) {
 
-            System.err.println(e.getMessage());
-         }
-      }
-   }
+                System.err.println(e.getMessage());
+            }
+        }
+    }
 }

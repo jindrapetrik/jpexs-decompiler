@@ -20,40 +20,40 @@ import java.util.List;
 
 public abstract class UnaryOpItem extends GraphTargetItem {
 
-   public GraphTargetItem value;
-   public String operator;
+    public GraphTargetItem value;
+    public String operator;
 
-   public UnaryOpItem(GraphSourceItem instruction, int precedence, GraphTargetItem value, String operator) {
-      super(instruction, precedence);
-      this.value = value;
-      this.operator = operator;
-   }
+    public UnaryOpItem(GraphSourceItem instruction, int precedence, GraphTargetItem value, String operator) {
+        super(instruction, precedence);
+        this.value = value;
+        this.operator = operator;
+    }
 
-   @Override
-   public String toString(List localData) {
-      String s = (value == null ? "null" : value.toString(localData));
-      if (value != null) {
-         if (value.precedence > precedence) {
-            s = "(" + s + ")";
-         }
-      }
-      return hilight(operator) + s;
-   }
+    @Override
+    public String toString(List localData) {
+        String s = (value == null ? "null" : value.toString(localData));
+        if (value != null) {
+            if (value.precedence > precedence) {
+                s = "(" + s + ")";
+            }
+        }
+        return hilight(operator) + s;
+    }
 
-   @Override
-   public boolean isCompileTime() {
-      return value.isCompileTime();
-   }
+    @Override
+    public boolean isCompileTime() {
+        return value.isCompileTime();
+    }
 
-   @Override
-   public boolean isVariableComputed() {
-      return value.isVariableComputed();
-   }
+    @Override
+    public boolean isVariableComputed() {
+        return value.isVariableComputed();
+    }
 
-   @Override
-   public List<GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(value.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(value.getNeededSources());
+        return ret;
+    }
 }

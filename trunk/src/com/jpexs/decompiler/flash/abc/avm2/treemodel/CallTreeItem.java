@@ -24,37 +24,37 @@ import java.util.List;
 
 public class CallTreeItem extends TreeItem {
 
-   public GraphTargetItem receiver;
-   public GraphTargetItem function;
-   public List<GraphTargetItem> arguments;
+    public GraphTargetItem receiver;
+    public GraphTargetItem function;
+    public List<GraphTargetItem> arguments;
 
-   public CallTreeItem(AVM2Instruction instruction, GraphTargetItem receiver, GraphTargetItem function, List<GraphTargetItem> arguments) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.receiver = receiver;
-      this.function = function;
-      this.arguments = arguments;
-   }
+    public CallTreeItem(AVM2Instruction instruction, GraphTargetItem receiver, GraphTargetItem function, List<GraphTargetItem> arguments) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.receiver = receiver;
+        this.function = function;
+        this.arguments = arguments;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      String args = "";
-      for (int a = 0; a < arguments.size(); a++) {
-         if (a > 0) {
-            args = args + ",";
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        String args = "";
+        for (int a = 0; a < arguments.size(); a++) {
+            if (a > 0) {
+                args = args + ",";
+            }
+            args = args + arguments.get(a).toString(constants, localRegNames, fullyQualifiedNames);
+        }
+        /*String recPart = ""; receiver.toString(constants, localRegNames) + hilight(".");
+         if (receiver instanceof NewActivationTreeItem) {
+         recPart = "";
          }
-         args = args + arguments.get(a).toString(constants, localRegNames, fullyQualifiedNames);
-      }
-      /*String recPart = ""; receiver.toString(constants, localRegNames) + hilight(".");
-       if (receiver instanceof NewActivationTreeItem) {
-       recPart = "";
-       }
-       if (receiver instanceof ThisTreeItem) {
-       recPart = "";
-       }*/
-      String fstr = function.toString(constants, localRegNames, fullyQualifiedNames);
-      if (function.precedence > precedence) {
-         fstr = "(" + fstr + ")";
-      }
-      return fstr + hilight("(") + args + hilight(")");
-   }
+         if (receiver instanceof ThisTreeItem) {
+         recPart = "";
+         }*/
+        String fstr = function.toString(constants, localRegNames, fullyQualifiedNames);
+        if (function.precedence > precedence) {
+            fstr = "(" + fstr + ")";
+        }
+        return fstr + hilight("(") + args + hilight(")");
+    }
 }

@@ -22,12 +22,12 @@ import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
 public class DivideTreeItem extends BinaryOpItem {
 
-   public DivideTreeItem(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-      super(instruction, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "/");
-   }
+    public DivideTreeItem(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "/");
+    }
 
-   @Override
-   public double toNumber() {
-      return leftSide.toNumber() / rightSide.toNumber();
-   }
+    @Override
+    public double toNumber() {
+        return leftSide.toNumber() / rightSide.toNumber();
+    }
 }

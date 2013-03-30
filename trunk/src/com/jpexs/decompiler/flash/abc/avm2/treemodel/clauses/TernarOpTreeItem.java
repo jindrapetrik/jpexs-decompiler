@@ -25,19 +25,19 @@ import java.util.List;
 
 public class TernarOpTreeItem extends TreeItem {
 
-   public GraphTargetItem expression;
-   public GraphTargetItem onTrue;
-   public GraphTargetItem onFalse;
+    public GraphTargetItem expression;
+    public GraphTargetItem onTrue;
+    public GraphTargetItem onFalse;
 
-   public TernarOpTreeItem(AVM2Instruction instruction, GraphTargetItem expression, GraphTargetItem onTrue, GraphTargetItem onFalse) {
-      super(instruction, PRECEDENCE_CONDITIONAL);
-      this.expression = expression;
-      this.onTrue = onTrue;
-      this.onFalse = onFalse;
-   }
+    public TernarOpTreeItem(AVM2Instruction instruction, GraphTargetItem expression, GraphTargetItem onTrue, GraphTargetItem onFalse) {
+        super(instruction, PRECEDENCE_CONDITIONAL);
+        this.expression = expression;
+        this.onTrue = onTrue;
+        this.onFalse = onFalse;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return expression.toString(constants, localRegNames, fullyQualifiedNames) + hilight("?") + onTrue.toString(constants, localRegNames, fullyQualifiedNames) + hilight(":") + onFalse.toString(constants, localRegNames, fullyQualifiedNames);
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return expression.toString(constants, localRegNames, fullyQualifiedNames) + hilight("?") + onTrue.toString(constants, localRegNames, fullyQualifiedNames) + hilight(":") + onFalse.toString(constants, localRegNames, fullyQualifiedNames);
+    }
 }

@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.abc.gui;
 
 public interface TreeVisitor {
 
-   public void onBranch(TreeElement branch);
+    public void onBranch(TreeElement branch);
 
-   public void onLeaf(TreeElement leaf);
+    public void onLeaf(TreeElement leaf);
 }

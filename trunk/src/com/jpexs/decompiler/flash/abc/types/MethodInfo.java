@@ -25,266 +25,266 @@ import java.util.List;
 
 public class MethodInfo {
 
-   public int param_types[];
-   public int ret_type;
-   public int name_index; //0=no name
-   // 1=need_arguments, 2=need_activation, 4=need_rest 8=has_optional 16=ignore_rest, 32=explicit, 64=setsdxns, 128=has_paramnames
-   public int flags;
-   public ValueKind optional[];
-   public int paramNames[];
-   private MethodBody body;
+    public int param_types[];
+    public int ret_type;
+    public int name_index; //0=no name
+    // 1=need_arguments, 2=need_activation, 4=need_rest 8=has_optional 16=ignore_rest, 32=explicit, 64=setsdxns, 128=has_paramnames
+    public int flags;
+    public ValueKind optional[];
+    public int paramNames[];
+    private MethodBody body;
 
-   public void setFlagSetsdxns() {
-      flags |= 64;
-   }
+    public void setFlagSetsdxns() {
+        flags |= 64;
+    }
 
-   public void setFlagSetsdxns(boolean val) {
-      if (val) {
-         setFlagSetsdxns();
-      } else {
-         unsetFlagSetsdxns();
-      }
-   }
+    public void setFlagSetsdxns(boolean val) {
+        if (val) {
+            setFlagSetsdxns();
+        } else {
+            unsetFlagSetsdxns();
+        }
+    }
 
-   public void unsetFlagSetsdxns() {
-      if (flagSetsdxns()) {
-         flags -= 64;
-      }
-   }
+    public void unsetFlagSetsdxns() {
+        if (flagSetsdxns()) {
+            flags -= 64;
+        }
+    }
 
-   public void setFlagNeed_activation() {
-      flags |= 2;
-   }
+    public void setFlagNeed_activation() {
+        flags |= 2;
+    }
 
-   public void setFlagNeed_activation(boolean val) {
-      if (val) {
-         setFlagNeed_activation();
-      } else {
-         unsetFlagNeed_activation();
-      }
-   }
+    public void setFlagNeed_activation(boolean val) {
+        if (val) {
+            setFlagNeed_activation();
+        } else {
+            unsetFlagNeed_activation();
+        }
+    }
 
-   public void unsetFlagNeed_activation() {
-      if (flagNeed_activation()) {
-         flags -= 2;
-      }
-   }
+    public void unsetFlagNeed_activation() {
+        if (flagNeed_activation()) {
+            flags -= 2;
+        }
+    }
 
-   public void setFlagNeed_rest() {
-      flags |= 4;
-   }
+    public void setFlagNeed_rest() {
+        flags |= 4;
+    }
 
-   public void unsetFlagNeed_rest() {
-      if (flagNeed_rest()) {
-         flags -= 4;
-      }
-   }
+    public void unsetFlagNeed_rest() {
+        if (flagNeed_rest()) {
+            flags -= 4;
+        }
+    }
 
-   public void setFlagNeed_rest(boolean val) {
-      if (val) {
-         setFlagNeed_rest();
-      } else {
-         unsetFlagNeed_rest();
-      }
-   }
+    public void setFlagNeed_rest(boolean val) {
+        if (val) {
+            setFlagNeed_rest();
+        } else {
+            unsetFlagNeed_rest();
+        }
+    }
 
-   public void setFlagHas_optional() {
-      flags |= 8;
-   }
+    public void setFlagHas_optional() {
+        flags |= 8;
+    }
 
-   public void unsetFlagHas_optional() {
-      if (flagHas_optional()) {
-         flags -= 8;
-      }
-   }
+    public void unsetFlagHas_optional() {
+        if (flagHas_optional()) {
+            flags -= 8;
+        }
+    }
 
-   public void setFlagHas_optional(boolean val) {
-      if (val) {
-         setFlagHas_optional();
-      } else {
-         unsetFlagHas_optional();
-      }
-   }
+    public void setFlagHas_optional(boolean val) {
+        if (val) {
+            setFlagHas_optional();
+        } else {
+            unsetFlagHas_optional();
+        }
+    }
 
-   public void setFlagHas_paramnames() {
-      flags |= 128;
-   }
+    public void setFlagHas_paramnames() {
+        flags |= 128;
+    }
 
-   public void unsetFlagHas_paramnames() {
-      if (flagHas_paramnames()) {
-         flags -= 128;
-      }
-   }
+    public void unsetFlagHas_paramnames() {
+        if (flagHas_paramnames()) {
+            flags -= 128;
+        }
+    }
 
-   public void setFlagHas_paramnames(boolean val) {
-      if (val) {
-         setFlagHas_paramnames();
-      } else {
-         unsetFlagHas_paramnames();
-      }
-   }
+    public void setFlagHas_paramnames(boolean val) {
+        if (val) {
+            setFlagHas_paramnames();
+        } else {
+            unsetFlagHas_paramnames();
+        }
+    }
 
-   public boolean flagNeed_arguments() {
-      return (flags & 1) == 1;
-   }
+    public boolean flagNeed_arguments() {
+        return (flags & 1) == 1;
+    }
 
-   public boolean flagNeed_activation() {
-      return (flags & 2) == 2;
-   }
+    public boolean flagNeed_activation() {
+        return (flags & 2) == 2;
+    }
 
-   public boolean flagNeed_rest() {
-      return (flags & 4) == 4;
-   }
+    public boolean flagNeed_rest() {
+        return (flags & 4) == 4;
+    }
 
-   public boolean flagHas_optional() {
-      return (flags & 8) == 8;
-   }
+    public boolean flagHas_optional() {
+        return (flags & 8) == 8;
+    }
 
-   public boolean flagIgnore_restHas_optional() {
-      return (flags & 16) == 16;
-   }
+    public boolean flagIgnore_restHas_optional() {
+        return (flags & 16) == 16;
+    }
 
-   public boolean flagExplicit() {
-      return (flags & 32) == 32;
-   }
+    public boolean flagExplicit() {
+        return (flags & 32) == 32;
+    }
 
-   public boolean flagSetsdxns() {
-      return (flags & 64) == 64;
-   }
+    public boolean flagSetsdxns() {
+        return (flags & 64) == 64;
+    }
 
-   public boolean flagHas_paramnames() {
-      return (flags & 128) == 128;
-   }
+    public boolean flagHas_paramnames() {
+        return (flags & 128) == 128;
+    }
 
-   public MethodInfo(int param_types[], int ret_type, int name_index, int flags, ValueKind optional[], int paramNames[]) {
-      this.param_types = param_types;
-      this.ret_type = ret_type;
-      this.name_index = name_index;
-      this.flags = flags;
-      this.optional = optional;
-      this.paramNames = paramNames;
-   }
+    public MethodInfo(int param_types[], int ret_type, int name_index, int flags, ValueKind optional[], int paramNames[]) {
+        this.param_types = param_types;
+        this.ret_type = ret_type;
+        this.name_index = name_index;
+        this.flags = flags;
+        this.optional = optional;
+        this.paramNames = paramNames;
+    }
 
-   @Override
-   public String toString() {
-      String optionalStr = "[";
-      if (optional != null) {
-         for (int i = 0; i < optional.length; i++) {
+    @Override
+    public String toString() {
+        String optionalStr = "[";
+        if (optional != null) {
+            for (int i = 0; i < optional.length; i++) {
+                if (i > 0) {
+                    optionalStr += ",";
+                }
+                optionalStr += optional[i].toString();
+            }
+        }
+        optionalStr += "]";
+        return "MethodInfo: param_types=" + Helper.intArrToString(param_types) + " ret_type=" + ret_type + " name_index=" + name_index + " flags=" + flags + " optional=" + optionalStr + " paramNames=" + Helper.intArrToString(paramNames);
+    }
+
+    public String toString(ConstantPool constants, List<String> fullyQualifiedNames) {
+        String optionalStr = "[";
+        if (optional != null) {
+            for (int i = 0; i < optional.length; i++) {
+                if (i > 0) {
+                    optionalStr += ",";
+                }
+                optionalStr += optional[i].toString(constants);
+            }
+        }
+        optionalStr += "]";
+
+        String param_typesStr = "";
+        for (int i = 0; i < param_types.length; i++) {
             if (i > 0) {
-               optionalStr += ",";
+                param_typesStr += ",";
             }
-            optionalStr += optional[i].toString();
-         }
-      }
-      optionalStr += "]";
-      return "MethodInfo: param_types=" + Helper.intArrToString(param_types) + " ret_type=" + ret_type + " name_index=" + name_index + " flags=" + flags + " optional=" + optionalStr + " paramNames=" + Helper.intArrToString(paramNames);
-   }
+            if (param_types[i] == 0) {
+                param_typesStr += "*";
+            } else {
+                param_typesStr += constants.constant_multiname[param_types[i]].toString(constants, fullyQualifiedNames);
+            }
+        }
 
-   public String toString(ConstantPool constants, List<String> fullyQualifiedNames) {
-      String optionalStr = "[";
-      if (optional != null) {
-         for (int i = 0; i < optional.length; i++) {
+        String paramNamesStr = "";
+        for (int i = 0; i < paramNames.length; i++) {
             if (i > 0) {
-               optionalStr += ",";
+                paramNamesStr += ",";
             }
-            optionalStr += optional[i].toString(constants);
-         }
-      }
-      optionalStr += "]";
+            paramNamesStr += constants.constant_string[paramNames[i]];
+        }
 
-      String param_typesStr = "";
-      for (int i = 0; i < param_types.length; i++) {
-         if (i > 0) {
-            param_typesStr += ",";
-         }
-         if (param_types[i] == 0) {
-            param_typesStr += "*";
-         } else {
-            param_typesStr += constants.constant_multiname[param_types[i]].toString(constants, fullyQualifiedNames);
-         }
-      }
+        String ret_typeStr = "";
+        if (ret_type == 0) {
+            ret_typeStr += "*";
+        } else {
+            ret_typeStr += constants.constant_multiname[ret_type].toString(constants, fullyQualifiedNames);
+        }
 
-      String paramNamesStr = "";
-      for (int i = 0; i < paramNames.length; i++) {
-         if (i > 0) {
-            paramNamesStr += ",";
-         }
-         paramNamesStr += constants.constant_string[paramNames[i]];
-      }
+        return "param_types=" + param_typesStr + " ret_type=" + ret_typeStr + " name=\"" + constants.constant_string[name_index] + "\" flags=" + flags + " optional=" + optionalStr + " paramNames=" + paramNamesStr;
+    }
 
-      String ret_typeStr = "";
-      if (ret_type == 0) {
-         ret_typeStr += "*";
-      } else {
-         ret_typeStr += constants.constant_multiname[ret_type].toString(constants, fullyQualifiedNames);
-      }
+    public String getName(ConstantPool constants) {
+        if (name_index == 0) {
+            return "UNKNOWN";
+        }
+        return constants.constant_string[name_index];
+    }
 
-      return "param_types=" + param_typesStr + " ret_type=" + ret_typeStr + " name=\"" + constants.constant_string[name_index] + "\" flags=" + flags + " optional=" + optionalStr + " paramNames=" + paramNamesStr;
-   }
-
-   public String getName(ConstantPool constants) {
-      if (name_index == 0) {
-         return "UNKNOWN";
-      }
-      return constants.constant_string[name_index];
-   }
-
-   public String getParamStr(ConstantPool constants, MethodBody body, ABC abc, List<String> fullyQualifiedNames) {
-      HashMap<Integer, String> localRegNames = new HashMap<Integer, String>();
-      if (body != null) {
-         localRegNames = body.code.getLocalRegNamesFromDebug(abc);
-      }
-      String paramStr = "";
-      for (int i = 0; i < param_types.length; i++) {
-         if (i > 0) {
-            paramStr += ", ";
-         }
-         if (!localRegNames.isEmpty()) {
-            paramStr += localRegNames.get(i + 1);
-         } else if ((paramNames.length > i) && (paramNames[i] != 0) && Main.PARAM_NAMES_ENABLE) {
-            paramStr += constants.constant_string[paramNames[i]];
-         } else {
-            paramStr += "param" + (i + 1);
-         }
-         paramStr += ":";
-         if (param_types[i] == 0) {
-            paramStr += "*";
-         } else {
-            paramStr += constants.constant_multiname[param_types[i]].getName(constants, fullyQualifiedNames);
-         }
-         if (optional != null) {
-            if (i >= param_types.length - optional.length) {
-               paramStr += "=" + optional[i - (param_types.length - optional.length)].toString(constants);
+    public String getParamStr(ConstantPool constants, MethodBody body, ABC abc, List<String> fullyQualifiedNames) {
+        HashMap<Integer, String> localRegNames = new HashMap<Integer, String>();
+        if (body != null) {
+            localRegNames = body.code.getLocalRegNamesFromDebug(abc);
+        }
+        String paramStr = "";
+        for (int i = 0; i < param_types.length; i++) {
+            if (i > 0) {
+                paramStr += ", ";
             }
-         }
-      }
-      if (flagNeed_rest()) {
-         if ((param_types != null) && (param_types.length > 0)) {
-            paramStr += ", ";
-         }
-         paramStr += "... ";
-         if (!localRegNames.isEmpty()) {
-            paramStr += localRegNames.get(param_types.length + 1);
-         } else {
-            paramStr += "rest";
-         }
+            if (!localRegNames.isEmpty()) {
+                paramStr += localRegNames.get(i + 1);
+            } else if ((paramNames.length > i) && (paramNames[i] != 0) && Main.PARAM_NAMES_ENABLE) {
+                paramStr += constants.constant_string[paramNames[i]];
+            } else {
+                paramStr += "param" + (i + 1);
+            }
+            paramStr += ":";
+            if (param_types[i] == 0) {
+                paramStr += "*";
+            } else {
+                paramStr += constants.constant_multiname[param_types[i]].getName(constants, fullyQualifiedNames);
+            }
+            if (optional != null) {
+                if (i >= param_types.length - optional.length) {
+                    paramStr += "=" + optional[i - (param_types.length - optional.length)].toString(constants);
+                }
+            }
+        }
+        if (flagNeed_rest()) {
+            if ((param_types != null) && (param_types.length > 0)) {
+                paramStr += ", ";
+            }
+            paramStr += "... ";
+            if (!localRegNames.isEmpty()) {
+                paramStr += localRegNames.get(param_types.length + 1);
+            } else {
+                paramStr += "rest";
+            }
 
-      }
-      return paramStr;
-   }
+        }
+        return paramStr;
+    }
 
-   public String getReturnTypeStr(ConstantPool constants, List<String> fullyQualifiedNames) {
-      if (ret_type == 0) {
-         return "*";
-      }
-      return constants.constant_multiname[ret_type].getName(constants, fullyQualifiedNames);
-   }
+    public String getReturnTypeStr(ConstantPool constants, List<String> fullyQualifiedNames) {
+        if (ret_type == 0) {
+            return "*";
+        }
+        return constants.constant_multiname[ret_type].getName(constants, fullyQualifiedNames);
+    }
 
-   public void setBody(MethodBody body) {
-      this.body = body;
-   }
+    public void setBody(MethodBody body) {
+        this.body = body;
+    }
 
-   public MethodBody getBody() {
-      return body;
-   }
+    public MethodBody getBody() {
+        return body;
+    }
 }

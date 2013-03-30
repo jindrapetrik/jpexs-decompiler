@@ -22,19 +22,19 @@ import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
 
 public class TernarOpTreeItem extends TreeItem {
 
-   public TreeItem expression;
-   public TreeItem onTrue;
-   public TreeItem onFalse;
+    public TreeItem expression;
+    public TreeItem onTrue;
+    public TreeItem onFalse;
 
-   public TernarOpTreeItem(Action instruction, TreeItem expression, TreeItem onTrue, TreeItem onFalse) {
-      super(instruction, PRECEDENCE_CONDITIONAL);
-      this.expression = expression;
-      this.onTrue = onTrue;
-      this.onFalse = onFalse;
-   }
+    public TernarOpTreeItem(Action instruction, TreeItem expression, TreeItem onTrue, TreeItem onFalse) {
+        super(instruction, PRECEDENCE_CONDITIONAL);
+        this.expression = expression;
+        this.onTrue = onTrue;
+        this.onFalse = onFalse;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return expression.toString(constants) + hilight("?") + onTrue.toString(constants) + hilight(":") + onFalse.toString(constants);
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return expression.toString(constants) + hilight("?") + onTrue.toString(constants) + hilight(":") + onFalse.toString(constants);
+    }
 }

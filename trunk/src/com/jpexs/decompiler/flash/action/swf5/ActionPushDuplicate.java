@@ -25,20 +25,20 @@ import java.util.Stack;
 
 public class ActionPushDuplicate extends Action {
 
-   public ActionPushDuplicate() {
-      super(0x4C, 0);
-   }
+    public ActionPushDuplicate() {
+        super(0x4C, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "PushDuplicate";
-   }
+    @Override
+    public String toString() {
+        return "PushDuplicate";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem value = stack.pop();
-      stack.push(value);
-      stack.push(value);
-      value.moreSrc.add(new GraphSourceItemPos(this, 0));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem value = stack.pop();
+        stack.push(value);
+        stack.push(value);
+        value.moreSrc.add(new GraphSourceItemPos(this, 0));
+    }
 }

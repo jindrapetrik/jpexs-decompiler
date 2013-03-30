@@ -22,5 +22,5 @@ package com.jpexs.decompiler.flash.types;
  */
 public class LANGCODE {
 
-   public int languageCode;
+    public int languageCode;
 }

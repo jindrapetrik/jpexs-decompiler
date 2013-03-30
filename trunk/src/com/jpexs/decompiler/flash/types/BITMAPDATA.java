@@ -23,6 +23,6 @@ package com.jpexs.decompiler.flash.types;
  */
 public class BITMAPDATA {
 
-   public PIX15 bitmapPixelDataPix15[];
-   public PIX24 bitmapPixelDataPix24[];
+    public PIX15 bitmapPixelDataPix15[];
+    public PIX24 bitmapPixelDataPix24[];
 }

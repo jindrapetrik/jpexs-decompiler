@@ -6,5 +6,5 @@ package com.jpexs.decompiler.flash.graph;
  */
 public interface LogicalOpItem {
 
-   public GraphTargetItem invert();
+    public GraphTargetItem invert();
 }

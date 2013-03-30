@@ -21,72 +21,72 @@ import java.util.List;
 
 public class IfItem extends GraphTargetItem implements Block {
 
-   public GraphTargetItem expression;
-   public List<GraphTargetItem> onTrue;
-   public List<GraphTargetItem> onFalse;
+    public GraphTargetItem expression;
+    public List<GraphTargetItem> onTrue;
+    public List<GraphTargetItem> onFalse;
 
-   @Override
-   public boolean isCompileTime() {
-      return expression.isCompileTime();
-   }
+    @Override
+    public boolean isCompileTime() {
+        return expression.isCompileTime();
+    }
 
-   @Override
-   public List<List<GraphTargetItem>> getSubs() {
-      List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
-      ret.add(onTrue);
-      ret.add(onFalse);
-      return ret;
-   }
+    @Override
+    public List<List<GraphTargetItem>> getSubs() {
+        List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
+        ret.add(onTrue);
+        ret.add(onFalse);
+        return ret;
+    }
 
-   public IfItem(GraphSourceItem src, GraphTargetItem expression, List<GraphTargetItem> onTrue, List<GraphTargetItem> onFalse) {
-      super(src, NOPRECEDENCE);
-      this.expression = expression;
-      this.onTrue = onTrue;
-      this.onFalse = onFalse;
-   }
+    public IfItem(GraphSourceItem src, GraphTargetItem expression, List<GraphTargetItem> onTrue, List<GraphTargetItem> onFalse) {
+        super(src, NOPRECEDENCE);
+        this.expression = expression;
+        this.onTrue = onTrue;
+        this.onFalse = onFalse;
+    }
 
-   @Override
-   public String toString(List localData) {
-      String ret;
-      ret = hilight("if(") + expression.toString(localData) + hilight(")") + "\r\n{\r\n";
-      for (GraphTargetItem ti : onTrue) {
-         ret += ti.toStringSemicoloned(localData) + "\r\n";
-      }
-      ret += hilight("}");
-      if (onFalse.size() > 0) {
-         ret += "\r\n" + hilight("else") + "\r\n" + hilight("{") + "\r\n";
-         for (GraphTargetItem ti : onFalse) {
+    @Override
+    public String toString(List localData) {
+        String ret;
+        ret = hilight("if(") + expression.toString(localData) + hilight(")") + "\r\n{\r\n";
+        for (GraphTargetItem ti : onTrue) {
             ret += ti.toStringSemicoloned(localData) + "\r\n";
-         }
-         ret += hilight("}");
-      }
-      return ret;
-   }
+        }
+        ret += hilight("}");
+        if (onFalse.size() > 0) {
+            ret += "\r\n" + hilight("else") + "\r\n" + hilight("{") + "\r\n";
+            for (GraphTargetItem ti : onFalse) {
+                ret += ti.toStringSemicoloned(localData) + "\r\n";
+            }
+            ret += hilight("}");
+        }
+        return ret;
+    }
 
-   @Override
-   public boolean needsSemicolon() {
-      return false;
-   }
+    @Override
+    public boolean needsSemicolon() {
+        return false;
+    }
 
-   @Override
-   public List<ContinueItem> getContinues() {
-      List<ContinueItem> ret = new ArrayList<ContinueItem>();
-      for (GraphTargetItem ti : onTrue) {
-         if (ti instanceof ContinueItem) {
-            ret.add((ContinueItem) ti);
-         }
-         if (ti instanceof Block) {
-            ret.addAll(((Block) ti).getContinues());
-         }
-      }
-      for (GraphTargetItem ti : onFalse) {
-         if (ti instanceof ContinueItem) {
-            ret.add((ContinueItem) ti);
-         }
-         if (ti instanceof Block) {
-            ret.addAll(((Block) ti).getContinues());
-         }
-      }
-      return ret;
-   }
+    @Override
+    public List<ContinueItem> getContinues() {
+        List<ContinueItem> ret = new ArrayList<ContinueItem>();
+        for (GraphTargetItem ti : onTrue) {
+            if (ti instanceof ContinueItem) {
+                ret.add((ContinueItem) ti);
+            }
+            if (ti instanceof Block) {
+                ret.addAll(((Block) ti).getContinues());
+            }
+        }
+        for (GraphTargetItem ti : onFalse) {
+            if (ti instanceof ContinueItem) {
+                ret.add((ContinueItem) ti);
+            }
+            if (ti instanceof Block) {
+                ret.addAll(((Block) ti).getContinues());
+            }
+        }
+        return ret;
+    }
 }

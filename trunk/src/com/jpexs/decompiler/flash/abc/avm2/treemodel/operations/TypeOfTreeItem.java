@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.graph.UnaryOpItem;
 
 public class TypeOfTreeItem extends UnaryOpItem {
 
-   public TypeOfTreeItem(AVM2Instruction instruction, GraphTargetItem value) {
-      super(instruction, PRECEDENCE_UNARY, value, "typeof ");
-   }
+    public TypeOfTreeItem(AVM2Instruction instruction, GraphTargetItem value) {
+        super(instruction, PRECEDENCE_UNARY, value, "typeof ");
+    }
 }

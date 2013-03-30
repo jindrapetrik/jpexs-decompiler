@@ -25,12 +25,12 @@ import java.util.List;
  */
 public class CLIPACTIONS {
 
-   /**
-    * All events used in these clip actions
-    */
-   public CLIPEVENTFLAGS allEventFlags;
-   /**
-    * Individual event handlers
-    */
-   public List<CLIPACTIONRECORD> clipActionRecords;
+    /**
+     * All events used in these clip actions
+     */
+    public CLIPEVENTFLAGS allEventFlags;
+    /**
+     * Individual event handlers
+     */
+    public List<CLIPACTIONRECORD> clipActionRecords;
 }

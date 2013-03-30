@@ -22,7 +22,7 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions;
  */
 public class TagInstruction extends InstructionDefinition {
 
-   public TagInstruction(String tagName) {
-      super(-1, tagName, new int[0]);
-   }
+    public TagInstruction(String tagName) {
+        super(-1, tagName, new int[0]);
+    }
 }

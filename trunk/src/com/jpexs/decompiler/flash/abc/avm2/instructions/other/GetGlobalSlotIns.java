@@ -33,33 +33,33 @@ import java.util.Stack;
 
 public class GetGlobalSlotIns extends InstructionDefinition {
 
-   public GetGlobalSlotIns() {
-      super(0x6e, "getglobalslot", new int[]{AVM2Code.DAT_SLOT_INDEX});
-   }
+    public GetGlobalSlotIns() {
+        super(0x6e, "getglobalslot", new int[]{AVM2Code.DAT_SLOT_INDEX});
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      int slotIndex = ins.operands[0];
-      GraphTargetItem obj = (GraphTargetItem) scopeStack.get(0); //scope
-      Multiname slotname = null;
-      if (obj instanceof ExceptionTreeItem) {
-         slotname = constants.constant_multiname[((ExceptionTreeItem) obj).exception.name_index];
-      } else {
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        int slotIndex = ins.operands[0];
+        GraphTargetItem obj = (GraphTargetItem) scopeStack.get(0); //scope
+        Multiname slotname = null;
+        if (obj instanceof ExceptionTreeItem) {
+            slotname = constants.constant_multiname[((ExceptionTreeItem) obj).exception.name_index];
+        } else {
 
-         for (int t = 0; t < body.traits.traits.length; t++) {
-            if (body.traits.traits[t] instanceof TraitSlotConst) {
-               if (((TraitSlotConst) body.traits.traits[t]).slot_id == slotIndex) {
-                  slotname = body.traits.traits[t].getName(abc);
-               }
+            for (int t = 0; t < body.traits.traits.length; t++) {
+                if (body.traits.traits[t] instanceof TraitSlotConst) {
+                    if (((TraitSlotConst) body.traits.traits[t]).slot_id == slotIndex) {
+                        slotname = body.traits.traits[t].getName(abc);
+                    }
+                }
+
             }
+        }
+        stack.push(new GetSlotTreeItem(ins, obj, slotname));
+    }
 
-         }
-      }
-      stack.push(new GetSlotTreeItem(ins, obj, slotname));
-   }
-
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return 1;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return 1;
+    }
 }

@@ -41,99 +41,99 @@ import java.util.Stack;
 
 public class SetPropertyIns extends InstructionDefinition implements SetTypeIns {
 
-   public SetPropertyIns() {
-      super(0x61, "setproperty", new int[]{AVM2Code.DAT_MULTINAME_INDEX});
-   }
+    public SetPropertyIns() {
+        super(0x61, "setproperty", new int[]{AVM2Code.DAT_MULTINAME_INDEX});
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      int multinameIndex = ins.operands[0];
-      GraphTargetItem value = (GraphTargetItem) stack.pop();
-      FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
-      GraphTargetItem obj = (GraphTargetItem) stack.pop();
-      if (value.getThroughRegister() instanceof IncrementTreeItem) {
-         GraphTargetItem inside = ((IncrementTreeItem) value.getThroughRegister()).object.getThroughRegister().getNotCoerced();
-         if (inside instanceof GetPropertyTreeItem) {
-            GetPropertyTreeItem insideProp = ((GetPropertyTreeItem) inside);
-            if (insideProp.propertyName.compareSame(multiname)) {
-               GraphTargetItem insideObj = obj;
-               if (insideObj instanceof LocalRegTreeItem) {
-                  insideObj = ((LocalRegTreeItem) insideObj).computedValue;
-               }
-               if (insideProp.object == insideObj) {
-                  if (stack.size() > 0) {
-                     GraphTargetItem top = stack.peek().getNotCoerced();
-                     if (top == insideProp) {
-                        stack.pop();
-                        stack.push(new PostIncrementTreeItem(ins, insideProp));
-                     } else if ((top instanceof IncrementTreeItem) && (((IncrementTreeItem) top).object == inside)) {
-                        stack.pop();
-                        stack.push(new PreIncrementTreeItem(ins, insideProp));
-                     } else {
-                        output.add(new PostIncrementTreeItem(ins, insideProp));
-                     }
-                  } else {
-                     output.add(new PostIncrementTreeItem(ins, insideProp));
-                  }
-                  return;
-               }
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        int multinameIndex = ins.operands[0];
+        GraphTargetItem value = (GraphTargetItem) stack.pop();
+        FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
+        GraphTargetItem obj = (GraphTargetItem) stack.pop();
+        if (value.getThroughRegister() instanceof IncrementTreeItem) {
+            GraphTargetItem inside = ((IncrementTreeItem) value.getThroughRegister()).object.getThroughRegister().getNotCoerced();
+            if (inside instanceof GetPropertyTreeItem) {
+                GetPropertyTreeItem insideProp = ((GetPropertyTreeItem) inside);
+                if (insideProp.propertyName.compareSame(multiname)) {
+                    GraphTargetItem insideObj = obj;
+                    if (insideObj instanceof LocalRegTreeItem) {
+                        insideObj = ((LocalRegTreeItem) insideObj).computedValue;
+                    }
+                    if (insideProp.object == insideObj) {
+                        if (stack.size() > 0) {
+                            GraphTargetItem top = stack.peek().getNotCoerced();
+                            if (top == insideProp) {
+                                stack.pop();
+                                stack.push(new PostIncrementTreeItem(ins, insideProp));
+                            } else if ((top instanceof IncrementTreeItem) && (((IncrementTreeItem) top).object == inside)) {
+                                stack.pop();
+                                stack.push(new PreIncrementTreeItem(ins, insideProp));
+                            } else {
+                                output.add(new PostIncrementTreeItem(ins, insideProp));
+                            }
+                        } else {
+                            output.add(new PostIncrementTreeItem(ins, insideProp));
+                        }
+                        return;
+                    }
+                }
             }
-         }
-      }
+        }
 
-      if (value.getThroughRegister() instanceof DecrementTreeItem) {
-         GraphTargetItem inside = ((DecrementTreeItem) value.getThroughRegister()).object.getThroughRegister().getNotCoerced();
-         if (inside instanceof GetPropertyTreeItem) {
-            GetPropertyTreeItem insideProp = ((GetPropertyTreeItem) inside);
-            if (insideProp.propertyName.compareSame(multiname)) {
-               GraphTargetItem insideObj = obj;
-               if (insideObj instanceof LocalRegTreeItem) {
-                  insideObj = ((LocalRegTreeItem) insideObj).computedValue;
-               }
-               if (insideProp.object == insideObj) {
-                  if (stack.size() > 0) {
-                     GraphTargetItem top = stack.peek().getNotCoerced();
-                     if (top == insideProp) {
-                        stack.pop();
-                        stack.push(new PostDecrementTreeItem(ins, insideProp));
-                     } else if ((top instanceof DecrementTreeItem) && (((DecrementTreeItem) top).object == inside)) {
-                        stack.pop();
-                        stack.push(new PreDecrementTreeItem(ins, insideProp));
-                     } else {
-                        output.add(new PostDecrementTreeItem(ins, insideProp));
-                     }
-                  } else {
-                     output.add(new PostDecrementTreeItem(ins, insideProp));
-                  }
-                  return;
-               }
+        if (value.getThroughRegister() instanceof DecrementTreeItem) {
+            GraphTargetItem inside = ((DecrementTreeItem) value.getThroughRegister()).object.getThroughRegister().getNotCoerced();
+            if (inside instanceof GetPropertyTreeItem) {
+                GetPropertyTreeItem insideProp = ((GetPropertyTreeItem) inside);
+                if (insideProp.propertyName.compareSame(multiname)) {
+                    GraphTargetItem insideObj = obj;
+                    if (insideObj instanceof LocalRegTreeItem) {
+                        insideObj = ((LocalRegTreeItem) insideObj).computedValue;
+                    }
+                    if (insideProp.object == insideObj) {
+                        if (stack.size() > 0) {
+                            GraphTargetItem top = stack.peek().getNotCoerced();
+                            if (top == insideProp) {
+                                stack.pop();
+                                stack.push(new PostDecrementTreeItem(ins, insideProp));
+                            } else if ((top instanceof DecrementTreeItem) && (((DecrementTreeItem) top).object == inside)) {
+                                stack.pop();
+                                stack.push(new PreDecrementTreeItem(ins, insideProp));
+                            } else {
+                                output.add(new PostDecrementTreeItem(ins, insideProp));
+                            }
+                        } else {
+                            output.add(new PostDecrementTreeItem(ins, insideProp));
+                        }
+                        return;
+                    }
+                }
             }
-         }
-      }
-      output.add(new SetPropertyTreeItem(ins, obj, multiname, value));
-   }
+        }
+        output.add(new SetPropertyTreeItem(ins, obj, multiname, value));
+    }
 
-   @Override
-   public String getObject(Stack<TreeItem> stack, ABC abc, AVM2Instruction ins, List<TreeItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      int multinameIndex = ins.operands[0];
-      String multiname = resolveMultinameNoPop(0, stack, abc.constants, multinameIndex, ins, fullyQualifiedNames);
-      GraphTargetItem obj = stack.get(1 + resolvedCount(abc.constants, multinameIndex)); //pod vrcholem
-      if ((!obj.toString().equals(""))) {
-         multiname = "." + multiname;
-      }
-      return obj + multiname;
-   }
+    @Override
+    public String getObject(Stack<TreeItem> stack, ABC abc, AVM2Instruction ins, List<TreeItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        int multinameIndex = ins.operands[0];
+        String multiname = resolveMultinameNoPop(0, stack, abc.constants, multinameIndex, ins, fullyQualifiedNames);
+        GraphTargetItem obj = stack.get(1 + resolvedCount(abc.constants, multinameIndex)); //pod vrcholem
+        if ((!obj.toString().equals(""))) {
+            multiname = "." + multiname;
+        }
+        return obj + multiname;
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      int ret = -2;
-      int multinameIndex = ins.operands[0];
-      if (abc.constants.constant_multiname[multinameIndex].needsName()) {
-         ret--;
-      }
-      if (abc.constants.constant_multiname[multinameIndex].needsNs()) {
-         ret--;
-      }
-      return ret;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        int ret = -2;
+        int multinameIndex = ins.operands[0];
+        if (abc.constants.constant_multiname[multinameIndex].needsName()) {
+            ret--;
+        }
+        if (abc.constants.constant_multiname[multinameIndex].needsNs()) {
+            ret--;
+        }
+        return ret;
+    }
 }

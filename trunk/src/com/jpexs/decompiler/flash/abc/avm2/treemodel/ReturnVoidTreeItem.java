@@ -23,12 +23,12 @@ import java.util.List;
 
 public class ReturnVoidTreeItem extends TreeItem {
 
-   public ReturnVoidTreeItem(AVM2Instruction instruction) {
-      super(instruction, NOPRECEDENCE);
-   }
+    public ReturnVoidTreeItem(AVM2Instruction instruction) {
+        super(instruction, NOPRECEDENCE);
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return hilight("return");
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return hilight("return");
+    }
 }

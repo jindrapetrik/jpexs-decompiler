@@ -24,37 +24,37 @@ package com.jpexs.decompiler.flash.types;
  */
 public class CXFORM {
 
-   /**
-    * Has color addition values
-    */
-   public boolean hasAddTerms;
-   /**
-    * Has color multiply values
-    */
-   public boolean hasMultTerms;
-   public int nbits;
-   /**
-    * Red multiply value
-    */
-   public int redMultTerm;
-   /**
-    * Green multiply value
-    */
-   public int greenMultTerm;
-   /**
-    * Blue multiply value
-    */
-   public int blueMultTerm;
-   /**
-    * Red addition value
-    */
-   public int redAddTerm;
-   /**
-    * Green addition value
-    */
-   public int greenAddTerm;
-   /**
-    * Blue addition value
-    */
-   public int blueAddTerm;
+    /**
+     * Has color addition values
+     */
+    public boolean hasAddTerms;
+    /**
+     * Has color multiply values
+     */
+    public boolean hasMultTerms;
+    public int nbits;
+    /**
+     * Red multiply value
+     */
+    public int redMultTerm;
+    /**
+     * Green multiply value
+     */
+    public int greenMultTerm;
+    /**
+     * Blue multiply value
+     */
+    public int blueMultTerm;
+    /**
+     * Red addition value
+     */
+    public int redAddTerm;
+    /**
+     * Green addition value
+     */
+    public int greenAddTerm;
+    /**
+     * Blue addition value
+     */
+    public int blueAddTerm;
 }

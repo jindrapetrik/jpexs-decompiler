@@ -29,17 +29,17 @@ import java.util.List;
  */
 public class NextNameTreeItem extends TreeItem {
 
-   GraphTargetItem index;
-   GraphTargetItem obj;
+    GraphTargetItem index;
+    GraphTargetItem obj;
 
-   public NextNameTreeItem(AVM2Instruction instruction, GraphTargetItem index, GraphTargetItem obj) {
-      super(instruction, NOPRECEDENCE);
-      this.index = index;
-      this.obj = obj;
-   }
+    public NextNameTreeItem(AVM2Instruction instruction, GraphTargetItem index, GraphTargetItem obj) {
+        super(instruction, NOPRECEDENCE);
+        this.index = index;
+        this.obj = obj;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return "nextName(" + index.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "," + obj.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + ")";
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return "nextName(" + index.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "," + obj.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + ")";
+    }
 }

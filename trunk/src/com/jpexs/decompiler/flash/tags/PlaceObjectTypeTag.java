@@ -8,9 +8,9 @@ import com.jpexs.decompiler.flash.types.MATRIX;
  */
 public interface PlaceObjectTypeTag {
 
-   public int getCharacterId();
+    public int getCharacterId();
 
-   public int getDepth();
+    public int getDepth();
 
-   public MATRIX getMatrix();
+    public MATRIX getMatrix();
 }

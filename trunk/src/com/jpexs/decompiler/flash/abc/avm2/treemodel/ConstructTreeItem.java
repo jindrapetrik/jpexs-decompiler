@@ -24,29 +24,29 @@ import java.util.List;
 
 public class ConstructTreeItem extends TreeItem {
 
-   public GraphTargetItem object;
-   public List<GraphTargetItem> args;
+    public GraphTargetItem object;
+    public List<GraphTargetItem> args;
 
-   public ConstructTreeItem(AVM2Instruction instruction, GraphTargetItem object, List<GraphTargetItem> args) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.object = object;
-      this.args = args;
-   }
+    public ConstructTreeItem(AVM2Instruction instruction, GraphTargetItem object, List<GraphTargetItem> args) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.object = object;
+        this.args = args;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      String argStr = "";
-      for (int a = 0; a < args.size(); a++) {
-         if (a > 0) {
-            argStr = argStr + ",";
-         }
-         argStr = argStr + args.get(a).toString(constants, localRegNames, fullyQualifiedNames);
-      }
-      if (object instanceof NewFunctionTreeItem) {
-         return object.toString(constants, localRegNames, fullyQualifiedNames);
-      }
-      String obStr = object.toString(constants, localRegNames, fullyQualifiedNames);
-      return hilight("new ") + obStr + hilight("(") + argStr + hilight(")");
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        String argStr = "";
+        for (int a = 0; a < args.size(); a++) {
+            if (a > 0) {
+                argStr = argStr + ",";
+            }
+            argStr = argStr + args.get(a).toString(constants, localRegNames, fullyQualifiedNames);
+        }
+        if (object instanceof NewFunctionTreeItem) {
+            return object.toString(constants, localRegNames, fullyQualifiedNames);
+        }
+        String obStr = object.toString(constants, localRegNames, fullyQualifiedNames);
+        return hilight("new ") + obStr + hilight("(") + argStr + hilight(")");
 
-   }
+    }
 }

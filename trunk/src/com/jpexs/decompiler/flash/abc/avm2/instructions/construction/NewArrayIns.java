@@ -31,22 +31,22 @@ import java.util.Stack;
 
 public class NewArrayIns extends InstructionDefinition {
 
-   public NewArrayIns() {
-      super(0x56, "newarray", new int[]{AVM2Code.DAT_ARG_COUNT});
-   }
+    public NewArrayIns() {
+        super(0x56, "newarray", new int[]{AVM2Code.DAT_ARG_COUNT});
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      int argCount = ins.operands[0];
-      List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
-      for (int a = 0; a < argCount; a++) {
-         args.add(0, (GraphTargetItem) stack.pop());
-      }
-      stack.push(new NewArrayTreeItem(ins, args));
-   }
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        int argCount = ins.operands[0];
+        List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
+        for (int a = 0; a < argCount; a++) {
+            args.add(0, (GraphTargetItem) stack.pop());
+        }
+        stack.push(new NewArrayTreeItem(ins, args));
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -ins.operands[0] + 1;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return -ins.operands[0] + 1;
+    }
 }

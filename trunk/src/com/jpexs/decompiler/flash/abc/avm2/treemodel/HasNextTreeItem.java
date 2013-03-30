@@ -29,17 +29,17 @@ import java.util.List;
  */
 public class HasNextTreeItem extends TreeItem {
 
-   public GraphTargetItem object;
-   public GraphTargetItem collection;
+    public GraphTargetItem object;
+    public GraphTargetItem collection;
 
-   public HasNextTreeItem(AVM2Instruction instruction, GraphTargetItem object, GraphTargetItem collection) {
-      super(instruction, NOPRECEDENCE);
-      this.object = object;
-      this.collection = collection;
-   }
+    public HasNextTreeItem(AVM2Instruction instruction, GraphTargetItem object, GraphTargetItem collection) {
+        super(instruction, NOPRECEDENCE);
+        this.object = object;
+        this.collection = collection;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return collection.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + " hasNext " + object.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return collection.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + " hasNext " + object.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
+    }
 }

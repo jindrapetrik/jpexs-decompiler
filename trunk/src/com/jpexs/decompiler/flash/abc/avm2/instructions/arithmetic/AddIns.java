@@ -30,41 +30,41 @@ import java.util.Stack;
 
 public class AddIns extends InstructionDefinition {
 
-   public AddIns() {
-      super(0xa0, "add", new int[]{});
-   }
+    public AddIns() {
+        super(0xa0, "add", new int[]{});
+    }
 
-   @Override
-   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-      Object o1 = lda.operandStack.pop();
-      Object o2 = lda.operandStack.pop();
-      if ((o1 instanceof Long) && ((o2 instanceof Long))) {
-         Long ret = new Long(((Long) o1).longValue() + ((Long) o2).longValue());
-         lda.operandStack.push(ret);
-      } else if ((o1 instanceof Double) && ((o2 instanceof Double))) {
-         Double ret = new Double(((Double) o1).doubleValue() + ((Double) o2).doubleValue());
-         lda.operandStack.push(ret);
-      } else if ((o1 instanceof Long) && ((o2 instanceof Double))) {
-         Double ret = new Double(((Long) o1).longValue() + ((Double) o2).doubleValue());
-         lda.operandStack.push(ret);
-      } else if ((o1 instanceof Double) && ((o2 instanceof Long))) {
-         Double ret = new Double(((Double) o1).doubleValue() + ((Long) o2).longValue());
-         lda.operandStack.push(ret);
-      } else {
-         String s = o1.toString() + o2.toString();
-         lda.operandStack.push(s);
-      }
-   }
+    @Override
+    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        Object o1 = lda.operandStack.pop();
+        Object o2 = lda.operandStack.pop();
+        if ((o1 instanceof Long) && ((o2 instanceof Long))) {
+            Long ret = new Long(((Long) o1).longValue() + ((Long) o2).longValue());
+            lda.operandStack.push(ret);
+        } else if ((o1 instanceof Double) && ((o2 instanceof Double))) {
+            Double ret = new Double(((Double) o1).doubleValue() + ((Double) o2).doubleValue());
+            lda.operandStack.push(ret);
+        } else if ((o1 instanceof Long) && ((o2 instanceof Double))) {
+            Double ret = new Double(((Long) o1).longValue() + ((Double) o2).doubleValue());
+            lda.operandStack.push(ret);
+        } else if ((o1 instanceof Double) && ((o2 instanceof Long))) {
+            Double ret = new Double(((Double) o1).doubleValue() + ((Long) o2).longValue());
+            lda.operandStack.push(ret);
+        } else {
+            String s = o1.toString() + o2.toString();
+            lda.operandStack.push(s);
+        }
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      GraphTargetItem v2 = (GraphTargetItem) stack.pop();
-      GraphTargetItem v1 = (GraphTargetItem) stack.pop();
-      stack.push(new AddTreeItem(ins, v1, v2));
-   }
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        GraphTargetItem v2 = (GraphTargetItem) stack.pop();
+        GraphTargetItem v1 = (GraphTargetItem) stack.pop();
+        stack.push(new AddTreeItem(ins, v1, v2));
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -2 + 1;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return -2 + 1;
+    }
 }

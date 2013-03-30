@@ -18,10 +18,10 @@ package com.jpexs.decompiler.flash.graph;
 
 public abstract class LoopItem extends GraphTargetItem {
 
-   public Loop loop;
+    public Loop loop;
 
-   public LoopItem(GraphSourceItem src, Loop loop) {
-      super(src, NOPRECEDENCE);
-      this.loop = loop;
-   }
+    public LoopItem(GraphSourceItem src, Loop loop) {
+        super(src, NOPRECEDENCE);
+        this.loop = loop;
+    }
 }

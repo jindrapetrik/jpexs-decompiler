@@ -25,29 +25,29 @@ import java.util.List;
 
 public class ConstructSuperTreeItem extends TreeItem {
 
-   public GraphTargetItem object;
-   public List<GraphTargetItem> args;
+    public GraphTargetItem object;
+    public List<GraphTargetItem> args;
 
-   public ConstructSuperTreeItem(AVM2Instruction instruction, GraphTargetItem object, List<GraphTargetItem> args) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.object = object;
-      this.args = args;
-   }
+    public ConstructSuperTreeItem(AVM2Instruction instruction, GraphTargetItem object, List<GraphTargetItem> args) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.object = object;
+        this.args = args;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      String argStr = "";
-      for (int a = 0; a < args.size(); a++) {
-         if (a > 0) {
-            argStr = argStr + ",";
-         }
-         argStr = argStr + args.get(a).toString(constants, localRegNames, fullyQualifiedNames);
-      }
-      String calee = object.toString(constants, localRegNames, fullyQualifiedNames) + ".";
-      if (Highlighting.stripHilights(calee).equals("this.")) {
-         calee = "";
-      }
-      return calee + hilight("super(") + argStr + hilight(")");
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        String argStr = "";
+        for (int a = 0; a < args.size(); a++) {
+            if (a > 0) {
+                argStr = argStr + ",";
+            }
+            argStr = argStr + args.get(a).toString(constants, localRegNames, fullyQualifiedNames);
+        }
+        String calee = object.toString(constants, localRegNames, fullyQualifiedNames) + ".";
+        if (Highlighting.stripHilights(calee).equals("this.")) {
+            calee = "";
+        }
+        return calee + hilight("super(") + argStr + hilight(")");
 
-   }
+    }
 }

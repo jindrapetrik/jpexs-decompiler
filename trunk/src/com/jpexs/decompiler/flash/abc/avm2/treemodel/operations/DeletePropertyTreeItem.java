@@ -26,17 +26,17 @@ import java.util.List;
 
 public class DeletePropertyTreeItem extends TreeItem {
 
-   public GraphTargetItem object;
-   public FullMultinameTreeItem propertyName;
+    public GraphTargetItem object;
+    public FullMultinameTreeItem propertyName;
 
-   public DeletePropertyTreeItem(AVM2Instruction instruction, GraphTargetItem object, FullMultinameTreeItem propertyName) {
-      super(instruction, PRECEDENCE_UNARY);
-      this.object = object;
-      this.propertyName = propertyName;
-   }
+    public DeletePropertyTreeItem(AVM2Instruction instruction, GraphTargetItem object, FullMultinameTreeItem propertyName) {
+        super(instruction, PRECEDENCE_UNARY);
+        this.object = object;
+        this.propertyName = propertyName;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return hilight("delete ") + object.toString(constants, localRegNames, fullyQualifiedNames) + "[" + propertyName.toString(constants, localRegNames, fullyQualifiedNames) + "]";
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return hilight("delete ") + object.toString(constants, localRegNames, fullyQualifiedNames) + "[" + propertyName.toString(constants, localRegNames, fullyQualifiedNames) + "]";
+    }
 }

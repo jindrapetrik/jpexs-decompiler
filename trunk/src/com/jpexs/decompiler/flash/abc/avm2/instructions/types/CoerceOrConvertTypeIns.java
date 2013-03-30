@@ -26,5 +26,5 @@ import java.util.List;
  */
 public interface CoerceOrConvertTypeIns {
 
-   public String getTargetType(ConstantPool constants, AVM2Instruction ins, List<String> fullyQualifiedNames);
+    public String getTargetType(ConstantPool constants, AVM2Instruction ins, List<String> fullyQualifiedNames);
 }

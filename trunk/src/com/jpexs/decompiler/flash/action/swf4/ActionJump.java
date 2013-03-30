@@ -31,74 +31,74 @@ import java.util.List;
 
 public class ActionJump extends Action {
 
-   public int offset;
-   public String identifier;
+    public int offset;
+    public String identifier;
 
-   public ActionJump(int offset) {
-      super(0x99, 2);
-      this.offset = offset;
-   }
+    public ActionJump(int offset) {
+        super(0x99, 2);
+        this.offset = offset;
+    }
 
-   public ActionJump(SWFInputStream sis) throws IOException {
-      super(0x99, 2);
-      offset = sis.readSI16();
-   }
+    public ActionJump(SWFInputStream sis) throws IOException {
+        super(0x99, 2);
+        offset = sis.readSI16();
+    }
 
-   @Override
-   public List<Long> getAllRefs(int version) {
-      List<Long> ret = new ArrayList<Long>();
-      ret.add(getRef(version));
-      return ret;
-   }
+    @Override
+    public List<Long> getAllRefs(int version) {
+        List<Long> ret = new ArrayList<Long>();
+        ret.add(getRef(version));
+        return ret;
+    }
 
-   public long getRef(int version) {
-      return getAddress() + getBytes(version).length + offset;
-   }
+    public long getRef(int version) {
+        return getAddress() + getBytes(version).length + offset;
+    }
 
-   @Override
-   public byte[] getBytes(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      SWFOutputStream sos = new SWFOutputStream(baos, version);
-      try {
-         sos.writeSI16(offset);
-         sos.close();
-      } catch (IOException e) {
-      }
-      return surroundWithAction(baos.toByteArray(), version);
-   }
+    @Override
+    public byte[] getBytes(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SWFOutputStream sos = new SWFOutputStream(baos, version);
+        try {
+            sos.writeSI16(offset);
+            sos.close();
+        } catch (IOException e) {
+        }
+        return surroundWithAction(baos.toByteArray(), version);
+    }
 
-   @Override
-   public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
-      String ofsStr = Helper.formatAddress(getAddress() + getBytes(version).length + offset);
-      return "Jump loc" + ofsStr;
-   }
+    @Override
+    public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+        String ofsStr = Helper.formatAddress(getAddress() + getBytes(version).length + offset);
+        return "Jump loc" + ofsStr;
+    }
 
-   public ActionJump(FlasmLexer lexer) throws IOException, ParseException {
-      super(0x99, 0);
-      identifier = lexIdentifier(lexer);
-   }
+    public ActionJump(FlasmLexer lexer) throws IOException, ParseException {
+        super(0x99, 0);
+        identifier = lexIdentifier(lexer);
+    }
 
-   @Override
-   public List<Action> getAllIfsOrJumps() {
-      List<Action> ret = new ArrayList<Action>();
-      ret.add(this);
-      return ret;
-   }
+    @Override
+    public List<Action> getAllIfsOrJumps() {
+        List<Action> ret = new ArrayList<Action>();
+        ret.add(this);
+        return ret;
+    }
 
-   @Override
-   public String toString() {
-      return "Jump " + offset;
-   }
+    @Override
+    public String toString() {
+        return "Jump " + offset;
+    }
 
-   @Override
-   public boolean isJump() {
-      return true;
-   }
+    @Override
+    public boolean isJump() {
+        return true;
+    }
 
-   @Override
-   public List<Integer> getBranches(GraphSource code) {
-      List<Integer> ret = super.getBranches(code);
-      ret.add(code.adr2pos(getAddress() + getBytes(((ActionGraphSource) code).version).length + offset));
-      return ret;
-   }
+    @Override
+    public List<Integer> getBranches(GraphSource code) {
+        List<Integer> ret = super.getBranches(code);
+        ret.add(code.adr2pos(getAddress() + getBytes(((ActionGraphSource) code).version).length + offset));
+        return ret;
+    }
 }

@@ -22,40 +22,40 @@ import java.io.IOException;
 
 public class ProductInfoTag extends Tag {
 
-   public long productID;
-   public long edition;
-   public int majorVersion;
-   public int minorVersion;
-   public long buildLow;
-   public long buildHigh;
-   public long compilationDate;
+    public long productID;
+    public long edition;
+    public int majorVersion;
+    public int minorVersion;
+    public long buildLow;
+    public long buildHigh;
+    public long compilationDate;
 
-   public ProductInfoTag(byte[] data, int version, long pos) throws IOException {
-      super(41, "ProductInfo", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      /*
-       * 0: Unknown
-       * 1: Macromedia Flex for J2EE
-       * 2: Macromedia Flex for .NET
-       * 3: Adobe Flex
-       */
-      productID = sis.readUI32();
+    public ProductInfoTag(byte[] data, int version, long pos) throws IOException {
+        super(41, "ProductInfo", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        /*
+         * 0: Unknown
+         * 1: Macromedia Flex for J2EE
+         * 2: Macromedia Flex for .NET
+         * 3: Adobe Flex
+         */
+        productID = sis.readUI32();
 
-      /*
-       * 0: Developer Edition
-       * 1: Full Commercial Edition
-       * 2: Non Commercial Edition
-       * 3: Educational Edition
-       * 4: Not For Resale (NFR) Edition
-       * 5: Trial Edition
-       * 6: None
-       */
-      edition = sis.readUI32();
-      majorVersion = sis.readUI8();
-      minorVersion = sis.readUI8();
-      buildLow = sis.readUI32();
-      buildHigh = sis.readUI32();
-      compilationDate = sis.readUI32() & 0xffffffffL;
-      compilationDate |= sis.readUI32() << 32;
-   }
+        /*
+         * 0: Developer Edition
+         * 1: Full Commercial Edition
+         * 2: Non Commercial Edition
+         * 3: Educational Edition
+         * 4: Not For Resale (NFR) Edition
+         * 5: Trial Edition
+         * 6: None
+         */
+        edition = sis.readUI32();
+        majorVersion = sis.readUI8();
+        minorVersion = sis.readUI8();
+        buildLow = sis.readUI32();
+        buildHigh = sis.readUI32();
+        compilationDate = sis.readUI32() & 0xffffffffL;
+        compilationDate |= sis.readUI32() << 32;
+    }
 }

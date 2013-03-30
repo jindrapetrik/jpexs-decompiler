@@ -26,12 +26,12 @@ import java.util.List;
  */
 public class ImplementsMultinameUsage extends InsideClassMultinameUsage {
 
-   public ImplementsMultinameUsage(int multinameIndex, int classIndex) {
-      super(multinameIndex, classIndex);
-   }
+    public ImplementsMultinameUsage(int multinameIndex, int classIndex) {
+        super(multinameIndex, classIndex);
+    }
 
-   @Override
-   public String toString(List<DoABCTag> abcTags, ABC abc) {
-      return super.toString(abcTags, abc) + " implements";
-   }
+    @Override
+    public String toString(List<DoABCTag> abcTags, ABC abc) {
+        return super.toString(abcTags, abc) + " implements";
+    }
 }

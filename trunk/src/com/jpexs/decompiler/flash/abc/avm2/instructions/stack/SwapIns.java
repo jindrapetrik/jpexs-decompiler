@@ -31,31 +31,31 @@ import java.util.Stack;
 
 public class SwapIns extends InstructionDefinition {
 
-   public SwapIns() {
-      super(0x2b, "swap", new int[]{});
-   }
+    public SwapIns() {
+        super(0x2b, "swap", new int[]{});
+    }
 
-   @Override
-   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-      Object obj1 = lda.operandStack.pop();
-      Object obj2 = lda.operandStack.pop();
-      lda.operandStack.push(obj1);
-      lda.operandStack.push(obj2);
-   }
+    @Override
+    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        Object obj1 = lda.operandStack.pop();
+        Object obj2 = lda.operandStack.pop();
+        lda.operandStack.push(obj1);
+        lda.operandStack.push(obj2);
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
 
-      GraphTargetItem o1 = stack.pop();
-      GraphTargetItem o2 = stack.pop();
-      stack.push(o1);
-      stack.push(o2);
-      o1.moreSrc.add(new GraphSourceItemPos(ins, 0));
-      o2.moreSrc.add(new GraphSourceItemPos(ins, 0));
-   }
+        GraphTargetItem o1 = stack.pop();
+        GraphTargetItem o2 = stack.pop();
+        stack.push(o1);
+        stack.push(o2);
+        o1.moreSrc.add(new GraphSourceItemPos(ins, 0));
+        o2.moreSrc.add(new GraphSourceItemPos(ins, 0));
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -2 + 2;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return -2 + 2;
+    }
 }

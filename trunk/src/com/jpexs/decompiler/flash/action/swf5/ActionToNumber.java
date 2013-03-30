@@ -25,18 +25,18 @@ import java.util.Stack;
 
 public class ActionToNumber extends Action {
 
-   public ActionToNumber() {
-      super(0x4A, 0);
-   }
+    public ActionToNumber() {
+        super(0x4A, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "ToNumber";
-   }
+    @Override
+    public String toString() {
+        return "ToNumber";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem object = stack.pop();
-      stack.push(new ToNumberTreeItem(this, object));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem object = stack.pop();
+        stack.push(new ToNumberTreeItem(this, object));
+    }
 }

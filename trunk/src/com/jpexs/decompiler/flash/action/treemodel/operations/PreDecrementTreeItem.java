@@ -22,12 +22,12 @@ import com.jpexs.decompiler.flash.graph.UnaryOpItem;
 
 public class PreDecrementTreeItem extends UnaryOpItem {
 
-   public PreDecrementTreeItem(GraphSourceItem instruction, TreeItem object) {
-      super(instruction, PRECEDENCE_UNARY, object, "--");
-   }
+    public PreDecrementTreeItem(GraphSourceItem instruction, TreeItem object) {
+        super(instruction, PRECEDENCE_UNARY, object, "--");
+    }
 
-   @Override
-   public double toNumber() {
-      return value.toNumber() - 1;
-   }
+    @Override
+    public double toNumber() {
+        return value.toNumber() - 1;
+    }
 }

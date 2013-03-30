@@ -26,24 +26,24 @@ import java.util.List;
  */
 public abstract class InsideClassMultinameUsage extends MultinameUsage {
 
-   public int multinameIndex;
-   public int classIndex;
+    public int multinameIndex;
+    public int classIndex;
 
-   public InsideClassMultinameUsage(int multinameIndex, int classIndex) {
-      this.multinameIndex = multinameIndex;
-      this.classIndex = classIndex;
-   }
+    public InsideClassMultinameUsage(int multinameIndex, int classIndex) {
+        this.multinameIndex = multinameIndex;
+        this.classIndex = classIndex;
+    }
 
-   @Override
-   public String toString(List<DoABCTag> abcTags, ABC abc) {
-      return "class " + abc.constants.constant_multiname[abc.instance_info[classIndex].name_index].getNameWithNamespace(abc.constants);
-   }
+    @Override
+    public String toString(List<DoABCTag> abcTags, ABC abc) {
+        return "class " + abc.constants.constant_multiname[abc.instance_info[classIndex].name_index].getNameWithNamespace(abc.constants);
+    }
 
-   public int getMultinameIndex() {
-      return multinameIndex;
-   }
+    public int getMultinameIndex() {
+        return multinameIndex;
+    }
 
-   public int getClassIndex() {
-      return classIndex;
-   }
+    public int getClassIndex() {
+        return classIndex;
+    }
 }

@@ -27,26 +27,26 @@ import java.util.Stack;
 
 public class ActionPop extends Action {
 
-   public ActionPop() {
-      super(0x17, 0);
-   }
+    public ActionPop() {
+        super(0x17, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "Pop";
-   }
+    @Override
+    public String toString() {
+        return "Pop";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      if (stack.isEmpty()) {
-         return;
-      }
-      GraphTargetItem val = stack.pop();
-      if ((val instanceof CallFunctionTreeItem) || (val instanceof CallMethodTreeItem) || (val instanceof NewMethodTreeItem)) {
-         output.add(val);
-      }
-      /*if (!(val instanceof DirectValueTreeItem)) {
-       output.add(new VoidTreeItem(this, val));
-       }*/
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        if (stack.isEmpty()) {
+            return;
+        }
+        GraphTargetItem val = stack.pop();
+        if ((val instanceof CallFunctionTreeItem) || (val instanceof CallMethodTreeItem) || (val instanceof NewMethodTreeItem)) {
+            output.add(val);
+        }
+        /*if (!(val instanceof DirectValueTreeItem)) {
+         output.add(new VoidTreeItem(this, val));
+         }*/
+    }
 }

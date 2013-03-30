@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
 public class InTreeItem extends BinaryOpItem {
 
-   public InTreeItem(AVM2Instruction instruction, GraphTargetItem name, GraphTargetItem object) {
-      super(instruction, PRECEDENCE_RELATIONAL, name, object, " in ");
-   }
+    public InTreeItem(AVM2Instruction instruction, GraphTargetItem name, GraphTargetItem object) {
+        super(instruction, PRECEDENCE_RELATIONAL, name, object, " in ");
+    }
 }

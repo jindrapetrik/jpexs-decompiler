@@ -22,22 +22,22 @@ import java.util.List;
 
 public class RandomNumberTreeItem extends TreeItem {
 
-   private GraphTargetItem maximum;
+    private GraphTargetItem maximum;
 
-   public RandomNumberTreeItem(GraphSourceItem instruction, GraphTargetItem maximum) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.maximum = maximum;
-   }
+    public RandomNumberTreeItem(GraphSourceItem instruction, GraphTargetItem maximum) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.maximum = maximum;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return hilight("random(") + maximum.toString(constants) + hilight(")");
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return hilight("random(") + maximum.toString(constants) + hilight(")");
+    }
 
-   @Override
-   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(maximum.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(maximum.getNeededSources());
+        return ret;
+    }
 }

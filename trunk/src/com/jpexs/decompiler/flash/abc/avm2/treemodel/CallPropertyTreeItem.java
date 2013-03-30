@@ -24,28 +24,28 @@ import java.util.List;
 
 public class CallPropertyTreeItem extends TreeItem {
 
-   public GraphTargetItem receiver;
-   public FullMultinameTreeItem propertyName;
-   public List<GraphTargetItem> arguments;
-   public boolean isVoid;
+    public GraphTargetItem receiver;
+    public FullMultinameTreeItem propertyName;
+    public List<GraphTargetItem> arguments;
+    public boolean isVoid;
 
-   public CallPropertyTreeItem(AVM2Instruction instruction, boolean isVoid, GraphTargetItem receiver, FullMultinameTreeItem propertyName, List<GraphTargetItem> arguments) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.receiver = receiver;
-      this.propertyName = propertyName;
-      this.arguments = arguments;
-      this.isVoid = isVoid;
-   }
+    public CallPropertyTreeItem(AVM2Instruction instruction, boolean isVoid, GraphTargetItem receiver, FullMultinameTreeItem propertyName, List<GraphTargetItem> arguments) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.receiver = receiver;
+        this.propertyName = propertyName;
+        this.arguments = arguments;
+        this.isVoid = isVoid;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      String args = "";
-      for (int a = 0; a < arguments.size(); a++) {
-         if (a > 0) {
-            args = args + hilight(",");
-         }
-         args = args + arguments.get(a).toString(constants, localRegNames, fullyQualifiedNames);
-      }
-      return formatProperty(constants, receiver, propertyName, localRegNames, fullyQualifiedNames) + hilight("(") + args + hilight(")");
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        String args = "";
+        for (int a = 0; a < arguments.size(); a++) {
+            if (a > 0) {
+                args = args + hilight(",");
+            }
+            args = args + arguments.get(a).toString(constants, localRegNames, fullyQualifiedNames);
+        }
+        return formatProperty(constants, receiver, propertyName, localRegNames, fullyQualifiedNames) + hilight("(") + args + hilight(")");
+    }
 }

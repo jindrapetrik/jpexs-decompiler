@@ -25,18 +25,18 @@ import java.util.Stack;
 
 public class ActionTypeOf extends Action {
 
-   public ActionTypeOf() {
-      super(0x44, 0);
-   }
+    public ActionTypeOf() {
+        super(0x44, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "TypeOf";
-   }
+    @Override
+    public String toString() {
+        return "TypeOf";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem object = stack.pop();
-      stack.push(new TypeOfTreeItem(this, object));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem object = stack.pop();
+        stack.push(new TypeOfTreeItem(this, object));
+    }
 }

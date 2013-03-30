@@ -32,115 +32,115 @@ import java.util.logging.Logger;
 
 public class DoInitActionTag extends CharacterTag implements ASMSource {
 
-   /**
-    * Identifier of Sprite
-    */
-   public int spriteId = 0;
-   /**
-    * List of actions to perform
-    */
-   //public List<Action> actions = new ArrayList<Action>();
-   public byte[] actionBytes;
+    /**
+     * Identifier of Sprite
+     */
+    public int spriteId = 0;
+    /**
+     * List of actions to perform
+     */
+    //public List<Action> actions = new ArrayList<Action>();
+    public byte[] actionBytes;
 
-   /**
-    * Constructor
-    *
-    * @param data Data bytes
-    * @param version SWF version
-    * @throws IOException
-    */
-   public DoInitActionTag(byte[] data, int version, long pos) throws IOException {
-      super(59, "DoInitAction", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      spriteId = sis.readUI16();
-      //actions = sis.readActionList();
-      actionBytes = sis.readBytes(sis.available());
-   }
+    /**
+     * Constructor
+     *
+     * @param data Data bytes
+     * @param version SWF version
+     * @throws IOException
+     */
+    public DoInitActionTag(byte[] data, int version, long pos) throws IOException {
+        super(59, "DoInitAction", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        spriteId = sis.readUI16();
+        //actions = sis.readActionList();
+        actionBytes = sis.readBytes(sis.available());
+    }
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      SWFOutputStream sos = new SWFOutputStream(baos, version);
-      try {
-         sos.writeUI16(spriteId);
-         sos.write(actionBytes);
-         //sos.write(Action.actionsToBytes(actions, true, version));
-         sos.close();
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SWFOutputStream sos = new SWFOutputStream(baos, version);
+        try {
+            sos.writeUI16(spriteId);
+            sos.write(actionBytes);
+            //sos.write(Action.actionsToBytes(actions, true, version));
+            sos.close();
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 
-   /**
-    * Whether or not this object contains ASM source
-    *
-    * @return True when contains
-    */
-   @Override
-   public boolean containsSource() {
-      return true;
-   }
+    /**
+     * Whether or not this object contains ASM source
+     *
+     * @return True when contains
+     */
+    @Override
+    public boolean containsSource() {
+        return true;
+    }
 
-   /**
-    * Converts actions to ASM source
-    *
-    * @param version SWF version
-    * @return ASM source
-    */
-   @Override
-   public String getASMSource(int version, boolean hex) {
-      return Action.actionsToString(getActions(version), null, version, hex);
-   }
+    /**
+     * Converts actions to ASM source
+     *
+     * @param version SWF version
+     * @return ASM source
+     */
+    @Override
+    public String getASMSource(int version, boolean hex) {
+        return Action.actionsToString(getActions(version), null, version, hex);
+    }
 
-   @Override
-   public List<Action> getActions(int version) {
-      try {
-         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-         int prevLength = 0;
-         if (previousTag != null) {
-            byte prevData[] = previousTag.getData(version);
-            baos.write(prevData);
-            prevLength = prevData.length;
-            baos.write(0);
-            baos.write(0);
-            prevLength += 2;
-            byte header[] = SWFOutputStream.getTagHeader(this, data, version);
-            baos.write(header);
-            prevLength += header.length;
-         }
-         baos.write(actionBytes);
-         ReReadableInputStream rri = new ReReadableInputStream(new ByteArrayInputStream(baos.toByteArray()));
-         rri.setPos(prevLength);
-         return Action.removeNops(SWFInputStream.readActionList(rri, version, prevLength), version);
-      } catch (Exception ex) {
-         Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex);
-         return new ArrayList<Action>();
-      }
-   }
+    @Override
+    public List<Action> getActions(int version) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            int prevLength = 0;
+            if (previousTag != null) {
+                byte prevData[] = previousTag.getData(version);
+                baos.write(prevData);
+                prevLength = prevData.length;
+                baos.write(0);
+                baos.write(0);
+                prevLength += 2;
+                byte header[] = SWFOutputStream.getTagHeader(this, data, version);
+                baos.write(header);
+                prevLength += header.length;
+            }
+            baos.write(actionBytes);
+            ReReadableInputStream rri = new ReReadableInputStream(new ByteArrayInputStream(baos.toByteArray()));
+            rri.setPos(prevLength);
+            return Action.removeNops(SWFInputStream.readActionList(rri, version, prevLength), version);
+        } catch (Exception ex) {
+            Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex);
+            return new ArrayList<Action>();
+        }
+    }
 
-   @Override
-   public void setActions(List<Action> actions, int version) {
-      actionBytes = Action.actionsToBytes(actions, true, version);
-   }
+    @Override
+    public void setActions(List<Action> actions, int version) {
+        actionBytes = Action.actionsToBytes(actions, true, version);
+    }
 
-   @Override
-   public byte[] getActionBytes() {
-      return actionBytes;
-   }
+    @Override
+    public byte[] getActionBytes() {
+        return actionBytes;
+    }
 
-   @Override
-   public void setActionBytes(byte[] actionBytes) {
-      this.actionBytes = actionBytes;
-   }
+    @Override
+    public void setActionBytes(byte[] actionBytes) {
+        this.actionBytes = actionBytes;
+    }
 
-   @Override
-   public int getCharacterID() {
-      return spriteId;
-   }
+    @Override
+    public int getCharacterID() {
+        return spriteId;
+    }
 }

@@ -22,22 +22,22 @@ import java.util.List;
 
 public class RemoveSpriteTreeItem extends TreeItem {
 
-   private GraphTargetItem target;
+    private GraphTargetItem target;
 
-   public RemoveSpriteTreeItem(GraphSourceItem instruction, GraphTargetItem target) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.target = target;
-   }
+    public RemoveSpriteTreeItem(GraphSourceItem instruction, GraphTargetItem target) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.target = target;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return hilight("removeMovieClip(") + target.toString(constants) + hilight(")");
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return hilight("removeMovieClip(") + target.toString(constants) + hilight(")");
+    }
 
-   @Override
-   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(target.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(target.getNeededSources());
+        return ret;
+    }
 }

@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 public class DebugFileIns extends InstructionDefinition {
 
-   public DebugFileIns() {
-      super(0xf1, "debugfile", new int[]{AVM2Code.DAT_STRING_INDEX});
-   }
+    public DebugFileIns() {
+        super(0xf1, "debugfile", new int[]{AVM2Code.DAT_STRING_INDEX});
+    }
 }

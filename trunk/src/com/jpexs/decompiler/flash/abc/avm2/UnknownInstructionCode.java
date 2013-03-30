@@ -18,10 +18,10 @@ package com.jpexs.decompiler.flash.abc.avm2;
 
 public class UnknownInstructionCode extends RuntimeException {
 
-   public int code;
+    public int code;
 
-   public UnknownInstructionCode(int code) {
-      super("Unknown instruction code: 0x" + Integer.toHexString(code));
-      this.code = code;
-   }
+    public UnknownInstructionCode(int code) {
+        super("Unknown instruction code: 0x" + Integer.toHexString(code));
+        this.code = code;
+    }
 }

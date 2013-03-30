@@ -22,28 +22,28 @@ import java.util.List;
 
 public class DeleteTreeItem extends TreeItem {
 
-   public GraphTargetItem object;
-   public GraphTargetItem propertyName;
+    public GraphTargetItem object;
+    public GraphTargetItem propertyName;
 
-   public DeleteTreeItem(GraphSourceItem instruction, GraphTargetItem object, GraphTargetItem propertyName) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.object = object;
-      this.propertyName = propertyName;
-   }
+    public DeleteTreeItem(GraphSourceItem instruction, GraphTargetItem object, GraphTargetItem propertyName) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.object = object;
+        this.propertyName = propertyName;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      if (object == null) {
-         return hilight("delete ") + propertyName.toString(constants);
-      }
-      return hilight("delete ") + object.toString(constants) + "." + stripQuotes(propertyName);
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        if (object == null) {
+            return hilight("delete ") + propertyName.toString(constants);
+        }
+        return hilight("delete ") + object.toString(constants) + "." + stripQuotes(propertyName);
+    }
 
-   @Override
-   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(object.getNeededSources());
-      ret.addAll(propertyName.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(object.getNeededSources());
+        ret.addAll(propertyName.getNeededSources());
+        return ret;
+    }
 }

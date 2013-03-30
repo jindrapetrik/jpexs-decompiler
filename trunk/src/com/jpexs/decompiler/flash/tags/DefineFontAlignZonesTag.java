@@ -28,43 +28,43 @@ import java.util.List;
 
 public class DefineFontAlignZonesTag extends Tag {
 
-   public int fontID;
-   public int CSMTableHint;
-   public List<ZONERECORD> zoneTable;
+    public int fontID;
+    public int CSMTableHint;
+    public List<ZONERECORD> zoneTable;
 
-   public DefineFontAlignZonesTag(byte[] data, int version, long pos) throws IOException {
-      super(73, "DefineFontAlignZones", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      fontID = sis.readUI16();
-      CSMTableHint = (int) sis.readUB(2);
-      sis.readUB(6);
-      zoneTable = new ArrayList<ZONERECORD>();
-      while (sis.available() > 0) {
-         ZONERECORD zr = sis.readZONERECORD();
-         zoneTable.add(zr);
-      }
-   }
+    public DefineFontAlignZonesTag(byte[] data, int version, long pos) throws IOException {
+        super(73, "DefineFontAlignZones", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        fontID = sis.readUI16();
+        CSMTableHint = (int) sis.readUB(2);
+        sis.readUB(6);
+        zoneTable = new ArrayList<ZONERECORD>();
+        while (sis.available() > 0) {
+            ZONERECORD zr = sis.readZONERECORD();
+            zoneTable.add(zr);
+        }
+    }
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         sos.writeUI16(fontID);
-         sos.writeUB(2, CSMTableHint);
-         sos.writeUB(6, 0);
-         for (ZONERECORD z : zoneTable) {
-            sos.writeZONERECORD(z);
-         }
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            sos.writeUI16(fontID);
+            sos.writeUB(2, CSMTableHint);
+            sos.writeUB(6, 0);
+            for (ZONERECORD z : zoneTable) {
+                sos.writeZONERECORD(z);
+            }
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 }

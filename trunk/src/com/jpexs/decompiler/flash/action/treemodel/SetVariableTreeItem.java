@@ -22,35 +22,35 @@ import java.util.List;
 
 public class SetVariableTreeItem extends TreeItem implements SetTypeTreeItem {
 
-   public GraphTargetItem name;
-   public GraphTargetItem value;
+    public GraphTargetItem name;
+    public GraphTargetItem value;
 
-   public SetVariableTreeItem(GraphSourceItem instruction, GraphTargetItem name, GraphTargetItem value) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.name = name;
-      this.value = value;
-   }
+    public SetVariableTreeItem(GraphSourceItem instruction, GraphTargetItem name, GraphTargetItem value) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.name = name;
+        this.value = value;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return stripQuotes(name) + hilight("=") + value.toString(constants);
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return stripQuotes(name) + hilight("=") + value.toString(constants);
+    }
 
-   @Override
-   public GraphTargetItem getObject() {
-      return new GetVariableTreeItem(src, value);
-   }
+    @Override
+    public GraphTargetItem getObject() {
+        return new GetVariableTreeItem(src, value);
+    }
 
-   @Override
-   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(name.getNeededSources());
-      ret.addAll(value.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(name.getNeededSources());
+        ret.addAll(value.getNeededSources());
+        return ret;
+    }
 
-   @Override
-   public boolean isCompileTime() {
-      return value.isCompileTime();
-   }
+    @Override
+    public boolean isCompileTime() {
+        return value.isCompileTime();
+    }
 }

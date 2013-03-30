@@ -25,18 +25,18 @@ import java.util.List;
 
 public class GetSlotTreeItem extends TreeItem {
 
-   public Multiname slotName;
-   public GraphTargetItem scope;
+    public Multiname slotName;
+    public GraphTargetItem scope;
 
-   public GetSlotTreeItem(AVM2Instruction instruction, GraphTargetItem scope, Multiname slotName) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.slotName = slotName;
-      this.scope = scope;
-   }
+    public GetSlotTreeItem(AVM2Instruction instruction, GraphTargetItem scope, Multiname slotName) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.slotName = slotName;
+        this.scope = scope;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      //scope.toString(constants)+"."
-      return hilight(slotName.getName(constants, fullyQualifiedNames));
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        //scope.toString(constants)+"."
+        return hilight(slotName.getName(constants, fullyQualifiedNames));
+    }
 }

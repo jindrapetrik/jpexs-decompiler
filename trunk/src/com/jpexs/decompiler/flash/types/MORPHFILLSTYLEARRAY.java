@@ -22,5 +22,5 @@ package com.jpexs.decompiler.flash.types;
  */
 public class MORPHFILLSTYLEARRAY {
 
-   public MORPHFILLSTYLE fillStyles[];
+    public MORPHFILLSTYLE fillStyles[];
 }

@@ -25,51 +25,51 @@ import com.jpexs.decompiler.flash.types.RGBA;
  */
 public class DROPSHADOWFILTER extends FILTER {
 
-   /**
-    * Color of the shadow
-    */
-   public RGBA dropShadowColor;
-   /**
-    * Horizontal blur amount
-    */
-   public double blurX;
-   /**
-    * Vertical blur amount
-    */
-   public double blurY;
-   /**
-    * Radian angle of the drop shadow
-    */
-   public double angle;
-   /**
-    * Distance of the drop shadow
-    */
-   public double distance;
-   /**
-    * Strength of the drop shadow
-    */
-   public float strength;
-   /**
-    * Inner shadow mode
-    */
-   public boolean innerShadow;
-   /**
-    * Knockout mode
-    */
-   public boolean knockout;
-   /**
-    * Composite source
-    */
-   public boolean compositeSource;
-   /**
-    * Number of blur passes
-    */
-   public int passes;
+    /**
+     * Color of the shadow
+     */
+    public RGBA dropShadowColor;
+    /**
+     * Horizontal blur amount
+     */
+    public double blurX;
+    /**
+     * Vertical blur amount
+     */
+    public double blurY;
+    /**
+     * Radian angle of the drop shadow
+     */
+    public double angle;
+    /**
+     * Distance of the drop shadow
+     */
+    public double distance;
+    /**
+     * Strength of the drop shadow
+     */
+    public float strength;
+    /**
+     * Inner shadow mode
+     */
+    public boolean innerShadow;
+    /**
+     * Knockout mode
+     */
+    public boolean knockout;
+    /**
+     * Composite source
+     */
+    public boolean compositeSource;
+    /**
+     * Number of blur passes
+     */
+    public int passes;
 
-   /**
-    * Constructor
-    */
-   public DROPSHADOWFILTER() {
-      super(0);
-   }
+    /**
+     * Constructor
+     */
+    public DROPSHADOWFILTER() {
+        super(0);
+    }
 }

@@ -25,18 +25,18 @@ import java.util.Stack;
 
 public class ActionDefineLocal2 extends Action {
 
-   public ActionDefineLocal2() {
-      super(0x41, 0);
-   }
+    public ActionDefineLocal2() {
+        super(0x41, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "DefineLocal2";
-   }
+    @Override
+    public String toString() {
+        return "DefineLocal2";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem name = stack.pop();
-      output.add(new DefineLocalTreeItem(this, name, null));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem name = stack.pop();
+        output.add(new DefineLocalTreeItem(this, name, null));
+    }
 }

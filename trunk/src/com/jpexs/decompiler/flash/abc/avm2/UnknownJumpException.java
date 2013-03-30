@@ -22,18 +22,18 @@ import java.util.Stack;
 
 public class UnknownJumpException extends RuntimeException {
 
-   public Stack stack;
-   public int ip;
-   public List<GraphTargetItem> output;
+    public Stack stack;
+    public int ip;
+    public List<GraphTargetItem> output;
 
-   public UnknownJumpException(Stack stack, int ip, List<GraphTargetItem> output) {
-      this.stack = stack;
-      this.ip = ip;
-      this.output = output;
-   }
+    public UnknownJumpException(Stack stack, int ip, List<GraphTargetItem> output) {
+        this.stack = stack;
+        this.ip = ip;
+        this.output = output;
+    }
 
-   @Override
-   public String toString() {
-      return "Unknown jump to " + ip;
-   }
+    @Override
+    public String toString() {
+        return "Unknown jump to " + ip;
+    }
 }

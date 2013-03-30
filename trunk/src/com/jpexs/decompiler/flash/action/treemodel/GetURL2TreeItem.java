@@ -22,46 +22,46 @@ import java.util.List;
 
 public class GetURL2TreeItem extends TreeItem {
 
-   public GraphTargetItem urlString;
-   public GraphTargetItem targetString;
-   public int method;
-   public boolean loadTargetFlag;
-   public boolean loadVariablesFlag;
+    public GraphTargetItem urlString;
+    public GraphTargetItem targetString;
+    public int method;
+    public boolean loadTargetFlag;
+    public boolean loadVariablesFlag;
 
-   @Override
-   public String toString(ConstantPool constants) {
-      String methodStr = "";
-      if (method == 1) {
-         methodStr = ",\"GET\"";
-      }
-      if (method == 2) {
-         methodStr = ",\"POST\"";
-      }
-      String prefix = "getUrl";
-      if (loadVariablesFlag) {
-         prefix = "loadVariables";
-      }
-      if (loadTargetFlag && (!loadVariablesFlag)) {
-         prefix = "loadMovie";
-      }
+    @Override
+    public String toString(ConstantPool constants) {
+        String methodStr = "";
+        if (method == 1) {
+            methodStr = ",\"GET\"";
+        }
+        if (method == 2) {
+            methodStr = ",\"POST\"";
+        }
+        String prefix = "getUrl";
+        if (loadVariablesFlag) {
+            prefix = "loadVariables";
+        }
+        if (loadTargetFlag && (!loadVariablesFlag)) {
+            prefix = "loadMovie";
+        }
 
-      return hilight(prefix + "(") + urlString.toString(constants) + hilight(",") + targetString.toString(constants) + hilight(methodStr + ")");
-   }
+        return hilight(prefix + "(") + urlString.toString(constants) + hilight(",") + targetString.toString(constants) + hilight(methodStr + ")");
+    }
 
-   public GetURL2TreeItem(GraphSourceItem instruction, GraphTargetItem urlString, GraphTargetItem targetString, int method, boolean loadTargetFlag, boolean loadVariablesFlag) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.urlString = urlString;
-      this.targetString = targetString;
-      this.method = method;
-      this.loadTargetFlag = loadTargetFlag;
-      this.loadVariablesFlag = loadVariablesFlag;
-   }
+    public GetURL2TreeItem(GraphSourceItem instruction, GraphTargetItem urlString, GraphTargetItem targetString, int method, boolean loadTargetFlag, boolean loadVariablesFlag) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.urlString = urlString;
+        this.targetString = targetString;
+        this.method = method;
+        this.loadTargetFlag = loadTargetFlag;
+        this.loadVariablesFlag = loadVariablesFlag;
+    }
 
-   @Override
-   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(urlString.getNeededSources());
-      ret.addAll(targetString.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(urlString.getNeededSources());
+        ret.addAll(targetString.getNeededSources());
+        return ret;
+    }
 }

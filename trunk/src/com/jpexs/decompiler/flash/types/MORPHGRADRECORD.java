@@ -22,8 +22,8 @@ package com.jpexs.decompiler.flash.types;
  */
 public class MORPHGRADRECORD {
 
-   public int startRatio;
-   public RGBA startColor;
-   public int endRatio;
-   public RGBA endColor;
+    public int startRatio;
+    public RGBA startColor;
+    public int endRatio;
+    public RGBA endColor;
 }

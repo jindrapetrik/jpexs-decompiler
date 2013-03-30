@@ -24,15 +24,15 @@ import java.util.List;
 
 public class WithObjectTreeItem extends TreeItem {
 
-   public GraphTargetItem scope;
+    public GraphTargetItem scope;
 
-   public WithObjectTreeItem(AVM2Instruction instruction, GraphTargetItem scope) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.scope = scope;
-   }
+    public WithObjectTreeItem(AVM2Instruction instruction, GraphTargetItem scope) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.scope = scope;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return "";
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return "";
+    }
 }

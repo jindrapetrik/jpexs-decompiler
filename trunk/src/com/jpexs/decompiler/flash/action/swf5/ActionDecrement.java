@@ -25,18 +25,18 @@ import java.util.Stack;
 
 public class ActionDecrement extends Action {
 
-   public ActionDecrement() {
-      super(0x51, 0);
-   }
+    public ActionDecrement() {
+        super(0x51, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "Decrement";
-   }
+    @Override
+    public String toString() {
+        return "Decrement";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem a = stack.pop();
-      stack.push(new DecrementTreeItem(this, a));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem a = stack.pop();
+        stack.push(new DecrementTreeItem(this, a));
+    }
 }

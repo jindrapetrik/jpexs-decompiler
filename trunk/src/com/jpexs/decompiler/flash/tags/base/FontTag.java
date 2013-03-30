@@ -24,7 +24,7 @@ import com.jpexs.decompiler.flash.types.SHAPE;
  */
 public interface FontTag extends AloneTag {
 
-   public int getFontId();
+    public int getFontId();
 
-   public SHAPE[] getGlyphShapeTable();
+    public SHAPE[] getGlyphShapeTable();
 }

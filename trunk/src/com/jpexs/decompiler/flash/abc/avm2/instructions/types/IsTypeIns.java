@@ -31,19 +31,19 @@ import java.util.Stack;
 
 public class IsTypeIns extends InstructionDefinition {
 
-   public IsTypeIns() {
-      super(0xb2, "istype", new int[]{AVM2Code.DAT_MULTINAME_INDEX});
-   }
+    public IsTypeIns() {
+        super(0xb2, "istype", new int[]{AVM2Code.DAT_MULTINAME_INDEX});
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      int multinameIndex = ins.operands[0];
-      GraphTargetItem value = (GraphTargetItem) stack.pop();
-      stack.push(new IsTypeTreeItem(ins, value, new FullMultinameTreeItem(ins, multinameIndex)));
-   }
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        int multinameIndex = ins.operands[0];
+        GraphTargetItem value = (GraphTargetItem) stack.pop();
+        stack.push(new IsTypeTreeItem(ins, value, new FullMultinameTreeItem(ins, multinameIndex)));
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -1 + 1; //may not be runtime multiname
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return -1 + 1; //may not be runtime multiname
+    }
 }

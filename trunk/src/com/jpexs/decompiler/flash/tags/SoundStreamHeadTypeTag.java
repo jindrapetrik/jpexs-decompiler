@@ -6,11 +6,11 @@ package com.jpexs.decompiler.flash.tags;
  */
 public interface SoundStreamHeadTypeTag {
 
-   public int getSoundFormat();
+    public int getSoundFormat();
 
-   public int getSoundRate();
+    public int getSoundRate();
 
-   public int getSoundSize();
+    public int getSoundSize();
 
-   public int getSoundType();
+    public int getSoundType();
 }

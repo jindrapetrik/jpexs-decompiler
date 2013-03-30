@@ -24,12 +24,12 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
  */
 public class InstructionStats {
 
-   public boolean seen = false;
-   public int stackpos = 0;
-   public int scopepos = 0;
-   public AVM2Instruction ins;
+    public boolean seen = false;
+    public int stackpos = 0;
+    public int scopepos = 0;
+    public AVM2Instruction ins;
 
-   public InstructionStats(AVM2Instruction ins) {
-      this.ins = ins;
-   }
+    public InstructionStats(AVM2Instruction ins) {
+        this.ins = ins;
+    }
 }

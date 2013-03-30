@@ -23,17 +23,17 @@ import com.jpexs.decompiler.flash.graph.LogicalOpItem;
 
 public class GtTreeItem extends BinaryOpItem implements LogicalOpItem {
 
-   public GtTreeItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-      super(instruction, PRECEDENCE_RELATIONAL, leftSide, rightSide, ">");
-   }
+    public GtTreeItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, PRECEDENCE_RELATIONAL, leftSide, rightSide, ">");
+    }
 
-   @Override
-   public GraphTargetItem invert() {
-      return new LeTreeItem(src, leftSide, rightSide);
-   }
+    @Override
+    public GraphTargetItem invert() {
+        return new LeTreeItem(src, leftSide, rightSide);
+    }
 
-   @Override
-   public boolean toBoolean() {
-      return leftSide.toNumber() > rightSide.toNumber();
-   }
+    @Override
+    public boolean toBoolean() {
+        return leftSide.toNumber() > rightSide.toNumber();
+    }
 }

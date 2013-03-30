@@ -27,21 +27,21 @@ import java.util.Stack;
 
 public class ActionSetVariable extends Action {
 
-   public ActionSetVariable() {
-      super(0x1D, 0);
-   }
+    public ActionSetVariable() {
+        super(0x1D, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "SetVariable";
-   }
+    @Override
+    public String toString() {
+        return "SetVariable";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem value = stack.pop();
-      GraphTargetItem name = stack.pop();
-      SetVariableTreeItem svt = new SetVariableTreeItem(this, name, value);
-      variables.put(Highlighting.stripHilights(name.toStringNoQuotes((ConstantPool)null)), value);
-      output.add(svt);
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem value = stack.pop();
+        GraphTargetItem name = stack.pop();
+        SetVariableTreeItem svt = new SetVariableTreeItem(this, name, value);
+        variables.put(Highlighting.stripHilights(name.toStringNoQuotes((ConstantPool) null)), value);
+        output.add(svt);
+    }
 }

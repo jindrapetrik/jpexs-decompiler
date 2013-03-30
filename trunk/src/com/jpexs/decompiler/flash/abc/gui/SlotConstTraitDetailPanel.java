@@ -33,55 +33,55 @@ import jsyntaxpane.syntaxkits.Flasm3MethodInfoSyntaxKit;
  */
 public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
 
-   public JEditorPane slotConstEditor;
-   private ABC abc;
-   private TraitSlotConst trait;
+    public JEditorPane slotConstEditor;
+    private ABC abc;
+    private TraitSlotConst trait;
 
-   public SlotConstTraitDetailPanel() {
-      slotConstEditor = new JEditorPane();
-      setLayout(new BorderLayout());
-      add(new JLabel("Type and Value:"), BorderLayout.NORTH);
-      add(new JScrollPane(slotConstEditor), BorderLayout.CENTER);
-      slotConstEditor.setContentType("text/flasm3_methodinfo");
-      Flasm3MethodInfoSyntaxKit sk = (Flasm3MethodInfoSyntaxKit) slotConstEditor.getEditorKit();
-      sk.deinstallComponent(slotConstEditor, "jsyntaxpane.components.LineNumbersRuler");
-   }
+    public SlotConstTraitDetailPanel() {
+        slotConstEditor = new JEditorPane();
+        setLayout(new BorderLayout());
+        add(new JLabel("Type and Value:"), BorderLayout.NORTH);
+        add(new JScrollPane(slotConstEditor), BorderLayout.CENTER);
+        slotConstEditor.setContentType("text/flasm3_methodinfo");
+        Flasm3MethodInfoSyntaxKit sk = (Flasm3MethodInfoSyntaxKit) slotConstEditor.getEditorKit();
+        sk.deinstallComponent(slotConstEditor, "jsyntaxpane.components.LineNumbersRuler");
+    }
 
-   public void load(TraitSlotConst trait, ABC abc) {
-      this.abc = abc;
-      this.trait = trait;
-      String s;
-      String typeStr;
-      if (trait.type_index > 0) {
-         typeStr = "m[" + trait.type_index + "]\"" + Helper.escapeString(abc.constants.constant_multiname[trait.type_index].toString(abc.constants, new ArrayList<String>())) + "\"";
-      } else {
-         typeStr = "*";
-      }
-      String valueStr = "";
-      if (trait.value_kind != 0) {
-         valueStr = " = " + (new ValueKind(trait.value_index, trait.value_kind)).toString(abc.constants);
-      }
+    public void load(TraitSlotConst trait, ABC abc) {
+        this.abc = abc;
+        this.trait = trait;
+        String s;
+        String typeStr;
+        if (trait.type_index > 0) {
+            typeStr = "m[" + trait.type_index + "]\"" + Helper.escapeString(abc.constants.constant_multiname[trait.type_index].toString(abc.constants, new ArrayList<String>())) + "\"";
+        } else {
+            typeStr = "*";
+        }
+        String valueStr = "";
+        if (trait.value_kind != 0) {
+            valueStr = " = " + (new ValueKind(trait.value_index, trait.value_kind)).toString(abc.constants);
+        }
 
-      s = typeStr + valueStr;
+        s = typeStr + valueStr;
 
-      slotConstEditor.setText(s);
-   }
+        slotConstEditor.setText(s);
+    }
 
-   @Override
-   public boolean save() {
-      try {
-         if (!MethodInfoParser.parseSlotConst(slotConstEditor.getText(), trait, abc)) {
+    @Override
+    public boolean save() {
+        try {
+            if (!MethodInfoParser.parseSlotConst(slotConstEditor.getText(), trait, abc)) {
+                return false;
+            }
+        } catch (ParseException ex) {
+            JOptionPane.showMessageDialog(slotConstEditor, ex.text, "SlotConst typevalue Error", JOptionPane.ERROR_MESSAGE);
             return false;
-         }
-      } catch (ParseException ex) {
-         JOptionPane.showMessageDialog(slotConstEditor, ex.text, "SlotConst typevalue Error", JOptionPane.ERROR_MESSAGE);
-         return false;
-      }
-      return true;
-   }
+        }
+        return true;
+    }
 
-   @Override
-   public void setEditMode(boolean val) {
-      slotConstEditor.setEditable(val);
-   }
+    @Override
+    public void setEditMode(boolean val) {
+        slotConstEditor.setEditable(val);
+    }
 }

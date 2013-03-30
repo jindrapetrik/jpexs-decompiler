@@ -25,17 +25,17 @@ import java.util.Stack;
 
 public class ActionNextFrame extends Action {
 
-   public ActionNextFrame() {
-      super(0x04, 0);
-   }
+    public ActionNextFrame() {
+        super(0x04, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "NextFrame";
-   }
+    @Override
+    public String toString() {
+        return "NextFrame";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      output.add(new SimpleActionTreeItem(this, "nextFrame()"));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        output.add(new SimpleActionTreeItem(this, "nextFrame()"));
+    }
 }

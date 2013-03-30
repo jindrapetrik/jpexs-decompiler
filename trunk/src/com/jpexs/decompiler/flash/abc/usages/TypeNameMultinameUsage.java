@@ -27,14 +27,14 @@ import java.util.List;
  */
 public class TypeNameMultinameUsage extends MultinameUsage {
 
-   public int typename_index;
+    public int typename_index;
 
-   public TypeNameMultinameUsage(int typename_index) {
-      this.typename_index = typename_index;
-   }
+    public TypeNameMultinameUsage(int typename_index) {
+        this.typename_index = typename_index;
+    }
 
-   @Override
-   public String toString(List<DoABCTag> abcTags, ABC abc) {
-      return "TypeName " + abc.constants.constant_multiname[typename_index].toString(abc.constants, new ArrayList<String>());
-   }
+    @Override
+    public String toString(List<DoABCTag> abcTags, ABC abc) {
+        return "TypeName " + abc.constants.constant_multiname[typename_index].toString(abc.constants, new ArrayList<String>());
+    }
 }

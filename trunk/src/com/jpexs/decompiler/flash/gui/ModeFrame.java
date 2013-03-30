@@ -34,64 +34,64 @@ import javax.swing.JLabel;
  */
 public class ModeFrame extends JFrame implements ActionListener {
 
-   private JButton openButton = new JButton("Open local file");
-   private JButton proxyButton = new JButton("Open via proxy");
-   private JButton exitButton = new JButton("Exit application");
+    private JButton openButton = new JButton("Open local file");
+    private JButton proxyButton = new JButton("Open via proxy");
+    private JButton exitButton = new JButton("Exit application");
 
-   /**
-    * Constructor
-    */
-   public ModeFrame() {
-      setSize(350, 200);
-      openButton.addActionListener(this);
-      openButton.setActionCommand("OPEN");
-      openButton.setIcon(View.getIcon("open24"));
-      proxyButton.addActionListener(this);
-      proxyButton.setActionCommand("PROXY");
-      proxyButton.setIcon(View.getIcon("proxy24"));
-      exitButton.addActionListener(this);
-      exitButton.setActionCommand("EXIT");
-      exitButton.setIcon(View.getIcon("exit24"));
-      setResizable(false);
-      Container cont = getContentPane();
-      cont.setLayout(new GridLayout(4, 1));
-      JLabel logoLabel = new JLabel();
-      logoLabel.setIcon(View.getIcon("logo"));
-      cont.add(logoLabel);
-      cont.add(openButton);
-      cont.add(proxyButton);
-      cont.add(exitButton);
-      View.centerScreen(this);
-      View.setWindowIcon(this);
-      setTitle(Main.shortApplicationVerName);
-      this.addWindowListener(new WindowAdapter() {
-         @Override
-         public void windowClosing(WindowEvent e) {
+    /**
+     * Constructor
+     */
+    public ModeFrame() {
+        setSize(350, 200);
+        openButton.addActionListener(this);
+        openButton.setActionCommand("OPEN");
+        openButton.setIcon(View.getIcon("open24"));
+        proxyButton.addActionListener(this);
+        proxyButton.setActionCommand("PROXY");
+        proxyButton.setIcon(View.getIcon("proxy24"));
+        exitButton.addActionListener(this);
+        exitButton.setActionCommand("EXIT");
+        exitButton.setIcon(View.getIcon("exit24"));
+        setResizable(false);
+        Container cont = getContentPane();
+        cont.setLayout(new GridLayout(4, 1));
+        JLabel logoLabel = new JLabel();
+        logoLabel.setIcon(View.getIcon("logo"));
+        cont.add(logoLabel);
+        cont.add(openButton);
+        cont.add(proxyButton);
+        cont.add(exitButton);
+        View.centerScreen(this);
+        View.setWindowIcon(this);
+        setTitle(Main.shortApplicationVerName);
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                Main.exit();
+            }
+        });
+    }
+
+    /**
+     * Method handling actions from buttons
+     *
+     * @param e event
+     */
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getActionCommand().equals("OPEN")) {
+            setVisible(false);
+            if (!Main.openFileDialog()) {
+                setVisible(true);
+            }
+        }
+        if (e.getActionCommand().equals("PROXY")) {
+            setVisible(false);
+            Main.showProxy();
+        }
+        if (e.getActionCommand().equals("EXIT")) {
+            setVisible(false);
             Main.exit();
-         }
-      });
-   }
-
-   /**
-    * Method handling actions from buttons
-    *
-    * @param e event
-    */
-   @Override
-   public void actionPerformed(ActionEvent e) {
-      if (e.getActionCommand().equals("OPEN")) {
-         setVisible(false);
-         if (!Main.openFileDialog()) {
-            setVisible(true);
-         }
-      }
-      if (e.getActionCommand().equals("PROXY")) {
-         setVisible(false);
-         Main.showProxy();
-      }
-      if (e.getActionCommand().equals("EXIT")) {
-         setVisible(false);
-         Main.exit();
-      }
-   }
+        }
+    }
 }

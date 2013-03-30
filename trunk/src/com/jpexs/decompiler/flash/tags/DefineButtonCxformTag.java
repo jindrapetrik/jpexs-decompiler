@@ -31,39 +31,39 @@ import java.io.OutputStream;
  */
 public class DefineButtonCxformTag extends Tag {
 
-   public int buttonId;
-   public CXFORM buttonColorTransform;
+    public int buttonId;
+    public CXFORM buttonColorTransform;
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         sos.writeUI16(buttonId);
-         sos.writeCXFORM(buttonColorTransform);
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            sos.writeUI16(buttonId);
+            sos.writeCXFORM(buttonColorTransform);
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 
-   /**
-    * Constructor
-    *
-    * @param data Data bytes
-    * @param version SWF version
-    * @throws IOException
-    */
-   public DefineButtonCxformTag(byte data[], int version, long pos) throws IOException {
-      super(23, "DefineButtonCxform", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      buttonId = sis.readUI16();
-      buttonColorTransform = sis.readCXFORM();
-   }
+    /**
+     * Constructor
+     *
+     * @param data Data bytes
+     * @param version SWF version
+     * @throws IOException
+     */
+    public DefineButtonCxformTag(byte data[], int version, long pos) throws IOException {
+        super(23, "DefineButtonCxform", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        buttonId = sis.readUI16();
+        buttonColorTransform = sis.readCXFORM();
+    }
 }

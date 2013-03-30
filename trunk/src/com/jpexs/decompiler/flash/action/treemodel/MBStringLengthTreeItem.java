@@ -22,26 +22,26 @@ import java.util.List;
 
 public class MBStringLengthTreeItem extends TreeItem {
 
-   public GraphTargetItem value;
+    public GraphTargetItem value;
 
-   public MBStringLengthTreeItem(GraphSourceItem instruction, GraphTargetItem value) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.value = value;
-   }
+    public MBStringLengthTreeItem(GraphSourceItem instruction, GraphTargetItem value) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.value = value;
+    }
 
-   @Override
-   public String toString(ConstantPool constants) {
-      String s = value.toString(constants);
-      if (value.precedence > precedence) {
-         s = "(" + s + ")";
-      }
-      return hilight("mblength(") + s + ")";
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        String s = value.toString(constants);
+        if (value.precedence > precedence) {
+            s = "(" + s + ")";
+        }
+        return hilight("mblength(") + s + ")";
+    }
 
-   @Override
-   public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-      List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(value.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
+        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(value.getNeededSources());
+        return ret;
+    }
 }

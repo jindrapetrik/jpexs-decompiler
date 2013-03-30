@@ -21,7 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 
 public class DebugLineIns extends InstructionDefinition {
 
-   public DebugLineIns() {
-      super(0xf0, "debugline", new int[]{AVM2Code.DAT_LINENUM});
-   }
+    public DebugLineIns() {
+        super(0xf0, "debugline", new int[]{AVM2Code.DAT_LINENUM});
+    }
 }

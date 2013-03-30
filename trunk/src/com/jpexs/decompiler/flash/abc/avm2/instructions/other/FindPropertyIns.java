@@ -32,36 +32,36 @@ import java.util.Stack;
 
 public class FindPropertyIns extends InstructionDefinition {
 
-   public FindPropertyIns() {
-      super(0x5e, "findproperty", new int[]{AVM2Code.DAT_MULTINAME_INDEX});
-   }
+    public FindPropertyIns() {
+        super(0x5e, "findproperty", new int[]{AVM2Code.DAT_MULTINAME_INDEX});
+    }
 
-   @Override
-   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-      int multiIndex = (int) ((Long) arguments.get(0)).longValue();
-      //if is runtime
-      //pop(name), pop(ns)
-      throw new RuntimeException("Cannot find property");
+    @Override
+    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        int multiIndex = (int) ((Long) arguments.get(0)).longValue();
+        //if is runtime
+        //pop(name), pop(ns)
+        throw new RuntimeException("Cannot find property");
 
-   }
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      int multinameIndex = ins.operands[0];
-      FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
-      stack.push(new FindPropertyTreeItem(ins, multiname)); //resolve right object
-   }
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        int multinameIndex = ins.operands[0];
+        FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
+        stack.push(new FindPropertyTreeItem(ins, multiname)); //resolve right object
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      int ret = 1;
-      int multinameIndex = ins.operands[0];
-      if (abc.constants.constant_multiname[multinameIndex].needsName()) {
-         ret--;
-      }
-      if (abc.constants.constant_multiname[multinameIndex].needsNs()) {
-         ret--;
-      }
-      return ret;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        int ret = 1;
+        int multinameIndex = ins.operands[0];
+        if (abc.constants.constant_multiname[multinameIndex].needsName()) {
+            ret--;
+        }
+        if (abc.constants.constant_multiname[multinameIndex].needsNs()) {
+            ret--;
+        }
+        return ret;
+    }
 }

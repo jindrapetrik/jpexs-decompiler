@@ -20,16 +20,16 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 
 public class NamespaceSet {
 
-   public int namespaces[];
+    public int namespaces[];
 
-   public String toString(ConstantPool constants) {
-      String s = "";
-      for (int i = 0; i < this.namespaces.length; i++) {
-         if (i > 0) {
-            s += ", ";
-         }
-         s += constants.constant_namespace[namespaces[i]].getNameWithKind(constants);
-      }
-      return s;
-   }
+    public String toString(ConstantPool constants) {
+        String s = "";
+        for (int i = 0; i < this.namespaces.length; i++) {
+            if (i > 0) {
+                s += ", ";
+            }
+            s += constants.constant_namespace[namespaces[i]].getNameWithKind(constants);
+        }
+        return s;
+    }
 }

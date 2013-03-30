@@ -25,17 +25,17 @@ import java.util.Stack;
 
 public class ActionCall extends Action {
 
-   public ActionCall() {
-      super(0x9E, 0);
-   }
+    public ActionCall() {
+        super(0x9E, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "Call";
-   }
+    @Override
+    public String toString() {
+        return "Call";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      output.add(new CallTreeItem(this, stack.pop()));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        output.add(new CallTreeItem(this, stack.pop()));
+    }
 }

@@ -26,105 +26,105 @@ import javax.swing.tree.TreePath;
 
 public class TagTreeModel implements TreeModel {
 
-   private String root = "";
-   private List<TagNode> list = new ArrayList<TagNode>();
+    private String root = "";
+    private List<TagNode> list = new ArrayList<TagNode>();
 
-   public TagTreeModel(List<TagNode> list, String rootName) {
-      this.root = rootName;
-      this.list = list;
-   }
+    public TagTreeModel(List<TagNode> list, String rootName) {
+        this.root = rootName;
+        this.list = list;
+    }
 
-   public List<TagNode> getNodeList() {
-      return list;
-   }
+    public List<TagNode> getNodeList() {
+        return list;
+    }
 
-   @Override
-   public Object getRoot() {
-      return root;
-   }
+    @Override
+    public Object getRoot() {
+        return root;
+    }
 
-   @Override
-   public Object getChild(Object parent, int index) {
-      if (parent instanceof TagNode) {
-         if (((TagNode) parent).tag instanceof ClassesListTreeModel) {
-            ClassesListTreeModel clt = (ClassesListTreeModel) ((TagNode) parent).tag;
-            return clt.getChild(clt.getRoot(), index);
-         }
-      } else if (parent instanceof TreeElement) {
-         return ((TreeElement) parent).getChild(index);
-      }
-      if (parent == root) {
-         return list.get(index);
-      } else {
-         return ((TagNode) parent).subItems.get(index);
-      }
-   }
-
-   @Override
-   public int getChildCount(Object parent) {
-      if (parent == root) {
-         return list.size();
-      } else {
-         if (parent instanceof TagNode) {
+    @Override
+    public Object getChild(Object parent, int index) {
+        if (parent instanceof TagNode) {
             if (((TagNode) parent).tag instanceof ClassesListTreeModel) {
-               ClassesListTreeModel clt = (ClassesListTreeModel) ((TagNode) parent).tag;
-               return clt.getChildCount(clt.getRoot());
+                ClassesListTreeModel clt = (ClassesListTreeModel) ((TagNode) parent).tag;
+                return clt.getChild(clt.getRoot(), index);
             }
-            return ((TagNode) parent).subItems.size();
-         } else if (parent instanceof TreeElement) {
-            return ((TreeElement) parent).getChildCount();
-         }
-         return 0;
+        } else if (parent instanceof TreeElement) {
+            return ((TreeElement) parent).getChild(index);
+        }
+        if (parent == root) {
+            return list.get(index);
+        } else {
+            return ((TagNode) parent).subItems.get(index);
+        }
+    }
 
-      }
-   }
-
-   @Override
-   public boolean isLeaf(Object node) {
-      return (getChildCount(node) == 0);
-   }
-
-   @Override
-   public void valueForPathChanged(TreePath path, Object newValue) {
-   }
-
-   @Override
-   public int getIndexOfChild(Object parent, Object child) {
-      if (parent instanceof TagNode) {
-         if (((TagNode) parent).tag instanceof ClassesListTreeModel) {
-            ClassesListTreeModel clt = (ClassesListTreeModel) ((TagNode) parent).tag;
-            return clt.getIndexOfChild(clt.getRoot(), child);
-         }
-      }
-      if (parent == root) {
-         for (int t = 0; t < list.size(); t++) {
-            if (list.get(t) == child) {
-               return t;
+    @Override
+    public int getChildCount(Object parent) {
+        if (parent == root) {
+            return list.size();
+        } else {
+            if (parent instanceof TagNode) {
+                if (((TagNode) parent).tag instanceof ClassesListTreeModel) {
+                    ClassesListTreeModel clt = (ClassesListTreeModel) ((TagNode) parent).tag;
+                    return clt.getChildCount(clt.getRoot());
+                }
+                return ((TagNode) parent).subItems.size();
+            } else if (parent instanceof TreeElement) {
+                return ((TreeElement) parent).getChildCount();
             }
-         }
-         return -1;
-      } else {
-         if (parent instanceof TagNode) {
-            List<TagNode> subTags = ((TagNode) parent).subItems;
-            for (int t = 0; t < subTags.size(); t++) {
-               if (subTags.get(t) == child) {
-                  return t;
-               }
+            return 0;
+
+        }
+    }
+
+    @Override
+    public boolean isLeaf(Object node) {
+        return (getChildCount(node) == 0);
+    }
+
+    @Override
+    public void valueForPathChanged(TreePath path, Object newValue) {
+    }
+
+    @Override
+    public int getIndexOfChild(Object parent, Object child) {
+        if (parent instanceof TagNode) {
+            if (((TagNode) parent).tag instanceof ClassesListTreeModel) {
+                ClassesListTreeModel clt = (ClassesListTreeModel) ((TagNode) parent).tag;
+                return clt.getIndexOfChild(clt.getRoot(), child);
             }
-         }
-         if (parent instanceof TreeElement) {
-            return ((TreeElement) parent).getIndexOfChild((TreeElement) child);
-         }
+        }
+        if (parent == root) {
+            for (int t = 0; t < list.size(); t++) {
+                if (list.get(t) == child) {
+                    return t;
+                }
+            }
+            return -1;
+        } else {
+            if (parent instanceof TagNode) {
+                List<TagNode> subTags = ((TagNode) parent).subItems;
+                for (int t = 0; t < subTags.size(); t++) {
+                    if (subTags.get(t) == child) {
+                        return t;
+                    }
+                }
+            }
+            if (parent instanceof TreeElement) {
+                return ((TreeElement) parent).getIndexOfChild((TreeElement) child);
+            }
 
-         return -1;
-      }
-   }
+            return -1;
+        }
+    }
 
-   @Override
-   public void addTreeModelListener(TreeModelListener l) {
-   }
+    @Override
+    public void addTreeModelListener(TreeModelListener l) {
+    }
 
-   @Override
-   public void removeTreeModelListener(TreeModelListener l) {
-   }
+    @Override
+    public void removeTreeModelListener(TreeModelListener l) {
+    }
 }

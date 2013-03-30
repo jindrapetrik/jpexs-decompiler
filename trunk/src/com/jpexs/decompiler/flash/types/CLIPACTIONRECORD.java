@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -34,87 +33,87 @@ import java.util.logging.Logger;
  */
 public class CLIPACTIONRECORD implements ASMSource {
 
-   /**
-    * Events to which this handler applies
-    */
-   public CLIPEVENTFLAGS eventFlags;
-   /**
-    * If EventFlags contain ClipEventKeyPress: Key code to trap
-    */
-   public int keyCode;
-   /**
-    * Actions to perform
-    */
-   //public List<Action> actions;
-   public byte[] actionBytes;
+    /**
+     * Events to which this handler applies
+     */
+    public CLIPEVENTFLAGS eventFlags;
+    /**
+     * If EventFlags contain ClipEventKeyPress: Key code to trap
+     */
+    public int keyCode;
+    /**
+     * Actions to perform
+     */
+    //public List<Action> actions;
+    public byte[] actionBytes;
 
-   /**
-    * Returns a string representation of the object
-    *
-    * @return a string representation of the object.
-    */
-   @Override
-   public String toString() {
-      return "CLIPACTIONRECORD";
-   }
+    /**
+     * Returns a string representation of the object
+     *
+     * @return a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        return "CLIPACTIONRECORD";
+    }
 
-   /**
-    * Returns header with events converted to string
-    *
-    * @return String representation of events
-    */
-   public String getHeader() {
-      String ret;
-      ret = eventFlags.toString();
-      if (eventFlags.clipEventKeyPress) {
-         ret = ret.replace("keyPress", "keyPress<" + keyCode + ">");
-      }
-      return ret;
-   }
+    /**
+     * Returns header with events converted to string
+     *
+     * @return String representation of events
+     */
+    public String getHeader() {
+        String ret;
+        ret = eventFlags.toString();
+        if (eventFlags.clipEventKeyPress) {
+            ret = ret.replace("keyPress", "keyPress<" + keyCode + ">");
+        }
+        return ret;
+    }
 
-   /**
-    * Converts actions to ASM source
-    *
-    * @param version SWF version
-    * @return ASM source
-    */
-   @Override
-   public String getASMSource(int version, boolean hex) {
-      return Action.actionsToString(getActions(version), null, version, hex);
-   }
+    /**
+     * Converts actions to ASM source
+     *
+     * @param version SWF version
+     * @return ASM source
+     */
+    @Override
+    public String getASMSource(int version, boolean hex) {
+        return Action.actionsToString(getActions(version), null, version, hex);
+    }
 
-   /**
-    * Whether or not this object contains ASM source
-    *
-    * @return True when contains
-    */
-   @Override
-   public boolean containsSource() {
-      return true;
-   }
+    /**
+     * Whether or not this object contains ASM source
+     *
+     * @return True when contains
+     */
+    @Override
+    public boolean containsSource() {
+        return true;
+    }
 
-   @Override
-   public List<Action> getActions(int version) {
-      try {
-         return Action.removeNops(SWFInputStream.readActionList(new ReReadableInputStream(new ByteArrayInputStream(actionBytes)), version, 0), version);
-      } catch (Exception ex) {
-         Logger.getLogger(BUTTONCONDACTION.class.getName()).log(Level.SEVERE, null, ex);
-         return new ArrayList<Action>();
-      }
-   }
+    @Override
+    public List<Action> getActions(int version) {
+        try {
+            return Action.removeNops(SWFInputStream.readActionList(new ReReadableInputStream(new ByteArrayInputStream(actionBytes)), version, 0), version);
+        } catch (Exception ex) {
+            Logger.getLogger(BUTTONCONDACTION.class.getName()).log(Level.SEVERE, null, ex);
+            return new ArrayList<Action>();
+        }
+    }
 
-   @Override
-   public void setActions(List<Action> actions, int version) {
-      actionBytes = Action.actionsToBytes(actions, true, version);
-   }
+    @Override
+    public void setActions(List<Action> actions, int version) {
+        actionBytes = Action.actionsToBytes(actions, true, version);
+    }
 
-   @Override
-   public byte[] getActionBytes() {
-      return actionBytes;
-   }
+    @Override
+    public byte[] getActionBytes() {
+        return actionBytes;
+    }
 
-   @Override
-   public void setActionBytes(byte[] actionBytes) {
-      this.actionBytes = actionBytes;
-   }
+    @Override
+    public void setActionBytes(byte[] actionBytes) {
+        this.actionBytes = actionBytes;
+    }
 }

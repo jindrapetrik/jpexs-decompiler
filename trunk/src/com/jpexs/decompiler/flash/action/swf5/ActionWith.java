@@ -31,78 +31,78 @@ import java.util.List;
 
 public class ActionWith extends Action implements ActionContainer {
 
-   public List<Action> actions;
-   public int size;
-   public int version;
+    public List<Action> actions;
+    public int size;
+    public int version;
 
-   @Override
-   public List<Action> getActions() {
-      return actions;
-   }
+    @Override
+    public List<Action> getActions() {
+        return actions;
+    }
 
-   public ActionWith(SWFInputStream sis, int version) throws IOException {
-      super(0x94, 2);
-      size = sis.readUI16();
-      this.version = version;
-      //actions = new ArrayList<Action>();
-      actions = (new SWFInputStream(new ByteArrayInputStream(sis.readBytes(size)), version)).readActionList();
-   }
+    public ActionWith(SWFInputStream sis, int version) throws IOException {
+        super(0x94, 2);
+        size = sis.readUI16();
+        this.version = version;
+        //actions = new ArrayList<Action>();
+        actions = (new SWFInputStream(new ByteArrayInputStream(sis.readBytes(size)), version)).readActionList();
+    }
 
-   public ActionWith(boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
-      super(0x94, 2);
-      lexBlockOpen(lexer);
-      actions = ASMParser.parse(ignoreNops, labels, address + 5, lexer, constantPool, version);
-   }
+    public ActionWith(boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
+        super(0x94, 2);
+        lexBlockOpen(lexer);
+        actions = ASMParser.parse(ignoreNops, labels, address + 5, lexer, constantPool, version);
+    }
 
-   @Override
-   public void setAddress(long address, int version) {
-      super.setAddress(address, version);
-      Action.setActionsAddresses(actions, address + 5, version);
-   }
+    @Override
+    public void setAddress(long address, int version) {
+        super.setAddress(address, version);
+        Action.setActionsAddresses(actions, address + 5, version);
+    }
 
-   @Override
-   public byte[] getHeaderBytes() {
-      ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      SWFOutputStream sos = new SWFOutputStream(baos, version);
-      try {
-         byte codeBytes[] = Action.actionsToBytes(actions, false, version);
-         sos.writeUI16(codeBytes.length);
-         sos.close();
-         baos2.write(surroundWithAction(baos.toByteArray(), version));
-      } catch (IOException e) {
-      }
-      return baos2.toByteArray();
-   }
+    @Override
+    public byte[] getHeaderBytes() {
+        ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SWFOutputStream sos = new SWFOutputStream(baos, version);
+        try {
+            byte codeBytes[] = Action.actionsToBytes(actions, false, version);
+            sos.writeUI16(codeBytes.length);
+            sos.close();
+            baos2.write(surroundWithAction(baos.toByteArray(), version));
+        } catch (IOException e) {
+        }
+        return baos2.toByteArray();
+    }
 
-   @Override
-   public byte[] getBytes(int version) {
-      ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      SWFOutputStream sos = new SWFOutputStream(baos, version);
-      try {
-         byte codeBytes[] = Action.actionsToBytes(actions, false, version);
-         sos.writeUI16(codeBytes.length);
-         sos.close();
-         baos2.write(surroundWithAction(baos.toByteArray(), version));
-         baos2.write(codeBytes);
-      } catch (IOException e) {
-      }
-      return baos2.toByteArray();
-   }
+    @Override
+    public byte[] getBytes(int version) {
+        ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SWFOutputStream sos = new SWFOutputStream(baos, version);
+        try {
+            byte codeBytes[] = Action.actionsToBytes(actions, false, version);
+            sos.writeUI16(codeBytes.length);
+            sos.close();
+            baos2.write(surroundWithAction(baos.toByteArray(), version));
+            baos2.write(codeBytes);
+        } catch (IOException e) {
+        }
+        return baos2.toByteArray();
+    }
 
-   @Override
-   public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
-      return "With {\r\n" + Action.actionsToString(actions, knownAddreses, constantPool, version, hex) + "}";
-   }
+    @Override
+    public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+        return "With {\r\n" + Action.actionsToString(actions, knownAddreses, constantPool, version, hex) + "}";
+    }
 
-   @Override
-   public List<Long> getAllRefs(int version) {
-      return Action.getActionsAllRefs(actions, version);
-   }
+    @Override
+    public List<Long> getAllRefs(int version) {
+        return Action.getActionsAllRefs(actions, version);
+    }
 
-   @Override
-   public List<Action> getAllIfsOrJumps() {
-      return Action.getActionsAllIfsOrJumps(actions);
-   }
+    @Override
+    public List<Action> getAllIfsOrJumps() {
+        return Action.getActionsAllIfsOrJumps(actions);
+    }
 }

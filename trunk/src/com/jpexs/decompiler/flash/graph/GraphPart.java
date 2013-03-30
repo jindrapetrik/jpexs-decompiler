@@ -25,147 +25,147 @@ import java.util.List;
  */
 public class GraphPart {
 
-   public int start = 0;
-   public int end = 0;
-   public int instanceCount = 0;
-   public List<GraphPart> nextParts = new ArrayList<GraphPart>();
-   public int posX = -1;
-   public int posY = -1;
-   public String path = "";
-   public List<GraphPart> refs = new ArrayList<GraphPart>();
-   public boolean ignored = false;
-   public List<Object> forContinues = new ArrayList<Object>();
+    public int start = 0;
+    public int end = 0;
+    public int instanceCount = 0;
+    public List<GraphPart> nextParts = new ArrayList<GraphPart>();
+    public int posX = -1;
+    public int posY = -1;
+    public String path = "";
+    public List<GraphPart> refs = new ArrayList<GraphPart>();
+    public boolean ignored = false;
+    public List<Object> forContinues = new ArrayList<Object>();
 
-   private boolean leadsTo(GraphSource code, GraphPart part, List<GraphPart> visited, List<GraphPart> ignored) {
-      if (visited.contains(this)) {
-         return false;
-      }
-      if (ignored.contains(this)) {
-         return false;
-      }
-      visited.add(this);
-      if (end < code.size() && code.get(end).isBranch() && (code.get(end).ignoredLoops())) {
-         return false;
-      }
-      for (GraphPart p : nextParts) {
-         if (p == part) {
-            return true;
-         } else {
-            if (p.leadsTo(code, part, visited, ignored)) {
-               return true;
+    private boolean leadsTo(GraphSource code, GraphPart part, List<GraphPart> visited, List<GraphPart> ignored) {
+        if (visited.contains(this)) {
+            return false;
+        }
+        if (ignored.contains(this)) {
+            return false;
+        }
+        visited.add(this);
+        if (end < code.size() && code.get(end).isBranch() && (code.get(end).ignoredLoops())) {
+            return false;
+        }
+        for (GraphPart p : nextParts) {
+            if (p == part) {
+                return true;
+            } else {
+                if (p.leadsTo(code, part, visited, ignored)) {
+                    return true;
+                }
             }
-         }
-      }
-      return false;
-   }
+        }
+        return false;
+    }
 
-   public boolean leadsTo(GraphSource code, GraphPart part, List<GraphPart> ignored) {
+    public boolean leadsTo(GraphSource code, GraphPart part, List<GraphPart> ignored) {
 
-      return leadsTo(code, part, new ArrayList<GraphPart>(), ignored);
-   }
+        return leadsTo(code, part, new ArrayList<GraphPart>(), ignored);
+    }
 
-   public GraphPart(int start, int end) {
-      this.start = start;
-      this.end = end;
-   }
+    public GraphPart(int start, int end) {
+        this.start = start;
+        this.end = end;
+    }
 
-   private GraphPart getNextPartPath(GraphPart original, String path, List<GraphPart> visited) {
-      if (visited.contains(this) && (this != original)) {
-         return null;
-      }
-      visited.add(this);
-      for (GraphPart p : nextParts) {
-         if (p == original) {
-            continue;
-         }
-         if (p.path.equals(path)) {
-            return p;
-         } else if (p.path.length() >= path.length()) {
-            GraphPart gp = p.getNextPartPath(original, path, visited);
-            if (gp != null) {
-               return gp;
+    private GraphPart getNextPartPath(GraphPart original, String path, List<GraphPart> visited) {
+        if (visited.contains(this) && (this != original)) {
+            return null;
+        }
+        visited.add(this);
+        for (GraphPart p : nextParts) {
+            if (p == original) {
+                continue;
             }
-         }
-      }
-      return null;
-   }
-
-   public GraphPart getNextPartPath(List<GraphPart> ignored) {
-      List<GraphPart> visited = new ArrayList<GraphPart>();
-      visited.addAll(ignored);
-      return getNextPartPath(this, path, visited);
-   }
-
-   public GraphPart getNextSuperPartPath(List<GraphPart> ignored) {
-      List<GraphPart> visited = new ArrayList<GraphPart>();
-      visited.addAll(ignored);
-      return getNextSuperPartPath(this, path, visited);
-   }
-
-   private GraphPart getNextSuperPartPath(GraphPart original, String path, List<GraphPart> visited) {
-      if (visited.contains(this)) {
-         return null;
-      }
-      visited.add(this);
-      for (GraphPart p : nextParts) {
-         if (p == original) {
-            continue;
-         }
-         if (p.path.length() < path.length()) {
-            return p;
-         } else {
-            GraphPart gp = p.getNextSuperPartPath(original, path, visited);
-            if (gp != null) {
-               return gp;
+            if (p.path.equals(path)) {
+                return p;
+            } else if (p.path.length() >= path.length()) {
+                GraphPart gp = p.getNextPartPath(original, path, visited);
+                if (gp != null) {
+                    return gp;
+                }
             }
-         }
-      }
-      return null;
-   }
+        }
+        return null;
+    }
 
-   @Override
-   public String toString() {
-      if (end < start) {
-         return "<-> " + (start + 1) + "-" + (end + 1);
-      }
-      return "" + (start + 1) + "-" + (end + 1) + (instanceCount > 1 ? "(" + instanceCount + " links)" : "") + "  p" + path;
-   }
+    public GraphPart getNextPartPath(List<GraphPart> ignored) {
+        List<GraphPart> visited = new ArrayList<GraphPart>();
+        visited.addAll(ignored);
+        return getNextPartPath(this, path, visited);
+    }
 
-   public boolean containsIP(int ip) {
-      return (ip >= start) && (ip <= end);
-   }
+    public GraphPart getNextSuperPartPath(List<GraphPart> ignored) {
+        List<GraphPart> visited = new ArrayList<GraphPart>();
+        visited.addAll(ignored);
+        return getNextSuperPartPath(this, path, visited);
+    }
 
-   private boolean containsPart(GraphPart part, GraphPart what, List<GraphPart> used) {
-      if (used.contains(part)) {
-         return false;
-      }
-      used.add(part);
-      for (GraphPart subpart : part.nextParts) {
-         if (subpart == what) {
-            return true;
-         }
-         if (containsPart(subpart, what, used)) {
-            return true;
-         }
-      }
-      return false;
-   }
+    private GraphPart getNextSuperPartPath(GraphPart original, String path, List<GraphPart> visited) {
+        if (visited.contains(this)) {
+            return null;
+        }
+        visited.add(this);
+        for (GraphPart p : nextParts) {
+            if (p == original) {
+                continue;
+            }
+            if (p.path.length() < path.length()) {
+                return p;
+            } else {
+                GraphPart gp = p.getNextSuperPartPath(original, path, visited);
+                if (gp != null) {
+                    return gp;
+                }
+            }
+        }
+        return null;
+    }
 
-   public int getHeight() {
-      return end - start + 1;
-   }
+    @Override
+    public String toString() {
+        if (end < start) {
+            return "<-> " + (start + 1) + "-" + (end + 1);
+        }
+        return "" + (start + 1) + "-" + (end + 1) + (instanceCount > 1 ? "(" + instanceCount + " links)" : "") + "  p" + path;
+    }
 
-   public int getPosAt(int offset) {
-      return start + offset;
-   }
+    public boolean containsIP(int ip) {
+        return (ip >= start) && (ip <= end);
+    }
 
-   public boolean containsPart(GraphPart what) {
-      return containsPart(this, what, new ArrayList<GraphPart>());
-   }
+    private boolean containsPart(GraphPart part, GraphPart what, List<GraphPart> used) {
+        if (used.contains(part)) {
+            return false;
+        }
+        used.add(part);
+        for (GraphPart subpart : part.nextParts) {
+            if (subpart == what) {
+                return true;
+            }
+            if (containsPart(subpart, what, used)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-   public List<GraphPart> getSubParts() {
-      List<GraphPart> ret = new ArrayList<GraphPart>();
-      ret.add(this);
-      return ret;
-   }
+    public int getHeight() {
+        return end - start + 1;
+    }
+
+    public int getPosAt(int offset) {
+        return start + offset;
+    }
+
+    public boolean containsPart(GraphPart what) {
+        return containsPart(this, what, new ArrayList<GraphPart>());
+    }
+
+    public List<GraphPart> getSubParts() {
+        List<GraphPart> ret = new ArrayList<GraphPart>();
+        ret.add(this);
+        return ret;
+    }
 }

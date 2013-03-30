@@ -29,90 +29,90 @@ import java.util.List;
 
 public class TryTreeItem extends TreeItem implements Block {
 
-   public List<GraphTargetItem> tryCommands;
-   public List<ABCException> catchExceptions;
-   public List<List<GraphTargetItem>> catchCommands;
-   public List<GraphTargetItem> finallyCommands;
+    public List<GraphTargetItem> tryCommands;
+    public List<ABCException> catchExceptions;
+    public List<List<GraphTargetItem>> catchCommands;
+    public List<GraphTargetItem> finallyCommands;
 
-   @Override
-   public List<List<GraphTargetItem>> getSubs() {
-      List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
-      ret.add(tryCommands);
-      ret.addAll(catchCommands);
-      ret.add(finallyCommands);
-      return ret;
-   }
+    @Override
+    public List<List<GraphTargetItem>> getSubs() {
+        List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
+        ret.add(tryCommands);
+        ret.addAll(catchCommands);
+        ret.add(finallyCommands);
+        return ret;
+    }
 
-   public TryTreeItem(List<GraphTargetItem> tryCommands, List<ABCException> catchExceptions, List<List<GraphTargetItem>> catchCommands, List<GraphTargetItem> finallyCommands) {
-      super(null, NOPRECEDENCE);
-      this.tryCommands = tryCommands;
-      this.catchExceptions = catchExceptions;
-      this.catchCommands = catchCommands;
-      this.finallyCommands = finallyCommands;
-   }
+    public TryTreeItem(List<GraphTargetItem> tryCommands, List<ABCException> catchExceptions, List<List<GraphTargetItem>> catchCommands, List<GraphTargetItem> finallyCommands) {
+        super(null, NOPRECEDENCE);
+        this.tryCommands = tryCommands;
+        this.catchExceptions = catchExceptions;
+        this.catchCommands = catchCommands;
+        this.finallyCommands = finallyCommands;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      String ret = "";
-      ret += "try\r\n{\r\n";
-      for (GraphTargetItem ti : tryCommands) {
-         ret += ti.toStringSemicoloned(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "\r\n";
-      }
-      ret += "}";
-      for (int e = 0; e < catchExceptions.size(); e++) {
-         ret += "\r\ncatch(" + catchExceptions.get(e).getVarName(constants, fullyQualifiedNames) + ":" + catchExceptions.get(e).getTypeName(constants, fullyQualifiedNames) + ")\r\n{\r\n";
-         List<GraphTargetItem> commands = catchCommands.get(e);
-         for (GraphTargetItem ti : commands) {
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        String ret = "";
+        ret += "try\r\n{\r\n";
+        for (GraphTargetItem ti : tryCommands) {
             ret += ti.toStringSemicoloned(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "\r\n";
-         }
-         ret += "}";
-      }
-      if (finallyCommands.size() > 0) {
-         ret += "\r\nfinally\r\n{\r\n";
-         for (GraphTargetItem ti : finallyCommands) {
-            ret += ti.toStringSemicoloned(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "\r\n";
-         }
-         ret += "}";
-      }
-      return ret;
-   }
+        }
+        ret += "}";
+        for (int e = 0; e < catchExceptions.size(); e++) {
+            ret += "\r\ncatch(" + catchExceptions.get(e).getVarName(constants, fullyQualifiedNames) + ":" + catchExceptions.get(e).getTypeName(constants, fullyQualifiedNames) + ")\r\n{\r\n";
+            List<GraphTargetItem> commands = catchCommands.get(e);
+            for (GraphTargetItem ti : commands) {
+                ret += ti.toStringSemicoloned(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "\r\n";
+            }
+            ret += "}";
+        }
+        if (finallyCommands.size() > 0) {
+            ret += "\r\nfinally\r\n{\r\n";
+            for (GraphTargetItem ti : finallyCommands) {
+                ret += ti.toStringSemicoloned(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "\r\n";
+            }
+            ret += "}";
+        }
+        return ret;
+    }
 
-   @Override
-   public List<ContinueItem> getContinues() {
-      List<ContinueItem> ret = new ArrayList<ContinueItem>();
-      for (GraphTargetItem ti : tryCommands) {
-         if (ti instanceof ContinueItem) {
-            ret.add((ContinueItem) ti);
-         }
-         if (ti instanceof Block) {
-            ret.addAll(((Block) ti).getContinues());
-         }
-      }
-      if (finallyCommands != null) {
-         for (GraphTargetItem ti : finallyCommands) {
+    @Override
+    public List<ContinueItem> getContinues() {
+        List<ContinueItem> ret = new ArrayList<ContinueItem>();
+        for (GraphTargetItem ti : tryCommands) {
             if (ti instanceof ContinueItem) {
-               ret.add((ContinueItem) ti);
+                ret.add((ContinueItem) ti);
             }
             if (ti instanceof Block) {
-               ret.addAll(((Block) ti).getContinues());
+                ret.addAll(((Block) ti).getContinues());
             }
-         }
-      }
-      for (List<GraphTargetItem> commands : catchCommands) {
-         for (GraphTargetItem ti : commands) {
-            if (ti instanceof ContinueItem) {
-               ret.add((ContinueItem) ti);
+        }
+        if (finallyCommands != null) {
+            for (GraphTargetItem ti : finallyCommands) {
+                if (ti instanceof ContinueItem) {
+                    ret.add((ContinueItem) ti);
+                }
+                if (ti instanceof Block) {
+                    ret.addAll(((Block) ti).getContinues());
+                }
             }
-            if (ti instanceof Block) {
-               ret.addAll(((Block) ti).getContinues());
+        }
+        for (List<GraphTargetItem> commands : catchCommands) {
+            for (GraphTargetItem ti : commands) {
+                if (ti instanceof ContinueItem) {
+                    ret.add((ContinueItem) ti);
+                }
+                if (ti instanceof Block) {
+                    ret.addAll(((Block) ti).getContinues());
+                }
             }
-         }
-      }
-      return ret;
-   }
+        }
+        return ret;
+    }
 
-   @Override
-   public boolean needsSemicolon() {
-      return false;
-   }
+    @Override
+    public boolean needsSemicolon() {
+        return false;
+    }
 }

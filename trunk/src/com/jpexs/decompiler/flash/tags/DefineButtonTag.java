@@ -46,153 +46,153 @@ import java.util.logging.Logger;
  */
 public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedTag {
 
-   /**
-    * ID for this character
-    */
-   public int buttonId;
-   /**
-    * Characters that make up the button
-    */
-   public List<BUTTONRECORD> characters;
-   /**
-    * Actions to perform
-    */
-   //public List<Action> actions;
-   public byte[] actionBytes;
+    /**
+     * ID for this character
+     */
+    public int buttonId;
+    /**
+     * Characters that make up the button
+     */
+    public List<BUTTONRECORD> characters;
+    /**
+     * Actions to perform
+     */
+    //public List<Action> actions;
+    public byte[] actionBytes;
 
-   @Override
-   public int getCharacterID() {
-      return buttonId;
-   }
+    @Override
+    public int getCharacterID() {
+        return buttonId;
+    }
 
-   /**
-    * Constructor
-    *
-    * @param data Data bytes
-    * @param version SWF version
-    * @throws IOException
-    */
-   public DefineButtonTag(byte[] data, int version, long pos) throws IOException {
-      super(7, "DefineButton", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      buttonId = sis.readUI16();
-      characters = sis.readBUTTONRECORDList(false);
-      //actions = sis.readActionList();
-      actionBytes = sis.readBytes(sis.available());
-   }
+    /**
+     * Constructor
+     *
+     * @param data Data bytes
+     * @param version SWF version
+     * @throws IOException
+     */
+    public DefineButtonTag(byte[] data, int version, long pos) throws IOException {
+        super(7, "DefineButton", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        buttonId = sis.readUI16();
+        characters = sis.readBUTTONRECORDList(false);
+        //actions = sis.readActionList();
+        actionBytes = sis.readBytes(sis.available());
+    }
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      if (Main.DISABLE_DANGEROUS) {
-         return super.getData(version);
-      }
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      if (Main.DEBUG_COPY) {
-         os = new CopyOutputStream(os, new ByteArrayInputStream(super.data));
-      }
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         sos.writeUI16(buttonId);
-         sos.writeBUTTONRECORDList(characters, false);
-         sos.write(actionBytes);
-         //sos.write(Action.actionsToBytes(actions, true, version));
-         sos.close();
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        if (Main.DISABLE_DANGEROUS) {
+            return super.getData(version);
+        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        if (Main.DEBUG_COPY) {
+            os = new CopyOutputStream(os, new ByteArrayInputStream(super.data));
+        }
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            sos.writeUI16(buttonId);
+            sos.writeBUTTONRECORDList(characters, false);
+            sos.write(actionBytes);
+            //sos.write(Action.actionsToBytes(actions, true, version));
+            sos.close();
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 
-   /**
-    * Converts actions to ASM source
-    *
-    * @param version SWF version
-    * @return ASM source
-    */
-   @Override
-   public String getASMSource(int version, boolean hex) {
-      return Action.actionsToString(getActions(version), null, version, hex);
-   }
+    /**
+     * Converts actions to ASM source
+     *
+     * @param version SWF version
+     * @return ASM source
+     */
+    @Override
+    public String getASMSource(int version, boolean hex) {
+        return Action.actionsToString(getActions(version), null, version, hex);
+    }
 
-   /**
-    * Whether or not this object contains ASM source
-    *
-    * @return True when contains
-    */
-   @Override
-   public boolean containsSource() {
-      return true;
-   }
+    /**
+     * Whether or not this object contains ASM source
+     *
+     * @return True when contains
+     */
+    @Override
+    public boolean containsSource() {
+        return true;
+    }
 
-   /**
-    * Returns actions associated with this object
-    *
-    * @param version Version
-    * @return List of actions
-    */
-   @Override
-   public List<Action> getActions(int version) {
-      try {
-         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-         int prevLength = 0;
-         if (previousTag != null) {
-            byte prevData[] = previousTag.getData(version);
-            baos.write(prevData);
-            prevLength = prevData.length;
-         }
-         baos.write(actionBytes);
-         ReReadableInputStream rri = new ReReadableInputStream(new ByteArrayInputStream(baos.toByteArray()));
-         rri.setPos(prevLength);
-         return Action.removeNops(SWFInputStream.readActionList(rri, version, prevLength), version);
-      } catch (Exception ex) {
-         Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex);
-         return new ArrayList<Action>();
-      }
-   }
+    /**
+     * Returns actions associated with this object
+     *
+     * @param version Version
+     * @return List of actions
+     */
+    @Override
+    public List<Action> getActions(int version) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            int prevLength = 0;
+            if (previousTag != null) {
+                byte prevData[] = previousTag.getData(version);
+                baos.write(prevData);
+                prevLength = prevData.length;
+            }
+            baos.write(actionBytes);
+            ReReadableInputStream rri = new ReReadableInputStream(new ByteArrayInputStream(baos.toByteArray()));
+            rri.setPos(prevLength);
+            return Action.removeNops(SWFInputStream.readActionList(rri, version, prevLength), version);
+        } catch (Exception ex) {
+            Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex);
+            return new ArrayList<Action>();
+        }
+    }
 
-   @Override
-   public void setActions(List<Action> actions, int version) {
-      actionBytes = Action.actionsToBytes(actions, true, version);
-   }
+    @Override
+    public void setActions(List<Action> actions, int version) {
+        actionBytes = Action.actionsToBytes(actions, true, version);
+    }
 
-   @Override
-   public byte[] getActionBytes() {
-      return actionBytes;
-   }
+    @Override
+    public byte[] getActionBytes() {
+        return actionBytes;
+    }
 
-   @Override
-   public void setActionBytes(byte[] actionBytes) {
-      this.actionBytes = actionBytes;
-   }
+    @Override
+    public void setActionBytes(byte[] actionBytes) {
+        this.actionBytes = actionBytes;
+    }
 
-   @Override
-   public Set<Integer> getNeededCharacters() {
-      HashSet<Integer> needed = new HashSet<Integer>();
-      for (BUTTONRECORD r : characters) {
-         needed.add(r.characterId);
-      }
-      return needed;
-   }
+    @Override
+    public Set<Integer> getNeededCharacters() {
+        HashSet<Integer> needed = new HashSet<Integer>();
+        for (BUTTONRECORD r : characters) {
+            needed.add(r.characterId);
+        }
+        return needed;
+    }
 
-   @Override
-   public RECT getRect(HashMap<Integer, CharacterTag> allCharacters) {
-      RECT rect = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
-      for (BUTTONRECORD r : characters) {
-         CharacterTag ch = allCharacters.get(r.characterId);
-         if (ch instanceof BoundedTag) {
-            RECT r2 = ((BoundedTag) ch).getRect(allCharacters);
-            rect.Xmin = Math.min(r2.Xmin, rect.Xmin);
-            rect.Ymin = Math.min(r2.Ymin, rect.Ymin);
-            rect.Xmax = Math.max(r2.Xmax, rect.Xmax);
-            rect.Ymax = Math.max(r2.Ymax, rect.Ymax);
-         }
-      }
-      return rect;
-   }
+    @Override
+    public RECT getRect(HashMap<Integer, CharacterTag> allCharacters) {
+        RECT rect = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
+        for (BUTTONRECORD r : characters) {
+            CharacterTag ch = allCharacters.get(r.characterId);
+            if (ch instanceof BoundedTag) {
+                RECT r2 = ((BoundedTag) ch).getRect(allCharacters);
+                rect.Xmin = Math.min(r2.Xmin, rect.Xmin);
+                rect.Ymin = Math.min(r2.Ymin, rect.Ymin);
+                rect.Xmax = Math.max(r2.Xmax, rect.Xmax);
+                rect.Ymax = Math.max(r2.Ymax, rect.Ymax);
+            }
+        }
+        return rect;
+    }
 }

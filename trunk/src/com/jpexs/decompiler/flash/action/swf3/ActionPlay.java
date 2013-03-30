@@ -25,17 +25,17 @@ import java.util.Stack;
 
 public class ActionPlay extends Action {
 
-   public ActionPlay() {
-      super(0x06, 0);
-   }
+    public ActionPlay() {
+        super(0x06, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "Play";
-   }
+    @Override
+    public String toString() {
+        return "Play";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      output.add(new SimpleActionTreeItem(this, "Play()"));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        output.add(new SimpleActionTreeItem(this, "Play()"));
+    }
 }

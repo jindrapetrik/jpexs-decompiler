@@ -31,17 +31,17 @@ import java.util.Stack;
 
 public class PushNamespaceIns extends InstructionDefinition {
 
-   public PushNamespaceIns() {
-      super(0x31, "pushnamespace", new int[]{AVM2Code.OPT_U30});
-   }
+    public PushNamespaceIns() {
+        super(0x31, "pushnamespace", new int[]{AVM2Code.OPT_U30});
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      stack.push(new NameSpaceTreeItem(ins, ins.operands[0]));
-   }
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        stack.push(new NameSpaceTreeItem(ins, ins.operands[0]));
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return 1;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return 1;
+    }
 }

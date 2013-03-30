@@ -25,18 +25,18 @@ import java.util.Stack;
 
 public class ActionStringLength extends Action {
 
-   public ActionStringLength() {
-      super(0x14, 0);
-   }
+    public ActionStringLength() {
+        super(0x14, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "StringLength";
-   }
+    @Override
+    public String toString() {
+        return "StringLength";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem a = stack.pop();
-      stack.push(new StringLengthTreeItem(this, a));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem a = stack.pop();
+        stack.push(new StringLengthTreeItem(this, a));
+    }
 }

@@ -31,56 +31,56 @@ import java.util.HashMap;
  */
 public class ImportAssets2Tag extends Tag {
 
-   public String url;
-   /**
-    * HashMap with assets
-    */
-   public HashMap<Integer, String> assets;
+    public String url;
+    /**
+     * HashMap with assets
+     */
+    public HashMap<Integer, String> assets;
 
-   /**
-    * Constructor
-    *
-    * @param data Data bytes
-    * @param version SWF version
-    * @throws IOException
-    */
-   public ImportAssets2Tag(byte data[], int version, long pos) throws IOException {
-      super(57, "ImportAssets2", data, pos);
-      assets = new HashMap<Integer, String>();
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      url = sis.readString();
-      sis.readUI8();//reserved, must be 1
-      sis.readUI8();//reserved, must be 0
-      int count = sis.readUI16();
-      for (int i = 0; i < count; i++) {
-         int characterId = sis.readUI16();
-         String name = sis.readString();
-         assets.put(characterId, name);
-      }
-   }
+    /**
+     * Constructor
+     *
+     * @param data Data bytes
+     * @param version SWF version
+     * @throws IOException
+     */
+    public ImportAssets2Tag(byte data[], int version, long pos) throws IOException {
+        super(57, "ImportAssets2", data, pos);
+        assets = new HashMap<Integer, String>();
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        url = sis.readString();
+        sis.readUI8();//reserved, must be 1
+        sis.readUI8();//reserved, must be 0
+        int count = sis.readUI16();
+        for (int i = 0; i < count; i++) {
+            int characterId = sis.readUI16();
+            String name = sis.readString();
+            assets.put(characterId, name);
+        }
+    }
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         sos.writeString(url);
-         sos.writeUI8(1); //reserved
-         sos.writeUI8(0); //reserved
-         sos.writeUI16(assets.size());
-         for (int characterId : assets.keySet()) {
-            sos.writeUI16(characterId);
-            sos.writeString(assets.get(characterId));
-         }
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            sos.writeString(url);
+            sos.writeUI8(1); //reserved
+            sos.writeUI8(0); //reserved
+            sos.writeUI16(assets.size());
+            for (int characterId : assets.keySet()) {
+                sos.writeUI16(characterId);
+                sos.writeString(assets.get(characterId));
+            }
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 }

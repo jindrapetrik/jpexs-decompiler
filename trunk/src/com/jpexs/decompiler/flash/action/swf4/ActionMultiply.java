@@ -25,19 +25,19 @@ import java.util.Stack;
 
 public class ActionMultiply extends Action {
 
-   public ActionMultiply() {
-      super(0x0C, 0);
-   }
+    public ActionMultiply() {
+        super(0x0C, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "Multiply";
-   }
+    @Override
+    public String toString() {
+        return "Multiply";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem a = stack.pop();
-      GraphTargetItem b = stack.pop();
-      stack.push(new MultiplyTreeItem(this, b, a));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem a = stack.pop();
+        GraphTargetItem b = stack.pop();
+        stack.push(new MultiplyTreeItem(this, b, a));
+    }
 }

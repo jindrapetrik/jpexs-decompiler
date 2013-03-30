@@ -30,25 +30,25 @@ import java.util.Stack;
 
 public class BitNotIns extends InstructionDefinition {
 
-   public BitNotIns() {
-      super(0x97, "bitnot", new int[]{});
-   }
+    public BitNotIns() {
+        super(0x97, "bitnot", new int[]{});
+    }
 
-   @Override
-   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-      Long value = (Long) lda.operandStack.pop();
-      Long ret = new Long(-value.longValue());
-      lda.operandStack.push(ret);
-   }
+    @Override
+    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        Long value = (Long) lda.operandStack.pop();
+        Long ret = new Long(-value.longValue());
+        lda.operandStack.push(ret);
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      GraphTargetItem v = (GraphTargetItem) stack.pop();
-      stack.push(new BitNotTreeItem(ins, v));
-   }
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        GraphTargetItem v = (GraphTargetItem) stack.pop();
+        stack.push(new BitNotTreeItem(ins, v));
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -1 + 1;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return -1 + 1;
+    }
 }

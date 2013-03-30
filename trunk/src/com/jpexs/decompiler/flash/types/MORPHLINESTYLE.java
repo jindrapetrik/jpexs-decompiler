@@ -22,8 +22,8 @@ package com.jpexs.decompiler.flash.types;
  */
 public class MORPHLINESTYLE {
 
-   public int startWidth;
-   public int endWidth;
-   public RGBA startColor;
-   public RGBA endColor;
+    public int startWidth;
+    public int endWidth;
+    public RGBA startColor;
+    public RGBA endColor;
 }

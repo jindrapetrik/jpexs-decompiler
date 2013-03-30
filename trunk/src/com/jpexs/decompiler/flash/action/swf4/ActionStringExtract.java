@@ -25,20 +25,20 @@ import java.util.Stack;
 
 public class ActionStringExtract extends Action {
 
-   public ActionStringExtract() {
-      super(0x15, 0);
-   }
+    public ActionStringExtract() {
+        super(0x15, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "StringExtract";
-   }
+    @Override
+    public String toString() {
+        return "StringExtract";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem count = stack.pop();
-      GraphTargetItem index = stack.pop();
-      GraphTargetItem value = stack.pop();
-      stack.push(new StringExtractTreeItem(this, value, index, count));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem count = stack.pop();
+        GraphTargetItem index = stack.pop();
+        GraphTargetItem value = stack.pop();
+        stack.push(new StringExtractTreeItem(this, value, index, count));
+    }
 }

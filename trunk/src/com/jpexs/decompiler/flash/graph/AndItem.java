@@ -20,19 +20,19 @@ import java.util.List;
 
 public class AndItem extends BinaryOpItem {
 
-   public GraphPart firstPart;
+    public GraphPart firstPart;
 
-   @Override
-   public List<GraphSourceItemPos> getNeededSources() {
-      List<GraphSourceItemPos> ret = super.getNeededSources();
-      ret.addAll(leftSide.getNeededSources());
-      ret.addAll(rightSide.getNeededSources());
-      return ret;
-   }
+    @Override
+    public List<GraphSourceItemPos> getNeededSources() {
+        List<GraphSourceItemPos> ret = super.getNeededSources();
+        ret.addAll(leftSide.getNeededSources());
+        ret.addAll(rightSide.getNeededSources());
+        return ret;
+    }
 
-   public AndItem(GraphSourceItem src, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-      super(src, PRECEDENCE_LOGICALAND, leftSide, rightSide, "&&");
-      this.leftSide = leftSide;
-      this.rightSide = rightSide;
-   }
+    public AndItem(GraphSourceItem src, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(src, PRECEDENCE_LOGICALAND, leftSide, rightSide, "&&");
+        this.leftSide = leftSide;
+        this.rightSide = rightSide;
+    }
 }

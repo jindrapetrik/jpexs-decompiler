@@ -22,48 +22,48 @@ package com.jpexs.decompiler.flash.types.shaperecords;
  */
 public class CurvedEdgeRecord extends SHAPERECORD {
 
-   public int typeFlag = 1;
-   public int straightFlag = 0;
-   public int numBits;
-   public int controlDeltaX;
-   public int controlDeltaY;
-   public int anchorDeltaX;
-   public int anchorDeltaY;
+    public int typeFlag = 1;
+    public int straightFlag = 0;
+    public int numBits;
+    public int controlDeltaX;
+    public int controlDeltaY;
+    public int anchorDeltaX;
+    public int anchorDeltaY;
 
-   @Override
-   public String toString() {
-      return "[CurvedEdgeRecord numBits=" + numBits + ", controlDeltaX=" + controlDeltaX + ", controlDeltaY=" + controlDeltaY + ", anchorDeltaX=" + anchorDeltaX + ". anchorDeltaY=" + anchorDeltaY + "]";
-   }
+    @Override
+    public String toString() {
+        return "[CurvedEdgeRecord numBits=" + numBits + ", controlDeltaX=" + controlDeltaX + ", controlDeltaY=" + controlDeltaY + ", anchorDeltaX=" + anchorDeltaX + ". anchorDeltaY=" + anchorDeltaY + "]";
+    }
 
-   @Override
-   public String toSWG(int oldX, int oldY) {
-      return "Q " + twipToPixel(oldX + controlDeltaX) + " " + twipToPixel(oldY + controlDeltaY) + " " + twipToPixel(oldX + controlDeltaX + anchorDeltaX) + " " + twipToPixel(oldY + controlDeltaY + anchorDeltaY);
+    @Override
+    public String toSWG(int oldX, int oldY) {
+        return "Q " + twipToPixel(oldX + controlDeltaX) + " " + twipToPixel(oldY + controlDeltaY) + " " + twipToPixel(oldX + controlDeltaX + anchorDeltaX) + " " + twipToPixel(oldY + controlDeltaY + anchorDeltaY);
 
-   }
+    }
 
-   @Override
-   public int changeX(int x) {
-      return x + (controlDeltaX + anchorDeltaX);
-   }
+    @Override
+    public int changeX(int x) {
+        return x + (controlDeltaX + anchorDeltaX);
+    }
 
-   @Override
-   public int changeY(int y) {
-      return y + (controlDeltaY + anchorDeltaY);
-   }
+    @Override
+    public int changeY(int y) {
+        return y + (controlDeltaY + anchorDeltaY);
+    }
 
-   @Override
-   public void flip() {
-      int tmp;
-      tmp = controlDeltaX;
-      controlDeltaX = -anchorDeltaX;
-      anchorDeltaX = -tmp;
-      tmp = controlDeltaY;
-      controlDeltaY = -anchorDeltaY;
-      anchorDeltaY = -tmp;
-   }
+    @Override
+    public void flip() {
+        int tmp;
+        tmp = controlDeltaX;
+        controlDeltaX = -anchorDeltaX;
+        anchorDeltaX = -tmp;
+        tmp = controlDeltaY;
+        controlDeltaY = -anchorDeltaY;
+        anchorDeltaY = -tmp;
+    }
 
-   @Override
-   public boolean isMove() {
-      return true;
-   }
+    @Override
+    public boolean isMove() {
+        return true;
+    }
 }

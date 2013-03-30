@@ -25,19 +25,19 @@ import java.util.Stack;
 
 public class ActionCastOp extends Action {
 
-   public ActionCastOp() {
-      super(0x2B, 0);
-   }
+    public ActionCastOp() {
+        super(0x2B, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "CastOp";
-   }
+    @Override
+    public String toString() {
+        return "CastOp";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem object = stack.pop();
-      GraphTargetItem constructor = stack.pop();
-      stack.push(new CastOpTreeItem(this, constructor, object));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem object = stack.pop();
+        GraphTargetItem constructor = stack.pop();
+        stack.push(new CastOpTreeItem(this, constructor, object));
+    }
 }

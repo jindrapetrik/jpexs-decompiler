@@ -26,24 +26,24 @@ import java.util.Stack;
 
 public class ActionInitObject extends Action {
 
-   public ActionInitObject() {
-      super(0x43, 0);
-   }
+    public ActionInitObject() {
+        super(0x43, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "InitObject";
-   }
+    @Override
+    public String toString() {
+        return "InitObject";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      long numArgs = popLong(stack);
-      List<GraphTargetItem> values = new ArrayList<GraphTargetItem>();
-      List<GraphTargetItem> names = new ArrayList<GraphTargetItem>();
-      for (long l = 0; l < numArgs; l++) {
-         values.add(stack.pop());
-         names.add(stack.pop());
-      }
-      stack.push(new InitObjectTreeItem(this, names, values));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        long numArgs = popLong(stack);
+        List<GraphTargetItem> values = new ArrayList<GraphTargetItem>();
+        List<GraphTargetItem> names = new ArrayList<GraphTargetItem>();
+        for (long l = 0; l < numArgs; l++) {
+            values.add(stack.pop());
+            names.add(stack.pop());
+        }
+        stack.push(new InitObjectTreeItem(this, names, values));
+    }
 }

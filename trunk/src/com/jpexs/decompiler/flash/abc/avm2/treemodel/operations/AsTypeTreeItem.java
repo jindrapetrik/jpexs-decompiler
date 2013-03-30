@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
 public class AsTypeTreeItem extends BinaryOpItem {
 
-   public AsTypeTreeItem(AVM2Instruction instruction, GraphTargetItem value, GraphTargetItem type) {
-      super(instruction, PRECEDENCE_RELATIONAL, value, type, " as ");
-   }
+    public AsTypeTreeItem(AVM2Instruction instruction, GraphTargetItem value, GraphTargetItem type) {
+        super(instruction, PRECEDENCE_RELATIONAL, value, type, " as ");
+    }
 }

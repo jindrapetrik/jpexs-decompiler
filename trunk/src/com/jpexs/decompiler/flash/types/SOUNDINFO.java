@@ -22,14 +22,14 @@ package com.jpexs.decompiler.flash.types;
  */
 public class SOUNDINFO {
 
-   public boolean syncStop;
-   public boolean syncNoMultiple;
-   public boolean hasEnvelope;
-   public boolean hasLoops;
-   public boolean hasOutPoint;
-   public boolean hasInPoint;
-   public long inPoint;
-   public long outPoint;
-   public int loopCount;
-   public SOUNDENVELOPE envelopeRecords[];
+    public boolean syncStop;
+    public boolean syncNoMultiple;
+    public boolean hasEnvelope;
+    public boolean hasLoops;
+    public boolean hasOutPoint;
+    public boolean hasInPoint;
+    public long inPoint;
+    public long outPoint;
+    public int loopCount;
+    public SOUNDENVELOPE envelopeRecords[];
 }

@@ -26,11 +26,11 @@ import java.util.Stack;
  */
 public class ConvertOutput {
 
-   public Stack<GraphTargetItem> stack;
-   public List<GraphTargetItem> output;
+    public Stack<GraphTargetItem> stack;
+    public List<GraphTargetItem> output;
 
-   public ConvertOutput(Stack<GraphTargetItem> stack, List<GraphTargetItem> output) {
-      this.stack = stack;
-      this.output = output;
-   }
+    public ConvertOutput(Stack<GraphTargetItem> stack, List<GraphTargetItem> output) {
+        this.stack = stack;
+        this.output = output;
+    }
 }

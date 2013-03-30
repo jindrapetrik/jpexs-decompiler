@@ -21,12 +21,12 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 
 public class SetLocalIns extends SetLocalTypeIns {
 
-   public SetLocalIns() {
-      super(0x63, "setlocal", new int[]{AVM2Code.DAT_LOCAL_REG_INDEX});
-   }
+    public SetLocalIns() {
+        super(0x63, "setlocal", new int[]{AVM2Code.DAT_LOCAL_REG_INDEX});
+    }
 
-   @Override
-   public int getRegisterId(AVM2Instruction ins) {
-      return ins.operands[0];
-   }
+    @Override
+    public int getRegisterId(AVM2Instruction ins) {
+        return ins.operands[0];
+    }
 }

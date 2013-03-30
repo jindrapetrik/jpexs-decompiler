@@ -22,12 +22,12 @@ import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 
 public class InTreeItem extends BinaryOpItem {
 
-   public InTreeItem(GraphSourceItem instruction, TreeItem name, TreeItem object) {
-      super(instruction, PRECEDENCE_RELATIONAL, name, object, " in ");
-   }
+    public InTreeItem(GraphSourceItem instruction, TreeItem name, TreeItem object) {
+        super(instruction, PRECEDENCE_RELATIONAL, name, object, " in ");
+    }
 
-   @Override
-   public boolean isCompileTime() {
-      return false;
-   }
+    @Override
+    public boolean isCompileTime() {
+        return false;
+    }
 }

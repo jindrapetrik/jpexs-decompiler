@@ -37,114 +37,114 @@ import javax.swing.JToggleButton;
  */
 public class MethodCodePanel extends JPanel implements ActionListener {
 
-   private ASMSourceEditorPane sourceTextArea;
-   public JPanel buttonsPanel;
-   private JToggleButton hexButton;
+    private ASMSourceEditorPane sourceTextArea;
+    public JPanel buttonsPanel;
+    private JToggleButton hexButton;
 
-   public void focusEditor() {
-      sourceTextArea.requestFocusInWindow();
-   }
+    public void focusEditor() {
+        sourceTextArea.requestFocusInWindow();
+    }
 
-   public String getTraitName() {
-      return sourceTextArea.getName();
-   }
+    public String getTraitName() {
+        return sourceTextArea.getName();
+    }
 
-   public void setIgnoreCarret(boolean ignoreCarret) {
-      sourceTextArea.setIgnoreCarret(ignoreCarret);
-   }
+    public void setIgnoreCarret(boolean ignoreCarret) {
+        sourceTextArea.setIgnoreCarret(ignoreCarret);
+    }
 
-   public void hilighOffset(long offset) {
-      sourceTextArea.hilighOffset(offset);
-   }
+    public void hilighOffset(long offset) {
+        sourceTextArea.hilighOffset(offset);
+    }
 
-   public void setBodyIndex(int bodyIndex, ABC abc) {
-      sourceTextArea.setBodyIndex(bodyIndex, abc, sourceTextArea.getName());
-   }
+    public void setBodyIndex(int bodyIndex, ABC abc) {
+        sourceTextArea.setBodyIndex(bodyIndex, abc, sourceTextArea.getName());
+    }
 
-   public void setBodyIndex(int bodyIndex, ABC abc, String name) {
-      sourceTextArea.setBodyIndex(bodyIndex, abc, name);
-   }
+    public void setBodyIndex(int bodyIndex, ABC abc, String name) {
+        sourceTextArea.setBodyIndex(bodyIndex, abc, name);
+    }
 
-   public int getBodyIndex() {
-      return sourceTextArea.bodyIndex;
-   }
+    public int getBodyIndex() {
+        return sourceTextArea.bodyIndex;
+    }
 
-   public void setCode(String text) {
-      sourceTextArea.setText(text);
-   }
+    public void setCode(String text) {
+        sourceTextArea.setText(text);
+    }
 
-   public boolean save(ConstantPool constants) {
-      return sourceTextArea.save(constants);
-   }
+    public boolean save(ConstantPool constants) {
+        return sourceTextArea.save(constants);
+    }
 
-   public MethodCodePanel(DecompiledEditorPane decompiledEditor) {
-      sourceTextArea = new ASMSourceEditorPane(decompiledEditor);
+    public MethodCodePanel(DecompiledEditorPane decompiledEditor) {
+        sourceTextArea = new ASMSourceEditorPane(decompiledEditor);
 
-      setLayout(new BorderLayout());
-      add(new JScrollPane(sourceTextArea), BorderLayout.CENTER);
-      sourceTextArea.setContentType("text/flasm3");
-      sourceTextArea.setFont(new Font("Monospaced", Font.PLAIN, sourceTextArea.getFont().getSize()));
+        setLayout(new BorderLayout());
+        add(new JScrollPane(sourceTextArea), BorderLayout.CENTER);
+        sourceTextArea.setContentType("text/flasm3");
+        sourceTextArea.setFont(new Font("Monospaced", Font.PLAIN, sourceTextArea.getFont().getSize()));
 
-      buttonsPanel = new JPanel();
-      buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
-      JButton verifyButton = new JButton("Verify");
-      verifyButton.setActionCommand("VERIFYBODY");
-      verifyButton.addActionListener(this);
+        buttonsPanel = new JPanel();
+        buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
+        JButton verifyButton = new JButton("Verify");
+        verifyButton.setActionCommand("VERIFYBODY");
+        verifyButton.addActionListener(this);
 
-      JButton graphButton = new JButton(View.getIcon("graph16"));
-      graphButton.setActionCommand("GRAPH");
-      graphButton.addActionListener(this);
-      graphButton.setToolTipText("View Graph");
-      graphButton.setMargin(new Insets(3, 3, 3, 3));
+        JButton graphButton = new JButton(View.getIcon("graph16"));
+        graphButton.setActionCommand("GRAPH");
+        graphButton.addActionListener(this);
+        graphButton.setToolTipText("View Graph");
+        graphButton.setMargin(new Insets(3, 3, 3, 3));
 
-      hexButton = new JToggleButton(View.getIcon("hex16"));
-      hexButton.setActionCommand("HEX");
-      hexButton.addActionListener(this);
-      hexButton.setToolTipText("View Hex");
-      hexButton.setMargin(new Insets(3, 3, 3, 3));
+        hexButton = new JToggleButton(View.getIcon("hex16"));
+        hexButton.setActionCommand("HEX");
+        hexButton.addActionListener(this);
+        hexButton.setToolTipText("View Hex");
+        hexButton.setMargin(new Insets(3, 3, 3, 3));
 
-      JButton execButton = new JButton("Execute");
-      execButton.setActionCommand("EXEC");
-      execButton.addActionListener(this);
+        JButton execButton = new JButton("Execute");
+        execButton.setActionCommand("EXEC");
+        execButton.addActionListener(this);
 
-      buttonsPanel.add(graphButton);
-      buttonsPanel.add(hexButton);
-      buttonsPanel.add(new JPanel());
-      // buttonsPanel.add(saveButton);
-      // buttonsPan.add(execButton);
+        buttonsPanel.add(graphButton);
+        buttonsPanel.add(hexButton);
+        buttonsPanel.add(new JPanel());
+        // buttonsPanel.add(saveButton);
+        // buttonsPan.add(execButton);
 
-      add(buttonsPanel, BorderLayout.NORTH);
-   }
+        add(buttonsPanel, BorderLayout.NORTH);
+    }
 
-   @Override
-   public void actionPerformed(ActionEvent e) {
-      if (Main.isWorking()) {
-         return;
-      }
-      if (e.getActionCommand().equals("GRAPH")) {
-         sourceTextArea.graph();
-      }
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (Main.isWorking()) {
+            return;
+        }
+        if (e.getActionCommand().equals("GRAPH")) {
+            sourceTextArea.graph();
+        }
 
-      if (e.getActionCommand().equals("HEX")) {
-         sourceTextArea.setHex(hexButton.isSelected());
-      }
+        if (e.getActionCommand().equals("HEX")) {
+            sourceTextArea.setHex(hexButton.isSelected());
+        }
 
-      if (e.getActionCommand().equals("EXEC")) {
-         sourceTextArea.exec();
-      }
-   }
+        if (e.getActionCommand().equals("EXEC")) {
+            sourceTextArea.exec();
+        }
+    }
 
-   public void setEditMode(boolean val) {
-      if (val) {
-         sourceTextArea.setHex(false);
-      } else {
-         if (hexButton.isSelected()) {
-            sourceTextArea.setHex(true);
-         }
-      }
+    public void setEditMode(boolean val) {
+        if (val) {
+            sourceTextArea.setHex(false);
+        } else {
+            if (hexButton.isSelected()) {
+                sourceTextArea.setHex(true);
+            }
+        }
 
-      sourceTextArea.setEditable(val);
-      sourceTextArea.getCaret().setVisible(true);
-      buttonsPanel.setVisible(!val);
-   }
+        sourceTextArea.setEditable(val);
+        sourceTextArea.getCaret().setVisible(true);
+        buttonsPanel.setVisible(!val);
+    }
 }

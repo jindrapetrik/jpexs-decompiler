@@ -24,22 +24,22 @@ import java.util.List;
 
 public class NewArrayTreeItem extends TreeItem {
 
-   public List<GraphTargetItem> values;
+    public List<GraphTargetItem> values;
 
-   public NewArrayTreeItem(AVM2Instruction instruction, List<GraphTargetItem> values) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.values = values;
-   }
+    public NewArrayTreeItem(AVM2Instruction instruction, List<GraphTargetItem> values) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.values = values;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      String args = "";
-      for (int a = 0; a < values.size(); a++) {
-         if (a > 0) {
-            args = args + ",";
-         }
-         args = args + values.get(a).toString(constants, localRegNames, fullyQualifiedNames);
-      }
-      return hilight("[") + args + hilight("]");
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        String args = "";
+        for (int a = 0; a < values.size(); a++) {
+            if (a > 0) {
+                args = args + ",";
+            }
+            args = args + values.get(a).toString(constants, localRegNames, fullyQualifiedNames);
+        }
+        return hilight("[") + args + hilight("]");
+    }
 }

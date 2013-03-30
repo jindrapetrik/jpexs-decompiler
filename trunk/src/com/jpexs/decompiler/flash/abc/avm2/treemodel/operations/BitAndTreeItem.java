@@ -22,12 +22,12 @@ import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
 public class BitAndTreeItem extends BinaryOpItem {
 
-   public BitAndTreeItem(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
-      super(instruction, PRECEDENCE_BITWISEAND, leftSide, rightSide, "&");
-   }
+    public BitAndTreeItem(AVM2Instruction instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+        super(instruction, PRECEDENCE_BITWISEAND, leftSide, rightSide, "&");
+    }
 
-   @Override
-   public double toNumber() {
-      return ((int) leftSide.toNumber()) & ((int) rightSide.toNumber());
-   }
+    @Override
+    public double toNumber() {
+        return ((int) leftSide.toNumber()) & ((int) rightSide.toNumber());
+    }
 }

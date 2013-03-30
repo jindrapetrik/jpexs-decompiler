@@ -25,19 +25,19 @@ import java.util.Stack;
 
 public class ActionBitRShift extends Action {
 
-   public ActionBitRShift() {
-      super(0x64, 0);
-   }
+    public ActionBitRShift() {
+        super(0x64, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "BitRShift";
-   }
+    @Override
+    public String toString() {
+        return "BitRShift";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem a = stack.pop();
-      GraphTargetItem b = stack.pop();
-      stack.push(new RShiftTreeItem(this, b, a));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem a = stack.pop();
+        GraphTargetItem b = stack.pop();
+        stack.push(new RShiftTreeItem(this, b, a));
+    }
 }

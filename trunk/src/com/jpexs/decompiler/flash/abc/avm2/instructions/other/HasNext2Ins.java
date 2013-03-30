@@ -30,15 +30,15 @@ import java.util.Stack;
 
 public class HasNext2Ins extends InstructionDefinition {
 
-   public HasNext2Ins() {
-      super(0x32, "hasnext2", new int[]{AVM2Code.OPT_U8, AVM2Code.OPT_U8});
-   }
+    public HasNext2Ins() {
+        super(0x32, "hasnext2", new int[]{AVM2Code.OPT_U8, AVM2Code.OPT_U8});
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      int objectReg = ins.operands[0];
-      int indexReg = ins.operands[1];
-      //stack.push("_loc_" + objectReg + ".hasNext(cnt=_loc_" + indexReg + ")");
-      stack.push(new HasNextTreeItem(ins, new LocalRegTreeItem(ins, indexReg, localRegs.get(indexReg)), localRegs.get(objectReg)));
-   }
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        int objectReg = ins.operands[0];
+        int indexReg = ins.operands[1];
+        //stack.push("_loc_" + objectReg + ".hasNext(cnt=_loc_" + indexReg + ")");
+        stack.push(new HasNextTreeItem(ins, new LocalRegTreeItem(ins, indexReg, localRegs.get(indexReg)), localRegs.get(objectReg)));
+    }
 }

@@ -32,22 +32,22 @@ import java.util.Stack;
 
 public class SetGlobalSlotIns extends InstructionDefinition implements SetTypeIns {
 
-   public SetGlobalSlotIns() {
-      super(0x6f, "setglobalslot", new int[]{AVM2Code.DAT_SLOT_INDEX});
-   }
+    public SetGlobalSlotIns() {
+        super(0x6f, "setglobalslot", new int[]{AVM2Code.DAT_SLOT_INDEX});
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      output.add(new SetGlobalSlotTreeItem(ins, ins.operands[0], (GraphTargetItem) stack.pop()));
-   }
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        output.add(new SetGlobalSlotTreeItem(ins, ins.operands[0], (GraphTargetItem) stack.pop()));
+    }
 
-   @Override
-   public String getObject(Stack<TreeItem> stack, ABC abc, AVM2Instruction ins, List<TreeItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return "globalslot" + ins.operands[0];
-   }
+    @Override
+    public String getObject(Stack<TreeItem> stack, ABC abc, AVM2Instruction ins, List<TreeItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return "globalslot" + ins.operands[0];
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      return -1;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        return -1;
+    }
 }

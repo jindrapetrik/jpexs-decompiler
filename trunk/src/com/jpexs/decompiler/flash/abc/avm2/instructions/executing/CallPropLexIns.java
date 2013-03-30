@@ -30,35 +30,35 @@ import java.util.Stack;
 
 public class CallPropLexIns extends CallPropertyIns {
 
-   public CallPropLexIns() {
-      instructionName = "callproplex";
-      instructionCode = 0x4c;
-   }
+    public CallPropLexIns() {
+        instructionName = "callproplex";
+        instructionCode = 0x4c;
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      int multinameIndex = ins.operands[0];
-      int argCount = ins.operands[1];
-      List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
-      for (int a = 0; a < argCount; a++) {
-         args.add(0, (GraphTargetItem) stack.pop());
-      }
-      FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
-      GraphTargetItem receiver = (GraphTargetItem) stack.pop();
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        int multinameIndex = ins.operands[0];
+        int argCount = ins.operands[1];
+        List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
+        for (int a = 0; a < argCount; a++) {
+            args.add(0, (GraphTargetItem) stack.pop());
+        }
+        FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
+        GraphTargetItem receiver = (GraphTargetItem) stack.pop();
 
-      stack.push(new CallPropertyTreeItem(ins, false, receiver, multiname, args));
-   }
+        stack.push(new CallPropertyTreeItem(ins, false, receiver, multiname, args));
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      int ret = -ins.operands[1] - 1 + 1;
-      int multinameIndex = ins.operands[0];
-      if (abc.constants.constant_multiname[multinameIndex].needsName()) {
-         ret--;
-      }
-      if (abc.constants.constant_multiname[multinameIndex].needsNs()) {
-         ret--;
-      }
-      return ret;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        int ret = -ins.operands[1] - 1 + 1;
+        int multinameIndex = ins.operands[0];
+        if (abc.constants.constant_multiname[multinameIndex].needsName()) {
+            ret--;
+        }
+        if (abc.constants.constant_multiname[multinameIndex].needsNs()) {
+            ret--;
+        }
+        return ret;
+    }
 }

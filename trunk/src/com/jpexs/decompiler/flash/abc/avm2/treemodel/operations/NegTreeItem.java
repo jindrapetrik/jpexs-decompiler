@@ -22,12 +22,12 @@ import com.jpexs.decompiler.flash.graph.UnaryOpItem;
 
 public class NegTreeItem extends UnaryOpItem {
 
-   public NegTreeItem(AVM2Instruction instruction, GraphTargetItem value) {
-      super(instruction, PRECEDENCE_UNARY, value, "-");
-   }
+    public NegTreeItem(AVM2Instruction instruction, GraphTargetItem value) {
+        super(instruction, PRECEDENCE_UNARY, value, "-");
+    }
 
-   @Override
-   public double toNumber() {
-      return -value.toNumber();
-   }
+    @Override
+    public double toNumber() {
+        return -value.toNumber();
+    }
 }

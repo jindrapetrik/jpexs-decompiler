@@ -34,60 +34,60 @@ import java.util.Stack;
 
 public class ConstructPropIns extends InstructionDefinition {
 
-   public ConstructPropIns() {
-      super(0x4a, "constructprop", new int[]{AVM2Code.DAT_MULTINAME_INDEX, AVM2Code.DAT_ARG_COUNT});
-   }
+    public ConstructPropIns() {
+        super(0x4a, "constructprop", new int[]{AVM2Code.DAT_MULTINAME_INDEX, AVM2Code.DAT_ARG_COUNT});
+    }
 
-   @Override
-   public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
-      /*int multinameIndex = (int) ((Long) arguments.get(0)).longValue();
-       int argCount = (int) ((Long) arguments.get(1)).longValue();
-       List passArguments = new ArrayList();
-       for (int i = argCount - 1; i >= 0; i--) {
-       passArguments.set(i, lda.operandStack.pop());
-       }*/
-      //if multiname[multinameIndex] is runtime
-      //pop(name) pop(ns)
-      throw new RuntimeException("Cannot construct property");
-      //create property
-      //push new instance
-   }
+    @Override
+    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+        /*int multinameIndex = (int) ((Long) arguments.get(0)).longValue();
+         int argCount = (int) ((Long) arguments.get(1)).longValue();
+         List passArguments = new ArrayList();
+         for (int i = argCount - 1; i >= 0; i--) {
+         passArguments.set(i, lda.operandStack.pop());
+         }*/
+        //if multiname[multinameIndex] is runtime
+        //pop(name) pop(ns)
+        throw new RuntimeException("Cannot construct property");
+        //create property
+        //push new instance
+    }
 
-   @Override
-   public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      int multinameIndex = ins.operands[0];
-      int argCount = ins.operands[1];
-      List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
-      for (int a = 0; a < argCount; a++) {
-         args.add(0, (GraphTargetItem) stack.pop());
-      }
-      FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
-      GraphTargetItem obj = (GraphTargetItem) stack.pop();
+    @Override
+    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        int multinameIndex = ins.operands[0];
+        int argCount = ins.operands[1];
+        List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
+        for (int a = 0; a < argCount; a++) {
+            args.add(0, (GraphTargetItem) stack.pop());
+        }
+        FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
+        GraphTargetItem obj = (GraphTargetItem) stack.pop();
 
-      if (multiname.isXML(constants, localRegNames, fullyQualifiedNames)) {
-         if (args.size() == 1) {
-            GraphTargetItem arg = args.get(0);
-            List<GraphTargetItem> xmlLines = new ArrayList<GraphTargetItem>();
-            if (ConstructIns.walkXML(arg, xmlLines)) {
-               stack.push(new XMLTreeItem(ins, xmlLines));
-               return;
+        if (multiname.isXML(constants, localRegNames, fullyQualifiedNames)) {
+            if (args.size() == 1) {
+                GraphTargetItem arg = args.get(0);
+                List<GraphTargetItem> xmlLines = new ArrayList<GraphTargetItem>();
+                if (ConstructIns.walkXML(arg, xmlLines)) {
+                    stack.push(new XMLTreeItem(ins, xmlLines));
+                    return;
+                }
             }
-         }
-      }
+        }
 
-      stack.push(new ConstructPropTreeItem(ins, obj, multiname, args));
-   }
+        stack.push(new ConstructPropTreeItem(ins, obj, multiname, args));
+    }
 
-   @Override
-   public int getStackDelta(AVM2Instruction ins, ABC abc) {
-      int ret = -ins.operands[1] - 1 + 1;
-      int multinameIndex = ins.operands[0];
-      if (abc.constants.constant_multiname[multinameIndex].needsName()) {
-         ret--;
-      }
-      if (abc.constants.constant_multiname[multinameIndex].needsNs()) {
-         ret--;
-      }
-      return ret;
-   }
+    @Override
+    public int getStackDelta(AVM2Instruction ins, ABC abc) {
+        int ret = -ins.operands[1] - 1 + 1;
+        int multinameIndex = ins.operands[0];
+        if (abc.constants.constant_multiname[multinameIndex].needsName()) {
+            ret--;
+        }
+        if (abc.constants.constant_multiname[multinameIndex].needsNs()) {
+            ret--;
+        }
+        return ret;
+    }
 }

@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.graph.UnaryOpItem;
 
 public class PreDecrementTreeItem extends UnaryOpItem implements AssignmentTreeItem {
 
-   public PreDecrementTreeItem(AVM2Instruction instruction, GraphTargetItem object) {
-      super(instruction, PRECEDENCE_UNARY, object, "--");
-   }
+    public PreDecrementTreeItem(AVM2Instruction instruction, GraphTargetItem object) {
+        super(instruction, PRECEDENCE_UNARY, object, "--");
+    }
 }

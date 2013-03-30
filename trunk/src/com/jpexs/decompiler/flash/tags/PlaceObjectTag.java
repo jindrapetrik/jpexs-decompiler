@@ -34,91 +34,91 @@ import java.util.Set;
  */
 public class PlaceObjectTag extends Tag implements PlaceObjectTypeTag {
 
-   /**
-    * ID of character to place
-    */
-   public int characterId;
-   /**
-    * Depth of character
-    */
-   public int depth;
-   /**
-    * Transform matrix data
-    */
-   public MATRIX matrix;
-   /**
-    * Color transform data
-    */
-   public CXFORM colorTransform;
+    /**
+     * ID of character to place
+     */
+    public int characterId;
+    /**
+     * Depth of character
+     */
+    public int depth;
+    /**
+     * Transform matrix data
+     */
+    public MATRIX matrix;
+    /**
+     * Color transform data
+     */
+    public CXFORM colorTransform;
 
-   /**
-    * Gets data bytes
-    *
-    * @param version SWF version
-    * @return Bytes of data
-    */
-   @Override
-   public byte[] getData(int version) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStream os = baos;
-      SWFOutputStream sos = new SWFOutputStream(os, version);
-      try {
-         sos.writeUI16(characterId);
-         sos.writeUI16(depth);
-         sos.writeMatrix(matrix);
-         if (colorTransform != null) {
-            sos.writeCXFORM(colorTransform);
-         }
-      } catch (IOException e) {
-      }
-      return baos.toByteArray();
-   }
+    /**
+     * Gets data bytes
+     *
+     * @param version SWF version
+     * @return Bytes of data
+     */
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            sos.writeUI16(characterId);
+            sos.writeUI16(depth);
+            sos.writeMatrix(matrix);
+            if (colorTransform != null) {
+                sos.writeCXFORM(colorTransform);
+            }
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
+    }
 
-   /**
-    * Constructor
-    *
-    * @param data Data bytes
-    * @param version SWF version
-    * @throws IOException
-    */
-   public PlaceObjectTag(byte data[], int version, long pos) throws IOException {
-      super(4, "PlaceObject", data, pos);
-      SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
-      characterId = sis.readUI16();
-      depth = sis.readUI16();
-      matrix = sis.readMatrix();
-      if (sis.available() > 0) {
-         colorTransform = sis.readCXFORM();
-      }
-   }
+    /**
+     * Constructor
+     *
+     * @param data Data bytes
+     * @param version SWF version
+     * @throws IOException
+     */
+    public PlaceObjectTag(byte data[], int version, long pos) throws IOException {
+        super(4, "PlaceObject", data, pos);
+        SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
+        characterId = sis.readUI16();
+        depth = sis.readUI16();
+        matrix = sis.readMatrix();
+        if (sis.available() > 0) {
+            colorTransform = sis.readCXFORM();
+        }
+    }
 
-   public PlaceObjectTag(int characterId, int depth, MATRIX matrix, CXFORM colorTransform) {
-      super(4, "PlaceObject", new byte[0], 0);
-      this.characterId = characterId;
-      this.depth = depth;
-      this.matrix = matrix;
-      this.colorTransform = colorTransform;
-   }
+    public PlaceObjectTag(int characterId, int depth, MATRIX matrix, CXFORM colorTransform) {
+        super(4, "PlaceObject", new byte[0], 0);
+        this.characterId = characterId;
+        this.depth = depth;
+        this.matrix = matrix;
+        this.colorTransform = colorTransform;
+    }
 
-   @Override
-   public Set<Integer> getNeededCharacters() {
-      Set<Integer> ret = new HashSet<Integer>();
-      ret.add(characterId);
-      return ret;
-   }
+    @Override
+    public Set<Integer> getNeededCharacters() {
+        Set<Integer> ret = new HashSet<Integer>();
+        ret.add(characterId);
+        return ret;
+    }
 
-   @Override
-   public int getCharacterId() {
-      return characterId;
-   }
+    @Override
+    public int getCharacterId() {
+        return characterId;
+    }
 
-   @Override
-   public int getDepth() {
-      return depth;
-   }
+    @Override
+    public int getDepth() {
+        return depth;
+    }
 
-   @Override
-   public MATRIX getMatrix() {
-      return matrix;
-   }
+    @Override
+    public MATRIX getMatrix() {
+        return matrix;
+    }
 }

@@ -27,93 +27,93 @@ import java.util.List;
 
 public abstract class TreeItem extends GraphTargetItem {
 
-   public AVM2Instruction instruction;
-   public boolean hidden = false;
+    public AVM2Instruction instruction;
+    public boolean hidden = false;
 
-   public TreeItem(GraphSourceItem instruction, int precedence) {
-      super(instruction, precedence);
-   }
-
-   @Override
-   public String toString(List localData) {
-      return toString((ConstantPool) localData.get(0), (HashMap<Integer, String>) localData.get(1), (List<String>) localData.get(2));
-   }
-
-   public abstract String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames);
-
-   public String toStringNoH(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return Highlighting.stripHilights(toString(constants, localRegNames, fullyQualifiedNames));
-   }
-
-   public String toStringSemicoloned(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return toString(constants, localRegNames, fullyQualifiedNames) + (needsSemicolon() ? ";" : "");
-   }
-
-   @Override
-   public boolean needsSemicolon() {
-      return true;
-   }
-
-   /*public String hilight(String str) {
-    if (instruction == null) {
-    return str;
+    public TreeItem(GraphSourceItem instruction, int precedence) {
+        super(instruction, precedence);
     }
-    if (instruction.mappedOffset >= 0) {
-    return Highlighting.hilighOffset(str, instruction.mappedOffset);
-    } else {
-    return Highlighting.hilighOffset(str, instruction.offset);
+
+    @Override
+    public String toString(List localData) {
+        return toString((ConstantPool) localData.get(0), (HashMap<Integer, String>) localData.get(1), (List<String>) localData.get(2));
     }
-    }*/
-   public boolean isFalse() {
-      return false;
-   }
 
-   public boolean isTrue() {
-      return false;
-   }
+    public abstract String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames);
 
-   protected String formatProperty(ConstantPool constants, GraphTargetItem object, GraphTargetItem propertyName, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      String obStr = object.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
-      if (object.precedence > PRECEDENCE_PRIMARY) {
-         obStr = "(" + obStr + ")";
-      }
-      if (object instanceof LocalRegTreeItem) {
-         if (((LocalRegTreeItem) object).computedValue instanceof FindPropertyTreeItem) {
-            obStr = "";
-         }
-      }
-      if (obStr.equals("")) {
-         return propertyName.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
-      }
-      if (propertyName instanceof FullMultinameTreeItem) {
-         if (((FullMultinameTreeItem) propertyName).isRuntime()) {
-            return joinProperty(obStr, propertyName.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)));
-         } else {
-            return joinProperty(obStr, ((FullMultinameTreeItem) propertyName).toString(constants, localRegNames, fullyQualifiedNames));
-         }
-      } else {
-         return obStr + "[" + propertyName.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "]";
-      }
-   }
+    public String toStringNoH(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return Highlighting.stripHilights(toString(constants, localRegNames, fullyQualifiedNames));
+    }
 
-   private String joinProperty(String prefix, String name) {
-      if (prefix.endsWith(".")) {
-         prefix = prefix.substring(0, prefix.length() - 1);
-      }
-      if (!Highlighting.stripHilights(name).startsWith("[")) {
-         return prefix + "." + name;
-      }
-      return prefix + name;
-   }
+    public String toStringSemicoloned(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return toString(constants, localRegNames, fullyQualifiedNames) + (needsSemicolon() ? ";" : "");
+    }
 
-   public static String localRegName(HashMap<Integer, String> localRegNames, int reg) {
-      if (localRegNames.containsKey(reg)) {
-         return localRegNames.get(reg);
-      } else {
-         if (reg == 0) {
-            return "this";
-         }
-         return "_loc" + reg + "_";
-      }
-   }
+    @Override
+    public boolean needsSemicolon() {
+        return true;
+    }
+
+    /*public String hilight(String str) {
+     if (instruction == null) {
+     return str;
+     }
+     if (instruction.mappedOffset >= 0) {
+     return Highlighting.hilighOffset(str, instruction.mappedOffset);
+     } else {
+     return Highlighting.hilighOffset(str, instruction.offset);
+     }
+     }*/
+    public boolean isFalse() {
+        return false;
+    }
+
+    public boolean isTrue() {
+        return false;
+    }
+
+    protected String formatProperty(ConstantPool constants, GraphTargetItem object, GraphTargetItem propertyName, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        String obStr = object.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
+        if (object.precedence > PRECEDENCE_PRIMARY) {
+            obStr = "(" + obStr + ")";
+        }
+        if (object instanceof LocalRegTreeItem) {
+            if (((LocalRegTreeItem) object).computedValue instanceof FindPropertyTreeItem) {
+                obStr = "";
+            }
+        }
+        if (obStr.equals("")) {
+            return propertyName.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
+        }
+        if (propertyName instanceof FullMultinameTreeItem) {
+            if (((FullMultinameTreeItem) propertyName).isRuntime()) {
+                return joinProperty(obStr, propertyName.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)));
+            } else {
+                return joinProperty(obStr, ((FullMultinameTreeItem) propertyName).toString(constants, localRegNames, fullyQualifiedNames));
+            }
+        } else {
+            return obStr + "[" + propertyName.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "]";
+        }
+    }
+
+    private String joinProperty(String prefix, String name) {
+        if (prefix.endsWith(".")) {
+            prefix = prefix.substring(0, prefix.length() - 1);
+        }
+        if (!Highlighting.stripHilights(name).startsWith("[")) {
+            return prefix + "." + name;
+        }
+        return prefix + name;
+    }
+
+    public static String localRegName(HashMap<Integer, String> localRegNames, int reg) {
+        if (localRegNames.containsKey(reg)) {
+            return localRegNames.get(reg);
+        } else {
+            if (reg == 0) {
+                return "this";
+            }
+            return "_loc" + reg + "_";
+        }
+    }
 }

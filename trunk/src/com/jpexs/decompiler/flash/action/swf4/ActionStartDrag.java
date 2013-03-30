@@ -26,44 +26,44 @@ import java.util.Stack;
 
 public class ActionStartDrag extends Action {
 
-   public ActionStartDrag() {
-      super(0x27, 0);
-   }
+    public ActionStartDrag() {
+        super(0x27, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "StartDrag";
-   }
+    @Override
+    public String toString() {
+        return "StartDrag";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem target = stack.pop();
-      GraphTargetItem lockCenter = stack.pop();
-      GraphTargetItem constrain = stack.pop();
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem target = stack.pop();
+        GraphTargetItem lockCenter = stack.pop();
+        GraphTargetItem constrain = stack.pop();
 
-      boolean hasConstrains = true;
-      if (constrain instanceof DirectValueTreeItem) {
-         if (((DirectValueTreeItem) constrain).value instanceof Long) {
-            if (((long) (Long) ((DirectValueTreeItem) constrain).value) == 0) {
-               hasConstrains = false;
+        boolean hasConstrains = true;
+        if (constrain instanceof DirectValueTreeItem) {
+            if (((DirectValueTreeItem) constrain).value instanceof Long) {
+                if (((long) (Long) ((DirectValueTreeItem) constrain).value) == 0) {
+                    hasConstrains = false;
+                }
             }
-         }
-         if (((DirectValueTreeItem) constrain).value instanceof Boolean) {
-            if (((boolean) (Boolean) ((DirectValueTreeItem) constrain).value) == false) {
-               hasConstrains = false;
+            if (((DirectValueTreeItem) constrain).value instanceof Boolean) {
+                if (((boolean) (Boolean) ((DirectValueTreeItem) constrain).value) == false) {
+                    hasConstrains = false;
+                }
             }
-         }
-      }
-      GraphTargetItem x1 = null;
-      GraphTargetItem y1 = null;
-      GraphTargetItem x2 = null;
-      GraphTargetItem y2 = null;
-      if (hasConstrains) {
-         y2 = stack.pop();
-         x2 = stack.pop();
-         y1 = stack.pop();
-         x1 = stack.pop();
-      }
-      output.add(new StartDragTreeItem(this, target, lockCenter, constrain, x1, y1, x2, y2));
-   }
+        }
+        GraphTargetItem x1 = null;
+        GraphTargetItem y1 = null;
+        GraphTargetItem x2 = null;
+        GraphTargetItem y2 = null;
+        if (hasConstrains) {
+            y2 = stack.pop();
+            x2 = stack.pop();
+            y1 = stack.pop();
+            x1 = stack.pop();
+        }
+        output.add(new StartDragTreeItem(this, target, lockCenter, constrain, x1, y1, x2, y2));
+    }
 }

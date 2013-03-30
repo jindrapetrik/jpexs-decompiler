@@ -25,18 +25,18 @@ import java.util.Stack;
 
 public class ActionToInteger extends Action {
 
-   public ActionToInteger() {
-      super(0x18, 0);
-   }
+    public ActionToInteger() {
+        super(0x18, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "ToInteger";
-   }
+    @Override
+    public String toString() {
+        return "ToInteger";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem a = stack.pop();
-      stack.push(new ToIntegerTreeItem(this, a));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem a = stack.pop();
+        stack.push(new ToIntegerTreeItem(this, a));
+    }
 }

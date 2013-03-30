@@ -28,66 +28,66 @@ import java.util.List;
 
 public class ForEachInTreeItem extends LoopItem implements Block {
 
-   public InTreeItem expression;
-   public List<GraphTargetItem> commands;
+    public InTreeItem expression;
+    public List<GraphTargetItem> commands;
 
-   @Override
-   public List<List<GraphTargetItem>> getSubs() {
-      List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
-      ret.add(commands);
-      return ret;
-   }
+    @Override
+    public List<List<GraphTargetItem>> getSubs() {
+        List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
+        ret.add(commands);
+        return ret;
+    }
 
-   public ForEachInTreeItem(GraphSourceItem instruction, Loop loop, InTreeItem expression, List<GraphTargetItem> commands) {
-      super(instruction, loop);
-      if (!commands.isEmpty()) {
-         GraphTargetItem firstAssign = commands.get(0);
-         if (firstAssign instanceof SetTypeTreeItem) {
-            if (expression.object instanceof LocalRegTreeItem) {
-               if (((SetTypeTreeItem) firstAssign).getValue().getNotCoerced() instanceof LocalRegTreeItem) {
-                  if (((LocalRegTreeItem) ((SetTypeTreeItem) firstAssign).getValue().getNotCoerced()).regIndex == ((LocalRegTreeItem) expression.object).regIndex) {
-                     commands.remove(0);
-                     expression.object = ((SetTypeTreeItem) firstAssign).getObject();
-                  }
-               }
+    public ForEachInTreeItem(GraphSourceItem instruction, Loop loop, InTreeItem expression, List<GraphTargetItem> commands) {
+        super(instruction, loop);
+        if (!commands.isEmpty()) {
+            GraphTargetItem firstAssign = commands.get(0);
+            if (firstAssign instanceof SetTypeTreeItem) {
+                if (expression.object instanceof LocalRegTreeItem) {
+                    if (((SetTypeTreeItem) firstAssign).getValue().getNotCoerced() instanceof LocalRegTreeItem) {
+                        if (((LocalRegTreeItem) ((SetTypeTreeItem) firstAssign).getValue().getNotCoerced()).regIndex == ((LocalRegTreeItem) expression.object).regIndex) {
+                            commands.remove(0);
+                            expression.object = ((SetTypeTreeItem) firstAssign).getObject();
+                        }
+                    }
 
+                }
+                //locAssign.
             }
-            //locAssign.
-         }
-      }
-      this.expression = expression;
-      this.commands = commands;
-   }
+        }
+        this.expression = expression;
+        this.commands = commands;
+    }
 
-   @Override
-   public boolean needsSemicolon() {
-      return false;
-   }
+    @Override
+    public boolean needsSemicolon() {
+        return false;
+    }
 
-   @Override
-   public String toString(List localData) {
-      String ret = "";
-      ret += "loop" + loop.id + ":\r\n";
-      ret += hilight("for each (") + expression.toString(localData) + ")\r\n{\r\n";
-      for (GraphTargetItem ti : commands) {
-         ret += ti.toStringSemicoloned(localData) + "\r\n";
-      }
-      ret += hilight("}") + "\r\n";
-      ret += ":loop" + loop.id;
-      return ret;
-   }
+    @Override
+    public String toString(List localData) {
+        String ret = "";
+        ret += "loop" + loop.id + ":\r\n";
+        ret += hilight("for each (") + expression.toString(localData) + ")\r\n{\r\n";
+        for (GraphTargetItem ti : commands) {
+            ret += ti.toStringSemicoloned(localData) + "\r\n";
+        }
+        ret += hilight("}") + "\r\n";
+        ret += ":loop" + loop.id;
+        return ret;
+    }
 
-   @Override
-   public List<ContinueItem> getContinues() {
-      List<ContinueItem> ret = new ArrayList<ContinueItem>();
-      for (GraphTargetItem ti : commands) {
-         if (ti instanceof ContinueItem) {
-            ret.add((ContinueItem) ti);
-         }
-         if (ti instanceof Block) {
-            ret.addAll(((Block) ti).getContinues());
-         }
-      }
-      return ret;
-   }
+    @Override
+    public List<ContinueItem> getContinues() {
+        List<ContinueItem> ret = new ArrayList<ContinueItem>();
+        for (GraphTargetItem ti : commands) {
+            if (ti instanceof ContinueItem) {
+                ret.add((ContinueItem) ti);
+            }
+            if (ti instanceof Block) {
+                ret.addAll(((Block) ti).getContinues());
+            }
+        }
+        return ret;
+    }
 }

@@ -28,19 +28,19 @@ import java.util.Stack;
 
 public class ActionEnumerate2 extends Action {
 
-   public ActionEnumerate2() {
-      super(0x55, 0);
-   }
+    public ActionEnumerate2() {
+        super(0x55, 0);
+    }
 
-   @Override
-   public String toString() {
-      return "Enumerate2";
-   }
+    @Override
+    public String toString() {
+        return "Enumerate2";
+    }
 
-   @Override
-   public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-      GraphTargetItem object = stack.pop();
-      stack.push(new DirectValueTreeItem(null, 0, new Null(), new ArrayList<String>()));
-      stack.push(new EnumerateTreeItem(this, object));
-   }
+    @Override
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        GraphTargetItem object = stack.pop();
+        stack.push(new DirectValueTreeItem(null, 0, new Null(), new ArrayList<String>()));
+        stack.push(new EnumerateTreeItem(this, object));
+    }
 }

@@ -20,15 +20,15 @@ import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 
 public class SimpleActionTreeItem extends TreeItem {
 
-   private String actionString;
+    private String actionString;
 
-   @Override
-   public String toString(ConstantPool constants) {
-      return hilight(actionString);
-   }
+    @Override
+    public String toString(ConstantPool constants) {
+        return hilight(actionString);
+    }
 
-   public SimpleActionTreeItem(GraphSourceItem instruction, String actionString) {
-      super(instruction, PRECEDENCE_PRIMARY);
-      this.actionString = actionString;
-   }
+    public SimpleActionTreeItem(GraphSourceItem instruction, String actionString) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.actionString = actionString;
+    }
 }

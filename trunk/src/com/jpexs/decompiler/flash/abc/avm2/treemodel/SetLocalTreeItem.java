@@ -25,27 +25,27 @@ import java.util.List;
 
 public class SetLocalTreeItem extends TreeItem implements SetTypeTreeItem, AssignmentTreeItem {
 
-   public int regIndex;
-   public GraphTargetItem value;
+    public int regIndex;
+    public GraphTargetItem value;
 
-   public SetLocalTreeItem(AVM2Instruction instruction, int regIndex, GraphTargetItem value) {
-      super(instruction, PRECEDENCE_ASSIGMENT);
-      this.regIndex = regIndex;
-      this.value = value;
-   }
+    public SetLocalTreeItem(AVM2Instruction instruction, int regIndex, GraphTargetItem value) {
+        super(instruction, PRECEDENCE_ASSIGMENT);
+        this.regIndex = regIndex;
+        this.value = value;
+    }
 
-   @Override
-   public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-      return hilight(localRegName(localRegNames, regIndex) + "=") + value.toString(constants, localRegNames, fullyQualifiedNames);
-   }
+    @Override
+    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return hilight(localRegName(localRegNames, regIndex) + "=") + value.toString(constants, localRegNames, fullyQualifiedNames);
+    }
 
-   @Override
-   public GraphTargetItem getObject() {
-      return new LocalRegTreeItem(instruction, regIndex, null);
-   }
+    @Override
+    public GraphTargetItem getObject() {
+        return new LocalRegTreeItem(instruction, regIndex, null);
+    }
 
-   @Override
-   public GraphTargetItem getValue() {
-      return value;
-   }
+    @Override
+    public GraphTargetItem getValue() {
+        return value;
+    }
 }
