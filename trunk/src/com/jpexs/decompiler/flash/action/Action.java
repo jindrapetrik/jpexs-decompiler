@@ -725,29 +725,7 @@ public class Action implements GraphSourceItem {
                 ActionWith awith = (ActionWith) action;
                 List<GraphTargetItem> withCommands = ActionGraph.translateViaGraph(registerNames, variables, functions, awith.actions, version);
                 output.add(new WithTreeItem(action, stack.pop(), withCommands));
-            }/*else if (action instanceof ActionPushDuplicate) {
-             do {
-             if (actions.get(ip + 1) instanceof ActionNot) {
-             if (actions.get(ip + 2) instanceof ActionIf) {
-             int nextPos = adr2ip(actions, ((ActionIf) actions.get(ip + 2)).getRef(version), version);
-             stack.push(new AndTreeItem(action, stack.pop(), actionsToStackTree(registerNames, actions, constants, ip + 4, nextPos - 1, version).pop()));
-             ip = nextPos;
-             } else {
-             output.add(new UnsupportedTreeItem(action, "ActionPushDuplicate with Not"));
-             break;
-             }
-             } else if (actions.get(ip + 1) instanceof ActionIf) {
-             int nextPos = adr2ip(actions, ((ActionIf) actions.get(ip + 1)).getRef(version), version);
-             stack.push(new OrTreeItem(action, stack.pop(), actionsToStackTree(registerNames,  actions, constants, ip + 3, nextPos - 1, version).pop()));
-             ip = nextPos;
-             } else {
-             output.add(new UnsupportedTreeItem(action, "ActionPushDuplicate with no If"));
-             break loopip;
-             }
-             action = actions.get(ip);
-             } while (action instanceof ActionPushDuplicate);
-             continue;
-             }*/ else if (action instanceof ActionStoreRegister) {
+            } else if (action instanceof ActionStoreRegister) {
                 if ((ip + 1 <= end) && (actions.get(ip + 1) instanceof ActionPop)) {
                     action.translate(localData, stack, output);
                     stack.pop();
