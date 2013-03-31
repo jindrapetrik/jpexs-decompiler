@@ -986,8 +986,6 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeBUTTONCONDACTION(BUTTONCONDACTION value, boolean isLast) throws IOException {
-        BUTTONCONDACTION ret = new BUTTONCONDACTION();
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         SWFOutputStream sos = new SWFOutputStream(baos, version);
         sos.writeUB(1, value.condIdleToOverDown ? 1 : 0);

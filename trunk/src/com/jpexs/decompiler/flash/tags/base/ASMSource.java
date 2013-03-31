@@ -61,4 +61,6 @@ public interface ASMSource {
     public byte[] getActionBytes();
 
     public void setActionBytes(byte actionBytes[]);
+
+    public long getPos();
 }

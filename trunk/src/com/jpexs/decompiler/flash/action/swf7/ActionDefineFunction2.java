@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.swf7;
 
+import com.jpexs.decompiler.flash.ReReadableInputStream;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
@@ -30,7 +31,6 @@ import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.treemodel.FunctionTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -79,9 +79,11 @@ public class ActionDefineFunction2 extends Action implements ActionContainer {
             }
         }
     }
+    private long hdrSize;
 
-    public ActionDefineFunction2(int actionLength, SWFInputStream sis, int version) throws IOException {
+    public ActionDefineFunction2(int actionLength, SWFInputStream sis, ReReadableInputStream rri, int version) throws IOException {
         super(0x8E, actionLength);
+        long posBef = sis.getPos();
         this.version = version;
         functionName = sis.readString();
         int numParams = sis.readUI16();
@@ -101,12 +103,15 @@ public class ActionDefineFunction2 extends Action implements ActionContainer {
             paramNames.add(sis.readString());
         }
         codeSize = sis.readUI16();
-
+        long posAfter = sis.getPos();
+        hdrSize = posAfter - posBef;
         //code = new ArrayList<Action>();
-        code = (new SWFInputStream(new ByteArrayInputStream(sis.readBytes(codeSize)), version)).readActionList();
+        int posBef2 = rri.getPos();
+        code = sis.readActionList(rri.getPos(), getFileAddress() + hdrSize, rri, codeSize);
+        rri.setPos(posBef2 + codeSize);
     }
 
-    public ActionDefineFunction2(boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
+    public ActionDefineFunction2(long containerSWFPos, boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
         super(0x8E, -1);
         functionName = lexString(lexer);
         int numParams = (int) lexLong(lexer);
@@ -125,7 +130,38 @@ public class ActionDefineFunction2 extends Action implements ActionContainer {
             paramNames.add(lexString(lexer));
         }
         lexBlockOpen(lexer);
-        code = ASMParser.parse(ignoreNops, labels, address + getPreLen(version), lexer, constantPool, version);
+        code = ASMParser.parse(containerSWFPos + getHeaderLength(), ignoreNops, labels, address + getPreLen(version), lexer, constantPool, version);
+    }
+
+    public long getHeaderLength() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SWFOutputStream sos = new SWFOutputStream(baos, version);
+        ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+        try {
+            sos.writeString(functionName);
+            sos.writeUI16(paramNames.size());
+            sos.writeUI8(registerCount);
+            sos.writeUB(1, preloadParentFlag ? 1 : 0);
+            sos.writeUB(1, preloadRootFlag ? 1 : 0);
+            sos.writeUB(1, suppressSuperFlag ? 1 : 0);
+            sos.writeUB(1, preloadSuperFlag ? 1 : 0);
+            sos.writeUB(1, suppressArgumentsFlag ? 1 : 0);
+            sos.writeUB(1, preloadArgumentsFlag ? 1 : 0);
+            sos.writeUB(1, suppressThisFlag ? 1 : 0);
+            sos.writeUB(1, preloadThisFlag ? 1 : 0);
+            sos.writeUB(7, 0);
+            sos.writeUB(1, preloadGlobalFlag ? 1 : 0);
+            for (int i = 0; i < paramNames.size(); i++) {
+                sos.writeUI8(paramRegisters.get(i));
+
+                sos.writeString(paramNames.get(i));
+            }
+            sos.writeUI16(0);
+            sos.close();
+            baos2.write(surroundWithAction(baos.toByteArray(), version));
+        } catch (IOException e) {
+        }
+        return baos2.toByteArray().length;
     }
 
     @Override
@@ -149,6 +185,7 @@ public class ActionDefineFunction2 extends Action implements ActionContainer {
             sos.writeUB(1, preloadGlobalFlag ? 1 : 0);
             for (int i = 0; i < paramNames.size(); i++) {
                 sos.writeUI8(paramRegisters.get(i));
+
                 sos.writeString(paramNames.get(i));
             }
             byte codeBytes[] = Action.actionsToBytes(code, false, version);
@@ -227,9 +264,11 @@ public class ActionDefineFunction2 extends Action implements ActionContainer {
     }
 
     @Override
-    public void setAddress(long address, int version) {
-        super.setAddress(address, version);
-        Action.setActionsAddresses(code, address + getPreLen(version), version);
+    public void setAddress(long address, int version, boolean recursive) {
+        super.setAddress(address, version, recursive);
+        if (recursive) {
+            Action.setActionsAddresses(code, address + getPreLen(version), version);
+        }
     }
 
     @Override
@@ -266,7 +305,7 @@ public class ActionDefineFunction2 extends Action implements ActionContainer {
                 + " " + preloadArgumentsFlag
                 + " " + suppressThisFlag
                 + " " + preloadThisFlag
-                + " " + preloadGlobalFlag).trim() + " " + paramStr + " {\r\n" + Action.actionsToString(code, knownAddreses, constantPool, version, hex) + "}";
+                + " " + preloadGlobalFlag).trim() + " " + paramStr + " {\r\n" + Action.actionsToString(getAddress() + getHeaderLength(), code, knownAddreses, constantPool, version, hex, getFileAddress() + hdrSize) + "}";
     }
 
     @Override
@@ -346,5 +385,10 @@ public class ActionDefineFunction2 extends Action implements ActionContainer {
     @Override
     public List<Action> getAllIfsOrJumps() {
         return Action.getActionsAllIfsOrJumps(code);
+    }
+
+    @Override
+    public int getDataLength() {
+        return codeSize;
     }
 }

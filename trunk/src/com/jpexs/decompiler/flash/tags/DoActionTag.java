@@ -72,7 +72,7 @@ public class DoActionTag extends Tag implements ASMSource {
      */
     @Override
     public String getASMSource(int version, boolean hex) {
-        return Action.actionsToString(getActions(version), null, version, hex);
+        return Action.actionsToString(0, getActions(version), null, version, hex, getPos());
     }
 
     /**
@@ -111,7 +111,7 @@ public class DoActionTag extends Tag implements ASMSource {
             baos.write(actionBytes);
             ReReadableInputStream rri = new ReReadableInputStream(new ByteArrayInputStream(baos.toByteArray()));
             rri.setPos(prevLength);
-            return Action.removeNops(SWFInputStream.readActionList(rri, version, prevLength), version);
+            return Action.removeNops(0, SWFInputStream.readActionList(0, getPos() - prevLength, rri, version, prevLength, -1), version, getPos());
         } catch (Exception ex) {
             Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex);
             return new ArrayList<Action>();

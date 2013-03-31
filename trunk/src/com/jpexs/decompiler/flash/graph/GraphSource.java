@@ -20,6 +20,7 @@ public abstract class GraphSource {
     public abstract List<GraphTargetItem> translatePart(List localData, Stack<GraphTargetItem> stack, int start, int end);
 
     private void visitCode(int ip, int lastIp, HashMap<Integer, List<Integer>> refs) {
+        boolean debugMode = false;
         while (ip < size()) {
             refs.get(ip).add(lastIp);
             lastIp = ip;
@@ -28,7 +29,13 @@ public abstract class GraphSource {
             }
             GraphSourceItem ins = get(ip);
 
-
+            if (ins.isIgnored()) {
+                ip++;
+                continue;
+            }
+            if (debugMode) {
+                System.err.println("visit ip " + ip + " action:" + ins);
+            }
             if (ins.isExit()) {
                 break;
             }

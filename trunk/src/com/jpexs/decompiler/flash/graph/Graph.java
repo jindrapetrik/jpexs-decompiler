@@ -1314,6 +1314,10 @@ public class Graph {
             ip = checkIp(ip);
             lastIp = ip;
             GraphSourceItem ins = code.get(ip);
+            if (ins.isIgnored()) {
+                ip++;
+                continue;
+            }
             if (ins.isExit()) {
                 part.end = ip;
                 allBlocks.add(part);

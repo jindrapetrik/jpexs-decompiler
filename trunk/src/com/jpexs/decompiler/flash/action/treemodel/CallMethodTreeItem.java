@@ -41,7 +41,7 @@ public class CallMethodTreeItem extends TreeItem {
             if (t > 0) {
                 paramStr += hilight(",");
             }
-            paramStr += arguments.get(t).toString(constants);
+            paramStr += arguments.get(t).toStringNL(constants);
         }
         boolean blankMethod = false;
         if (methodName instanceof DirectValueTreeItem) {

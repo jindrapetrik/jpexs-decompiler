@@ -21,6 +21,8 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -33,6 +35,34 @@ import java.util.logging.Logger;
  */
 public class BUTTONCONDACTION implements ASMSource {
 
+    private long pos;
+
+    @Override
+    public long getPos() {
+        return pos;
+    }
+
+    public BUTTONCONDACTION(InputStream is, int version, long containerOffset) throws IOException {
+        SWFInputStream sis = new SWFInputStream(is, version);
+        pos = containerOffset;
+        int condActionSize = sis.readUI16();
+        isLast = condActionSize <= 0;
+        condIdleToOverDown = sis.readUB(1) == 1;
+        condOutDownToIdle = sis.readUB(1) == 1;
+        condOutDownToOverDown = sis.readUB(1) == 1;
+        condOverDownToOutDown = sis.readUB(1) == 1;
+        condOverDownToOverUp = sis.readUB(1) == 1;
+        condOverUpToOverDown = sis.readUB(1) == 1;
+        condOverUpToIddle = sis.readUB(1) == 1;
+        condIdleToOverUp = sis.readUB(1) == 1;
+        condKeyPress = (int) sis.readUB(7);
+        condOverDownToIddle = sis.readUB(1) == 1;
+        if (condActionSize <= 0) {
+            actionBytes = sis.readBytes(sis.available());
+        } else {
+            actionBytes = sis.readBytes(condActionSize - 4);
+        }
+    }
     /**
      * Is this BUTTONCONDACTION last in the list?
      */
@@ -112,7 +142,7 @@ public class BUTTONCONDACTION implements ASMSource {
      */
     @Override
     public String getASMSource(int version, boolean hex) {
-        return Action.actionsToString(getActions(version), null, version, hex);
+        return Action.actionsToString(0, getActions(version), null, version, hex, getPos() + 4);
     }
 
     /**
@@ -134,7 +164,7 @@ public class BUTTONCONDACTION implements ASMSource {
     @Override
     public List<Action> getActions(int version) {
         try {
-            return Action.removeNops(SWFInputStream.readActionList(new ReReadableInputStream(new ByteArrayInputStream(actionBytes)), version, 0), version);
+            return Action.removeNops(0, SWFInputStream.readActionList(0, getPos() + 4, new ReReadableInputStream(new ByteArrayInputStream(actionBytes)), version, 0, -1), version, getPos() + 4);
         } catch (Exception ex) {
             Logger.getLogger(BUTTONCONDACTION.class.getName()).log(Level.SEVERE, null, ex);
             return new ArrayList<Action>();

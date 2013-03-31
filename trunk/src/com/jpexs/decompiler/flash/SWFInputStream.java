@@ -18,8 +18,6 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
-import com.jpexs.decompiler.flash.action.parser.ASMParser;
-import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.special.ActionContainer;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.special.ActionNop;
@@ -51,7 +49,6 @@ import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -490,9 +487,13 @@ public class SWFInputStream extends InputStream {
         return ret;
     }
 
-    public List<Action> readActionList() throws IOException {
+    public List<Action> readActionList(long address, long containerSWFOffset) throws IOException {
         ReReadableInputStream rri = new ReReadableInputStream(this);
-        return readActionList(rri, version, 0);
+        return readActionList(address, containerSWFOffset, rri, version, 0, -1);
+    }
+
+    public List<Action> readActionList(long address, long containerSWFOffset, ReReadableInputStream rri, int maxlen) throws IOException {
+        return readActionList(address, containerSWFOffset, rri, version, rri.getPos(), rri.getPos() + maxlen);
     }
 
     private static void getConstantPool(ConstantPool cpool, List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, int lastIp, List<ConstantPool> constantPools, List<Integer> visited, int version) {
@@ -559,7 +560,7 @@ public class SWFInputStream extends InputStream {
                         ins.setIgnored(true);
                     }
                     if ((!aif.ignoreUsed) && aif.jumpUsed) {
-                        ActionJump jmpIns = new ActionJump(aif.offset);
+                        ActionJump jmpIns = new ActionJump(aif.getJumpOffset());
                         ((ActionJump) jmpIns).setAddress(aif.getAddress(), version);
                         code.set(ip, (ActionJump) jmpIns);
                     }
@@ -572,11 +573,11 @@ public class SWFInputStream extends InputStream {
                                     ((ActionPush) ig.item).ignoredParts.add(ig.pos);
 
                                     if (((ActionPush) ig.item).ignoredParts.size() == ((ActionPush) ig.item).values.size()) {
-                                        ((Action) ig.item).ignored = true;
+                                        ((Action) ig.item).setIgnored(true);
                                     }
                                 }
                             } else {
-                                ((Action) ig.item).ignored = true;
+                                ((Action) ig.item).setIgnored(true);
                             }
                         }
                     }
@@ -589,7 +590,7 @@ public class SWFInputStream extends InputStream {
                         }
                     }
                     stack.pop();
-                    getConstantPool(cpool, localData, stack, output, code, condition ? (code.adr2pos(((ActionIf) ins).getAddress() + ((ActionIf) ins).getBytes(code.version).length + ((ActionIf) ins).offset)) : ip + 1, ip, constantPools, visited, version);
+                    getConstantPool(cpool, localData, stack, output, code, condition ? (code.adr2pos(((ActionIf) ins).getAddress() + ((ActionIf) ins).getBytes(code.version).length + ((ActionIf) ins).getJumpOffset())) : ip + 1, ip, constantPools, visited, version);
                 } else {
                     if (ins instanceof ActionIf) {
                         stack.pop();
@@ -634,7 +635,7 @@ public class SWFInputStream extends InputStream {
      * @return List of actions
      * @throws IOException
      */
-    public static List<Action> readActionList(ReReadableInputStream rri, int version, int ip) throws IOException {
+    public static List<Action> readActionList(long address, long containerSWFOffset, ReReadableInputStream rri, int version, int ip, int endip) throws IOException {
         List<Action> retdups = new ArrayList<Action>();
         ConstantPool cpool = new ConstantPool();
 
@@ -652,7 +653,7 @@ public class SWFInputStream extends InputStream {
          method = 2;
          goesPrev = readActionListAtPos(true, localData, stack, cpool, sis, rri, ip, retdups, ip);
          }*/
-        goesPrev = readActionListAtPos(false, true, localData, stack, cpool, sis, rri, ip, retdups, ip);
+        goesPrev = readActionListAtPos(address, containerSWFOffset, false, true, localData, stack, cpool, sis, rri, ip, retdups, ip, endip);
 
         if (goesPrev) {
         } else {
@@ -676,7 +677,7 @@ public class SWFInputStream extends InputStream {
             if (a instanceof ActionEnd) {
                 if (i < retdups.size() - 1) {
                     ActionJump jmp = new ActionJump(0);
-                    jmp.offset = retdups.size() - i - jmp.getBytes(version).length;
+                    jmp.setJumpOffset(retdups.size() - i - jmp.getBytes(version).length);
                     a.replaceWith = jmp;
                 }
             }
@@ -699,16 +700,18 @@ public class SWFInputStream extends InputStream {
         String s = null;
         //Action.setConstantPool(ret, cpool);
 
-        try {
-            s = Highlighting.stripHilights(Action.actionsToString(ret, null, version, false));
-            ret = ASMParser.parse(false, new ByteArrayInputStream(s.getBytes()), SWF.DEFAULT_VERSION);
-        } catch (ParseException ex) {
-            Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error", ex);
-        }
+        /* try {
+         s = Highlighting.stripHilights(Action.actionsToString(address,ret, null, version, false,containerSWFOffset));
+         //System.out.println("PARSE:"+s);
+         Helper.writeFile("t.txt", s.getBytes());
+         ret = ASMParser.parse(address,containerSWFOffset,false, new ByteArrayInputStream(s.getBytes()), SWF.DEFAULT_VERSION);
+         } catch (ParseException ex) {
+         Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error", ex);
+         }*/
         return ret;
     }
 
-    private static boolean readActionListAtPos(boolean notCompileTime, boolean enableVariables, List localData, Stack<GraphTargetItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret, int startIp) throws IOException {
+    private static boolean readActionListAtPos(long address, long containerSWFOffset, boolean notCompileTime, boolean enableVariables, List localData, Stack<GraphTargetItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret, int startIp, int endip) throws IOException {
         boolean debugMode = false;
         boolean decideBranch = false;
         boolean retv = false;
@@ -718,12 +721,21 @@ public class SWFInputStream extends InputStream {
         long filePos = rri.getPos();
         Scanner sc = new Scanner(System.in);
         int prevIp = ip;
-        while ((a = sis.readAction()) != null) {
+        while (((endip == -1) || (endip > ip)) && (a = sis.readAction(rri)) != null) {
             if ((ip < ret.size()) && (!(ret.get(ip) instanceof ActionNop))) {
                 a = ret.get(ip);
             }
-            a.setAddress(prevIp, SWF.DEFAULT_VERSION);
+            a.containerSWFOffset = containerSWFOffset;
+            a.setAddress(prevIp, SWF.DEFAULT_VERSION, false);
             int info = a.actionLength + 1 + ((a.actionCode > 0x80) ? 2 : 0);
+            byte b[] = a.getBytes(sis.version);
+            int infoCorrect = info;
+            if (a instanceof ActionContainer) {
+                infoCorrect += ((ActionContainer) a).getDataLength();
+            }
+            if (b.length != infoCorrect) {
+                //throw new RuntimeException("Wrong length "+a.toString()+" info:"+infoCorrect+" actual:"+b.length+" datalen:"+(infoCorrect-info));
+            }
             int actual = 0;
             if (a instanceof ActionContainer) {
                 actual = ((ActionContainer) a).getHeaderBytes().length;
@@ -742,10 +754,24 @@ public class SWFInputStream extends InputStream {
                 retv = true;
             }
             if (debugMode) {
-                //if(a instanceof ActionIf){
-                System.out.println("readActionListAtPos ip: " + (ip - startIp) + " action(len " + a.actionLength + "): " + a + (a.isIgnored() ? " (ignored)" : "") + " stack:" + Highlighting.stripHilights(stack.toString()) + " " + Helper.byteArrToString(a.getBytes(SWF.DEFAULT_VERSION)));
+                //if(a instanceof ActionIf){                
+                String atos = a.getASMSource(new ArrayList<Long>(), cpool.constants, sis.version, false);
+                if (a instanceof ActionContainer) {
+                    atos = a.toString();
+                }
+                System.err.println("readActionListAtPos ip: " + (ip - startIp) + " (0x" + Helper.formatAddress(ip - startIp) + ") " + " action(len " + a.actionLength + "): " + atos + (a.isIgnored() ? " (ignored)" : "") + " stack:" + Helper.stackToString(stack, Helper.toList(cpool)) + " " + Helper.byteArrToString(a.getBytes(SWF.DEFAULT_VERSION)));
                 //}
+                String add = "";
+                if (a instanceof ActionIf) {
+                    add = " change: " + ((ActionIf) a).getJumpOffset();
+                }
+                if (a instanceof ActionJump) {
+                    add = " change: " + ((ActionJump) a).getJumpOffset();
+                }
+                System.err.println(add);
             }
+
+
             /*if(a instanceof ActionConstantPool){
              throw new IllegalArgumentException("CP found");
              }     */
@@ -792,14 +818,14 @@ public class SWFInputStream extends InputStream {
                         GraphTargetItem top = null;
                         top = stack.pop();
 
-                        int nip = rri.getPos() + aif.offset;
+                        int nip = rri.getPos() + aif.getJumpOffset();
 
                         if (decideBranch) {
                             System.out.print("newip " + nip + ", ");
                             System.out.print("Action: jump(j),ignore(i),compute(c)?");
                             String next = sc.next();
                             if (next.equals("j")) {
-                                newip = rri.getPos() + aif.offset;
+                                newip = rri.getPos() + aif.getJumpOffset();
                                 rri.setPos(newip);
 
                             } else if (next.equals("i")) {
@@ -816,10 +842,10 @@ public class SWFInputStream extends InputStream {
                                 System.out.print("is compiletime -> ");
                             }
                             if (top.toBoolean()) {
-                                newip = rri.getPos() + aif.offset;
+                                newip = rri.getPos() + aif.getJumpOffset();
                                 //rri.setPos(newip);
                                 if (((!enableVariables) || (!top.isVariableComputed())) && (!aif.ignoreUsed)) {
-                                    a = new ActionJump(aif.offset);
+                                    a = new ActionJump(aif.getJumpOffset());
                                     a.setAddress(aif.getAddress(), SWF.DEFAULT_VERSION);
                                 }
                                 aif.jumpUsed = true;
@@ -854,11 +880,11 @@ public class SWFInputStream extends InputStream {
                                             ((ActionPush) ig.item).ignoredParts.add(ig.pos);
 
                                             if (((ActionPush) ig.item).ignoredParts.size() == ((ActionPush) ig.item).values.size()) {
-                                                ((Action) ig.item).ignored = true;
+                                                ((Action) ig.item).setIgnored(true);
                                             }
                                         }
                                     } else {
-                                        ((Action) ig.item).ignored = true;
+                                        ((Action) ig.item).setIgnored(true);
                                     }
                                 }
                             }
@@ -871,7 +897,7 @@ public class SWFInputStream extends InputStream {
                             goaif = true;
                         }
                     } else if (a instanceof ActionJump) {
-                        newip = rri.getPos() + ((ActionJump) a).offset;
+                        newip = rri.getPos() + ((ActionJump) a).getJumpOffset();
                         //if(newip>=0){
                         //rri.setPos(newip);
                         //}
@@ -932,7 +958,7 @@ public class SWFInputStream extends InputStream {
                 aif.jumpUsed = true;
                 int oldPos = rri.getPos();
                 Stack<GraphTargetItem> substack = (Stack<GraphTargetItem>) stack.clone();
-                if (readActionListAtPos(true, enableVariables, localData, substack, cpool, sis, rri, rri.getPos() + aif.offset, ret, startIp)) {
+                if (readActionListAtPos(address, containerSWFOffset, true, enableVariables, localData, substack, cpool, sis, rri, rri.getPos() + aif.getJumpOffset(), ret, startIp, endip)) {
                     retv = true;
                 }
                 rri.setPos(oldPos);
@@ -1281,13 +1307,17 @@ public class SWFInputStream extends InputStream {
         return ret;
     }
 
+    public Action readAction() throws IOException {
+        return readAction(new ReReadableInputStream(this));
+    }
+
     /**
      * Reads one Action from the stream
      *
      * @return Action or null when ActionEndFlag or end of the stream
      * @throws IOException
      */
-    public Action readAction() throws IOException {
+    public Action readAction(ReReadableInputStream rri) throws IOException {
         {
             int actionCode = readUI8();
             if (actionCode == 0) {
@@ -1415,7 +1445,7 @@ public class SWFInputStream extends InputStream {
                 case 0x88:
                     return new ActionConstantPool(actionLength, this, version);
                 case 0x9B:
-                    return new ActionDefineFunction(actionLength, this, version);
+                    return new ActionDefineFunction(actionLength, this, rri, version);
                 case 0x3C:
                     return new ActionDefineLocal();
                 case 0x41:
@@ -1443,7 +1473,7 @@ public class SWFInputStream extends InputStream {
                 case 0x45:
                     return new ActionTargetPath();
                 case 0x94:
-                    return new ActionWith(this, version);
+                    return new ActionWith(this, rri, version);
                 case 0x4A:
                     return new ActionToNumber();
                 case 0x4B:
@@ -1493,7 +1523,7 @@ public class SWFInputStream extends InputStream {
                     return new ActionStringGreater();
                 //SWF7 Actions
                 case 0x8E:
-                    return new ActionDefineFunction2(actionLength, this, version);
+                    return new ActionDefineFunction2(actionLength, this, rri, version);
                 case 0x69:
                     return new ActionExtends();
                 case 0x2B:
@@ -1501,7 +1531,7 @@ public class SWFInputStream extends InputStream {
                 case 0x2C:
                     return new ActionImplementsOp();
                 case 0x8F:
-                    return new ActionTry(actionLength, this, version);
+                    return new ActionTry(actionLength, this, rri, version);
                 case 0x2A:
                     return new ActionThrow();
                 default:
@@ -1643,17 +1673,10 @@ public class SWFInputStream extends InputStream {
      * @throws IOException
      */
     public CLIPACTIONRECORD readCLIPACTIONRECORD() throws IOException {
-        CLIPACTIONRECORD ret = new CLIPACTIONRECORD();
-        ret.eventFlags = readCLIPEVENTFLAGS();
+        CLIPACTIONRECORD ret = new CLIPACTIONRECORD(this, version, getPos());
         if (ret.eventFlags.isClear()) {
             return null;
         }
-        long actionRecordSize = readUI32();
-        if (ret.eventFlags.clipEventKeyPress) {
-            ret.keyCode = readUI8();
-            actionRecordSize--;
-        }
-        ret.actionBytes = readBytes(actionRecordSize);
         //ret.actions = (new SWFInputStream(new ByteArrayInputStream(readBytes(actionRecordSize)), version)).readActionList();
         return ret;
     }
@@ -2030,24 +2053,7 @@ public class SWFInputStream extends InputStream {
      * @throws IOException
      */
     public BUTTONCONDACTION readBUTTONCONDACTION() throws IOException {
-        BUTTONCONDACTION ret = new BUTTONCONDACTION();
-        int condActionSize = readUI16();
-        ret.isLast = condActionSize <= 0;
-        ret.condIdleToOverDown = readUB(1) == 1;
-        ret.condOutDownToIdle = readUB(1) == 1;
-        ret.condOutDownToOverDown = readUB(1) == 1;
-        ret.condOverDownToOutDown = readUB(1) == 1;
-        ret.condOverDownToOverUp = readUB(1) == 1;
-        ret.condOverUpToOverDown = readUB(1) == 1;
-        ret.condOverUpToIddle = readUB(1) == 1;
-        ret.condIdleToOverUp = readUB(1) == 1;
-        ret.condKeyPress = (int) readUB(7);
-        ret.condOverDownToIddle = readUB(1) == 1;
-        if (condActionSize <= 0) {
-            ret.actionBytes = readBytes(available());
-        } else {
-            ret.actionBytes = readBytes(condActionSize - 4);
-        }
+        BUTTONCONDACTION ret = new BUTTONCONDACTION(this, version, getPos());
         //ret.actions = readActionList();
         return ret;
     }

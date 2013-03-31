@@ -64,6 +64,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     public int getCharacterID() {
         return buttonId;
     }
+    private long hdrSize;
 
     /**
      * Constructor
@@ -78,6 +79,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
         buttonId = sis.readUI16();
         characters = sis.readBUTTONRECORDList(false);
         //actions = sis.readActionList();
+        hdrSize = sis.getPos();
         actionBytes = sis.readBytes(sis.available());
     }
 
@@ -117,7 +119,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
      */
     @Override
     public String getASMSource(int version, boolean hex) {
-        return Action.actionsToString(getActions(version), null, version, hex);
+        return Action.actionsToString(0, getActions(version), null, version, hex, getPos() + hdrSize);
     }
 
     /**
@@ -149,7 +151,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
             baos.write(actionBytes);
             ReReadableInputStream rri = new ReReadableInputStream(new ByteArrayInputStream(baos.toByteArray()));
             rri.setPos(prevLength);
-            return Action.removeNops(SWFInputStream.readActionList(rri, version, prevLength), version);
+            return Action.removeNops(0, SWFInputStream.readActionList(0, getPos() + hdrSize - prevLength, rri, version, prevLength, -1), version, getPos() + hdrSize);
         } catch (Exception ex) {
             Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex);
             return new ArrayList<Action>();

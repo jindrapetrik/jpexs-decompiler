@@ -28,18 +28,28 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ActionIf extends Action {
 
-    public int offset;
+    private int offset;
     public String identifier;
     public boolean compileTime;
     public boolean jumpUsed = false;
     public boolean ignoreUsed = false;
 
+    public int getJumpOffset() {
+        return offset;
+    }
+
+    public final void setJumpOffset(int offset) {
+        this.offset = offset;
+    }
+
     public ActionIf(SWFInputStream sis) throws IOException {
         super(0x9D, 2);
-        offset = sis.readSI16();
+        setJumpOffset(sis.readSI16());
     }
 
     @Override
@@ -96,8 +106,15 @@ public class ActionIf extends Action {
     @Override
     public List<Integer> getBranches(GraphSource code) {
         List<Integer> ret = super.getBranches(code);
-        ret.add(code.adr2pos(getAddress() + getBytes(((ActionGraphSource) code).version).length + offset));
-        ret.add(code.adr2pos(getAddress() + getBytes(((ActionGraphSource) code).version).length));
+        int jmp = code.adr2pos(getAddress() + getBytes(((ActionGraphSource) code).version).length + offset);
+        int after = code.adr2pos(getAddress() + getBytes(((ActionGraphSource) code).version).length);
+        if (jmp == -1) {
+            Logger.getLogger(ActionIf.class.getName()).log(Level.SEVERE, "Invalid IF jump to ofs" + Helper.formatAddress(getAddress() + getBytes(((ActionGraphSource) code).version).length + offset));
+            ret.add(after);
+        } else {
+            ret.add(jmp);
+        }
+        ret.add(after);
         return ret;
     }
 

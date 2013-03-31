@@ -121,4 +121,16 @@ public abstract class GraphTargetItem {
     public GraphTargetItem getThroughRegister() {
         return this;
     }
+
+    public boolean needsNewLine() {
+        return false;
+    }
+
+    public String toStringNL(Object... localData) {
+        List localData2 = new ArrayList();
+        for (Object o : localData) {
+            localData2.add(o);
+        }
+        return toString(localData2) + (needsNewLine() ? "\r\n" : "");
+    }
 }

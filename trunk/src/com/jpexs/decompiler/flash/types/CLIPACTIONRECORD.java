@@ -21,6 +21,8 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -33,6 +35,30 @@ import java.util.logging.Logger;
  */
 public class CLIPACTIONRECORD implements ASMSource {
 
+    private long pos;
+    private long hdrPos;
+
+    public CLIPACTIONRECORD(InputStream is, int version, long pos) throws IOException {
+        SWFInputStream sis = new SWFInputStream(is, version);
+        eventFlags = sis.readCLIPEVENTFLAGS();
+        if (eventFlags.isClear()) {
+            return;
+        }
+        long actionRecordSize = sis.readUI32();
+        if (eventFlags.clipEventKeyPress) {
+            keyCode = sis.readUI8();
+            actionRecordSize--;
+        }
+        hdrPos = sis.getPos();
+        actionBytes = sis.readBytes(actionRecordSize);
+        this.pos = pos;
+
+    }
+
+    @Override
+    public long getPos() {
+        return pos;
+    }
     /**
      * Events to which this handler applies
      */
@@ -79,7 +105,7 @@ public class CLIPACTIONRECORD implements ASMSource {
      */
     @Override
     public String getASMSource(int version, boolean hex) {
-        return Action.actionsToString(getActions(version), null, version, hex);
+        return Action.actionsToString(0, getActions(version), null, version, hex, getPos() + hdrPos);
     }
 
     /**
@@ -95,7 +121,7 @@ public class CLIPACTIONRECORD implements ASMSource {
     @Override
     public List<Action> getActions(int version) {
         try {
-            return Action.removeNops(SWFInputStream.readActionList(new ReReadableInputStream(new ByteArrayInputStream(actionBytes)), version, 0), version);
+            return Action.removeNops(0, SWFInputStream.readActionList(0, getPos() + hdrPos, new ReReadableInputStream(new ByteArrayInputStream(actionBytes)), version, 0, -1), version, getPos() + hdrPos);
         } catch (Exception ex) {
             Logger.getLogger(BUTTONCONDACTION.class.getName()).log(Level.SEVERE, null, ex);
             return new ArrayList<Action>();

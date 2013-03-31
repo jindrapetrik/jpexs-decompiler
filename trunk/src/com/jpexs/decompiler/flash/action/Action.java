@@ -54,7 +54,7 @@ public class Action implements GraphSourceItem {
     public Action beforeInsert;
     public Action afterInsert;
     public Action replaceWith;
-    public boolean ignored = false;
+    private boolean ignored = false;
     /**
      * Action type identifier
      */
@@ -63,7 +63,12 @@ public class Action implements GraphSourceItem {
      * Length of action data
      */
     public int actionLength;
+    public long containerSWFOffset;
     private long address;
+
+    public long getFileAddress() {
+        return containerSWFOffset + getAddress();
+    }
     /**
      * Names of ActionScript properties
      */
@@ -161,17 +166,17 @@ public class Action implements GraphSourceItem {
         List<Long> ret = new ArrayList<Long>();
         for (Action a : list) {
             if (a.replaceWith != null) {
-                a.replaceWith.setAddress(a.getAddress(), version);
+                a.replaceWith.setAddress(a.getAddress(), version, false);
                 ret.addAll(a.replaceWith.getAllRefs(version));
             }
             if (a.beforeInsert != null) {
-                a.beforeInsert.setAddress(a.getAddress(), version);
+                a.beforeInsert.setAddress(a.getAddress(), version, false);
                 ret.addAll(a.beforeInsert.getAllRefs(version));
             }
             List<Long> part = a.getAllRefs(version);
             ret.addAll(part);
             if (a.afterInsert != null) {
-                a.afterInsert.setAddress(a.getAddress(), version);
+                a.afterInsert.setAddress(a.getAddress(), version, false);
                 ret.addAll(a.afterInsert.getAllRefs(version));
             }
         }
@@ -184,7 +189,11 @@ public class Action implements GraphSourceItem {
      * @param address Address
      * @param version SWF version
      */
-    public void setAddress(long address, int version) {
+    public final void setAddress(long address, int version) {
+        setAddress(address, version, true);
+    }
+
+    public void setAddress(long address, int version, boolean recursive) {
         this.address = address;
     }
 
@@ -354,8 +363,8 @@ public class Action implements GraphSourceItem {
      * @param hex Add hexadecimal?
      * @return ASM source as String
      */
-    public static String actionsToString(List<Action> list, List<Long> importantOffsets, int version, boolean hex) {
-        return actionsToString(list, importantOffsets, new ArrayList<String>(), version, hex);
+    public static String actionsToString(long address, List<Action> list, List<Long> importantOffsets, int version, boolean hex, long swfPos) {
+        return actionsToString(address, list, importantOffsets, new ArrayList<String>(), version, hex, swfPos);
     }
 
     /**
@@ -368,7 +377,7 @@ public class Action implements GraphSourceItem {
      * @param hex Add hexadecimal?
      * @return ASM source as String
      */
-    public static String actionsToString(List<Action> list, List<Long> importantOffsets, List<String> constantPool, int version, boolean hex) {
+    public static String actionsToString(long address, List<Action> list, List<Long> importantOffsets, List<String> constantPool, int version, boolean hex, long swfPos) {
         String ret = "";
         long offset;
         if (importantOffsets == null) {
@@ -376,10 +385,12 @@ public class Action implements GraphSourceItem {
             importantOffsets = getActionsAllRefs(list, version);
         }
 
-        offset = 0;
+        offset = address;
+        int pos = -1;
         for (Action a : list) {
+            pos++;
             if (hex) {
-                ret += "<ffdec:hex>" + Helper.bytesToHexString((a instanceof ActionContainer) ? ((ActionContainer) a).getHeaderBytes() : a.getBytes(version)) + "</ffdec:hex>\r\n";
+                ret += "<ffdec:hex>" +/*"0x"+Helper.formatAddress(a.getFileAddress())+": "+*/ Helper.bytesToHexString((a instanceof ActionContainer) ? ((ActionContainer) a).getHeaderBytes() : a.getBytes(version)) + "</ffdec:hex>\r\n";
             }
             offset = a.getAddress();
             if (importantOffsets.contains(offset)) {
@@ -389,7 +400,12 @@ public class Action implements GraphSourceItem {
             if (a.replaceWith != null) {
                 ret += Highlighting.hilighOffset("", offset) + a.replaceWith.getASMSource(importantOffsets, constantPool, version, hex) + "\r\n";
             } else if (a.ignored) {
-                int len = a.getBytes(version).length;
+                int len = 0;
+                if (pos + 1 < list.size()) {
+                    len = (int) (list.get(pos + 1).getAddress() - a.getAddress());
+                } else {
+                    len = a.getBytes(version).length;
+                }
                 for (int i = 0; i < len; i++) {
                     ret += "Nop\r\n";
                 }
@@ -398,9 +414,16 @@ public class Action implements GraphSourceItem {
                     ret += a.beforeInsert.getASMSource(importantOffsets, constantPool, version, hex) + "\r\n";
                 }
                 //if (!(a instanceof ActionNop)) {
-                ret += Highlighting.hilighOffset("", offset) + a.getASMSourceReplaced(importantOffsets, constantPool, version, hex) + (a.ignored ? "; ignored" : "") + "\r\n";
-
-                //}
+                /*String add="";
+                 if(a instanceof ActionIf){
+                 add = " change: "+((ActionIf)a).getJumpOffset();
+                 }
+                 if(a instanceof ActionJump){
+                 add = " change: "+((ActionJump)a).getJumpOffset();
+                 }*/
+                 ret += Highlighting.hilighOffset("", offset) + a.getASMSourceReplaced(importantOffsets, constantPool, version, hex) + (a.ignored ? "; ignored" : "")+/*"; ofs"+Helper.formatAddress(offset)+add +*/ "\r\n";
+                  
+                        //}
                 if (a.afterInsert != null) {
                     ret += a.afterInsert.getASMSource(importantOffsets, constantPool, version, hex) + "\r\n";
                 }
@@ -649,6 +672,10 @@ public class Action implements GraphSourceItem {
                 break;
             }
             Action action = actions.get(ip);
+            if (action.isIgnored()) {
+                ip++;
+                continue;
+            }
             //System.out.println(" ip "+ip+" "+action);
             //return in for..in
             if ((action instanceof ActionPush) && (((ActionPush) action).values.size() == 1) && (((ActionPush) action).values.get(0) instanceof Null)) {
@@ -657,7 +684,7 @@ public class Action implements GraphSourceItem {
                         if (actions.get(ip + 2) instanceof ActionNot) {
                             if (actions.get(ip + 3) instanceof ActionIf) {
                                 ActionIf aif = (ActionIf) actions.get(ip + 3);
-                                if (adr2ip(actions, ip2adr(actions, ip + 4, version) + aif.offset, version) == ip) {
+                                if (adr2ip(actions, ip2adr(actions, ip + 4, version) + aif.getJumpOffset(), version) == ip) {
                                     ip += 4;
                                     continue;
                                 }
@@ -897,6 +924,21 @@ public class Action implements GraphSourceItem {
                                                                 break;
                                                             }
                                                             pos++;
+                                                        } else if (((StoreRegisterTreeItem) parts.get(pos)).value instanceof NewObjectTreeItem) {
+                                                            if (parts.get(pos + 1) instanceof SetMemberTreeItem) {
+                                                                if (((SetMemberTreeItem) parts.get(pos + 1)).value == ((StoreRegisterTreeItem) parts.get(pos)).value) {
+                                                                    instanceReg = ((StoreRegisterTreeItem) parts.get(pos)).register.number;
+                                                                    NewObjectTreeItem nm = (NewObjectTreeItem) ((StoreRegisterTreeItem) parts.get(pos)).value;
+                                                                    extendsOp = new GetVariableTreeItem(null, nm.objectName);
+                                                                } else {
+                                                                    ok = false;
+                                                                    break;
+                                                                }
+                                                            } else {
+                                                                ok = false;
+                                                                break;
+                                                            }
+                                                            pos++;
                                                         } else {
                                                             ok = false;
                                                             break;
@@ -1037,12 +1079,12 @@ public class Action implements GraphSourceItem {
         return false;
     }
 
-    public static List<Action> removeNops(List<Action> actions, int version) {
+    public static List<Action> removeNops(long address, List<Action> actions, int version, long swfPos) {
         List<Action> ret = actions;
         String s = null;
         try {
-            s = Highlighting.stripHilights(Action.actionsToString(ret, null, version, false));
-            ret = ASMParser.parse(true, new ByteArrayInputStream(s.getBytes()), SWF.DEFAULT_VERSION);
+            s = Highlighting.stripHilights(Action.actionsToString(address, ret, null, version, false, swfPos));
+            ret = ASMParser.parse(address, swfPos, true, new ByteArrayInputStream(s.getBytes()), SWF.DEFAULT_VERSION);
         } catch (Exception ex) {
             Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error", ex);
         }

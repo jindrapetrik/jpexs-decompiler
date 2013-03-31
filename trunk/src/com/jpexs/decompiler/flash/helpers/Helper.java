@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.helpers;
 
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -25,6 +26,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -331,5 +333,17 @@ public class Helper {
 
     public static String hexToComments(String str) {
         return str.replaceAll("<ffdec:hex>([^\r\n]*)</ffdec:hex>(\r?\n)", "; $1$2");
+    }
+
+    public static String stackToString(Stack<GraphTargetItem> stack, List localData) {
+        String ret = "[";
+        for (int i = stack.size() - 1; i >= 0; i--) {
+            if (i < stack.size() - 1) {
+                ret += ", ";
+            }
+            ret += stack.get(i).toString(localData);
+        }
+        ret += "]";
+        return Highlighting.stripHilights(ret);
     }
 }

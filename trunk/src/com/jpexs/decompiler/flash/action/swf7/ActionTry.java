@@ -16,13 +16,13 @@
  */
 package com.jpexs.decompiler.flash.action.swf7;
 
+import com.jpexs.decompiler.flash.ReReadableInputStream;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.*;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.helpers.Helper;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,9 +38,13 @@ public class ActionTry extends Action {
     public List<Action> tryBody;
     public List<Action> catchBody;
     public List<Action> finallyBody;
+    long tryPos;
+    long catchPos;
+    long finPos;
 
-    public ActionTry(int actionLength, SWFInputStream sis, int version) throws IOException {
+    public ActionTry(int actionLength, SWFInputStream sis, ReReadableInputStream rri, int version) throws IOException {
         super(0x8F, actionLength);
+        long startPos = sis.getPos();
         sis.readUB(5);
         catchInRegisterFlag = sis.readUB(1) == 1;
         finallyBlockFlag = sis.readUB(1) == 1;
@@ -53,42 +57,44 @@ public class ActionTry extends Action {
         } else {
             catchName = sis.readString();
         }
-        byte tryBodyBytes[] = sis.readBytes(trySize);
-        byte catchBodyBytes[] = sis.readBytes(catchSize);
-        byte finallyBodyBytes[] = sis.readBytes(finallySize);
-        tryBody = (new SWFInputStream(new ByteArrayInputStream(tryBodyBytes), version)).readActionList();
-        catchBody = (new SWFInputStream(new ByteArrayInputStream(catchBodyBytes), version)).readActionList();
-        finallyBody = (new SWFInputStream(new ByteArrayInputStream(finallyBodyBytes), version)).readActionList();
+        tryPos = sis.getPos() - startPos;
+        tryBody = sis.readActionList(rri.getPos(), getFileAddress() + tryPos, rri, trySize);
+        catchPos = sis.getPos() - startPos;
+        catchBody = sis.readActionList(rri.getPos(), getFileAddress() + catchPos, rri, catchSize);
+        finPos = sis.getPos() - startPos;
+        finallyBody = sis.readActionList(rri.getPos(), getFileAddress() + finPos, rri, finallySize);
     }
 
     @Override
-    public void setAddress(long address, int version) {
-        super.setAddress(address, version);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
-        try {
-            sos.writeUB(5, 0);
-            sos.writeUB(1, catchInRegisterFlag ? 1 : 0);
-            sos.writeUB(1, finallyBlockFlag ? 1 : 0);
-            sos.writeUB(1, catchBlockFlag ? 1 : 0);
-            byte tryBodyBytes[] = Action.actionsToBytes(tryBody, false, version);
-            byte catchBodyBytes[] = Action.actionsToBytes(catchBody, false, version);
-            byte finallyBodyBytes[] = Action.actionsToBytes(finallyBody, false, version);
-            sos.writeUI16(tryBodyBytes.length);
-            sos.writeUI16(catchBodyBytes.length);
-            sos.writeUI16(finallyBodyBytes.length);
-            if (catchInRegisterFlag) {
-                sos.writeUI8(catchRegister);
-            } else {
-                sos.writeString(catchName);
+    public void setAddress(long address, int version, boolean recursive) {
+        super.setAddress(address, version, recursive);
+        if (recursive) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            SWFOutputStream sos = new SWFOutputStream(baos, version);
+            try {
+                sos.writeUB(5, 0);
+                sos.writeUB(1, catchInRegisterFlag ? 1 : 0);
+                sos.writeUB(1, finallyBlockFlag ? 1 : 0);
+                sos.writeUB(1, catchBlockFlag ? 1 : 0);
+                byte tryBodyBytes[] = Action.actionsToBytes(tryBody, false, version);
+                byte catchBodyBytes[] = Action.actionsToBytes(catchBody, false, version);
+                byte finallyBodyBytes[] = Action.actionsToBytes(finallyBody, false, version);
+                sos.writeUI16(tryBodyBytes.length);
+                sos.writeUI16(catchBodyBytes.length);
+                sos.writeUI16(finallyBodyBytes.length);
+                if (catchInRegisterFlag) {
+                    sos.writeUI8(catchRegister);
+                } else {
+                    sos.writeString(catchName);
+                }
+                Action.setActionsAddresses(tryBody, address + baos.toByteArray().length, version);
+                sos.write(tryBodyBytes);
+                Action.setActionsAddresses(catchBody, address + baos.toByteArray().length, version);
+                sos.write(catchBodyBytes);
+                Action.setActionsAddresses(finallyBody, address + baos.toByteArray().length, version);
+                sos.close();
+            } catch (IOException e) {
             }
-            Action.setActionsAddresses(tryBody, address + baos.toByteArray().length, version);
-            sos.write(tryBodyBytes);
-            Action.setActionsAddresses(catchBody, address + baos.toByteArray().length, version);
-            sos.write(catchBodyBytes);
-            Action.setActionsAddresses(finallyBody, address + baos.toByteArray().length, version);
-            sos.close();
-        } catch (IOException e) {
         }
     }
 
@@ -121,10 +127,10 @@ public class ActionTry extends Action {
         return surroundWithAction(baos.toByteArray(), version);
     }
 
-    public ActionTry(boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
+    public ActionTry(long containerSWFPos, boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
         super(0x8F, 0);
         lexBlockOpen(lexer);
-        tryBody = ASMParser.parse(ignoreNops, labels, address + 4 + 6, lexer, constantPool, version);
+        tryBody = ASMParser.parse(containerSWFPos/*TODO: FIX THIS!!!*/, ignoreNops, labels, address + 4 + 6, lexer, constantPool, version);
         ParsedSymbol symb = lexer.yylex();
         catchBlockFlag = false;
         if (symb.type == ParsedSymbol.TYPE_INSTRUCTION_NAME) {
@@ -141,14 +147,14 @@ public class ActionTry extends Action {
                     throw new ParseException("Catched name or register expected", lexer.yyline());
                 }
                 lexBlockOpen(lexer);
-                catchBody = ASMParser.parse(ignoreNops, labels, address + 4 + 6 + Action.actionsToBytes(tryBody, false, version).length, lexer, constantPool, version);
+                catchBody = ASMParser.parse(containerSWFPos/*TODO: FIX THIS!!!*/, ignoreNops, labels, address + 4 + 6 + Action.actionsToBytes(tryBody, false, version).length, lexer, constantPool, version);
                 symb = lexer.yylex();
             }
             if (symb.type == ParsedSymbol.TYPE_INSTRUCTION_NAME) {
                 if (((String) symb.value).toLowerCase().equals("finally")) {
                     finallyBlockFlag = true;
                     lexBlockOpen(lexer);
-                    finallyBody = ASMParser.parse(ignoreNops, labels, address + 4 + 6 + Action.actionsToBytes(tryBody, false, version).length + Action.actionsToBytes(catchBody, false, version).length, lexer, constantPool, version);
+                    finallyBody = ASMParser.parse(containerSWFPos/*TODO: FIX THIS!!!*/, ignoreNops, labels, address + 4 + 6 + Action.actionsToBytes(tryBody, false, version).length + Action.actionsToBytes(catchBody, false, version).length, lexer, constantPool, version);
                 } else {
                     finallyBlockFlag = false;
                     lexer.yypushback(lexer.yylength());
@@ -166,7 +172,7 @@ public class ActionTry extends Action {
     public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
         String ret = "";
         ret += "Try {";
-        ret += Action.actionsToString(tryBody, knownAddreses, constantPool, version, hex);
+        ret += Action.actionsToString(getAddress() + tryPos, tryBody, knownAddreses, constantPool, version, hex, getFileAddress() + tryPos);
         ret += "}";
         if (catchBlockFlag) {
             ret += "\r\nCatch ";
@@ -176,12 +182,12 @@ public class ActionTry extends Action {
                 ret += "\"" + Helper.escapeString(catchName) + "\"";
             }
             ret += " {\r\n";
-            ret += Action.actionsToString(catchBody, knownAddreses, constantPool, version, hex);
+            ret += Action.actionsToString(getAddress() + catchPos, catchBody, knownAddreses, constantPool, version, hex, getFileAddress() + catchPos);
             ret += "}";
         }
         if (finallyBlockFlag) {
             ret += "\r\nFinally {\r\n";
-            ret += Action.actionsToString(finallyBody, knownAddreses, constantPool, version, hex);
+            ret += Action.actionsToString(getAddress() + finPos, finallyBody, knownAddreses, constantPool, version, hex, getFileAddress() + finPos);
             ret += "}";
         }
         return ret;

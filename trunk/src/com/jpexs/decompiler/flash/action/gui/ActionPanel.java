@@ -115,7 +115,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                 if (Main.DO_DECOMPILE) {
                     List<com.jpexs.decompiler.flash.action.Action> as = asm.getActions(SWF.DEFAULT_VERSION);
                     lastCode = as;
-                    com.jpexs.decompiler.flash.action.Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
+                    //com.jpexs.decompiler.flash.action.Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
                     String s = com.jpexs.decompiler.flash.action.Action.actionsToSource(as, SWF.DEFAULT_VERSION);
                     decompiledHilights = Highlighting.getInstrHighlights(s);
                     decompiledEditor.setText(Highlighting.stripHilights(s));
@@ -316,7 +316,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             setHex(hexButton.isSelected());
         } else if (e.getActionCommand().equals("SAVEACTION")) {
             try {
-                src.setActions(ASMParser.parse(true, new ByteArrayInputStream(editor.getText().getBytes()), SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION);
+                src.setActions(ASMParser.parse(0, src.getPos(), true, new ByteArrayInputStream(editor.getText().getBytes()), SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION);
                 setSource(this.src);
                 JOptionPane.showMessageDialog(this, "Code successfully saved");
             } catch (IOException ex) {

@@ -39,7 +39,7 @@ public class CallFunctionTreeItem extends TreeItem {
             if (t > 0) {
                 paramStr += hilight(",");
             }
-            paramStr += arguments.get(t).toString(constants);
+            paramStr += arguments.get(t).toStringNL(constants);
         }
         return stripQuotes(functionName) + hilight("(") + paramStr + hilight(")");
     }

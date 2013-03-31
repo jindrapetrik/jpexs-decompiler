@@ -1100,7 +1100,7 @@ public class SWF {
             }
         }
         for (ASMSource src : actionsMap.keySet()) {
-            actionsMap.put(src, Action.removeNops(actionsMap.get(src), version));
+            actionsMap.put(src, Action.removeNops(0, actionsMap.get(src), version, 0));
             src.setActions(actionsMap.get(src), version);
         }
         return ret;

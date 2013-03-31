@@ -110,4 +110,9 @@ public class FunctionTreeItem extends TreeItem {
         }
         return 0;
     }
+
+    @Override
+    public boolean needsNewLine() {
+        return true;
+    }
 }

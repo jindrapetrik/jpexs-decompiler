@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.swf5;
 
+import com.jpexs.decompiler.flash.ReReadableInputStream;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
@@ -40,24 +41,26 @@ public class ActionWith extends Action implements ActionContainer {
         return actions;
     }
 
-    public ActionWith(SWFInputStream sis, int version) throws IOException {
+    public ActionWith(SWFInputStream sis, ReReadableInputStream rri, int version) throws IOException {
         super(0x94, 2);
         size = sis.readUI16();
         this.version = version;
         //actions = new ArrayList<Action>();
-        actions = (new SWFInputStream(new ByteArrayInputStream(sis.readBytes(size)), version)).readActionList();
+        actions = (new SWFInputStream(new ByteArrayInputStream(sis.readBytes(size)), version)).readActionList(rri.getPos(), containerSWFOffset + getAddress() + 2, rri, size);
     }
 
-    public ActionWith(boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
+    public ActionWith(long containerSWFPos, boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
         super(0x94, 2);
         lexBlockOpen(lexer);
-        actions = ASMParser.parse(ignoreNops, labels, address + 5, lexer, constantPool, version);
+        actions = ASMParser.parse(containerSWFPos + 2, ignoreNops, labels, address + 5, lexer, constantPool, version);
     }
 
     @Override
-    public void setAddress(long address, int version) {
-        super.setAddress(address, version);
-        Action.setActionsAddresses(actions, address + 5, version);
+    public void setAddress(long address, int version, boolean recursive) {
+        super.setAddress(address, version, recursive);
+        if (recursive) {
+            Action.setActionsAddresses(actions, address + 5, version);
+        }
     }
 
     @Override
@@ -93,7 +96,7 @@ public class ActionWith extends Action implements ActionContainer {
 
     @Override
     public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
-        return "With {\r\n" + Action.actionsToString(actions, knownAddreses, constantPool, version, hex) + "}";
+        return "With {\r\n" + Action.actionsToString(getAddress() + 2, actions, knownAddreses, constantPool, version, hex, containerSWFOffset + getAddress() + 2) + "}";
     }
 
     @Override
@@ -104,5 +107,10 @@ public class ActionWith extends Action implements ActionContainer {
     @Override
     public List<Action> getAllIfsOrJumps() {
         return Action.getActionsAllIfsOrJumps(actions);
+    }
+
+    @Override
+    public int getDataLength() {
+        return size;
     }
 }

@@ -26,7 +26,7 @@ public class ActionEnd extends Action {
 
     public ActionEnd() {
         super(0, 0);
-        ignored = true;
+        setIgnored(true);
     }
 
     @Override

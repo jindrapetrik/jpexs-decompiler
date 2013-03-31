@@ -12,4 +12,6 @@ public interface ActionContainer {
     public byte[] getHeaderBytes();
 
     public List<Action> getActions();
+
+    public int getDataLength();
 }

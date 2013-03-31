@@ -28,11 +28,21 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ActionJump extends Action {
 
-    public int offset;
+    private int offset;
     public String identifier;
+
+    public int getJumpOffset() {
+        return offset;
+    }
+
+    public void setJumpOffset(int offset) {
+        this.offset = offset;
+    }
 
     public ActionJump(int offset) {
         super(0x99, 2);
@@ -98,7 +108,12 @@ public class ActionJump extends Action {
     @Override
     public List<Integer> getBranches(GraphSource code) {
         List<Integer> ret = super.getBranches(code);
-        ret.add(code.adr2pos(getAddress() + getBytes(((ActionGraphSource) code).version).length + offset));
+        int ofs = code.adr2pos(getAddress() + getBytes(((ActionGraphSource) code).version).length + offset);
+        if (ofs == -1) {
+            ofs = code.adr2pos(getAddress() + getBytes(((ActionGraphSource) code).version).length);
+            Logger.getLogger(ActionJump.class.getName()).log(Level.SEVERE, "Invalid jump to ofs" + Helper.formatAddress(getAddress() + getBytes(((ActionGraphSource) code).version).length + offset) + " from ofs" + Helper.formatAddress(getAddress()));
+        }
+        ret.add(ofs);
         return ret;
     }
 }

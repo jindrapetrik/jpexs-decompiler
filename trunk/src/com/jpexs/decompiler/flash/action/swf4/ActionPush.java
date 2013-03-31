@@ -175,6 +175,8 @@ public class ActionPush extends Action {
                     } else {
                         break loop;
                     }
+                case ParsedSymbol.TYPE_COMMENT:
+                    break;
                 default:
                     throw new ParseException("Arguments expected", lexer.yyline());
 
