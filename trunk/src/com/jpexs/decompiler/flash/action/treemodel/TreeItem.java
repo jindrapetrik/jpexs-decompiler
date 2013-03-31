@@ -46,7 +46,7 @@ public abstract class TreeItem extends GraphTargetItem {
         return false;
     }
 
-    protected String stripQuotes(GraphTargetItem target) {
+    protected String stripQuotes(GraphTargetItem target, ConstantPool constants) {
         if (target instanceof DirectValueTreeItem) {
             if (((DirectValueTreeItem) target).value instanceof String) {
                 return (String) ((DirectValueTreeItem) target).hilight((String) ((DirectValueTreeItem) target).value);
@@ -55,7 +55,7 @@ public abstract class TreeItem extends GraphTargetItem {
         if (target == null) {
             return "";
         } else {
-            return target.toString();
+            return target.toString(constants);
         }
     }
 

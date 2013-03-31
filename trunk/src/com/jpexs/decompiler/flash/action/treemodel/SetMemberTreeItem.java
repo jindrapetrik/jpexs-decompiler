@@ -35,7 +35,7 @@ public class SetMemberTreeItem extends TreeItem implements SetTypeTreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return object.toString(constants) + "." + stripQuotes(objectName) + "=" + value.toString(constants);
+        return object.toString(constants) + "." + stripQuotes(objectName, constants) + "=" + value.toString(constants);
     }
 
     @Override

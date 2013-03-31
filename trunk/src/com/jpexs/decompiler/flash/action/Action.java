@@ -384,7 +384,10 @@ public class Action implements GraphSourceItem {
             //setActionsAddresses(list, 0, version);
             importantOffsets = getActionsAllRefs(list, version);
         }
-
+        List<ConstantPool> cps = SWFInputStream.getConstantPool(new ActionGraphSource(list, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, version);
+        if (!cps.isEmpty()) {
+            setConstantPool(list, cps.get(cps.size() - 1));
+        }
         offset = address;
         int pos = -1;
         for (Action a : list) {
@@ -421,9 +424,9 @@ public class Action implements GraphSourceItem {
                  if(a instanceof ActionJump){
                  add = " change: "+((ActionJump)a).getJumpOffset();
                  }*/
-                 ret += Highlighting.hilighOffset("", offset) + a.getASMSourceReplaced(importantOffsets, constantPool, version, hex) + (a.ignored ? "; ignored" : "")+/*"; ofs"+Helper.formatAddress(offset)+add +*/ "\r\n";
-                  
-                        //}
+                ret += Highlighting.hilighOffset("", offset) + a.getASMSourceReplaced(importantOffsets, constantPool, version, hex) + (a.ignored ? "; ignored" : "") +/*"; ofs"+Helper.formatAddress(offset)+add +*/ "\r\n";
+
+                //}
                 if (a.afterInsert != null) {
                     ret += a.afterInsert.getASMSource(importantOffsets, constantPool, version, hex) + "\r\n";
                 }

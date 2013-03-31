@@ -34,9 +34,9 @@ public class DefineLocalTreeItem extends TreeItem implements SetTypeTreeItem {
     @Override
     public String toString(ConstantPool constants) {
         if (value == null) {
-            return hilight("var ") + stripQuotes(name);
+            return hilight("var ") + stripQuotes(name, constants);
         }
-        return hilight("var ") + stripQuotes(name) + hilight("=") + value.toString(constants);
+        return hilight("var ") + stripQuotes(name, constants) + hilight("=") + value.toString(constants);
     }
 
     @Override

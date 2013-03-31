@@ -753,23 +753,6 @@ public class SWFInputStream extends InputStream {
             if (ip < startIp) {
                 retv = true;
             }
-            if (debugMode) {
-                //if(a instanceof ActionIf){                
-                String atos = a.getASMSource(new ArrayList<Long>(), cpool.constants, sis.version, false);
-                if (a instanceof ActionContainer) {
-                    atos = a.toString();
-                }
-                System.err.println("readActionListAtPos ip: " + (ip - startIp) + " (0x" + Helper.formatAddress(ip - startIp) + ") " + " action(len " + a.actionLength + "): " + atos + (a.isIgnored() ? " (ignored)" : "") + " stack:" + Helper.stackToString(stack, Helper.toList(cpool)) + " " + Helper.byteArrToString(a.getBytes(SWF.DEFAULT_VERSION)));
-                //}
-                String add = "";
-                if (a instanceof ActionIf) {
-                    add = " change: " + ((ActionIf) a).getJumpOffset();
-                }
-                if (a instanceof ActionJump) {
-                    add = " change: " + ((ActionJump) a).getJumpOffset();
-                }
-                System.err.println(add);
-            }
 
 
             /*if(a instanceof ActionConstantPool){
@@ -792,6 +775,24 @@ public class SWFInputStream extends InputStream {
                     ((ActionDefineFunction2) a).setConstantPool(cpool.constants);
                     cpool.count++;
                 }
+            }
+
+            if (debugMode) {
+                //if(a instanceof ActionIf){                
+                String atos = a.getASMSource(new ArrayList<Long>(), cpool.constants, sis.version, false);
+                if (a instanceof ActionContainer) {
+                    atos = a.toString();
+                }
+                System.err.println("readActionListAtPos ip: " + (ip - startIp) + " (0x" + Helper.formatAddress(ip - startIp) + ") " + " action(len " + a.actionLength + "): " + atos + (a.isIgnored() ? " (ignored)" : "") + " stack:" + Helper.stackToString(stack, Helper.toList(cpool)) + " " + Helper.byteArrToString(a.getBytes(SWF.DEFAULT_VERSION)));
+                //}
+                String add = "";
+                if (a instanceof ActionIf) {
+                    add = " change: " + ((ActionIf) a).getJumpOffset();
+                }
+                if (a instanceof ActionJump) {
+                    add = " change: " + ((ActionJump) a).getJumpOffset();
+                }
+                System.err.println(add);
             }
             long newFilePos = rri.getPos();
             long actionLen = newFilePos - filePos;

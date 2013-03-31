@@ -40,7 +40,7 @@ public class NewObjectTreeItem extends TreeItem {
             }
             paramStr += arguments.get(t).toString(constants);
         }
-        return hilight("new ") + stripQuotes(objectName) + hilight("(") + paramStr + hilight(")");
+        return hilight("new ") + stripQuotes(objectName, constants) + hilight("(") + paramStr + hilight(")");
     }
 
     @Override

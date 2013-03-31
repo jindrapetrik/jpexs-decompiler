@@ -57,7 +57,7 @@ public class CallMethodTreeItem extends TreeItem {
         if (blankMethod) {
             return scriptObject.toString(constants) + hilight("(") + paramStr + hilight(")");
         }
-        return scriptObject.toString(constants) + hilight(".") + stripQuotes(methodName) + hilight("(") + paramStr + hilight(")");
+        return scriptObject.toString(constants) + hilight(".") + stripQuotes(methodName, constants) + hilight("(") + paramStr + hilight(")");
     }
 
     @Override

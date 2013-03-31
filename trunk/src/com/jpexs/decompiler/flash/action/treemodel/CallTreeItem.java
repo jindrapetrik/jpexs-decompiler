@@ -31,7 +31,7 @@ public class CallTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return stripQuotes(value) + hilight("()");
+        return stripQuotes(value, constants) + hilight("()");
     }
 
     @Override

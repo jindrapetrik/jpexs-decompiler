@@ -36,7 +36,7 @@ public class DeleteTreeItem extends TreeItem {
         if (object == null) {
             return hilight("delete ") + propertyName.toString(constants);
         }
-        return hilight("delete ") + object.toString(constants) + "." + stripQuotes(propertyName);
+        return hilight("delete ") + object.toString(constants) + "." + stripQuotes(propertyName, constants);
     }
 
     @Override

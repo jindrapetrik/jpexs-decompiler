@@ -40,7 +40,7 @@ public class GetVariableTreeItem extends TreeItem {
             //return "null";
         }
         //return ""+computedValue.toNumber(); 
-        return stripQuotes(name);
+        return stripQuotes(name, constants);
     }
 
     @Override

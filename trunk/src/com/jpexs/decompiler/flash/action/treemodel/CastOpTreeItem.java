@@ -34,7 +34,7 @@ public class CastOpTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return hilight("(") + stripQuotes(constructor) + hilight(")") + object.toString(Helper.toList(constants));
+        return hilight("(") + stripQuotes(constructor, constants) + hilight(")") + object.toString(Helper.toList(constants));
     }
 
     @Override

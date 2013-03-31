@@ -41,7 +41,7 @@ public class CallFunctionTreeItem extends TreeItem {
             }
             paramStr += arguments.get(t).toStringNL(constants);
         }
-        return stripQuotes(functionName) + hilight("(") + paramStr + hilight(")");
+        return stripQuotes(functionName, constants) + hilight("(") + paramStr + hilight(")");
     }
 
     @Override

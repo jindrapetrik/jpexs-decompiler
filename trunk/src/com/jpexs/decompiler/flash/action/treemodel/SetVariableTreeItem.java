@@ -33,7 +33,7 @@ public class SetVariableTreeItem extends TreeItem implements SetTypeTreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return stripQuotes(name) + hilight("=") + value.toString(constants);
+        return stripQuotes(name, constants) + hilight("=") + value.toString(constants);
     }
 
     @Override

@@ -35,9 +35,9 @@ public class GetMemberTreeItem extends TreeItem {
     public String toString(ConstantPool constants) {
         if (!((memberName instanceof DirectValueTreeItem) && (((DirectValueTreeItem) memberName).value instanceof String))) {
             //if(!(functionName instanceof GetVariableTreeItem))
-            return object.toString(constants) + "[" + stripQuotes(memberName) + "]";
+            return object.toString(constants) + "[" + stripQuotes(memberName, constants) + "]";
         }
-        return object.toString(constants) + "." + stripQuotes(memberName);
+        return object.toString(constants) + "." + stripQuotes(memberName, constants);
     }
 
     @Override
