@@ -1320,6 +1320,7 @@ public class Graph {
             }
             if(ins instanceof GraphSourceItemContainer){
                 ip=code.adr2pos(((GraphSourceItemContainer)ins).getEndAddress());
+                continue;
             }else
             if (ins.isExit()) {
                 part.end = ip;

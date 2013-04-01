@@ -675,7 +675,7 @@ public class Action implements GraphSourceItem {
         GraphTargetItem inItem = null;
         int loopStart = 0;
         loopip:
-        while (ip <= end + 1) {
+        while (ip <= end) {
 
             long addr = ip2adr(actions, ip, version);
             /*if (unknownJumps.contains(addr)) {
