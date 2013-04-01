@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.ParsedSymbol;
 import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.io.ByteArrayInputStream;
@@ -186,7 +187,7 @@ public class ActionPush extends Action {
     }
 
     @Override
-    public String getASMSourceReplaced(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+    public String getASMSourceReplaced(List<GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
         if (replacement == null || replacement.size() < values.size()) {
             return toString();
         }
@@ -228,6 +229,7 @@ public class ActionPush extends Action {
         int pos = 0;
         for (Object o : values) {
             if (ignoredParts.contains(pos)) {
+                pos++;
                 continue;
             }
             if (o instanceof ConstantIndex) {

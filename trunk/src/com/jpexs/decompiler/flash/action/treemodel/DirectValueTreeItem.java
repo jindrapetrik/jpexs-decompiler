@@ -61,6 +61,33 @@ public class DirectValueTreeItem extends TreeItem {
         if (value instanceof Boolean) {
             return ((Boolean) value) ? 1 : 0;
         }
+        
+        if (value instanceof String) {
+            String s=(String) value;
+            if(s.length()==1){
+                return s.charAt(0);
+            }
+            double ret=0.0;
+            try{
+                ret=Double.parseDouble(s);
+            }catch(NumberFormatException nex){
+                
+            }
+            return ret;
+        }
+        if (value instanceof ConstantIndex) {
+            String s=(this.constants.get(((ConstantIndex) value).index));
+            if(s.length()==1){
+                return s.charAt(0);
+            }
+            double ret=0.0;
+            try{
+                ret=Double.parseDouble(s);
+            }catch(NumberFormatException nex){
+                
+            }
+            return ret;
+        }
         return super.toNumber();
     }
 
@@ -80,6 +107,20 @@ public class DirectValueTreeItem extends TreeItem {
         }
         if (value instanceof Long) {
             return ((Long) value) != 0;
+        }
+        if (value instanceof String) {
+            String s=(String) value;
+            if(s.length()==1){
+                return toNumber()==0;
+            }
+            return !s.equals("");
+        }
+        if (value instanceof ConstantIndex) {
+            String s=(this.constants.get(((ConstantIndex) value).index));
+            if(s.length()==1){
+                return toNumber()==0;
+            }
+            return !s.equals("");
         }
         return false;
     }
@@ -148,6 +189,9 @@ public class DirectValueTreeItem extends TreeItem {
 
     @Override
     public boolean isCompileTime() {
-        return (value instanceof Double) || (value instanceof Float) || (value instanceof Boolean) || (value instanceof Long) || (value instanceof Null) || (computedRegValue != null && computedRegValue.isCompileTime());
+        return (value instanceof Double) || (value instanceof Float) || (value instanceof Boolean) || (value instanceof Long) || (value instanceof Null) || (computedRegValue != null && computedRegValue.isCompileTime())
+                
+               //||(value instanceof String) || (value instanceof ConstantIndex)
+                ;
     }
 }

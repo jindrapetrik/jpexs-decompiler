@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.graph.GraphSource;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -76,7 +77,7 @@ public class ActionIf extends Action {
     }
 
     @Override
-    public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+    public String getASMSource(List<GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
         String ofsStr = Helper.formatAddress(getAddress() + getBytes(version).length + offset);
         return "If loc" + ofsStr + (compileTime ? " ;compileTime" : "");
     }

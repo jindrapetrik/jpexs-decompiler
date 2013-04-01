@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.*;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -169,7 +170,7 @@ public class ActionTry extends Action {
     }
 
     @Override
-    public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+    public String getASMSource(List<GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
         String ret = "";
         ret += "Try {";
         ret += Action.actionsToString(getAddress() + tryPos, tryBody, knownAddreses, constantPool, version, hex, getFileAddress() + tryPos);

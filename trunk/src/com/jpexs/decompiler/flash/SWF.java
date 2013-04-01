@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash;
 import SevenZip.Compression.LZMA.Encoder;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
-import com.jpexs.decompiler.flash.action.special.ActionContainer;
+import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
 import com.jpexs.decompiler.flash.action.swf4.ActionGetVariable;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
@@ -977,8 +977,8 @@ public class SWF {
                 functions.add(ins);
             }
 
-            if (ins instanceof ActionContainer) {
-                getVariables(variables, functions, new ActionGraphSource(((ActionContainer) ins).getActions(), code.version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0);
+            if (ins instanceof GraphSourceItemContainer) {
+                //getVariables(variables, functions, new ActionGraphSource(((ActionContainer) ins).getActions(), code.version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0);
             }
 
             if ((ins instanceof ActionSetVariable) || (ins instanceof ActionSetMember) || (ins instanceof ActionDefineLocal)) {
@@ -1042,7 +1042,9 @@ public class SWF {
         HashMap<DirectValueTreeItem, ConstantPool> ret = new HashMap<DirectValueTreeItem, ConstantPool>();
         List<Action> actions = src.getActions(version);
         actionsMap.put(src, actions);
-        getVariables(variables, functions, new ActionGraphSource(actions, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0);
+        List<GraphSourceItem> ss=new ArrayList<GraphSourceItem>();
+        ss.addAll(actions);
+        getVariables(variables, functions, new ActionGraphSource(ss, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0);
         return ret;
     }
     private HashMap<ASMSource, List<Action>> actionsMap = new HashMap<ASMSource, List<Action>>();

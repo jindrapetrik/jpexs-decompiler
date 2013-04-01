@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.parser;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.flashlite.ActionFSCommand2;
 import com.jpexs.decompiler.flash.action.flashlite.ActionStrictMode;
+import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.flash.action.special.ActionNop;
 import com.jpexs.decompiler.flash.action.swf3.*;
 import com.jpexs.decompiler.flash.action.swf4.*;
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,6 +39,7 @@ public class ASMParser {
 
     public static List<Action> parse(long containerSWFOffset, boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
         List<Action> list = new ArrayList<Action>();
+        Stack<GraphSourceItemContainer> containers=new Stack<GraphSourceItemContainer>();
         while (true) {
             ParsedSymbol symb = lexer.yylex();
             if (symb.type == ParsedSymbol.TYPE_LABEL) {
@@ -51,231 +54,242 @@ public class ASMParser {
                         }
                     }
                 }
-            } else if (symb.type == ParsedSymbol.TYPE_INSTRUCTION_NAME) {
+            } else if(symb.type == ParsedSymbol.TYPE_BLOCK_END){
+                if(containers.isEmpty()){
+                    throw new ParseException("Block end without start", lexer.yyline());
+                }
+                GraphSourceItemContainer a=containers.pop();
+                a.setEndAddress(address);
+            }else if (symb.type == ParsedSymbol.TYPE_INSTRUCTION_NAME) {
                 String instructionName = ((String) symb.value).toLowerCase();
+                Action a =null;
                 if (instructionName.equals("GetURL".toLowerCase())) {
-                    list.add(new ActionGetURL(lexer));
+                    a=new ActionGetURL(lexer);
                 } else if (instructionName.equals("GoToLabel".toLowerCase())) {
-                    list.add(new ActionGoToLabel(lexer));
+                    a=(new ActionGoToLabel(lexer));
                 } else if (instructionName.equals("GotoFrame".toLowerCase())) {
-                    list.add(new ActionGotoFrame(lexer));
+                    a=(new ActionGotoFrame(lexer));
                 } else if (instructionName.equals("NextFrame".toLowerCase())) {
-                    list.add(new ActionNextFrame());
+                    a=(new ActionNextFrame());
                 } else if (instructionName.equals("Play".toLowerCase())) {
-                    list.add(new ActionPlay());
+                    a=(new ActionPlay());
                 } else if (instructionName.equals("PrevFrame".toLowerCase())) {
-                    list.add(new ActionPrevFrame());
+                    a=(new ActionPrevFrame());
                 } else if (instructionName.equals("SetTarget".toLowerCase())) {
-                    list.add(new ActionSetTarget(lexer));
+                    a=(new ActionSetTarget(lexer));
                 } else if (instructionName.equals("Stop".toLowerCase())) {
-                    list.add(new ActionStop());
+                    a=(new ActionStop());
                 } else if (instructionName.equals("StopSounds".toLowerCase())) {
-                    list.add(new ActionStopSounds());
+                    a=(new ActionStopSounds());
                 } else if (instructionName.equals("ToggleQuality".toLowerCase())) {
-                    list.add(new ActionToggleQuality());
+                    a=(new ActionToggleQuality());
                 } else if (instructionName.equals("WaitForFrame".toLowerCase())) {
-                    list.add(new ActionWaitForFrame(lexer));
+                    a=(new ActionWaitForFrame(lexer));
                 } else if (instructionName.equals("Add".toLowerCase())) {
-                    list.add(new ActionAdd());
+                    a=(new ActionAdd());
                 } else if (instructionName.equals("And".toLowerCase())) {
-                    list.add(new ActionAnd());
+                    a=(new ActionAnd());
                 } else if (instructionName.equals("AsciiToChar".toLowerCase())) {
-                    list.add(new ActionAsciiToChar());
+                    a=(new ActionAsciiToChar());
                 } else if (instructionName.equals("Call".toLowerCase())) {
-                    list.add(new ActionCall());
+                    a=(new ActionCall());
                 } else if (instructionName.equals("CharToAscii".toLowerCase())) {
-                    list.add(new ActionCharToAscii());
+                    a=(new ActionCharToAscii());
                 } else if (instructionName.equals("CloneSprite".toLowerCase())) {
-                    list.add(new ActionCloneSprite());
+                    a=(new ActionCloneSprite());
                 } else if (instructionName.equals("Divide".toLowerCase())) {
-                    list.add(new ActionDivide());
+                    a=(new ActionDivide());
                 } else if (instructionName.equals("EndDrag".toLowerCase())) {
-                    list.add(new ActionEndDrag());
+                    a=(new ActionEndDrag());
                 } else if (instructionName.equals("Equals".toLowerCase())) {
-                    list.add(new ActionEquals());
+                    a=(new ActionEquals());
                 } else if (instructionName.equals("GetProperty".toLowerCase())) {
-                    list.add(new ActionGetProperty());
+                    a=(new ActionGetProperty());
                 } else if (instructionName.equals("GetTime".toLowerCase())) {
-                    list.add(new ActionGetTime());
+                    a=(new ActionGetTime());
                 } else if (instructionName.equals("GetURL2".toLowerCase())) {
-                    list.add(new ActionGetURL2(lexer));
+                    a=(new ActionGetURL2(lexer));
                 } else if (instructionName.equals("GetVariable".toLowerCase())) {
-                    list.add(new ActionGetVariable());
+                    a=(new ActionGetVariable());
                 } else if (instructionName.equals("GotoFrame2".toLowerCase())) {
-                    list.add(new ActionGotoFrame2(lexer));
+                    a=(new ActionGotoFrame2(lexer));
                 } else if (instructionName.equals("If".toLowerCase())) {
-                    list.add(new ActionIf(lexer));
+                    a=(new ActionIf(lexer));
                 } else if (instructionName.equals("Jump".toLowerCase())) {
-                    list.add(new ActionJump(lexer));
+                    a=(new ActionJump(lexer));
                 } else if (instructionName.equals("Less".toLowerCase())) {
-                    list.add(new ActionLess());
+                    a=(new ActionLess());
                 } else if (instructionName.equals("MBAsciiToChar".toLowerCase())) {
-                    list.add(new ActionMBAsciiToChar());
+                    a=(new ActionMBAsciiToChar());
                 } else if (instructionName.equals("MBCharToAscii".toLowerCase())) {
-                    list.add(new ActionMBCharToAscii());
+                    a=(new ActionMBCharToAscii());
                 } else if (instructionName.equals("MBStringExtract".toLowerCase())) {
-                    list.add(new ActionMBStringExtract());
+                    a=(new ActionMBStringExtract());
                 } else if (instructionName.equals("MBStringLength".toLowerCase())) {
-                    list.add(new ActionMBStringLength());
+                    a=(new ActionMBStringLength());
                 } else if (instructionName.equals("Multiply".toLowerCase())) {
-                    list.add(new ActionMultiply());
+                    a=(new ActionMultiply());
                 } else if (instructionName.equals("Not".toLowerCase())) {
-                    list.add(new ActionNot());
+                    a=(new ActionNot());
                 } else if (instructionName.equals("Or".toLowerCase())) {
-                    list.add(new ActionOr());
+                    a=(new ActionOr());
                 } else if (instructionName.equals("Pop".toLowerCase())) {
-                    list.add(new ActionPop());
+                    a=(new ActionPop());
                 } else if (instructionName.equals("Push".toLowerCase())) {
-                    list.add(new ActionPush(lexer, constantPool));
+                    a=(new ActionPush(lexer, constantPool));
                 } else if (instructionName.equals("RandomNumber".toLowerCase())) {
-                    list.add(new ActionRandomNumber());
+                    a=(new ActionRandomNumber());
                 } else if (instructionName.equals("RemoveSprite".toLowerCase())) {
-                    list.add(new ActionRemoveSprite());
+                    a=(new ActionRemoveSprite());
                 } else if (instructionName.equals("SetProperty".toLowerCase())) {
-                    list.add(new ActionSetProperty());
+                    a=(new ActionSetProperty());
                 } else if (instructionName.equals("SetTarget2".toLowerCase())) {
-                    list.add(new ActionSetTarget2());
+                    a=(new ActionSetTarget2());
                 } else if (instructionName.equals("SetVariable".toLowerCase())) {
-                    list.add(new ActionSetVariable());
+                    a=(new ActionSetVariable());
                 } else if (instructionName.equals("StartDrag".toLowerCase())) {
-                    list.add(new ActionStartDrag());
+                    a=(new ActionStartDrag());
                 } else if (instructionName.equals("StringAdd".toLowerCase())) {
-                    list.add(new ActionStringAdd());
+                    a=(new ActionStringAdd());
                 } else if (instructionName.equals("StringEquals".toLowerCase())) {
-                    list.add(new ActionStringEquals());
+                    a=(new ActionStringEquals());
                 } else if (instructionName.equals("StringExtract".toLowerCase())) {
-                    list.add(new ActionStringExtract());
+                    a=(new ActionStringExtract());
                 } else if (instructionName.equals("StringLength".toLowerCase())) {
-                    list.add(new ActionStringLength());
+                    a=(new ActionStringLength());
                 } else if (instructionName.equals("StringLess".toLowerCase())) {
-                    list.add(new ActionStringLess());
+                    a=(new ActionStringLess());
                 } else if (instructionName.equals("Subtract".toLowerCase())) {
-                    list.add(new ActionSubtract());
+                    a=(new ActionSubtract());
                 } else if (instructionName.equals("ToInteger".toLowerCase())) {
-                    list.add(new ActionToInteger());
+                    a=(new ActionToInteger());
                 } else if (instructionName.equals("Trace".toLowerCase())) {
-                    list.add(new ActionTrace());
+                    a=(new ActionTrace());
                 } else if (instructionName.equals("WaitForFrame2".toLowerCase())) {
-                    list.add(new ActionWaitForFrame2(lexer));
+                    a=(new ActionWaitForFrame2(lexer));
                 } else if (instructionName.equals("Add2".toLowerCase())) {
-                    list.add(new ActionAdd2());
+                    a=(new ActionAdd2());
                 } else if (instructionName.equals("BitAnd".toLowerCase())) {
-                    list.add(new ActionBitAnd());
+                    a=(new ActionBitAnd());
                 } else if (instructionName.equals("BitLShift".toLowerCase())) {
-                    list.add(new ActionBitLShift());
+                    a=(new ActionBitLShift());
                 } else if (instructionName.equals("BitOr".toLowerCase())) {
-                    list.add(new ActionBitOr());
+                    a=(new ActionBitOr());
                 } else if (instructionName.equals("BitRShift".toLowerCase())) {
-                    list.add(new ActionBitRShift());
+                    a=(new ActionBitRShift());
                 } else if (instructionName.equals("BitURShift".toLowerCase())) {
-                    list.add(new ActionBitURShift());
+                    a=(new ActionBitURShift());
                 } else if (instructionName.equals("BitXor".toLowerCase())) {
-                    list.add(new ActionBitXor());
+                    a=(new ActionBitXor());
                 } else if (instructionName.equals("CallFunction".toLowerCase())) {
-                    list.add(new ActionCallFunction());
+                    a=(new ActionCallFunction());
                 } else if (instructionName.equals("CallMethod".toLowerCase())) {
-                    list.add(new ActionCallMethod());
+                    a=(new ActionCallMethod());
                 } else if (instructionName.equals("ConstantPool".toLowerCase())) {
                     ActionConstantPool acp = new ActionConstantPool(lexer);
                     constantPool = acp.constantPool;
-                    list.add(acp);
+                    a=(acp);
                 } else if (instructionName.equals("Decrement".toLowerCase())) {
-                    list.add(new ActionDecrement());
+                    a=(new ActionDecrement());
                 } else if (instructionName.equals("DefineFunction".toLowerCase())) {
-                    list.add(new ActionDefineFunction(containerSWFOffset + address, ignoreNops, labels, address, lexer, constantPool, version));
+                    a=(new ActionDefineFunction(containerSWFOffset + address, ignoreNops, labels, address, lexer, constantPool, version));
                 } else if (instructionName.equals("DefineLocal".toLowerCase())) {
-                    list.add(new ActionDefineLocal());
+                    a=(new ActionDefineLocal());
                 } else if (instructionName.equals("DefineLocal2".toLowerCase())) {
-                    list.add(new ActionDefineLocal2());
+                    a=(new ActionDefineLocal2());
                 } else if (instructionName.equals("Delete".toLowerCase())) {
-                    list.add(new ActionDelete());
+                    a=(new ActionDelete());
                 } else if (instructionName.equals("Delete2".toLowerCase())) {
-                    list.add(new ActionDelete2());
+                    a=(new ActionDelete2());
                 } else if (instructionName.equals("Enumerate".toLowerCase())) {
-                    list.add(new ActionEnumerate());
+                    a=(new ActionEnumerate());
                 } else if (instructionName.equals("Equals2".toLowerCase())) {
-                    list.add(new ActionEquals2());
+                    a=(new ActionEquals2());
                 } else if (instructionName.equals("GetMember".toLowerCase())) {
-                    list.add(new ActionGetMember());
+                    a=(new ActionGetMember());
                 } else if (instructionName.equals("Increment".toLowerCase())) {
-                    list.add(new ActionIncrement());
+                    a=(new ActionIncrement());
                 } else if (instructionName.equals("InitArray".toLowerCase())) {
-                    list.add(new ActionInitArray());
+                    a=(new ActionInitArray());
                 } else if (instructionName.equals("InitObject".toLowerCase())) {
-                    list.add(new ActionInitObject());
+                    a=(new ActionInitObject());
                 } else if (instructionName.equals("Less2".toLowerCase())) {
-                    list.add(new ActionLess2());
+                    a=(new ActionLess2());
                 } else if (instructionName.equals("Modulo".toLowerCase())) {
-                    list.add(new ActionModulo());
+                    a=(new ActionModulo());
                 } else if (instructionName.equals("NewMethod".toLowerCase())) {
-                    list.add(new ActionNewMethod());
+                    a=(new ActionNewMethod());
                 } else if (instructionName.equals("NewObject".toLowerCase())) {
-                    list.add(new ActionNewObject());
+                    a=(new ActionNewObject());
                 } else if (instructionName.equals("PushDuplicate".toLowerCase())) {
-                    list.add(new ActionPushDuplicate());
+                    a=(new ActionPushDuplicate());
                 } else if (instructionName.equals("Return".toLowerCase())) {
-                    list.add(new ActionReturn());
+                    a=(new ActionReturn());
                 } else if (instructionName.equals("SetMember".toLowerCase())) {
-                    list.add(new ActionSetMember());
+                    a=(new ActionSetMember());
                 } else if (instructionName.equals("StackSwap".toLowerCase())) {
-                    list.add(new ActionStackSwap());
+                    a=(new ActionStackSwap());
                 } else if (instructionName.equals("StoreRegister".toLowerCase())) {
-                    list.add(new ActionStoreRegister(lexer));
+                    a=(new ActionStoreRegister(lexer));
                 } else if (instructionName.equals("TargetPath".toLowerCase())) {
-                    list.add(new ActionTargetPath());
+                    a=(new ActionTargetPath());
                 } else if (instructionName.equals("ToNumber".toLowerCase())) {
-                    list.add(new ActionToNumber());
+                    a=(new ActionToNumber());
                 } else if (instructionName.equals("ToString".toLowerCase())) {
-                    list.add(new ActionToString());
+                    a=(new ActionToString());
                 } else if (instructionName.equals("TypeOf".toLowerCase())) {
-                    list.add(new ActionTypeOf());
+                    a=(new ActionTypeOf());
                 } else if (instructionName.equals("With".toLowerCase())) {
-                    list.add(new ActionWith(containerSWFOffset + address, ignoreNops, labels, address, lexer, constantPool, version));
+                    a=(new ActionWith(containerSWFOffset + address, ignoreNops, labels, address, lexer, constantPool, version));
                 } else if (instructionName.equals("Enumerate2".toLowerCase())) {
-                    list.add(new ActionEnumerate2());
+                    a=(new ActionEnumerate2());
                 } else if (instructionName.equals("Greater".toLowerCase())) {
-                    list.add(new ActionGreater());
+                    a=(new ActionGreater());
                 } else if (instructionName.equals("InstanceOf".toLowerCase())) {
-                    list.add(new ActionInstanceOf());
+                    a=(new ActionInstanceOf());
                 } else if (instructionName.equals("StrictEquals".toLowerCase())) {
-                    list.add(new ActionStrictEquals());
+                    a=(new ActionStrictEquals());
                 } else if (instructionName.equals("StringGreater".toLowerCase())) {
-                    list.add(new ActionStringGreater());
+                    a=(new ActionStringGreater());
                 } else if (instructionName.equals("CastOp".toLowerCase())) {
-                    list.add(new ActionCastOp());
+                    a=(new ActionCastOp());
                 } else if (instructionName.equals("DefineFunction2".toLowerCase())) {
-                    list.add(new ActionDefineFunction2(containerSWFOffset + address, ignoreNops, labels, address, lexer, constantPool, version));
+                    a=(new ActionDefineFunction2(containerSWFOffset + address, ignoreNops, labels, address, lexer, constantPool, version));
                 } else if (instructionName.equals("Extends".toLowerCase())) {
-                    list.add(new ActionExtends());
+                    a=(new ActionExtends());
                 } else if (instructionName.equals("ImplementsOp".toLowerCase())) {
-                    list.add(new ActionImplementsOp());
+                    a=(new ActionImplementsOp());
                 } else if (instructionName.equals("Throw".toLowerCase())) {
-                    list.add(new ActionThrow());
+                    a=(new ActionThrow());
                 } else if (instructionName.equals("Try".toLowerCase())) {
-                    list.add(new ActionTry(containerSWFOffset + address, ignoreNops, labels, address, lexer, constantPool, version));
+                    a=(new ActionTry(containerSWFOffset + address, ignoreNops, labels, address, lexer, constantPool, version));
                 } else if (instructionName.equals("FSCommand2".toLowerCase())) {
-                    list.add(new ActionFSCommand2());
+                    a=(new ActionFSCommand2());
                 } else if (instructionName.equals("StrictMode".toLowerCase())) {
-                    list.add(new ActionStrictMode(lexer));
+                    a=(new ActionStrictMode(lexer));
                 } else if (instructionName.equals("Nop".toLowerCase())) {
                     if (!ignoreNops) {
-                        list.add(new ActionNop());
+                        a=(new ActionNop());
                     }
                 }/* else if(instructionName.startsWith("ofs")) {
                  continue;
                  }*/ else {
                     throw new ParseException("Unknown instruction name :" + instructionName, lexer.yyline());
                 }
-                if (instructionName.equals("Nop".toLowerCase())) {
-                    if (!ignoreNops) {
-                        (list.get(list.size() - 1)).containerSWFOffset = containerSWFOffset;
-                        (list.get(list.size() - 1)).setAddress(address, version, false);
-                        address += 1;
-                    }
-                } else {
-                    (list.get(list.size() - 1)).containerSWFOffset = containerSWFOffset;
-                    (list.get(list.size() - 1)).setAddress(address, version, false);
-                    address += (list.get(list.size() - 1)).getBytes(version).length;
+                if (a instanceof ActionNop) {            
+                        a.containerSWFOffset = containerSWFOffset;
+                        a.setAddress(address, version, false);
+                        address += 1;                    
+                } else if(a!=null) {
+                    a.containerSWFOffset = containerSWFOffset;
+                    a.setAddress(address, version, false);
+                    address += a.getBytes(version).length;
+                }
+                if(a instanceof GraphSourceItemContainer){
+                    containers.push((GraphSourceItemContainer)a);
+                }
+                if(a!=null){
+                    list.add(a);
                 }
             } else if (symb.type == ParsedSymbol.TYPE_EOL) {
             } else if ((symb.type == ParsedSymbol.TYPE_BLOCK_END) || (symb.type == ParsedSymbol.TYPE_EOF)) {

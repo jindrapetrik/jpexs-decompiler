@@ -21,14 +21,16 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraph;
+import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.parser.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.Label;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
-import com.jpexs.decompiler.flash.action.special.ActionContainer;
+import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.treemodel.FunctionTreeItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.io.ByteArrayOutputStream;
@@ -38,7 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-public class ActionDefineFunction2 extends Action implements ActionContainer {
+public class ActionDefineFunction2 extends Action implements GraphSourceItemContainer {
 
     public String functionName;
     public String replacedFunctionName;
@@ -56,29 +58,32 @@ public class ActionDefineFunction2 extends Action implements ActionContainer {
     public boolean preloadGlobalFlag;
     public int registerCount;
     public int codeSize;
-    public List<Action> code;
+    //public List<Action> code;
     private int version;
     public List<String> constantPool;
 
     @Override
-    public List<Action> getActions() {
-        return code;
+    public long getEndAddress() {
+        return getAddress()+getHeaderLength()+codeSize;
     }
 
-    public void setConstantPool(List<String> constantPool) {
-        this.constantPool = constantPool;
-        for (Action a : code) {
-            if (a instanceof ActionPush) {
-                ((ActionPush) a).constantPool = constantPool;
-            }
-            if (a instanceof ActionDefineFunction2) {
-                ((ActionDefineFunction2) a).setConstantPool(constantPool);
-            }
-            if (a instanceof ActionDefineFunction) {
-                ((ActionDefineFunction) a).setConstantPool(constantPool);
-            }
-        }
+    @Override
+    public void setEndAddress(long address) {
+        codeSize = (int)(address-getAddress()-getHeaderLength());
     }
+    
+    
+    
+    @Override
+    public List<GraphSourceItem> getItems(List<GraphSourceItem> parent) {
+        if(parent.isEmpty()){
+            return parent;
+        }
+        ActionGraphSource src=new ActionGraphSource(parent, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
+        return parent.subList(src.adr2pos(getAddress()+hdrSize),src.adr2pos(getAddress()+hdrSize+codeSize));
+    }
+
+    
     private long hdrSize;
 
     public ActionDefineFunction2(int actionLength, SWFInputStream sis, ReReadableInputStream rri, int version) throws IOException {
@@ -107,8 +112,8 @@ public class ActionDefineFunction2 extends Action implements ActionContainer {
         hdrSize = posAfter - posBef;
         //code = new ArrayList<Action>();
         int posBef2 = rri.getPos();
-        code = sis.readActionList(rri.getPos(), getFileAddress() + hdrSize, rri, codeSize);
-        rri.setPos(posBef2 + codeSize);
+        //code = sis.readActionList(rri.getPos(), getFileAddress() + hdrSize, rri, codeSize);
+        //rri.setPos(posBef2 + codeSize);
     }
 
     public ActionDefineFunction2(long containerSWFPos, boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
@@ -130,7 +135,7 @@ public class ActionDefineFunction2 extends Action implements ActionContainer {
             paramNames.add(lexString(lexer));
         }
         lexBlockOpen(lexer);
-        code = ASMParser.parse(containerSWFPos + getHeaderLength(), ignoreNops, labels, address + getPreLen(version), lexer, constantPool, version);
+        //code = ASMParser.parse(containerSWFPos + getHeaderLength(), ignoreNops, labels, address + getPreLen(version), lexer, constantPool, version);
     }
 
     public long getHeaderLength() {
@@ -188,8 +193,8 @@ public class ActionDefineFunction2 extends Action implements ActionContainer {
 
                 sos.writeString(paramNames.get(i));
             }
-            byte codeBytes[] = Action.actionsToBytes(code, false, version);
-            sos.writeUI16(codeBytes.length);
+            //byte codeBytes[] = Action.actionsToBytes(code, false, version);
+            sos.writeUI16(codeSize);//codeBytes.length);
             sos.close();
 
 
@@ -222,13 +227,13 @@ public class ActionDefineFunction2 extends Action implements ActionContainer {
                 sos.writeUI8(paramRegisters.get(i));
                 sos.writeString(paramNames.get(i));
             }
-            byte codeBytes[] = Action.actionsToBytes(code, false, version);
-            sos.writeUI16(codeBytes.length);
+            //byte codeBytes[] = Action.actionsToBytes(code, false, version);
+            sos.writeUI16(codeSize);//codeBytes.length);
             sos.close();
 
 
             baos2.write(surroundWithAction(baos.toByteArray(), version));
-            baos2.write(codeBytes);
+            //baos2.write(codeBytes);
         } catch (IOException e) {
         }
         return baos2.toByteArray();
@@ -267,12 +272,12 @@ public class ActionDefineFunction2 extends Action implements ActionContainer {
     public void setAddress(long address, int version, boolean recursive) {
         super.setAddress(address, version, recursive);
         if (recursive) {
-            Action.setActionsAddresses(code, address + getPreLen(version), version);
+            //Action.setActionsAddresses(code, address + getPreLen(version), version);
         }
     }
 
     @Override
-    public String getASMSourceReplaced(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+    public String getASMSourceReplaced(List<GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
         List<String> oldParamNames = paramNames;
         if (replacedParamNames != null) {
             paramNames = replacedParamNames;
@@ -281,7 +286,7 @@ public class ActionDefineFunction2 extends Action implements ActionContainer {
         if (replacedFunctionName != null) {
             functionName = replacedFunctionName;
         }
-        String ret = getASMSource(knownAddreses, constantPool, version, hex);
+        String ret = getASMSource(container,knownAddreses, constantPool, version, hex);
         paramNames = oldParamNames;
         functionName = oldFunctionName;
         return ret;
@@ -289,7 +294,7 @@ public class ActionDefineFunction2 extends Action implements ActionContainer {
     }
 
     @Override
-    public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+    public String getASMSource(List<GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
         String paramStr = "";
         for (int i = 0; i < paramNames.size(); i++) {
             paramStr += paramRegisters.get(i) + " \"" + Helper.escapeString(paramNames.get(i)) + "\"";
@@ -305,7 +310,7 @@ public class ActionDefineFunction2 extends Action implements ActionContainer {
                 + " " + preloadArgumentsFlag
                 + " " + suppressThisFlag
                 + " " + preloadThisFlag
-                + " " + preloadGlobalFlag).trim() + " " + paramStr + " {\r\n" + Action.actionsToString(getAddress() + getHeaderLength(), code, knownAddreses, constantPool, version, hex, getFileAddress() + hdrSize) + "}";
+                + " " + preloadGlobalFlag).trim() + " " + paramStr + " {";// + "\r\n" + Action.actionsToString(getAddress() + getHeaderLength(), getItems(container), knownAddreses, constantPool, version, hex, getFileAddress() + hdrSize) + "}";
     }
 
     @Override
@@ -339,6 +344,11 @@ public class ActionDefineFunction2 extends Action implements ActionContainer {
     @Override
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
 
+        
+    }
+
+    @Override
+    public void translateContainer(List<GraphTargetItem> content, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
         HashMap<Integer, String> funcRegNames = (HashMap<Integer, String>) regNames.clone();
         for (int f = 0; f < paramNames.size(); f++) {
             int reg = paramRegisters.get(f);
@@ -372,19 +382,21 @@ public class ActionDefineFunction2 extends Action implements ActionContainer {
             pos++;
         }
 
-        FunctionTreeItem fti = new FunctionTreeItem(this, functionName, paramNames, ActionGraph.translateViaGraph(funcRegNames, variables, functions, code, version), constantPool, getFirstRegister());
+        FunctionTreeItem fti = new FunctionTreeItem(this, functionName, paramNames,content, constantPool, getFirstRegister());
         functions.put(functionName, fti);
         stack.push(fti);
     }
+    
+    
 
     @Override
     public List<Long> getAllRefs(int version) {
-        return Action.getActionsAllRefs(code, version);
+        return super.getAllRefs(version);//return Action.getActionsAllRefs(code, version);
     }
 
     @Override
     public List<Action> getAllIfsOrJumps() {
-        return Action.getActionsAllIfsOrJumps(code);
+        return super.getAllIfsOrJumps(); //return Action.getActionsAllIfsOrJumps(code);
     }
 
     @Override

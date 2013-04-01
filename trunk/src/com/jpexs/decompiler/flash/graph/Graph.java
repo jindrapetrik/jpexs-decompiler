@@ -1318,6 +1318,9 @@ public class Graph {
                 ip++;
                 continue;
             }
+            if(ins instanceof GraphSourceItemContainer){
+                ip=code.adr2pos(((GraphSourceItemContainer)ins).getEndAddress());
+            }else
             if (ins.isExit()) {
                 part.end = ip;
                 allBlocks.add(part);

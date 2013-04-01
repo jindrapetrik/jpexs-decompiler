@@ -53,7 +53,7 @@ import java.util.Stack;
  */
 public class ActionGraph extends Graph {
 
-    public ActionGraph(List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version) {
+    public ActionGraph(List code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version) {
         super(new ActionGraphSource(code, version, registerNames, variables, functions), new ArrayList<Integer>());
         //this.version = version;
       /*heads = makeGraph(code, new ArrayList<GraphPart>());
@@ -63,7 +63,8 @@ public class ActionGraph extends Graph {
          }*/
     }
 
-    public static List<GraphTargetItem> translateViaGraph(HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version) {
+    public static List<GraphTargetItem> translateViaGraph(HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List code, int version) {
+        
         ActionGraph g = new ActionGraph(code, registerNames, variables, functions, version);
         List localData = new ArrayList();
         localData.add(registerNames);

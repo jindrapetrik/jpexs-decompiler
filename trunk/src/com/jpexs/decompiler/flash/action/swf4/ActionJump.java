@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.graph.GraphSource;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -40,13 +41,13 @@ public class ActionJump extends Action {
         return offset;
     }
 
-    public void setJumpOffset(int offset) {
+    public final void setJumpOffset(int offset) {
         this.offset = offset;
     }
 
     public ActionJump(int offset) {
         super(0x99, 2);
-        this.offset = offset;
+        setJumpOffset(offset);
     }
 
     public ActionJump(SWFInputStream sis) throws IOException {
@@ -78,7 +79,7 @@ public class ActionJump extends Action {
     }
 
     @Override
-    public String getASMSource(List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+    public String getASMSource(List<GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
         String ofsStr = Helper.formatAddress(getAddress() + getBytes(version).length + offset);
         return "Jump loc" + ofsStr;
     }
@@ -111,6 +112,7 @@ public class ActionJump extends Action {
         int ofs = code.adr2pos(getAddress() + getBytes(((ActionGraphSource) code).version).length + offset);
         if (ofs == -1) {
             ofs = code.adr2pos(getAddress() + getBytes(((ActionGraphSource) code).version).length);
+            new Exception().printStackTrace();
             Logger.getLogger(ActionJump.class.getName()).log(Level.SEVERE, "Invalid jump to ofs" + Helper.formatAddress(getAddress() + getBytes(((ActionGraphSource) code).version).length + offset) + " from ofs" + Helper.formatAddress(getAddress()));
         }
         ret.add(ofs);
