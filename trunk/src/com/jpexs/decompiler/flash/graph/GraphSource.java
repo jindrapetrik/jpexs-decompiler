@@ -40,6 +40,10 @@ public abstract class GraphSource {
                 break;
             }
 
+            if(ins instanceof GraphSourceItemContainer){
+                visitCode(adr2pos(((GraphSourceItemContainer)ins).getEndAddress()), ip, refs);
+            }
+            
             if (ins.isBranch() || ins.isJump()) {
                 List<Integer> branches = ins.getBranches(this);
                 for (int b : branches) {

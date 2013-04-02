@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.graph;
 
+import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -948,8 +949,7 @@ public class Graph {
             } else {
                 ret.addAll(output);
             }
-            GraphPart loopBodyStart = null;
-            GraphPart next = part.getNextPartPath(loopContinues);
+            GraphPart loopBodyStart = null;            
             if (reversed == loop) {
                 if (expr instanceof LogicalOpItem) {
                     expr = ((LogicalOpItem) expr).invert();
@@ -957,6 +957,8 @@ public class Graph {
                     expr = new NotItem(null, expr);
                 }
             }
+            
+            GraphPart next = part.getNextPartPath(loopContinues);
             List<GraphTargetItem> retx = ret;
             if ((!loop) || (doWhile && (part.nextParts.size() > 1))) {
                 if (doWhile) {
@@ -1288,6 +1290,9 @@ public class Graph {
         GraphPart part = ret;
         while (ip < code.size()) {
             if (visited2[ip] || ((ip != startip) && (refs.get(ip).size() > 1))) {
+                if(lastIp==497){
+                    System.out.println("dff");
+                }
                 part.end = lastIp;
                 GraphPart found = null;
                 for (GraphPart p : allBlocks) {
@@ -1311,6 +1316,7 @@ public class Graph {
                     part = gp;
                 }
             }
+            
             ip = checkIp(ip);
             lastIp = ip;
             GraphSourceItem ins = code.get(ip);
@@ -1319,7 +1325,7 @@ public class Graph {
                 continue;
             }
             if(ins instanceof GraphSourceItemContainer){
-                ip=code.adr2pos(((GraphSourceItemContainer)ins).getEndAddress());
+                ip = code.adr2pos(((GraphSourceItemContainer)ins).getEndAddress());
                 continue;
             }else
             if (ins.isExit()) {
@@ -1335,6 +1341,7 @@ public class Graph {
                 break;
             } else if (ins.isBranch()) {
                 part.end = ip;
+                
                 allBlocks.add(part);
                 List<Integer> branches = ins.getBranches(code);
                 for (int i = 0; i < branches.size(); i++) {

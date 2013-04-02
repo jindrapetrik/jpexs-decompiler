@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -110,12 +112,13 @@ public class ActionGraphSource extends GraphSource {
             }
             //ret = adr2posInside(adr);
             if(ret==-1){
-                System.err.println("Addr loc"+Helper.formatAddress(adr)+" not found");
+                Logger.getLogger(ActionGraphSource.class.getName()).log(Level.SEVERE, "Address loc"+Helper.formatAddress(adr)+" not found");
+                /*System.err.println("Addr loc"+Helper.formatAddress(adr)+" not found");
                 int pos=0;
                 for(long l:posCache){
                     System.err.println("ip "+pos+" action "+get(pos).toString()+" loc"+Helper.formatAddress(l));
                     pos++;
-                }
+                }*/
             }
         }
         return ret;

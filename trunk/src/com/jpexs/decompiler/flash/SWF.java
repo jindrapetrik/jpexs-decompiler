@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
 import com.jpexs.decompiler.flash.action.swf4.ActionGetVariable;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
+import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ActionSetVariable;
 import com.jpexs.decompiler.flash.action.swf4.Null;
@@ -45,6 +46,7 @@ import com.jpexs.decompiler.flash.flv.FLVOutputStream;
 import com.jpexs.decompiler.flash.flv.FLVTAG;
 import com.jpexs.decompiler.flash.flv.VIDEODATA;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.gui.FrameNode;
 import com.jpexs.decompiler.flash.gui.TagNode;
@@ -238,7 +240,7 @@ public class SWF {
      * @param is Stream to read SWF from
      * @throws IOException
      */
-    public SWF(InputStream is, PercentListener listener) throws IOException {
+    public SWF(InputStream is, PercentListener listener) throws IOException {        
         byte hdr[] = new byte[3];
         is.read(hdr);
         String shdr = new String(hdr);
@@ -285,7 +287,7 @@ public class SWF {
         int tmpFirstByetOfFrameRate = sis.readUI8();
         frameRate = sis.readUI8();
         frameCount = sis.readUI16();
-        tags = sis.readTagList(0);
+        tags = sis.readTagList(0);        
     }
 
     /**
@@ -510,13 +512,13 @@ public class SWF {
         }
         return ret;
     }
-    protected HashSet<EventListener> listeners = new HashSet<EventListener>();
+    private HashSet<EventListener> listeners = new HashSet<EventListener>();
 
-    public void addEventListener(EventListener listener) {
+    public final void addEventListener(EventListener listener) {
         listeners.add(listener);
     }
 
-    public void removeEventListener(EventListener listener) {
+    public final void removeEventListener(EventListener listener) {
         listeners.remove(listener);
     }
 
@@ -947,7 +949,6 @@ public class SWF {
         }
         return null;
     }
-
     private static void getVariables(ConstantPool constantPool, List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, int lastIp, HashMap<DirectValueTreeItem, ConstantPool> variables, List<GraphSourceItem> functions, List<Integer> visited) {
         boolean debugMode = false;
         while ((ip > -1) && ip < code.size()) {
@@ -957,8 +958,13 @@ public class SWF {
 
             lastIp = ip;
             GraphSourceItem ins = code.get(ip);
+            
             if (debugMode) {
-                System.out.println("Visit " + ip + ": " + ins + " stack:" + Highlighting.stripHilights(stack.toString()));
+                System.err.println("Visit " + ip + ": ofs" +Helper.formatAddress(((Action)ins).getAddress())+":" + ((Action)ins).getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), new ArrayList<String>(), code.version,false) + " stack:" + Helper.stackToString(stack, Helper.toList(new ConstantPool())));
+            }
+            if(ins.isIgnored()){
+                ip++;
+                continue;
             }
 
             GraphTargetItem name = null;
@@ -978,7 +984,12 @@ public class SWF {
             }
 
             if (ins instanceof GraphSourceItemContainer) {
-                //getVariables(variables, functions, new ActionGraphSource(((ActionContainer) ins).getActions(), code.version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0);
+                long endAddr=((GraphSourceItemContainer)ins).getEndAddress();
+                int endIp=code.adr2pos(endAddr);
+                getVariables(variables, functions, new ActionGraphSource(code.getActions().subList(ip+1, endIp), code.version, new HashMap<Integer, String>(),new HashMap<String, GraphTargetItem>(),new HashMap<String, GraphTargetItem>()),0);
+                ((GraphSourceItemContainer)ins).translateContainer(new ArrayList<GraphTargetItem>(), stack, output, new HashMap<Integer, String>(),new HashMap<String, GraphTargetItem>(),new HashMap<String, GraphTargetItem>());
+                ip=endIp;
+                continue;
             }
 
             if ((ins instanceof ActionSetVariable) || (ins instanceof ActionSetMember) || (ins instanceof ActionDefineLocal)) {
@@ -1006,7 +1017,7 @@ public class SWF {
                 break;
             }
 
-            if (ins.isBranch() || ins.isJump()) {
+            if (ins.isBranch() || ins.isJump()) {                
                 if (ins instanceof ActionIf) {
                     stack.pop();
                 }
@@ -1022,7 +1033,7 @@ public class SWF {
                         }
                     }
                 }
-
+               // }
                 break;
             }
             ip++;
@@ -1041,6 +1052,13 @@ public class SWF {
     private HashMap<DirectValueTreeItem, ConstantPool> getVariables(HashMap<DirectValueTreeItem, ConstantPool> variables, List<GraphSourceItem> functions, ASMSource src) {
         HashMap<DirectValueTreeItem, ConstantPool> ret = new HashMap<DirectValueTreeItem, ConstantPool>();
         List<Action> actions = src.getActions(version);
+       /* int ip=0;
+        for(Action a:actions){
+            System.out.println("ip "+ip+" "+a.getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), new ArrayList<String>(), version, false));
+            ip++;
+        }
+        if(true)
+        return ret;*/
         actionsMap.put(src, actions);
         List<GraphSourceItem> ss=new ArrayList<GraphSourceItem>();
         ss.addAll(actions);
@@ -1049,13 +1067,14 @@ public class SWF {
     }
     private HashMap<ASMSource, List<Action>> actionsMap = new HashMap<ASMSource, List<Action>>();
 
-    private void getVariables(List<Object> objs) {
+    private void getVariables(List<Object> objs,String path) {
         for (Object o : objs) {
             if (o instanceof ASMSource) {
+                informListeners("getVariables", path+"/"+o.toString());
                 getVariables(allVariableNames, allFunctions, (ASMSource) o);
             }
             if (o instanceof Container) {
-                getVariables(((Container) o).getSubItems());
+                getVariables(((Container) o).getSubItems(),path+"/"+o.toString());
             }
         }
     }
@@ -1067,7 +1086,7 @@ public class SWF {
         List<Object> objs = new ArrayList<Object>();
         int ret = 0;
         objs.addAll(tags);
-        getVariables(objs);
+        getVariables(objs,"");
         for (GraphSourceItem fun : allFunctions) {
             if (fun instanceof ActionDefineFunction) {
                 ActionDefineFunction f = (ActionDefineFunction) fun;

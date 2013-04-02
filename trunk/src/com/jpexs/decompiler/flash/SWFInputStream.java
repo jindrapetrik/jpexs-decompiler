@@ -540,8 +540,15 @@ public class SWFInputStream extends InputStream {
                 }
             }
             if (debugMode) {
-                System.err.println("getConstantPool ip " + ip + ": " + ins + " stack:" + Helper.stackToString(stack,Helper.toList(cpool)));
-                if(ip==68){
+                String add="";
+                if(ins instanceof ActionIf){
+                    add+=" change:"+((ActionIf)ins).getJumpOffset();
+                }
+                if(ins instanceof ActionJump){
+                    add+=" change:"+(((ActionJump)ins).getJumpOffset());
+                }
+                System.err.println("getConstantPool ip " + ip + ", addr "+Helper.formatAddress(((Action)ins).getAddress())+": " + ((Action)ins).getASMSource(new ArrayList<GraphSourceItem>(),new ArrayList<Long>(), Helper.toList(cpool), version, false) +add+ " stack:" + Helper.stackToString(stack,Helper.toList(cpool)));
+                if(ip==116){
                     System.err.println("kok");
                 }
             }
@@ -698,6 +705,16 @@ public class SWFInputStream extends InputStream {
         }
 
         List<ConstantPool> pools = new ArrayList<ConstantPool>();
+        StringBuilder br=new StringBuilder();
+        for(int i=0;i<ret.size();i++){
+            br.append(i);
+            br.append(", loc");
+            br.append(Helper.formatAddress(((Action)ret.get(i)).getAddress()));
+            br.append(": ");
+            br.append(((Action)ret.get(i)).getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), cpool.constants, version, false));
+            br.append("\r\n");
+        }
+        Helper.writeFile("test.txt", br.toString().getBytes());
         pools = getConstantPool(new ActionGraphSource(ret, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), ip, version);
 
         if (pools.size() == 1) {
@@ -814,7 +831,7 @@ public class SWFInputStream extends InputStream {
                 }
                 System.err.println();
                 //}
-                if(ip - startIp==911){
+                if(ip - startIp==110){
                     System.err.println("dd");
                     //readActionListAtPos ip: 116 (0x0074)  action(len 2): If loc0125 ;compileTime stack:[!(==734)] [9d 02 00 21 00]
                 }
@@ -985,10 +1002,10 @@ public class SWFInputStream extends InputStream {
                 List localData2 = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
                 List<GraphTargetItem> output2=new ArrayList<GraphTargetItem>();
                 readActionListAtPos(output2,containers, address, containerSWFOffset, notCompileTime, enableVariables, localData2, new Stack<GraphTargetItem>(), cpool, sis, rri, ip+info, ret, startIp, (int)endAddr);
-                cnt.translateContainer(output2, stack, output,(HashMap<Integer, String>) localData.get(0),(HashMap<String, GraphTargetItem>)localData.get(1),(HashMap<String, GraphTargetItem>)localData.get(2));                
-                
+                cnt.translateContainer(output2, stack, output,(HashMap<Integer, String>) localData.get(0),(HashMap<String, GraphTargetItem>)localData.get(1),(HashMap<String, GraphTargetItem>)localData.get(2));                                
                 ip = (int)endAddr;
                 prevIp = ip;
+                rri.setPos(ip);
                 filePos = rri.getPos();
                 continue;
                 //infoCorrect += ((ActionContainer) a).getDataLength();
