@@ -21,6 +21,9 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
+import static com.jpexs.decompiler.flash.abc.types.traits.Trait.TRAIT_CONST;
+import com.jpexs.decompiler.flash.graph.Graph;
+import static com.jpexs.decompiler.flash.graph.Graph.INDENTOPEN;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
@@ -53,24 +56,18 @@ public class TraitSlotConst extends Trait {
         return typeStr;
     }
 
-    public String getNameValueStr(ABC abc, List<String> fullyQualifiedNames) {
-
+    public String getNameStr(ABC abc, List<String> fullyQualifiedNames) {
         String typeStr = getType(abc.constants, fullyQualifiedNames);
         if (typeStr.equals("*")) {
             typeStr = "";
         } else {
             typeStr = ":" + typeStr;
         }
-        String valueStr = "";
         ValueKind val = null;
         if (value_kind != 0) {
             val = new ValueKind(value_index, value_kind);
-            valueStr = " = " + val.toString(abc.constants);
         }
 
-        if (assignedValue != null) {
-            valueStr = " = " + Highlighting.stripHilights(assignedValue.toString(abc.constants, new HashMap<Integer, String>(), fullyQualifiedNames));
-        }
         String slotconst = "var";
         if (kindType == TRAIT_CONST) {
             slotconst = "const";
@@ -78,7 +75,27 @@ public class TraitSlotConst extends Trait {
         if (val != null && val.isNamespace()) {
             slotconst = "namespace";
         }
-        return slotconst + " " + getName(abc).getName(abc.constants, fullyQualifiedNames) + typeStr + valueStr + ";";
+        return slotconst + " " + getName(abc).getName(abc.constants, fullyQualifiedNames) + typeStr;
+
+    }
+
+    public String getValueStr(ABC abc, List<String> fullyQualifiedNames) {
+        String valueStr = null;
+        ValueKind val = null;
+        if (value_kind != 0) {
+            val = new ValueKind(value_index, value_kind);
+            valueStr = val.toString(abc.constants);
+        }
+
+        if (assignedValue != null) {
+            valueStr = Highlighting.stripHilights(assignedValue.toString(abc.constants, new HashMap<Integer, String>(), fullyQualifiedNames));
+        }
+        return valueStr;
+    }
+
+    public String getNameValueStr(ABC abc, List<String> fullyQualifiedNames) {
+        String valueStr = getValueStr(abc, fullyQualifiedNames);
+        return getNameStr(abc, fullyQualifiedNames) + (valueStr == null ? "" : " = " + valueStr) + ";";
     }
 
     public boolean isNamespace() {
@@ -110,7 +127,41 @@ public class TraitSlotConst extends Trait {
         if (!showModifier) {
             modifier = "";
         }
-        return ABC.IDENT_STRING + ABC.IDENT_STRING + modifier + getNameValueStr(abc, fullyQualifiedNames);
+        String ret = modifier + getNameStr(abc, fullyQualifiedNames);
+        String valueStr = getValueStr(abc, fullyQualifiedNames);
+        if (valueStr != null) {
+            ret+=" = ";            
+            int befLen=ret.length();
+            ret = ABC.IDENT_STRING + ABC.IDENT_STRING + ret;
+            String valueStrParts[] = valueStr.split("\r\n");
+            boolean first=true;
+            for (int i = 0; i < valueStrParts.length; i++) {
+                if(valueStrParts[i].equals("")){
+                    continue;
+                }
+                if(Highlighting.stripHilights(valueStrParts[i]).equals(Graph.INDENTOPEN)){
+                    //befLen+=ABC.IDENT_STRING.length();
+                    continue;
+                }
+                if(Highlighting.stripHilights(valueStrParts[i]).equals(Graph.INDENTCLOSE)){
+                    //befLen-=ABC.IDENT_STRING.length();
+                    continue;
+                }
+                if(!first){
+                    ret+=ABC.IDENT_STRING + ABC.IDENT_STRING;
+                    for(int j=0;j<befLen;j++){
+                        ret+=" ";
+                    }
+                }
+                ret+=valueStrParts[i];                
+                ret+="\r\n";
+                first=false;
+            }
+        }       
+        if(ret.endsWith("\r\n")){
+            ret=ret.substring(0,ret.length()-2)+";\r\n";
+        }
+        return ret;
     }
 
     public boolean isConst() {

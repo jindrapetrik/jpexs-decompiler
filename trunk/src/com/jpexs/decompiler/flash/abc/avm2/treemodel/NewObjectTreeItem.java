@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.graph.Graph;
 import java.util.HashMap;
 import java.util.List;
 
@@ -39,6 +40,6 @@ public class NewObjectTreeItem extends TreeItem {
             }
             params += pairs.get(n).toString(constants, localRegNames, fullyQualifiedNames);
         }
-        return hilight("{") + params + hilight("}");
+        return "\r\n" +Graph.INDENTOPEN + "\r\n" + hilight("{") + "\r\n" + params + "\r\n" + hilight("}")+"\r\n"+Graph.INDENTCLOSE + "\r\n";
     }
 }
