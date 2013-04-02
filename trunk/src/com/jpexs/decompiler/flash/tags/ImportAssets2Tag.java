@@ -45,7 +45,7 @@ public class ImportAssets2Tag extends Tag {
      * @throws IOException
      */
     public ImportAssets2Tag(byte data[], int version, long pos) throws IOException {
-        super(57, "ImportAssets2", data, pos);
+        super(71, "ImportAssets2", data, pos);
         assets = new HashMap<Integer, String>();
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         url = sis.readString();
