@@ -22,81 +22,53 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.*;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
+import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.clauses.TryTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
-public class ActionTry extends Action {
+public class ActionTry extends Action implements GraphSourceItemContainer {
 
     public boolean catchInRegisterFlag;
     public boolean finallyBlockFlag;
     public boolean catchBlockFlag;
     public String catchName;
     public int catchRegister;
-    public List<Action> tryBody;
-    public List<Action> catchBody;
-    public List<Action> finallyBody;
-    long tryPos;
-    long catchPos;
-    long finPos;
+    long trySize;
+    long catchSize;
+    long finallySize;
+    private int version;
 
     public ActionTry(int actionLength, SWFInputStream sis, ReReadableInputStream rri, int version) throws IOException {
         super(0x8F, actionLength);
         long startPos = sis.getPos();
         sis.readUB(5);
+        this.version = version;
         catchInRegisterFlag = sis.readUB(1) == 1;
         finallyBlockFlag = sis.readUB(1) == 1;
         catchBlockFlag = sis.readUB(1) == 1;
-        int trySize = sis.readUI16();
-        int catchSize = sis.readUI16();
-        int finallySize = sis.readUI16();
+        trySize = sis.readUI16();
+        catchSize = sis.readUI16();
+        finallySize = sis.readUI16();
         if (catchInRegisterFlag) {
             catchRegister = sis.readUI8();
         } else {
             catchName = sis.readString();
         }
-        tryPos = sis.getPos() - startPos;
-        tryBody = sis.readActionList(rri.getPos(), getFileAddress() + tryPos, rri, trySize);
-        catchPos = sis.getPos() - startPos;
-        catchBody = sis.readActionList(rri.getPos(), getFileAddress() + catchPos, rri, catchSize);
-        finPos = sis.getPos() - startPos;
-        finallyBody = sis.readActionList(rri.getPos(), getFileAddress() + finPos, rri, finallySize);
     }
 
     @Override
     public void setAddress(long address, int version, boolean recursive) {
         super.setAddress(address, version, recursive);
-        if (recursive) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            SWFOutputStream sos = new SWFOutputStream(baos, version);
-            try {
-                sos.writeUB(5, 0);
-                sos.writeUB(1, catchInRegisterFlag ? 1 : 0);
-                sos.writeUB(1, finallyBlockFlag ? 1 : 0);
-                sos.writeUB(1, catchBlockFlag ? 1 : 0);
-                byte tryBodyBytes[] = Action.actionsToBytes(tryBody, false, version);
-                byte catchBodyBytes[] = Action.actionsToBytes(catchBody, false, version);
-                byte finallyBodyBytes[] = Action.actionsToBytes(finallyBody, false, version);
-                sos.writeUI16(tryBodyBytes.length);
-                sos.writeUI16(catchBodyBytes.length);
-                sos.writeUI16(finallyBodyBytes.length);
-                if (catchInRegisterFlag) {
-                    sos.writeUI8(catchRegister);
-                } else {
-                    sos.writeString(catchName);
-                }
-                Action.setActionsAddresses(tryBody, address + baos.toByteArray().length, version);
-                sos.write(tryBodyBytes);
-                Action.setActionsAddresses(catchBody, address + baos.toByteArray().length, version);
-                sos.write(catchBodyBytes);
-                Action.setActionsAddresses(finallyBody, address + baos.toByteArray().length, version);
-                sos.close();
-            } catch (IOException e) {
-            }
-        }
     }
 
     @Override
@@ -108,20 +80,14 @@ public class ActionTry extends Action {
             sos.writeUB(1, catchInRegisterFlag ? 1 : 0);
             sos.writeUB(1, finallyBlockFlag ? 1 : 0);
             sos.writeUB(1, catchBlockFlag ? 1 : 0);
-            byte tryBodyBytes[] = Action.actionsToBytes(tryBody, false, version);
-            byte catchBodyBytes[] = Action.actionsToBytes(catchBody, false, version);
-            byte finallyBodyBytes[] = Action.actionsToBytes(finallyBody, false, version);
-            sos.writeUI16(tryBodyBytes.length);
-            sos.writeUI16(catchBodyBytes.length);
-            sos.writeUI16(finallyBodyBytes.length);
+            sos.writeUI16((int) trySize);
+            sos.writeUI16((int) catchSize);
+            sos.writeUI16((int) finallySize);
             if (catchInRegisterFlag) {
                 sos.writeUI8(catchRegister);
             } else {
-                sos.writeString(catchName);
+                sos.writeString(catchName == null ? "" : catchName);
             }
-            sos.write(tryBodyBytes);
-            sos.write(catchBodyBytes);
-            sos.write(finallyBodyBytes);
             sos.close();
         } catch (IOException e) {
         }
@@ -130,85 +96,179 @@ public class ActionTry extends Action {
 
     public ActionTry(long containerSWFPos, boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
         super(0x8F, 0);
-        lexBlockOpen(lexer);
-        tryBody = ASMParser.parse(containerSWFPos/*TODO: FIX THIS!!!*/, ignoreNops, labels, address + 4 + 6, lexer, constantPool, version);
+        this.version = version;
+
         ParsedSymbol symb = lexer.yylex();
-        catchBlockFlag = false;
-        if (symb.type == ParsedSymbol.TYPE_INSTRUCTION_NAME) {
-            if (((String) symb.value).toLowerCase().equals("catch")) {
-                catchBlockFlag = true;
-                ParsedSymbol catchedVal = lexer.yylex();
-                if (catchedVal.type == ParsedSymbol.TYPE_REGISTER) {
-                    catchInRegisterFlag = true;
-                    catchRegister = ((RegisterNumber) catchedVal.value).number;
-                } else if (catchedVal.type == ParsedSymbol.TYPE_STRING) {
-                    catchInRegisterFlag = false;
-                    catchName = (String) catchedVal.value;
-                } else {
-                    throw new ParseException("Catched name or register expected", lexer.yyline());
-                }
-                lexBlockOpen(lexer);
-                catchBody = ASMParser.parse(containerSWFPos/*TODO: FIX THIS!!!*/, ignoreNops, labels, address + 4 + 6 + Action.actionsToBytes(tryBody, false, version).length, lexer, constantPool, version);
-                symb = lexer.yylex();
-            }
-            if (symb.type == ParsedSymbol.TYPE_INSTRUCTION_NAME) {
-                if (((String) symb.value).toLowerCase().equals("finally")) {
-                    finallyBlockFlag = true;
-                    lexBlockOpen(lexer);
-                    finallyBody = ASMParser.parse(containerSWFPos/*TODO: FIX THIS!!!*/, ignoreNops, labels, address + 4 + 6 + Action.actionsToBytes(tryBody, false, version).length + Action.actionsToBytes(catchBody, false, version).length, lexer, constantPool, version);
-                } else {
-                    finallyBlockFlag = false;
-                    lexer.yypushback(lexer.yylength());
-                }
-            } else {
-                finallyBlockFlag = false;
-                lexer.yypushback(lexer.yylength());
-            }
+        if (symb.type == ParsedSymbol.TYPE_STRING) {
+            catchInRegisterFlag = false;
+            catchName = (String) symb.value;
+        } else if (symb.type == ParsedSymbol.TYPE_REGISTER) {
+            catchRegister = (Integer) symb.value;
+            catchInRegisterFlag = true;
+        } else if (symb.type == ParsedSymbol.TYPE_BLOCK_START) {
+            return;
         } else {
-            lexer.yypushback(lexer.yylength());
+            throw new ParseException("Unknown symbol after Try", lexer.yyline());
         }
+        lexBlockOpen(lexer);
+    }
+
+    @Override
+    public String getASMSourceBetween(int pos) {
+        String ret = "";
+        if (pos == 0) {
+            if (catchBlockFlag) {
+                ret += "Catch";
+                ret += " {\r\n";
+                return ret;
+            }
+            if (finallyBlockFlag) {
+                ret += "Finally {\r\n";
+                return ret;
+            }
+        }
+        if (pos == 1) {
+            if (catchBlockFlag && finallyBlockFlag) {
+                ret += "Finally {\r\n";
+                return ret;
+            }
+        }
+        return ret;
     }
 
     @Override
     public String getASMSource(List<GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
         String ret = "";
-        ret += "Try {";
-        ret += Action.actionsToString(getAddress() + tryPos, tryBody, knownAddreses, constantPool, version, hex, getFileAddress() + tryPos);
-        ret += "}";
+        ret += "Try ";
         if (catchBlockFlag) {
-            ret += "\r\nCatch ";
             if (catchInRegisterFlag) {
                 ret += "register" + catchRegister;
             } else {
                 ret += "\"" + Helper.escapeString(catchName) + "\"";
             }
-            ret += " {\r\n";
-            ret += Action.actionsToString(getAddress() + catchPos, catchBody, knownAddreses, constantPool, version, hex, getFileAddress() + catchPos);
-            ret += "}";
+            ret += " ";
         }
-        if (finallyBlockFlag) {
-            ret += "\r\nFinally {\r\n";
-            ret += Action.actionsToString(getAddress() + finPos, finallyBody, knownAddreses, constantPool, version, hex, getFileAddress() + finPos);
-            ret += "}";
-        }
+        ret += "{";
         return ret;
     }
 
     @Override
     public List<Long> getAllRefs(int version) {
         List<Long> ret = new ArrayList<Long>();
-        ret.addAll(Action.getActionsAllRefs(tryBody, version));
-        ret.addAll(Action.getActionsAllRefs(catchBody, version));
-        ret.addAll(Action.getActionsAllRefs(finallyBody, version));
         return ret;
     }
 
     @Override
     public List<Action> getAllIfsOrJumps() {
         List<Action> ret = new ArrayList<Action>();
-        ret.addAll(Action.getActionsAllIfsOrJumps(tryBody));
-        ret.addAll(Action.getActionsAllIfsOrJumps(catchBody));
-        ret.addAll(Action.getActionsAllIfsOrJumps(finallyBody));
         return ret;
+    }
+
+    @Override
+    public long getHeaderSize() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SWFOutputStream sos = new SWFOutputStream(baos, version);
+        try {
+            sos.writeUB(5, 0);
+            sos.writeUB(1, catchInRegisterFlag ? 1 : 0);
+            sos.writeUB(1, finallyBlockFlag ? 1 : 0);
+            sos.writeUB(1, catchBlockFlag ? 1 : 0);
+            sos.writeUI16((int) trySize);
+            sos.writeUI16((int) catchSize);
+            sos.writeUI16((int) finallySize);
+            if (catchInRegisterFlag) {
+                sos.writeUI8(catchRegister);
+            } else {
+                sos.writeString(catchName == null ? "" : catchName);
+            }
+            /*sos.write(tryBodyBytes);
+             sos.write(catchBodyBytes);
+             sos.write(finallyBodyBytes);*/
+            sos.close();
+        } catch (IOException e) {
+        }
+        return surroundWithAction(baos.toByteArray(), version).length;
+    }
+
+    @Override
+    public List<Long> getContainerSizes() {
+        List<Long> ret = new ArrayList<Long>();
+        ret.add(trySize);
+        ret.add(catchSize);
+        ret.add(finallySize);
+        return ret;
+    }
+
+    @Override
+    public boolean parseDivision(int pos, long addr, FlasmLexer lexer) {
+        try {
+            ParsedSymbol symb = lexer.yylex();
+            //catchBlockFlag = false;
+            if (symb.type == ParsedSymbol.TYPE_INSTRUCTION_NAME) {
+                if (((String) symb.value).toLowerCase().equals("catch")) {
+                    trySize = addr - getAddress() - getHeaderSize();
+                    catchBlockFlag = true;
+                    lexBlockOpen(lexer);
+                    return true;
+                }
+                if (symb.type == ParsedSymbol.TYPE_INSTRUCTION_NAME) {
+                    if (((String) symb.value).toLowerCase().equals("finally")) {
+                        if (catchBlockFlag) {
+                            catchSize = addr - getAddress() - getHeaderSize() - trySize;
+                        } else {
+                            trySize = addr - getAddress() - getHeaderSize();
+                        }
+                        finallyBlockFlag = true;
+                        lexBlockOpen(lexer);
+                        return true;
+                    } else {
+                        //finallyBlockFlag = false;
+                        lexer.yypushback(lexer.yylength());
+                    }
+                } else {
+                    //finallyBlockFlag = false;
+                    lexer.yypushback(lexer.yylength());
+                }
+            } else {
+                lexer.yypushback(lexer.yylength());
+            }
+        } catch (Exception ex) {
+        }
+
+        if (finallyBlockFlag) {
+            finallySize = addr - getAddress() - getHeaderSize() - trySize - catchSize;
+        } else if (catchBlockFlag) {
+            catchSize = addr - getAddress() - getHeaderSize() - trySize;
+        }
+        lexer.yybegin(0);
+        return false;
+    }
+
+    @Override
+    public void translateContainer(List<List<GraphTargetItem>> contents, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        List<GraphTargetItem> tryCommands = contents.get(0);
+        TreeItem catchName;
+        if (catchInRegisterFlag) {
+            catchName = new DirectValueTreeItem(this, -1, new RegisterNumber(this.catchRegister), new ArrayList<String>());
+        } else {
+            catchName = new DirectValueTreeItem(this, -1, this.catchName, new ArrayList<String>());
+        }
+        List<GraphTargetItem> catchExceptions = new ArrayList<GraphTargetItem>();
+        if (catchBlockFlag) {
+            catchExceptions.add(catchName);
+        }
+        List<List<GraphTargetItem>> catchCommands = new ArrayList<List<GraphTargetItem>>();
+        if (catchBlockFlag) {
+            catchCommands.add(contents.get(1));
+        }
+        List<GraphTargetItem> finallyCommands = contents.get(2);
+        output.add(new TryTreeItem(tryCommands, catchExceptions, catchCommands, finallyCommands));
+
+
+    }
+
+    @Override
+    public String toString() {
+        return "Try";
     }
 }

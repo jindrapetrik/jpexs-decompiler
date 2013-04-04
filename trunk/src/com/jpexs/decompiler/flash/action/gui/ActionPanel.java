@@ -316,6 +316,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             setHex(hexButton.isSelected());
         } else if (e.getActionCommand().equals("SAVEACTION")) {
             try {
+                Helper.writeFile("as.txt", editor.getText().getBytes());
                 src.setActions(ASMParser.parse(0, src.getPos(), true, new ByteArrayInputStream(editor.getText().getBytes()), SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION);
                 setSource(this.src);
                 JOptionPane.showMessageDialog(this, "Code successfully saved");

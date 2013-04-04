@@ -23,17 +23,16 @@ import com.jpexs.decompiler.flash.action.parser.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.ParsedSymbol;
-import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.flash.action.swf4.*;
 import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf6.ActionEnumerate2;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
-import com.jpexs.decompiler.flash.action.swf7.ActionTry;
 import com.jpexs.decompiler.flash.action.treemodel.*;
 import com.jpexs.decompiler.flash.action.treemodel.clauses.*;
 import com.jpexs.decompiler.flash.graph.Graph;
 import com.jpexs.decompiler.flash.graph.GraphSource;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.graph.IfItem;
 import com.jpexs.decompiler.flash.graph.NotItem;
@@ -377,62 +376,78 @@ public class Action implements GraphSourceItem {
      * @param hex Add hexadecimal?
      * @return ASM source as String
      */
-    public static String actionsToString(long address, List list, List<Long> importantOffsets, List<String> constantPool, int version, boolean hex, long swfPos) {        
+    public static String actionsToString(long address, List list, List<Long> importantOffsets, List<String> constantPool, int version, boolean hex, long swfPos) {
         String ret = "";
         long offset;
         if (importantOffsets == null) {
             //setActionsAddresses(list, 0, version);
             importantOffsets = getActionsAllRefs(list, version);
         }
-        List<GraphSourceItem> srcList=new ArrayList<GraphSourceItem>();
-        for(Object o:list){
-            if(o instanceof Action){
-                srcList.add((Action)o);
+        List<GraphSourceItem> srcList = new ArrayList<GraphSourceItem>();
+        for (Object o : list) {
+            if (o instanceof Action) {
+                srcList.add((Action) o);
             }
         }
-         List<ConstantPool> cps = SWFInputStream.getConstantPool(new ActionGraphSource(srcList, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, version);
+        List<ConstantPool> cps = SWFInputStream.getConstantPool(new ActionGraphSource(srcList, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, version);
         if (!cps.isEmpty()) {
             setConstantPool(list, cps.get(cps.size() - 1));
         }
-        HashMap<Long,List<GraphSourceItemContainer>> containers=new HashMap<Long, List<GraphSourceItemContainer>>();
+        HashMap<Long, List<GraphSourceItemContainer>> containers = new HashMap<Long, List<GraphSourceItemContainer>>();
+        HashMap<GraphSourceItemContainer, Integer> containersPos = new HashMap<GraphSourceItemContainer, Integer>();
         offset = address;
         int pos = -1;
         for (GraphSourceItem s : srcList) {
-            Action a=null;
-            if(s instanceof Action){
-                a=(Action)s;
+            Action a = null;
+            if (s instanceof Action) {
+                a = (Action) s;
             }
             pos++;
             if (hex) {
-                ret += "<ffdec:hex>" +/*"0x"+Helper.formatAddress(a.getFileAddress())+": "+*/ Helper.bytesToHexString((a instanceof GraphSourceItemContainer) ? ((GraphSourceItemContainer) a).getHeaderBytes() : a.getBytes(version)) + "</ffdec:hex>\r\n";
+                ret += "<ffdec:hex>" +/*"0x"+Helper.formatAddress(a.getFileAddress())+": "+*/ Helper.bytesToHexString(a.getBytes(version)) + "</ffdec:hex>\r\n";
             }
             offset = a.getAddress();
-            
-            if((!(a.ignored)) && (a instanceof GraphSourceItemContainer)){
-                if(!containers.containsKey(((GraphSourceItemContainer)a).getEndAddress())){
-                    containers.put(((GraphSourceItemContainer)a).getEndAddress(), new ArrayList<GraphSourceItemContainer>());
+
+            if ((!(a.ignored)) && (a instanceof GraphSourceItemContainer)) {
+                GraphSourceItemContainer cnt = (GraphSourceItemContainer) a;
+                containersPos.put(cnt, 0);
+                List<Long> sizes = cnt.getContainerSizes();
+                long addr = ((Action) cnt).getAddress() + cnt.getHeaderSize();
+                for (Long size : sizes) {
+                    addr += size;
+                    if (size == 0) {
+                        continue;
+                    }
+                    if (!containers.containsKey(addr)) {
+                        containers.put(addr, new ArrayList<GraphSourceItemContainer>());
+                    }
+                    containers.get(addr).add(cnt);
                 }
-                containers.get(((GraphSourceItemContainer)a).getEndAddress()).add((GraphSourceItemContainer)a);
             }
-            
-            if(containers.containsKey(offset)){
-                for(int i=0;i<containers.get(offset).size();i++){
-                    ret+="}\r\n";
+
+            if (containers.containsKey(offset)) {
+                for (int i = 0; i < containers.get(offset).size(); i++) {
+                    ret += "}\r\n";
+                    GraphSourceItemContainer cnt = containers.get(offset).get(i);
+                    int cntPos = containersPos.get(cnt);
+                    ret += cnt.getASMSourceBetween(cntPos);
+                    cntPos++;
+                    containersPos.put(cnt, cntPos);
                 }
             }
-            
+
             if (importantOffsets.contains(offset)) {
                 ret += "loc" + Helper.formatAddress(offset) + ":";
             }
-            
-            
+
+
 
             if (a.replaceWith != null) {
-                ret += Highlighting.hilighOffset("", offset) + a.replaceWith.getASMSource(list,importantOffsets, constantPool, version, hex) + "\r\n";
+                ret += Highlighting.hilighOffset("", offset) + a.replaceWith.getASMSource(list, importantOffsets, constantPool, version, hex) + "\r\n";
             } else if (a.ignored) {
                 int len = 0;
                 if (pos + 1 < list.size()) {
-                    len = (int) (((Action)(list.get(pos + 1))).getAddress() - a.getAddress());
+                    len = (int) (((Action) (list.get(pos + 1))).getAddress() - a.getAddress());
                 } else {
                     len = a.getBytes(version).length;
                 }
@@ -441,26 +456,36 @@ public class Action implements GraphSourceItem {
                 }
             } else {
                 if (a.beforeInsert != null) {
-                    ret += a.beforeInsert.getASMSource(list,importantOffsets, constantPool, version, hex) + "\r\n";
+                    ret += a.beforeInsert.getASMSource(list, importantOffsets, constantPool, version, hex) + "\r\n";
                 }
                 //if (!(a instanceof ActionNop)) {
-                String add="";
-                 if(a instanceof ActionIf){
-                 add = " change: "+((ActionIf)a).getJumpOffset();
-                 }
-                 if(a instanceof ActionJump){
-                 add = " change: "+((ActionJump)a).getJumpOffset();
-                 }
-                 add="; ofs"+Helper.formatAddress(offset)+add;
-                 add="";
-                ret += Highlighting.hilighOffset("", offset) + a.getASMSourceReplaced(list,importantOffsets, constantPool, version, hex) + (a.ignored ? "; ignored" : "") +add + "\r\n";
+                String add = "";
+                if (a instanceof ActionIf) {
+                    add = " change: " + ((ActionIf) a).getJumpOffset();
+                }
+                if (a instanceof ActionJump) {
+                    add = " change: " + ((ActionJump) a).getJumpOffset();
+                }
+                add = "; ofs" + Helper.formatAddress(offset) + add;
+                add = "";
+                ret += Highlighting.hilighOffset("", offset) + a.getASMSourceReplaced(list, importantOffsets, constantPool, version, hex) + (a.ignored ? "; ignored" : "") + add + "\r\n";
 
                 //}
                 if (a.afterInsert != null) {
-                    ret += a.afterInsert.getASMSource(list,importantOffsets, constantPool, version, hex) + "\r\n";
+                    ret += a.afterInsert.getASMSource(list, importantOffsets, constantPool, version, hex) + "\r\n";
                 }
             }
             offset += a.getBytes(version).length;
+        }
+        if (containers.containsKey(offset)) {
+            for (int i = 0; i < containers.get(offset).size(); i++) {
+                ret += "}\r\n";
+                GraphSourceItemContainer cnt = containers.get(offset).get(i);
+                int cntPos = containersPos.get(cnt);
+                ret += cnt.getASMSourceBetween(cntPos);
+                cntPos++;
+                containersPos.put(cnt, cntPos);
+            }
         }
         if (importantOffsets.contains(offset)) {
             ret += "loc" + Helper.formatAddress(offset) + ":\r\n";
@@ -517,12 +542,12 @@ public class Action implements GraphSourceItem {
      * @return address
      */
     public static long ip2adr(List<Action> actions, int ip, int version) {
-      /*  List<Action> actions=new ArrayList<Action>();
-        for(GraphSourceItem s:sources){
-            if(s instanceof Action){
-                actions.add((Action)s);
-            }
-        }*/
+        /*  List<Action> actions=new ArrayList<Action>();
+         for(GraphSourceItem s:sources){
+         if(s instanceof Action){
+         actions.add((Action)s);
+         }
+         }*/
         if (ip >= actions.size()) {
             if (actions.isEmpty()) {
                 return 0;
@@ -655,10 +680,10 @@ public class Action implements GraphSourceItem {
     }
 
     public static List<GraphTargetItem> actionsPartToTree(HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, Stack<GraphTargetItem> stack, List<GraphSourceItem> src, int start, int end, int version) {
-        List<Action> actions=new ArrayList<Action>();
-        for(GraphSourceItem s:src){
-            if(s instanceof Action){
-                actions.add((Action)s);
+        List<Action> actions = new ArrayList<Action>();
+        for (GraphSourceItem s : src) {
+            if (s instanceof Action) {
+                actions.add((Action) s);
             }
         }
         if (start < actions.size() && (end > 0) && (start > 0)) {
@@ -720,17 +745,26 @@ public class Action implements GraphSourceItem {
                 ip++;
                 continue;
             }
-            
-            if(action instanceof GraphSourceItemContainer){
-                long endAddr=((GraphSourceItemContainer)action).getEndAddress();
-                int endip=adr2ip(actions, endAddr, version);
+
+            if (action instanceof GraphSourceItemContainer) {
+                GraphSourceItemContainer cnt = (GraphSourceItemContainer) action;
                 //List<GraphTargetItem> out=actionsPartToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(),new HashMap<String, GraphTargetItem>(), new Stack<GraphTargetItem>(), src, ip+1,endip-1 , version);            
-                List<GraphTargetItem> out=ActionGraph.translateViaGraph(registerNames, variables, functions, src.subList(ip+1, endip), version);
-                ((GraphSourceItemContainer)action).translateContainer(out, stack, output, registerNames, variables, functions);
-                ip=endip;
+                long endAddr = action.getAddress() + cnt.getHeaderSize();
+                List<List<GraphTargetItem>> outs = new ArrayList<List<GraphTargetItem>>();
+                for (long size : cnt.getContainerSizes()) {
+                    if (size == 0) {
+                        outs.add(new ArrayList<GraphTargetItem>());
+                        continue;
+                    }
+                    List<GraphTargetItem> out = ActionGraph.translateViaGraph(registerNames, variables, functions, src.subList(adr2ip(actions, endAddr, version), adr2ip(actions, endAddr + size, version)), version);
+                    outs.add(out);
+                    endAddr += size;
+                }
+                ((GraphSourceItemContainer) action).translateContainer(outs, stack, output, registerNames, variables, functions);
+                ip = adr2ip(actions, endAddr, version);
                 continue;
             }
-            
+
             //System.out.println(" ip "+ip+" "+action);
             //return in for..in
             if ((action instanceof ActionPush) && (((ActionPush) action).values.size() == 1) && (((ActionPush) action).values.get(0) instanceof Null)) {
@@ -758,26 +792,26 @@ public class Action implements GraphSourceItem {
                 EnumerateTreeItem en = (EnumerateTreeItem) stack.peek();
                 inItem = en.object;
                 continue;
-            } else if (action instanceof ActionTry) {
-                ActionTry atry = (ActionTry) action;
-                List<GraphTargetItem> tryCommands = ActionGraph.translateViaGraph(registerNames, variables, functions, atry.tryBody, version);
-                TreeItem catchName;
-                if (atry.catchInRegisterFlag) {
-                    catchName = new DirectValueTreeItem(atry, -1, new RegisterNumber(atry.catchRegister), new ArrayList<String>());
-                } else {
-                    catchName = new DirectValueTreeItem(atry, -1, atry.catchName, new ArrayList<String>());
-                }
-                List<GraphTargetItem> catchExceptions = new ArrayList<GraphTargetItem>();
-                catchExceptions.add(catchName);
-                List<List<GraphTargetItem>> catchCommands = new ArrayList<List<GraphTargetItem>>();
-                catchCommands.add(ActionGraph.translateViaGraph(registerNames, variables, functions, atry.catchBody, version));
-                List<GraphTargetItem> finallyCommands = ActionGraph.translateViaGraph(registerNames, variables, functions, atry.finallyBody, version);
-                output.add(new TryTreeItem(tryCommands, catchExceptions, catchCommands, finallyCommands));
-            } else /*if (action instanceof ActionWith) {
-                ActionWith awith = (ActionWith) action;
-                List<GraphTargetItem> withCommands = ActionGraph.translateViaGraph(registerNames, variables, functions,new ArrayList<Action>() , version); //TODO:parse with actions
-                output.add(new WithTreeItem(action, stack.pop(), withCommands));
-            } else */if (action instanceof ActionStoreRegister) {
+            } else /*if (action instanceof ActionTry) {
+             ActionTry atry = (ActionTry) action;
+             List<GraphTargetItem> tryCommands = ActionGraph.translateViaGraph(registerNames, variables, functions, atry.tryBody, version);
+             TreeItem catchName;
+             if (atry.catchInRegisterFlag) {
+             catchName = new DirectValueTreeItem(atry, -1, new RegisterNumber(atry.catchRegister), new ArrayList<String>());
+             } else {
+             catchName = new DirectValueTreeItem(atry, -1, atry.catchName, new ArrayList<String>());
+             }
+             List<GraphTargetItem> catchExceptions = new ArrayList<GraphTargetItem>();
+             catchExceptions.add(catchName);
+             List<List<GraphTargetItem>> catchCommands = new ArrayList<List<GraphTargetItem>>();
+             catchCommands.add(ActionGraph.translateViaGraph(registerNames, variables, functions, atry.catchBody, version));
+             List<GraphTargetItem> finallyCommands = ActionGraph.translateViaGraph(registerNames, variables, functions, atry.finallyBody, version);
+             output.add(new TryTreeItem(tryCommands, catchExceptions, catchCommands, finallyCommands));
+             } else  if (action instanceof ActionWith) {
+             ActionWith awith = (ActionWith) action;
+             List<GraphTargetItem> withCommands = ActionGraph.translateViaGraph(registerNames, variables, functions,new ArrayList<Action>() , version); //TODO:parse with actions
+             output.add(new WithTreeItem(action, stack.pop(), withCommands));
+             } else */ if (action instanceof ActionStoreRegister) {
                 if ((ip + 1 <= end) && (actions.get(ip + 1) instanceof ActionPop)) {
                     action.translate(localData, stack, output);
                     stack.pop();
@@ -1114,15 +1148,17 @@ public class Action implements GraphSourceItem {
 
     public static List<Action> removeNops(long address, List<Action> actions, int version, long swfPos) {
         List<Action> ret = actions;
-        if(true){
+        if (true) {
             //return ret;
         }
         String s = null;
         try {
             s = Highlighting.stripHilights(Action.actionsToString(address, ret, null, version, false, swfPos));
+
             ret = ASMParser.parse(address, swfPos, true, new ByteArrayInputStream(s.getBytes()), SWF.DEFAULT_VERSION);
         } catch (Exception ex) {
             Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error", ex);
+            Helper.writeFile("as2.txt", s.getBytes());
         }
         return ret;
     }
@@ -1148,6 +1184,6 @@ public class Action implements GraphSourceItem {
     }
 
     public String getASMSourceReplaced(List<GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
-        return getASMSource(container,knownAddreses, constantPool, version, hex);
+        return getASMSource(container, knownAddreses, constantPool, version, hex);
     }
 }

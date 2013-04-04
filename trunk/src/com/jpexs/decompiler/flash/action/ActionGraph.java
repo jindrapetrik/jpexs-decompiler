@@ -64,7 +64,7 @@ public class ActionGraph extends Graph {
     }
 
     public static List<GraphTargetItem> translateViaGraph(HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List code, int version) {
-        
+
         ActionGraph g = new ActionGraph(code, registerNames, variables, functions, version);
         List localData = new ArrayList();
         localData.add(registerNames);

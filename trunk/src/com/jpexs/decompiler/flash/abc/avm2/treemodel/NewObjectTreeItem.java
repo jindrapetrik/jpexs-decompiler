@@ -40,6 +40,6 @@ public class NewObjectTreeItem extends TreeItem {
             }
             params += pairs.get(n).toString(constants, localRegNames, fullyQualifiedNames);
         }
-        return "\r\n" +Graph.INDENTOPEN + "\r\n" + hilight("{") + "\r\n" + params + "\r\n" + hilight("}")+"\r\n"+Graph.INDENTCLOSE + "\r\n";
+        return "\r\n" + Graph.INDENTOPEN + "\r\n" + hilight("{") + "\r\n" + params + "\r\n" + hilight("}") + "\r\n" + Graph.INDENTCLOSE + "\r\n";
     }
 }

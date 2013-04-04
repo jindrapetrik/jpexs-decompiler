@@ -59,7 +59,7 @@ public class GraphPart {
         return false;
     }
 
-    public boolean leadsTo(GraphSource code, GraphPart part, List<GraphPart> ignored) {        
+    public boolean leadsTo(GraphSource code, GraphPart part, List<GraphPart> ignored) {
         return leadsTo(code, part, new ArrayList<GraphPart>(), ignored);
     }
 

@@ -1,5 +1,6 @@
 package com.jpexs.decompiler.flash.graph;
 
+import com.jpexs.decompiler.flash.action.Action;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,9 +20,9 @@ public abstract class GraphSource {
 
     public abstract List<GraphTargetItem> translatePart(List localData, Stack<GraphTargetItem> stack, int start, int end);
 
-    private void visitCode(int ip, int lastIp, HashMap<Integer, List<Integer>> refs) {
+    private void visitCode(int ip, int lastIp, HashMap<Integer, List<Integer>> refs, int endIp) {
         boolean debugMode = false;
-        while (ip < size()) {
+        while (((endIp == -1) || (ip < endIp)) && (ip < size())) {
             refs.get(ip).add(lastIp);
             lastIp = ip;
             if (refs.get(ip).size() > 1) {
@@ -40,15 +41,27 @@ public abstract class GraphSource {
                 break;
             }
 
-            if(ins instanceof GraphSourceItemContainer){
-                visitCode(adr2pos(((GraphSourceItemContainer)ins).getEndAddress()), ip, refs);
+            if (ins instanceof GraphSourceItemContainer) {
+                GraphSourceItemContainer cnt = (GraphSourceItemContainer) ins;
+                if (ins instanceof Action) { //TODO: Remove dependency of AVM1
+                    long endAddr = ((Action) ins).getAddress() + cnt.getHeaderSize();
+                    for (long size : cnt.getContainerSizes()) {
+                        if (size != 0) {
+                            visitCode(adr2pos(endAddr), ip, refs, adr2pos(endAddr + size));
+                        }
+                        endAddr += size;
+                    }
+                    ip = adr2pos(endAddr);
+                    continue;
+                }
+
             }
-            
+
             if (ins.isBranch() || ins.isJump()) {
                 List<Integer> branches = ins.getBranches(this);
                 for (int b : branches) {
                     if (b >= 0) {
-                        visitCode(b, ip, refs);
+                        visitCode(b, ip, refs, endIp);
                     }
                 }
                 break;
@@ -62,11 +75,11 @@ public abstract class GraphSource {
         for (int i = 0; i < size(); i++) {
             refs.put(i, new ArrayList<Integer>());
         }
-        visitCode(0, 0, refs);
+        visitCode(0, 0, refs, -1);
         int pos = 0;
         for (int e : alternateEntries) {
             pos++;
-            visitCode(e, -pos, refs);
+            visitCode(e, -pos, refs, -1);
         }
         return refs;
     }

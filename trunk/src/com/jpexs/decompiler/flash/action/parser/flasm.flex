@@ -68,6 +68,7 @@ False = "false"
 Null = "null"
 Undefined = "undefined"
 
+Infinity = -? "Infinity"
 
 /* integer literals */
 PositiveNumberLiteral = 0 | [1-9][0-9]*
@@ -76,7 +77,7 @@ NegativeNumberLiteral = - {PositiveNumberLiteral}
 NumberLiteral = {PositiveNumberLiteral}|{NegativeNumberLiteral}
 
 /* floating point literals */        
-FloatLiteral = ({FLit1}|{FLit2}|{FLit3}) {Exponent}?
+FloatLiteral = {Infinity} | (({FLit1}|{FLit2}|{FLit3}) {Exponent}?)
 
 FLit1    = [0-9]+ \. [0-9]* 
 FLit2    = \. [0-9]+ 
@@ -126,7 +127,7 @@ Constant= constant{PositiveNumberLiteral}
   {FloatLiteral}                 { return new ParsedSymbol(ParsedSymbol.TYPE_FLOAT,new Double(Double.parseDouble((yytext()))));  }
   {LineTerminator}      {yybegin(YYINITIAL); return new ParsedSymbol(ParsedSymbol.TYPE_EOL); }
   {Comment}             {return new ParsedSymbol(ParsedSymbol.TYPE_COMMENT,yytext().substring(1));}
-  {StartOfBlock}                        {  return new ParsedSymbol(ParsedSymbol.TYPE_BLOCK_START); }
+  {StartOfBlock}                        {  yybegin(YYINITIAL); return new ParsedSymbol(ParsedSymbol.TYPE_BLOCK_START); }
   {True}                {return new ParsedSymbol(ParsedSymbol.TYPE_BOOLEAN,Boolean.TRUE);}
   {False}                {return new ParsedSymbol(ParsedSymbol.TYPE_BOOLEAN,Boolean.FALSE);}
   {Null}                {return new ParsedSymbol(ParsedSymbol.TYPE_NULL,new Null());}

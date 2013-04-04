@@ -20,17 +20,12 @@ import com.jpexs.decompiler.flash.ReReadableInputStream;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.ActionGraph;
-import com.jpexs.decompiler.flash.action.ActionGraphSource;
-import com.jpexs.decompiler.flash.action.parser.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.Label;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
-import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
-import com.jpexs.decompiler.flash.action.swf4.ActionPush;
-import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.treemodel.FunctionTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.io.ByteArrayOutputStream;
@@ -61,29 +56,6 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
     //public List<Action> code;
     private int version;
     public List<String> constantPool;
-
-    @Override
-    public long getEndAddress() {
-        return getAddress()+getHeaderLength()+codeSize;
-    }
-
-    @Override
-    public void setEndAddress(long address) {
-        codeSize = (int)(address-getAddress()-getHeaderLength());
-    }
-    
-    
-    
-    @Override
-    public List<GraphSourceItem> getItems(List<GraphSourceItem> parent) {
-        if(parent.isEmpty()){
-            return parent;
-        }
-        ActionGraphSource src=new ActionGraphSource(parent, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
-        return parent.subList(src.adr2pos(getAddress()+hdrSize),src.adr2pos(getAddress()+hdrSize+codeSize));
-    }
-
-    
     private long hdrSize;
 
     public ActionDefineFunction2(int actionLength, SWFInputStream sis, ReReadableInputStream rri, int version) throws IOException {
@@ -138,7 +110,8 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
         //code = ASMParser.parse(containerSWFPos + getHeaderLength(), ignoreNops, labels, address + getPreLen(version), lexer, constantPool, version);
     }
 
-    public long getHeaderLength() {
+    @Override
+    public long getHeaderSize() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         SWFOutputStream sos = new SWFOutputStream(baos, version);
         ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
@@ -167,41 +140,6 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
         } catch (IOException e) {
         }
         return baos2.toByteArray().length;
-    }
-
-    @Override
-    public byte[] getHeaderBytes() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
-        ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-        try {
-            sos.writeString(functionName);
-            sos.writeUI16(paramNames.size());
-            sos.writeUI8(registerCount);
-            sos.writeUB(1, preloadParentFlag ? 1 : 0);
-            sos.writeUB(1, preloadRootFlag ? 1 : 0);
-            sos.writeUB(1, suppressSuperFlag ? 1 : 0);
-            sos.writeUB(1, preloadSuperFlag ? 1 : 0);
-            sos.writeUB(1, suppressArgumentsFlag ? 1 : 0);
-            sos.writeUB(1, preloadArgumentsFlag ? 1 : 0);
-            sos.writeUB(1, suppressThisFlag ? 1 : 0);
-            sos.writeUB(1, preloadThisFlag ? 1 : 0);
-            sos.writeUB(7, 0);
-            sos.writeUB(1, preloadGlobalFlag ? 1 : 0);
-            for (int i = 0; i < paramNames.size(); i++) {
-                sos.writeUI8(paramRegisters.get(i));
-
-                sos.writeString(paramNames.get(i));
-            }
-            //byte codeBytes[] = Action.actionsToBytes(code, false, version);
-            sos.writeUI16(codeSize);//codeBytes.length);
-            sos.close();
-
-
-            baos2.write(surroundWithAction(baos.toByteArray(), version));
-        } catch (IOException e) {
-        }
-        return baos2.toByteArray();
     }
 
     @Override
@@ -286,7 +224,7 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
         if (replacedFunctionName != null) {
             functionName = replacedFunctionName;
         }
-        String ret = getASMSource(container,knownAddreses, constantPool, version, hex);
+        String ret = getASMSource(container, knownAddreses, constantPool, version, hex);
         paramNames = oldParamNames;
         functionName = oldFunctionName;
         return ret;
@@ -343,12 +281,10 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
 
     @Override
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-
-        
     }
 
     @Override
-    public void translateContainer(List<GraphTargetItem> content, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+    public void translateContainer(List<List<GraphTargetItem>> content, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
         HashMap<Integer, String> funcRegNames = (HashMap<Integer, String>) regNames.clone();
         for (int f = 0; f < paramNames.size(); f++) {
             int reg = paramRegisters.get(f);
@@ -382,12 +318,10 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
             pos++;
         }
 
-        FunctionTreeItem fti = new FunctionTreeItem(this, functionName, paramNames,content, constantPool, getFirstRegister());
+        FunctionTreeItem fti = new FunctionTreeItem(this, functionName, paramNames, content.get(0), constantPool, getFirstRegister());
         functions.put(functionName, fti);
         stack.push(fti);
     }
-    
-    
 
     @Override
     public List<Long> getAllRefs(int version) {
@@ -400,7 +334,20 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
     }
 
     @Override
-    public int getDataLength() {
-        return codeSize;
+    public List<Long> getContainerSizes() {
+        List<Long> ret = new ArrayList<Long>();
+        ret.add((Long) (long) codeSize);
+        return ret;
+    }
+
+    @Override
+    public boolean parseDivision(int pos, long addr, FlasmLexer lexer) {
+        codeSize = (int) (addr - getAddress() - getHeaderSize());
+        return false;
+    }
+
+    @Override
+    public String getASMSourceBetween(int pos) {
+        return "";
     }
 }

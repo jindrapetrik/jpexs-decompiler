@@ -20,17 +20,12 @@ import com.jpexs.decompiler.flash.ReReadableInputStream;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.ActionGraph;
-import com.jpexs.decompiler.flash.action.ActionGraphSource;
-import com.jpexs.decompiler.flash.action.parser.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.Label;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
-import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
-import com.jpexs.decompiler.flash.action.swf4.ActionPush;
-import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.action.treemodel.FunctionTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.io.ByteArrayOutputStream;
@@ -51,29 +46,6 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
     private int version;
     public List<String> constantPool;
     private long hdrSize;
-
-    @Override
-    public long getEndAddress() {
-        return getAddress()+getHeaderLength()+codeSize;
-    }
-
-    @Override
-    public void setEndAddress(long address) {
-        codeSize = (int)(address-getAddress()-getHeaderLength());
-    }
-
-    
-    
-    
-    @Override
-    public List<GraphSourceItem> getItems(List<GraphSourceItem> parent) {
-        if(parent.isEmpty()){
-            return parent;
-        }
-        ActionGraphSource src=new ActionGraphSource(parent, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
-        return parent.subList(src.adr2pos(getAddress()+getHeaderLength()),src.adr2pos(getAddress()+getHeaderLength()+codeSize));
-    }
-
 
     public ActionDefineFunction(int actionLength, SWFInputStream sis, ReReadableInputStream rri, int version) throws IOException {
         super(0x9B, actionLength);
@@ -106,7 +78,8 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
         //code = ASMParser.parse(containerSWFPos + getHeaderLength(), ignoreNops, labels, address + getPreLen(version), lexer, constantPool, version);
     }
 
-    public long getHeaderLength() {
+    @Override
+    public long getHeaderSize() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         SWFOutputStream sos = new SWFOutputStream(baos, version);
         ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
@@ -124,28 +97,6 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
         } catch (IOException e) {
         }
         return baos2.toByteArray().length;
-    }
-
-    @Override
-    public byte[] getHeaderBytes() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
-        ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-        try {
-            sos.writeString(functionName);
-            sos.writeUI16(paramNames.size());
-            for (String s : paramNames) {
-                sos.writeString(s);
-            }
-            //byte codeBytes[] = Action.actionsToBytes(getActions(null), false, version);
-            sos.writeUI16(codeSize);//codeBytes.length);
-            sos.close();
-
-
-            baos2.write(surroundWithAction(baos.toByteArray(), version));
-        } catch (IOException e) {
-        }
-        return baos2.toByteArray();
     }
 
     @Override
@@ -203,7 +154,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
             paramStr += "\"" + Helper.escapeString(paramNames.get(i)) + "\"";
             paramStr += " ";
         }
-        
+
         return "DefineFunction \"" + Helper.escapeString(functionName) + "\" " + paramNames.size() + " " + paramStr + " {";// + "\r\n" +Action.actionsToString(getAddress() + getHeaderLength(),getItems(container) , knownAddreses, constantPool, version, hex, getFileAddress() + hdrSize) + "}";
     }
 
@@ -217,7 +168,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
         if (replacedFunctionName != null) {
             functionName = replacedFunctionName;
         }
-        String ret = getASMSource(container,knownAddreses, constantPool, version, hex);
+        String ret = getASMSource(container, knownAddreses, constantPool, version, hex);
         paramNames = oldParamNames;
         functionName = oldFunctionName;
         return ret;
@@ -236,25 +187,36 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
 
     @Override
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-        
     }
 
     @Override
-    public void translateContainer(List<GraphTargetItem> content, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-       FunctionTreeItem fti = new FunctionTreeItem(this, functionName, paramNames, content, constantPool, 1);
+    public void translateContainer(List<List<GraphTargetItem>> content, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        FunctionTreeItem fti = new FunctionTreeItem(this, functionName, paramNames, content.get(0), constantPool, 1);
         //ActionGraph.translateViaGraph(regNames, variables, functions, code, version)
         stack.push(fti);
         functions.put(functionName, fti);
     }
-    
-    
+
     @Override
     public String toString() {
         return "DefineFunction";
     }
 
     @Override
-    public int getDataLength() {
-        return codeSize;
+    public boolean parseDivision(int pos, long addr, FlasmLexer lexer) {
+        codeSize = (int) (addr - getAddress() - getHeaderSize());
+        return false;
+    }
+
+    @Override
+    public List<Long> getContainerSizes() {
+        List<Long> ret = new ArrayList<Long>();
+        ret.add((Long) (long) codeSize);
+        return ret;
+    }
+
+    @Override
+    public String getASMSourceBetween(int pos) {
+        return "";
     }
 }

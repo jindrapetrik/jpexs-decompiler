@@ -20,18 +20,16 @@ import com.jpexs.decompiler.flash.ReReadableInputStream;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.ActionGraphSource;
-import com.jpexs.decompiler.flash.action.parser.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.Label;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
-import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.flash.action.treemodel.clauses.WithTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -41,27 +39,11 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
     //public List<Action> actions;
     public int codeSize;
     public int version;
-    
-    @Override
-    public long getEndAddress() {
-        return getAddress()+2+codeSize;
-    }
 
     @Override
-    public void setEndAddress(long address) {
-        codeSize = (int)(address-getAddress()-2);
-    }
-    
-    
-
-   
-    @Override
-    public List<GraphSourceItem> getItems(List<GraphSourceItem> parent) {
-        if(parent.isEmpty()){
-            return parent;
-        }
-        ActionGraphSource src=new ActionGraphSource(parent, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
-        return parent.subList(src.adr2pos(getAddress()+2),src.adr2pos(getAddress()+2+codeSize));
+    public boolean parseDivision(int pos, long addr, FlasmLexer lexer) {
+        codeSize = (int) (addr - getAddress() - getHeaderSize());
+        return false;
     }
 
     public ActionWith(SWFInputStream sis, ReReadableInputStream rri, int version) throws IOException {
@@ -70,7 +52,7 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
         this.version = version;
         //actions = new ArrayList<Action>();
         //actions = (new SWFInputStream(new ByteArrayInputStream(sis.readBytes(codeSize)), version)).readActionList(rri.getPos(), containerSWFOffset + getAddress() + 2, rri, codeSize);
-        
+
     }
 
     public ActionWith(long containerSWFPos, boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
@@ -85,21 +67,6 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
         if (recursive) {
             //Action.setActionsAddresses(actions, address + 5, version);
         }
-    }
-
-    @Override
-    public byte[] getHeaderBytes() {
-        ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
-        try {
-            //byte codeBytes[] = Action.actionsToBytes(actions, false, version);
-            sos.writeUI16(codeSize);//codeBytes.length);
-            sos.close();
-            baos2.write(surroundWithAction(baos.toByteArray(), version));
-        } catch (IOException e) {
-        }
-        return baos2.toByteArray();
     }
 
     @Override
@@ -134,13 +101,24 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
     }
 
     @Override
-    public int getDataLength() {
-        return codeSize;
+    public void translateContainer(List<List<GraphTargetItem>> content, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+        output.add(new WithTreeItem(this, stack.pop(), content.get(0)));
     }
 
     @Override
-    public void translateContainer(List<GraphTargetItem> content, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-        output.add(new WithTreeItem(this, stack.pop(), content));
+    public List<Long> getContainerSizes() {
+        List<Long> ret = new ArrayList<Long>();
+        ret.add((Long) (long) codeSize);
+        return ret;
     }
-    
+
+    @Override
+    public String getASMSourceBetween(int pos) {
+        return "";
+    }
+
+    @Override
+    public long getHeaderSize() {
+        return surroundWithAction(new byte[]{0, 0}, version).length;
+    }
 }

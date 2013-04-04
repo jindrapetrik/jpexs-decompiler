@@ -1,7 +1,6 @@
 package com.jpexs.decompiler.flash.graph;
 
-import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -12,15 +11,13 @@ import java.util.Stack;
  */
 public interface GraphSourceItemContainer {
 
-    public byte[] getHeaderBytes();
+    public long getHeaderSize();
 
-    public List<GraphSourceItem> getItems(List<GraphSourceItem> parent);
+    public List<Long> getContainerSizes();
 
-    public int getDataLength();
-    
-    public long getEndAddress();
-    
-    public void setEndAddress(long address);
-    
-    public void translateContainer(List<GraphTargetItem> content,Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions);
+    public String getASMSourceBetween(int pos);
+
+    public boolean parseDivision(int pos, long addr, FlasmLexer lexer);
+
+    public void translateContainer(List<List<GraphTargetItem>> contents, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions);
 }

@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import static com.jpexs.decompiler.flash.abc.types.traits.Trait.TRAIT_CONST;
 import com.jpexs.decompiler.flash.graph.Graph;
-import static com.jpexs.decompiler.flash.graph.Graph.INDENTOPEN;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
@@ -130,36 +129,36 @@ public class TraitSlotConst extends Trait {
         String ret = modifier + getNameStr(abc, fullyQualifiedNames);
         String valueStr = getValueStr(abc, fullyQualifiedNames);
         if (valueStr != null) {
-            ret+=" = ";            
-            int befLen=ret.length();
+            ret += " = ";
+            int befLen = ret.length();
             ret = ABC.IDENT_STRING + ABC.IDENT_STRING + ret;
             String valueStrParts[] = valueStr.split("\r\n");
-            boolean first=true;
+            boolean first = true;
             for (int i = 0; i < valueStrParts.length; i++) {
-                if(valueStrParts[i].equals("")){
+                if (valueStrParts[i].equals("")) {
                     continue;
                 }
-                if(Highlighting.stripHilights(valueStrParts[i]).equals(Graph.INDENTOPEN)){
+                if (Highlighting.stripHilights(valueStrParts[i]).equals(Graph.INDENTOPEN)) {
                     //befLen+=ABC.IDENT_STRING.length();
                     continue;
                 }
-                if(Highlighting.stripHilights(valueStrParts[i]).equals(Graph.INDENTCLOSE)){
+                if (Highlighting.stripHilights(valueStrParts[i]).equals(Graph.INDENTCLOSE)) {
                     //befLen-=ABC.IDENT_STRING.length();
                     continue;
                 }
-                if(!first){
-                    ret+=ABC.IDENT_STRING + ABC.IDENT_STRING;
-                    for(int j=0;j<befLen;j++){
-                        ret+=" ";
+                if (!first) {
+                    ret += ABC.IDENT_STRING + ABC.IDENT_STRING;
+                    for (int j = 0; j < befLen; j++) {
+                        ret += " ";
                     }
                 }
-                ret+=valueStrParts[i];                
-                ret+="\r\n";
-                first=false;
+                ret += valueStrParts[i];
+                ret += "\r\n";
+                first = false;
             }
-        }       
-        if(ret.endsWith("\r\n")){
-            ret=ret.substring(0,ret.length()-2)+";\r\n";
+        }
+        if (ret.endsWith("\r\n")) {
+            ret = ret.substring(0, ret.length() - 2) + ";\r\n";
         }
         return ret;
     }
