@@ -193,7 +193,7 @@ public class TraitClass extends Trait {
     }
 
     private void parseImportsUsagesFromMethodInfo(List<DoABCTag> abcTags, ABC abc, int method_index, List<String> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames, List<Integer> visitedMethods) {
-        if (method_index > abc.method_info.length) {
+        if (method_index >= abc.method_info.length) {
             return;
         }
         visitedMethods.add(method_index);
