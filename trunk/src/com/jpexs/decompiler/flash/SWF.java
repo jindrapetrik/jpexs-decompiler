@@ -1059,13 +1059,6 @@ public class SWF {
     private HashMap<DirectValueTreeItem, ConstantPool> getVariables(HashMap<DirectValueTreeItem, ConstantPool> variables, List<GraphSourceItem> functions, ASMSource src) {
         HashMap<DirectValueTreeItem, ConstantPool> ret = new HashMap<DirectValueTreeItem, ConstantPool>();
         List<Action> actions = src.getActions(version);
-        /* int ip=0;
-         for(Action a:actions){
-         System.out.println("ip "+ip+" "+a.getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), new ArrayList<String>(), version, false));
-         ip++;
-         }
-         if(true)
-         return ret;*/
         actionsMap.put(src, actions);
         List<GraphSourceItem> ss = new ArrayList<GraphSourceItem>();
         ss.addAll(actions);

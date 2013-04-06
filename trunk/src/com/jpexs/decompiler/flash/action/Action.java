@@ -765,7 +765,6 @@ public class Action implements GraphSourceItem {
                 continue;
             }
 
-            //System.out.println(" ip "+ip+" "+action);
             //return in for..in
             if ((action instanceof ActionPush) && (((ActionPush) action).values.size() == 1) && (((ActionPush) action).values.get(0) instanceof Null)) {
                 if (ip + 3 <= end) {
@@ -1158,7 +1157,6 @@ public class Action implements GraphSourceItem {
             ret = ASMParser.parse(address, swfPos, true, new ByteArrayInputStream(s.getBytes()), SWF.DEFAULT_VERSION);
         } catch (Exception ex) {
             Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error", ex);
-            Helper.writeFile("as2.txt", s.getBytes());
         }
         return ret;
     }

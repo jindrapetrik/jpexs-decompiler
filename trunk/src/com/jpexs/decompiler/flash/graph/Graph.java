@@ -1290,9 +1290,6 @@ public class Graph {
         GraphPart part = ret;
         while (ip < code.size()) {
             if (visited2[ip] || ((ip != startip) && (refs.get(ip).size() > 1))) {
-                if (lastIp == 497) {
-                    System.out.println("dff");
-                }
                 part.end = lastIp;
                 GraphPart found = null;
                 for (GraphPart p : allBlocks) {

@@ -724,7 +724,6 @@ public class SWFInputStream extends InputStream {
             br.append(((Action) ret.get(i)).getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), cpool.constants, version, false));
             br.append("\r\n");
         }
-        Helper.writeFile("test.txt", br.toString().getBytes());
         pools = getConstantPool(new ActionGraphSource(ret, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), ip, version);
 
         if (pools.size() == 1) {
@@ -743,16 +742,6 @@ public class SWFInputStream extends InputStream {
             ret.add(0, aj);
         }
         String s = null;
-        //Action.setConstantPool(ret, cpool);
-
-        /* try {
-         s = Highlighting.stripHilights(Action.actionsToString(address,ret, null, version, false,containerSWFOffset));
-         //System.out.println("PARSE:"+s);
-         Helper.writeFile("t.txt", s.getBytes());
-         ret = ASMParser.parse(address,containerSWFOffset,false, new ByteArrayInputStream(s.getBytes()), SWF.DEFAULT_VERSION);
-         } catch (ParseException ex) {
-         Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error", ex);
-         }*/
         List<Action> reta = new ArrayList<Action>();
         for (Object o : ret) {
             if (o instanceof Action) {
