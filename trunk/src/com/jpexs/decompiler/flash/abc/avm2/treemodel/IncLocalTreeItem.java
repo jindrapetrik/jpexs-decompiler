@@ -33,5 +33,5 @@ public class IncLocalTreeItem extends TreeItem {
     @Override
     public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         return localRegName(localRegNames, regIndex) + hilight("++");
-    }
+    }  
 }
