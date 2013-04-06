@@ -126,12 +126,11 @@ public class TraitSlotConst extends Trait {
         if (!showModifier) {
             modifier = "";
         }
-        String ret = modifier + getNameStr(abc, fullyQualifiedNames);
+        String ret = ABC.IDENT_STRING + ABC.IDENT_STRING + modifier + getNameStr(abc, fullyQualifiedNames);
         String valueStr = getValueStr(abc, fullyQualifiedNames);
         if (valueStr != null) {
             ret += " = ";
             int befLen = ret.length();
-            ret = ABC.IDENT_STRING + ABC.IDENT_STRING + ret;
             String valueStrParts[] = valueStr.split("\r\n");
             boolean first = true;
             for (int i = 0; i < valueStrParts.length; i++) {
@@ -158,8 +157,9 @@ public class TraitSlotConst extends Trait {
             }
         }
         if (ret.endsWith("\r\n")) {
-            ret = ret.substring(0, ret.length() - 2) + ";\r\n";
+            ret = ret.substring(0, ret.length() - 2);
         }
+        ret += ";";
         return ret;
     }
 
