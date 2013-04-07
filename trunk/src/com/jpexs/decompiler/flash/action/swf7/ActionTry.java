@@ -271,4 +271,9 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
     public String toString() {
         return "Try";
     }
+    
+    @Override
+    public HashMap<Integer, String> getRegNames(){
+        return new HashMap<Integer, String>();
+    }
 }

@@ -756,7 +756,7 @@ public class Action implements GraphSourceItem {
                         outs.add(new ArrayList<GraphTargetItem>());
                         continue;
                     }
-                    List<GraphTargetItem> out = ActionGraph.translateViaGraph(registerNames, variables, functions, src.subList(adr2ip(actions, endAddr, version), adr2ip(actions, endAddr + size, version)), version);
+                    List<GraphTargetItem> out = ActionGraph.translateViaGraph(cnt.getRegNames(), variables, functions, src.subList(adr2ip(actions, endAddr, version), adr2ip(actions, endAddr + size, version)), version);
                     outs.add(out);
                     endAddr += size;
                 }

@@ -19,5 +19,7 @@ public interface GraphSourceItemContainer {
 
     public boolean parseDivision(int pos, long addr, FlasmLexer lexer);
 
+    public HashMap<Integer, String> getRegNames();
+    
     public void translateContainer(List<List<GraphTargetItem>> contents, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions);
 }

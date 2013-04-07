@@ -284,8 +284,8 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
     }
 
     @Override
-    public void translateContainer(List<List<GraphTargetItem>> content, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-        HashMap<Integer, String> funcRegNames = (HashMap<Integer, String>) regNames.clone();
+    public HashMap<Integer, String> getRegNames(){
+        HashMap<Integer, String> funcRegNames = new HashMap<Integer, String>();
         for (int f = 0; f < paramNames.size(); f++) {
             int reg = paramRegisters.get(f);
             if (reg != 0) {
@@ -317,7 +317,11 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
             funcRegNames.put(pos, "_global");
             pos++;
         }
-
+        return funcRegNames;
+    }
+    
+    @Override
+    public void translateContainer(List<List<GraphTargetItem>> content, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {        
         FunctionTreeItem fti = new FunctionTreeItem(this, functionName, paramNames, content.get(0), constantPool, getFirstRegister());
         functions.put(functionName, fti);
         stack.push(fti);

@@ -121,4 +121,9 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
     public long getHeaderSize() {
         return surroundWithAction(new byte[]{0, 0}, version).length;
     }
+    
+    @Override
+    public HashMap<Integer, String> getRegNames() {
+        return new HashMap<Integer, String>();
+    }
 }
