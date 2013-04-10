@@ -20,9 +20,9 @@ import com.jpexs.decompiler.flash.ReReadableInputStream;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
-import com.jpexs.decompiler.flash.action.parser.Label;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
+import com.jpexs.decompiler.flash.action.parser.pcode.Label;
 import com.jpexs.decompiler.flash.action.treemodel.FunctionTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
@@ -57,6 +57,25 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
     private int version;
     public List<String> constantPool;
     private long hdrSize;
+
+    public ActionDefineFunction2(String functionName, boolean preloadParentFlag, boolean preloadRootFlag, boolean suppressSuperFlag, boolean preloadSuperFlag, boolean suppressArgumentsFlag, boolean preloadArgumentsFlag, boolean suppressThisFlag, boolean preloadThisFlag, boolean preloadGlobalFlag, int registerCount, int codeSize, int version, List<String> paramNames, List<Integer> paramRegisters) {
+        super(0x8E, 0);
+        this.functionName = functionName;
+        this.preloadParentFlag = preloadParentFlag;
+        this.preloadRootFlag = preloadRootFlag;
+        this.suppressSuperFlag = suppressSuperFlag;
+        this.preloadSuperFlag = preloadSuperFlag;
+        this.suppressArgumentsFlag = suppressArgumentsFlag;
+        this.preloadArgumentsFlag = preloadArgumentsFlag;
+        this.suppressThisFlag = suppressThisFlag;
+        this.preloadThisFlag = preloadThisFlag;
+        this.preloadGlobalFlag = preloadGlobalFlag;
+        this.registerCount = registerCount;
+        this.codeSize = codeSize;
+        this.version = version;
+        this.paramNames = paramNames;
+        this.paramRegisters = paramRegisters;
+    }
 
     public ActionDefineFunction2(int actionLength, SWFInputStream sis, ReReadableInputStream rri, int version) throws IOException {
         super(0x8E, actionLength);
@@ -284,7 +303,7 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
     }
 
     @Override
-    public HashMap<Integer, String> getRegNames(){
+    public HashMap<Integer, String> getRegNames() {
         HashMap<Integer, String> funcRegNames = new HashMap<Integer, String>();
         for (int f = 0; f < paramNames.size(); f++) {
             int reg = paramRegisters.get(f);
@@ -319,9 +338,9 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
         }
         return funcRegNames;
     }
-    
+
     @Override
-    public void translateContainer(List<List<GraphTargetItem>> content, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {        
+    public void translateContainer(List<List<GraphTargetItem>> content, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
         FunctionTreeItem fti = new FunctionTreeItem(this, functionName, paramNames, content.get(0), constantPool, getFirstRegister());
         functions.put(functionName, fti);
         stack.push(fti);

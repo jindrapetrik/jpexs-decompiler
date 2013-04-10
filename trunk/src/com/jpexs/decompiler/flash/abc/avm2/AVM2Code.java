@@ -2411,24 +2411,24 @@ public class AVM2Code implements Serializable {
         public boolean skipUsed = false;
     }
 
-    private static int removeTraps(boolean secondPass, boolean useVisited,List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, int lastIp, List<Integer> visited,HashMap<GraphSourceItem, Decision> decisions) {
+    private static int removeTraps(boolean secondPass, boolean useVisited, List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, int lastIp, List<Integer> visited, HashMap<GraphSourceItem, Decision> decisions) {
         boolean debugMode = false;
         int ret = 0;
         while ((ip > -1) && ip < code.size()) {
-            if(useVisited && visited.contains(ip)){
+            if (useVisited && visited.contains(ip)) {
                 break;
             }
-            if(!visited.contains(ip)){
+            if (!visited.contains(ip)) {
                 visited.add(ip);
             }
             lastIp = ip;
             GraphSourceItem ins = code.get(ip);
-            if(ins.isIgnored()){
+            if (ins.isIgnored()) {
                 ip++;
                 continue;
-            }            
+            }
             if (debugMode) {
-                System.out.println((useVisited?"useV ":"")+"Visit " + ip + ": " + ins + " stack:" + Highlighting.stripHilights(stack.toString()));
+                System.out.println((useVisited ? "useV " : "") + "Visit " + ip + ": " + ins + " stack:" + Highlighting.stripHilights(stack.toString()));
             }
             if ((ins instanceof AVM2Instruction) && (((AVM2Instruction) ins).definition instanceof NewFunctionIns)) {
                 stack.push(new BooleanTreeItem(null, true));
@@ -2454,7 +2454,7 @@ public class AVM2Code implements Serializable {
                     Decision dec = new Decision();
                     if (decisions.containsKey(ins)) {
                         dec = decisions.get(ins);
-                    }else{
+                    } else {
                         decisions.put(ins, dec);
                     }
                     if (condition) {
@@ -2472,7 +2472,7 @@ public class AVM2Code implements Serializable {
                         }
                     }
                     GraphTargetItem tar = stack.pop();
-                    if (secondPass && (dec.jumpUsed != dec.skipUsed)) {                        
+                    if (secondPass && (dec.jumpUsed != dec.skipUsed)) {
                         for (GraphSourceItemPos pos : tar.getNeededSources()) {
                             if (pos.item != ins) {
                                 pos.item.setIgnored(true);
@@ -2480,7 +2480,7 @@ public class AVM2Code implements Serializable {
                         }
                     }
 
-                    ret += removeTraps(secondPass,useVisited, localData, stack, output, code, condition ? branches.get(0) : branches.get(1), ip, visited,decisions);
+                    ret += removeTraps(secondPass, useVisited, localData, stack, output, code, condition ? branches.get(0) : branches.get(1), ip, visited, decisions);
                 } else {
                     if (ins.isBranch() && (!ins.isJump())) {
                         stack.pop();
@@ -2489,7 +2489,7 @@ public class AVM2Code implements Serializable {
                     for (int b : branches) {
                         Stack<GraphTargetItem> brStack = (Stack<GraphTargetItem>) stack.clone();
                         if (b >= 0) {
-                            ret += removeTraps(secondPass,useVisited||(!ins.isJump()), localData, brStack, output, code, b, ip, visited,decisions);
+                            ret += removeTraps(secondPass, useVisited || (!ins.isJump()), localData, brStack, output, code, b, ip, visited, decisions);
                         } else {
                             if (debugMode) {
                                 System.out.println("Negative branch:" + b);
@@ -2508,8 +2508,8 @@ public class AVM2Code implements Serializable {
     }
 
     public static int removeTraps(List localData, AVM2GraphSource code, int addr) {
-        HashMap<GraphSourceItem, AVM2Code.Decision> decisions=new HashMap<GraphSourceItem, AVM2Code.Decision>();
-        removeTraps(false,false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0,new ArrayList<Integer>(), decisions);
-        return removeTraps(true,false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0,new ArrayList<Integer>(),decisions);
+        HashMap<GraphSourceItem, AVM2Code.Decision> decisions = new HashMap<GraphSourceItem, AVM2Code.Decision>();
+        removeTraps(false, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0, new ArrayList<Integer>(), decisions);
+        return removeTraps(true, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0, new ArrayList<Integer>(), decisions);
     }
 }

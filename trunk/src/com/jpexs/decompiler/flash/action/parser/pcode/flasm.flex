@@ -1,7 +1,8 @@
 /* Flash assembler language lexer specification */
 
-package com.jpexs.decompiler.flash.action.parser;
+package com.jpexs.decompiler.flash.action.parser.pcode;
 
+import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf4.Undefined;
@@ -16,7 +17,7 @@ import com.jpexs.decompiler.flash.action.swf4.Null;
 %char
 %line
 %column
-%type ParsedSymbol
+%type ASMParsedSymbol
 %throws ParseException
 
 %{
@@ -104,14 +105,14 @@ Constant= constant{PositiveNumberLiteral}
 
   {Label}                        {
                                     String s=yytext();
-                                    return new ParsedSymbol(ParsedSymbol.TYPE_LABEL,s.substring(0,s.length()-1));
+                                    return new ASMParsedSymbol(ASMParsedSymbol.TYPE_LABEL,s.substring(0,s.length()-1));
                                 }
 
   /* identifiers */ 
   {InstructionName}                   { yybegin(PARAMETERS);
-                                        return new ParsedSymbol(ParsedSymbol.TYPE_INSTRUCTION_NAME,yytext());
+                                        return new ASMParsedSymbol(ASMParsedSymbol.TYPE_INSTRUCTION_NAME,yytext());
                                       }
-  {EndOfBlock}                        {  return new ParsedSymbol(ParsedSymbol.TYPE_BLOCK_END); }
+  {EndOfBlock}                        {  return new ASMParsedSymbol(ASMParsedSymbol.TYPE_BLOCK_END); }
 }
 
 <PARAMETERS> {
@@ -123,20 +124,20 @@ Constant= constant{PositiveNumberLiteral}
 
   /* numeric literals */
 
-  {NumberLiteral}            { return new ParsedSymbol(ParsedSymbol.TYPE_INTEGER,new Long(Long.parseLong((yytext()))));  }
-  {FloatLiteral}                 { return new ParsedSymbol(ParsedSymbol.TYPE_FLOAT,new Double(Double.parseDouble((yytext()))));  }
-  {LineTerminator}      {yybegin(YYINITIAL); return new ParsedSymbol(ParsedSymbol.TYPE_EOL); }
-  {Comment}             {return new ParsedSymbol(ParsedSymbol.TYPE_COMMENT,yytext().substring(1));}
-  {StartOfBlock}                        {  yybegin(YYINITIAL); return new ParsedSymbol(ParsedSymbol.TYPE_BLOCK_START); }
-  {True}                {return new ParsedSymbol(ParsedSymbol.TYPE_BOOLEAN,Boolean.TRUE);}
-  {False}                {return new ParsedSymbol(ParsedSymbol.TYPE_BOOLEAN,Boolean.FALSE);}
-  {Null}                {return new ParsedSymbol(ParsedSymbol.TYPE_NULL,new Null());}
-  {Undefined}                {return new ParsedSymbol(ParsedSymbol.TYPE_UNDEFINED,new Undefined());}
+  {NumberLiteral}            { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_INTEGER,new Long(Long.parseLong((yytext()))));  }
+  {FloatLiteral}                 { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_FLOAT,new Double(Double.parseDouble((yytext()))));  }
+  {LineTerminator}      {yybegin(YYINITIAL); return new ASMParsedSymbol(ASMParsedSymbol.TYPE_EOL); }
+  {Comment}             {return new ASMParsedSymbol(ASMParsedSymbol.TYPE_COMMENT,yytext().substring(1));}
+  {StartOfBlock}                        {  yybegin(YYINITIAL); return new ASMParsedSymbol(ASMParsedSymbol.TYPE_BLOCK_START); }
+  {True}                {return new ASMParsedSymbol(ASMParsedSymbol.TYPE_BOOLEAN,Boolean.TRUE);}
+  {False}                {return new ASMParsedSymbol(ASMParsedSymbol.TYPE_BOOLEAN,Boolean.FALSE);}
+  {Null}                {return new ASMParsedSymbol(ASMParsedSymbol.TYPE_NULL,new Null());}
+  {Undefined}                {return new ASMParsedSymbol(ASMParsedSymbol.TYPE_UNDEFINED,new Undefined());}
 
-  {Register}              { return new ParsedSymbol(ParsedSymbol.TYPE_REGISTER,new RegisterNumber(Integer.parseInt(yytext().substring(8))));  }
-  {Constant}              { return new ParsedSymbol(ParsedSymbol.TYPE_CONSTANT,new ConstantIndex(Integer.parseInt(yytext().substring(8))));  }
+  {Register}              { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_REGISTER,new RegisterNumber(Integer.parseInt(yytext().substring(8))));  }
+  {Constant}              { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_CONSTANT,new ConstantIndex(Integer.parseInt(yytext().substring(8))));  }
 
-  {Identifier}            { return new ParsedSymbol(ParsedSymbol.TYPE_IDENTIFIER,yytext());  }
+  {Identifier}            { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_IDENTIFIER,yytext());  }
       
 }
 
@@ -144,7 +145,7 @@ Constant= constant{PositiveNumberLiteral}
   \"                             {
                                      yybegin(PARAMETERS);
                                      // length also includes the trailing quote
-                                     return new ParsedSymbol(ParsedSymbol.TYPE_STRING,string.toString());
+                                     return new ASMParsedSymbol(ASMParsedSymbol.TYPE_STRING,string.toString());
                                  }
 
   {StringCharacter}+             { string.append( yytext() ); }
@@ -169,4 +170,4 @@ Constant= constant{PositiveNumberLiteral}
 
 /* error fallback */
 .|\n                             { }
-<<EOF>>                          { return new ParsedSymbol(ParsedSymbol.TYPE_EOF); }
+<<EOF>>                          { return new ASMParsedSymbol(ASMParsedSymbol.TYPE_EOF); }

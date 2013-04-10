@@ -35,6 +35,10 @@ public class SetMemberTreeItem extends TreeItem implements SetTypeTreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
+        if (!((objectName instanceof DirectValueTreeItem) && (((DirectValueTreeItem) objectName).value instanceof String))) {
+            //if(!(functionName instanceof GetVariableTreeItem))
+            return object.toString(constants) + "[" + stripQuotes(objectName, constants) + "]" + "=" + value.toString(constants);
+        }
         return object.toString(constants) + "." + stripQuotes(objectName, constants) + "=" + value.toString(constants);
     }
 

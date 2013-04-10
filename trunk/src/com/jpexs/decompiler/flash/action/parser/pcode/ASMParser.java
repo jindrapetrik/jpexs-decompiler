@@ -14,11 +14,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.action.parser;
+package com.jpexs.decompiler.flash.action.parser.pcode;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.flashlite.ActionFSCommand2;
 import com.jpexs.decompiler.flash.action.flashlite.ActionStrictMode;
+import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.special.ActionNop;
 import com.jpexs.decompiler.flash.action.swf3.*;
 import com.jpexs.decompiler.flash.action.swf4.*;
@@ -43,10 +44,10 @@ public class ASMParser {
         Stack<GraphSourceItemContainer> containers = new Stack<GraphSourceItemContainer>();
         HashMap<GraphSourceItemContainer, Integer> containerPos = new HashMap<GraphSourceItemContainer, Integer>();
         while (true) {
-            ParsedSymbol symb = lexer.yylex();
-            if (symb.type == ParsedSymbol.TYPE_LABEL) {
+            ASMParsedSymbol symb = lexer.yylex();
+            if (symb.type == ASMParsedSymbol.TYPE_LABEL) {
                 labels.add(new Label((String) symb.value, address));
-            } else if (symb.type == ParsedSymbol.TYPE_COMMENT) {
+            } else if (symb.type == ASMParsedSymbol.TYPE_COMMENT) {
                 if (!list.isEmpty()) {
                     String cmt = (String) symb.value;
                     if (cmt.equals("compileTime")) {
@@ -56,7 +57,7 @@ public class ASMParser {
                         }
                     }
                 }
-            } else if (symb.type == ParsedSymbol.TYPE_BLOCK_END) {
+            } else if (symb.type == ASMParsedSymbol.TYPE_BLOCK_END) {
                 if (containers.isEmpty()) {
                     throw new ParseException("Block end without start", lexer.yyline());
                 }
@@ -66,7 +67,7 @@ public class ASMParser {
                 if (!a.parseDivision(pos, address, lexer)) {
                     containers.pop();
                 }
-            } else if (symb.type == ParsedSymbol.TYPE_INSTRUCTION_NAME) {
+            } else if (symb.type == ASMParsedSymbol.TYPE_INSTRUCTION_NAME) {
                 String instructionName = ((String) symb.value).toLowerCase();
                 Action a = null;
                 if (instructionName.equals("GetURL".toLowerCase())) {
@@ -298,8 +299,8 @@ public class ASMParser {
                 if (a != null) {
                     list.add(a);
                 }
-            } else if (symb.type == ParsedSymbol.TYPE_EOL) {
-            } else if ((symb.type == ParsedSymbol.TYPE_BLOCK_END) || (symb.type == ParsedSymbol.TYPE_EOF)) {
+            } else if (symb.type == ASMParsedSymbol.TYPE_EOL) {
+            } else if ((symb.type == ASMParsedSymbol.TYPE_BLOCK_END) || (symb.type == ASMParsedSymbol.TYPE_EOF)) {
                 return list;
             } else {
                 throw new ParseException("Label or Instruction name expected, found:" + symb.type + " " + symb.value, lexer.yyline());

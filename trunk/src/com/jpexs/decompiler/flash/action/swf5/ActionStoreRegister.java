@@ -19,8 +19,8 @@ package com.jpexs.decompiler.flash.action.swf5;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.treemodel.StoreRegisterTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
@@ -34,6 +34,11 @@ import java.util.Stack;
 public class ActionStoreRegister extends Action {
 
     public int registerNumber;
+
+    public ActionStoreRegister(int registerNumber) {
+        super(0x87, 1);
+        this.registerNumber = registerNumber;
+    }
 
     public ActionStoreRegister(SWFInputStream sis) throws IOException {
         super(0x87, 1);

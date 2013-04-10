@@ -14,9 +14,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.action.parser;
+package com.jpexs.decompiler.flash.action.parser.pcode;
 
-public class ParsedSymbol {
+public class ASMParsedSymbol {
 
     public int type;
     public Object value;
@@ -38,12 +38,12 @@ public class ParsedSymbol {
     public static final int TYPE_EOL = 16;
     public static final int TYPE_CONSTANT_LITERAL = 17;
 
-    public ParsedSymbol(int type, Object value) {
+    public ASMParsedSymbol(int type, Object value) {
         this.type = type;
         this.value = value;
     }
 
-    public ParsedSymbol(int type) {
+    public ASMParsedSymbol(int type) {
         this.type = type;
     }
 }

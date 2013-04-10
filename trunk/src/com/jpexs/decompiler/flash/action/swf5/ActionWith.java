@@ -20,9 +20,9 @@ import com.jpexs.decompiler.flash.ReReadableInputStream;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
-import com.jpexs.decompiler.flash.action.parser.Label;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
+import com.jpexs.decompiler.flash.action.parser.pcode.Label;
 import com.jpexs.decompiler.flash.action.treemodel.clauses.WithTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
@@ -121,7 +121,7 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
     public long getHeaderSize() {
         return surroundWithAction(new byte[]{0, 0}, version).length;
     }
-    
+
     @Override
     public HashMap<Integer, String> getRegNames() {
         return new HashMap<Integer, String>();

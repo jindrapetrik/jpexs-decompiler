@@ -19,10 +19,10 @@ package com.jpexs.decompiler.flash.action;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.action.parser.ASMParser;
-import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
-import com.jpexs.decompiler.flash.action.parser.ParsedSymbol;
+import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
+import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
+import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.swf4.*;
 import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf6.ActionEnumerate2;
@@ -215,8 +215,8 @@ public class Action implements GraphSourceItem {
      * @throws ParseException When read object is not String
      */
     protected String lexString(FlasmLexer lex) throws IOException, ParseException {
-        ParsedSymbol symb = lex.yylex();
-        if (symb.type != ParsedSymbol.TYPE_STRING) {
+        ASMParsedSymbol symb = lex.yylex();
+        if (symb.type != ASMParsedSymbol.TYPE_STRING) {
             throw new ParseException("String expected", lex.yyline());
         }
         return (String) symb.value;
@@ -230,8 +230,8 @@ public class Action implements GraphSourceItem {
      * @throws ParseException When read object is not Block startServer
      */
     protected void lexBlockOpen(FlasmLexer lex) throws IOException, ParseException {
-        ParsedSymbol symb = lex.yylex();
-        if (symb.type != ParsedSymbol.TYPE_BLOCK_START) {
+        ASMParsedSymbol symb = lex.yylex();
+        if (symb.type != ASMParsedSymbol.TYPE_BLOCK_START) {
             throw new ParseException("Block startServer ", lex.yyline());
         }
     }
@@ -245,8 +245,8 @@ public class Action implements GraphSourceItem {
      * @throws ParseException When read object is not Identifier
      */
     protected String lexIdentifier(FlasmLexer lex) throws IOException, ParseException {
-        ParsedSymbol symb = lex.yylex();
-        if (symb.type != ParsedSymbol.TYPE_IDENTIFIER) {
+        ASMParsedSymbol symb = lex.yylex();
+        if (symb.type != ASMParsedSymbol.TYPE_IDENTIFIER) {
             throw new ParseException("Identifier expected", lex.yyline());
         }
         return (String) symb.value;
@@ -261,8 +261,8 @@ public class Action implements GraphSourceItem {
      * @throws ParseException When read object is not long value
      */
     protected long lexLong(FlasmLexer lex) throws IOException, ParseException {
-        ParsedSymbol symb = lex.yylex();
-        if (symb.type != ParsedSymbol.TYPE_INTEGER) {
+        ASMParsedSymbol symb = lex.yylex();
+        if (symb.type != ASMParsedSymbol.TYPE_INTEGER) {
             throw new ParseException("Integer expected", lex.yyline());
         }
         return (Long) symb.value;
@@ -277,8 +277,8 @@ public class Action implements GraphSourceItem {
      * @throws ParseException When read object is not boolean value
      */
     protected boolean lexBoolean(FlasmLexer lex) throws IOException, ParseException {
-        ParsedSymbol symb = lex.yylex();
-        if (symb.type != ParsedSymbol.TYPE_BOOLEAN) {
+        ASMParsedSymbol symb = lex.yylex();
+        if (symb.type != ASMParsedSymbol.TYPE_BOOLEAN) {
             throw new ParseException("Boolean expected", lex.yyline());
         }
         return (Boolean) symb.value;

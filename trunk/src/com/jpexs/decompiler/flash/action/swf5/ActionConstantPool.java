@@ -19,9 +19,9 @@ package com.jpexs.decompiler.flash.action.swf5;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
-import com.jpexs.decompiler.flash.action.parser.ParsedSymbol;
+import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
+import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.io.ByteArrayOutputStream;
@@ -47,8 +47,8 @@ public class ActionConstantPool extends Action {
     public ActionConstantPool(FlasmLexer lexer) throws IOException, ParseException {
         super(0x88, 0);
         while (true) {
-            ParsedSymbol symb = lexer.yylex();
-            if (symb.type == ParsedSymbol.TYPE_STRING) {
+            ASMParsedSymbol symb = lexer.yylex();
+            if (symb.type == ASMParsedSymbol.TYPE_STRING) {
                 constantPool.add((String) symb.value);
             } else {
                 lexer.yypushback(lexer.yylength());

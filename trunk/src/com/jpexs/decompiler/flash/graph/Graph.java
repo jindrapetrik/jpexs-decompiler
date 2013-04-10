@@ -992,10 +992,9 @@ public class Graph {
                     if (debugMode) {
                         System.err.println("ONFALSE: (inside " + part + ")");
                     }
-                    if((next == part.nextParts.get(0)) || (part.nextParts.get(0).path.equals(part.path) || part.nextParts.get(0).path.length() < part.path.length()))
-                    {
-                        onFalse=new ArrayList<GraphTargetItem>();
-                    }else{
+                    if ((next == part.nextParts.get(0)) || (part.nextParts.get(0).path.equals(part.path) || part.nextParts.get(0).path.length() < part.path.length())) {
+                        onFalse = new ArrayList<GraphTargetItem>();
+                    } else {
                         onFalse = (printGraph(prepareBranchLocalData(localData), falseStack, allParts, part, part.nextParts.get(0), next == null ? stopPart : next, loops, forFinalCommands));
                     }
                     if (debugMode) {
@@ -1009,13 +1008,13 @@ public class Graph {
                     if (whileTrue) {
                         retw = new ArrayList<GraphTargetItem>();
                         retw.add(new IfItem(null, expr, onTrue, onFalse));
-                        
+
                         List<GraphTargetItem> body = new ArrayList<GraphTargetItem>();
-                        if(next!=null){
-                            body=printGraph(prepareBranchLocalData(localData), stack, allParts, part,next, stopPart, loops, forFinalCommands);
+                        if (next != null) {
+                            body = printGraph(prepareBranchLocalData(localData), stack, allParts, part, next, stopPart, loops, forFinalCommands);
                         }
                         retw.addAll(body);
-                    
+
                         retx.add(new WhileItem(null, whileTrueLoop, new TrueItem(null), retw));
                         next = null;
                     } else {
@@ -1056,7 +1055,7 @@ public class Graph {
                 if (doWhile) {
                     loopBodyStart = next;
                 }
-                if(whileTrue){
+                if (whileTrue) {
                     loopBodyStart = part;
                 }
             }

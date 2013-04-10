@@ -20,8 +20,8 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
-import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.graph.GraphSource;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
@@ -46,6 +46,11 @@ public class ActionIf extends Action {
 
     public final void setJumpOffset(int offset) {
         this.offset = offset;
+    }
+
+    public ActionIf(int offset) {
+        super(0x9D, 2);
+        setJumpOffset(offset);
     }
 
     public ActionIf(SWFInputStream sis) throws IOException {

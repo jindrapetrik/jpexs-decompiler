@@ -20,7 +20,10 @@ import com.jpexs.decompiler.flash.ReReadableInputStream;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.parser.*;
+import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
+import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
+import com.jpexs.decompiler.flash.action.parser.pcode.Label;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
@@ -98,14 +101,14 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
         super(0x8F, 0);
         this.version = version;
 
-        ParsedSymbol symb = lexer.yylex();
-        if (symb.type == ParsedSymbol.TYPE_STRING) {
+        ASMParsedSymbol symb = lexer.yylex();
+        if (symb.type == ASMParsedSymbol.TYPE_STRING) {
             catchInRegisterFlag = false;
             catchName = (String) symb.value;
-        } else if (symb.type == ParsedSymbol.TYPE_REGISTER) {
+        } else if (symb.type == ASMParsedSymbol.TYPE_REGISTER) {
             catchRegister = (Integer) symb.value;
             catchInRegisterFlag = true;
-        } else if (symb.type == ParsedSymbol.TYPE_BLOCK_START) {
+        } else if (symb.type == ASMParsedSymbol.TYPE_BLOCK_START) {
             return;
         } else {
             throw new ParseException("Unknown symbol after Try", lexer.yyline());
@@ -202,16 +205,16 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
     @Override
     public boolean parseDivision(int pos, long addr, FlasmLexer lexer) {
         try {
-            ParsedSymbol symb = lexer.yylex();
+            ASMParsedSymbol symb = lexer.yylex();
             //catchBlockFlag = false;
-            if (symb.type == ParsedSymbol.TYPE_INSTRUCTION_NAME) {
+            if (symb.type == ASMParsedSymbol.TYPE_INSTRUCTION_NAME) {
                 if (((String) symb.value).toLowerCase().equals("catch")) {
                     trySize = addr - getAddress() - getHeaderSize();
                     catchBlockFlag = true;
                     lexBlockOpen(lexer);
                     return true;
                 }
-                if (symb.type == ParsedSymbol.TYPE_INSTRUCTION_NAME) {
+                if (symb.type == ASMParsedSymbol.TYPE_INSTRUCTION_NAME) {
                     if (((String) symb.value).toLowerCase().equals("finally")) {
                         if (catchBlockFlag) {
                             catchSize = addr - getAddress() - getHeaderSize() - trySize;
@@ -271,9 +274,9 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
     public String toString() {
         return "Try";
     }
-    
+
     @Override
-    public HashMap<Integer, String> getRegNames(){
+    public HashMap<Integer, String> getRegNames() {
         return new HashMap<Integer, String>();
     }
 }

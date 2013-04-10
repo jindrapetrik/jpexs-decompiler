@@ -20,8 +20,8 @@ import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.gui.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.action.ActionGraph;
-import com.jpexs.decompiler.flash.action.parser.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.gui.View;
@@ -118,7 +118,16 @@ public class ActionPanel extends JPanel implements ActionListener {
                     //com.jpexs.decompiler.flash.action.Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
                     String s = com.jpexs.decompiler.flash.action.Action.actionsToSource(as, SWF.DEFAULT_VERSION);
                     decompiledHilights = Highlighting.getInstrHighlights(s);
-                    decompiledEditor.setText(Highlighting.stripHilights(s));
+                    String stripped = Highlighting.stripHilights(s);
+                    /*try {
+                     ActionScriptParser.parse(stripped);
+                     } catch (ParseException ex) {
+                     JOptionPane.showMessageDialog(null, ex.getMessage());
+                     Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
+                     } catch (IOException ex) {
+                     Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
+                     }*/
+                    decompiledEditor.setText(stripped);
                 }
                 setEditMode(false);
                 Main.stopWork();

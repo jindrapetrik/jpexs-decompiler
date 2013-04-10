@@ -15,7 +15,6 @@ import java.awt.Graphics;
 import java.awt.Panel;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JFrame;
@@ -84,8 +83,7 @@ public class FlashPlayerPanel extends Panel {
 
         SHELLEXECUTEINFO sei = new SHELLEXECUTEINFO();
         sei.fMask = 0x00000040;
-        String path = new File(new File(".").getAbsolutePath()).getParentFile().getAbsolutePath();
-        sei.lpFile = new WString(path + "\\lib\\FlashPlayer.exe");
+        sei.lpFile = new WString("lib\\FlashPlayer.exe");
         sei.lpParameters = new WString(hwnd.getPointer().hashCode() + " " + hwndFrame.getPointer().hashCode());
         sei.nShow = WinUser.SW_NORMAL;
         Shell32.INSTANCE.ShellExecuteEx(sei);

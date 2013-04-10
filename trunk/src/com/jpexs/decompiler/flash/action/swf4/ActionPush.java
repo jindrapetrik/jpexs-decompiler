@@ -19,9 +19,9 @@ package com.jpexs.decompiler.flash.action.swf4;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.parser.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
-import com.jpexs.decompiler.flash.action.parser.ParsedSymbol;
+import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
+import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -142,6 +142,14 @@ public class ActionPush extends Action {
         return surroundWithAction(baos.toByteArray(), version);
     }
 
+    public ActionPush(Object... values) throws IOException, ParseException {
+        super(0x96, 0);
+        this.values = new ArrayList<Object>();
+        for (Object o : values) {
+            this.values.add(o);
+        }
+    }
+
     public ActionPush(FlasmLexer lexer, List<String> constantPool) throws IOException, ParseException {
         super(0x96, 0);
         this.constantPool = constantPool;
@@ -149,9 +157,9 @@ public class ActionPush extends Action {
         int count = 0;
         loop:
         while (true) {
-            ParsedSymbol symb = lexer.yylex();
+            ASMParsedSymbol symb = lexer.yylex();
             switch (symb.type) {
-                case ParsedSymbol.TYPE_STRING:
+                case ASMParsedSymbol.TYPE_STRING:
                     count++;
                     if (constantPool.contains((String) symb.value)) {
                         values.add(new ConstantIndex(constantPool.indexOf(symb.value), constantPool));
@@ -159,24 +167,24 @@ public class ActionPush extends Action {
                         values.add(symb.value);
                     }
                     break;
-                case ParsedSymbol.TYPE_FLOAT:
-                case ParsedSymbol.TYPE_NULL:
-                case ParsedSymbol.TYPE_UNDEFINED:
-                case ParsedSymbol.TYPE_REGISTER:
-                case ParsedSymbol.TYPE_BOOLEAN:
-                case ParsedSymbol.TYPE_INTEGER:
-                case ParsedSymbol.TYPE_CONSTANT:
+                case ASMParsedSymbol.TYPE_FLOAT:
+                case ASMParsedSymbol.TYPE_NULL:
+                case ASMParsedSymbol.TYPE_UNDEFINED:
+                case ASMParsedSymbol.TYPE_REGISTER:
+                case ASMParsedSymbol.TYPE_BOOLEAN:
+                case ASMParsedSymbol.TYPE_INTEGER:
+                case ASMParsedSymbol.TYPE_CONSTANT:
                     count++;
                     values.add(symb.value);
                     break;
-                case ParsedSymbol.TYPE_EOL:
-                case ParsedSymbol.TYPE_EOF:
+                case ASMParsedSymbol.TYPE_EOL:
+                case ASMParsedSymbol.TYPE_EOF:
                     if (count == 0) {
                         throw new ParseException("Arguments expected", lexer.yyline());
                     } else {
                         break loop;
                     }
-                case ParsedSymbol.TYPE_COMMENT:
+                case ASMParsedSymbol.TYPE_COMMENT:
                     break;
                 default:
                     throw new ParseException("Arguments expected", lexer.yyline());

@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.DecLocalTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.IntegerValueTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.AddTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.SubtractTreeItem;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -61,6 +60,6 @@ public class DecLocalIIns extends InstructionDefinition {
         int regIndex = ins.operands[0];
         output.add(new DecLocalTreeItem(ins, regIndex));
         localRegs.put(regIndex, new SubtractTreeItem(ins, localRegs.get(regIndex), new IntegerValueTreeItem(ins, new Long(1))));
-    
+
     }
 }
