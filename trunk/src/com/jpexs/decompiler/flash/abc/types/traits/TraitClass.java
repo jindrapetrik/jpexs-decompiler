@@ -34,7 +34,8 @@ import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
@@ -65,7 +66,7 @@ public class TraitClass extends Trait {
         return "Class " + abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " class_info=" + class_info + " metadata=" + Helper.intArrToString(metadata);
     }
 
-    private boolean parseUsagesFromNS(List<DoABCTag> abcTags, ABC abc, List imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
+    private boolean parseUsagesFromNS(List<ABCContainerTag> abcTags, ABC abc, List imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
         Namespace ns = abc.constants.constant_namespace[namespace_index];
         if (name.equals("")) {
             name = "*";
@@ -74,8 +75,8 @@ public class TraitClass extends Trait {
         /*if (ns.kind == Namespace.KIND_NAMESPACE)*/ {
             String oldimport = newimport;
             newimport = null;
-            for (DoABCTag abcTag : abcTags) {
-                String newname = abcTag.abc.nsValueToName(oldimport);
+            for (ABCContainerTag abcTag : abcTags) {
+                String newname = abcTag.getABC().nsValueToName(oldimport);
                 if (newname.equals("-")) {
                     return true;
                 }
@@ -110,7 +111,7 @@ public class TraitClass extends Trait {
         return false;
     }
 
-    private void parseImportsUsagesFromNS(List<DoABCTag> abcTags, ABC abc, List imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
+    private void parseImportsUsagesFromNS(List<ABCContainerTag> abcTags, ABC abc, List imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
         Namespace ns = abc.constants.constant_namespace[namespace_index];
         if (name.equals("")) {
             name = "*";
@@ -138,7 +139,7 @@ public class TraitClass extends Trait {
         //}
     }
 
-    private void parseUsagesFromMultiname(List<DoABCTag> abcTags, ABC abc, List<String> imports, List<String> uses, Multiname m, String ignorePackage, List<String> fullyQualifiedNames) {
+    private void parseUsagesFromMultiname(List<ABCContainerTag> abcTags, ABC abc, List<String> imports, List<String> uses, Multiname m, String ignorePackage, List<String> fullyQualifiedNames) {
         if (m != null) {
             if (m.kind == Multiname.TYPENAME) {
                 if (m.qname_index != 0) {
@@ -165,7 +166,7 @@ public class TraitClass extends Trait {
         }
     }
 
-    private void parseImportsUsagesFromMultiname(List<DoABCTag> abcTags, ABC abc, List<String> imports, List<String> uses, Multiname m, String ignorePackage, List<String> fullyQualifiedNames) {
+    private void parseImportsUsagesFromMultiname(List<ABCContainerTag> abcTags, ABC abc, List<String> imports, List<String> uses, Multiname m, String ignorePackage, List<String> fullyQualifiedNames) {
         if (m != null) {
             if (m.kind == Multiname.TYPENAME) {
                 if (m.qname_index != 0) {
@@ -192,8 +193,8 @@ public class TraitClass extends Trait {
         }
     }
 
-    private void parseImportsUsagesFromMethodInfo(List<DoABCTag> abcTags, ABC abc, int method_index, List<String> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames, List<Integer> visitedMethods) {
-        if (method_index >= abc.method_info.length) {
+    private void parseImportsUsagesFromMethodInfo(List<ABCContainerTag> abcTags, ABC abc, int method_index, List<String> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames, List<Integer> visitedMethods) {
+        if ((method_index<0)  || (method_index >= abc.method_info.length)) {
             return;
         }
         visitedMethods.add(method_index);
@@ -241,13 +242,13 @@ public class TraitClass extends Trait {
         }
     }
 
-    private void parseImportsUsagesFromTraits(List<DoABCTag> abcTags, ABC abc, Traits ts, List<String> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames) {
+    private void parseImportsUsagesFromTraits(List<ABCContainerTag> abcTags, ABC abc, Traits ts, List<String> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames) {
         for (Trait t : ts.traits) {
             parseImportsUsagesFromTrait(abcTags, abc, t, imports, uses, ignorePackage, fullyQualifiedNames);
         }
     }
 
-    private void parseImportsUsagesFromTrait(List<DoABCTag> abcTags, ABC abc, Trait t, List<String> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames) {
+    private void parseImportsUsagesFromTrait(List<ABCContainerTag> abcTags, ABC abc, Trait t, List<String> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames) {
         if (t instanceof TraitMethodGetterSetter) {
             TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
             parseImportsUsagesFromMultiname(abcTags, abc, imports, uses, abc.constants.constant_multiname[tm.name_index], ignorePackage, fullyQualifiedNames);
@@ -263,7 +264,7 @@ public class TraitClass extends Trait {
         }
     }
 
-    private List getImportsUsages(List<DoABCTag> abcTags, ABC abc, List<String> imports, List<String> uses, List<String> fullyQualifiedNames) {
+    private List getImportsUsages(List<ABCContainerTag> abcTags, ABC abc, List<String> imports, List<String> uses, List<String> fullyQualifiedNames) {
         //constructor
 
 
@@ -294,13 +295,13 @@ public class TraitClass extends Trait {
     }
 
     @Override
-    public String convertHeader(String path, List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+    public String convertHeader(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
         String classHeader = abc.instance_info[class_info].getClassHeaderStr(abc, fullyQualifiedNames);
         return classHeader;
     }
 
     @Override
-    public String convert(String path, List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+    public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
         if (!highlight) {
             Highlighting.doHighlight = false;
         }
@@ -316,9 +317,9 @@ public class TraitClass extends Trait {
         String packageName = abc.instance_info[class_info].getName(abc.constants).getNamespace(abc.constants).getName(abc.constants);
 
         List<String> namesInThisPackage = new ArrayList<String>();
-        for (DoABCTag tag : abcTags) {
-            for (ScriptInfo si : tag.abc.script_info) {
-                String spath = si.getPath(tag.abc);
+        for (ABCContainerTag tag : abcTags) {
+            for (ScriptInfo si : tag.getABC().script_info) {
+                String spath = si.getPath(tag.getABC());
                 String pkg = "";
                 String name = spath;
                 if (spath.contains(".")) {

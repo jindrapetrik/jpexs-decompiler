@@ -20,7 +20,8 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.helpers.Helper;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import java.io.Serializable;
 import java.util.List;
 
@@ -44,7 +45,7 @@ public abstract class Trait implements Serializable {
     public static final int TRAIT_FUNCTION = 5;
     public static final int TRAIT_CONST = 6;
 
-    public String getModifiers(List<DoABCTag> abcTags, ABC abc, boolean isStatic) {
+    public String getModifiers(List<ABCContainerTag> abcTags, ABC abc, boolean isStatic) {
         String ret = "";
         if ((kindFlags & ATTR_Override) > 0) {
             ret += "override";
@@ -54,8 +55,8 @@ public abstract class Trait implements Serializable {
             String nsname = "";
             //if (abc.constants.constant_namespace[m.namespace_index].kind == Namespace.KIND_NAMESPACE) {
             {
-                for (DoABCTag abcTag : abcTags) {
-                    nsname = abcTag.abc.nsValueToName(abc.constants.constant_namespace[m.namespace_index].getName(abc.constants));
+                for (ABCContainerTag abcTag : abcTags) {
+                    nsname = abcTag.getABC().nsValueToName(abc.constants.constant_namespace[m.namespace_index].getName(abc.constants));
                     if (nsname.equals("-")) {
                         break;
                     }
@@ -110,15 +111,15 @@ public abstract class Trait implements Serializable {
         return abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
     }
 
-    public String convert(String path, List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+    public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
         return abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
     }
 
-    public String convertPackaged(String path, List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcod, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+    public String convertPackaged(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcod, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
         return makePackageFromIndex(abc, name_index, convert(path, abcTags, abc, isStatic, pcod, classIndex, highlight, fullyQualifiedNames));
     }
 
-    public String convertHeader(String path, List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+    public String convertHeader(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
         return convert(path, abcTags, abc, isStatic, pcode, classIndex, highlight, fullyQualifiedNames).trim();
     }
 

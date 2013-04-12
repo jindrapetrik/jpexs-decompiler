@@ -18,7 +18,8 @@ package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.io.Serializable;
 import java.util.List;
 
@@ -49,7 +50,7 @@ public class Traits implements Serializable {
         return s;
     }
 
-    public String convert(String path, List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, boolean makePackages, int classIndex, boolean highlighting, List<String> fullyQualifiedNames) {
+    public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, boolean makePackages, int classIndex, boolean highlighting, List<String> fullyQualifiedNames) {
         String s = "";
         for (int t = 0; t < traits.length; t++) {
             if (t > 0) {

@@ -20,7 +20,8 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.util.List;
 import java.util.Stack;
 
@@ -35,7 +36,7 @@ public class TraitMethodGetterSetter extends Trait {
     }
 
     @Override
-    public String convertHeader(String path, List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+    public String convertHeader(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
         String modifier = getModifiers(abcTags, abc, isStatic) + " ";
         if (modifier.equals(" ")) {
             modifier = "";
@@ -53,7 +54,7 @@ public class TraitMethodGetterSetter extends Trait {
     }
 
     @Override
-    public String convert(String path, List<DoABCTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+    public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
         if (debugMode) {
             System.out.println("Decompiling " + path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames));
         }
