@@ -29,6 +29,7 @@ public class RecompileTest  {
     public void testRecompile() {
         File dir=new File(TESTDATADIR);
         File files[]=dir.listFiles(new FilenameFilter(){
+            @Override
             public boolean accept(File dir, String name) {
                 return name.toLowerCase().endsWith(".swf");
             }

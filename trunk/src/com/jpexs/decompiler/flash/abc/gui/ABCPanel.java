@@ -20,7 +20,8 @@ import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.gui.tablemodels.*;
 import com.jpexs.decompiler.flash.gui.View;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Font;
@@ -42,7 +43,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
     public TraitsList navigator;
     public ClassesListTree classTree;
     public ABC abc;
-    public List<DoABCTag> list;
+    public List<ABCContainerTag> list;
     public JComboBox abcComboBox;
     public int listIndex = -1;
     public DecompiledEditorPane decompiledTextArea;
@@ -147,9 +148,9 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
         if (index == -1) {
             classTree.setDoABCTags(list);
         } else {
-            List<DoABCTag> oneList = new ArrayList<DoABCTag>();
+            List<ABCContainerTag> oneList = new ArrayList<ABCContainerTag>();
             oneList.add(list.get(index));
-            this.abc = list.get(index).abc;
+            this.abc = list.get(index).getABC();
             classTree.setDoABCTags(oneList);
         }
         updateConstList();
@@ -172,14 +173,14 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
 
     }
 
-    public ABCPanel(List<DoABCTag> list) {
+    public ABCPanel(List<ABCContainerTag> list) {
 
 
         DefaultSyntaxKit.initKit();
 
         this.list = list;
         if (list.size() > 0) {
-            this.abc = list.get(0).abc;
+            this.abc = list.get(0).getABC();
         }
         setLayout(new BorderLayout());
 
@@ -302,7 +303,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
         }
         constantTable.setAutoCreateRowSorter(true);
 
-        final List<DoABCTag> inlist = list;
+        final List<ABCContainerTag> inlist = list;
         final ABCPanel t = this;
         constantTable.addMouseListener(new MouseAdapter() {
             @Override

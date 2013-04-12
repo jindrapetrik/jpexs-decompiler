@@ -17,7 +17,8 @@
 package com.jpexs.decompiler.flash.abc.usages;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.util.List;
 
 /**
@@ -26,5 +27,5 @@ import java.util.List;
  */
 public abstract class MultinameUsage {
 
-    public abstract String toString(List<DoABCTag> abcTags, ABC abc);
+    public abstract String toString(List<ABCContainerTag> abcTags, ABC abc);
 }

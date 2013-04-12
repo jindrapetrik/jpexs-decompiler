@@ -27,7 +27,8 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.abc.usages.*;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -543,11 +544,11 @@ public class ABC {
         }
     }
 
-    public void export(String directory, boolean pcode, List<DoABCTag> abcList) throws IOException {
+    public void export(String directory, boolean pcode, List<ABCContainerTag> abcList) throws IOException {
         export(directory, pcode, abcList, "");
     }
 
-    public void export(String directory, boolean pcode, List<DoABCTag> abcList, String abcStr) throws IOException {
+    public void export(String directory, boolean pcode, List<ABCContainerTag> abcList, String abcStr) throws IOException {
         for (int i = 0; i < script_info.length; i++) {
             String path = script_info[i].getPath(this);
             String packageName = path.substring(0, path.lastIndexOf("."));

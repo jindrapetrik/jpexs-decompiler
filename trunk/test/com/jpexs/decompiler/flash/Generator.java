@@ -4,7 +4,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import java.io.FileInputStream;
 import java.io.PrintWriter;
@@ -20,14 +20,14 @@ import java.util.Stack;
 public class Generator {
    public static void main(String[] args) throws Exception {
       SWF swf=new SWF(new FileInputStream("testdata/as3/TestMovie.swf"));
-      DoABCTag tag = null;
+      DoABCDefineTag tag = null;
       for (Tag t : swf.tags) {
-         if (t instanceof DoABCTag) {
-            tag = (DoABCTag) t;
+         if (t instanceof DoABCDefineTag) {
+            tag = (DoABCDefineTag) t;
             break;
          }
       }
-      ABC abc=tag.abc;
+      ABC abc=tag.getABC();
       int classId=abc.findClassByName("classes.Test");
       StringBuilder s=new StringBuilder();
       for(Trait t:abc.instance_info[classId].instance_traits.traits){

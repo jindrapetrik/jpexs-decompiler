@@ -16,7 +16,8 @@
  */
 package com.jpexs.decompiler.flash.abc.gui;
 
-import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.ComboBoxModel;
@@ -24,11 +25,11 @@ import javax.swing.event.ListDataListener;
 
 public class ABCComboBoxModel implements ComboBoxModel {
 
-    public List<DoABCTag> list;
+    public List<ABCContainerTag> list;
     public int itemIndex = 0;
     public static final String ROOT = " - all - ";
 
-    public ABCComboBoxModel(List<DoABCTag> list) {
+    public ABCComboBoxModel(List<ABCContainerTag> list) {
         this.list = list;
         Collections.sort(this.list);
     }

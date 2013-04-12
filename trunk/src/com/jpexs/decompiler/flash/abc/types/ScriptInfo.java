@@ -20,7 +20,8 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -62,11 +63,11 @@ public class ScriptInfo {
         return packageName + "." + scriptName;
     }
 
-    public String convert(List<DoABCTag> abcTags, ABC abc, boolean pcode, boolean highlighting) {
+    public String convert(List<ABCContainerTag> abcTags, ABC abc, boolean pcode, boolean highlighting) {
         return traits.convert("", abcTags, abc, false, pcode, true, -1, highlighting, new ArrayList<String>());
     }
 
-    public void export(ABC abc, List<DoABCTag> abcList, String directory, boolean pcode) throws IOException {
+    public void export(ABC abc, List<ABCContainerTag> abcList, String directory, boolean pcode) throws IOException {
         String path = getPath(abc);
         String packageName = path.substring(0, path.lastIndexOf("."));
         String className = path.substring(path.lastIndexOf(".") + 1);

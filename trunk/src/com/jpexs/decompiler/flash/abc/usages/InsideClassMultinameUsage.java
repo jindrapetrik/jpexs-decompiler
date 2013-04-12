@@ -17,7 +17,8 @@
 package com.jpexs.decompiler.flash.abc.usages;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.util.List;
 
 /**
@@ -35,7 +36,7 @@ public abstract class InsideClassMultinameUsage extends MultinameUsage {
     }
 
     @Override
-    public String toString(List<DoABCTag> abcTags, ABC abc) {
+    public String toString(List<ABCContainerTag> abcTags, ABC abc) {
         return "class " + abc.constants.constant_multiname[abc.instance_info[classIndex].name_index].getNameWithNamespace(abc.constants);
     }
 

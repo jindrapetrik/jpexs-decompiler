@@ -49,6 +49,7 @@ import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.gui.FrameNode;
 import com.jpexs.decompiler.flash.gui.TagNode;
 import com.jpexs.decompiler.flash.helpers.Helper;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
@@ -60,7 +61,7 @@ import com.jpexs.decompiler.flash.tags.DefineButtonTag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
@@ -413,17 +414,17 @@ public class SWF {
                 }
             }
         };
-        List<DoABCTag> abcTags = new ArrayList<DoABCTag>();
+        List<ABCContainerTag> abcTags = new ArrayList<ABCContainerTag>();
         for (Tag t : tags) {
-            if (t instanceof DoABCTag) {
-                abcTags.add((DoABCTag) t);
+            if (t instanceof ABCContainerTag) {
+                abcTags.add((ABCContainerTag) t);
                 asV3Found = true;
             }
         }
         for (int i = 0; i < abcTags.size(); i++) {
-            DoABCTag t = abcTags.get(i);
-            t.abc.addEventListener(evl);
-            t.abc.export(outdir, isPcode, abcTags, "tag " + (i + 1) + "/" + abcTags.size() + " ");
+            ABCContainerTag t = abcTags.get(i);
+            t.getABC().addEventListener(evl);
+            t.getABC().export(outdir, isPcode, abcTags, "tag " + (i + 1) + "/" + abcTags.size() + " ");
         }
 
         if (!asV3Found) {

@@ -20,7 +20,8 @@ import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.gui.View;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +34,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 public class ClassesListTree extends JTree implements TreeSelectionListener {
 
-    private List<DoABCTag> abcList;
+    private List<ABCContainerTag> abcList;
     public HashMap<String, TreeLeafScript> treeList;
     private ABCPanel abcPanel;
 
@@ -45,7 +46,7 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
         scrollPathToVisible(treePath);
     }
 
-    public ClassesListTree(List<DoABCTag> list, ABCPanel abcPanel) {
+    public ClassesListTree(List<ABCContainerTag> list, ABCPanel abcPanel) {
         this.abcList = list;
         this.treeList = getTreeList(list);
         this.abcPanel = abcPanel;
@@ -92,18 +93,18 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
         return selectedScripts;
     }
 
-    public HashMap<String, TreeLeafScript> getTreeList(List<DoABCTag> list) {
+    public HashMap<String, TreeLeafScript> getTreeList(List<ABCContainerTag> list) {
         HashMap<String, TreeLeafScript> ret = new HashMap<String, TreeLeafScript>();
-        for (DoABCTag tag : list) {
-            for (int i = 0; i < tag.abc.script_info.length; i++) {
-                String path = tag.abc.script_info[i].getPath(tag.abc);
-                ret.put(path, new TreeLeafScript(tag.abc, i));
+        for (ABCContainerTag tag : list) {
+            for (int i = 0; i < tag.getABC().script_info.length; i++) {
+                String path = tag.getABC().script_info[i].getPath(tag.getABC());
+                ret.put(path, new TreeLeafScript(tag.getABC(), i));
             }
         }
         return ret;
     }
 
-    public void setDoABCTags(List<DoABCTag> list) {
+    public void setDoABCTags(List<ABCContainerTag> list) {
         this.abcList = list;
         this.treeList = getTreeList(list);
         setModel(new ClassesListTreeModel(this.treeList));

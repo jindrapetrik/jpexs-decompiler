@@ -4,7 +4,8 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,14 +17,14 @@ public class TraitsListItem {
 
     private Type type;
     private boolean isStatic;
-    private List<DoABCTag> abcTags;
+    private List<ABCContainerTag> abcTags;
     private ABC abc;
     private int classIndex;
     private int index;
     public static final String STR_INSTANCE_INITIALIZER = "instance initializer";
     public static final String STR_CLASS_INITIALIZER = "class initializer";
 
-    public TraitsListItem(Type type, int index, boolean isStatic, List<DoABCTag> abcTags, ABC abc, int classIndex) {
+    public TraitsListItem(Type type, int index, boolean isStatic, List<ABCContainerTag> abcTags, ABC abc, int classIndex) {
         this.type = type;
         this.index = index;
         this.isStatic = isStatic;

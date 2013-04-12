@@ -1286,7 +1286,9 @@ public class SWFInputStream extends InputStream {
                 case 71:
                     ret = new ImportAssets2Tag(data, version, pos);
                     break;
-                //case 72:
+                case 72:
+                    ret = new DoABCTag(data, version, pos);
+                    break;
                 case 73:
                     ret = new DefineFontAlignZonesTag(data, version, pos);
                     break;
@@ -1307,7 +1309,7 @@ public class SWFInputStream extends InputStream {
                     break;
                 //case 79-81:
                 case 82:
-                    ret = new DoABCTag(data, version, pos);
+                    ret = new DoABCDefineTag(data, version, pos);
                     break;
                 case 83:
                     ret = new DefineShape4Tag(data, version, pos);

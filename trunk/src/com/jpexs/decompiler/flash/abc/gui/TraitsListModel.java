@@ -17,7 +17,8 @@
 package com.jpexs.decompiler.flash.abc.gui;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -28,7 +29,7 @@ import javax.swing.event.ListDataListener;
 public class TraitsListModel implements ListModel {
 
     private List<TraitsListItem> items;
-    private List<DoABCTag> abcTags;
+    private List<ABCContainerTag> abcTags;
     private ABC abc;
     private int classIndex;
 
@@ -57,7 +58,7 @@ public class TraitsListModel implements ListModel {
         items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, true, abcTags, abc, classIndex));
     }
 
-    public TraitsListModel(List<DoABCTag> abcTags, ABC abc, int classIndex, boolean sorted) {
+    public TraitsListModel(List<ABCContainerTag> abcTags, ABC abc, int classIndex, boolean sorted) {
         this.abcTags = abcTags;
         this.abc = abc;
         this.classIndex = classIndex;

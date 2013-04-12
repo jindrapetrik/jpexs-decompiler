@@ -20,7 +20,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +35,7 @@ public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {
     }
 
     @Override
-    public String toString(List<DoABCTag> abcTags, ABC abc) {
+    public String toString(List<ABCContainerTag> abcTags, ABC abc) {
         return super.toString(abcTags, abc) + " "
                 + (parentTraitIndex > -1
                 ? (isStatic

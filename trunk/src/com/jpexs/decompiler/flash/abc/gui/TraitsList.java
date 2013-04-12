@@ -17,7 +17,8 @@
 package com.jpexs.decompiler.flash.abc.gui;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
@@ -27,7 +28,7 @@ import javax.swing.event.ListSelectionListener;
 public class TraitsList extends JList implements ListSelectionListener {
 
     ABC abc;
-    List<DoABCTag> abcTags;
+    List<ABCContainerTag> abcTags;
     int classIndex = -1;
     private ABCPanel abcPanel;
     private boolean sorted = false;
@@ -49,7 +50,7 @@ public class TraitsList extends JList implements ListSelectionListener {
         setCellRenderer(new IconListRenderer());
     }
 
-    public void setABC(List<DoABCTag> abcTags, ABC abc) {
+    public void setABC(List<ABCContainerTag> abcTags, ABC abc) {
         this.abc = abc;
         this.abcTags = abcTags;
         setModel(new DefaultListModel());

@@ -21,7 +21,8 @@ import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -263,13 +264,13 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         addCaretListener(this);
         this.abcPanel = abcPanel;
     }
-    private List<DoABCTag> abcList;
+    private List<ABCContainerTag> abcList;
 
     public void clearScriptCache() {
         bufferedClasses.clear();
     }
 
-    public void setScript(ScriptInfo script, ABC abc, List<DoABCTag> abcList) {
+    public void setScript(ScriptInfo script, ABC abc, List<ABCContainerTag> abcList) {
         if (script == null) {
             highlights = new ArrayList<Highlighting>();
             traitHighlights = new ArrayList<Highlighting>();

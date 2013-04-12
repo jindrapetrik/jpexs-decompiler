@@ -2,7 +2,7 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -25,17 +25,17 @@ public class ActionScript3Test {
    @BeforeClass
    public void init() throws IOException {
       swf = new SWF(new FileInputStream("testdata/as3/TestMovie.swf"));
-      DoABCTag tag = null;
+      DoABCDefineTag tag = null;
       for (Tag t : swf.tags) {
-         if (t instanceof DoABCTag) {
-            tag = (DoABCTag) t;
+         if (t instanceof DoABCDefineTag) {
+            tag = (DoABCDefineTag) t;
             break;
          }
       }
       assertNotNull(tag);
-      clsIndex = tag.abc.findClassByName("classes.Test");
+      clsIndex = tag.getABC().findClassByName("classes.Test");
       assertTrue(clsIndex > -1);
-      this.abc = tag.abc;
+      this.abc = tag.getABC();
    }
 
    private void decompileMethod(String methodName, String expectedResult, boolean isStatic) {

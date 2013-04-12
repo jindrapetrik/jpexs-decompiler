@@ -22,7 +22,8 @@ import com.jpexs.decompiler.flash.abc.usages.MethodMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.TraitMultinameUsage;
 import com.jpexs.decompiler.flash.gui.View;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
@@ -46,7 +47,7 @@ public class UsageFrame extends JFrame implements ActionListener, MouseListener 
     private ABC abc;
     private ABCPanel abcPanel;
 
-    public UsageFrame(List<DoABCTag> abcTags, ABC abc, int multinameIndex, ABCPanel abcPanel) {
+    public UsageFrame(List<ABCContainerTag> abcTags, ABC abc, int multinameIndex, ABCPanel abcPanel) {
         this.abcPanel = abcPanel;
         List<MultinameUsage> usages = abc.findMultinameUsage(multinameIndex);
         this.abc = abc;

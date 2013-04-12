@@ -54,7 +54,7 @@ import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
@@ -157,7 +157,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     final static String DETAILCARDEMPTYPANEL = "Empty card";
     private JPEGTablesTag jtt;
     private HashMap<Integer, CharacterTag> characters;
-    private List<DoABCTag> abcList;
+    private List<ABCContainerTag> abcList;
     JSplitPane splitPane1;
     JSplitPane splitPane2;
     private JPanel detailPanel;
@@ -372,7 +372,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         cl2.show(detailPanel, DETAILCARDEMPTYPANEL);
 
 
-        abcList = new ArrayList<DoABCTag>();
+        abcList = new ArrayList<ABCContainerTag>();
         getActionScript3(objs, abcList);
         if (!abcList.isEmpty()) {
             addTab(tabPane, abcPanel = new ABCPanel(abcList), "ActionScript3", View.getIcon("as16"));
@@ -597,13 +597,13 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         }
     }
 
-    public static void getActionScript3(List<Object> list, List<DoABCTag> actionScripts) {
+    public static void getActionScript3(List<Object> list, List<ABCContainerTag> actionScripts) {
         for (Object t : list) {
             if (t instanceof Container) {
                 getActionScript3(((Container) t).getSubItems(), actionScripts);
             }
-            if (t instanceof DoABCTag) {
-                actionScripts.add((DoABCTag) t);
+            if (t instanceof ABCContainerTag) {
+                actionScripts.add((ABCContainerTag) t);
             }
         }
     }
@@ -1160,8 +1160,8 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                     protected Object doInBackground() throws Exception {
                         int cnt = 0;
                         if (all) {
-                            for (DoABCTag tag : abcPanel.list) {
-                                tag.abc.restoreControlFlow();
+                            for (ABCContainerTag tag : abcPanel.list) {
+                                tag.getABC().restoreControlFlow();
                             }
                         } else {
                             int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
@@ -1188,8 +1188,8 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                     protected Object doInBackground() throws Exception {
                         int cnt = 0;
                         if (all) {
-                            for (DoABCTag tag : abcPanel.list) {
-                                cnt += tag.abc.removeTraps();
+                            for (ABCContainerTag tag : abcPanel.list) {
+                                cnt += tag.getABC().removeTraps();
                             }
                         } else {
                             int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
@@ -1216,8 +1216,8 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                     protected Object doInBackground() throws Exception {
                         int cnt = 0;
                         if (all) {
-                            for (DoABCTag tag : abcPanel.list) {
-                                cnt += tag.abc.removeDeadCode();
+                            for (ABCContainerTag tag : abcPanel.list) {
+                                cnt += tag.getABC().removeDeadCode();
                             }
                         } else {
                             int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
@@ -1246,8 +1246,8 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
                         if (abcPanel != null) {
                             HashMap<String, String> namesMap = new HashMap<String, String>();
-                            for (DoABCTag tag : abcPanel.list) {
-                                cnt += tag.abc.deobfuscateIdentifiers(namesMap);
+                            for (ABCContainerTag tag : abcPanel.list) {
+                                cnt += tag.getABC().deobfuscateIdentifiers(namesMap);
                             }
                         } else {
                             cnt = swf.deobfuscateAS2Identifiers();
@@ -1278,14 +1278,14 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                     @Override
                     protected Object doInBackground() throws Exception {
                         if (deobfuscationDialog.processAllCheckbox.isSelected()) {
-                            for (DoABCTag tag : abcPanel.list) {
+                            for (ABCContainerTag tag : abcPanel.list) {
                                 if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
-                                    tag.abc.removeDeadCode();
+                                    tag.getABC().removeDeadCode();
                                 } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
-                                    tag.abc.removeTraps();
+                                    tag.getABC().removeTraps();
                                 } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_RESTORE_CONTROL_FLOW) {
-                                    tag.abc.removeTraps();
-                                    tag.abc.restoreControlFlow();
+                                    tag.getABC().removeTraps();
+                                    tag.getABC().restoreControlFlow();
                                 }
                             }
                         } else {

@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc.usages;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +34,7 @@ public class TypeNameMultinameUsage extends MultinameUsage {
     }
 
     @Override
-    public String toString(List<DoABCTag> abcTags, ABC abc) {
+    public String toString(List<ABCContainerTag> abcTags, ABC abc) {
         return "TypeName " + abc.constants.constant_multiname[typename_index].toString(abc.constants, new ArrayList<String>());
     }
 }

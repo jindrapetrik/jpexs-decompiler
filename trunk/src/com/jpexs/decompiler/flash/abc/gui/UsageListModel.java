@@ -18,7 +18,8 @@ package com.jpexs.decompiler.flash.abc.gui;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import java.util.List;
 import javax.swing.DefaultListModel;
 
@@ -29,9 +30,9 @@ import javax.swing.DefaultListModel;
 public class UsageListModel extends DefaultListModel {
 
     private ABC abc;
-    private List<DoABCTag> abcTags;
+    private List<ABCContainerTag> abcTags;
 
-    public UsageListModel(List<DoABCTag> abcTags, ABC abc) {
+    public UsageListModel(List<ABCContainerTag> abcTags, ABC abc) {
         this.abc = abc;
         this.abcTags = abcTags;
     }

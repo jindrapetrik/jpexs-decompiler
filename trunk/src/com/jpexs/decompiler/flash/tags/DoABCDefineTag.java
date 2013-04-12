@@ -26,22 +26,32 @@ import java.io.*;
 /**
  * Defines a series of ActionScript 3 bytecodes to be executed
  */
-public class DoABCTag extends Tag implements ABCContainerTag {
+public class DoABCDefineTag extends Tag implements ABCContainerTag {
 
-    /**
-     * ActionScript 3 bytecodes
-     */
-    private ABC abc;
-
-    @Override
     public ABC getABC() {
         return abc;
     }
 
     
+    /**
+     * ActionScript 3 bytecodes
+     */
+    private ABC abc;
+    /**
+     * A 32-bit flags value, which may contain the following bits set:
+     * kDoAbcLazyInitializeFlag = 1: Indicates that the ABC block should not be
+     * executed immediately, but only parsed. A later finddef may cause its
+     * scripts to execute.
+     */
+    public long flags;
+    /**
+     * The name assigned to the bytecode.
+     */
+    public String name;
+
     @Override
     public String getName() {
-        return "DoABC";
+        return "DoABCDefine (" + name + ")";
     }
 
     /**
@@ -51,9 +61,12 @@ public class DoABCTag extends Tag implements ABCContainerTag {
      * @param version SWF version
      * @throws IOException
      */
-    public DoABCTag(byte[] data, int version, long pos) throws IOException {
-        super(72, "DoABC", data, pos);
+    public DoABCDefineTag(byte[] data, int version, long pos) throws IOException {
+        super(82, "DoABCDefine", data, pos);
         InputStream is = new ByteArrayInputStream(data);
+        SWFInputStream sis = new SWFInputStream(is, version);
+        flags = sis.readUI32();
+        name = sis.readString();
         abc = new ABC(is);
     }
 
@@ -72,6 +85,8 @@ public class DoABCTag extends Tag implements ABCContainerTag {
                 os = new CopyOutputStream(os, new ByteArrayInputStream(super.data));
             }
             SWFOutputStream sos = new SWFOutputStream(os, version);
+            sos.writeUI32(flags);
+            sos.writeString(name);
             abc.saveToStream(sos);
             sos.close();
             return bos.toByteArray();
@@ -80,9 +95,14 @@ public class DoABCTag extends Tag implements ABCContainerTag {
         return new byte[0];
     }
 
-
     @Override
     public int compareTo(ABCContainerTag o) {
+        if(o instanceof DoABCDefineTag){
+            DoABCDefineTag n=(DoABCDefineTag)o;
+            int lastCmp = name.compareTo(n.name);
+            return (lastCmp != 0 ? lastCmp
+                    : name.compareTo(n.name));
+        }
         return 0;
     }
 }
