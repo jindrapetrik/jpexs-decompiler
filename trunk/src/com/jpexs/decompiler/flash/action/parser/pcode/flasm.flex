@@ -78,7 +78,7 @@ NegativeNumberLiteral = - {PositiveNumberLiteral}
 NumberLiteral = {PositiveNumberLiteral}|{NegativeNumberLiteral}
 
 /* floating point literals */        
-FloatLiteral = {Infinity} | (({FLit1}|{FLit2}|{FLit3}) {Exponent}?)
+FloatLiteral = "NaN" | {Infinity} | (({FLit1}|{FLit2}|{FLit3}) {Exponent}?)
 
 FLit1    = [0-9]+ \. [0-9]* 
 FLit2    = \. [0-9]+ 
