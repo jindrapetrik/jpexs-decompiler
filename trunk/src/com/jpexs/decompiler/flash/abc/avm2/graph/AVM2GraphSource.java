@@ -28,6 +28,12 @@ public class AVM2GraphSource extends GraphSource {
     HashMap<Integer, String> localRegNames;
     List<String> fullyQualifiedNames;
 
+    public AVM2Code getCode() {
+        return code;
+    }
+    
+    
+
     public AVM2GraphSource(AVM2Code code, boolean isStatic, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> scopeStack, ABC abc, MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         this.code = code;
         this.isStatic = isStatic;

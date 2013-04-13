@@ -65,4 +65,9 @@ public abstract class BinaryOpItem extends GraphTargetItem {
     public boolean isVariableComputed() {
         return leftSide.isVariableComputed() || rightSide.isVariableComputed();
     }
+    
+    @Override
+    public boolean hasSideEffect() {
+        return leftSide.hasSideEffect()||rightSide.hasSideEffect();
+    }
 }

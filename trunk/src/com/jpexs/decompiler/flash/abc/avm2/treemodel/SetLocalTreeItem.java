@@ -48,4 +48,11 @@ public class SetLocalTreeItem extends TreeItem implements SetTypeTreeItem, Assig
     public GraphTargetItem getValue() {
         return value;
     }
+
+    @Override
+    public boolean hasSideEffect() {
+        return true;
+    }
+    
+    
 }

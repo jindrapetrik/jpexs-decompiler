@@ -44,7 +44,7 @@ public class ActionScript3Test {
       String actualResult = abc.bodies[bodyIndex].toString(methodName, false, isStatic, clsIndex, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, false, new ArrayList<String>(), abc.instance_info[clsIndex].instance_traits);
       actualResult = actualResult.replaceAll("[ \r\n]", "");
       expectedResult = expectedResult.replaceAll("[ \r\n]", "");
-      assertEquals(expectedResult, actualResult);
+      assertEquals(actualResult,expectedResult);
    }
 
    @Test

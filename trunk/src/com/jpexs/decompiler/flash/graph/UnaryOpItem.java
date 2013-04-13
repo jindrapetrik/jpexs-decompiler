@@ -56,4 +56,9 @@ public abstract class UnaryOpItem extends GraphTargetItem {
         ret.addAll(value.getNeededSources());
         return ret;
     }
+    
+    @Override
+    public boolean hasSideEffect() {
+        return value.hasSideEffect();
+    }
 }

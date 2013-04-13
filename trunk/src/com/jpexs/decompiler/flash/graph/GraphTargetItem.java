@@ -89,6 +89,11 @@ public abstract class GraphTargetItem {
     public boolean isCompileTime() {
         return false;
     }
+    
+    public boolean hasSideEffect()
+    {
+        return false;
+    }
 
     public boolean isVariableComputed() {
         return false;

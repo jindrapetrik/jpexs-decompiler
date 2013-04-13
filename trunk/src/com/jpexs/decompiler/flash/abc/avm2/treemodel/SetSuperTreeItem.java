@@ -44,4 +44,9 @@ public class SetSuperTreeItem extends TreeItem {
         }
         return calee + hilight("super.") + propertyName.toString(constants, localRegNames, fullyQualifiedNames) + hilight("=") + value.toString(constants, localRegNames, fullyQualifiedNames);
     }
+    
+    @Override
+    public boolean hasSideEffect() {
+        return true;
+    }
 }

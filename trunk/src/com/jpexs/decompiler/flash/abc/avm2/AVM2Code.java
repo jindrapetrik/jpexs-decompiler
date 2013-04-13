@@ -2414,7 +2414,7 @@ public class AVM2Code implements Serializable {
     private static int removeTraps(boolean secondPass, boolean useVisited, List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, int lastIp, List<Integer> visited, HashMap<GraphSourceItem, Decision> decisions) {
         boolean debugMode = false;
         int ret = 0;
-        while ((ip > -1) && ip < code.size()) {
+        iploop:while ((ip > -1) && ip < code.size()) {
             if (useVisited && visited.contains(ip)) {
                 break;
             }
@@ -2430,6 +2430,60 @@ public class AVM2Code implements Serializable {
             if (debugMode) {
                 System.out.println((useVisited ? "useV " : "") + "Visit " + ip + ": " + ins + " stack:" + Highlighting.stripHilights(stack.toString()));
             }
+            AVM2Instruction ains=(AVM2Instruction)ins;
+            if (ains.definition instanceof DupIns) {
+                    do {
+                        AVM2Instruction insAfter = (AVM2Instruction)code.get(ip + 1);
+                        if (insAfter.definition instanceof ConvertBIns) { //SWF compiled with debug contain convert_b
+                            ip++;
+                            insAfter = (AVM2Instruction)code.get(ip + 1);
+                        }
+
+                        if (insAfter.definition instanceof SetLocalTypeIns) {
+                            //chained assignments
+                            int reg = (((SetLocalTypeIns) insAfter.definition).getRegisterId(insAfter));
+                            for (int t = ip + 1; t < code.size(); t++) {
+                                if (((AVM2Instruction)code.get(t)).definition instanceof KillIns) {
+                                    if (((AVM2Instruction)code.get(t)).operands[0] == reg) {
+                                        break;
+                                    }
+                                }
+                                if (((AVM2Instruction)code.get(t)).definition instanceof GetLocalTypeIns) {
+                                    if (((GetLocalTypeIns) ((AVM2Instruction)code.get(t)).definition).getRegisterId((AVM2Instruction)code.get(t)) == reg) {
+                                        if (((AVM2Instruction)code.get(t + 1)).definition instanceof KillIns) {
+                                            if (((AVM2Instruction)code.get(t + 1)).operands[0] == reg) {
+                                                code.getCode().initToSource();
+                                                ConvertOutput assignment = code.getCode().toSourceOutput(false, (Boolean)localData.get(0), (Integer)localData.get(1), (HashMap<Integer, GraphTargetItem>)localData.get(2), stack, (Stack<GraphTargetItem>)localData.get(3), (ABC)localData.get(7), (ConstantPool)localData.get(4), (MethodInfo[])localData.get(5), (MethodBody)localData.get(6), ip + 2, t - 1, (HashMap<Integer, String>)localData.get(8), (List<String>)localData.get(9), null);
+                                                stack.push(assignment.output.remove(assignment.output.size() - 1));
+                                                ip = t + 2;
+                                                continue iploop;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            if (!code.getCode().isKilled(reg, 0, code.size()-1)) {
+                                for (int i = ip; i >= 0; i--) {
+                                    if (((AVM2Instruction)code.get(i)).definition instanceof DupIns) {
+                                        GraphTargetItem v = stack.pop();
+                                        stack.push(new LocalRegTreeItem((AVM2Instruction)ins, reg, v));
+                                        stack.push(v);
+                                    } else {
+                                        break;
+                                    }
+                                }
+                            } else {
+                                break;
+                            }
+                            ip++;
+                            continue iploop;
+                            //}
+
+                        } else {
+                            break;                           
+                        }
+                    } while (((AVM2Instruction)ins).definition instanceof DupIns);
+            }
             if ((ins instanceof AVM2Instruction) && (((AVM2Instruction) ins).definition instanceof NewFunctionIns)) {
                 stack.push(new BooleanTreeItem(null, true));
             } else {
@@ -2439,10 +2493,11 @@ public class AVM2Code implements Serializable {
                 break;
             }
 
+            
             if (ins.isBranch() || ins.isJump()) {
                 List<Integer> branches = ins.getBranches(code);
                 if ((ins instanceof AVM2Instruction) && ((AVM2Instruction) ins).definition instanceof IfTypeIns
-                        && (!(((AVM2Instruction) ins).definition instanceof JumpIns)) && (!stack.isEmpty()) && (stack.peek().isCompileTime())) {
+                        && (!(((AVM2Instruction) ins).definition instanceof JumpIns)) && (!stack.isEmpty()) && (stack.peek().isCompileTime())&&(!stack.peek().hasSideEffect())) {
                     boolean condition = stack.peek().toBoolean();
                     if (debugMode) {
                         if (condition) {
