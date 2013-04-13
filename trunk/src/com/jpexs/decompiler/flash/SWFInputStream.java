@@ -585,7 +585,7 @@ public class SWFInputStream extends InputStream {
 
             if (ins.isBranch() || ins.isJump()) {
 
-                if (ins instanceof ActionIf && !stack.isEmpty() && (stack.peek().isCompileTime())) {
+                if (ins instanceof ActionIf && !stack.isEmpty() && (stack.peek().isCompileTime()&&(!stack.peek().hasSideEffect()))) {
                     ActionIf aif = (ActionIf) ins;
                     if (aif.ignoreUsed && (!aif.jumpUsed)) {
                         ins.setIgnored(true);
@@ -872,7 +872,7 @@ public class SWFInputStream extends InputStream {
                             } else if (next.equals("c")) {
                                 goaif = true;
                             }
-                        } else if (top.isCompileTime() && ((!top.isVariableComputed()) || (top.isVariableComputed() && enableVariables && (!notCompileTime)))) {
+                        } else if (top.isCompileTime() && (!top.hasSideEffect()) && ((!top.isVariableComputed()) || (top.isVariableComputed() && enableVariables && (!notCompileTime)))) {
                             //if(top.isCompileTime()) {
                             //if(false){
                             if (enableVariables) {

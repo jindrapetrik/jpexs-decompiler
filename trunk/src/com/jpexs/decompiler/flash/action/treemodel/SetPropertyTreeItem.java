@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.treemodel;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import static com.jpexs.decompiler.flash.graph.GraphTargetItem.PRECEDENCE_ASSIGMENT;
 import java.util.List;
 
 public class SetPropertyTreeItem extends TreeItem implements SetTypeTreeItem {
@@ -28,7 +29,7 @@ public class SetPropertyTreeItem extends TreeItem implements SetTypeTreeItem {
     public GraphTargetItem value;
 
     public SetPropertyTreeItem(GraphSourceItem instruction, GraphTargetItem target, int propertyIndex, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_PRIMARY);
+        super(instruction, PRECEDENCE_ASSIGMENT);
         this.target = target;
         this.propertyIndex = propertyIndex;
         this.value = value;
@@ -53,5 +54,10 @@ public class SetPropertyTreeItem extends TreeItem implements SetTypeTreeItem {
         ret.addAll(target.getNeededSources());
         ret.addAll(value.getNeededSources());
         return ret;
+    }
+    
+    @Override
+    public boolean hasSideEffect() {
+        return true;
     }
 }

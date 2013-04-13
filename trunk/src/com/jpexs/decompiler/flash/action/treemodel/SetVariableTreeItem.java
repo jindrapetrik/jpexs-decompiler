@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.treemodel;
 
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import static com.jpexs.decompiler.flash.graph.GraphTargetItem.PRECEDENCE_ASSIGMENT;
 import java.util.List;
 
 public class SetVariableTreeItem extends TreeItem implements SetTypeTreeItem {
@@ -26,7 +27,7 @@ public class SetVariableTreeItem extends TreeItem implements SetTypeTreeItem {
     public GraphTargetItem value;
 
     public SetVariableTreeItem(GraphSourceItem instruction, GraphTargetItem name, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_PRIMARY);
+        super(instruction, PRECEDENCE_ASSIGMENT);
         this.name = name;
         this.value = value;
     }
@@ -53,4 +54,11 @@ public class SetVariableTreeItem extends TreeItem implements SetTypeTreeItem {
     public boolean isCompileTime() {
         return value.isCompileTime();
     }
+
+    @Override
+    public boolean hasSideEffect() {
+        return true;
+    }
+    
+    
 }
