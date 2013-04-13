@@ -23,6 +23,8 @@ import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.SetTypeTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.StoreRegisterTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
@@ -249,7 +251,21 @@ public class ActionPush extends Action {
             }
             if (o instanceof RegisterNumber) {
                 if (regNames.containsKey(((RegisterNumber) o).number)) {
-                    ((RegisterNumber) o).name = regNames.get(((RegisterNumber) o).number);
+                    ((RegisterNumber) o).name = regNames.get(((RegisterNumber) o).number);                    
+                }else if(output.size()>=2){ //chained assignments:
+                    GraphTargetItem last=output.get(output.size()-1);
+                    GraphTargetItem prev=output.get(output.size()-2);
+                    if(last instanceof SetTypeTreeItem ){
+                        if(prev instanceof StoreRegisterTreeItem){
+                            StoreRegisterTreeItem str=(StoreRegisterTreeItem)prev;
+                            if(str.register.number==((RegisterNumber) o).number){
+                                stack.push(output.remove(output.size()-1));
+                                output.remove(output.size()-1);
+                                pos++;
+                                continue;
+                            }
+                        }
+                    }                    
                 }
             }
             DirectValueTreeItem dvt = new DirectValueTreeItem(this, pos, o, constantPool);

@@ -47,6 +47,16 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
     public List<String> constantPool;
     private long hdrSize;
 
+    public ActionDefineFunction(String functionName, List<String> paramNames, int codeSize, int version) {
+        super(0x9B, 0);
+        this.functionName = functionName;
+        this.codeSize = codeSize;
+        this.version = version;
+        this.paramNames=paramNames;
+    }
+    
+    
+
     public ActionDefineFunction(int actionLength, SWFInputStream sis, ReReadableInputStream rri, int version) throws IOException {
         super(0x9B, actionLength);
         this.version = version;
