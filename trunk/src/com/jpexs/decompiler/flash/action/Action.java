@@ -911,7 +911,7 @@ public class Action implements GraphSourceItem {
 
     public static List<GraphTargetItem> checkClass(List<GraphTargetItem> output) {
         if(true){
-            return output;
+            //return output;
         }
         List<GraphTargetItem> ret = new ArrayList<GraphTargetItem>();
         List<GraphTargetItem> functions = new ArrayList<GraphTargetItem>();
