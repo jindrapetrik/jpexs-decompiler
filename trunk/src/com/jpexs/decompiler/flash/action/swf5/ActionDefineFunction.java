@@ -52,10 +52,8 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
         this.functionName = functionName;
         this.codeSize = codeSize;
         this.version = version;
-        this.paramNames=paramNames;
+        this.paramNames = paramNames;
     }
-    
-    
 
     public ActionDefineFunction(int actionLength, SWFInputStream sis, ReReadableInputStream rri, int version) throws IOException {
         super(0x9B, actionLength);
@@ -165,7 +163,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
             paramStr += " ";
         }
 
-        return "DefineFunction \"" + Helper.escapeString(functionName) + "\" " + paramNames.size() + " " + paramStr + " {"+(codeSize==0?"\r\n}":"");// + "\r\n" +Action.actionsToString(getAddress() + getHeaderLength(),getItems(container) , knownAddreses, constantPool, version, hex, getFileAddress() + hdrSize) + "}";
+        return "DefineFunction \"" + Helper.escapeString(functionName) + "\" " + paramNames.size() + " " + paramStr + " {" + (codeSize == 0 ? "\r\n}" : "");// + "\r\n" +Action.actionsToString(getAddress() + getHeaderLength(),getItems(container) , knownAddreses, constantPool, version, hex, getFileAddress() + hdrSize) + "}";
     }
 
     @Override

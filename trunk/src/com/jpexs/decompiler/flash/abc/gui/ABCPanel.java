@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.gui.tablemodels.*;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Font;

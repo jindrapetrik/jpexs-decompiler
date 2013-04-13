@@ -25,4 +25,12 @@ import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 public interface SetTypeTreeItem {
 
     public GraphTargetItem getObject();
+
+    public GraphTargetItem getValue();
+
+    public void setTempRegister(int regIndex);
+
+    public int getTempRegister();
+
+    public void setValue(GraphTargetItem value);
 }

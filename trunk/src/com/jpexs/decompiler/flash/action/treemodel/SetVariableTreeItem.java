@@ -25,6 +25,27 @@ public class SetVariableTreeItem extends TreeItem implements SetTypeTreeItem {
 
     public GraphTargetItem name;
     public GraphTargetItem value;
+    private int tempRegister = -1;
+
+    @Override
+    public void setValue(GraphTargetItem value) {
+        this.value = value;
+    }
+
+    @Override
+    public int getTempRegister() {
+        return tempRegister;
+    }
+
+    @Override
+    public void setTempRegister(int tempRegister) {
+        this.tempRegister = tempRegister;
+    }
+
+    @Override
+    public GraphTargetItem getValue() {
+        return value;
+    }
 
     public SetVariableTreeItem(GraphSourceItem instruction, GraphTargetItem name, GraphTargetItem value) {
         super(instruction, PRECEDENCE_ASSIGMENT);
@@ -39,7 +60,7 @@ public class SetVariableTreeItem extends TreeItem implements SetTypeTreeItem {
 
     @Override
     public GraphTargetItem getObject() {
-        return new GetVariableTreeItem(src, value);
+        return new GetVariableTreeItem(src, name);
     }
 
     @Override
@@ -59,6 +80,4 @@ public class SetVariableTreeItem extends TreeItem implements SetTypeTreeItem {
     public boolean hasSideEffect() {
         return true;
     }
-    
-    
 }

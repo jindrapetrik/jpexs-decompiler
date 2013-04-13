@@ -28,11 +28,10 @@ import java.io.*;
  */
 public class DoABCDefineTag extends Tag implements ABCContainerTag {
 
+    @Override
     public ABC getABC() {
         return abc;
     }
-
-    
     /**
      * ActionScript 3 bytecodes
      */
@@ -97,8 +96,8 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
 
     @Override
     public int compareTo(ABCContainerTag o) {
-        if(o instanceof DoABCDefineTag){
-            DoABCDefineTag n=(DoABCDefineTag)o;
+        if (o instanceof DoABCDefineTag) {
+            DoABCDefineTag n = (DoABCDefineTag) o;
             int lastCmp = name.compareTo(n.name);
             return (lastCmp != 0 ? lastCmp
                     : name.compareTo(n.name));

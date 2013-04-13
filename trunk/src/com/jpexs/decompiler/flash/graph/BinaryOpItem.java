@@ -65,9 +65,39 @@ public abstract class BinaryOpItem extends GraphTargetItem {
     public boolean isVariableComputed() {
         return leftSide.isVariableComputed() || rightSide.isVariableComputed();
     }
-    
+
     @Override
     public boolean hasSideEffect() {
-        return leftSide.hasSideEffect()||rightSide.hasSideEffect();
+        return leftSide.hasSideEffect() || rightSide.hasSideEffect();
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 71 * hash + (this.leftSide != null ? this.leftSide.hashCode() : 0);
+        hash = 71 * hash + (this.rightSide != null ? this.rightSide.hashCode() : 0);
+        hash = 71 * hash + (this.operator != null ? this.operator.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final BinaryOpItem other = (BinaryOpItem) obj;
+        if (this.leftSide != other.leftSide && (this.leftSide == null || !this.leftSide.equals(other.leftSide))) {
+            return false;
+        }
+        if (this.rightSide != other.rightSide && (this.rightSide == null || !this.rightSide.equals(other.rightSide))) {
+            return false;
+        }
+        if ((this.operator == null) ? (other.operator != null) : !this.operator.equals(other.operator)) {
+            return false;
+        }
+        return true;
     }
 }

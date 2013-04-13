@@ -50,7 +50,7 @@ public class SetPropertyTreeItem extends TreeItem implements SetTypeTreeItem, As
     public GraphTargetItem getValue() {
         return value;
     }
-    
+
     @Override
     public boolean hasSideEffect() {
         return true;

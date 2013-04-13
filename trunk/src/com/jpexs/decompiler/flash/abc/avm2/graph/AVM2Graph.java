@@ -73,8 +73,6 @@ public class AVM2Graph extends Graph {
     public AVM2Code getCode() {
         return code;
     }
-    
-    
 
     public AVM2Graph(AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> scopeStack, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         super(new AVM2GraphSource(code, isStatic, classIndex, localRegs, scopeStack, abc, body, localRegNames, fullyQualifiedNames), body.getExceptionEntries());

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jpexs.decompiler.flash.action.parser.script;
 
 /**
@@ -22,16 +21,18 @@ package com.jpexs.decompiler.flash.action.parser.script;
  * @author JPEXS
  */
 public class ParsedSymbol {
+
     public SymbolGroup group;
     public Object value;
     public SymbolType type;
 
-    public ParsedSymbol(SymbolGroup group,SymbolType type){
+    public ParsedSymbol(SymbolGroup group, SymbolType type) {
         this.group = group;
         this.type = type;
         this.value = null;
     }
-    public ParsedSymbol(SymbolGroup group,SymbolType type, Object value) {
+
+    public ParsedSymbol(SymbolGroup group, SymbolType type, Object value) {
         this.group = group;
         this.type = type;
         this.value = value;
@@ -39,16 +40,15 @@ public class ParsedSymbol {
 
     @Override
     public String toString() {
-        return group.toString()+" "+type.toString()+" "+(value!=null?value.toString():"");
+        return group.toString() + " " + type.toString() + " " + (value != null ? value.toString() : "");
     }
-    public boolean isType(SymbolType... types){
-        for(SymbolType t:types){
-            if(type==t){
+
+    public boolean isType(SymbolType... types) {
+        for (SymbolType t : types) {
+            if (type == t) {
                 return true;
             }
         }
         return false;
     }
-    
-    
 }

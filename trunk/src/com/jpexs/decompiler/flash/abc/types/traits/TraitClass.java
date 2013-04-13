@@ -35,7 +35,6 @@ import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
@@ -194,7 +193,7 @@ public class TraitClass extends Trait {
     }
 
     private void parseImportsUsagesFromMethodInfo(List<ABCContainerTag> abcTags, ABC abc, int method_index, List<String> imports, List<String> uses, String ignorePackage, List<String> fullyQualifiedNames, List<Integer> visitedMethods) {
-        if ((method_index<0)  || (method_index >= abc.method_info.length)) {
+        if ((method_index < 0) || (method_index >= abc.method_info.length)) {
             return;
         }
         visitedMethods.add(method_index);

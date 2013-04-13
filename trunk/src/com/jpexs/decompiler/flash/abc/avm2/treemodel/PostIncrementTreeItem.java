@@ -37,7 +37,7 @@ public class PostIncrementTreeItem extends TreeItem implements AssignmentTreeIte
     public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         return object.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + hilight("++");
     }
-    
+
     @Override
     public boolean hasSideEffect() {
         return true;

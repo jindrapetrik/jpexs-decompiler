@@ -22,9 +22,13 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
+import com.jpexs.decompiler.flash.action.treemodel.DecrementTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.IncrementTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.SetTypeTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.StoreRegisterTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.operations.PreDecrementTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.operations.PreIncrementTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
@@ -208,6 +212,36 @@ public class ActionPush extends Action {
         return ts;
     }
 
+    public String toStringNoQ(int i) {
+        String ret = "";
+        if (values.get(i) instanceof ConstantIndex) {
+            ((ConstantIndex) values.get(i)).constantPool = constantPool;
+            ret += ((ConstantIndex) values.get(i)).toStringNoQ();
+        } else if (values.get(i) instanceof String) {
+            ret += (String) values.get(i);
+        } else if (values.get(i) instanceof RegisterNumber) {
+            ret += ((RegisterNumber) values.get(i)).toStringNoName();
+        } else {
+            ret += values.get(i).toString();
+        }
+        return ret;
+    }
+
+    public String toString(int i) {
+        String ret = "";
+        if (values.get(i) instanceof ConstantIndex) {
+            ((ConstantIndex) values.get(i)).constantPool = constantPool;
+            ret += ((ConstantIndex) values.get(i)).toString();
+        } else if (values.get(i) instanceof String) {
+            ret += "\"" + Helper.escapeString((String) values.get(i)) + "\"";
+        } else if (values.get(i) instanceof RegisterNumber) {
+            ret += ((RegisterNumber) values.get(i)).toStringNoName();
+        } else {
+            ret += values.get(i).toString();
+        }
+        return ret;
+    }
+
     @Override
     public String toString() {
         String ret = "Push ";
@@ -220,16 +254,7 @@ public class ActionPush extends Action {
                 ret += " ";
             }
             pos++;
-            if (values.get(i) instanceof ConstantIndex) {
-                ((ConstantIndex) values.get(i)).constantPool = constantPool;
-                ret += ((ConstantIndex) values.get(i)).toString();
-            } else if (values.get(i) instanceof String) {
-                ret += "\"" + Helper.escapeString((String) values.get(i)) + "\"";
-            } else if (values.get(i) instanceof RegisterNumber) {
-                ret += ((RegisterNumber) values.get(i)).toStringNoName();
-            } else {
-                ret += values.get(i).toString();
-            }
+            ret += toString(i);
         }
         return ret;
     }
@@ -251,21 +276,30 @@ public class ActionPush extends Action {
             }
             if (o instanceof RegisterNumber) {
                 if (regNames.containsKey(((RegisterNumber) o).number)) {
-                    ((RegisterNumber) o).name = regNames.get(((RegisterNumber) o).number);                    
-                }else if(output.size()>=2){ //chained assignments:
-                    GraphTargetItem last=output.get(output.size()-1);
-                    GraphTargetItem prev=output.get(output.size()-2);
-                    if(last instanceof SetTypeTreeItem ){
-                        if(prev instanceof StoreRegisterTreeItem){
-                            StoreRegisterTreeItem str=(StoreRegisterTreeItem)prev;
-                            if(str.register.number==((RegisterNumber) o).number){
-                                stack.push(output.remove(output.size()-1));
-                                output.remove(output.size()-1);
+                    ((RegisterNumber) o).name = regNames.get(((RegisterNumber) o).number);
+                } else if (output.size() >= 2) { //chained assignments:, ignore for class prototype assignment
+                    GraphTargetItem last = output.get(output.size() - 1);
+                    GraphTargetItem prev = output.get(output.size() - 2);
+                    if (last instanceof SetTypeTreeItem) {
+                        if (prev instanceof StoreRegisterTreeItem) {
+                            StoreRegisterTreeItem str = (StoreRegisterTreeItem) prev;
+                            if (str.register.number == ((RegisterNumber) o).number) {
+                                SetTypeTreeItem stt = (SetTypeTreeItem) last;
+                                stt.setTempRegister(((RegisterNumber) o).number);
+                                if ((stt.getValue() instanceof IncrementTreeItem) && (((IncrementTreeItem) stt.getValue()).object.equals(stt.getObject()))) {
+                                    stack.push(new PreIncrementTreeItem(this, stt.getObject()));
+                                } else if ((stt.getValue() instanceof DecrementTreeItem) && (((DecrementTreeItem) stt.getValue()).object.equals(stt.getObject()))) {
+                                    stack.push(new PreDecrementTreeItem(this, stt.getObject()));
+                                } else {
+                                    stack.push(last);
+                                }
+                                output.remove(output.size() - 1);
+                                output.remove(output.size() - 1);
                                 pos++;
                                 continue;
                             }
                         }
-                    }                    
+                    }
                 }
             }
             DirectValueTreeItem dvt = new DirectValueTreeItem(this, pos, o, constantPool);

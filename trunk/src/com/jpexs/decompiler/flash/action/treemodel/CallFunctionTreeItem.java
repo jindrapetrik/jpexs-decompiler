@@ -77,4 +77,30 @@ public class CallFunctionTreeItem extends TreeItem {
         }
         return calculatedFunction.toNumber();
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 37 * hash + (this.functionName != null ? this.functionName.hashCode() : 0);
+        hash = 37 * hash + (this.arguments != null ? this.arguments.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CallFunctionTreeItem other = (CallFunctionTreeItem) obj;
+        if (this.functionName != other.functionName && (this.functionName == null || !this.functionName.equals(other.functionName))) {
+            return false;
+        }
+        if (this.arguments != other.arguments && (this.arguments == null || !this.arguments.equals(other.arguments))) {
+            return false;
+        }
+        return true;
+    }
 }

@@ -17,6 +17,10 @@
 package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.treemodel.DecrementTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.IncrementTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.PostDecrementTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.PostIncrementTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.SetMemberTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
@@ -39,6 +43,26 @@ public class ActionSetMember extends Action {
         GraphTargetItem value = stack.pop();
         GraphTargetItem objectName = stack.pop();
         GraphTargetItem object = stack.pop();
+        if (value instanceof IncrementTreeItem) {
+            GraphTargetItem obj = ((IncrementTreeItem) value).object;
+            if (!stack.isEmpty()) {
+                if (stack.peek().equals(obj)) {
+                    stack.pop();
+                    stack.push(new PostIncrementTreeItem(this, obj));
+                    return;
+                }
+            }
+        }
+        if (value instanceof DecrementTreeItem) {
+            GraphTargetItem obj = ((DecrementTreeItem) value).object;
+            if (!stack.isEmpty()) {
+                if (stack.peek().equals(obj)) {
+                    stack.pop();
+                    stack.push(new PostDecrementTreeItem(this, obj));
+                    return;
+                }
+            }
+        }
         output.add(new SetMemberTreeItem(this, object, objectName, value));
     }
 }

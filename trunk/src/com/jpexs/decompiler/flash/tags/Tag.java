@@ -126,9 +126,9 @@ public class Tag {
 
     public Set<Integer> getDeepNeededCharacters(HashMap<Integer, CharacterTag> characters) {
         Set<Integer> ret = new HashSet<Integer>();
-        Set<Integer> needed = getNeededCharacters();        
+        Set<Integer> needed = getNeededCharacters();
         for (int ch : needed) {
-            if(!characters.containsKey(ch)){ //TODO: use Import tag (?)
+            if (!characters.containsKey(ch)) { //TODO: use Import tag (?)
                 continue;
             }
             ret.add(ch);

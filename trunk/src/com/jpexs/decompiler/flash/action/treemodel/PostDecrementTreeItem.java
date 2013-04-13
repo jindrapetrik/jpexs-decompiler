@@ -14,20 +14,27 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.action.treemodel.operations;
+package com.jpexs.decompiler.flash.action.treemodel;
 
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
-import com.jpexs.decompiler.flash.graph.UnaryOpItem;
 
-public class PreDecrementTreeItem extends UnaryOpItem {
+public class PostDecrementTreeItem extends TreeItem {
 
-    public PreDecrementTreeItem(GraphSourceItem instruction, GraphTargetItem object) {
-        super(instruction, PRECEDENCE_UNARY, object, "--");
+    public GraphTargetItem object;
+
+    public PostDecrementTreeItem(GraphSourceItem instruction, GraphTargetItem object) {
+        super(instruction, PRECEDENCE_POSTFIX);
+        this.object = object;
     }
 
     @Override
-    public double toNumber() {
-        return value.toNumber() - 1;
+    public String toString(ConstantPool constants) {
+        return object.toString(constants) + hilight("--");
+    }
+
+    @Override
+    public boolean hasSideEffect() {
+        return true;
     }
 }

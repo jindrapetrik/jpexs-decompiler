@@ -17,7 +17,11 @@
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.treemodel.DecrementTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.IncrementTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.PostDecrementTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.PostIncrementTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.SetPropertyTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
@@ -44,6 +48,26 @@ public class ActionSetProperty extends Action {
         if (index instanceof DirectValueTreeItem) {
             if (((DirectValueTreeItem) index).value instanceof Long) {
                 indexInt = (int) (long) (Long) ((DirectValueTreeItem) index).value;
+            }
+        }
+        if (value instanceof IncrementTreeItem) {
+            GraphTargetItem obj = ((IncrementTreeItem) value).object;
+            if (!stack.isEmpty()) {
+                if (stack.peek().equals(obj)) {
+                    stack.pop();
+                    stack.push(new PostIncrementTreeItem(this, obj));
+                    return;
+                }
+            }
+        }
+        if (value instanceof DecrementTreeItem) {
+            GraphTargetItem obj = ((DecrementTreeItem) value).object;
+            if (!stack.isEmpty()) {
+                if (stack.peek().equals(obj)) {
+                    stack.pop();
+                    stack.push(new PostDecrementTreeItem(this, obj));
+                    return;
+                }
             }
         }
         output.add(new SetPropertyTreeItem(this, target, indexInt, value));

@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.TraitMultinameUsage;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;

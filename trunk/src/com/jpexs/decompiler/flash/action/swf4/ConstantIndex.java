@@ -36,6 +36,17 @@ public class ConstantIndex {
         this.constantPool = constantPool;
     }
 
+    public String toStringNoQ() {
+        if (Main.RESOLVE_CONSTANTS) {
+            if (constantPool != null) {
+                if (index < constantPool.size()) {
+                    return constantPool.get(index);
+                }
+            }
+        }
+        return "constant" + index;
+    }
+
     @Override
     public String toString() {
         if (Main.RESOLVE_CONSTANTS) {

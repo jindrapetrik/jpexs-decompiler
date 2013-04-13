@@ -26,7 +26,7 @@ public class PreDecrementTreeItem extends UnaryOpItem implements AssignmentTreeI
     public PreDecrementTreeItem(AVM2Instruction instruction, GraphTargetItem object) {
         super(instruction, PRECEDENCE_UNARY, object, "--");
     }
-    
+
     @Override
     public boolean hasSideEffect() {
         return true;

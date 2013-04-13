@@ -18,6 +18,10 @@ package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
+import com.jpexs.decompiler.flash.action.treemodel.DecrementTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.IncrementTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.PostDecrementTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.PostIncrementTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.SetVariableTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
@@ -40,8 +44,28 @@ public class ActionSetVariable extends Action {
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
         GraphTargetItem value = stack.pop();
         GraphTargetItem name = stack.pop();
-        SetVariableTreeItem svt = new SetVariableTreeItem(this, name, value);
         variables.put(Highlighting.stripHilights(name.toStringNoQuotes((ConstantPool) null)), value);
+        if (value instanceof IncrementTreeItem) {
+            GraphTargetItem obj = ((IncrementTreeItem) value).object;
+            if (!stack.isEmpty()) {
+                if (stack.peek().equals(obj)) {
+                    stack.pop();
+                    stack.push(new PostIncrementTreeItem(this, obj));
+                    return;
+                }
+            }
+        }
+        if (value instanceof DecrementTreeItem) {
+            GraphTargetItem obj = ((DecrementTreeItem) value).object;
+            if (!stack.isEmpty()) {
+                if (stack.peek().equals(obj)) {
+                    stack.pop();
+                    stack.push(new PostDecrementTreeItem(this, obj));
+                    return;
+                }
+            }
+        }
+        SetVariableTreeItem svt = new SetVariableTreeItem(this, name, value);
         output.add(svt);
     }
 }

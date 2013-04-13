@@ -22,6 +22,7 @@ package com.jpexs.decompiler.flash.action.parser.script;
  */
 public enum SymbolType {
     //Keywords
+
     BREAK,
     CASE,
     CONTINUE,
@@ -130,5 +131,4 @@ public enum SymbolType {
     INTEGER,
     DOUBLE,
     TYPENAME
-    
 }

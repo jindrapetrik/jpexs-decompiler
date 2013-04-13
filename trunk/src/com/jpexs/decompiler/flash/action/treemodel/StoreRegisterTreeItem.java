@@ -26,6 +26,27 @@ public class StoreRegisterTreeItem extends TreeItem implements SetTypeTreeItem {
     public RegisterNumber register;
     public GraphTargetItem value;
 
+    @Override
+    public void setValue(GraphTargetItem value) {
+        this.value = value;
+    }
+    private int tempRegister = -1;
+
+    @Override
+    public int getTempRegister() {
+        return tempRegister;
+    }
+
+    @Override
+    public void setTempRegister(int tempRegister) {
+        this.tempRegister = tempRegister;
+    }
+
+    @Override
+    public GraphTargetItem getValue() {
+        return value;
+    }
+
     public StoreRegisterTreeItem(GraphSourceItem instruction, RegisterNumber register, GraphTargetItem value) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.value = value;

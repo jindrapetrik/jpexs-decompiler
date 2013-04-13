@@ -810,19 +810,20 @@ public class Action implements GraphSourceItem {
              ActionWith awith = (ActionWith) action;
              List<GraphTargetItem> withCommands = ActionGraph.translateViaGraph(registerNames, variables, functions,new ArrayList<Action>() , version); //TODO:parse with actions
              output.add(new WithTreeItem(action, stack.pop(), withCommands));
-             } else */ if (action instanceof ActionStoreRegister) {
-                if ((ip + 1 <= end) && (actions.get(ip + 1) instanceof ActionPop)) {
-                    action.translate(localData, stack, output);
-                    stack.pop();
-                    ip++;
-                } else {
-                    try {
-                        action.translate(localData, stack, output);
-                    } catch (Exception ex) {
-                        //ignore
-                    }
-                }
-            } /*else if (action instanceof ActionStrictEquals) {
+             } else */ if (false) {
+            } /*if (action instanceof ActionStoreRegister) {
+             if ((ip + 1 <= end) && (actions.get(ip + 1) instanceof ActionPop)) {
+             action.translate(localData, stack, output);
+             stack.pop();
+             ip++;
+             } else {
+             try {
+             action.translate(localData, stack, output);
+             } catch (Exception ex) {
+             //ignore
+             }
+             }
+             } */ /*else if (action instanceof ActionStrictEquals) {
              if ((ip + 1 < actions.size()) && (actions.get(ip + 1) instanceof ActionIf)) {
              List<TreeItem> caseValues = new ArrayList<TreeItem>();
              List<List<TreeItem>> caseCommands = new ArrayList<List<TreeItem>>();
@@ -910,7 +911,7 @@ public class Action implements GraphSourceItem {
     }
 
     public static List<GraphTargetItem> checkClass(List<GraphTargetItem> output) {
-        if(true){
+        if (true) {
             //return output;
         }
         List<GraphTargetItem> ret = new ArrayList<GraphTargetItem>();
@@ -937,7 +938,21 @@ public class Action implements GraphSourceItem {
                                 className = getWithoutGlobal((GetMemberTreeItem) nti.value);
                                 if (parts.size() >= 1) {
                                     if (parts.get(0) instanceof StoreRegisterTreeItem) {
-                                        int classReg = ((StoreRegisterTreeItem) parts.get(0)).register.number;
+                                        StoreRegisterTreeItem str1 = (StoreRegisterTreeItem) parts.get(0);
+                                        int classReg = str1.register.number;
+                                        int instanceReg = -1;
+                                        if ((str1.value instanceof GetMemberTreeItem) && ((GetMemberTreeItem) str1.value).object instanceof SetTypeTreeItem) {
+                                            int tmp = classReg;
+                                            SetTypeTreeItem stt = (SetTypeTreeItem) ((GetMemberTreeItem) str1.value).object;
+                                            classReg = stt.getTempRegister();
+                                            instanceReg = tmp;
+                                            parts.remove(0);
+                                            parts.add(0, new StoreRegisterTreeItem(null, new RegisterNumber(classReg), stt.getValue()));
+                                            parts.add(1, (GraphTargetItem) stt);
+                                            ((GetMemberTreeItem) str1.value).object = new DirectValueTreeItem(null, 0, new RegisterNumber(classReg), null);
+                                            parts.add(2, new StoreRegisterTreeItem(null, new RegisterNumber(instanceReg), str1.value));
+                                        }
+
                                         if ((parts.size() >= 2) && (parts.get(1) instanceof SetMemberTreeItem)) {
                                             GraphTargetItem ti1 = ((SetMemberTreeItem) parts.get(1)).value;
                                             GraphTargetItem ti2 = ((StoreRegisterTreeItem) parts.get(0)).value;
@@ -966,7 +981,7 @@ public class Action implements GraphSourceItem {
                                                         return output2;
                                                     }
                                                     if (parts.get(pos) instanceof StoreRegisterTreeItem) {
-                                                        int instanceReg = -1;
+
                                                         if (((StoreRegisterTreeItem) parts.get(pos)).value instanceof GetMemberTreeItem) {
                                                             GraphTargetItem obj = ((GetMemberTreeItem) ((StoreRegisterTreeItem) parts.get(pos)).value).object;
                                                             if (obj instanceof DirectValueTreeItem) {
@@ -1017,6 +1032,13 @@ public class Action implements GraphSourceItem {
                                                             break;
                                                         }
                                                         pos++;
+                                                        if (parts.size() <= pos) {
+                                                            ok = false;
+                                                            break;
+                                                        }
+                                                        if (parts.get(pos) instanceof PopTreeItem) {
+                                                            pos++;
+                                                        }
                                                         if (parts.size() <= pos) {
                                                             ok = false;
                                                             break;

@@ -47,4 +47,30 @@ public class GetMemberTreeItem extends TreeItem {
         ret.addAll(memberName.getNeededSources());
         return ret;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 47 * hash + (this.object != null ? this.object.hashCode() : 0);
+        hash = 47 * hash + (this.memberName != null ? this.memberName.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final GetMemberTreeItem other = (GetMemberTreeItem) obj;
+        if (this.object != other.object && (this.object == null || !this.object.equals(other.object))) {
+            return false;
+        }
+        if (this.memberName != other.memberName && (this.memberName == null || !this.memberName.equals(other.memberName))) {
+            return false;
+        }
+        return true;
+    }
 }

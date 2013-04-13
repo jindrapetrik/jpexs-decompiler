@@ -267,7 +267,7 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
                 + " " + preloadArgumentsFlag
                 + " " + suppressThisFlag
                 + " " + preloadThisFlag
-                + " " + preloadGlobalFlag).trim() + " " + paramStr + " {"+(codeSize==0?"\r\n}":"");// + "\r\n" + Action.actionsToString(getAddress() + getHeaderLength(), getItems(container), knownAddreses, constantPool, version, hex, getFileAddress() + hdrSize) + "}";
+                + " " + preloadGlobalFlag).trim() + " " + paramStr + " {" + (codeSize == 0 ? "\r\n}" : "");// + "\r\n" + Action.actionsToString(getAddress() + getHeaderLength(), getItems(container), knownAddreses, constantPool, version, hex, getFileAddress() + hdrSize) + "}";
     }
 
     @Override

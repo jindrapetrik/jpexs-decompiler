@@ -72,7 +72,7 @@ public class SetSlotTreeItem extends TreeItem implements SetTypeTreeItem, Assign
     public GraphTargetItem getValue() {
         return value;
     }
-    
+
     @Override
     public boolean hasSideEffect() {
         return true;

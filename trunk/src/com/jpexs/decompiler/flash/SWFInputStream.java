@@ -585,7 +585,7 @@ public class SWFInputStream extends InputStream {
 
             if (ins.isBranch() || ins.isJump()) {
 
-                if (ins instanceof ActionIf && !stack.isEmpty() && (stack.peek().isCompileTime()&&(!stack.peek().hasSideEffect()))) {
+                if (ins instanceof ActionIf && !stack.isEmpty() && (stack.peek().isCompileTime() && (!stack.peek().hasSideEffect()))) {
                     ActionIf aif = (ActionIf) ins;
                     if (aif.ignoreUsed && (!aif.jumpUsed)) {
                         ins.setIgnored(true);

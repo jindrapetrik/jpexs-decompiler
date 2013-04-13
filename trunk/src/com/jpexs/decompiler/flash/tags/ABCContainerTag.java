@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
  *
  * @author JPEXS
  */
-public interface ABCContainerTag extends Comparable<ABCContainerTag>{
+public interface ABCContainerTag extends Comparable<ABCContainerTag> {
+
     public ABC getABC();
 }

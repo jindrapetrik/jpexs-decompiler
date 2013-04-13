@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.Main;
-import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
@@ -38,7 +37,6 @@ public class DoABCTag extends Tag implements ABCContainerTag {
         return abc;
     }
 
-    
     @Override
     public String getName() {
         return "DoABC";
@@ -79,7 +77,6 @@ public class DoABCTag extends Tag implements ABCContainerTag {
         }
         return new byte[0];
     }
-
 
     @Override
     public int compareTo(ABCContainerTag o) {

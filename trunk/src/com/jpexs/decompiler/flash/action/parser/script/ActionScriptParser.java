@@ -36,7 +36,6 @@ import static com.jpexs.decompiler.flash.action.parser.script.SymbolType.DO;
 import static com.jpexs.decompiler.flash.action.parser.script.SymbolType.INCREMENT;
 import static com.jpexs.decompiler.flash.action.parser.script.SymbolType.PARENT_OPEN;
 import static com.jpexs.decompiler.flash.action.parser.script.SymbolType.SWITCH;
-import com.jpexs.decompiler.flash.action.swf3.ActionPlay;
 import com.jpexs.decompiler.flash.action.swf4.*;
 import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf6.ActionGreater;
@@ -48,7 +47,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -333,20 +331,20 @@ public class ActionScriptParser {
 
             }
         }
-        
-        if(!isInterface){
-            ifbody.add(new ActionPush((Long)1L));
+
+        if (!isInterface) {
+            ifbody.add(new ActionPush((Long) 1L));
             ifbody.add(new ActionPush(new Null()));
             ifbody.addAll(typeToActions(globalClassTypeStr, false));
             ifbody.add(new ActionPush("prototype"));
             ifbody.add(new ActionGetMember());
-            ifbody.add(new ActionPush((Long)3L));
+            ifbody.add(new ActionPush((Long) 3L));
             ifbody.add(new ActionPush("ASSetPropFlags"));
             ifbody.add(new ActionCallFunction());
         }
-        
-        if(constr.isEmpty()){
-            constr.add(new ActionDefineFunction(null,new ArrayList<String>(),0,SWF.DEFAULT_VERSION));
+
+        if (constr.isEmpty()) {
+            constr.add(new ActionDefineFunction(null, new ArrayList<String>(), 0, SWF.DEFAULT_VERSION));
             constr.add(new ActionStoreRegister(1));
             constr.addAll(typeToActions(globalClassTypeStr, true));
         }
@@ -370,7 +368,7 @@ public class ActionScriptParser {
             constr.add(new ActionImplementsOp());
         }
         ifbody.addAll(0, constr);
-        
+
         ret.addAll(typeToActions(globalClassTypeStr, false));
         ret.add(new ActionNot());
         ret.add(new ActionNot());

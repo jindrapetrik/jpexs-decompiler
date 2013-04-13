@@ -53,6 +53,4 @@ public class SetLocalTreeItem extends TreeItem implements SetTypeTreeItem, Assig
     public boolean hasSideEffect() {
         return true;
     }
-    
-    
 }

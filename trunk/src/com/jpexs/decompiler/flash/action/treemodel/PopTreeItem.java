@@ -14,21 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.action.parser.script;
+package com.jpexs.decompiler.flash.action.treemodel;
+
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 
 /**
  *
  * @author JPEXS
  */
-public enum SymbolGroup {
+public class PopTreeItem extends TreeItem {
 
-    OPERATOR,
-    KEYWORD,
-    STRING,
-    COMMENT,
-    XML,
-    IDENTIFIER,
-    INTEGER,
-    DOUBLE,
-    TYPENAME
+    public PopTreeItem(GraphSourceItem instruction) {
+        super(instruction, NOPRECEDENCE);
+    }
+
+    @Override
+    public String toString(ConstantPool constants) {
+        return "";
+    }
+
+    @Override
+    public boolean needsSemicolon() {
+        return false;
+    }
 }

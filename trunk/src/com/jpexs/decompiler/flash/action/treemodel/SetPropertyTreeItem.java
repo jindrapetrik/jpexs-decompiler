@@ -28,6 +28,27 @@ public class SetPropertyTreeItem extends TreeItem implements SetTypeTreeItem {
     public int propertyIndex;
     public GraphTargetItem value;
 
+    @Override
+    public void setValue(GraphTargetItem value) {
+        this.value = value;
+    }
+    private int tempRegister = -1;
+
+    @Override
+    public int getTempRegister() {
+        return tempRegister;
+    }
+
+    @Override
+    public void setTempRegister(int tempRegister) {
+        this.tempRegister = tempRegister;
+    }
+
+    @Override
+    public GraphTargetItem getValue() {
+        return value;
+    }
+
     public SetPropertyTreeItem(GraphSourceItem instruction, GraphTargetItem target, int propertyIndex, GraphTargetItem value) {
         super(instruction, PRECEDENCE_ASSIGMENT);
         this.target = target;
@@ -55,7 +76,7 @@ public class SetPropertyTreeItem extends TreeItem implements SetTypeTreeItem {
         ret.addAll(value.getNeededSources());
         return ret;
     }
-    
+
     @Override
     public boolean hasSideEffect() {
         return true;

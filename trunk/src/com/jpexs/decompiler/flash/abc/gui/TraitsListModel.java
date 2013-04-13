@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.abc.gui;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;

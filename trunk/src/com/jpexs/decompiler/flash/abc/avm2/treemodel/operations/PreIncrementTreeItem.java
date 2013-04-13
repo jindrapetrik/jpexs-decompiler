@@ -25,7 +25,7 @@ public class PreIncrementTreeItem extends UnaryOpItem {
     public PreIncrementTreeItem(AVM2Instruction instruction, GraphTargetItem object) {
         super(instruction, PRECEDENCE_UNARY, object, "++");
     }
-    
+
     @Override
     public boolean hasSideEffect() {
         return true;

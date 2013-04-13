@@ -26,6 +26,27 @@ public class SetMemberTreeItem extends TreeItem implements SetTypeTreeItem {
     public GraphTargetItem object;
     public GraphTargetItem objectName;
     public GraphTargetItem value;
+    private int tempRegister = -1;
+
+    @Override
+    public void setValue(GraphTargetItem value) {
+        this.value = value;
+    }
+
+    @Override
+    public int getTempRegister() {
+        return tempRegister;
+    }
+
+    @Override
+    public void setTempRegister(int tempRegister) {
+        this.tempRegister = tempRegister;
+    }
+
+    @Override
+    public GraphTargetItem getValue() {
+        return value;
+    }
 
     public SetMemberTreeItem(GraphSourceItem instruction, GraphTargetItem object, GraphTargetItem objectName, GraphTargetItem value) {
         super(instruction, PRECEDENCE_ASSIGMENT);
@@ -56,7 +77,7 @@ public class SetMemberTreeItem extends TreeItem implements SetTypeTreeItem {
         ret.addAll(value.getNeededSources());
         return ret;
     }
-    
+
     @Override
     public boolean hasSideEffect() {
         return true;

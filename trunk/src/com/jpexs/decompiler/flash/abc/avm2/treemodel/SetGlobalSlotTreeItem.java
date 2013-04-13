@@ -37,7 +37,7 @@ public class SetGlobalSlotTreeItem extends TreeItem {
     public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         return hilight("setglobalslot(" + slotId + ",") + value.toString(constants, localRegNames, fullyQualifiedNames) + hilight(")");
     }
-    
+
     @Override
     public boolean hasSideEffect() {
         return true;
