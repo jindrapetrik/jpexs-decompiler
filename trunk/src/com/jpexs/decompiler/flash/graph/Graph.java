@@ -1423,8 +1423,10 @@ public class Graph {
             localDataList.add(o);
         }
         for (GraphTargetItem ti : tree) {
-            ret.append(ti.toStringSemicoloned(localDataList));
-            ret.append("\r\n");
+            if (!ti.isEmpty()) {
+                ret.append(ti.toStringSemicoloned(localDataList));
+                ret.append("\r\n");
+            }
         }
         String parts[] = ret.toString().split("\r\n");
         ret = new StringBuilder();

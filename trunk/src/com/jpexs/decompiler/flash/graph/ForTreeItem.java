@@ -72,7 +72,9 @@ public class ForTreeItem extends LoopItem implements Block {
         }
         ret += hilight(")") + "\r\n{\r\n";
         for (GraphTargetItem ti : commands) {
-            ret += ti.toStringSemicoloned(localData) + "\r\n";
+            if (!ti.isEmpty()) {
+                ret += ti.toStringSemicoloned(localData) + "\r\n";
+            }
         }
         ret += hilight("}") + "\r\n";
         ret += ":loop" + loop.id;

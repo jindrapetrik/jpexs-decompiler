@@ -43,7 +43,9 @@ public class WhileItem extends LoopItem implements Block {
         ret += "loop" + loop.id + ":\r\n";
         ret += hilight("while(") + (expression == null ? "null" : expression.toString(localData)) + hilight(")") + "\r\n{\r\n";
         for (GraphTargetItem ti : commands) {
-            ret += ti.toStringSemicoloned(localData) + "\r\n";
+            if (!ti.isEmpty()) {
+                ret += ti.toStringSemicoloned(localData) + "\r\n";
+            }
         }
         ret += hilight("}") + "\r\n";
         ret += ":loop" + loop.id;

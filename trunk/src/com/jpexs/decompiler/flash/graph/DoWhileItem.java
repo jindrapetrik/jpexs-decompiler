@@ -48,7 +48,9 @@ public class DoWhileItem extends LoopItem implements Block {
         ret += "loop" + loop.id + ":\r\n";
         ret += hilight("do\r\n{") + "\r\n";
         for (GraphTargetItem ti : commands) {
-            ret += ti.toStringSemicoloned(localData) + "\r\n";
+            if (!ti.isEmpty()) {
+                ret += ti.toStringSemicoloned(localData) + "\r\n";
+            }
         }
         ret += hilight("}\r\nwhile(") + expression.toString(localData) + hilight(");") + "\r\n";
         ret += ":loop" + loop.id;

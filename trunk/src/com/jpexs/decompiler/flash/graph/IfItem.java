@@ -50,13 +50,17 @@ public class IfItem extends GraphTargetItem implements Block {
         String ret;
         ret = hilight("if(") + expression.toString(localData) + hilight(")") + "\r\n{\r\n";
         for (GraphTargetItem ti : onTrue) {
-            ret += ti.toStringSemicoloned(localData) + "\r\n";
+            if (!ti.isEmpty()) {
+                ret += ti.toStringSemicoloned(localData) + "\r\n";
+            }
         }
         ret += hilight("}");
         if (onFalse.size() > 0) {
             ret += "\r\n" + hilight("else") + "\r\n" + hilight("{") + "\r\n";
             for (GraphTargetItem ti : onFalse) {
-                ret += ti.toStringSemicoloned(localData) + "\r\n";
+                if (!ti.isEmpty()) {
+                    ret += ti.toStringSemicoloned(localData) + "\r\n";
+                }
             }
             ret += hilight("}");
         }

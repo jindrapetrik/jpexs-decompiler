@@ -57,7 +57,9 @@ public class SwitchItem extends LoopItem implements Block {
             }
             ret += Graph.INDENTOPEN + "\r\n";
             for (int j = 0; j < caseCommands.get(i).size(); j++) {
-                ret += caseCommands.get(i).get(j).toStringSemicoloned(localData) + "\r\n";
+                if (!caseCommands.get(i).get(j).isEmpty()) {
+                    ret += caseCommands.get(i).get(j).toStringSemicoloned(localData) + "\r\n";
+                }
             }
             ret += Graph.INDENTCLOSE + "\r\n";
         }
@@ -66,7 +68,9 @@ public class SwitchItem extends LoopItem implements Block {
                 ret += hilight("default") + ":\r\n";
                 ret += Graph.INDENTOPEN + "\r\n";
                 for (int j = 0; j < defaultCommands.size(); j++) {
-                    ret += defaultCommands.get(j).toStringSemicoloned(localData) + "\r\n";
+                    if (!defaultCommands.get(j).isEmpty()) {
+                        ret += defaultCommands.get(j).toStringSemicoloned(localData) + "\r\n";
+                    }
                 }
                 ret += Graph.INDENTCLOSE + "\r\n";
             }

@@ -137,4 +137,8 @@ public abstract class GraphTargetItem {
         }
         return toString(localData2) + (needsNewLine() ? "\r\n" : "");
     }
+
+    public boolean isEmpty() {
+        return false;
+    }
 }

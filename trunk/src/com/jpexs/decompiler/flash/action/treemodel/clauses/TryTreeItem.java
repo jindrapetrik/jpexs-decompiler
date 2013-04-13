@@ -55,21 +55,27 @@ public class TryTreeItem extends TreeItem implements Block {
         List localData = new ArrayList();
         localData.add(constants);
         for (GraphTargetItem ti : tryCommands) {
-            ret += ti.toStringSemicoloned(localData) + "\r\n";
+            if (!ti.isEmpty()) {
+                ret += ti.toStringSemicoloned(localData) + "\r\n";
+            }
         }
         ret += "}";
         for (int e = 0; e < catchExceptions.size(); e++) {
             ret += "\r\ncatch(" + catchExceptions.get(e).toStringNoQuotes(localData) + ")\r\n{\r\n";
             List<GraphTargetItem> commands = catchCommands.get(e);
             for (GraphTargetItem ti : commands) {
-                ret += ti.toStringSemicoloned(localData) + "\r\n";
+                if (!ti.isEmpty()) {
+                    ret += ti.toStringSemicoloned(localData) + "\r\n";
+                }
             }
             ret += "}";
         }
         if (finallyCommands.size() > 0) {
             ret += "\r\nfinally\r\n{\r\n";
             for (GraphTargetItem ti : finallyCommands) {
-                ret += ti.toStringSemicoloned(localData) + "\r\n";
+                if (!ti.isEmpty()) {
+                    ret += ti.toStringSemicoloned(localData) + "\r\n";
+                }
             }
             ret += "}";
         }

@@ -37,4 +37,9 @@ public class PopTreeItem extends TreeItem {
     public boolean needsSemicolon() {
         return false;
     }
+
+    @Override
+    public boolean isEmpty() {
+        return true;
+    }
 }
