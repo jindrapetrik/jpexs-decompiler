@@ -177,7 +177,7 @@ public class ActionScriptParser {
         s = lex(lexer);
         while (s.isType(SymbolType.DOT, SymbolType.BRACKET_OPEN)) {
             if (s.type == SymbolType.BRACKET_OPEN) {
-                ret.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                ret.addAll(expression(lexer, registerVars, inFunction, inMethod, true));
                 expected(lexer, SymbolType.BRACKET_CLOSE);
                 ret.add(new ActionGetMember());
                 s = lex(lexer);
@@ -236,7 +236,7 @@ public class ActionScriptParser {
                 lexer.pushback(s);
             }
             cnt++;
-            ret.addAll(0,expression(lexer, registerVars, inFunction, inMethod));
+            ret.addAll(0, expression(lexer, registerVars, inFunction, inMethod, true));
             s = lex(lexer);
             expected(s, lexer.yyline(), SymbolType.COMMA, SymbolType.PARENT_CLOSE);
         }
@@ -255,10 +255,10 @@ public class ActionScriptParser {
             if (s.type != SymbolType.COMMA) {
                 lexer.pushback(s);
             }
-            s = lex(lexer); 
-            expected(s,lexer.yyline(), SymbolType.IDENTIFIER);
+            s = lex(lexer);
+            expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
             paramNames.add(s.value.toString());
-            s = lex(lexer);            
+            s = lex(lexer);
             if (s.type == SymbolType.COLON) {
                 type(lexer);
                 s = lex(lexer);
@@ -279,7 +279,7 @@ public class ActionScriptParser {
         registerVars.put("this", REGISTER_THIS);
         registerVars.put("_global", REGISTER_GLOBAL);
         for (int i = 0; i < paramNames.size(); i++) {
-            registerVars.put(paramNames.get(i), (7 + (paramNames.size()-i-1)));
+            registerVars.put(paramNames.get(i), (7 + (paramNames.size() - i - 1)));
         }
         boolean preloadParentFlag = false;
         boolean preloadRootFlag = false;
@@ -359,12 +359,12 @@ public class ActionScriptParser {
                 registerMap.put(6, newpos);
                 newpos++;
             }
-            if(newpos<1){
-                newpos=1;
+            if (newpos < 1) {
+                newpos = 1;
             }
             for (int i = 0; i < paramNames.size(); i++) {
                 registerMap.put(7 + i, newpos);
-                paramRegs.add(newpos);
+                paramRegs.add(0,newpos);
                 newpos++;
             }
 
@@ -492,7 +492,7 @@ public class ActionScriptParser {
                         s = lex(lexer);
                     }
                     if (s.type == SymbolType.ASSIGN) {
-                        ifbody.addAll(expression(lexer, new HashMap<String, Integer>(), false, false));
+                        ifbody.addAll(expression(lexer, new HashMap<String, Integer>(), false, false, true));
                         ifbody.add(new ActionPush(new RegisterNumber(isStatic ? 1 : 2)));
                         ifbody.add(new ActionPush(ident));
                         ifbody.add(new ActionSetMember());
@@ -605,16 +605,16 @@ public class ActionScriptParser {
                 ret.addAll(function(lexer, true, s.value.toString(), false));
                 break;
             case NEW:
-                List<Action> newcmds=new ArrayList<Action>();
+                List<Action> newcmds = new ArrayList<Action>();
                 newcmds.addAll(typeToActions(type(lexer), false));
                 expected(lexer, SymbolType.PARENT_OPEN);
                 if (newcmds.get(newcmds.size() - 1) instanceof ActionGetMember) {
                     newcmds.remove(newcmds.size() - 1);
-                    newcmds.addAll(0,call(lexer, registerVars, inFunction, inMethod));
+                    newcmds.addAll(0, call(lexer, registerVars, inFunction, inMethod));
                     newcmds.add(new ActionNewMethod());
                 } else if (newcmds.get(newcmds.size() - 1) instanceof ActionGetVariable) {
                     newcmds.remove(newcmds.size() - 1);
-                    newcmds.addAll(0,call(lexer, registerVars, inFunction, inMethod));
+                    newcmds.addAll(0, call(lexer, registerVars, inFunction, inMethod));
                     newcmds.add(new ActionNewObject());
                 }
                 ret.addAll(newcmds);
@@ -632,7 +632,7 @@ public class ActionScriptParser {
                 }
 
                 if (s.type == SymbolType.ASSIGN) {
-                    ret.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                    ret.addAll(expression(lexer, registerVars, inFunction, inMethod, true));
                     if (inFunction) {
                         for (int i = 0; i < 256; i++) {
                             if (!registerVars.containsValue(i)) {
@@ -685,7 +685,7 @@ public class ActionScriptParser {
                 switch (s.type) {
                     case ASSIGN:
                         ret.addAll(var);
-                        ret = gettoset(ret, expression(lexer, registerVars, inFunction, inMethod));
+                        ret = gettoset(ret, expression(lexer, registerVars, inFunction, inMethod, true));
                         break;
                     case ASSIGN_BITAND:
                     case ASSIGN_BITOR:
@@ -700,7 +700,7 @@ public class ActionScriptParser {
                     case ASSIGN_XOR:
                         List<Action> varset = new ArrayList<Action>();
                         varset.addAll(var);
-                        var.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                        var.addAll(expression(lexer, registerVars, inFunction, inMethod, true));
                         switch (s.type) {
                             case ASSIGN_BITAND:
                                 var.add(new ActionBitAnd());
@@ -747,11 +747,11 @@ public class ActionScriptParser {
                         }
                         break;
                     case PARENT_OPEN: //function call
-                        List<Action> callcmds=new ArrayList<Action>();
+                        List<Action> callcmds = new ArrayList<Action>();
                         callcmds.addAll(var);
                         if (callcmds.get(callcmds.size() - 1) instanceof ActionGetMember) {
                             callcmds.remove(callcmds.size() - 1);
-                            callcmds.addAll(0,call(lexer, registerVars, inFunction, inMethod));
+                            callcmds.addAll(0, call(lexer, registerVars, inFunction, inMethod));
                             callcmds.add(new ActionCallMethod());
                             callcmds.add(new ActionPop());
                         } else if (callcmds.get(callcmds.size() - 1) instanceof ActionGetVariable) {
@@ -759,11 +759,11 @@ public class ActionScriptParser {
                             ActionPush ap = (ActionPush) callcmds.get(callcmds.size() - 1);
                             if (ap.values.get(0).equals("trace")) {
                                 callcmds.remove(callcmds.size() - 1);
-                                callcmds.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                                callcmds.addAll(expression(lexer, registerVars, inFunction, inMethod, true));
                                 expected(lexer, SymbolType.COMMA, SymbolType.PARENT_CLOSE);
                                 callcmds.add(new ActionTrace());
                             } else {
-                                callcmds.addAll(0,call(lexer, registerVars, inFunction, inMethod));
+                                callcmds.addAll(0, call(lexer, registerVars, inFunction, inMethod));
                                 callcmds.add(new ActionCallFunction());
                                 callcmds.add(new ActionPop());
                             }
@@ -776,7 +776,7 @@ public class ActionScriptParser {
                 break;
             case IF:
                 expected(lexer, SymbolType.PARENT_OPEN);
-                ret.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                ret.addAll(expression(lexer, registerVars, inFunction, inMethod, true));
                 expected(lexer, SymbolType.PARENT_CLOSE);
                 List<Action> onTrue = command(lexer, registerVars, inFunction, inMethod);
                 List<Action> onFalse = null;
@@ -814,7 +814,7 @@ public class ActionScriptParser {
                 break;
             case WHILE:
                 expected(lexer, SymbolType.PARENT_OPEN);
-                List<Action> whileExpr = expression(lexer, registerVars, inFunction, inMethod);
+                List<Action> whileExpr = expression(lexer, registerVars, inFunction, inMethod, true);
                 expected(lexer, SymbolType.PARENT_CLOSE);
                 List<Action> whileBody = command(lexer, registerVars, inFunction, inMethod);
                 whileExpr.add(new ActionNot());
@@ -835,7 +835,7 @@ public class ActionScriptParser {
                 List<Action> doBody = command(lexer, registerVars, inFunction, inMethod);
                 expected(lexer, SymbolType.WHILE);
                 expected(lexer, SymbolType.PARENT_OPEN);
-                List<Action> doExpr = expression(lexer, registerVars, inFunction, inMethod);
+                List<Action> doExpr = expression(lexer, registerVars, inFunction, inMethod, true);
 
                 expected(lexer, SymbolType.PARENT_CLOSE);
                 int doBodyLen = Action.actionsToBytes(doBody, false, SWF.DEFAULT_VERSION).length;
@@ -857,7 +857,7 @@ public class ActionScriptParser {
                     if (s2.type == SymbolType.IDENTIFIER) {
                         ParsedSymbol s3 = lex(lexer);
                         if (s3.type == SymbolType.IN) {
-                            expression(lexer, registerVars, inFunction, inMethod);
+                            expression(lexer, registerVars, inFunction, inMethod, true);
                             forin = true;
                         }
                     } else {
@@ -872,7 +872,7 @@ public class ActionScriptParser {
                 if (!forin) {
                     ret.addAll(nonempty(command(lexer, registerVars, inFunction, inMethod)));
                     expected(lexer, SymbolType.SEMICOLON);
-                    forExpr = expression(lexer, registerVars, inFunction, inMethod);
+                    forExpr = expression(lexer, registerVars, inFunction, inMethod, true);
                     expected(lexer, SymbolType.SEMICOLON);
                     forFinalCommands = command(lexer, registerVars, inFunction, inMethod);
                 }
@@ -897,7 +897,7 @@ public class ActionScriptParser {
                 break;
             case SWITCH:
                 expected(lexer, SymbolType.PARENT_OPEN);
-                List<Action> switchExpr = expression(lexer, registerVars, inFunction, inMethod);
+                List<Action> switchExpr = expression(lexer, registerVars, inFunction, inMethod, true);
                 expected(lexer, SymbolType.PARENT_CLOSE);
                 expected(lexer, SymbolType.CURLY_OPEN);
                 s = lex(lexer);
@@ -918,10 +918,10 @@ public class ActionScriptParser {
                     List<List<Action>> caseExprs = new ArrayList<List<Action>>();
                     List<ActionIf> caseIfsOne = new ArrayList<ActionIf>();
                     while (s.type == SymbolType.CASE) {
-                        List<Action> curCaseExpr = expression(lexer, registerVars, inFunction, inMethod);
+                        List<Action> curCaseExpr = expression(lexer, registerVars, inFunction, inMethod, true);
                         caseExprs.add(curCaseExpr);
                         if (firstCase) {
-                            curCaseExpr.add(0,new ActionStoreRegister(exprReg));
+                            curCaseExpr.add(0, new ActionStoreRegister(exprReg));
                         } else {
                             curCaseExpr.add(0, new ActionPush(new RegisterNumber(exprReg)));
                         }
@@ -947,7 +947,7 @@ public class ActionScriptParser {
                 if (s.type == SymbolType.DEFAULT) {
                     expected(lexer, SymbolType.COLON);
                     defCmd = commands(lexer, registerVars, inFunction, inMethod);
-                    s=lexer.lex();
+                    s = lexer.lex();
                 }
                 for (List<Action> caseCmd : caseCmds) {
                     ret.addAll(caseCmd);
@@ -971,7 +971,7 @@ public class ActionScriptParser {
                 for (int i = 0; i < caseIfs.size(); i++) {
                     for (int c = 0; c < caseIfs.get(i).size(); c++) {
                         int jmpPos = 0;
-                        for (int j = c+1; j < caseIfs.get(i).size(); j++) {
+                        for (int j = c + 1; j < caseIfs.get(i).size(); j++) {
                             jmpPos += exprLengths.get(i).get(j);
                         }
                         for (int k = i + 1; k < caseIfs.size(); k++) {
@@ -1014,7 +1014,7 @@ public class ActionScriptParser {
                 ret.add(acontinue);
                 break;
             case RETURN:
-                List<Action> retexpr = expression(lexer, true, registerVars, inFunction, inMethod);
+                List<Action> retexpr = expression(lexer, true, registerVars, inFunction, inMethod, true);
                 if (retexpr.isEmpty()) {
                     ret.add(new ActionPush(new Undefined()));
                 }
@@ -1063,7 +1063,7 @@ public class ActionScriptParser {
                 }
                 break;
             case THROW:
-                ret.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                ret.addAll(expression(lexer, registerVars, inFunction, inMethod, true));
                 ret.add(new ActionThrow());
                 break;
             default:
@@ -1080,70 +1080,86 @@ public class ActionScriptParser {
 
     }
 
-    private static List<Action> expression(ActionScriptLexer lexer, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod) throws IOException, ParseException {
-        return expression(lexer, false, registerVars, inFunction, inMethod);
+    private static List<Action> expression(ActionScriptLexer lexer, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder) throws IOException, ParseException {
+        return expression(lexer, false, registerVars, inFunction, inMethod, allowRemainder);
     }
 
-    private static List<Action> expressionRemainder(ActionScriptLexer lexer, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod) throws IOException, ParseException {
-        return expressionRemainder(new ArrayList<Action>(), lexer, registerVars, inFunction, inMethod);
+    private static List<Action> expressionRemainder(ActionScriptLexer lexer, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod,boolean allowRemainder) throws IOException, ParseException {
+        return expressionRemainder(new ArrayList<Action>(), lexer, registerVars, inFunction, inMethod,allowRemainder);
     }
 
-    private static List<Action> expressionRemainder(List<Action> expr, ActionScriptLexer lexer, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod) throws IOException, ParseException {
+    private static List<Action> expressionRemainder(List<Action> expr, ActionScriptLexer lexer, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod,boolean allowRemainder) throws IOException, ParseException {
         List<Action> ret = new ArrayList<Action>();
         ParsedSymbol s = lex(lexer);
         switch (s.type) {
+            case TERNAR:
+                List<Action> terOnTrue=expression(lexer, registerVars, inFunction, inMethod,true);
+                expected(lexer, SymbolType.COLON);                
+                List<Action> terOnFalse=expression(lexer, registerVars, inFunction, inMethod,true);
+                ret.add(new ActionNot());
+                ActionIf ifter=new ActionIf(0);
+                ret.add(ifter);
+                ActionJump jmpter=new ActionJump(0);
+                terOnTrue.add(jmpter);
+                int terOnTrueLen=Action.actionsToBytes(terOnTrue, false, SWF.DEFAULT_VERSION).length;
+                int terOnFalseLen=Action.actionsToBytes(terOnFalse, false, SWF.DEFAULT_VERSION).length;
+                ifter.setJumpOffset(terOnTrueLen);
+                jmpter.setJumpOffset(terOnFalseLen);
+                ret.addAll(terOnTrue);
+                ret.addAll(terOnFalse);
+                break;
             case BITAND:
-                ret.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                ret.addAll(expression(lexer, registerVars, inFunction, inMethod, allowRemainder));
                 ret.add(new ActionBitAnd());
                 break;
             case BITOR:
-                ret.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                ret.addAll(expression(lexer, registerVars, inFunction, inMethod, allowRemainder));
                 ret.add(new ActionBitOr());
                 break;
             case DIVIDE:
-                ret.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                ret.addAll(expression(lexer, registerVars, inFunction, inMethod, allowRemainder));
                 ret.add(new ActionDivide());
                 break;
             case EQUALS:
-                ret.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                ret.addAll(expression(lexer, registerVars, inFunction, inMethod, allowRemainder));
                 ret.add(new ActionEquals2());
                 break;
             case STRICT_EQUALS:
-                ret.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                ret.addAll(expression(lexer, registerVars, inFunction, inMethod, allowRemainder));
                 ret.add(new ActionStrictEquals());
                 break;
             case NOT_EQUAL:
-                ret.addAll(expression(lexer, registerVars, inFunction, inMethod));
-                ret.add(new ActionEquals());
+                ret.addAll(expression(lexer, registerVars, inFunction, inMethod, allowRemainder));
+                ret.add(new ActionEquals2());
                 ret.add(new ActionNot());
                 break;
             case STRICT_NOT_EQUAL:
-                ret.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                ret.addAll(expression(lexer, registerVars, inFunction, inMethod, allowRemainder));
                 ret.add(new ActionStrictEquals());
                 ret.add(new ActionNot());
                 break;
             case LOWER_THAN:
-                ret.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                ret.addAll(expression(lexer, registerVars, inFunction, inMethod, allowRemainder));
                 ret.add(new ActionLess2());
                 break;
             case LOWER_EQUAL:
-                ret.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                ret.addAll(expression(lexer, registerVars, inFunction, inMethod, allowRemainder));
                 ret.add(new ActionGreater());
                 ret.add(new ActionNot());
                 break;
             case GREATER_THAN:
-                ret.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                ret.addAll(expression(lexer, registerVars, inFunction, inMethod, allowRemainder));
                 ret.add(new ActionGreater());
                 break;
             case GREATER_EQUAL:
-                ret.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                ret.addAll(expression(lexer, registerVars, inFunction, inMethod, allowRemainder));
                 ret.add(new ActionLess2());
                 ret.add(new ActionNot());
                 break;
             case AND:
                 ret.add(new ActionPushDuplicate());
                 ret.add(new ActionNot());
-                List<Action> andExpr = expression(lexer, registerVars, inFunction, inMethod);
+                List<Action> andExpr = expression(lexer, registerVars, inFunction, inMethod, true);
                 andExpr.add(0, new ActionPop());
                 int andExprLen = Action.actionsToBytes(andExpr, false, SWF.DEFAULT_VERSION).length;
                 ret.add(new ActionIf(andExprLen));
@@ -1151,14 +1167,14 @@ public class ActionScriptParser {
                 break;
             case OR:
                 ret.add(new ActionPushDuplicate());
-                List<Action> orExpr = expression(lexer, registerVars, inFunction, inMethod);
+                List<Action> orExpr = expression(lexer, registerVars, inFunction, inMethod, true);
                 orExpr.add(0, new ActionPop());
                 int orExprLen = Action.actionsToBytes(orExpr, false, SWF.DEFAULT_VERSION).length;
                 ret.add(new ActionIf(orExprLen));
                 ret.addAll(orExpr);
                 break;
             case MINUS:
-                List<Action> minusExp = expression(lexer, registerVars, inFunction, inMethod);
+                List<Action> minusExp = expression(lexer, registerVars, inFunction, inMethod, allowRemainder);
                 if ((minusExp.size() == 1) && (minusExp.get(0) instanceof ActionPush) && (((ActionPush) minusExp.get(0)).values.get(0).equals(new Long(1)))) {
                     ret.add(new ActionDecrement());
                 } else {
@@ -1167,11 +1183,11 @@ public class ActionScriptParser {
                 }
                 break;
             case MULTIPLY:
-                ret.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                ret.addAll(expression(lexer, registerVars, inFunction, inMethod, allowRemainder));
                 ret.add(new ActionMultiply());
                 break;
             case PLUS:
-                List<Action> plusExp = expression(lexer, registerVars, inFunction, inMethod);
+                List<Action> plusExp = expression(lexer, registerVars, inFunction, inMethod, allowRemainder);
                 if ((plusExp.size() == 1) && (plusExp.get(0) instanceof ActionPush) && (((ActionPush) plusExp.get(0)).values.get(0).equals(new Long(1)))) {
                     ret.add(new ActionIncrement());
                 } else {
@@ -1180,21 +1196,21 @@ public class ActionScriptParser {
                 }
                 break;
             case XOR:
-                ret.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                ret.addAll(expression(lexer, registerVars, inFunction, inMethod, allowRemainder));
                 ret.add(new ActionBitXor());
                 break;
             case AS:
 
                 break;
             case INSTANCEOF:
-                ret.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                ret.addAll(expression(lexer, registerVars, inFunction, inMethod, allowRemainder));
                 ret.add(new ActionInstanceOf());
                 break;
             case IS:
 
                 break;
             case TYPEOF:
-                ret.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                ret.addAll(expression(lexer, registerVars, inFunction, inMethod, allowRemainder));
                 ret.add(new ActionTypeOf());
                 break;
             default:
@@ -1203,9 +1219,11 @@ public class ActionScriptParser {
         return ret;
     }
 
-    private static List<Action> expression(ActionScriptLexer lexer, boolean allowEmpty, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod) throws IOException, ParseException {
+    private static List<Action> expression(ActionScriptLexer lexer, boolean allowEmpty, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder) throws IOException, ParseException {
         List<Action> ret = new ArrayList<Action>();
         ParsedSymbol s = lex(lexer);
+        boolean existsRemainder = false;
+        boolean assocRight=false;
         switch (s.type) {
             case CURLY_OPEN: //Object literal
                 s = lex(lexer);
@@ -1215,9 +1233,9 @@ public class ActionScriptParser {
                         lexer.pushback(s);
                     }
                     objCnt++;
-                    ret.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                    ret.addAll(expression(lexer, registerVars, inFunction, inMethod, true));
                     expected(lexer, SymbolType.COLON);
-                    ret.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                    ret.addAll(expression(lexer, registerVars, inFunction, inMethod, true));
                     s = lex(lexer);
                     if (!s.isType(SymbolType.COMMA, SymbolType.CURLY_CLOSE)) {
                         expected(s, lexer.yyline(), SymbolType.COMMA, SymbolType.CURLY_CLOSE);
@@ -1234,7 +1252,7 @@ public class ActionScriptParser {
                         lexer.pushback(s);
                     }
                     arrCnt++;
-                    expression(lexer, registerVars, inFunction, inMethod);
+                    expression(lexer, registerVars, inFunction, inMethod, true);
                     s = lex(lexer);
                     if (!s.isType(SymbolType.COMMA, SymbolType.BRACKET_CLOSE)) {
                         expected(s, lexer.yyline(), SymbolType.COMMA, SymbolType.BRACKET_CLOSE);
@@ -1258,7 +1276,8 @@ public class ActionScriptParser {
             case INTEGER:
             case DOUBLE:
                 ret.add(new ActionPush(s.value));
-                ret.addAll(expressionRemainder(lexer, registerVars, inFunction, inMethod));
+                //ret.addAll(expressionRemainder(lexer, registerVars, inFunction, inMethod));
+                existsRemainder = true;
                 break;
             case DELETE:
                 ret.addAll(variable(lexer, registerVars, inFunction, inMethod));
@@ -1291,29 +1310,32 @@ public class ActionScriptParser {
                     ret.add(new ActionSetMember());
                 }
                 ret.add(new ActionPush(new RegisterNumber(tmpReg)));
-                ret.addAll(expressionRemainder(lexer, registerVars, inFunction, inMethod));
+                //ret.addAll(expressionRemainder(lexer, registerVars, inFunction, inMethod));
+                existsRemainder = true;
                 break;
             case NOT:
-                ret.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                ret.addAll(expression(lexer, registerVars, inFunction, inMethod, true));
                 ret.add(new ActionNot());
-                ret.addAll(expressionRemainder(lexer, registerVars, inFunction, inMethod));
+                //ret.addAll(expressionRemainder(lexer, registerVars, inFunction, inMethod));
+                existsRemainder = true;
                 break;
             case PARENT_OPEN:
-                ret.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                ret.addAll(expression(lexer, registerVars, inFunction, inMethod, true));
                 expected(lexer, SymbolType.PARENT_CLOSE);
-                ret.addAll(expressionRemainder(lexer, registerVars, inFunction, inMethod));
+                //ret.addAll(expressionRemainder(lexer, registerVars, inFunction, inMethod));
+                existsRemainder = true;
                 break;
             case NEW:
-                List<Action> newcmds=new ArrayList<Action>();
+                List<Action> newcmds = new ArrayList<Action>();
                 newcmds.addAll(variable(lexer, registerVars, inFunction, inMethod));
                 expected(lexer, SymbolType.PARENT_OPEN);
                 if (newcmds.get(newcmds.size() - 1) instanceof ActionGetMember) {
                     newcmds.remove(newcmds.size() - 1);
-                    newcmds.addAll(0,call(lexer, registerVars, inFunction, inMethod));
+                    newcmds.addAll(0, call(lexer, registerVars, inFunction, inMethod));
                     newcmds.add(new ActionNewMethod());
                 } else if (newcmds.get(newcmds.size() - 1) instanceof ActionGetVariable) {
                     newcmds.remove(newcmds.size() - 1);
-                    newcmds.addAll(0,call(lexer, registerVars, inFunction, inMethod));
+                    newcmds.addAll(0, call(lexer, registerVars, inFunction, inMethod));
                     newcmds.add(new ActionNewObject());
                 }
                 ret.addAll(newcmds);
@@ -1327,8 +1349,20 @@ public class ActionScriptParser {
                 s = lex(lexer);
                 switch (s.type) {
                     case ASSIGN:
-                        var = gettoset(var, expression(lexer, registerVars, inFunction, inMethod));
+                        int asTmpReg = 0;
+                        for (int i = 0; i < 256; i++) {
+                            if (!registerVars.containsValue(i)) {
+                                asTmpReg = i;
+                                break;
+                            }
+                        }
+                        List<Action> varval=expression(lexer, registerVars, inFunction, inMethod, true);
+                        varval.add(new ActionStoreRegister(asTmpReg));
+                        var = gettoset(var,varval);                                          
                         ret.addAll(var);
+                        ret.add(new ActionPush(new RegisterNumber(asTmpReg)));
+                        existsRemainder=true;
+                        assocRight=true;
                         break;
                     case ASSIGN_BITAND:
                     case ASSIGN_BITOR:
@@ -1340,7 +1374,7 @@ public class ActionScriptParser {
                     case ASSIGN_XOR:
                         List<Action> varset = new ArrayList<Action>();
                         varset.addAll(var);
-                        var.addAll(expression(lexer, registerVars, inFunction, inMethod));
+                        var.addAll(expression(lexer, registerVars, inFunction, inMethod, true));
                         switch (s.type) {
                             case ASSIGN_BITAND:
                                 var.add(new ActionBitAnd());
@@ -1364,17 +1398,19 @@ public class ActionScriptParser {
                                 var.add(new ActionAdd());
                                 break;
                         }
-                        int asTmpReg = 0;
+                        int asaTmpReg = 0;
                         for (int i = 0; i < 256; i++) {
                             if (!registerVars.containsValue(i)) {
-                                asTmpReg = i;
+                                asaTmpReg = i;
                                 break;
                             }
                         }
-                        var.add(new ActionStoreRegister(asTmpReg));
+                        var.add(new ActionStoreRegister(asaTmpReg));
                         varset = gettoset(varset, var);
                         ret.addAll(varset);
-                        ret.add(new ActionPush(new RegisterNumber(asTmpReg)));
+                        ret.add(new ActionPush(new RegisterNumber(asaTmpReg)));
+                        existsRemainder=true;
+                        assocRight=true;
                         break;
                     case INCREMENT:
                     case DECREMENT:
@@ -1398,11 +1434,11 @@ public class ActionScriptParser {
                     case PARENT_OPEN: //function call
                         if (var.get(var.size() - 1) instanceof ActionGetMember) {
                             var.remove(var.size() - 1);
-                            var.addAll(0,call(lexer, registerVars, inFunction, inMethod));
+                            var.addAll(0, call(lexer, registerVars, inFunction, inMethod));
                             var.add(new ActionCallMethod());
                         } else if (var.get(var.size() - 1) instanceof ActionGetVariable) {
                             var.remove(var.size() - 1);
-                            var.addAll(0,call(lexer, registerVars, inFunction, inMethod));
+                            var.addAll(0, call(lexer, registerVars, inFunction, inMethod));
                             var.add(new ActionCallFunction());
                         }
                         ret.addAll(var);
@@ -1410,12 +1446,20 @@ public class ActionScriptParser {
                     default:
                         ret.addAll(var);
                         lexer.pushback(s);
-                        ret.addAll(expressionRemainder(lexer, registerVars, inFunction, inMethod));
+                        existsRemainder = true;
+                    //ret.addAll(expressionRemainder(lexer, registerVars, inFunction, inMethod));
                 }
                 break;
             default:
                 lexer.pushback(s);
         }
+        List<Action> rem = new ArrayList<Action>();
+        if (allowRemainder&&existsRemainder) {
+            do {
+                rem = expressionRemainder(lexer, registerVars, inFunction, inMethod,assocRight);
+                ret.addAll(rem);
+            } while ((!assocRight)&&(!rem.isEmpty()));
+        }      
         return ret;
     }
 
@@ -1432,7 +1476,7 @@ public class ActionScriptParser {
 
         ret.addAll(commands(lexer, new HashMap<String, Integer>(), false, false));
 
-        if (lexer.lex().type!=SymbolType.EOF) {
+        if (lexer.lex().type != SymbolType.EOF) {
             throw new ParseException("Parsing finisned before end of the file", lexer.yyline());
         }
         Action.setActionsAddresses(ret, 0, SWF.DEFAULT_VERSION);
