@@ -75,7 +75,8 @@ public class ActionStoreRegister extends Action {
             rn.name = regNames.get(registerNumber);
         }
         item.moreSrc.add(new GraphSourceItemPos(this, 0));
+        boolean define=!variables.containsKey("__register" + registerNumber);
         variables.put("__register" + registerNumber, item);
-        output.add(new StoreRegisterTreeItem(this, rn, item));
+        output.add(new StoreRegisterTreeItem(this, rn, item,define));
     }
 }

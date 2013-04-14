@@ -397,6 +397,7 @@ public class Action implements GraphSourceItem {
         HashMap<GraphSourceItemContainer, Integer> containersPos = new HashMap<GraphSourceItemContainer, Integer>();
         offset = address;
         int pos = -1;
+        boolean lastPush = false;
         for (GraphSourceItem s : srcList) {
             Action a = null;
             if (s instanceof Action) {
@@ -437,6 +438,10 @@ public class Action implements GraphSourceItem {
             }
 
             if (importantOffsets.contains(offset)) {
+                if (lastPush) {
+                    ret += "\r\n";
+                    lastPush = false;
+                }
                 ret += "loc" + Helper.formatAddress(offset) + ":";
             }
 
@@ -468,14 +473,28 @@ public class Action implements GraphSourceItem {
                 }
                 add = "; ofs" + Helper.formatAddress(offset) + add;
                 add = "";
-                ret += Highlighting.hilighOffset("", offset) + a.getASMSourceReplaced(list, importantOffsets, constantPool, version, hex) + (a.ignored ? "; ignored" : "") + add + "\r\n";
-
+                if ((a instanceof ActionPush) && lastPush) {
+                    ret += " " + ((ActionPush) a).paramsToStringReplaced(list, importantOffsets, constantPool, version, hex);
+                } else {
+                    if(lastPush){
+                        ret+="\r\n";
+                    }
+                    ret += Highlighting.hilighOffset("", offset) + a.getASMSourceReplaced(list, importantOffsets, constantPool, version, hex) + (a.ignored ? "; ignored" : "") + add + ((a instanceof ActionPush) ? "" : "\r\n");
+                }
+                if (a instanceof ActionPush) {
+                    lastPush = true;
+                } else {
+                    lastPush = false;
+                }
                 //}
                 if (a.afterInsert != null) {
                     ret += a.afterInsert.getASMSource(list, importantOffsets, constantPool, version, hex) + "\r\n";
                 }
             }
             offset += a.getBytes(version).length;
+        }
+        if (lastPush) {
+            ret += "\r\n";
         }
         if (containers.containsKey(offset)) {
             for (int i = 0; i < containers.get(offset).size(); i++) {
@@ -947,10 +966,10 @@ public class Action implements GraphSourceItem {
                                             classReg = stt.getTempRegister();
                                             instanceReg = tmp;
                                             parts.remove(0);
-                                            parts.add(0, new StoreRegisterTreeItem(null, new RegisterNumber(classReg), stt.getValue()));
+                                            parts.add(0, new StoreRegisterTreeItem(null, new RegisterNumber(classReg), stt.getValue(),false));
                                             parts.add(1, (GraphTargetItem) stt);
                                             ((GetMemberTreeItem) str1.value).object = new DirectValueTreeItem(null, 0, new RegisterNumber(classReg), null);
-                                            parts.add(2, new StoreRegisterTreeItem(null, new RegisterNumber(instanceReg), str1.value));
+                                            parts.add(2, new StoreRegisterTreeItem(null, new RegisterNumber(instanceReg), str1.value,false));
                                         }
 
                                         if ((parts.size() >= 2) && (parts.get(1) instanceof SetMemberTreeItem)) {

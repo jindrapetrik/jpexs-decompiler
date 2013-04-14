@@ -211,6 +211,17 @@ public class ActionPush extends Action {
         values = oldVal;
         return ts;
     }
+    
+    public String paramsToStringReplaced(List<GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+        if (replacement == null || replacement.size() < values.size()) {
+            return paramsToString();
+        }
+        List<Object> oldVal = values;
+        values = replacement;
+        String ts = paramsToString();
+        values = oldVal;
+        return ts;
+    }
 
     public String toStringNoQ(int i) {
         String ret = "";
@@ -242,9 +253,8 @@ public class ActionPush extends Action {
         return ret;
     }
 
-    @Override
-    public String toString() {
-        String ret = "Push ";
+    public String paramsToString(){
+        String ret="";
         int pos = 0;
         for (int i = 0; i < values.size(); i++) {
             if (ignoredParts.contains(i)) {
@@ -257,6 +267,10 @@ public class ActionPush extends Action {
             ret += toString(i);
         }
         return ret;
+    }
+    @Override
+    public String toString() {
+        return "Push "+paramsToString();        
     }
 
     @Override

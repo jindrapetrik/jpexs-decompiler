@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.gui.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
+import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.gui.View;
@@ -40,6 +41,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.CaretEvent;
@@ -48,8 +51,10 @@ import jsyntaxpane.DefaultSyntaxKit;
 
 public class ActionPanel extends JPanel implements ActionListener {
 
+    private boolean debugRecompile = false;
     public LineMarkedEditorPane editor;
     public LineMarkedEditorPane decompiledEditor;
+    public LineMarkedEditorPane recompiledEditor;
     public List<Tag> list;
     public JSplitPane splitPane;
     public JSplitPane splitPane2;
@@ -128,6 +133,15 @@ public class ActionPanel extends JPanel implements ActionListener {
                      Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
                      }*/
                     decompiledEditor.setText(stripped);
+                    if (debugRecompile) {
+                        try {
+                            recompiledEditor.setText(Highlighting.stripHilights(com.jpexs.decompiler.flash.action.Action.actionsToString(0, ActionScriptParser.parse(stripped), null, SWF.DEFAULT_VERSION, false, 0)));
+                        } catch (ParseException ex) {
+                            Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (IOException ex) {
+                            Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
                 }
                 setEditMode(false);
                 Main.stopWork();
@@ -146,6 +160,8 @@ public class ActionPanel extends JPanel implements ActionListener {
         decompiledEditor = new LineMarkedEditorPane();
         decompiledEditor.setEditable(false);
 
+        recompiledEditor = new LineMarkedEditorPane();
+        recompiledEditor.setEditable(false);
 
         JButton graphButton = new JButton(View.getIcon("graph16"));
         graphButton.setActionCommand("GRAPH");
@@ -209,12 +225,17 @@ public class ActionPanel extends JPanel implements ActionListener {
         decLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
 
 
+        JPanel panC = new JPanel();
+        panC.setLayout(new BorderLayout());
+        panC.add(new JScrollPane(recompiledEditor), BorderLayout.CENTER);
+        panC.add(new JLabel("Recompiled"), BorderLayout.NORTH);
+
 
 
 
         setLayout(new BorderLayout());
         //add(splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(tagTree), splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panA, panB)), BorderLayout.CENTER);
-        add(splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panA, panB), BorderLayout.CENTER);
+        add(splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panA, debugRecompile ? new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panB, panC) : panB), BorderLayout.CENTER);
 //      splitPane.setResizeWeight(0.5);
         splitPane2.setResizeWeight(0.5);
         editor.setContentType("text/flasm");
@@ -222,6 +243,10 @@ public class ActionPanel extends JPanel implements ActionListener {
         decompiledEditor.setContentType("text/actionscript");
         decompiledEditor.setFont(new Font("Monospaced", Font.PLAIN, decompiledEditor.getFont().getSize()));
 
+        if (debugRecompile) {
+            recompiledEditor.setContentType("text/flasm");
+            recompiledEditor.setFont(new Font("Monospaced", Font.PLAIN, editor.getFont().getSize()));
+        }
         //tagTree.addTreeSelectionListener(this);
         editor.addCaretListener(new CaretListener() {
             @Override
