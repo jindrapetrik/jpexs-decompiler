@@ -51,6 +51,21 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
     long finallySize;
     private int version;
 
+    public ActionTry(boolean catchInRegisterFlag, boolean finallyBlockFlag, boolean catchBlockFlag, String catchName, int catchRegister, long trySize, long catchSize, long finallySize, int version) {
+        super(0x8F, 0);
+        this.catchInRegisterFlag = catchInRegisterFlag;
+        this.finallyBlockFlag = finallyBlockFlag;
+        this.catchBlockFlag = catchBlockFlag;
+        this.catchName = catchName;
+        this.catchRegister = catchRegister;
+        this.trySize = trySize;
+        this.catchSize = catchSize;
+        this.finallySize = finallySize;
+        this.version = version;
+    }
+
+    
+    
     public ActionTry(int actionLength, SWFInputStream sis, ReReadableInputStream rri, int version) throws IOException {
         super(0x8F, actionLength);
         long startPos = sis.getPos();
