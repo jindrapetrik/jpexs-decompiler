@@ -51,7 +51,7 @@ import jsyntaxpane.DefaultSyntaxKit;
 
 public class ActionPanel extends JPanel implements ActionListener {
 
-    private boolean debugRecompile = true;
+    private boolean debugRecompile = false;
     public LineMarkedEditorPane editor;
     public LineMarkedEditorPane decompiledEditor;
     public LineMarkedEditorPane recompiledEditor;

@@ -183,8 +183,15 @@ public class ActionScriptParser {
         } else {
             if (inMethod) {
                 ret.add(new ActionPush(new RegisterNumber(REGISTER_THIS)));
-                ret.add(pushConst(s.value.toString()));
-                ret.add(new ActionGetMember());
+                //TODO: Handle properties (?)
+                if (false) { //Action.propertyNamesList.contains(s.value.toString())) {
+                    ret.add(new ActionPush((Long) (long) (int) Action.propertyNamesList.indexOf(s.value.toString())));
+                    ret.add(new ActionGetProperty());
+                } else {
+                    ret.add(pushConst(s.value.toString()));
+                    ret.add(new ActionGetMember());
+                }
+
             } else {
                 ret.add(s.value.toString().equals("trace") ? new ActionPush(s.value.toString()) : pushConst(s.value.toString()));
                 ret.add(new ActionGetVariable());
@@ -201,8 +208,14 @@ public class ActionScriptParser {
             }
             s = lex();
             expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.THIS, SymbolType.SUPER);
-            ret.add(pushConst(s.value.toString()));
-            ret.add(new ActionGetMember());
+            //TODO: Handle properties (?)
+            if (false) {//Action.propertyNamesList.contains(s.value.toString())) {
+                ret.add(new ActionPush((Long) (long) (int) Action.propertyNamesList.indexOf(s.value.toString())));
+                ret.add(new ActionGetProperty());
+            } else {
+                ret.add(pushConst(s.value.toString()));
+                ret.add(new ActionGetMember());
+            }
             s = lex();
         }
         lexer.pushback(s);
@@ -475,6 +488,10 @@ public class ActionScriptParser {
                 ret.addAll(value);
                 ret.add(new ActionStoreRegister(((RegisterNumber) ((ActionPush) a).values.get(0)).number));
                 ret.add(new ActionPop());
+            } else if (a instanceof ActionGetProperty) {
+                ret.remove(ret.size() - 1);
+                ret.addAll(value);
+                ret.add(new ActionSetProperty());
             }
         }
         return ret;
@@ -806,6 +823,9 @@ public class ActionScriptParser {
                         }
                         if (at instanceof ActionGetVariable) {
                             ret.add(new ActionSetVariable());
+                        }
+                        if (at instanceof ActionGetProperty) {
+                            ret.add(new ActionSetProperty());
                         }
                         break;
                     case PARENT_OPEN: //function call

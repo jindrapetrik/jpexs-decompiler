@@ -72,8 +72,8 @@ public class Action implements GraphSourceItem {
      * Names of ActionScript properties
      */
     public static final String[] propertyNames = new String[]{
-        "_x",
-        "_y",
+        "_X",
+        "_Y",
         "_xscale",
         "_yscale",
         "_currentframe",
@@ -95,6 +95,7 @@ public class Action implements GraphSourceItem {
         "_xmouse",
         "_ymouse"
     };
+    public static final List<String> propertyNamesList=Arrays.asList(propertyNames);
     private static Logger logger = Logger.getLogger(Action.class.getName());
 
     /**
