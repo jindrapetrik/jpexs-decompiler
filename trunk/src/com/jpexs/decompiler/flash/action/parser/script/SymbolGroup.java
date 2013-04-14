@@ -30,5 +30,6 @@ public enum SymbolGroup {
     IDENTIFIER,
     INTEGER,
     DOUBLE,
-    TYPENAME
+    TYPENAME,
+    EOF
 }

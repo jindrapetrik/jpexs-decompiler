@@ -178,9 +178,11 @@ SingleCharacter = [^\r\n\'\\]
   "~"                            { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.NEGATE,yytext());  }  
   "?"                            { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.TERNAR,yytext());  }  
   ":"                            { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.COLON,yytext());  }  
+  "==="                          { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.STRICT_EQUALS,yytext());  }   
   "=="                           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.EQUALS,yytext());  } 
   "<="                           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.LOWER_EQUAL,yytext());  }  
   ">="                           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.GREATER_EQUAL,yytext());  }  
+  "!=="                          { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.STRICT_NOT_EQUAL,yytext());  }    
   "!="                           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.NOT_EQUAL,yytext());  }  
   "&&"                           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.AND,yytext());  }  
   "||"                           { return new ParsedSymbol(SymbolGroup.OPERATOR,SymbolType.OR,yytext());  }  
@@ -338,4 +340,4 @@ SingleCharacter = [^\r\n\'\\]
 
 /* error fallback */
 .|\n                             {  }
-<<EOF>>                          { return null; }
+<<EOF>>                          { return new ParsedSymbol(SymbolGroup.EOF,SymbolType.EOF,null); }

@@ -85,9 +85,11 @@ public enum SymbolType {
     TERNAR,
     COLON,
     EQUALS,
+    STRICT_EQUALS,
     LOWER_EQUAL,
     GREATER_EQUAL,
     NOT_EQUAL,
+    STRICT_NOT_EQUAL,
     AND,
     OR,
     INCREMENT,
@@ -130,5 +132,6 @@ public enum SymbolType {
     IDENTIFIER,
     INTEGER,
     DOUBLE,
-    TYPENAME
+    TYPENAME,
+    EOF
 }
