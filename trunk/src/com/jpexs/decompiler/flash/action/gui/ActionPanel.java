@@ -51,7 +51,7 @@ import jsyntaxpane.DefaultSyntaxKit;
 
 public class ActionPanel extends JPanel implements ActionListener {
 
-    private boolean debugRecompile = false;
+    private boolean debugRecompile = true;
     public LineMarkedEditorPane editor;
     public LineMarkedEditorPane decompiledEditor;
     public LineMarkedEditorPane recompiledEditor;
@@ -135,7 +135,9 @@ public class ActionPanel extends JPanel implements ActionListener {
                     decompiledEditor.setText(stripped);
                     if (debugRecompile) {
                         try {
-                            recompiledEditor.setText(Highlighting.stripHilights(com.jpexs.decompiler.flash.action.Action.actionsToString(0, ActionScriptParser.parse(stripped), null, SWF.DEFAULT_VERSION, false, 0)));
+                            ActionScriptParser ps = new ActionScriptParser();
+
+                            recompiledEditor.setText(Highlighting.stripHilights(com.jpexs.decompiler.flash.action.Action.actionsToString(0, ps.parse(stripped), null, SWF.DEFAULT_VERSION, false, 0)));
                         } catch (ParseException ex) {
                             Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
                         } catch (IOException ex) {

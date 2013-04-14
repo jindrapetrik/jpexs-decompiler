@@ -25,7 +25,7 @@ public class StoreRegisterTreeItem extends TreeItem implements SetTypeTreeItem {
 
     public RegisterNumber register;
     public GraphTargetItem value;
-    public boolean define=false;
+    public boolean define = false;
 
     @Override
     public void setValue(GraphTargetItem value) {
@@ -57,7 +57,7 @@ public class StoreRegisterTreeItem extends TreeItem implements SetTypeTreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return (define?hilight("var "):"")+hilight(register.toString() + "=") + value.toString(constants);
+        return (define ? hilight("var ") : "") + hilight(register.toString() + "=") + value.toString(constants);
     }
 
     @Override

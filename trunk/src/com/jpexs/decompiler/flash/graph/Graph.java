@@ -950,7 +950,7 @@ public class Graph {
                 ret.addAll(output);
             }
             GraphPart loopBodyStart = null;
-            if ((reversed == loop)||doWhile) {
+            if ((reversed == loop) || doWhile) {
                 if (expr instanceof LogicalOpItem) {
                     expr = ((LogicalOpItem) expr).invert();
                 } else {

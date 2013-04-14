@@ -35,6 +35,11 @@ public class ActionConstantPool extends Action {
 
     public List<String> constantPool = new ArrayList<String>();
 
+    public ActionConstantPool(List<String> constantPool) {
+        super(0x88, 0);
+        this.constantPool = constantPool;
+    }
+
     public ActionConstantPool(int actionLength, SWFInputStream sis, int version) throws IOException {
         super(0x88, actionLength);
         //sis = new SWFInputStream(new ByteArrayInputStream(sis.readBytes(actionLength)), version);

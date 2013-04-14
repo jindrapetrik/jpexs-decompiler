@@ -77,8 +77,8 @@ public class SWFInputStream extends InputStream {
     private long percentMax;
     private List<byte[]> buffered = new ArrayList<byte[]>();
     private ByteArrayOutputStream buffer;
-    private static boolean DEOBFUSCATION_ALL_CODE_IN_PREVIOUS_TAG = (Boolean)Configuration.getConfig("deobfuscateUsePrevTagOnly",true);
-    private static boolean AUTO_DEOBFUSCATE = (Boolean)Configuration.getConfig("autoDeobfuscate",true);
+    private static boolean DEOBFUSCATION_ALL_CODE_IN_PREVIOUS_TAG = (Boolean) Configuration.getConfig("deobfuscateUsePrevTagOnly", true);
+    private static boolean AUTO_DEOBFUSCATE = (Boolean) Configuration.getConfig("autoDeobfuscate", true);
 
     public int getBufferLength() {
         return buffer.size();

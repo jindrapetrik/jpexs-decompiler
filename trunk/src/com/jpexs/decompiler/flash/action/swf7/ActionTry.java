@@ -64,8 +64,6 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
         this.version = version;
     }
 
-    
-    
     public ActionTry(int actionLength, SWFInputStream sis, ReReadableInputStream rri, int version) throws IOException {
         super(0x8F, actionLength);
         long startPos = sis.getPos();

@@ -36,8 +36,8 @@ public class ActionJump extends Action {
 
     private int offset;
     public String identifier;
-    public boolean isContinue=false;
-    public boolean isBreak=false;
+    public boolean isContinue = false;
+    public boolean isBreak = false;
 
     public int getJumpOffset() {
         return offset;

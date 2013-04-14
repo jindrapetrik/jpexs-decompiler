@@ -315,7 +315,7 @@ public class ActionGraph extends Graph {
 
     @Override
     protected int checkIp(int ip) {
-        int oldIp=ip;
+        int oldIp = ip;
         //return in for..in
         GraphSourceItem action = code.get(ip);
         if ((action instanceof ActionPush) && (((ActionPush) action).values.size() == 1) && (((ActionPush) action).values.get(0) instanceof Null)) {
@@ -332,7 +332,7 @@ public class ActionGraph extends Graph {
                 }
             }
         }
-        if(oldIp!=ip){
+        if (oldIp != ip) {
             return checkIp(ip);
         }
         return ip;

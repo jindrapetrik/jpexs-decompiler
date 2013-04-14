@@ -476,8 +476,8 @@ public class Action implements GraphSourceItem {
                 if ((a instanceof ActionPush) && lastPush) {
                     ret += " " + ((ActionPush) a).paramsToStringReplaced(list, importantOffsets, constantPool, version, hex);
                 } else {
-                    if(lastPush){
-                        ret+="\r\n";
+                    if (lastPush) {
+                        ret += "\r\n";
                     }
                     ret += Highlighting.hilighOffset("", offset) + a.getASMSourceReplaced(list, importantOffsets, constantPool, version, hex) + (a.ignored ? "; ignored" : "") + add + ((a instanceof ActionPush) ? "" : "\r\n");
                 }
@@ -966,10 +966,10 @@ public class Action implements GraphSourceItem {
                                             classReg = stt.getTempRegister();
                                             instanceReg = tmp;
                                             parts.remove(0);
-                                            parts.add(0, new StoreRegisterTreeItem(null, new RegisterNumber(classReg), stt.getValue(),false));
+                                            parts.add(0, new StoreRegisterTreeItem(null, new RegisterNumber(classReg), stt.getValue(), false));
                                             parts.add(1, (GraphTargetItem) stt);
                                             ((GetMemberTreeItem) str1.value).object = new DirectValueTreeItem(null, 0, new RegisterNumber(classReg), null);
-                                            parts.add(2, new StoreRegisterTreeItem(null, new RegisterNumber(instanceReg), str1.value,false));
+                                            parts.add(2, new StoreRegisterTreeItem(null, new RegisterNumber(instanceReg), str1.value, false));
                                         }
 
                                         if ((parts.size() >= 2) && (parts.get(1) instanceof SetMemberTreeItem)) {
