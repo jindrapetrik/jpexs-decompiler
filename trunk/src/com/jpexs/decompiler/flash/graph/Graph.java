@@ -950,7 +950,7 @@ public class Graph {
                 ret.addAll(output);
             }
             GraphPart loopBodyStart = null;
-            if (reversed == loop) {
+            if ((reversed == loop)||doWhile) {
                 if (expr instanceof LogicalOpItem) {
                     expr = ((LogicalOpItem) expr).invert();
                 } else {
@@ -1095,6 +1095,11 @@ public class Graph {
                             if (ift.onFalse.isEmpty() || ((ift.onFalse.size() == 1) && (ift.onFalse.get(0) instanceof ContinueItem) && (((ContinueItem) ift.onFalse.get(0)).loopId == currentLoop.id))) {
                                 if (ift.expression != null) {
                                     expr = ift.expression;
+                                    if (expr instanceof LogicalOpItem) {
+                                        expr = ((LogicalOpItem) expr).invert();
+                                    } else {
+                                        expr = new NotItem(null, expr);
+                                    }
                                 }
                                 addIf = ift.onTrue;
                                 loopBody.remove(loopBody.size() - 1);
