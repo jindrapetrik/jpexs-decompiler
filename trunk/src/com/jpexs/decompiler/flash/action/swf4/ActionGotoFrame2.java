@@ -35,6 +35,13 @@ public class ActionGotoFrame2 extends Action {
     boolean playFlag;
     public int sceneBias;
 
+    public ActionGotoFrame2(boolean playFlag, boolean sceneBiasFlag, int sceneBias) {
+        super(0x9F, 0);
+        this.sceneBiasFlag = sceneBiasFlag;
+        this.playFlag = playFlag;
+        this.sceneBias = sceneBias;
+    }
+
     public ActionGotoFrame2(int actionLength, SWFInputStream sis) throws IOException {
         super(0x9F, actionLength);
         sis.readUB(6); //reserved

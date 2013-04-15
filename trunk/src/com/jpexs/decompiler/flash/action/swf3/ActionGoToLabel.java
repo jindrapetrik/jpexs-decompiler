@@ -34,6 +34,11 @@ public class ActionGoToLabel extends Action {
 
     public String label;
 
+    public ActionGoToLabel(String label) {
+        super(0x8C, 0);
+        this.label = label;
+    }
+
     public ActionGoToLabel(int actionLength, SWFInputStream sis, int version) throws IOException {
         super(0x8C, actionLength);
         //byte data[] = sis.readBytes(actionLength);

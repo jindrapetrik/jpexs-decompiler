@@ -157,7 +157,38 @@ SingleCharacter = [^\r\n\'\\]
   "null"                         { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.NULL,yytext()); }
   "this"                         { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.THIS,yytext()); }
   "true"                         { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.TRUE,yytext()); }
-
+  "getUrl"                       { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.GETURL,yytext()); }
+  "trace"                        { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.TRACE,yytext()); }
+  "gotoAndStop"                  { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.GOTOANDSTOP,yytext()); }
+  "nextFrame"                    { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.NEXTFRAME,yytext()); }
+  "play"                         { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.PLAY,yytext()); }
+  "prevFrame"                    { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.PREVFRAME,yytext()); }
+  "tellTarget"                   { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.TELLTARGET,yytext()); }
+  "stop"                         { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.STOP,yytext()); }
+  "stopAllSounds"                { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.STOPALLSOUNDS,yytext()); }
+  "toggleHighQuality"            { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.TOGGLEHIGHQUALITY,yytext()); }
+  "ifFrameLoaded"                 { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.IFFRAMELOADED,yytext()); }
+  "ord"                          { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.ORD,yytext()); }
+  "chr"                          { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.CHR,yytext()); }
+  "duplicateMovieClip"           { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.DUPLICATEMOVIECLIP,yytext()); }
+  "stopDrag"                     { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.STOPDRAG,yytext()); }
+  "getTimer"                     { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.GETTIMER,yytext()); }
+  "loadVariables"                { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.LOADVARIABLES,yytext()); }
+  "loadMovie"                    { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.LOADMOVIE,yytext()); }
+  "gotoAndPlay"                  { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.GOTOANDPLAY,yytext()); }
+  "mbord"                        { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.MBORD,yytext()); }
+  "mbchr"                        { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.MBCHR,yytext()); }
+  "mblength"                     { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.MBLENGTH,yytext()); }
+  "mbsubstring"                  { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.MBSUBSTRING,yytext()); }
+  "random"                       { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.RANDOM,yytext()); }
+  "removeMovieClip"              { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.REMOVEMOVIECLIP,yytext()); }
+  "startDrag"                    { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.STARTDRAG,yytext()); }
+  "substr"                       { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.SUBSTR,yytext()); }
+  "length"                       { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.LENGTH,yytext()); }
+  "int"                          { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.INT,yytext()); }
+  "targetPath"                   { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.TARGETPATH,yytext()); }
+  "Number"                      { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.NUMBER_OP,yytext()); }
+  "String"                     { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.STRING_OP,yytext()); }
 
   /* operators */
 

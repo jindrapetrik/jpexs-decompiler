@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.swf4;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
 import com.jpexs.decompiler.flash.action.treemodel.DecrementTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.GetVariableTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.IncrementTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.PostDecrementTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.PostIncrementTreeItem;
@@ -61,6 +62,22 @@ public class ActionSetVariable extends Action {
                 if (stack.peek().equals(obj)) {
                     stack.pop();
                     stack.push(new PostDecrementTreeItem(this, obj));
+                    return;
+                }
+            }
+        }
+        if (value instanceof IncrementTreeItem) {
+            if (((IncrementTreeItem) value).object instanceof GetVariableTreeItem) {
+                if (((GetVariableTreeItem) ((IncrementTreeItem) value).object).name.equals(name)) {
+                    output.add(new PostIncrementTreeItem(this, ((IncrementTreeItem) value).object));
+                    return;
+                }
+            }
+        }
+        if (value instanceof DecrementTreeItem) {
+            if (((DecrementTreeItem) value).object instanceof GetVariableTreeItem) {
+                if (((GetVariableTreeItem) ((DecrementTreeItem) value).object).name.equals(name)) {
+                    output.add(new PostDecrementTreeItem(this, ((DecrementTreeItem) value).object));
                     return;
                 }
             }

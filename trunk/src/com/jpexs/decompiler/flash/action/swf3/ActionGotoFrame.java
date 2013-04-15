@@ -33,6 +33,11 @@ public class ActionGotoFrame extends Action {
 
     public int frame;
 
+    public ActionGotoFrame(int frame) {
+        super(0x81, 2);
+        this.frame = frame;
+    }
+
     public ActionGotoFrame(SWFInputStream sis) throws IOException {
         super(0x81, 2);
         frame = sis.readUI16();

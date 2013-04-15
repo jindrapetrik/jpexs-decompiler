@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.action.flashlite.ActionFSCommand2;
 import com.jpexs.decompiler.flash.action.flashlite.ActionStrictMode;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.special.ActionNop;
+import com.jpexs.decompiler.flash.action.special.ActionStore;
 import com.jpexs.decompiler.flash.action.swf3.*;
 import com.jpexs.decompiler.flash.action.swf4.*;
 import com.jpexs.decompiler.flash.action.swf5.*;
@@ -43,6 +44,9 @@ public class ASMParser {
         List<Action> list = new ArrayList<Action>();
         Stack<GraphSourceItemContainer> containers = new Stack<GraphSourceItemContainer>();
         HashMap<GraphSourceItemContainer, Integer> containerPos = new HashMap<GraphSourceItemContainer, Integer>();
+        Stack<ActionStore> stores = new Stack<ActionStore>();
+        Stack<Integer> storeLengths = new Stack<Integer>();
+        int actualLen = 0;
         while (true) {
             ASMParsedSymbol symb = lexer.yylex();
             if (symb.type == ASMParsedSymbol.TYPE_LABEL) {
@@ -298,6 +302,25 @@ public class ASMParser {
                 }
                 if (a != null) {
                     list.add(a);
+                    if (!stores.isEmpty()) {
+                        actualLen++;
+                        if (actualLen == stores.peek().getStoreSize()) {
+                            ActionStore st = stores.pop();
+                            st.setStore(list.subList(list.size() - actualLen, list.size()));
+                            list = list.subList(0, list.size() - actualLen);
+                            if (!stores.isEmpty()) {
+                                actualLen = storeLengths.pop();
+                            }
+                        }
+                    }
+                    if (a instanceof ActionStore) {
+                        if (!stores.isEmpty()) {
+                            storeLengths.push(actualLen);
+                        }
+                        stores.push((ActionStore) a);
+                        actualLen = 0;
+
+                    }
                 }
             } else if (symb.type == ASMParsedSymbol.TYPE_EOL) {
             } else if ((symb.type == ASMParsedSymbol.TYPE_BLOCK_END) || (symb.type == ASMParsedSymbol.TYPE_EOF)) {

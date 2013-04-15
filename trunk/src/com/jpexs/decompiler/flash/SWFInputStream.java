@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.special.ActionNop;
+import com.jpexs.decompiler.flash.action.special.ActionStore;
 import com.jpexs.decompiler.flash.action.swf3.*;
 import com.jpexs.decompiler.flash.action.swf4.*;
 import com.jpexs.decompiler.flash.action.swf5.*;
@@ -777,7 +778,7 @@ public class SWFInputStream extends InputStream {
                 //throw new RuntimeException("Wrong length "+a.toString()+" info:"+infoCorrect+" actual:"+b.length+" datalen:"+(infoCorrect-info));
             }
             int actual = actual = a.getBytes(sis.version).length;
-            if (!(a instanceof GraphSourceItemContainer)) {
+            if ((!(a instanceof ActionStore)) && (!(a instanceof GraphSourceItemContainer))) {
                 int change = info - (rri.getPos() - ip);
                 if (change > 0) {
                     a.afterInsert = new ActionJump(change);

@@ -14,23 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.action.parser.script;
+package com.jpexs.decompiler.flash.action.special;
+
+import com.jpexs.decompiler.flash.action.Action;
+import java.util.List;
 
 /**
  *
  * @author JPEXS
  */
-public enum SymbolGroup {
+public interface ActionStore {
 
-    OPERATOR,
-    KEYWORD,
-    STRING,
-    COMMENT,
-    XML,
-    IDENTIFIER,
-    INTEGER,
-    DOUBLE,
-    TYPENAME,
-    EOF,
-    GLOBALFUNC
+    public int getStoreSize();
+
+    public void setStore(List<Action> store);
 }

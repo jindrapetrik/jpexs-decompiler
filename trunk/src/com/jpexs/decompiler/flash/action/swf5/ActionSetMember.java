@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.DecrementTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.GetMemberTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.IncrementTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.PostDecrementTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.PostIncrementTreeItem;
@@ -41,7 +42,7 @@ public class ActionSetMember extends Action {
     @Override
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
         GraphTargetItem value = stack.pop();
-        GraphTargetItem objectName = stack.pop();
+        GraphTargetItem memberName = stack.pop();
         GraphTargetItem object = stack.pop();
         if (value instanceof IncrementTreeItem) {
             GraphTargetItem obj = ((IncrementTreeItem) value).object;
@@ -63,6 +64,27 @@ public class ActionSetMember extends Action {
                 }
             }
         }
-        output.add(new SetMemberTreeItem(this, object, objectName, value));
+
+        if (value instanceof IncrementTreeItem) {
+            if (((IncrementTreeItem) value).object instanceof GetMemberTreeItem) {
+                if (((GetMemberTreeItem) ((IncrementTreeItem) value).object).object.equals(object)) {
+                    if (((GetMemberTreeItem) ((IncrementTreeItem) value).object).memberName.equals(memberName)) {
+                        output.add(new PostIncrementTreeItem(this, ((IncrementTreeItem) value).object));
+                        return;
+                    }
+                }
+            }
+        }
+        if (value instanceof DecrementTreeItem) {
+            if (((DecrementTreeItem) value).object instanceof GetMemberTreeItem) {
+                if (((GetMemberTreeItem) ((DecrementTreeItem) value).object).object.equals(object)) {
+                    if (((GetMemberTreeItem) ((DecrementTreeItem) value).object).memberName.equals(memberName)) {
+                        output.add(new PostDecrementTreeItem(this, ((DecrementTreeItem) value).object));
+                        return;
+                    }
+                }
+            }
+        }
+        output.add(new SetMemberTreeItem(this, object, memberName, value));
     }
 }

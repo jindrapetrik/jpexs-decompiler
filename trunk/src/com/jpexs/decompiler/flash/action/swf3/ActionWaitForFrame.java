@@ -16,33 +16,47 @@
  */
 package com.jpexs.decompiler.flash.action.swf3;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
-import com.jpexs.decompiler.flash.action.treemodel.WaitForFrameTreeItem;
+import com.jpexs.decompiler.flash.action.special.ActionStore;
+import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.clauses.IfFrameLoadedTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-public class ActionWaitForFrame extends Action {
+public class ActionWaitForFrame extends Action implements ActionStore {
 
     public int frame;
     public int skipCount;
+    public List<Action> skipped;
 
     public ActionWaitForFrame(SWFInputStream sis) throws IOException {
         super(0x8A, 3);
         frame = sis.readUI16();
         skipCount = sis.readUI8();
+        skipped = new ArrayList<Action>();
+        for (int i = 0; i < skipCount; i++) {
+            skipped.add(sis.readAction());
+        }
     }
 
     @Override
     public String toString() {
-        return "WaitForFrame " + frame + " " + skipCount;
+        String ret = "WaitForFrame " + frame + " " + skipCount;
+        for (Action a : skipped) {
+            ret += "\r\n" + a.toString();
+        }
+        return ret;
     }
 
     @Override
@@ -52,6 +66,9 @@ public class ActionWaitForFrame extends Action {
         try {
             sos.writeUI16(frame);
             sos.writeUI8(skipCount);
+            for (Action a : skipped) {
+                sos.write(a.getBytes(SWF.DEFAULT_VERSION));
+            }
             sos.close();
         } catch (IOException e) {
         }
@@ -62,10 +79,24 @@ public class ActionWaitForFrame extends Action {
         super(0x8A, -1);
         frame = (int) lexLong(lexer);
         skipCount = (int) lexLong(lexer);
+        skipped = new ArrayList<Action>();
     }
 
     @Override
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-        output.add(new WaitForFrameTreeItem(this, frame, skipCount));
+        GraphTargetItem frameTi = new DirectValueTreeItem(null, 0, new Long(frame), new ArrayList<String>());
+        List<GraphTargetItem> body = ActionGraph.translateViaGraph(regNames, variables, functions, skipped, SWF.DEFAULT_VERSION);
+        output.add(new IfFrameLoadedTreeItem(frameTi, body, this));
+    }
+
+    @Override
+    public int getStoreSize() {
+        return skipCount;
+    }
+
+    @Override
+    public void setStore(List<Action> store) {
+        skipped = store;
+        skipCount = store.size();
     }
 }

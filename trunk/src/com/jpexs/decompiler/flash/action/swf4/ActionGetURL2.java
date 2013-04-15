@@ -37,6 +37,13 @@ public class ActionGetURL2 extends Action {
     public boolean loadTargetFlag;
     public boolean loadVariablesFlag;
 
+    public ActionGetURL2(int sendVarsMethod, boolean loadTargetFlag, boolean loadVariablesFlag) {
+        super(0x9A, 1);
+        this.loadTargetFlag = loadTargetFlag;
+        this.loadVariablesFlag = loadVariablesFlag;
+        this.sendVarsMethod = sendVarsMethod;
+    }
+
     public ActionGetURL2(SWFInputStream sis) throws IOException {
         super(0x9A, 1);
         sendVarsMethod = (int) sis.readUB(2);

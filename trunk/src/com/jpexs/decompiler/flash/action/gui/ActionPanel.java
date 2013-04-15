@@ -58,9 +58,13 @@ public class ActionPanel extends JPanel implements ActionListener {
     public List<Tag> list;
     public JSplitPane splitPane;
     public JSplitPane splitPane2;
-    public JButton saveButton = new JButton("Save");
-    public JButton editButton = new JButton("Edit");
-    public JButton cancelButton = new JButton("Cancel");
+    public JButton saveButton = new JButton("Save", View.getIcon("save16"));
+    public JButton editButton = new JButton("Edit", View.getIcon("edit16"));
+    public JButton cancelButton = new JButton("Cancel", View.getIcon("cancel16"));
+    public JLabel betaLabel = new JLabel("(Beta)");
+    public JButton editDecompiledButton = new JButton("Edit", View.getIcon("edit16"));
+    public JButton saveDecompiledButton = new JButton("Save", View.getIcon("save16"));
+    public JButton cancelDecompiledButton = new JButton("Cancel", View.getIcon("cancel16"));
     public JToggleButton hexButton;
     public JButton saveHexButton = new JButton("Save hex");
     public JButton loadHexButton = new JButton("Load hex");
@@ -71,6 +75,7 @@ public class ActionPanel extends JPanel implements ActionListener {
     public String lastDisasm = "";
     private boolean ignoreCarret = false;
     private boolean editMode = false;
+    private boolean editDecompiledMode = false;
     private List<com.jpexs.decompiler.flash.action.Action> lastCode;
     private ASMSource src;
     public JPanel topButtonsPan;
@@ -146,6 +151,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                     }
                 }
                 setEditMode(false);
+                setDecompiledEditMode(false);
                 Main.stopWork();
             }
         }).start();
@@ -200,6 +206,21 @@ public class ActionPanel extends JPanel implements ActionListener {
         buttonsPan.add(saveButton);
         buttonsPan.add(cancelButton);
 
+        editButton.setMargin(new Insets(3, 3, 3, 10));
+        saveButton.setMargin(new Insets(3, 3, 3, 10));
+        cancelButton.setMargin(new Insets(3, 3, 3, 10));
+
+
+        JPanel decButtonsPan = new JPanel(new FlowLayout());
+        decButtonsPan.add(editDecompiledButton);
+        decButtonsPan.add(betaLabel);
+        decButtonsPan.add(saveDecompiledButton);
+        decButtonsPan.add(cancelDecompiledButton);
+
+        editDecompiledButton.setMargin(new Insets(3, 3, 3, 10));
+        saveDecompiledButton.setMargin(new Insets(3, 3, 3, 10));
+        cancelDecompiledButton.setMargin(new Insets(3, 3, 3, 10));
+
         //buttonsPan.add(saveHexButton);
         //buttonsPan.add(loadHexButton);
         panB.add(buttonsPan, BorderLayout.SOUTH);
@@ -219,10 +240,22 @@ public class ActionPanel extends JPanel implements ActionListener {
         cancelButton.setVisible(false);
 
 
+
+        saveDecompiledButton.addActionListener(this);
+        saveDecompiledButton.setActionCommand("SAVEDECOMPILED");
+        editDecompiledButton.addActionListener(this);
+        editDecompiledButton.setActionCommand("EDITDECOMPILED");
+
+        cancelDecompiledButton.addActionListener(this);
+        cancelDecompiledButton.setActionCommand("CANCELDECOMPILED");
+        saveDecompiledButton.setVisible(false);
+        cancelDecompiledButton.setVisible(false);
+
         JPanel panA = new JPanel();
         panA.setLayout(new BorderLayout());
         panA.add(new JScrollPane(decompiledEditor), BorderLayout.CENTER);
         panA.add(decLabel, BorderLayout.NORTH);
+        panA.add(decButtonsPan, BorderLayout.SOUTH);
         decLabel.setHorizontalAlignment(SwingConstants.CENTER);
         decLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
 
@@ -256,6 +289,9 @@ public class ActionPanel extends JPanel implements ActionListener {
                 if (ignoreCarret) {
                     return;
                 }
+                if (editMode || editDecompiledMode) {
+                    return;
+                }
                 editor.getCaret().setVisible(true);
                 int pos = editor.getCaretPosition();
                 Highlighting lastH = new Highlighting(0, 0, 0);
@@ -282,7 +318,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                 if (ignoreCarret) {
                     return;
                 }
-                if (editMode) {
+                if (editMode || editDecompiledMode) {
                     return;
                 }
                 decompiledEditor.getCaret().setVisible(true);
@@ -336,6 +372,25 @@ public class ActionPanel extends JPanel implements ActionListener {
         editMode = val;
     }
 
+    public void setDecompiledEditMode(boolean val) {
+        if (val) {
+            decompiledEditor.setEditable(true);
+            saveDecompiledButton.setVisible(true);
+            editDecompiledButton.setVisible(false);
+            betaLabel.setVisible(false);
+            cancelDecompiledButton.setVisible(true);
+            decompiledEditor.getCaret().setVisible(true);
+        } else {
+            decompiledEditor.setEditable(false);
+            saveDecompiledButton.setVisible(false);
+            editDecompiledButton.setVisible(true);
+            betaLabel.setVisible(true);
+            cancelDecompiledButton.setVisible(false);
+            decompiledEditor.getCaret().setVisible(true);
+        }
+        editDecompiledMode = val;
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("GRAPH")) {
@@ -355,13 +410,36 @@ public class ActionPanel extends JPanel implements ActionListener {
                 src.setActions(ASMParser.parse(0, src.getPos(), true, new ByteArrayInputStream(editor.getText().getBytes()), SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION);
                 setSource(this.src);
                 JOptionPane.showMessageDialog(this, "Code successfully saved");
+                saveButton.setVisible(false);
+                cancelButton.setVisible(false);
+                editButton.setVisible(true);
+                editor.setEditable(false);
+                editMode = false;
             } catch (IOException ex) {
             } catch (ParseException ex) {
                 JOptionPane.showMessageDialog(this, "" + ex.text + " on line " + ex.line, "Error", JOptionPane.ERROR_MESSAGE);
             }
-            saveButton.setVisible(false);
-            editButton.setVisible(true);
-            editor.setEditable(false);
+        } else if (e.getActionCommand().equals("EDITDECOMPILED")) {
+            setDecompiledEditMode(true);
+        } else if (e.getActionCommand().equals("CANCELDECOMPILED")) {
+            setDecompiledEditMode(false);
+        } else if (e.getActionCommand().equals("SAVEDECOMPILED")) {
+            try {
+                ActionScriptParser par = new ActionScriptParser();
+                src.setActions(par.parse(decompiledEditor.getText()), SWF.DEFAULT_VERSION);
+                setSource(this.src);
+                JOptionPane.showMessageDialog(this, "Code successfully saved");
+                saveDecompiledButton.setVisible(false);
+                cancelDecompiledButton.setVisible(false);
+                editDecompiledButton.setVisible(true);
+                betaLabel.setVisible(true);
+                decompiledEditor.setEditable(false);
+                editDecompiledMode = false;
+            } catch (IOException ex) {
+            } catch (ParseException ex) {
+                JOptionPane.showMessageDialog(this, "" + ex.text + " on line " + ex.line, "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
         }
     }
 }

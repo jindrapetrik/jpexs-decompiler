@@ -32,7 +32,7 @@ public class ToNumberTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return value.toString(Helper.toList(constants)) + hilight(".valueOf()");
+        return hilight("Number(") + value.toString(Helper.toList(constants)) + hilight(")");
     }
 
     @Override

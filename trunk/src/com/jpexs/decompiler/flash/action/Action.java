@@ -95,7 +95,7 @@ public class Action implements GraphSourceItem {
         "_xmouse",
         "_ymouse"
     };
-    public static final List<String> propertyNamesList=Arrays.asList(propertyNames);
+    public static final List<String> propertyNamesList = Arrays.asList(propertyNames);
     private static Logger logger = Logger.getLogger(Action.class.getName());
 
     /**
