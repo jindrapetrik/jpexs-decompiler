@@ -16,9 +16,11 @@
  */
 package com.jpexs.decompiler.flash.abc.gui;
 
+import com.jpexs.decompiler.flash.gui.View;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.FlowLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
@@ -38,9 +40,9 @@ public class DetailPanel extends JPanel implements ActionListener {
     public static final String UNSUPPORTED_TRAIT_CARD = "-";
     public static final String SLOT_CONST_TRAIT_CARD = "Slot/Const Trait";
     private JPanel innerPanel;
-    public JButton saveButton = new JButton("Save");
-    public JButton editButton = new JButton("Edit");
-    public JButton cancelButton = new JButton("Cancel");
+    public JButton saveButton = new JButton("Save", View.getIcon("save16"));
+    public JButton editButton = new JButton("Edit", View.getIcon("edit16"));
+    public JButton cancelButton = new JButton("Cancel", View.getIcon("cancel16"));
     private HashMap<String, JComponent> cardMap = new HashMap<String, JComponent>();
     private String selectedCard;
     private JLabel selectedLabel;
@@ -72,6 +74,10 @@ public class DetailPanel extends JPanel implements ActionListener {
         setLayout(new BorderLayout());
         add(innerPanel, BorderLayout.CENTER);
 
+        editButton.setMargin(new Insets(3, 3, 3, 10));
+        saveButton.setMargin(new Insets(3, 3, 3, 10));
+        cancelButton.setMargin(new Insets(3, 3, 3, 10));
+        
         buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new FlowLayout());
         saveButton.setActionCommand("SAVEDETAIL");
