@@ -163,6 +163,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     private JPanel detailPanel;
     private JTextField filterField = new JTextField("");
     private JPanel searchPanel;
+    private JCheckBoxMenuItem autoDeobfuscateMenuItem;
 
     public void setPercent(int percent) {
         progressBar.setValue(percent);
@@ -268,6 +269,12 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         miDeobfuscation.setActionCommand("DEOBFUSCATE");
         miDeobfuscation.addActionListener(this);
 
+        autoDeobfuscateMenuItem = new JCheckBoxMenuItem("Automatic deobfuscation");
+        autoDeobfuscateMenuItem.setState((Boolean) Configuration.getConfig("autoDeobfuscate", true));
+        autoDeobfuscateMenuItem.addActionListener(this);
+        autoDeobfuscateMenuItem.setActionCommand("AUTODEOBFUSCATE");
+
+        menuDeobfuscation.add(autoDeobfuscateMenuItem);
         JCheckBoxMenuItem miSubLimiter = new JCheckBoxMenuItem("Enable sub limiter");
         miSubLimiter.setActionCommand("SUBLIMITER");
         miSubLimiter.addActionListener(this);
@@ -954,6 +961,13 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        if (e.getActionCommand().equals("AUTODEOBFUSCATE")) {
+            if (JOptionPane.showConfirmDialog(this, "Automatic deobfuscation is a way to decompile obfuscated code.\r\nDeobfuscation leads to slower decompilation and some of the dead code may be eliminated.\r\nIf the code is not obfuscated, it's better to turn autodeobfuscation off.\r\nDo you really want to " + (autoDeobfuscateMenuItem.getState() ? "turn ON" : "turn OFF") + " automatic debfuscation?", "Confirm", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                Configuration.setConfig("autoDeobfuscate", autoDeobfuscateMenuItem.getState());
+            } else {
+                autoDeobfuscateMenuItem.setState(!autoDeobfuscateMenuItem.getState());
+            }
+        }
         if (e.getActionCommand().equals("EXIT")) {
             setVisible(false);
             if (Main.proxyFrame != null) {

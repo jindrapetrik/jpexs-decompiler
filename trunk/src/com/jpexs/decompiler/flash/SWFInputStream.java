@@ -79,7 +79,6 @@ public class SWFInputStream extends InputStream {
     private List<byte[]> buffered = new ArrayList<byte[]>();
     private ByteArrayOutputStream buffer;
     private static boolean DEOBFUSCATION_ALL_CODE_IN_PREVIOUS_TAG = (Boolean) Configuration.getConfig("deobfuscateUsePrevTagOnly", true);
-    private static boolean AUTO_DEOBFUSCATE = (Boolean) Configuration.getConfig("autoDeobfuscate", true);
 
     public int getBufferLength() {
         return buffer.size();
@@ -587,7 +586,7 @@ public class SWFInputStream extends InputStream {
 
             if (ins.isBranch() || ins.isJump()) {
 
-                if (AUTO_DEOBFUSCATE && (ins instanceof ActionIf) && !stack.isEmpty() && (stack.peek().isCompileTime() && (!stack.peek().hasSideEffect()))) {
+                if ((Boolean) Configuration.getConfig("autoDeobfuscate", false) && (ins instanceof ActionIf) && !stack.isEmpty() && (stack.peek().isCompileTime() && (!stack.peek().hasSideEffect()))) {
                     ActionIf aif = (ActionIf) ins;
                     if (aif.ignoreUsed && (!aif.jumpUsed)) {
                         ins.setIgnored(true);
@@ -874,7 +873,7 @@ public class SWFInputStream extends InputStream {
                             } else if (next.equals("c")) {
                                 goaif = true;
                             }
-                        } else if (AUTO_DEOBFUSCATE && top.isCompileTime() && (!top.hasSideEffect()) && ((!top.isVariableComputed()) || (top.isVariableComputed() && enableVariables && (!notCompileTime)))) {
+                        } else if ((Boolean) Configuration.getConfig("autoDeobfuscate", false) && top.isCompileTime() && (!top.hasSideEffect()) && ((!top.isVariableComputed()) || (top.isVariableComputed() && enableVariables && (!notCompileTime)))) {
                             //if(top.isCompileTime()) {
                             //if(false){
                             if (enableVariables) {

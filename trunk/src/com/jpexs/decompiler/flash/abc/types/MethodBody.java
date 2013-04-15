@@ -43,7 +43,6 @@ public class MethodBody implements Cloneable, Serializable {
     public AVM2Code code;
     public ABCException exceptions[] = new ABCException[0];
     public Traits traits = new Traits();
-    private static boolean AUTO_DEOBFUSCATE = (Boolean) Configuration.getConfig("autoDeobfuscate", true);
 
     public List<Integer> getExceptionEntries() {
         List<Integer> ret = new ArrayList<Integer>();
@@ -117,7 +116,7 @@ public class MethodBody implements Cloneable, Serializable {
             MethodBody b = (MethodBody) Helper.deepCopy(this);
             deobfuscated = b.code;
             deobfuscated.markMappedOffsets();
-            if (AUTO_DEOBFUSCATE) {
+            if ((Boolean) Configuration.getConfig("autoDeobfuscate", true)) {
                 deobfuscated.removeTraps(constants, b, abc);
             }
             //deobfuscated.restoreControlFlow(constants, b);
