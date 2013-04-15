@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.types;
 
+import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
@@ -42,6 +43,7 @@ public class MethodBody implements Cloneable, Serializable {
     public AVM2Code code;
     public ABCException exceptions[] = new ABCException[0];
     public Traits traits = new Traits();
+    private static boolean AUTO_DEOBFUSCATE = (Boolean) Configuration.getConfig("autoDeobfuscate", true);
 
     public List<Integer> getExceptionEntries() {
         List<Integer> ret = new ArrayList<Integer>();
@@ -115,7 +117,9 @@ public class MethodBody implements Cloneable, Serializable {
             MethodBody b = (MethodBody) Helper.deepCopy(this);
             deobfuscated = b.code;
             deobfuscated.markMappedOffsets();
-            deobfuscated.removeTraps(constants, b, abc);
+            if (AUTO_DEOBFUSCATE) {
+                deobfuscated.removeTraps(constants, b, abc);
+            }
             //deobfuscated.restoreControlFlow(constants, b);
             try {
                 s += deobfuscated.toSource(path, isStatic, classIndex, abc, constants, method_info, b, hilight, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);

@@ -2411,11 +2411,22 @@ public class AVM2Code implements Serializable {
         public boolean skipUsed = false;
     }
 
-    private static int removeTraps(boolean secondPass, boolean useVisited, List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, int lastIp, List<Integer> visited, HashMap<GraphSourceItem, Decision> decisions) {
+    private static int removeTraps(boolean secondPass, boolean useVisited, List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, int lastIp, List<Integer> visited, HashMap<Integer, HashMap<Integer, GraphTargetItem>> visitedStates, HashMap<GraphSourceItem, Decision> decisions) {
         boolean debugMode = false;
         int ret = 0;
         iploop:
         while ((ip > -1) && ip < code.size()) {
+
+
+
+            HashMap<Integer, GraphTargetItem> currentState = (HashMap<Integer, GraphTargetItem>) localData.get(2);
+            if (visitedStates.containsKey(ip)) {
+                HashMap<Integer, GraphTargetItem> lastState = visitedStates.get(ip);
+                if (lastState.equals(currentState)) {
+                    break;
+                }
+            }
+            visitedStates.put(ip, (HashMap<Integer, GraphTargetItem>) currentState.clone());
             if (useVisited && visited.contains(ip)) {
                 break;
             }
@@ -2536,7 +2547,7 @@ public class AVM2Code implements Serializable {
                         }
                     }
 
-                    ret += removeTraps(secondPass, useVisited, localData, stack, output, code, condition ? branches.get(0) : branches.get(1), ip, visited, decisions);
+                    ret += removeTraps(secondPass, useVisited, localData, stack, output, code, condition ? branches.get(0) : branches.get(1), ip, visited, visitedStates, decisions);
                 } else {
                     if (ins.isBranch() && (!ins.isJump())) {
                         stack.pop();
@@ -2545,7 +2556,7 @@ public class AVM2Code implements Serializable {
                     for (int b : branches) {
                         Stack<GraphTargetItem> brStack = (Stack<GraphTargetItem>) stack.clone();
                         if (b >= 0) {
-                            ret += removeTraps(secondPass, useVisited || (!ins.isJump()), localData, brStack, output, code, b, ip, visited, decisions);
+                            ret += removeTraps(secondPass, useVisited || (!ins.isJump()), localData, brStack, output, code, b, ip, visited, visitedStates, decisions);
                         } else {
                             if (debugMode) {
                                 System.out.println("Negative branch:" + b);
@@ -2565,7 +2576,7 @@ public class AVM2Code implements Serializable {
 
     public static int removeTraps(List localData, AVM2GraphSource code, int addr) {
         HashMap<GraphSourceItem, AVM2Code.Decision> decisions = new HashMap<GraphSourceItem, AVM2Code.Decision>();
-        removeTraps(false, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0, new ArrayList<Integer>(), decisions);
-        return removeTraps(true, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0, new ArrayList<Integer>(), decisions);
+        removeTraps(false, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0, new ArrayList<Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions);
+        return removeTraps(true, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0, new ArrayList<Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions);
     }
 }
