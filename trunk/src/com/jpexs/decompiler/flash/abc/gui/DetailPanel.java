@@ -77,7 +77,7 @@ public class DetailPanel extends JPanel implements ActionListener {
         editButton.setMargin(new Insets(3, 3, 3, 10));
         saveButton.setMargin(new Insets(3, 3, 3, 10));
         cancelButton.setMargin(new Insets(3, 3, 3, 10));
-        
+
         buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new FlowLayout());
         saveButton.setActionCommand("SAVEDETAIL");

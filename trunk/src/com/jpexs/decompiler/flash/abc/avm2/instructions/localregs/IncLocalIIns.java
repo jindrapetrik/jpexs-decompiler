@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.IncLocalTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.IntegerValueTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.treemodel.NotCompileTimeTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.AddTreeItem;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -39,6 +40,10 @@ public class IncLocalIIns extends InstructionDefinition {
     public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         int regIndex = ins.operands[0];
         output.add(new IncLocalTreeItem(ins, regIndex));
-        localRegs.put(regIndex, new AddTreeItem(ins, localRegs.get(regIndex), new IntegerValueTreeItem(ins, new Long(1))));
+        if (localRegs.containsKey(regIndex)) {
+            localRegs.put(regIndex, new NotCompileTimeTreeItem(ins));
+        } else {
+            localRegs.put(regIndex, new AddTreeItem(ins, localRegs.get(regIndex), new IntegerValueTreeItem(ins, new Long(1))));
+        }
     }
 }

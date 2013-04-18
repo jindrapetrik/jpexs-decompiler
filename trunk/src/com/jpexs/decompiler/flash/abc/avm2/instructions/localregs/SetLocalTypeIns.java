@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.treemodel.FindPropertyTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.IncrementTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.LocalRegTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.NewActivationTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.treemodel.NotCompileTimeTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.PostDecrementTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.PostIncrementTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.SetLocalTreeItem;
@@ -48,7 +49,11 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
     public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         int regId = getRegisterId(ins);
         GraphTargetItem value = (GraphTargetItem) stack.pop();
-        localRegs.put(regId, value);
+        if (localRegs.containsKey(regId)) {
+            localRegs.put(regId, new NotCompileTimeTreeItem(ins));
+        } else {
+            localRegs.put(regId, value);
+        }
         if (value instanceof NewActivationTreeItem) {
             return;
         }

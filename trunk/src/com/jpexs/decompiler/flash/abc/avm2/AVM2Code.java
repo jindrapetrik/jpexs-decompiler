@@ -2411,27 +2411,32 @@ public class AVM2Code implements Serializable {
         public boolean skipUsed = false;
     }
 
-    private static int removeTraps(boolean secondPass, boolean useVisited, List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, int lastIp, List<Integer> visited, HashMap<Integer, HashMap<Integer, GraphTargetItem>> visitedStates, HashMap<GraphSourceItem, Decision> decisions) {
+    private static int removeTraps(boolean secondPass, boolean useVisited, List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, int lastIp, HashMap<Integer, Integer> visited, HashMap<Integer, HashMap<Integer, GraphTargetItem>> visitedStates, HashMap<GraphSourceItem, Decision> decisions) {
         boolean debugMode = false;
         int ret = 0;
         iploop:
         while ((ip > -1) && ip < code.size()) {
 
-
-
-            HashMap<Integer, GraphTargetItem> currentState = (HashMap<Integer, GraphTargetItem>) localData.get(2);
-            if (visitedStates.containsKey(ip)) {
-                HashMap<Integer, GraphTargetItem> lastState = visitedStates.get(ip);
-                if (lastState.equals(currentState)) {
+            if (useVisited) {
+                if (visited.containsKey(ip)) {
                     break;
                 }
-            }
-            visitedStates.put(ip, (HashMap<Integer, GraphTargetItem>) currentState.clone());
-            if (useVisited && visited.contains(ip)) {
-                break;
-            }
-            if (!visited.contains(ip)) {
-                visited.add(ip);
+                if (!visited.containsKey(ip)) {
+                    visited.put(ip, 0);
+                } else {
+                    visited.put(ip, visited.get(ip) + 1);
+                }
+            } else {
+                HashMap<Integer, GraphTargetItem> currentState = (HashMap<Integer, GraphTargetItem>) localData.get(2);
+
+                if (visitedStates.containsKey(ip)) {
+                    HashMap<Integer, GraphTargetItem> lastState = visitedStates.get(ip);
+                    if (lastState.equals(currentState)) {
+                        break;
+                    }
+                }
+                visitedStates.put(ip, (HashMap<Integer, GraphTargetItem>) currentState.clone());
+
             }
             lastIp = ip;
             GraphSourceItem ins = code.get(ip);
@@ -2440,7 +2445,7 @@ public class AVM2Code implements Serializable {
                 continue;
             }
             if (debugMode) {
-                System.out.println((useVisited ? "useV " : "") + "Visit " + ip + ": " + ins + " stack:" + Highlighting.stripHilights(stack.toString()));
+                System.out.println((useVisited ? "useV " : "") + (secondPass ? "secondPass " : "") + "Visit " + ip + ": " + ins + " stack:" + Highlighting.stripHilights(stack.toString()));
             }
             AVM2Instruction ains = (AVM2Instruction) ins;
             if (ains.definition instanceof DupIns) {
@@ -2551,6 +2556,15 @@ public class AVM2Code implements Serializable {
                 } else {
                     if (ins.isBranch() && (!ins.isJump())) {
                         stack.pop();
+
+                        Decision dec = new Decision();
+                        if (decisions.containsKey(ins)) {
+                            dec = decisions.get(ins);
+                        } else {
+                            decisions.put(ins, dec);
+                        }
+                        dec.jumpUsed = true;
+                        dec.skipUsed = true;
                     }
 
                     for (int b : branches) {
@@ -2576,7 +2590,8 @@ public class AVM2Code implements Serializable {
 
     public static int removeTraps(List localData, AVM2GraphSource code, int addr) {
         HashMap<GraphSourceItem, AVM2Code.Decision> decisions = new HashMap<GraphSourceItem, AVM2Code.Decision>();
-        removeTraps(false, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0, new ArrayList<Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions);
-        return removeTraps(true, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0, new ArrayList<Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions);
+        removeTraps(false, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0, new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions);
+        localData.set(2, new HashMap<Integer, GraphTargetItem>());
+        return removeTraps(true, true, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0, new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions);
     }
 }
