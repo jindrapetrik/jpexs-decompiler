@@ -1008,6 +1008,18 @@ public class Action implements GraphSourceItem {
                                                         output2.add(new ClassTreeItem(className, extendsOp, implementsOp, functions, vars, staticFunctions, staticVars));
                                                         return output2;
                                                     }
+                                                    if ((parts.get(pos) instanceof SetMemberTreeItem) && ((SetMemberTreeItem) parts.get(pos)).object instanceof SetTypeTreeItem) {
+                                                        //int tmp = classReg;
+                                                        SetMemberTreeItem smt=(SetMemberTreeItem)parts.get(pos);
+                                                        SetTypeTreeItem stt = (SetTypeTreeItem) ((SetMemberTreeItem) parts.get(pos)).object;
+                                                        instanceReg = stt.getTempRegister();
+                                   
+                                                        parts.remove(pos);
+                                                        parts.add(pos+0, new StoreRegisterTreeItem(null, new RegisterNumber(instanceReg), stt.getValue(), false));
+                                                        parts.add(pos+1, (GraphTargetItem) stt);
+                                                        smt.object = new DirectValueTreeItem(null, 0, new RegisterNumber(instanceReg), null);
+                                                        parts.add(pos+2, smt);
+                                                    }
                                                     if (parts.get(pos) instanceof StoreRegisterTreeItem) {
 
                                                         if (((StoreRegisterTreeItem) parts.get(pos)).value instanceof GetMemberTreeItem) {
