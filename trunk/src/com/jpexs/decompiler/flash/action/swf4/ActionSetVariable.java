@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.action.treemodel.IncrementTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.PostDecrementTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.PostIncrementTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.SetVariableTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.StoreRegisterTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.util.HashMap;
@@ -81,6 +82,9 @@ public class ActionSetVariable extends Action {
                     return;
                 }
             }
+        }
+        if(value instanceof StoreRegisterTreeItem){
+            ((StoreRegisterTreeItem)value).define=false;
         }
         SetVariableTreeItem svt = new SetVariableTreeItem(this, name, value);
         output.add(svt);

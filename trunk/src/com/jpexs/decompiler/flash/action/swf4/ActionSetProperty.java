@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.treemodel.IncrementTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.PostDecrementTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.PostIncrementTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.SetPropertyTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.StoreRegisterTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
@@ -69,6 +70,9 @@ public class ActionSetProperty extends Action {
                     return;
                 }
             }
+        }
+        if(value instanceof StoreRegisterTreeItem){
+            ((StoreRegisterTreeItem)value).define=false;
         }
         output.add(new SetPropertyTreeItem(this, target, indexInt, value));
     }

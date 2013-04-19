@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.treemodel.IncrementTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.PostDecrementTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.PostIncrementTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.SetMemberTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.StoreRegisterTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
@@ -84,6 +85,9 @@ public class ActionSetMember extends Action {
                     }
                 }
             }
+        }
+        if(value instanceof StoreRegisterTreeItem){
+            ((StoreRegisterTreeItem)value).define=false;
         }
         output.add(new SetMemberTreeItem(this, object, memberName, value));
     }

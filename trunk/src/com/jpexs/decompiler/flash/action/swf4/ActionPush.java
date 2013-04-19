@@ -193,7 +193,7 @@ public class ActionPush extends Action {
                 case ASMParsedSymbol.TYPE_COMMENT:
                     break;
                 default:
-                    throw new ParseException("Arguments expected", lexer.yyline());
+                    throw new ParseException("Arguments expected, "+symb.type+" "+symb.value+" found", lexer.yyline());
 
 
             }
@@ -289,7 +289,7 @@ public class ActionPush extends Action {
                     o = constantPool.get(((ConstantIndex) o).index);
                 }
             }
-            if (o instanceof RegisterNumber) {
+            /*if (o instanceof RegisterNumber) {
                 if (regNames.containsKey(((RegisterNumber) o).number)) {
                     ((RegisterNumber) o).name = regNames.get(((RegisterNumber) o).number);
                 } else if (output.size() >= 2) { //chained assignments:, ignore for class prototype assignment
@@ -306,7 +306,8 @@ public class ActionPush extends Action {
                                 } else if ((stt.getValue() instanceof DecrementTreeItem) && (((DecrementTreeItem) stt.getValue()).object.equals(stt.getObject()))) {
                                     stack.push(new PreDecrementTreeItem(this, stt.getObject()));
                                 } else {
-                                    stack.push(last);
+                                    //stack.push(last);
+                                    continue;
                                 }
                                 output.remove(output.size() - 1);
                                 output.remove(output.size() - 1);
@@ -316,7 +317,7 @@ public class ActionPush extends Action {
                         }
                     }
                 }
-            }
+            }*/
             DirectValueTreeItem dvt = new DirectValueTreeItem(this, pos, o, constantPool);
             stack.push(dvt);
             if (o instanceof RegisterNumber) {

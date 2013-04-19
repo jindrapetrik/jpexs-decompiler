@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
+import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.StoreRegisterTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -69,7 +70,7 @@ public class ActionStoreRegister extends Action {
 
     @Override
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-        GraphTargetItem item = stack.peek();
+        GraphTargetItem item = stack.pop();
         RegisterNumber rn = new RegisterNumber(registerNumber);
         if (regNames.containsKey(registerNumber)) {
             rn.name = regNames.get(registerNumber);
@@ -77,6 +78,20 @@ public class ActionStoreRegister extends Action {
         item.moreSrc.add(new GraphSourceItemPos(this, 0));
         boolean define = !variables.containsKey("__register" + registerNumber);
         variables.put("__register" + registerNumber, item);
-        output.add(new StoreRegisterTreeItem(this, rn, item, define));
+        if(item instanceof DirectValueTreeItem){
+            if(((DirectValueTreeItem)item).value instanceof RegisterNumber){
+                if(((RegisterNumber)((DirectValueTreeItem)item).value).number==registerNumber){
+                    stack.push(item);
+                    return;
+                }
+            }
+        }
+        if(item instanceof StoreRegisterTreeItem){
+            if(((StoreRegisterTreeItem)item).register.number==registerNumber){
+                stack.push(item);
+                return;
+            }
+        }
+        stack.push(new StoreRegisterTreeItem(this, rn, item, define));
     }
 }
