@@ -16,12 +16,14 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.treemodel.operations.AddTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
-public class PostIncrementTreeItem extends TreeItem {
+public class PostIncrementTreeItem extends TreeItem implements SetTypeTreeItem {
 
     public GraphTargetItem object;
+    private int tempRegister = -1;
 
     public PostIncrementTreeItem(GraphSourceItem instruction, GraphTargetItem object) {
         super(instruction, PRECEDENCE_POSTFIX);
@@ -36,5 +38,30 @@ public class PostIncrementTreeItem extends TreeItem {
     @Override
     public boolean hasSideEffect() {
         return true;
+    }
+
+    @Override
+    public GraphTargetItem getObject() {
+        return object;
+    }
+
+    @Override
+    public GraphTargetItem getValue() {
+        return new AddTreeItem(null, object, new DirectValueTreeItem(null, 0, new Long(1), null));
+    }
+
+    @Override
+    public void setTempRegister(int regIndex) {
+        tempRegister = regIndex;
+    }
+
+    @Override
+    public int getTempRegister() {
+        return tempRegister;
+    }
+
+    @Override
+    public void setValue(GraphTargetItem value) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

@@ -71,8 +71,8 @@ public class ActionSetProperty extends Action {
                 }
             }
         }
-        if(value instanceof StoreRegisterTreeItem){
-            ((StoreRegisterTreeItem)value).define=false;
+        if (value instanceof StoreRegisterTreeItem) {
+            ((StoreRegisterTreeItem) value).define = false;
         }
         output.add(new SetPropertyTreeItem(this, target, indexInt, value));
     }

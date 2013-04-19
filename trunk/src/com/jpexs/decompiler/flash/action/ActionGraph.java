@@ -146,7 +146,9 @@ public class ActionGraph extends Graph {
             int pos = 0;
             StrictEqTreeItem set = (StrictEqTreeItem) stack.pop();
             caseValuesMap.put(pos, set.rightSide);
-
+            if (set.leftSide instanceof StoreRegisterTreeItem) {
+                switchedObject = ((StoreRegisterTreeItem) set.leftSide).value;
+            }
             //GraphPart switchLoc = part.nextParts.get(1).nextParts.get(0);
             List<GraphPart> caseBodyParts = new ArrayList<GraphPart>();
             caseBodyParts.add(part.nextParts.get(0));

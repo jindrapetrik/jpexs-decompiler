@@ -21,7 +21,7 @@ import java.util.List;
 
 public class WhileItem extends LoopItem implements Block {
 
-    public GraphTargetItem expression;
+    public List<GraphTargetItem> expression;
     public List<GraphTargetItem> commands;
 
     @Override
@@ -31,7 +31,7 @@ public class WhileItem extends LoopItem implements Block {
         return ret;
     }
 
-    public WhileItem(GraphSourceItem src, Loop loop, GraphTargetItem expression, List<GraphTargetItem> commands) {
+    public WhileItem(GraphSourceItem src, Loop loop, List<GraphTargetItem> expression, List<GraphTargetItem> commands) {
         super(src, loop);
         this.expression = expression;
         this.commands = commands;
@@ -41,7 +41,17 @@ public class WhileItem extends LoopItem implements Block {
     public String toString(List localData) {
         String ret = "";
         ret += "loop" + loop.id + ":\r\n";
-        ret += hilight("while(") + (expression == null ? "null" : expression.toString(localData)) + hilight(")") + "\r\n{\r\n";
+        String expStr = "";
+        for (int i = 0; i < expression.size(); i++) {
+            if (expression.get(i).isEmpty()) {
+                continue;
+            }
+            if (i > 0) {
+                expStr += ", ";
+            }
+            expStr += expression.get(i).toString(localData);
+        }
+        ret += hilight("while(") + expStr + hilight(")") + "\r\n{\r\n";
         for (GraphTargetItem ti : commands) {
             if (!ti.isEmpty()) {
                 ret += ti.toStringSemicoloned(localData) + "\r\n";

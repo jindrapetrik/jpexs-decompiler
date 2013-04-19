@@ -83,8 +83,8 @@ public class ActionSetVariable extends Action {
                 }
             }
         }
-        if(value instanceof StoreRegisterTreeItem){
-            ((StoreRegisterTreeItem)value).define=false;
+        if (value instanceof StoreRegisterTreeItem) {
+            ((StoreRegisterTreeItem) value).define = false;
         }
         SetVariableTreeItem svt = new SetVariableTreeItem(this, name, value);
         output.add(svt);

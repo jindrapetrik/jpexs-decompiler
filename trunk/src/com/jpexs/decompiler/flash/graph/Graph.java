@@ -1014,8 +1014,9 @@ public class Graph {
                             body = printGraph(prepareBranchLocalData(localData), stack, allParts, part, next, stopPart, loops, forFinalCommands);
                         }
                         retw.addAll(body);
-
-                        retx.add(new WhileItem(null, whileTrueLoop, new TrueItem(null), retw));
+                        List<GraphTargetItem> tr = new ArrayList<GraphTargetItem>();
+                        tr.add(new TrueItem(null));
+                        retx.add(new WhileItem(null, whileTrueLoop, tr, retw));
                         next = null;
                     } else {
                         retx.add(new IfItem(null, expr, onTrue, onFalse));
@@ -1105,11 +1106,19 @@ public class Graph {
                                 loopBody.remove(loopBody.size() - 1);
                             }
                         }
-                        ret.add(new DoWhileItem(null, currentLoop, loopBody, expr));
-                        ret.addAll(addIf);
+                        if ((!addIf.isEmpty()) && (addIf.get(addIf.size() - 1) instanceof ContinueItem) && (((ContinueItem) addIf.get(addIf.size() - 1)).loopId == currentLoop.id)) {
+                            loopBody.add(expr);
+                            checkContinueAtTheEnd(addIf, currentLoop);
+                            ret.add(new WhileItem(null, currentLoop, loopBody, addIf));
+                        } else {
+                            ret.add(new DoWhileItem(null, currentLoop, loopBody, expr));
+                            ret.addAll(addIf);
+                        }
 
                     } else {
-                        ret.add(new WhileItem(null, currentLoop, expr, loopBody));
+                        List<GraphTargetItem> ex = new ArrayList<GraphTargetItem>();
+                        ex.add(expr);
+                        ret.add(new WhileItem(null, currentLoop, ex, loopBody));
                     }
                 }
             }

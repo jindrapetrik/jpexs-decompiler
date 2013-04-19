@@ -78,16 +78,16 @@ public class ActionStoreRegister extends Action {
         item.moreSrc.add(new GraphSourceItemPos(this, 0));
         boolean define = !variables.containsKey("__register" + registerNumber);
         variables.put("__register" + registerNumber, item);
-        if(item instanceof DirectValueTreeItem){
-            if(((DirectValueTreeItem)item).value instanceof RegisterNumber){
-                if(((RegisterNumber)((DirectValueTreeItem)item).value).number==registerNumber){
+        if (item instanceof DirectValueTreeItem) {
+            if (((DirectValueTreeItem) item).value instanceof RegisterNumber) {
+                if (((RegisterNumber) ((DirectValueTreeItem) item).value).number == registerNumber) {
                     stack.push(item);
                     return;
                 }
             }
         }
-        if(item instanceof StoreRegisterTreeItem){
-            if(((StoreRegisterTreeItem)item).register.number==registerNumber){
+        if (item instanceof StoreRegisterTreeItem) {
+            if (((StoreRegisterTreeItem) item).register.number == registerNumber) {
                 stack.push(item);
                 return;
             }

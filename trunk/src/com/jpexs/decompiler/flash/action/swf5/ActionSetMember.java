@@ -86,8 +86,8 @@ public class ActionSetMember extends Action {
                 }
             }
         }
-        if(value instanceof StoreRegisterTreeItem){
-            ((StoreRegisterTreeItem)value).define=false;
+        if (value instanceof StoreRegisterTreeItem) {
+            ((StoreRegisterTreeItem) value).define = false;
         }
         output.add(new SetMemberTreeItem(this, object, memberName, value));
     }
