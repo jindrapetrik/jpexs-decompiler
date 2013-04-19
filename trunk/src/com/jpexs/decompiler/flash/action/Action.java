@@ -449,8 +449,16 @@ public class Action implements GraphSourceItem {
 
 
             if (a.replaceWith != null) {
+                if (lastPush) {
+                    ret += "\r\n";
+                    lastPush = false;
+                }
                 ret += Highlighting.hilighOffset("", offset) + a.replaceWith.getASMSource(list, importantOffsets, constantPool, version, hex) + "\r\n";
             } else if (a.ignored) {
+                if (lastPush) {
+                    ret += "\r\n";
+                    lastPush = false;
+                }
                 int len = 0;
                 if (pos + 1 < list.size()) {
                     len = (int) (((Action) (list.get(pos + 1))).getAddress() - a.getAddress());
