@@ -45,13 +45,13 @@ public class ModeFrame extends JFrame implements ActionListener {
         setSize(350, 200);
         openButton.addActionListener(this);
         openButton.setActionCommand("OPEN");
-        openButton.setIcon(View.getIcon("open24"));
+        openButton.setIcon(View.getIcon("open32"));
         proxyButton.addActionListener(this);
         proxyButton.setActionCommand("PROXY");
-        proxyButton.setIcon(View.getIcon("proxy24"));
+        proxyButton.setIcon(View.getIcon("proxy32"));
         exitButton.addActionListener(this);
         exitButton.setActionCommand("EXIT");
-        exitButton.setIcon(View.getIcon("exit24"));
+        exitButton.setIcon(View.getIcon("exit32"));
         setResizable(false);
         Container cont = getContentPane();
         cont.setLayout(new GridLayout(4, 1));
