@@ -141,4 +141,8 @@ public abstract class GraphTargetItem {
     public boolean isEmpty() {
         return false;
     }
+
+    public GraphTargetItem getThroughNotCompilable() {
+        return this;
+    }
 }

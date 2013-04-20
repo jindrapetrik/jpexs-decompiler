@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,8 +28,11 @@ import java.util.List;
  */
 public class NotCompileTimeTreeItem extends TreeItem {
 
-    public NotCompileTimeTreeItem(GraphSourceItem instruction) {
+    public GraphTargetItem object;
+
+    public NotCompileTimeTreeItem(GraphSourceItem instruction, GraphTargetItem object) {
         super(instruction, NOPRECEDENCE);
+        this.object = object;
     }
 
     @Override
@@ -39,5 +43,10 @@ public class NotCompileTimeTreeItem extends TreeItem {
     @Override
     public boolean isCompileTime() {
         return false;
+    }
+
+    @Override
+    public GraphTargetItem getThroughNotCompilable() {
+        return object.getThroughNotCompilable();
     }
 }

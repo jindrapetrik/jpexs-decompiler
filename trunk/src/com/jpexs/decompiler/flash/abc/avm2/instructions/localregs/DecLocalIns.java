@@ -61,7 +61,7 @@ public class DecLocalIns extends InstructionDefinition {
         int regIndex = ins.operands[0];
         output.add(new DecLocalTreeItem(ins, regIndex));
         if (localRegs.containsKey(regIndex)) {
-            localRegs.put(regIndex, new NotCompileTimeTreeItem(ins));
+            localRegs.put(regIndex, new NotCompileTimeTreeItem(ins, new SubtractTreeItem(ins, localRegs.get(regIndex), new IntegerValueTreeItem(ins, new Long(1)))));
         } else {
             localRegs.put(regIndex, new SubtractTreeItem(ins, localRegs.get(regIndex), new IntegerValueTreeItem(ins, new Long(1))));
         }

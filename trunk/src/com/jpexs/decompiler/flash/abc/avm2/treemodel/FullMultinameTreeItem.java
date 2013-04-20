@@ -98,12 +98,12 @@ public class FullMultinameTreeItem extends TreeItem {
         }
         GraphTargetItem tiName = name;
         while (tiName instanceof LocalRegTreeItem) {
-            tiName = ((LocalRegTreeItem) tiName).computedValue;
+            tiName = ((LocalRegTreeItem) tiName).computedValue.getThroughNotCompilable();
         }
 
         GraphTargetItem tiName2 = other.name;
         while (tiName2 instanceof LocalRegTreeItem) {
-            tiName2 = ((LocalRegTreeItem) tiName2).computedValue;
+            tiName2 = ((LocalRegTreeItem) tiName2).computedValue.getThroughNotCompilable();
         }
         if (tiName != tiName2) {
             return false;
@@ -111,12 +111,12 @@ public class FullMultinameTreeItem extends TreeItem {
 
         GraphTargetItem tiNameSpace = namespace;
         while (tiNameSpace instanceof LocalRegTreeItem) {
-            tiNameSpace = ((LocalRegTreeItem) tiNameSpace).computedValue;
+            tiNameSpace = ((LocalRegTreeItem) tiNameSpace).computedValue.getThroughNotCompilable();
         }
 
         GraphTargetItem tiNameSpace2 = other.namespace;
         while (tiNameSpace2 instanceof LocalRegTreeItem) {
-            tiNameSpace2 = ((LocalRegTreeItem) tiNameSpace2).computedValue;
+            tiNameSpace2 = ((LocalRegTreeItem) tiNameSpace2).computedValue.getThroughNotCompilable();
         }
         if (tiNameSpace != tiNameSpace2) {
             return false;

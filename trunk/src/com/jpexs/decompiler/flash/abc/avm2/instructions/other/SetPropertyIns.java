@@ -58,7 +58,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                 if (insideProp.propertyName.compareSame(multiname)) {
                     GraphTargetItem insideObj = obj;
                     if (insideObj instanceof LocalRegTreeItem) {
-                        insideObj = ((LocalRegTreeItem) insideObj).computedValue;
+                        insideObj = ((LocalRegTreeItem) insideObj).computedValue.getThroughNotCompilable();
                     }
                     if (insideProp.object == insideObj) {
                         if (stack.size() > 0) {
@@ -88,7 +88,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                 if (insideProp.propertyName.compareSame(multiname)) {
                     GraphTargetItem insideObj = obj;
                     if (insideObj instanceof LocalRegTreeItem) {
-                        insideObj = ((LocalRegTreeItem) insideObj).computedValue;
+                        insideObj = ((LocalRegTreeItem) insideObj).computedValue.getThroughNotCompilable();
                     }
                     if (insideProp.object == insideObj) {
                         if (stack.size() > 0) {

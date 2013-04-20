@@ -78,7 +78,7 @@ public abstract class TreeItem extends GraphTargetItem {
             obStr = "(" + obStr + ")";
         }
         if (object instanceof LocalRegTreeItem) {
-            if (((LocalRegTreeItem) object).computedValue instanceof FindPropertyTreeItem) {
+            if (((LocalRegTreeItem) object).computedValue.getThroughNotCompilable() instanceof FindPropertyTreeItem) {
                 obStr = "";
             }
         }
