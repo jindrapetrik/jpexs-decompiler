@@ -18,15 +18,17 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class DefineBinaryDataTag extends Tag {
+public class DefineBinaryDataTag extends CharacterTag {
 
     public int tag;
     public byte binaryData[];
+    public long reserved;
 
     /**
      * Gets data bytes
@@ -41,6 +43,7 @@ public class DefineBinaryDataTag extends Tag {
         SWFOutputStream sos = new SWFOutputStream(os, version);
         try {
             sos.writeUI16(tag);
+            sos.writeUI32(reserved);
             sos.write(binaryData);
         } catch (IOException e) {
         }
@@ -51,6 +54,12 @@ public class DefineBinaryDataTag extends Tag {
         super(87, "DefineBinaryData", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         tag = sis.readUI16();
+        reserved = sis.readUI32();
         binaryData = sis.readBytes(sis.available());
+    }
+
+    @Override
+    public int getCharacterID() {
+        return tag;
     }
 }

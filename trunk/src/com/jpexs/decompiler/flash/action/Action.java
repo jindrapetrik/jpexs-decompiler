@@ -977,7 +977,7 @@ public class Action implements GraphSourceItem {
                                     if (parts.get(0) instanceof StoreRegisterTreeItem) {
                                         StoreRegisterTreeItem str1 = (StoreRegisterTreeItem) parts.get(0);
                                         int classReg = str1.register.number;
-                                        int instanceReg = -1;                                       
+                                        int instanceReg = -1;
 
                                         if ((parts.size() >= 2) && (parts.get(1) instanceof SetMemberTreeItem)) {
                                             GraphTargetItem ti1 = ((SetMemberTreeItem) parts.get(1)).value;
@@ -1006,7 +1006,7 @@ public class Action implements GraphSourceItem {
                                                         output2.add(new ClassTreeItem(className, extendsOp, implementsOp, functions, vars, staticFunctions, staticVars));
                                                         return output2;
                                                     }
-          
+
                                                     if (parts.get(pos) instanceof SetMemberTreeItem) {
                                                         SetMemberTreeItem smt = (SetMemberTreeItem) parts.get(pos);
                                                         if (smt.value instanceof StoreRegisterTreeItem) {

@@ -36,6 +36,15 @@ public abstract class CharacterTag extends Tag {
      * List of ExportAssetsTag used for converting to String
      */
     public List<ExportAssetsTag> exportAssetsTags = new ArrayList<ExportAssetsTag>();
+    private String className;
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    public String getClassName() {
+        return className;
+    }
 
     @Override
     public String getName() {
@@ -45,6 +54,9 @@ public abstract class CharacterTag extends Tag {
             if (pos > -1) {
                 nameAppend = ": " + eat.names.get(pos);
             }
+        }
+        if (className != null) {
+            nameAppend = ": " + className;
         }
         return super.getName() + " (" + getCharacterID() + nameAppend + ")";
     }

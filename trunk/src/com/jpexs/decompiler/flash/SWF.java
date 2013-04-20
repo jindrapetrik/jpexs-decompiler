@@ -51,6 +51,7 @@ import com.jpexs.decompiler.flash.gui.FrameNode;
 import com.jpexs.decompiler.flash.gui.TagNode;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
@@ -68,6 +69,7 @@ import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHeadTypeTag;
+import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
@@ -286,6 +288,29 @@ public class SWF {
         frameRate = sis.readUI8();
         frameCount = sis.readUI16();
         tags = sis.readTagList(0);
+        assignClassesToSymbols();
+    }
+
+    public void assignClassesToSymbols() {
+        HashMap<Integer, String> classes = new HashMap<Integer, String>();
+        for (Tag t : tags) {
+            if (t instanceof SymbolClassTag) {
+                SymbolClassTag sct = (SymbolClassTag) t;
+                for (int i = 0; i < sct.tagIDs.length; i++) {
+                    if ((!classes.containsKey(sct.tagIDs[i])) && (!classes.containsValue(sct.classNames[i]))) {
+                        classes.put(sct.tagIDs[i], sct.classNames[i]);
+                    }
+                }
+            }
+        }
+        for (Tag t : tags) {
+            if (t instanceof CharacterTag) {
+                CharacterTag ct = (CharacterTag) t;
+                if (classes.containsKey(ct.getCharacterID())) {
+                    ct.setClassName(classes.get(ct.getCharacterID()));
+                }
+            }
+        }
     }
 
     /**
@@ -774,6 +799,36 @@ public class SWF {
         }
     }
 
+    public static void exportBinaryData(String outdir, List<Tag> tags) throws IOException {
+        if (tags.isEmpty()) {
+            return;
+        }
+        if (!(new File(outdir)).exists()) {
+            (new File(outdir)).mkdirs();
+        }
+        for (Tag t : tags) {
+            if (t instanceof DefineBinaryDataTag) {
+                int characterID = 0;
+                if (t instanceof CharacterTag) {
+                    characterID = ((CharacterTag) t).getCharacterID();
+                }
+                FileOutputStream fos = null;
+                try {
+                    fos = new FileOutputStream(outdir + File.separator + characterID + ".bin");
+                    fos.write(((DefineBinaryDataTag) t).binaryData);
+                } finally {
+                    if (fos != null) {
+                        try {
+                            fos.close();
+                        } catch (Exception ex) {
+                            //ignore
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public static void exportImages(String outdir, List<Tag> tags, JPEGTablesTag jtt) throws IOException {
         if (tags.isEmpty()) {
             return;
@@ -856,6 +911,10 @@ public class SWF {
 
     public void exportShapes(String outdir) throws IOException {
         exportShapes(outdir, tags);
+    }
+
+    public void exportBinaryData(String outdir) throws IOException {
+        exportBinaryData(outdir, tags);
     }
     public static final String[] reservedWords = {
         "as", "break", "case", "catch", "class", "const", "continue", "default", "delete", "do", "each", "else",

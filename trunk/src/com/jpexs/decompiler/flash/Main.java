@@ -411,8 +411,8 @@ public class Main {
         System.out.println(" ...opens SWF file with the decompiler GUI");
         System.out.println(" 3) -proxy (-PXXX)");
         System.out.println("  ...auto start proxy in the tray. Optional parameter -P specifies port for proxy. Defaults to 55555. ");
-        System.out.println(" 4) -export (as|pcode|image|shape|movie|sound) outdirectory infile [-selectas3class class1 class2 ...]");
-        System.out.println("  ...export infile sources to outdirectory as AsctionScript code (\"as\" argument) or as PCode (\"pcode\" argument), images, shapes or movies");
+        System.out.println(" 4) -export (as|pcode|image|shape|movie|sound|binaryData) outdirectory infile [-selectas3class class1 class2 ...]");
+        System.out.println("  ...export infile sources to outdirectory as AsctionScript code (\"as\" argument) or as PCode (\"pcode\" argument), images, shapes, movies or binaryData");
         System.out.println("     When \"as\" or \"pcode\" type specified, optional \"-selectas3class\" parameter can be passed to export only selected classes (ActionScript 3 only)");
         System.out.println(" 5) -dumpSWF infile");
         System.out.println("  ...dumps list of SWF tags to console");
@@ -422,15 +422,15 @@ public class Main {
         System.out.println("  ...Decompress infile and save it to outfile");
         System.out.println();
         System.out.println("Examples:");
-        System.out.println("java -jar FFDec.jar myfile.swf");
-        System.out.println("java -jar FFDec.jar -proxy");
-        System.out.println("java -jar FFDec.jar -proxy -P1234");
-        System.out.println("java -jar FFDec.jar -export as \"C:\\decompiled\\\" myfile.swf");
-        System.out.println("java -jar FFDec.jar -export as \"C:\\decompiled\\\" myfile.swf -selectas3class com.example.MyClass com.example.SecondClass");
-        System.out.println("java -jar FFDec.jar -export pcode \"C:\\decompiled\\\" myfile.swf");
-        System.out.println("java -jar FFDec.jar -dumpSWF myfile.swf");
-        System.out.println("java -jar FFDec.jar -compress myfile.swf myfiledec.swf");
-        System.out.println("java -jar FFDec.jar -decompress myfiledec.swf myfile.swf");
+        System.out.println("java -jar ffdec.jar myfile.swf");
+        System.out.println("java -jar ffdec.jar -proxy");
+        System.out.println("java -jar ffdec.jar -proxy -P1234");
+        System.out.println("java -jar ffdec.jar -export as \"C:\\decompiled\\\" myfile.swf");
+        System.out.println("java -jar ffdec.jar -export as \"C:\\decompiled\\\" myfile.swf -selectas3class com.example.MyClass com.example.SecondClass");
+        System.out.println("java -jar ffdec.jar -export pcode \"C:\\decompiled\\\" myfile.swf");
+        System.out.println("java -jar ffdec.jar -dumpSWF myfile.swf");
+        System.out.println("java -jar ffdec.jar -compress myfile.swf myfiledec.swf");
+        System.out.println("java -jar ffdec.jar -decompress myfiledec.swf myfile.swf");
     }
 
     private static void copyFile(String from, String to) throws IOException {
@@ -492,8 +492,10 @@ public class Main {
                             if (!exportFormat.toLowerCase().equals("shape")) {
                                 if (!exportFormat.toLowerCase().equals("movie")) {
                                     if (!exportFormat.toLowerCase().equals("sound")) {
-                                        System.err.println("Invalid export format:" + exportFormat);
-                                        badArguments();
+                                        if (!exportFormat.toLowerCase().equals("binaryData")) {
+                                            System.err.println("Invalid export format:" + exportFormat);
+                                            badArguments();
+                                        }
                                     }
                                 }
                             }
@@ -539,6 +541,9 @@ public class Main {
                         exportOK = true;
                     } else if (exportFormat.equals("sound")) {
                         exfile.exportSounds(outDir.getAbsolutePath(), true);
+                        exportOK = true;
+                    } else if (exportFormat.equals("binaryData")) {
+                        exfile.exportBinaryData(outDir.getAbsolutePath());
                         exportOK = true;
                     } else {
                         exportOK = false;
