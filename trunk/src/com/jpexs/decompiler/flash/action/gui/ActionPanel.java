@@ -81,6 +81,7 @@ public class ActionPanel extends JPanel implements ActionListener {
     public JPanel topButtonsPan;
     private String srcWithHex;
     private String srcNoHex;
+    private String lastDecompiled = "";
 
     public void setText(String text) {
         int pos = editor.getCaretPosition();
@@ -137,7 +138,8 @@ public class ActionPanel extends JPanel implements ActionListener {
                      } catch (IOException ex) {
                      Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
                      }*/
-                    decompiledEditor.setText(stripped);
+                    decompiledEditor.setText(lastDecompiled = stripped);
+
                     if (debugRecompile) {
                         try {
                             ActionScriptParser ps = new ActionScriptParser();
@@ -360,6 +362,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             editButton.setVisible(false);
             cancelButton.setVisible(true);
             editor.getCaret().setVisible(true);
+            asmLabel.setIcon(View.getIcon("editing16"));
         } else {
             setText(hexButton.isSelected() ? srcWithHex : srcNoHex);
             editor.setEditable(false);
@@ -367,9 +370,11 @@ public class ActionPanel extends JPanel implements ActionListener {
             editButton.setVisible(true);
             cancelButton.setVisible(false);
             editor.getCaret().setVisible(true);
+            asmLabel.setIcon(null);
         }
         topButtonsPan.setVisible(!val);
         editMode = val;
+        editor.requestFocusInWindow();
     }
 
     public void setDecompiledEditMode(boolean val) {
@@ -380,6 +385,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             betaLabel.setVisible(false);
             cancelDecompiledButton.setVisible(true);
             decompiledEditor.getCaret().setVisible(true);
+            decLabel.setIcon(View.getIcon("editing16"));
         } else {
             decompiledEditor.setEditable(false);
             saveDecompiledButton.setVisible(false);
@@ -387,8 +393,10 @@ public class ActionPanel extends JPanel implements ActionListener {
             betaLabel.setVisible(true);
             cancelDecompiledButton.setVisible(false);
             decompiledEditor.getCaret().setVisible(true);
+            decLabel.setIcon(null);
         }
         editDecompiledMode = val;
+        decompiledEditor.requestFocusInWindow();
     }
 
     @Override
@@ -423,6 +431,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             setDecompiledEditMode(true);
         } else if (e.getActionCommand().equals("CANCELDECOMPILED")) {
             setDecompiledEditMode(false);
+            decompiledEditor.setText(lastDecompiled);
         } else if (e.getActionCommand().equals("SAVEDECOMPILED")) {
             try {
                 ActionScriptParser par = new ActionScriptParser();

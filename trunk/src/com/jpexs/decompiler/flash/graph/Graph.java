@@ -1095,7 +1095,7 @@ public class Graph {
                                             } else {
                                                 ex = new NotItem(null, ex);
                                             }
-                                            if (!finalCommands.isEmpty()) {
+                                            if ((finalCommands != null) && (!finalCommands.isEmpty())) {
                                                 tr.addAll(finalCommands);
                                             }
                                             tr.add(ex);

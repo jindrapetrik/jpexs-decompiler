@@ -120,6 +120,11 @@ public class DetailPanel extends JPanel implements ActionListener {
         editButton.setVisible(!val);
         cancelButton.setVisible(val);
         editMode = val;
+        if (val) {
+            selectedLabel.setIcon(View.getIcon("editing16"));
+        } else {
+            selectedLabel.setIcon(null);
+        }
     }
 
     public void showCard(String name, Trait trait) {
