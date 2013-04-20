@@ -1513,15 +1513,15 @@ public class AVM2Graph extends Graph {
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i) instanceof WhileItem) {
                 WhileItem w = (WhileItem) list.get(i);
-                if (w.expression instanceof HasNextTreeItem) {
+                if ((!w.expression.isEmpty()) && (w.expression.get(w.expression.size() - 1) instanceof HasNextTreeItem)) {
                     if (!w.commands.isEmpty()) {
                         if (w.commands.get(0) instanceof SetTypeTreeItem) {
                             SetTypeTreeItem sti = (SetTypeTreeItem) w.commands.remove(0);
                             GraphTargetItem gti = sti.getValue().getNotCoerced();
                             if (gti instanceof NextValueTreeItem) {
-                                list.set(i, new ForEachInTreeItem(w.src, w.loop, new InTreeItem(null, sti.getObject(), ((HasNextTreeItem) w.expression).collection), w.commands));
+                                list.set(i, new ForEachInTreeItem(w.src, w.loop, new InTreeItem(null, sti.getObject(), ((HasNextTreeItem) w.expression.get(w.expression.size() - 1)).collection), w.commands));
                             } else if (gti instanceof NextNameTreeItem) {
-                                list.set(i, new ForInTreeItem(w.src, w.loop, new InTreeItem(null, sti.getObject(), ((HasNextTreeItem) w.expression).collection), w.commands));
+                                list.set(i, new ForInTreeItem(w.src, w.loop, new InTreeItem(null, sti.getObject(), ((HasNextTreeItem) w.expression.get(w.expression.size() - 1)).collection), w.commands));
                             }
                         }
                     }

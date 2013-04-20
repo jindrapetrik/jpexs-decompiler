@@ -37,7 +37,7 @@ public class NotCompileTimeTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return "<NOTCOMPILETIME>";
+        return object.toString(constants, localRegNames, fullyQualifiedNames);
     }
 
     @Override
