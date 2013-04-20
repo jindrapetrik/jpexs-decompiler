@@ -967,21 +967,17 @@ public class Action implements GraphSourceItem {
                                 List<GraphTargetItem> parts = it.onTrue;
                                 className = getWithoutGlobal((GetMemberTreeItem) nti.value);
                                 if (parts.size() >= 1) {
+                                    if (parts.get(0) instanceof SetMemberTreeItem) {
+                                        SetMemberTreeItem smt = (SetMemberTreeItem) parts.get(0);
+                                        if (smt.value instanceof StoreRegisterTreeItem) {
+                                            parts.add(0, smt.value);
+                                            smt.value = ((StoreRegisterTreeItem) smt.value).value;
+                                        }
+                                    }
                                     if (parts.get(0) instanceof StoreRegisterTreeItem) {
                                         StoreRegisterTreeItem str1 = (StoreRegisterTreeItem) parts.get(0);
                                         int classReg = str1.register.number;
-                                        int instanceReg = -1;
-                                        if ((str1.value instanceof GetMemberTreeItem) && ((GetMemberTreeItem) str1.value).object instanceof SetTypeTreeItem) {
-                                            int tmp = classReg;
-                                            SetTypeTreeItem stt = (SetTypeTreeItem) ((GetMemberTreeItem) str1.value).object;
-                                            classReg = stt.getTempRegister();
-                                            instanceReg = tmp;
-                                            parts.remove(0);
-                                            parts.add(0, new StoreRegisterTreeItem(null, new RegisterNumber(classReg), stt.getValue(), false));
-                                            parts.add(1, (GraphTargetItem) stt);
-                                            ((GetMemberTreeItem) str1.value).object = new DirectValueTreeItem(null, 0, new RegisterNumber(classReg), null);
-                                            parts.add(2, new StoreRegisterTreeItem(null, new RegisterNumber(instanceReg), str1.value, false));
-                                        }
+                                        int instanceReg = -1;                                       
 
                                         if ((parts.size() >= 2) && (parts.get(1) instanceof SetMemberTreeItem)) {
                                             GraphTargetItem ti1 = ((SetMemberTreeItem) parts.get(1)).value;
@@ -1010,17 +1006,13 @@ public class Action implements GraphSourceItem {
                                                         output2.add(new ClassTreeItem(className, extendsOp, implementsOp, functions, vars, staticFunctions, staticVars));
                                                         return output2;
                                                     }
-                                                    if ((parts.get(pos) instanceof SetMemberTreeItem) && ((SetMemberTreeItem) parts.get(pos)).object instanceof SetTypeTreeItem) {
-                                                        //int tmp = classReg;
+          
+                                                    if (parts.get(pos) instanceof SetMemberTreeItem) {
                                                         SetMemberTreeItem smt = (SetMemberTreeItem) parts.get(pos);
-                                                        SetTypeTreeItem stt = (SetTypeTreeItem) ((SetMemberTreeItem) parts.get(pos)).object;
-                                                        instanceReg = stt.getTempRegister();
-
-                                                        parts.remove(pos);
-                                                        parts.add(pos + 0, new StoreRegisterTreeItem(null, new RegisterNumber(instanceReg), stt.getValue(), false));
-                                                        parts.add(pos + 1, (GraphTargetItem) stt);
-                                                        smt.object = new DirectValueTreeItem(null, 0, new RegisterNumber(instanceReg), null);
-                                                        parts.add(pos + 2, smt);
+                                                        if (smt.value instanceof StoreRegisterTreeItem) {
+                                                            parts.add(pos, smt.value);
+                                                            smt.value = ((StoreRegisterTreeItem) smt.value).value;
+                                                        }
                                                     }
                                                     if (parts.get(pos) instanceof StoreRegisterTreeItem) {
 
