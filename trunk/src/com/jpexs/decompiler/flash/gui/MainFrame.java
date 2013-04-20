@@ -344,10 +344,10 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         miCheckUpdates.setIcon(View.getIcon("update16"));
         miCheckUpdates.addActionListener(this);
 
-        JMenuItem miDonate = new JMenuItem("Donate...");
-        miDonate.setActionCommand("DONATE");
-        miDonate.setIcon(View.getIcon("donate16"));
-        miDonate.addActionListener(this);
+        JMenuItem miHelpUs = new JMenuItem("Help us!");
+        miHelpUs.setActionCommand("HELPUS");
+        miHelpUs.setIcon(View.getIcon("donate16"));
+        miHelpUs.addActionListener(this);
 
         JMenuItem miHomepage = new JMenuItem("Visit homepage");
         miHomepage.setActionCommand("HOMEPAGE");
@@ -356,7 +356,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
 
         menuHelp.add(miCheckUpdates);
-        menuHelp.add(miDonate);
+        menuHelp.add(miHelpUs);
         menuHelp.add(miHomepage);
         menuHelp.add(miAbout);
         menuBar.add(menuHelp);
@@ -1156,17 +1156,17 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             }
         }
 
-        if (e.getActionCommand().equals("DONATE")) {
-            String donateURL = Main.projectPage + "/donate.html";
+        if (e.getActionCommand().equals("HELPUS")) {
+            String helpUsURL = Main.projectPage + "/help_us.html";
             if (java.awt.Desktop.isDesktopSupported()) {
                 java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
                 try {
-                    java.net.URI uri = new java.net.URI(donateURL);
+                    java.net.URI uri = new java.net.URI(helpUsURL);
                     desktop.browse(uri);
                 } catch (Exception ex) {
                 }
             } else {
-                JOptionPane.showMessageDialog(null, "Please visit\r\n" + donateURL + "\r\nfor details.");
+                JOptionPane.showMessageDialog(null, "Please visit\r\n" + helpUsURL + "\r\nfor details.");
             }
         }
 
