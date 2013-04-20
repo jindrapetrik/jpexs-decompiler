@@ -316,6 +316,9 @@ public class ActionPush extends Action {
             stack.push(dvt);
             if (o instanceof RegisterNumber) {
                 dvt.computedRegValue = variables.get("__register" + ((RegisterNumber) o).number);
+                if (regNames.containsKey(((RegisterNumber)o).number)) {
+                    ((RegisterNumber)o).name = regNames.get(((RegisterNumber)o).number);
+                }
             }
             pos++;
         }
