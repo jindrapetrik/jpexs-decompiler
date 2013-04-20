@@ -320,57 +320,32 @@ public class SWF {
         return true;
     }
 
-    /**
-     * Decompress SWF file
-     *
-     * @param fis Input stream
-     * @param fos Output stream
-     */
-    public static boolean cws2fws(InputStream fis, OutputStream fos) {
-        try {
-            byte swfHead[] = new byte[8];
-            fis.read(swfHead);
-            InflaterInputStream iis = new InflaterInputStream(fis);
-            if (swfHead[0] != 'C') {
-                fis.close();
-                return false;
-            }
-            swfHead[0] = 'F';
-            fos.write(swfHead);
-            int i;
-            while ((i = iis.read()) != -1) {
-                fos.write(i);
-            }
-
-            fis.close();
-            fos.close();
-        } catch (FileNotFoundException ex) {
-            return false;
-        } catch (IOException ex) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Decompress LZMA compressed SWF file
-     *
-     * @param fis Input stream
-     * @param fos Output stream
-     */
-    public static boolean zws2fws(InputStream fis, OutputStream fos) {
+    public static boolean decompress(InputStream fis, OutputStream fos) {
         try {
             byte hdr[] = new byte[3];
             fis.read(hdr);
             String shdr = new String(hdr);
-            if (!shdr.equals("ZWS")) {
-                return false;
-            }
-            int version = fis.read();
-            SWFInputStream sis = new SWFInputStream(fis, version, 4);
-            long fileSize = sis.readUI32();
+            if (shdr.equals("CWS")) {
+                int version = fis.read();
+                SWFInputStream sis = new SWFInputStream(fis, version, 4);
+                long fileSize = sis.readUI32();
+                SWFOutputStream sos = new SWFOutputStream(fos, version);
+                sos.write("FWS".getBytes());
+                sos.writeUI8(version);
+                sos.writeUI32(fileSize);
+                InflaterInputStream iis = new InflaterInputStream(fis);
+                int i;
+                while ((i = iis.read()) != -1) {
+                    fos.write(i);
+                }
 
-            if (hdr[0] == 'Z') {
+                fis.close();
+                fos.close();
+            } else if (shdr.equals("ZWS")) {
+                int version = fis.read();
+                SWFInputStream sis = new SWFInputStream(fis, version, 4);
+                long fileSize = sis.readUI32();
+
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 long outSize = sis.readUI32();
                 int propertiesSize = 5;
@@ -392,6 +367,8 @@ public class SWF {
                 sos.writeUI32(fileSize);
                 sos.write(baos.toByteArray());
                 sos.close();
+                fis.close();
+                fos.close();
             } else {
                 return false;
             }

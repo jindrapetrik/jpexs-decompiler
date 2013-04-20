@@ -562,7 +562,7 @@ public class Main {
                     badArguments();
                 }
 
-                if (SWF.cws2fws(new FileInputStream(args[pos + 1]), new FileOutputStream(args[pos + 2]))) {
+                if (SWF.decompress(new FileInputStream(args[pos + 1]), new FileOutputStream(args[pos + 2]))) {
                     System.out.println("OK");
                     System.exit(0);
                 } else {
