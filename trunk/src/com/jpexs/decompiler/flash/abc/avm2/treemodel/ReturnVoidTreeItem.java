@@ -18,10 +18,11 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.graph.ExitItem;
 import java.util.HashMap;
 import java.util.List;
 
-public class ReturnVoidTreeItem extends TreeItem {
+public class ReturnVoidTreeItem extends TreeItem implements ExitItem {
 
     public ReturnVoidTreeItem(AVM2Instruction instruction) {
         super(instruction, NOPRECEDENCE);
