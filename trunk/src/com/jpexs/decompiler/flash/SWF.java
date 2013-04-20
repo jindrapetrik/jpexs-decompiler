@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash;
 
 import SevenZip.Compression.LZMA.Encoder;
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
@@ -378,6 +379,37 @@ public class SWF {
             return false;
         }
         return true;
+    }
+
+    public boolean exportAS3Class(String className, String outdir, boolean isPcode) throws Exception {
+        List<ABCContainerTag> abcTags = new ArrayList<ABCContainerTag>();
+
+        for (Tag t : tags) {
+            if (t instanceof ABCContainerTag) {
+                ABCContainerTag cnt = (ABCContainerTag) t;
+                abcTags.add(cnt);
+            }
+        }
+        for (int i = 0; i < abcTags.size(); i++) {
+            ABC abc = abcTags.get(i).getABC();
+            int scriptIndex = abc.findScriptByPath(className);
+            if (scriptIndex > -1) {
+                String cnt = "";
+                if (abc.script_info.length > 1) {
+                    cnt = "script " + (i + 1) + "/" + abc.script_info.length + " ";
+                }
+                String path = abc.script_info[scriptIndex].getPath(abc);
+                String packageName = path.substring(0, path.lastIndexOf("."));
+                if (packageName.equals("")) {
+                    path = path.substring(1);
+                }
+                String exStr = "Exporting " + "tag " + (i + 1) + "/" + abcTags.size() + " " + cnt + path + " ...";
+                informListeners("export", exStr);
+                abc.script_info[scriptIndex].export(abc, abcTags, outdir, isPcode);
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean exportActionScript(String outdir, boolean isPcode) throws Exception {

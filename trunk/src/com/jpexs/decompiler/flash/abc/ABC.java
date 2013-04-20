@@ -872,4 +872,13 @@ public class ABC {
         }
         return -1;
     }
+    public int findScriptByPath(String name) {
+        for (int c = 0; c < script_info.length; c++) {
+            String s = script_info[c].getPath(this);
+            if (name.equals(s)) {
+                return c;
+            }
+        }
+        return -1;
+    }
 }

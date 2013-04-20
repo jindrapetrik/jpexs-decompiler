@@ -1019,7 +1019,7 @@ public class Graph {
                             checkContinueAtTheEnd(retw, whileTrueLoop);
                             List<GraphTargetItem> finalCommands = forFinalCommands.get(whileTrueLoop);
                             IfItem ifi = null;
-                            if (!finalCommands.isEmpty()) {
+                            if ((finalCommands!=null) && !finalCommands.isEmpty()) {
                                 if (finalCommands.get(finalCommands.size() - 1) instanceof IfItem) {
                                     ifi = (IfItem) finalCommands.get(finalCommands.size() - 1);
                                     finalCommands.remove(finalCommands.size() - 1);

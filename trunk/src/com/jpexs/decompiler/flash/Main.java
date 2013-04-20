@@ -411,8 +411,9 @@ public class Main {
         System.out.println(" ...opens SWF file with the decompiler GUI");
         System.out.println(" 3) -proxy (-PXXX)");
         System.out.println("  ...auto start proxy in the tray. Optional parameter -P specifies port for proxy. Defaults to 55555. ");
-        System.out.println(" 4) -export (as|pcode|image|shape|movie|sound) outdirectory infile");
+        System.out.println(" 4) -export (as|pcode|image|shape|movie|sound) outdirectory infile [-selectas3class class1 class2 ...]");
         System.out.println("  ...export infile sources to outdirectory as AsctionScript code (\"as\" argument) or as PCode (\"pcode\" argument), images, shapes or movies");
+        System.out.println("     When \"as\" or \"pcode\" type specified, optional \"-selectas3class\" parameter can be passed to export only selected classes (ActionScript 3 only)");
         System.out.println(" 5) -dumpSWF infile");
         System.out.println("  ...dumps list of SWF tags to console");
         System.out.println(" 6) -compress infile outfile");
@@ -425,6 +426,7 @@ public class Main {
         System.out.println("java -jar FFDec.jar -proxy");
         System.out.println("java -jar FFDec.jar -proxy -P1234");
         System.out.println("java -jar FFDec.jar -export as \"C:\\decompiled\\\" myfile.swf");
+        System.out.println("java -jar FFDec.jar -export as \"C:\\decompiled\\\" myfile.swf -selectas3class com.example.MyClass com.example.SecondClass");
         System.out.println("java -jar FFDec.jar -export pcode \"C:\\decompiled\\\" myfile.swf");
         System.out.println("java -jar FFDec.jar -dumpSWF myfile.swf");
         System.out.println("java -jar FFDec.jar -compress myfile.swf myfiledec.swf");
@@ -524,7 +526,14 @@ public class Main {
                         exfile.exportShapes(outDir.getAbsolutePath());
                         exportOK = true;
                     } else if (exportFormat.equals("as") || exportFormat.equals("pcode")) {
-                        exportOK = exfile.exportActionScript(outDir.getAbsolutePath(), exportFormat.equals("pcode"));
+                        if ((pos + 5 < args.length) && (args[pos + 4].equals("-selectas3class"))) {
+                            exportOK = true;
+                            for (int i = pos + 5; i < args.length; i++) {
+                                exportOK = exportOK && exfile.exportAS3Class(args[i], outDir.getAbsolutePath(), exportFormat.equals("pcode"));
+                            }
+                        } else {
+                            exportOK = exfile.exportActionScript(outDir.getAbsolutePath(), exportFormat.equals("pcode"));
+                        }
                     } else if (exportFormat.equals("movie")) {
                         exfile.exportMovies(outDir.getAbsolutePath());
                         exportOK = true;
