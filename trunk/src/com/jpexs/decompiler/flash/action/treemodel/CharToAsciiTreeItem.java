@@ -31,7 +31,7 @@ public class CharToAsciiTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return hilight("chr(") + value.toString(constants) + hilight(")");
+        return hilight("ord(") + value.toString(constants) + hilight(")");
     }
 
     @Override

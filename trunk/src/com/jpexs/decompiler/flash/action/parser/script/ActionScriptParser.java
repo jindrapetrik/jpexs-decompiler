@@ -647,6 +647,117 @@ public class ActionScriptParser {
         return ret;
     }
 
+    private List<Action> expressionCommands(ParsedSymbol s, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forinlevel) throws IOException, ParseException {
+        List<Action> ret = new ArrayList<Action>();
+        switch (s.type) {
+            case MBORD:
+                expected(SymbolType.PARENT_OPEN);
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
+                expected(SymbolType.PARENT_CLOSE);
+                ret.add(new ActionMBCharToAscii());
+                break;
+            case MBCHR:
+                expected(SymbolType.PARENT_OPEN);
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
+                expected(SymbolType.PARENT_CLOSE);
+                ret.add(new ActionMBAsciiToChar());
+                break;
+            case MBLENGTH:
+                expected(SymbolType.PARENT_OPEN);
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
+                expected(SymbolType.PARENT_CLOSE);
+                ret.add(new ActionMBStringLength());
+                break;
+            case MBSUBSTRING:
+                expected(SymbolType.PARENT_OPEN);
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
+                expected(SymbolType.COMMA);
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
+                expected(SymbolType.COMMA);
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
+                expected(SymbolType.PARENT_CLOSE);
+                ret.add(new ActionMBStringExtract());
+                break;
+            case SUBSTR:
+                expected(SymbolType.PARENT_OPEN);
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
+                expected(SymbolType.COMMA);
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
+                expected(SymbolType.COMMA);
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
+                expected(SymbolType.PARENT_CLOSE);
+                ret.add(new ActionStringExtract());
+                break;
+            case LENGTH:
+                expected(SymbolType.PARENT_OPEN);
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
+                expected(SymbolType.PARENT_CLOSE);
+                ret.add(new ActionStringLength());
+                break;
+            case RANDOM:
+                expected(SymbolType.PARENT_OPEN);
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
+                expected(SymbolType.PARENT_CLOSE);
+                ret.add(new ActionRandomNumber());
+                break;
+            case INT:
+                expected(SymbolType.PARENT_OPEN);
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
+                expected(SymbolType.PARENT_CLOSE);
+                ret.add(new ActionToInteger());
+                break;
+
+            case TARGETPATH:
+                expected(SymbolType.PARENT_OPEN);
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
+                expected(SymbolType.PARENT_CLOSE);
+                ret.add(new ActionTargetPath());
+                break;
+            case NUMBER_OP:
+                expected(SymbolType.PARENT_OPEN);
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
+                expected(SymbolType.PARENT_CLOSE);
+                ret.add(new ActionToNumber());
+                break;
+            case STRING_OP:
+                expected(SymbolType.PARENT_OPEN);
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
+                expected(SymbolType.PARENT_CLOSE);
+                ret.add(new ActionToString());
+                break;
+            case ORD:
+                expected(SymbolType.PARENT_OPEN);
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
+                expected(SymbolType.PARENT_CLOSE);
+                ret.add(new ActionCharToAscii());
+                break;
+            case CHR:
+                expected(SymbolType.PARENT_OPEN);
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
+                expected(SymbolType.PARENT_CLOSE);
+                ret.add(new ActionAsciiToChar());
+                break;
+            case DUPLICATEMOVIECLIP:
+                expected(SymbolType.PARENT_OPEN);
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
+                expected(SymbolType.COMMA);
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
+                expected(SymbolType.COMMA);
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
+                expected(SymbolType.PARENT_CLOSE);
+                ret.add(new ActionCloneSprite());
+                break;
+            case GETTIMER:
+                expected(SymbolType.PARENT_OPEN);
+                expected(SymbolType.PARENT_CLOSE);
+                ret.add(new ActionGetTime());
+                break;
+            default:
+                return null;
+        }
+        return ret;
+    }
+
     private List<Action> command(HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forinlevel) throws IOException, ParseException {
         List<Action> ret = new ArrayList<Action>();
         if (debugMode) {
@@ -659,18 +770,18 @@ public class ActionScriptParser {
         switch (s.type) {
             case TRACE:
                 expected(SymbolType.PARENT_OPEN);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
                 ret.add(new ActionTrace());
                 expected(SymbolType.PARENT_CLOSE);
                 break;
             case GETURL:
                 expected(SymbolType.PARENT_OPEN);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
                 s = lex();
                 expected(s, lexer.yyline(), SymbolType.PARENT_CLOSE, SymbolType.COMMA);
                 int getuMethod = 1;
                 if (s.type == SymbolType.COMMA) {
-                    ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
+                    ret.addAll(expression(registerVars, inFunction, inMethod, true));
                     s = lex();
                     if (s.type == SymbolType.COMMA) {
                         s = lex();
@@ -694,11 +805,11 @@ public class ActionScriptParser {
                 break;
             case GOTOANDSTOP:
                 expected(SymbolType.PARENT_OPEN);
-                List<Action> gtsFrame = expression(registerVars, inFunction, inMethod, inMethod);
+                List<Action> gtsFrame = expression(registerVars, inFunction, inMethod, true);
                 s = lex();
                 if (s.type == SymbolType.COMMA) {
                     s = lex();
-                    gtsFrame = expression(registerVars, inFunction, inMethod, inMethod);
+                    gtsFrame = expression(registerVars, inFunction, inMethod, true);
                 } else {
                     lexer.pushback(s);
                 }
@@ -723,7 +834,7 @@ public class ActionScriptParser {
                 break;
             case TELLTARGET:
                 expected(SymbolType.PARENT_OPEN);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
                 expected(SymbolType.PARENT_CLOSE);
                 ret.add(new ActionSetTarget2());
                 break;
@@ -742,47 +853,18 @@ public class ActionScriptParser {
                 expected(SymbolType.PARENT_CLOSE);
                 ret.add(new ActionToggleQuality());
                 break;
-            case ORD:
-                expected(SymbolType.PARENT_OPEN);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
-                expected(SymbolType.PARENT_CLOSE);
-                ret.add(new ActionCharToAscii());
-                ret.add(new ActionPop());
-                break;
-            case CHR:
-                expected(SymbolType.PARENT_OPEN);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
-                expected(SymbolType.PARENT_CLOSE);
-                ret.add(new ActionAsciiToChar());
-                ret.add(new ActionPop());
-                break;
-            case DUPLICATEMOVIECLIP:
-                expected(SymbolType.PARENT_OPEN);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
-                expected(SymbolType.COMMA);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
-                expected(SymbolType.COMMA);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
-                expected(SymbolType.PARENT_CLOSE);
-                ret.add(new ActionCloneSprite());
-                ret.add(new ActionPop());
-                break;
+
             case STOPDRAG:
                 expected(SymbolType.PARENT_OPEN);
                 expected(SymbolType.PARENT_CLOSE);
                 ret.add(new ActionEndDrag());
                 break;
-            case GETTIMER:
-                expected(SymbolType.PARENT_OPEN);
-                expected(SymbolType.PARENT_CLOSE);
-                ret.add(new ActionGetTime());
-                ret.add(new ActionPop());
-                break;
+
             case LOADVARIABLES:
                 expected(SymbolType.PARENT_OPEN);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
                 expected(SymbolType.COMMA);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
                 s = lex();
                 expected(s, lexer.yyline(), SymbolType.PARENT_CLOSE, SymbolType.COMMA);
                 int lvmethod = 1;
@@ -804,7 +886,7 @@ public class ActionScriptParser {
                 break;
             case LOADMOVIE:
                 expected(SymbolType.PARENT_OPEN);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
                 s = lex();
                 expected(s, lexer.yyline(), SymbolType.PARENT_CLOSE, SymbolType.COMMA);
                 int method = 1;
@@ -826,11 +908,11 @@ public class ActionScriptParser {
                 break;
             case GOTOANDPLAY:
                 expected(SymbolType.PARENT_OPEN);
-                List<Action> gtpFrame = expression(registerVars, inFunction, inMethod, inMethod);
+                List<Action> gtpFrame = expression(registerVars, inFunction, inMethod, true);
                 s = lex();
                 if (s.type == SymbolType.COMMA) {
                     s = lex();
-                    gtpFrame = expression(registerVars, inFunction, inMethod, inMethod);
+                    gtpFrame = expression(registerVars, inFunction, inMethod, true);
                 } else {
                     lexer.pushback(s);
                 }
@@ -838,83 +920,32 @@ public class ActionScriptParser {
                 ret.add(new ActionGotoFrame2(true, false, (int) (long) (Long) s.value));
                 expected(SymbolType.PARENT_CLOSE);
                 break;
-            case MBORD:
-                expected(SymbolType.PARENT_OPEN);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
-                expected(SymbolType.PARENT_CLOSE);
-                ret.add(new ActionMBCharToAscii());
-                ret.add(new ActionPop());
-                break;
-            case MBCHR:
-                expected(SymbolType.PARENT_OPEN);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
-                expected(SymbolType.PARENT_CLOSE);
-                ret.add(new ActionMBAsciiToChar());
-                ret.add(new ActionPop());
-                break;
-            case MBLENGTH:
-                expected(SymbolType.PARENT_OPEN);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
-                expected(SymbolType.PARENT_CLOSE);
-                ret.add(new ActionMBStringLength());
-                ret.add(new ActionPop());
-                break;
-            case MBSUBSTRING:
-                expected(SymbolType.PARENT_OPEN);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
-                expected(SymbolType.COMMA);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
-                expected(SymbolType.COMMA);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
-                expected(SymbolType.PARENT_CLOSE);
-                ret.add(new ActionMBStringExtract());
-                ret.add(new ActionPop());
-                break;
-            case SUBSTR:
-                expected(SymbolType.PARENT_OPEN);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
-                expected(SymbolType.COMMA);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
-                expected(SymbolType.COMMA);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
-                expected(SymbolType.PARENT_CLOSE);
-                ret.add(new ActionStringExtract());
-                ret.add(new ActionPop());
-                break;
-            /*case LENGTH:
-             break;*/
-            case RANDOM:
-                expected(SymbolType.PARENT_OPEN);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
-                expected(SymbolType.PARENT_CLOSE);
-                ret.add(new ActionRandomNumber());
-                ret.add(new ActionPop());
-                break;
+
             case REMOVEMOVIECLIP:
                 expected(SymbolType.PARENT_OPEN);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
                 expected(SymbolType.PARENT_CLOSE);
                 ret.add(new ActionRemoveSprite());
                 break;
             case STARTDRAG:
                 expected(SymbolType.PARENT_OPEN);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
                 s = lex();
                 if (s.type == SymbolType.COMMA) {
-                    ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
+                    ret.addAll(expression(registerVars, inFunction, inMethod, true));
                     s = lex();
                     if (s.type == SymbolType.COMMA) {
                         ret.add(new ActionPush(Boolean.TRUE));
-                        ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
+                        ret.addAll(expression(registerVars, inFunction, inMethod, true));
                         s = lex();
                         if (s.type == SymbolType.COMMA) {
-                            ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
+                            ret.addAll(expression(registerVars, inFunction, inMethod, true));
                             s = lex();
                             if (s.type == SymbolType.COMMA) {
-                                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
+                                ret.addAll(expression(registerVars, inFunction, inMethod, true));
                                 s = lex();
                                 if (s.type == SymbolType.COMMA) {
-                                    ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
+                                    ret.addAll(expression(registerVars, inFunction, inMethod, true));
                                 } else {
                                     lexer.pushback(s);
                                     ret.add(new ActionPush(new Long(0)));
@@ -942,33 +973,10 @@ public class ActionScriptParser {
                 expected(SymbolType.PARENT_CLOSE);
                 ret.add(new ActionStartDrag());
                 break;
-            case INT:
-                expected(SymbolType.PARENT_OPEN);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
-                expected(SymbolType.PARENT_CLOSE);
-                ret.add(new ActionToInteger());
-                ret.add(new ActionPop());
-                break;
 
-            case TARGETPATH:
-                break;
-            case NUMBER_OP:
-                expected(SymbolType.PARENT_OPEN);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
-                expected(SymbolType.PARENT_CLOSE);
-                ret.add(new ActionToNumber());
-                ret.add(new ActionPop());
-                break;
-            case STRING_OP:
-                expected(SymbolType.PARENT_OPEN);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
-                expected(SymbolType.PARENT_CLOSE);
-                ret.add(new ActionToString());
-                ret.add(new ActionPop());
-                break;
             case IFFRAMELOADED:
                 expected(SymbolType.PARENT_OPEN);
-                ret.addAll(expression(registerVars, inFunction, inMethod, inMethod));
+                ret.addAll(expression(registerVars, inFunction, inMethod, true));
                 expected(SymbolType.PARENT_CLOSE);
                 expected(SymbolType.CURLY_OPEN);
                 List<Action> iflComs = commands(registerVars, inFunction, inMethod, forinlevel);
@@ -1543,6 +1551,12 @@ public class ActionScriptParser {
                 ret.add(new ActionThrow());
                 break;
             default:
+                List<Action> valcmd = expressionCommands(s, registerVars, inFunction, inMethod, forinlevel);
+                if (valcmd != null) {
+                    ret.addAll(valcmd);
+                    ret.add(new ActionPop());
+                    break;
+                }
                 if (s.type != SymbolType.SEMICOLON) {
                     lexer.pushback(s);
                 }
@@ -1937,6 +1951,11 @@ public class ActionScriptParser {
                 }
                 break;
             default:
+                List<Action> excmd = expressionCommands(s, registerVars, inFunction, inMethod, -1);
+                if (excmd != null) {
+                    ret.addAll(excmd);
+                    break;
+                }
                 lexer.pushback(s);
         }
         List<Action> rem = new ArrayList<Action>();
