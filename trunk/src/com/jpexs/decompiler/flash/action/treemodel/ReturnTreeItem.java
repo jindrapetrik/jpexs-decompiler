@@ -16,11 +16,12 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.graph.ExitItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
 
-public class ReturnTreeItem extends TreeItem {
+public class ReturnTreeItem extends TreeItem implements ExitItem {
 
     public GraphTargetItem value;
 
