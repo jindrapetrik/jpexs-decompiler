@@ -1075,10 +1075,10 @@ public class Graph {
                     }
 
                     if ((!onTrue.isEmpty()) && (!onFalse.isEmpty())) {
-                        if (onTrue.get(onTrue.size() - 1) instanceof ExitItem) {
-                            if (onFalse.get(onFalse.size() - 1) instanceof ContinueItem) {
-                                retw.add(onFalse.remove(onFalse.size() - 1));
-                            }
+                        GraphTargetItem last=onTrue.get(onTrue.size() - 1);
+                        if ((last instanceof ExitItem)||(last instanceof ContinueItem)||(last instanceof BreakItem)) {
+                            retw.addAll(onFalse);
+                            onFalse.clear();
                         }
                     }
 
