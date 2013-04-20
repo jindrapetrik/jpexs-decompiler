@@ -99,13 +99,17 @@ public class ActionGraph extends Graph {
                 WhileItem wi = (WhileItem) it;
                 if ((!wi.commands.isEmpty()) && (wi.commands.get(0) instanceof SetTypeTreeItem)) {
                     SetTypeTreeItem sti = (SetTypeTreeItem) wi.commands.get(0);
-                    if (wi.expression instanceof NeqTreeItem) {
-                        NeqTreeItem ne = (NeqTreeItem) wi.expression;
+                    if (wi.expression.get(wi.expression.size() - 1) instanceof NeqTreeItem) {
+                        NeqTreeItem ne = (NeqTreeItem) wi.expression.get(wi.expression.size() - 1);
                         if (ne.rightSide instanceof DirectValueTreeItem) {
                             DirectValueTreeItem dv = (DirectValueTreeItem) ne.rightSide;
                             if (dv.value instanceof Null) {
-                                if (ne.leftSide instanceof EnumerateTreeItem) {
-                                    EnumerateTreeItem eti = (EnumerateTreeItem) ne.leftSide;
+                                GraphTargetItem en = ne.leftSide;
+                                if (en instanceof StoreRegisterTreeItem) {
+                                    en = ((StoreRegisterTreeItem) en).value;
+                                }
+                                if (en instanceof EnumerateTreeItem) {
+                                    EnumerateTreeItem eti = (EnumerateTreeItem) en;
                                     list.remove(t);
                                     wi.commands.remove(0);
                                     list.add(t, new ForInTreeItem(null, wi.loop, sti.getObject(), eti.object, wi.commands));
