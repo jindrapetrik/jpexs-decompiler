@@ -16,13 +16,16 @@
  */
 package com.jpexs.decompiler.flash.abc.gui;
 
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -49,6 +52,7 @@ public class DetailPanel extends JPanel implements ActionListener {
     private boolean editMode = false;
     private JPanel buttonsPanel;
     private ABCPanel abcPanel;
+    private JLabel traitNameLabel;
 
     public DetailPanel(ABCPanel abcPanel) {
         this.abcPanel = abcPanel;
@@ -98,7 +102,15 @@ public class DetailPanel extends JPanel implements ActionListener {
         selectedLabel.setText(selectedCard);
         selectedLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
         selectedLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        add(selectedLabel, BorderLayout.NORTH);
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.add(selectedLabel, BorderLayout.NORTH);
+        traitNameLabel = new JLabel("");
+        JPanel traitInfoPanel = new JPanel();
+        traitInfoPanel.setLayout(new BoxLayout(traitInfoPanel, BoxLayout.LINE_AXIS));
+        traitInfoPanel.add(new JLabel("  Name:"));
+        traitInfoPanel.add(traitNameLabel);
+        topPanel.add(traitInfoPanel, BorderLayout.CENTER);
+        add(topPanel, BorderLayout.NORTH);
     }
 
     public void setEditMode(boolean val) {
@@ -110,13 +122,18 @@ public class DetailPanel extends JPanel implements ActionListener {
         editMode = val;
     }
 
-    public void showCard(String name) {
+    public void showCard(String name, Trait trait) {
         CardLayout layout = (CardLayout) innerPanel.getLayout();
         layout.show(innerPanel, name);
         boolean b = cardMap.get(name) instanceof TraitDetail;
         buttonsPanel.setVisible(b);
         selectedCard = name;
         selectedLabel.setText(selectedCard);
+        if (trait == null) {
+            traitNameLabel.setText("-");
+        } else {
+            traitNameLabel.setText(" m[" + trait.name_index + "]\"" + Helper.escapeString(trait.getName(abcPanel.abc).toString(abcPanel.abc.constants, new ArrayList<String>())) + "\"");
+        }
     }
 
     @Override

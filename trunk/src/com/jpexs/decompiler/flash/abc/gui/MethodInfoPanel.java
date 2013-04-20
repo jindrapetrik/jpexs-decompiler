@@ -38,11 +38,18 @@ public class MethodInfoPanel extends JPanel {
     public JEditorPane returnTypeEditor;
     private MethodInfo methodInfo;
     private ABC abc;
+    private JLabel methodIndexLabel;
 
     public MethodInfoPanel() {
         returnTypeEditor = new JEditorPane();
         paramEditor = new LineMarkedEditorPane();
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        JPanel miPanel = new JPanel();
+        miPanel.setLayout(new BoxLayout(miPanel, BoxLayout.LINE_AXIS));
+        miPanel.add(new JLabel("Method Index:"));
+        methodIndexLabel = new JLabel("   ");
+        miPanel.add(methodIndexLabel);
+        add(miPanel);
         add(new JLabel("Parameters:"));
         add(new JScrollPane(paramEditor));
         add(new JLabel("Return value type:"));
@@ -63,6 +70,8 @@ public class MethodInfoPanel extends JPanel {
         if (methodInfoIndex <= 0) {
             paramEditor.setText("");
         }
+
+        methodIndexLabel.setText("" + methodInfoIndex);
         this.methodInfo = abc.method_info[methodInfoIndex];
         int p = 0;
         String ret = "";

@@ -45,7 +45,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     private ABCPanel abcPanel;
 
     public void setNoTrait() {
-        abcPanel.detailPanel.showCard(DetailPanel.UNSUPPORTED_TRAIT_CARD);
+        abcPanel.detailPanel.showCard(DetailPanel.UNSUPPORTED_TRAIT_CARD, null);
     }
 
     public void hilightOffset(long offset) {
@@ -72,7 +72,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         this.classIndex = classIndex;
     }
 
-    private boolean displayMethod(int pos, int methodIndex, String name) {
+    private boolean displayMethod(int pos, int methodIndex, String name, Trait trait) {
         if (abc == null) {
             return false;
         }
@@ -80,7 +80,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         if (bi == -1) {
             return false;
         }
-        abcPanel.detailPanel.showCard(DetailPanel.METHOD_TRAIT_CARD);
+        abcPanel.detailPanel.showCard(DetailPanel.METHOD_TRAIT_CARD, trait);
         if (reset || (abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex() != bi)) {
             abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abc, name);
             abcPanel.detailPanel.methodTraitPanel.methodBodyParamsPanel.loadFromBody(abc.bodies[bi]);
@@ -139,11 +139,12 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                     if (abc != null) {
                         name = abc.instance_info[classIndex].getName(abc.constants).getNameWithNamespace(abc.constants);
                     }
+                    Trait t = null;
                     for (Highlighting th : traitHighlights) {
                         if ((pos >= th.startPos) && (pos < th.startPos + th.len)) {
                             lastTraitIndex = (int) th.offset;
                             if (abc != null) {
-                                Trait t = abc.findTraitByTraitId(classIndex, lastTraitIndex);
+                                t = abc.findTraitByTraitId(classIndex, lastTraitIndex);
                                 if (t != null) {
                                     name += ":" + t.getName(abc).getName(abc.constants, new ArrayList<String>());
                                 }
@@ -151,7 +152,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                         }
                     }
 
-                    displayMethod(pos, (int) tm.offset, name);
+                    displayMethod(pos, (int) tm.offset, name, t);
                     currentMethodHighlight = tm;
 
 
@@ -170,22 +171,23 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                     if (tr != null) {
                         if (tr instanceof TraitSlotConst) {
                             abcPanel.detailPanel.slotConstTraitPanel.load((TraitSlotConst) tr, abc);
-                            abcPanel.detailPanel.showCard(DetailPanel.SLOT_CONST_TRAIT_CARD);
+                            abcPanel.detailPanel.showCard(DetailPanel.SLOT_CONST_TRAIT_CARD, tr);
                             abcPanel.detailPanel.setEditMode(false);
                             return;
                         }
                     }
                     currentMethodHighlight = th;
                     String name = "";
+                    Trait t = null;
                     if (abc != null) {
                         name = abc.instance_info[classIndex].getName(abc.constants).getNameWithNamespace(abc.constants);
-                        Trait t = abc.findTraitByTraitId(classIndex, lastTraitIndex);
+                        t = abc.findTraitByTraitId(classIndex, lastTraitIndex);
                         if (t != null) {
                             name += ":" + t.getName(abc).getName(abc.constants, new ArrayList<String>());
                         }
                     }
 
-                    displayMethod(pos, abc.findMethodIdByTraitId(classIndex, (int) th.offset), name);
+                    displayMethod(pos, abc.findMethodIdByTraitId(classIndex, (int) th.offset), name, t);
                     return;
                 }
             }
