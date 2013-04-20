@@ -22,7 +22,7 @@ import java.util.List;
 public class DoWhileItem extends LoopItem implements Block {
 
     public List<GraphTargetItem> commands;
-    public GraphTargetItem expression;
+    public List<GraphTargetItem> expression;
 
     @Override
     public boolean needsSemicolon() {
@@ -36,7 +36,7 @@ public class DoWhileItem extends LoopItem implements Block {
         return ret;
     }
 
-    public DoWhileItem(GraphSourceItem src, Loop loop, List<GraphTargetItem> commands, GraphTargetItem expression) {
+    public DoWhileItem(GraphSourceItem src, Loop loop, List<GraphTargetItem> commands, List<GraphTargetItem> expression) {
         super(src, loop);
         this.expression = expression;
         this.commands = commands;
@@ -52,7 +52,17 @@ public class DoWhileItem extends LoopItem implements Block {
                 ret += ti.toStringSemicoloned(localData) + "\r\n";
             }
         }
-        ret += hilight("}\r\nwhile(") + expression.toString(localData) + hilight(");") + "\r\n";
+        String expStr = "";
+        for (int i = 0; i < expression.size(); i++) {
+            if (expression.get(i).isEmpty()) {
+                continue;
+            }
+            if (i > 0) {
+                expStr += ", ";
+            }
+            expStr += expression.get(i).toString(localData);
+        }
+        ret += hilight("}\r\nwhile(") + expStr + hilight(");") + "\r\n";
         ret += ":loop" + loop.id;
 
         return ret;

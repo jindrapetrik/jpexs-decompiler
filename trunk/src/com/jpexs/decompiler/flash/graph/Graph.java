@@ -399,7 +399,6 @@ public class Graph {
         List<GraphTargetItem> ret = new ArrayList<GraphTargetItem>();
         boolean debugMode = false;
 
-
         if (debugMode) {
             System.err.println("PART " + part);
         }
@@ -1014,10 +1013,51 @@ public class Graph {
                             body = printGraph(prepareBranchLocalData(localData), stack, allParts, part, next, stopPart, loops, forFinalCommands);
                         }
                         retw.addAll(body);
-                        List<GraphTargetItem> tr = new ArrayList<GraphTargetItem>();
-                        tr.add(new TrueItem(null));
-                        retx.add(new WhileItem(null, whileTrueLoop, tr, retw));
-                        next = null;
+
+
+                        if (!retw.isEmpty()) {
+                            checkContinueAtTheEnd(retw, whileTrueLoop);
+                            List<GraphTargetItem> finalCommands = forFinalCommands.get(whileTrueLoop);
+                            IfItem ifi = null;
+                            if (!finalCommands.isEmpty()) {
+                                if (finalCommands.get(finalCommands.size() - 1) instanceof IfItem) {
+                                    ifi = (IfItem) finalCommands.get(finalCommands.size() - 1);
+                                    finalCommands.remove(finalCommands.size() - 1);
+                                }
+                            } else if (retw.get(retw.size() - 1) instanceof IfItem) {
+                                ifi = (IfItem) retw.get(retw.size() - 1);
+                                retw.remove(retw.size() - 1);
+                            }
+                            if (ifi != null) {
+                                if (ifi.onFalse.isEmpty()) {
+                                    if (!ifi.onTrue.isEmpty()) {
+                                        if (ifi.onTrue.get(ifi.onTrue.size() - 1) instanceof ExitItem) {
+                                            whileTrue = false;
+                                            List<GraphTargetItem> tr = new ArrayList<GraphTargetItem>();
+                                            GraphTargetItem ex = ifi.expression;
+                                            if (ex instanceof LogicalOpItem) {
+                                                ex = ((LogicalOpItem) ex).invert();
+                                            } else {
+                                                ex = new NotItem(null, ex);
+                                            }
+                                            if (!finalCommands.isEmpty()) {
+                                                tr.addAll(finalCommands);
+                                            }
+                                            tr.add(ex);
+                                            retx.add(new DoWhileItem(null, whileTrueLoop, retw, tr));
+                                            retx.addAll(ifi.onTrue);
+                                            next = null;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if (whileTrue) {
+                            List<GraphTargetItem> tr = new ArrayList<GraphTargetItem>();
+                            tr.add(new TrueItem(null));
+                            retx.add(new WhileItem(null, whileTrueLoop, tr, retw));
+                            next = null;
+                        }
                     } else {
                         retx.add(new IfItem(null, expr, onTrue, onFalse));
                     }
@@ -1091,9 +1131,10 @@ public class Graph {
                         checkContinueAtTheEnd(loopBody, currentLoop);
 
                         List<GraphTargetItem> addIf = new ArrayList<GraphTargetItem>();
+                        List<GraphTargetItem> nextcmds = new ArrayList<GraphTargetItem>();
                         if ((!loopBody.isEmpty()) && (loopBody.get(loopBody.size() - 1) instanceof IfItem)) {
                             IfItem ift = (IfItem) loopBody.get(loopBody.size() - 1);
-                            if (ift.onFalse.isEmpty() || ((ift.onFalse.size() == 1) && (ift.onFalse.get(0) instanceof ContinueItem) && (((ContinueItem) ift.onFalse.get(0)).loopId == currentLoop.id))) {
+                            if ((ift.onFalse.isEmpty() || (ift.onFalse.get(ift.onFalse.size() - 1) instanceof ExitItem)) || ((ift.onFalse.size() == 1) && (ift.onFalse.get(0) instanceof ContinueItem) && (((ContinueItem) ift.onFalse.get(0)).loopId == currentLoop.id))) {
                                 if (ift.expression != null) {
                                     expr = ift.expression;
                                     if (expr instanceof LogicalOpItem) {
@@ -1103,15 +1144,19 @@ public class Graph {
                                     }
                                 }
                                 addIf = ift.onTrue;
+                                nextcmds = ift.onFalse;
                                 loopBody.remove(loopBody.size() - 1);
                             }
                         }
-                        if ((!addIf.isEmpty()) && (addIf.get(addIf.size() - 1) instanceof ContinueItem) && (((ContinueItem) addIf.get(addIf.size() - 1)).loopId == currentLoop.id)) {
+                        if ((!addIf.isEmpty())) { // && (addIf.get(addIf.size() - 1) instanceof ContinueItem) && (((ContinueItem) addIf.get(addIf.size() - 1)).loopId == currentLoop.id)) {
                             loopBody.add(expr);
                             checkContinueAtTheEnd(addIf, currentLoop);
                             ret.add(new WhileItem(null, currentLoop, loopBody, addIf));
+                            ret.addAll(nextcmds);
                         } else {
-                            ret.add(new DoWhileItem(null, currentLoop, loopBody, expr));
+                            List<GraphTargetItem> ex = new ArrayList<GraphTargetItem>();
+                            ex.add(expr);
+                            ret.add(new DoWhileItem(null, currentLoop, loopBody, ex));
                             ret.addAll(addIf);
                         }
 
@@ -1216,7 +1261,7 @@ public class Graph {
                                 }
                             }
                         }
-                        if ((nearestLoop != null) && (nearestLoop.loopBreak != null)) {
+                        if ((nearestLoop != null)) {// && (nearestLoop.loopBreak != null)) {
                             List<GraphTargetItem> finalCommands = printGraph(localData, stack, allParts, part, p, nearestLoop.loopContinue, loops, forFinalCommands);
                             nearestLoop.loopContinue = p;
                             forFinalCommands.put(nearestLoop, finalCommands);

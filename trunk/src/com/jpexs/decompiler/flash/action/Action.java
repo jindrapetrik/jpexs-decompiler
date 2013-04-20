@@ -36,6 +36,7 @@ import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.graph.IfItem;
 import com.jpexs.decompiler.flash.graph.NotItem;
+import com.jpexs.decompiler.flash.graph.ScriptEndItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.io.ByteArrayInputStream;
@@ -766,6 +767,7 @@ public class Action implements GraphSourceItem {
                 break;
             }
             if (ip >= actions.size()) {
+                output.add(new ScriptEndItem());
                 break;
             }
             Action action = actions.get(ip);
