@@ -1134,7 +1134,7 @@ public class Graph {
                         List<GraphTargetItem> nextcmds = new ArrayList<GraphTargetItem>();
                         if ((!loopBody.isEmpty()) && (loopBody.get(loopBody.size() - 1) instanceof IfItem)) {
                             IfItem ift = (IfItem) loopBody.get(loopBody.size() - 1);
-                            if ((ift.onFalse.isEmpty() || (ift.onFalse.get(ift.onFalse.size() - 1) instanceof ExitItem)) || ((ift.onFalse.size() == 1) && (ift.onFalse.get(0) instanceof ContinueItem) && (((ContinueItem) ift.onFalse.get(0)).loopId == currentLoop.id))) {
+                            if ((!ift.onFalse.isEmpty() && (ift.onFalse.get(ift.onFalse.size() - 1) instanceof ExitItem)) || ((ift.onFalse.size() == 1) && (ift.onFalse.get(0) instanceof ContinueItem) && (((ContinueItem) ift.onFalse.get(0)).loopId == currentLoop.id))) {
                                 if (ift.expression != null) {
                                     expr = ift.expression;
                                     if (expr instanceof LogicalOpItem) {
@@ -1146,18 +1146,33 @@ public class Graph {
                                 addIf = ift.onTrue;
                                 nextcmds = ift.onFalse;
                                 loopBody.remove(loopBody.size() - 1);
+                            }else if ((!ift.onTrue.isEmpty() && (ift.onTrue.get(ift.onTrue.size() - 1) instanceof ExitItem)) || ((ift.onTrue.size() == 1) && (ift.onTrue.get(0) instanceof ContinueItem) && (((ContinueItem) ift.onTrue.get(0)).loopId == currentLoop.id))) {
+                                if (ift.expression != null) {
+                                    expr = ift.expression;
+                                    if (expr instanceof LogicalOpItem) {
+                                        expr = ((LogicalOpItem) expr).invert();
+                                    } else {
+                                        expr = new NotItem(null, expr);
+                                    }
+                                }
+                                addIf = ift.onFalse;                                
+                                nextcmds = ift.onTrue;
+                                loopBody.remove(loopBody.size() - 1);
+                                if(addIf.isEmpty()){
+                                    //addIf.addAll(loopBody);
+                                }
                             }
                         }
-                        if ((!addIf.isEmpty())) { // && (addIf.get(addIf.size() - 1) instanceof ContinueItem) && (((ContinueItem) addIf.get(addIf.size() - 1)).loopId == currentLoop.id)) {
+                        if ((!addIf.isEmpty())&&(!(addIf.get(0) instanceof ScriptEndItem))) { // && (addIf.get(addIf.size() - 1) instanceof ContinueItem) && (((ContinueItem) addIf.get(addIf.size() - 1)).loopId == currentLoop.id)) {
                             loopBody.add(expr);
                             checkContinueAtTheEnd(addIf, currentLoop);
-                            ret.add(new WhileItem(null, currentLoop, loopBody, addIf));
+                            ret.add(new WhileItem(null, currentLoop, addIf,loopBody));
                             ret.addAll(nextcmds);
                         } else {
                             List<GraphTargetItem> ex = new ArrayList<GraphTargetItem>();
                             ex.add(expr);
                             ret.add(new DoWhileItem(null, currentLoop, loopBody, ex));
-                            ret.addAll(addIf);
+                            ret.addAll(nextcmds);
                         }
 
                     } else {
