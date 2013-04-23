@@ -584,8 +584,8 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
      * The SECURITY_ATTRIBUTES structure contains the security descriptor for an
      * object and specifies whether the handle retrieved by specifying this
      * structure is inheritable. This structure provides security settings for
-     * objects created by various functions, such as {@link Kernel32#CreateFile},
-     * {@link Kernel32#CreatePipe}, or {@link Advapi32#RegCreateKeyEx}.
+     * objects created by various functions, such as Kernel32#CreateFile,
+     * Kernel32#CreatePipe, or Advapi32#RegCreateKeyEx.
      */
     public static class SECURITY_ATTRIBUTES extends Structure {
 

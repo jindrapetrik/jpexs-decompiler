@@ -409,7 +409,7 @@ public class SWFOutputStream extends OutputStream {
     /**
      * Calculates number of bits needed for representing unsigned value
      *
-     * @param v Unsigned value
+     * @param value Unsigned value
      * @return Number of bits
      */
     public static int getNeededBitsU(int value) {

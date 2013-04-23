@@ -32,6 +32,7 @@ import java.awt.event.MouseEvent;
 import java.io.*;
 import java.net.Socket;
 import java.util.Calendar;
+import java.util.Properties;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -61,12 +62,14 @@ public class Main {
     public static String file;
     public static String maskURL;
     public static SWF swf;
-    public static final String version = "1.5.0u1";
-    public static final String applicationName = "JPEXS Free Flash Decompiler v." + version;
+    public static String version = "";
+    public static final String applicationName = "JPEXS Free Flash Decompiler";
+    public static String applicationVerName;
     public static final String shortApplicationName = "FFDec";
-    public static final String shortApplicationVerName = shortApplicationName + " v." + version;
+    public static String shortApplicationVerName;
     public static final String projectPage = "http://www.free-decompiler.com/flash";
-    public static final String updatePage = "http://www.free-decompiler.com/flash/?update=" + version;
+    public static String updatePageStub = "http://www.free-decompiler.com/flash/?update=";
+    public static String updatePage;
     public static final String vendor = "JPEXS";
     public static LoadingDialog loadingDialog;
     public static ModeFrame modeFrame;
@@ -75,6 +78,20 @@ public class Main {
     private static MenuItem stopMenuItem;
     private static boolean commandLineMode = false;
     public static MainFrame mainFrame;
+
+    private static void loadProperties(){
+        Properties prop = new Properties();
+        try {
+            prop.load(Main.class.getResourceAsStream("/project.properties"));
+            version = prop.getProperty("version");
+            applicationVerName = applicationName + " v."+version;
+            updatePage = updatePageStub + version;
+            shortApplicationVerName = shortApplicationName + " v." + version;
+        } catch (IOException ex) {
+            //ignore
+            version = "unknown";
+        }
+    }
 
     public static boolean isCommandLineMode() {
         return commandLineMode;
@@ -396,8 +413,8 @@ public class Main {
     }
 
     public static void printHeader() {
-        System.out.println(applicationName);
-        for (int i = 0; i < applicationName.length(); i++) {
+        System.out.println(applicationVerName);
+        for (int i = 0; i < applicationVerName.length(); i++) {
             System.out.print("-");
         }
         System.out.println();
@@ -449,7 +466,8 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
-        View.setLookAndFeel();
+        loadProperties();
+        View.setLookAndFeel();        
         Configuration.load();
 
         int pos = 0;

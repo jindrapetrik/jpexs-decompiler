@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.Main;
+import static com.jpexs.decompiler.flash.Main.applicationVerName;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.gui.ABCPanel;
@@ -224,7 +225,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                 Main.exit();
             }
         });
-        setTitle(Main.applicationName + (Main.DISPLAY_FILENAME ? " - " + Main.getFileTitle() : ""));
+        setTitle(Main.applicationVerName + (Main.DISPLAY_FILENAME ? " - " + Main.getFileTitle() : ""));
         JMenuBar menuBar = new JMenuBar();
 
         JMenu menuFile = new JMenu("File");
@@ -1020,7 +1021,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         }
         if (e.getActionCommand().equals("SAVEAS")) {
             if (Main.saveFileDialog()) {
-                setTitle(Main.applicationName + (Main.DISPLAY_FILENAME ? " - " + Main.getFileTitle() : ""));
+                setTitle(Main.applicationVerName + (Main.DISPLAY_FILENAME ? " - " + Main.getFileTitle() : ""));
             }
         }
         if (e.getActionCommand().equals("OPEN")) {

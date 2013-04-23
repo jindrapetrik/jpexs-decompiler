@@ -30,10 +30,10 @@ public class SHAPE {
     public List<SHAPERECORD> shapeRecords;
 
     /**
-     * EXPERIMENTAL
+     * Converts shape to SVG
      *
-     * @param shapeNum
-     * @return
+     * @param shapeNum Type of DefineShape
+     * @return String with XML representation of this shape (SVG)
      */
     public String toSVG(int shapeNum) {
         return SHAPERECORD.shapeToSVG(shapeNum, null, null, numFillBits, numLineBits, shapeRecords);

@@ -113,7 +113,7 @@ public class Highlighting {
      * Beggining of hilight of method
      *
      * @param index
-     * @return
+     * @return Hilighted method begin
      */
     public static String hilighMethodBegin(long index) {
         if (!doHighlight) {
@@ -125,7 +125,7 @@ public class Highlighting {
     /**
      * Ending of hilight of method
      *
-     * @return
+     * @return Hilighted method end
      */
     public static String hilighMethodEnd() {
         if (!doHighlight) {

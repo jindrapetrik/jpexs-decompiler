@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="common build script" default="all" basedir=".">
+    <description>Builds project</description>      
+    <property name="DISTLIBRARIESFULLDIR" value="${DISTRIBUTIONDIR}/${DISTLIBRARIESDIRNAME}"/>    
+    <patternset id="compiler.resources">
+        <include name="**/?*.properties"/>
+        <include name="**/?*.bin"/>
+        <include name="**/?*.xml"/>
+        <include name="**/?*.txt"/>
+        <include name="**/?*.gif"/>
+        <include name="**/?*.png"/>
+        <include name="**/?*.jpeg"/>
+        <include name="**/?*.jpg"/>
+        <include name="**/?*.html"/>
+        <include name="**/?*.dtd"/>
+        <include name="**/?*.tld"/>
+        <include name="**/?*.mid"/>
+        <include name="**/?*.wav"/>
+    </patternset>
+
+    <path id="emma.lib">
+        <pathelement location="${TESTLIBDIR}/emma.jar"/>
+        <pathelement location="${TESTLIBDIR}/emma_ant.jar"/>
+    </path>
+    <taskdef resource="emma_ant.properties" classpathref="emma.lib"/>
+
+    <target name="coverage.instrumentation">
+        <mkdir dir="${INSTRDIR}"/>
+        <mkdir dir="${COVERAGEDIR}"/>
+        <emma>
+            <instr instrpath="${COMPILEDIR}" destdir="${INSTRDIR}" metadatafile="${COVERAGEDIR}/metadata.emma"
+                   mode="copy">
+            </instr>
+        </emma>
+        <copy todir="${INSTRDIR}">
+            <fileset dir="${SOURCEDIR}">
+                <patternset refid="compiler.resources" />
+                <type type="file" />
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="compile">
+        <delete dir="${COMPILEDIR}"/>
+        <mkdir dir="${COMPILEDIR}"/>
+        <javac srcdir="${SOURCEDIR}" destdir="${COMPILEDIR}" includes="**/*.java" target="1.6" source="1.6" debug="true"
+               debuglevel="lines,vars,source" includeantruntime="false">
+            <classpath>
+                <fileset dir="${LIBRARIESDIR}" includes="**/*.jar"/>
+            </classpath>
+        </javac>
+        <copy todir="${COMPILEDIR}">
+            <fileset dir="${SOURCEDIR}">
+                <patternset refid="compiler.resources"/>
+                <type type="file"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="test" depends="clean,compile">
+        <delete dir="${TESTRESULTSDIR}"/>
+        <mkdir dir="${TESTRESULTSDIR}"/>
+        <mkdir dir="${TESTRESULTSDIR}/raw/"/>
+        <delete dir="${COMPILETESTSDIR}"/>
+        <mkdir dir="${COMPILETESTSDIR}"/>
+        <javac srcdir="${TESTDIR}" destdir="${COMPILETESTSDIR}" includes="**/*.java" target="1.6" debug="true" includeantruntime="false">
+            <classpath>
+                <pathelement path="${COMPILEDIR}"/>
+                <fileset dir="${LIBRARIESDIR}" includes="**/*.jar"/>
+                <fileset dir="${TESTLIBDIR}" includes="**/*.jar"/>
+            </classpath>
+        </javac>
+        <antcall target="coverage.instrumentation"/>
+        
+        <taskdef classname="org.testng.TestNGAntTask" classpath="${TESTLIBDIR}/testng-6.8.jar" name="testng" />
+    
+        
+        <testng 
+            outputDir="${TESTRESULTSDIR}"
+            haltOnFailure="true" verbose="2" workingDir="${basedir}">
+        
+            <classpath>
+                <pathelement path="${COMPILETESTSDIR}"/>
+                <pathelement path="${INSTRDIR}"/>
+                <pathelement path="${COMPILEDIR}"/>
+                <fileset dir="${LIBRARIESDIR}" includes="**/*.jar"/>
+                <fileset dir="${TESTLIBDIR}" includes="**/*.jar"/>
+            </classpath>
+            <jvmarg value="-Demma.coverage.out.file=${COVERAGEDIR}/coverage.emma"/>
+            <jvmarg value="-Demma.coverage.out.merge=true"/>
+            <classfileset dir="${COMPILETESTSDIR}" includes="**/*.class" />                        
+            
+        </testng>                
+        <!-- Coverage report -->
+        <mkdir dir="${COVERAGERESULTSDIR}"/>
+        <emma>
+            <report sourcepath="${SOURCEDIR}" depth="method">
+                <fileset dir="${COVERAGEDIR}">
+                    <include name="*.emma"/>
+                </fileset>
+                <html outfile="${COVERAGERESULTSDIR}/index.html" />
+            </report>
+        </emma>
+    </target>
+    
+    <condition property="is_windows">
+        <os family="windows"/>
+    </condition>
+    
+    <target name="installer" depends="dist" if="is_windows">
+        <echo message="#define MyAppVersion &quot;${VERSION}&quot;" file="${INSTALLERCONFIG}" />
+        <exec dir="${basedir}" executable="${INNOSETUPPATH}\iscc.exe">
+            <arg file="${INSTALLERPROJECT}" />
+        </exec>
+    </target>
+    
+    <target name="archive" depends="dist">
+        <mkdir dir="${RELEASESDIR}"/>
+        <zip destfile="${RELEASESDIR}/${ZIPNAME}" basedir="${DISTRIBUTIONDIR}" />
+    </target>
+    
+    <target name="-exe-config">
+        <echoxml file="${EXECONFIG}">
+            <launch4jConfig>
+                <dontWrapJar>true</dontWrapJar>
+                <headerType>gui</headerType>
+                <jar>${JARFILENAME}.jar</jar>
+                <outfile>${DISTRIBUTIONDIR}/${EXEFILENAME}.exe</outfile>
+                <errTitle></errTitle>
+                <cmdLine></cmdLine>
+                <chdir></chdir>
+                <priority>normal</priority>
+                <downloadUrl>http://java.com/download</downloadUrl>
+                <supportUrl></supportUrl>
+                <customProcName>false</customProcName>
+                <stayAlive>false</stayAlive>
+                <manifest></manifest>
+                <icon>${EXEICON}</icon>
+                <jre>
+                    <path></path>
+                    <minVersion>${MINJAVAVERSION}</minVersion>
+                    <maxVersion></maxVersion>
+                    <jdkPreference>preferJre</jdkPreference>
+                </jre>
+                <versionInfo>
+                    <fileVersion>${VERSIONNUMBER}</fileVersion>
+                    <txtFileVersion>${VERSION}</txtFileVersion>
+                    <fileDescription>${PRODUCTNAME}</fileDescription>
+                    <copyright>${VENDOR}</copyright>
+                    <productVersion>${VERSIONNUMBER}</productVersion>
+                    <txtProductVersion>${VERSION}</txtProductVersion>
+                    <productName>${PRODUCTNAME}</productName>
+                    <companyName></companyName>
+                    <internalName>${INTERNALNAME}</internalName>
+                    <originalFilename>${EXEFILENAME}.exe</originalFilename>
+                </versionInfo>
+            </launch4jConfig>
+        </echoxml>
+    </target>
+    <target name="-exe-linux" unless="is_windows" depends="-exe-config">
+        <exec dir="${LAUNCH4JPATH}" executable="${LAUNCH4JPATH}/launch4j">
+            <arg file="${EXECONFIG}" />
+        </exec>
+    </target>
+    <target name="-exe-windows" if="is_windows" depends="-exe-config">
+        <exec dir="${LAUNCH4JPATH}" executable="${LAUNCH4JPATH}\launch4jc.exe">
+            <arg file="${EXECONFIG}" />
+        </exec>
+    </target>
+    <target name="exe" depends="-exe-linux,-exe-windows">
+        
+    </target>
+
+    <target name="release">
+        <antcall target="archive" />
+        <antcall target="installer" />
+    </target>
+    
+    <target name="all">    
+        <antcall target="clean" />            
+        <antcall target="test" />
+        <antcall target="javadoc" />
+        <antcall target="release" />
+    </target>
+    
+    
+    <target name="dist" depends="build,exe">
+        <copy todir="${DISTRIBUTIONDIR}">
+            <fileset dir="${RESOURCESDIR}" includes="**/*.*"/>
+        </copy>
+    </target>
+    
+    <target name="build" depends="clean,compile">
+        <mkdir dir="${DISTRIBUTIONDIR}"/>
+        <delete dir="${DISTLIBRARIESFULLDIR}"/>
+        <mkdir dir="${DISTLIBRARIESFULLDIR}"/>
+        <copy todir="${DISTLIBRARIESFULLDIR}">
+            <fileset dir="${LIBRARIESDIR}" includes="**/*.jar"/>
+            <fileset dir="${LIBRARIESDIR}" includes="**/*.exe"/>
+        </copy>
+        
+        
+        
+        <tstamp>
+            <format property="BUILTAT" pattern="MM/dd/yyyy hh:mm aa" timezone="CET"/>
+        </tstamp>
+        <exec executable="hg" outputproperty="MERCURIALTAG">
+            <arg value="id"/>
+            <arg value="-i"/>
+        </exec>            
+
+        <propertyfile file="${COMPILEDIR}/${PROPERTIESNAME}"
+                      comment="This file is automatically generated - DO NOT EDIT">        
+            <entry key="buildtime" value="${BUILTAT}"/>
+            <entry key="build" value="${MERCURIALTAG}"/>
+            <entry key="builder" value="${BUILDER}"/>
+            <entry key="version" value="${VERSION}"/>
+        </propertyfile>
+        
+        <pathconvert pathsep=" " property="manifestClassPath">
+            <fileset dir="${DISTRIBUTIONDIR}" includes="${DISTLIBRARIESDIRNAME}/**/*.*"/>
+            <chainedmapper>
+                <flattenmapper/>
+                <globmapper from="*" to="${DISTLIBRARIESDIRNAME}/*"/>
+            </chainedmapper>
+        </pathconvert>
+
+        <jar destfile="${DISTRIBUTIONDIR}/${JARFILENAME}.jar" basedir="${COMPILEDIR}">
+            <manifest>
+                <attribute name="Main-Class" value="${MAINCLASS}"/>
+                <attribute name="Class-Path" value="${manifestClassPath}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="run" depends="build">
+        <java jar="${DISTRIBUTIONDIR}/${JARFILENAME}.jar" fork="true"/>
+    </target>
+
+
+    <target name="javadoc">
+        <mkdir dir="${JAVADOCDIR}"/>
+        <javadoc sourcepath="${SOURCEDIR}" destdir="${JAVADOCDIR}" windowtitle="${PROJECTNAME}"
+                 useexternalfile="yes">
+            <fileset dir="${SOURCEDIR}" includes="**/*.java"/>
+            <classpath>
+                <fileset dir="${LIBRARIESDIR}" includes="**/*.jar"/>
+            </classpath>
+        </javadoc>
+    </target>
+    <target name="clean">
+        <delete dir="${DISTRIBUTIONDIR}"/>
+        <delete dir="${COMPILETESTSDIR}"/>
+        <delete dir="${COMPILEDIR}"/>
+        <delete dir="${COVERAGEDIR}"/>
+        <delete dir="${TESTRESULTSDIR}"/>
+    </target>
+</project>

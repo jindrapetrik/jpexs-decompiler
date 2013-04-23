@@ -113,7 +113,7 @@ public class Action implements GraphSourceItem {
     /**
      * Returns address of this action
      *
-     * @return
+     * @return address of this action
      */
     public long getAddress() {
         return address;
@@ -529,7 +529,7 @@ public class Action implements GraphSourceItem {
      * @param constantPool Constant pool
      * @param version SWF version
      * @param hex Add hexadecimal
-     * @return
+     * @return String of P-code source
      */
     public String getASMSource(List<GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
         return toString();
@@ -537,11 +537,11 @@ public class Action implements GraphSourceItem {
 
     /**
      * Translates this function to stack and output.
-     *
      * @param stack Stack
-     * @param constants Constant pool
      * @param output Output
      * @param regNames Register names
+     * @param variables Variables
+     * @param functions Functions
      */
     public void translate(Stack<com.jpexs.decompiler.flash.graph.GraphTargetItem> stack, List<com.jpexs.decompiler.flash.graph.GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
     }
