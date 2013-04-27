@@ -158,6 +158,16 @@ public class SWFInputStream extends InputStream {
     @Override
     public int read() throws IOException {
         bitPos = 0;
+        try {
+            return readNoBitReset();
+        } catch (EndOfStreamException ex) {
+            Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return -1;
+    }
+
+    public int readEx() throws IOException {
+        bitPos = 0;
         return readNoBitReset();
     }
 
@@ -174,7 +184,7 @@ public class SWFInputStream extends InputStream {
     }
     private int lastPercent = -1;
 
-    private int readNoBitReset() throws IOException {
+    private int readNoBitReset() throws IOException, EndOfStreamException {
         pos++;
         if (percentMax > 0) {
             int percent = (int) (pos * 100 / percentMax);
@@ -199,7 +209,7 @@ public class SWFInputStream extends InputStream {
      * @throws IOException
      */
     public int readUI8() throws IOException {
-        return read();
+        return readEx();
     }
 
     /**
@@ -227,7 +237,7 @@ public class SWFInputStream extends InputStream {
      * @throws IOException
      */
     public long readUI32() throws IOException {
-        return (read() + (read() << 8) + (read() << 16) + (read() << 24)) & 0xffffffff;
+        return (readEx() + (readEx() << 8) + (readEx() << 16) + (readEx() << 24)) & 0xffffffff;
     }
 
     /**
@@ -237,7 +247,7 @@ public class SWFInputStream extends InputStream {
      * @throws IOException
      */
     public int readUI16() throws IOException {
-        return read() + (read() << 8);
+        return readEx() + (readEx() << 8);
     }
 
     /**
@@ -247,7 +257,7 @@ public class SWFInputStream extends InputStream {
      * @throws IOException
      */
     public long readSI32() throws IOException {
-        long uval = read() + (read() << 8) + (read() << 16) + (read() << 24);
+        long uval = readEx() + (readEx() << 8) + (readEx() << 16) + (readEx() << 24);
         if (uval >= 0x80000000) {
             return -(((~uval) & 0xffffffff) + 1);
         } else {
@@ -262,7 +272,7 @@ public class SWFInputStream extends InputStream {
      * @throws IOException
      */
     public int readSI16() throws IOException {
-        int uval = read() + (read() << 8);
+        int uval = readEx() + (readEx() << 8);
         if (uval >= 0x8000) {
             return -(((~uval) & 0xffff) + 1);
         } else {
@@ -277,7 +287,7 @@ public class SWFInputStream extends InputStream {
      * @throws IOException
      */
     public int readSI8() throws IOException {
-        int uval = read();
+        int uval = readEx();
         if (uval >= 0x80) {
             return -(((~uval) & 0xff) + 1);
         } else {
@@ -304,8 +314,8 @@ public class SWFInputStream extends InputStream {
      * @throws IOException
      */
     public float readFIXED8() throws IOException {
-        int afterPoint = read();
-        int beforePoint = read();
+        int afterPoint = readEx();
+        int beforePoint = readEx();
         return beforePoint + (((float) afterPoint) / 256);
     }
 
@@ -379,7 +389,7 @@ public class SWFInputStream extends InputStream {
         }
         byte ret[] = new byte[(int) count];
         for (int i = 0; i < count; i++) {
-            ret[i] = (byte) read();
+            ret[i] = (byte) readEx();
         }
         return ret;
     }
@@ -391,23 +401,23 @@ public class SWFInputStream extends InputStream {
      * @throws IOException
      */
     public long readEncodedU32() throws IOException {
-        int result = read();
+        int result = readEx();
         if ((result & 0x00000080) == 0) {
             return result;
         }
-        result = (result & 0x0000007f) | (read()) << 7;
+        result = (result & 0x0000007f) | (readEx()) << 7;
         if ((result & 0x00004000) == 0) {
             return result;
         }
-        result = (result & 0x00003fff) | (read()) << 14;
+        result = (result & 0x00003fff) | (readEx()) << 14;
         if ((result & 0x00200000) == 0) {
             return result;
         }
-        result = (result & 0x001fffff) | (read()) << 21;
+        result = (result & 0x001fffff) | (readEx()) << 21;
         if ((result & 0x10000000) == 0) {
             return result;
         }
-        result = (result & 0x0fffffff) | (read()) << 28;
+        result = (result & 0x0fffffff) | (readEx()) << 28;
         return result;
     }
     private int bitPos = 0;
@@ -1398,10 +1408,10 @@ public class SWFInputStream extends InputStream {
     public Action readAction(ReReadableInputStream rri) throws IOException {
         {
             int actionCode = -1;
-            
-            try{
-                actionCode=readUI8();
-            }catch(EndOfStreamException eos){
+
+            try {
+                actionCode = readUI8();
+            } catch (EndOfStreamException eos) {
                 return null;
             }
             if (actionCode == 0) {
@@ -2586,9 +2596,9 @@ public class SWFInputStream extends InputStream {
      */
     public MORPHGRADIENT readMORPHGRADIENT() throws IOException {
         MORPHGRADIENT ret = new MORPHGRADIENT();
-        int numGradients = (int) readUI8();       
+        int numGradients = (int) readUI8();
         numGradients = numGradients % 8; //there should be 1 to 8 but sometimes there is more. This modulo seems to be OK.
-        
+
         ret.gradientRecords = new MORPHGRADRECORD[numGradients];
         for (int i = 0; i < numGradients; i++) {
             ret.gradientRecords[i] = readMORPHGRADRECORD();
