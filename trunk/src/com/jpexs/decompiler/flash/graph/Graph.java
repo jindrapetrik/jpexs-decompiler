@@ -603,7 +603,7 @@ public class Graph {
                     ret.add(ti);
                 } else {
                     printGraph(localData, stack, allParts, parent, next, reversed ? sp1 : sp0, loops, forFinalCommands);
-                    GraphTargetItem second = stack.pop();
+                    GraphTargetItem second = stack.pop();                                                            
                     GraphTargetItem first = stack.pop();
                     if (reversed) {
                         AndItem a = new AndItem(null, first, second);
@@ -1480,6 +1480,7 @@ public class Graph {
                     if (p.start == ip) {
                         p.refs.add(part);
                         part.nextParts.add(p);
+                        allBlocks.add(part);
                         return ret;
                     }
                 }
