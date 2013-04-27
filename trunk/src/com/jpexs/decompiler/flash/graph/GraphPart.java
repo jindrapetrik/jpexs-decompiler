@@ -31,7 +31,7 @@ public class GraphPart {
     public List<GraphPart> nextParts = new ArrayList<GraphPart>();
     public int posX = -1;
     public int posY = -1;
-    public String path = "";
+    public GraphPath path = new GraphPath();
     public List<GraphPart> refs = new ArrayList<GraphPart>();
     public boolean ignored = false;
     public List<Object> forContinues = new ArrayList<Object>();
@@ -68,7 +68,7 @@ public class GraphPart {
         this.end = end;
     }
 
-    private GraphPart getNextPartPath(GraphPart original, String path, List<GraphPart> visited) {
+    private GraphPart getNextPartPath(GraphPart original, GraphPath path, List<GraphPart> visited) {
         if (visited.contains(this) && (this != original)) {
             return null;
         }
@@ -101,7 +101,7 @@ public class GraphPart {
         return getNextSuperPartPath(this, path, visited);
     }
 
-    private GraphPart getNextSuperPartPath(GraphPart original, String path, List<GraphPart> visited) {
+    private GraphPart getNextSuperPartPath(GraphPart original, GraphPath path, List<GraphPart> visited) {
         if (visited.contains(this)) {
             return null;
         }
