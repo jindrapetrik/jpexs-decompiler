@@ -41,7 +41,7 @@
     </target>
 
     <target name="compile">
-        <delete dir="${COMPILEDIR}"/>
+        <!--<delete dir="${COMPILEDIR}"/>-->
         <mkdir dir="${COMPILEDIR}"/>
         <javac srcdir="${SOURCEDIR}" destdir="${COMPILEDIR}" includes="**/*.java" target="1.6" source="1.6" debug="true"
                debuglevel="lines,vars,source" includeantruntime="false">
@@ -190,9 +190,9 @@
         </copy>
     </target>
     
-    <target name="build" depends="clean,compile">
+    <target name="build" depends="compile">
         <mkdir dir="${DISTRIBUTIONDIR}"/>
-        <delete dir="${DISTLIBRARIESFULLDIR}"/>
+        <!-- <delete dir="${DISTLIBRARIESFULLDIR}"/> -->
         <mkdir dir="${DISTLIBRARIESFULLDIR}"/>
         <copy todir="${DISTLIBRARIESFULLDIR}">
             <fileset dir="${LIBRARIESDIR}" includes="**/*.jar"/>
@@ -234,7 +234,9 @@
     </target>
 
     <target name="run" depends="build">
-        <java jar="${DISTRIBUTIONDIR}/${JARFILENAME}.jar" fork="true"/>
+        <java jar="${DISTRIBUTIONDIR}/${JARFILENAME}.jar" fork="true">
+            <arg line="${RUNPARAMS}" />
+        </java>
     </target>
 
 

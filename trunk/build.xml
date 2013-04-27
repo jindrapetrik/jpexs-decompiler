@@ -40,5 +40,6 @@
     <property name="INSTALLERPROJECT" value="${basedir}/installer.iss"/>
     <property name="EXECONFIG" value="${basedir}/build_exe.xml"/>
     
+    <property name="RUNPARAMS" value="" />    
     <import file="build_common.xml"/>
 </project>
