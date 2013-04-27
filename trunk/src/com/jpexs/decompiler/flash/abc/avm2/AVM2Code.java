@@ -1175,7 +1175,7 @@ public class AVM2Code implements Serializable {
                 visited[ip] = true;
                 AVM2Instruction ins = code.get(ip);
                 if (debugMode) {
-                    System.out.println("translating ip " + ip + " ins " + ins.toString() + " stack:" + Highlighting.stripHilights(stack.toString()) + " scopeStack:" + Highlighting.stripHilights(scopeStack.toString()));
+                    System.err.println("translating ip " + ip + " ins " + ins.toString() + " stack:" + Highlighting.stripHilights(stack.toString()) + " scopeStack:" + Highlighting.stripHilights(scopeStack.toString()));
                 }
                 if (ins.definition instanceof NewFunctionIns) {
                     if (ip + 1 <= end) {

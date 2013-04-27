@@ -99,7 +99,7 @@ public class Graph {
                         break loopi;
                     }
                     if (lastpref == null) {
-                        lastpref = r.path.parent(i - 1);
+                        lastpref = r.path.parent(i);
                     } else {
                         if (!r.path.startsWith(lastpref)) {
                             i--;
@@ -112,7 +112,7 @@ public class Graph {
                 i = part.path.length();
             }
             if (modify && ((uniqueRefs.size() > 1) && (prvni >= 0))) {
-                GraphPath newpath = uniqueRefs.get(prvni).path.parent(i - 1);
+                GraphPath newpath = uniqueRefs.get(prvni).path.parent(i);
                 if (!part.path.equals(newpath)) {
                     if (part.path.startsWith(newpath)) {
                         GraphPath origPath = part.path;
@@ -466,7 +466,7 @@ public class Graph {
             }
             if (part == null) {
                 //return ret;
-            } else if (part.leadsTo(code, part, getLoopsContinues(loops))) {
+            } else if ((part.nextParts.size() == 1) && part.leadsTo(code, part, getLoopsContinues(loops))) {
                 Loop l = new Loop(loops.size(), part, null);
                 List<GraphTargetItem> trueExp = new ArrayList<GraphTargetItem>();
                 trueExp.add(new TrueItem(null));
@@ -548,7 +548,7 @@ public class Graph {
 
             if (part.nextParts.size() == 2) {
 
-                if ((stack.size() >= 2) && (stack.get(stack.size() - 1) instanceof NotItem) && (((NotItem) (stack.get(stack.size() - 1))).getOriginal() == stack.get(stack.size() - 2))) {
+                if ((stack.size() >= 2) && (stack.get(stack.size() - 1) instanceof NotItem) && (((NotItem) (stack.get(stack.size() - 1))).getOriginal().getNotCoerced() == stack.get(stack.size() - 2).getNotCoerced())) {
                     ret.addAll(output);
                     GraphPart sp0 = getNextNoJump(part.nextParts.get(0));
                     GraphPart sp1 = getNextNoJump(part.nextParts.get(1));
@@ -596,7 +596,7 @@ public class Graph {
                         }
                     }
                     return ret;
-                } else if ((stack.size() >= 2) && (stack.get(stack.size() - 1) == stack.get(stack.size() - 2))) {
+                } else if ((stack.size() >= 2) && (stack.get(stack.size() - 1).getNotCoerced() == stack.get(stack.size() - 2).getNotCoerced())) {
                     ret.addAll(output);
                     GraphPart sp0 = getNextNoJump(part.nextParts.get(0));
                     GraphPart sp1 = getNextNoJump(part.nextParts.get(1));
@@ -765,19 +765,23 @@ public class Graph {
                         }
                     }
                     List<GraphTargetItem> onFalse = new ArrayList<GraphTargetItem>();
-                    if (lopFalse != null) {
-                        onFalse.add(lopFalse);
+                    if ((!onTrue.isEmpty()) && onTrue.get(onTrue.size() - 1) instanceof ExitItem) {
+                        next = part.nextParts.get(0);
                     } else {
-                        if (debugMode) {
-                            System.err.println("ONFALSE: (inside " + part + ")");
-                        }
-                        if ((next == part.nextParts.get(0)) || (part.nextParts.get(0).path.equals(part.path) || part.nextParts.get(0).path.length() < part.path.length())) {
-                            onFalse = new ArrayList<GraphTargetItem>();
+                        if (lopFalse != null) {
+                            onFalse.add(lopFalse);
                         } else {
-                            onFalse = (printGraph(prepareBranchLocalData(localData), falseStack, allParts, part, part.nextParts.get(0), next == null ? stopPart : next, loops, forFinalCommands));
-                        }
-                        if (debugMode) {
-                            System.err.println("/ONFALSE (inside " + part + ")");
+                            if (debugMode) {
+                                System.err.println("ONFALSE: (inside " + part + ")");
+                            }
+                            if ((next == part.nextParts.get(0)) || (part.nextParts.get(0).path.equals(part.path) || part.nextParts.get(0).path.length() < part.path.length())) {
+                                onFalse = new ArrayList<GraphTargetItem>();
+                            } else {
+                                onFalse = (printGraph(prepareBranchLocalData(localData), falseStack, allParts, part, part.nextParts.get(0), next == null ? stopPart : next, loops, forFinalCommands));
+                            }
+                            if (debugMode) {
+                                System.err.println("/ONFALSE (inside " + part + ")");
+                            }
                         }
                     }
                     if (isEmpty(onTrue) && isEmpty(onFalse) && (trueStack.size() > stackSizeBefore) && (falseStack.size() > stackSizeBefore)) {

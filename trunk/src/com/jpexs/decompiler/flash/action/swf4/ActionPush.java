@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.swf4;
 
+import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
@@ -33,6 +34,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ActionPush extends Action {
 
@@ -46,46 +49,49 @@ public class ActionPush extends Action {
         int type;
         values = new ArrayList<Object>();
         sis = new SWFInputStream(new ByteArrayInputStream(sis.readBytes(actionLength)), version);
-        while ((type = sis.readUI8()) > -1) {
-            switch (type) {
-                case 0:
-                    values.add(sis.readString());
-                    break;
-                case 1:
-                    values.add(sis.readFLOAT());
-                    break;
-                case 2:
-                    values.add(new Null());
-                    break;
-                case 3:
-                    values.add(new Undefined());
-                    break;
-                case 4:
-                    values.add(new RegisterNumber(sis.readUI8()));
-                    break;
-                case 5:
-                    int b = sis.readUI8();
-                    if (b == 0) {
-                        values.add((Boolean) false);
-                    } else {
-                        values.add((Boolean) true);
-                    }
+        try {
+            while ((type = sis.readUI8()) > -1) {
+                switch (type) {
+                    case 0:
+                        values.add(sis.readString());
+                        break;
+                    case 1:
+                        values.add(sis.readFLOAT());
+                        break;
+                    case 2:
+                        values.add(new Null());
+                        break;
+                    case 3:
+                        values.add(new Undefined());
+                        break;
+                    case 4:
+                        values.add(new RegisterNumber(sis.readUI8()));
+                        break;
+                    case 5:
+                        int b = sis.readUI8();
+                        if (b == 0) {
+                            values.add((Boolean) false);
+                        } else {
+                            values.add((Boolean) true);
+                        }
 
-                    break;
-                case 6:
-                    values.add(sis.readDOUBLE());
-                    break;
-                case 7:
-                    long el = sis.readSI32();
-                    values.add((Long) el);
-                    break;
-                case 8:
-                    values.add(new ConstantIndex(sis.readUI8()));
-                    break;
-                case 9:
-                    values.add(new ConstantIndex(sis.readUI16()));
-                    break;
+                        break;
+                    case 6:
+                        values.add(sis.readDOUBLE());
+                        break;
+                    case 7:
+                        long el = sis.readSI32();
+                        values.add((Long) el);
+                        break;
+                    case 8:
+                        values.add(new ConstantIndex(sis.readUI8()));
+                        break;
+                    case 9:
+                        values.add(new ConstantIndex(sis.readUI16()));
+                        break;
+                }
             }
+        } catch (EndOfStreamException ex) {
         }
     }
 
