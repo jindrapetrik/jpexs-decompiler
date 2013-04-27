@@ -185,7 +185,11 @@ public class SWFInputStream extends InputStream {
                 lastPercent = percent;
             }
         }
-        return is.read();
+        int r = is.read();
+        if (r == -1) {
+            throw new EndOfStreamException();
+        }
+        return r;
     }
 
     /**
@@ -1393,7 +1397,13 @@ public class SWFInputStream extends InputStream {
      */
     public Action readAction(ReReadableInputStream rri) throws IOException {
         {
-            int actionCode = readUI8();
+            int actionCode = -1;
+            
+            try{
+                actionCode=readUI8();
+            }catch(EndOfStreamException eos){
+                return null;
+            }
             if (actionCode == 0) {
                 return new ActionEnd();
             }
@@ -2576,7 +2586,9 @@ public class SWFInputStream extends InputStream {
      */
     public MORPHGRADIENT readMORPHGRADIENT() throws IOException {
         MORPHGRADIENT ret = new MORPHGRADIENT();
-        int numGradients = (int) readUI8();
+        int numGradients = (int) readUI8();       
+        numGradients = numGradients % 8; //there should be 1 to 8 but sometimes there is more. This modulo seems to be OK.
+        
         ret.gradientRecords = new MORPHGRADRECORD[numGradients];
         for (int i = 0; i < numGradients; i++) {
             ret.gradientRecords[i] = readMORPHGRADRECORD();
