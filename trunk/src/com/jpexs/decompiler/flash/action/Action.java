@@ -537,6 +537,7 @@ public class Action implements GraphSourceItem {
 
     /**
      * Translates this function to stack and output.
+     *
      * @param stack Stack
      * @param output Output
      * @param regNames Register names
@@ -1067,8 +1068,12 @@ public class Action implements GraphSourceItem {
                                                         }
                                                         pos++;
                                                         if (parts.size() <= pos) {
-                                                            ok = false;
-                                                            break;
+                                                            List<GraphTargetItem> output2 = new ArrayList<GraphTargetItem>();
+                                                            for (int i = 0; i < prevCount; i++) {
+                                                                output2.add(output.get(i));
+                                                            }
+                                                            output2.add(new ClassTreeItem(className, extendsOp, implementsOp, functions, vars, staticFunctions, staticVars));
+                                                            return output2;
                                                         }
                                                         if (parts.get(pos) instanceof PopTreeItem) {
                                                             pos++;
