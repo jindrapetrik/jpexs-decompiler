@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir=".." name="ffdec-IDE">
+    <import file="../build.xml"/>
+    <target name="-profile-check">
+        <startprofiler freeform="true"/>
+    </target>
+    <target depends="-profile-check" if="profiler.configured" name="profile-nb">
+        <antcall target="run" />
+    </target>
+</project>
