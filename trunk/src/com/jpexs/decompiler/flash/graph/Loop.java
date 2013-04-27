@@ -31,4 +31,9 @@ public class Loop {
         this.loopBreak = loopBreak;
         this.id = id;
     }
+
+    @Override
+    public String toString() {
+        return "loop(id:" + id + ",continue:" + loopContinue + ", break:" + loopBreak + ")";
+    }
 }
