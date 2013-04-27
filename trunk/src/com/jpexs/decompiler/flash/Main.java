@@ -79,12 +79,12 @@ public class Main {
     private static boolean commandLineMode = false;
     public static MainFrame mainFrame;
 
-    private static void loadProperties(){
+    private static void loadProperties() {
         Properties prop = new Properties();
         try {
             prop.load(Main.class.getResourceAsStream("/project.properties"));
             version = prop.getProperty("version");
-            applicationVerName = applicationName + " v."+version;
+            applicationVerName = applicationName + " v." + version;
             updatePage = updatePageStub + version;
             shortApplicationVerName = shortApplicationName + " v." + version;
         } catch (IOException ex) {
@@ -467,7 +467,7 @@ public class Main {
      */
     public static void main(String[] args) throws IOException {
         loadProperties();
-        View.setLookAndFeel();        
+        View.setLookAndFeel();
         Configuration.load();
 
         int pos = 0;

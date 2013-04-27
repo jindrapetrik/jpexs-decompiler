@@ -25,5 +25,4 @@ public class EndOfStreamException extends RuntimeException {
     public EndOfStreamException() {
         super("Premature end of the stream reached");
     }
-    
 }
