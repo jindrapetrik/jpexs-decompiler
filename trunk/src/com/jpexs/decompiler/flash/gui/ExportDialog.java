@@ -19,6 +19,7 @@ public class ExportDialog extends JDialog {
     boolean cancelled = false;
     String options[][] = {
         {"SVG"},
+        {"Plain Text", "Formatted text"},
         {"PNG/JPEG"},
         {"FLV (No audio)"},
         {"MP3/FLV", "FLV (Audio only)"},
@@ -26,16 +27,18 @@ public class ExportDialog extends JDialog {
     };
     String optionNames[] = {
         "Shapes",
+        "Texts",
         "Images",
         "Movies",
         "Sounds",
         "ActionScript"
     };
     public static final int OPTION_SHAPES = 0;
-    public static final int OPTION_IMAGES = 1;
-    public static final int OPTION_MOVIES = 2;
-    public static final int OPTION_SOUNDS = 3;
-    public static final int OPTION_ACTIONSCRIPT = 4;
+    public static final int OPTION_TEXTS = 1;
+    public static final int OPTION_IMAGES = 2;
+    public static final int OPTION_MOVIES = 3;
+    public static final int OPTION_SOUNDS = 4;
+    public static final int OPTION_ACTIONSCRIPT = 5;
     private JComboBox combos[];
 
     public int getOption(int index) {
@@ -58,10 +61,10 @@ public class ExportDialog extends JDialog {
         int top = 10;
         for (int i = 0; i < optionNames.length; i++) {
             JLabel lab = new JLabel(optionNames[i]);
-            lab.setBounds(10, top, 60, 25);
+            lab.setBounds(10, top, 75, 25);
             cnt.add(lab);
             combos[i] = new JComboBox(options[i]);
-            combos[i].setBounds(75, top, 105, 25);
+            combos[i].setBounds(90, top, 125, 25);
             cnt.add(combos[i]);
             top += 25;
         }
@@ -75,7 +78,7 @@ public class ExportDialog extends JDialog {
                 setVisible(false);
             }
         });
-        okButton.setBounds(25, top, 75, 25);
+        okButton.setBounds(43, top, 75, 25);
 
         JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(new ActionListener() {
@@ -85,11 +88,15 @@ public class ExportDialog extends JDialog {
                 setVisible(false);
             }
         });
-        cancelButton.setBounds(100, top, 75, 25);
+        cancelButton.setBounds(118, top, 75, 25);
 
+        top += 25;
         cnt.add(okButton);
         cnt.add(cancelButton);
-        setSize(210, top + 70);
+
+        top += 15;
+        pack();
+        setSize(245, top + getInsets().top);
         View.centerScreen(this);
         View.setWindowIcon(this);
         getRootPane().setDefaultButton(okButton);

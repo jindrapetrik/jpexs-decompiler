@@ -76,6 +76,7 @@ import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
+import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.types.RECT;
 import java.io.*;
 import java.util.ArrayList;
@@ -767,6 +768,40 @@ public class SWF {
                 }
             }
         }
+    }
+
+    public void exportTexts(String outdir, List<Tag> tags, boolean formatted) throws IOException {
+        if (tags.isEmpty()) {
+            return;
+        }
+        if (!(new File(outdir)).exists()) {
+            (new File(outdir)).mkdirs();
+        }
+        for (Tag t : tags) {
+            if (t instanceof TextTag) {
+                FileOutputStream fos = null;
+                try {
+                    fos = new FileOutputStream(outdir + File.separator + ((TextTag) t).getCharacterID() + ".txt");
+                    if (formatted) {
+                        fos.write(((TextTag) t).getFormattedText(this.tags).getBytes("UTF-8"));
+                    } else {
+                        fos.write(((TextTag) t).getText(this.tags).getBytes("UTF-8"));
+                    }
+                } finally {
+                    if (fos != null) {
+                        try {
+                            fos.close();
+                        } catch (Exception ex) {
+                            //ignore
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void exportTexts(String outdir, boolean formatted) throws IOException {
+        exportTexts(outdir, tags, formatted);
     }
 
     public static void exportShapes(String outdir, List<Tag> tags) throws IOException {

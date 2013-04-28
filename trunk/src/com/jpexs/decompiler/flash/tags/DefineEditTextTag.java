@@ -71,17 +71,49 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextT
     public String variableName;
     public String initialText;
 
+    private String stripTags(String inp) {
+        boolean intag = false;
+        String outp = "";
+        for (int i = 0; i < inp.length(); ++i) {
+            if (!intag && inp.charAt(i) == '<') {
+                intag = true;
+                continue;
+            }
+            if (intag && inp.charAt(i) == '>') {
+                intag = false;
+                continue;
+            }
+            if (!intag) {
+                outp = outp + inp.charAt(i);
+            }
+        }
+        return outp;
+    }
+
+    private String entitiesReplace(String s) {
+        s = s.replace("&lt;", "<");
+        s = s.replace("&gt;", ">");
+        s = s.replace("&amp;", "&");
+        s = s.replace("&quot;", "\"");
+        return s;
+    }
+
     @Override
     public String getText(List<Tag> tags) {
-        if (hasText) {
-            return initialText;
+        String ret = getFormattedText(tags);
+        if (html) {
+            ret = stripTags(ret);
+            ret = entitiesReplace(ret);
         }
-        return "";
+        return ret;
     }
 
     @Override
     public String getFormattedText(List<Tag> tags) {
-        return getText(tags);
+        if (hasText) {
+            return initialText;
+        }
+        return "";
     }
 
     @Override

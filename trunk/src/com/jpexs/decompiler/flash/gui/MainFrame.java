@@ -1176,6 +1176,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                     Configuration.setConfig("lastExportDir", chooser.getSelectedFile().getParentFile().getAbsolutePath());
                     final boolean isPcode = export.getOption(ExportDialog.OPTION_ACTIONSCRIPT) == 1;
                     final boolean isMp3 = export.getOption(ExportDialog.OPTION_SOUNDS) == 0;
+                    final boolean isFormatted = export.getOption(ExportDialog.OPTION_TEXTS) == 1;
                     final boolean onlySel = e.getActionCommand().endsWith("SEL");
                     (new Thread() {
                         @Override
@@ -1196,6 +1197,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                     List<Tag> shapes = new ArrayList<Tag>();
                                     List<Tag> movies = new ArrayList<Tag>();
                                     List<Tag> sounds = new ArrayList<Tag>();
+                                    List<Tag> texts = new ArrayList<Tag>();
                                     List<TagNode> actionNodes = new ArrayList<TagNode>();
                                     List<Tag> binaryData = new ArrayList<Tag>();
                                     for (Object d : sel) {
@@ -1219,6 +1221,9 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                             if ("binaryData".equals(getTagType(n.tag))) {
                                                 binaryData.add((Tag) n.tag);
                                             }
+                                            if ("text".equals(getTagType(n.tag))) {
+                                                texts.add((Tag) n.tag);
+                                            }
                                         }
                                         if (d instanceof TreeElement) {
                                             if (((TreeElement) d).isLeaf()) {
@@ -1228,6 +1233,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                     }
                                     SWF.exportImages(selFile + File.separator + "images", images, jtt);
                                     SWF.exportShapes(selFile + File.separator + "shapes", shapes);
+                                    swf.exportTexts(selFile + File.separator + "texts", texts, isFormatted);
                                     swf.exportMovies(selFile + File.separator + "movies", movies);
                                     swf.exportSounds(selFile + File.separator + "sounds", sounds, isMp3);
                                     swf.exportBinaryData(selFile + File.separator + "binaryData", binaryData);
@@ -1250,6 +1256,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                 } else {
                                     swf.exportImages(selFile + File.separator + "images");
                                     swf.exportShapes(selFile + File.separator + "shapes");
+                                    swf.exportTexts(selFile + File.separator + "texts", isFormatted);
                                     swf.exportMovies(selFile + File.separator + "movies");
                                     swf.exportSounds(selFile + File.separator + "sounds", isMp3);
                                     swf.exportBinaryData(selFile + File.separator + "binaryData");
