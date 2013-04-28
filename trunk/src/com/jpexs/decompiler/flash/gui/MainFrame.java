@@ -115,6 +115,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -122,6 +123,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.DocumentEvent;
@@ -401,6 +403,32 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
         tagTree = new JTree(new TagTreeModel(createTagList(objs, null), (new File(Main.file)).getName()));
         tagTree.addTreeSelectionListener(this);
+        final JPopupMenu spritePopupMenu = new JPopupMenu();
+        JMenuItem removeMenuItem = new JMenuItem("Remove");
+        removeMenuItem.addActionListener(this);
+        removeMenuItem.setActionCommand("REMOVEITEM");
+        spritePopupMenu.add(removeMenuItem);
+        tagTree.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+
+                    int row = tagTree.getClosestRowForLocation(e.getX(), e.getY());
+                    tagTree.setSelectionRow(row);
+                    Object tagObj = tagTree.getLastSelectedPathComponent();
+                    if (tagObj == null) {
+                        return;
+                    }
+
+                    if (tagObj instanceof TagNode) {
+                        tagObj = ((TagNode) tagObj).tag;
+                    }
+                    if (tagObj instanceof DefineSpriteTag) {
+                        spritePopupMenu.show(e.getComponent(), e.getX(), e.getY());
+                    }
+                }
+            }
+        });
         TreeCellRenderer tcr = new DefaultTreeCellRenderer() {
             @Override
             public Component getTreeCellRendererComponent(
@@ -479,15 +507,14 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         } catch (FlashUnsupportedException fue) {
         }
         displayPanel = new JPanel(new CardLayout());
+        displayPanel.add(panWithPreview, CARDFLASHPANEL);
         if (flashPanel != null) {
             panWithPreview.add(flashPanel, BorderLayout.CENTER);
-            displayPanel.add(panWithPreview, CARDFLASHPANEL);
         } else {
             JPanel swtPanel = new JPanel(new BorderLayout());
             swtPanel.add(new JLabel("<html><center>Preview of this object is not available on this platform. (Windows only)</center></html>", JLabel.CENTER), BorderLayout.CENTER);
             swtPanel.setBackground(Color.white);
             panWithPreview.add(swtPanel, BorderLayout.CENTER);
-            displayPanel.add(swtPanel, CARDFLASHPANEL);
         }
         imagePanel = new ImagePanel();
         displayPanel.add(imagePanel, CARDIMAGEPANEL);
@@ -998,6 +1025,44 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        if (e.getActionCommand().equals("REMOVEITEM")) {
+            Object tagObj = tagTree.getLastSelectedPathComponent();
+            if (tagObj == null) {
+                return;
+            }
+
+            if (tagObj instanceof TagNode) {
+                tagObj = ((TagNode) tagObj).tag;
+            }
+            if (tagObj instanceof DefineSpriteTag) {
+                DefineSpriteTag sprite = (DefineSpriteTag) tagObj;
+                for (int i = 0; i < swf.tags.size(); i++) {
+                    Tag t = swf.tags.get(i);
+                    if (t == sprite) {
+                        swf.tags.remove(i);
+                        i--;
+                    } else if (t instanceof DefineSpriteTag) {
+                        DefineSpriteTag st = (DefineSpriteTag) t;
+                        for (int j = 0; j < st.subTags.size(); j++) {
+                            Tag t2 = st.subTags.get(j);
+                            Set<Integer> needed = t2.getNeededCharacters();
+                            if (needed.contains(sprite.spriteId)) {
+                                st.subTags.remove(j);
+                                j--;
+                            }
+                        }
+                    } else {
+                        Set<Integer> needed = t.getNeededCharacters();
+                        if (needed.contains(sprite.spriteId)) {
+                            swf.tags.remove(i);
+                            i--;
+                        }
+                    }
+                }
+                showCard(CARDEMPTYPANEL);
+                refreshTree();
+            }
+        }
         if (e.getActionCommand().equals("SAVETEXT")) {
             if (oldValue instanceof TextTag) {
                 try {
@@ -1683,5 +1748,11 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         } else {
             showCard(CARDEMPTYPANEL);
         }
+    }
+
+    public void refreshTree() {
+        List<Object> objs = new ArrayList<Object>();
+        objs.addAll(swf.tags);
+        tagTree.setModel(new TagTreeModel(createTagList(objs, null), (new File(Main.file)).getName()));
     }
 }

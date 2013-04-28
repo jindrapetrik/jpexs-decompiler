@@ -106,6 +106,7 @@ public class FlashPlayerPanel extends Panel {
             Kernel32.INSTANCE.WriteFile(pipe, new byte[]{(byte) flash.getBytes().length}, 1, ibr, null);
             Kernel32.INSTANCE.WriteFile(pipe, flash.getBytes(), flash.getBytes().length, ibr, null);
         }
+        resize();
     }
 
     public static void unload() {
