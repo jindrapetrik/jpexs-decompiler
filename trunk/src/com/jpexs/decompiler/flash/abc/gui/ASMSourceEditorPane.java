@@ -110,7 +110,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
     }
 
     public void graph() {
-        AVM2Graph gr = new AVM2Graph(abc.bodies[bodyIndex].code, abc, abc.bodies[bodyIndex], false, 0, new HashMap<Integer, GraphTargetItem>(), new Stack<GraphTargetItem>(), new HashMap<Integer, String>(), new ArrayList<String>());
+        AVM2Graph gr = new AVM2Graph(abc.bodies[bodyIndex].code, abc, abc.bodies[bodyIndex], false, -1, -1, new HashMap<Integer, GraphTargetItem>(), new Stack<GraphTargetItem>(), new HashMap<Integer, String>(), new ArrayList<String>());
         (new GraphFrame(gr, name)).setVisible(true);
     }
 

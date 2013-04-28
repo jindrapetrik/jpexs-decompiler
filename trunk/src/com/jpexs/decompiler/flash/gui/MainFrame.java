@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.Main;
-import static com.jpexs.decompiler.flash.Main.applicationVerName;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.gui.ABCPanel;
@@ -1104,7 +1103,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                         for (int i = 0; i < tlsList.size(); i++) {
                                             TreeLeafScript tls = tlsList.get(i);
                                             Main.startWork("Exporting " + (i + 1) + "/" + tlsList.size() + " " + tls.abc.script_info[tls.scriptIndex].getPath(tls.abc) + " ...");
-                                            tls.abc.script_info[tls.scriptIndex].export(tls.abc, abcPanel.list, selFile, isPcode);
+                                            tls.abc.script_info[tls.scriptIndex].export(tls.abc, abcPanel.list, selFile, isPcode, tls.scriptIndex);
                                         }
                                     } else {
                                         List<TagNode> allNodes = new ArrayList<TagNode>();
@@ -1408,9 +1407,9 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                             }
                         }
                         abcPanel.navigator.setABC(abcList, scriptLeaf.abc);
-                        abcPanel.navigator.setClassIndex(classIndex);
+                        abcPanel.navigator.setClassIndex(classIndex, scriptLeaf.scriptIndex);
                         abcPanel.setAbc(scriptLeaf.abc);
-                        abcPanel.decompiledTextArea.setScript(scriptLeaf.abc.script_info[scriptLeaf.scriptIndex], scriptLeaf.abc, abcList);
+                        abcPanel.decompiledTextArea.setScript(scriptLeaf.scriptIndex, scriptLeaf.abc, abcList);
                         abcPanel.decompiledTextArea.setClassIndex(classIndex);
                         abcPanel.decompiledTextArea.setNoTrait();
                         abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setCode("");

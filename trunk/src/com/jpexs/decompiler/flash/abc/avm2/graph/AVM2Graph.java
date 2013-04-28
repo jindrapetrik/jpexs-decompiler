@@ -74,8 +74,8 @@ public class AVM2Graph extends Graph {
         return code;
     }
 
-    public AVM2Graph(AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> scopeStack, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        super(new AVM2GraphSource(code, isStatic, classIndex, localRegs, scopeStack, abc, body, localRegNames, fullyQualifiedNames), body.getExceptionEntries());
+    public AVM2Graph(AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> scopeStack, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        super(new AVM2GraphSource(code, isStatic, scriptIndex, classIndex, localRegs, scopeStack, abc, body, localRegNames, fullyQualifiedNames), body.getExceptionEntries());
         this.code = code;
         this.abc = abc;
         this.body = body;
@@ -103,8 +103,8 @@ public class AVM2Graph extends Graph {
     public static final int DATA_FINALLYJUMPS = 11;
     public static final int DATA_IGNOREDSWITCHES = 12;
 
-    public static List<GraphTargetItem> translateViaGraph(String path, AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> scopeStack, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        AVM2Graph g = new AVM2Graph(code, abc, body, isStatic, classIndex, localRegs, scopeStack, localRegNames, fullyQualifiedNames);
+    public static List<GraphTargetItem> translateViaGraph(String path, AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> scopeStack, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        AVM2Graph g = new AVM2Graph(code, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, fullyQualifiedNames);
         List<GraphPart> allParts = new ArrayList<GraphPart>();
         for (GraphPart head : g.heads) {
             populateParts(head, allParts);
@@ -123,6 +123,7 @@ public class AVM2Graph extends Graph {
         localData.add(new ArrayList<ABCException>());
         localData.add(new ArrayList<Integer>());
         localData.add(new ArrayList<Integer>());
+        localData.add((Integer) scriptIndex);
         return g.translate(localData);
     }
     /*

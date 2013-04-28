@@ -62,11 +62,11 @@ public class ScriptInfo {
         return packageName + "." + scriptName;
     }
 
-    public String convert(List<ABCContainerTag> abcTags, ABC abc, boolean pcode, boolean highlighting) {
-        return traits.convert("", abcTags, abc, false, pcode, true, -1, highlighting, new ArrayList<String>());
+    public String convert(List<ABCContainerTag> abcTags, ABC abc, boolean pcode, boolean highlighting, int scriptIndex) {
+        return traits.convert("", abcTags, abc, false, pcode, true, scriptIndex, -1, highlighting, new ArrayList<String>());
     }
 
-    public void export(ABC abc, List<ABCContainerTag> abcList, String directory, boolean pcode) throws IOException {
+    public void export(ABC abc, List<ABCContainerTag> abcList, String directory, boolean pcode, int scriptIndex) throws IOException {
         String path = getPath(abc);
         String packageName = path.substring(0, path.lastIndexOf("."));
         String className = path.substring(path.lastIndexOf(".") + 1);
@@ -76,7 +76,7 @@ public class ScriptInfo {
         }
         String fileName = outDir.toString() + File.separator + className + ".as";
         FileOutputStream fos = new FileOutputStream(fileName);
-        fos.write(convert(abcList, abc, pcode, false).getBytes());
+        fos.write(convert(abcList, abc, pcode, false, scriptIndex).getBytes());
         fos.close();
 
     }

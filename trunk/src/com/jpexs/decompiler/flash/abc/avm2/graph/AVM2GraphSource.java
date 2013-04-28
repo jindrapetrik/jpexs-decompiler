@@ -21,6 +21,7 @@ public class AVM2GraphSource extends GraphSource {
     private AVM2Code code;
     boolean isStatic;
     int classIndex;
+    int scriptIndex;
     HashMap<Integer, GraphTargetItem> localRegs;
     Stack<GraphTargetItem> scopeStack;
     ABC abc;
@@ -32,7 +33,7 @@ public class AVM2GraphSource extends GraphSource {
         return code;
     }
 
-    public AVM2GraphSource(AVM2Code code, boolean isStatic, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> scopeStack, ABC abc, MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public AVM2GraphSource(AVM2Code code, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> scopeStack, ABC abc, MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         this.code = code;
         this.isStatic = isStatic;
         this.classIndex = classIndex;
@@ -42,6 +43,7 @@ public class AVM2GraphSource extends GraphSource {
         this.body = body;
         this.localRegNames = localRegNames;
         this.fullyQualifiedNames = fullyQualifiedNames;
+        this.scriptIndex = scriptIndex;
     }
 
     @Override
@@ -62,7 +64,7 @@ public class AVM2GraphSource extends GraphSource {
     @Override
     public List<GraphTargetItem> translatePart(List localData, Stack<GraphTargetItem> stack, int start, int end) {
         List<GraphTargetItem> ret = new ArrayList<GraphTargetItem>();
-        ConvertOutput co = code.toSourceOutput(false, isStatic, classIndex, localRegs, stack, (Stack<GraphTargetItem>) localData.get(AVM2Graph.DATA_SCOPESTACK), abc, abc.constants, abc.method_info, body, start, end, localRegNames, fullyQualifiedNames, new boolean[size()]);
+        ConvertOutput co = code.toSourceOutput(false, isStatic, scriptIndex, classIndex, localRegs, stack, (Stack<GraphTargetItem>) localData.get(AVM2Graph.DATA_SCOPESTACK), abc, abc.constants, abc.method_info, body, start, end, localRegNames, fullyQualifiedNames, new boolean[size()]);
         ret.addAll(co.output);
         return ret;
     }

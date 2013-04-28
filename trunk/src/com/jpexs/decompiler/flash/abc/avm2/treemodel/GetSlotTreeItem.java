@@ -36,7 +36,9 @@ public class GetSlotTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        //scope.toString(constants)+"."
+        if (slotName == null) {
+            return hilight("/*UnknownSlot*/");
+        }
         return hilight(slotName.getName(constants, fullyQualifiedNames));
     }
 }

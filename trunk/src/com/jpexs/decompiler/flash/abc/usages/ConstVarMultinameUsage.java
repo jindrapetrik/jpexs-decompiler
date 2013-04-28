@@ -39,10 +39,10 @@ public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {
         return super.toString(abcTags, abc) + " "
                 + (parentTraitIndex > -1
                 ? (isStatic
-                ? (((TraitMethodGetterSetter) abc.class_info[classIndex].static_traits.traits[parentTraitIndex]).convertHeader("", abcTags, abc, isStatic, false, classIndex, false, new ArrayList<String>()))
-                : (((TraitMethodGetterSetter) abc.instance_info[classIndex].instance_traits.traits[parentTraitIndex]).convertHeader("", abcTags, abc, isStatic, false, classIndex, false, new ArrayList<String>())))
+                ? (((TraitMethodGetterSetter) abc.class_info[classIndex].static_traits.traits[parentTraitIndex]).convertHeader("", abcTags, abc, isStatic, false, -1/*FIXME*/, classIndex, false, new ArrayList<String>()))
+                : (((TraitMethodGetterSetter) abc.instance_info[classIndex].instance_traits.traits[parentTraitIndex]).convertHeader("", abcTags, abc, isStatic, false, -1/*FIXME*/, classIndex, false, new ArrayList<String>())))
                 : "")
-                + ((TraitSlotConst) traits.traits[traitIndex]).convertHeader("", abcTags, abc, isStatic, false, classIndex, false, new ArrayList<String>());
+                + ((TraitSlotConst) traits.traits[traitIndex]).convertHeader("", abcTags, abc, isStatic, false, -1/*FIXME*/, classIndex, false, new ArrayList<String>());
     }
 
     public int getTraitIndex() {

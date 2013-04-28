@@ -49,7 +49,7 @@ public class Traits implements Serializable {
         return s;
     }
 
-    public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, boolean makePackages, int classIndex, boolean highlighting, List<String> fullyQualifiedNames) {
+    public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, boolean makePackages, int scriptIndex, int classIndex, boolean highlighting, List<String> fullyQualifiedNames) {
         String s = "";
         for (int t = 0; t < traits.length; t++) {
             if (t > 0) {
@@ -58,9 +58,9 @@ public class Traits implements Serializable {
             String plus;
             //System.out.println(path+":"+traits[t].convertHeader(path, abcTags, abc, isStatic, pcode, classIndex, highlighting, fullyQualifiedNames));
             if (makePackages) {
-                plus = traits[t].convertPackaged(path, abcTags, abc, isStatic, pcode, classIndex, highlighting, fullyQualifiedNames);
+                plus = traits[t].convertPackaged(path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlighting, fullyQualifiedNames);
             } else {
-                plus = traits[t].convert(path, abcTags, abc, isStatic, pcode, classIndex, highlighting, fullyQualifiedNames);
+                plus = traits[t].convert(path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlighting, fullyQualifiedNames);
             }
             if (highlighting) {
                 int h = t;

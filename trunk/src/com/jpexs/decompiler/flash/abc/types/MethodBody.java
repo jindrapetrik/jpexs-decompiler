@@ -100,7 +100,7 @@ public class MethodBody implements Cloneable, Serializable {
         return ret;
     }
 
-    public String toString(String path, boolean pcode, boolean isStatic, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, boolean hilight, List<String> fullyQualifiedNames, Traits initTraits) {
+    public String toString(String path, boolean pcode, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, boolean hilight, List<String> fullyQualifiedNames, Traits initTraits) {
         String s = "";
         if (!Main.DO_DECOMPILE) {
             s = "//NOT DECOMPILED";
@@ -121,7 +121,7 @@ public class MethodBody implements Cloneable, Serializable {
             }
             //deobfuscated.restoreControlFlow(constants, b);
             try {
-                s += deobfuscated.toSource(path, isStatic, classIndex, abc, constants, method_info, b, hilight, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
+                s += deobfuscated.toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, b, hilight, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
                 s = s.trim();
                 if (hilight) {
                     s = Highlighting.hilighMethod(s, this.method_info);

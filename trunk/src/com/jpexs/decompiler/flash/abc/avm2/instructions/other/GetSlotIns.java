@@ -23,10 +23,13 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.ClassTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.GetSlotTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.treemodel.NewActivationTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.treemodel.ScriptTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.ThisTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.ExceptionTreeItem;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
@@ -40,7 +43,7 @@ public class GetSlotIns extends InstructionDefinition {
     }
 
     @Override
-    public void translate(boolean isStatic, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         int slotIndex = ins.operands[0];
         GraphTargetItem obj = (GraphTargetItem) stack.pop(); //scope
         obj = obj.getThroughRegister();
@@ -51,7 +54,17 @@ public class GetSlotIns extends InstructionDefinition {
             slotname = ((ClassTreeItem) obj).className;
         } else if (obj instanceof ThisTreeItem) {
             slotname = ((ThisTreeItem) obj).className;
-        } else {
+        } else if (obj instanceof ScriptTreeItem) {
+            for (int t = 0; t < abc.script_info[((ScriptTreeItem) obj).scriptIndex].traits.traits.length; t++) {
+                Trait tr = abc.script_info[((ScriptTreeItem) obj).scriptIndex].traits.traits[t];
+                if (tr instanceof TraitSlotConst) {
+                    if (((TraitSlotConst) tr).slot_id == slotIndex) {
+                        slotname = tr.getName(abc);
+                    }
+                }
+            }
+        } else if (obj instanceof NewActivationTreeItem) {
+
             for (int t = 0; t < body.traits.traits.length; t++) {
                 if (body.traits.traits[t] instanceof TraitSlotConst) {
                     if (((TraitSlotConst) body.traits.traits[t]).slot_id == slotIndex) {

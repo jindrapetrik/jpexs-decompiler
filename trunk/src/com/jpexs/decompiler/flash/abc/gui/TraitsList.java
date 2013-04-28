@@ -53,16 +53,16 @@ public class TraitsList extends JList implements ListSelectionListener {
         this.abc = abc;
         this.abcTags = abcTags;
         setModel(new DefaultListModel());
-        setClassIndex(-1);
+        setClassIndex(-1, -1);
     }
 
-    public void setClassIndex(int classIndex) {
+    public void setClassIndex(int classIndex, int scriptIndex) {
         this.classIndex = classIndex;
         if (classIndex == -1) {
             setModel(new DefaultListModel());
         } else {
             if (abc != null) {
-                setModel(new TraitsListModel(abcTags, abc, classIndex, sorted));
+                setModel(new TraitsListModel(abcTags, abc, classIndex, scriptIndex, sorted));
             }
         }
     }

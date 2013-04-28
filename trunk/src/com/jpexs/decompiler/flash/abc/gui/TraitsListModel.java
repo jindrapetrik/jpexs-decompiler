@@ -31,6 +31,7 @@ public class TraitsListModel implements ListModel {
     private List<ABCContainerTag> abcTags;
     private ABC abc;
     private int classIndex;
+    private int scriptIndex;
 
     public void setSorted(boolean sorted) {
         if (sorted) {
@@ -48,19 +49,20 @@ public class TraitsListModel implements ListModel {
     private void reset() {
         items = new ArrayList<TraitsListItem>();
         for (int t = 0; t < abc.class_info[classIndex].static_traits.traits.length; t++) {
-            items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(abc.class_info[classIndex].static_traits.traits[t]), t, true, abcTags, abc, classIndex));
+            items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(abc.class_info[classIndex].static_traits.traits[t]), t, true, abcTags, abc, classIndex, scriptIndex));
         }
         for (int t = 0; t < abc.instance_info[classIndex].instance_traits.traits.length; t++) {
-            items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(abc.instance_info[classIndex].instance_traits.traits[t]), t, false, abcTags, abc, classIndex));
+            items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(abc.instance_info[classIndex].instance_traits.traits[t]), t, false, abcTags, abc, classIndex, scriptIndex));
         }
-        items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, false, abcTags, abc, classIndex));
-        items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, true, abcTags, abc, classIndex));
+        items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, false, abcTags, abc, classIndex, scriptIndex));
+        items.add(new TraitsListItem(TraitsListItem.Type.INITIALIZER, 0, true, abcTags, abc, classIndex, scriptIndex));
     }
 
-    public TraitsListModel(List<ABCContainerTag> abcTags, ABC abc, int classIndex, boolean sorted) {
+    public TraitsListModel(List<ABCContainerTag> abcTags, ABC abc, int classIndex, int scriptIndex, boolean sorted) {
         this.abcTags = abcTags;
         this.abc = abc;
         this.classIndex = classIndex;
+        this.scriptIndex = scriptIndex;
         reset();
         if (sorted) {
             setSorted(true);

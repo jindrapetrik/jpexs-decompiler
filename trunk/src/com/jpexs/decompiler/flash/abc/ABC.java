@@ -560,7 +560,7 @@ public class ABC {
             }
             String exStr = "Exporting " + abcStr + cnt + path + " ...";
             informListeners("export", exStr);
-            script_info[i].export(this, abcList, directory, pcode);
+            script_info[i].export(this, abcList, directory, pcode, i);
         }
     }
 

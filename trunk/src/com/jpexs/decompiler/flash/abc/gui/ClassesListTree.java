@@ -139,9 +139,9 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
                             }
                         }
                         abcPanel.navigator.setABC(abcList, scriptLeaf.abc);
-                        abcPanel.navigator.setClassIndex(classIndex);
+                        abcPanel.navigator.setClassIndex(classIndex, scriptLeaf.scriptIndex);
                         abcPanel.setAbc(scriptLeaf.abc);
-                        abcPanel.decompiledTextArea.setScript(scriptLeaf.abc.script_info[scriptLeaf.scriptIndex], scriptLeaf.abc, abcList);
+                        abcPanel.decompiledTextArea.setScript(scriptLeaf.scriptIndex, scriptLeaf.abc, abcList);
                         abcPanel.decompiledTextArea.setClassIndex(classIndex);
                         abcPanel.decompiledTextArea.setNoTrait();
                         abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setCode("");

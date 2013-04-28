@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2013 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -466,13 +466,6 @@ public class Graph {
             }
             if (part == null) {
                 //return ret;
-            } else if ((part.nextParts.size() == 1) && part.leadsTo(code, part, getLoopsContinues(loops))) {
-                Loop l = new Loop(loops.size(), part, null);
-                List<GraphTargetItem> trueExp = new ArrayList<GraphTargetItem>();
-                trueExp.add(new TrueItem(null));
-                loops.add(l);
-                ret.add(new WhileItem(null, l, trueExp, printGraph(localData, stack, allParts, parent, part, stopPart, loops, forFinalCommands)));
-                return ret;
             }
             part = checkPart(localData, part);
             if (part == null) {
@@ -514,7 +507,7 @@ public class Graph {
             if (part.nextParts.size() == 2) {
                 if (!stack.isEmpty()) {
                     GraphTargetItem top = stack.peek();
-                    if (false) { //top.isCompileTime()){               
+                    if (false) { //top.isCompileTime()){
                         stack.pop();
                         if (top.toBoolean()) {
                             ret.addAll(output);
@@ -650,11 +643,7 @@ public class Graph {
             }
 
 
-            List<GraphTargetItem> retChecked = null;
-            if ((retChecked = check(code, localData, allParts, stack, parent, part, stopPart, loops, output, forFinalCommands)) != null) {
-                ret.addAll(retChecked);
-                return ret;
-            }
+
             List<GraphPart> loopContinues = getLoopsContinues(loops);
             boolean loop = false;
             boolean reversed = false;
@@ -677,6 +666,83 @@ public class Graph {
                 loop = true;
                 reversed = true;
             }
+
+
+            Loop lc = null;
+            if (part.leadsTo(code, part, loopContinues)) {
+                lc = new Loop(loops.size(), part, null);
+                loops.add(lc);
+            }
+
+            List<GraphTargetItem> retChecked = null;
+            if ((retChecked = check(code, localData, allParts, stack, parent, part, stopPart, loops, output, forFinalCommands)) != null) {
+                if (lc != null) {
+                    List<GraphTargetItem> trueExp = new ArrayList<GraphTargetItem>();
+                    trueExp.add(new TrueItem(null));
+                    boolean chwt = true;
+
+                    if (!retChecked.isEmpty()) { //doWhileCheck
+                        checkContinueAtTheEnd(retChecked, lc);
+                        List<GraphTargetItem> finalCommands = forFinalCommands.get(lc);
+                        IfItem ifi = null;
+                        if ((finalCommands != null) && !finalCommands.isEmpty()) {
+                            if (finalCommands.get(finalCommands.size() - 1) instanceof IfItem) {
+                                ifi = (IfItem) finalCommands.get(finalCommands.size() - 1);
+                                finalCommands.remove(finalCommands.size() - 1);
+                            }
+                        } else if (retChecked.get(retChecked.size() - 1) instanceof IfItem) {
+                            ifi = (IfItem) retChecked.get(retChecked.size() - 1);
+                            retChecked.remove(retChecked.size() - 1);
+                        }
+                        if (ifi != null) {
+                            if (ifi.onFalse.isEmpty()) {
+                                if (!ifi.onTrue.isEmpty()) {
+                                    if (ifi.onTrue.get(ifi.onTrue.size() - 1) instanceof ExitItem) {
+                                        whileTrue = false;
+                                        List<GraphTargetItem> tr = new ArrayList<GraphTargetItem>();
+                                        GraphTargetItem ex = ifi.expression;
+                                        if (ex instanceof LogicalOpItem) {
+                                            ex = ((LogicalOpItem) ex).invert();
+                                        } else {
+                                            ex = new NotItem(null, ex);
+                                        }
+                                        if ((finalCommands != null) && (!finalCommands.isEmpty())) {
+                                            tr.addAll(finalCommands);
+                                        }
+                                        tr.add(ex);
+                                        ret.add(new DoWhileItem(null, lc, retChecked, tr));
+                                        ret.addAll(ifi.onTrue);
+                                        chwt = false;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (chwt) {
+                        ret.add(new WhileItem(null, lc, trueExp, retChecked));
+                    }
+                } else {
+                    ret.addAll(retChecked);
+                }
+                return ret;
+            } else {
+                if (lc != null) {
+                    loops.remove(lc);
+                }
+            }
+
+            /* if ( part.leadsTo(code, part, getLoopsContinues(loops))) {
+             Loop l = new Loop(loops.size(), part, null);
+             List<GraphTargetItem> trueExp = new ArrayList<GraphTargetItem>();
+             trueExp.add(new TrueItem(null));
+             loops.add(l);
+             List<GraphTargetItem> wtbody=new ArrayList<GraphTargetItem>();
+             wtbody.addAll(output);
+             wtbody.addAll(printGraph(localData, stack, allParts, parent, part, stopPart, loops, forFinalCommands));
+             ret.add(new WhileItem(null, l, trueExp, wtbody));
+             return ret;
+             }*/
             if (((part.nextParts.size() == 2) || ((part.nextParts.size() == 1) && loop)) /*&& (!isSwitch)*/) {
 
                 boolean doWhile = loop;
@@ -799,7 +865,7 @@ public class Graph {
                             retw.addAll(body);
 
 
-                            if (!retw.isEmpty()) {
+                            if (!retw.isEmpty()) { //doWhileCheck
                                 checkContinueAtTheEnd(retw, whileTrueLoop);
                                 List<GraphTargetItem> finalCommands = forFinalCommands.get(whileTrueLoop);
                                 IfItem ifi = null;

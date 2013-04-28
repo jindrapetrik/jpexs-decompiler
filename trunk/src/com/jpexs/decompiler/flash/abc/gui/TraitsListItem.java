@@ -20,16 +20,18 @@ public class TraitsListItem {
     private ABC abc;
     private int classIndex;
     private int index;
+    private int scriptIndex;
     public static final String STR_INSTANCE_INITIALIZER = "instance initializer";
     public static final String STR_CLASS_INITIALIZER = "class initializer";
 
-    public TraitsListItem(Type type, int index, boolean isStatic, List<ABCContainerTag> abcTags, ABC abc, int classIndex) {
+    public TraitsListItem(Type type, int index, boolean isStatic, List<ABCContainerTag> abcTags, ABC abc, int classIndex, int scriptIndex) {
         this.type = type;
         this.index = index;
         this.isStatic = isStatic;
         this.abcTags = abcTags;
         this.abc = abc;
         this.classIndex = classIndex;
+        this.scriptIndex = scriptIndex;
     }
 
     public int getGlobalTraitId() {
@@ -62,9 +64,9 @@ public class TraitsListItem {
     @Override
     public String toString() {
         if ((type != Type.INITIALIZER) && isStatic) {
-            return abc.class_info[classIndex].static_traits.traits[index].convertHeader("", abcTags, abc, true, false, classIndex, false, new ArrayList<String>());
+            return abc.class_info[classIndex].static_traits.traits[index].convertHeader("", abcTags, abc, true, false, scriptIndex, classIndex, false, new ArrayList<String>());
         } else if ((type != Type.INITIALIZER) && (!isStatic)) {
-            return abc.instance_info[classIndex].instance_traits.traits[index].convertHeader("", abcTags, abc, false, false, classIndex, false, new ArrayList<String>());
+            return abc.instance_info[classIndex].instance_traits.traits[index].convertHeader("", abcTags, abc, false, false, scriptIndex, classIndex, false, new ArrayList<String>());
         } else if (!isStatic) {
             return STR_INSTANCE_INITIALIZER;
         } else {

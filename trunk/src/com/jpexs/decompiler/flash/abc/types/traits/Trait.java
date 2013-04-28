@@ -110,16 +110,16 @@ public abstract class Trait implements Serializable {
         return abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
     }
 
-    public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+    public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
         return abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
     }
 
-    public String convertPackaged(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcod, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
-        return makePackageFromIndex(abc, name_index, convert(path, abcTags, abc, isStatic, pcod, classIndex, highlight, fullyQualifiedNames));
+    public String convertPackaged(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcod, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+        return makePackageFromIndex(abc, name_index, convert(path, abcTags, abc, isStatic, pcod, scriptIndex, classIndex, highlight, fullyQualifiedNames));
     }
 
-    public String convertHeader(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
-        return convert(path, abcTags, abc, isStatic, pcode, classIndex, highlight, fullyQualifiedNames).trim();
+    public String convertHeader(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+        return convert(path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlight, fullyQualifiedNames).trim();
     }
 
     protected String makePackageFromIndex(ABC abc, int name_index, String value) {

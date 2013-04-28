@@ -430,7 +430,7 @@ public class SWF {
                 }
                 String exStr = "Exporting " + "tag " + (i + 1) + "/" + abcTags.size() + " " + cnt + path + " ...";
                 informListeners("export", exStr);
-                abc.script_info[scriptIndex].export(abc, abcTags, outdir, isPcode);
+                abc.script_info[scriptIndex].export(abc, abcTags, outdir, isPcode, scriptIndex);
                 return true;
             }
         }
