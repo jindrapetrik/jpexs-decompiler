@@ -117,15 +117,19 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag {
         try {
             TextLexer lexer = new TextLexer(new InputStreamReader(new ByteArrayInputStream(text.getBytes("UTF-8")), "UTF-8"));
             ParsedSymbol s = null;
-            textRecords = new ArrayList<TEXTRECORD>();
+            List<TEXTRECORD> textRecords = new ArrayList<TEXTRECORD>();
             RGB color = null;
             int fontId = -1;
             int textHeight = -1;
             FontTag font = null;
             Integer x = null;
             Integer y = null;
-            glyphBits = 0;
-            advanceBits = 0;
+            int currentX = 0;
+            int currentY = 0;
+            int glyphBits = 0;
+            int advanceBits = 0;
+            int maxX = Integer.MIN_VALUE;
+            int minX = Integer.MAX_VALUE;
             while ((s = lexer.yylex()) != null) {
                 switch (s.type) {
                     case COLOR:
@@ -148,9 +152,17 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag {
                         break;
                     case X:
                         x = (Integer) s.values[0];
+                        currentX = x;
+                        if (currentX < minX) {
+                            minX = currentX;
+                        }
+                        if (currentX > maxX) {
+                            maxX = currentX;
+                        }
                         break;
                     case Y:
                         y = (Integer) s.values[0];
+                        currentY = y;
                         break;
                     case TEXT:
                         if (font == null) {
@@ -184,10 +196,20 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag {
                             char c = txt.charAt(i);
                             tr.glyphEntries[i] = new GLYPHENTRY();
                             tr.glyphEntries[i].glyphIndex = font.charToGlyph(tags, c);
+
+
+
                             if (tr.glyphEntries[i].glyphIndex == -1) {
                                 throw new ParseException("Font does not contain glyph for character '" + c + "'", lexer.yyline());
                             }
                             tr.glyphEntries[i].glyphAdvance = textHeight * font.getGlyphAdvance(tr.glyphEntries[i].glyphIndex) / 1024;
+
+                            int gw = textHeight * font.getGlyphWidth(tr.glyphEntries[i].glyphIndex) / 1024;
+                            if (i == 0) {
+                                currentX += gw;
+                            } else {
+                                currentX += tr.glyphEntries[i].glyphAdvance;
+                            }
                             if (SWFOutputStream.getNeededBitsS(tr.glyphEntries[i].glyphIndex) > glyphBits) {
                                 glyphBits = SWFOutputStream.getNeededBitsS(tr.glyphEntries[i].glyphIndex);
                             }
@@ -197,10 +219,21 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag {
 
                         }
                         textRecords.add(tr);
+                        if (currentX > maxX) {
+                            maxX = currentX;
+                        }
+                        if (currentX < minX) {
+                            minX = currentX;
+                        }
                         break;
                 }
 
             }
+            this.advanceBits = advanceBits;
+            this.glyphBits = glyphBits;
+            this.textRecords = textRecords;
+            this.textBounds.Xmin = minX;
+            this.textBounds.Xmax = maxX;
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {

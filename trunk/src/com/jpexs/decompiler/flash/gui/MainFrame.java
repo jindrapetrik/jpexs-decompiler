@@ -86,6 +86,7 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -104,6 +105,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -173,6 +175,9 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     private JPanel searchPanel;
     private JCheckBoxMenuItem autoDeobfuscateMenuItem;
     private JPanel displayWithPreview;
+    private JButton textSaveButton;
+    private JButton textEditButton;
+    private JButton textCancelButton;
 
     public void setPercent(int percent) {
         progressBar.setValue(percent);
@@ -484,16 +489,37 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         List<Object> list2 = new ArrayList<Object>();
         list2.addAll(swf.tags);
         parseCharacters(list2);
-
-
         JPanel textPanel = new JPanel(new BorderLayout());
         textPanel.add(textValue, BorderLayout.CENTER);
-        JButton textSaveButton = new JButton("Save text", View.getIcon("save16"));
-        textPanel.add(textSaveButton, BorderLayout.EAST);
+        textValue.setEditable(false);
+
+        JPanel buttonsPanel = new JPanel();
+        buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
+
+
+        textSaveButton = new JButton("Save", View.getIcon("save16"));
+        textSaveButton.setMargin(new Insets(3, 3, 3, 10));
         textSaveButton.setActionCommand("SAVETEXT");
         textSaveButton.addActionListener(this);
 
+        textEditButton = new JButton("Edit", View.getIcon("edit16"));
+        textEditButton.setMargin(new Insets(3, 3, 3, 10));
+        textEditButton.setActionCommand("EDITTEXT");
+        textEditButton.addActionListener(this);
 
+        textCancelButton = new JButton("Cancel", View.getIcon("cancel16"));
+        textCancelButton.setMargin(new Insets(3, 3, 3, 10));
+        textCancelButton.setActionCommand("CANCELTEXT");
+        textCancelButton.addActionListener(this);
+
+        buttonsPanel.add(textEditButton);
+        buttonsPanel.add(textSaveButton);
+        buttonsPanel.add(textCancelButton);
+
+        textSaveButton.setVisible(false);
+        textCancelButton.setVisible(false);
+
+        textPanel.add(buttonsPanel, BorderLayout.EAST);
 
         displayWithPreview = new JPanel(new CardLayout());
         displayWithPreview.add(textPanel, CARDTEXTPANEL);
@@ -1063,11 +1089,17 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                 refreshTree();
             }
         }
+        if (e.getActionCommand().equals("EDITTEXT")) {
+            setEditText(true);
+        }
+        if (e.getActionCommand().equals("CANCELTEXT")) {
+            setEditText(false);
+        }
         if (e.getActionCommand().equals("SAVETEXT")) {
             if (oldValue instanceof TextTag) {
                 try {
                     ((TextTag) oldValue).setFormattedText(swf.tags, textValue.getText());
-                    reload(true);
+                    setEditText(false);
                 } catch (ParseException ex) {
                     JOptionPane.showMessageDialog(null, "Invalid text: " + ex.text + " on line " + ex.line, "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -1477,6 +1509,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
     @Override
     public void valueChanged(TreeSelectionEvent e) {
+        setEditText(false);
         reload(false);
     }
 
@@ -1754,5 +1787,15 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         List<Object> objs = new ArrayList<Object>();
         objs.addAll(swf.tags);
         tagTree.setModel(new TagTreeModel(createTagList(objs, null), (new File(Main.file)).getName()));
+    }
+
+    public void setEditText(boolean edit) {
+        textValue.setEditable(edit);
+        textSaveButton.setVisible(edit);
+        textEditButton.setVisible(!edit);
+        textCancelButton.setVisible(edit);
+        if (!edit) {
+            reload(true);
+        }
     }
 }

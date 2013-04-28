@@ -35,4 +35,6 @@ public interface FontTag extends AloneTag {
     public int charToGlyph(List<Tag> tags, char c);
 
     public int getGlyphAdvance(int glyphIndex);
+
+    public int getGlyphWidth(int glyphIndex);
 }

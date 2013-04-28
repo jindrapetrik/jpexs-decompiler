@@ -53,7 +53,7 @@ public class RECT {
 
     @Override
     public String toString() {
-        return "[RECT x=" + Xmin + "-" + Xmax + ", y=" + Ymin + "-" + Ymax + "]";
+        return "[RECT x=" + Xmin + " to " + Xmax + ", y=" + Ymin + " to " + Ymax + "]";
     }
 
     public int getWidth() {

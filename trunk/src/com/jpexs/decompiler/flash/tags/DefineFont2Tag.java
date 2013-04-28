@@ -60,6 +60,11 @@ public class DefineFont2Tag extends CharacterTag implements FontTag {
     public KERNINGRECORD fontKerningTable[];
 
     @Override
+    public int getGlyphWidth(int glyphIndex) {
+        return glyphShapeTable[glyphIndex].getBounds().getWidth();
+    }
+
+    @Override
     public int getGlyphAdvance(int glyphIndex) {
         if (fontFlagsHasLayout) {
             return fontAdvanceTable[glyphIndex];

@@ -41,6 +41,11 @@ public class DefineFontTag extends CharacterTag implements FontTag {
 
     @Override
     public int getGlyphAdvance(int glyphIndex) {
+        return getGlyphWidth(glyphIndex);
+    }
+
+    @Override
+    public int getGlyphWidth(int glyphIndex) {
         return glyphShapeTable[glyphIndex].getBounds().getWidth();
     }
 
