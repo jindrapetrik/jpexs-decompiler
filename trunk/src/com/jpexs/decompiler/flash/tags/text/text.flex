@@ -45,7 +45,7 @@ NegativeNumber = - {PositiveNumber}
 Number = {PositiveNumber}|{NegativeNumber}
 Hex = [0-9a-f][0-9a-f]
 
-Font = "[font " {PositiveNumber} " height:" {PositiveNumber} "]"
+Font = "[font " {PositiveNumber} " height " {PositiveNumber} "]"
 Color = "[color #" {Hex}{Hex}{Hex} "]"
 ColorA = "[color #" {Hex}{Hex}{Hex}{Hex} "]"
 X = "[x " {Number} "]"
@@ -57,7 +57,7 @@ Y = "[y " {Number} "]"
 <YYINITIAL> {
   {Font}                         {
                                     if(string==null){
-                                        Pattern pat = Pattern.compile("\\[font ([0-9]+) height:([0-9]+)\\]");
+                                        Pattern pat = Pattern.compile("\\[font ([0-9]+) height ([0-9]+)\\]");
                                         Matcher m=pat.matcher(yytext());
                                         if(m.matches()){
                                             return new ParsedSymbol(SymbolType.FONT,Integer.parseInt(m.group(1)),Integer.parseInt(m.group(2)));

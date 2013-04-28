@@ -101,7 +101,7 @@ public class DefineText2Tag extends CharacterTag implements BoundedTag, TextTag 
                         }
                     }
                 }
-                ret += "[font " + rec.fontId + " height:" + rec.textHeight + "]";
+                ret += "[font " + rec.fontId + " height " + rec.textHeight + "]";
             }
             if (rec.styleFlagsHasColor) {
                 ret += "[color " + rec.textColorA.toHexARGB() + "]";
