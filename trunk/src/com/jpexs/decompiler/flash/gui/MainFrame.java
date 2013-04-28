@@ -74,6 +74,8 @@ import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.tags.text.ParseException;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -103,6 +105,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -156,6 +159,8 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     final static String CARDACTIONSCRIPTPANEL = "ActionScript card";
     final static String DETAILCARDAS3NAVIGATOR = "Traits list";
     final static String DETAILCARDEMPTYPANEL = "Empty card";
+    final static String CARDTEXTPANEL = "Text card";
+    private JTextField textValue = new JTextField("");
     private JPEGTablesTag jtt;
     private HashMap<Integer, CharacterTag> characters;
     private List<ABCContainerTag> abcList;
@@ -165,6 +170,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     private JTextField filterField = new JTextField("");
     private JPanel searchPanel;
     private JCheckBoxMenuItem autoDeobfuscateMenuItem;
+    private JPanel displayWithPreview;
 
     public void setPercent(int percent) {
         progressBar.setValue(percent);
@@ -451,18 +457,36 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         list2.addAll(swf.tags);
         parseCharacters(list2);
 
-        //setLayout(new BorderLayout());
+
+        JPanel textPanel = new JPanel(new BorderLayout());
+        textPanel.add(textValue, BorderLayout.CENTER);
+        JButton textSaveButton = new JButton("Save text", View.getIcon("save16"));
+        textPanel.add(textSaveButton, BorderLayout.EAST);
+        textSaveButton.setActionCommand("SAVETEXT");
+        textSaveButton.addActionListener(this);
+
+
+
+        displayWithPreview = new JPanel(new CardLayout());
+        displayWithPreview.add(textPanel, CARDTEXTPANEL);
+        displayWithPreview.setVisible(false);
+
+        JPanel panWithPreview = new JPanel(new BorderLayout());
+        panWithPreview.add(displayWithPreview, BorderLayout.SOUTH);
+
         try {
             flashPanel = new FlashPlayerPanel(this);
         } catch (FlashUnsupportedException fue) {
         }
         displayPanel = new JPanel(new CardLayout());
         if (flashPanel != null) {
-            displayPanel.add(flashPanel, CARDFLASHPANEL);
+            panWithPreview.add(flashPanel, BorderLayout.CENTER);
+            displayPanel.add(panWithPreview, CARDFLASHPANEL);
         } else {
             JPanel swtPanel = new JPanel(new BorderLayout());
             swtPanel.add(new JLabel("<html><center>Preview of this object is not available on this platform. (Windows only)</center></html>", JLabel.CENTER), BorderLayout.CENTER);
             swtPanel.setBackground(Color.white);
+            panWithPreview.add(swtPanel, BorderLayout.CENTER);
             displayPanel.add(swtPanel, CARDFLASHPANEL);
         }
         imagePanel = new ImagePanel();
@@ -974,6 +998,17 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        if (e.getActionCommand().equals("SAVETEXT")) {
+            if (oldValue instanceof TextTag) {
+                try {
+                    ((TextTag) oldValue).setFormattedText(swf.tags, textValue.getText());
+                    reload(true);
+                } catch (ParseException ex) {
+                    JOptionPane.showMessageDialog(null, "Invalid text: " + ex.text + " on line " + ex.line, "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+
         if (e.getActionCommand().equals("AUTODEOBFUSCATE")) {
             if (JOptionPane.showConfirmDialog(this, "Automatic deobfuscation is a way to decompile obfuscated code.\r\nDeobfuscation leads to slower decompilation and some of the dead code may be eliminated.\r\nIf the code is not obfuscated, it's better to turn autodeobfuscation off.\r\nDo you really want to " + (autoDeobfuscateMenuItem.getState() ? "turn ON" : "turn OFF") + " automatic debfuscation?", "Confirm", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
                 Configuration.setConfig("autoDeobfuscate", autoDeobfuscateMenuItem.getState());
@@ -1346,6 +1381,11 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     }
     private int splitPos = 0;
 
+    public void showDetailWithPreview(String card) {
+        CardLayout cl = (CardLayout) (displayWithPreview.getLayout());
+        cl.show(displayWithPreview, card);
+    }
+
     public void showDetail(String card) {
         CardLayout cl = (CardLayout) (detailPanel.getLayout());
         cl.show(detailPanel, card);
@@ -1630,6 +1670,14 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
             } catch (Exception ex) {
                 Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            if (tagObj instanceof TextTag) {
+                displayWithPreview.setVisible(true);
+                showDetailWithPreview(CARDTEXTPANEL);
+                textValue.setText(((TextTag) tagObj).getFormattedText(swf.tags));
+            } else {
+                displayWithPreview.setVisible(false);
             }
 
         } else {

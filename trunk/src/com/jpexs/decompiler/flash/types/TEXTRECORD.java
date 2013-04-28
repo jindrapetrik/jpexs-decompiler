@@ -16,6 +16,10 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
+import java.util.List;
+
 /**
  *
  * @author JPEXS
@@ -33,4 +37,12 @@ public class TEXTRECORD {
     public int yOffset;
     public int textHeight;
     public GLYPHENTRY glyphEntries[];
+
+    public String getText(List<Tag> tags, FontTag font) {
+        String ret = "";
+        for (GLYPHENTRY ge : glyphEntries) {
+            ret += font.glyphToChar(tags, ge.glyphIndex);
+        }
+        return ret;
+    }
 }

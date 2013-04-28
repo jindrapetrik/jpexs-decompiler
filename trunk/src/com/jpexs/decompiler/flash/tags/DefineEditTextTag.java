@@ -20,6 +20,8 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.tags.text.ParseException;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGBA;
 import java.io.ByteArrayInputStream;
@@ -28,6 +30,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -35,7 +38,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class DefineEditTextTag extends CharacterTag implements BoundedTag {
+public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextTag {
 
     public int characterID;
     public RECT bounds;
@@ -67,6 +70,25 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag {
     public int leading;
     public String variableName;
     public String initialText;
+
+    @Override
+    public String getText(List<Tag> tags) {
+        if (hasText) {
+            return initialText;
+        }
+        return "";
+    }
+
+    @Override
+    public String getFormattedText(List<Tag> tags) {
+        return getText(tags);
+    }
+
+    @Override
+    public void setFormattedText(List<Tag> tags, String text) throws ParseException {
+        initialText = text;
+        hasText = true;
+    }
 
     @Override
     public RECT getRect(HashMap<Integer, CharacterTag> allCharacters) {

@@ -14,25 +14,16 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.tags.base;
+package com.jpexs.decompiler.flash.tags.text;
 
-import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.types.SHAPE;
-import java.util.List;
+public class ParseException extends Exception {
 
-/**
- *
- * @author JPEXS
- */
-public interface FontTag extends AloneTag {
+    public long line;
+    public String text;
 
-    public int getFontId();
-
-    public SHAPE[] getGlyphShapeTable();
-
-    public char glyphToChar(List<Tag> tags, int glyphIndex);
-
-    public int charToGlyph(List<Tag> tags, char c);
-
-    public int getGlyphAdvance(int glyphIndex);
+    public ParseException(String text, long line) {
+        super("ParseException:" + text + " on line " + line);
+        this.line = line;
+        this.text = text;
+    }
 }

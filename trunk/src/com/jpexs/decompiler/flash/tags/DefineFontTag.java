@@ -25,6 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 
 /**
  *
@@ -36,6 +37,41 @@ public class DefineFontTag extends CharacterTag implements FontTag {
     public int fontId;
     public int offsetTable[];
     public SHAPE glyphShapeTable[];
+    private DefineFontInfoTag fontInfoTag = null;
+
+    @Override
+    public int getGlyphAdvance(int glyphIndex) {
+        return glyphShapeTable[glyphIndex].getBounds().getWidth();
+    }
+
+    private void ensureFontInfo(List<Tag> tags) {
+        if (fontInfoTag == null) {
+            for (Tag t : tags) {
+                if (t instanceof DefineFontInfoTag) {
+                    if (((DefineFontInfoTag) t).fontId == fontId) {
+                        fontInfoTag = (DefineFontInfoTag) t;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public char glyphToChar(List<Tag> tags, int glyphIndex) {
+        ensureFontInfo(tags);
+        if (fontInfoTag == null) {
+            return '?';
+        } else {
+            return (char) (int) fontInfoTag.codeTable.get(glyphIndex);
+        }
+    }
+
+    @Override
+    public int charToGlyph(List<Tag> tags, char c) {
+        ensureFontInfo(tags);
+        return fontInfoTag.codeTable.indexOf(c);
+    }
 
     /**
      * Gets data bytes

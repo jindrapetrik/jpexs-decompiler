@@ -55,4 +55,34 @@ public class RGBA {
         }
         return "#" + rh + gh + bh;
     }
+
+    public String toHexARGB() {
+        String ra = Integer.toHexString(alpha);
+        if (ra.length() < 2) {
+            ra = "0" + ra;
+        }
+        String rh = Integer.toHexString(red);
+        if (rh.length() < 2) {
+            rh = "0" + rh;
+        }
+        String gh = Integer.toHexString(green);
+        if (gh.length() < 2) {
+            gh = "0" + gh;
+        }
+        String bh = Integer.toHexString(blue);
+        if (bh.length() < 2) {
+            bh = "0" + bh;
+        }
+        return "#" + ra + rh + gh + bh;
+    }
+
+    public RGBA(int red, int green, int blue, int alpha) {
+        this.red = red;
+        this.green = green;
+        this.blue = blue;
+        this.alpha = alpha;
+    }
+
+    public RGBA() {
+    }
 }

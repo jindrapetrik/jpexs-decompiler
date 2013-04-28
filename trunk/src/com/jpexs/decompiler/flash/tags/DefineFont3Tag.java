@@ -30,6 +30,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DefineFont3Tag extends CharacterTag implements FontTag {
 
@@ -47,13 +49,32 @@ public class DefineFont3Tag extends CharacterTag implements FontTag {
     public int numGlyphs;
     public long offsetTable[];
     public SHAPE glyphShapeTable[];
-    public int codeTable[];
+    public List<Integer> codeTable;
     public int fontAscent;
     public int fontDescent;
     public int fontLeading;
     public int fontAdvanceTable[];
     public RECT fontBoundsTable[];
     public KERNINGRECORD fontKerningTable[];
+
+    @Override
+    public int getGlyphAdvance(int glyphIndex) {
+        if (fontFlagsHasLayout) {
+            return fontAdvanceTable[glyphIndex] / 20;
+        } else {
+            return glyphShapeTable[glyphIndex].getBounds().getWidth();
+        }
+    }
+
+    @Override
+    public char glyphToChar(List<Tag> tags, int glyphIndex) {
+        return (char) (int) codeTable.get(glyphIndex);
+    }
+
+    @Override
+    public int charToGlyph(List<Tag> tags, char c) {
+        return codeTable.indexOf((Integer) (int) c);
+    }
 
     public DefineFont3Tag(byte[] data, int version, long pos) throws IOException {
         super(75, "DefineFont3", data, pos);
@@ -89,12 +110,12 @@ public class DefineFont3Tag extends CharacterTag implements FontTag {
         for (int i = 0; i < numGlyphs; i++) {
             glyphShapeTable[i] = sis.readSHAPE(1);
         }
-        codeTable = new int[numGlyphs];
+        codeTable = new ArrayList<Integer>(); //int[numGlyphs];
         for (int i = 0; i < numGlyphs; i++) {
             if (fontFlagsWideCodes) {
-                codeTable[i] = sis.readUI16();
+                codeTable.add(sis.readUI16());
             } else {
-                codeTable[i] = sis.readUI8();
+                codeTable.add(sis.readUI8());
             }
         }
         if (fontFlagsHasLayout) {
@@ -177,9 +198,9 @@ public class DefineFont3Tag extends CharacterTag implements FontTag {
 
             for (int i = 0; i < numGlyphs; i++) {
                 if (fontFlagsWideCodes) {
-                    sos.writeUI16(codeTable[i]);
+                    sos.writeUI16(codeTable.get(i));
                 } else {
-                    sos.writeUI8(codeTable[i]);
+                    sos.writeUI8(codeTable.get(i));
                 }
             }
             if (fontFlagsHasLayout) {
