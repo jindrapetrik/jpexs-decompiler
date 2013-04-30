@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
+import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.swf4.*;
 import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf6.ActionEnumerate2;
@@ -476,8 +477,10 @@ public class Action implements GraphSourceItem {
                 } else {
                     len = a.getBytes(version).length;
                 }
-                for (int i = 0; i < len; i++) {
-                    ret.append("Nop\r\n");
+                if (!(a instanceof ActionEnd)) {
+                    for (int i = 0; i < len; i++) {
+                        ret.append("Nop\r\n");
+                    }
                 }
             } else {
                 if (a.beforeInsert != null) {
