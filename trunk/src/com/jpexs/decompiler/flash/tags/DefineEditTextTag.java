@@ -332,6 +332,11 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextT
             this.multiline = multiline;
             this.password = password;
             this.readOnly = readOnly;
+            this.noSelect = noSelect;
+            this.border = border;
+            this.wasStatic = wasStatic;
+            this.html = html;
+            this.useOutlines = useOutlines;
             if (textColor != null) {
                 hasTextColor = true;
                 this.textColor = textColor;
