@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.Configuration;
+import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.ReReadableInputStream;
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -119,7 +121,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
      */
     @Override
     public String getASMSource(int version, boolean hex) {
-        return Action.actionsToString(0, getActions(version), null, version, hex, getPos() + hdrSize);
+        return Action.actionsToString(listeners, 0, getActions(version), null, version, hex, getPos() + hdrSize);
     }
 
     /**
@@ -151,7 +153,13 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
             baos.write(actionBytes);
             ReReadableInputStream rri = new ReReadableInputStream(new ByteArrayInputStream(baos.toByteArray()));
             rri.setPos(prevLength);
-            return Action.removeNops(0, SWFInputStream.readActionList(0, getPos() + hdrSize - prevLength, rri, version, prevLength, -1), version, getPos() + hdrSize);
+
+            boolean deobfuscate = (Boolean) Configuration.getConfig("autoDeobfuscate", true);
+            List<Action> list = SWFInputStream.readActionList(listeners, 0, getPos() + hdrSize - prevLength, rri, version, prevLength, -1);
+            if (deobfuscate) {
+                list = Action.removeNops(0, list, version, getPos() + hdrSize);
+            }
+            return list;
         } catch (Exception ex) {
             Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex);
             return new ArrayList<Action>();
@@ -196,5 +204,16 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
             }
         }
         return rect;
+    }
+    List<DisassemblyListener> listeners = new ArrayList<DisassemblyListener>();
+
+    @Override
+    public void addDisassemblyListener(DisassemblyListener listener) {
+        listeners.add(listener);
+    }
+
+    @Override
+    public void removeDisassemblyListener(DisassemblyListener listener) {
+        listeners.remove(listener);
     }
 }

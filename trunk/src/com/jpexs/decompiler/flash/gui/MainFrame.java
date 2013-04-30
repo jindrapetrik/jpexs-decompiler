@@ -489,9 +489,23 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         List<Object> list2 = new ArrayList<Object>();
         list2.addAll(swf.tags);
         parseCharacters(list2);
-        JPanel textPanel = new JPanel(new BorderLayout());
-        textPanel.add(textValue, BorderLayout.CENTER);
+        JPanel textTopPanel = new JPanel(new BorderLayout());
+        textTopPanel.add(textValue, BorderLayout.CENTER);
         textValue.setEditable(false);
+
+
+        /*JPanel textBottomPanel = new JPanel();
+         textBottomPanel.setLayout(new BoxLayout(textBottomPanel, BoxLayout.X_AXIS));
+         textBottomPanel.add(new JLabel("Xmin:"));
+         textBottomPanel.add(textRectXmin);
+         textBottomPanel.add(new JLabel("Ymin:"));
+         textBottomPanel.add(textRectYmin);
+         textBottomPanel.add(new JLabel("Xmax:"));
+         textBottomPanel.add(textRectXmax);        
+         textBottomPanel.add(new JLabel("Ymax:"));
+         textBottomPanel.add(textRectYmax);*/
+
+
 
         JPanel buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
@@ -519,9 +533,16 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         textSaveButton.setVisible(false);
         textCancelButton.setVisible(false);
 
-        textPanel.add(buttonsPanel, BorderLayout.EAST);
+        textTopPanel.add(buttonsPanel, BorderLayout.EAST);
 
         displayWithPreview = new JPanel(new CardLayout());
+
+
+        JPanel textPanel = new JPanel();
+        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
+        textPanel.add(textTopPanel);
+        //textPanel.add(textBottomPanel);
+
         displayWithPreview.add(textPanel, CARDTEXTPANEL);
         displayWithPreview.setVisible(false);
 

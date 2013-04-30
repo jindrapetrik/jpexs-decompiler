@@ -67,7 +67,7 @@ public class DefineFont3Tag extends CharacterTag implements FontTag {
         if (fontFlagsHasLayout) {
             return fontAdvanceTable[glyphIndex] / 20;
         } else {
-            return glyphShapeTable[glyphIndex].getBounds().getWidth();
+            return getGlyphWidth(glyphIndex) + 20;
         }
     }
 

@@ -81,4 +81,8 @@ public class ReReadableInputStream extends InputStream {
     public int available() throws IOException {
         return (count + is.available()) - pos;
     }
+
+    public long length() throws IOException {
+        return count + is.available();
+    }
 }

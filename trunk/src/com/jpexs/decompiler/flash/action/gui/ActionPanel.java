@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.gui;
 
+import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.gui.LineMarkedEditorPane;
@@ -93,8 +94,15 @@ public class ActionPanel extends JPanel implements ActionListener {
             lastH = h;
         }
         long offset = lastH.offset;
+        editor.setText("; Getting hilights...");
         disassembledHilights = Highlighting.getInstrHighlights(text);
-        editor.setText(Highlighting.stripHilights(text));
+        String stripped = Highlighting.stripHilights(text);
+        /*if(stripped.length()>30000){
+         editor.setContentType("text/plain");
+         }else{
+         editor.setContentType("text/flasm");
+         }*/
+        editor.setText(stripped);
         for (Highlighting h : disassembledHilights) {
             if (h.offset == offset) {
                 editor.setCaretPosition(h.startPos);
@@ -117,13 +125,35 @@ public class ActionPanel extends JPanel implements ActionListener {
             public void run() {
                 editor.setText("; Disassembling...");
                 if (Main.DO_DECOMPILE) {
-                    decompiledEditor.setText("//Decompiling...");
+                    decompiledEditor.setText("//Waiting for dissasembly...");
                 }
+                DisassemblyListener listener = new DisassemblyListener() {
+                    int percent = 0;
+                    String phase = "";
+
+                    @Override
+                    public void progress(String phase, long pos, long total) {
+                        if (total < 1) {
+                            return;
+                        }
+                        int newpercent = (int) (pos * 100 / total);
+                        if (((newpercent > percent) || (!this.phase.equals(phase))) && newpercent <= 100) {
+                            percent = newpercent;
+                            this.phase = phase;
+                            editor.setText("; Disassembling - " + phase + " " + percent + "%...");
+                        }
+                    }
+                };
+                asm.addDisassemblyListener(listener);
                 lastDisasm = asm.getASMSource(SWF.DEFAULT_VERSION, true);
+                asm.removeDisassemblyListener(listener);
+                editor.setText("; Disassembled");
                 srcWithHex = Helper.hexToComments(lastDisasm);
                 srcNoHex = Helper.stripComments(lastDisasm);
+                editor.setText("; Disassembling - setting");
                 setHex(hexButton.isSelected());
                 if (Main.DO_DECOMPILE) {
+                    decompiledEditor.setText("//Decompiling...");
                     List<com.jpexs.decompiler.flash.action.Action> as = asm.getActions(SWF.DEFAULT_VERSION);
                     lastCode = as;
                     //com.jpexs.decompiler.flash.action.Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
@@ -138,13 +168,19 @@ public class ActionPanel extends JPanel implements ActionListener {
                      } catch (IOException ex) {
                      Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
                      }*/
-                    decompiledEditor.setText(lastDecompiled = stripped);
+                    lastDecompiled = stripped;
+                    /*if(lastDecompiled.length()>30000){
+                     decompiledEditor.setContentType("text/plain");
+                     }else{
+                     decompiledEditor.setContentType("text/actionscript");
+                     }*/
+                    decompiledEditor.setText(lastDecompiled);
 
                     if (debugRecompile) {
                         try {
                             ActionScriptParser ps = new ActionScriptParser();
 
-                            recompiledEditor.setText(Highlighting.stripHilights(com.jpexs.decompiler.flash.action.Action.actionsToString(0, ps.parse(stripped), null, SWF.DEFAULT_VERSION, false, 0)));
+                            recompiledEditor.setText(Highlighting.stripHilights(com.jpexs.decompiler.flash.action.Action.actionsToString(new ArrayList<DisassemblyListener>(), 0, ps.parse(stripped), null, SWF.DEFAULT_VERSION, false, 0)));
                         } catch (ParseException ex) {
                             Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
                         } catch (IOException ex) {

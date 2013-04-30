@@ -28,6 +28,9 @@ public class DivideTreeItem extends BinaryOpItem {
 
     @Override
     public double toNumber() {
+        if (Double.compare(rightSide.toNumber(), 0) == 0) {
+            return Double.NaN;
+        }
         return leftSide.toNumber() / rightSide.toNumber();
     }
 }

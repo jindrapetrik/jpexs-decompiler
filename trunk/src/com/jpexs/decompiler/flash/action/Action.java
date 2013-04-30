@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action;
 
+import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
@@ -364,8 +365,8 @@ public class Action implements GraphSourceItem {
      * @param hex Add hexadecimal?
      * @return ASM source as String
      */
-    public static String actionsToString(long address, List<Action> list, List<Long> importantOffsets, int version, boolean hex, long swfPos) {
-        return actionsToString(address, list, importantOffsets, new ArrayList<String>(), version, hex, swfPos);
+    public static String actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, int version, boolean hex, long swfPos) {
+        return actionsToString(listeners, address, list, importantOffsets, new ArrayList<String>(), version, hex, swfPos);
     }
 
     /**
@@ -378,8 +379,7 @@ public class Action implements GraphSourceItem {
      * @param hex Add hexadecimal?
      * @return ASM source as String
      */
-    public static String actionsToString(long address, List list, List<Long> importantOffsets, List<String> constantPool, int version, boolean hex, long swfPos) {
-        String ret = "";
+    public static String actionsToString(List<DisassemblyListener> listeners, long address, List list, List<Long> importantOffsets, List<String> constantPool, int version, boolean hex, long swfPos) {
         long offset;
         if (importantOffsets == null) {
             //setActionsAddresses(list, 0, version);
@@ -391,7 +391,7 @@ public class Action implements GraphSourceItem {
                 srcList.add((Action) o);
             }
         }
-        List<ConstantPool> cps = SWFInputStream.getConstantPool(new ActionGraphSource(srcList, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, version);
+        List<ConstantPool> cps = SWFInputStream.getConstantPool(new ArrayList<DisassemblyListener>(), new ActionGraphSource(srcList, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, version);
         if (!cps.isEmpty()) {
             setConstantPool(list, cps.get(cps.size() - 1));
         }
@@ -400,14 +400,20 @@ public class Action implements GraphSourceItem {
         offset = address;
         int pos = -1;
         boolean lastPush = false;
+        StringBuilder ret = new StringBuilder();
         for (GraphSourceItem s : srcList) {
+            for (DisassemblyListener l : listeners) {
+                l.progress("toString", pos + 2, srcList.size());
+            }
             Action a = null;
             if (s instanceof Action) {
                 a = (Action) s;
             }
             pos++;
             if (hex) {
-                ret += "<ffdec:hex>" +/*"0x"+Helper.formatAddress(a.getFileAddress())+": "+*/ Helper.bytesToHexString(a.getBytes(version)) + "</ffdec:hex>\r\n";
+                ret.append("<ffdec:hex>");/* +"0x"+Helper.formatAddress(a.getFileAddress())+": "+*/;
+                ret.append(Helper.bytesToHexString(a.getBytes(version)));
+                ret.append("</ffdec:hex>\r\n");
             }
             offset = a.getAddress();
 
@@ -430,10 +436,10 @@ public class Action implements GraphSourceItem {
 
             if (containers.containsKey(offset)) {
                 for (int i = 0; i < containers.get(offset).size(); i++) {
-                    ret += "}\r\n";
+                    ret.append("}\r\n");
                     GraphSourceItemContainer cnt = containers.get(offset).get(i);
                     int cntPos = containersPos.get(cnt);
-                    ret += cnt.getASMSourceBetween(cntPos);
+                    ret.append(cnt.getASMSourceBetween(cntPos));
                     cntPos++;
                     containersPos.put(cnt, cntPos);
                 }
@@ -441,23 +447,27 @@ public class Action implements GraphSourceItem {
 
             if (importantOffsets.contains(offset)) {
                 if (lastPush) {
-                    ret += "\r\n";
+                    ret.append("\r\n");
                     lastPush = false;
                 }
-                ret += "loc" + Helper.formatAddress(offset) + ":";
+                ret.append("loc");
+                ret.append(Helper.formatAddress(offset));
+                ret.append(":");
             }
 
 
 
             if (a.replaceWith != null) {
                 if (lastPush) {
-                    ret += "\r\n";
+                    ret.append("\r\n");
                     lastPush = false;
                 }
-                ret += Highlighting.hilighOffset("", offset) + a.replaceWith.getASMSource(list, importantOffsets, constantPool, version, hex) + "\r\n";
+                ret.append(Highlighting.hilighOffset("", offset));
+                ret.append(a.replaceWith.getASMSource(list, importantOffsets, constantPool, version, hex));
+                ret.append("\r\n");
             } else if (a.ignored) {
                 if (lastPush) {
-                    ret += "\r\n";
+                    ret.append("\r\n");
                     lastPush = false;
                 }
                 int len = 0;
@@ -467,11 +477,12 @@ public class Action implements GraphSourceItem {
                     len = a.getBytes(version).length;
                 }
                 for (int i = 0; i < len; i++) {
-                    ret += "Nop\r\n";
+                    ret.append("Nop\r\n");
                 }
             } else {
                 if (a.beforeInsert != null) {
-                    ret += a.beforeInsert.getASMSource(list, importantOffsets, constantPool, version, hex) + "\r\n";
+                    ret.append(a.beforeInsert.getASMSource(list, importantOffsets, constantPool, version, hex));
+                    ret.append("\r\n");
                 }
                 //if (!(a instanceof ActionNop)) {
                 String add = "";
@@ -484,12 +495,17 @@ public class Action implements GraphSourceItem {
                 add = "; ofs" + Helper.formatAddress(offset) + add;
                 add = "";
                 if ((a instanceof ActionPush) && lastPush) {
-                    ret += " " + ((ActionPush) a).paramsToStringReplaced(list, importantOffsets, constantPool, version, hex);
+                    ret.append(" ");
+                    ret.append(((ActionPush) a).paramsToStringReplaced(list, importantOffsets, constantPool, version, hex));
                 } else {
                     if (lastPush) {
-                        ret += "\r\n";
+                        ret.append("\r\n");
                     }
-                    ret += Highlighting.hilighOffset("", offset) + a.getASMSourceReplaced(list, importantOffsets, constantPool, version, hex) + (a.ignored ? "; ignored" : "") + add + ((a instanceof ActionPush) ? "" : "\r\n");
+                    ret.append(Highlighting.hilighOffset("", offset));
+                    ret.append(a.getASMSourceReplaced(list, importantOffsets, constantPool, version, hex));
+                    ret.append(a.ignored ? "; ignored" : "");
+                    ret.append(add);
+                    ret.append((a instanceof ActionPush) ? "" : "\r\n");
                 }
                 if (a instanceof ActionPush) {
                     lastPush = true;
@@ -498,28 +514,31 @@ public class Action implements GraphSourceItem {
                 }
                 //}
                 if (a.afterInsert != null) {
-                    ret += a.afterInsert.getASMSource(list, importantOffsets, constantPool, version, hex) + "\r\n";
+                    ret.append(a.afterInsert.getASMSource(list, importantOffsets, constantPool, version, hex));
+                    ret.append("\r\n");
                 }
             }
             offset += a.getBytes(version).length;
         }
         if (lastPush) {
-            ret += "\r\n";
+            ret.append("\r\n");
         }
         if (containers.containsKey(offset)) {
             for (int i = 0; i < containers.get(offset).size(); i++) {
-                ret += "}\r\n";
+                ret.append("}\r\n");
                 GraphSourceItemContainer cnt = containers.get(offset).get(i);
                 int cntPos = containersPos.get(cnt);
-                ret += cnt.getASMSourceBetween(cntPos);
+                ret.append(cnt.getASMSourceBetween(cntPos));
                 cntPos++;
                 containersPos.put(cnt, cntPos);
             }
         }
         if (importantOffsets.contains(offset)) {
-            ret += "loc" + Helper.formatAddress(offset) + ":\r\n";
+            ret.append("loc");
+            ret.append(Helper.formatAddress(offset));
+            ret.append(":\r\n");
         }
-        return ret;
+        return ret.toString();
     }
 
     /**
@@ -1216,7 +1235,7 @@ public class Action implements GraphSourceItem {
         }
         String s = null;
         try {
-            s = Highlighting.stripHilights(Action.actionsToString(address, ret, null, version, false, swfPos));
+            s = Highlighting.stripHilights(Action.actionsToString(new ArrayList<DisassemblyListener>(), address, ret, null, version, false, swfPos));
 
             ret = ASMParser.parse(address, swfPos, true, new ByteArrayInputStream(s.getBytes()), SWF.DEFAULT_VERSION);
         } catch (Exception ex) {

@@ -14,28 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.tags.base;
-
-import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.text.ParseException;
-import com.jpexs.decompiler.flash.types.RECT;
-import java.util.List;
+package com.jpexs.decompiler.flash;
 
 /**
  *
  * @author JPEXS
  */
-public interface TextTag {
+public interface DisassemblyListener {
 
-    public String getText(List<Tag> tags);
-
-    public String getFormattedText(List<Tag> tags);
-
-    public void setFormattedText(List<Tag> tags, String text) throws ParseException;
-
-    public int getCharacterID();
-
-    public RECT getBounds();
-
-    public void setBounds(RECT r);
+    public void progress(String phase, long pos, long total);
 }

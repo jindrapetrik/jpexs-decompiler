@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
+import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.action.Action;
 import java.util.List;
 
@@ -63,4 +64,8 @@ public interface ASMSource {
     public void setActionBytes(byte actionBytes[]);
 
     public long getPos();
+
+    public void addDisassemblyListener(DisassemblyListener listener);
+
+    public void removeDisassemblyListener(DisassemblyListener listener);
 }

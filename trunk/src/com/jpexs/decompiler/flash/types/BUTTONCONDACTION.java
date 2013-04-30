@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.Configuration;
+import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.ReReadableInputStream;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
@@ -142,7 +144,7 @@ public class BUTTONCONDACTION implements ASMSource {
      */
     @Override
     public String getASMSource(int version, boolean hex) {
-        return Action.actionsToString(0, getActions(version), null, version, hex, getPos() + 4);
+        return Action.actionsToString(listeners, 0, getActions(version), null, version, hex, getPos() + 4);
     }
 
     /**
@@ -164,7 +166,13 @@ public class BUTTONCONDACTION implements ASMSource {
     @Override
     public List<Action> getActions(int version) {
         try {
-            return Action.removeNops(0, SWFInputStream.readActionList(0, getPos() + 4, new ReReadableInputStream(new ByteArrayInputStream(actionBytes)), version, 0, -1), version, getPos() + 4);
+            boolean deobfuscate = (Boolean) Configuration.getConfig("autoDeobfuscate", true);
+            List<Action> list = SWFInputStream.readActionList(listeners, 0, getPos() + 4, new ReReadableInputStream(new ByteArrayInputStream(actionBytes)), version, 0, -1);
+            if (deobfuscate) {
+                list = Action.removeNops(0, list, version, getPos() + 4);
+            }
+            return list;
+
         } catch (Exception ex) {
             Logger.getLogger(BUTTONCONDACTION.class.getName()).log(Level.SEVERE, null, ex);
             return new ArrayList<Action>();
@@ -184,5 +192,16 @@ public class BUTTONCONDACTION implements ASMSource {
     @Override
     public void setActionBytes(byte[] actionBytes) {
         this.actionBytes = actionBytes;
+    }
+    List<DisassemblyListener> listeners = new ArrayList<DisassemblyListener>();
+
+    @Override
+    public void addDisassemblyListener(DisassemblyListener listener) {
+        listeners.add(listener);
+    }
+
+    @Override
+    public void removeDisassemblyListener(DisassemblyListener listener) {
+        listeners.remove(listener);
     }
 }

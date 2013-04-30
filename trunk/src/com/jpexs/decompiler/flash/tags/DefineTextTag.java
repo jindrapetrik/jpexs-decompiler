@@ -63,6 +63,16 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag {
     public List<TEXTRECORD> textRecords;
 
     @Override
+    public RECT getBounds() {
+        return textBounds;
+    }
+
+    @Override
+    public void setBounds(RECT r) {
+        textBounds = r;
+    }
+
+    @Override
     public String getText(List<Tag> tags) {
         FontTag fnt = null;
         String ret = "";
@@ -86,7 +96,24 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag {
     public String getFormattedText(List<Tag> tags) {
         FontTag fnt = null;
         String ret = "";
+        ret += "[xmin " + textBounds.Xmin + " ymin " + textBounds.Ymin + " xmax " + textBounds.Xmax + " ymax " + textBounds.Ymax;
+        if (textMatrix.translateX != 0) {
+            ret += " translatex " + textMatrix.translateX;
+        }
+        if (textMatrix.translateY != 0) {
+            ret += " translatey " + textMatrix.translateY;
+        }
+        if (textMatrix.hasScale) {
+            ret += " scalex " + textMatrix.scaleX;
+            ret += " scaley " + textMatrix.scaleY;
+        }
+        if (textMatrix.hasRotate) {
+            ret += " rotateskew0 " + textMatrix.rotateSkew0;
+            ret += " rotateskew1 " + textMatrix.rotateSkew1;
+        }
+        ret += "]";
         for (TEXTRECORD rec : textRecords) {
+            String params = "";
             if (rec.styleFlagsHasFont) {
                 for (Tag t : tags) {
                     if (t instanceof FontTag) {
@@ -96,16 +123,19 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag {
                         }
                     }
                 }
-                ret += "[font " + rec.fontId + " height " + rec.textHeight + "]";
+                params += " font " + rec.fontId + " height " + rec.textHeight;
             }
             if (rec.styleFlagsHasColor) {
-                ret += "[color " + rec.textColor.toHexRGB() + "]";
+                params += " color " + rec.textColor.toHexRGB();
             }
             if (rec.styleFlagsHasXOffset) {
-                ret += "[x " + rec.xOffset + "]";
+                params += " x " + rec.xOffset;
             }
             if (rec.styleFlagsHasYOffset) {
-                ret += "[y " + rec.yOffset + "]";
+                params += " y " + rec.yOffset;
+            }
+            if (params.length() > 0) {
+                ret += "[" + params.trim() + "]";
             }
             ret += Helper.escapeString(rec.getText(tags, fnt)).replace("[", "\\[").replace("]", "\\]");
         }
@@ -130,39 +160,127 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag {
             int advanceBits = 0;
             int maxX = Integer.MIN_VALUE;
             int minX = Integer.MAX_VALUE;
+            MATRIX textMatrix = new MATRIX();
+            textMatrix.hasRotate = false;
+            textMatrix.hasScale = false;
+            RECT textBounds = new RECT();
             while ((s = lexer.yylex()) != null) {
                 switch (s.type) {
-                    case COLOR:
-                        Matcher m = Pattern.compile("([0-9a-f][0-9a-f])([0-9a-f][0-9a-f])([0-9a-f][0-9a-f])").matcher(s.values[0].toString());
-                        if (m.matches()) {
-                            color = new RGB(Integer.parseInt(m.group(1), 16), Integer.parseInt(m.group(2), 16), Integer.parseInt(m.group(3), 16));
-                        }
-                        break;
-                    case FONT:
-                        fontId = (Integer) s.values[0];
-                        textHeight = (Integer) s.values[1];
-                        for (Tag t : tags) {
-                            if (t instanceof FontTag) {
-                                if (((FontTag) t).getFontId() == fontId) {
-                                    font = (FontTag) t;
-                                    break;
+                    case PARAMETER:
+                        String paramName = (String) s.values[0];
+                        String paramValue = (String) s.values[1];
+                        if (paramName.equals("color")) {
+                            Matcher m = Pattern.compile("#([0-9a-f][0-9a-f])([0-9a-f][0-9a-f])([0-9a-f][0-9a-f])").matcher(paramValue);
+                            if (m.matches()) {
+                                color = new RGB(Integer.parseInt(m.group(1), 16), Integer.parseInt(m.group(2), 16), Integer.parseInt(m.group(3), 16));
+                            } else {
+                                throw new ParseException("Invalid color. Valid format is #rrggbb.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("font")) {
+                            try {
+                                fontId = Integer.parseInt(paramValue);
+
+                                for (Tag t : tags) {
+                                    if (t instanceof FontTag) {
+                                        if (((FontTag) t).getFontId() == fontId) {
+                                            font = (FontTag) t;
+                                            break;
+                                        }
+                                    }
                                 }
+                                if (font == null) {
+                                    throw new ParseException("Font not found", lexer.yyline());
+                                }
+                            } catch (NumberFormatException nfe) {
+                                throw new ParseException("Invalid font id - number expected.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("height")) {
+                            try {
+                                textHeight = Integer.parseInt(paramValue);
+                            } catch (NumberFormatException nfe) {
+                                throw new ParseException("Invalid font height - number expected.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("x")) {
+
+                            try {
+                                x = Integer.parseInt(paramValue);
+                                currentX = x;
+                            } catch (NumberFormatException nfe) {
+                                throw new ParseException("Invalid x position - number expected.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("y")) {
+
+                            try {
+                                y = Integer.parseInt(paramValue);
+                                currentY = y;
+                            } catch (NumberFormatException nfe) {
+                                throw new ParseException("Invalid y position - number expected.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("xmin")) {
+                            try {
+                                textBounds.Xmin = Integer.parseInt(paramValue);
+                            } catch (NumberFormatException nfe) {
+                                throw new ParseException("Invalid xmin position - number expected.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("xmax")) {
+                            try {
+                                textBounds.Xmax = Integer.parseInt(paramValue);
+                            } catch (NumberFormatException nfe) {
+                                throw new ParseException("Invalid xmax position - number expected.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("ymin")) {
+                            try {
+                                textBounds.Ymin = Integer.parseInt(paramValue);
+                            } catch (NumberFormatException nfe) {
+                                throw new ParseException("Invalid ymin position - number expected.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("ymax")) {
+                            try {
+                                textBounds.Ymax = Integer.parseInt(paramValue);
+                            } catch (NumberFormatException nfe) {
+                                throw new ParseException("Invalid ymax position - number expected.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("scalex")) {
+                            try {
+                                textMatrix.scaleX = Integer.parseInt(paramValue);
+                                textMatrix.hasScale = true;
+                            } catch (NumberFormatException nfe) {
+                                throw new ParseException("Invalid scalex value - number expected.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("scaley")) {
+                            try {
+                                textMatrix.scaleY = Integer.parseInt(paramValue);
+                                textMatrix.hasScale = true;
+                            } catch (NumberFormatException nfe) {
+                                throw new ParseException("Invalid scalex value - number expected.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("rotateskew0")) {
+                            try {
+                                textMatrix.rotateSkew0 = Integer.parseInt(paramValue);
+                                textMatrix.hasRotate = true;
+                            } catch (NumberFormatException nfe) {
+                                throw new ParseException("Invalid rotateskew0 value - number expected.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("rotateskew1")) {
+                            try {
+                                textMatrix.rotateSkew1 = Integer.parseInt(paramValue);
+                                textMatrix.hasRotate = true;
+                            } catch (NumberFormatException nfe) {
+                                throw new ParseException("Invalid rotateskew1 value - number expected.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("translatex")) {
+                            try {
+                                textMatrix.translateX = Integer.parseInt(paramValue);
+                            } catch (NumberFormatException nfe) {
+                                throw new ParseException("Invalid translatex value - number expected.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("translatey")) {
+                            try {
+                                textMatrix.translateY = Integer.parseInt(paramValue);
+                            } catch (NumberFormatException nfe) {
+                                throw new ParseException("Invalid translatey value - number expected.", lexer.yyline());
                             }
                         }
-                        break;
-                    case X:
-                        x = (Integer) s.values[0];
-                        currentX = x;
-                        if (currentX < minX) {
-                            minX = currentX;
-                        }
-                        if (currentX > maxX) {
-                            maxX = currentX;
-                        }
-                        break;
-                    case Y:
-                        y = (Integer) s.values[0];
-                        currentY = y;
                         break;
                     case TEXT:
                         if (font == null) {
@@ -210,8 +328,8 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag {
                             } else {
                                 currentX += tr.glyphEntries[i].glyphAdvance;
                             }
-                            if (SWFOutputStream.getNeededBitsS(tr.glyphEntries[i].glyphIndex) > glyphBits) {
-                                glyphBits = SWFOutputStream.getNeededBitsS(tr.glyphEntries[i].glyphIndex);
+                            if (SWFOutputStream.getNeededBitsU(tr.glyphEntries[i].glyphIndex) > glyphBits) {
+                                glyphBits = SWFOutputStream.getNeededBitsU(tr.glyphEntries[i].glyphIndex);
                             }
                             if (SWFOutputStream.getNeededBitsS(tr.glyphEntries[i].glyphAdvance) > advanceBits) {
                                 advanceBits = SWFOutputStream.getNeededBitsS(tr.glyphEntries[i].glyphAdvance);
@@ -232,8 +350,10 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag {
             this.advanceBits = advanceBits;
             this.glyphBits = glyphBits;
             this.textRecords = textRecords;
-            this.textBounds.Xmin = minX;
-            this.textBounds.Xmax = maxX;
+            this.textMatrix = textMatrix;
+            this.textBounds = textBounds;
+            //this.textBounds.Xmin = minX;
+            //this.textBounds.Xmax = maxX;
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {

@@ -69,7 +69,7 @@ public class DefineFont2Tag extends CharacterTag implements FontTag {
         if (fontFlagsHasLayout) {
             return fontAdvanceTable[glyphIndex];
         } else {
-            return glyphShapeTable[glyphIndex].getBounds().getWidth();
+            return getGlyphWidth(glyphIndex) + 20;
         }
     }
 

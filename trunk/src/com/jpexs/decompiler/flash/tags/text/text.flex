@@ -1,8 +1,21 @@
-/* Flash assembler language lexer specification */
-
+/*
+ * Copyright (C) 2013 JPEXS
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.jpexs.decompiler.flash.tags.text;
 
-import java.util.regex.*;
 
 %%
 
@@ -20,6 +33,7 @@ import java.util.regex.*;
 
   StringBuffer string = null;
     boolean finish=false;
+    String parameterName=null;
 
 
     /**
@@ -40,60 +54,17 @@ import java.util.regex.*;
 
 %}
 
-PositiveNumber = 0 | [1-9][0-9]*
-NegativeNumber = - {PositiveNumber}
-Number = {PositiveNumber}|{NegativeNumber}
-Hex = [0-9a-f][0-9a-f]
+Parameter = [a-z0-9_]+
+Value = [^ \]]+
 
-Font = "[font " {PositiveNumber} " height " {PositiveNumber} "]"
-Color = "[color #" {Hex}{Hex}{Hex} "]"
-ColorA = "[color #" {Hex}{Hex}{Hex}{Hex} "]"
-X = "[x " {Number} "]"
-Y = "[y " {Number} "]"
-
+%state PARAMETER,VALUE
 
 %%
 
 <YYINITIAL> {
-  {Font}                         {
-                                    if(string==null){
-                                        Pattern pat = Pattern.compile("\\[font ([0-9]+) height ([0-9]+)\\]");
-                                        Matcher m=pat.matcher(yytext());
-                                        if(m.matches()){
-                                            return new ParsedSymbol(SymbolType.FONT,Integer.parseInt(m.group(1)),Integer.parseInt(m.group(2)));
-                                        }
-                                    }else{
-                                        yypushback(yylength());
-                                        String ret=string.toString();
-                                        string = null;
-                                        return new ParsedSymbol(SymbolType.TEXT,ret.toString());
-                                    }
-                                 }
-  {Color}|{ColorA}               {
-                                    if(string==null){
-                                        return new ParsedSymbol(SymbolType.COLOR,yytext().substring(8,yytext().length()-1));
-                                    }else{
-                                        yypushback(yylength());
-                                        String ret=string.toString();
-                                        string = null;
-                                        return new ParsedSymbol(SymbolType.TEXT,ret.toString());
-                                    }
-                                 }
-  {X}                            {
-                                    if(string==null){
-                                        return new ParsedSymbol(SymbolType.X,Integer.parseInt(yytext().substring(3,yytext().length()-1)));
-                                    }else{
-                                        yypushback(yylength());
-                                        String ret=string.toString();
-                                        string = null;
-                                        return new ParsedSymbol(SymbolType.TEXT,ret.toString());
-                                    }
-                                 }
-  {Y}                            {
-                                    if(string==null){
-                                        return new ParsedSymbol(SymbolType.Y,Integer.parseInt(yytext().substring(3,yytext().length()-1)));
-                                    }else{
-                                        yypushback(yylength());
+  "["                            {
+                                    yybegin(PARAMETER);
+                                    if(string!=null){
                                         String ret=string.toString();
                                         string = null;
                                         return new ParsedSymbol(SymbolType.TEXT,ret.toString());
@@ -115,6 +86,28 @@ Y = "[y " {Number} "]"
   \\.                            { throw new ParseException("Illegal escape sequence \""+yytext()+"\"",yyline+1); }   
   .                              { if(string==null) string=new StringBuffer(); string.append( yytext() ); }
  <<EOF>>                         { if(finish){return null;}else{finish=true; return new ParsedSymbol(SymbolType.TEXT,string.toString());}}
+}
+
+<PARAMETER> {
+    " "                          {}
+    {Parameter}                  {
+                                    parameterName = yytext();
+                                    yybegin(VALUE);
+                                 }
+    "]"                          {
+                                    yybegin(YYINITIAL);
+                                 }
+}
+
+<VALUE> {
+    " "                          {}
+    {Value}                      {  
+                                    yybegin(PARAMETER);                                    
+                                    return new ParsedSymbol(SymbolType.PARAMETER,new Object[]{parameterName,yytext()});
+                                 }
+    "]"                          {
+                                    yybegin(YYINITIAL);
+                                 }
 }
 
 /* error fallback */

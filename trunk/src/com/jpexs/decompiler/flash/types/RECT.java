@@ -51,6 +51,13 @@ public class RECT {
     public RECT() {
     }
 
+    public RECT(RECT r) {
+        Xmin = r.Xmin;
+        Xmax = r.Xmax;
+        Ymin = r.Ymin;
+        Ymax = r.Ymax;
+    }
+
     @Override
     public String toString() {
         return "[RECT x=" + Xmin + " to " + Xmax + ", y=" + Ymin + " to " + Ymax + "]";

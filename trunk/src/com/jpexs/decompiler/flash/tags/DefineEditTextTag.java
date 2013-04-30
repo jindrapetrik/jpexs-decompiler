@@ -22,16 +22,23 @@ import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
+import com.jpexs.decompiler.flash.tags.text.ParsedSymbol;
+import com.jpexs.decompiler.flash.tags.text.TextLexer;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGBA;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -70,6 +77,16 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextT
     public int leading;
     public String variableName;
     public String initialText;
+
+    @Override
+    public RECT getBounds() {
+        return bounds;
+    }
+
+    @Override
+    public void setBounds(RECT r) {
+        bounds = r;
+    }
 
     private String stripTags(String inp) {
         boolean intag = false;
@@ -110,16 +127,247 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextT
 
     @Override
     public String getFormattedText(List<Tag> tags) {
+        String ret = "";
+        ret += "[";
+        String[] alignValues = {"left", "right", "center", "justify"};
+        ret += "xmin " + bounds.Xmin + " ymin " + bounds.Ymin + " xmax " + bounds.Xmax + " ymax " + bounds.Ymax + " ";
+        ret += (wordWrap ? "wordwrap 1 " : "") + (multiline ? "multiline 1 " : "")
+                + (password ? "password 1 " : "") + (readOnly ? "readonly 1 " : "")
+                + (autoSize ? "autosize 1 " : "") + (noSelect ? "noselect 1 " : "")
+                + (border ? "border 1 " : "") + (wasStatic ? "wasstatic 1 " : "")
+                + (html ? "html 1 " : "") + (useOutlines ? "useoutlines 1 " : "")
+                + (hasFont ? "font " + fontId + " " : "") + (hasTextColor ? "color " + textColor.toHexARGB() + " " : "")
+                + (hasFontClass ? "fontclass " + fontClass + " " : "") + (hasMaxLength ? "maxlength " + maxLength + " " : "")
+                + "align " + alignValues[align] + " "
+                + (hasLayout ? "leftmargin " + leftMargin + " rightmargin " + rightMargin + " indent " + indent + " leading " + leading + " " : "")
+                + (!variableName.equals("") ? "variablename " + variableName + " " : "");
+        ret = ret.trim() + "]";
         if (hasText) {
-            return initialText;
+            ret += initialText.replace("\\", "\\\\").replace("[", "\\[").replace("]", "\\]");
         }
-        return "";
+        return ret;
     }
 
     @Override
     public void setFormattedText(List<Tag> tags, String text) throws ParseException {
-        initialText = text;
-        hasText = true;
+        try {
+            TextLexer lexer = new TextLexer(new InputStreamReader(new ByteArrayInputStream(text.getBytes("UTF-8")), "UTF-8"));
+            ParsedSymbol s = null;
+            text = "";
+            RECT bounds = new RECT(this.bounds);
+            boolean wordWrap = false;
+            boolean multiline = false;
+            boolean password = false;
+            boolean readOnly = false;
+            boolean autoSize = false;
+            boolean noSelect = false;
+            boolean border = false;
+            boolean wasStatic = false;
+            boolean html = false;
+            boolean useOutlines = false;
+            int fontId = -1;
+            int fontHeight = -1;
+            String fontClass = null;
+            RGBA textColor = null;
+            int maxLength = -1;
+            int align = -1;
+            int leftMargin = -1;
+            int rightMargin = -1;
+            int indent = -1;
+            int leading = -1;
+            String variableName = null;
+
+            while ((s = lexer.yylex()) != null) {
+                switch (s.type) {
+                    case PARAMETER:
+                        String paramName = (String) s.values[0];
+                        String paramValue = (String) s.values[1];
+                        if (paramName.equals("xmin")) {
+                            try {
+                                bounds.Xmin = Integer.parseInt(paramValue);
+                            } catch (NumberFormatException nfe) {
+                                throw new ParseException("Invalid xmin value. Number expected.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("ymin")) {
+                            try {
+                                bounds.Ymin = Integer.parseInt(paramValue);
+                            } catch (NumberFormatException nfe) {
+                                throw new ParseException("Invalid ymin value. Number expected.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("xmax")) {
+                            try {
+                                bounds.Xmax = Integer.parseInt(paramValue);
+                            } catch (NumberFormatException nfe) {
+                                throw new ParseException("Invalid xmax value. Number expected.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("ymax")) {
+                            try {
+                                bounds.Ymax = Integer.parseInt(paramValue);
+                            } catch (NumberFormatException nfe) {
+                                throw new ParseException("Invalid ymax value. Number expected.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("wordwrap")) {
+                            if (paramValue.equals("1")) {
+                                wordWrap = true;
+                            }
+                        } else if (paramName.equals("multiline")) {
+                            if (paramValue.equals("1")) {
+                                multiline = true;
+                            }
+                        } else if (paramName.equals("password")) {
+                            if (paramValue.equals("1")) {
+                                password = true;
+                            }
+                        } else if (paramName.equals("readonly")) {
+                            if (paramValue.equals("1")) {
+                                readOnly = true;
+                            }
+                        } else if (paramName.equals("autosize")) {
+                            if (paramValue.equals("1")) {
+                                autoSize = true;
+                            }
+                        } else if (paramName.equals("noselect")) {
+                            if (paramValue.equals("1")) {
+                                noSelect = true;
+                            }
+                        } else if (paramName.equals("border")) {
+                            if (paramValue.equals("1")) {
+                                border = true;
+                            }
+                        } else if (paramName.equals("wasstatic")) {
+                            if (paramValue.equals("1")) {
+                                wasStatic = true;
+                            }
+                        } else if (paramName.equals("html")) {
+                            if (paramValue.equals("1")) {
+                                html = true;
+                            }
+                        } else if (paramName.equals("useoutlines")) {
+                            if (paramValue.equals("1")) {
+                                useOutlines = true;
+                            }
+                        } else if (paramName.equals("font")) {
+                            try {
+                                fontId = Integer.parseInt(paramValue);
+                            } catch (NumberFormatException ne) {
+                                throw new ParseException("Invalid font value. Number expected.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("fontclass")) {
+                            fontClass = paramValue;
+                        } else if (paramName.equals("height")) {
+                            try {
+                                fontHeight = Integer.parseInt(paramValue);
+                            } catch (NumberFormatException ne) {
+                                throw new ParseException("Invalid height value. Number expected.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("color")) {
+                            Matcher m = Pattern.compile("#([0-9a-f][0-9a-f])([0-9a-f][0-9a-f])([0-9a-f][0-9a-f])([0-9a-f][0-9a-f])").matcher(paramValue);
+                            if (m.matches()) {
+                                textColor = new RGBA(Integer.parseInt(m.group(2), 16), Integer.parseInt(m.group(3), 16), Integer.parseInt(m.group(4), 16), Integer.parseInt(m.group(1), 16));
+                            } else {
+                                throw new ParseException("Invalid color. Valid format is #aarrggbb.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("maxlength")) {
+                            try {
+                                maxLength = Integer.parseInt(paramValue);
+                            } catch (NumberFormatException ne) {
+                                throw new ParseException("Invalid maxLength value. Number expected.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("align")) {
+                            if (paramValue.equals("left")) {
+                                align = 0;
+                            } else if (paramValue.equals("right")) {
+                                align = 1;
+                            } else if (paramValue.equals("center")) {
+                                align = 2;
+                            } else if (paramValue.equals("justify")) {
+                                align = 3;
+                            } else {
+                                throw new ParseException("Invalid align value. Expected one of: left,right,center or justify.", lexer.yyline());
+                            }
+
+                        } else if (paramName.equals("leftmargin")) {
+                            try {
+                                leftMargin = Integer.parseInt(paramValue);
+                            } catch (NumberFormatException ne) {
+                                throw new ParseException("Invalid leftmargin value. Number expected.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("rightmargin")) {
+                            try {
+                                rightMargin = Integer.parseInt(paramValue);
+                            } catch (NumberFormatException ne) {
+                                throw new ParseException("Invalid rightmargin value. Number expected.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("indent")) {
+                            try {
+                                indent = Integer.parseInt(paramValue);
+                            } catch (NumberFormatException ne) {
+                                throw new ParseException("Invalid indent value. Number expected.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("leading")) {
+                            try {
+                                leading = Integer.parseInt(paramValue);
+                            } catch (NumberFormatException ne) {
+                                throw new ParseException("Invalid leading value. Number expected.", lexer.yyline());
+                            }
+                        } else if (paramName.equals("variablename")) {
+                            variableName = paramValue;
+                        } else {
+                            throw new ParseException("Unrecognized parameter name", lexer.yyline());
+                        }
+                        break;
+                    case TEXT:
+                        text += (String) s.values[0];
+                        break;
+                }
+            }
+
+            if (text.length() > 0) {
+                initialText = text;
+                this.hasText = true;
+            } else {
+                this.hasText = false;
+            }
+            this.wordWrap = wordWrap;
+            this.multiline = multiline;
+            this.password = password;
+            this.readOnly = readOnly;
+            if (textColor != null) {
+                hasTextColor = true;
+                this.textColor = textColor;
+            }
+            if (maxLength > -1) {
+                this.maxLength = maxLength;
+                hasMaxLength = true;
+            }
+            if (fontId > -1) {
+                this.fontId = fontId;
+            }
+            if (fontClass != null) {
+                this.fontClass = fontClass;
+                hasFontClass = true;
+            }
+            this.autoSize = autoSize;
+            if ((leftMargin > -1)
+                    || (rightMargin > -1)
+                    || (indent > -1)
+                    || (leading > -1)) {
+                this.leftMargin = leftMargin;
+                this.rightMargin = rightMargin;
+                this.indent = indent;
+                this.leading = leading;
+                hasLayout = true;
+            }
+            if (variableName == null) {
+                variableName = "";
+            }
+            this.variableName = variableName;
+
+        } catch (IOException ex) {
+            Logger.getLogger(DefineEditTextTag.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
     }
 
     @Override
