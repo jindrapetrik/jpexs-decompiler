@@ -12,6 +12,7 @@
             <classpath refid="cp"/>
             <jvmarg value="-Xdebug"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
+            <arg line="" />
         </java>
     </target>
 </project>
