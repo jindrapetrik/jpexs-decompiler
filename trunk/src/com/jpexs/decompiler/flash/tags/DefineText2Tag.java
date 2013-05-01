@@ -96,22 +96,22 @@ public class DefineText2Tag extends CharacterTag implements BoundedTag, TextTag 
     public String getFormattedText(List<Tag> tags) {
         FontTag fnt = null;
         String ret = "";
-        ret += "[xmin " + textBounds.Xmin + " ymin " + textBounds.Ymin + " xmax " + textBounds.Xmax + " ymax " + textBounds.Ymax;
+        ret += "[\r\nxmin " + textBounds.Xmin + "\r\nymin " + textBounds.Ymin + "\r\nxmax " + textBounds.Xmax + "\r\nymax " + textBounds.Ymax;
         if (textMatrix.translateX != 0) {
-            ret += " translatex " + textMatrix.translateX;
+            ret += "\r\ntranslatex " + textMatrix.translateX;
         }
         if (textMatrix.translateY != 0) {
-            ret += " translatey " + textMatrix.translateY;
+            ret += "\r\ntranslatey " + textMatrix.translateY;
         }
         if (textMatrix.hasScale) {
-            ret += " scalex " + textMatrix.scaleX;
-            ret += " scaley " + textMatrix.scaleY;
+            ret += "\r\nscalex " + textMatrix.scaleX;
+            ret += "\r\nscaley " + textMatrix.scaleY;
         }
         if (textMatrix.hasRotate) {
-            ret += " rotateskew0 " + textMatrix.rotateSkew0;
-            ret += " rotateskew1 " + textMatrix.rotateSkew1;
+            ret += "\r\nrotateskew0 " + textMatrix.rotateSkew0;
+            ret += "\r\nrotateskew1 " + textMatrix.rotateSkew1;
         }
-        ret += "]";
+        ret += "\r\n]";
         for (TEXTRECORD rec : textRecords) {
             String params = "";
             if (rec.styleFlagsHasFont) {
@@ -123,19 +123,19 @@ public class DefineText2Tag extends CharacterTag implements BoundedTag, TextTag 
                         }
                     }
                 }
-                params += " font " + rec.fontId + " height " + rec.textHeight;
+                params += "\r\nfont " + rec.fontId + "\r\nheight " + rec.textHeight;
             }
             if (rec.styleFlagsHasColor) {
-                params += " color " + rec.textColorA.toHexARGB();
+                params += "\r\ncolor " + rec.textColorA.toHexARGB();
             }
             if (rec.styleFlagsHasXOffset) {
-                params += " x " + rec.xOffset;
+                params += "\r\nx " + rec.xOffset;
             }
             if (rec.styleFlagsHasYOffset) {
-                params += " y " + rec.yOffset;
+                params += "\r\ny " + rec.yOffset;
             }
             if (params.length() > 0) {
-                ret += "[" + params.trim() + "]";
+                ret += "[" + params + "\r\n]";
             }
             ret += Helper.escapeString(rec.getText(tags, fnt)).replace("[", "\\[").replace("]", "\\]");
         }

@@ -55,7 +55,8 @@ package com.jpexs.decompiler.flash.tags.text;
 %}
 
 Parameter = [a-z0-9_]+
-Value = [^ \]]+
+Value = [^ \r\n\]]+
+Divider = [ \r\n]+
 
 %state PARAMETER,VALUE
 
@@ -89,7 +90,7 @@ Value = [^ \]]+
 }
 
 <PARAMETER> {
-    " "                          {}
+    {Divider}                          {}
     {Parameter}                  {
                                     parameterName = yytext();
                                     yybegin(VALUE);
@@ -100,7 +101,7 @@ Value = [^ \]]+
 }
 
 <VALUE> {
-    " "                          {}
+    {Divider}                          {}
     {Value}                      {  
                                     yybegin(PARAMETER);                                    
                                     return new ParsedSymbol(SymbolType.PARAMETER,new Object[]{parameterName,yytext()});

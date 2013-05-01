@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.gui.ABCPanel;
 import com.jpexs.decompiler.flash.abc.gui.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.abc.gui.DeobfuscationDialog;
+import com.jpexs.decompiler.flash.abc.gui.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.abc.gui.TreeElement;
 import com.jpexs.decompiler.flash.abc.gui.TreeLeafScript;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
@@ -86,6 +87,7 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -109,6 +111,8 @@ import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -122,11 +126,13 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -164,7 +170,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     final static String DETAILCARDAS3NAVIGATOR = "Traits list";
     final static String DETAILCARDEMPTYPANEL = "Empty card";
     final static String CARDTEXTPANEL = "Text card";
-    private JTextField textValue = new JTextField("");
+    private LineMarkedEditorPane textValue;
     private JPEGTablesTag jtt;
     private HashMap<Integer, CharacterTag> characters;
     private List<ABCContainerTag> abcList;
@@ -178,6 +184,8 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     private JButton textSaveButton;
     private JButton textEditButton;
     private JButton textCancelButton;
+    private JPanel parametersPanel;
+    private JSplitPane previewSplitPane;
 
     public void setPercent(int percent) {
         progressBar.setValue(percent);
@@ -490,9 +498,10 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         list2.addAll(swf.tags);
         parseCharacters(list2);
         JPanel textTopPanel = new JPanel(new BorderLayout());
-        textTopPanel.add(textValue, BorderLayout.CENTER);
-        textValue.setEditable(false);
-
+        textValue = new LineMarkedEditorPane();
+        textTopPanel.add(new JScrollPane(textValue), BorderLayout.CENTER);
+        textValue.setEditable(false);        
+        //textValue.setFont(UIManager.getFont("TextField.font"));
 
         /*JPanel textBottomPanel = new JPanel();
          textBottomPanel.setLayout(new BoxLayout(textBottomPanel, BoxLayout.X_AXIS));
@@ -508,7 +517,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
 
         JPanel buttonsPanel = new JPanel();
-        buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
+        buttonsPanel.setLayout(new FlowLayout());
 
 
         textSaveButton = new JButton("Save", View.getIcon("save16"));
@@ -533,7 +542,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         textSaveButton.setVisible(false);
         textCancelButton.setVisible(false);
 
-        textTopPanel.add(buttonsPanel, BorderLayout.EAST);
+        textTopPanel.add(buttonsPanel, BorderLayout.SOUTH);
 
         displayWithPreview = new JPanel(new CardLayout());
 
@@ -544,25 +553,50 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         //textPanel.add(textBottomPanel);
 
         displayWithPreview.add(textPanel, CARDTEXTPANEL);
-        displayWithPreview.setVisible(false);
+        //displayWithPreview.setVisible(false);
+        
 
-        JPanel panWithPreview = new JPanel(new BorderLayout());
-        panWithPreview.add(displayWithPreview, BorderLayout.SOUTH);
+        
+        
+        Component leftComponent = null;
 
         try {
             flashPanel = new FlashPlayerPanel(this);
         } catch (FlashUnsupportedException fue) {
         }
         displayPanel = new JPanel(new CardLayout());
-        displayPanel.add(panWithPreview, CARDFLASHPANEL);
+        
         if (flashPanel != null) {
-            panWithPreview.add(flashPanel, BorderLayout.CENTER);
+            leftComponent=flashPanel;
         } else {
             JPanel swtPanel = new JPanel(new BorderLayout());
             swtPanel.add(new JLabel("<html><center>Preview of this object is not available on this platform. (Windows only)</center></html>", JLabel.CENTER), BorderLayout.CENTER);
             swtPanel.setBackground(Color.white);
-            panWithPreview.add(swtPanel, BorderLayout.CENTER);
+            leftComponent = swtPanel;            
         }
+        
+        textValue.setContentType("text/swf_text");
+        
+        previewSplitPane=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        previewSplitPane.setDividerLocation(300);
+        JPanel pan=new JPanel(new BorderLayout());
+        JLabel prevLabel=new JLabel("SWF preview");
+        prevLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        prevLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        
+        JLabel paramsLabel=new JLabel("Parameters");
+        paramsLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        paramsLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        pan.add(prevLabel,BorderLayout.NORTH);
+        pan.add(leftComponent,BorderLayout.CENTER);
+        previewSplitPane.setLeftComponent(pan);
+        
+        parametersPanel=new JPanel(new BorderLayout());
+        parametersPanel.add(paramsLabel,BorderLayout.NORTH);
+        parametersPanel.add(displayWithPreview,BorderLayout.CENTER);
+        previewSplitPane.setRightComponent(parametersPanel);
+        parametersPanel.setVisible(false);
+        displayPanel.add(previewSplitPane, CARDFLASHPANEL);
         imagePanel = new ImagePanel();
         displayPanel.add(imagePanel, CARDIMAGEPANEL);
         displayPanel.add(new JPanel(), CARDEMPTYPANEL);
@@ -1799,11 +1833,12 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             }
 
             if (tagObj instanceof TextTag) {
-                displayWithPreview.setVisible(true);
+                parametersPanel.setVisible(true);
+                previewSplitPane.setDividerLocation(previewSplitPane.getWidth()/2);
                 showDetailWithPreview(CARDTEXTPANEL);
                 textValue.setText(((TextTag) tagObj).getFormattedText(swf.tags));
             } else {
-                displayWithPreview.setVisible(false);
+                parametersPanel.setVisible(false);
             }
 
         } else {

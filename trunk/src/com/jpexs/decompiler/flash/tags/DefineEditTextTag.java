@@ -130,18 +130,18 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextT
         String ret = "";
         ret += "[";
         String[] alignValues = {"left", "right", "center", "justify"};
-        ret += "xmin " + bounds.Xmin + " ymin " + bounds.Ymin + " xmax " + bounds.Xmax + " ymax " + bounds.Ymax + " ";
-        ret += (wordWrap ? "wordwrap 1 " : "") + (multiline ? "multiline 1 " : "")
-                + (password ? "password 1 " : "") + (readOnly ? "readonly 1 " : "")
-                + (autoSize ? "autosize 1 " : "") + (noSelect ? "noselect 1 " : "")
-                + (border ? "border 1 " : "") + (wasStatic ? "wasstatic 1 " : "")
-                + (html ? "html 1 " : "") + (useOutlines ? "useoutlines 1 " : "")
-                + (hasFont ? "font " + fontId + " " : "") + (hasTextColor ? "color " + textColor.toHexARGB() + " " : "")
-                + (hasFontClass ? "fontclass " + fontClass + " " : "") + (hasMaxLength ? "maxlength " + maxLength + " " : "")
-                + "align " + alignValues[align] + " "
-                + (hasLayout ? "leftmargin " + leftMargin + " rightmargin " + rightMargin + " indent " + indent + " leading " + leading + " " : "")
-                + (!variableName.equals("") ? "variablename " + variableName + " " : "");
-        ret = ret.trim() + "]";
+        ret += "\r\nxmin " + bounds.Xmin + "\r\nymin " + bounds.Ymin + "\r\nxmax " + bounds.Xmax + "\r\nymax " + bounds.Ymax + "\r\n";
+        ret += (wordWrap ? "wordwrap 1\r\n" : "") + (multiline ? "multiline 1\r\n" : "")
+                + (password ? "password 1\r\n" : "") + (readOnly ? "readonly 1\r\n" : "")
+                + (autoSize ? "autosize 1\r\n" : "") + (noSelect ? "noselect 1\r\n" : "")
+                + (border ? "border 1\r\n" : "") + (wasStatic ? "wasstatic 1\r\n" : "")
+                + (html ? "html 1\r\n" : "") + (useOutlines ? "useoutlines 1\r\n" : "")
+                + (hasFont ? "font " + fontId + "\r\n" : "") + (hasTextColor ? "color " + textColor.toHexARGB() + "\r\n" : "")
+                + (hasFontClass ? "fontclass " + fontClass + "\r\n" : "") + (hasMaxLength ? "maxlength " + maxLength + "\r\n" : "")
+                + "align " + alignValues[align] + "\r\n"
+                + (hasLayout ? "leftmargin " + leftMargin + "\r\nrightmargin " + rightMargin + "\r\nindent " + indent + "\r\nleading " + leading + "\r\n" : "")
+                + (!variableName.equals("") ? "variablename " + variableName + "\r\n" : "");
+        ret = ret + "]";
         if (hasText) {
             ret += initialText.replace("\\", "\\\\").replace("[", "\\[").replace("]", "\\]");
         }
