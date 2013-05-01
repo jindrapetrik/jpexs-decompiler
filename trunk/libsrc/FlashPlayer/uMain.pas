@@ -4,16 +4,17 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, OleCtrls, ShockwaveFlashObjects_TLB, StdCtrls;
+  Dialogs, OleCtrls, ShockwaveFlashObjects_TLB, StdCtrls, ExtCtrls;
 
 type
   TfrmMain = class(TForm)
     flaPreview: TShockwaveFlash;
+    tmrWatchDog: TTimer;
 
     procedure FormActivate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
+    procedure tmrWatchDogTimer(Sender: TObject);
   private
     { Private declarations }
   public
@@ -36,6 +37,7 @@ var
   frmMain: TfrmMain;
   k:String;
   t:TPipeThread;
+  target:HWND=0;
 implementation
 
 {$R *.dfm}
@@ -60,6 +62,7 @@ end;
 
 procedure TPipeThread.displaySWF();
 begin
+  windows.SetParent(frmMain.Handle,target);
   frmMain.flaPreview.Free;
   frmMain.flaPreview:=nil;
   frmMain.flaPreview:=TShockwaveFlash.Create(frmMain);
@@ -146,7 +149,6 @@ end;
 end;
 
 procedure TfrmMain.FormActivate(Sender: TObject);
-var target:HWND;
 begin
   if(ParamCount>=2) then
   begin
@@ -179,11 +181,15 @@ begin
 t.Free;
 end;
 
-procedure TfrmMain.Button1Click(Sender: TObject);
+procedure TfrmMain.tmrWatchDogTimer(Sender: TObject);
 begin
-
-//flaPreview.
-//flaPreview.Visible:=true;
+ if target<>0 then
+ begin
+    if not IsWindow(target) then
+    begin
+      Application.Terminate;
+    end;
+ end;
 end;
 
 end.
