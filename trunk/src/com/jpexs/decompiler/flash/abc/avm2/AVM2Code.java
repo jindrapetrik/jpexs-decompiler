@@ -2471,7 +2471,7 @@ public class AVM2Code implements Serializable {
                                     if (((AVM2Instruction) code.get(t + 1)).definition instanceof KillIns) {
                                         if (((AVM2Instruction) code.get(t + 1)).operands[0] == reg) {
                                             code.getCode().initToSource();
-                                            ConvertOutput assignment = code.getCode().toSourceOutput(false, (Boolean) localData.get(0), (Integer) localData.get(10), (Integer) localData.get(1), (HashMap<Integer, GraphTargetItem>) localData.get(2), stack, (Stack<GraphTargetItem>) localData.get(3), (ABC) localData.get(7), (ConstantPool) localData.get(4), (MethodInfo[]) localData.get(5), (MethodBody) localData.get(6), ip + 2, t - 1, (HashMap<Integer, String>) localData.get(8), (List<String>) localData.get(9), null);
+                                            ConvertOutput assignment = code.getCode().toSourceOutput(false, (Boolean) localData.get(0), (Integer) localData.get(13), (Integer) localData.get(1), (HashMap<Integer, GraphTargetItem>) localData.get(2), stack, (Stack<GraphTargetItem>) localData.get(3), (ABC) localData.get(7), (ConstantPool) localData.get(4), (MethodInfo[]) localData.get(5), (MethodBody) localData.get(6), ip + 2, t - 1, (HashMap<Integer, String>) localData.get(8), (List<String>) localData.get(9), null);
                                             stack.push(assignment.output.remove(assignment.output.size() - 1));
                                             ip = t + 2;
                                             continue iploop;
