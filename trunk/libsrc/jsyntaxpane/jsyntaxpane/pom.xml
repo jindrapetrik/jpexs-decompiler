@@ -29,12 +29,13 @@
     </pluginRepository>
   </pluginRepositories>
   
-  <build>
+  <build>      
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.3</version>
         <configuration>
+          <!--<compilerArgument>-encoding utf8</compilerArgument>-->
           <source>1.6</source>
           <target>1.6</target>
         </configuration>
@@ -43,6 +44,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <configuration>
+          <outputDirectory>../../../lib</outputDirectory>
           <excludes>
             <exclude>**/Thumbs.db</exclude>
           </excludes>        
