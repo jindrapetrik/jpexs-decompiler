@@ -50,6 +50,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,6 +62,7 @@ import java.util.Scanner;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.InflaterInputStream;
 
 /**
  * Class for reading data from SWF file
@@ -392,6 +394,18 @@ public class SWFInputStream extends InputStream {
             ret[i] = (byte) readEx();
         }
         return ret;
+    }
+
+    public byte[] readBytesZlib(long count) throws IOException {
+        byte data[] = readBytes(count);
+        InflaterInputStream dis = new InflaterInputStream(new ByteArrayInputStream(data));
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte buf[] = new byte[4096];
+        int c = 0;
+        while ((c = dis.read(buf)) > 0) {
+            baos.write(buf, 0, c);
+        }
+        return baos.toByteArray();
     }
 
     /**

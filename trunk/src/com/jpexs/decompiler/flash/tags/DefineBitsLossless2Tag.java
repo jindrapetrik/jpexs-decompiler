@@ -16,12 +16,15 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import static com.jpexs.decompiler.flash.tags.DefineBitsLosslessTag.FORMAT_24BIT_RGB;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
-import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.ALPHABITMAPDATA;
 import com.jpexs.decompiler.flash.types.ALPHACOLORMAPDATA;
+import com.jpexs.decompiler.flash.types.ARGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -30,9 +33,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.zip.InflaterInputStream;
+import javax.imageio.ImageIO;
 
-public class DefineBitsLossless2Tag extends CharacterTag implements AloneTag {
+public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
 
     public int characterID;
     public int bitmapFormat;
@@ -41,12 +46,44 @@ public class DefineBitsLossless2Tag extends CharacterTag implements AloneTag {
     public int bitmapColorTableSize;
     public byte zlibBitmapData[]; //TODO: Parse ALPHACOLORMAPDATA,ALPHABITMAPDATA
     public static final int FORMAT_8BIT_COLORMAPPED = 3;
-    public static final int FORMAT_15BIT_RGB = 4;
-    public static final int FORMAT_24BIT_RGB = 5;
+    public static final int FORMAT_32BIT_ARGB = 5;
 
     @Override
     public int getCharacterID() {
         return characterID;
+    }
+
+    @Override
+    public void setImage(byte data[]) throws IOException {
+        BufferedImage image = ImageIO.read(new ByteArrayInputStream(data));
+        ALPHABITMAPDATA bitmapData = new ALPHABITMAPDATA();
+        bitmapFormat = FORMAT_24BIT_RGB;
+        bitmapWidth = image.getWidth();
+        bitmapHeight = image.getHeight();
+        bitmapData.bitmapPixelData = new ARGB[bitmapWidth * bitmapHeight];
+        int pos = 0;
+        for (int y = 0; y < bitmapHeight; y++) {
+            for (int x = 0; x < bitmapWidth; x++) {
+                int argb = image.getRGB(x, y);
+                int a = (argb >> 24) & 0xff;
+                int r = (argb >> 16) & 0xff;
+                int g = (argb >> 8) & 0xff;
+                int b = (argb >> 0) & 0xff;
+                bitmapData.bitmapPixelData[pos] = new ARGB();
+                bitmapData.bitmapPixelData[pos].alpha = a;
+                bitmapData.bitmapPixelData[pos].red = r;
+                bitmapData.bitmapPixelData[pos].green = g;
+                bitmapData.bitmapPixelData[pos].blue = b;
+                pos++;
+            }
+        }
+        ByteArrayOutputStream bitmapDataOS = new ByteArrayOutputStream();
+        SWFOutputStream sos = new SWFOutputStream(bitmapDataOS, SWF.DEFAULT_VERSION);
+        sos.writeALPHABITMAPDATA(bitmapData, bitmapFormat, bitmapWidth, bitmapHeight);
+        ByteArrayOutputStream zlibOS = new ByteArrayOutputStream();
+        SWFOutputStream sos2 = new SWFOutputStream(zlibOS, SWF.DEFAULT_VERSION);
+        sos2.writeBytesZlib(bitmapDataOS.toByteArray());
+        zlibBitmapData = zlibOS.toByteArray();
     }
 
     public DefineBitsLossless2Tag(byte[] data, int version, long pos) throws IOException {
@@ -85,7 +122,7 @@ public class DefineBitsLossless2Tag extends CharacterTag implements AloneTag {
             if (bitmapFormat == FORMAT_8BIT_COLORMAPPED) {
                 colorMapData = sis.readALPHACOLORMAPDATA(bitmapColorTableSize, bitmapWidth, bitmapHeight);
             }
-            if ((bitmapFormat == FORMAT_15BIT_RGB) || (bitmapFormat == FORMAT_24BIT_RGB)) {
+            if (bitmapFormat == FORMAT_32BIT_ARGB) {
                 bitmapData = sis.readALPHABITMAPDATA(bitmapFormat, bitmapWidth, bitmapHeight);
             }
         } catch (IOException ex) {
@@ -118,7 +155,13 @@ public class DefineBitsLossless2Tag extends CharacterTag implements AloneTag {
         return baos.toByteArray();
     }
 
-    public BufferedImage getImage() {
+    @Override
+    public String getImageFormat() {
+        return "png";
+    }
+
+    @Override
+    public BufferedImage getImage(List<Tag> tags) {
         BufferedImage bi = new BufferedImage(bitmapWidth, bitmapHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics g = bi.getGraphics();
         ALPHACOLORMAPDATA colorMapData = null;
@@ -126,7 +169,7 @@ public class DefineBitsLossless2Tag extends CharacterTag implements AloneTag {
         if (bitmapFormat == DefineBitsLossless2Tag.FORMAT_8BIT_COLORMAPPED) {
             colorMapData = getColorMapData();
         }
-        if ((bitmapFormat == DefineBitsLossless2Tag.FORMAT_15BIT_RGB) || (bitmapFormat == DefineBitsLossless2Tag.FORMAT_24BIT_RGB)) {
+        if (bitmapFormat == DefineBitsLossless2Tag.FORMAT_32BIT_ARGB) {
             bitmapData = getBitmapData();
         }
         int pos32aligned = 0;
@@ -137,7 +180,7 @@ public class DefineBitsLossless2Tag extends CharacterTag implements AloneTag {
                     RGBA color = colorMapData.colorTableRGB[colorMapData.colorMapPixelData[pos32aligned] & 0xff];
                     g.setColor(new Color(color.red, color.green, color.blue, color.alpha));
                 }
-                if ((bitmapFormat == DefineBitsLossless2Tag.FORMAT_15BIT_RGB) || (bitmapFormat == DefineBitsLossless2Tag.FORMAT_24BIT_RGB)) {
+                if ((bitmapFormat == DefineBitsLossless2Tag.FORMAT_32BIT_ARGB)) {
                     g.setColor(new Color(bitmapData.bitmapPixelData[pos].red, bitmapData.bitmapPixelData[pos].green, bitmapData.bitmapPixelData[pos].blue, bitmapData.bitmapPixelData[pos].alpha));
                 }
                 g.fillRect(x, y, 1, 1);

@@ -18,11 +18,14 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
-import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.List;
+import javax.imageio.ImageIO;
 
-public class DefineBitsJPEG2Tag extends CharacterTag implements AloneTag {
+public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
 
     public int characterID;
     public byte[] imageData;
@@ -32,10 +35,29 @@ public class DefineBitsJPEG2Tag extends CharacterTag implements AloneTag {
         return characterID;
     }
 
+    @Override
+    public String getImageFormat() {
+        return ImageTag.getImageFormat(imageData);
+    }
+
+    @Override
+    public BufferedImage getImage(List<Tag> tags) {
+        try {
+            return ImageIO.read(new ByteArrayInputStream(imageData));
+        } catch (IOException ex) {
+        }
+        return null;
+    }
+
     public DefineBitsJPEG2Tag(byte[] data, int version, long pos) throws IOException {
         super(21, "DefineBitsJPEG2", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterID = sis.readUI16();
         imageData = sis.readBytes(sis.available());
+    }
+
+    @Override
+    public void setImage(byte data[]) {
+        imageData = data;
     }
 }

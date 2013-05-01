@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.tags.DefineBitsLosslessTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.*;
 import com.jpexs.decompiler.flash.types.filters.BEVELFILTER;
@@ -36,6 +37,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.zip.DeflaterOutputStream;
 
 /**
  * Class for writing data into SWF file
@@ -716,6 +718,19 @@ public class SWFOutputStream extends OutputStream {
         writeUI8(value.green);
         writeUI8(value.blue);
         writeUI8(value.alpha);
+    }
+
+    /**
+     * Writes ARGB value to the stream
+     *
+     * @param value ARGB value
+     * @throws IOException
+     */
+    public void writeARGB(ARGB value) throws IOException {
+        writeUI8(value.alpha);
+        writeUI8(value.red);
+        writeUI8(value.green);
+        writeUI8(value.blue);
     }
 
     /**
@@ -1584,5 +1599,80 @@ public class SWFOutputStream extends OutputStream {
     public void writeZONEDATA(ZONEDATA value) throws IOException {
         writeUI16(value.alignmentCoordinate);
         writeUI16(value.range);
+    }
+
+    public void writeBytesZlib(byte data[]) throws IOException {
+        DeflaterOutputStream deflater = new DeflaterOutputStream(this);
+        deflater.write(data);
+        deflater.flush();
+    }
+
+    /**
+     * Reads one BITMAPDATA value from the stream
+     *
+     * @throws IOException
+     */
+    public void writeBITMAPDATA(BITMAPDATA value, int bitmapFormat, int bitmapWidth, int bitmapHeight) throws IOException {
+        int dataLen = 0;
+        int pos = 0;
+        for (int y = 0; y < bitmapHeight; y++) {
+            int x = 0;
+            for (; x < bitmapWidth; x++) {
+                if (bitmapFormat == DefineBitsLosslessTag.FORMAT_15BIT_RGB) {
+                    dataLen += 2;
+                    writePIX15(value.bitmapPixelDataPix15[pos]);
+                }
+                if (bitmapFormat == DefineBitsLosslessTag.FORMAT_24BIT_RGB) {
+                    dataLen += 4;
+                    writePIX24(value.bitmapPixelDataPix24[pos]);
+                }
+                pos++;
+            }
+            while ((dataLen % 4) != 0) {
+                dataLen++;
+                writeUI8(0);
+            }
+        }
+    }
+
+    /**
+     * Reads one ALPHABITMAPDATA value from the stream
+     *
+     * @throws IOException
+     */
+    public void writeALPHABITMAPDATA(ALPHABITMAPDATA value, int bitmapFormat, int bitmapWidth, int bitmapHeight) throws IOException {
+        int pos = 0;
+        for (int y = 0; y < bitmapHeight; y++) {
+            for (int x = 0; x < bitmapWidth; x++) {
+                writeARGB(value.bitmapPixelData[pos]);
+                pos++;
+            }
+        }
+    }
+
+    /**
+     * Writes PIX24 value to the stream
+     *
+     * @param value PIX24 value
+     * @throws IOException
+     */
+    public void writePIX24(PIX24 value) throws IOException {
+        writeUI8(0);
+        writeUI8(value.red);
+        writeUI8(value.green);
+        writeUI8(value.blue);
+    }
+
+    /**
+     * Writes PIX15 value to the stream
+     *
+     * @param value PIX15 value
+     * @throws IOException
+     */
+    public void writePIX15(PIX15 value) throws IOException {
+        writeUB(1, 0);
+        writeUB(5, value.red);
+        writeUB(5, value.green);
+        writeUB(5, value.blue);
     }
 }

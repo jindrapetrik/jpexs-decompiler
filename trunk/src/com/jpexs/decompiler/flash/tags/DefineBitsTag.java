@@ -19,16 +19,30 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
+import javax.imageio.ImageIO;
 
-public class DefineBitsTag extends CharacterTag {
+public class DefineBitsTag extends ImageTag {
 
     public int characterID;
     public byte jpegData[];
+    private JPEGTablesTag jtt = null;
+
+    @Override
+    public void setImage(byte data[]) {
+        throw new UnsupportedOperationException("Set image is not supported for DefineBits");
+    }
+
+    @Override
+    public boolean importSupported() {
+        return false;
+    }
 
     public DefineBitsTag(byte[] data, int version, long pos) throws IOException {
         super(6, "DefineBits", data, pos);
@@ -37,7 +51,20 @@ public class DefineBitsTag extends CharacterTag {
         jpegData = sis.readBytes(sis.available());
     }
 
-    public byte[] getFullImageData(JPEGTablesTag jtt) {
+    private void getJPEGTables(List<Tag> tags) {
+        if (jtt == null) {
+            for (Tag t : tags) {
+                if (t instanceof JPEGTablesTag) {
+                    jtt = (JPEGTablesTag) t;
+                    break;
+                }
+            }
+        }
+    }
+
+    @Override
+    public BufferedImage getImage(List<Tag> tags) {
+        getJPEGTables(tags);
         if ((jtt != null)) {
             ByteArrayOutputStream baos = null;
 
@@ -60,7 +87,14 @@ public class DefineBitsTag extends CharacterTag {
                     }
                 }
             }
-            return baos.toByteArray();
+            if (baos == null) {
+                return null;
+            }
+            try {
+                return ImageIO.read(new ByteArrayInputStream(baos.toByteArray()));
+            } catch (IOException ex) {
+                return null;
+            }
         }
         return null;
     }
@@ -87,5 +121,10 @@ public class DefineBitsTag extends CharacterTag {
     @Override
     public int getCharacterID() {
         return characterID;
+    }
+
+    @Override
+    public String getImageFormat() {
+        return "jpg";
     }
 }

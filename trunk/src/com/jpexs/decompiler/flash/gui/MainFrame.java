@@ -75,6 +75,7 @@ import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
@@ -111,8 +112,6 @@ import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
-import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -126,18 +125,17 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
-import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
@@ -186,6 +184,8 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     private JButton textCancelButton;
     private JPanel parametersPanel;
     private JSplitPane previewSplitPane;
+    private JButton imageReplaceButton;
+    private JPanel imageButtonsPanel;
 
     public void setPercent(int percent) {
         progressBar.setValue(percent);
@@ -500,7 +500,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         JPanel textTopPanel = new JPanel(new BorderLayout());
         textValue = new LineMarkedEditorPane();
         textTopPanel.add(new JScrollPane(textValue), BorderLayout.CENTER);
-        textValue.setEditable(false);        
+        textValue.setEditable(false);
         //textValue.setFont(UIManager.getFont("TextField.font"));
 
         /*JPanel textBottomPanel = new JPanel();
@@ -554,10 +554,10 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
         displayWithPreview.add(textPanel, CARDTEXTPANEL);
         //displayWithPreview.setVisible(false);
-        
 
-        
-        
+
+
+
         Component leftComponent = null;
 
         try {
@@ -565,40 +565,55 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         } catch (FlashUnsupportedException fue) {
         }
         displayPanel = new JPanel(new CardLayout());
-        
+
         if (flashPanel != null) {
-            leftComponent=flashPanel;
+            leftComponent = flashPanel;
         } else {
             JPanel swtPanel = new JPanel(new BorderLayout());
             swtPanel.add(new JLabel("<html><center>Preview of this object is not available on this platform. (Windows only)</center></html>", JLabel.CENTER), BorderLayout.CENTER);
             swtPanel.setBackground(Color.white);
-            leftComponent = swtPanel;            
+            leftComponent = swtPanel;
         }
-        
+
         textValue.setContentType("text/swf_text");
-        
-        previewSplitPane=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+
+        previewSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         previewSplitPane.setDividerLocation(300);
-        JPanel pan=new JPanel(new BorderLayout());
-        JLabel prevLabel=new JLabel("SWF preview");
+        JPanel pan = new JPanel(new BorderLayout());
+        JLabel prevLabel = new JLabel("SWF preview");
         prevLabel.setHorizontalAlignment(SwingConstants.CENTER);
         prevLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
-        
-        JLabel paramsLabel=new JLabel("Parameters");
+
+        JLabel paramsLabel = new JLabel("Parameters");
         paramsLabel.setHorizontalAlignment(SwingConstants.CENTER);
         paramsLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
-        pan.add(prevLabel,BorderLayout.NORTH);
-        pan.add(leftComponent,BorderLayout.CENTER);
+        pan.add(prevLabel, BorderLayout.NORTH);
+        pan.add(leftComponent, BorderLayout.CENTER);
         previewSplitPane.setLeftComponent(pan);
-        
-        parametersPanel=new JPanel(new BorderLayout());
-        parametersPanel.add(paramsLabel,BorderLayout.NORTH);
-        parametersPanel.add(displayWithPreview,BorderLayout.CENTER);
+
+        parametersPanel = new JPanel(new BorderLayout());
+        parametersPanel.add(paramsLabel, BorderLayout.NORTH);
+        parametersPanel.add(displayWithPreview, BorderLayout.CENTER);
         previewSplitPane.setRightComponent(parametersPanel);
         parametersPanel.setVisible(false);
         displayPanel.add(previewSplitPane, CARDFLASHPANEL);
         imagePanel = new ImagePanel();
-        displayPanel.add(imagePanel, CARDIMAGEPANEL);
+        JPanel imagesCard = new JPanel(new BorderLayout());
+        imagesCard.add(imagePanel, BorderLayout.CENTER);
+
+
+
+
+        imageReplaceButton = new JButton("Replace...", View.getIcon("edit16"));
+        imageReplaceButton.setMargin(new Insets(3, 3, 3, 10));
+        imageReplaceButton.setActionCommand("REPLACEIMAGE");
+        imageReplaceButton.addActionListener(this);
+        imageButtonsPanel = new JPanel(new FlowLayout());
+        imageButtonsPanel.add(imageReplaceButton);
+
+        imagesCard.add(imageButtonsPanel, BorderLayout.SOUTH);
+
+        displayPanel.add(imagesCard, CARDIMAGEPANEL);
         displayPanel.add(new JPanel(), CARDEMPTYPANEL);
         if (actionPanel != null) {
             displayPanel.add(actionPanel, CARDACTIONSCRIPTPANEL);
@@ -1106,6 +1121,53 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        if (e.getActionCommand().equals("REPLACEIMAGE")) {
+            Object tagObj = tagTree.getLastSelectedPathComponent();
+            if (tagObj == null) {
+                return;
+            }
+
+            if (tagObj instanceof TagNode) {
+                tagObj = ((TagNode) tagObj).tag;
+            }
+            if (tagObj instanceof ImageTag) {
+                ImageTag it = (ImageTag) tagObj;
+                if (it.importSupported()) {
+                    JFileChooser fc = new JFileChooser();
+                    fc.setCurrentDirectory(new File((String) Configuration.getConfig("lastOpenDir", ".")));
+                    fc.setFileFilter(new FileFilter() {
+                        @Override
+                        public boolean accept(File f) {
+                            return (f.getName().toLowerCase().endsWith(".jpg"))
+                                    || (f.getName().toLowerCase().endsWith(".jpeg"))
+                                    || (f.getName().toLowerCase().endsWith(".gif"))
+                                    || (f.getName().toLowerCase().endsWith(".png"))
+                                    || (f.isDirectory());
+                        }
+
+                        @Override
+                        public String getDescription() {
+                            return "Images (*.jpg,*.gif,*.png)";
+                        }
+                    });
+                    JFrame f = new JFrame();
+                    View.setWindowIcon(f);
+                    int returnVal = fc.showOpenDialog(f);
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        Configuration.setConfig("lastOpenDir", fc.getSelectedFile().getParentFile().getAbsolutePath());
+                        File selfile = fc.getSelectedFile();
+                        byte data[] = Helper.readFile(selfile.getAbsolutePath());
+                        try {
+                            it.setImage(data);
+                        } catch (IOException ex) {
+                            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "message", ex);
+                            JOptionPane.showMessageDialog(null, "Invalid image.","Error",JOptionPane.ERROR_MESSAGE);
+                        }
+                        reload(true);
+                    }
+                }
+            }
+        }
         if (e.getActionCommand().equals("REMOVEITEM")) {
             Object tagObj = tagTree.getLastSelectedPathComponent();
             if (tagObj == null) {
@@ -1286,7 +1348,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                             }
                                         }
                                     }
-                                    SWF.exportImages(selFile + File.separator + "images", images, jtt);
+                                    swf.exportImages(selFile + File.separator + "images", images);
                                     SWF.exportShapes(selFile + File.separator + "shapes", shapes);
                                     swf.exportTexts(selFile + File.separator + "texts", texts, isFormatted);
                                     swf.exportMovies(selFile + File.separator + "movies", movies);
@@ -1632,24 +1694,10 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         } else if (tagObj instanceof ASMSource) {
             showCard(CARDACTIONSCRIPTPANEL);
             actionPanel.setSource((ASMSource) tagObj);
-        } else if (tagObj instanceof DefineBitsTag) {
+        } else if (tagObj instanceof ImageTag) {
+            imageButtonsPanel.setVisible(((ImageTag) tagObj).importSupported());
             showCard(CARDIMAGEPANEL);
-            imagePanel.setImage(((DefineBitsTag) tagObj).getFullImageData(jtt));
-        } else if (tagObj instanceof DefineBitsJPEG2Tag) {
-            showCard(CARDIMAGEPANEL);
-            imagePanel.setImage(((DefineBitsJPEG2Tag) tagObj).imageData);
-        } else if (tagObj instanceof DefineBitsJPEG3Tag) {
-            showCard(CARDIMAGEPANEL);
-            imagePanel.setImage(((DefineBitsJPEG3Tag) tagObj).imageData);
-        } else if (tagObj instanceof DefineBitsJPEG4Tag) {
-            showCard(CARDIMAGEPANEL);
-            imagePanel.setImage(((DefineBitsJPEG4Tag) tagObj).imageData);
-        } else if (tagObj instanceof DefineBitsLosslessTag) {
-            showCard(CARDIMAGEPANEL);
-            imagePanel.setImage(((DefineBitsLosslessTag) tagObj).getImage());
-        } else if (tagObj instanceof DefineBitsLossless2Tag) {
-            showCard(CARDIMAGEPANEL);
-            imagePanel.setImage(((DefineBitsLossless2Tag) tagObj).getImage());
+            imagePanel.setImage(((ImageTag) tagObj).getImage(swf.tags));
         } else if ((tagObj instanceof FrameNode && ((FrameNode) tagObj).isDisplayed()) || (((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag))) {
             try {
 
@@ -1834,7 +1882,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
             if (tagObj instanceof TextTag) {
                 parametersPanel.setVisible(true);
-                previewSplitPane.setDividerLocation(previewSplitPane.getWidth()/2);
+                previewSplitPane.setDividerLocation(previewSplitPane.getWidth() / 2);
                 showDetailWithPreview(CARDTEXTPANEL);
                 textValue.setText(((TextTag) tagObj).getFormattedText(swf.tags));
             } else {

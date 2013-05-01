@@ -16,12 +16,14 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
-import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.BITMAPDATA;
 import com.jpexs.decompiler.flash.types.COLORMAPDATA;
+import com.jpexs.decompiler.flash.types.PIX24;
 import com.jpexs.decompiler.flash.types.RGB;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -30,9 +32,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.zip.InflaterInputStream;
+import javax.imageio.ImageIO;
 
-public class DefineBitsLosslessTag extends CharacterTag implements AloneTag {
+public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
 
     public int characterID;
     public int bitmapFormat;
@@ -47,7 +51,39 @@ public class DefineBitsLosslessTag extends CharacterTag implements AloneTag {
     private BITMAPDATA bitmapData;
     private boolean decompressed = false;
 
-    public BufferedImage getImage() {
+    @Override
+    public void setImage(byte data[]) throws IOException {
+        BufferedImage image = ImageIO.read(new ByteArrayInputStream(data));
+        bitmapFormat = FORMAT_24BIT_RGB;
+        bitmapWidth = image.getWidth();
+        bitmapHeight = image.getHeight();
+        bitmapData.bitmapPixelDataPix24 = new PIX24[bitmapWidth * bitmapHeight];
+        int pos = 0;
+        for (int y = 0; y < bitmapHeight; y++) {
+            for (int x = 0; x < bitmapWidth; x++) {
+                int argb = image.getRGB(x, y);
+                //int a = (argb >> 24) & 0xff;
+                int r = (argb >> 16) & 0xff;
+                int g = (argb >> 8) & 0xff;
+                int b = (argb >> 0) & 0xff;
+                bitmapData.bitmapPixelDataPix24[pos] = new PIX24();
+                bitmapData.bitmapPixelDataPix24[pos].red = r;
+                bitmapData.bitmapPixelDataPix24[pos].green = g;
+                bitmapData.bitmapPixelDataPix24[pos].blue = b;
+                pos++;
+            }
+        }
+        ByteArrayOutputStream bitmapDataOS = new ByteArrayOutputStream();
+        SWFOutputStream sos = new SWFOutputStream(bitmapDataOS, SWF.DEFAULT_VERSION);
+        sos.writeBITMAPDATA(bitmapData, bitmapFormat, bitmapWidth, bitmapHeight);
+        ByteArrayOutputStream zlibOS = new ByteArrayOutputStream();
+        SWFOutputStream sos2 = new SWFOutputStream(zlibOS, SWF.DEFAULT_VERSION);
+        sos2.writeBytesZlib(bitmapDataOS.toByteArray());
+        zlibBitmapData = zlibOS.toByteArray();
+    }
+
+    @Override
+    public BufferedImage getImage(List<Tag> tags) {
         BufferedImage bi = new BufferedImage(bitmapWidth, bitmapHeight, BufferedImage.TYPE_INT_RGB);
         Graphics g = bi.getGraphics();
         COLORMAPDATA colorMapData = null;
@@ -152,5 +188,10 @@ public class DefineBitsLosslessTag extends CharacterTag implements AloneTag {
         } catch (IOException e) {
         }
         return baos.toByteArray();
+    }
+
+    @Override
+    public String getImageFormat() {
+        return "png";
     }
 }
