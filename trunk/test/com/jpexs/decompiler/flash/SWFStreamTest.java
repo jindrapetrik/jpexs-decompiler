@@ -14,15 +14,15 @@ public class SWFStreamTest {
 
     @Test
     public void testNeededBits() {
-        assertEquals(SWFOutputStream.getNeededBitsU(3),2);
-        assertEquals(SWFOutputStream.getNeededBitsU(255),8);
-        assertEquals(SWFOutputStream.getNeededBitsS(3),3);
-        assertEquals(SWFOutputStream.getNeededBitsS(255),9);
-        assertEquals(SWFOutputStream.getNeededBitsS(-2),3);
-        assertEquals(SWFOutputStream.getNeededBitsS(-597),11);
-        assertEquals(SWFOutputStream.getNeededBitsF(15.5f),21);
-        assertEquals(SWFOutputStream.getNeededBitsF(0.1f),17);
-        assertEquals(SWFOutputStream.getNeededBitsF(-2.8891602f),19);
+        assertEquals(SWFOutputStream.getNeededBitsU(3), 2);
+        assertEquals(SWFOutputStream.getNeededBitsU(255), 8);
+        assertEquals(SWFOutputStream.getNeededBitsS(3), 3);
+        assertEquals(SWFOutputStream.getNeededBitsS(255), 9);
+        assertEquals(SWFOutputStream.getNeededBitsS(-2), 3);
+        assertEquals(SWFOutputStream.getNeededBitsS(-597), 11);
+        assertEquals(SWFOutputStream.getNeededBitsF(15.5f), 21);
+        assertEquals(SWFOutputStream.getNeededBitsF(0.1f), 17);
+        assertEquals(SWFOutputStream.getNeededBitsF(-2.8891602f), 19);
     }
 
     @Test
@@ -77,7 +77,6 @@ public class SWFStreamTest {
         assertEquals(-5, sis.readSB(9));
         sis.close();
     }
-
 
     @Test
     public void testFLOATAndDouble() throws IOException {

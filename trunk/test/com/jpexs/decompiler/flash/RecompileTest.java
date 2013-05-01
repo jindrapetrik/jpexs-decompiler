@@ -9,8 +9,8 @@ import org.testng.annotations.Test;
  *
  * @author JPEXS
  */
+public class RecompileTest {
 
-public class RecompileTest  {
     public static final String TESTDATADIR = "testdata";
 
     private void testRecompileOne(String filename) {
@@ -27,16 +27,15 @@ public class RecompileTest  {
 
     @Test
     public void testRecompile() {
-        File dir=new File(TESTDATADIR);
-        File files[]=dir.listFiles(new FilenameFilter(){
+        File dir = new File(TESTDATADIR);
+        File files[] = dir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 return name.toLowerCase().endsWith(".swf");
             }
         });
-        for(File f:files){
+        for (File f : files) {
             testRecompileOne(f.getAbsolutePath());
         }
     }
-
 }
