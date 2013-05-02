@@ -38,7 +38,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     private List<Highlighting> classHighlights = new ArrayList<Highlighting>();
     private Highlighting currentMethodHighlight;
     private ABC abc;
-    private int scriptIndex;
+    private int scriptIndex=-1;
     public int lastTraitIndex = 0;
     private boolean ignoreCarret = false;
     private boolean reset = false;
@@ -315,7 +315,9 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         if (bufferedClasses.containsKey(scriptIndex)) {
             bufferedClasses.remove(scriptIndex);
         }
-        setScript(scriptIndex, abc, abcList);
+        if((scriptIndex!=-1)&&(abc!=null)){
+            setScript(scriptIndex, abc, abcList);
+        }
         setNoTrait();
         setClassIndex(ci);
     }
