@@ -1531,6 +1531,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                 new SwingWorker() {
                     @Override
                     protected Object doInBackground() throws Exception {
+                        try{
                         int cnt = 0;
 
                         if (abcPanel != null) {
@@ -1548,6 +1549,9 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                         }
                         doFilter();
                         reload(true);
+                        }catch(Exception ex){
+                            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "message", ex);
+                        }
                         return true;
                     }
                 }.execute();
