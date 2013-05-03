@@ -30,13 +30,18 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.util.HashMap;
 import java.util.List;
 
-public class TraitSlotConst extends Trait {
+public class TraitSlotConst extends Trait implements TraitWithSlot {
 
     public int slot_id;
     public int type_index;
     public int value_index;
     public int value_kind;
     public GraphTargetItem assignedValue;
+
+    @Override
+    public int getSlotIndex() {
+        return slot_id;
+    }
 
     @Override
     public String toString(ABC abc, List<String> fullyQualifiedNames) {

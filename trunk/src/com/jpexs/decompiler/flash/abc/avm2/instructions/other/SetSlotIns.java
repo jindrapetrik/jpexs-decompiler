@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.abc.avm2.treemodel.IncrementTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.NewActivationTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.PostDecrementTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.PostIncrementTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.treemodel.ScriptTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.SetSlotTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.ThisTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
@@ -37,7 +38,9 @@ import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.PreDecrementTree
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.PreIncrementTreeItem;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitWithSlot;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
@@ -59,17 +62,27 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
         if (obj instanceof NewActivationTreeItem) {
             ((NewActivationTreeItem) obj).slots.put(slotIndex, value);
         }
+
         if (obj instanceof ExceptionTreeItem) {
             slotname = constants.constant_multiname[((ExceptionTreeItem) obj).exception.name_index];
         } else if (obj instanceof ClassTreeItem) {
             slotname = ((ClassTreeItem) obj).className;
         } else if (obj instanceof ThisTreeItem) {
             slotname = ((ThisTreeItem) obj).className;
-        } else {
-            //if(value.startsWith("catched ")) return;
+        } else if (obj instanceof ScriptTreeItem) {
+            for (int t = 0; t < abc.script_info[((ScriptTreeItem) obj).scriptIndex].traits.traits.length; t++) {
+                Trait tr = abc.script_info[((ScriptTreeItem) obj).scriptIndex].traits.traits[t];
+                if (tr instanceof TraitWithSlot) {
+                    if (((TraitWithSlot) tr).getSlotIndex() == slotIndex) {
+                        slotname = tr.getName(abc);
+                    }
+                }
+            }
+        } else if (obj instanceof NewActivationTreeItem) {
+
             for (int t = 0; t < body.traits.traits.length; t++) {
-                if (body.traits.traits[t] instanceof TraitSlotConst) {
-                    if (((TraitSlotConst) body.traits.traits[t]).slot_id == slotIndex) {
+                if (body.traits.traits[t] instanceof TraitWithSlot) {
+                    if (((TraitWithSlot) body.traits.traits[t]).getSlotIndex() == slotIndex) {
                         slotname = body.traits.traits[t].getName(abc);
                     }
                 }

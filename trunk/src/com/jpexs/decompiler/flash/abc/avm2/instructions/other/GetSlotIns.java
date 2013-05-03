@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitWithSlot;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
@@ -57,8 +58,8 @@ public class GetSlotIns extends InstructionDefinition {
         } else if (obj instanceof ScriptTreeItem) {
             for (int t = 0; t < abc.script_info[((ScriptTreeItem) obj).scriptIndex].traits.traits.length; t++) {
                 Trait tr = abc.script_info[((ScriptTreeItem) obj).scriptIndex].traits.traits[t];
-                if (tr instanceof TraitSlotConst) {
-                    if (((TraitSlotConst) tr).slot_id == slotIndex) {
+                if (tr instanceof TraitWithSlot) {
+                    if (((TraitWithSlot) tr).getSlotIndex() == slotIndex) {
                         slotname = tr.getName(abc);
                     }
                 }
@@ -66,8 +67,8 @@ public class GetSlotIns extends InstructionDefinition {
         } else if (obj instanceof NewActivationTreeItem) {
 
             for (int t = 0; t < body.traits.traits.length; t++) {
-                if (body.traits.traits[t] instanceof TraitSlotConst) {
-                    if (((TraitSlotConst) body.traits.traits[t]).slot_id == slotIndex) {
+                if (body.traits.traits[t] instanceof TraitWithSlot) {
+                    if (((TraitWithSlot) body.traits.traits[t]).getSlotIndex() == slotIndex) {
                         slotname = body.traits.traits[t].getName(abc);
                     }
                 }

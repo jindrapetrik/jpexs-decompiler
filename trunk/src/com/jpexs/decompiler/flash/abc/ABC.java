@@ -476,6 +476,9 @@ public class ABC {
     }
 
     public Trait findTraitByTraitId(int classIndex, int traitId) {
+        if (classIndex == -1) {
+            return null;
+        }
         if (traitId < class_info[classIndex].static_traits.traits.length) {
             return class_info[classIndex].static_traits.traits[traitId];
         } else if (traitId < class_info[classIndex].static_traits.traits.length + instance_info[classIndex].instance_traits.traits.length) {
@@ -487,6 +490,9 @@ public class ABC {
     }
 
     public int findMethodIdByTraitId(int classIndex, int traitId) {
+        if (classIndex == -1) {
+            return -1;
+        }
         if (traitId < class_info[classIndex].static_traits.traits.length) {
             if (class_info[classIndex].static_traits.traits[traitId] instanceof TraitMethodGetterSetter) {
                 return ((TraitMethodGetterSetter) class_info[classIndex].static_traits.traits[traitId]).method_info;

@@ -45,11 +45,16 @@ import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class TraitClass extends Trait {
+public class TraitClass extends Trait implements TraitWithSlot {
 
     public int slot_id;
     public int class_info;
     private static final String[] builtInClasses = {"ArgumentError", "arguments", "Array", "Boolean", "Class", "Date", "DefinitionError", "Error", "EvalError", "Function", "int", "JSON", "Math", "Namespace", "Number", "Object", "QName", "RangeError", "ReferenceError", "RegExp", "SecurityError", "String", "SyntaxError", "TypeError", "uint", "URIError", "VerifyError", "XML", "XMLList"};
+
+    @Override
+    public int getSlotIndex() {
+        return slot_id;
+    }
 
     private static boolean isBuiltInClass(String name) {
         for (String g : builtInClasses) {

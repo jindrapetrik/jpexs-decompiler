@@ -24,10 +24,15 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.util.List;
 import java.util.Stack;
 
-public class TraitFunction extends Trait {
+public class TraitFunction extends Trait implements TraitWithSlot {
 
     public int slot_index;
     public int method_info;
+
+    @Override
+    public int getSlotIndex() {
+        return slot_index;
+    }
 
     @Override
     public String toString(ABC abc, List<String> fullyQualifiedNames) {
