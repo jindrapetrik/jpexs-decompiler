@@ -428,8 +428,8 @@ public class Main {
         System.out.println(" ...opens SWF file with the decompiler GUI");
         System.out.println(" 3) -proxy (-PXXX)");
         System.out.println("  ...auto start proxy in the tray. Optional parameter -P specifies port for proxy. Defaults to 55555. ");
-        System.out.println(" 4) -export (as|pcode|image|shape|movie|sound|binaryData) outdirectory infile [-selectas3class class1 class2 ...]");
-        System.out.println("  ...export infile sources to outdirectory as AsctionScript code (\"as\" argument) or as PCode (\"pcode\" argument), images, shapes, movies or binaryData");
+        System.out.println(" 4) -export (as|pcode|image|shape|movie|sound|binaryData|text|textplain) outdirectory infile [-selectas3class class1 class2 ...]");
+        System.out.println("  ...export infile sources to outdirectory as AsctionScript code (\"as\" argument) or as PCode (\"pcode\" argument), images, shapes, movies, binaryData, text with formatting or plain text.");
         System.out.println("     When \"as\" or \"pcode\" type specified, optional \"-selectas3class\" parameter can be passed to export only selected classes (ActionScript 3 only)");
         System.out.println(" 5) -dumpSWF infile");
         System.out.println("  ...dumps list of SWF tags to console");
@@ -511,8 +511,13 @@ public class Main {
                                 if (!exportFormat.toLowerCase().equals("movie")) {
                                     if (!exportFormat.toLowerCase().equals("sound")) {
                                         if (!exportFormat.toLowerCase().equals("binaryData")) {
-                                            System.err.println("Invalid export format:" + exportFormat);
-                                            badArguments();
+                                            if (!exportFormat.toLowerCase().equals("text")) {
+                                                if (!exportFormat.toLowerCase().equals("textplain")) {
+                                                    System.err.println("Invalid export format:" + exportFormat);
+                                                    badArguments();
+                                                }
+                                            }
+
                                         }
                                     }
                                 }
@@ -562,6 +567,12 @@ public class Main {
                         exportOK = true;
                     } else if (exportFormat.equals("binaryData")) {
                         exfile.exportBinaryData(outDir.getAbsolutePath());
+                        exportOK = true;
+                    } else if (exportFormat.equals("text")) {
+                        exfile.exportTexts(outDir.getAbsolutePath(), true);
+                        exportOK = true;
+                    } else if (exportFormat.equals("textplain")) {
+                        exfile.exportTexts(outDir.getAbsolutePath(), false);
                         exportOK = true;
                     } else {
                         exportOK = false;
