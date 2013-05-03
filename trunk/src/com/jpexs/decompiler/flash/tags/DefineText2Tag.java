@@ -170,7 +170,7 @@ public class DefineText2Tag extends CharacterTag implements BoundedTag, TextTag 
                         String paramName = (String) s.values[0];
                         String paramValue = (String) s.values[1];
                         if (paramName.equals("color")) {
-                            Matcher m = Pattern.compile("#([0-9a-f][0-9a-f])([0-9a-f][0-9a-f])([0-9a-f][0-9a-f])([0-9a-f][0-9a-f])").matcher(s.values[0].toString());
+                            Matcher m = Pattern.compile("#([0-9a-f][0-9a-f])([0-9a-f][0-9a-f])([0-9a-f][0-9a-f])([0-9a-f][0-9a-f])").matcher(paramValue);
                             if (m.matches()) {
                                 colorA = new RGBA(Integer.parseInt(m.group(2), 16), Integer.parseInt(m.group(3), 16), Integer.parseInt(m.group(4), 16), Integer.parseInt(m.group(1), 16));
                             } else {
