@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MethodBody implements Cloneable, Serializable {
 
@@ -70,8 +72,8 @@ public class MethodBody implements Cloneable, Serializable {
         code.restoreControlFlow(constants, this);
     }
 
-    public int removeTraps(ConstantPool constants, ABC abc) {
-        return code.removeTraps(constants, this, abc);
+    public int removeTraps(ConstantPool constants, ABC abc, int scriptIndex, int classIndex, boolean isStatic) {
+        return code.removeTraps(constants, this, abc, scriptIndex, classIndex, isStatic);
     }
 
     public HashMap<Integer, String> getLocalRegNames(ABC abc) {
@@ -117,7 +119,11 @@ public class MethodBody implements Cloneable, Serializable {
             deobfuscated = b.code;
             deobfuscated.markMappedOffsets();
             if ((Boolean) Configuration.getConfig("autoDeobfuscate", true)) {
-                deobfuscated.removeTraps(constants, b, abc);
+                try {
+                    deobfuscated.removeTraps(constants, b, abc, scriptIndex, classIndex, isStatic);
+                } catch (Exception ex) {
+                    Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Error during remove traps", ex);
+                }
             }
             //deobfuscated.restoreControlFlow(constants, b);
             try {

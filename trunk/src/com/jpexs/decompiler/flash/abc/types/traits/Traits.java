@@ -26,6 +26,14 @@ public class Traits implements Serializable {
 
     public Trait traits[] = new Trait[0];
 
+    public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc) {
+        int ret = 0;
+        for (Trait t : traits) {
+            ret += t.removeTraps(scriptIndex, classIndex, isStatic, abc);
+        }
+        return ret;
+    }
+
     @Override
     public String toString() {
         String s = "";

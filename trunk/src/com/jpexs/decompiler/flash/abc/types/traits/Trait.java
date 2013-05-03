@@ -138,4 +138,6 @@ public abstract class Trait implements Serializable {
             return abc.constants.constant_multiname[name_index];
         }
     }
+
+    public abstract int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc);
 }

@@ -301,6 +301,7 @@ public class TraitClass extends Trait {
 
     @Override
     public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+
         if (!highlight) {
             Highlighting.doHighlight = false;
         }
@@ -314,7 +315,9 @@ public class TraitClass extends Trait {
         }
 
         String packageName = abc.instance_info[class_info].getName(abc.constants).getNamespace(abc.constants).getName(abc.constants);
-
+        if (debugMode) {
+            System.err.println("Decompiling " + packageName + "." + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames));
+        }
         List<String> namesInThisPackage = new ArrayList<String>();
         for (ABCContainerTag tag : abcTags) {
             for (ScriptInfo si : tag.getABC().script_info) {
@@ -461,5 +464,21 @@ public class TraitClass extends Trait {
     @Override
     public Multiname getName(ABC abc) {
         return abc.constants.constant_multiname[abc.instance_info[class_info].name_index];
+    }
+
+    @Override
+    public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc) {
+        int iInitializer = abc.findBodyIndex(abc.instance_info[class_info].iinit_index);
+        int ret = 0;
+        if (iInitializer != -1) {
+            ret += abc.bodies[iInitializer].removeTraps(abc.constants, abc, scriptIndex, class_info, false);
+        }
+        int sInitializer = abc.findBodyIndex(abc.class_info[class_info].cinit_index);
+        if (sInitializer != -1) {
+            ret += abc.bodies[sInitializer].removeTraps(abc.constants, abc, scriptIndex, class_info, true);
+        }
+        ret += abc.instance_info[class_info].instance_traits.removeTraps(scriptIndex, class_info, false, abc);
+        ret += abc.class_info[class_info].static_traits.removeTraps(scriptIndex, class_info, true, abc);
+        return ret;
     }
 }

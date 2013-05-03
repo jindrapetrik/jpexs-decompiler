@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.avm2.treemodel.CommentTreeItem;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.util.ArrayList;
+import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -557,9 +558,20 @@ public class Graph {
                     if ((ti = checkLoop(next, stopPart, loops)) != null) {
                         ret.add(ti);
                     } else {
-                        printGraph(localData, stack, allParts, parent, next, reversed ? sp1 : sp0, loops, forFinalCommands);
-                        GraphTargetItem second = stack.pop();
                         GraphTargetItem first = stack.pop();
+                        GraphTargetItem second = null;
+                        if (first.isCompileTime() && (reversed == first.toBoolean())) {
+                            second = new TrueItem(null);
+                        } else {
+                            printGraph(localData, stack, allParts, parent, next, reversed ? sp1 : sp0, loops, forFinalCommands);
+                            try {
+                                second = stack.pop();
+                            } catch (EmptyStackException ese) {
+                                ese.printStackTrace();
+                                System.err.println(part.toString());
+                                System.out.println("" + first.isCompileTime() + first.toBoolean());
+                            }
+                        }
                         if (!reversed) {
                             AndItem a = new AndItem(null, first, second);
                             stack.push(a);
@@ -605,9 +617,16 @@ public class Graph {
                     if ((ti = checkLoop(next, stopPart, loops)) != null) {
                         ret.add(ti);
                     } else {
-                        printGraph(localData, stack, allParts, parent, next, reversed ? sp1 : sp0, loops, forFinalCommands);
-                        GraphTargetItem second = stack.pop();
                         GraphTargetItem first = stack.pop();
+                        GraphTargetItem second = null;
+                        if (first.isCompileTime() && (reversed == !first.toBoolean())) {
+                            second = new TrueItem(null);
+                        } else {
+                            printGraph(localData, stack, allParts, parent, next, reversed ? sp1 : sp0, loops, forFinalCommands);
+                            second = stack.pop();
+                        }
+
+
                         if (reversed) {
                             AndItem a = new AndItem(null, first, second);
                             stack.push(a);

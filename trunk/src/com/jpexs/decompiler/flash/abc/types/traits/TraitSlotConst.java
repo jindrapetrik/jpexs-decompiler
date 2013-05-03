@@ -170,4 +170,10 @@ public class TraitSlotConst extends Trait {
     public boolean isVar() {
         return kindType == TRAIT_SLOT;
     }
+
+    @Override
+    public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc) {
+        //do nothing
+        return 0;
+    }
 }

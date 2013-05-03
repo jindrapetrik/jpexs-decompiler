@@ -244,9 +244,9 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
 
     @Override
     public void translate(List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output) {
-        definition.translate((Boolean) localData.get(0), 
+        definition.translate((Boolean) localData.get(0),
                 (Integer) localData.get(13),
-                (Integer) localData.get(1), 
+                (Integer) localData.get(1),
                 (HashMap<Integer, GraphTargetItem>) localData.get(2),
                 stack,
                 (Stack<GraphTargetItem>) localData.get(3),

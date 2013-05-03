@@ -55,4 +55,13 @@ public class TraitFunction extends Trait {
         return ABC.IDENT_STRING + ABC.IDENT_STRING + header + (abc.instance_info[classIndex].isInterface() ? ";" : " {\r\n" + bodyStr + "\r\n" + ABC.IDENT_STRING + ABC.IDENT_STRING + "}");
 
     }
+
+    @Override
+    public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc) {
+        int bodyIndex = abc.findBodyIndex(method_info);
+        if (bodyIndex != -1) {
+            return abc.bodies[bodyIndex].removeTraps(abc.constants, abc, scriptIndex, classIndex, isStatic);
+        }
+        return 0;
+    }
 }

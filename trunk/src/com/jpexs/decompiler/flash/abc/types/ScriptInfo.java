@@ -32,6 +32,10 @@ public class ScriptInfo {
     public int init_index; //MethodInfo
     public Traits traits;
 
+    public int removeTraps(int scriptIndex, ABC abc) {
+        return traits.removeTraps(scriptIndex, -1, true, abc);
+    }
+
     @Override
     public String toString() {
         return "method_index=" + init_index + "\r\n" + traits.toString();

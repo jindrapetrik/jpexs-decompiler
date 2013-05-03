@@ -38,11 +38,21 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     private List<Highlighting> classHighlights = new ArrayList<Highlighting>();
     private Highlighting currentMethodHighlight;
     private ABC abc;
-    private int scriptIndex=-1;
+    private int scriptIndex = -1;
     public int lastTraitIndex = 0;
     private boolean ignoreCarret = false;
     private boolean reset = false;
     private ABCPanel abcPanel;
+    private int classIndex = -1;
+    private boolean isStatic = false;
+
+    public int getScriptIndex() {
+        return scriptIndex;
+    }
+
+    public boolean getIsStatic() {
+        return isStatic;
+    }
 
     public void setNoTrait() {
         abcPanel.detailPanel.showCard(DetailPanel.UNSUPPORTED_TRAIT_CARD, null);
@@ -72,7 +82,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         this.classIndex = classIndex;
     }
 
-    private boolean displayMethod(int pos, int methodIndex, String name, Trait trait) {
+    private boolean displayMethod(int pos, int methodIndex, String name, Trait trait, boolean isStatic) {
         if (abc == null) {
             return false;
         }
@@ -86,6 +96,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             abcPanel.detailPanel.methodTraitPanel.methodBodyParamsPanel.loadFromBody(abc.bodies[bi]);
             abcPanel.detailPanel.methodTraitPanel.methodInfoPanel.load(abc.bodies[bi].method_info, abc);
             abcPanel.detailPanel.setEditMode(false);
+            this.isStatic = isStatic;
         }
         boolean success = false;
         for (Highlighting h : highlights) {
@@ -103,7 +114,6 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             abcPanel.navigator.setClassIndex(classIndex, scriptIndex);
         }
     }
-    private int classIndex = -1;
 
     public void resetEditing() {
         reset = true;
@@ -147,6 +157,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                             lastTraitIndex = (int) th.offset;
                             if (abc != null) {
                                 t = abc.findTraitByTraitId(classIndex, lastTraitIndex);
+                                isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
                                 if (t != null) {
                                     name += ":" + t.getName(abc).getName(abc.constants, new ArrayList<String>());
                                 }
@@ -154,7 +165,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                         }
                     }
 
-                    displayMethod(pos, (int) tm.offset, name, t);
+                    displayMethod(pos, (int) tm.offset, name, t, isStatic);
                     currentMethodHighlight = tm;
 
 
@@ -184,12 +195,13 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                     if (abc != null) {
                         name = abc.instance_info[classIndex].getName(abc.constants).getNameWithNamespace(abc.constants);
                         t = abc.findTraitByTraitId(classIndex, lastTraitIndex);
+                        isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
                         if (t != null) {
                             name += ":" + t.getName(abc).getName(abc.constants, new ArrayList<String>());
                         }
                     }
 
-                    displayMethod(pos, abc.findMethodIdByTraitId(classIndex, (int) th.offset), name, t);
+                    displayMethod(pos, abc.findMethodIdByTraitId(classIndex, (int) th.offset), name, t, isStatic);
                     return;
                 }
             }
@@ -315,7 +327,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         if (bufferedClasses.containsKey(scriptIndex)) {
             bufferedClasses.remove(scriptIndex);
         }
-        if((scriptIndex!=-1)&&(abc!=null)){
+        if ((scriptIndex != -1) && (abc != null)) {
             setScript(scriptIndex, abc, abcList);
         }
         setNoTrait();

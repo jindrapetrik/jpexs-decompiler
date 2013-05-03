@@ -1161,7 +1161,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                             it.setImage(data);
                         } catch (IOException ex) {
                             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "message", ex);
-                            JOptionPane.showMessageDialog(null, "Invalid image.","Error",JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(null, "Invalid image.", "Error", JOptionPane.ERROR_MESSAGE);
                         }
                         reload(true);
                     }
@@ -1483,7 +1483,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                         } else {
                             int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
                             if (bi != -1) {
-                                cnt += abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc);
+                                cnt += abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, abcPanel.decompiledTextArea.getScriptIndex(), abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic());
                             }
                             abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc);
                         }
@@ -1531,25 +1531,25 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                 new SwingWorker() {
                     @Override
                     protected Object doInBackground() throws Exception {
-                        try{
-                        int cnt = 0;
+                        try {
+                            int cnt = 0;
 
-                        if (abcPanel != null) {
-                            HashMap<String, String> namesMap = new HashMap<String, String>();
-                            for (ABCContainerTag tag : abcPanel.list) {
-                                cnt += tag.getABC().deobfuscateIdentifiers(namesMap);
+                            if (abcPanel != null) {
+                                HashMap<String, String> namesMap = new HashMap<String, String>();
+                                for (ABCContainerTag tag : abcPanel.list) {
+                                    cnt += tag.getABC().deobfuscateIdentifiers(namesMap);
+                                }
+                            } else {
+                                cnt = swf.deobfuscateAS2Identifiers();
                             }
-                        } else {
-                            cnt = swf.deobfuscateAS2Identifiers();
-                        }
-                        Main.stopWork();
-                        JOptionPane.showMessageDialog(null, "Identifiers renamed: " + cnt);
-                        if (abcPanel != null) {
-                            abcPanel.reload();
-                        }
-                        doFilter();
-                        reload(true);
-                        }catch(Exception ex){
+                            Main.stopWork();
+                            JOptionPane.showMessageDialog(null, "Identifiers renamed: " + cnt);
+                            if (abcPanel != null) {
+                                abcPanel.reload();
+                            }
+                            doFilter();
+                            reload(true);
+                        } catch (Exception ex) {
                             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "message", ex);
                         }
                         return true;
@@ -1587,9 +1587,9 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                 if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
                                     abcPanel.abc.bodies[bi].removeDeadCode(abcPanel.abc.constants);
                                 } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
-                                    abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc);
+                                    abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, abcPanel.decompiledTextArea.getScriptIndex(), abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic());
                                 } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_RESTORE_CONTROL_FLOW) {
-                                    abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc);
+                                    abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, abcPanel.decompiledTextArea.getScriptIndex(), abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic());
                                     abcPanel.abc.bodies[bi].restoreControlFlow(abcPanel.abc.constants);
                                 }
                             }

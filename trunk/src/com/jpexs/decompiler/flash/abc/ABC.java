@@ -72,8 +72,8 @@ public class ABC {
 
     public int removeTraps() {
         int rem = 0;
-        for (MethodBody body : bodies) {
-            rem += body.removeTraps(constants, this);
+        for (int s = 0; s < script_info.length; s++) {
+            rem += script_info[s].removeTraps(s, this);
         }
         return rem;
     }
@@ -463,6 +463,16 @@ public class ABC {
             }
         }
         return ret.toString();
+    }
+
+    public boolean isStaticTraitId(int classIndex, int traitId) {
+        if (traitId < class_info[classIndex].static_traits.traits.length) {
+            return true;
+        } else if (traitId < class_info[classIndex].static_traits.traits.length + instance_info[classIndex].instance_traits.traits.length) {
+            return false;
+        } else {
+            return true; //Can be class or instance initializer
+        }
     }
 
     public Trait findTraitByTraitId(int classIndex, int traitId) {
