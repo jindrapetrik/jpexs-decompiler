@@ -24,4 +24,5 @@ public class MORPHGRADIENT {
 
     public int numGradients;
     public MORPHGRADRECORD gradientRecords[];
+    public int numGradientsExtra;
 }
