@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.types.MORPHFILLSTYLEARRAY;
@@ -30,13 +29,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
  *
  * @author JPEXS
  */
-public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, AloneTag {
+public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag {
 
     public int characterId;
     public RECT startBounds;
@@ -49,6 +50,15 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Al
     public MORPHLINESTYLEARRAY morphLineStyles;
     public SHAPE startEdges;
     public SHAPE endEdges;
+
+    @Override
+    public Set<Integer> getNeededCharacters() {
+        HashSet<Integer> ret = new HashSet<Integer>();
+        ret.addAll(morphFillStyles.getNeededCharacters());
+        ret.addAll(startEdges.getNeededCharacters());
+        ret.addAll(endEdges.getNeededCharacters());
+        return ret;
+    }
 
     @Override
     public RECT getRect(HashMap<Integer, CharacterTag> characters) {

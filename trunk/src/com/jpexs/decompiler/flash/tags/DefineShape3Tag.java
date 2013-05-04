@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
-import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
@@ -28,7 +27,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Set;
 
-public class DefineShape3Tag extends CharacterTag implements BoundedTag, AloneTag, ShapeTag {
+public class DefineShape3Tag extends CharacterTag implements BoundedTag, ShapeTag {
 
     public int shapeId;
     public RECT shapeBounds;
