@@ -462,8 +462,13 @@ public class Graph {
                 System.err.println("PART " + part);
             }
 
-            while (((part != null) && (part.getHeight() == 1)) && (code.size() > part.start) && (code.get(part.start).isJump())) {  //Parts with only jump in it gets ignored
-                part = part.nextParts.get(0);
+            while (((part != null) && (part.getHeight() == 1)) && (code.size() > part.start) && (code.get(part.start).isJump())) {  //Parts with only jump in it gets ignored                
+                GraphTargetItem lop = checkLoop(part.nextParts.get(0), stopPart, loops);
+                if (lop == null) {
+                    part = part.nextParts.get(0);
+                } else {
+                    break;
+                }
             }
 
             if (code.size() <= part.start) {
