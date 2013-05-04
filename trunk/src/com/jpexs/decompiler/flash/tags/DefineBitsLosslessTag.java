@@ -80,6 +80,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
         SWFOutputStream sos2 = new SWFOutputStream(zlibOS, SWF.DEFAULT_VERSION);
         sos2.writeBytesZlib(bitmapDataOS.toByteArray());
         zlibBitmapData = zlibOS.toByteArray();
+        decompressed = false;
     }
 
     @Override
