@@ -462,6 +462,14 @@ public class Graph {
                 System.err.println("PART " + part);
             }
 
+            while (((part != null) && (part.getHeight() == 1)) && (code.size() > part.start) && (code.get(part.start).isJump())) {  //Parts with only jump in it gets ignored
+                part = part.nextParts.get(0);
+            }
+
+            if (code.size() <= part.start) {
+                return ret;
+            }
+
             if (part == stopPart) {
                 return ret;
             }
