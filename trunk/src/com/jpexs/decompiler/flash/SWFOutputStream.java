@@ -37,6 +37,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
 /**
@@ -1602,9 +1603,9 @@ public class SWFOutputStream extends OutputStream {
     }
 
     public void writeBytesZlib(byte data[]) throws IOException {
-        DeflaterOutputStream deflater = new DeflaterOutputStream(this);
+        DeflaterOutputStream deflater = new DeflaterOutputStream(this,new Deflater(9));
         deflater.write(data);
-        deflater.flush();
+        deflater.finish();
     }
 
     /**

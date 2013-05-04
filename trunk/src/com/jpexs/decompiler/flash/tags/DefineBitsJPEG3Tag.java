@@ -16,8 +16,10 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import java.awt.image.BufferedImage;
@@ -27,6 +29,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
@@ -45,10 +49,18 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
         imageData = data;
         if (ImageTag.getImageFormat(data).equals("jpg")) {
             BufferedImage image = getImage(new ArrayList<Tag>());
-            bitmapAlphaData = new byte[image.getWidth() * image.getHeight()];
-            for (int i = 0; i < bitmapAlphaData.length; i++) {
-                bitmapAlphaData[i] = (byte) 255;
+            byte ba[] = new byte[image.getWidth() * image.getHeight()];
+            for (int i = 0; i < ba.length; i++) {
+                ba[i] = (byte) 255;
             }
+            ByteArrayOutputStream baos=new ByteArrayOutputStream();
+            SWFOutputStream sos=new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
+            try {
+                sos.writeBytesZlib(ba);
+            } catch (IOException ex) {
+                Logger.getLogger(DefineBitsJPEG3Tag.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            bitmapAlphaData = baos.toByteArray();
         } else {
             bitmapAlphaData = new byte[0];
         }
