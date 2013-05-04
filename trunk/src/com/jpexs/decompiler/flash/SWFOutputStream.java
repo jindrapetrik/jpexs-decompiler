@@ -1453,7 +1453,7 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeMORPHGRADIENT(MORPHGRADIENT value, int shapeNum) throws IOException {
-        writeUB(4, value.gradientRecords.length);
+        writeUI8(value.gradientRecords.length + value.numGradientsExtra);
         for (int i = 0; i < value.gradientRecords.length; i++) {
             writeMORPHGRADRECORD(value.gradientRecords[i]);
         }
@@ -1603,7 +1603,7 @@ public class SWFOutputStream extends OutputStream {
     }
 
     public void writeBytesZlib(byte data[]) throws IOException {
-        DeflaterOutputStream deflater = new DeflaterOutputStream(this,new Deflater(9));
+        DeflaterOutputStream deflater = new DeflaterOutputStream(this, new Deflater(9));
         deflater.write(data);
         deflater.finish();
     }
