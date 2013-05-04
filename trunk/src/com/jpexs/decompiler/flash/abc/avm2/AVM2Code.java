@@ -2290,58 +2290,58 @@ public class AVM2Code implements Serializable {
             }
             AVM2Instruction ains = (AVM2Instruction) ins;
             /*if (ains.definition instanceof DupIns) {
-                do {
-                    AVM2Instruction insAfter = (AVM2Instruction) code.get(ip + 1);
-                    if (insAfter.definition instanceof ConvertBIns) { //SWF compiled with debug contain convert_b
-                        ip++;
-                        insAfter = (AVM2Instruction) code.get(ip + 1);
-                    }
+             do {
+             AVM2Instruction insAfter = (AVM2Instruction) code.get(ip + 1);
+             if (insAfter.definition instanceof ConvertBIns) { //SWF compiled with debug contain convert_b
+             ip++;
+             insAfter = (AVM2Instruction) code.get(ip + 1);
+             }
 
-                    if (insAfter.definition instanceof SetLocalTypeIns) {
-                        //chained assignments
-                        int reg = (((SetLocalTypeIns) insAfter.definition).getRegisterId(insAfter));
-                        for (int t = ip + 1; t < code.size(); t++) {
-                            if (((AVM2Instruction) code.get(t)).definition instanceof KillIns) {
-                                if (((AVM2Instruction) code.get(t)).operands[0] == reg) {
-                                    break;
-                                }
-                            }
-                            if (((AVM2Instruction) code.get(t)).definition instanceof GetLocalTypeIns) {
-                                if (((GetLocalTypeIns) ((AVM2Instruction) code.get(t)).definition).getRegisterId((AVM2Instruction) code.get(t)) == reg) {
-                                    if (((AVM2Instruction) code.get(t + 1)).definition instanceof KillIns) {
-                                        if (((AVM2Instruction) code.get(t + 1)).operands[0] == reg) {
-                                            code.getCode().initToSource();
-                                            ConvertOutput assignment = code.getCode().toSourceOutput(false, (Boolean) localData.get(0), (Integer) localData.get(13), (Integer) localData.get(1), (HashMap<Integer, GraphTargetItem>) localData.get(2), stack, (Stack<GraphTargetItem>) localData.get(3), (ABC) localData.get(7), (ConstantPool) localData.get(4), (MethodInfo[]) localData.get(5), (MethodBody) localData.get(6), ip + 2, t - 1, (HashMap<Integer, String>) localData.get(8), (List<String>) localData.get(9), null);
-                                            stack.push(assignment.output.remove(assignment.output.size() - 1));
-                                            ip = t + 2;
-                                            continue iploop;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        if (!code.getCode().isKilled(reg, 0, code.size() - 1)) {
-                            for (int i = ip; i >= 0; i--) {
-                                if (((AVM2Instruction) code.get(i)).definition instanceof DupIns) {
-                                    GraphTargetItem v = stack.pop();
-                                    stack.push(new LocalRegTreeItem((AVM2Instruction) ins, reg, v));
-                                    stack.push(v);
-                                } else {
-                                    break;
-                                }
-                            }
-                        } else {
-                            break;
-                        }
-                        ip++;
-                        continue iploop;
-                        //}
+             if (insAfter.definition instanceof SetLocalTypeIns) {
+             //chained assignments
+             int reg = (((SetLocalTypeIns) insAfter.definition).getRegisterId(insAfter));
+             for (int t = ip + 1; t < code.size(); t++) {
+             if (((AVM2Instruction) code.get(t)).definition instanceof KillIns) {
+             if (((AVM2Instruction) code.get(t)).operands[0] == reg) {
+             break;
+             }
+             }
+             if (((AVM2Instruction) code.get(t)).definition instanceof GetLocalTypeIns) {
+             if (((GetLocalTypeIns) ((AVM2Instruction) code.get(t)).definition).getRegisterId((AVM2Instruction) code.get(t)) == reg) {
+             if (((AVM2Instruction) code.get(t + 1)).definition instanceof KillIns) {
+             if (((AVM2Instruction) code.get(t + 1)).operands[0] == reg) {
+             code.getCode().initToSource();
+             ConvertOutput assignment = code.getCode().toSourceOutput(false, (Boolean) localData.get(0), (Integer) localData.get(13), (Integer) localData.get(1), (HashMap<Integer, GraphTargetItem>) localData.get(2), stack, (Stack<GraphTargetItem>) localData.get(3), (ABC) localData.get(7), (ConstantPool) localData.get(4), (MethodInfo[]) localData.get(5), (MethodBody) localData.get(6), ip + 2, t - 1, (HashMap<Integer, String>) localData.get(8), (List<String>) localData.get(9), null);
+             stack.push(assignment.output.remove(assignment.output.size() - 1));
+             ip = t + 2;
+             continue iploop;
+             }
+             }
+             }
+             }
+             }
+             if (!code.getCode().isKilled(reg, 0, code.size() - 1)) {
+             for (int i = ip; i >= 0; i--) {
+             if (((AVM2Instruction) code.get(i)).definition instanceof DupIns) {
+             GraphTargetItem v = stack.pop();
+             stack.push(new LocalRegTreeItem((AVM2Instruction) ins, reg, v));
+             stack.push(v);
+             } else {
+             break;
+             }
+             }
+             } else {
+             break;
+             }
+             ip++;
+             continue iploop;
+             //}
 
-                    } else {
-                        break;
-                    }
-                } while (((AVM2Instruction) ins).definition instanceof DupIns);
-            }*/
+             } else {
+             break;
+             }
+             } while (((AVM2Instruction) ins).definition instanceof DupIns);
+             }*/
             if ((ins instanceof AVM2Instruction) && (((AVM2Instruction) ins).definition instanceof NewFunctionIns)) {
                 stack.push(new BooleanTreeItem(null, true));
             } else {

@@ -16,20 +16,33 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
  * @author JPEXS
  */
-public class SHAPEWITHSTYLE {
+public class SHAPEWITHSTYLE implements NeedsCharacters {
 
     public FILLSTYLEARRAY fillStyles;
     public LINESTYLEARRAY lineStyles;
     public int numFillBits;
     public int numLineBits;
     public List<SHAPERECORD> shapeRecords;
+
+    @Override
+    public Set<Integer> getNeededCharacters() {
+        HashSet<Integer> ret = new HashSet<Integer>();
+        ret.addAll(fillStyles.getNeededCharacters());
+        for (SHAPERECORD r : shapeRecords) {
+            ret.addAll(r.getNeededCharacters());
+        }
+        return ret;
+    }
 
     /**
      * Converts shape to SVG

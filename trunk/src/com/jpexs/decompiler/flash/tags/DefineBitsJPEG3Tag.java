@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import java.awt.image.BufferedImage;
@@ -53,8 +52,8 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
             for (int i = 0; i < ba.length; i++) {
                 ba[i] = (byte) 255;
             }
-            ByteArrayOutputStream baos=new ByteArrayOutputStream();
-            SWFOutputStream sos=new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
             try {
                 sos.writeBytesZlib(ba);
             } catch (IOException ex) {
@@ -68,8 +67,8 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
 
     @Override
     public String getImageFormat() {
-        String fmt=ImageTag.getImageFormat(imageData);
-        if(fmt.equals("jpg")){
+        String fmt = ImageTag.getImageFormat(imageData);
+        if (fmt.equals("jpg")) {
             fmt = "png"; //transparency
         }
         return fmt;
@@ -78,13 +77,13 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
     @Override
     public BufferedImage getImage(List<Tag> tags) {
         try {
-            BufferedImage img=ImageIO.read(new ByteArrayInputStream(imageData));
-            BufferedImage img2=new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
-            for(int y=0;y<img.getHeight();y++){
-                for(int x=0;x<img.getWidth();x++){
-                    int val=img.getRGB(x, y);
-                    int a = bitmapAlphaData[x+y*img.getWidth()]&0xff;
-                    val = (val&0xffffff) | (a<<24);
+            BufferedImage img = ImageIO.read(new ByteArrayInputStream(imageData));
+            BufferedImage img2 = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            for (int y = 0; y < img.getHeight(); y++) {
+                for (int x = 0; x < img.getWidth(); x++) {
+                    int val = img.getRGB(x, y);
+                    int a = bitmapAlphaData[x + y * img.getWidth()] & 0xff;
+                    val = (val & 0xffffff) | (a << 24);
                     img2.setRGB(x, y, val);
                 }
             }

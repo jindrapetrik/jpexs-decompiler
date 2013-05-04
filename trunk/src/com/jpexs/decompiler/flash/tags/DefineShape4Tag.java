@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Set;
 
 public class DefineShape4Tag extends CharacterTag implements BoundedTag, AloneTag, ShapeTag {
 
@@ -36,6 +37,11 @@ public class DefineShape4Tag extends CharacterTag implements BoundedTag, AloneTa
     public boolean usesNonScalingStrokes;
     public boolean usesScalingStrokes;
     public SHAPEWITHSTYLE shapes;
+
+    @Override
+    public Set<Integer> getNeededCharacters() {
+        return shapes.getNeededCharacters();
+    }
 
     @Override
     public String toSVG() {

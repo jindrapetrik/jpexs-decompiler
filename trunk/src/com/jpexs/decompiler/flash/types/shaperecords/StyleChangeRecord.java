@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.types.shaperecords;
 
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
+import java.util.Set;
 
 /**
  *
@@ -41,6 +42,15 @@ public class StyleChangeRecord extends SHAPERECORD {
     public LINESTYLEARRAY lineStyles;
     public int numFillBits;
     public int numLineBits;
+
+    @Override
+    public Set<Integer> getNeededCharacters() {
+        Set<Integer> ret = super.getNeededCharacters();
+        if (stateNewStyles) {
+            ret.addAll(fillStyles.getNeededCharacters());
+        }
+        return ret;
+    }
 
     @Override
     public String toString() {

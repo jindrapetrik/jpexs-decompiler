@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types.shaperecords;
 
+import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
@@ -23,7 +24,9 @@ import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.RECT;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,10 +34,16 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public abstract class SHAPERECORD implements Cloneable {
+public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
 
     public static float twipToPixel(int twip) {
         return ((float) twip) / 20.0f;
+    }
+
+    @Override
+    public Set<Integer> getNeededCharacters() {
+        HashSet<Integer> ret = new HashSet<Integer>();
+        return ret;
     }
 
     private static class Path {

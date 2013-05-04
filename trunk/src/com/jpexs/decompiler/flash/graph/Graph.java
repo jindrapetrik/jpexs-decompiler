@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.abc.avm2.treemodel.CommentTreeItem;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.util.ArrayList;
-import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;

@@ -26,12 +26,18 @@ import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Set;
 
 public class DefineShapeTag extends CharacterTag implements BoundedTag, AloneTag, ShapeTag {
 
     public int shapeId;
     public RECT shapeBounds;
     public SHAPEWITHSTYLE shapes;
+
+    @Override
+    public Set<Integer> getNeededCharacters() {
+        return shapes.getNeededCharacters();
+    }
 
     @Override
     public RECT getRect(HashMap<Integer, CharacterTag> characters) {

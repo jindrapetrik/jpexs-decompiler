@@ -30,7 +30,6 @@ import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.ExceptionTreeItem;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
-import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitWithSlot;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;

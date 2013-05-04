@@ -16,11 +16,24 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  *
  * @author JPEXS
  */
-public class FILLSTYLEARRAY {
+public class FILLSTYLEARRAY implements NeedsCharacters {
 
     public FILLSTYLE fillStyles[];
+
+    @Override
+    public Set<Integer> getNeededCharacters() {
+        HashSet<Integer> ret = new HashSet<Integer>();
+        for (FILLSTYLE fs : fillStyles) {
+            ret.addAll(fs.getNeededCharacters());
+        }
+        return ret;
+    }
 }

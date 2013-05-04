@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -25,7 +26,7 @@ import java.util.Set;
 /**
  * Represents Tag inside SWF file
  */
-public class Tag {
+public class Tag implements NeedsCharacters {
 
     /**
      * Identifier of tag type
@@ -120,6 +121,7 @@ public class Tag {
         return pos;
     }
 
+    @Override
     public Set<Integer> getNeededCharacters() {
         return new HashSet<Integer>();
     }

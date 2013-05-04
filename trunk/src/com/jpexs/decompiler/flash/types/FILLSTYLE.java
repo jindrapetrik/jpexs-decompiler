@@ -16,11 +16,15 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  *
  * @author JPEXS
  */
-public class FILLSTYLE {
+public class FILLSTYLE implements NeedsCharacters {
 
     public int fillStyleType;
     public static final int SOLID = 0x0;
@@ -39,4 +43,16 @@ public class FILLSTYLE {
     public FOCALGRADIENT focalGradient;
     public int bitmapId;
     public MATRIX bitmapMatrix;
+
+    @Override
+    public Set<Integer> getNeededCharacters() {
+        HashSet<Integer> ret = new HashSet<Integer>();
+        if ((fillStyleType == REPEATING_BITMAP)
+                || (fillStyleType == CLIPPED_BITMAP)
+                || (fillStyleType == NON_SMOOTHED_REPEATING_BITMAP)
+                || (fillStyleType == NON_SMOOTHED_CLIPPED_BITMAP)) {
+            ret.add(bitmapId);
+        }
+        return ret;
+    }
 }
