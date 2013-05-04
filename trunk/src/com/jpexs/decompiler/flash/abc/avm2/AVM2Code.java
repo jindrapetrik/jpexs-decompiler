@@ -2289,7 +2289,7 @@ public class AVM2Code implements Serializable {
                 System.out.println((useVisited ? "useV " : "") + (secondPass ? "secondPass " : "") + "Visit " + ip + ": " + ins + " stack:" + Highlighting.stripHilights(stack.toString()));
             }
             AVM2Instruction ains = (AVM2Instruction) ins;
-            if (ains.definition instanceof DupIns) {
+            /*if (ains.definition instanceof DupIns) {
                 do {
                     AVM2Instruction insAfter = (AVM2Instruction) code.get(ip + 1);
                     if (insAfter.definition instanceof ConvertBIns) { //SWF compiled with debug contain convert_b
@@ -2341,7 +2341,7 @@ public class AVM2Code implements Serializable {
                         break;
                     }
                 } while (((AVM2Instruction) ins).definition instanceof DupIns);
-            }
+            }*/
             if ((ins instanceof AVM2Instruction) && (((AVM2Instruction) ins).definition instanceof NewFunctionIns)) {
                 stack.push(new BooleanTreeItem(null, true));
             } else {
