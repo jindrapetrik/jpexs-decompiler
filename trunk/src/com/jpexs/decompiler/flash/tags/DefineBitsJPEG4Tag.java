@@ -51,7 +51,11 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
 
     @Override
     public String getImageFormat() {
-        return ImageTag.getImageFormat(imageData);
+        String fmt=ImageTag.getImageFormat(imageData);
+        if(fmt.equals("jpg")){
+            fmt = "png"; //transparency
+        }
+        return fmt;
     }
 
     @Override
@@ -79,7 +83,17 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
     @Override
     public BufferedImage getImage(List<Tag> tags) {
         try {
-            return ImageIO.read(new ByteArrayInputStream(imageData));
+            BufferedImage img=ImageIO.read(new ByteArrayInputStream(imageData));
+            BufferedImage img2=new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            for(int y=0;y<img.getHeight();y++){
+                for(int x=0;x<img.getWidth();x++){
+                    int val=img.getRGB(x, y);
+                    int a = bitmapAlphaData[x+y*img.getWidth()]&0xff;
+                    val = (val&0xffffff) | (a<<24);
+                    img2.setRGB(x, y, val);
+                }
+            }
+            return img2;
         } catch (IOException ex) {
         }
         return null;
