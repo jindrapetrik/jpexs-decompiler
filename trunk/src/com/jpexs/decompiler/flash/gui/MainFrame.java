@@ -1154,8 +1154,8 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                     View.setWindowIcon(f);
                     int returnVal = fc.showOpenDialog(f);
                     if (returnVal == JFileChooser.APPROVE_OPTION) {
-                        Configuration.setConfig("lastOpenDir", fc.getSelectedFile().getParentFile().getAbsolutePath());
-                        File selfile = fc.getSelectedFile();
+                        Configuration.setConfig("lastOpenDir", Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
+                        File selfile = Helper.fixDialogFile(fc.getSelectedFile());
                         byte data[] = Helper.readFile(selfile.getAbsolutePath());
                         try {
                             it.setImage(data);
@@ -1289,8 +1289,8 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                 if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                     final long timeBefore = System.currentTimeMillis();
                     Main.startWork("Exporting...");
-                    final String selFile = chooser.getSelectedFile().getAbsolutePath();
-                    Configuration.setConfig("lastExportDir", chooser.getSelectedFile().getParentFile().getAbsolutePath());
+                    final String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
+                    Configuration.setConfig("lastExportDir", Helper.fixDialogFile(chooser.getSelectedFile()).getParentFile().getAbsolutePath());
                     final boolean isPcode = export.getOption(ExportDialog.OPTION_ACTIONSCRIPT) == 1;
                     final boolean isMp3 = export.getOption(ExportDialog.OPTION_SOUNDS) == 0;
                     final boolean isFormatted = export.getOption(ExportDialog.OPTION_TEXTS) == 1;

@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.gui.NewVersionDialog;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -277,7 +278,7 @@ public class Main {
         View.setWindowIcon(f);
         int returnVal = fc.showSaveDialog(f);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File file = fc.getSelectedFile();
+            File file = Helper.fixDialogFile(fc.getSelectedFile());
             try {
                 Main.saveFile(file.getAbsolutePath());
                 Configuration.setConfig("lastSaveDir", file.getParentFile().getAbsolutePath());
@@ -309,8 +310,8 @@ public class Main {
         View.setWindowIcon(f);
         int returnVal = fc.showOpenDialog(f);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            Configuration.setConfig("lastOpenDir", fc.getSelectedFile().getParentFile().getAbsolutePath());
-            File selfile = fc.getSelectedFile();
+            Configuration.setConfig("lastOpenDir", Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
+            File selfile = Helper.fixDialogFile(fc.getSelectedFile());
             Main.openFile(selfile.getAbsolutePath());
             return true;
         } else {

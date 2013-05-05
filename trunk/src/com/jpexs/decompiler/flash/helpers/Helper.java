@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.helpers;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,6 +30,8 @@ import java.util.List;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Class with helper method
@@ -345,5 +348,15 @@ public class Helper {
         }
         ret += "]";
         return Highlighting.stripHilights(ret);
+    }
+
+    public static File fixDialogFile(File f) {
+        Pattern pat = Pattern.compile("\"([^\"]+)\"");
+        String name = f.getAbsolutePath();
+        Matcher m = pat.matcher(name);
+        if (m.find()) {
+            f = new File(m.group(1));
+        }
+        return f;
     }
 }

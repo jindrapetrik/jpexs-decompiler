@@ -103,10 +103,10 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
             ABC abc = tag.getABC();
             for (int i = 0; i < abc.script_info.length; i++) {
                 ScriptInfo script = abc.script_info[i];
-                HashMap<String, ScriptPack> packs=script.getPacks(abc, i);
-                for(String path:packs.keySet()){
+                HashMap<String, ScriptPack> packs = script.getPacks(abc, i);
+                for (String path : packs.keySet()) {
                     ret.put(path, packs.get(path));
-                }                
+                }
             }
         }
         return ret;
