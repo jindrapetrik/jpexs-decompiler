@@ -22,7 +22,7 @@ import java.util.List;
 
 public class StringExtractTreeItem extends TreeItem {
 
-    public GraphTargetItem value;
+    //public GraphTargetItem value;
     public GraphTargetItem index;
     public GraphTargetItem count;
 

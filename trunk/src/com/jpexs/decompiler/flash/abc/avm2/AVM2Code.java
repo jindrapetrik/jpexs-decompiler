@@ -50,6 +50,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.graph.Graph;
+import com.jpexs.decompiler.flash.graph.GraphPart;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -1032,7 +1033,7 @@ public class AVM2Code implements Serializable {
         return pos2adr(fixIPAfterDebugLine(adr2pos(addr)));
     }
 
-    public ConvertOutput toSourceOutput(boolean processJumps, boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, boolean visited[]) throws ConvertException {
+    public ConvertOutput toSourceOutput(GraphPart part, boolean processJumps, boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, boolean visited[]) throws ConvertException {
         boolean debugMode = DEBUG_MODE;
         if (debugMode) {
             System.out.println("OPEN SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
@@ -1064,101 +1065,6 @@ public class AVM2Code implements Serializable {
                 int ipfix = fixIPAfterDebugLine(ip);
                 int addrfix = pos2adr(ipfix);
                 int maxend = -1;
-                if (processTry) {
-                    List<ABCException> catchedExceptions = new ArrayList<ABCException>();
-                    for (int e = 0; e < body.exceptions.length; e++) {
-                        if (addrfix == fixAddrAfterDebugLine(body.exceptions[e].start)) {
-                            if (!body.exceptions[e].isFinally()) {
-                                if ((fixAddrAfterDebugLine(body.exceptions[e].end) > maxend) && (!parsedExceptions.contains(body.exceptions[e]))) {
-                                    catchedExceptions.clear();
-                                    maxend = fixAddrAfterDebugLine(body.exceptions[e].end);
-                                    catchedExceptions.add(body.exceptions[e]);
-                                } else if (fixAddrAfterDebugLine(body.exceptions[e].end) == maxend) {
-                                    catchedExceptions.add(body.exceptions[e]);
-                                }
-                            }
-                        }
-                    }
-                    if (catchedExceptions.size() > 0) {
-                        ip = ipfix;
-                        addr = addrfix;
-                        parsedExceptions.addAll(catchedExceptions);
-                        int endpos = adr2pos(fixAddrAfterDebugLine(catchedExceptions.get(0).end));
-
-
-                        List<List<GraphTargetItem>> catchedCommands = new ArrayList<List<GraphTargetItem>>();
-                        if (code.get(endpos).definition instanceof JumpIns) {
-                            int afterCatchAddr = pos2adr(endpos + 1) + code.get(endpos).operands[0];
-                            int afterCatchPos = adr2pos(afterCatchAddr);
-                            Collections.sort(catchedExceptions, new Comparator<ABCException>() {
-                                @Override
-                                public int compare(ABCException o1, ABCException o2) {
-                                    try {
-                                        return fixAddrAfterDebugLine(o1.target) - fixAddrAfterDebugLine(o2.target);
-                                    } catch (ConvertException ex) {
-                                        return 0;
-                                    }
-                                }
-                            });
-
-
-                            List<GraphTargetItem> finallyCommands = new ArrayList<GraphTargetItem>();
-                            int returnPos = afterCatchPos;
-                            for (int e = 0; e < body.exceptions.length; e++) {
-                                if (body.exceptions[e].isFinally()) {
-                                    if (addr == fixAddrAfterDebugLine(body.exceptions[e].start)) {
-                                        if (afterCatchPos + 1 == adr2pos(fixAddrAfterDebugLine(body.exceptions[e].end))) {
-                                            AVM2Instruction jmpIns = code.get(adr2pos(fixAddrAfterDebugLine(body.exceptions[e].end)));
-                                            if (jmpIns.definition instanceof JumpIns) {
-                                                int finStart = adr2pos(fixAddrAfterDebugLine(body.exceptions[e].end) + jmpIns.getBytes().length + jmpIns.operands[0]);
-                                                finallyJumps.add(finStart);
-                                                if (unknownJumps.contains(finStart)) {
-                                                    unknownJumps.remove((Integer) finStart);
-                                                }
-                                                for (int f = finStart; f <= end; f++) {
-                                                    if (code.get(f).definition instanceof LookupSwitchIns) {
-                                                        AVM2Instruction swins = code.get(f);
-                                                        if (swins.operands.length >= 3) {
-                                                            if (swins.operands[0] == swins.getBytes().length) {
-                                                                if (adr2pos(pos2adr(f) + swins.operands[2]) < finStart) {
-                                                                    finallyCommands = toSourceOutput(processJumps, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, finStart, f - 1, localRegNames, fullyQualifiedNames, visited).output;
-                                                                    returnPos = f + 1;
-                                                                    break;
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            for (int e = 0; e < catchedExceptions.size(); e++) {
-                                int eendpos;
-                                if (e < catchedExceptions.size() - 1) {
-                                    eendpos = adr2pos(fixAddrAfterDebugLine(catchedExceptions.get(e + 1).target)) - 2;
-                                } else {
-                                    eendpos = afterCatchPos - 1;
-                                }
-                                Stack<GraphTargetItem> substack = new Stack<GraphTargetItem>();
-                                substack.add(new ExceptionTreeItem(catchedExceptions.get(e)));
-                                catchedCommands.add(toSourceOutput(processJumps, isStatic, scriptIndex, classIndex, localRegs, substack, new Stack<GraphTargetItem>(), abc, constants, method_info, body, adr2pos(fixAddrAfterDebugLine(catchedExceptions.get(e).target)), eendpos, localRegNames, fullyQualifiedNames, visited).output);
-                            }
-
-                            List<GraphTargetItem> tryCommands = toSourceOutput(processJumps, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, ip, endpos - 1, localRegNames, fullyQualifiedNames, visited).output;
-
-
-                            output.add(new TryTreeItem(tryCommands, catchedExceptions, catchedCommands, finallyCommands));
-                            ip = returnPos;
-                            addr = pos2adr(ip);
-                        }
-
-                    }
-                }
 
                 if (ip > end) {
                     break;
@@ -1277,8 +1183,10 @@ public class AVM2Code implements Serializable {
                                     if (((GetLocalTypeIns) code.get(t).definition).getRegisterId(code.get(t)) == reg) {
                                         if (code.get(t + 1).definition instanceof KillIns) {
                                             if (code.get(t + 1).operands[0] == reg) {
-                                                ConvertOutput assignment = toSourceOutput(processJumps, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, ip + 2, t - 1, localRegNames, fullyQualifiedNames, visited);
-                                                stack.push(assignment.output.remove(assignment.output.size() - 1));
+                                                ConvertOutput assignment = toSourceOutput(part, processJumps, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, ip + 2, t - 1, localRegNames, fullyQualifiedNames, visited);
+                                                GraphTargetItem tar = assignment.output.remove(assignment.output.size() - 1);
+                                                tar.firstPart = part;
+                                                stack.push(tar);
                                                 ip = t + 2;
                                                 continue iploop;
                                             }

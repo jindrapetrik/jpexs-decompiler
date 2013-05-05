@@ -24,6 +24,15 @@ public abstract class BinaryOpItem extends GraphTargetItem {
     public GraphTargetItem rightSide;
     protected String operator = "";
 
+    @Override
+    public GraphPart getFirstPart() {
+        GraphPart fp = leftSide.getFirstPart();
+        if (fp == null) {
+            return super.getFirstPart();
+        }
+        return fp;
+    }
+
     public BinaryOpItem(GraphSourceItem instruction, int precedence, GraphTargetItem leftSide, GraphTargetItem rightSide, String operator) {
         super(instruction, precedence);
         this.leftSide = leftSide;

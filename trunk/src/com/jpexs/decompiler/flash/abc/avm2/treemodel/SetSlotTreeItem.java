@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.AssignmentTreeItem;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.graph.GraphPart;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +28,7 @@ import java.util.List;
 public class SetSlotTreeItem extends TreeItem implements SetTypeTreeItem, AssignmentTreeItem {
 
     public Multiname slotName;
-    public GraphTargetItem value;
+    //public GraphTargetItem value;
     public GraphTargetItem scope;
 
     public SetSlotTreeItem(AVM2Instruction instruction, GraphTargetItem scope, Multiname slotName, GraphTargetItem value) {
@@ -35,6 +36,11 @@ public class SetSlotTreeItem extends TreeItem implements SetTypeTreeItem, Assign
         this.slotName = slotName;
         this.value = value;
         this.scope = scope;
+    }
+
+    @Override
+    public GraphPart getFirstPart() {
+        return value.getFirstPart();
     }
 
     @Override

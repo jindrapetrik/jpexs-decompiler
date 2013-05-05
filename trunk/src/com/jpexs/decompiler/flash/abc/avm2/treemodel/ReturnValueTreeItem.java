@@ -25,8 +25,7 @@ import java.util.List;
 
 public class ReturnValueTreeItem extends TreeItem implements ExitItem {
 
-    public GraphTargetItem value;
-
+    //public GraphTargetItem value;
     public ReturnValueTreeItem(AVM2Instruction instruction, GraphTargetItem value) {
         super(instruction, NOPRECEDENCE);
         this.value = value;

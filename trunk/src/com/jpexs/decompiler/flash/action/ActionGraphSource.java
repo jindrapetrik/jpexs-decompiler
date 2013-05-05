@@ -1,5 +1,6 @@
 package com.jpexs.decompiler.flash.action;
 
+import com.jpexs.decompiler.flash.graph.GraphPart;
 import com.jpexs.decompiler.flash.graph.GraphSource;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -55,7 +56,7 @@ public class ActionGraphSource extends GraphSource {
     }
 
     @Override
-    public List<GraphTargetItem> translatePart(List localData, Stack<GraphTargetItem> stack, int start, int end) {
+    public List<GraphTargetItem> translatePart(GraphPart part, List localData, Stack<GraphTargetItem> stack, int start, int end) {
         return (Action.actionsPartToTree(registerNames, variables, functions, stack, actions, start, end, version));
     }
     private List<Long> posCache = null;

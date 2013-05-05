@@ -27,7 +27,7 @@ public class InitPropertyTreeItem extends TreeItem implements SetTypeTreeItem, A
 
     public GraphTargetItem object;
     public FullMultinameTreeItem propertyName;
-    public GraphTargetItem value;
+    //public GraphTargetItem value;
 
     public InitPropertyTreeItem(AVM2Instruction instruction, GraphTargetItem object, FullMultinameTreeItem propertyName, GraphTargetItem value) {
         super(instruction, PRECEDENCE_ASSIGMENT);

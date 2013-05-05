@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.graph.GraphPart;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +26,12 @@ import java.util.List;
 public class SetGlobalSlotTreeItem extends TreeItem {
 
     public int slotId;
-    public GraphTargetItem value;
+    //public GraphTargetItem value;
+
+    @Override
+    public GraphPart getFirstPart() {
+        return value.getFirstPart();
+    }
 
     public SetGlobalSlotTreeItem(AVM2Instruction instruction, int slotId, GraphTargetItem value) {
         super(instruction, PRECEDENCE_ASSIGMENT);

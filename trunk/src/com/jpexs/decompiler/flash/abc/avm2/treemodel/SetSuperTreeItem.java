@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.graph.GraphPart;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.util.HashMap;
@@ -25,9 +26,14 @@ import java.util.List;
 
 public class SetSuperTreeItem extends TreeItem {
 
-    public GraphTargetItem value;
+    //public GraphTargetItem value;
     public GraphTargetItem object;
     public FullMultinameTreeItem propertyName;
+
+    @Override
+    public GraphPart getFirstPart() {
+        return value.getFirstPart();
+    }
 
     public SetSuperTreeItem(AVM2Instruction instruction, GraphTargetItem value, GraphTargetItem object, FullMultinameTreeItem propertyName) {
         super(instruction, PRECEDENCE_ASSIGMENT);

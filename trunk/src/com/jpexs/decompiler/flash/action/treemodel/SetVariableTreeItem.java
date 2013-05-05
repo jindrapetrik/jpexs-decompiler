@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.graph.GraphPart;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import static com.jpexs.decompiler.flash.graph.GraphTargetItem.PRECEDENCE_ASSIGMENT;
@@ -24,8 +25,13 @@ import java.util.List;
 public class SetVariableTreeItem extends TreeItem implements SetTypeTreeItem {
 
     public GraphTargetItem name;
-    public GraphTargetItem value;
+    //public GraphTargetItem value;
     private int tempRegister = -1;
+
+    @Override
+    public GraphPart getFirstPart() {
+        return value.getFirstPart();
+    }
 
     @Override
     public void setValue(GraphTargetItem value) {

@@ -23,8 +23,7 @@ import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
 public class StringLengthTreeItem extends TreeItem {
 
-    public GraphTargetItem value;
-
+    //public GraphTargetItem value;
     public StringLengthTreeItem(GraphSourceItem instruction, GraphTargetItem value) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.value = value;

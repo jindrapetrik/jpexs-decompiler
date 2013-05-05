@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.treemodel;
 
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
+import com.jpexs.decompiler.flash.graph.GraphPart;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
@@ -24,8 +25,13 @@ import java.util.List;
 public class StoreRegisterTreeItem extends TreeItem implements SetTypeTreeItem {
 
     public RegisterNumber register;
-    public GraphTargetItem value;
+    //public GraphTargetItem value;
     public boolean define = false;
+
+    @Override
+    public GraphPart getFirstPart() {
+        return value.getFirstPart();
+    }
 
     @Override
     public void setValue(GraphTargetItem value) {

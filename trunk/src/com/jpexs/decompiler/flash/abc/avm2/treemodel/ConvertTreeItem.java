@@ -24,7 +24,7 @@ import java.util.List;
 
 public class ConvertTreeItem extends TreeItem {
 
-    public GraphTargetItem value;
+    //public GraphTargetItem value;
     public String type;
 
     public ConvertTreeItem(AVM2Instruction instruction, GraphTargetItem value, String type) {

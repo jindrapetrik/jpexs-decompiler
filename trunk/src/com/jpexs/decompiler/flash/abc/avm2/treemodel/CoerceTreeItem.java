@@ -24,7 +24,7 @@ import java.util.List;
 
 public class CoerceTreeItem extends TreeItem {
 
-    public GraphTargetItem value;
+    //public GraphTargetItem value;
     public String type;
 
     public CoerceTreeItem(AVM2Instruction instruction, GraphTargetItem value, String type) {

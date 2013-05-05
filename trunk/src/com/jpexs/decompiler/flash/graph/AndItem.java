@@ -20,18 +20,6 @@ import java.util.List;
 
 public class AndItem extends BinaryOpItem {
 
-    public GraphPart firstPart;
-
-    public GraphPart getFirstPart() {
-        if (leftSide instanceof AndItem) {
-            return ((AndItem) leftSide).getFirstPart();
-        }
-        if (leftSide instanceof OrItem) {
-            return ((OrItem) leftSide).getFirstPart();
-        }
-        return firstPart;
-    }
-
     @Override
     public List<GraphSourceItemPos> getNeededSources() {
         List<GraphSourceItemPos> ret = super.getNeededSources();

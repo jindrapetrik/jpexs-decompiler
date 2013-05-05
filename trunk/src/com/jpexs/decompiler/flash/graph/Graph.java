@@ -463,7 +463,7 @@ public class Graph {
             }
             end = p.end;
             int start = p.start;
-            ret.addAll(code.translatePart(localData, stack, start, end));
+            ret.addAll(code.translatePart(part, localData, stack, start, end));
         }
         return ret;
     }
@@ -536,7 +536,7 @@ public class Graph {
                  }*/
 
                 try {
-                    output.addAll(code.translatePart(localData, stack, start, end));
+                    output.addAll(code.translatePart(p, localData, stack, start, end));
                 } catch (Exception ex) {
                     Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, "error during printgraph", ex);
                     return ret;
@@ -824,11 +824,9 @@ public class Graph {
                     ret.addAll(output);
                 }
                 if (loop) {
-                    if (expr instanceof AndItem) {
-                        currentLoop.loopContinue = ((AndItem) expr).getFirstPart();
-                    }
-                    if (expr instanceof OrItem) {
-                        currentLoop.loopContinue = ((OrItem) expr).getFirstPart();
+                    GraphPart f = expr.getFirstPart();
+                    if (f != null) {
+                        currentLoop.loopContinue = f;
                     }
                 }
                 GraphPart loopBodyStart = null;

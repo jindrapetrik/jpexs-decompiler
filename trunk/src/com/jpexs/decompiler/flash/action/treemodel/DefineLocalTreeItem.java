@@ -23,7 +23,7 @@ import java.util.List;
 public class DefineLocalTreeItem extends TreeItem implements SetTypeTreeItem {
 
     public GraphTargetItem name;
-    public GraphTargetItem value;
+    //public GraphTargetItem value;
     private int tempRegister = -1;
 
     @Override

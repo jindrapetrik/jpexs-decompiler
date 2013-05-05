@@ -24,7 +24,7 @@ import java.util.List;
 public class NameValuePair extends TreeItem {
 
     public GraphTargetItem name;
-    public GraphTargetItem value;
+    //public GraphTargetItem value;
 
     public NameValuePair(GraphTargetItem name, GraphTargetItem value) {
         super(name.src, NOPRECEDENCE);

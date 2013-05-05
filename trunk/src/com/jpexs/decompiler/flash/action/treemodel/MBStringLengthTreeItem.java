@@ -22,8 +22,7 @@ import java.util.List;
 
 public class MBStringLengthTreeItem extends TreeItem {
 
-    public GraphTargetItem value;
-
+    //public GraphTargetItem value;
     public MBStringLengthTreeItem(GraphSourceItem instruction, GraphTargetItem value) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.value = value;

@@ -4,6 +4,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConvertOutput;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.graph.GraphPart;
 import com.jpexs.decompiler.flash.graph.GraphSource;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -62,9 +63,9 @@ public class AVM2GraphSource extends GraphSource {
     }
 
     @Override
-    public List<GraphTargetItem> translatePart(List localData, Stack<GraphTargetItem> stack, int start, int end) {
+    public List<GraphTargetItem> translatePart(GraphPart part, List localData, Stack<GraphTargetItem> stack, int start, int end) {
         List<GraphTargetItem> ret = new ArrayList<GraphTargetItem>();
-        ConvertOutput co = code.toSourceOutput(false, isStatic, scriptIndex, classIndex, localRegs, stack, (Stack<GraphTargetItem>) localData.get(AVM2Graph.DATA_SCOPESTACK), abc, abc.constants, abc.method_info, body, start, end, localRegNames, fullyQualifiedNames, new boolean[size()]);
+        ConvertOutput co = code.toSourceOutput(part, false, isStatic, scriptIndex, classIndex, localRegs, stack, (Stack<GraphTargetItem>) localData.get(AVM2Graph.DATA_SCOPESTACK), abc, abc.constants, abc.method_info, body, start, end, localRegNames, fullyQualifiedNames, new boolean[size()]);
         ret.addAll(co.output);
         return ret;
     }

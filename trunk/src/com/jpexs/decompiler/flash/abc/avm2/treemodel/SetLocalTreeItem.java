@@ -26,7 +26,7 @@ import java.util.List;
 public class SetLocalTreeItem extends TreeItem implements SetTypeTreeItem, AssignmentTreeItem {
 
     public int regIndex;
-    public GraphTargetItem value;
+    //public GraphTargetItem value;
 
     public SetLocalTreeItem(AVM2Instruction instruction, int regIndex, GraphTargetItem value) {
         super(instruction, PRECEDENCE_ASSIGMENT);

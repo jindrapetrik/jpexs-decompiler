@@ -23,8 +23,7 @@ import java.util.List;
 
 public class ReturnTreeItem extends TreeItem implements ExitItem {
 
-    public GraphTargetItem value;
-
+    //public GraphTargetItem value;
     public ReturnTreeItem(GraphSourceItem instruction, GraphTargetItem value) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.value = value;

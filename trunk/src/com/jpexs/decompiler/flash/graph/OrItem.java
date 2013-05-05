@@ -20,18 +20,6 @@ import java.util.List;
 
 public class OrItem extends BinaryOpItem {
 
-    public GraphPart firstPart;
-
-    public GraphPart getFirstPart() {
-        if (leftSide instanceof AndItem) {
-            return ((AndItem) leftSide).getFirstPart();
-        }
-        if (leftSide instanceof OrItem) {
-            return ((OrItem) leftSide).getFirstPart();
-        }
-        return firstPart;
-    }
-
     public OrItem(GraphSourceItem src, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(src, PRECEDENCE_LOGICALOR, leftSide, rightSide, "||");
         this.leftSide = leftSide;

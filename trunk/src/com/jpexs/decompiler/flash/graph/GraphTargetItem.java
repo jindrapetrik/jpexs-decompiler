@@ -31,6 +31,19 @@ public abstract class GraphTargetItem {
     public int pos = 0;
     public int precedence;
     public List<GraphSourceItemPos> moreSrc = new ArrayList<GraphSourceItemPos>();
+    public GraphPart firstPart;
+    public GraphTargetItem value;
+
+    public GraphPart getFirstPart() {
+        if (value == null) {
+            return firstPart;
+        }
+        GraphPart ret = value.getFirstPart();
+        if (ret == null) {
+            return firstPart;
+        }
+        return ret;
+    }
 
     public GraphTargetItem(GraphSourceItem src, int precedence) {
         this.src = src;

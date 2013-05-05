@@ -24,8 +24,7 @@ import java.util.List;
 
 public class ThrowTreeItem extends TreeItem {
 
-    public GraphTargetItem value;
-
+    //public GraphTargetItem value;
     public ThrowTreeItem(AVM2Instruction instruction, GraphTargetItem value) {
         super(instruction, NOPRECEDENCE);
         this.value = value;

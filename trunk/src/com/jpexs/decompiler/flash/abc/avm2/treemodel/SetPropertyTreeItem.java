@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.AssignmentTreeItem;
+import com.jpexs.decompiler.flash.graph.GraphPart;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +29,11 @@ public class SetPropertyTreeItem extends TreeItem implements SetTypeTreeItem, As
     public GraphTargetItem object;
     public FullMultinameTreeItem propertyName;
     public GraphTargetItem value;
+
+    @Override
+    public GraphPart getFirstPart() {
+        return value.getFirstPart();
+    }
 
     public SetPropertyTreeItem(AVM2Instruction instruction, GraphTargetItem object, FullMultinameTreeItem propertyName, GraphTargetItem value) {
         super(instruction, PRECEDENCE_ASSIGMENT);
