@@ -188,7 +188,7 @@ public class ActionGraph extends Graph {
 
                 List<GraphTargetItem> defaultCommands = new ArrayList<GraphTargetItem>();
 
-                defaultCommands = printGraph(localData, stack, allParts, null, defaultPart, defaultPart2, loops, forFinalCommands);
+                defaultCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, defaultPart, defaultPart2, loops, forFinalCommands);
 
 
                 List<GraphPart> loopContinues = new ArrayList<GraphPart>();
@@ -260,7 +260,7 @@ public class ActionGraph extends Graph {
                     defaultPart = null;
                 }
                 if ((defaultPart != null) && (defaultCommands.isEmpty())) {
-                    defaultCommands = printGraph(localData, stack, allParts, null, defaultPart, next, loops, forFinalCommands);
+                    defaultCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, defaultPart, next, loops, forFinalCommands);
                 }
 
                 List<GraphPart> ignored = new ArrayList<GraphPart>();
@@ -287,7 +287,7 @@ public class ActionGraph extends Graph {
                             }
                         }
                     }
-                    cc.addAll(0, printGraph(localData, stack, allParts, null, caseBodies.get(i), nextCase, loops, forFinalCommands));
+                    cc.addAll(0, printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, caseBodies.get(i), nextCase, loops, forFinalCommands));
                     if (cc.size() >= 2) {
                         if (cc.get(cc.size() - 1) instanceof BreakItem) {
                             if ((cc.get(cc.size() - 2) instanceof ContinueItem) || (cc.get(cc.size() - 2) instanceof BreakItem)) {
@@ -311,7 +311,7 @@ public class ActionGraph extends Graph {
                     if (ti != null) {
                         ret.add(ti);
                     } else {
-                        ret.addAll(printGraph(localData, stack, allParts, null, next, stopPart, loops, forFinalCommands));
+                        ret.addAll(printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, next, stopPart, loops, forFinalCommands));
                     }
                 }
             }

@@ -61,12 +61,19 @@ public class Graph {
     }
 
     private boolean fixGraphOnce(GraphPart part, List<GraphPart> visited, boolean doChildren) {
+        if ((part.start == 1743) && (!doChildren)) {
+            //p/1/0
+            System.out.println("dfewf");
+        }
+        if ((part.start == 1740) && (!doChildren)) {
+            System.out.println("efewf");
+        }
         if (visited.contains(part)) {
             return false;
         }
         visited.add(part);
         boolean fixed = false;
-        int i = 1;
+        int i = 0;
         GraphPath lastpref = null;
         boolean modify = true;
         int prvni = -1;
@@ -154,8 +161,19 @@ public class Graph {
             }
 
         }
-        for (GraphPart p : part.nextParts) {
-            fixGraphOnce(p, visited, doChildren);
+        if (part.nextParts.size() == 2) {
+            if (part.nextParts.get(1).leadsTo(code, part.nextParts.get(0), visited)) {
+                fixGraphOnce(part.nextParts.get(1), visited, doChildren);
+                fixGraphOnce(part.nextParts.get(0), visited, doChildren);
+            } else {
+                fixGraphOnce(part.nextParts.get(0), visited, doChildren);
+                fixGraphOnce(part.nextParts.get(1), visited, doChildren);
+            }
+        } else {
+            for (int j = part.nextParts.size() - 1; j >= 0; j--) {
+                GraphPart p = part.nextParts.get(j);
+                fixGraphOnce(p, visited, doChildren);
+            }
         }
         return fixed;
     }
@@ -295,7 +313,7 @@ public class Graph {
             populateParts(head, allParts);
         }
         Stack<GraphTargetItem> stack = new Stack<GraphTargetItem>();
-        List<GraphTargetItem> ret = printGraph(localData, stack, allParts, null, heads.get(0), null, new ArrayList<Loop>(), new HashMap<Loop, List<GraphTargetItem>>());
+        List<GraphTargetItem> ret = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, heads.get(0), null, new ArrayList<Loop>(), new HashMap<Loop, List<GraphTargetItem>>());
         processIfs(ret);
         finalProcessStack(stack, ret);
         finalProcessAll(ret, 0);
@@ -450,9 +468,12 @@ public class Graph {
         return ret;
     }
 
-    protected List<GraphTargetItem> printGraph(List localData, Stack<GraphTargetItem> stack, List<GraphPart> allParts, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, HashMap<Loop, List<GraphTargetItem>> forFinalCommands) {
-        //String methodPath, Stack<GraphTargetItem> stack, Stack<TreeItem> scopeStack, List<GraphPart> allParts, List<ABCException> parsedExceptions, List<Integer> finallyJumps, int level, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, HashMap<Integer, TreeItem> localRegs, MethodBody body, List<Integer> ignoredSwitches
-
+    protected List<GraphTargetItem> printGraph(List<GraphPart> visited, List localData, Stack<GraphTargetItem> stack, List<GraphPart> allParts, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, HashMap<Loop, List<GraphTargetItem>> forFinalCommands) {
+        if (visited.contains(part)) {
+            //return new ArrayList<GraphTargetItem>();
+        } else {
+            visited.add(part);
+        }
         List<GraphTargetItem> ret = new ArrayList<GraphTargetItem>();
         try {
             boolean debugMode = false;
@@ -462,6 +483,10 @@ public class Graph {
             }
 
             while (((part != null) && (part.getHeight() == 1)) && (code.size() > part.start) && (code.get(part.start).isJump())) {  //Parts with only jump in it gets ignored                
+
+                if (part == stopPart) {
+                    return ret;
+                }
                 GraphTargetItem lop = checkLoop(part.nextParts.get(0), stopPart, loops);
                 if (lop == null) {
                     part = part.nextParts.get(0);
@@ -470,7 +495,7 @@ public class Graph {
                 }
             }
 
-            if (code.size() <= part.start) {
+            if ((part != null) && (code.size() <= part.start)) {
                 return ret;
             }
 
@@ -524,11 +549,11 @@ public class Graph {
                         stack.pop();
                         if (top.toBoolean()) {
                             ret.addAll(output);
-                            ret.addAll(printGraph(localData, stack, allParts, parent, part.nextParts.get(0), stopPart, loops, forFinalCommands));
+                            ret.addAll(printGraph(visited, localData, stack, allParts, parent, part.nextParts.get(0), stopPart, loops, forFinalCommands));
                             return ret;
                         } else {
                             ret.addAll(output);
-                            ret.addAll(printGraph(localData, stack, allParts, parent, part.nextParts.get(1), stopPart, loops, forFinalCommands));
+                            ret.addAll(printGraph(visited, localData, stack, allParts, parent, part.nextParts.get(1), stopPart, loops, forFinalCommands));
                             return ret;
                         }
                     } else {
@@ -570,7 +595,7 @@ public class Graph {
                     if ((ti = checkLoop(next, stopPart, loops)) != null) {
                         ret.add(ti);
                     } else {
-                        printGraph(localData, stack, allParts, parent, next, reversed ? sp1 : sp0, loops, forFinalCommands);
+                        printGraph(visited, localData, stack, allParts, parent, next, reversed ? sp1 : sp0, loops, forFinalCommands);
                         GraphTargetItem second = stack.pop();
                         GraphTargetItem first = stack.pop();
                         if (!reversed) {
@@ -598,7 +623,7 @@ public class Graph {
                         if ((ti = checkLoop(next, stopPart, loops)) != null) {
                             ret.add(ti);
                         } else {
-                            ret.addAll(printGraph(localData, stack, allParts, parent, next, stopPart, loops, forFinalCommands));
+                            ret.addAll(printGraph(visited, localData, stack, allParts, parent, next, stopPart, loops, forFinalCommands));
                         }
                     }
                     return ret;
@@ -618,7 +643,7 @@ public class Graph {
                     if ((ti = checkLoop(next, stopPart, loops)) != null) {
                         ret.add(ti);
                     } else {
-                        printGraph(localData, stack, allParts, parent, next, reversed ? sp1 : sp0, loops, forFinalCommands);
+                        printGraph(visited, localData, stack, allParts, parent, next, reversed ? sp1 : sp0, loops, forFinalCommands);
 
                         GraphTargetItem second = stack.pop();
                         GraphTargetItem first = stack.pop();
@@ -649,7 +674,7 @@ public class Graph {
                         if ((ti = checkLoop(next, stopPart, loops)) != null) {
                             ret.add(ti);
                         } else {
-                            ret.addAll(printGraph(localData, stack, allParts, parent, next, stopPart, loops, forFinalCommands));
+                            ret.addAll(printGraph(visited, localData, stack, allParts, parent, next, stopPart, loops, forFinalCommands));
                         }
                     }
 
@@ -754,7 +779,7 @@ public class Graph {
              loops.add(l);
              List<GraphTargetItem> wtbody=new ArrayList<GraphTargetItem>();
              wtbody.addAll(output);
-             wtbody.addAll(printGraph(localData, stack, allParts, parent, part, stopPart, loops, forFinalCommands));
+             wtbody.addAll(printGraph(visited, localData, stack, allParts, parent, part, stopPart, loops, forFinalCommands));
              ret.add(new WhileItem(null, l, trueExp, wtbody));
              return ret;
              }*/
@@ -770,12 +795,7 @@ public class Graph {
                     loops.add(currentLoop);
                 }
 
-                loopContinues = new ArrayList<GraphPart>();
-                for (Loop l : loops) {
-                    if (l.loopContinue != null) {
-                        loopContinues.add(l.loopContinue);
-                    }
-                }
+
 
                 if ((!whileTrue) && loop && (part.nextParts.size() > 1) && (!doWhile)) {
                     currentLoop.loopBreak = part.nextParts.get(reversed ? 0 : 1);
@@ -791,23 +811,25 @@ public class Graph {
                         expr = stack.pop();
                     }
                 }
-                if (loop) {
-                    GraphTargetItem expr2 = expr;
-                    if (expr2 instanceof NotItem) {
-                        expr2 = ((NotItem) expr2).getOriginal();
-                    }
-                    if (expr2 instanceof AndItem) {
-                        currentLoop.loopContinue = ((AndItem) expr2).firstPart;
-                    }
-                    if (expr2 instanceof OrItem) {
-                        currentLoop.loopContinue = ((OrItem) expr2).firstPart;
-                    }
-                }
+                /*if (loop) {
+                 GraphTargetItem expr2 = expr;
+                 if (expr2 instanceof NotItem) {
+                 expr2 = ((NotItem) expr2).getOriginal();
+                 }                    
+                 }*/
 
                 if (doWhile) {
                     //ret.add(new DoWhileTreeItem(null, currentLoop.id, part.start, output, expr));
                 } else {
                     ret.addAll(output);
+                }
+                if (loop) {
+                    if (expr instanceof AndItem) {
+                        currentLoop.loopContinue = ((AndItem) expr).getFirstPart();
+                    }
+                    if (expr instanceof OrItem) {
+                        currentLoop.loopContinue = ((OrItem) expr).getFirstPart();
+                    }
                 }
                 GraphPart loopBodyStart = null;
                 if ((reversed == loop) || doWhile) {
@@ -817,6 +839,8 @@ public class Graph {
                         expr = new NotItem(null, expr);
                     }
                 }
+
+                loopContinues = getLoopsContinues(loops);
 
                 GraphPart next = part.getNextPartPath(loopContinues);
                 List<GraphTargetItem> retx = ret;
@@ -840,7 +864,7 @@ public class Graph {
                         if (debugMode) {
                             System.err.println("ONTRUE: (inside " + part + ")");
                         }
-                        onTrue = printGraph(prepareBranchLocalData(localData), trueStack, allParts, part, part.nextParts.get(1), next == null ? stopPart : next, loops, forFinalCommands);
+                        onTrue = printGraph(visited, prepareBranchLocalData(localData), trueStack, allParts, part, part.nextParts.get(1), next == null ? stopPart : next, loops, forFinalCommands);
                         if (debugMode) {
                             System.err.println("/ONTRUE (inside " + part + ")");
                         }
@@ -858,7 +882,7 @@ public class Graph {
                             if ((next == part.nextParts.get(0)) || (part.nextParts.get(0).path.equals(part.path) || part.nextParts.get(0).path.length() < part.path.length())) {
                                 onFalse = new ArrayList<GraphTargetItem>();
                             } else {
-                                onFalse = (printGraph(prepareBranchLocalData(localData), falseStack, allParts, part, part.nextParts.get(0), next == null ? stopPart : next, loops, forFinalCommands));
+                                onFalse = (printGraph(visited, prepareBranchLocalData(localData), falseStack, allParts, part, part.nextParts.get(0), next == null ? stopPart : next, loops, forFinalCommands));
                             }
                             if (debugMode) {
                                 System.err.println("/ONFALSE (inside " + part + ")");
@@ -875,7 +899,7 @@ public class Graph {
 
                             List<GraphTargetItem> body = new ArrayList<GraphTargetItem>();
                             if (next != null) {
-                                body = printGraph(prepareBranchLocalData(localData), stack, allParts, part, next, stopPart, loops, forFinalCommands);
+                                body = printGraph(visited, prepareBranchLocalData(localData), stack, allParts, part, next, stopPart, loops, forFinalCommands);
                             }
                             retw.addAll(body);
 
@@ -944,7 +968,7 @@ public class Graph {
                         loopBody.add(ti);
                     } else {
                         if (!(doWhile && (loopBodyStart == null))) {
-                            loopBody = printGraph(prepareBranchLocalData(localData), stack, allParts, part, loopBodyStart != null ? loopBodyStart : part.nextParts.get(reversed ? 1 : 0), stopPart, loops, forFinalCommands);
+                            loopBody = printGraph(visited, prepareBranchLocalData(localData), stack, allParts, part, loopBodyStart != null ? loopBodyStart : part.nextParts.get(reversed ? 1 : 0), stopPart, loops, forFinalCommands);
                         }
                     }
                     checkContinueAtTheEnd(loopBody, currentLoop);
@@ -960,7 +984,7 @@ public class Graph {
                             }
                             loopBody.addAll(0, output);
                             if (part.nextParts.size() == 1) {
-                                loopBody.addAll(printGraph(prepareBranchLocalData(localData), stack, allParts, part, part.nextParts.get(0), stopPart, loops, forFinalCommands));
+                                loopBody.addAll(printGraph(visited, prepareBranchLocalData(localData), stack, allParts, part, part.nextParts.get(0), stopPart, loops, forFinalCommands));
                             }
 
                             checkContinueAtTheEnd(loopBody, currentLoop);
@@ -1034,7 +1058,7 @@ public class Graph {
                         if (debugMode) {
                             System.err.println("NEXT: (inside " + part + ")");
                         }
-                        ret.addAll(printGraph(localData, stack, allParts, part, next, stopPart, loops, forFinalCommands));
+                        ret.addAll(printGraph(visited, localData, stack, allParts, part, next, stopPart, loops, forFinalCommands));
                         if (debugMode) {
                             System.err.println("/NEXT: (inside " + part + ")");
                         }
@@ -1097,7 +1121,7 @@ public class Graph {
                 GraphTargetItem lop = checkLoop(p, stopPart, loops);
                 if (lop == null) {
                     if (p.path.length() >= part.path.length()) {
-                        ret.addAll(printGraph(localData, stack, allParts, part, p, stopPart, loops, forFinalCommands));
+                        ret.addAll(printGraph(visited, localData, stack, allParts, part, p, stopPart, loops, forFinalCommands));
                     } else {
                         if ((p != stopPart) && (p.refs.size() > 1)) {
                             List<GraphPart> nextList = new ArrayList<GraphPart>();
@@ -1113,7 +1137,7 @@ public class Graph {
                                 }
                             }
                             if ((nearestLoop != null)) {// && (nearestLoop.loopBreak != null)) {
-                                List<GraphTargetItem> finalCommands = printGraph(localData, stack, allParts, part, p, nearestLoop.loopContinue, loops, forFinalCommands);
+                                List<GraphTargetItem> finalCommands = printGraph(visited, localData, stack, allParts, part, p, nearestLoop.loopContinue, loops, forFinalCommands);
                                 nearestLoop.loopContinue = p;
                                 forFinalCommands.put(nearestLoop, finalCommands);
                                 ContinueItem cti = new ContinueItem(null, nearestLoop.id);
