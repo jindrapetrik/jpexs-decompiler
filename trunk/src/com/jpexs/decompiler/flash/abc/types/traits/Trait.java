@@ -21,7 +21,11 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Trait implements Serializable {
@@ -140,4 +144,27 @@ public abstract class Trait implements Serializable {
     }
 
     public abstract int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc);
+
+    public String getPath(ABC abc) {
+        Multiname name = getName(abc);
+        Namespace ns = name.getNamespace(abc.constants);
+        String packageName = ns.getName(abc.constants);
+        String objectName = name.getName(abc.constants, new ArrayList<String>());
+        return packageName + "." + objectName;
+    }
+
+    public void export(String directory, ABC abc, List<ABCContainerTag> abcList, boolean pcode, int scriptIndex, int classIndex, boolean isStatic) throws IOException {
+        Multiname name = getName(abc);
+        Namespace ns = name.getNamespace(abc.constants);
+        String packageName = ns.getName(abc.constants);
+        String objectName = name.getName(abc.constants, new ArrayList<String>());
+        File outDir = new File(directory + File.separatorChar + packageName.replace('.', File.separatorChar));
+        if (!outDir.exists()) {
+            outDir.mkdirs();
+        }
+        String fileName = outDir.toString() + File.separator + objectName + ".as";
+        FileOutputStream fos = new FileOutputStream(fileName);
+        fos.write(convertPackaged("", abcList, abc, isStatic, pcode, scriptIndex, classIndex, false, new ArrayList<String>()).getBytes());
+        fos.close();
+    }
 }

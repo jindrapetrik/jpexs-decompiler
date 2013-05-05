@@ -326,16 +326,19 @@ public class TraitClass extends Trait implements TraitWithSlot {
         List<String> namesInThisPackage = new ArrayList<String>();
         for (ABCContainerTag tag : abcTags) {
             for (ScriptInfo si : tag.getABC().script_info) {
-                String spath = si.getPath(tag.getABC());
-                String pkg = "";
-                String name = spath;
-                if (spath.contains(".")) {
-                    pkg = spath.substring(0, spath.lastIndexOf("."));
-                    name = spath.substring(spath.lastIndexOf(".") + 1);
+                for (Trait t : si.traits.traits) {
+                    String spath = t.getPath(tag.getABC());
+                    String pkg = "";
+                    String name = spath;
+                    if (spath.contains(".")) {
+                        pkg = spath.substring(0, spath.lastIndexOf("."));
+                        name = spath.substring(spath.lastIndexOf(".") + 1);
+                    }
+                    if (pkg.equals(packageName)) {
+                        namesInThisPackage.add(name);
+                    }
                 }
-                if (pkg.equals(packageName)) {
-                    namesInThisPackage.add(name);
-                }
+
             }
         }
         //imports

@@ -17,6 +17,10 @@
 package com.jpexs.decompiler.flash.abc.gui;
 
 import com.jpexs.decompiler.flash.Main;
+import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.gui.View;
@@ -95,9 +99,20 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
     public HashMap<String, TreeLeafScript> getTreeList(List<ABCContainerTag> list) {
         HashMap<String, TreeLeafScript> ret = new HashMap<String, TreeLeafScript>();
         for (ABCContainerTag tag : list) {
-            for (int i = 0; i < tag.getABC().script_info.length; i++) {
-                String path = tag.getABC().script_info[i].getPath(tag.getABC());
-                ret.put(path, new TreeLeafScript(tag.getABC(), i));
+            ABC abc = tag.getABC();
+            for (int i = 0; i < abc.script_info.length; i++) {
+                ScriptInfo script = abc.script_info[i];
+                for (int j = 0; j < script.traits.traits.length; j++) {
+                    Trait t = script.traits.traits[j];
+                    Multiname name = t.getName(abc);
+                    Namespace ns = name.getNamespace(abc.constants);
+                    String packageName = ns.getName(abc.constants);
+                    String objectName = name.getName(abc.constants, new ArrayList<String>());
+                    String path = packageName + "." + objectName;
+                    ret.put(path, new TreeLeafScript(abc, i, j));
+                }
+
+
             }
         }
         return ret;
@@ -141,7 +156,7 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
                         abcPanel.navigator.setABC(abcList, scriptLeaf.abc);
                         abcPanel.navigator.setClassIndex(classIndex, scriptLeaf.scriptIndex);
                         abcPanel.setAbc(scriptLeaf.abc);
-                        abcPanel.decompiledTextArea.setScript(scriptLeaf.scriptIndex, scriptLeaf.abc, abcList);
+                        abcPanel.decompiledTextArea.setScript(scriptLeaf, abcList);
                         abcPanel.decompiledTextArea.setClassIndex(classIndex);
                         abcPanel.decompiledTextArea.setNoTrait();
                         abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setCode("");

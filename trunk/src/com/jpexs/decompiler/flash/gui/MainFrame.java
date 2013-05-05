@@ -1357,8 +1357,12 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                     if (abcPanel != null) {
                                         for (int i = 0; i < tlsList.size(); i++) {
                                             TreeLeafScript tls = tlsList.get(i);
-                                            Main.startWork("Exporting " + (i + 1) + "/" + tlsList.size() + " " + tls.abc.script_info[tls.scriptIndex].getPath(tls.abc) + " ...");
-                                            tls.abc.script_info[tls.scriptIndex].export(tls.abc, abcPanel.list, selFile, isPcode, tls.scriptIndex);
+
+
+                                            for (Trait t : tls.abc.script_info[tls.scriptIndex].traits.traits) {
+                                                Main.startWork("Exporting " + (i + 1) + "/" + tlsList.size() + " " + t.getPath(tls.abc) + " ...");
+                                                t.export(selFile, tls.abc, abcList, isPcode, tls.scriptIndex, -1, false);
+                                            }
                                         }
                                     } else {
                                         List<TagNode> allNodes = new ArrayList<TagNode>();
@@ -1483,7 +1487,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                         } else {
                             int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
                             if (bi != -1) {
-                                cnt += abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, abcPanel.decompiledTextArea.getScriptIndex(), abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic());
+                                cnt += abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, abcPanel.decompiledTextArea.getScriptLeaf().scriptIndex, abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic());
                             }
                             abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc);
                         }
@@ -1587,9 +1591,9 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                 if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
                                     abcPanel.abc.bodies[bi].removeDeadCode(abcPanel.abc.constants);
                                 } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
-                                    abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, abcPanel.decompiledTextArea.getScriptIndex(), abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic());
+                                    abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, abcPanel.decompiledTextArea.getScriptLeaf().scriptIndex, abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic());
                                 } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_RESTORE_CONTROL_FLOW) {
-                                    abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, abcPanel.decompiledTextArea.getScriptIndex(), abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic());
+                                    abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, abcPanel.decompiledTextArea.getScriptLeaf().scriptIndex, abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic());
                                     abcPanel.abc.bodies[bi].restoreControlFlow(abcPanel.abc.constants);
                                 }
                             }
@@ -1675,7 +1679,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                         abcPanel.navigator.setABC(abcList, scriptLeaf.abc);
                         abcPanel.navigator.setClassIndex(classIndex, scriptLeaf.scriptIndex);
                         abcPanel.setAbc(scriptLeaf.abc);
-                        abcPanel.decompiledTextArea.setScript(scriptLeaf.scriptIndex, scriptLeaf.abc, abcList);
+                        abcPanel.decompiledTextArea.setScript(scriptLeaf, abcList);
                         abcPanel.decompiledTextArea.setClassIndex(classIndex);
                         abcPanel.decompiledTextArea.setNoTrait();
                         abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setCode("");

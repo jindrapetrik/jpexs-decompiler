@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash;
 
 import SevenZip.Compression.LZMA.Encoder;
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.gui.TreeLeafScript;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
@@ -413,20 +415,16 @@ public class SWF {
         }
         for (int i = 0; i < abcTags.size(); i++) {
             ABC abc = abcTags.get(i).getABC();
-            int scriptIndex = abc.findScriptByPath(className);
-            if (scriptIndex > -1) {
+            TreeLeafScript scr = abc.findScriptTraitByPath(className);
+            if (scr != null) {
                 String cnt = "";
                 if (abc.script_info.length > 1) {
                     cnt = "script " + (i + 1) + "/" + abc.script_info.length + " ";
                 }
-                String path = abc.script_info[scriptIndex].getPath(abc);
-                String packageName = path.substring(0, path.lastIndexOf("."));
-                if (packageName.equals("")) {
-                    path = path.substring(1);
-                }
-                String exStr = "Exporting " + "tag " + (i + 1) + "/" + abcTags.size() + " " + cnt + path + " ...";
+                Trait t = abc.script_info[scr.scriptIndex].traits.traits[scr.traitIndex];
+                String exStr = "Exporting " + "tag " + (i + 1) + "/" + abcTags.size() + " " + cnt + t.getPath(abc) + " ...";
                 informListeners("export", exStr);
-                abc.script_info[scriptIndex].export(abc, abcTags, outdir, isPcode, scriptIndex);
+                t.export(outdir, abc, abcTags, isPcode, scr.scriptIndex, -1,false);
                 return true;
             }
         }

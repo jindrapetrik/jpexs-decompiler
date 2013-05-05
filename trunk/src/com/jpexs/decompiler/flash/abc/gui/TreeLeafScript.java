@@ -26,9 +26,11 @@ public class TreeLeafScript {
 
     public ABC abc;
     public int scriptIndex;
+    public int traitIndex = 0;
 
-    public TreeLeafScript(ABC abc, int scriptIndex) {
+    public TreeLeafScript(ABC abc, int scriptIndex, int traitIndex) {
         this.abc = abc;
         this.scriptIndex = scriptIndex;
+        this.traitIndex = traitIndex;
     }
 }

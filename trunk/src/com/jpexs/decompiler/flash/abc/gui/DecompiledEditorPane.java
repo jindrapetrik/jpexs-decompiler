@@ -38,7 +38,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     private List<Highlighting> classHighlights = new ArrayList<Highlighting>();
     private Highlighting currentMethodHighlight;
     private ABC abc;
-    private int scriptIndex = -1;
+    private TreeLeafScript script;
     public int lastTraitIndex = 0;
     private boolean ignoreCarret = false;
     private boolean reset = false;
@@ -46,8 +46,8 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     private int classIndex = -1;
     private boolean isStatic = false;
 
-    public int getScriptIndex() {
-        return scriptIndex;
+    public TreeLeafScript getScriptLeaf() {
+        return script;
     }
 
     public boolean getIsStatic() {
@@ -138,7 +138,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             for (Highlighting cm : classHighlights) {
                 if ((pos >= cm.startPos) && (pos < cm.startPos + cm.len)) {
                     classIndex = (int) cm.offset;
-                    displayClass(classIndex, scriptIndex);
+                    displayClass(classIndex, script.scriptIndex);
                     break;
                 }
             }
@@ -155,7 +155,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                     for (Highlighting th : traitHighlights) {
                         if ((pos >= th.startPos) && (pos < th.startPos + th.len)) {
                             lastTraitIndex = (int) th.offset;
-                            if (abc != null) {
+                            if ((abc != null) && (classIndex != -1)) {
                                 t = abc.findTraitByTraitId(classIndex, lastTraitIndex);
                                 isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
                                 if (t != null) {
@@ -227,7 +227,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             this.classHighlights = classHighlights;
         }
     }
-    private HashMap<Integer, BufferedClass> bufferedClasses = new HashMap<Integer, BufferedClass>();
+    private HashMap<TreeLeafScript, BufferedClass> bufferedClasses = new HashMap<TreeLeafScript, BufferedClass>();
 
     public void gotoLastTrait() {
         gotoTrait(lastTraitIndex);
@@ -285,8 +285,11 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         bufferedClasses.clear();
     }
 
-    public void setScript(int scriptIndex, ABC abc, List<ABCContainerTag> abcList) {
+    public void setScript(TreeLeafScript scriptLeaf, List<ABCContainerTag> abcList) {
+        int scriptIndex = scriptLeaf.scriptIndex;
+        int scriptTraitIndex = scriptLeaf.traitIndex;
         ScriptInfo script = null;
+        ABC abc = scriptLeaf.abc;
         if (scriptIndex > -1) {
             script = abc.script_info[scriptIndex];
         }
@@ -294,22 +297,22 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             highlights = new ArrayList<Highlighting>();
             traitHighlights = new ArrayList<Highlighting>();
             methodHighlights = new ArrayList<Highlighting>();
-            this.scriptIndex = scriptIndex;
+            this.script = scriptLeaf;
             return;
         }
         setText("//Please wait...");
 
         String hilightedCode;
-        if (!bufferedClasses.containsKey(script)) {
-            hilightedCode = script.convert(abcList, abc, false, true, scriptIndex);
+        if (!bufferedClasses.containsKey(scriptLeaf)) {
+            hilightedCode = script.traits.traits[scriptTraitIndex].convertPackaged("", abcList, abc, false, false, scriptIndex, -1, true, new ArrayList<String>());
             highlights = Highlighting.getInstrHighlights(hilightedCode);
             traitHighlights = Highlighting.getTraitHighlights(hilightedCode);
             methodHighlights = Highlighting.getMethodHighlights(hilightedCode);
             classHighlights = Highlighting.getClassHighlights(hilightedCode);
             hilightedCode = Highlighting.stripHilights(hilightedCode);
-            bufferedClasses.put(scriptIndex, new BufferedClass(hilightedCode, highlights, traitHighlights, methodHighlights, classHighlights));
+            bufferedClasses.put(scriptLeaf, new BufferedClass(hilightedCode, highlights, traitHighlights, methodHighlights, classHighlights));
         } else {
-            BufferedClass bc = bufferedClasses.get(script);
+            BufferedClass bc = bufferedClasses.get(scriptLeaf);
             hilightedCode = bc.text;
             highlights = bc.highlights;
             traitHighlights = bc.traitHighlights;
@@ -318,17 +321,17 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         }
         this.abc = abc;
         this.abcList = abcList;
-        this.scriptIndex = scriptIndex;
+        this.script = scriptLeaf;
         setText(hilightedCode);
     }
 
     public void reloadClass() {
         int ci = classIndex;
-        if (bufferedClasses.containsKey(scriptIndex)) {
-            bufferedClasses.remove(scriptIndex);
+        if (bufferedClasses.containsKey(script)) {
+            bufferedClasses.remove(script);
         }
-        if ((scriptIndex != -1) && (abc != null)) {
-            setScript(scriptIndex, abc, abcList);
+        if ((script != null) && (abc != null)) {
+            setScript(script, abcList);
         }
         setNoTrait();
         setClassIndex(ci);

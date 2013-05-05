@@ -18,11 +18,8 @@ package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
-import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,43 +42,15 @@ public class ScriptInfo {
         return "method_index=" + init_index + "\r\n" + traits.toString(abc, fullyQualifiedNames);
     }
 
-    public String getPath(ABC abc) {
-        String packageName = "";
-        String scriptName = "";
-        int classCount = 0;
-        for (Trait t : traits.traits) {
-            Multiname name = t.getName(abc);
-            Namespace ns = name.getNamespace(abc.constants);
-            if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                packageName = ns.getName(abc.constants);
-                scriptName = name.getName(abc.constants, new ArrayList<String>());
-                if (t instanceof TraitClass) {
-                    classCount++;
-                }
-            }
-        }
-        if (classCount > 1) {
-            scriptName = "[script]";
-        }
-        return packageName + "." + scriptName;
-    }
-
     public String convert(List<ABCContainerTag> abcTags, ABC abc, boolean pcode, boolean highlighting, int scriptIndex) {
         return traits.convert("", abcTags, abc, false, pcode, true, scriptIndex, -1, highlighting, new ArrayList<String>());
     }
 
     public void export(ABC abc, List<ABCContainerTag> abcList, String directory, boolean pcode, int scriptIndex) throws IOException {
-        String path = getPath(abc);
-        String packageName = path.substring(0, path.lastIndexOf("."));
-        String className = path.substring(path.lastIndexOf(".") + 1);
-        File outDir = new File(directory + File.separatorChar + packageName.replace('.', File.separatorChar));
-        if (!outDir.exists()) {
-            outDir.mkdirs();
+        for (Trait t : traits.traits) {
+            t.export(directory, abc, abcList, pcode, scriptIndex, -1, false);
         }
-        String fileName = outDir.toString() + File.separator + className + ".as";
-        FileOutputStream fos = new FileOutputStream(fileName);
-        fos.write(convert(abcList, abc, pcode, false, scriptIndex).getBytes());
-        fos.close();
+
 
     }
 }

@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCode;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.gui.TreeLeafScript;
 import com.jpexs.decompiler.flash.abc.types.*;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
@@ -565,18 +566,16 @@ public class ABC {
 
     public void export(String directory, boolean pcode, List<ABCContainerTag> abcList, String abcStr) throws IOException {
         for (int i = 0; i < script_info.length; i++) {
-            String path = script_info[i].getPath(this);
-            String packageName = path.substring(0, path.lastIndexOf("."));
-            if (packageName.equals("")) {
-                path = path.substring(1);
-            }
+
             String cnt = "";
             if (script_info.length > 1) {
                 cnt = "script " + (i + 1) + "/" + script_info.length + " ";
             }
-            String exStr = "Exporting " + abcStr + cnt + path + " ...";
-            informListeners("export", exStr);
-            script_info[i].export(this, abcList, directory, pcode, i);
+            for (Trait t : script_info[i].traits.traits) {
+                String exStr = "Exporting " + abcStr + cnt + t.getPath(this) + " ...";
+                informListeners("export", exStr);
+                t.export(directory, this, abcList, pcode, i, -1, false);
+            }
         }
     }
 
@@ -889,13 +888,15 @@ public class ABC {
         return -1;
     }
 
-    public int findScriptByPath(String name) {
+    public TreeLeafScript findScriptTraitByPath(String name) {
         for (int c = 0; c < script_info.length; c++) {
-            String s = script_info[c].getPath(this);
-            if (name.equals(s)) {
-                return c;
+            for (int t = 0; t < script_info[c].traits.traits.length; t++) {
+                Trait tr = script_info[c].traits.traits[t];
+                if (tr.getPath(this).equals(name)) {
+                    return new TreeLeafScript(this, c, t);
+                }
             }
         }
-        return -1;
+        return null;
     }
 }
