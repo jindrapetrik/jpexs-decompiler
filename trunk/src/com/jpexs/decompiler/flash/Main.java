@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.gui.AboutDialog;
 import com.jpexs.decompiler.flash.gui.LoadingDialog;
 import com.jpexs.decompiler.flash.gui.MainFrame;
 import com.jpexs.decompiler.flash.gui.ModeFrame;
+import com.jpexs.decompiler.flash.gui.NewVersionDialog;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
@@ -31,6 +32,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Properties;
 import java.util.logging.ConsoleHandler;
@@ -45,11 +47,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Main executable class
@@ -68,7 +65,7 @@ public class Main {
     public static final String shortApplicationName = "FFDec";
     public static String shortApplicationVerName;
     public static final String projectPage = "http://www.free-decompiler.com/flash";
-    public static String updatePageStub = "http://www.free-decompiler.com/flash/?update=";
+    public static String updatePageStub = "http://www.free-decompiler.com/flash/update.html?currentVersion=";
     public static String updatePage;
     public static final String vendor = "JPEXS";
     public static LoadingDialog loadingDialog;
@@ -78,6 +75,8 @@ public class Main {
     private static MenuItem stopMenuItem;
     private static boolean commandLineMode = false;
     public static MainFrame mainFrame;
+    private static final int UPDATE_SYSTEM_MAJOR = 1;
+    private static final int UPDATE_SYSTEM_MINOR = 0;
 
     private static void loadProperties() {
         Properties prop = new Properties();
@@ -768,74 +767,91 @@ public class Main {
 
     public static boolean checkForUpdates() {
         try {
-            Socket sock = new Socket("code.google.com", 80);
+            Socket sock = new Socket("www.free-decompiler.com", 80);
             OutputStream os = sock.getOutputStream();
-            os.write("GET /feeds/p/asdec/downloads/basic HTTP/1.1\r\nHost: code.google.com\r\nConnection: close\r\n\r\n".getBytes());
+            os.write(("GET /flash/update.html?action=check&currentVersion=" + version + " HTTP/1.1\r\nHost: www.free-decompiler.com\r\nUser-Agent: " + shortApplicationVerName + "\r\nConnection: close\r\n\r\n").getBytes());
             BufferedReader br = new BufferedReader(new InputStreamReader(sock.getInputStream()));
             String s;
-            String response = "";
             boolean start = false;
+            java.util.List<Version> versions = new ArrayList<Version>();
+            String header = "";
+            Pattern headerPat = Pattern.compile("\\[([a-zA-Z0-9]+)\\]");
+            int updateMajor = 0;
+            int updateMinor = 0;
+            Version ver = null;
             while ((s = br.readLine()) != null) {
                 if (start) {
-                    response += s + "\r\n";
+                    Matcher m = headerPat.matcher(s);
+                    if (m.matches()) {
+                        header = m.group(1);
+                        if (header.equals("version")) {
+                            ver = new Version();
+                            versions.add(ver);
+                        }
+                        if (header.equals("noversion")) {
+                            break;
+                        }
+                    } else {
+                        if (s.contains("=")) {
+                            String key = s.substring(0, s.indexOf("="));
+                            String val = s.substring(s.indexOf("=") + 1);
+                            if ("updateSystem".equals(header)) {
+                                if (key.equals("majorVersion")) {
+                                    updateMajor = Integer.parseInt(val);
+                                    if (updateMajor > UPDATE_SYSTEM_MAJOR) {
+                                        break;
+                                    }
+                                }
+                                if (key.equals("minorVersion")) {
+                                    updateMinor = Integer.parseInt(val);
+                                }
+                            }
+                            if ("version".equals(header) && (ver != null)) {
+                                if (key.equals("versionId")) {
+                                    ver.versionId = Integer.parseInt(val);
+                                }
+                                if (key.equals("versionName")) {
+                                    ver.versionName = val;
+                                }
+                                if (key.equals("longVersionName")) {
+                                    ver.longVersionName = val;
+                                }
+                                if (key.equals("releaseDate")) {
+                                    ver.releaseDate = val;
+                                }
+                                if (key.equals("appName")) {
+                                    ver.appName = val;
+                                }
+                                if (key.equals("appFullName")) {
+                                    ver.appFullName = val;
+                                }
+                                if (key.equals("updateLink")) {
+                                    ver.updateLink = val;
+                                }
+                                if (key.equals("change[]")) {
+                                    String changeType = val.substring(0, val.indexOf("|"));
+                                    String change = val.substring(val.indexOf("|") + 1);
+                                    if (!ver.changes.containsKey(changeType)) {
+                                        ver.changes.put(changeType, new ArrayList<String>());
+                                    }
+                                    java.util.List<String> chlist = ver.changes.get(changeType);
+                                    chlist.add(change);
+                                }
+                            }
+                        }
+                    }
                 }
                 if (s.equals("")) {
                     start = true;
                 }
             }
-            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            Document doc = builder.parse(new ByteArrayInputStream(response.getBytes()));
-            NodeList contents = doc.getElementsByTagName("content");
-            for (int i = 0; i < contents.getLength(); i++) {
-                Node nod = contents.item(i);
-                String cont = nod.getTextContent().trim();
-                String parts[] = cont.split("\n");
-                boolean isUpdate = false;
-                for (String part : parts) {
-                    if (part.trim().equals("Update")) {
-                        isUpdate = true;
-                        break;
-                    }
-                }
-                if ((parts.length > 4) && (isUpdate)) {
-                    String downloadName = parts[1];
-                    String link = parts[parts.length - 2];
-                    if (isUpdate) {
-                        String downVersion = "NEW";
-                        if (downloadName.startsWith(shortApplicationName + " version ")) {
-                            downVersion = downloadName.substring((shortApplicationName + " version ").length());
-                            if (downVersion.contains(" ")) {
-                                downVersion = downVersion.substring(0, downVersion.indexOf(" "));
-                            }
-                        }
-                        if (link.startsWith("<a href=\"")) {
-                            link = link.substring(link.indexOf("\"") + 1);
-                            link = link.substring(0, link.indexOf("\""));
-                            if (!downVersion.equals(version)) {
-                                java.awt.Desktop desktop = null;
-                                if (java.awt.Desktop.isDesktopSupported()) {
-                                    desktop = java.awt.Desktop.getDesktop();
-                                    if (desktop.isSupported(java.awt.Desktop.Action.BROWSE)) {
-                                        if (JOptionPane.showConfirmDialog(null, "New version of " + shortApplicationName + " is available: " + downloadName + ".\r\nDo you want to go to project web page to download it?", "New version", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.YES_OPTION) {
-                                            java.net.URI uri = new java.net.URI(updatePage);
-                                            desktop.browse(uri);
-                                        }
-                                    } else {
-                                        desktop = null;
-                                    }
-                                }
-                                if (desktop == null) {
-                                    JOptionPane.showMessageDialog(null, "New version of " + shortApplicationName + " is available: " + downloadName + ".\r\nPlease go to " + projectPage + " to download it.", "New version", JOptionPane.INFORMATION_MESSAGE);
-                                }
 
-                                Configuration.setConfig("lastUpdatesCheckDate", Calendar.getInstance());
-                                return true;
-                            }
-                        }
-                    }
-                }
+            if (!versions.isEmpty()) {
+                NewVersionDialog newVersionDialog = new NewVersionDialog(versions);
+                newVersionDialog.setVisible(true);
+                Configuration.setConfig("lastUpdatesCheckDate", Calendar.getInstance());
+                return true;
             }
-
         } catch (Exception ex) {
             return false;
         }

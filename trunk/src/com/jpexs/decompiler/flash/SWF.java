@@ -424,7 +424,7 @@ public class SWF {
                 Trait t = abc.script_info[scr.scriptIndex].traits.traits[scr.traitIndex];
                 String exStr = "Exporting " + "tag " + (i + 1) + "/" + abcTags.size() + " " + cnt + t.getPath(abc) + " ...";
                 informListeners("export", exStr);
-                t.export(outdir, abc, abcTags, isPcode, scr.scriptIndex, -1,false);
+                t.export(outdir, abc, abcTags, isPcode, scr.scriptIndex, -1, false);
                 return true;
             }
         }
