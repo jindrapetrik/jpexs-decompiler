@@ -86,24 +86,14 @@ public abstract class TreeItem extends GraphTargetItem {
             return propertyName.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
         }
         if (propertyName instanceof FullMultinameTreeItem) {
-            if (((FullMultinameTreeItem) propertyName).isRuntime()) {
-                return joinProperty(obStr, propertyName.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)));
+            if (((FullMultinameTreeItem) propertyName).name != null) {
+                return obStr + propertyName.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
             } else {
-                return joinProperty(obStr, ((FullMultinameTreeItem) propertyName).toString(constants, localRegNames, fullyQualifiedNames));
+                return obStr + "." + propertyName.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
             }
         } else {
             return obStr + "[" + propertyName.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "]";
         }
-    }
-
-    private String joinProperty(String prefix, String name) {
-        if (prefix.endsWith(".")) {
-            prefix = prefix.substring(0, prefix.length() - 1);
-        }
-        if (!Highlighting.stripHilights(name).startsWith("[")) {
-            return prefix + "." + name;
-        }
-        return prefix + name;
     }
 
     public static String localRegName(HashMap<Integer, String> localRegNames, int reg) {
