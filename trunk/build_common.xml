@@ -57,7 +57,7 @@
         </copy>
     </target>
 
-    <target name="test" depends="clean,compile">
+    <target name="test" depends="compile">
         <delete dir="${TESTRESULTSDIR}"/>
         <mkdir dir="${TESTRESULTSDIR}"/>
         <mkdir dir="${TESTRESULTSDIR}/raw/"/>
@@ -77,7 +77,7 @@
         
         <testng 
             outputDir="${TESTRESULTSDIR}"
-            haltOnFailure="true" verbose="2" workingDir="${basedir}">
+            haltOnFailure="false" verbose="2" workingDir="${basedir}">
         
             <classpath>
                 <pathelement path="${COMPILETESTSDIR}"/>
