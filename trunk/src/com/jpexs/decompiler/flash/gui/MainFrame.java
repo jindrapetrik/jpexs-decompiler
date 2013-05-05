@@ -25,7 +25,7 @@ import com.jpexs.decompiler.flash.abc.gui.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.abc.gui.DeobfuscationDialog;
 import com.jpexs.decompiler.flash.abc.gui.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.abc.gui.TreeElement;
-import com.jpexs.decompiler.flash.abc.gui.TreeLeafScript;
+import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.action.gui.ActionPanel;
@@ -881,7 +881,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         }
         if (t instanceof TreeElement) {
             TreeElement te = (TreeElement) t;
-            if (te.getItem() instanceof TreeLeafScript) {
+            if (te.getItem() instanceof ScriptPack) {
                 return "as";
             } else {
                 return "package";
@@ -1302,7 +1302,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                 if (onlySel) {
                                     List<Object> sel = getAllSelected(tagTree);
 
-                                    List<TreeLeafScript> tlsList = new ArrayList<TreeLeafScript>();
+                                    List<ScriptPack> tlsList = new ArrayList<ScriptPack>();
                                     JPEGTablesTag jtt = null;
                                     for (Tag t : swf.tags) {
                                         if (t instanceof JPEGTablesTag) {
@@ -1344,7 +1344,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                         }
                                         if (d instanceof TreeElement) {
                                             if (((TreeElement) d).isLeaf()) {
-                                                tlsList.add((TreeLeafScript) ((TreeElement) d).getItem());
+                                                tlsList.add((ScriptPack) ((TreeElement) d).getItem());
                                             }
                                         }
                                     }
@@ -1356,13 +1356,9 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                     swf.exportBinaryData(selFile + File.separator + "binaryData", binaryData);
                                     if (abcPanel != null) {
                                         for (int i = 0; i < tlsList.size(); i++) {
-                                            TreeLeafScript tls = tlsList.get(i);
-
-
-                                            for (Trait t : tls.abc.script_info[tls.scriptIndex].traits.traits) {
-                                                Main.startWork("Exporting " + (i + 1) + "/" + tlsList.size() + " " + t.getPath(tls.abc) + " ...");
-                                                t.export(selFile, tls.abc, abcList, isPcode, tls.scriptIndex, -1, false);
-                                            }
+                                            ScriptPack tls = tlsList.get(i);
+                                            Main.startWork("Exporting " + (i + 1) + "/" + tlsList.size() + " " + tls.getPath() + " ...");
+                                            tls.export(selFile, abcList, isPcode);
                                         }
                                     } else {
                                         List<TagNode> allNodes = new ArrayList<TagNode>();
@@ -1662,8 +1658,8 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             return;
         }
         oldValue = tagObj;
-        if (tagObj instanceof TreeLeafScript) {
-            final TreeLeafScript scriptLeaf = (TreeLeafScript) tagObj;
+        if (tagObj instanceof ScriptPack) {
+            final ScriptPack scriptLeaf = (ScriptPack) tagObj;
             if (!Main.isWorking()) {
                 Main.startWork("Decompiling...");
                 (new Thread() {

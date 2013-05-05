@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCode;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.gui.TreeLeafScript;
 import com.jpexs.decompiler.flash.abc.types.*;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
@@ -571,10 +570,11 @@ public class ABC {
             if (script_info.length > 1) {
                 cnt = "script " + (i + 1) + "/" + script_info.length + " ";
             }
-            for (Trait t : script_info[i].traits.traits) {
-                String exStr = "Exporting " + abcStr + cnt + t.getPath(this) + " ...";
+            HashMap<String, ScriptPack> packs = script_info[i].getPacks(this, i);
+            for (String path : packs.keySet()) {
+                String exStr = "Exporting " + abcStr + cnt + path + " ...";
                 informListeners("export", exStr);
-                t.export(directory, this, abcList, pcode, i, -1, false);
+                packs.get(path).export(directory, abcList, pcode);
             }
         }
     }
@@ -888,12 +888,14 @@ public class ABC {
         return -1;
     }
 
-    public TreeLeafScript findScriptTraitByPath(String name) {
+    public ScriptPack findScriptTraitByPath(String name) {
         for (int c = 0; c < script_info.length; c++) {
             for (int t = 0; t < script_info[c].traits.traits.length; t++) {
                 Trait tr = script_info[c].traits.traits[t];
                 if (tr.getPath(this).equals(name)) {
-                    return new TreeLeafScript(this, c, t);
+                    List<Integer> indices = new ArrayList<Integer>();
+                    indices.add(t);
+                    return new ScriptPack(this, c, indices);
                 }
             }
         }

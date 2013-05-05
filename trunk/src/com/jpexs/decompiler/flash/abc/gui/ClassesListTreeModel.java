@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.gui;
 
+import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import java.util.HashMap;
@@ -38,7 +39,7 @@ class ClassIndexVisitor implements TreeVisitor {
         if (o == null) {
             return;
         }
-        TreeLeafScript sc = (TreeLeafScript) o;
+        ScriptPack sc = (ScriptPack) o;
         for (Trait t : sc.abc.script_info[sc.scriptIndex].traits.traits) {
             if (t instanceof TraitClass) {
                 if (((TraitClass) t).class_info == classIndex) {
@@ -55,7 +56,7 @@ class ClassIndexVisitor implements TreeVisitor {
         if (o == null) {
             return;
         }
-        TreeLeafScript sc = (TreeLeafScript) o;
+        ScriptPack sc = (ScriptPack) o;
         for (Trait t : sc.abc.script_info[sc.scriptIndex].traits.traits) {
             if (t instanceof TraitClass) {
                 if (((TraitClass) t).class_info == classIndex) {
@@ -75,11 +76,11 @@ public class ClassesListTreeModel implements TreeModel {
 
     private Tree classTree = new Tree();
 
-    public ClassesListTreeModel(HashMap<String, TreeLeafScript> list) {
+    public ClassesListTreeModel(HashMap<String, ScriptPack> list) {
         this(list, null);
     }
 
-    public ClassesListTreeModel(HashMap<String, TreeLeafScript> list, String filter) {
+    public ClassesListTreeModel(HashMap<String, ScriptPack> list, String filter) {
         for (String path : list.keySet()) {
             if (filter != null) {
                 if (!filter.equals("")) {

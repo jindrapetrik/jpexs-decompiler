@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.gui;
 
+import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -38,7 +39,7 @@ import javax.swing.tree.TreeSelectionModel;
 public class ClassesListTree extends JTree implements TreeSelectionListener {
 
     private List<ABCContainerTag> abcList;
-    public HashMap<String, TreeLeafScript> treeList;
+    public HashMap<String, ScriptPack> treeList;
     private ABCPanel abcPanel;
 
     public void selectClass(int classIndex) {
@@ -61,9 +62,9 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
         setCellRenderer(treeRenderer);
     }
 
-    public List<TreeLeafScript> getSelectedScripts() {
+    public List<ScriptPack> getSelectedScripts() {
         TreeSelectionModel tsm = getSelectionModel();
-        final List<TreeLeafScript> selectedScripts = new ArrayList<TreeLeafScript>();
+        final List<ScriptPack> selectedScripts = new ArrayList<ScriptPack>();
         TreePath tps[] = tsm.getSelectionPaths();
         if (tps == null) {
             return selectedScripts;
@@ -72,8 +73,8 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
             TreeElement te = (TreeElement) tp.getLastPathComponent();
             if (te.isLeaf()) {
                 Object item = te.getItem();
-                if (item instanceof TreeLeafScript) {
-                    selectedScripts.add((TreeLeafScript) item);
+                if (item instanceof ScriptPack) {
+                    selectedScripts.add((ScriptPack) item);
                 }
             } else {
                 TreeVisitor tvi = new TreeVisitor() {
@@ -84,8 +85,8 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
                     @Override
                     public void onLeaf(TreeElement leaf) {
                         Object item = leaf.getItem();
-                        if (item instanceof TreeLeafScript) {
-                            selectedScripts.add((TreeLeafScript) item);
+                        if (item instanceof ScriptPack) {
+                            selectedScripts.add((ScriptPack) item);
                         }
                     }
                 };
@@ -96,23 +97,16 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
         return selectedScripts;
     }
 
-    public HashMap<String, TreeLeafScript> getTreeList(List<ABCContainerTag> list) {
-        HashMap<String, TreeLeafScript> ret = new HashMap<String, TreeLeafScript>();
+    public HashMap<String, ScriptPack> getTreeList(List<ABCContainerTag> list) {
+        HashMap<String, ScriptPack> ret = new HashMap<String, ScriptPack>();
         for (ABCContainerTag tag : list) {
             ABC abc = tag.getABC();
             for (int i = 0; i < abc.script_info.length; i++) {
                 ScriptInfo script = abc.script_info[i];
-                for (int j = 0; j < script.traits.traits.length; j++) {
-                    Trait t = script.traits.traits[j];
-                    Multiname name = t.getName(abc);
-                    Namespace ns = name.getNamespace(abc.constants);
-                    String packageName = ns.getName(abc.constants);
-                    String objectName = name.getName(abc.constants, new ArrayList<String>());
-                    String path = packageName + "." + objectName;
-                    ret.put(path, new TreeLeafScript(abc, i, j));
-                }
-
-
+                HashMap<String, ScriptPack> packs=script.getPacks(abc, i);
+                for(String path:packs.keySet()){
+                    ret.put(path, packs.get(path));
+                }                
             }
         }
         return ret;
@@ -138,8 +132,8 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
             return;
         }
         Object item = tp.getItem();
-        if (item instanceof TreeLeafScript) {
-            final TreeLeafScript scriptLeaf = (TreeLeafScript) item;
+        if (item instanceof ScriptPack) {
+            final ScriptPack scriptLeaf = (ScriptPack) item;
 
             if (!Main.isWorking()) {
                 Main.startWork("Decompiling...");

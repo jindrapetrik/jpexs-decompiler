@@ -17,17 +17,54 @@
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ScriptInfo {
 
     public int init_index; //MethodInfo
     public Traits traits;
+
+    public HashMap<String, ScriptPack> getPacks(ABC abc, int scriptIndex) {
+        HashMap<String, ScriptPack> ret = new HashMap<String, ScriptPack>();
+
+        List<Integer> otherTraits = new ArrayList<Integer>();
+        for (int j = 0; j < traits.traits.length; j++) {
+            Trait t = traits.traits[j];
+            Multiname name = t.getName(abc);
+            Namespace ns = name.getNamespace(abc.constants);
+            if (!((ns.kind == Namespace.KIND_PACKAGE_INTERNAL)
+                    || (ns.kind == Namespace.KIND_PACKAGE))) {
+                otherTraits.add(j);
+            }
+        }
+        for (int j = 0; j < traits.traits.length; j++) {
+            Trait t = traits.traits[j];
+            Multiname name = t.getName(abc);
+            Namespace ns = name.getNamespace(abc.constants);
+            if ((ns.kind == Namespace.KIND_PACKAGE_INTERNAL)
+                    || (ns.kind == Namespace.KIND_PACKAGE)) {
+                String packageName = ns.getName(abc.constants);
+                String objectName = name.getName(abc.constants, new ArrayList<String>());
+                String path = packageName + "." + objectName;
+                List<Integer> traitIndices = new ArrayList<Integer>();
+
+                traitIndices.add(j);
+                if (!otherTraits.isEmpty()) {
+                    traitIndices.addAll(otherTraits);
+                }
+                otherTraits = new ArrayList<Integer>();
+                ret.put(path, new ScriptPack(abc, scriptIndex, traitIndices));
+            }
+        }
+        return ret;
+    }
 
     public int removeTraps(int scriptIndex, ABC abc) {
         return traits.removeTraps(scriptIndex, -1, true, abc);
@@ -47,10 +84,9 @@ public class ScriptInfo {
     }
 
     public void export(ABC abc, List<ABCContainerTag> abcList, String directory, boolean pcode, int scriptIndex) throws IOException {
-        for (Trait t : traits.traits) {
-            t.export(directory, abc, abcList, pcode, scriptIndex, -1, false);
+        HashMap<String, ScriptPack> packs = getPacks(abc, scriptIndex);
+        for (ScriptPack pack : packs.values()) {
+            pack.export(directory, abcList, pcode);
         }
-
-
     }
 }

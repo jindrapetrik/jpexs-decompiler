@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.gui;
 
+import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
@@ -38,7 +39,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     private List<Highlighting> classHighlights = new ArrayList<Highlighting>();
     private Highlighting currentMethodHighlight;
     private ABC abc;
-    private TreeLeafScript script;
+    private ScriptPack script;
     public int lastTraitIndex = 0;
     private boolean ignoreCarret = false;
     private boolean reset = false;
@@ -46,7 +47,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     private int classIndex = -1;
     private boolean isStatic = false;
 
-    public TreeLeafScript getScriptLeaf() {
+    public ScriptPack getScriptLeaf() {
         return script;
     }
 
@@ -227,7 +228,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             this.classHighlights = classHighlights;
         }
     }
-    private HashMap<TreeLeafScript, BufferedClass> bufferedClasses = new HashMap<TreeLeafScript, BufferedClass>();
+    private HashMap<ScriptPack, BufferedClass> bufferedClasses = new HashMap<ScriptPack, BufferedClass>();
 
     public void gotoLastTrait() {
         gotoTrait(lastTraitIndex);
@@ -285,9 +286,8 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         bufferedClasses.clear();
     }
 
-    public void setScript(TreeLeafScript scriptLeaf, List<ABCContainerTag> abcList) {
+    public void setScript(ScriptPack scriptLeaf, List<ABCContainerTag> abcList) {
         int scriptIndex = scriptLeaf.scriptIndex;
-        int scriptTraitIndex = scriptLeaf.traitIndex;
         ScriptInfo script = null;
         ABC abc = scriptLeaf.abc;
         if (scriptIndex > -1) {
@@ -302,9 +302,13 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         }
         setText("//Please wait...");
 
-        String hilightedCode;
+        StringBuilder hilightedCodeBuf = new StringBuilder();
+        String hilightedCode = "";
         if (!bufferedClasses.containsKey(scriptLeaf)) {
-            hilightedCode = script.traits.traits[scriptTraitIndex].convertPackaged("", abcList, abc, false, false, scriptIndex, -1, true, new ArrayList<String>());
+            for (int scriptTraitIndex : scriptLeaf.traitIndices) {
+                hilightedCodeBuf.append(script.traits.traits[scriptTraitIndex].convertPackaged("", abcList, abc, false, false, scriptIndex, -1, true, new ArrayList<String>()));
+            }
+            hilightedCode = hilightedCodeBuf.toString();
             highlights = Highlighting.getInstrHighlights(hilightedCode);
             traitHighlights = Highlighting.getTraitHighlights(hilightedCode);
             methodHighlights = Highlighting.getMethodHighlights(hilightedCode);
