@@ -61,13 +61,6 @@ public class Graph {
     }
 
     private boolean fixGraphOnce(GraphPart part, List<GraphPart> visited, boolean doChildren) {
-        if ((part.start == 1743) && (!doChildren)) {
-            //p/1/0
-            System.out.println("dfewf");
-        }
-        if ((part.start == 1740) && (!doChildren)) {
-            System.out.println("efewf");
-        }
         if (visited.contains(part)) {
             return false;
         }
