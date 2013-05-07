@@ -43,15 +43,8 @@ public class ActionStartDrag extends Action {
 
         boolean hasConstrains = true;
         if (constrain instanceof DirectValueTreeItem) {
-            if (((DirectValueTreeItem) constrain).value instanceof Long) {
-                if (((long) (Long) ((DirectValueTreeItem) constrain).value) == 0) {
-                    hasConstrains = false;
-                }
-            }
-            if (((DirectValueTreeItem) constrain).value instanceof Boolean) {
-                if (((boolean) (Boolean) ((DirectValueTreeItem) constrain).value) == false) {
-                    hasConstrains = false;
-                }
+            if (Double.compare(constrain.toNumber(), 0) == 0) {
+                hasConstrains = false;
             }
         }
         GraphTargetItem x1 = null;

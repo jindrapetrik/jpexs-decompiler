@@ -45,15 +45,8 @@ public class StartDragTreeItem extends TreeItem {
     public String toString(ConstantPool constants) {
         boolean hasConstrains = true;
         if (constrain instanceof DirectValueTreeItem) {
-            if (((DirectValueTreeItem) constrain).value instanceof Long) {
-                if (((long) (Long) ((DirectValueTreeItem) constrain).value) == 0) {
-                    hasConstrains = false;
-                }
-            }
-            if (((DirectValueTreeItem) constrain).value instanceof Boolean) {
-                if (((boolean) (Boolean) ((DirectValueTreeItem) constrain).value) == false) {
-                    hasConstrains = false;
-                }
+            if (Double.compare(constrain.toNumber(), 0) == 0) {
+                hasConstrains = false;
             }
         }
         return hilight("startDrag(") + target.toString(constants) + hilight(",") + lockCenter.toString(constants) + (hasConstrains ? hilight(",") + x1.toString(constants) + hilight(",") + y1.toString(constants) + hilight(",") + x2.toString(constants) + hilight(",") + y2.toString(constants) : "") + hilight(")");
