@@ -105,11 +105,13 @@ public class DefineFont3Tag extends CharacterTag implements FontTag {
                 offsetTable[i] = sis.readUI16();
             }
         }
-        long codeTableOffset;
-        if (fontFlagsWideOffsets) {
-            codeTableOffset = sis.readUI32();
-        } else {
-            codeTableOffset = sis.readUI16();
+        long codeTableOffset = 0;
+        if (numGlyphs > 0) {
+            if (fontFlagsWideOffsets) {
+                codeTableOffset = sis.readUI32();
+            } else {
+                codeTableOffset = sis.readUI16();
+            }
         }
         glyphShapeTable = new SHAPE[numGlyphs];
         for (int i = 0; i < numGlyphs; i++) {
@@ -190,22 +192,23 @@ public class DefineFont3Tag extends CharacterTag implements FontTag {
             }
             byte ba3[] = baos3.toByteArray();
             sos.write(ba2);
-            //codetableoffset 881         
-            if (fontFlagsWideOffsets) {
-                long offset = ba2.length + ba3.length + 4;
-                sos.writeUI32(offset);
-            } else {
-                long offset = ba2.length + ba3.length + 2;
-                sos.writeUI16((int) offset);
-            }
-            sos.write(ba3);
-
-
-            for (int i = 0; i < numGlyphs; i++) {
-                if (fontFlagsWideCodes) {
-                    sos.writeUI16(codeTable.get(i));
+            if (numGlyphs > 0) {
+                if (fontFlagsWideOffsets) {
+                    long offset = ba2.length + ba3.length + 4;
+                    sos.writeUI32(offset);
                 } else {
-                    sos.writeUI8(codeTable.get(i));
+                    long offset = ba2.length + ba3.length + 2;
+                    sos.writeUI16((int) offset);
+                }
+                sos.write(ba3);
+
+
+                for (int i = 0; i < numGlyphs; i++) {
+                    if (fontFlagsWideCodes) {
+                        sos.writeUI16(codeTable.get(i));
+                    } else {
+                        sos.writeUI8(codeTable.get(i));
+                    }
                 }
             }
             if (fontFlagsHasLayout) {
