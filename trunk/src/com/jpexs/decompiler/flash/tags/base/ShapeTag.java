@@ -16,11 +16,17 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
+import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+
 /**
  *
  * @author JPEXS
  */
 public interface ShapeTag {
 
+    public SHAPEWITHSTYLE getShapes();
+
     public String toSVG();
+
+    public int getShapeNum();
 }

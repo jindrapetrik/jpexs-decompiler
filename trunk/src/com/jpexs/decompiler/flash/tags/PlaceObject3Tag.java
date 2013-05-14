@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
+import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
@@ -148,6 +149,23 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
     // FIXME bug found in ecoDrive.swf, 
     private boolean bitmapCacheBug;
 
+    @Override
+    public List<FILTER> getFilters() {
+        if (placeFlagHasFilterList) {
+            return surfaceFilterList;
+        } else {
+            return new ArrayList<FILTER>();
+        }
+    }
+
+    @Override
+    public int getClipDepth() {
+        if (placeFlagHasClipDepth) {
+            return clipDepth;
+        }
+        return -1;
+    }
+
     /**
      * Gets data bytes
      *
@@ -181,7 +199,7 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
             sos.writeUB(1, placeFlagHasBlendMode ? 1 : 0);
             sos.writeUB(1, placeFlagHasFilterList ? 1 : 0);
             sos.writeUI16(depth);
-            if (placeFlagHasClassName || (placeFlagHasImage && placeFlagHasCharacter)) {
+            if (placeFlagHasClassName) {
                 sos.writeString(className);
             }
             if (placeFlagHasCharacter) {
@@ -248,7 +266,7 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
         placeFlagHasFilterList = sis.readUB(1) == 1;
 
         depth = sis.readUI16();
-        if (placeFlagHasClassName || (placeFlagHasImage && placeFlagHasCharacter)) {
+        if (placeFlagHasClassName) {
             className = sis.readString();
         }
         if (placeFlagHasCharacter) {
@@ -346,5 +364,32 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
         } else {
             return null;
         }
+    }
+
+    @Override
+    public String getName() {
+        if (placeFlagHasName) {
+            return name;
+        }
+        return null;
+    }
+
+    @Override
+    public CXFORM getColorTransform() {
+        return null;
+    }
+
+    @Override
+    public CXFORMWITHALPHA getColorTransformWithAlpha() {
+        if (placeFlagHasColorTransform) {
+            return colorTransform;
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public int getBlendMode() {
+        return blendMode;
     }
 }

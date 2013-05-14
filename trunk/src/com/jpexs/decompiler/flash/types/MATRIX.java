@@ -68,7 +68,7 @@ public class MATRIX implements Serializable {
         return "[MATRIX scale:" + scaleX + "," + scaleY + ", rotate:" + rotateSkew0 + "," + rotateSkew1 + ", translate:" + translateX + "," + translateY + "]";
     }
 
-    private float toFloat(int i) {
+    public float toFloat(int i) {
         return ((float) i) / (1 << 16);
     }
 

@@ -34,6 +34,16 @@ public class DefineShapeTag extends CharacterTag implements BoundedTag, ShapeTag
     public SHAPEWITHSTYLE shapes;
 
     @Override
+    public int getShapeNum() {
+        return 1;
+    }
+
+    @Override
+    public SHAPEWITHSTYLE getShapes() {
+        return shapes;
+    }
+
+    @Override
     public Set<Integer> getNeededCharacters() {
         return shapes.getNeededCharacters();
     }

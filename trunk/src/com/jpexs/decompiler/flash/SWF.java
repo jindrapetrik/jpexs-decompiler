@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash;
 import SevenZip.Compression.LZMA.Encoder;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
-import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
@@ -75,6 +74,7 @@ import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.xfl.XFLConverter;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1146,5 +1146,13 @@ public class SWF {
             src.setActions(actionsMap.get(src), version);
         }
         return ret;
+    }
+
+    public void exportFla(String outfile, String swfName) {
+        XFLConverter.convertSWF(this, swfName, outfile, true);
+    }
+
+    public void exportXfl(String outfile, String swfName) {
+        XFLConverter.convertSWF(this, swfName, outfile, false);
     }
 }

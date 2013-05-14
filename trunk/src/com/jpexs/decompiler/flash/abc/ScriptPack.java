@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.abc;
 
-import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;

@@ -514,8 +514,13 @@ public class Main {
                                             if (!exportFormat.toLowerCase().equals("text")) {
                                                 if (!exportFormat.toLowerCase().equals("textplain")) {
                                                     if (!exportFormat.toLowerCase().equals("all")) {
-                                                        System.err.println("Invalid export format:" + exportFormat);
-                                                        badArguments();
+                                                        if (!exportFormat.toLowerCase().equals("fla")) {
+                                                            if (!exportFormat.toLowerCase().equals("xfl")) {
+                                                                System.err.println("Invalid export format:" + exportFormat);
+                                                                badArguments();
+                                                            }
+                                                        }
+
                                                     }
 
                                                 }
@@ -592,6 +597,12 @@ public class Main {
                         exportOK = true;
                     } else if (exportFormat.equals("textplain")) {
                         exfile.exportTexts(outDir.getAbsolutePath(), false);
+                        exportOK = true;
+                    } else if (exportFormat.equals("fla")) {
+                        exfile.exportFla(outDir.getAbsolutePath(), inFile.getName());
+                        exportOK = true;
+                    } else if (exportFormat.equals("xfl")) {
+                        exfile.exportXfl(outDir.getAbsolutePath(), inFile.getName());
                         exportOK = true;
                     } else {
                         exportOK = false;

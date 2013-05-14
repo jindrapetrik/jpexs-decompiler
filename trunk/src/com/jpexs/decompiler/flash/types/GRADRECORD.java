@@ -26,4 +26,8 @@ public class GRADRECORD {
     public boolean inShape3;
     public RGB color;
     public RGBA colorA;
+
+    public float getRatioFloat() {
+        return ((float) ratio) / 255.0f;
+    }
 }

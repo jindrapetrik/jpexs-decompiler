@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
+import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -46,7 +47,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedTag {
+public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedTag, ButtonTag {
 
     /**
      * ID for this character
@@ -67,6 +68,11 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
         return buttonId;
     }
     private long hdrSize;
+
+    @Override
+    public List<BUTTONRECORD> getRecords() {
+        return characters;
+    }
 
     /**
      * Constructor

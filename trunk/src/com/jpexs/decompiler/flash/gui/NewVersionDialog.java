@@ -43,8 +43,8 @@ import javax.swing.UIManager;
  */
 public class NewVersionDialog extends JDialog implements ActionListener {
 
-    Version latestVersion;    
-    
+    Version latestVersion;
+
     public NewVersionDialog(List<Version> versions) {
         setSize(new Dimension(500, 300));
         Container cnt = getContentPane();
@@ -104,9 +104,9 @@ public class NewVersionDialog extends JDialog implements ActionListener {
         this.getRootPane().setDefaultButton(buttonOk);
         View.centerScreen(this);
         setModalityType(ModalityType.APPLICATION_MODAL);
-        changesText.setCaretPosition(0);    
+        changesText.setCaretPosition(0);
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("OK")) {

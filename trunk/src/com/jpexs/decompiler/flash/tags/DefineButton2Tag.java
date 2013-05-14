@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
+import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
@@ -44,7 +45,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class DefineButton2Tag extends CharacterTag implements Container, BoundedTag {
+public class DefineButton2Tag extends CharacterTag implements Container, BoundedTag, ButtonTag {
 
     /**
      * ID for this character
@@ -66,6 +67,11 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
     @Override
     public int getCharacterID() {
         return buttonId;
+    }
+
+    @Override
+    public List<BUTTONRECORD> getRecords() {
+        return characters;
     }
 
     /**

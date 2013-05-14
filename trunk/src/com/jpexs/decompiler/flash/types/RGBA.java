@@ -40,6 +40,10 @@ public class RGBA {
      */
     public int alpha;
 
+    public float getAlphaFloat() {
+        return ((float) alpha) / 255.0f;
+    }
+
     public String toHexRGB() {
         String rh = Integer.toHexString(red);
         if (rh.length() < 2) {

@@ -22,8 +22,10 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
+import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.MATRIX;
+import com.jpexs.decompiler.flash.types.filters.FILTER;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -104,6 +106,19 @@ public class PlaceObject2Tag extends Tag implements Container, PlaceObjectTypeTa
      * @since SWF 5 If PlaceFlagHasClipActions, Clip Actions Data
      */
     public CLIPACTIONS clipActions;
+
+    @Override
+    public int getClipDepth() {
+        if (placeFlagHasClipDepth) {
+            return clipDepth;
+        }
+        return -1;
+    }
+
+    @Override
+    public List<FILTER> getFilters() {
+        return new ArrayList<FILTER>();
+    }
 
     /**
      * Gets data bytes
@@ -278,5 +293,32 @@ public class PlaceObject2Tag extends Tag implements Container, PlaceObjectTypeTa
         } else {
             return null;
         }
+    }
+
+    @Override
+    public String getName() {
+        if (placeFlagHasName) {
+            return name;
+        }
+        return null;
+    }
+
+    @Override
+    public CXFORM getColorTransform() {
+        return null;
+    }
+
+    @Override
+    public CXFORMWITHALPHA getColorTransformWithAlpha() {
+        if (placeFlagHasColorTransform) {
+            return colorTransform;
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public int getBlendMode() {
+        return 0;
     }
 }

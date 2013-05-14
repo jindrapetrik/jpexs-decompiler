@@ -19,12 +19,16 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.CXFORM;
+import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.MATRIX;
+import com.jpexs.decompiler.flash.types.filters.FILTER;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -50,6 +54,16 @@ public class PlaceObjectTag extends Tag implements PlaceObjectTypeTag {
      * Color transform data
      */
     public CXFORM colorTransform;
+
+    @Override
+    public List<FILTER> getFilters() {
+        return new ArrayList<FILTER>();
+    }
+
+    @Override
+    public int getClipDepth() {
+        return -1;
+    }
 
     /**
      * Gets data bytes
@@ -120,5 +134,25 @@ public class PlaceObjectTag extends Tag implements PlaceObjectTypeTag {
     @Override
     public MATRIX getMatrix() {
         return matrix;
+    }
+
+    @Override
+    public String getName() {
+        return null;
+    }
+
+    @Override
+    public CXFORM getColorTransform() {
+        return colorTransform;
+    }
+
+    @Override
+    public CXFORMWITHALPHA getColorTransformWithAlpha() {
+        return null;
+    }
+
+    @Override
+    public int getBlendMode() {
+        return 0;
     }
 }
