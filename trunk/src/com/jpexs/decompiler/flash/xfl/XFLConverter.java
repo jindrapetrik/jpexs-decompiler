@@ -20,15 +20,21 @@ import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
+import com.jpexs.decompiler.flash.tags.DefineFontNameTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.DefineText2Tag;
+import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
+import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
+import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
@@ -42,9 +48,11 @@ import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.filters.BEVELFILTER;
 import com.jpexs.decompiler.flash.types.filters.BLURFILTER;
 import com.jpexs.decompiler.flash.types.filters.COLORMATRIXFILTER;
@@ -57,6 +65,8 @@ import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -70,6 +80,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -88,9 +99,13 @@ import javax.xml.transform.stream.StreamSource;
  * @author JPEXS
  */
 public class XFLConverter {
-    
-    private XFLConverter(){
-        
+
+    public static final int KEY_MODE_NORMAL = 9728;
+    public static final int KEY_MODE_CLASSIC_TWEEN = 22017;
+    public static final int KEY_MODE_SHAPE_TWEEN = 17922;
+    public static final int KEY_MODE_MOTION_TWEEN = 8195;
+
+    private XFLConverter() {
     }
 
     public static String convertShapeEdge(MATRIX mat, SHAPERECORD record, int x, int y) {
@@ -153,7 +168,7 @@ public class XFLConverter {
                 + "</SolidStroke>";
     }
 
-    public static String convertLineStyle(LINESTYLE2 ls, int shapeNum) {
+    public static String convertLineStyle(HashMap<Integer, CharacterTag> characters, LINESTYLE2 ls, int shapeNum) {
         String ret = "";
         String params = "";
         if (ls.pixelHintingFlag) {
@@ -198,7 +213,7 @@ public class XFLConverter {
                     + (ls.color.getAlphaFloat() != 1 ? " alpha=\"" + ls.color.getAlphaFloat() + "\"" : "")
                     + "\"/>";
         } else {
-            ret += convertFillStyle(ls.fillType, shapeNum);
+            ret += convertFillStyle(characters, ls.fillType, shapeNum);
         }
         ret += "</fill>";
         ret += "</SolidStroke>";
@@ -209,7 +224,7 @@ public class XFLConverter {
         return ((float) i) / (1 << 16);
     }
 
-    public static String convertFillStyle(FILLSTYLE fs, int shapeNum) {
+    public static String convertFillStyle(HashMap<Integer, CharacterTag> characters, FILLSTYLE fs, int shapeNum) {
         String ret = "";
         //ret += "<FillStyle index=\"" + index + "\">";
         switch (fs.fillStyleType) {
@@ -231,7 +246,13 @@ public class XFLConverter {
             case NON_SMOOTHED_REPEATING_BITMAP:
             case NON_SMOOTHED_CLIPPED_BITMAP:
                 ret += "<BitmapFill";
-                ret += " bitmapPath=\"" + "\""; //TODO:Bitmap path
+                ret += " bitmapPath=\"";
+                CharacterTag bitmapCh = characters.get(fs.bitmapId);
+                if (bitmapCh instanceof ImageTag) {
+                    ImageTag it = (ImageTag) bitmapCh;
+                    ret += "bitmap" + bitmapCh.getCharacterID() + "." + it.getImageFormat();
+                }
+                ret += "\"";
 
                 if ((fs.fillStyleType == CLIPPED_BITMAP) || (fs.fillStyleType == NON_SMOOTHED_CLIPPED_BITMAP)) {
                     ret += " bitmapIsClipped=\"true\"";
@@ -332,23 +353,23 @@ public class XFLConverter {
         return ret;
     }
 
-    public static String convertShape(MATRIX mat, int shapeNum, SHAPE shape) {
-        return convertShape(mat, shapeNum, shape.shapeRecords);
+    public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, SHAPE shape) {
+        return convertShape(characters, mat, shapeNum, shape.shapeRecords);
     }
 
-    public static String convertShape(MATRIX mat, int shapeNum, SHAPEWITHSTYLE shape) {
-        return convertShape(mat, shapeNum, shape.shapeRecords, shape.fillStyles, shape.lineStyles);
+    public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, SHAPEWITHSTYLE shape) {
+        return convertShape(characters, mat, shapeNum, shape.shapeRecords, shape.fillStyles, shape.lineStyles);
     }
 
-    public static String convertShape(MATRIX mat, ShapeTag shape) {
-        return convertShape(mat, shape.getShapeNum(), shape.getShapes());
+    public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, ShapeTag shape) {
+        return convertShape(characters, mat, shape.getShapeNum(), shape.getShapes());
     }
 
-    public static String convertShape(MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords) {
-        return convertShape(mat, shapeNum, shapeRecords, null, null);
+    public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords) {
+        return convertShape(characters, mat, shapeNum, shapeRecords, null, null);
     }
 
-    public static String convertShape(MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles) {
+    public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles) {
         String ret = "";
         if (mat == null) {
             mat = new MATRIX();
@@ -372,7 +393,7 @@ public class XFLConverter {
         if (fillStyles != null) {
             for (FILLSTYLE fs : fillStyles.fillStyles) {
                 fillsStr += "<FillStyle index=\"" + (fillStyleCount + 1) + "\">";
-                fillsStr += convertFillStyle(fs, shapeNum);
+                fillsStr += convertFillStyle(characters, fs, shapeNum);
                 fillsStr += "</FillStyle>";
                 fillStyleCount++;
             }
@@ -382,7 +403,7 @@ public class XFLConverter {
             if (shapeNum == 4) {
                 for (int l = 0; l < lineStyles.lineStyles2.length; l++) {
                     strokesStr += "<StrokeStyle index=\"" + (lineStyleCount + 1) + "\">";
-                    strokesStr += convertLineStyle(lineStyles.lineStyles2[l], shapeNum);
+                    strokesStr += convertLineStyle(characters, lineStyles.lineStyles2[l], shapeNum);
                     strokesStr += "</StrokeStyle>";
                     lineStyleCount++;
                 }
@@ -402,14 +423,14 @@ public class XFLConverter {
                 if (scr.stateNewStyles) {
                     for (int f = 0; f < scr.fillStyles.fillStyles.length; f++) {
                         fillsStr += "<FillStyle index=\"" + (fillStyleCount + 1) + "\">";
-                        fillsStr += convertFillStyle(scr.fillStyles.fillStyles[f], shapeNum);
+                        fillsStr += convertFillStyle(characters, scr.fillStyles.fillStyles[f], shapeNum);
                         fillsStr += "</FillStyle>";
                         fillStyleCount++;
                     }
                     if (shapeNum == 4) {
                         for (int l = 0; l < scr.lineStyles.lineStyles2.length; l++) {
                             strokesStr += "<StrokeStyle index=\"" + (lineStyleCount + 1) + "\">";
-                            strokesStr += convertLineStyle(scr.lineStyles.lineStyles2[l], shapeNum);
+                            strokesStr += convertLineStyle(characters, scr.lineStyles.lineStyles2[l], shapeNum);
                             strokesStr += "</StrokeStyle>";
                             lineStyleCount++;
                         }
@@ -801,7 +822,7 @@ public class XFLConverter {
         return new Date().getTime() / 1000;
     }
 
-    public static String convertLibrary(List<Integer> oneInstanceShapes, String backgroundColor, List<Tag> tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files) {
+    public static String convertLibrary(Map<Integer, String> characterClasses, List<Integer> oneInstanceShapes, String backgroundColor, List<Tag> tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files) {
         String ret = "";
         List<String> media = new ArrayList<String>();
         List<String> symbols = new ArrayList<String>();
@@ -818,6 +839,9 @@ public class XFLConverter {
                     symbolStr += " symbolType=\"graphic\"";
                 } else if (symbol instanceof ButtonTag) {
                     symbolStr += " symbolType=\"button\"";
+                }
+                if (characterClasses.containsKey(symbol.getCharacterID())) {
+                    symbolStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterID()) + "\"";
                 }
                 symbolStr += ">";
                 symbolStr += "<timeline>";
@@ -868,7 +892,7 @@ public class XFLConverter {
                             if (duration > 1) {
                                 symbolStr += " duration=\"" + duration + "\"";
                             }
-                            symbolStr += " keyMode=\"9728\">";
+                            symbolStr += " keyMode=\"" + KEY_MODE_NORMAL + "\">";
                             symbolStr += "<elements>";
                             symbolStr += recCharStr;
                             symbolStr += "</elements>";
@@ -890,9 +914,9 @@ public class XFLConverter {
                     symbolStr += "<layers>";
                     symbolStr += "<DOMLayer name=\"Layer 1\" current=\"true\" isSelected=\"true\">"; //color=\"#4FFF4F\"
                     symbolStr += "<frames>";
-                    symbolStr += "<DOMFrame index=\"0\" keyMode=\"9728\">";
+                    symbolStr += "<DOMFrame index=\"0\" keyMode=\"" + KEY_MODE_NORMAL + "\">";
                     symbolStr += "<elements>";
-                    symbolStr += convertShape(null, shape);
+                    symbolStr += convertShape(characters, null, shape);
                     symbolStr += "</elements>";
                     symbolStr += "</DOMFrame>";
                     symbolStr += "</frames>";
@@ -916,32 +940,32 @@ public class XFLConverter {
                 }
                 symbLinkStr += " loadImmediate=\"false\" lastModified=\"" + getTimestamp() + "\"/>"; //TODO: itemID=\"518de416-00000341\"
                 symbols.add(symbLinkStr);
-            } else {
-                if (symbol instanceof ImageTag) {
-                    ImageTag imageTag = (ImageTag) symbol;
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    BufferedImage image = imageTag.getImage(tags);
-                    String format = imageTag.getImageFormat();
-                    try {
-                        ImageIO.write(image, format.toUpperCase(), baos);
-                    } catch (IOException ex) {
-                        Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    String symbolFile = "bitmap" + symbol.getCharacterID() + "." + imageTag.getImageFormat();
-                    files.put(symbolFile, baos.toByteArray());
-                    String mediaLinkStr = "<DOMBitmapItem name=\"Page-White-Code-32.png\" sourceLastImported=\"" + getTimestamp() + "\" externalFileSize=\"" + baos.toByteArray().length + "\"";
-                    if (format.equals("png") || format.equals("gif")) {
-                        mediaLinkStr += " useImportedJPEGData=\"false\" compressionType=\"lossless\" originalCompressionType=\"lossless\"";
-                    } else if (format.equals("jpg")) {
-                        mediaLinkStr += " isJPEG=\"true\"";
-                    }
-                    mediaLinkStr += " quality=\"50\" href=\"" + symbolFile + "\" bitmapDataHRef=\"M " + (media.size() + 1) + " " + getTimestamp() + ".dat\" frameRight=\"" + image.getWidth() + "\" frameBottom=\"" + image.getHeight() + "\"/>\n";
-                    //sourceExternalFilepath=\"../xfl/LIBRARY/Page-White-Code-32.png\"
-                    //itemID=\"518d55d6-00000304\"
-                    media.add(mediaLinkStr);
+            } else if (symbol instanceof ImageTag) {
+                ImageTag imageTag = (ImageTag) symbol;
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                BufferedImage image = imageTag.getImage(tags);
+                String format = imageTag.getImageFormat();
+                try {
+                    ImageIO.write(image, format.toUpperCase(), baos);
+                } catch (IOException ex) {
+                    Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                //bitmap,sound...
+                String symbolFile = "bitmap" + symbol.getCharacterID() + "." + imageTag.getImageFormat();
+                files.put(symbolFile, baos.toByteArray());
+                String mediaLinkStr = "<DOMBitmapItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp() + "\" externalFileSize=\"" + baos.toByteArray().length + "\"";
+                if (format.equals("png") || format.equals("gif")) {
+                    mediaLinkStr += " useImportedJPEGData=\"false\" compressionType=\"lossless\" originalCompressionType=\"lossless\"";
+                } else if (format.equals("jpg")) {
+                    mediaLinkStr += " isJPEG=\"true\"";
+                }
+                if (characterClasses.containsKey(symbol.getCharacterID())) {
+                    mediaLinkStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterID()) + "\"";
+                }
+                mediaLinkStr += " quality=\"50\" href=\"" + symbolFile + "\" bitmapDataHRef=\"M " + (media.size() + 1) + " " + getTimestamp() + ".dat\" frameRight=\"" + image.getWidth() + "\" frameBottom=\"" + image.getHeight() + "\"/>\n";
+                media.add(mediaLinkStr);
+
             }
+            //TODO: sound, video...
         }
         if (!media.isEmpty()) {
             ret += "<media>";
@@ -998,7 +1022,9 @@ public class XFLConverter {
                     if (characters.containsKey(characterId)) {
                         CharacterTag ch = characters.get(characterId);
                         if ((ch instanceof ShapeTag) && oneInstanceShapes.contains(characterId)) {
-                            elements += convertShape(po.getMatrix(), (ShapeTag) ch);
+                            elements += convertShape(characters, po.getMatrix(), (ShapeTag) ch);
+                        } else if (ch instanceof TextTag) {
+                            elements += convertText(tags, (TextTag) ch, po.getMatrix());
                         } else {
                             elements += convertSymbolInstance(po.getName(), po.getMatrix(), po.getColorTransform(), po.getColorTransformWithAlpha(), po.getBlendMode(), po.getFilters(), characters.get(characterId), characters);
                         }
@@ -1012,7 +1038,7 @@ public class XFLConverter {
                         if (duration > 1) {
                             ret += " duration=\"" + duration + "\"";
                         }
-                        ret += " keyMode=\"9728\">";
+                        ret += " keyMode=\"" + KEY_MODE_NORMAL + "\">";
                         ret += "<elements>";
                         ret += lastElements;
                         ret += "</elements>";
@@ -1032,7 +1058,7 @@ public class XFLConverter {
             if (duration > 1) {
                 ret += " duration=\"" + duration + "\"";
             }
-            ret += " keyMode=\"9728\">";
+            ret += " keyMode=\"" + KEY_MODE_NORMAL + "\">";
             ret += "<elements>";
             ret += lastElements;
             ret += "</elements>";
@@ -1143,6 +1169,109 @@ public class XFLConverter {
         }
     }
 
+    private static Map<Integer, String> getCharacterClasses(List<Tag> tags) {
+        Map<Integer, String> ret = new HashMap<Integer, String>();
+        for (Tag t : tags) {
+            if (t instanceof SymbolClassTag) {
+                SymbolClassTag sc = (SymbolClassTag) t;
+                for (int i = 0; i < sc.tagIDs.length; i++) {
+                    if (!ret.containsKey(sc.tagIDs[i]) && !ret.containsValue(sc.classNames[i])) {
+                        ret.put(sc.tagIDs[i], sc.classNames[i]);
+                    }
+                }
+            }
+        }
+        return ret;
+    }
+
+    public static String convertText(List<Tag> tags, TextTag tag, MATRIX matrix) {
+        String ret = "";
+        if (matrix == null) {
+            matrix = new MATRIX();
+        }
+        String matStr = "";
+        matStr += "<matrix>";
+        matStr += convertMatrix(matrix);
+        matStr += "</matrix>";
+        if ((tag instanceof DefineTextTag) || (tag instanceof DefineText2Tag)) {
+            ret += "<DOMStaticText fontRenderingMode=\"standard\" width=\"" + tag.getBounds().getWidth() / 2 + "\" height=\"" + tag.getBounds().getHeight() + "\" autoExpand=\"true\" isSelectable=\"false\">";
+            ret += matStr;
+            List<TEXTRECORD> textRecords = new ArrayList<TEXTRECORD>();
+            if (tag instanceof DefineTextTag) {
+                textRecords = ((DefineTextTag) tag).textRecords;
+            } else if (tag instanceof DefineText2Tag) {
+                textRecords = ((DefineText2Tag) tag).textRecords;
+            }
+            ret += "<textRuns>";
+            int fontId = -1;
+            FontTag font = null;
+            String fontName = null;
+            String psFontName = null;
+            String availableFonts[] = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+            int textHeight = -1;
+            RGB textColor = null;
+            RGBA textColorA = null;
+            for (TEXTRECORD rec : textRecords) {
+                if (rec.styleFlagsHasColor) {
+                    if (tag instanceof DefineTextTag) {
+                        textColor = rec.textColor;
+                    } else {
+                        textColorA = rec.textColorA;
+                    }
+                }
+                if (rec.styleFlagsHasFont) {
+                    fontId = rec.fontId;
+                    fontName = null;
+                    textHeight = rec.textHeight;
+                    font = null;
+                    for (Tag t : tags) {
+                        if (t instanceof FontTag) {
+                            if (((FontTag) t).getFontId() == fontId) {
+                                font = (FontTag) t;
+                            }
+                        }
+                        if (t instanceof DefineFontNameTag) {
+                            if (((DefineFontNameTag) t).fontId == fontId) {
+                                fontName = ((DefineFontNameTag) t).fontName;
+                            }
+                        }
+                    }
+                    if ((fontName == null) && (font != null)) {
+                        fontName = font.getFontName(tags);
+                    }
+                    psFontName = null;
+                    if (fontName != null) {
+                        for (String avFont : availableFonts) {
+                            if (avFont.equals(fontName)) {
+                                Font f = new Font(fontName, 0, 10);
+                                psFontName = f.getPSName();
+                            }
+                        }
+                    }
+                }
+                ret += "<DOMTextRun>";
+                ret += "<characters>" + rec.getText(tags, font) + "</characters>";
+                ret += "<textAttrs>";
+
+                ret += "<DOMTextAttrs aliasText=\"false\" rotation=\"true\" indent=\"5\" leftMargin=\"2\" letterSpacing=\"1\" lineSpacing=\"6\" rightMargin=\"3\" size=\"" + textHeight + "\" bitmapSize=\"1040\"";
+                if (textColor != null) {
+                    ret += " fillColor=\"" + textColor.toHexRGB() + "\"";
+                } else if (textColorA != null) {
+                    ret += " fillColor=\"" + textColorA.toHexRGB() + "\" alpha=\"" + textColorA.getAlphaFloat() + "\"";
+                }
+                ret += " face=\"" + psFontName + "\"";
+                ret += "/>";
+
+                ret += "</textAttrs>";
+                ret += "</DOMTextRun>";
+            }
+            ret += "</textRuns>";
+
+        }
+        //TODO:DefineEditText
+        return ret;
+    }
+
     public static void convertSWF(SWF swf, String swfFileName, String outfile, boolean compressed) {
         String domDocument = "";
         String baseName = swfFileName;
@@ -1155,6 +1284,7 @@ public class XFLConverter {
         HashMap<String, byte[]> files = new HashMap<String, byte[]>();
         HashMap<Integer, CharacterTag> characters = getCharacters(swf.tags);
         List<Integer> oneInstaceShapes = getOneInstanceShapes(swf.tags, characters);
+        Map<Integer, String> characterClasses = getCharacterClasses(swf.tags);
         String backgroundColor = "#ffffff";
         for (Tag t : swf.tags) {
             if (t instanceof SetBackgroundColorTag) {
@@ -1162,7 +1292,7 @@ public class XFLConverter {
                 backgroundColor = sbc.backgroundColor.toHexRGB();
             }
         }
-        domDocument += convertLibrary(oneInstaceShapes, backgroundColor, swf.tags, characters, files);
+        domDocument += convertLibrary(characterClasses, oneInstaceShapes, backgroundColor, swf.tags, characters, files);
         domDocument += "<timelines>";
         domDocument += convertTimeline(oneInstaceShapes, backgroundColor, swf.tags, characters, "Scene 1");
         domDocument += "</timelines>";
@@ -1259,14 +1389,14 @@ public class XFLConverter {
                 + "    <AS3ConfigConst>CONFIG::FLASH_AUTHORING=&quot;true&quot;;</AS3ConfigConst>\n"
                 + "    <DebuggingPermitted>0</DebuggingPermitted>\n"
                 + "    <DebuggingPassword></DebuggingPassword>\n"
-                + "    <CompressMovie>1</CompressMovie>\n"
-                + "    <CompressionType>0</CompressionType>\n"
+                + "    <CompressMovie>" + (swf.compressed ? "1" : "0") + "</CompressMovie>\n"
+                + "    <CompressionType>" + (swf.lzma ? "1" : "0") + "</CompressionType>\n"
                 + "    <InvisibleLayer>1</InvisibleLayer>\n"
                 + "    <DeviceSound>0</DeviceSound>\n"
                 + "    <StreamUse8kSampleRate>0</StreamUse8kSampleRate>\n"
                 + "    <EventUse8kSampleRate>0</EventUse8kSampleRate>\n"
                 + "    <UseNetwork>0</UseNetwork>\n"
-                + "    <DocumentClass></DocumentClass>\n"
+                + "    <DocumentClass>" + (characterClasses.containsKey(0) ? characterClasses.get(0) : "") + "</DocumentClass>\n"
                 + "    <AS3Strict>2</AS3Strict>\n"
                 + "    <AS3Coach>4</AS3Coach>\n"
                 + "    <AS3AutoDeclare>4096</AS3AutoDeclare>\n"
@@ -1331,8 +1461,8 @@ public class XFLConverter {
                 + "    <exportSMIL>1</exportSMIL>\n"
                 + "  </PublishRNWKProperties>\n"
                 + "  <PublishGifProperties enabled=\"true\">\n"
-                + "    <Width>550</Width>\n"
-                + "    <Height>400</Height>\n"
+                + "    <Width>" + (swf.displayRect.getWidth() / 20) + "</Width>\n"
+                + "    <Height>" + (swf.displayRect.getHeight() / 20) + "</Height>\n"
                 + "    <Animated>0</Animated>\n"
                 + "    <MatchMovieDim>1</MatchMovieDim>\n"
                 + "    <Loop>1</Loop>\n"
@@ -1350,8 +1480,8 @@ public class XFLConverter {
                 + "    <PaletteName></PaletteName>\n"
                 + "  </PublishGifProperties>\n"
                 + "  <PublishPNGProperties enabled=\"true\">\n"
-                + "    <Width>550</Width>\n"
-                + "    <Height>400</Height>\n"
+                + "    <Width>" + (swf.displayRect.getWidth() / 20) + "</Width>\n"
+                + "    <Height>" + (swf.displayRect.getHeight() / 20) + "</Height>\n"
                 + "    <OptimizeColors>1</OptimizeColors>\n"
                 + "    <Interlace>0</Interlace>\n"
                 + "    <Transparent>0</Transparent>\n"
@@ -1367,8 +1497,8 @@ public class XFLConverter {
                 + "    <PaletteName></PaletteName>\n"
                 + "  </PublishPNGProperties>\n"
                 + "  <PublishQTProperties enabled=\"true\">\n"
-                + "    <Width>550</Width>\n"
-                + "    <Height>400</Height>\n"
+                + "    <Width>" + (swf.displayRect.getWidth() / 20) + "</Width>\n"
+                + "    <Height>" + (swf.displayRect.getHeight() / 20) + "</Height>\n"
                 + "    <MatchMovieDim>1</MatchMovieDim>\n"
                 + "    <UseQTSoundCompression>0</UseQTSoundCompression>\n"
                 + "    <AlphaOption></AlphaOption>\n"

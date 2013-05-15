@@ -38,6 +38,7 @@ public class DefineFontTag extends CharacterTag implements FontTag {
     public int offsetTable[];
     public SHAPE glyphShapeTable[];
     private DefineFontInfoTag fontInfoTag = null;
+    private DefineFontInfo2Tag fontInfo2Tag = null;
 
     @Override
     public int getGlyphAdvance(int glyphIndex) {
@@ -58,6 +59,12 @@ public class DefineFontTag extends CharacterTag implements FontTag {
                         break;
                     }
                 }
+                if (t instanceof DefineFontInfo2Tag) {
+                    if (((DefineFontInfo2Tag) t).fontID == fontId) {
+                        fontInfo2Tag = (DefineFontInfo2Tag) t;
+                        break;
+                    }
+                }
             }
         }
     }
@@ -65,17 +72,25 @@ public class DefineFontTag extends CharacterTag implements FontTag {
     @Override
     public char glyphToChar(List<Tag> tags, int glyphIndex) {
         ensureFontInfo(tags);
-        if (fontInfoTag == null) {
-            return '?';
-        } else {
+        if (fontInfo2Tag != null) {
+            return (char) (int) fontInfo2Tag.codeTable.get(glyphIndex);
+        }else if (fontInfoTag != null) {
             return (char) (int) fontInfoTag.codeTable.get(glyphIndex);
+        } else {
+            return '?';
         }
     }
 
     @Override
     public int charToGlyph(List<Tag> tags, char c) {
         ensureFontInfo(tags);
-        return fontInfoTag.codeTable.indexOf(c);
+        if(fontInfo2Tag!=null){
+            return fontInfo2Tag.codeTable.indexOf(c);
+        }else if(fontInfoTag!=null){
+            return fontInfoTag.codeTable.indexOf(c);
+        }
+        return -1;
+        
     }
 
     /**
@@ -139,5 +154,17 @@ public class DefineFontTag extends CharacterTag implements FontTag {
     @Override
     public int getCharacterID() {
         return fontId;
+    }
+    
+    @Override
+    public String getFontName(List<Tag> tags){
+        ensureFontInfo(tags);
+        if(fontInfo2Tag!=null){
+            return fontInfo2Tag.fontName;
+        }
+        if(fontInfoTag!=null){
+            return fontInfoTag.fontName;
+        }        
+        return null;
     }
 }

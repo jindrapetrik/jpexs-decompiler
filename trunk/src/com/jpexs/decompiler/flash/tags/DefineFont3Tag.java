@@ -246,4 +246,9 @@ public class DefineFont3Tag extends CharacterTag implements FontTag {
     public int getCharacterID() {
         return fontId;
     }
+    
+    @Override
+    public String getFontName(List<Tag> tags){
+        return fontName;
+    }
 }

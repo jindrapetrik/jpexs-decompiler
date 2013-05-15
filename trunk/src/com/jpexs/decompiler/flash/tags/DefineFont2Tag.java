@@ -246,4 +246,9 @@ public class DefineFont2Tag extends CharacterTag implements FontTag {
     public int charToGlyph(List<Tag> tags, char c) {
         return codeTable.indexOf((Integer) (int) c);
     }
+    
+    @Override
+    public String getFontName(List<Tag> tags){
+        return fontName;
+    }
 }

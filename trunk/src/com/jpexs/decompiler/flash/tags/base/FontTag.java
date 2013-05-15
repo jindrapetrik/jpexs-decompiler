@@ -37,4 +37,6 @@ public interface FontTag extends AloneTag {
     public int getGlyphAdvance(int glyphIndex);
 
     public int getGlyphWidth(int glyphIndex);
+    
+    public String getFontName(List<Tag> tags);
 }

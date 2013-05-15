@@ -23,6 +23,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -40,7 +42,7 @@ public class DefineFontInfo2Tag extends Tag {
     public boolean fontFlagsBold;
     public boolean fontFlagsWideCodes;
     public LANGCODE languageCode;
-    public int codeTable[];
+    public List<Integer> codeTable;
 
     /**
      * Gets data bytes
@@ -65,8 +67,8 @@ public class DefineFontInfo2Tag extends Tag {
             sos.writeUB(1, fontFlagsBold ? 1 : 0);
             sos.writeUB(1, fontFlagsWideCodes ? 1 : 0);
             sos.writeLANGCODE(languageCode);
-            for (int i = 0; i < codeTable.length; i++) {
-                sos.writeUI16(codeTable[i]);
+            for (int c:codeTable) {
+                sos.writeUI16(c);
             }
         } catch (IOException e) {
         }
@@ -92,11 +94,12 @@ public class DefineFontInfo2Tag extends Tag {
         fontFlagsANSI = sis.readUB(1) == 1;
         fontFlagsItalic = sis.readUB(1) == 1;
         fontFlagsBold = sis.readUB(1) == 1;
-        fontFlagsWideCodes = sis.readUB(1) == 1;
+        fontFlagsWideCodes = sis.readUB(1) == 1; //Always 1
         languageCode = sis.readLANGCODE();
-        codeTable = new int[sis.available() / 2];
-        for (int i = 0; i < codeTable.length; i++) {
-            codeTable[i] = sis.readUI16();
+        int ctLen= sis.available() / 2;
+        codeTable = new ArrayList<Integer>();
+        for (int i = 0; i < ctLen; i++) {
+            codeTable.add(sis.readUI16());
         }
     }
 }
