@@ -1978,8 +1978,8 @@ public class SWFInputStream extends InputStream {
      */
     public BEVELFILTER readBEVELFILTER() throws IOException {
         BEVELFILTER ret = new BEVELFILTER();
+        ret.highlightColor = readRGBA(); //Highlight color first. It it opposite of the documentation
         ret.shadowColor = readRGBA();
-        ret.highlightColor = readRGBA();
         ret.blurX = readFIXED();
         ret.blurY = readFIXED();
         ret.angle = readFIXED();

@@ -19,7 +19,9 @@ package com.jpexs.decompiler.flash.xfl;
 import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
+import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.DefineFontNameTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
@@ -69,10 +71,12 @@ import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -87,12 +91,19 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.imageio.ImageIO;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  *
@@ -767,8 +778,8 @@ public class XFLConverter {
         } else if (tag instanceof DefineSpriteTag) {
             DefineSpriteTag sprite = (DefineSpriteTag) tag;
             RECT spriteRect = sprite.getRect(characters);
-            double centerPoint3DX = ((double) (matrix.translateX + spriteRect.getWidth() / 2)) / 20.0;
-            double centerPoint3DY = ((double) (matrix.translateY + spriteRect.getHeight() / 2)) / 20.0;
+            double centerPoint3DX = twipToPixel(matrix.translateX + spriteRect.getWidth() / 2);
+            double centerPoint3DY = twipToPixel(matrix.translateY + spriteRect.getHeight() / 2);
             ret += " centerPoint3DX=\"" + centerPoint3DX + "\" centerPoint3DY=\"" + centerPoint3DY + "\"";
         } else if (tag instanceof ButtonTag) {
             ret += " symbolType=\"button\"";
@@ -998,7 +1009,8 @@ public class XFLConverter {
             transformer.transform(xmlInput, xmlOutput);
             return xmlOutput.getWriter().toString();
         } catch (Exception e) {
-            throw new RuntimeException(e); // simple exception handling, please review it
+            Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Pretty print error", e);
+            return input;
         }
     }
 
@@ -1024,7 +1036,7 @@ public class XFLConverter {
                         if ((ch instanceof ShapeTag) && oneInstanceShapes.contains(characterId)) {
                             elements += convertShape(characters, po.getMatrix(), (ShapeTag) ch);
                         } else if (ch instanceof TextTag) {
-                            elements += convertText(tags, (TextTag) ch, po.getMatrix());
+                            elements += convertText(tags, (TextTag) ch, po.getMatrix(), po.getFilters());
                         } else {
                             elements += convertSymbolInstance(po.getName(), po.getMatrix(), po.getColorTransform(), po.getColorTransformWithAlpha(), po.getBlendMode(), po.getFilters(), characters.get(characterId), characters);
                         }
@@ -1184,24 +1196,76 @@ public class XFLConverter {
         return ret;
     }
 
-    public static String convertText(List<Tag> tags, TextTag tag, MATRIX matrix) {
+    public static String convertText(List<Tag> tags, TextTag tag, MATRIX matrix, List<FILTER> filters) {
         String ret = "";
         if (matrix == null) {
             matrix = new MATRIX();
+        }
+        CSMTextSettingsTag csmts = null;
+        String filterStr = "";
+        if (!filters.isEmpty()) {
+            filterStr += "<filters>";
+            for (FILTER f : filters) {
+                filterStr += convertFilter(f);
+            }
+            filterStr += "</filters>";
+        }
+
+        for (Tag t : tags) {
+            if (t instanceof CSMTextSettingsTag) {
+                CSMTextSettingsTag c = (CSMTextSettingsTag) t;
+                if (c.textID == tag.getCharacterID()) {
+                    csmts = c;
+                    break;
+                }
+            }
+        }
+        String fontRenderingMode = "standard";
+        String antiAlias = "";
+        if (csmts != null) {
+            if (csmts.thickness == 0 & csmts.sharpness == 0) {
+                fontRenderingMode = null;
+            } else {
+                fontRenderingMode = "customThicknessSharpness";
+            }
+            antiAlias = " antiAliasSharpness=\"" + doubleToString(csmts.sharpness) + "\" antiAliasThickness=\"" + doubleToString(csmts.thickness) + "\"";
         }
         String matStr = "";
         matStr += "<matrix>";
         matStr += convertMatrix(matrix);
         matStr += "</matrix>";
         if ((tag instanceof DefineTextTag) || (tag instanceof DefineText2Tag)) {
-            ret += "<DOMStaticText fontRenderingMode=\"standard\" width=\"" + tag.getBounds().getWidth() / 2 + "\" height=\"" + tag.getBounds().getHeight() + "\" autoExpand=\"true\" isSelectable=\"false\">";
-            ret += matStr;
             List<TEXTRECORD> textRecords = new ArrayList<TEXTRECORD>();
             if (tag instanceof DefineTextTag) {
                 textRecords = ((DefineTextTag) tag).textRecords;
             } else if (tag instanceof DefineText2Tag) {
                 textRecords = ((DefineText2Tag) tag).textRecords;
             }
+            looprec:
+            for (TEXTRECORD rec : textRecords) {
+                if (rec.styleFlagsHasFont) {
+                    for (Tag t : tags) {
+                        if (t instanceof FontTag) {
+                            FontTag ft = (FontTag) t;
+                            if (ft.getFontId() == rec.fontId) {
+                                if (ft.isSmall()) {
+                                    fontRenderingMode = "bitmap";
+                                    break looprec;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            ret += "<DOMStaticText";
+            if (fontRenderingMode != null) {
+                ret += " fontRenderingMode=\"" + fontRenderingMode + "\"";
+            }
+            ret += antiAlias;
+            ret += " width=\"" + tag.getBounds().getWidth() / 2 + "\" height=\"" + tag.getBounds().getHeight() + "\" autoExpand=\"true\" isSelectable=\"false\">";
+            ret += matStr;
+
             ret += "<textRuns>";
             int fontId = -1;
             FontTag font = null;
@@ -1250,10 +1314,10 @@ public class XFLConverter {
                     }
                 }
                 ret += "<DOMTextRun>";
-                ret += "<characters>" + rec.getText(tags, font) + "</characters>";
+                ret += "<characters>" + xmlString(rec.getText(tags, font)) + "</characters>";
                 ret += "<textAttrs>";
 
-                ret += "<DOMTextAttrs aliasText=\"false\" rotation=\"true\" indent=\"5\" leftMargin=\"2\" letterSpacing=\"1\" lineSpacing=\"6\" rightMargin=\"3\" size=\"" + textHeight + "\" bitmapSize=\"1040\"";
+                ret += "<DOMTextAttrs aliasText=\"false\" rotation=\"true\" indent=\"5\" leftMargin=\"2\" letterSpacing=\"1\" lineSpacing=\"6\" rightMargin=\"3\" size=\"" + twipToPixel(textHeight) + "\" bitmapSize=\"1040\"";
                 if (textColor != null) {
                     ret += " fillColor=\"" + textColor.toHexRGB() + "\"";
                 } else if (textColorA != null) {
@@ -1266,9 +1330,78 @@ public class XFLConverter {
                 ret += "</DOMTextRun>";
             }
             ret += "</textRuns>";
-
+            ret += filterStr;
+            ret += "</DOMStaticText>";
+        } else if (tag instanceof DefineEditTextTag) {
+            DefineEditTextTag det = (DefineEditTextTag) tag;
+            String tagName;
+            for (Tag t : tags) {
+                if (t instanceof FontTag) {
+                    FontTag ft = (FontTag) t;
+                    if (ft.getFontId() == det.fontId) {
+                        if (ft.isSmall()) {
+                            fontRenderingMode = "bitmap";
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!det.useOutlines) {
+                fontRenderingMode = "device";
+            }
+            if (det.wasStatic) {
+                tagName = "DOMStaticText";
+            } else if (det.readOnly) {
+                tagName = "DOMDynamicText";
+            } else {
+                tagName = "DOMInputText";
+            }
+            ret += "<" + tagName;
+            if (fontRenderingMode != null) {
+                ret += " fontRenderingMode=\"" + fontRenderingMode + "\"";
+            }
+            ret += antiAlias;
+            double width = twipToPixel(det.getBounds().getWidth());
+            double height = twipToPixel(det.getBounds().getHeight());
+            if (det.hasLayout) {
+                width -= twipToPixel(det.rightMargin);
+                width -= twipToPixel(det.leftMargin);
+                //height-=det.
+            }
+            ret += " width=\"" + width + "\"";
+            ret += " height=\"" + height + "\"";
+            if (det.border) {
+                ret += "  border=\"true\"";
+            }
+            if (det.html) {
+                ret += " renderAsHTML=\"true\"";
+            }
+            if (det.noSelect) {
+                ret += " isSelectable=\"false\"";
+            }
+            if (det.multiline && det.wordWrap) {
+                ret += " lineType=\"multiline\"";
+            } else if (det.multiline && (!det.wordWrap)) {
+                ret += " lineType=\"multiline no wrap\"";
+            } else if (det.password) {
+                ret += " lineType=\"password\"";
+            }
+            if (det.hasMaxLength) {
+                ret += " maxCharacters=\"" + det.maxLength + "\"";
+            }
+            if (!det.variableName.equals("")) {
+                ret += " variableName=\"" + det.variableName + "\"";
+            }
+            ret += ">";
+            ret += matStr;
+            ret += "<textRuns>";
+            if (det.hasText) {
+                ret += convertHTMLText(tags, det, det.initialText);
+            }
+            ret += "</textRuns>";
+            ret += filterStr;
+            ret += "</" + tagName + ">";
         }
-        //TODO:DefineEditText
         return ret;
     }
 
@@ -1350,8 +1483,8 @@ public class XFLConverter {
                 + "    <AlternateFilename>" + baseName + "_alternate.html</AlternateFilename>\n"
                 + "    <UsingOwnAlternateFile>0</UsingOwnAlternateFile>\n"
                 + "    <OwnAlternateFilename></OwnAlternateFilename>\n"
-                + "    <Width>" + (swf.displayRect.getWidth() / 20) + "</Width>\n"
-                + "    <Height>" + (swf.displayRect.getHeight() / 20) + "</Height>\n"
+                + "    <Width>" + twipToPixel(swf.displayRect.getWidth()) + "</Width>\n"
+                + "    <Height>" + twipToPixel(swf.displayRect.getHeight()) + "</Height>\n"
                 + "    <Align>0</Align>\n"
                 + "    <Units>0</Units>\n"
                 + "    <Loop>1</Loop>\n"
@@ -1435,8 +1568,8 @@ public class XFLConverter {
                 + "    </LibraryVersions>\n"
                 + "  </PublishFlashProperties>\n"
                 + "  <PublishJpegProperties enabled=\"true\">\n"
-                + "    <Width>" + (swf.displayRect.getWidth() / 20) + "</Width>\n"
-                + "    <Height>" + (swf.displayRect.getHeight() / 20) + "</Height>\n"
+                + "    <Width>" + twipToPixel(swf.displayRect.getWidth()) + "</Width>\n"
+                + "    <Height>" + twipToPixel(swf.displayRect.getHeight()) + "</Height>\n"
                 + "    <Progressive>0</Progressive>\n"
                 + "    <DPI>4718592</DPI>\n"
                 + "    <Size>0</Size>\n"
@@ -1461,8 +1594,8 @@ public class XFLConverter {
                 + "    <exportSMIL>1</exportSMIL>\n"
                 + "  </PublishRNWKProperties>\n"
                 + "  <PublishGifProperties enabled=\"true\">\n"
-                + "    <Width>" + (swf.displayRect.getWidth() / 20) + "</Width>\n"
-                + "    <Height>" + (swf.displayRect.getHeight() / 20) + "</Height>\n"
+                + "    <Width>" + twipToPixel(swf.displayRect.getWidth()) + "</Width>\n"
+                + "    <Height>" + twipToPixel(swf.displayRect.getHeight()) + "</Height>\n"
                 + "    <Animated>0</Animated>\n"
                 + "    <MatchMovieDim>1</MatchMovieDim>\n"
                 + "    <Loop>1</Loop>\n"
@@ -1480,8 +1613,8 @@ public class XFLConverter {
                 + "    <PaletteName></PaletteName>\n"
                 + "  </PublishGifProperties>\n"
                 + "  <PublishPNGProperties enabled=\"true\">\n"
-                + "    <Width>" + (swf.displayRect.getWidth() / 20) + "</Width>\n"
-                + "    <Height>" + (swf.displayRect.getHeight() / 20) + "</Height>\n"
+                + "    <Width>" + twipToPixel(swf.displayRect.getWidth()) + "</Width>\n"
+                + "    <Height>" + twipToPixel(swf.displayRect.getHeight()) + "</Height>\n"
                 + "    <OptimizeColors>1</OptimizeColors>\n"
                 + "    <Interlace>0</Interlace>\n"
                 + "    <Transparent>0</Transparent>\n"
@@ -1497,8 +1630,8 @@ public class XFLConverter {
                 + "    <PaletteName></PaletteName>\n"
                 + "  </PublishPNGProperties>\n"
                 + "  <PublishQTProperties enabled=\"true\">\n"
-                + "    <Width>" + (swf.displayRect.getWidth() / 20) + "</Width>\n"
-                + "    <Height>" + (swf.displayRect.getHeight() / 20) + "</Height>\n"
+                + "    <Width>" + twipToPixel(swf.displayRect.getWidth()) + "</Width>\n"
+                + "    <Height>" + twipToPixel(swf.displayRect.getHeight()) + "</Height>\n"
                 + "    <MatchMovieDim>1</MatchMovieDim>\n"
                 + "    <UseQTSoundCompression>0</UseQTSoundCompression>\n"
                 + "    <AlphaOption></AlphaOption>\n"
@@ -1673,5 +1806,217 @@ public class XFLConverter {
         }
 
         return "<AdjustColorFilter brightness=\"" + normBrightness(b) + "\" contrast=\"" + normContrast(c) + "\" saturation=\"" + normSaturation(s) + "\" hue=\"" + normHue(h) + "\"/>";
+    }
+
+    private static String convertHTMLText(List<Tag> tags, DefineEditTextTag det, String html) {
+        HTMLTextParser tparser = new HTMLTextParser(tags, det);
+        try {
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            factory.setValidating(false);
+
+            SAXParser parser = factory.newSAXParser();
+
+            XMLReader reader = parser.getXMLReader();
+
+
+            reader.setContentHandler(tparser);
+            reader.setErrorHandler(tparser);
+            reader.parse(new InputSource(new InputStreamReader(new ByteArrayInputStream(html.getBytes("UTF-8")), "UTF-8")));
+        } catch (Exception e) {
+            Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Error while converting HTML", e);
+        }
+        return tparser.result;
+    }
+
+    private static String xmlString(String s) {
+        return s.replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("&", "&amp;").replace("\r\n", "&#xD;").replace("\r", "&#xD;").replace("\n", "&#xD;");
+    }
+
+    private static double twipToPixel(double tw) {
+        return tw / 20.0;
+    }
+
+    private static class HTMLTextParser extends DefaultHandler {
+
+        public String result = "";
+        private String fontFace = "";
+        private String color = "";
+        private int size = -1;
+        private int indent = -1;
+        private int leftMargin = -1;
+        private int rightMargin = -1;
+        private int lineSpacing = -1;
+        private double letterSpacing = -1;
+        private String alignment = null;
+        private List<Tag> tags;
+        private boolean bold = false;
+        private boolean italic = false;
+        private boolean underline = false;
+        private boolean li = false;
+        private String url = null;
+        private String target = null;
+
+        public HTMLTextParser(List<Tag> tags, DefineEditTextTag det) {
+            if (det.hasLayout) {
+                leftMargin = det.leftMargin;
+                rightMargin = det.rightMargin;
+                indent = det.indent;
+                lineSpacing = det.leading;
+                String alignNames[] = {"left", "right", "center", "justify"};
+                alignment = alignNames[det.align];
+            }
+            this.tags = tags;
+        }
+
+        @Override
+        public void startDocument() throws SAXException {
+        }
+
+        @Override
+        public void startElement(String uri, String localName,
+                String qName, Attributes attributes) throws SAXException {
+            if (qName.equals("a")) {
+                String href = attributes.getValue("href");
+                if (href != null) {
+                    url = href;
+                }
+                String t = attributes.getValue("target");
+                if (t != null) {
+                    target = t;
+                }
+            } else if (qName.equals("b")) {
+                bold = true;
+            } else if (qName.equals("i")) {
+                italic = true;
+            } else if (qName.equals("u")) {
+                underline = true;
+            } else if (qName.equals("li")) {
+                li = true;
+            } else if (qName.equals("p")) {
+                String a = attributes.getValue("align");
+                if (a != null) {
+                    alignment = a;
+                }
+                if (!result.equals("")) {
+                    putText("\r\n");
+                }
+            } else if (qName.equals("font")) {
+                //kerning  ?
+                String ls = attributes.getValue("letterSpacing");
+                if (ls != null) {
+                    letterSpacing = Double.parseDouble(ls);
+                }
+                String s = attributes.getValue("size");
+                if (s != null) {
+                    size = Integer.parseInt(s);
+                }
+                String c = attributes.getValue("color");
+                if (c != null) {
+                    color = c;
+                }
+                String f = attributes.getValue("face");
+                if (f != null) {
+                    for (Tag t : tags) {
+                        if (t instanceof FontTag) {
+                            FontTag ft = (FontTag) t;
+                            String fontName = "";
+                            if (f.equals(ft.getFontName(tags))) {
+                                for (Tag u : tags) {
+                                    if (u instanceof DefineFontNameTag) {
+                                        if (((DefineFontNameTag) u).fontId == ft.getFontId()) {
+                                            fontName = ((DefineFontNameTag) u).fontName;
+                                        }
+                                    }
+                                }
+                                if (fontName == null) {
+                                    fontName = ft.getFontName(tags);
+                                }
+                                fontFace = new Font(fontName, (italic ? Font.ITALIC : 0) | (bold ? Font.BOLD : 0) | (!italic && !bold ? Font.PLAIN : 0), size < 0 ? 10 : size).getPSName();
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            //textformat,tab,br
+        }
+
+        @Override
+        public void endElement(String uri, String localName,
+                String qName) throws SAXException {
+            if (qName.equals("a")) {
+                url = null;
+                target = null;
+            }
+            if (qName.equals("b")) {
+                bold = false;
+            }
+            if (qName.equals("i")) {
+                italic = false;
+            }
+            if (qName.equals("u")) {
+                underline = false;
+            }
+            if (qName.equals("li")) {
+                li = false;
+            }
+        }
+
+        private void putText(String txt) {
+
+            result += "<DOMTextRun>";
+            result += "<characters>" + xmlString(txt) + "</characters>";
+            result += "<textAttrs>";
+            result += "<DOMTextAttrs";
+            if (alignment != null) {
+                result += " alignment=\"" + alignment + "\"";
+            }
+            result += " rotation=\"true\""; //?
+            if (indent > -1) {
+                result += " indent=\"" + twipToPixel(indent) + "\"";
+            }
+            if (leftMargin > -1) {
+                result += " leftMargin=\"" + twipToPixel(leftMargin) + "\"";
+            }
+            if (letterSpacing > -1) {
+                result += " letterSpacing=\"" + letterSpacing + "\"";
+            }
+            if (lineSpacing > -1) {
+                result += " lineSpacing=\"" + twipToPixel(lineSpacing) + "\"";
+            }
+            if (rightMargin > -1) {
+                result += " rightMargin=\"" + twipToPixel(rightMargin) + "\"";
+            }
+            if (size > -1) {
+                result += " size=\"" + size + "\"";
+                result += " bitmapSize=\"" + (size * 20) + "\"";
+            }
+            if (fontFace != null) {
+                result += " face=\"" + fontFace + "\"";
+            }
+            if (color != null) {
+                result += " fillColor=\"" + color + "\"";
+            }
+            if (url != null) {
+                result += " url=\"" + url + "\"";
+            }
+            if (target != null) {
+                result += " target=\"" + target + "\"";
+            }
+            result += "/>";
+            result += "</textAttrs>";
+            result += "</DOMTextRun>";
+        }
+
+        @Override
+        public void characters(char[] ch, int start, int length)
+                throws SAXException {
+            putText(new String(ch, start, length));
+
+        }
+
+        @Override
+        public void endDocument() {
+        }
     }
 }

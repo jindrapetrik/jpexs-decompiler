@@ -58,6 +58,11 @@ public class DefineFont3Tag extends CharacterTag implements FontTag {
     public KERNINGRECORD fontKerningTable[];
 
     @Override
+    public boolean isSmall() {
+        return fontFlagsSmallText;
+    }
+
+    @Override
     public int getGlyphWidth(int glyphIndex) {
         return glyphShapeTable[glyphIndex].getBounds().getWidth() / 20;
     }
@@ -246,9 +251,13 @@ public class DefineFont3Tag extends CharacterTag implements FontTag {
     public int getCharacterID() {
         return fontId;
     }
-    
+
     @Override
-    public String getFontName(List<Tag> tags){
-        return fontName;
+    public String getFontName(List<Tag> tags) {
+        String ret = fontName;
+        if (ret.contains("" + (char) 0)) {
+            ret = ret.substring(0, ret.indexOf(0));
+        }
+        return ret;
     }
 }

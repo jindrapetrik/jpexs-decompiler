@@ -67,7 +67,7 @@ public class DefineFontInfo2Tag extends Tag {
             sos.writeUB(1, fontFlagsBold ? 1 : 0);
             sos.writeUB(1, fontFlagsWideCodes ? 1 : 0);
             sos.writeLANGCODE(languageCode);
-            for (int c:codeTable) {
+            for (int c : codeTable) {
                 sos.writeUI16(c);
             }
         } catch (IOException e) {
@@ -96,7 +96,7 @@ public class DefineFontInfo2Tag extends Tag {
         fontFlagsBold = sis.readUB(1) == 1;
         fontFlagsWideCodes = sis.readUB(1) == 1; //Always 1
         languageCode = sis.readLANGCODE();
-        int ctLen= sis.available() / 2;
+        int ctLen = sis.available() / 2;
         codeTable = new ArrayList<Integer>();
         for (int i = 0; i < ctLen; i++) {
             codeTable.add(sis.readUI16());

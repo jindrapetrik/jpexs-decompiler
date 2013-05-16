@@ -41,6 +41,11 @@ public class DefineFontTag extends CharacterTag implements FontTag {
     private DefineFontInfo2Tag fontInfo2Tag = null;
 
     @Override
+    public boolean isSmall() {
+        return false;
+    }
+
+    @Override
     public int getGlyphAdvance(int glyphIndex) {
         return getGlyphWidth(glyphIndex);
     }
@@ -74,7 +79,7 @@ public class DefineFontTag extends CharacterTag implements FontTag {
         ensureFontInfo(tags);
         if (fontInfo2Tag != null) {
             return (char) (int) fontInfo2Tag.codeTable.get(glyphIndex);
-        }else if (fontInfoTag != null) {
+        } else if (fontInfoTag != null) {
             return (char) (int) fontInfoTag.codeTable.get(glyphIndex);
         } else {
             return '?';
@@ -84,13 +89,13 @@ public class DefineFontTag extends CharacterTag implements FontTag {
     @Override
     public int charToGlyph(List<Tag> tags, char c) {
         ensureFontInfo(tags);
-        if(fontInfo2Tag!=null){
+        if (fontInfo2Tag != null) {
             return fontInfo2Tag.codeTable.indexOf(c);
-        }else if(fontInfoTag!=null){
+        } else if (fontInfoTag != null) {
             return fontInfoTag.codeTable.indexOf(c);
         }
         return -1;
-        
+
     }
 
     /**
@@ -155,16 +160,16 @@ public class DefineFontTag extends CharacterTag implements FontTag {
     public int getCharacterID() {
         return fontId;
     }
-    
+
     @Override
-    public String getFontName(List<Tag> tags){
+    public String getFontName(List<Tag> tags) {
         ensureFontInfo(tags);
-        if(fontInfo2Tag!=null){
+        if (fontInfo2Tag != null) {
             return fontInfo2Tag.fontName;
         }
-        if(fontInfoTag!=null){
+        if (fontInfoTag != null) {
             return fontInfoTag.fontName;
-        }        
+        }
         return null;
     }
 }

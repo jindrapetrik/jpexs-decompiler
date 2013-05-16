@@ -33,8 +33,8 @@ public class CSMTextSettingsTag extends Tag {
     public int textID;
     public int useFlashType;
     public int gridFit;
-    public double thickness;
-    public double sharpness;
+    public float thickness;
+    public float sharpness;
 
     /**
      * Gets data bytes
@@ -52,8 +52,8 @@ public class CSMTextSettingsTag extends Tag {
             sos.writeUB(2, useFlashType);
             sos.writeUB(3, gridFit);
             sos.writeUB(3, 0);
-            sos.writeFIXED(thickness); //TODO:write F32
-            sos.writeFIXED(sharpness); //TODO:write F32
+            sos.writeFLOAT(thickness); //F32 = FLOAT
+            sos.writeFLOAT(sharpness); //F32 = FLOAT
             sos.writeUI8(0);
         } catch (IOException e) {
         }
@@ -74,8 +74,8 @@ public class CSMTextSettingsTag extends Tag {
         useFlashType = (int) sis.readUB(2);
         gridFit = (int) sis.readUB(3);
         sis.readUB(3); //reserved
-        thickness = sis.readFIXED(); //TODO: read F32
-        sharpness = sis.readFIXED(); //TODO: read F32
+        thickness = sis.readFLOAT(); //F32 = FLOAT
+        sharpness = sis.readFLOAT(); //F32 = FLOAT
         sis.readUI8(); //reserved
     }
 

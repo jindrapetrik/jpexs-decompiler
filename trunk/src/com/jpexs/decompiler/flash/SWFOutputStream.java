@@ -824,8 +824,8 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeBEVELFILTER(BEVELFILTER value) throws IOException {
-        writeRGBA(value.shadowColor);
         writeRGBA(value.highlightColor);
+        writeRGBA(value.shadowColor);
         writeFIXED(value.blurX);
         writeFIXED(value.blurY);
         writeFIXED(value.angle);
