@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
@@ -25,6 +26,7 @@ import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.MATRIX;
+import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -97,6 +99,14 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
      */
     public boolean placeFlagHasFilterList;
     /**
+     * Has opaque background. SWF 11 and higher.
+     */
+    public boolean placeFlagOpaqueBackground;
+    /**
+     * Has visibility flag. SWF 11 and higher.
+     */
+    public boolean placeFlagHasVisible;
+    /**
      * Depth of character
      */
     public int depth;
@@ -146,8 +156,20 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
      * @since SWF 5 If PlaceFlagHasClipActions, Clip Actions Data
      */
     public CLIPACTIONS clipActions;
+    
+    /**
+     * If PlaceFlagHasVisible, 0 = Place invisible, 1 = Place visible
+     */
+    public int visible;
+    
+    /**
+     * If PlaceFlagHasVisible, Background color
+     */
+    public RGBA backgroundColor;
+    
     // FIXME bug found in ecoDrive.swf, 
     private boolean bitmapCacheBug;
+    private int reserved;
 
     @Override
     public List<FILTER> getFilters() {
@@ -192,7 +214,9 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
             sos.writeUB(1, placeFlagHasMatrix ? 1 : 0);
             sos.writeUB(1, placeFlagHasCharacter ? 1 : 0);
             sos.writeUB(1, placeFlagMove ? 1 : 0);
-            sos.writeUB(3, 0);
+            sos.writeUB(1, reserved);
+            sos.writeUB(1, placeFlagOpaqueBackground ? 1 : 0); //SWF11
+            sos.writeUB(1, placeFlagHasVisible ? 1 : 0); //SWF11
             sos.writeUB(1, placeFlagHasImage ? 1 : 0);
             sos.writeUB(1, placeFlagHasClassName ? 1 : 0);
             sos.writeUB(1, placeFlagHasCacheAsBitmap ? 1 : 0);
@@ -231,6 +255,10 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
                     sos.writeUI8(bitmapCache);
                 }
             }
+            if(placeFlagHasVisible){
+                sos.writeUI8(visible);
+                sos.writeRGBA(backgroundColor);
+            }
             if (placeFlagHasClipActions) {
                 sos.writeCLIPACTIONS(clipActions);
             }
@@ -258,7 +286,9 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
         placeFlagHasMatrix = sis.readUB(1) == 1;
         placeFlagHasCharacter = sis.readUB(1) == 1;
         placeFlagMove = sis.readUB(1) == 1;
-        sis.readUB(3); //reserved
+        reserved = (int) sis.readUB(1);
+        placeFlagOpaqueBackground = sis.readUB(1) == 1; //SWF11
+        placeFlagHasVisible = sis.readUB(1) == 1;       //SWF11
         placeFlagHasImage = sis.readUB(1) == 1;
         placeFlagHasClassName = sis.readUB(1) == 1;
         placeFlagHasCacheAsBitmap = sis.readUB(1) == 1;
@@ -295,12 +325,16 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
         }
         bitmapCacheBug = false;
         if (placeFlagHasCacheAsBitmap) {
-            bitmapCache = sis.readUI8();
-            if (bitmapCache == -1) {
-                // EOF
+            try{
+                bitmapCache = sis.readUI8();
+            }catch(EndOfStreamException eex){
                 bitmapCacheBug = true;
                 bitmapCache = 1;
             }
+        }
+        if(placeFlagHasVisible){
+            visible = sis.readUI8();
+            backgroundColor = sis.readRGBA();
         }
         if (placeFlagHasClipActions) {
             clipActions = sis.readCLIPACTIONS();
