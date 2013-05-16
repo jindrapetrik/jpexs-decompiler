@@ -865,6 +865,9 @@ public class XFLConverter {
                     symbolStr += " symbolType=\"graphic\"";
                 } else if (symbol instanceof ButtonTag) {
                     symbolStr += " symbolType=\"button\"";
+                    if (((ButtonTag) symbol).trackAsMenu()) {
+                        symbolStr += "  trackAsMenu=\"true\"";
+                    }
                 }
                 if (characterClasses.containsKey(symbol.getCharacterID())) {
                     symbolStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterID()) + "\"";
@@ -1108,11 +1111,9 @@ public class XFLConverter {
         ret += "<layers>";
         int layerCount = getLayerCount(tags);
         Stack<Integer> parentLayers = new Stack<Integer>();
-        //Set<Integer> maskLayers=new HashSet<Integer>();
         int index = 0;
         for (int d = layerCount; d >= 1; d--, index++) {
             for (Tag t : tags) {
-
                 if (t instanceof PlaceObjectTypeTag) {
                     PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
                     if (po.getClipDepth() == d) {

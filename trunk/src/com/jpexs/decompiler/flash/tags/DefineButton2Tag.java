@@ -207,4 +207,9 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
         }
         return rect;
     }
+
+    @Override
+    public boolean trackAsMenu() {
+        return trackAsMenu;
+    }
 }

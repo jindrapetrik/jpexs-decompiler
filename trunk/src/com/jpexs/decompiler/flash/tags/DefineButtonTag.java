@@ -222,4 +222,9 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     public void removeDisassemblyListener(DisassemblyListener listener) {
         listeners.remove(listener);
     }
+
+    @Override
+    public boolean trackAsMenu() {
+        return false;
+    }
 }

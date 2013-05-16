@@ -26,4 +26,6 @@ import java.util.List;
 public interface ButtonTag {
 
     public List<BUTTONRECORD> getRecords();
+
+    public boolean trackAsMenu();
 }
