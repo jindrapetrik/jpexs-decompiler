@@ -156,17 +156,14 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
      * @since SWF 5 If PlaceFlagHasClipActions, Clip Actions Data
      */
     public CLIPACTIONS clipActions;
-    
     /**
      * If PlaceFlagHasVisible, 0 = Place invisible, 1 = Place visible
      */
     public int visible;
-    
     /**
      * If PlaceFlagHasVisible, Background color
      */
     public RGBA backgroundColor;
-    
     // FIXME bug found in ecoDrive.swf, 
     private boolean bitmapCacheBug;
     private int reserved;
@@ -255,7 +252,7 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
                     sos.writeUI8(bitmapCache);
                 }
             }
-            if(placeFlagHasVisible){
+            if (placeFlagHasVisible) {
                 sos.writeUI8(visible);
                 sos.writeRGBA(backgroundColor);
             }
@@ -325,14 +322,14 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
         }
         bitmapCacheBug = false;
         if (placeFlagHasCacheAsBitmap) {
-            try{
+            try {
                 bitmapCache = sis.readUI8();
-            }catch(EndOfStreamException eex){
+            } catch (EndOfStreamException eex) {
                 bitmapCacheBug = true;
                 bitmapCache = 1;
             }
         }
-        if(placeFlagHasVisible){
+        if (placeFlagHasVisible) {
             visible = sis.readUI8();
             backgroundColor = sis.readRGBA();
         }
