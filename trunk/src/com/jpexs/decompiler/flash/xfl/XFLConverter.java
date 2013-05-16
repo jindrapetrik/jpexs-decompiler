@@ -757,7 +757,7 @@ public class XFLConverter {
         return ret;
     }
 
-    public static String convertSymbolInstance(String name, MATRIX matrix, CXFORM colorTransform, CXFORMWITHALPHA colorTransformAlpha, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, CharacterTag tag, HashMap<Integer, CharacterTag> characters) {
+    public static String convertSymbolInstance(String name, MATRIX matrix, CXFORM colorTransform, CXFORMWITHALPHA colorTransformAlpha, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, boolean isVisible, RGBA backgroundColor, CharacterTag tag, HashMap<Integer, CharacterTag> characters) {
         String ret = "";
         if (matrix == null) {
             matrix = new MATRIX();
@@ -788,11 +788,22 @@ public class XFLConverter {
         if (cacheAsBitmap) {
             ret += " cacheAsBitmap=\"true\"";
         }
+        if (!isVisible) {
+            ret += " isVisible=\"false\"";
+        }
         ret += ">";
         ret += "<matrix>";
         ret += convertMatrix(matrix);
         ret += "</matrix>";
         ret += "<transformationPoint><Point/></transformationPoint>";
+
+        if (backgroundColor != null) {
+            ret += "<MatteColor color=\"" + backgroundColor.toHexRGB() + "\"";
+            if (backgroundColor.alpha != 255) {
+                ret += " alpha=\"" + doubleToString(backgroundColor.getAlphaFloat()) + "\"";
+            }
+            ret += "/>";
+        }
         if (colorTransform != null) {
             ret += "<color><Color";
             if (colorTransform.hasMultTerms) {
@@ -885,7 +896,7 @@ public class XFLConverter {
                                 filters = rec.filterList;
                             }
                         }
-                        String recCharStr = convertSymbolInstance(null, null, null, colorTransformAlpha, false, blendMode, filters, characters.get(rec.characterId), characters);
+                        String recCharStr = convertSymbolInstance(null, null, null, colorTransformAlpha, false, blendMode, filters, true, null, characters.get(rec.characterId), characters);
                         if (rec.buttonStateUp) {
                             frame = 1;
                         }
@@ -1042,7 +1053,7 @@ public class XFLConverter {
                         } else if (ch instanceof TextTag) {
                             elements += convertText(tags, (TextTag) ch, po.getMatrix(), po.getFilters());
                         } else {
-                            elements += convertSymbolInstance(po.getName(), po.getMatrix(), po.getColorTransform(), po.getColorTransformWithAlpha(), po.cacheAsBitmap(), po.getBlendMode(), po.getFilters(), characters.get(characterId), characters);
+                            elements += convertSymbolInstance(po.getName(), po.getMatrix(), po.getColorTransform(), po.getColorTransformWithAlpha(), po.cacheAsBitmap(), po.getBlendMode(), po.getFilters(), po.isVisible(), po.getBackgroundColor(), characters.get(characterId), characters);
                         }
                     }
                 }

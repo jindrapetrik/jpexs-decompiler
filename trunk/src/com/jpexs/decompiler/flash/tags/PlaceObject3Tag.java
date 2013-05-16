@@ -254,6 +254,8 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
             }
             if (placeFlagHasVisible) {
                 sos.writeUI8(visible);
+            }
+            if (placeFlagOpaqueBackground) {
                 sos.writeRGBA(backgroundColor);
             }
             if (placeFlagHasClipActions) {
@@ -329,10 +331,15 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
                 bitmapCache = 1;
             }
         }
+
         if (placeFlagHasVisible) {
             visible = sis.readUI8();
+        }
+        if (placeFlagOpaqueBackground) {
             backgroundColor = sis.readRGBA();
         }
+
+        System.out.println("" + sis.available());
         if (placeFlagHasClipActions) {
             clipActions = sis.readCLIPACTIONS();
         }
@@ -435,5 +442,21 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
     @Override
     public boolean cacheAsBitmap() {
         return placeFlagHasCacheAsBitmap;
+    }
+
+    @Override
+    public boolean isVisible() {
+        if (placeFlagHasVisible) {
+            return visible == 1;
+        }
+        return true;
+    }
+
+    @Override
+    public RGBA getBackgroundColor() {
+        if (placeFlagOpaqueBackground) {
+            return backgroundColor;
+        }
+        return null;
     }
 }

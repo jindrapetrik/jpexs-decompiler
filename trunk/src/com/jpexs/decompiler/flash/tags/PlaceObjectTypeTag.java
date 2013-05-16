@@ -3,6 +3,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.MATRIX;
+import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import java.util.List;
 
@@ -33,4 +34,8 @@ public interface PlaceObjectTypeTag {
     public String getClassName();
 
     public boolean cacheAsBitmap();
+
+    public boolean isVisible();
+
+    public RGBA getBackgroundColor();
 }

@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.MATRIX;
+import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -329,6 +330,16 @@ public class PlaceObject2Tag extends Tag implements Container, PlaceObjectTypeTa
 
     @Override
     public String getClassName() {
+        return null;
+    }
+
+    @Override
+    public boolean isVisible() {
+        return true;
+    }
+
+    @Override
+    public RGBA getBackgroundColor() {
         return null;
     }
 }
