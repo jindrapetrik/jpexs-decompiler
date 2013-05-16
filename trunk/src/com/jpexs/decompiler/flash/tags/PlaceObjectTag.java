@@ -155,4 +155,14 @@ public class PlaceObjectTag extends Tag implements PlaceObjectTypeTag {
     public int getBlendMode() {
         return 0;
     }
+
+    @Override
+    public boolean cacheAsBitmap() {
+        return false;
+    }
+
+    @Override
+    public String getClassName() {
+        return null;
+    }
 }

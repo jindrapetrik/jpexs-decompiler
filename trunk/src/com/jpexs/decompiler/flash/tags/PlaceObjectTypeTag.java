@@ -29,4 +29,8 @@ public interface PlaceObjectTypeTag {
     public List<FILTER> getFilters();
 
     public int getClipDepth();
+
+    public String getClassName();
+
+    public boolean cacheAsBitmap();
 }

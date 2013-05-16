@@ -321,4 +321,14 @@ public class PlaceObject2Tag extends Tag implements Container, PlaceObjectTypeTa
     public int getBlendMode() {
         return 0;
     }
+
+    @Override
+    public boolean cacheAsBitmap() {
+        return false;
+    }
+
+    @Override
+    public String getClassName() {
+        return null;
+    }
 }

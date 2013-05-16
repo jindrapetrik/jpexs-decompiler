@@ -541,7 +541,6 @@ public class XFLConverter {
 
     private static List<Integer> getOneInstanceShapes(List<Tag> tags, HashMap<Integer, CharacterTag> characters) {
         HashMap<Integer, Integer> usages = new HashMap<Integer, Integer>();
-        //HashMap<Integer,Integer> stage=new HashMap<Integer, Integer>();
         for (Tag t : tags) {
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
@@ -560,8 +559,10 @@ public class XFLConverter {
                     if (po.getColorTransformWithAlpha() != null) {
                         usageCount++;
                     }
+                    if (po.cacheAsBitmap()) {
+                        usageCount++;
+                    }
                     usages.put(ch, usageCount + 1);
-                    //stage.put(po.getDepth(), ch);
                 }
             }
         }
@@ -756,7 +757,7 @@ public class XFLConverter {
         return ret;
     }
 
-    public static String convertSymbolInstance(String name, MATRIX matrix, CXFORM colorTransform, CXFORMWITHALPHA colorTransformAlpha, int blendMode, List<FILTER> filters, CharacterTag tag, HashMap<Integer, CharacterTag> characters) {
+    public static String convertSymbolInstance(String name, MATRIX matrix, CXFORM colorTransform, CXFORMWITHALPHA colorTransformAlpha, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, CharacterTag tag, HashMap<Integer, CharacterTag> characters) {
         String ret = "";
         if (matrix == null) {
             matrix = new MATRIX();
@@ -783,6 +784,9 @@ public class XFLConverter {
             ret += " centerPoint3DX=\"" + centerPoint3DX + "\" centerPoint3DY=\"" + centerPoint3DY + "\"";
         } else if (tag instanceof ButtonTag) {
             ret += " symbolType=\"button\"";
+        }
+        if (cacheAsBitmap) {
+            ret += " cacheAsBitmap=\"true\"";
         }
         ret += ">";
         ret += "<matrix>";
@@ -881,7 +885,7 @@ public class XFLConverter {
                                 filters = rec.filterList;
                             }
                         }
-                        String recCharStr = convertSymbolInstance(null, null, null, colorTransformAlpha, blendMode, filters, characters.get(rec.characterId), characters);
+                        String recCharStr = convertSymbolInstance(null, null, null, colorTransformAlpha, false, blendMode, filters, characters.get(rec.characterId), characters);
                         if (rec.buttonStateUp) {
                             frame = 1;
                         }
@@ -1038,7 +1042,7 @@ public class XFLConverter {
                         } else if (ch instanceof TextTag) {
                             elements += convertText(tags, (TextTag) ch, po.getMatrix(), po.getFilters());
                         } else {
-                            elements += convertSymbolInstance(po.getName(), po.getMatrix(), po.getColorTransform(), po.getColorTransformWithAlpha(), po.getBlendMode(), po.getFilters(), characters.get(characterId), characters);
+                            elements += convertSymbolInstance(po.getName(), po.getMatrix(), po.getColorTransform(), po.getColorTransformWithAlpha(), po.cacheAsBitmap(), po.getBlendMode(), po.getFilters(), characters.get(characterId), characters);
                         }
                     }
                 }

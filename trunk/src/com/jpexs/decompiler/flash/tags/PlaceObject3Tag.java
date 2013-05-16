@@ -392,4 +392,17 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
     public int getBlendMode() {
         return blendMode;
     }
+
+    @Override
+    public String getClassName() {
+        if (placeFlagHasClassName) {
+            return className;
+        }
+        return null;
+    }
+
+    @Override
+    public boolean cacheAsBitmap() {
+        return placeFlagHasCacheAsBitmap;
+    }
 }
