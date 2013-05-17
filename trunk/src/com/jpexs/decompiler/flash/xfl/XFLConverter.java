@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.xfl;
 
 import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
@@ -25,6 +26,7 @@ import com.jpexs.decompiler.flash.tags.DefineButtonCxformTag;
 import com.jpexs.decompiler.flash.tags.DefineButtonTag;
 import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.DefineFontNameTag;
+import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
@@ -36,6 +38,9 @@ import com.jpexs.decompiler.flash.tags.FrameLabelTag;
 import com.jpexs.decompiler.flash.tags.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
+import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
+import com.jpexs.decompiler.flash.tags.SoundStreamHeadTypeTag;
+import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
@@ -63,6 +68,7 @@ import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import com.jpexs.decompiler.flash.types.SOUNDENVELOPE;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.filters.BEVELFILTER;
 import com.jpexs.decompiler.flash.types.filters.BLURFILTER;
@@ -76,6 +82,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
+import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
@@ -586,7 +593,20 @@ public class XFLConverter {
 
     private static HashMap<Integer, CharacterTag> getCharacters(List<Tag> tags) {
         HashMap<Integer, CharacterTag> ret = new HashMap<Integer, CharacterTag>();
+        int maxId = 0;
         for (Tag t : tags) {
+            if (t instanceof CharacterTag) {
+                CharacterTag ct = (CharacterTag) t;
+                if (ct.getCharacterID() > maxId) {
+                    maxId = ct.getCharacterID();
+                }
+            }
+        }
+        for (Tag t : tags) {
+            if (t instanceof SoundStreamHeadTypeTag) {
+                SoundStreamHeadTypeTag ssh = (SoundStreamHeadTypeTag) t;
+                ssh.setVirtualCharacterId(maxId++);
+            }
             if (t instanceof CharacterTag) {
                 CharacterTag ct = (CharacterTag) t;
                 ret.put(ct.getCharacterID(), ct);
@@ -958,7 +978,7 @@ public class XFLConverter {
         return new Date().getTime() / 1000;
     }
 
-    public static String convertLibrary(Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> oneInstanceShapes, String backgroundColor, List<Tag> tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files) {
+    public static String convertLibrary(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> oneInstanceShapes, String backgroundColor, List<Tag> tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files) {
 
         //TODO: Imported assets
         //linkageImportForRS="true" linkageIdentifier="xxx" linkageURL="yyy.swf"
@@ -1122,6 +1142,156 @@ public class XFLConverter {
                 mediaLinkStr += " quality=\"50\" href=\"" + symbolFile + "\" bitmapDataHRef=\"M " + (media.size() + 1) + " " + getTimestamp() + ".dat\" frameRight=\"" + image.getWidth() + "\" frameBottom=\"" + image.getHeight() + "\"/>\n";
                 media.add(mediaLinkStr);
 
+            } else if ((symbol instanceof SoundStreamHeadTypeTag) || (symbol instanceof DefineSoundTag)) {
+                int soundFormat = 0;
+                int soundRate = 0;
+                int soundType = 0;
+                int soundSize = 0;
+                long soundSampleCount = 0;
+                byte soundData[] = new byte[0];
+                double rateMap[] = {5.5, 11, 22, 44};
+                String exportFormat = "flv";
+                if (symbol instanceof SoundStreamHeadTypeTag) {
+                    SoundStreamHeadTypeTag sstream = (SoundStreamHeadTypeTag) symbol;
+                    soundFormat = sstream.getSoundFormat();
+                    soundRate = sstream.getSoundRate();
+                    soundType = sstream.getSoundType();
+                    soundSize = sstream.getSoundSize();
+                    soundSampleCount = sstream.getSoundSampleCount();
+                    boolean found = false;
+                    for (Tag t : tags) {
+                        if (found && (t instanceof SoundStreamBlockTag)) {
+                            SoundStreamBlockTag bl = (SoundStreamBlockTag) t;
+                            soundData = bl.getData(SWF.DEFAULT_VERSION);
+                            break;
+                        }
+                        if (t == symbol) {
+                            found = true;
+                        }
+                    }
+                } else if (symbol instanceof DefineSoundTag) {
+                    DefineSoundTag sound = (DefineSoundTag) symbol;
+                    soundFormat = sound.soundFormat;
+                    soundRate = sound.soundRate;
+                    soundType = sound.soundType;
+                    soundData = sound.soundData;
+                    soundSize = sound.soundSize;
+                    soundSampleCount = sound.soundSampleCount;
+                }
+                int format = 0;
+                int bits = 0;
+                if ((soundFormat == DefineSoundTag.FORMAT_ADPCM)
+                        || (soundFormat == DefineSoundTag.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN)
+                        || (soundFormat == DefineSoundTag.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN)) {
+                    if (soundType == 1) { //stereo
+                        format += 1;
+                    }
+                    switch (soundRate) {
+                        case 0:
+                            format += 2;
+                            break;
+                        case 1:
+                            format += 6;
+                            break;
+                        case 2:
+                            format += 10;
+                            break;
+                        case 3:
+                            format += 14;
+                            break;
+                    }
+                }
+                if (soundFormat == DefineSoundTag.FORMAT_SPEEX) {
+                    bits = 18;
+                }
+                if (soundFormat == DefineSoundTag.FORMAT_ADPCM) {
+                    SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(soundData), SWF.DEFAULT_VERSION);
+
+                    try {
+                        int adpcmCodeSize = (int) sis.readUB(2);
+                        bits = 2 + adpcmCodeSize;
+                    } catch (IOException ex) {
+                        Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                if (soundFormat == DefineSoundTag.FORMAT_MP3) {
+                    exportFormat = "mp3";
+                    if (soundType == 0) { //mono
+                        format += 1;
+                    }
+                    format += 4; //quality best
+                    SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(soundData), SWF.DEFAULT_VERSION);
+                    try {
+                        sis.readSI16();
+                        MP3FRAME frame = new MP3FRAME(sis);
+                        int bitRate = frame.getBitrate();
+
+                        switch (bitRate) {
+                            case 8:
+                                bits = 6;
+                                break;
+                            case 16:
+                                bits = 7;
+                                break;
+                            case 20:
+                                bits = 8;
+                                break;
+                            case 24:
+                                bits = 9;
+                                break;
+                            case 32:
+                                bits = 10;
+                                break;
+                            case 48:
+                                bits = 11;
+                                break;
+                            case 56:
+                                bits = 12;
+                                break;
+                            case 64:
+                                bits = 13;
+                                break;
+                            case 80:
+                                bits = 14;
+                                break;
+                            case 112:
+                                bits = 15;
+                                break;
+                            case 128:
+                                bits = 16;
+                                break;
+                            case 160:
+                                bits = 17;
+                                break;
+
+                        }
+                    } catch (IOException ex) {
+                        Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                byte data[] = new byte[0];
+                try {
+                    data = swf.exportSound(symbol);
+                } catch (IOException ex) {
+                    Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                String symbolFile = "sound" + symbol.getCharacterID() + "." + exportFormat;
+                files.put(symbolFile, data);
+                String mediaLinkStr = "<DOMSoundItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp() + "\" externalFileSize=\"" + data.length + "\"";
+
+                mediaLinkStr += " format=\"";
+                mediaLinkStr += rateMap[soundRate] + "kHz";
+                mediaLinkStr += " " + (soundSize == 1 ? "16bit" : "8bit");
+                mediaLinkStr += " " + (soundType == 1 ? "Stereo" : "Mono");
+                mediaLinkStr += "\"";
+                mediaLinkStr += " exportFormat=\"" + format + "\" exportBits=\"" + bits + "\" sampleCount=\"" + soundSampleCount + "\"";
+
+                if (characterClasses.containsKey(symbol.getCharacterID())) {
+                    mediaLinkStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterID()) + "\"";
+                }
+
+                mediaLinkStr += "/>\n";
+                media.add(mediaLinkStr);
             }
             //TODO: sound, video...
         }
@@ -1161,6 +1331,122 @@ public class XFLConverter {
         }
     }
 
+    private static String convertFrame(HashMap<Integer, CharacterTag> characters, List<Tag> tags, SoundStreamHeadTypeTag soundStreamHead, StartSoundTag startSound, int frame, String frameName, boolean isAnchor, int duration, String actionScript, String elements) {
+        String ret = "";
+        DefineSoundTag sound = null;
+        if (startSound != null) {
+            for (Tag t : tags) {
+                if (t instanceof DefineSoundTag) {
+                    DefineSoundTag s = (DefineSoundTag) t;
+                    if (s.soundId == startSound.soundId) {
+                        sound = s;
+                        break;
+                    }
+                }
+            }
+        }
+
+        ret += "<DOMFrame index=\"" + (frame) + "\"";
+        if (duration > 1) {
+            ret += " duration=\"" + duration + "\"";
+        }
+        if (frameName != null) {
+            ret += " name=\"" + frameName + "\"";
+            if (isAnchor) {
+                ret += " labelType=\"anchor\" bookmark=\"true\"";
+            } else {
+                ret += " labelType=\"name\"";
+            }
+            isAnchor = false;
+            frameName = null;
+        }
+        ret += " keyMode=\"" + KEY_MODE_NORMAL + "\"";
+
+        String soundEnvelopeStr = "";
+        if (soundStreamHead != null) {
+            ret += " soundName=\"sound" + soundStreamHead.getCharacterID() + "." + soundStreamHead.getExportFormat() + "\"";
+            ret += " soundSync=\"stream\"";
+            soundEnvelopeStr += "<SoundEnvelope>";
+            soundEnvelopeStr += "<SoundEnvelopePoint level0=\"32768\" level1=\"32768\"/>";
+            soundEnvelopeStr += "</SoundEnvelope>";
+        }
+        if (startSound != null) {
+            ret += " soundName=\"sound" + sound.soundId + "." + sound.getExportFormat() + "\"";
+            if (startSound.soundInfo.hasInPoint) {
+                ret += " inPoint44=\"" + startSound.soundInfo.inPoint + "\"";
+            }
+            if (startSound.soundInfo.hasOutPoint) {
+                ret += " outPoint44=\"" + startSound.soundInfo.outPoint + "\"";
+            }
+            if (startSound.soundInfo.hasLoops) {
+                if (startSound.soundInfo.loopCount == 32767) {
+                    ret += " soundLoopMode=\"loop\"";
+                }
+                ret += " soundLoop=\"" + startSound.soundInfo.loopCount + "\"";
+            }
+
+            if (!startSound.soundInfo.syncNoMultiple && !startSound.soundInfo.syncStop) {
+                //event
+            } else if (startSound.soundInfo.syncNoMultiple && !startSound.soundInfo.syncStop) {
+                ret += " soundSync=\"start\"";
+            }
+            soundEnvelopeStr += "<SoundEnvelope>";
+            if (startSound.soundInfo.hasEnvelope) {
+                for (SOUNDENVELOPE env : startSound.soundInfo.envelopeRecords) {
+                    soundEnvelopeStr += "<SoundEnvelopePoint mark44=\"" + env.pos44 + "\" level0=\"" + env.leftLevel + "\" level1=\"" + env.rightLevel + "\"/>";
+                }
+
+                if (startSound.soundInfo.envelopeRecords.length == 1
+                        && startSound.soundInfo.envelopeRecords[0].leftLevel == 32768
+                        && startSound.soundInfo.envelopeRecords[0].pos44 == 0
+                        && startSound.soundInfo.envelopeRecords[0].rightLevel == 0) {
+                    ret += " soundEffect=\"left channel\"";
+                } else if (startSound.soundInfo.envelopeRecords.length == 1
+                        && startSound.soundInfo.envelopeRecords[0].leftLevel == 0
+                        && startSound.soundInfo.envelopeRecords[0].pos44 == 0
+                        && startSound.soundInfo.envelopeRecords[0].rightLevel == 32768) {
+                    ret += " soundEffect=\"right channel\"";
+                } else if (startSound.soundInfo.envelopeRecords.length == 2
+                        && startSound.soundInfo.envelopeRecords[0].leftLevel == 32768
+                        && startSound.soundInfo.envelopeRecords[0].pos44 == 0
+                        && startSound.soundInfo.envelopeRecords[0].rightLevel == 0
+                        && startSound.soundInfo.envelopeRecords[1].leftLevel == 0
+                        && startSound.soundInfo.envelopeRecords[1].pos44 == sound.soundSampleCount
+                        && startSound.soundInfo.envelopeRecords[1].rightLevel == 32768) {
+                    ret += " soundEffect=\"fade left to right\"";
+                } else if (startSound.soundInfo.envelopeRecords.length == 2
+                        && startSound.soundInfo.envelopeRecords[0].leftLevel == 0
+                        && startSound.soundInfo.envelopeRecords[0].pos44 == 0
+                        && startSound.soundInfo.envelopeRecords[0].rightLevel == 32768
+                        && startSound.soundInfo.envelopeRecords[1].leftLevel == 32768
+                        && startSound.soundInfo.envelopeRecords[1].pos44 == sound.soundSampleCount
+                        && startSound.soundInfo.envelopeRecords[1].rightLevel == 0) {
+                    ret += " soundEffect=\"fade right to left\"";
+                } else {
+                    ret += " soundEffect=\"custom\"";
+                }
+                //TODO: fade in, fade out
+
+            } else {
+                soundEnvelopeStr += "<SoundEnvelopePoint level0=\"32768\" level1=\"32768\"/>";
+            }
+            soundEnvelopeStr += "</SoundEnvelope>";
+        }
+        ret += ">";
+
+        ret += soundEnvelopeStr;
+        if (!actionScript.equals("")) {
+            ret += "<ActionScript><script><![CDATA[";
+            ret += actionScript;
+            ret += "]]></script></ActionScript>";
+        }
+        ret += "<elements>";
+        ret += elements;
+        ret += "</elements>";
+        ret += "</DOMFrame>";
+        return ret;
+    }
+
     private static String convertFrames(String initActionScript, String prevStr, String afterStr, List<Integer> oneInstanceShapes, List<Tag> tags, HashMap<Integer, CharacterTag> characters, int depth) {
         String ret = "";
         prevStr += "<frames>";
@@ -1173,6 +1459,8 @@ public class XFLConverter {
         String lastActionScript = "";
         String frameName = null;
         boolean isAnchor = false;
+        StartSoundTag startSound = null;
+        SoundStreamHeadTypeTag soundStreamHead = null;
         for (Tag t : tags) {
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
@@ -1194,75 +1482,68 @@ public class XFLConverter {
                     }
                 }
             }
+            if (t instanceof StartSoundTag) {
+                if (startSound != null) {
+                    lastActionScript = initActionScript + lastActionScript;
+                    initActionScript = "";
+                    ret += convertFrame(characters, tags, soundStreamHead, startSound, frame, frameName, isAnchor, duration, lastActionScript, lastElements);
+                    frame += duration;
+                    duration = 1;
+                    lastElements = elements;
+                    lastActionScript = actionScript;
+                    elements = "";
+                    actionScript = "";
+                    frameName = null;
+                    isAnchor = false;
+                    soundStreamHead = null;
+                }
+                startSound = (StartSoundTag) t;
+            }
+            if (t instanceof SoundStreamHeadTypeTag) {
+                if (soundStreamHead != null) {
+                    lastActionScript = initActionScript + lastActionScript;
+                    initActionScript = "";
+                    ret += convertFrame(characters, tags, soundStreamHead, startSound, frame, frameName, isAnchor, duration, lastActionScript, lastElements);
+                    frame += duration;
+                    duration = 1;
+                    lastElements = elements;
+                    lastActionScript = actionScript;
+                    elements = "";
+                    actionScript = "";
+                    frameName = null;
+                    isAnchor = false;
+                    startSound = null;
+                    soundStreamHead = null;
+                }
+                soundStreamHead = (SoundStreamHeadTypeTag) t;
+            }
             if (t instanceof DoActionTag) {
                 actionScript += convertActionScript((DoActionTag) t);
             }
             if (t instanceof FrameLabelTag) {
                 FrameLabelTag flt = (FrameLabelTag) t;
                 if (frameName != null) {
-                    ret += "<DOMFrame index=\"" + (frame) + "\"";
-                    if (duration > 1) {
-                        ret += " duration=\"" + duration + "\"";
-                    }
-                    ret += " name=\"" + frameName + "\"";
-                    if (isAnchor) {
-                        ret += " labelType=\"anchor\" bookmark=\"true\"";
-                    } else {
-                        ret += " labelType=\"name\"";
-                    }
-                    ret += " keyMode=\"" + KEY_MODE_NORMAL + "\">";
                     lastActionScript = initActionScript + lastActionScript;
                     initActionScript = "";
-
-                    if (!lastActionScript.equals("")) {
-                        ret += "<ActionScript><script><![CDATA[";
-                        ret += lastActionScript;
-                        ret += "]]></script></ActionScript>";
-                    }
-                    ret += "<elements>";
-                    ret += lastElements;
-                    ret += "</elements>";
-                    ret += "</DOMFrame>";
+                    ret += convertFrame(characters, tags, soundStreamHead, startSound, frame, frameName, isAnchor, duration, lastActionScript, lastElements);
                     frame += duration;
                     duration = 1;
                     lastElements = elements;
                     lastActionScript = actionScript;
                     elements = "";
                     actionScript = "";
+                    startSound = null;
+                    soundStreamHead = null;
                 }
                 frameName = flt.getLabelName();
                 isAnchor = flt.isNamedAnchor();
             }
             if (t instanceof ShowFrameTag) {
-                if (!elements.equals("") || !actionScript.equals("")) {
+                if (!elements.equals("") || !actionScript.equals("") || soundStreamHead != null || startSound != null) {
                     if (!lastElements.equals("") || !lastActionScript.equals("")) {
-                        ret += "<DOMFrame index=\"" + (frame) + "\"";
-                        if (duration > 1) {
-                            ret += " duration=\"" + duration + "\"";
-                        }
-                        if (frameName != null) {
-                            ret += " name=\"" + frameName + "\"";
-                            if (isAnchor) {
-                                ret += " labelType=\"anchor\" bookmark=\"true\"";
-                            } else {
-                                ret += " labelType=\"name\"";
-                            }
-                            isAnchor = false;
-                            frameName = null;
-                        }
-                        ret += " keyMode=\"" + KEY_MODE_NORMAL + "\">";
                         lastActionScript = initActionScript + lastActionScript;
                         initActionScript = "";
-
-                        if (!lastActionScript.equals("")) {
-                            ret += "<ActionScript><script><![CDATA[";
-                            ret += lastActionScript;
-                            ret += "]]></script></ActionScript>";
-                        }
-                        ret += "<elements>";
-                        ret += lastElements;
-                        ret += "</elements>";
-                        ret += "</DOMFrame>";
+                        ret += convertFrame(characters, tags, soundStreamHead, startSound, frame, frameName, isAnchor, duration, lastActionScript, lastElements);
                     }
                     frame += duration;
                     duration = 1;
@@ -1270,6 +1551,8 @@ public class XFLConverter {
                     lastActionScript = actionScript;
                     elements = "";
                     actionScript = "";
+                    soundStreamHead = null;
+                    startSound = null;
                 } else {
                     duration++;
                 }
@@ -1277,36 +1560,12 @@ public class XFLConverter {
         }
         lastActionScript = initActionScript + lastActionScript;
         initActionScript = "";
-        if (!lastElements.equals("") || !lastActionScript.equals("")) {
+        if (!lastElements.equals("") || !lastActionScript.equals("") || soundStreamHead != null || startSound != null) {
             if (frame < 0) {
                 frame = 0;
                 duration = 1;
             }
-            ret += "<DOMFrame index=\"" + frame + "\"";
-            if (frameName != null) {
-                ret += " name=\"" + frameName + "\"";
-                if (isAnchor) {
-                    ret += " labelType=\"anchor\" bookmark=\"true\"";
-                } else {
-                    ret += " labelType=\"name\"";
-                }
-            }
-            if (duration > 1) {
-                ret += " duration=\"" + duration + "\"";
-            }
-            ret += " keyMode=\"" + KEY_MODE_NORMAL + "\">";
-            if (!lastActionScript.equals("")) {
-                ret += "<ActionScript><script><![CDATA[";
-                ret += lastActionScript;
-                ret += "]]></script></ActionScript>";
-            }
-            ret += "<elements>";
-            ret += lastElements;
-            ret += "</elements>";
-            ret += "</DOMFrame>";
-            frame += duration;
-            duration = 1;
-            elements = "";
+            ret += convertFrame(characters, tags, soundStreamHead, startSound, frame, frameName, isAnchor, duration, lastActionScript, lastElements);
         }
 
         afterStr = "</frames>" + afterStr;
@@ -1699,7 +1958,7 @@ public class XFLConverter {
         domDocument += " frameRate=\"" + swf.frameRate + "\"";
         domDocument += ">";
 
-        domDocument += convertLibrary(characterVariables, characterClasses, oneInstaceShapes, backgroundColor, swf.tags, characters, files);
+        domDocument += convertLibrary(swf, characterVariables, characterClasses, oneInstaceShapes, backgroundColor, swf.tags, characters, files);
         domDocument += "<timelines>";
         domDocument += convertTimeline("", oneInstaceShapes, backgroundColor, swf.tags, characters, "Scene 1");
         domDocument += "</timelines>";

@@ -94,4 +94,16 @@ public class DefineSoundTag extends CharacterTag {
         soundSampleCount = sis.readUI32();
         soundData = sis.readBytes(sis.available());
     }
+
+    public String getExportFormat() {
+        if (soundFormat == FORMAT_MP3) {
+            return "mp3";
+        }
+        return "flv";
+    }
+
+    public double getkHz() {
+        double rateMap[] = {5.5, 11, 22, 44};
+        return rateMap[soundRate];
+    }
 }

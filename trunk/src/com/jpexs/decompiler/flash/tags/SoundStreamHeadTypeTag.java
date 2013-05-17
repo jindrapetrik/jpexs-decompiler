@@ -13,4 +13,12 @@ public interface SoundStreamHeadTypeTag {
     public int getSoundSize();
 
     public int getSoundType();
+
+    public long getSoundSampleCount();
+
+    public void setVirtualCharacterId(int ch);
+
+    public int getCharacterID();
+
+    public String getExportFormat();
 }

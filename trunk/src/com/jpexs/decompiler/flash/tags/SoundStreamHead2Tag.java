@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import static com.jpexs.decompiler.flash.tags.DefineSoundTag.FORMAT_MP3;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,7 +30,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class SoundStreamHead2Tag extends Tag implements SoundStreamHeadTypeTag {
+public class SoundStreamHead2Tag extends CharacterTag implements SoundStreamHeadTypeTag {
 
     public int playBackSoundRate;
     public int playBackSoundSize;
@@ -39,6 +41,30 @@ public class SoundStreamHead2Tag extends Tag implements SoundStreamHeadTypeTag {
     public int streamSoundType;
     public int streamSoundSampleCount;
     public int latencySeek;
+    private int virtualCharacterId = 0;
+
+    @Override
+    public int getCharacterID() {
+        return virtualCharacterId;
+    }
+
+    @Override
+    public String getExportFormat() {
+        if (streamSoundCompression == FORMAT_MP3) {
+            return "mp3";
+        }
+        return "flv";
+    }
+
+    @Override
+    public long getSoundSampleCount() {
+        return streamSoundSampleCount;
+    }
+
+    @Override
+    public void setVirtualCharacterId(int ch) {
+        virtualCharacterId = ch;
+    }
 
     /**
      * Gets data bytes

@@ -608,6 +608,56 @@ public class SWF {
         exportSounds(outdir, tags, mp3);
     }
 
+    public byte[] exportSound(Tag t) throws IOException {
+        boolean mp3 = true;
+        ByteArrayOutputStream fos = new ByteArrayOutputStream();
+        int id = 0;
+        if (t instanceof DefineSoundTag) {
+            id = ((DefineSoundTag) t).soundId;
+        }
+
+
+        if (t instanceof DefineSoundTag) {
+            DefineSoundTag st = (DefineSoundTag) t;
+            if ((st.soundFormat == DefineSoundTag.FORMAT_MP3) && mp3) {
+                fos = new ByteArrayOutputStream();
+                fos.write(st.soundData);
+            } else {
+                fos = new ByteArrayOutputStream();
+                FLVOutputStream flv = new FLVOutputStream(fos);
+                flv.writeHeader(true, false);
+                flv.writeTag(new FLVTAG(0, new AUDIODATA(st.soundFormat, st.soundRate, st.soundSize, st.soundType, st.soundData)));
+            }
+        }
+        if (t instanceof SoundStreamHeadTypeTag) {
+            SoundStreamHeadTypeTag shead = (SoundStreamHeadTypeTag) t;
+            List<SoundStreamBlockTag> blocks = new ArrayList<SoundStreamBlockTag>();
+            List<Object> objs = new ArrayList<Object>(this.tags);
+            populateSoundStreamBlocks(objs, t, blocks);
+            if ((shead.getSoundFormat() == 2) && mp3) {
+                fos = new ByteArrayOutputStream();
+                for (int b = 0; b < blocks.size(); b++) {
+                    byte data[] = blocks.get(b).getData(SWF.DEFAULT_VERSION);
+                    fos.write(data, 4, data.length - 4);
+                }
+            } else {
+                fos = new ByteArrayOutputStream();
+                FLVOutputStream flv = new FLVOutputStream(fos);
+                flv.writeHeader(true, false);
+
+                int ms = (int) (1000.0f / ((float) frameRate));
+                for (int b = 0; b < blocks.size(); b++) {
+                    byte data[] = blocks.get(b).getData(SWF.DEFAULT_VERSION);
+                    if (shead.getSoundFormat() == 2) { //MP3
+                        data = Arrays.copyOfRange(data, 4, data.length);
+                    }
+                    flv.writeTag(new FLVTAG(ms * b, new AUDIODATA(shead.getSoundFormat(), shead.getSoundRate(), shead.getSoundSize(), shead.getSoundType(), data)));
+                }
+            }
+        }
+        return fos.toByteArray();
+    }
+
     public void exportSounds(String outdir, List<Tag> tags, boolean mp3) throws IOException {
         if (tags.isEmpty()) {
             return;
@@ -623,8 +673,7 @@ public class SWF {
                 if (t instanceof DefineSoundTag) {
                     id = ((DefineSoundTag) t).soundId;
                 }
-                if (mp3) {
-                }
+
 
                 if (t instanceof DefineSoundTag) {
                     DefineSoundTag st = (DefineSoundTag) t;
