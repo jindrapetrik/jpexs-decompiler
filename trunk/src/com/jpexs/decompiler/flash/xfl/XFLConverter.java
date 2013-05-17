@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.xfl;
 
 import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
@@ -37,6 +38,7 @@ import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
@@ -839,6 +841,86 @@ public class XFLConverter {
                 ret += convertFilter(f);
             }
             ret += "</filters>";
+        }
+        if (tag instanceof DefineButton2Tag) {
+            DefineButton2Tag db2 = (DefineButton2Tag) tag;
+            if (!db2.actions.isEmpty()) {
+                ret += "<ActionScript><script><![CDATA[";
+                for (BUTTONCONDACTION bca : db2.actions) {
+                    List<String> events = new ArrayList<String>();
+                    if (bca.condOverUpToOverDown) {
+                        events.add("press");
+                    }
+                    if (bca.condOverDownToOverUp) {
+                        events.add("release");
+                    }
+                    if (bca.condOutDownToIdle) {
+                        events.add("releaseOutside");
+                    }
+                    if (bca.condIdleToOverUp) {
+                        events.add("rollOver");
+                    }
+                    if (bca.condOverUpToIddle) {
+                        events.add("rollOut");
+                    }
+                    if (bca.condOverDownToOutDown) {
+                        events.add("dragOut");
+                    }
+                    if (bca.condOutDownToOverDown) {
+                        events.add("dragOver");
+                    }
+                    if (bca.condKeyPress > 0) {
+                        String keyNames[] = {
+                            null,
+                            "<Left>",
+                            "<Right>",
+                            "<Home>",
+                            "<End>",
+                            "<Insert>",
+                            "<Delete>",
+                            "<Backspace>",
+                            "<Enter>",
+                            "<Up>",
+                            "<Down>",
+                            "<PgUp>",
+                            "<PgDn>",
+                            "<Tab>",
+                            "<Escape>",
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            "<Space>"
+                        };
+                        if ((bca.condKeyPress < keyNames.length) && (bca.condKeyPress > 0) && (keyNames[bca.condKeyPress] != null)) {
+                            events.add("keyPress \"" + keyNames[bca.condKeyPress] + "\"");
+                        } else {
+                            events.add("keyPress \"" + (char) bca.condKeyPress + "\"");
+                        }
+                    }
+                    String onStr = "";
+                    for (int i = 0; i < events.size(); i++) {
+                        if (i > 0) {
+                            onStr += ", ";
+                        }
+                        onStr += events.get(i);
+                    }
+                    ret += "on(" + onStr + ")\r\n";
+                    String decompiledASHilighted = com.jpexs.decompiler.flash.action.Action.actionsToSource(bca.getActions(SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION);
+                    String decompiledAS = Highlighting.stripHilights(decompiledASHilighted);
+                    ret += decompiledAS;
+                    ret += "}";
+                }
+                ret += "]]></script></ActionScript>";
+            }
         }
         ret += "</DOMSymbolInstance>";
         return ret;

@@ -339,7 +339,6 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
             backgroundColor = sis.readRGBA();
         }
 
-        System.out.println("" + sis.available());
         if (placeFlagHasClipActions) {
             clipActions = sis.readCLIPACTIONS();
         }
