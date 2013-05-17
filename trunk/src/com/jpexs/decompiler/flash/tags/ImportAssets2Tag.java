@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.base.ImportTag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -29,7 +30,7 @@ import java.util.HashMap;
  *
  * @author JPEXS
  */
-public class ImportAssets2Tag extends Tag {
+public class ImportAssets2Tag extends Tag implements ImportTag {
 
     public String url;
     /**
@@ -82,5 +83,15 @@ public class ImportAssets2Tag extends Tag {
         } catch (IOException e) {
         }
         return baos.toByteArray();
+    }
+
+    @Override
+    public HashMap<Integer, String> getAssets() {
+        return assets;
+    }
+
+    @Override
+    public String getUrl() {
+        return url;
     }
 }

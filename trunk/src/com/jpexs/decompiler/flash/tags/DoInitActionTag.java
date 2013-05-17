@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
-import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -32,7 +31,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DoInitActionTag extends CharacterTag implements ASMSource {
+public class DoInitActionTag extends Tag implements ASMSource {
 
     /**
      * Identifier of Sprite
@@ -146,7 +145,6 @@ public class DoInitActionTag extends CharacterTag implements ASMSource {
         this.actionBytes = actionBytes;
     }
 
-    @Override
     public int getCharacterID() {
         return spriteId;
     }

@@ -28,6 +28,14 @@ public class FrameLabelTag extends Tag {
     private String name;
     private boolean namedAnchor = false;
 
+    public String getLabelName() {
+        return name;
+    }
+
+    public boolean isNamedAnchor() {
+        return namedAnchor;
+    }
+
     public FrameLabelTag(byte[] data, int version, long pos) throws IOException {
         super(43, "FrameLabel", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);

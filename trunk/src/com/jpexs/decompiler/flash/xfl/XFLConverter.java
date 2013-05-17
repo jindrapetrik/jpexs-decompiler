@@ -19,19 +19,26 @@ package com.jpexs.decompiler.flash.xfl;
 import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
-import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
+import com.jpexs.decompiler.flash.tags.DefineButtonCxformTag;
+import com.jpexs.decompiler.flash.tags.DefineButtonTag;
 import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.DefineFontNameTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
+import com.jpexs.decompiler.flash.tags.DoActionTag;
+import com.jpexs.decompiler.flash.tags.DoInitActionTag;
+import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
+import com.jpexs.decompiler.flash.tags.FileAttributesTag;
+import com.jpexs.decompiler.flash.tags.FrameLabelTag;
 import com.jpexs.decompiler.flash.tags.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
@@ -759,10 +766,21 @@ public class XFLConverter {
         return ret;
     }
 
-    public static String convertSymbolInstance(String name, MATRIX matrix, CXFORM colorTransform, CXFORMWITHALPHA colorTransformAlpha, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, boolean isVisible, RGBA backgroundColor, CharacterTag tag, HashMap<Integer, CharacterTag> characters) {
+    public static String convertSymbolInstance(String name, MATRIX matrix, CXFORM colorTransform, CXFORMWITHALPHA colorTransformAlpha, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, boolean isVisible, RGBA backgroundColor, CharacterTag tag, HashMap<Integer, CharacterTag> characters, List<Tag> tags) {
         String ret = "";
         if (matrix == null) {
             matrix = new MATRIX();
+        }
+        if (tag instanceof DefineButtonTag) {
+            DefineButtonTag bt = (DefineButtonTag) tag;
+            for (Tag t : tags) {
+                if (t instanceof DefineButtonCxformTag) {
+                    DefineButtonCxformTag bcx = (DefineButtonCxformTag) t;
+                    if (bcx.buttonId == bt.buttonId) {
+                        colorTransform = bcx.buttonColorTransform;
+                    }
+                }
+            }
         }
 
         ret += "<DOMSymbolInstance libraryItemName=\"" + "Symbol " + tag.getCharacterID() + "\"";
@@ -842,6 +860,13 @@ public class XFLConverter {
             }
             ret += "</filters>";
         }
+        if (tag instanceof DefineButtonTag) {
+            ret += "<ActionScript><script><![CDATA[";
+            ret += "on(press){\r\n";
+            ret += convertActionScript(((DefineButtonTag) tag));
+            ret += "}";
+            ret += "]]></script></ActionScript>";
+        }
         if (tag instanceof DefineButton2Tag) {
             DefineButton2Tag db2 = (DefineButton2Tag) tag;
             if (!db2.actions.isEmpty()) {
@@ -913,10 +938,8 @@ public class XFLConverter {
                         }
                         onStr += events.get(i);
                     }
-                    ret += "on(" + onStr + ")\r\n";
-                    String decompiledASHilighted = com.jpexs.decompiler.flash.action.Action.actionsToSource(bca.getActions(SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION);
-                    String decompiledAS = Highlighting.stripHilights(decompiledASHilighted);
-                    ret += decompiledAS;
+                    ret += "on(" + onStr + "){\r\n";
+                    ret += convertActionScript(bca);
                     ret += "}";
                 }
                 ret += "]]></script></ActionScript>";
@@ -926,11 +949,19 @@ public class XFLConverter {
         return ret;
     }
 
+    private static String convertActionScript(ASMSource as) {
+        String decompiledASHilighted = com.jpexs.decompiler.flash.action.Action.actionsToSource(as.getActions(SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION);
+        return Highlighting.stripHilights(decompiledASHilighted);
+    }
+
     private static long getTimestamp() {
         return new Date().getTime() / 1000;
     }
 
-    public static String convertLibrary(Map<Integer, String> characterClasses, List<Integer> oneInstanceShapes, String backgroundColor, List<Tag> tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files) {
+    public static String convertLibrary(Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> oneInstanceShapes, String backgroundColor, List<Tag> tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files) {
+
+        //TODO: Imported assets
+        //linkageImportForRS="true" linkageIdentifier="xxx" linkageURL="yyy.swf"
         String ret = "";
         List<String> media = new ArrayList<String>();
         List<String> symbols = new ArrayList<String>();
@@ -953,6 +984,9 @@ public class XFLConverter {
                 }
                 if (characterClasses.containsKey(symbol.getCharacterID())) {
                     symbolStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterID()) + "\"";
+                }
+                if (characterVariables.containsKey(symbol.getCharacterID())) {
+                    symbolStr += " linkageExportForAS=\"true\" linkageIdentifier=\"" + characterVariables.get(symbol.getCharacterID()) + "\"";
                 }
                 symbolStr += ">";
                 symbolStr += "<timeline>";
@@ -981,7 +1015,7 @@ public class XFLConverter {
                                 filters = rec.filterList;
                             }
                         }
-                        String recCharStr = convertSymbolInstance(null, null, null, colorTransformAlpha, false, blendMode, filters, true, null, characters.get(rec.characterId), characters);
+                        String recCharStr = convertSymbolInstance(null, null, null, colorTransformAlpha, false, blendMode, filters, true, null, characters.get(rec.characterId), characters, tags);
                         if (rec.buttonStateUp) {
                             frame = 1;
                         }
@@ -1017,7 +1051,20 @@ public class XFLConverter {
                     symbolStr += "</DOMTimeline>";
                 } else if (symbol instanceof DefineSpriteTag) {
                     DefineSpriteTag sprite = (DefineSpriteTag) symbol;
-                    symbolStr += convertTimeline(oneInstanceShapes, backgroundColor, sprite.getSubTags(), characters, "Symbol " + symbol.getCharacterID());
+                    String initActionScript = "";
+                    for (Tag t : tags) {
+                        if (t instanceof DoInitActionTag) {
+                            DoInitActionTag dia = (DoInitActionTag) t;
+                            if (dia.spriteId == sprite.spriteId) {
+                                initActionScript += convertActionScript(dia);
+                            }
+                        }
+                    }
+                    if (!initActionScript.equals("")) {
+                        initActionScript = "#initclip\r\n" + initActionScript + "#endinitclip";
+                    }
+
+                    symbolStr += convertTimeline(initActionScript, oneInstanceShapes, backgroundColor, sprite.getSubTags(), characters, "Symbol " + symbol.getCharacterID());
                 } else if (symbol instanceof ShapeTag) {
                     itemIcon = "1";
                     ShapeTag shape = (ShapeTag) symbol;
@@ -1114,7 +1161,7 @@ public class XFLConverter {
         }
     }
 
-    private static String convertFrames(String prevStr, String afterStr, List<Integer> oneInstanceShapes, List<Tag> tags, HashMap<Integer, CharacterTag> characters, int depth) {
+    private static String convertFrames(String initActionScript, String prevStr, String afterStr, List<Integer> oneInstanceShapes, List<Tag> tags, HashMap<Integer, CharacterTag> characters, int depth) {
         String ret = "";
         prevStr += "<frames>";
         int frame = -1;
@@ -1122,6 +1169,10 @@ public class XFLConverter {
         String lastElements = "";
         int characterId = -1;
         int duration = 1;
+        String actionScript = "";
+        String lastActionScript = "";
+        String frameName = null;
+        boolean isAnchor = false;
         for (Tag t : tags) {
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
@@ -1138,19 +1189,76 @@ public class XFLConverter {
                         } else if (ch instanceof TextTag) {
                             elements += convertText(tags, (TextTag) ch, po.getMatrix(), po.getFilters());
                         } else {
-                            elements += convertSymbolInstance(po.getName(), po.getMatrix(), po.getColorTransform(), po.getColorTransformWithAlpha(), po.cacheAsBitmap(), po.getBlendMode(), po.getFilters(), po.isVisible(), po.getBackgroundColor(), characters.get(characterId), characters);
+                            elements += convertSymbolInstance(po.getName(), po.getMatrix(), po.getColorTransform(), po.getColorTransformWithAlpha(), po.cacheAsBitmap(), po.getBlendMode(), po.getFilters(), po.isVisible(), po.getBackgroundColor(), characters.get(characterId), characters, tags);
                         }
                     }
                 }
             }
+            if (t instanceof DoActionTag) {
+                actionScript += convertActionScript((DoActionTag) t);
+            }
+            if (t instanceof FrameLabelTag) {
+                FrameLabelTag flt = (FrameLabelTag) t;
+                if (frameName != null) {
+                    ret += "<DOMFrame index=\"" + (frame) + "\"";
+                    if (duration > 1) {
+                        ret += " duration=\"" + duration + "\"";
+                    }
+                    ret += " name=\"" + frameName + "\"";
+                    if (isAnchor) {
+                        ret += " labelType=\"anchor\" bookmark=\"true\"";
+                    } else {
+                        ret += " labelType=\"name\"";
+                    }
+                    ret += " keyMode=\"" + KEY_MODE_NORMAL + "\">";
+                    lastActionScript = initActionScript + lastActionScript;
+                    initActionScript = "";
+
+                    if (!lastActionScript.equals("")) {
+                        ret += "<ActionScript><script><![CDATA[";
+                        ret += lastActionScript;
+                        ret += "]]></script></ActionScript>";
+                    }
+                    ret += "<elements>";
+                    ret += lastElements;
+                    ret += "</elements>";
+                    ret += "</DOMFrame>";
+                    frame += duration;
+                    duration = 1;
+                    lastElements = elements;
+                    lastActionScript = actionScript;
+                    elements = "";
+                    actionScript = "";
+                }
+                frameName = flt.getLabelName();
+                isAnchor = flt.isNamedAnchor();
+            }
             if (t instanceof ShowFrameTag) {
-                if (!elements.equals("")) {
-                    if (!lastElements.equals("")) {
-                        ret += "<DOMFrame index=\"" + frame + "\"";
+                if (!elements.equals("") || !actionScript.equals("")) {
+                    if (!lastElements.equals("") || !lastActionScript.equals("")) {
+                        ret += "<DOMFrame index=\"" + (frame) + "\"";
                         if (duration > 1) {
                             ret += " duration=\"" + duration + "\"";
                         }
+                        if (frameName != null) {
+                            ret += " name=\"" + frameName + "\"";
+                            if (isAnchor) {
+                                ret += " labelType=\"anchor\" bookmark=\"true\"";
+                            } else {
+                                ret += " labelType=\"name\"";
+                            }
+                            isAnchor = false;
+                            frameName = null;
+                        }
                         ret += " keyMode=\"" + KEY_MODE_NORMAL + "\">";
+                        lastActionScript = initActionScript + lastActionScript;
+                        initActionScript = "";
+
+                        if (!lastActionScript.equals("")) {
+                            ret += "<ActionScript><script><![CDATA[";
+                            ret += lastActionScript;
+                            ret += "]]></script></ActionScript>";
+                        }
                         ret += "<elements>";
                         ret += lastElements;
                         ret += "</elements>";
@@ -1159,18 +1267,39 @@ public class XFLConverter {
                     frame += duration;
                     duration = 1;
                     lastElements = elements;
+                    lastActionScript = actionScript;
                     elements = "";
+                    actionScript = "";
                 } else {
                     duration++;
                 }
             }
         }
-        if (!lastElements.equals("")) {
+        lastActionScript = initActionScript + lastActionScript;
+        initActionScript = "";
+        if (!lastElements.equals("") || !lastActionScript.equals("")) {
+            if (frame < 0) {
+                frame = 0;
+                duration = 1;
+            }
             ret += "<DOMFrame index=\"" + frame + "\"";
+            if (frameName != null) {
+                ret += " name=\"" + frameName + "\"";
+                if (isAnchor) {
+                    ret += " labelType=\"anchor\" bookmark=\"true\"";
+                } else {
+                    ret += " labelType=\"name\"";
+                }
+            }
             if (duration > 1) {
                 ret += " duration=\"" + duration + "\"";
             }
             ret += " keyMode=\"" + KEY_MODE_NORMAL + "\">";
+            if (!lastActionScript.equals("")) {
+                ret += "<ActionScript><script><![CDATA[";
+                ret += lastActionScript;
+                ret += "]]></script></ActionScript>";
+            }
             ret += "<elements>";
             ret += lastElements;
             ret += "</elements>";
@@ -1187,13 +1316,26 @@ public class XFLConverter {
         return ret;
     }
 
-    public static String convertTimeline(List<Integer> oneInstanceShapes, String backgroundColor, List<Tag> tags, HashMap<Integer, CharacterTag> characters, String name) {
+    public static String convertTimeline(String initActionScript, List<Integer> oneInstanceShapes, String backgroundColor, List<Tag> tags, HashMap<Integer, CharacterTag> characters, String name) {
         String ret = "";
         ret += "<DOMTimeline name=\"" + name + "\">";
         ret += "<layers>";
         int layerCount = getLayerCount(tags);
         Stack<Integer> parentLayers = new Stack<Integer>();
         int index = 0;
+        if ((layerCount == 0) && (!initActionScript.equals(""))) {
+            ret += "<DOMLayer name=\"Layer " + index + "\" color=\"" + backgroundColor + "\">";
+            ret += "<frames>";
+            ret += "<DOMFrame index=\"" + 0 + "\"";
+            ret += " keyMode=\"" + KEY_MODE_NORMAL + "\">";
+            ret += "<ActionScript><script><![CDATA[";
+            ret += initActionScript;
+            ret += "]]></script></ActionScript>";
+            ret += "<elements>";
+            ret += "</elements>";
+            ret += "</DOMFrame>";
+            ret += "</DOMLayer>";
+        }
         for (int d = layerCount; d >= 1; d--, index++) {
             for (Tag t : tags) {
                 if (t instanceof PlaceObjectTypeTag) {
@@ -1206,7 +1348,7 @@ public class XFLConverter {
                         ret += "<DOMLayer name=\"Layer " + index + "\" color=\"" + backgroundColor + "\" ";
                         ret += " layerType=\"mask\" locked=\"true\"";
                         ret += ">";
-                        ret += convertFrames("", "", oneInstanceShapes, tags, characters, po.getDepth());
+                        ret += convertFrames(index == 0 ? initActionScript : "", "", "", oneInstanceShapes, tags, characters, po.getDepth());
                         ret += "</DOMLayer>";
                         index++;
                         break;
@@ -1247,7 +1389,7 @@ public class XFLConverter {
             }
             layerPrev += ">";
             String layerAfter = "</DOMLayer>";
-            String cf = convertFrames(layerPrev, layerAfter, oneInstanceShapes, tags, characters, d);
+            String cf = convertFrames(index == 0 ? initActionScript : "", layerPrev, layerAfter, oneInstanceShapes, tags, characters, d);
             if (cf.equals("")) {
                 index--;
             }
@@ -1287,6 +1429,21 @@ public class XFLConverter {
                 for (int i = 0; i < sc.tagIDs.length; i++) {
                     if (!ret.containsKey(sc.tagIDs[i]) && !ret.containsValue(sc.classNames[i])) {
                         ret.put(sc.tagIDs[i], sc.classNames[i]);
+                    }
+                }
+            }
+        }
+        return ret;
+    }
+
+    private static Map<Integer, String> getCharacterVariables(List<Tag> tags) {
+        Map<Integer, String> ret = new HashMap<Integer, String>();
+        for (Tag t : tags) {
+            if (t instanceof ExportAssetsTag) {
+                ExportAssetsTag ea = (ExportAssetsTag) t;
+                for (int i = 0; i < ea.tags.size(); i++) {
+                    if (!ret.containsKey(ea.tags.get(i))) {
+                        ret.put(ea.tags.get(i), ea.names.get(i));
                     }
                 }
             }
@@ -1511,11 +1668,25 @@ public class XFLConverter {
         if (baseName.contains(".")) {
             baseName = baseName.substring(0, baseName.lastIndexOf("."));
         }
-        domDocument += "<DOMDocument xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://ns.adobe.com/xfl/2008/\" currentTimeline=\"1\" xflVersion=\"2.2\" creatorInfo=\"" + Main.applicationName + "\" platform=\"Windows\" versionInfo=\"Saved by " + Main.applicationVerName + "\" majorVersion=\"" + Main.version + "\" buildNumber=\"\" nextSceneIdentifier=\"2\" playOptionsPlayLoop=\"false\" playOptionsPlayPages=\"false\" playOptionsPlayFrameActions=\"false\" autoSaveHasPrompted=\"true\">";
         HashMap<String, byte[]> files = new HashMap<String, byte[]>();
         HashMap<Integer, CharacterTag> characters = getCharacters(swf.tags);
         List<Integer> oneInstaceShapes = getOneInstanceShapes(swf.tags, characters);
         Map<Integer, String> characterClasses = getCharacterClasses(swf.tags);
+        Map<Integer, String> characterVariables = getCharacterVariables(swf.tags);
+
+        FileAttributesTag fa = null;
+        for (Tag t : swf.tags) {
+            if (t instanceof FileAttributesTag) {
+                fa = (FileAttributesTag) t;
+            }
+        }
+
+        boolean useAS3 = false;
+        boolean useNetwork = false;
+        if (fa != null) {
+            useAS3 = fa.actionScript3;
+            useNetwork = fa.useNetwork;
+        }
         String backgroundColor = "#ffffff";
         for (Tag t : swf.tags) {
             if (t instanceof SetBackgroundColorTag) {
@@ -1523,19 +1694,18 @@ public class XFLConverter {
                 backgroundColor = sbc.backgroundColor.toHexRGB();
             }
         }
-        domDocument += convertLibrary(characterClasses, oneInstaceShapes, backgroundColor, swf.tags, characters, files);
+        domDocument += "<DOMDocument xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://ns.adobe.com/xfl/2008/\" currentTimeline=\"1\" xflVersion=\"2.2\" creatorInfo=\"" + Main.applicationName + "\" platform=\"Windows\" versionInfo=\"Saved by " + Main.applicationVerName + "\" majorVersion=\"" + Main.version + "\" buildNumber=\"\" nextSceneIdentifier=\"2\" playOptionsPlayLoop=\"false\" playOptionsPlayPages=\"false\" playOptionsPlayFrameActions=\"false\" autoSaveHasPrompted=\"true\"";
+        domDocument += " backgroundColor=\"" + backgroundColor + "\"";
+        domDocument += " frameRate=\"" + swf.frameRate + "\"";
+        domDocument += ">";
+
+        domDocument += convertLibrary(characterVariables, characterClasses, oneInstaceShapes, backgroundColor, swf.tags, characters, files);
         domDocument += "<timelines>";
-        domDocument += convertTimeline(oneInstaceShapes, backgroundColor, swf.tags, characters, "Scene 1");
+        domDocument += convertTimeline("", oneInstaceShapes, backgroundColor, swf.tags, characters, "Scene 1");
         domDocument += "</timelines>";
         domDocument += "</DOMDocument>";
         domDocument = prettyFormatXML(domDocument);
 
-        boolean asV3Found = false;
-        for (Tag t : swf.tags) {
-            if (t instanceof ABCContainerTag) {
-                asV3Found = true;
-            }
-        }
 
         String publishSettings = "<flash_profiles>\n"
                 + "<flash_profile version=\"1.0\" name=\"Default\" current=\"true\">\n"
@@ -1613,7 +1783,7 @@ public class XFLConverter {
                 + "    <OverrideSounds>0</OverrideSounds>\n"
                 + "    <Version>15</Version>\n"
                 + "    <ExternalPlayer>FlashPlayer11.2</ExternalPlayer>\n"
-                + "    <ActionScriptVersion>" + (asV3Found ? "3" : "2") + "</ActionScriptVersion>\n"
+                + "    <ActionScriptVersion>" + (useAS3 ? "3" : "2") + "</ActionScriptVersion>\n"
                 + "    <PackageExportFrame>1</PackageExportFrame>\n"
                 + "    <PackagePaths></PackagePaths>\n"
                 + "    <AS3PackagePaths>.</AS3PackagePaths>\n"
@@ -1626,7 +1796,7 @@ public class XFLConverter {
                 + "    <DeviceSound>0</DeviceSound>\n"
                 + "    <StreamUse8kSampleRate>0</StreamUse8kSampleRate>\n"
                 + "    <EventUse8kSampleRate>0</EventUse8kSampleRate>\n"
-                + "    <UseNetwork>0</UseNetwork>\n"
+                + "    <UseNetwork>" + (useNetwork ? 1 : 0) + "</UseNetwork>\n"
                 + "    <DocumentClass>" + (characterClasses.containsKey(0) ? characterClasses.get(0) : "") + "</DocumentClass>\n"
                 + "    <AS3Strict>2</AS3Strict>\n"
                 + "    <AS3Coach>4</AS3Coach>\n"

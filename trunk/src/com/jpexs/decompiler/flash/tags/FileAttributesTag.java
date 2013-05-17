@@ -30,6 +30,7 @@ public class FileAttributesTag extends Tag {
     public boolean hasMetadata;
     public boolean actionScript3;
     public boolean useNetwork;
+    public boolean noCrossDomainCache;
     private int reserved1;
     private int reserved2;
     private int reserved3;
@@ -43,7 +44,8 @@ public class FileAttributesTag extends Tag {
         useGPU = sis.readUB(1) != 0;
         hasMetadata = sis.readUB(1) != 0;
         actionScript3 = sis.readUB(1) != 0;
-        reserved2 = (int) sis.readUB(2); // reserved
+        noCrossDomainCache = sis.readUB(1) != 0;
+        reserved2 = (int) sis.readUB(1); // reserved
         useNetwork = sis.readUB(1) != 0;
         // UB[24] == 0 (reserved)
         reserved3 = (int) sis.readUB(24); //reserved
@@ -66,7 +68,8 @@ public class FileAttributesTag extends Tag {
             sos.writeUB(1, useGPU ? 1 : 0);
             sos.writeUB(1, hasMetadata ? 1 : 0);
             sos.writeUB(1, actionScript3 ? 1 : 0);
-            sos.writeUB(2, reserved2); //reserved
+            sos.writeUB(1, noCrossDomainCache ? 1 : 0);
+            sos.writeUB(1, reserved2); //reserved
             sos.writeUB(1, useNetwork ? 1 : 0);
             sos.writeUB(24, reserved3); //reserved
         } catch (IOException e) {

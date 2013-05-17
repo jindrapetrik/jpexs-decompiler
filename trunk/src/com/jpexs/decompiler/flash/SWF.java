@@ -522,7 +522,7 @@ public class SWF {
                 ((DefineButton2Tag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
             }
             if (ret.get(i).tag instanceof DoInitActionTag) {
-                ((DoInitActionTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
+                //((DoInitActionTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
             }
             if (ret.get(i).tag instanceof ASMSource) {
                 ASMSource ass = (ASMSource) ret.get(i).tag;
