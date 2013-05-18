@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
+import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
@@ -366,6 +367,9 @@ public class XFLConverter {
 
     public static String convertMatrix(MATRIX m) {
         String ret = "";
+        if (m == null) {
+            m = new MATRIX();
+        }
         ret += "<Matrix ";
         ret += "tx=\"" + (((float) m.translateX) / 20.0) + "\" ";
         ret += "ty=\"" + (((float) m.translateY) / 20.0) + "\" ";
@@ -1293,8 +1297,47 @@ public class XFLConverter {
 
                 mediaLinkStr += "/>\n";
                 media.add(mediaLinkStr);
+            } else if (symbol instanceof DefineVideoStreamTag) {
+                DefineVideoStreamTag video = (DefineVideoStreamTag) symbol;
+                String videoType = "no media";
+                switch (video.codecID) {
+                    case 2:
+                        videoType = "h263 media";
+                        break;
+                    case 3:
+                        videoType = "screen share media";
+                        break;
+                    case 4:
+                        videoType = "vp6 media";
+                        break;
+                    case 5:
+                        videoType = "vp6 alpha media";
+                        break;
+                }
+
+                byte data[] = new byte[0];
+                try {
+                    data = swf.exportMovie(video);
+                } catch (IOException ex) {
+                    Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                String symbolFile = "movie" + symbol.getCharacterID() + "." + "flv";
+                files.put(symbolFile, data);
+                String mediaLinkStr = "<DOMVideoItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp() + "\" externalFileSize=\"" + data.length + "\"";
+                mediaLinkStr += " href=\"" + symbolFile + "\"";
+                mediaLinkStr += " videoType=\"" + videoType + "\"";
+                mediaLinkStr += " fps=\"" + swf.frameRate + "\"";
+                mediaLinkStr += " width=\"" + video.width + "\"";
+                mediaLinkStr += " height=\"" + video.height + "\"";
+                double len = ((double) video.numFrames) / ((double) swf.frameRate);
+                mediaLinkStr += " length=\"" + len + "\"";
+                if (characterClasses.containsKey(symbol.getCharacterID())) {
+                    mediaLinkStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterID()) + "\"";
+                }
+                mediaLinkStr += "/>\n";
+                media.add(mediaLinkStr);
             }
-            //TODO: video...
+
         }
         if (!media.isEmpty()) {
             ret += "<media>";
@@ -1448,6 +1491,18 @@ public class XFLConverter {
         return ret;
     }
 
+    private static String convertVideoInstance(MATRIX matrix, DefineVideoStreamTag video) {
+        String ret = "<DOMVideoInstance libraryItemName=\"movie" + video.characterID + ".flv\" frameRight=\"" + (20 * video.width) + "\" frameBottom=\"" + (20 * video.height) + "\">";
+        ret += "<matrix>";
+        ret += convertMatrix(matrix);
+        ret += "</matrix>";
+        ret += "<transformationPoint>";
+        ret += "<Point />";
+        ret += "</transformationPoint>";
+        ret += "</DOMVideoInstance>";
+        return ret;
+    }
+
     private static String convertFrames(String initActionScript, String prevStr, String afterStr, List<Integer> oneInstanceShapes, List<Tag> tags, HashMap<Integer, CharacterTag> characters, int depth) {
         String ret = "";
         prevStr += "<frames>";
@@ -1460,7 +1515,7 @@ public class XFLConverter {
         String lastActionScript = "";
         String frameName = null;
         boolean isAnchor = false;
-
+        DefineVideoStreamTag video = null;
         for (Tag t : tags) {
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
@@ -1476,6 +1531,11 @@ public class XFLConverter {
                             elements += convertShape(characters, po.getMatrix(), (ShapeTag) ch);
                         } else if (ch instanceof TextTag) {
                             elements += convertText(tags, (TextTag) ch, po.getMatrix(), po.getFilters());
+                        } else if (ch instanceof DefineVideoStreamTag) {
+                            if (ch != video) {
+                                elements += convertVideoInstance(po.getMatrix(), (DefineVideoStreamTag) ch);
+                            }
+                            video = (DefineVideoStreamTag) ch;
                         } else {
                             elements += convertSymbolInstance(po.getName(), po.getMatrix(), po.getColorTransform(), po.getColorTransformWithAlpha(), po.cacheAsBitmap(), po.getBlendMode(), po.getFilters(), po.isVisible(), po.getBackgroundColor(), characters.get(characterId), characters, tags);
                         }
@@ -1603,7 +1663,7 @@ public class XFLConverter {
         Stack<Integer> parentLayers = new Stack<Integer>();
         int index = 0;
         if ((layerCount == 0) && (!initActionScript.equals(""))) {
-            ret += "<DOMLayer name=\"Layer " + index + "\" color=\"" + backgroundColor + "\">";
+            ret += "<DOMLayer name=\"Layer " + (index + 1) + "\" color=\"" + backgroundColor + "\">";
             ret += "<frames>";
             ret += "<DOMFrame index=\"" + 0 + "\"";
             ret += " keyMode=\"" + KEY_MODE_NORMAL + "\">";
@@ -1624,7 +1684,7 @@ public class XFLConverter {
                             parentLayers.push(index);
                         }
 
-                        ret += "<DOMLayer name=\"Layer " + index + "\" color=\"" + backgroundColor + "\" ";
+                        ret += "<DOMLayer name=\"Layer " + (index + 1) + "\" color=\"" + backgroundColor + "\" ";
                         ret += " layerType=\"mask\" locked=\"true\"";
                         ret += ">";
                         ret += convertFrames(index == 0 ? initActionScript : "", "", "", oneInstanceShapes, tags, characters, po.getDepth());
@@ -1657,7 +1717,7 @@ public class XFLConverter {
                 parentLayer = parentLayers.pop();
             }
             String layerPrev = "";
-            layerPrev += "<DOMLayer name=\"Layer " + index + "\" color=\"" + backgroundColor + "\" ";
+            layerPrev += "<DOMLayer name=\"Layer " + (index + 1) + "\" color=\"" + backgroundColor + "\" ";
             if (d == 1) {
                 layerPrev += " current=\"true\" isSelected=\"true\"";
             }

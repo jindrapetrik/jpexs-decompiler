@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash;
 
 import SevenZip.Compression.LZMA.Encoder;
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
@@ -805,6 +806,102 @@ public class SWF {
         }
     }
 
+    public byte[] exportMovie(DefineVideoStreamTag videoStream) throws IOException {
+        HashMap<Integer, VideoFrameTag> frames = new HashMap<Integer, VideoFrameTag>();
+        List<Object> os = new ArrayList<Object>(this.tags);
+        populateVideoFrames(videoStream.characterID, os, frames);
+
+
+
+        long fileSize = 0;
+
+        //double ms = 1000.0f / ((float) frameRate);
+
+        ByteArrayOutputStream fos = new ByteArrayOutputStream();
+        fos = new ByteArrayOutputStream();
+        //CopyOutputStream cos = new CopyOutputStream(fos, new FileInputStream("f:\\trunk\\testdata\\xfl\\xfl\\_obj\\streamvideo 7.flv"));
+        OutputStream tos = fos;
+        FLVOutputStream flv = new FLVOutputStream(tos);
+        flv.writeHeader(false, true);
+        //flv.writeTag(new FLVTAG(0, SCRIPTDATA.onMetaData(ms * frames.size() / 1000.0, videoStream.width, videoStream.height, 0, frameRate, videoStream.codecID, 0, 0, false, 0, fileSize)));
+        int horizontalAdjustment = 0;
+        int verticalAdjustment = 0;
+        for (int i = 0; i < frames.size(); i++) {
+            VideoFrameTag tag = frames.get(i);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            int frameType = 1;
+
+            if ((videoStream.codecID == DefineVideoStreamTag.CODEC_VP6)
+                    || (videoStream.codecID == DefineVideoStreamTag.CODEC_VP6_ALPHA)) {
+                SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(tag.videoData), SWF.DEFAULT_VERSION);
+                if (videoStream.codecID == DefineVideoStreamTag.CODEC_VP6_ALPHA) {
+                    sis.readUI24(); //offsetToAlpha
+                }
+                int frameMode = (int) sis.readUB(1);
+
+                if (frameMode == 0) {
+                    frameType = 1; //intra
+                } else {
+                    frameType = 2; //inter
+                }
+                int qp = (int) sis.readUB(6);
+                int marker = (int) sis.readUB(1);
+                if (frameMode == 0) {
+                    int version = (int) sis.readUB(5);
+                    int version2 = (int) sis.readUB(2);
+                    boolean interlace = sis.readUB(1) == 1;//interlace
+                    if (marker == 1 || version2 == 0) {
+                        sis.readUI16();//offset
+                    }
+                    int dim_y = sis.readUI8();
+                    int dim_x = sis.readUI8();
+                    int render_y = sis.readUI8();
+                    int render_x = sis.readUI8();
+                    horizontalAdjustment = (int) (dim_x * Math.ceil(((double) videoStream.width) / (double) dim_x)) - videoStream.width;
+                    verticalAdjustment = (int) (dim_y * Math.ceil(((double) videoStream.height) / (double) dim_y)) - videoStream.height;
+
+                }
+
+                SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
+                sos.writeUB(4, horizontalAdjustment);
+                sos.writeUB(4, verticalAdjustment);
+            }
+            if (videoStream.codecID == DefineVideoStreamTag.CODEC_SORENSON_H263) {
+                SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(tag.videoData), SWF.DEFAULT_VERSION);
+                sis.readUB(17);//pictureStartCode
+                sis.readUB(5); //version
+                sis.readUB(8); //temporalReference
+                int pictureSize = (int) sis.readUB(3); //pictureSize
+                if (pictureSize == 0) {
+                    sis.readUB(8); //customWidth
+                    sis.readUB(8); //customHeight
+                }
+                if (pictureSize == 1) {
+                    sis.readUB(16); //customWidth
+                    sis.readUB(16); //customHeight
+                }
+                int pictureType = (int) sis.readUB(2);
+                switch (pictureType) {
+                    case 0: //intra
+                        frameType = 1; //keyframe
+                        break;
+                    case 1://inter
+                        frameType = 2;
+                        break;
+                    case 2: //disposable
+                        frameType = 3;
+                        break;
+                }
+            }
+
+            baos.write(tag.videoData);
+            flv.writeTag(new FLVTAG((int) Math.floor(i * 1000.0f / ((float) frameRate)), new VIDEODATA(frameType, videoStream.codecID, baos.toByteArray())));
+        }
+        fileSize = fos.toByteArray().length;
+        return fos.toByteArray();
+    }
+
     public void exportMovies(String outdir, List<Tag> tags) throws IOException {
         if (tags.isEmpty()) {
             return;
@@ -812,62 +909,12 @@ public class SWF {
         if (!(new File(outdir)).exists()) {
             (new File(outdir)).mkdirs();
         }
-        List<Object> os = new ArrayList<Object>(this.tags);
         for (Tag t : tags) {
             if (t instanceof DefineVideoStreamTag) {
                 DefineVideoStreamTag videoStream = (DefineVideoStreamTag) t;
-                HashMap<Integer, VideoFrameTag> frames = new HashMap<Integer, VideoFrameTag>();
-                populateVideoFrames(videoStream.characterID, os, frames);
-
-                FileOutputStream fos = null;
-                try {
-                    fos = new FileOutputStream(outdir + File.separator + ((DefineVideoStreamTag) t).characterID + ".flv");
-                    FLVOutputStream flv = new FLVOutputStream(fos);
-                    flv.writeHeader(false, true);
-                    int ms = (int) (1000.0f / ((float) frameRate));
-                    for (int i = 0; i < frames.size(); i++) {
-                        VideoFrameTag tag = frames.get(i);
-                        int frameType = 0;
-                        if (videoStream.codecID == 2) { //H263
-                            SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(tag.videoData), SWF.DEFAULT_VERSION);
-                            sis.readUB(17);//pictureStartCode
-                            sis.readUB(5); //version
-                            sis.readUB(8); //temporalReference
-                            int pictureSize = (int) sis.readUB(3); //pictureSize
-                            if (pictureSize == 0) {
-                                sis.readUB(8); //customWidth
-                                sis.readUB(8); //customHeight
-                            }
-                            if (pictureSize == 1) {
-                                sis.readUB(16); //customWidth
-                                sis.readUB(16); //customHeight
-                            }
-                            int pictureType = (int) sis.readUB(2);
-                            switch (pictureType) {
-                                case 0: //intra
-                                    frameType = 1; //keyframe
-                                    break;
-                                case 1://inter
-                                    frameType = 2;
-                                    break;
-                                case 2: //disposable
-                                    frameType = 3;
-                                    break;
-                            }
-                        }
-                        flv.writeTag(new FLVTAG(i * ms, new VIDEODATA(frameType, videoStream.codecID, tag.videoData)));
-                    }
-
-
-                } finally {
-                    if (fos != null) {
-                        try {
-                            fos.close();
-                        } catch (Exception ex) {
-                            //ignore
-                        }
-                    }
-                }
+                FileOutputStream fos = new FileOutputStream(outdir + File.separator + ((DefineVideoStreamTag) t).characterID + ".flv");
+                fos.write(exportMovie(videoStream));
+                fos.close();
             }
         }
     }

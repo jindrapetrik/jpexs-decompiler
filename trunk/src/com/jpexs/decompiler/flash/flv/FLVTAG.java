@@ -13,6 +13,11 @@ public class FLVTAG {
     public static final int DATATYPE_AUDIO = 8;
     public static final int DATATYPE_SCRIPT_DATA = 18;
 
+    public FLVTAG(long timeStamp, SCRIPTDATA data) {
+        tagType = DATATYPE_SCRIPT_DATA;
+        this.data = data;
+    }
+
     public FLVTAG(long timeStamp, VIDEODATA data) {
         this.tagType = DATATYPE_VIDEO;
         this.timeStamp = timeStamp;

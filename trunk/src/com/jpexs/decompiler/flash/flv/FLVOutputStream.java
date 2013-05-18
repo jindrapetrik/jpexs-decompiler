@@ -2,6 +2,7 @@ package com.jpexs.decompiler.flash.flv;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 
 /**
  *
@@ -129,9 +130,116 @@ public class FLVOutputStream extends OutputStream {
         writeUI24(tag.timeStamp & 0xffffff);
         writeUI8((int) ((tag.timeStamp >> 24) & 0xff));
         writeUI24(0);
-        write(data);
+        write(data); //codecId 4, frameType 1
         long posAfter = getPos();
         long size = posAfter - posBefore;
         writeUI32(size);
+    }
+
+    public void writeSCRIPTDATASTRING(String s) throws IOException {
+        int len = s.getBytes("UTF-8").length;
+        writeUI16(len);
+        write(s.getBytes("UTF-8"));
+    }
+
+    public void writeSCRIPTDATALONGSTRING(String s) throws IOException {
+        int len = s.getBytes("UTF-8").length;
+        writeUI32(len);
+        write(s.getBytes("UTF-8"));
+    }
+
+    private void writeLong(long value) throws IOException {
+        byte writeBuffer[] = new byte[8];
+        writeBuffer[3] = (byte) (value >>> 56);
+        writeBuffer[2] = (byte) (value >>> 48);
+        writeBuffer[1] = (byte) (value >>> 40);
+        writeBuffer[0] = (byte) (value >>> 32);
+        writeBuffer[7] = (byte) (value >>> 24);
+        writeBuffer[6] = (byte) (value >>> 16);
+        writeBuffer[5] = (byte) (value >>> 8);
+        writeBuffer[4] = (byte) (value);
+        write(writeBuffer);
+    }
+
+    public void writeDOUBLE(double value) throws IOException {
+        writeLong(Double.doubleToLongBits(value));
+    }
+
+    public void writeSCRIPTDATAOBJECT(SCRIPTDATAOBJECT o) throws IOException {
+        writeSCRIPTDATASTRING(o.objectName);
+        writeSCRIPTDATAVALUE(o.objectData);
+    }
+
+    public void writeSCRIPTDATAVARIABLE(SCRIPTDATAVARIABLE v) throws IOException {
+        writeSCRIPTDATASTRING(v.variableName);
+        writeSCRIPTDATAVALUE(v.variableData);
+    }
+
+    public void writeSCRIPTDATAVALUE(SCRIPTDATAVALUE v) throws IOException {
+        writeUI8(v.type);
+        switch (v.type) {
+            case 0:
+                writeDOUBLE((double) (Double) v.value);
+                break;
+            case 1:
+                writeUI8((boolean) (Boolean) v.value ? 1 : 0);
+                break;
+            case 2:
+                writeSCRIPTDATASTRING((String) v.value);
+                break;
+            case 3:
+                List<SCRIPTDATAOBJECT> objects = (List<SCRIPTDATAOBJECT>) v.value;
+                for (SCRIPTDATAOBJECT o : objects) {
+                    writeSCRIPTDATAOBJECT(o);
+                }
+                writeUI24(9);//SCRIPTDATAOBJECTEND
+                break;
+            case 4:
+                writeSCRIPTDATASTRING((String) v.value);
+                break;
+            case 5:
+                //null
+                break;
+            case 6:
+                //undefined
+                break;
+            case 7:
+                writeUI16((int) (Integer) v.value);
+                break;
+            case 8:
+                List<SCRIPTDATAVARIABLE> variables = (List<SCRIPTDATAVARIABLE>) v.value;
+                writeUI32(variables.size());
+                for (SCRIPTDATAVARIABLE var : variables) {
+                    writeSCRIPTDATAVARIABLE(var);
+                }
+                writeUI24(9);//SCRIPTDATAVARIABLEEND
+                break;
+            case 9:
+                //reserved
+                break;
+            case 10:
+                List<SCRIPTDATAVARIABLE> stvariables = (List<SCRIPTDATAVARIABLE>) v.value;
+                writeUI32(stvariables.size());
+                for (SCRIPTDATAVARIABLE var : stvariables) {
+                    writeSCRIPTDATAVARIABLE(var);
+                }
+                break;
+            case 11:
+                writeSCRIPTDATADATE((SCRIPTDATADATE) v.value);
+                break;
+            case 12:
+                writeSCRIPTDATALONGSTRING((String) v.value);
+                break;
+
+        }
+    }
+
+    public void writeSI16(int value) throws IOException {
+        writeUI16(value);
+    }
+
+    public void writeSCRIPTDATADATE(SCRIPTDATADATE d) throws IOException {
+        writeDOUBLE(d.dateTime);
+        writeSI16(d.localDateTimeOffset);
     }
 }

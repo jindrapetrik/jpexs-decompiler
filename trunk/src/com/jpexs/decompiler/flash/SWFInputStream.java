@@ -252,6 +252,10 @@ public class SWFInputStream extends InputStream {
         return readEx() + (readEx() << 8);
     }
 
+    public int readUI24() throws IOException {
+        return readEx() + (readEx() << 8) + (readEx() << 16);
+    }
+
     /**
      * Reads one SI32 (Signed 32bit integer) value from the stream
      *

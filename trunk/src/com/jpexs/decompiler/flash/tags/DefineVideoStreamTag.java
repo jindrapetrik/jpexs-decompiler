@@ -38,6 +38,10 @@ public class DefineVideoStreamTag extends CharacterTag {
     public int videoFlagsDeblocking;
     public boolean videoFlagsSmoothing;
     public int codecID;
+    public static final int CODEC_SORENSON_H263 = 2;
+    public static final int CODEC_SCREEN_VIDEO = 3;
+    public static final int CODEC_VP6 = 4;
+    public static final int CODEC_VP6_ALPHA = 5;
 
     @Override
     public int getCharacterID() {
