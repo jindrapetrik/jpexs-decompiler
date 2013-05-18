@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import static com.jpexs.decompiler.flash.tags.DefineSoundTag.FORMAT_MP3;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -50,8 +49,11 @@ public class SoundStreamHead2Tag extends CharacterTag implements SoundStreamHead
 
     @Override
     public String getExportFormat() {
-        if (streamSoundCompression == FORMAT_MP3) {
+        if (streamSoundCompression == DefineSoundTag.FORMAT_MP3) {
             return "mp3";
+        }
+        if (streamSoundCompression == DefineSoundTag.FORMAT_ADPCM) {
+            return "wav";
         }
         return "flv";
     }

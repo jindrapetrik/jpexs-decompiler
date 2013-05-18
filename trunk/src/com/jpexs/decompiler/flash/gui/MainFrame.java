@@ -1292,7 +1292,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                     final String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
                     Configuration.setConfig("lastExportDir", Helper.fixDialogFile(chooser.getSelectedFile()).getParentFile().getAbsolutePath());
                     final boolean isPcode = export.getOption(ExportDialog.OPTION_ACTIONSCRIPT) == 1;
-                    final boolean isMp3 = export.getOption(ExportDialog.OPTION_SOUNDS) == 0;
+                    final boolean isMp3OrWav = export.getOption(ExportDialog.OPTION_SOUNDS) == 0;
                     final boolean isFormatted = export.getOption(ExportDialog.OPTION_TEXTS) == 1;
                     final boolean onlySel = e.getActionCommand().endsWith("SEL");
                     (new Thread() {
@@ -1352,7 +1352,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                     SWF.exportShapes(selFile + File.separator + "shapes", shapes);
                                     swf.exportTexts(selFile + File.separator + "texts", texts, isFormatted);
                                     swf.exportMovies(selFile + File.separator + "movies", movies);
-                                    swf.exportSounds(selFile + File.separator + "sounds", sounds, isMp3);
+                                    swf.exportSounds(selFile + File.separator + "sounds", sounds, isMp3OrWav, isMp3OrWav);
                                     swf.exportBinaryData(selFile + File.separator + "binaryData", binaryData);
                                     if (abcPanel != null) {
                                         for (int i = 0; i < tlsList.size(); i++) {
@@ -1375,7 +1375,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                     swf.exportShapes(selFile + File.separator + "shapes");
                                     swf.exportTexts(selFile + File.separator + "texts", isFormatted);
                                     swf.exportMovies(selFile + File.separator + "movies");
-                                    swf.exportSounds(selFile + File.separator + "sounds", isMp3);
+                                    swf.exportSounds(selFile + File.separator + "sounds", isMp3OrWav, isMp3OrWav);
                                     swf.exportBinaryData(selFile + File.separator + "binaryData");
                                     swf.exportActionScript(selFile, isPcode);
                                 }

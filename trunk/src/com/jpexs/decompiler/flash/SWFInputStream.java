@@ -181,7 +181,7 @@ public class SWFInputStream extends InputStream {
         return bytesRead;
     }
 
-    private void alignByte() {
+    public void alignByte() {
         bitPos = 0;
     }
     private int lastPercent = -1;
@@ -2973,5 +2973,12 @@ public class SWFInputStream extends InputStream {
     @Override
     public int available() throws IOException {
         return is.available();
+    }
+
+    public long availableBits() throws IOException {
+        if (bitPos > 0) {
+            return available() * 8 + (8 - bitPos);
+        }
+        return available() * 8;
     }
 }

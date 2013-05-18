@@ -17,10 +17,11 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-public class RemoveObject2Tag extends Tag {
+public class RemoveObject2Tag extends Tag implements RemoveTag {
 
     public int depth;
 
@@ -28,5 +29,10 @@ public class RemoveObject2Tag extends Tag {
         super(28, "RemoveObject2", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         depth = sis.readUI16();
+    }
+
+    @Override
+    public int getDepth() {
+        return depth;
     }
 }

@@ -48,6 +48,7 @@ import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
@@ -605,7 +606,7 @@ public class XFLConverter {
         for (Tag t : tags) {
             if (t instanceof SoundStreamHeadTypeTag) {
                 SoundStreamHeadTypeTag ssh = (SoundStreamHeadTypeTag) t;
-                ssh.setVirtualCharacterId(maxId++);
+                ssh.setVirtualCharacterId(++maxId);
             }
             if (t instanceof CharacterTag) {
                 CharacterTag ct = (CharacterTag) t;
@@ -1149,7 +1150,7 @@ public class XFLConverter {
                 int soundSize = 0;
                 long soundSampleCount = 0;
                 byte soundData[] = new byte[0];
-                double rateMap[] = {5.5, 11, 22, 44};
+                int rateMap[] = {5, 11, 22, 44};
                 String exportFormat = "flv";
                 if (symbol instanceof SoundStreamHeadTypeTag) {
                     SoundStreamHeadTypeTag sstream = (SoundStreamHeadTypeTag) symbol;
@@ -1206,7 +1207,7 @@ public class XFLConverter {
                 }
                 if (soundFormat == DefineSoundTag.FORMAT_ADPCM) {
                     SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(soundData), SWF.DEFAULT_VERSION);
-
+                    exportFormat = "wav";
                     try {
                         int adpcmCodeSize = (int) sis.readUB(2);
                         bits = 2 + adpcmCodeSize;
@@ -1278,7 +1279,7 @@ public class XFLConverter {
                 String symbolFile = "sound" + symbol.getCharacterID() + "." + exportFormat;
                 files.put(symbolFile, data);
                 String mediaLinkStr = "<DOMSoundItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp() + "\" externalFileSize=\"" + data.length + "\"";
-
+                mediaLinkStr += " href=\"" + symbolFile + "\"";
                 mediaLinkStr += " format=\"";
                 mediaLinkStr += rateMap[soundRate] + "kHz";
                 mediaLinkStr += " " + (soundSize == 1 ? "16bit" : "8bit");
@@ -1293,7 +1294,7 @@ public class XFLConverter {
                 mediaLinkStr += "/>\n";
                 media.add(mediaLinkStr);
             }
-            //TODO: sound, video...
+            //TODO: video...
         }
         if (!media.isEmpty()) {
             ret += "<media>";
@@ -1385,11 +1386,11 @@ public class XFLConverter {
                 ret += " soundLoop=\"" + startSound.soundInfo.loopCount + "\"";
             }
 
-            if (!startSound.soundInfo.syncNoMultiple && !startSound.soundInfo.syncStop) {
-                //event
-            } else if (startSound.soundInfo.syncNoMultiple && !startSound.soundInfo.syncStop) {
+            if (startSound.soundInfo.syncStop) {
+                ret += " soundSync=\"stop\"";
+            } else if (startSound.soundInfo.syncNoMultiple) {
                 ret += " soundSync=\"start\"";
-            }
+            };
             soundEnvelopeStr += "<SoundEnvelope>";
             if (startSound.soundInfo.hasEnvelope) {
                 for (SOUNDENVELOPE env : startSound.soundInfo.envelopeRecords) {
@@ -1459,8 +1460,7 @@ public class XFLConverter {
         String lastActionScript = "";
         String frameName = null;
         boolean isAnchor = false;
-        StartSoundTag startSound = null;
-        SoundStreamHeadTypeTag soundStreamHead = null;
+
         for (Tag t : tags) {
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
@@ -1482,41 +1482,6 @@ public class XFLConverter {
                     }
                 }
             }
-            if (t instanceof StartSoundTag) {
-                if (startSound != null) {
-                    lastActionScript = initActionScript + lastActionScript;
-                    initActionScript = "";
-                    ret += convertFrame(characters, tags, soundStreamHead, startSound, frame, frameName, isAnchor, duration, lastActionScript, lastElements);
-                    frame += duration;
-                    duration = 1;
-                    lastElements = elements;
-                    lastActionScript = actionScript;
-                    elements = "";
-                    actionScript = "";
-                    frameName = null;
-                    isAnchor = false;
-                    soundStreamHead = null;
-                }
-                startSound = (StartSoundTag) t;
-            }
-            if (t instanceof SoundStreamHeadTypeTag) {
-                if (soundStreamHead != null) {
-                    lastActionScript = initActionScript + lastActionScript;
-                    initActionScript = "";
-                    ret += convertFrame(characters, tags, soundStreamHead, startSound, frame, frameName, isAnchor, duration, lastActionScript, lastElements);
-                    frame += duration;
-                    duration = 1;
-                    lastElements = elements;
-                    lastActionScript = actionScript;
-                    elements = "";
-                    actionScript = "";
-                    frameName = null;
-                    isAnchor = false;
-                    startSound = null;
-                    soundStreamHead = null;
-                }
-                soundStreamHead = (SoundStreamHeadTypeTag) t;
-            }
             if (t instanceof DoActionTag) {
                 actionScript += convertActionScript((DoActionTag) t);
             }
@@ -1525,25 +1490,36 @@ public class XFLConverter {
                 if (frameName != null) {
                     lastActionScript = initActionScript + lastActionScript;
                     initActionScript = "";
-                    ret += convertFrame(characters, tags, soundStreamHead, startSound, frame, frameName, isAnchor, duration, lastActionScript, lastElements);
+                    ret += convertFrame(characters, tags, null, null, frame, frameName, isAnchor, duration, lastActionScript, lastElements);
                     frame += duration;
                     duration = 1;
                     lastElements = elements;
                     lastActionScript = actionScript;
                     elements = "";
                     actionScript = "";
-                    startSound = null;
-                    soundStreamHead = null;
                 }
                 frameName = flt.getLabelName();
                 isAnchor = flt.isNamedAnchor();
             }
+            if (t instanceof RemoveTag) {
+                if (!lastElements.equals("") || !lastActionScript.equals("")) {
+                    lastActionScript = initActionScript + lastActionScript;
+                    initActionScript = "";
+                    ret += convertFrame(characters, tags, null, null, frame, frameName, isAnchor, duration, lastActionScript, lastElements);
+                }
+                frame += duration;
+                duration = 1;
+                lastElements = elements;
+                lastActionScript = actionScript;
+                elements = "";
+                actionScript = "";
+            }
             if (t instanceof ShowFrameTag) {
-                if (!elements.equals("") || !actionScript.equals("") || soundStreamHead != null || startSound != null) {
+                if (!elements.equals("") || !actionScript.equals("")) {
                     if (!lastElements.equals("") || !lastActionScript.equals("")) {
                         lastActionScript = initActionScript + lastActionScript;
                         initActionScript = "";
-                        ret += convertFrame(characters, tags, soundStreamHead, startSound, frame, frameName, isAnchor, duration, lastActionScript, lastElements);
+                        ret += convertFrame(characters, tags, null, null, frame, frameName, isAnchor, duration, lastActionScript, lastElements);
                     }
                     frame += duration;
                     duration = 1;
@@ -1551,8 +1527,6 @@ public class XFLConverter {
                     lastActionScript = actionScript;
                     elements = "";
                     actionScript = "";
-                    soundStreamHead = null;
-                    startSound = null;
                 } else {
                     duration++;
                 }
@@ -1560,17 +1534,63 @@ public class XFLConverter {
         }
         lastActionScript = initActionScript + lastActionScript;
         initActionScript = "";
-        if (!lastElements.equals("") || !lastActionScript.equals("") || soundStreamHead != null || startSound != null) {
+        if (!lastElements.equals("") || !lastActionScript.equals("")) {
             if (frame < 0) {
                 frame = 0;
                 duration = 1;
             }
-            ret += convertFrame(characters, tags, soundStreamHead, startSound, frame, frameName, isAnchor, duration, lastActionScript, lastElements);
+            ret += convertFrame(characters, tags, null, null, frame, frameName, isAnchor, duration, lastActionScript, lastElements);
         }
 
         afterStr = "</frames>" + afterStr;
         if (!ret.equals("")) {
             ret = prevStr + ret + afterStr;
+        }
+        return ret;
+    }
+
+    public static String convertSoundLayer(int layerIndex, String backgroundColor, HashMap<Integer, CharacterTag> characters, List<Tag> tags) {
+        String ret = "";
+        StartSoundTag lastStartSound = null;
+        SoundStreamHeadTypeTag lastSoundStreamHead = null;
+        StartSoundTag startSound = null;
+        SoundStreamHeadTypeTag soundStreamHead = null;
+        int duration = 1;
+        int frame = 0;
+        for (Tag t : tags) {
+            if (t instanceof StartSoundTag) {
+                startSound = (StartSoundTag) t;
+            }
+            if (t instanceof SoundStreamHeadTypeTag) {
+                soundStreamHead = (SoundStreamHeadTypeTag) t;
+            }
+            if (t instanceof ShowFrameTag) {
+                if (soundStreamHead != null || startSound != null) {
+                    if (lastSoundStreamHead != null || lastStartSound != null) {
+                        ret += convertFrame(characters, tags, lastSoundStreamHead, lastStartSound, frame, null, false, duration, "", "");
+                    }
+                    frame += duration;
+                    duration = 1;
+                    lastSoundStreamHead = soundStreamHead;
+                    lastStartSound = startSound;
+                    soundStreamHead = null;
+                    startSound = null;
+                } else {
+                    duration++;
+                }
+            }
+        }
+        if (lastSoundStreamHead != null || lastStartSound != null) {
+            if (frame < 0) {
+                frame = 0;
+                duration = 1;
+            }
+            ret += convertFrame(characters, tags, lastSoundStreamHead, lastStartSound, frame, null, false, duration, "", "");
+        }
+        if (!ret.equals("")) {
+            ret = "<DOMLayer name=\"Layer " + layerIndex + "\" color=\"" + backgroundColor + "\">"
+                    + "<frames>" + ret + "</frames>"
+                    + "</DOMLayer>";
         }
         return ret;
     }
@@ -1657,6 +1677,10 @@ public class XFLConverter {
 
 
         }
+
+        int soundLayerIndex = layerCount;
+        ret += convertSoundLayer(soundLayerIndex, backgroundColor, characters, tags);
+
         ret += "</layers>";
         ret += "</DOMTimeline>";
         return ret;

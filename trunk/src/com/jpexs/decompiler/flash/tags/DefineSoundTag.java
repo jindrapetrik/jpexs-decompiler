@@ -96,14 +96,12 @@ public class DefineSoundTag extends CharacterTag {
     }
 
     public String getExportFormat() {
-        if (soundFormat == FORMAT_MP3) {
+        if (soundFormat == DefineSoundTag.FORMAT_MP3) {
             return "mp3";
         }
+        if (soundFormat == DefineSoundTag.FORMAT_ADPCM) {
+            return "wav";
+        }
         return "flv";
-    }
-
-    public double getkHz() {
-        double rateMap[] = {5.5, 11, 22, 44};
-        return rateMap[soundRate];
     }
 }

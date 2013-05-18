@@ -562,7 +562,7 @@ public class Main {
                         System.out.println("Exporting movies...");
                         exfile.exportMovies(outDir.getAbsolutePath() + File.separator + "movies");
                         System.out.println("Exporting sounds...");
-                        exfile.exportSounds(outDir.getAbsolutePath() + File.separator + "sounds", true);
+                        exfile.exportSounds(outDir.getAbsolutePath() + File.separator + "sounds", true, true);
                         System.out.println("Exporting binaryData...");
                         exfile.exportBinaryData(outDir.getAbsolutePath() + File.separator + "binaryData");
                         System.out.println("Exporting texts...");
@@ -587,7 +587,7 @@ public class Main {
                         exfile.exportMovies(outDir.getAbsolutePath());
                         exportOK = true;
                     } else if (exportFormat.equals("sound")) {
-                        exfile.exportSounds(outDir.getAbsolutePath(), true);
+                        exfile.exportSounds(outDir.getAbsolutePath(), true, true);
                         exportOK = true;
                     } else if (exportFormat.equals("binaryData")) {
                         exfile.exportBinaryData(outDir.getAbsolutePath());
