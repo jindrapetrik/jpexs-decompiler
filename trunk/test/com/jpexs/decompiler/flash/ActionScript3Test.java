@@ -50,7 +50,8 @@ public class ActionScript3Test {
 
     @Test
     public void testHello() {
-        decompileMethod("testHello", "trace(\"hello\");\r\n", false);
+        decompileMethod("testHello", "trace(\"hello\");\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -88,7 +89,8 @@ public class ActionScript3Test {
                 + "var index:uint = 0;\r\n"
                 + "chars[index++]=5;\r\n"
                 + "trace(\"arr[++e]\");\r\n"
-                + "chars[++index]=5;\r\n", false);
+                + "chars[++index]=5;\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -99,7 +101,8 @@ public class ActionScript3Test {
                 + "trace(\"a=\"+a);\r\n"
                 + "a++;\r\n"
                 + "}\r\n"
-                + "while(a<20);\r\n", false);
+                + "while(a<20);\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -123,7 +126,8 @@ public class ActionScript3Test {
                 + "finally\r\n"
                 + "{\r\n"
                 + "trace(\"finally block\");\r\n"
-                + "}\r\n", false);
+                + "}\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -154,7 +158,8 @@ public class ActionScript3Test {
                 + "a=5*(2+3);\r\n"
                 + "a=5+6*7;\r\n"
                 + "a=5*2+2;\r\n"
-                + "trace(\"a=\"+a);\r\n", false);
+                + "trace(\"a=\"+a);\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -163,7 +168,8 @@ public class ActionScript3Test {
                 + "trace(\"quotes:\\\"hello!\\\"\");\r\n"
                 + "trace(\"backslash: \\\\ \");\r\n"
                 + "trace(\"single quotes: \\'hello!\\'\");\r\n"
-                + "trace(\"new line \\r\\n hello!\");\r\n", false);
+                + "trace(\"new line \\r\\n hello!\");\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -237,7 +243,8 @@ public class ActionScript3Test {
                 + "d++;\r\n"
                 + "}\r\n"
                 + "trace(\"hello\");\r\n"
-                + "}\r\n", false);
+                + "}\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -258,7 +265,8 @@ public class ActionScript3Test {
                 + "break;\r\n"
                 + "default:\r\n"
                 + "trace(\"default clause\");\r\n"
-                + "}\r\n", false);
+                + "}\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -273,7 +281,8 @@ public class ActionScript3Test {
                 + "else\r\n"
                 + "{\r\n"
                 + "trace(\"onFalse\");\r\n"
-                + "}\r\n", false);
+                + "}\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -287,7 +296,8 @@ public class ActionScript3Test {
                 + "}\r\n"
                 + "trace(\"hello:\"+a);\r\n"
                 + "a++;\r\n"
-                + "}\r\n", false);
+                + "}\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -296,7 +306,8 @@ public class ActionScript3Test {
                 + "if(a==7)\r\n"
                 + "{\r\n"
                 + "trace(\"onTrue\");\r\n"
-                + "}\r\n", false);
+                + "}\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -309,7 +320,8 @@ public class ActionScript3Test {
                 + "else\r\n"
                 + "{\r\n"
                 + "trace(\"onFalse\");\r\n"
-                + "}\r\n", false);
+                + "}\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -319,7 +331,8 @@ public class ActionScript3Test {
                 + "{\r\n"
                 + "trace(\"a=\"+a);\r\n"
                 + "a++;\r\n"
-                + "}\r\n", false);
+                + "}\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -347,7 +360,8 @@ public class ActionScript3Test {
                 + "trace(\"part4\");\r\n"
                 + "}\r\n"
                 + "trace(\"part5\");\r\n"
-                + "}\r\n", false);
+                + "}\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -370,7 +384,8 @@ public class ActionScript3Test {
                 + "finally\r\n"
                 + "{\r\n"
                 + "trace(\"Finally part\");\r\n"
-                + "}\r\n", false);
+                + "}\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -389,7 +404,8 @@ public class ActionScript3Test {
                 + "case 89:\r\n"
                 + "trace(\"eightynine\");\r\n"
                 + "break;\r\n"
-                + "}\r\n", false);
+                + "}\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -399,7 +415,8 @@ public class ActionScript3Test {
                 + "var c:* = 4;\r\n"
                 + "var d:* = 78;\r\n"
                 + "var e:* = a==b?c==d?1:7:3;\r\n"
-                + "trace(\"e=\"+e);\r\n", false);
+                + "trace(\"e=\"+e);\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -428,7 +445,8 @@ public class ActionScript3Test {
                 + "trace(\"b!=7\");\r\n"
                 + "}\r\n"
                 + "}\r\n"
-                + "trace(\"end\");\r\n", false);
+                + "trace(\"end\");\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -437,7 +455,8 @@ public class ActionScript3Test {
                 + "v.push(\"hello\");\r\n"
                 + "v[0]=\"hi\";\r\n"
                 + "v[5*8-39]=\"hi2\";\r\n"
-                + "trace(v[0]);\r\n", false);
+                + "trace(v[0]);\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -447,7 +466,8 @@ public class ActionScript3Test {
                 + "if(k==15)\r\n"
                 + "{\r\n"
                 + "d.method(d.attrib*5);\r\n"
-                + "}\r\n", false);
+                + "}\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -472,7 +492,8 @@ public class ActionScript3Test {
                 + "for each (item in list)\r\n"
                 + "{\r\n"
                 + "trace(\"item #\"+item);\r\n"
-                + "}\r\n", false);
+                + "}\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -488,7 +509,8 @@ public class ActionScript3Test {
                 + "for each (test[0] in list)\r\n"
                 + "{\r\n"
                 + "trace(\"item #\"+test[0]);\r\n"
-                + "}\r\n", false);
+                + "}\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -501,7 +523,8 @@ public class ActionScript3Test {
                 + "for each (this.testPriv in list)\r\n"
                 + "{\r\n"
                 + "trace(\"item #\"+this.testPriv);\r\n"
-                + "}\r\n", false);
+                + "}\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -527,7 +550,8 @@ public class ActionScript3Test {
                 + "traceParam2(aParam);\r\n"
                 + "return first;\r\n"
                 + "};\r\n"
-                + "traceParameter(\"hello\");\r\n", false);
+                + "traceParameter(\"hello\");\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -543,7 +567,8 @@ public class ActionScript3Test {
                 + "break;\r\n"
                 + "default:\r\n"
                 + "jj=3;\r\n"
-                + "}\r\n", false);
+                + "}\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -555,7 +580,8 @@ public class ActionScript3Test {
                 + "d=c=b=a=5;\r\n"
                 + "var e:TestClass2 = TestClass2.createMe(\"test\");\r\n"
                 + "e.attrib1=e.attrib2=e.attrib3=this.getCounter();\r\n"
-                + "this.traceIt(e.toString());\r\n", false);
+                + "this.traceIt(e.toString());\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -585,13 +611,15 @@ public class ActionScript3Test {
                 + "var innerFunc:Function = new function(b:String):*\r\n"
                 + "{\r\n"
                 + "trace(b);\r\n"
+                + "return;\r\n"
                 + "};\r\n"
                 + "var k:int = 5;\r\n"
                 + "if(k==6)\r\n"
                 + "{\r\n"
                 + "s=8;\r\n"
                 + "}\r\n"
-                + "innerFunc(a);\r\n", false);
+                + "innerFunc(a);\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -610,7 +638,8 @@ public class ActionScript3Test {
                 + "vclass=new TestClass1();\r\n"
                 + "vnumber=0.5;\r\n"
                 + "vnumber=6;\r\n"
-                + "vobject=vclass;\r\n", false);
+                + "vobject=vclass;\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -624,20 +653,23 @@ public class ActionScript3Test {
                 + "for each (item in dic)\r\n"
                 + "{\r\n"
                 + "trace(item);\r\n"
-                + "}\r\n", false);
+                + "}\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
     public void testNames() {
         decompileMethod("testNames", "var ns:* = this.getNamespace();\r\n"
-                + "var name:* = this.getName();\r\n", false);
+                + "var name:* = this.getName();\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
     public void testComplexExpressions() {
         decompileMethod("testComplexExpressions", "var i:* = 0;\r\n"
                 + "var j:* = 0;\r\n"
-                + "j=i=i+(i=i+i++);\r\n", false);
+                + "j=i=i+(i=i+i++);\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -678,7 +710,8 @@ public class ActionScript3Test {
                 + "j=9;\r\n"
                 + "b=true;\r\n"
                 + "}\r\n"
-                + "b=(i==0||i==1)&&j==0;\r\n", false);
+                + "b=(i==0||i==1)&&j==0;\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -690,7 +723,8 @@ public class ActionScript3Test {
                 + "var b:* = 1;\r\n"
                 + "b++;\r\n"
                 + "var c:* = 1;\r\n"
-                + "b=c++;\r\n", false);
+                + "b=c++;\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -705,7 +739,8 @@ public class ActionScript3Test {
                 + "k=6;\r\n"
                 + "}\r\n"
                 + "}\r\n"
-                + "k=7;\r\n", false);
+                + "k=7;\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -724,7 +759,8 @@ public class ActionScript3Test {
                 + "if(t>=0)\r\n"
                 + "{\r\n"
                 + "trace(\"ch\");\r\n"
-                + "}\r\n", false);
+                + "}\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -757,7 +793,8 @@ public class ActionScript3Test {
                 + "b--;\r\n"
                 + "}\r\n"
                 + "a=7;\r\n"
-                + "b=9;\r\n", false);
+                + "b=9;\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -765,7 +802,8 @@ public class ActionScript3Test {
         decompileMethod("testNamedAnonFunctions", "var test:* = new function testFunc(param1:*, param2:int, param3:Array):Boolean\r\n"
                 + "{\r\n"
                 + "return (param1 as TestClass2).attrib1==5;\r\n"
-                + "};\r\n", false);
+                + "};\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -773,6 +811,7 @@ public class ActionScript3Test {
         decompileMethod("testStringConcat", "var k:* = 8;\r\n"
                 + "this.traceIt(\"hello\"+5*6);\r\n"
                 + "this.traceIt(\"hello\"+(k-1));\r\n"
-                + "this.traceIt(\"hello\"+5+6);\r\n", false);
+                + "this.traceIt(\"hello\"+5+6);\r\n"
+                + "return;\r\n", false);
     }
 }
