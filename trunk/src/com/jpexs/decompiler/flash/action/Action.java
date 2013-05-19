@@ -982,34 +982,40 @@ public class Action implements GraphSourceItem {
                 IfItem it = (IfItem) t;
                 if (it.expression instanceof NotItem) {
                     NotItem nti = (NotItem) it.expression;
-                    if (nti.value instanceof GetMemberTreeItem) {
+                    if ((nti.value instanceof GetMemberTreeItem) || (nti.value instanceof GetVariableTreeItem)) {
                         if (true) { //it.onFalse.isEmpty()){ //||(it.onFalse.get(0) instanceof UnsupportedTreeItem)) {
                             if ((it.onTrue.size() == 1) && (it.onTrue.get(0) instanceof SetMemberTreeItem) && (((SetMemberTreeItem) it.onTrue.get(0)).value instanceof NewObjectTreeItem)) {
                                 //ignore
                             } else {
                                 List<GraphTargetItem> parts = it.onTrue;
-                                className = getWithoutGlobal((GetMemberTreeItem) nti.value);
+                                className = getWithoutGlobal(nti.value);
                                 if (parts.size() >= 1) {
-                                    if (parts.get(0) instanceof SetMemberTreeItem) {
-                                        SetMemberTreeItem smt = (SetMemberTreeItem) parts.get(0);
+                                    int ipos = 0;
+                                    while ((parts.get(ipos) instanceof IfItem)
+                                            && ((((IfItem) parts.get(ipos)).onTrue.size() == 1) && (((IfItem) parts.get(ipos)).onTrue.get(0) instanceof SetMemberTreeItem) && (((SetMemberTreeItem) ((IfItem) parts.get(ipos)).onTrue.get(0)).value instanceof NewObjectTreeItem))) {
+
+                                        ipos++;
+                                    }
+                                    if (parts.get(ipos) instanceof SetMemberTreeItem) {
+                                        SetMemberTreeItem smt = (SetMemberTreeItem) parts.get(ipos);
                                         if (smt.value instanceof StoreRegisterTreeItem) {
-                                            parts.add(0, smt.value);
+                                            parts.add(ipos, smt.value);
                                             smt.value = ((StoreRegisterTreeItem) smt.value).value;
                                         }
                                     }
-                                    if (parts.get(0) instanceof StoreRegisterTreeItem) {
-                                        StoreRegisterTreeItem str1 = (StoreRegisterTreeItem) parts.get(0);
+                                    if (parts.get(ipos) instanceof StoreRegisterTreeItem) {
+                                        StoreRegisterTreeItem str1 = (StoreRegisterTreeItem) parts.get(ipos);
                                         int classReg = str1.register.number;
                                         int instanceReg = -1;
 
-                                        if ((parts.size() >= 2) && (parts.get(1) instanceof SetMemberTreeItem)) {
-                                            GraphTargetItem ti1 = ((SetMemberTreeItem) parts.get(1)).value;
-                                            GraphTargetItem ti2 = ((StoreRegisterTreeItem) parts.get(0)).value;
+                                        if ((parts.size() >= ipos + 2) && (parts.get(ipos + 1) instanceof SetMemberTreeItem)) {
+                                            GraphTargetItem ti1 = ((SetMemberTreeItem) parts.get(ipos + 1)).value;
+                                            GraphTargetItem ti2 = ((StoreRegisterTreeItem) parts.get(ipos + 0)).value;
                                             if (ti1 == ti2) {
-                                                if (((SetMemberTreeItem) parts.get(1)).value instanceof FunctionTreeItem) {
-                                                    ((FunctionTreeItem) ((SetMemberTreeItem) parts.get(1)).value).calculatedFunctionName = (className instanceof GetMemberTreeItem) ? ((GetMemberTreeItem) className).memberName : className;
-                                                    functions.add((FunctionTreeItem) ((SetMemberTreeItem) parts.get(1)).value);
-                                                    int pos = 2;
+                                                if (((SetMemberTreeItem) parts.get(ipos + 1)).value instanceof FunctionTreeItem) {
+                                                    ((FunctionTreeItem) ((SetMemberTreeItem) parts.get(ipos + 1)).value).calculatedFunctionName = (className instanceof GetMemberTreeItem) ? ((GetMemberTreeItem) className).memberName : className;
+                                                    functions.add((FunctionTreeItem) ((SetMemberTreeItem) parts.get(ipos + 1)).value);
+                                                    int pos = ipos + 2;
                                                     if (parts.size() <= pos) {
                                                         ok = false;
                                                         break;

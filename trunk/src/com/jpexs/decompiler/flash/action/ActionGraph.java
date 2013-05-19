@@ -160,7 +160,7 @@ public class ActionGraph extends Graph {
             int cnt = 1;
             while (part.nextParts.size() > 1
                     && part.nextParts.get(1).getHeight() > 1
-                    && code.get(part.nextParts.get(1).end) instanceof ActionIf
+                    && code.get(part.nextParts.get(1).end >= code.size() ? code.size() - 1 : part.nextParts.get(1).end) instanceof ActionIf
                     && ((top = translatePartGetStack(localData, part.nextParts.get(1), stack)) instanceof StrictEqTreeItem)) {
                 cnt++;
                 part = part.nextParts.get(1);

@@ -62,7 +62,7 @@ public class ActionPanel extends JPanel implements ActionListener {
     public JButton saveButton = new JButton("Save", View.getIcon("save16"));
     public JButton editButton = new JButton("Edit", View.getIcon("edit16"));
     public JButton cancelButton = new JButton("Cancel", View.getIcon("cancel16"));
-    public JLabel betaLabel = new JLabel("(Beta)");
+    public JLabel experimentalLabel = new JLabel("(Experimental)");
     public JButton editDecompiledButton = new JButton("Edit", View.getIcon("edit16"));
     public JButton saveDecompiledButton = new JButton("Save", View.getIcon("save16"));
     public JButton cancelDecompiledButton = new JButton("Cancel", View.getIcon("cancel16"));
@@ -251,7 +251,7 @@ public class ActionPanel extends JPanel implements ActionListener {
 
         JPanel decButtonsPan = new JPanel(new FlowLayout());
         decButtonsPan.add(editDecompiledButton);
-        decButtonsPan.add(betaLabel);
+        decButtonsPan.add(experimentalLabel);
         decButtonsPan.add(saveDecompiledButton);
         decButtonsPan.add(cancelDecompiledButton);
 
@@ -418,7 +418,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             decompiledEditor.setEditable(true);
             saveDecompiledButton.setVisible(true);
             editDecompiledButton.setVisible(false);
-            betaLabel.setVisible(false);
+            experimentalLabel.setVisible(false);
             cancelDecompiledButton.setVisible(true);
             decompiledEditor.getCaret().setVisible(true);
             decLabel.setIcon(View.getIcon("editing16"));
@@ -426,7 +426,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             decompiledEditor.setEditable(false);
             saveDecompiledButton.setVisible(false);
             editDecompiledButton.setVisible(true);
-            betaLabel.setVisible(true);
+            experimentalLabel.setVisible(true);
             cancelDecompiledButton.setVisible(false);
             decompiledEditor.getCaret().setVisible(true);
             decLabel.setIcon(null);
@@ -477,7 +477,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                 saveDecompiledButton.setVisible(false);
                 cancelDecompiledButton.setVisible(false);
                 editDecompiledButton.setVisible(true);
-                betaLabel.setVisible(true);
+                experimentalLabel.setVisible(true);
                 decompiledEditor.setEditable(false);
                 editDecompiledMode = false;
             } catch (IOException ex) {
