@@ -462,7 +462,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         out.flush();
         Highlighting.doHighlight = true;
         try {
-            return Highlighting.hilighClass(new String(baos.toByteArray(), "UTF-8"),class_info);
+            return Highlighting.hilighClass(new String(baos.toByteArray(), "UTF-8"), class_info);
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(TraitClass.class.getName()).log(Level.SEVERE, null, ex);
             return "";
