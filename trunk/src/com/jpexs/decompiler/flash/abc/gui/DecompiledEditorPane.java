@@ -212,7 +212,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         }
     }
 
-    private class BufferedClass {
+    private class CachedDecompilation {
 
         public String text;
         public List<Highlighting> highlights;
@@ -220,7 +220,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         public List<Highlighting> methodHighlights;
         public List<Highlighting> classHighlights;
 
-        public BufferedClass(String text, List<Highlighting> highlights, List<Highlighting> traitHighlights, List<Highlighting> methodHighlights, List<Highlighting> classHighlights) {
+        public CachedDecompilation(String text, List<Highlighting> highlights, List<Highlighting> traitHighlights, List<Highlighting> methodHighlights, List<Highlighting> classHighlights) {
             this.text = text;
             this.highlights = highlights;
             this.traitHighlights = traitHighlights;
@@ -228,7 +228,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             this.classHighlights = classHighlights;
         }
     }
-    private HashMap<ScriptPack, BufferedClass> bufferedClasses = new HashMap<ScriptPack, BufferedClass>();
+    private HashMap<ScriptPack, CachedDecompilation> decompilationCache = new HashMap<ScriptPack, CachedDecompilation>();
 
     public void gotoLastTrait() {
         gotoTrait(lastTraitIndex);
@@ -283,7 +283,41 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     private List<ABCContainerTag> abcList;
 
     public void clearScriptCache() {
-        bufferedClasses.clear();
+        decompilationCache.clear();
+    }
+
+    public List<ScriptPack> searchCache(String str) {
+        List<ScriptPack> found = new ArrayList<ScriptPack>();
+        for (ScriptPack pack : decompilationCache.keySet()) {
+            CachedDecompilation cs = decompilationCache.get(pack);
+            if (cs.text.contains(str)) {
+                found.add(pack);
+            }
+        }
+        return found;
+    }
+
+    public void cacheScriptPack(ScriptPack scriptLeaf, List<ABCContainerTag> abcList) {
+        int scriptIndex = scriptLeaf.scriptIndex;
+        StringBuilder hilightedCodeBuf = new StringBuilder();
+        String hilightedCode = "";
+        ScriptInfo script = null;
+        ABC abc = scriptLeaf.abc;
+        if (scriptIndex > -1) {
+            script = abc.script_info[scriptIndex];
+        }
+        if (!decompilationCache.containsKey(scriptLeaf)) {
+            for (int scriptTraitIndex : scriptLeaf.traitIndices) {
+                hilightedCodeBuf.append(script.traits.traits[scriptTraitIndex].convertPackaged("", abcList, abc, false, false, scriptIndex, -1, true, new ArrayList<String>()));
+            }
+            hilightedCode = hilightedCodeBuf.toString();
+            List<Highlighting> highlights = Highlighting.getInstrHighlights(hilightedCode);
+            List<Highlighting> traitHighlights = Highlighting.getTraitHighlights(hilightedCode);
+            List<Highlighting> methodHighlights = Highlighting.getMethodHighlights(hilightedCode);
+            List<Highlighting> classHighlights = Highlighting.getClassHighlights(hilightedCode);
+            hilightedCode = Highlighting.stripHilights(hilightedCode);
+            decompilationCache.put(scriptLeaf, new CachedDecompilation(hilightedCode, highlights, traitHighlights, methodHighlights, classHighlights));
+        }
     }
 
     public void setScript(ScriptPack scriptLeaf, List<ABCContainerTag> abcList) {
@@ -302,27 +336,14 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         }
         setText("//Please wait...");
 
-        StringBuilder hilightedCodeBuf = new StringBuilder();
         String hilightedCode = "";
-        if (!bufferedClasses.containsKey(scriptLeaf)) {
-            for (int scriptTraitIndex : scriptLeaf.traitIndices) {
-                hilightedCodeBuf.append(script.traits.traits[scriptTraitIndex].convertPackaged("", abcList, abc, false, false, scriptIndex, -1, true, new ArrayList<String>()));
-            }
-            hilightedCode = hilightedCodeBuf.toString();
-            highlights = Highlighting.getInstrHighlights(hilightedCode);
-            traitHighlights = Highlighting.getTraitHighlights(hilightedCode);
-            methodHighlights = Highlighting.getMethodHighlights(hilightedCode);
-            classHighlights = Highlighting.getClassHighlights(hilightedCode);
-            hilightedCode = Highlighting.stripHilights(hilightedCode);
-            bufferedClasses.put(scriptLeaf, new BufferedClass(hilightedCode, highlights, traitHighlights, methodHighlights, classHighlights));
-        } else {
-            BufferedClass bc = bufferedClasses.get(scriptLeaf);
-            hilightedCode = bc.text;
-            highlights = bc.highlights;
-            traitHighlights = bc.traitHighlights;
-            methodHighlights = bc.methodHighlights;
-            classHighlights = bc.classHighlights;
-        }
+        cacheScriptPack(scriptLeaf, abcList);
+        CachedDecompilation cd = decompilationCache.get(scriptLeaf);
+        hilightedCode = cd.text;
+        highlights = cd.highlights;
+        traitHighlights = cd.traitHighlights;
+        methodHighlights = cd.methodHighlights;
+        classHighlights = cd.classHighlights;
         this.abc = abc;
         this.abcList = abcList;
         this.script = scriptLeaf;
@@ -331,8 +352,8 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
 
     public void reloadClass() {
         int ci = classIndex;
-        if (bufferedClasses.containsKey(script)) {
-            bufferedClasses.remove(script);
+        if (decompilationCache.containsKey(script)) {
+            decompilationCache.remove(script);
         }
         if ((script != null) && (abc != null)) {
             setScript(script, abcList);
@@ -347,7 +368,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
 
     public void setABC(ABC abc) {
         this.abc = abc;
-        bufferedClasses.clear();
+        decompilationCache.clear();
         setText("");
     }
 }

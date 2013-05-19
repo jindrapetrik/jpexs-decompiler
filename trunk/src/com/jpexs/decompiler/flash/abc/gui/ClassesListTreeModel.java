@@ -75,6 +75,11 @@ class ClassIndexVisitor implements TreeVisitor {
 public class ClassesListTreeModel implements TreeModel {
 
     private Tree classTree = new Tree();
+    private HashMap<String, ScriptPack> list;
+
+    public HashMap<String, ScriptPack> getList() {
+        return list;
+    }
 
     public ClassesListTreeModel(HashMap<String, ScriptPack> list) {
         this(list, null);
@@ -93,6 +98,7 @@ public class ClassesListTreeModel implements TreeModel {
             String packageName = path.substring(0, path.lastIndexOf("."));
             classTree.add(nsName, packageName, list.get(path));
         }
+        this.list = list;
 
     }
 

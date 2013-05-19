@@ -354,6 +354,13 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         miProxy.setActionCommand("SHOWPROXY");
         miProxy.setIcon(View.getIcon("proxy16"));
         miProxy.addActionListener(this);
+
+        JMenuItem miSearchScript = new JMenuItem("Search ActionScript...");
+        miSearchScript.addActionListener(this);
+        miSearchScript.setActionCommand("SEARCHAS");
+        miSearchScript.setIcon(View.getIcon("search16"));
+
+        menuTools.add(miSearchScript);
         menuTools.add(miProxy);
 
         //menuTools.add(menuDeobfuscation);
@@ -1128,6 +1135,28 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
     @Override
     public void actionPerformed(ActionEvent e) {
+
+        if (e.getActionCommand().equals("SEARCHAS")) {
+            if (abcPanel != null) {
+                final String txt = JOptionPane.showInputDialog("Search text:");
+                if (txt != null) {
+                    Main.startWork("Searching \"" + txt + "\"...");
+                    (new Thread() {
+                        @Override
+                        public void run() {
+                            if (abcPanel.search(txt)) {
+                                showDetail(DETAILCARDAS3NAVIGATOR);
+                                showCard(CARDACTIONSCRIPTPANEL);
+                            } else {
+                                JOptionPane.showMessageDialog(null, "String \"" + txt + "\" not found.", "Not found", JOptionPane.INFORMATION_MESSAGE);
+                            }
+                            Main.stopWork();
+                        }
+                    }).start();
+
+                }
+            }
+        }
         if (e.getActionCommand().equals("REPLACEIMAGE")) {
             Object tagObj = tagTree.getLastSelectedPathComponent();
             if (tagObj == null) {
