@@ -27,7 +27,6 @@ import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.swf4.*;
 import com.jpexs.decompiler.flash.action.swf5.*;
-import com.jpexs.decompiler.flash.action.swf6.ActionEnumerate2;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.action.treemodel.*;
 import com.jpexs.decompiler.flash.action.treemodel.clauses.*;
@@ -798,7 +797,6 @@ public class Action implements GraphSourceItem {
                 ip++;
                 continue;
             }
-
             if (action instanceof GraphSourceItemContainer) {
                 GraphSourceItemContainer cnt = (GraphSourceItemContainer) action;
                 //List<GraphTargetItem> out=actionsPartToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(),new HashMap<String, GraphTargetItem>(), new Stack<GraphTargetItem>(), src, ip+1,endip-1 , version);            
@@ -836,15 +834,15 @@ public class Action implements GraphSourceItem {
             }
 
             /*ActionJump && ActionIf removed*/
-            if ((action instanceof ActionEnumerate2) || (action instanceof ActionEnumerate)) {
-                loopStart = ip + 1;
-                isForIn = true;
-                ip += 4;
-                action.translate(localData, stack, output);
-                EnumerateTreeItem en = (EnumerateTreeItem) stack.peek();
-                inItem = en.object;
-                continue;
-            } else /*if (action instanceof ActionTry) {
+            /*if ((action instanceof ActionEnumerate2) || (action instanceof ActionEnumerate)) {
+             loopStart = ip + 1;
+             isForIn = true;
+             ip += 4;
+             action.translate(localData, stack, output);
+             EnumerateTreeItem en = (EnumerateTreeItem) stack.peek();
+             inItem = en.object;
+             continue;
+             } else*/ /*if (action instanceof ActionTry) {
              ActionTry atry = (ActionTry) action;
              List<GraphTargetItem> tryCommands = ActionGraph.translateViaGraph(registerNames, variables, functions, atry.tryBody, version);
              TreeItem catchName;

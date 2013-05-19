@@ -112,9 +112,10 @@ public class Graph {
                 i = part.path.length();
             }
             if (modify && ((uniqueRefs.size() > 1) && (prvni >= 0))) {
-                GraphPath newpath = uniqueRefs.get(prvni).path.parent(i);
+                GraphPath prvniUniq = uniqueRefs.get(prvni).path;
+                GraphPath newpath = prvniUniq.parent(i);
                 if (!part.path.equals(newpath)) {
-                    if (part.path.startsWith(newpath)) {
+                    if (part.path.startsWith(newpath) && ((newpath.length() == prvniUniq.length()) || (prvniUniq.getKey(newpath.length()) == part.path.getKey(newpath.length())))) {
                         GraphPath origPath = part.path;
                         GraphPart p = part;
                         part.path = newpath;
@@ -123,6 +124,7 @@ public class Graph {
                             if (!p.path.equals(origPath)) {
                                 break;
                             }
+
                             p.path = newpath;
                         }
                         fixGraphOnce(part, new ArrayList<GraphPart>(), true);
@@ -146,7 +148,7 @@ public class Graph {
                         GraphPart npart = part.nextParts.get(j);
 
                         if (npart.path.length() > part.path.length() + 1) {
-                            npart.path = part.path.sub(j);
+                            npart.path = part.path.sub(j, part.end);
                             fixed = true;
                         }
                     }
@@ -246,7 +248,7 @@ public class Graph {
         int pos = 0;
         for (GraphPart p : part.nextParts) {
             if (!visited.contains(p)) {
-                p.path = part.path.sub(pos);
+                p.path = part.path.sub(pos, p.end);
             }
             resetGraph(p, visited);
             pos++;
@@ -832,7 +834,6 @@ public class Graph {
                 }
 
                 loopContinues = getLoopsContinues(loops);
-
                 GraphPart next = part.getNextPartPath(loopContinues);
                 List<GraphTargetItem> retx = ret;
                 if ((!loop) || (doWhile && (part.nextParts.size() > 1))) {
@@ -1293,7 +1294,7 @@ public class Graph {
                 allBlocks.add(part);
                 List<Integer> branches = ins.getBranches(code);
                 for (int i = 0; i < branches.size(); i++) {
-                    part.nextParts.add(g = makeGraph(part, path.sub(i), code, branches.get(i), ip, allBlocks, refs, visited2));
+                    part.nextParts.add(g = makeGraph(part, path.sub(i, ip), code, branches.get(i), ip, allBlocks, refs, visited2));
                     g.refs.add(part);
                 }
                 break;

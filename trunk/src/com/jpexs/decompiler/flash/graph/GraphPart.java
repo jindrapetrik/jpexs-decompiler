@@ -69,6 +69,9 @@ public class GraphPart {
     }
 
     private GraphPart getNextPartPath(GraphPart original, GraphPath path, List<GraphPart> visited) {
+        if (visited.contains(this) && (this == original)) {
+            return null;
+        }
         if (visited.contains(this) && (this != original)) {
             return null;
         }
@@ -92,6 +95,9 @@ public class GraphPart {
     public GraphPart getNextPartPath(List<GraphPart> ignored) {
         List<GraphPart> visited = new ArrayList<GraphPart>();
         visited.addAll(ignored);
+        if (visited.contains(this)) {
+            visited.remove(this);
+        }
         return getNextPartPath(this, path, visited);
     }
 

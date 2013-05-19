@@ -25,24 +25,35 @@ import java.util.List;
  */
 public class GraphPath {
 
-    private List<Integer> parts = new ArrayList<Integer>();
+    private List<Integer> keys = new ArrayList<Integer>();
+    private List<Integer> vals = new ArrayList<Integer>();
     public String rootName = "";
 
-    public GraphPath(String rootName, List<Integer> parts) {
+    public GraphPath(String rootName, List<Integer> keys, List<Integer> vals) {
         this.rootName = rootName;
-        this.parts.addAll(parts);
+        this.keys.addAll(keys);
+        this.vals.addAll(vals);
     }
 
-    public GraphPath(List<Integer> parts) {
-        this.parts.addAll(parts);
+    public GraphPath(List<Integer> keys, List<Integer> vals) {
+        this.keys.addAll(keys);
+        this.vals.addAll(vals);
     }
 
     public boolean startsWith(GraphPath p) {
         if (p.length() > length()) {
             return false;
         }
+
+
+        List<Integer> otherKeys = new ArrayList<Integer>(p.keys);
+        List<Integer> otherVals = new ArrayList<Integer>(p.vals);
+
         for (int i = 0; i < p.length(); i++) {
-            if (parts.get(i) != p.get(i)) {
+            if (keys.get(i) != otherKeys.get(i)) {
+                return false;
+            }
+            if (vals.get(i) != otherVals.get(i)) {
                 return false;
             }
         }
@@ -52,42 +63,44 @@ public class GraphPath {
     public GraphPath parent(int len) {
         GraphPath par = new GraphPath(rootName);
         for (int i = 0; i < len; i++) {
-            par.parts.add(parts.get(i));
+            par.keys.add(keys.get(i));
+            par.vals.add(vals.get(i));
         }
         return par;
     }
 
-    public GraphPath sub(int part) {
-        GraphPath next = new GraphPath(rootName, this.parts);
-        next.parts.add(part);
+    public GraphPath sub(int part, int codePos) {
+        GraphPath next = new GraphPath(rootName, this.keys, this.vals);
+        next.keys.add(codePos);
+        next.vals.add(part);
         return next;
     }
 
-    public GraphPath(String rootName, Integer... parts) {
+    public GraphPath(String rootName) {
         this.rootName = rootName;
-        for (int p : parts) {
-            this.parts.add(p);
-        }
     }
 
-    public GraphPath(Integer... parts) {
-        for (int p : parts) {
-            this.parts.add(p);
-        }
+    public GraphPath() {
     }
 
     public int length() {
-        return parts.size();
+        return vals.size();
     }
 
     public int get(int index) {
-        return parts.get(index);
+        return vals.get(index);
+    }
+
+    public int getKey(int index) {
+        return keys.get(index);
     }
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 41 * hash + (this.parts != null ? this.parts.hashCode() : 0);
+        int hash = 5;
+        hash = 23 * hash + (this.keys != null ? this.keys.hashCode() : 0);
+        hash = 23 * hash + (this.vals != null ? this.vals.hashCode() : 0);
+        hash = 23 * hash + (this.rootName != null ? this.rootName.hashCode() : 0);
         return hash;
     }
 
@@ -112,11 +125,22 @@ public class GraphPath {
                 return false;
             }
         }
-        if (this.parts.size() != other.parts.size()) {
+
+        if (!arrMatch(keys, other.keys)) {
             return false;
         }
-        for (int i = 0; i < this.parts.size(); i++) {
-            if (this.parts.get(i) != other.parts.get(i)) {
+        if (!arrMatch(vals, other.vals)) {
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean arrMatch(List<Integer> arr, List<Integer> arr2) {
+        if (arr.size() != arr2.size()) {
+            return false;
+        }
+        for (int i = 0; i < arr.size(); i++) {
+            if (arr.get(i) != arr2.get(i)) {
                 return false;
             }
         }
@@ -126,8 +150,8 @@ public class GraphPath {
     @Override
     public String toString() {
         String ret = rootName;
-        for (int i : parts) {
-            ret += "/" + i;
+        for (int i = 0; i < keys.size(); i++) {
+            ret += "/" + keys.get(i) + ":" + vals.get(i);
         }
         return ret;
     }
