@@ -36,12 +36,13 @@ public class ActionScript3Test {
         clsIndex = tag.getABC().findClassByName("classes.Test");
         assertTrue(clsIndex > -1);
         this.abc = tag.getABC();
+        Configuration.setConfig("autoDeobfuscate", false);
     }
 
     private void decompileMethod(String methodName, String expectedResult, boolean isStatic) {
         int bodyIndex = abc.findMethodBodyByName(clsIndex, methodName);
         assertTrue(bodyIndex > -1);
-        String actualResult = abc.bodies[bodyIndex].toString(methodName, false, isStatic, -1/*FIX?*/,clsIndex, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, false, new ArrayList<String>(), abc.instance_info[clsIndex].instance_traits);
+        String actualResult = abc.bodies[bodyIndex].toString(methodName, false, isStatic, -1/*FIX?*/, clsIndex, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, false, new ArrayList<String>(), abc.instance_info[clsIndex].instance_traits);
         actualResult = actualResult.replaceAll("[ \r\n]", "");
         expectedResult = expectedResult.replaceAll("[ \r\n]", "");
         assertEquals(actualResult, expectedResult);
@@ -531,7 +532,18 @@ public class ActionScript3Test {
 
     @Test
     public void testMissingDefault() {
-        decompileMethod("testMissingDefault", "var jj:* = 1;\r\n", false);
+        decompileMethod("testMissingDefault", "var jj:* = 1;\r\n"
+                + "switch(jj)\r\n"
+                + "{\r\n"
+                + "case 1:\r\n"
+                + "jj=1;\r\n"
+                + "break;\r\n"
+                + "case 2:\r\n"
+                + "jj=2;\r\n"
+                + "break;\r\n"
+                + "default:\r\n"
+                + "jj=3;\r\n"
+                + "}\r\n", false);
     }
 
     @Test
@@ -559,7 +571,11 @@ public class ActionScript3Test {
                 + "finally\r\n"
                 + "{\r\n"
                 + "trace(\"hi \");\r\n"
-                + "return \"hu\"+str;\r\n"
+                + "if(5==4)\r\n"
+                + "{\r\n"
+                + "return _loc5_;\r\n"
+                + "}\r\n"
+                + "return _loc5_;\r\n"
                 + "}\r\n", false);
     }
 
@@ -735,6 +751,11 @@ public class ActionScript3Test {
     public void testWhileAnd() {
         decompileMethod("testWhileAnd", "var a:* = 5;\r\n"
                 + "var b:* = 10;\r\n"
+                + "while(a<10&&b>1)\r\n"
+                + "{\r\n"
+                + "a++;\r\n"
+                + "b--;\r\n"
+                + "}\r\n"
                 + "a=7;\r\n"
                 + "b=9;\r\n", false);
     }

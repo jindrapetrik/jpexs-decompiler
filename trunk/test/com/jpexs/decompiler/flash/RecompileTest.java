@@ -11,7 +11,7 @@ import org.testng.annotations.Test;
  */
 public class RecompileTest {
 
-    public static final String TESTDATADIR = "testdata";
+    public static final String TESTDATADIR = "testdata/recompile";
 
     private void testRecompileOne(String filename) {
         try {
@@ -28,6 +28,9 @@ public class RecompileTest {
     @Test
     public void testRecompile() {
         File dir = new File(TESTDATADIR);
+        if (!dir.exists()) {
+            return;
+        }
         File files[] = dir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
@@ -35,7 +38,7 @@ public class RecompileTest {
             }
         });
         for (File f : files) {
-            testRecompileOne(f.getAbsolutePath());
+            testRecompileOne(f.getName());
         }
     }
 }

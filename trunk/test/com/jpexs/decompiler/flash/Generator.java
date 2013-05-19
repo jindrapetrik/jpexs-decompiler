@@ -20,6 +20,7 @@ import java.util.Stack;
 public class Generator {
 
     public static void main(String[] args) throws Exception {
+        Configuration.setConfig("autoDeobfuscate", false);
         SWF swf = new SWF(new FileInputStream("testdata/as3/TestMovie.swf"));
         DoABCDefineTag tag = null;
         for (Tag t : swf.tags) {
@@ -40,7 +41,7 @@ public class Generator {
                     s.append("(){\r\ndecompileMethod(\"");
                     s.append(name);
                     s.append("\", ");
-                    String src = abc.findBody(((TraitMethodGetterSetter) t).method_info).toString("", false, false,-1/*FIX?*/, classId, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, false, new ArrayList<String>(), abc.instance_info[classId].instance_traits);
+                    String src = abc.findBody(((TraitMethodGetterSetter) t).method_info).toString("", false, false, -1/*FIX?*/, classId, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, false, new ArrayList<String>(), abc.instance_info[classId].instance_traits);
                     String srcs[] = src.split("[\r\n]+");
                     for (int i = 0; i < srcs.length; i++) {
                         String ss = srcs[i];
