@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.gui.tablemodels.*;
+import com.jpexs.decompiler.flash.gui.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.awt.BorderLayout;
@@ -33,13 +34,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.*;
+import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.actions.DocumentSearchData;
+import jsyntaxpane.actions.gui.QuickFindDialog;
 
 public class ABCPanel extends JPanel implements ItemListener, ActionListener {
 
@@ -68,15 +72,29 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
     private int foundPos = 0;
     private JLabel searchForLabel;
     private String searchFor;
+    private boolean searchIgnoreCase;
+    private boolean searchRegexp;
 
-    public boolean search(String txt) {
+    public boolean search(String txt, boolean ignoreCase, boolean regexp) {
         if ((txt != null) && (!txt.equals(""))) {
+            searchIgnoreCase = ignoreCase;
+            searchRegexp = regexp;
             ClassesListTreeModel clModel = (ClassesListTreeModel) classTree.getModel();
             HashMap<String, ScriptPack> allpacks = clModel.getList();
+            found = new ArrayList<ScriptPack>();
+            Pattern pat = null;
+            if (regexp) {
+                pat = Pattern.compile(txt, ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
+            } else {
+                pat = Pattern.compile(Pattern.quote(txt), ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
+            }
             for (ScriptPack p : allpacks.values()) {
                 decompiledTextArea.cacheScriptPack(p, list);
+                if (pat.matcher(decompiledTextArea.getCachedText(p)).find()) {
+                    found.add(p);
+                }
             }
-            found = decompiledTextArea.searchCache(txt);
+            //found = decompiledTextArea.searchCache(txt, ignoreCase, regexp);
             if (found.isEmpty()) {
                 searchPanel.setVisible(false);
                 return false;
@@ -324,9 +342,6 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
         searchPanel.add(searchPos);
         searchPanel.add(nextSearchButton);
         searchPanel.add(cancelSearchButton);
-
-
-
         searchPanel.setVisible(false);
         JLabel picLabel = new JLabel(View.getIcon("search16"));
         filterPanel.add(picLabel, BorderLayout.EAST);
@@ -429,10 +444,22 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
     public void updateSearchPos() {
         searchPos.setText((foundPos + 1) + "/" + found.size());
         decompiledTextArea.setScript(found.get(foundPos), list);
+        TagTreeModel ttm = (TagTreeModel) Main.mainFrame.tagTree.getModel();
+        TreePath tp = ttm.getTagPath(found.get(foundPos));
+        Main.mainFrame.tagTree.setSelectionPath(tp);
+        Main.mainFrame.tagTree.scrollPathToVisible(tp);
         decompiledTextArea.setCaretPosition(0);
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
         DocumentSearchData dsd = DocumentSearchData.getFromEditor(decompiledTextArea);
-        dsd.setPattern(searchFor, false, false);
-        dsd.showQuickFindDialog(decompiledTextArea);
+        dsd.setPattern(searchFor, searchRegexp, searchIgnoreCase);
+        QuickFindDialog quickFindDlg = new QuickFindDialog(decompiledTextArea, dsd);
+        quickFindDlg.setRegularExpression(searchRegexp);
+        quickFindDlg.setIgnoreCase(searchIgnoreCase);
+        quickFindDlg.showFor(decompiledTextArea);
     }
 
     @Override

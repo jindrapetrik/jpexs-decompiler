@@ -34,6 +34,44 @@ public class TagTreeModel implements TreeModel {
         this.list = list;
     }
 
+    private List<Object> searchTag(Object obj, Object parent, List<Object> path) {
+        List<Object> ret = null;
+        int cnt = getChildCount(parent);
+        for (int i = 0; i < cnt; i++) {
+            Object n = getChild(parent, i);
+            List<Object> newPath = new ArrayList<Object>();
+            newPath.addAll(path);
+            newPath.add(n);
+
+            if (n instanceof TreeElement) {
+                TreeElement te = (TreeElement) n;
+                Object it = te.getItem();
+                if (obj == it) {
+                    return newPath;
+                }
+            }
+            if (n instanceof TagNode) {
+                TagNode nd = (TagNode) n;
+                if (nd.tag == obj) {
+                    return newPath;
+                }
+            }
+            ret = searchTag(obj, n, newPath);
+            if (ret != null) {
+                return ret;
+            }
+        }
+        return ret;
+    }
+
+    public TreePath getTagPath(Object obj) {
+        List<Object> path = new ArrayList<Object>();
+        path.add(getRoot());
+        path = searchTag(obj, getRoot(), path);
+        TreePath tp = new TreePath(path.toArray(new Object[path.size()]));
+        return tp;
+    }
+
     public List<TagNode> getNodeList() {
         return list;
     }

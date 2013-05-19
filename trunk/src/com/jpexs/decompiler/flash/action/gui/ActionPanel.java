@@ -19,13 +19,18 @@ package com.jpexs.decompiler.flash.action.gui;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.abc.ScriptPack;
+import com.jpexs.decompiler.flash.abc.gui.DecompiledEditorPane;
 import com.jpexs.decompiler.flash.abc.gui.LineMarkedEditorPane;
+import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
+import com.jpexs.decompiler.flash.gui.TagNode;
+import com.jpexs.decompiler.flash.gui.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
@@ -41,14 +46,27 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.*;
+import java.util.regex.Pattern;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JToggleButton;
+import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
+import jsyntaxpane.actions.DocumentSearchData;
+import jsyntaxpane.actions.gui.QuickFindDialog;
 
 public class ActionPanel extends JPanel implements ActionListener {
 
@@ -83,6 +101,108 @@ public class ActionPanel extends JPanel implements ActionListener {
     private String srcWithHex;
     private String srcNoHex;
     private String lastDecompiled = "";
+    public JPanel searchPanel;
+    public JLabel searchPos;
+    private List<ASMSource> found = new ArrayList<ASMSource>();
+    private int foundPos = 0;
+    private JLabel searchForLabel;
+    private String searchFor;
+    private List<ASMSource> cacheKeys = new LinkedList<ASMSource>();
+    private List<CachedScript> cacheValues = new LinkedList<CachedScript>();
+    //private HashMap<ASMSource, CachedScript> cache = new HashMap<ASMSource, CachedScript>();
+    private boolean searchIgnoreCase;
+    private boolean searchRegexp;
+
+    private CachedScript getCached(ASMSource pack) {
+        for (int i = 0; i < cacheKeys.size(); i++) {
+            if (cacheKeys.get(i) == pack) {
+                return cacheValues.get(i);
+            }
+        }
+        return null;
+    }
+
+    private void cacheScript(ASMSource src) {
+        int maxCacheSize = 20;
+        for (int i = 0; i < cacheKeys.size(); i++) {
+            if (cacheKeys.get(i) == src) {
+                return;
+            }
+        }
+        List<Action> as = src.getActions(SWF.DEFAULT_VERSION);
+        String s = com.jpexs.decompiler.flash.action.Action.actionsToSource(as, SWF.DEFAULT_VERSION);
+        List<Highlighting> hilights = Highlighting.getInstrHighlights(s);
+        String srcNoHex = Highlighting.stripHilights(s);
+        cacheKeys.add(src);
+        cacheValues.add(new CachedScript(srcNoHex, hilights, as));
+        if (cacheKeys.size() > maxCacheSize) {
+            cacheKeys.remove(0);
+            cacheValues.remove(0);
+        }
+
+    }
+
+    private static class CachedScript {
+
+        public String text;
+        List<Highlighting> hilights;
+        List<com.jpexs.decompiler.flash.action.Action> actions;
+
+        public CachedScript(String text, List<Highlighting> hilights, List<Action> actions) {
+            this.text = text;
+            this.hilights = hilights;
+            this.actions = actions;
+        }
+    }
+
+    private List<ASMSource> getASMs(List<TagNode> nodes) {
+        List<ASMSource> ret = new ArrayList<ASMSource>();
+        for (TagNode n : nodes) {
+            if (n.tag instanceof ASMSource) {
+                //cacheScript((ASMSource) n.tag);
+                ret.add((ASMSource) n.tag);
+            }
+            ret.addAll(getASMs(n.subItems));
+        }
+        return ret;
+    }
+
+    public boolean search(String txt, boolean ignoreCase, boolean regexp) {
+        if ((txt != null) && (!txt.equals(""))) {
+            searchIgnoreCase = ignoreCase;
+            searchRegexp = regexp;
+            List<Object> tags = new ArrayList<Object>(Main.swf.tags);
+            List<TagNode> list = Main.swf.createASTagList(tags, null);
+            List<ASMSource> asms = getASMs(list);
+            found = new ArrayList<ASMSource>();
+            Pattern pat = null;
+            if (regexp) {
+                pat = Pattern.compile(txt, ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
+            } else {
+                pat = Pattern.compile(Pattern.quote(txt), ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
+            }
+            for (ASMSource s : asms) {
+                cacheScript(s);
+                if (pat.matcher(getCached(s).text).find()) {
+                    found.add(s);
+                }
+            }
+
+            if (found.isEmpty()) {
+                searchPanel.setVisible(false);
+                return false;
+            } else {
+                foundPos = 0;
+                setSource(found.get(foundPos), true);
+                searchPanel.setVisible(true);
+                searchFor = txt;
+                updateSearchPos();
+                searchForLabel.setText("Search for \"" + txt + "\" : ");
+            }
+            return true;
+        }
+        return false;
+    }
 
     public void setText(String text) {
         int pos = editor.getCaretPosition();
@@ -116,7 +236,7 @@ public class ActionPanel extends JPanel implements ActionListener {
         setText(hex ? srcWithHex : srcNoHex);
     }
 
-    public void setSource(ASMSource src) {
+    public void setSource(ASMSource src, final boolean useCache) {
         this.src = src;
         Main.startWork("Decompiling...");
         final ASMSource asm = (ASMSource) src;
@@ -154,32 +274,21 @@ public class ActionPanel extends JPanel implements ActionListener {
                 setHex(hexButton.isSelected());
                 if (Main.DO_DECOMPILE) {
                     decompiledEditor.setText("//Decompiling...");
-                    List<com.jpexs.decompiler.flash.action.Action> as = asm.getActions(SWF.DEFAULT_VERSION);
-                    lastCode = as;
-                    //com.jpexs.decompiler.flash.action.Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
-                    String s = com.jpexs.decompiler.flash.action.Action.actionsToSource(as, SWF.DEFAULT_VERSION);
-                    decompiledHilights = Highlighting.getInstrHighlights(s);
-                    String stripped = Highlighting.stripHilights(s);
-                    /*try {
-                     ActionScriptParser.parse(stripped);
-                     } catch (ParseException ex) {
-                     JOptionPane.showMessageDialog(null, ex.getMessage());
-                     Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
-                     } catch (IOException ex) {
-                     Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
-                     }*/
-                    lastDecompiled = stripped;
-                    /*if(lastDecompiled.length()>30000){
-                     decompiledEditor.setContentType("text/plain");
-                     }else{
-                     decompiledEditor.setContentType("text/actionscript");
-                     }*/
+                    String stripped = "";
+                    if (!useCache) {
+                        uncache(asm);
+                    }
+                    cacheScript(asm);
+                    CachedScript sc = getCached(asm);
+                    lastCode = sc.actions;
+                    decompiledHilights = sc.hilights;
+                    lastDecompiled = sc.text;
+                    stripped = lastDecompiled;
                     decompiledEditor.setText(lastDecompiled);
 
                     if (debugRecompile) {
                         try {
                             ActionScriptParser ps = new ActionScriptParser();
-
                             recompiledEditor.setText(Highlighting.stripHilights(com.jpexs.decompiler.flash.action.Action.actionsToString(new ArrayList<DisassemblyListener>(), 0, ps.parse(stripped), null, SWF.DEFAULT_VERSION, false, 0)));
                         } catch (ParseException ex) {
                             Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -199,7 +308,6 @@ public class ActionPanel extends JPanel implements ActionListener {
     }
 
     public ActionPanel() {
-        this.list = list;
         DefaultSyntaxKit.initKit();
         editor = new LineMarkedEditorPane();
         editor.setEditable(false);
@@ -208,6 +316,30 @@ public class ActionPanel extends JPanel implements ActionListener {
 
         recompiledEditor = new LineMarkedEditorPane();
         recompiledEditor.setEditable(false);
+
+        searchPanel = new JPanel(new FlowLayout());
+
+        JButton prevSearchButton = new JButton(View.getIcon("prev16"));
+        prevSearchButton.setMargin(new Insets(3, 3, 3, 3));
+        prevSearchButton.addActionListener(this);
+        prevSearchButton.setActionCommand("SEARCHPREV");
+        JButton nextSearchButton = new JButton(View.getIcon("next16"));
+        nextSearchButton.setMargin(new Insets(3, 3, 3, 3));
+        nextSearchButton.addActionListener(this);
+        nextSearchButton.setActionCommand("SEARCHNEXT");
+        JButton cancelSearchButton = new JButton(View.getIcon("cancel16"));
+        cancelSearchButton.setMargin(new Insets(3, 3, 3, 3));
+        cancelSearchButton.addActionListener(this);
+        cancelSearchButton.setActionCommand("SEARCHCANCEL");
+        searchPos = new JLabel("0/0");
+        searchForLabel = new JLabel("Search for \"\": ");
+        searchPanel.add(searchForLabel);
+        searchPanel.add(prevSearchButton);
+        searchPanel.add(new JLabel("Script "));
+        searchPanel.add(searchPos);
+        searchPanel.add(nextSearchButton);
+        searchPanel.add(cancelSearchButton);
+
 
         JButton graphButton = new JButton(View.getIcon("graph16"));
         graphButton.setActionCommand("GRAPH");
@@ -289,9 +421,14 @@ public class ActionPanel extends JPanel implements ActionListener {
         saveDecompiledButton.setVisible(false);
         cancelDecompiledButton.setVisible(false);
 
+        JPanel decPanel = new JPanel(new BorderLayout());
+        decPanel.add(new JScrollPane(decompiledEditor), BorderLayout.CENTER);
+        decPanel.add(searchPanel, BorderLayout.NORTH);
+
+        searchPanel.setVisible(false);
         JPanel panA = new JPanel();
         panA.setLayout(new BorderLayout());
-        panA.add(new JScrollPane(decompiledEditor), BorderLayout.CENTER);
+        panA.add(decPanel, BorderLayout.CENTER);
         panA.add(decLabel, BorderLayout.NORTH);
         panA.add(decButtonsPan, BorderLayout.SOUTH);
         decLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -366,7 +503,9 @@ public class ActionPanel extends JPanel implements ActionListener {
                         for (Highlighting h2 : disassembledHilights) {
                             if (h2.offset == h.offset) {
                                 ignoreCarret = true;
-                                editor.setCaretPosition(h2.startPos);
+                                if (h2.startPos > 0 && h2.startPos < editor.getText().length()) {
+                                    editor.setCaretPosition(h2.startPos);
+                                }
                                 editor.getCaret().setVisible(true);
                                 ignoreCarret = false;
                                 break;
@@ -437,6 +576,23 @@ public class ActionPanel extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        if (e.getActionCommand().equals("SEARCHCANCEL")) {
+            foundPos = 0;
+            searchPanel.setVisible(false);
+            found = new ArrayList<ASMSource>();
+            searchFor = null;
+        }
+        if (e.getActionCommand().equals("SEARCHPREV")) {
+            foundPos--;
+            if (foundPos < 0) {
+                foundPos += found.size();
+            }
+            updateSearchPos();
+        }
+        if (e.getActionCommand().equals("SEARCHNEXT")) {
+            foundPos = (foundPos + 1) % found.size();
+            updateSearchPos();
+        }
         if (e.getActionCommand().equals("GRAPH")) {
             if (lastCode != null) {
                 GraphFrame gf = new GraphFrame(new ActionGraph(lastCode, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), SWF.DEFAULT_VERSION), "");
@@ -452,7 +608,7 @@ public class ActionPanel extends JPanel implements ActionListener {
         } else if (e.getActionCommand().equals("SAVEACTION")) {
             try {
                 src.setActions(ASMParser.parse(0, src.getPos(), true, new ByteArrayInputStream(editor.getText().getBytes()), SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION);
-                setSource(this.src);
+                setSource(this.src, false);
                 JOptionPane.showMessageDialog(this, "Code successfully saved");
                 saveButton.setVisible(false);
                 cancelButton.setVisible(false);
@@ -472,7 +628,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             try {
                 ActionScriptParser par = new ActionScriptParser();
                 src.setActions(par.parse(decompiledEditor.getText()), SWF.DEFAULT_VERSION);
-                setSource(this.src);
+                setSource(this.src, false);
                 JOptionPane.showMessageDialog(this, "Code successfully saved");
                 saveDecompiledButton.setVisible(false);
                 cancelDecompiledButton.setVisible(false);
@@ -485,6 +641,37 @@ public class ActionPanel extends JPanel implements ActionListener {
                 JOptionPane.showMessageDialog(this, "" + ex.text + " on line " + ex.line, "Error", JOptionPane.ERROR_MESSAGE);
             }
 
+        }
+    }
+
+    public void updateSearchPos() {
+        searchPos.setText((foundPos + 1) + "/" + found.size());
+        setSource(found.get(foundPos), true);
+        TagTreeModel ttm = (TagTreeModel) Main.mainFrame.tagTree.getModel();
+        TreePath tp = ttm.getTagPath(found.get(foundPos));
+        Main.mainFrame.tagTree.setSelectionPath(tp);
+        Main.mainFrame.tagTree.scrollPathToVisible(tp);
+        decompiledEditor.setCaretPosition(0);
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        DocumentSearchData dsd = DocumentSearchData.getFromEditor(decompiledEditor);
+        dsd.setPattern(searchFor, searchRegexp, searchIgnoreCase);
+        QuickFindDialog quickFindDlg = new QuickFindDialog(decompiledEditor, dsd);
+        quickFindDlg.setRegularExpression(searchRegexp);
+        quickFindDlg.setIgnoreCase(searchIgnoreCase);
+        quickFindDlg.showFor(decompiledEditor);
+    }
+
+    private void uncache(ASMSource pack) {
+        for (int i = 0; i < cacheKeys.size(); i++) {
+            if (cacheKeys.get(i) == pack) {
+                cacheValues.remove(i);
+                cacheKeys.remove(i);
+                break;
+            }
         }
     }
 }

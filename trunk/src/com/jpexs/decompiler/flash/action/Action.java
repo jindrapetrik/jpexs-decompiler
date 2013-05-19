@@ -402,8 +402,8 @@ public class Action implements GraphSourceItem {
         boolean lastPush = false;
         StringBuilder ret = new StringBuilder();
         for (GraphSourceItem s : srcList) {
-            for (DisassemblyListener l : listeners) {
-                l.progress("toString", pos + 2, srcList.size());
+            for (int i = 0; i < listeners.size(); i++) {
+                listeners.get(i).progress("toString", pos + 2, srcList.size());
             }
             Action a = null;
             if (s instanceof Action) {

@@ -355,7 +355,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         miProxy.setIcon(View.getIcon("proxy16"));
         miProxy.addActionListener(this);
 
-        JMenuItem miSearchScript = new JMenuItem("Search ActionScript...");
+        JMenuItem miSearchScript = new JMenuItem("Search All ActionScript...");
         miSearchScript.addActionListener(this);
         miSearchScript.setActionCommand("SEARCHAS");
         miSearchScript.setIcon(View.getIcon("search16"));
@@ -1132,28 +1132,46 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     public boolean confirmExperimental() {
         return JOptionPane.showConfirmDialog(null, "Following procedure can damage SWF file which can be then unplayable.\r\nUSE IT ON YOUR OWN RISK. Do you want to continue?", "Warning", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION;
     }
+    private SearchDialog searchDialog;
 
     @Override
     public void actionPerformed(ActionEvent e) {
 
         if (e.getActionCommand().equals("SEARCHAS")) {
-            if (abcPanel != null) {
-                final String txt = JOptionPane.showInputDialog("Search text:");
-                if (txt != null) {
+            if (searchDialog == null) {
+                searchDialog = new SearchDialog();
+            }
+            searchDialog.setVisible(true);
+            if (searchDialog.result) {
+                final String txt = searchDialog.searchField.getText();
+                if (!txt.equals("")) {
                     Main.startWork("Searching \"" + txt + "\"...");
-                    (new Thread() {
-                        @Override
-                        public void run() {
-                            if (abcPanel.search(txt)) {
-                                showDetail(DETAILCARDAS3NAVIGATOR);
-                                showCard(CARDACTIONSCRIPTPANEL);
-                            } else {
-                                JOptionPane.showMessageDialog(null, "String \"" + txt + "\" not found.", "Not found", JOptionPane.INFORMATION_MESSAGE);
+                    if (abcPanel != null) {
+                        (new Thread() {
+                            @Override
+                            public void run() {
+                                if (abcPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
+                                    showDetail(DETAILCARDAS3NAVIGATOR);
+                                    showCard(CARDACTIONSCRIPTPANEL);
+                                } else {
+                                    JOptionPane.showMessageDialog(null, "String \"" + txt + "\" not found.", "Not found", JOptionPane.INFORMATION_MESSAGE);
+                                }
+                                Main.stopWork();
                             }
-                            Main.stopWork();
-                        }
-                    }).start();
-
+                        }).start();
+                    } else {
+                        (new Thread() {
+                            @Override
+                            public void run() {
+                                if (actionPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
+                                    showCard(CARDACTIONSCRIPTPANEL);
+                                } else {
+                                    JOptionPane.showMessageDialog(null, "String \"" + txt + "\" not found.", "Not found", JOptionPane.INFORMATION_MESSAGE);
+                                }
+                                Main.stopWork();
+                            }
+                        }).start();
+                    }
                 }
             }
         }
@@ -1787,7 +1805,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             showCard(CARDEMPTYPANEL);
         } else if (tagObj instanceof ASMSource) {
             showCard(CARDACTIONSCRIPTPANEL);
-            actionPanel.setSource((ASMSource) tagObj);
+            actionPanel.setSource((ASMSource) tagObj, true);
         } else if (tagObj instanceof ImageTag) {
             imageButtonsPanel.setVisible(((ImageTag) tagObj).importSupported());
             showCard(CARDIMAGEPANEL);

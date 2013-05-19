@@ -536,8 +536,8 @@ public class SWFInputStream extends InputStream {
             if (visited.contains(ip)) {
                 break;
             }
-            for (DisassemblyListener listener : listeners) {
-                listener.progress("constantpool", ip + 1, code.size());
+            for (int i = 0; i < listeners.size(); i++) {
+                listeners.get(i).progress("constantpool", ip + 1, code.size());
             }
             lastIp = ip;
             GraphSourceItem ins = code.get(ip);
@@ -806,8 +806,8 @@ public class SWFInputStream extends InputStream {
         Scanner sc = new Scanner(System.in);
         int prevIp = ip;
         while (((endip == -1) || (endip > ip)) && (a = sis.readAction(rri)) != null) {
-            for (DisassemblyListener listener : listeners) {
-                listener.progress("Reading", rri.getCount(), rri.length());
+            for (int i = 0; i < listeners.size(); i++) {
+                listeners.get(i).progress("Reading", rri.getCount(), rri.length());
             }
             if ((ip < ret.size()) && (!(ret.get(ip) instanceof ActionNop))) {
                 a = ret.get(ip);
