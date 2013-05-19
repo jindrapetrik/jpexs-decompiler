@@ -261,7 +261,13 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         miSaveAs.setIcon(View.getIcon("saveas16"));
         miSaveAs.setActionCommand("SAVEAS");
         miSaveAs.addActionListener(this);
-        JMenuItem menuExportAll = new JMenuItem("Export all");
+
+        JMenuItem menuExportFla = new JMenuItem("Export to FLA");
+        menuExportFla.setActionCommand("EXPORTFLA");
+        menuExportFla.addActionListener(this);
+        menuExportFla.setIcon(View.getIcon("flash16"));
+
+        JMenuItem menuExportAll = new JMenuItem("Export all parts");
         menuExportAll.setActionCommand("EXPORT");
         menuExportAll.addActionListener(this);
         JMenuItem menuExportSel = new JMenuItem("Export selection");
@@ -275,6 +281,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         menuFile.add(miOpen);
         menuFile.add(miSave);
         menuFile.add(miSaveAs);
+        menuFile.add(menuExportFla);
         menuFile.add(menuExportAll);
         menuFile.add(menuExportSel);
         menuFile.addSeparator();
@@ -1276,8 +1283,62 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             Main.openFileDialog();
 
         }
+        if (e.getActionCommand().equals("EXPORTFLA")) {
+            JFileChooser fc = new JFileChooser();
+            String selDir = (String) Configuration.getConfig("lastOpenDir", ".");
+            fc.setCurrentDirectory(new File(selDir));
+            if (!selDir.endsWith(File.separator)) {
+                selDir += File.separator;
+            }
+            String fileName = (new File(Main.file).getName());
+            fileName = fileName.substring(0, fileName.length() - 4) + ".fla";
+            fc.setSelectedFile(new File(selDir + fileName));
+            FileFilter fla = new FileFilter() {
+                @Override
+                public boolean accept(File f) {
+                    return f.isDirectory() || (f.getName().toLowerCase().endsWith(".fla"));
+                }
 
-        if (e.getActionCommand().startsWith("EXPORT")) {
+                @Override
+                public String getDescription() {
+                    return "Flash CS 6 Document (*.fla)";
+                }
+            };
+            FileFilter xfl = new FileFilter() {
+                @Override
+                public boolean accept(File f) {
+                    return f.isDirectory() || (f.getName().toLowerCase().endsWith(".xfl"));
+                }
+
+                @Override
+                public String getDescription() {
+                    return "Flash CS 6 Uncompressed Document (*.xfl)";
+                }
+            };
+            fc.setFileFilter(fla);
+            fc.addChoosableFileFilter(xfl);
+            fc.setAcceptAllFileFilterUsed(false);
+            JFrame f = new JFrame();
+            View.setWindowIcon(f);
+            int returnVal = fc.showSaveDialog(f);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                Configuration.setConfig("lastOpenDir", Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
+                final File selfile = Helper.fixDialogFile(fc.getSelectedFile());
+                Main.startWork("Exporting FLA...");
+                final boolean compressed = fc.getFileFilter() == fla;
+                (new Thread() {
+                    @Override
+                    public void run() {
+                        if (compressed) {
+                            swf.exportFla(selfile.getAbsolutePath(), new File(Main.file).getName());
+                        } else {
+                            swf.exportXfl(selfile.getAbsolutePath(), new File(Main.file).getName());
+                        }
+                        Main.stopWork();
+                    }
+                }).start();
+            }
+        } else if (e.getActionCommand().startsWith("EXPORT")) {
             final ExportDialog export = new ExportDialog();
             export.setVisible(true);
             if (!export.cancelled) {

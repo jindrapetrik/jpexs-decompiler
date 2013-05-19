@@ -1007,11 +1007,17 @@ public class XFLConverter {
                         symbolStr += "  trackAsMenu=\"true\"";
                     }
                 }
+                boolean linkageExportForAS = false;
                 if (characterClasses.containsKey(symbol.getCharacterID())) {
-                    symbolStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterID()) + "\"";
+                    linkageExportForAS = true;
+                    symbolStr += " linkageClassName=\"" + characterClasses.get(symbol.getCharacterID()) + "\"";
                 }
                 if (characterVariables.containsKey(symbol.getCharacterID())) {
-                    symbolStr += " linkageExportForAS=\"true\" linkageIdentifier=\"" + characterVariables.get(symbol.getCharacterID()) + "\"";
+                    linkageExportForAS = true;
+                    symbolStr += " linkageIdentifier=\"" + characterVariables.get(symbol.getCharacterID()) + "\"";
+                }
+                if (linkageExportForAS) {
+                    symbolStr += " linkageExportForAS=\"true\"";
                 }
                 symbolStr += ">";
                 symbolStr += "<timeline>";
@@ -2302,6 +2308,15 @@ public class XFLConverter {
             }
 
             writeFile("PROXY-CS5".getBytes(), outfile);
+        }
+        if (useAS3) {
+            File outF = new File(outfile);
+            File outDir = outF.getParentFile();
+            try {
+                swf.exportActionScript(outDir.getAbsolutePath(), false);
+            } catch (Exception ex) {
+                Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Error during ActionScript3 export", ex);
+            }
         }
     }
 
