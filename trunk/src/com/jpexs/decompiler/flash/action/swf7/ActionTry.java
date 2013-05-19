@@ -119,7 +119,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
             catchInRegisterFlag = false;
             catchName = (String) symb.value;
         } else if (symb.type == ASMParsedSymbol.TYPE_REGISTER) {
-            catchRegister = (Integer) symb.value;
+            catchRegister = ((RegisterNumber) symb.value).number;
             catchInRegisterFlag = true;
         } else if (symb.type == ASMParsedSymbol.TYPE_BLOCK_START) {
             return;
