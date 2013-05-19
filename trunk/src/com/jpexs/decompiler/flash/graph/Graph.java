@@ -491,6 +491,7 @@ public class Graph {
             }
 
             if ((part != null) && (code.size() <= part.start)) {
+                ret.add(new ScriptEndItem());
                 return ret;
             }
 
@@ -532,6 +533,9 @@ public class Graph {
 
                 try {
                     output.addAll(code.translatePart(p, localData, stack, start, end));
+                    if ((end >= code.size() - 1) && p.nextParts.isEmpty()) {
+                        output.add(new ScriptEndItem());
+                    }
                 } catch (Exception ex) {
                     Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, "error during printgraph", ex);
                     return ret;
@@ -988,11 +992,11 @@ public class Graph {
                                 if ((!ift.onFalse.isEmpty()) && (ift.onFalse.get(ift.onFalse.size() - 1) instanceof ExitItem)) {//((ift.onFalse.size() == 1) && (ift.onFalse.get(0) instanceof ContinueItem) && (((ContinueItem) ift.onFalse.get(0)).loopId == currentLoop.id))) {
                                     if (ift.expression != null) {
                                         expr = ift.expression;
-                                        if (expr instanceof LogicalOpItem) {
-                                            expr = ((LogicalOpItem) expr).invert();
-                                        } else {
-                                            expr = new NotItem(null, expr);
-                                        }
+                                        /*if (expr instanceof LogicalOpItem) {
+                                         expr = ((LogicalOpItem) expr).invert();
+                                         } else {
+                                         expr = new NotItem(null, expr);
+                                         }*/
                                     }
                                     nextcmds = ift.onFalse;
                                     newBody = ift.onTrue;
