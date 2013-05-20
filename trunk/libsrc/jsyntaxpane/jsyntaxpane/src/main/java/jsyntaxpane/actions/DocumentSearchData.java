@@ -255,6 +255,15 @@ public class DocumentSearchData {
 		replaceDlg.setVisible(true);
 	}
 
+        public void showQuickFindDialogEx(JTextComponent target,boolean ignoreCase,boolean regularExpresion) {
+		if (quickFindDlg == null) {
+			quickFindDlg = new QuickFindDialog(target, this);
+		}
+		quickFindDlg.showFor(target);
+                quickFindDlg.setIgnoreCase(ignoreCase);
+                quickFindDlg.setRegularExpression(regularExpresion);
+	}
+        
 	public void showQuickFindDialog(JTextComponent target) {
 		if (quickFindDlg == null) {
 			quickFindDlg = new QuickFindDialog(target, this);

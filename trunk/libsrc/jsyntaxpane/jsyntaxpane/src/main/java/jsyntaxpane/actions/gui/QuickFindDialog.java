@@ -257,6 +257,20 @@ public class QuickFindDialog extends javax.swing.JDialog
     private javax.swing.JTextField jTxtFind;
     // End of variables declaration//GEN-END:variables
 
+    
+    //JPEXS added
+    public void setIgnoreCase(boolean ignoreCase){
+        jChkIgnoreCase.setSelected(ignoreCase);
+    }
+    //JPEXS added
+    public void setRegularExpression(boolean regularExpresion){
+        jChkRegExp.setSelected(regularExpresion);
+    }
+    //JPEXS added
+    public void setWrap(boolean wrap){
+        jChkWrap.setSelected(wrap);        
+    }
+    
 	@Override
 	public void insertUpdate(DocumentEvent e) {
 		updateFind();

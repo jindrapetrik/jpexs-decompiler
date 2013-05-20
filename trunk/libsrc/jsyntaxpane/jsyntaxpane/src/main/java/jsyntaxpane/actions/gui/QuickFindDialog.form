@@ -7,11 +7,12 @@
       <Color blue="40" green="40" id="darkGray" palette="1" red="40" type="palette"/>
     </Property>
     <Property name="name" type="java.lang.String" value="QuickFindDialog" noResource="true"/>
-    <Property name="resizable" type="boolean" value="false"/>
     <Property name="undecorated" type="boolean" value="true"/>
+    <Property name="resizable" type="boolean" value="false"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
+    <SyntheticProperty name="generateCenter" type="boolean" value="false"/>
   </SyntheticProperties>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
