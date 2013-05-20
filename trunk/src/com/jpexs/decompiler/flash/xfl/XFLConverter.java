@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.xfl;
 import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
@@ -190,9 +191,9 @@ public class XFLConverter {
     public static String convertLineStyle(LINESTYLE ls, int shapeNum) {
         return "<SolidStroke weight=\"" + (((float) ls.width) / 20.0) + "\">"
                 + "<fill>"
-                + "<SolidColor color=\"" + (shapeNum == 3 ? ls.colorA.toHexRGB() : ls.color.toHexRGB())
+                + "<SolidColor color=\"" + (shapeNum == 3 ? ls.colorA.toHexRGB() : ls.color.toHexRGB()) + "\""
                 + (shapeNum == 3 ? " alpha=\"" + ls.colorA.getAlphaFloat() + "\"" : "")
-                + "\"/>"
+                + " />"
                 + "</fill>"
                 + "</SolidStroke>";
     }
@@ -238,9 +239,9 @@ public class XFLConverter {
         ret += "<fill>";
 
         if (!ls.hasFillFlag) {
-            ret += "<SolidColor color=\"" + ls.color.toHexRGB()
+            ret += "<SolidColor color=\"" + ls.color.toHexRGB() + "\""
                     + (ls.color.getAlphaFloat() != 1 ? " alpha=\"" + ls.color.getAlphaFloat() + "\"" : "")
-                    + "\"/>";
+                    + " />";
         } else {
             ret += convertFillStyle(characters, ls.fillType, shapeNum);
         }
@@ -928,12 +929,17 @@ public class XFLConverter {
                             "<End>",
                             "<Insert>",
                             "<Delete>",
+                            null,
                             "<Backspace>",
+                            null,
+                            null,
+                            null,
+                            null,
                             "<Enter>",
                             "<Up>",
                             "<Down>",
-                            "<PgUp>",
-                            "<PgDn>",
+                            "<PageUp>",
+                            "<PageDown>",
                             "<Tab>",
                             "<Escape>",
                             null,
@@ -1420,7 +1426,7 @@ public class XFLConverter {
             soundEnvelopeStr += "<SoundEnvelopePoint level0=\"32768\" level1=\"32768\"/>";
             soundEnvelopeStr += "</SoundEnvelope>";
         }
-        if (startSound != null) {
+        if (startSound != null && sound != null) {
             ret += " soundName=\"sound" + sound.soundId + "." + sound.getExportFormat() + "\"";
             if (startSound.soundInfo.hasInPoint) {
                 ret += " inPoint44=\"" + startSound.soundInfo.inPoint + "\"";
@@ -1845,6 +1851,8 @@ public class XFLConverter {
             } else if (tag instanceof DefineText2Tag) {
                 textRecords = ((DefineText2Tag) tag).textRecords;
             }
+
+
             looprec:
             for (TEXTRECORD rec : textRecords) {
                 if (rec.styleFlagsHasFont) {
@@ -1917,21 +1925,23 @@ public class XFLConverter {
                         }
                     }
                 }
-                ret += "<DOMTextRun>";
-                ret += "<characters>" + xmlString(rec.getText(tags, font)) + "</characters>";
-                ret += "<textAttrs>";
+                if (font != null) {
+                    ret += "<DOMTextRun>";
+                    ret += "<characters>" + xmlString(rec.getText(tags, font)) + "</characters>";
+                    ret += "<textAttrs>";
 
-                ret += "<DOMTextAttrs aliasText=\"false\" rotation=\"true\" indent=\"5\" leftMargin=\"2\" letterSpacing=\"1\" lineSpacing=\"6\" rightMargin=\"3\" size=\"" + twipToPixel(textHeight) + "\" bitmapSize=\"1040\"";
-                if (textColor != null) {
-                    ret += " fillColor=\"" + textColor.toHexRGB() + "\"";
-                } else if (textColorA != null) {
-                    ret += " fillColor=\"" + textColorA.toHexRGB() + "\" alpha=\"" + textColorA.getAlphaFloat() + "\"";
+                    ret += "<DOMTextAttrs aliasText=\"false\" rotation=\"true\" indent=\"5\" leftMargin=\"2\" letterSpacing=\"1\" lineSpacing=\"6\" rightMargin=\"3\" size=\"" + twipToPixel(textHeight) + "\" bitmapSize=\"1040\"";
+                    if (textColor != null) {
+                        ret += " fillColor=\"" + textColor.toHexRGB() + "\"";
+                    } else if (textColorA != null) {
+                        ret += " fillColor=\"" + textColorA.toHexRGB() + "\" alpha=\"" + textColorA.getAlphaFloat() + "\"";
+                    }
+                    ret += " face=\"" + psFontName + "\"";
+                    ret += "/>";
+
+                    ret += "</textAttrs>";
+                    ret += "</DOMTextRun>";
                 }
-                ret += " face=\"" + psFontName + "\"";
-                ret += "/>";
-
-                ret += "</textAttrs>";
-                ret += "</DOMTextRun>";
             }
             ret += "</textRuns>";
             ret += filterStr;
@@ -2447,6 +2457,7 @@ public class XFLConverter {
 
             reader.setContentHandler(tparser);
             reader.setErrorHandler(tparser);
+            html = "<html>" + html + "</html>";
             reader.parse(new InputSource(new InputStreamReader(new ByteArrayInputStream(html.getBytes("UTF-8")), "UTF-8")));
         } catch (Exception e) {
             Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Error while converting HTML", e);
