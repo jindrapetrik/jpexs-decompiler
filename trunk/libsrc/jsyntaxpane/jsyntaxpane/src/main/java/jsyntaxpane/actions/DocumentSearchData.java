@@ -262,6 +262,7 @@ public class DocumentSearchData {
 		quickFindDlg.showFor(target);
                 quickFindDlg.setIgnoreCase(ignoreCase);
                 quickFindDlg.setRegularExpression(regularExpresion);
+                
 	}
         
 	public void showQuickFindDialog(JTextComponent target) {
