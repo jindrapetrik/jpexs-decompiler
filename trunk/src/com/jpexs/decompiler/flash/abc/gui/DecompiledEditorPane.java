@@ -21,17 +21,13 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import com.jpexs.decompiler.flash.helpers.Cache;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.regex.Pattern;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
@@ -50,6 +46,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     private ABCPanel abcPanel;
     private int classIndex = -1;
     private boolean isStatic = false;
+    private Cache cache = new Cache();
 
     public ScriptPack getScriptLeaf() {
         return script;
@@ -216,61 +213,16 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         }
     }
 
-    private class CachedDecompilation {
-
-        public String text;
-        public String hilightedText;
-
-        public List<Highlighting> getHighlights() {
-            return Highlighting.getInstrHighlights(hilightedText);
-        }
-
-        public List<Highlighting> getTraitHighlights() {
-            return Highlighting.getTraitHighlights(hilightedText);
-        }
-
-        public List<Highlighting> getMethodHighlights() {
-            return Highlighting.getMethodHighlights(hilightedText);
-        }
-
-        public List<Highlighting> getClassHighlights() {
-            return Highlighting.getClassHighlights(hilightedText);
-        }
-
-        public CachedDecompilation(String hilightedText) {
-            this.hilightedText = hilightedText;
-            this.text = Highlighting.stripHilights(hilightedText);
-        }
-    }
-    private List<ScriptPack> cacheKeys = new LinkedList<ScriptPack>();
-    private List<CachedDecompilation> cacheValues = new LinkedList<CachedDecompilation>();
-
     private void uncache(ScriptPack pack) {
-        for (int i = 0; i < cacheKeys.size(); i++) {
-            if (cacheKeys.get(i) == pack) {
-                cacheValues.remove(i);
-                cacheKeys.remove(i);
-                break;
-            }
-        }
+        cache.remove(pack);
     }
 
     private CachedDecompilation getCached(ScriptPack pack) {
-        for (int i = 0; i < cacheKeys.size(); i++) {
-            if (cacheKeys.get(i) == pack) {
-                return cacheValues.get(i);
-            }
-        }
-        return null;
+        return (CachedDecompilation) cache.get(pack);
     }
 
     public String getCachedText(ScriptPack pack) {
-        for (int i = 0; i < cacheKeys.size(); i++) {
-            if (cacheKeys.get(i) == pack) {
-                return cacheValues.get(i).text;
-            }
-        }
-        return null;
+        return getCached(pack).text;
     }
 
     public void gotoLastTrait() {
@@ -326,8 +278,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     private List<ABCContainerTag> abcList;
 
     public void clearScriptCache() {
-        cacheKeys.clear();
-        cacheValues.clear();
+        cache.clear();
     }
 
     public void cacheScriptPack(ScriptPack scriptLeaf, List<ABCContainerTag> abcList) {
@@ -340,24 +291,13 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         if (scriptIndex > -1) {
             script = abc.script_info[scriptIndex];
         }
-        boolean found = false;
-        for (int i = 0; i < cacheKeys.size(); i++) {
-            if (cacheKeys.get(i) == scriptLeaf) {
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            cacheKeys.add(scriptLeaf);
+        if (!cache.contains(scriptLeaf)) {
             for (int scriptTraitIndex : scriptLeaf.traitIndices) {
                 hilightedCodeBuf.append(script.traits.traits[scriptTraitIndex].convertPackaged("", abcList, abc, false, false, scriptIndex, -1, true, new ArrayList<String>()));
             }
+
             hilightedCode = hilightedCodeBuf.toString();
-            cacheValues.add(new CachedDecompilation(hilightedCode));
-        }
-        if (cacheKeys.size() > maxCacheSize) {
-            cacheKeys.remove(0);
-            cacheValues.remove(0);
+            cache.put(scriptLeaf, new CachedDecompilation(hilightedCode));
         }
     }
 
@@ -407,8 +347,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
 
     public void setABC(ABC abc) {
         this.abc = abc;
-        cacheKeys.clear();
-        cacheValues.clear();
+        cache.clear();
         setText("");
     }
 }

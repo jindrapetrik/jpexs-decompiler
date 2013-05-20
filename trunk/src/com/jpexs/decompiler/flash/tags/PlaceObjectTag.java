@@ -138,7 +138,7 @@ public class PlaceObjectTag extends Tag implements PlaceObjectTypeTag {
     }
 
     @Override
-    public String getName() {
+    public String getInstanceName() {
         return null;
     }
 

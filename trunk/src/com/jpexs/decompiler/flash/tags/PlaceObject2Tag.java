@@ -297,7 +297,7 @@ public class PlaceObject2Tag extends Tag implements Container, PlaceObjectTypeTa
     }
 
     @Override
-    public String getName() {
+    public String getInstanceName() {
         if (placeFlagHasName) {
             return name;
         }

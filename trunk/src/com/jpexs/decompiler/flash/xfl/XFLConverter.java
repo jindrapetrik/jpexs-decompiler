@@ -571,7 +571,7 @@ public class XFLConverter {
                         usages.put(ch, 0);
                     }
                     int usageCount = usages.get(ch);
-                    if (po.getName() != null) {
+                    if (po.getInstanceName() != null) {
                         usageCount++;
                     }
                     if (po.getColorTransform() != null) {
@@ -1543,7 +1543,7 @@ public class XFLConverter {
                             }
                             video = (DefineVideoStreamTag) ch;
                         } else {
-                            elements += convertSymbolInstance(po.getName(), po.getMatrix(), po.getColorTransform(), po.getColorTransformWithAlpha(), po.cacheAsBitmap(), po.getBlendMode(), po.getFilters(), po.isVisible(), po.getBackgroundColor(), characters.get(characterId), characters, tags);
+                            elements += convertSymbolInstance(po.getInstanceName(), po.getMatrix(), po.getColorTransform(), po.getColorTransformWithAlpha(), po.cacheAsBitmap(), po.getBlendMode(), po.getFilters(), po.isVisible(), po.getBackgroundColor(), characters.get(characterId), characters, tags);
                         }
                     }
                 }

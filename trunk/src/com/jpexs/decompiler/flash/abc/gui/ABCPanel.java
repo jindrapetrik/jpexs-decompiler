@@ -32,6 +32,7 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -43,7 +44,6 @@ import javax.swing.table.*;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.actions.DocumentSearchData;
-import jsyntaxpane.actions.gui.QuickFindDialog;
 
 public class ABCPanel extends JPanel implements ItemListener, ActionListener {
 
@@ -94,6 +94,9 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
                     found.add(p);
                 }
             }
+
+            System.gc();
+
             //found = decompiledTextArea.searchCache(txt, ignoreCase, regexp);
             if (found.isEmpty()) {
                 searchPanel.setVisible(false);
@@ -449,17 +452,17 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
         Main.mainFrame.tagTree.setSelectionPath(tp);
         Main.mainFrame.tagTree.scrollPathToVisible(tp);
         decompiledTextArea.setCaretPosition(0);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        DocumentSearchData dsd = DocumentSearchData.getFromEditor(decompiledTextArea);
-        dsd.setPattern(searchFor, searchRegexp, searchIgnoreCase);
-        QuickFindDialog quickFindDlg = new QuickFindDialog(decompiledTextArea, dsd);
-        quickFindDlg.setRegularExpression(searchRegexp);
-        quickFindDlg.setIgnoreCase(searchIgnoreCase);
-        quickFindDlg.showFor(decompiledTextArea);
+        java.util.Timer t = new java.util.Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                DocumentSearchData dsd = DocumentSearchData.getFromEditor(decompiledTextArea);
+                dsd.setPattern(searchFor, searchRegexp, searchIgnoreCase);
+                dsd.showQuickFindDialogEx(decompiledTextArea, searchIgnoreCase, searchRegexp);
+            }
+        }, 1000);
+
+
     }
 
     @Override

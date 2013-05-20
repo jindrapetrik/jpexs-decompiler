@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.helpers;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -27,7 +28,7 @@ import java.util.regex.Pattern;
  *
  * @author JPEXS
  */
-public class Highlighting {
+public class Highlighting implements Serializable {
 
     /**
      * Starting position

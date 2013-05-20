@@ -19,8 +19,6 @@ package com.jpexs.decompiler.flash.action.gui;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.abc.ScriptPack;
-import com.jpexs.decompiler.flash.abc.gui.DecompiledEditorPane;
 import com.jpexs.decompiler.flash.abc.gui.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraph;
@@ -32,6 +30,7 @@ import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.gui.TagNode;
 import com.jpexs.decompiler.flash.gui.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.helpers.Cache;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -46,8 +45,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -66,7 +65,6 @@ import javax.swing.event.CaretListener;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.actions.DocumentSearchData;
-import jsyntaxpane.actions.gui.QuickFindDialog;
 
 public class ActionPanel extends JPanel implements ActionListener {
 
@@ -107,51 +105,21 @@ public class ActionPanel extends JPanel implements ActionListener {
     private int foundPos = 0;
     private JLabel searchForLabel;
     private String searchFor;
-    private List<ASMSource> cacheKeys = new LinkedList<ASMSource>();
-    private List<CachedScript> cacheValues = new LinkedList<CachedScript>();
-    //private HashMap<ASMSource, CachedScript> cache = new HashMap<ASMSource, CachedScript>();
     private boolean searchIgnoreCase;
     private boolean searchRegexp;
+    private Cache cache = new Cache();
 
     private CachedScript getCached(ASMSource pack) {
-        for (int i = 0; i < cacheKeys.size(); i++) {
-            if (cacheKeys.get(i) == pack) {
-                return cacheValues.get(i);
-            }
-        }
-        return null;
+        return (CachedScript) cache.get(pack);
     }
 
     private void cacheScript(ASMSource src) {
-        int maxCacheSize = 20;
-        for (int i = 0; i < cacheKeys.size(); i++) {
-            if (cacheKeys.get(i) == src) {
-                return;
-            }
-        }
-        List<Action> as = src.getActions(SWF.DEFAULT_VERSION);
-        String s = com.jpexs.decompiler.flash.action.Action.actionsToSource(as, SWF.DEFAULT_VERSION);
-        List<Highlighting> hilights = Highlighting.getInstrHighlights(s);
-        String srcNoHex = Highlighting.stripHilights(s);
-        cacheKeys.add(src);
-        cacheValues.add(new CachedScript(srcNoHex, hilights, as));
-        if (cacheKeys.size() > maxCacheSize) {
-            cacheKeys.remove(0);
-            cacheValues.remove(0);
-        }
-
-    }
-
-    private static class CachedScript {
-
-        public String text;
-        List<Highlighting> hilights;
-        List<com.jpexs.decompiler.flash.action.Action> actions;
-
-        public CachedScript(String text, List<Highlighting> hilights, List<Action> actions) {
-            this.text = text;
-            this.hilights = hilights;
-            this.actions = actions;
+        if (!cache.contains(src)) {
+            List<Action> as = src.getActions(SWF.DEFAULT_VERSION);
+            String s = com.jpexs.decompiler.flash.action.Action.actionsToSource(as, SWF.DEFAULT_VERSION);
+            List<Highlighting> hilights = Highlighting.getInstrHighlights(s);
+            String srcNoHex = Highlighting.stripHilights(s);
+            cache.put(src, new CachedScript(srcNoHex, hilights));
         }
     }
 
@@ -225,7 +193,9 @@ public class ActionPanel extends JPanel implements ActionListener {
         editor.setText(stripped);
         for (Highlighting h : disassembledHilights) {
             if (h.offset == offset) {
-                editor.setCaretPosition(h.startPos);
+                if (h.startPos <= editor.getText().length()) {
+                    editor.setCaretPosition(h.startPos);
+                }
                 break;
             }
         }
@@ -280,7 +250,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                     }
                     cacheScript(asm);
                     CachedScript sc = getCached(asm);
-                    lastCode = sc.actions;
+                    lastCode = asm.getActions(SWF.DEFAULT_VERSION);
                     decompiledHilights = sc.hilights;
                     lastDecompiled = sc.text;
                     stripped = lastDecompiled;
@@ -652,26 +622,18 @@ public class ActionPanel extends JPanel implements ActionListener {
         Main.mainFrame.tagTree.setSelectionPath(tp);
         Main.mainFrame.tagTree.scrollPathToVisible(tp);
         decompiledEditor.setCaretPosition(0);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        DocumentSearchData dsd = DocumentSearchData.getFromEditor(decompiledEditor);
-        dsd.setPattern(searchFor, searchRegexp, searchIgnoreCase);
-        QuickFindDialog quickFindDlg = new QuickFindDialog(decompiledEditor, dsd);
-        quickFindDlg.setRegularExpression(searchRegexp);
-        quickFindDlg.setIgnoreCase(searchIgnoreCase);
-        quickFindDlg.showFor(decompiledEditor);
+        java.util.Timer t = new java.util.Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                DocumentSearchData dsd = DocumentSearchData.getFromEditor(decompiledEditor);
+                dsd.setPattern(searchFor, searchRegexp, searchIgnoreCase);
+                dsd.showQuickFindDialogEx(decompiledEditor, searchIgnoreCase, searchRegexp);
+            }
+        }, 1000);
     }
 
     private void uncache(ASMSource pack) {
-        for (int i = 0; i < cacheKeys.size(); i++) {
-            if (cacheKeys.get(i) == pack) {
-                cacheValues.remove(i);
-                cacheKeys.remove(i);
-                break;
-            }
-        }
+        cache.remove(pack);
     }
 }
