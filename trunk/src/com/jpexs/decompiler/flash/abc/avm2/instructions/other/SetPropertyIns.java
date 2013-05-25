@@ -51,18 +51,18 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
         GraphTargetItem value = (GraphTargetItem) stack.pop();
         FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
         GraphTargetItem obj = (GraphTargetItem) stack.pop();
-        if (value.getThroughRegister() instanceof IncrementTreeItem) {
-            GraphTargetItem inside = ((IncrementTreeItem) value.getThroughRegister()).object.getThroughRegister().getNotCoerced();
+        if (value.getThroughDuplicate().getThroughRegister().getThroughDuplicate() instanceof IncrementTreeItem) {
+            GraphTargetItem inside = ((IncrementTreeItem) value.getThroughDuplicate().getThroughRegister().getThroughDuplicate()).object.getThroughRegister().getNotCoerced().getThroughDuplicate();
             if (inside instanceof GetPropertyTreeItem) {
                 GetPropertyTreeItem insideProp = ((GetPropertyTreeItem) inside);
                 if (insideProp.propertyName.compareSame(multiname)) {
-                    GraphTargetItem insideObj = obj;
+                    GraphTargetItem insideObj = obj.getThroughDuplicate();
                     if (insideObj instanceof LocalRegTreeItem) {
-                        insideObj = ((LocalRegTreeItem) insideObj).computedValue.getThroughNotCompilable();
+                        insideObj = ((LocalRegTreeItem) insideObj).computedValue.getThroughNotCompilable().getThroughDuplicate();
                     }
-                    if (insideProp.object == insideObj) {
+                    if (insideProp.object.getThroughDuplicate() == insideObj) {
                         if (stack.size() > 0) {
-                            GraphTargetItem top = stack.peek().getNotCoerced();
+                            GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
                             if (top == insideProp) {
                                 stack.pop();
                                 stack.push(new PostIncrementTreeItem(ins, insideProp));
@@ -81,18 +81,18 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
             }
         }
 
-        if (value.getThroughRegister() instanceof DecrementTreeItem) {
-            GraphTargetItem inside = ((DecrementTreeItem) value.getThroughRegister()).object.getThroughRegister().getNotCoerced();
+        if (value.getThroughDuplicate().getThroughRegister().getThroughDuplicate() instanceof DecrementTreeItem) {
+            GraphTargetItem inside = ((DecrementTreeItem) value.getThroughDuplicate().getThroughRegister().getThroughDuplicate()).object.getThroughRegister().getNotCoerced().getThroughDuplicate();
             if (inside instanceof GetPropertyTreeItem) {
                 GetPropertyTreeItem insideProp = ((GetPropertyTreeItem) inside);
                 if (insideProp.propertyName.compareSame(multiname)) {
-                    GraphTargetItem insideObj = obj;
+                    GraphTargetItem insideObj = obj.getThroughDuplicate();
                     if (insideObj instanceof LocalRegTreeItem) {
-                        insideObj = ((LocalRegTreeItem) insideObj).computedValue.getThroughNotCompilable();
+                        insideObj = ((LocalRegTreeItem) insideObj).computedValue.getThroughNotCompilable().getThroughDuplicate();
                     }
-                    if (insideProp.object == insideObj) {
+                    if (insideProp.object.getThroughDuplicate() == insideObj) {
                         if (stack.size() > 0) {
-                            GraphTargetItem top = stack.peek().getNotCoerced();
+                            GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
                             if (top == insideProp) {
                                 stack.pop();
                                 stack.push(new PostDecrementTreeItem(ins, insideProp));

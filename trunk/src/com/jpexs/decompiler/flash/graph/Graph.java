@@ -594,9 +594,10 @@ public class Graph {
                     if ((ti = checkLoop(next, stopPart, loops)) != null) {
                         ret.add(ti);
                     } else {
+                        GraphTargetItem first = stack.pop();
                         printGraph(visited, localData, stack, allParts, parent, next, reversed ? sp1 : sp0, loops, forFinalCommands);
                         GraphTargetItem second = stack.pop();
-                        GraphTargetItem first = stack.pop();
+
                         if (!reversed) {
                             AndItem a = new AndItem(null, first, second);
                             stack.push(a);
@@ -642,10 +643,10 @@ public class Graph {
                     if ((ti = checkLoop(next, stopPart, loops)) != null) {
                         ret.add(ti);
                     } else {
-                        printGraph(visited, localData, stack, allParts, parent, next, reversed ? sp1 : sp0, loops, forFinalCommands);
-
-                        GraphTargetItem second = stack.pop();
                         GraphTargetItem first = stack.pop();
+                        printGraph(visited, localData, stack, allParts, parent, next, reversed ? sp1 : sp0, loops, forFinalCommands);
+                        GraphTargetItem second = stack.pop();
+
 
                         if (reversed) {
                             AndItem a = new AndItem(null, first, second);

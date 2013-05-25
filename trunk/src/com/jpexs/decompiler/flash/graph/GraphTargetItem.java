@@ -158,4 +158,8 @@ public abstract class GraphTargetItem {
     public GraphTargetItem getThroughNotCompilable() {
         return this;
     }
+
+    public GraphTargetItem getThroughDuplicate() {
+        return this;
+    }
 }

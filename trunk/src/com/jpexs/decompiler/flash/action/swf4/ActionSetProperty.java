@@ -42,16 +42,16 @@ public class ActionSetProperty extends Action {
 
     @Override
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-        GraphTargetItem value = stack.pop();
-        GraphTargetItem index = stack.pop();
-        GraphTargetItem target = stack.pop();
+        GraphTargetItem value = stack.pop().getThroughDuplicate();
+        GraphTargetItem index = stack.pop().getThroughDuplicate();
+        GraphTargetItem target = stack.pop().getThroughDuplicate();
         int indexInt = 0;
         if (index instanceof DirectValueTreeItem) {
             if (((DirectValueTreeItem) index).value instanceof Long) {
                 indexInt = (int) (long) (Long) ((DirectValueTreeItem) index).value;
             }
         }
-        if (value instanceof IncrementTreeItem) {
+        if (value.getThroughDuplicate() instanceof IncrementTreeItem) {
             GraphTargetItem obj = ((IncrementTreeItem) value).object;
             if (!stack.isEmpty()) {
                 if (stack.peek().equals(obj)) {

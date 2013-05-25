@@ -96,14 +96,14 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
             };
         }
 
-        if (value.getNotCoerced() instanceof IncrementTreeItem) {
-            GraphTargetItem inside = ((IncrementTreeItem) value.getNotCoerced()).object.getThroughRegister().getNotCoerced();
+        if (value.getNotCoerced().getThroughDuplicate() instanceof IncrementTreeItem) {
+            GraphTargetItem inside = ((IncrementTreeItem) value.getNotCoerced()).object.getThroughRegister().getNotCoerced().getThroughDuplicate();
             if (inside instanceof GetSlotTreeItem) {
                 GetSlotTreeItem slotItem = (GetSlotTreeItem) inside;
                 if ((slotItem.scope.getThroughRegister() == obj.getThroughRegister())
                         && (slotItem.slotName == slotname)) {
                     if (stack.size() > 0) {
-                        GraphTargetItem top = stack.peek().getNotCoerced();
+                        GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
                         if (top == inside) {
                             stack.pop();
                             stack.push(new PostIncrementTreeItem(ins, inside));
@@ -121,14 +121,14 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
             }
         }
 
-        if (value.getNotCoerced() instanceof DecrementTreeItem) {
-            GraphTargetItem inside = ((DecrementTreeItem) value.getNotCoerced()).object.getThroughRegister().getNotCoerced();
+        if (value.getNotCoerced().getThroughDuplicate() instanceof DecrementTreeItem) {
+            GraphTargetItem inside = ((DecrementTreeItem) value.getNotCoerced()).object.getThroughRegister().getNotCoerced().getThroughDuplicate();
             if (inside instanceof GetSlotTreeItem) {
                 GetSlotTreeItem slotItem = (GetSlotTreeItem) inside;
                 if ((slotItem.scope.getThroughRegister() == obj.getThroughRegister())
                         && (slotItem.slotName == slotname)) {
                     if (stack.size() > 0) {
-                        GraphTargetItem top = stack.peek().getNotCoerced();
+                        GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
                         if (top == inside) {
                             stack.pop();
                             stack.push(new PostDecrementTreeItem(ins, inside));

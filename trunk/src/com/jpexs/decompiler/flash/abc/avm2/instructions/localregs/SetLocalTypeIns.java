@@ -61,11 +61,11 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
             return;
         }
         if (value.getNotCoerced() instanceof IncrementTreeItem) {
-            GraphTargetItem inside = ((IncrementTreeItem) value.getNotCoerced()).object.getNotCoerced();
+            GraphTargetItem inside = ((IncrementTreeItem) value.getNotCoerced()).object.getNotCoerced().getThroughDuplicate();
             if (inside instanceof LocalRegTreeItem) {
                 if (((LocalRegTreeItem) inside).regIndex == regId) {
                     if (stack.size() > 0) {
-                        GraphTargetItem top = stack.peek().getNotCoerced();
+                        GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
                         if (top == inside) {
                             stack.pop();
                             stack.push(new PostIncrementTreeItem(ins, inside));
@@ -84,11 +84,11 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
         }
 
         if (value.getNotCoerced() instanceof DecrementTreeItem) {
-            GraphTargetItem inside = ((DecrementTreeItem) value.getNotCoerced()).object.getNotCoerced();
+            GraphTargetItem inside = ((DecrementTreeItem) value.getNotCoerced()).object.getNotCoerced().getThroughDuplicate();
             if (inside instanceof LocalRegTreeItem) {
                 if (((LocalRegTreeItem) inside).regIndex == regId) {
                     if (stack.size() > 0) {
-                        GraphTargetItem top = stack.peek().getNotCoerced();
+                        GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
                         if (top == inside) {
                             stack.pop();
                             stack.push(new PostDecrementTreeItem(ins, inside));

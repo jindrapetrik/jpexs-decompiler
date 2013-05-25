@@ -44,7 +44,7 @@ public class ActionSetVariable extends Action {
 
     @Override
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-        GraphTargetItem value = stack.pop();
+        GraphTargetItem value = stack.pop().getThroughDuplicate();
         GraphTargetItem name = stack.pop();
         variables.put(Highlighting.stripHilights(name.toStringNoQuotes((ConstantPool) null)), value);
         if (value instanceof IncrementTreeItem) {

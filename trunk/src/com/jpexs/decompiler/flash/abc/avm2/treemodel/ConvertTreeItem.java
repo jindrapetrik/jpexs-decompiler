@@ -41,6 +41,6 @@ public class ConvertTreeItem extends TreeItem {
 
     @Override
     public GraphTargetItem getNotCoerced() {
-        return value;
+        return value.getNotCoerced();
     }
 }

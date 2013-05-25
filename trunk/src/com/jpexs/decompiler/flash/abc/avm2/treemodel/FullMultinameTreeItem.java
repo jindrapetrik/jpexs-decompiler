@@ -97,26 +97,38 @@ public class FullMultinameTreeItem extends TreeItem {
             return false;
         }
         GraphTargetItem tiName = name;
+        if (name != null) {
+            name = name.getThroughDuplicate();
+        }
         while (tiName instanceof LocalRegTreeItem) {
-            tiName = ((LocalRegTreeItem) tiName).computedValue.getThroughNotCompilable();
+            tiName = ((LocalRegTreeItem) tiName).computedValue.getThroughNotCompilable().getThroughDuplicate();
         }
 
         GraphTargetItem tiName2 = other.name;
+        if (tiName2 != null) {
+            tiName2 = tiName2.getThroughDuplicate();
+        }
         while (tiName2 instanceof LocalRegTreeItem) {
-            tiName2 = ((LocalRegTreeItem) tiName2).computedValue.getThroughNotCompilable();
+            tiName2 = ((LocalRegTreeItem) tiName2).computedValue.getThroughNotCompilable().getThroughDuplicate();
         }
         if (tiName != tiName2) {
             return false;
         }
 
         GraphTargetItem tiNameSpace = namespace;
+        if (tiNameSpace != null) {
+            tiNameSpace = tiNameSpace.getThroughDuplicate();
+        }
         while (tiNameSpace instanceof LocalRegTreeItem) {
-            tiNameSpace = ((LocalRegTreeItem) tiNameSpace).computedValue.getThroughNotCompilable();
+            tiNameSpace = ((LocalRegTreeItem) tiNameSpace).computedValue.getThroughNotCompilable().getThroughDuplicate();
         }
 
         GraphTargetItem tiNameSpace2 = other.namespace;
+        if (tiNameSpace2 != null) {
+            tiNameSpace2 = tiNameSpace2.getThroughDuplicate();
+        }
         while (tiNameSpace2 instanceof LocalRegTreeItem) {
-            tiNameSpace2 = ((LocalRegTreeItem) tiNameSpace2).computedValue.getThroughNotCompilable();
+            tiNameSpace2 = ((LocalRegTreeItem) tiNameSpace2).computedValue.getThroughNotCompilable().getThroughDuplicate();
         }
         if (tiNameSpace != tiNameSpace2) {
             return false;
