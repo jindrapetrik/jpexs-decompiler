@@ -439,7 +439,7 @@ public class XFLConverter {
             lastFillStyleCount = fillStyles.fillStyles.length;
         }
         if (lineStyles != null) {
-            if (shapeNum == 4) {
+            if (lineStyles.lineStyles2 != null) { //(shapeNum == 4) {
                 for (int l = 0; l < lineStyles.lineStyles2.length; l++) {
                     strokesStr += "<StrokeStyle index=\"" + (lineStyleCount + 1) + "\">";
                     strokesStr += convertLineStyle(characters, lineStyles.lineStyles2[l], shapeNum);
@@ -507,6 +507,8 @@ public class XFLConverter {
 
         LINESTYLEARRAY actualLinestyles = lineStyles;
         int strokeStyleOrig = 0;
+        fillStyleCount = fillStyles.fillStyles.length;
+        lastFillStyleCount = fillStyleCount;
         for (SHAPERECORD edge : shapeRecords) {
             if (edge instanceof StyleChangeRecord) {
                 StyleChangeRecord scr = (StyleChangeRecord) edge;
@@ -517,6 +519,7 @@ public class XFLConverter {
                      //fillsStr += "</FillStyle>";
                      //fillStyleCount++;
                      }*/
+
                     if (shapeNum == 4) {
                         for (int l = 0; l < scr.lineStyles.lineStyles2.length; l++) {
                             strokesStr += "<StrokeStyle index=\"" + (lineStyleCount + 1) + "\">";
@@ -533,6 +536,7 @@ public class XFLConverter {
                         }
                     }
                     lastFillStyleCount = scr.fillStyles.fillStyles.length;
+                    fillStyleCount += lastFillStyleCount;
                     lastLineStyleCount = (shapeNum == 4) ? scr.lineStyles.lineStyles2.length : scr.lineStyles.lineStyles.length;
                     actualLinestyles = scr.lineStyles;
                 }
@@ -540,7 +544,7 @@ public class XFLConverter {
                     /*edgeStyle += " fillStyle0=\"";
                      edgeStyle += fillStyleCount - lastFillStyleCount + scr.fillStyle0;
                      edgeStyle += "\"";*/
-                    int fillStyle0_new = scr.fillStyle0 == 0 ? 0 : fillStylesMap.get(fillStylesStr.size() - lastFillStyleCount + scr.fillStyle0 - 1) + 1;
+                    int fillStyle0_new = scr.fillStyle0 == 0 ? 0 : fillStylesMap.get(fillStyleCount - lastFillStyleCount + scr.fillStyle0 - 1) + 1;
                     //fillStyle0 = fillStyle0_new;
                     if (morphshape) { //???
                         fillStyle1 = fillStyle0_new;
@@ -552,7 +556,7 @@ public class XFLConverter {
                     /*edgeStyle += " fillStyle1=\"";
                      edgeStyle += fillStyleCount - lastFillStyleCount + scr.fillStyle1;
                      edgeStyle += "\"";*/
-                    int fillStyle1_new = scr.fillStyle1 == 0 ? 0 : fillStylesMap.get(fillStylesStr.size() - lastFillStyleCount + scr.fillStyle1 - 1) + 1;
+                    int fillStyle1_new = scr.fillStyle1 == 0 ? 0 : fillStylesMap.get(fillStyleCount - lastFillStyleCount + scr.fillStyle1 - 1) + 1;
                     if (morphshape) {
                         fillStyle0 = fillStyle1_new;
                     } else {
@@ -564,7 +568,7 @@ public class XFLConverter {
                     /*edgeStyle += " strokeStyle=\"";
                      edgeStyle += lineStyleCount - lastLineStyleCount + scr.lineStyle;
                      edgeStyle += "\"";*/
-                    strokeStyle = lineStyleCount - lastLineStyleCount + scr.lineStyle;
+                    strokeStyle = scr.lineStyle == 0 ? 0 : lineStyleCount - lastLineStyleCount + scr.lineStyle;
                     strokeStyleOrig = scr.lineStyle - 1;
                 }
                 if (!edges.isEmpty()) {
@@ -573,37 +577,40 @@ public class XFLConverter {
                         boolean empty = false;
                         if ((fillStyle0 <= 0) && (fillStyle1 <= 0) && (strokeStyle > 0)) {
                             if (shapeNum == 4) {
-                                if (actualLinestyles.lineStyles2[strokeStyleOrig].color.alpha == 0) {
-                                    if (actualLinestyles.lineStyles2[strokeStyleOrig].color.red == 0) {
-                                        if (actualLinestyles.lineStyles2[strokeStyleOrig].color.green == 0) {
-                                            if (actualLinestyles.lineStyles2[strokeStyleOrig].color.blue == 0) {
-                                                empty = true;
+
+                                if (!actualLinestyles.lineStyles2[strokeStyleOrig].hasFillFlag) {
+                                    if (actualLinestyles.lineStyles2[strokeStyleOrig].color.alpha == 0) {
+                                        if (actualLinestyles.lineStyles2[strokeStyleOrig].color.red == 0) {
+                                            if (actualLinestyles.lineStyles2[strokeStyleOrig].color.green == 0) {
+                                                if (actualLinestyles.lineStyles2[strokeStyleOrig].color.blue == 0) {
+                                                    empty = true;
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
+                            if (!empty) {
+                                edgesStr += "<Edge";
+                                if (fillStyle0 > -1) {
+                                    edgesStr += " fillStyle0=\"" + fillStyle0 + "\"";
+                                }
+                                if (fillStyle1 > -1) {
+                                    edgesStr += " fillStyle1=\"" + fillStyle1 + "\"";
+                                }
+                                if (strokeStyle > -1) {
+                                    edgesStr += " strokeStyle=\"" + strokeStyle + "\"";
+                                }
+                                edgesStr += " edges=\"" + convertShapeEdges(x, y, mat, edges) + "\" />";
+                            }
                         }
-                        if (!empty) {
-                            edgesStr += "<Edge";
-                            if (fillStyle0 > -1) {
-                                edgesStr += " fillStyle0=\"" + fillStyle0 + "\"";
-                            }
-                            if (fillStyle1 > -1) {
-                                edgesStr += " fillStyle1=\"" + fillStyle1 + "\"";
-                            }
-                            if (strokeStyle > -1) {
-                                edgesStr += " strokeStyle=\"" + strokeStyle + "\"";
-                            }
-                            edgesStr += " edges=\"" + convertShapeEdges(x, y, mat, edges) + "\" />";
-                        }
+                        edgeStyle = "";
+                        strokeStyle = -1;
+                        fillStyle0 = -1;
+                        fillStyle1 = -1;
                     }
-                    edgeStyle = "";
-                    strokeStyle = -1;
-                    fillStyle0 = -1;
-                    fillStyle1 = -1;
+                    edges.clear();
                 }
-                edges.clear();
             }
             edges.add(edge);
             x = edge.changeX(x);
@@ -615,11 +622,13 @@ public class XFLConverter {
                 boolean empty = false;
                 if ((fillStyle0 <= 0) && (fillStyle1 <= 0) && (strokeStyle > 0)) {
                     if (shapeNum == 4) {
-                        if (actualLinestyles.lineStyles2[strokeStyleOrig].color.alpha == 0) {
-                            if (actualLinestyles.lineStyles2[strokeStyleOrig].color.red == 0) {
-                                if (actualLinestyles.lineStyles2[strokeStyleOrig].color.green == 0) {
-                                    if (actualLinestyles.lineStyles2[strokeStyleOrig].color.blue == 0) {
-                                        empty = true;
+                        if (!actualLinestyles.lineStyles2[strokeStyleOrig].hasFillFlag) {
+                            if (actualLinestyles.lineStyles2[strokeStyleOrig].color.alpha == 0) {
+                                if (actualLinestyles.lineStyles2[strokeStyleOrig].color.red == 0) {
+                                    if (actualLinestyles.lineStyles2[strokeStyleOrig].color.green == 0) {
+                                        if (actualLinestyles.lineStyles2[strokeStyleOrig].color.blue == 0) {
+                                            empty = true;
+                                        }
                                     }
                                 }
                             }
@@ -1787,10 +1796,10 @@ public class XFLConverter {
                     if (character instanceof MorphShapeTag) {
                         MorphShapeTag m = (MorphShapeTag) character;
                         if (ratio == 65535) {
-                            elements += convertShape(characters, matrix, 4, m.getEndEdges().shapeRecords, m.getFillStyles().getEndFillStyles(), m.getLineStyles().getEndLineStyles(m.getShapeNum()), true);
+                            elements += convertShape(characters, matrix, 3, m.getEndEdges().shapeRecords, m.getFillStyles().getEndFillStyles(), m.getLineStyles().getEndLineStyles(m.getShapeNum()), true);
                             shapeTween = false;
                         } else {
-                            elements += convertShape(characters, matrix, 4, m.getStartEdges().shapeRecords, m.getFillStyles().getStartFillStyles(), m.getLineStyles().getStartLineStyles(m.getShapeNum()), true);
+                            elements += convertShape(characters, matrix, 3, m.getStartEdges().shapeRecords, m.getFillStyles().getStartFillStyles(), m.getLineStyles().getStartLineStyles(m.getShapeNum()), true);
                             shapeTween = true;
                         }
                     } else {
