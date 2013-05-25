@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.types.traits;
 
+import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
@@ -405,7 +406,9 @@ public class TraitClass extends Trait implements TraitWithSlot {
         String bodyStr = "";
         bodyIndex = abc.findBodyIndex(abc.class_info[class_info].cinit_index);
         if (bodyIndex != -1) {
-            bodyStr = abc.bodies[bodyIndex].toString(packageName + "." + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".staticinitializer", pcode, true, scriptIndex, class_info, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), true, highlight, fullyQualifiedNames, abc.class_info[class_info].static_traits);
+            if (Main.DO_DECOMPILE) {
+                bodyStr = abc.bodies[bodyIndex].toString(packageName + "." + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".staticinitializer", pcode, true, scriptIndex, class_info, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), true, highlight, fullyQualifiedNames, abc.class_info[class_info].static_traits);
+            }
         }
         if (Highlighting.stripHilights(bodyStr).equals("")) {
             toPrint = ABC.addTabs(bodyStr, 3);
@@ -439,7 +442,9 @@ public class TraitClass extends Trait implements TraitWithSlot {
             bodyStr = "";
             bodyIndex = abc.findBodyIndex(abc.instance_info[class_info].iinit_index);
             if (bodyIndex != -1) {
-                bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(packageName + "." + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".initializer", pcode, false, scriptIndex, class_info, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, highlight, fullyQualifiedNames, abc.instance_info[class_info].instance_traits), 3);
+                if (Main.DO_DECOMPILE) {
+                    bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(packageName + "." + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".initializer", pcode, false, scriptIndex, class_info, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, highlight, fullyQualifiedNames, abc.instance_info[class_info].instance_traits), 3);
+                }
                 constructorParams = abc.method_info[abc.instance_info[class_info].iinit_index].getParamStr(abc.constants, abc.bodies[bodyIndex], abc, fullyQualifiedNames);
             } else {
                 constructorParams = abc.method_info[abc.instance_info[class_info].iinit_index].getParamStr(abc.constants, null, abc, fullyQualifiedNames);

@@ -2300,8 +2300,10 @@ public class AVM2Code implements Serializable {
                             }
                         }
                     }
-
-                    ret += removeTraps(secondPass, useVisited, localData, stack, output, code, condition ? branches.get(0) : branches.get(1), ip, visited, visitedStates, decisions);
+                    ip = condition ? branches.get(0) : branches.get(1);
+                    lastIp = ip;
+                    continue;
+                    //ret += removeTraps(secondPass, useVisited, localData, stack, output, code, condition ? branches.get(0) : branches.get(1), ip, visited, visitedStates, decisions);
                 } else {
                     if (ins.isBranch() && (!ins.isJump())) {
                         stack.pop();

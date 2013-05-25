@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.types.traits;
 
+import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -54,6 +55,9 @@ public class TraitMethodGetterSetter extends Trait {
 
     @Override
     public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+        if (!Main.DO_DECOMPILE) {
+            return "";
+        }
         if (debugMode) {
             System.err.println("Decompiling " + path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames));
         }
