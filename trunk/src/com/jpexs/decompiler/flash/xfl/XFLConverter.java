@@ -575,7 +575,7 @@ public class XFLConverter {
                     if ((fillStyle0 > 0) || (fillStyle1 > 0) || (strokeStyle > 0)) {
                         //if(true){
                         boolean empty = false;
-                        if ((fillStyle0 <= 0) && (fillStyle1 <= 0) && (strokeStyle > 0)) {
+                        if ((fillStyle0 <= 0) && (fillStyle1 <= 0) && (strokeStyle > 0) && morphshape) {
                             if (shapeNum == 4) {
 
                                 if (!actualLinestyles.lineStyles2[strokeStyleOrig].hasFillFlag) {
@@ -620,7 +620,7 @@ public class XFLConverter {
             if ((fillStyle0 > 0) || (fillStyle1 > 0) || (strokeStyle > 0)) {
 
                 boolean empty = false;
-                if ((fillStyle0 <= 0) && (fillStyle1 <= 0) && (strokeStyle > 0)) {
+                if ((fillStyle0 <= 0) && (fillStyle1 <= 0) && (strokeStyle > 0) && morphshape) {
                     if (shapeNum == 4) {
                         if (!actualLinestyles.lineStyles2[strokeStyleOrig].hasFillFlag) {
                             if (actualLinestyles.lineStyles2[strokeStyleOrig].color.alpha == 0) {
@@ -1127,9 +1127,9 @@ public class XFLConverter {
         List<String> symbols = new ArrayList<String>();
         for (int ch : characters.keySet()) {
             CharacterTag symbol = characters.get(ch);
-            /*if ((symbol instanceof ShapeTag) && oneInstanceShapes.contains(symbol.getCharacterID())) {
-             continue; //shapes with 1 ocurrence are not added to library
-             }*/
+            if ((symbol instanceof ShapeTag) && oneInstanceShapes.contains(symbol.getCharacterID())) {
+                continue; //shapes with 1 ocurrence are not added to library
+            }
             if ((symbol instanceof ShapeTag) || (symbol instanceof DefineSpriteTag) || (symbol instanceof ButtonTag)) {
                 String symbolStr = "";
 
