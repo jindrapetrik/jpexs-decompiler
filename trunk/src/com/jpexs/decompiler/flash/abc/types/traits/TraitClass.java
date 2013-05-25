@@ -462,7 +462,27 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         outTraits.add(abc.instance_info[class_info].instance_traits.convert(packageName + "." + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, false, pcode, false, scriptIndex, class_info, highlight, fullyQualifiedNames));
 
-        out.println(Helper.joinStrings(outTraits, "\r\n\r\n"));
+
+        StringBuilder bui = new StringBuilder();
+        boolean first = true;
+        String glue = "\r\n\r\n";
+        for (String s : outTraits) {
+            if (!Highlighting.stripHilights(s).trim().equals("")) {
+                if (!first) {
+
+                    bui.append(glue);
+                } else {
+                    first = false;
+                }
+            } else {
+                s = s.replace(ABC.IDENT_STRING, "");
+            }
+            bui.append(s);
+        }
+
+
+        //out.println(Helper.joinStrings(outTraits, "\r\n\r\n"));
+        out.println(bui.toString());
         out.println(ABC.IDENT_STRING + "}");//class
         out.flush();
         Highlighting.doHighlight = true;
