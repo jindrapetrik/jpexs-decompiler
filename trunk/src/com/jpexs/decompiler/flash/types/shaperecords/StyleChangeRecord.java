@@ -72,7 +72,7 @@ public class StyleChangeRecord extends SHAPERECORD {
         if (stateMoveTo) {
             return moveDeltaX;
         }
-        return 0;
+        return x;
     }
 
     @Override
@@ -80,7 +80,7 @@ public class StyleChangeRecord extends SHAPERECORD {
         if (stateMoveTo) {
             return moveDeltaY;
         }
-        return 0;
+        return y;
     }
 
     @Override

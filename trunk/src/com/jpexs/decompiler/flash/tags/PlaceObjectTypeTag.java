@@ -40,4 +40,6 @@ public interface PlaceObjectTypeTag {
     public RGBA getBackgroundColor();
 
     public boolean flagMove();
+
+    public int getRatio();
 }

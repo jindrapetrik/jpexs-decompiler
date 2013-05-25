@@ -54,4 +54,30 @@ public class MORPHFILLSTYLE implements NeedsCharacters {
         }
         return ret;
     }
+
+    public FILLSTYLE getStartFillStyle() {
+        FILLSTYLE ret = new FILLSTYLE();
+        ret.bitmapId = bitmapId;
+        ret.bitmapMatrix = startBitmapMatrix;
+        ret.colorA = startColor;
+        ret.fillStyleType = fillStyleType;
+        if (gradient != null) {
+            ret.gradient = gradient.getStartGradient();
+        }
+        ret.gradientMatrix = startGradientMatrix;
+        return ret;
+    }
+
+    public FILLSTYLE getEndFillStyle() {
+        FILLSTYLE ret = new FILLSTYLE();
+        ret.bitmapId = bitmapId;
+        ret.bitmapMatrix = endBitmapMatrix;
+        ret.colorA = endColor;
+        ret.fillStyleType = fillStyleType;
+        if (gradient != null) {
+            ret.gradient = gradient.getEndGradient();
+        }
+        ret.gradientMatrix = endGradientMatrix;
+        return ret;
+    }
 }

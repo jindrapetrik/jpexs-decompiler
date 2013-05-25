@@ -26,4 +26,18 @@ public class MORPHGRADRECORD {
     public RGBA startColor;
     public int endRatio;
     public RGBA endColor;
+
+    public GRADRECORD getStartRecord() {
+        GRADRECORD ret = new GRADRECORD();
+        ret.ratio = startRatio;
+        ret.colorA = startColor;
+        return ret;
+    }
+
+    public GRADRECORD getEndRecord() {
+        GRADRECORD ret = new GRADRECORD();
+        ret.ratio = endRatio;
+        ret.colorA = endColor;
+        return ret;
+    }
 }

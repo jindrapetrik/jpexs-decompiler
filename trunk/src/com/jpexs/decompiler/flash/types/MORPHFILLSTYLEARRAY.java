@@ -36,4 +36,22 @@ public class MORPHFILLSTYLEARRAY implements NeedsCharacters {
         }
         return ret;
     }
+
+    public FILLSTYLEARRAY getStartFillStyles() {
+        FILLSTYLEARRAY ret = new FILLSTYLEARRAY();
+        ret.fillStyles = new FILLSTYLE[fillStyles.length];
+        for (int m = 0; m < fillStyles.length; m++) {
+            ret.fillStyles[m] = fillStyles[m].getStartFillStyle();
+        }
+        return ret;
+    }
+
+    public FILLSTYLEARRAY getEndFillStyles() {
+        FILLSTYLEARRAY ret = new FILLSTYLEARRAY();
+        ret.fillStyles = new FILLSTYLE[fillStyles.length];
+        for (int m = 0; m < fillStyles.length; m++) {
+            ret.fillStyles[m] = fillStyles[m].getEndFillStyle();
+        }
+        return ret;
+    }
 }

@@ -25,4 +25,22 @@ public class MORPHGRADIENT {
     public int numGradients;
     public MORPHGRADRECORD gradientRecords[];
     public int numGradientsExtra;
+
+    public GRADIENT getStartGradient() {
+        GRADIENT ret = new GRADIENT();
+        ret.gradientRecords = new GRADRECORD[gradientRecords.length];
+        for (int m = 0; m < gradientRecords.length; m++) {
+            ret.gradientRecords[m] = gradientRecords[m].getStartRecord();
+        }
+        return ret;
+    }
+
+    public GRADIENT getEndGradient() {
+        GRADIENT ret = new GRADIENT();
+        ret.gradientRecords = new GRADRECORD[gradientRecords.length];
+        for (int m = 0; m < gradientRecords.length; m++) {
+            ret.gradientRecords[m] = gradientRecords[m].getEndRecord();
+        }
+        return ret;
+    }
 }

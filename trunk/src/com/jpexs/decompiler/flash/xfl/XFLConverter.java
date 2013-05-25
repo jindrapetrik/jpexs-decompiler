@@ -49,6 +49,7 @@ import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
@@ -176,11 +177,11 @@ public class XFLConverter {
         return ret;
     }
 
-    public static String convertShapeEdges(MATRIX mat, List<SHAPERECORD> records) {
+    public static String convertShapeEdges(int startX, int startY, MATRIX mat, List<SHAPERECORD> records) {
         String ret = "";
-        int x = 0;
-        int y = 0;
-        ret += "!0 0";
+        int x = startX;
+        int y = startY;
+        ret += "!" + startX + " " + startY;
         for (SHAPERECORD rec : records) {
             ret += convertShapeEdge(mat, rec, x, y);
             x = rec.changeX(x);
@@ -395,7 +396,7 @@ public class XFLConverter {
     }
 
     public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, SHAPEWITHSTYLE shape) {
-        return convertShape(characters, mat, shapeNum, shape.shapeRecords, shape.fillStyles, shape.lineStyles);
+        return convertShape(characters, mat, shapeNum, shape.shapeRecords, shape.fillStyles, shape.lineStyles, false);
     }
 
     public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, ShapeTag shape) {
@@ -403,10 +404,10 @@ public class XFLConverter {
     }
 
     public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords) {
-        return convertShape(characters, mat, shapeNum, shapeRecords, null, null);
+        return convertShape(characters, mat, shapeNum, shapeRecords, null, null, false);
     }
 
-    public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles) {
+    public static String convertShape(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape) {
         String ret = "";
         if (mat == null) {
             mat = new MATRIX();
@@ -501,7 +502,11 @@ public class XFLConverter {
             }
         }
 
+        int x = 0;
+        int y = 0;
 
+        LINESTYLEARRAY actualLinestyles = lineStyles;
+        int strokeStyleOrig = 0;
         for (SHAPERECORD edge : shapeRecords) {
             if (edge instanceof StyleChangeRecord) {
                 StyleChangeRecord scr = (StyleChangeRecord) edge;
@@ -529,26 +534,99 @@ public class XFLConverter {
                     }
                     lastFillStyleCount = scr.fillStyles.fillStyles.length;
                     lastLineStyleCount = (shapeNum == 4) ? scr.lineStyles.lineStyles2.length : scr.lineStyles.lineStyles.length;
+                    actualLinestyles = scr.lineStyles;
                 }
                 if (scr.stateFillStyle0) {
                     /*edgeStyle += " fillStyle0=\"";
                      edgeStyle += fillStyleCount - lastFillStyleCount + scr.fillStyle0;
                      edgeStyle += "\"";*/
-                    fillStyle0 = scr.fillStyle0 == 0 ? 0 : fillStylesMap.get(fillStylesStr.size() - lastFillStyleCount + scr.fillStyle0 - 1) + 1;
+                    int fillStyle0_new = scr.fillStyle0 == 0 ? 0 : fillStylesMap.get(fillStylesStr.size() - lastFillStyleCount + scr.fillStyle0 - 1) + 1;
+                    //fillStyle0 = fillStyle0_new;
+                    if (morphshape) { //???
+                        fillStyle1 = fillStyle0_new;
+                    } else {
+                        fillStyle0 = fillStyle0_new;
+                    }
                 }
                 if (scr.stateFillStyle1) {
                     /*edgeStyle += " fillStyle1=\"";
                      edgeStyle += fillStyleCount - lastFillStyleCount + scr.fillStyle1;
                      edgeStyle += "\"";*/
-                    fillStyle1 = scr.fillStyle1 == 0 ? 0 : fillStylesMap.get(fillStylesStr.size() - lastFillStyleCount + scr.fillStyle1 - 1) + 1;
+                    int fillStyle1_new = scr.fillStyle1 == 0 ? 0 : fillStylesMap.get(fillStylesStr.size() - lastFillStyleCount + scr.fillStyle1 - 1) + 1;
+                    if (morphshape) {
+                        fillStyle0 = fillStyle1_new;
+                    } else {
+                        fillStyle1 = fillStyle1_new;
+                    }
+                    //fillStyle1 = fillStyle1_new;
                 }
                 if (scr.stateLineStyle) {
                     /*edgeStyle += " strokeStyle=\"";
                      edgeStyle += lineStyleCount - lastLineStyleCount + scr.lineStyle;
                      edgeStyle += "\"";*/
                     strokeStyle = lineStyleCount - lastLineStyleCount + scr.lineStyle;
+                    strokeStyleOrig = scr.lineStyle - 1;
                 }
                 if (!edges.isEmpty()) {
+                    if ((fillStyle0 > 0) || (fillStyle1 > 0) || (strokeStyle > 0)) {
+                        //if(true){
+                        boolean empty = false;
+                        if ((fillStyle0 <= 0) && (fillStyle1 <= 0) && (strokeStyle > 0)) {
+                            if (shapeNum == 4) {
+                                if (actualLinestyles.lineStyles2[strokeStyleOrig].color.alpha == 0) {
+                                    if (actualLinestyles.lineStyles2[strokeStyleOrig].color.red == 0) {
+                                        if (actualLinestyles.lineStyles2[strokeStyleOrig].color.green == 0) {
+                                            if (actualLinestyles.lineStyles2[strokeStyleOrig].color.blue == 0) {
+                                                empty = true;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if (!empty) {
+                            edgesStr += "<Edge";
+                            if (fillStyle0 > -1) {
+                                edgesStr += " fillStyle0=\"" + fillStyle0 + "\"";
+                            }
+                            if (fillStyle1 > -1) {
+                                edgesStr += " fillStyle1=\"" + fillStyle1 + "\"";
+                            }
+                            if (strokeStyle > -1) {
+                                edgesStr += " strokeStyle=\"" + strokeStyle + "\"";
+                            }
+                            edgesStr += " edges=\"" + convertShapeEdges(x, y, mat, edges) + "\" />";
+                        }
+                    }
+                    edgeStyle = "";
+                    strokeStyle = -1;
+                    fillStyle0 = -1;
+                    fillStyle1 = -1;
+                }
+                edges.clear();
+            }
+            edges.add(edge);
+            x = edge.changeX(x);
+            y = edge.changeY(y);
+        }
+        if (!edges.isEmpty()) {
+            if ((fillStyle0 > 0) || (fillStyle1 > 0) || (strokeStyle > 0)) {
+
+                boolean empty = false;
+                if ((fillStyle0 <= 0) && (fillStyle1 <= 0) && (strokeStyle > 0)) {
+                    if (shapeNum == 4) {
+                        if (actualLinestyles.lineStyles2[strokeStyleOrig].color.alpha == 0) {
+                            if (actualLinestyles.lineStyles2[strokeStyleOrig].color.red == 0) {
+                                if (actualLinestyles.lineStyles2[strokeStyleOrig].color.green == 0) {
+                                    if (actualLinestyles.lineStyles2[strokeStyleOrig].color.blue == 0) {
+                                        empty = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!empty) {
                     edgesStr += "<Edge";
                     if (fillStyle0 > -1) {
                         edgesStr += " fillStyle0=\"" + fillStyle0 + "\"";
@@ -559,28 +637,9 @@ public class XFLConverter {
                     if (strokeStyle > -1) {
                         edgesStr += " strokeStyle=\"" + strokeStyle + "\"";
                     }
-                    edgesStr += " edges=\"" + convertShapeEdges(mat, edges) + "\" />";
-                    edgeStyle = "";
-                    strokeStyle = -1;
-                    fillStyle0 = -1;
-                    fillStyle1 = -1;
+                    edgesStr += " edges=\"" + convertShapeEdges(x, y, mat, edges) + "\" />";
                 }
-                edges.clear();
             }
-            edges.add(edge);
-        }
-        if (!edges.isEmpty()) {
-            edgesStr += "<Edge";
-            if (fillStyle0 > -1) {
-                edgesStr += " fillStyle0=\"" + fillStyle0 + "\"";
-            }
-            if (fillStyle1 > -1) {
-                edgesStr += " fillStyle1=\"" + fillStyle1 + "\"";
-            }
-            if (strokeStyle > -1) {
-                edgesStr += " strokeStyle=\"" + strokeStyle + "\"";
-            }
-            edgesStr += " edges=\"" + convertShapeEdges(mat, edges) + "\" />";
             edgeStyle = "";
         }
         edges.clear();
@@ -638,6 +697,12 @@ public class XFLConverter {
                     }
                     if (po.cacheAsBitmap()) {
                         usageCount++;
+                    }
+                    MATRIX mat = po.getMatrix();
+                    if (mat != null) {
+                        if (!mat.isEmpty()) {
+                            usageCount++;
+                        }
                     }
                     usages.put(ch, usageCount + 1);
                 }
@@ -1472,7 +1537,7 @@ public class XFLConverter {
         }
     }
 
-    private static String convertFrame(HashMap<Integer, CharacterTag> characters, List<Tag> tags, SoundStreamHeadTypeTag soundStreamHead, StartSoundTag startSound, int frame, String frameName, boolean isAnchor, int duration, String actionScript, String elements) {
+    private static String convertFrame(boolean shapeTween, HashMap<Integer, CharacterTag> characters, List<Tag> tags, SoundStreamHeadTypeTag soundStreamHead, StartSoundTag startSound, int frame, String frameName, boolean isAnchor, int duration, String actionScript, String elements) {
         String ret = "";
         DefineSoundTag sound = null;
         if (startSound != null) {
@@ -1501,8 +1566,11 @@ public class XFLConverter {
             isAnchor = false;
             frameName = null;
         }
-        ret += " keyMode=\"" + KEY_MODE_NORMAL + "\"";
-
+        if (shapeTween) {
+            ret += " tweenType=\"shape\" keyMode=\"" + KEY_MODE_SHAPE_TWEEN + "\"";
+        } else {
+            ret += " keyMode=\"" + KEY_MODE_NORMAL + "\"";
+        }
         String soundEnvelopeStr = "";
         if (soundStreamHead != null) {
             ret += " soundName=\"sound" + soundStreamHead.getCharacterID() + "." + soundStreamHead.getExportFormat() + "\"";
@@ -1622,6 +1690,9 @@ public class XFLConverter {
         boolean isVisible = true;
         RGBA backGroundColor = null;
         int characterId = -1;
+        int ratio = -1;
+        boolean shapeTween = false;
+        boolean lastShapeTween = false;
 
         for (Tag t : timelineTags) {
             if (t instanceof PlaceObjectTypeTag) {
@@ -1663,6 +1734,10 @@ public class XFLConverter {
                             if (filters2 != null) {
                                 filters = filters2;
                             }
+                            int ratio2 = po.getRatio();
+                            if (ratio2 > -1) {
+                                ratio = ratio2;
+                            }
                         } else {
                             matrix = po.getMatrix();
                             instanceName = po.getInstanceName();
@@ -1671,6 +1746,7 @@ public class XFLConverter {
                             cacheAsBitmap = po.cacheAsBitmap();
                             blendMode = po.getBlendMode();
                             filters = po.getFilters();
+                            ratio = po.getRatio();
                         }
 
 
@@ -1704,22 +1780,34 @@ public class XFLConverter {
             if (t instanceof ShowFrameTag) {
                 elements = "";
 
-                /*if ((character instanceof ShapeTag) && oneInstanceShapes.contains(characterId)) {
-                 ret += convertShape(characters, matrix, (ShapeTag) character);
-                 }*/
-                if (character != null) {
-                    if (character instanceof TextTag) {
-                        elements += convertText(tags, (TextTag) character, matrix, filters);
-                    } else if (character instanceof DefineVideoStreamTag) {
-                        elements += convertVideoInstance(matrix, (DefineVideoStreamTag) character);
+                if ((character instanceof ShapeTag) && oneInstanceShapes.contains(characterId)) {
+                    elements += convertShape(characters, matrix, (ShapeTag) character);
+                    shapeTween = false;
+                } else if (character != null) {
+                    if (character instanceof MorphShapeTag) {
+                        MorphShapeTag m = (MorphShapeTag) character;
+                        if (ratio == 65535) {
+                            elements += convertShape(characters, matrix, 4, m.getEndEdges().shapeRecords, m.getFillStyles().getEndFillStyles(), m.getLineStyles().getEndLineStyles(m.getShapeNum()), true);
+                            shapeTween = false;
+                        } else {
+                            elements += convertShape(characters, matrix, 4, m.getStartEdges().shapeRecords, m.getFillStyles().getStartFillStyles(), m.getLineStyles().getStartLineStyles(m.getShapeNum()), true);
+                            shapeTween = true;
+                        }
                     } else {
-                        elements += convertSymbolInstance(instanceName, matrix, colorTransForm, colorTransFormAlpha, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, character, characters, tags);
+                        shapeTween = false;
+                        if (character instanceof TextTag) {
+                            elements += convertText(tags, (TextTag) character, matrix, filters);
+                        } else if (character instanceof DefineVideoStreamTag) {
+                            elements += convertVideoInstance(matrix, (DefineVideoStreamTag) character);
+                        } else {
+                            elements += convertSymbolInstance(instanceName, matrix, colorTransForm, colorTransFormAlpha, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, character, characters, tags);
+                        }
                     }
                 }
 
                 frame++;
                 if (!elements.equals(lastElements) && frame > 0) {
-                    ret += convertFrame(characters, tags, null, null, frame - duration, frameName, isAnchor, duration, "", lastElements);
+                    ret += convertFrame(lastShapeTween, characters, tags, null, null, frame - duration, frameName, isAnchor, duration, "", lastElements);
                     duration = 1;
                 } else if (frame == 0) {
                     duration = 1;
@@ -1727,7 +1815,7 @@ public class XFLConverter {
                     duration++;
                 }
 
-
+                lastShapeTween = shapeTween;
                 lastElements = elements;
 
 
@@ -1736,7 +1824,7 @@ public class XFLConverter {
             }
         }
         if (!lastElements.equals("")) {
-            ret += convertFrame(characters, tags, null, null, (frame < 0 ? 0 : frame) - duration, frameName, isAnchor, duration, "", lastElements);
+            ret += convertFrame(lastShapeTween, characters, tags, null, null, (frame < 0 ? 0 : frame) - duration, frameName, isAnchor, duration, "", lastElements);
         }
         afterStr = "</frames>" + afterStr;
         if (!ret.equals("")) {
@@ -1824,7 +1912,7 @@ public class XFLConverter {
             if (t instanceof ShowFrameTag) {
                 if (soundStreamHead != null || startSound != null) {
                     if (lastSoundStreamHead != null || lastStartSound != null) {
-                        ret += convertFrame(characters, tags, lastSoundStreamHead, lastStartSound, frame, null, false, duration, "", "");
+                        ret += convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, null, false, duration, "", "");
                     }
                     frame += duration;
                     duration = 1;
@@ -1842,7 +1930,7 @@ public class XFLConverter {
                 frame = 0;
                 duration = 1;
             }
-            ret += convertFrame(characters, tags, lastSoundStreamHead, lastStartSound, frame, null, false, duration, "", "");
+            ret += convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, null, false, duration, "", "");
         }
         if (!ret.equals("")) {
             ret = "<DOMLayer name=\"Layer " + layerIndex + "\" color=\"" + backgroundColor + "\">"
@@ -2105,7 +2193,7 @@ public class XFLConverter {
                     ret += "<textAttrs>";
 
                     ret += "<DOMTextAttrs aliasText=\"false\" rotation=\"true\" size=\"" + twipToPixel(textHeight) + "\" bitmapSize=\"1040\"";
-                    //indent=\"5\" leftMargin=\"2\" letterSpacing=\"1\" lineSpacing=\"6\" rightMargin=\"3\" 
+                    //indent=\"5\" leftMargin=\"2\" letterSpacing=\"1\" lineSpacing=\"6\" rightMargin=\"3\"
                     if (textColor != null) {
                         ret += " fillColor=\"" + textColor.toHexRGB() + "\"";
                     } else if (textColorA != null) {
@@ -2618,7 +2706,7 @@ public class XFLConverter {
 
     private static int normContrast(double c) {
         double ctrMap[] = {
-            //      0     1     2     3     4     5     6     7     8     9                                        
+            //      0     1     2     3     4     5     6     7     8     9
             /*0*/0, 0.01, 0.02, 0.04, 0.05, 0.06, 0.07, 0.08, 0.1, 0.11,
             /*1*/ 0.12, 0.14, 0.15, 0.16, 0.17, 0.18, 0.20, 0.21, 0.22, 0.24,
             /*2*/ 0.25, 0.27, 0.28, 0.30, 0.32, 0.34, 0.36, 0.38, 0.40, 0.42,
@@ -2706,7 +2794,7 @@ public class XFLConverter {
             parser = XMLReaderFactory.createXMLReader();
             parser.setContentHandler(tparser);
             parser.setErrorHandler(tparser);
-            //parser.setFeature("http://xml.org/sax/features/validation", false);    
+            //parser.setFeature("http://xml.org/sax/features/validation", false);
             html = "<?xml version=\"1.0\"?>\n"
                     + "<!DOCTYPE some_name [ \n"
                     + "<!ENTITY nbsp \"&#160;\"> \n"

@@ -26,4 +26,18 @@ public class MORPHLINESTYLE {
     public int endWidth;
     public RGBA startColor;
     public RGBA endColor;
+
+    public LINESTYLE getStartLineStyle() {
+        LINESTYLE ret = new LINESTYLE();
+        ret.colorA = startColor;
+        ret.width = startWidth;
+        return ret;
+    }
+
+    public LINESTYLE getEndLineStyle() {
+        LINESTYLE ret = new LINESTYLE();
+        ret.colorA = endColor;
+        ret.width = endWidth;
+        return ret;
+    }
 }

@@ -90,4 +90,8 @@ public class MATRIX implements Serializable {
         ret.rotateSkew1 = m.rotateSkew1 + this.rotateSkew1;
         return ret;
     }
+
+    public boolean isEmpty() {
+        return (translateX == 0) && (translateY == 0) && (!hasRotate) && (!hasScale);
+    }
 }

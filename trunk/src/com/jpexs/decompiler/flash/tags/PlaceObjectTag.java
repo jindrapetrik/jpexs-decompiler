@@ -180,4 +180,9 @@ public class PlaceObjectTag extends Tag implements PlaceObjectTypeTag {
     public boolean flagMove() {
         return false;
     }
+
+    @Override
+    public int getRatio() {
+        return -1;
+    }
 }

@@ -42,4 +42,42 @@ public class MORPHLINESTYLE2 {
     public RGBA startColor;
     public RGBA endColor;
     public MORPHFILLSTYLE fillType;
+
+    public LINESTYLE2 getStartLineStyle2() {
+        LINESTYLE2 ret = new LINESTYLE2();
+        ret.width = startWidth;
+        ret.startCapStyle = startCapStyle;
+        ret.joinStyle = joinStyle;
+        ret.hasFillFlag = hasFillFlag;
+        ret.noHScaleFlag = noHScaleFlag;
+        ret.noVScaleFlag = noVScaleFlag;
+        ret.pixelHintingFlag = pixelHintingFlag;
+        ret.noClose = noClose;
+        ret.endCapStyle = endCapStyle;
+        ret.miterLimitFactor = miterLimitFactor;
+        ret.color = startColor;
+        if (hasFillFlag) {
+            ret.fillType = fillType.getStartFillStyle();
+        }
+        return ret;
+    }
+
+    public LINESTYLE2 getEndLineStyle2() {
+        LINESTYLE2 ret = new LINESTYLE2();
+        ret.width = endWidth;
+        ret.startCapStyle = startCapStyle;
+        ret.joinStyle = joinStyle;
+        ret.hasFillFlag = hasFillFlag;
+        ret.noHScaleFlag = noHScaleFlag;
+        ret.noVScaleFlag = noVScaleFlag;
+        ret.pixelHintingFlag = pixelHintingFlag;
+        ret.noClose = noClose;
+        ret.endCapStyle = endCapStyle;
+        ret.miterLimitFactor = miterLimitFactor;
+        ret.color = endColor;
+        if (hasFillFlag) {
+            ret.fillType = fillType.getEndFillStyle();
+        }
+        return ret;
+    }
 }

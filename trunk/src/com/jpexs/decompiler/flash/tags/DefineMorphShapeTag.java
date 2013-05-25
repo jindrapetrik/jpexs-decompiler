@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.types.MORPHFILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.MORPHLINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -37,7 +38,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class DefineMorphShapeTag extends CharacterTag implements BoundedTag {
+public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, MorphShapeTag {
 
     public int characterId;
     public RECT startBounds;
@@ -119,5 +120,40 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag {
         rect.Xmax = Math.max(startBounds.Xmax, endBounds.Xmax);
         rect.Ymax = Math.max(startBounds.Ymax, endBounds.Ymax);
         return rect;
+    }
+
+    @Override
+    public RECT getStartBounds() {
+        return startBounds;
+    }
+
+    @Override
+    public RECT getEndBounds() {
+        return endBounds;
+    }
+
+    @Override
+    public MORPHFILLSTYLEARRAY getFillStyles() {
+        return morphFillStyles;
+    }
+
+    @Override
+    public MORPHLINESTYLEARRAY getLineStyles() {
+        return morphLineStyles;
+    }
+
+    @Override
+    public SHAPE getStartEdges() {
+        return startEdges;
+    }
+
+    @Override
+    public SHAPE getEndEdges() {
+        return endEdges;
+    }
+
+    @Override
+    public int getShapeNum() {
+        return 1;
     }
 }

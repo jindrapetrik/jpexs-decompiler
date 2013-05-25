@@ -347,4 +347,12 @@ public class PlaceObject2Tag extends Tag implements Container, PlaceObjectTypeTa
     public boolean flagMove() {
         return placeFlagMove;
     }
+
+    @Override
+    public int getRatio() {
+        if (!placeFlagHasRatio) {
+            return -1;
+        }
+        return ratio;
+    }
 }
