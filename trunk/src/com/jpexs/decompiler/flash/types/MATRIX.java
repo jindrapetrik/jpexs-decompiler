@@ -78,4 +78,16 @@ public class MATRIX implements Serializable {
         ret.y = (int) (p.x * (hasRotate ? toFloat(rotateSkew0) : 0) + p.y * (hasScale ? toFloat(scaleY) : 1) + translateY);
         return ret;
     }
+
+    public MATRIX merge(MATRIX m) {
+        MATRIX ret = new MATRIX();
+        ret.translateX = m.translateX + this.translateX;
+        ret.translateY = m.translateY + this.translateY;
+
+        ret.scaleX = (m.hasScale ? m.scaleX : 1) * (this.hasScale ? this.scaleX : 1);
+        ret.scaleY = (m.hasScale ? m.scaleY : 1) * (this.hasScale ? this.scaleY : 1);
+        ret.rotateSkew0 = m.rotateSkew0 + this.rotateSkew0;
+        ret.rotateSkew1 = m.rotateSkew1 + this.rotateSkew1;
+        return ret;
+    }
 }

@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.xfl;
 import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
-import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
@@ -110,7 +109,6 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.imageio.ImageIO;
-import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
@@ -121,8 +119,10 @@ import javax.xml.transform.stream.StreamSource;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  *
@@ -143,7 +143,7 @@ public class XFLConverter {
         if (record instanceof StyleChangeRecord) {
             StyleChangeRecord scr = (StyleChangeRecord) record;
             Point p = new Point(scr.moveDeltaX, scr.moveDeltaY);
-            p = mat.apply(p);
+            //p = mat.apply(p);
             if (scr.stateMoveTo) {
                 return "! " + p.x + " " + p.y;
             }
@@ -158,7 +158,7 @@ public class XFLConverter {
                 x += ser.deltaX;
             }
             Point p = new Point(x, y);
-            p = mat.apply(p);
+            //p = mat.apply(p);
             return "| " + p.x + " " + p.y;
         }
         if (record instanceof CurvedEdgeRecord) {
@@ -168,9 +168,9 @@ public class XFLConverter {
             int anchorX = cer.anchorDeltaX + controlX;
             int anchorY = cer.anchorDeltaY + controlY;
             Point control = new Point(controlX, controlY);
-            control = mat.apply(control);
+            //control = mat.apply(control);
             Point anchor = new Point(anchorX, anchorY);
-            anchor = mat.apply(anchor);
+            //anchor = mat.apply(anchor);
             return "[ " + control.x + " " + control.y + " " + anchor.x + " " + anchor.y;
         }
         return ret;
@@ -180,6 +180,7 @@ public class XFLConverter {
         String ret = "";
         int x = 0;
         int y = 0;
+        ret += "!0 0";
         for (SHAPERECORD rec : records) {
             ret += convertShapeEdge(mat, rec, x, y);
             x = rec.changeX(x);
@@ -243,7 +244,7 @@ public class XFLConverter {
                     + (ls.color.getAlphaFloat() != 1 ? " alpha=\"" + ls.color.getAlphaFloat() + "\"" : "")
                     + " />";
         } else {
-            ret += convertFillStyle(characters, ls.fillType, shapeNum);
+            ret += convertFillStyle(null/* FIXME */, characters, ls.fillType, shapeNum);
         }
         ret += "</fill>";
         ret += "</SolidStroke>";
@@ -254,7 +255,10 @@ public class XFLConverter {
         return ((float) i) / (1 << 16);
     }
 
-    public static String convertFillStyle(HashMap<Integer, CharacterTag> characters, FILLSTYLE fs, int shapeNum) {
+    public static String convertFillStyle(MATRIX mat, HashMap<Integer, CharacterTag> characters, FILLSTYLE fs, int shapeNum) {
+        if (mat == null) {
+            mat = new MATRIX();
+        }
         String ret = "";
         //ret += "<FillStyle index=\"" + index + "\">";
         switch (fs.fillStyleType) {
@@ -347,8 +351,8 @@ public class XFLConverter {
                 }
                 for (GRADRECORD rec : records) {
                     ret += "<GradientEntry";
-                    ret += " color=\"" + (shapeNum == 3 ? rec.colorA.toHexRGB() : rec.color.toHexRGB()) + "\"";
-                    if (shapeNum == 3) {
+                    ret += " color=\"" + (shapeNum >= 3 ? rec.colorA.toHexRGB() : rec.color.toHexRGB()) + "\"";
+                    if (shapeNum >= 3) {
                         ret += " alpha=\"" + rec.colorA.getAlphaFloat() + "\"";
                     }
                     ret += " ratio=\"" + rec.getRatioFloat() + "\"";
@@ -408,7 +412,7 @@ public class XFLConverter {
             mat = new MATRIX();
         }
         List<SHAPERECORD> edges = new ArrayList<SHAPERECORD>();
-        int fillStyleCount = 0;
+        //int fillStyleCount = 0;
         int lineStyleCount = 0;
         int lastFillStyleCount = 0;
         int lastLineStyleCount = 0;
@@ -423,14 +427,15 @@ public class XFLConverter {
         strokesStr += "<strokes>";
         edgesStr += "<edges>";
 
+        List<String> fillStylesStr = new ArrayList<String>();
         if (fillStyles != null) {
             for (FILLSTYLE fs : fillStyles.fillStyles) {
-                fillsStr += "<FillStyle index=\"" + (fillStyleCount + 1) + "\">";
-                fillsStr += convertFillStyle(characters, fs, shapeNum);
-                fillsStr += "</FillStyle>";
-                fillStyleCount++;
+                //fillsStr += "<FillStyle index=\"" + (fillStylesStr.size() + 1) + "\">";
+                fillStylesStr.add(convertFillStyle(mat, characters, fs, shapeNum));
+                //fillsStr += "</FillStyle>";
+                //fillStyleCount++;
             }
-            lastFillStyleCount = fillStyleCount;
+            lastFillStyleCount = fillStyles.fillStyles.length;
         }
         if (lineStyles != null) {
             if (shapeNum == 4) {
@@ -450,16 +455,63 @@ public class XFLConverter {
             }
             lastLineStyleCount = lineStyleCount;
         }
+
         for (SHAPERECORD edge : shapeRecords) {
             if (edge instanceof StyleChangeRecord) {
                 StyleChangeRecord scr = (StyleChangeRecord) edge;
                 if (scr.stateNewStyles) {
                     for (int f = 0; f < scr.fillStyles.fillStyles.length; f++) {
-                        fillsStr += "<FillStyle index=\"" + (fillStyleCount + 1) + "\">";
-                        fillsStr += convertFillStyle(characters, scr.fillStyles.fillStyles[f], shapeNum);
-                        fillsStr += "</FillStyle>";
-                        fillStyleCount++;
+                        fillStylesStr.add(convertFillStyle(mat, characters, scr.fillStyles.fillStyles[f], shapeNum));
                     }
+                }
+            }
+        }
+        boolean usedFillStyles[] = new boolean[fillStylesStr.size()];
+        int fillStyleCount = 0;
+        lastFillStyleCount = 0;
+        if (fillStyles != null) {
+            lastFillStyleCount = fillStyles.fillStyles.length;
+            fillStyleCount += lastFillStyleCount;
+        }
+        for (SHAPERECORD edge : shapeRecords) {
+            if (edge instanceof StyleChangeRecord) {
+                StyleChangeRecord scr = (StyleChangeRecord) edge;
+                if (scr.stateNewStyles) {
+                    lastFillStyleCount = scr.fillStyles.fillStyles.length;
+                    fillStyleCount += lastFillStyleCount;
+                }
+                if (scr.stateFillStyle0 && scr.fillStyle0 > 0) {
+                    usedFillStyles[fillStyleCount - lastFillStyleCount + scr.fillStyle0 - 1] = true;
+                }
+                if (scr.stateFillStyle1 && scr.fillStyle1 > 0) {
+                    usedFillStyles[fillStyleCount - lastFillStyleCount + scr.fillStyle1 - 1] = true;
+                }
+            }
+        }
+
+        int mapPos = 0;
+        HashMap<Integer, Integer> fillStylesMap = new HashMap<Integer, Integer>();
+        for (int f = 0; f < fillStyleCount; f++) {
+            if (usedFillStyles[f]) {
+                fillStylesMap.put(f, mapPos);
+                mapPos++;
+                fillsStr += "<FillStyle index=\"" + mapPos + "\">";
+                fillsStr += fillStylesStr.get(f);
+                fillsStr += "</FillStyle>";
+            }
+        }
+
+
+        for (SHAPERECORD edge : shapeRecords) {
+            if (edge instanceof StyleChangeRecord) {
+                StyleChangeRecord scr = (StyleChangeRecord) edge;
+                if (scr.stateNewStyles) {
+                    /*for (int f = 0; f < scr.fillStyles.fillStyles.length; f++) {
+                     //fillsStr += "<FillStyle index=\"" + (fillStyleCount + 1) + "\">";
+                     fillStylesStr.add(convertFillStyle(mat, characters, scr.fillStyles.fillStyles[f], shapeNum));
+                     //fillsStr += "</FillStyle>";
+                     //fillStyleCount++;
+                     }*/
                     if (shapeNum == 4) {
                         for (int l = 0; l < scr.lineStyles.lineStyles2.length; l++) {
                             strokesStr += "<StrokeStyle index=\"" + (lineStyleCount + 1) + "\">";
@@ -482,13 +534,13 @@ public class XFLConverter {
                     /*edgeStyle += " fillStyle0=\"";
                      edgeStyle += fillStyleCount - lastFillStyleCount + scr.fillStyle0;
                      edgeStyle += "\"";*/
-                    fillStyle0 = fillStyleCount - lastFillStyleCount + scr.fillStyle0;
+                    fillStyle0 = scr.fillStyle0 == 0 ? 0 : fillStylesMap.get(fillStylesStr.size() - lastFillStyleCount + scr.fillStyle0 - 1) + 1;
                 }
                 if (scr.stateFillStyle1) {
                     /*edgeStyle += " fillStyle1=\"";
                      edgeStyle += fillStyleCount - lastFillStyleCount + scr.fillStyle1;
                      edgeStyle += "\"";*/
-                    fillStyle1 = fillStyleCount - lastFillStyleCount + scr.fillStyle1;
+                    fillStyle1 = scr.fillStyle1 == 0 ? 0 : fillStylesMap.get(fillStylesStr.size() - lastFillStyleCount + scr.fillStyle1 - 1) + 1;
                 }
                 if (scr.stateLineStyle) {
                     /*edgeStyle += " strokeStyle=\"";
@@ -537,6 +589,9 @@ public class XFLConverter {
         edgesStr += "</edges>";
 
         ret += "<DOMShape>";
+        /*ret+="<matrix>";
+         ret+=convertMatrix(mat);
+         ret+="</matrix>";*/
         ret += fillsStr;
         ret += strokesStr;
         ret += edgesStr;
@@ -879,7 +934,7 @@ public class XFLConverter {
             }
             ret += "/></color>";
         }
-        if (!filters.isEmpty()) {
+        if (filters != null) {
             ret += "<filters>";
             for (FILTER f : filters) {
                 ret += convertFilter(f);
@@ -887,16 +942,16 @@ public class XFLConverter {
             ret += "</filters>";
         }
         if (tag instanceof DefineButtonTag) {
-            ret += "<ActionScript><script><![CDATA[";
+            ret += "<Actionscript><script><![CDATA[";
             ret += "on(press){\r\n";
             ret += convertActionScript(((DefineButtonTag) tag));
             ret += "}";
-            ret += "]]></script></ActionScript>";
+            ret += "]]></script></Actionscript>";
         }
         if (tag instanceof DefineButton2Tag) {
             DefineButton2Tag db2 = (DefineButton2Tag) tag;
             if (!db2.actions.isEmpty()) {
-                ret += "<ActionScript><script><![CDATA[";
+                ret += "<Actionscript><script><![CDATA[";
                 for (BUTTONCONDACTION bca : db2.actions) {
                     List<String> events = new ArrayList<String>();
                     if (bca.condOverUpToOverDown) {
@@ -973,7 +1028,7 @@ public class XFLConverter {
                     ret += convertActionScript(bca);
                     ret += "}";
                 }
-                ret += "]]></script></ActionScript>";
+                ret += "]]></script></Actionscript>";
             }
         }
         ret += "</DOMSymbolInstance>";
@@ -998,9 +1053,9 @@ public class XFLConverter {
         List<String> symbols = new ArrayList<String>();
         for (int ch : characters.keySet()) {
             CharacterTag symbol = characters.get(ch);
-            if ((symbol instanceof ShapeTag) && oneInstanceShapes.contains(symbol.getCharacterID())) {
-                continue; //shapes with 1 ocurrence are not added to library
-            }
+            /*if ((symbol instanceof ShapeTag) && oneInstanceShapes.contains(symbol.getCharacterID())) {
+             continue; //shapes with 1 ocurrence are not added to library
+             }*/
             if ((symbol instanceof ShapeTag) || (symbol instanceof DefineSpriteTag) || (symbol instanceof ButtonTag)) {
                 String symbolStr = "";
 
@@ -1032,76 +1087,104 @@ public class XFLConverter {
                     itemIcon = "0";
                     symbolStr += "<DOMTimeline name=\"Symbol " + symbol.getCharacterID() + "\" currentFrame=\"0\">";
                     symbolStr += "<layers>";
-                    symbolStr += "<DOMLayer name=\"Layer 1\" current=\"true\" isSelected=\"true\">"; //color=\"#4FFF4F\"
-                    symbolStr += "<frames>";
+
                     ButtonTag button = (ButtonTag) symbol;
                     List<BUTTONRECORD> records = button.getRecords();
                     String frames[] = {"", "", "", ""};
-                    int lastFrame = 0;
-                    int frame = 0;
+
+                    int maxDepth = 0;
                     for (BUTTONRECORD rec : records) {
-                        CXFORMWITHALPHA colorTransformAlpha = null;
-                        int blendMode = 0;
-                        List<FILTER> filters = new ArrayList<FILTER>();
-                        if (button instanceof DefineButton2Tag) {
-                            colorTransformAlpha = rec.colorTransform;
-                            if (rec.buttonHasBlendMode) {
-                                blendMode = rec.blendMode;
-                            }
-                            if (rec.buttonHasFilterList) {
-                                filters = rec.filterList;
-                            }
-                        }
-                        String recCharStr = convertSymbolInstance(null, null, null, colorTransformAlpha, false, blendMode, filters, true, null, characters.get(rec.characterId), characters, tags);
-                        if (rec.buttonStateUp) {
-                            frame = 1;
-                        }
-                        if (rec.buttonStateOver) {
-                            frame = 2;
-                        }
-                        if (rec.buttonStateDown) {
-                            frame = 3;
-                        }
-                        if (rec.buttonStateHitTest) {
-                            frame = 4;
-                        }
-                        int duration = frame - lastFrame;
-                        lastFrame = frame;
-                        if (duration > 0) {
-                            symbolStr += "<DOMFrame index=\"";
-                            symbolStr += (frame - 1);
-                            symbolStr += "\"";
-                            if (duration > 1) {
-                                symbolStr += " duration=\"" + duration + "\"";
-                            }
-                            symbolStr += " keyMode=\"" + KEY_MODE_NORMAL + "\">";
-                            symbolStr += "<elements>";
-                            symbolStr += recCharStr;
-                            symbolStr += "</elements>";
-                            symbolStr += "</DOMFrame>";
+                        if (rec.placeDepth > maxDepth) {
+                            maxDepth = rec.placeDepth;
                         }
                     }
-
-                    symbolStr += "</frames>";
-                    symbolStr += "</DOMLayer>";
+                    for (int i = maxDepth; i >= 1; i--) {
+                        symbolStr += "<DOMLayer name=\"Layer " + (maxDepth - i + 1) + "\"";
+                        if (i == 1) {
+                            symbolStr += " current=\"true\" isSelected=\"true\"";
+                        }
+                        symbolStr += ">"; //color=\"#4FFF4F\"
+                        symbolStr += "<frames>";
+                        int lastFrame = 0;
+                        loopframes:
+                        for (int frame = 1; frame <= 4; frame++) {
+                            for (BUTTONRECORD rec : records) {
+                                if (rec.placeDepth == i) {
+                                    boolean ok = false;
+                                    switch (frame) {
+                                        case 1:
+                                            ok = rec.buttonStateUp;
+                                            break;
+                                        case 2:
+                                            ok = rec.buttonStateOver;
+                                            break;
+                                        case 3:
+                                            ok = rec.buttonStateDown;
+                                            break;
+                                        case 4:
+                                            ok = rec.buttonStateHitTest;
+                                            break;
+                                    }
+                                    if (!ok) {
+                                        continue;
+                                    }
+                                    CXFORMWITHALPHA colorTransformAlpha = null;
+                                    int blendMode = 0;
+                                    List<FILTER> filters = new ArrayList<FILTER>();
+                                    if (button instanceof DefineButton2Tag) {
+                                        colorTransformAlpha = rec.colorTransform;
+                                        if (rec.buttonHasBlendMode) {
+                                            blendMode = rec.blendMode;
+                                        }
+                                        if (rec.buttonHasFilterList) {
+                                            filters = rec.filterList;
+                                        }
+                                    }
+                                    CharacterTag character = characters.get(rec.characterId);
+                                    MATRIX matrix = rec.placeMatrix;
+                                    String recCharStr = "";
+                                    if (character instanceof TextTag) {
+                                        recCharStr = convertText(tags, (TextTag) character, matrix, filters);
+                                    } else if (character instanceof DefineVideoStreamTag) {
+                                        recCharStr = convertVideoInstance(matrix, (DefineVideoStreamTag) character);
+                                    } else {
+                                        recCharStr = convertSymbolInstance(null, matrix, null, colorTransformAlpha, false, blendMode, filters, true, null, characters.get(rec.characterId), characters, tags);
+                                    }
+                                    int duration = frame - lastFrame;
+                                    lastFrame = frame;
+                                    if (duration > 0) {
+                                        if (duration > 1) {
+                                            symbolStr += "<DOMFrame index=\"";
+                                            symbolStr += (frame - duration);
+                                            symbolStr += "\"";
+                                            symbolStr += " duration=\"" + (duration - 1) + "\"";
+                                            symbolStr += " keyMode=\"" + KEY_MODE_NORMAL + "\">";
+                                            symbolStr += "<elements>";
+                                            symbolStr += "</elements>";
+                                            symbolStr += "</DOMFrame>";
+                                        }
+                                        symbolStr += "<DOMFrame index=\"";
+                                        symbolStr += (frame - 1);
+                                        symbolStr += "\"";
+                                        symbolStr += " keyMode=\"" + KEY_MODE_NORMAL + "\">";
+                                        symbolStr += "<elements>";
+                                        symbolStr += recCharStr;
+                                        symbolStr += "</elements>";
+                                        symbolStr += "</DOMFrame>";
+                                    }
+                                }
+                            }
+                        }
+                        symbolStr += "</frames>";
+                        symbolStr += "</DOMLayer>";
+                    }
                     symbolStr += "</layers>";
                     symbolStr += "</DOMTimeline>";
                 } else if (symbol instanceof DefineSpriteTag) {
                     DefineSpriteTag sprite = (DefineSpriteTag) symbol;
                     String initActionScript = "";
-                    for (Tag t : tags) {
-                        if (t instanceof DoInitActionTag) {
-                            DoInitActionTag dia = (DoInitActionTag) t;
-                            if (dia.spriteId == sprite.spriteId) {
-                                initActionScript += convertActionScript(dia);
-                            }
-                        }
-                    }
-                    if (!initActionScript.equals("")) {
-                        initActionScript = "#initclip\r\n" + initActionScript + "#endinitclip";
-                    }
 
-                    symbolStr += convertTimeline(initActionScript, oneInstanceShapes, backgroundColor, sprite.getSubTags(), characters, "Symbol " + symbol.getCharacterID());
+                    symbolStr += convertTimeline(sprite.spriteId, oneInstanceShapes, backgroundColor, tags, sprite.getSubTags(), characters, "Symbol " + symbol.getCharacterID());
                 } else if (symbol instanceof ShapeTag) {
                     itemIcon = "1";
                     ShapeTag shape = (ShapeTag) symbol;
@@ -1292,23 +1375,25 @@ public class XFLConverter {
                 } catch (IOException ex) {
                     Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                String symbolFile = "sound" + symbol.getCharacterID() + "." + exportFormat;
-                files.put(symbolFile, data);
-                String mediaLinkStr = "<DOMSoundItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp() + "\" externalFileSize=\"" + data.length + "\"";
-                mediaLinkStr += " href=\"" + symbolFile + "\"";
-                mediaLinkStr += " format=\"";
-                mediaLinkStr += rateMap[soundRate] + "kHz";
-                mediaLinkStr += " " + (soundSize == 1 ? "16bit" : "8bit");
-                mediaLinkStr += " " + (soundType == 1 ? "Stereo" : "Mono");
-                mediaLinkStr += "\"";
-                mediaLinkStr += " exportFormat=\"" + format + "\" exportBits=\"" + bits + "\" sampleCount=\"" + soundSampleCount + "\"";
+                if (!exportFormat.equals("flv")) { //FLV import format unsupported
+                    String symbolFile = "sound" + symbol.getCharacterID() + "." + exportFormat;
+                    files.put(symbolFile, data);
+                    String mediaLinkStr = "<DOMSoundItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp() + "\" externalFileSize=\"" + data.length + "\"";
+                    mediaLinkStr += " href=\"" + symbolFile + "\"";
+                    mediaLinkStr += " format=\"";
+                    mediaLinkStr += rateMap[soundRate] + "kHz";
+                    mediaLinkStr += " " + (soundSize == 1 ? "16bit" : "8bit");
+                    mediaLinkStr += " " + (soundType == 1 ? "Stereo" : "Mono");
+                    mediaLinkStr += "\"";
+                    mediaLinkStr += " exportFormat=\"" + format + "\" exportBits=\"" + bits + "\" sampleCount=\"" + soundSampleCount + "\"";
 
-                if (characterClasses.containsKey(symbol.getCharacterID())) {
-                    mediaLinkStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterID()) + "\"";
+                    if (characterClasses.containsKey(symbol.getCharacterID())) {
+                        mediaLinkStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterID()) + "\"";
+                    }
+
+                    mediaLinkStr += "/>\n";
+                    media.add(mediaLinkStr);
                 }
-
-                mediaLinkStr += "/>\n";
-                media.add(mediaLinkStr);
             } else if (symbol instanceof DefineVideoStreamTag) {
                 DefineVideoStreamTag video = (DefineVideoStreamTag) symbol;
                 String videoType = "no media";
@@ -1492,9 +1577,9 @@ public class XFLConverter {
 
         ret += soundEnvelopeStr;
         if (!actionScript.equals("")) {
-            ret += "<ActionScript><script><![CDATA[";
+            ret += "<Actionscript><script><![CDATA[";
             ret += actionScript;
-            ret += "]]></script></ActionScript>";
+            ret += "]]></script></Actionscript>";
         }
         ret += "<elements>";
         ret += elements;
@@ -1515,20 +1600,30 @@ public class XFLConverter {
         return ret;
     }
 
-    private static String convertFrames(String initActionScript, String prevStr, String afterStr, List<Integer> oneInstanceShapes, List<Tag> tags, HashMap<Integer, CharacterTag> characters, int depth) {
+    private static String convertFrames(String prevStr, String afterStr, List<Integer> oneInstanceShapes, List<Tag> tags, List<Tag> timelineTags, HashMap<Integer, CharacterTag> characters, int depth) {
         String ret = "";
         prevStr += "<frames>";
         int frame = -1;
         String elements = "";
         String lastElements = "";
-        int characterId = -1;
+
         int duration = 1;
-        String actionScript = "";
-        String lastActionScript = "";
         String frameName = null;
         boolean isAnchor = false;
-        DefineVideoStreamTag video = null;
-        for (Tag t : tags) {
+
+        CharacterTag character = null;
+        MATRIX matrix = null;
+        String instanceName = null;
+        CXFORM colorTransForm = null;
+        CXFORMWITHALPHA colorTransFormAlpha = null;
+        boolean cacheAsBitmap = false;
+        int blendMode = 0;
+        List<FILTER> filters = new ArrayList<FILTER>();
+        boolean isVisible = true;
+        RGBA backGroundColor = null;
+        int characterId = -1;
+
+        for (Tag t : timelineTags) {
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
                 if (po.getDepth() == depth) {
@@ -1538,82 +1633,111 @@ public class XFLConverter {
                     }
                     characterId = newCharId;
                     if (characters.containsKey(characterId)) {
-                        CharacterTag ch = characters.get(characterId);
-                        if ((ch instanceof ShapeTag) && oneInstanceShapes.contains(characterId)) {
-                            elements += convertShape(characters, po.getMatrix(), (ShapeTag) ch);
-                        } else if (ch instanceof TextTag) {
-                            elements += convertText(tags, (TextTag) ch, po.getMatrix(), po.getFilters());
-                        } else if (ch instanceof DefineVideoStreamTag) {
-                            if (ch != video) {
-                                elements += convertVideoInstance(po.getMatrix(), (DefineVideoStreamTag) ch);
+                        character = characters.get(characterId);
+                        if (po.flagMove()) {
+                            MATRIX matrix2 = po.getMatrix();
+                            if (matrix2 != null) {
+                                matrix = matrix2;
                             }
-                            video = (DefineVideoStreamTag) ch;
+                            String instanceName2 = po.getInstanceName();
+                            if (instanceName2 != null) {
+                                instanceName = instanceName2;
+                            }
+                            CXFORM colorTransForm2 = po.getColorTransform();
+                            if (colorTransForm2 != null) {
+                                colorTransForm = colorTransForm2;
+                            }
+
+                            CXFORMWITHALPHA colorTransFormAlpha2 = po.getColorTransformWithAlpha();
+                            if (colorTransFormAlpha2 != null) {
+                                colorTransFormAlpha = colorTransFormAlpha2;
+                            }
+                            if (po.cacheAsBitmap()) {
+                                cacheAsBitmap = true;
+                            }
+                            int blendMode2 = po.getBlendMode();
+                            if (blendMode2 > 0) {
+                                blendMode = blendMode2;
+                            }
+                            List<FILTER> filters2 = po.getFilters();
+                            if (filters2 != null) {
+                                filters = filters2;
+                            }
                         } else {
-                            elements += convertSymbolInstance(po.getInstanceName(), po.getMatrix(), po.getColorTransform(), po.getColorTransformWithAlpha(), po.cacheAsBitmap(), po.getBlendMode(), po.getFilters(), po.isVisible(), po.getBackgroundColor(), characters.get(characterId), characters, tags);
+                            matrix = po.getMatrix();
+                            instanceName = po.getInstanceName();
+                            colorTransForm = po.getColorTransform();
+                            colorTransFormAlpha = po.getColorTransformWithAlpha();
+                            cacheAsBitmap = po.cacheAsBitmap();
+                            blendMode = po.getBlendMode();
+                            filters = po.getFilters();
                         }
+
+
+
                     }
                 }
             }
-            if (t instanceof DoActionTag) {
-                actionScript += convertActionScript((DoActionTag) t);
+
+            if (t instanceof RemoveTag) {
+                RemoveTag rt = (RemoveTag) t;
+                if (rt.getDepth() == depth) {
+                    character = null;
+                    matrix = null;
+                    instanceName = null;
+                    colorTransForm = null;
+                    colorTransFormAlpha = null;
+                    cacheAsBitmap = false;
+                    blendMode = 0;
+                    filters = new ArrayList<FILTER>();
+                    isVisible = true;
+                    backGroundColor = null;
+                    characterId = -1;
+                }
             }
             if (t instanceof FrameLabelTag) {
                 FrameLabelTag flt = (FrameLabelTag) t;
-                if (frameName != null) {
-                    lastActionScript = initActionScript + lastActionScript;
-                    initActionScript = "";
-                    ret += convertFrame(characters, tags, null, null, frame, frameName, isAnchor, duration, lastActionScript, lastElements);
-                    frame += duration;
-                    duration = 1;
-                    lastElements = elements;
-                    lastActionScript = actionScript;
-                    elements = "";
-                    actionScript = "";
-                }
                 frameName = flt.getLabelName();
                 isAnchor = flt.isNamedAnchor();
             }
-            if (t instanceof RemoveTag) {
-                if (!lastElements.equals("") || !lastActionScript.equals("")) {
-                    lastActionScript = initActionScript + lastActionScript;
-                    initActionScript = "";
-                    ret += convertFrame(characters, tags, null, null, frame, frameName, isAnchor, duration, lastActionScript, lastElements);
-                }
-                frame += duration;
-                duration = 1;
-                lastElements = elements;
-                lastActionScript = actionScript;
-                elements = "";
-                actionScript = "";
-            }
+
             if (t instanceof ShowFrameTag) {
-                if (!elements.equals("") || !actionScript.equals("")) {
-                    if (!lastElements.equals("") || !lastActionScript.equals("")) {
-                        lastActionScript = initActionScript + lastActionScript;
-                        initActionScript = "";
-                        ret += convertFrame(characters, tags, null, null, frame, frameName, isAnchor, duration, lastActionScript, lastElements);
+                elements = "";
+
+                /*if ((character instanceof ShapeTag) && oneInstanceShapes.contains(characterId)) {
+                 ret += convertShape(characters, matrix, (ShapeTag) character);
+                 }*/
+                if (character != null) {
+                    if (character instanceof TextTag) {
+                        elements += convertText(tags, (TextTag) character, matrix, filters);
+                    } else if (character instanceof DefineVideoStreamTag) {
+                        elements += convertVideoInstance(matrix, (DefineVideoStreamTag) character);
+                    } else {
+                        elements += convertSymbolInstance(instanceName, matrix, colorTransForm, colorTransFormAlpha, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, character, characters, tags);
                     }
-                    frame += duration;
+                }
+
+                frame++;
+                if (!elements.equals(lastElements) && frame > 0) {
+                    ret += convertFrame(characters, tags, null, null, frame - duration, frameName, isAnchor, duration, "", lastElements);
                     duration = 1;
-                    lastElements = elements;
-                    lastActionScript = actionScript;
-                    elements = "";
-                    actionScript = "";
+                } else if (frame == 0) {
+                    duration = 1;
                 } else {
                     duration++;
                 }
-            }
-        }
-        lastActionScript = initActionScript + lastActionScript;
-        initActionScript = "";
-        if (!lastElements.equals("") || !lastActionScript.equals("")) {
-            if (frame < 0) {
-                frame = 0;
-                duration = 1;
-            }
-            ret += convertFrame(characters, tags, null, null, frame, frameName, isAnchor, duration, lastActionScript, lastElements);
-        }
 
+
+                lastElements = elements;
+
+
+                frameName = null;
+                isAnchor = false;
+            }
+        }
+        if (!lastElements.equals("")) {
+            ret += convertFrame(characters, tags, null, null, (frame < 0 ? 0 : frame) - duration, frameName, isAnchor, duration, "", lastElements);
+        }
         afterStr = "</frames>" + afterStr;
         if (!ret.equals("")) {
             ret = prevStr + ret + afterStr;
@@ -1621,7 +1745,68 @@ public class XFLConverter {
         return ret;
     }
 
-    public static String convertSoundLayer(int layerIndex, String backgroundColor, HashMap<Integer, CharacterTag> characters, List<Tag> tags) {
+    public static String convertActionScriptLayer(int layerIndex, int spriteId, List<Tag> tags, List<Tag> timeLineTags, String backgroundColor) {
+        String ret = "";
+
+        String script = "";
+        int duration = 0;
+        int frame = 0;
+        for (Tag t : tags) {
+            if (t instanceof DoInitActionTag) {
+                DoInitActionTag dia = (DoInitActionTag) t;
+                if (dia.spriteId == spriteId) {
+                    script += convertActionScript(dia);
+                }
+            }
+        }
+        if (!script.equals("")) {
+            script = "#initclip\r\n" + script + "#endinitclip\r\n";
+        }
+        for (Tag t : timeLineTags) {
+            if (t instanceof DoActionTag) {
+                DoActionTag da = (DoActionTag) t;
+                script += convertActionScript(da);
+            }
+            if (t instanceof ShowFrameTag) {
+
+                if (script.equals("")) {
+                    duration++;
+                } else {
+                    if (duration > 0) {
+                        ret += "<DOMFrame index=\"" + (frame - duration) + "\"";
+                        if (duration > 1) {
+                            ret += " duration=\"" + duration + "\"";
+                        }
+                        ret += " keyMode=\"" + KEY_MODE_NORMAL + "\">";
+                        ret += "<elements>";
+                        ret += "</elements>";
+                        ret += "</DOMFrame>";
+                    }
+                    ret += "<DOMFrame index=\"" + frame + "\"";
+                    ret += " keyMode=\"" + KEY_MODE_NORMAL + "\">";
+                    ret += "<Actionscript><script><![CDATA[";
+                    ret += script;
+                    ret += "]]></script></Actionscript>";
+                    ret += "<elements>";
+                    ret += "</elements>";
+                    ret += "</DOMFrame>";
+                    script = "";
+                    duration = 0;
+                }
+                frame++;
+            }
+        }
+        if (!ret.equals("")) {
+            ret = "<DOMLayer name=\"Layer " + (layerIndex + 1) + "\" color=\"" + backgroundColor + "\">"
+                    + "<frames>"
+                    + ret
+                    + "</frames>"
+                    + "</DOMLayer>";
+        }
+        return ret;
+    }
+
+    public static String convertSoundLayer(int layerIndex, String backgroundColor, HashMap<Integer, CharacterTag> characters, List<Tag> tags, List<Tag> timeLineTags) {
         String ret = "";
         StartSoundTag lastStartSound = null;
         SoundStreamHeadTypeTag lastSoundStreamHead = null;
@@ -1629,7 +1814,7 @@ public class XFLConverter {
         SoundStreamHeadTypeTag soundStreamHead = null;
         int duration = 1;
         int frame = 0;
-        for (Tag t : tags) {
+        for (Tag t : timeLineTags) {
             if (t instanceof StartSoundTag) {
                 startSound = (StartSoundTag) t;
             }
@@ -1667,28 +1852,15 @@ public class XFLConverter {
         return ret;
     }
 
-    public static String convertTimeline(String initActionScript, List<Integer> oneInstanceShapes, String backgroundColor, List<Tag> tags, HashMap<Integer, CharacterTag> characters, String name) {
+    public static String convertTimeline(int spriteId, List<Integer> oneInstanceShapes, String backgroundColor, List<Tag> tags, List<Tag> timelineTags, HashMap<Integer, CharacterTag> characters, String name) {
         String ret = "";
         ret += "<DOMTimeline name=\"" + name + "\">";
         ret += "<layers>";
-        int layerCount = getLayerCount(tags);
+        int layerCount = getLayerCount(timelineTags);
         Stack<Integer> parentLayers = new Stack<Integer>();
         int index = 0;
-        if ((layerCount == 0) && (!initActionScript.equals(""))) {
-            ret += "<DOMLayer name=\"Layer " + (index + 1) + "\" color=\"" + backgroundColor + "\">";
-            ret += "<frames>";
-            ret += "<DOMFrame index=\"" + 0 + "\"";
-            ret += " keyMode=\"" + KEY_MODE_NORMAL + "\">";
-            ret += "<ActionScript><script><![CDATA[";
-            ret += initActionScript;
-            ret += "]]></script></ActionScript>";
-            ret += "<elements>";
-            ret += "</elements>";
-            ret += "</DOMFrame>";
-            ret += "</DOMLayer>";
-        }
         for (int d = layerCount; d >= 1; d--, index++) {
-            for (Tag t : tags) {
+            for (Tag t : timelineTags) {
                 if (t instanceof PlaceObjectTypeTag) {
                     PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
                     if (po.getClipDepth() == d) {
@@ -1699,7 +1871,7 @@ public class XFLConverter {
                         ret += "<DOMLayer name=\"Layer " + (index + 1) + "\" color=\"" + backgroundColor + "\" ";
                         ret += " layerType=\"mask\" locked=\"true\"";
                         ret += ">";
-                        ret += convertFrames(index == 0 ? initActionScript : "", "", "", oneInstanceShapes, tags, characters, po.getDepth());
+                        ret += convertFrames("", "", oneInstanceShapes, tags, timelineTags, characters, po.getDepth());
                         ret += "</DOMLayer>";
                         index++;
                         break;
@@ -1709,7 +1881,7 @@ public class XFLConverter {
 
 
             boolean hasClipDepth = false;
-            for (Tag t : tags) {
+            for (Tag t : timelineTags) {
                 if (t instanceof PlaceObjectTypeTag) {
                     PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
                     if (po.getDepth() == d) {
@@ -1740,18 +1912,20 @@ public class XFLConverter {
             }
             layerPrev += ">";
             String layerAfter = "</DOMLayer>";
-            String cf = convertFrames(index == 0 ? initActionScript : "", layerPrev, layerAfter, oneInstanceShapes, tags, characters, d);
+            String cf = convertFrames(layerPrev, layerAfter, oneInstanceShapes, tags, timelineTags, characters, d);
             if (cf.equals("")) {
                 index--;
             }
             ret += cf;
-
-
-
         }
 
         int soundLayerIndex = layerCount;
-        ret += convertSoundLayer(soundLayerIndex, backgroundColor, characters, tags);
+        layerCount++;
+        ret += convertSoundLayer(soundLayerIndex, backgroundColor, characters, tags, timelineTags);
+
+        int actionScriptLayerIndex = layerCount;
+        layerCount++;
+        ret += convertActionScriptLayer(actionScriptLayerIndex, spriteId, tags, timelineTags, backgroundColor);
 
         ret += "</layers>";
         ret += "</DOMTimeline>";
@@ -1813,7 +1987,7 @@ public class XFLConverter {
         }
         CSMTextSettingsTag csmts = null;
         String filterStr = "";
-        if (!filters.isEmpty()) {
+        if (filters != null) {
             filterStr += "<filters>";
             for (FILTER f : filters) {
                 filterStr += convertFilter(f);
@@ -1915,7 +2089,7 @@ public class XFLConverter {
                     if ((fontName == null) && (font != null)) {
                         fontName = font.getFontName(tags);
                     }
-                    psFontName = null;
+                    psFontName = fontName;
                     if (fontName != null) {
                         for (String avFont : availableFonts) {
                             if (avFont.equals(fontName)) {
@@ -1930,7 +2104,8 @@ public class XFLConverter {
                     ret += "<characters>" + xmlString(rec.getText(tags, font)) + "</characters>";
                     ret += "<textAttrs>";
 
-                    ret += "<DOMTextAttrs aliasText=\"false\" rotation=\"true\" indent=\"5\" leftMargin=\"2\" letterSpacing=\"1\" lineSpacing=\"6\" rightMargin=\"3\" size=\"" + twipToPixel(textHeight) + "\" bitmapSize=\"1040\"";
+                    ret += "<DOMTextAttrs aliasText=\"false\" rotation=\"true\" size=\"" + twipToPixel(textHeight) + "\" bitmapSize=\"1040\"";
+                    //indent=\"5\" leftMargin=\"2\" letterSpacing=\"1\" lineSpacing=\"6\" rightMargin=\"3\" 
                     if (textColor != null) {
                         ret += " fillColor=\"" + textColor.toHexRGB() + "\"";
                     } else if (textColorA != null) {
@@ -2010,7 +2185,85 @@ public class XFLConverter {
             ret += matStr;
             ret += "<textRuns>";
             if (det.hasText) {
-                ret += convertHTMLText(tags, det, det.initialText);
+                if (det.html) {
+                    ret += convertHTMLText(tags, det, det.initialText);
+                } else {
+                    ret += "<DOMTextRun>";
+                    ret += "<characters>" + xmlString(det.initialText) + "</characters>";
+                    int leftMargin = -1;
+                    int rightMargin = -1;
+                    int indent = -1;
+                    int lineSpacing = -1;
+                    String alignment = null;
+                    boolean italic = false;
+                    boolean bold = false;
+                    String fontFace = null;
+                    int size = -1;
+                    if (det.hasFont) {
+                        String fontName = null;
+                        FontTag ft = null;
+                        for (Tag u : tags) {
+                            if (u instanceof DefineFontNameTag) {
+                                if (((DefineFontNameTag) u).fontId == det.fontId) {
+                                    fontName = ((DefineFontNameTag) u).fontName;
+                                }
+                            }
+                            if (u instanceof FontTag) {
+                                if (((FontTag) u).getFontId() == det.fontId) {
+                                    ft = (FontTag) u;
+                                }
+                            }
+                            if (fontName != null && ft != null) {
+                                break;
+                            }
+                        }
+                        if (ft != null) {
+                            if (fontName == null) {
+                                fontName = ft.getFontName(tags);
+                            }
+                            italic = ft.isItalic();
+                            bold = ft.isBold();
+                            size = det.fontHeight;
+                            fontFace = new Font(fontName, (italic ? Font.ITALIC : 0) | (bold ? Font.BOLD : 0) | (!italic && !bold ? Font.PLAIN : 0), size < 0 ? 10 : size).getPSName();
+                        }
+                    }
+                    if (det.hasLayout) {
+                        leftMargin = det.leftMargin;
+                        rightMargin = det.rightMargin;
+                        indent = det.indent;
+                        lineSpacing = det.leading;
+                        String alignNames[] = {"left", "right", "center", "justify"};
+                        alignment = alignNames[det.align];
+                    }
+                    ret += "<textAttrs>";
+                    ret += "<DOMTextAttrs";
+                    if (alignment != null) {
+                        ret += " alignment=\"" + alignment + "\"";
+                    }
+                    ret += " rotation=\"true\""; //?
+                    if (indent > -1) {
+                        ret += " indent=\"" + twipToPixel(indent) + "\"";
+                    }
+                    if (leftMargin > -1) {
+                        ret += " leftMargin=\"" + twipToPixel(leftMargin) + "\"";
+                    }
+                    if (lineSpacing > -1) {
+                        ret += " lineSpacing=\"" + twipToPixel(lineSpacing) + "\"";
+                    }
+                    if (rightMargin > -1) {
+                        ret += " rightMargin=\"" + twipToPixel(rightMargin) + "\"";
+                    }
+                    if (size > -1) {
+                        ret += " size=\"" + size + "\"";
+                        ret += " bitmapSize=\"" + (size * 20) + "\"";
+                    }
+                    if (fontFace != null) {
+                        ret += " face=\"" + fontFace + "\"";
+                    }
+                    ret += "/>";
+                    ret += "</textAttrs>";
+                    ret += "</DOMTextRun>";
+                }
             }
             ret += "</textRuns>";
             ret += filterStr;
@@ -2060,7 +2313,7 @@ public class XFLConverter {
 
         domDocument += convertLibrary(swf, characterVariables, characterClasses, oneInstaceShapes, backgroundColor, swf.tags, characters, files);
         domDocument += "<timelines>";
-        domDocument += convertTimeline("", oneInstaceShapes, backgroundColor, swf.tags, characters, "Scene 1");
+        domDocument += convertTimeline(0, oneInstaceShapes, backgroundColor, swf.tags, swf.tags, characters, "Scene 1");
         domDocument += "</timelines>";
         domDocument += "</DOMDocument>";
         domDocument = prettyFormatXML(domDocument);
@@ -2446,19 +2699,33 @@ public class XFLConverter {
 
     private static String convertHTMLText(List<Tag> tags, DefineEditTextTag det, String html) {
         HTMLTextParser tparser = new HTMLTextParser(tags, det);
+        XMLReader parser;
         try {
             SAXParserFactory factory = SAXParserFactory.newInstance();
-            factory.setValidating(false);
+            //factory.setValidating(false);
+            parser = XMLReaderFactory.createXMLReader();
+            parser.setContentHandler(tparser);
+            parser.setErrorHandler(tparser);
+            //parser.setFeature("http://xml.org/sax/features/validation", false);    
+            html = "<?xml version=\"1.0\"?>\n"
+                    + "<!DOCTYPE some_name [ \n"
+                    + "<!ENTITY nbsp \"&#160;\"> \n"
+                    + "]><html>" + html + "</html>";
+            try {
+                parser.parse(new InputSource(new InputStreamReader(new ByteArrayInputStream(html.getBytes("UTF-8")), "UTF-8")));
+            } catch (SAXParseException spe) {
+                System.out.println(html);
+                System.err.println(tparser.result);
+            }
+            //XMLReader reader = parser.getXMLReader();
 
-            SAXParser parser = factory.newSAXParser();
 
-            XMLReader reader = parser.getXMLReader();
+            /*reader.setContentHandler(tparser);
+             reader.setErrorHandler(tparser);
+             reader.setEntityResolver(tparser);
+             html = "<html>" + html + "</html>";
+             reader.parse(new InputSource(new InputStreamReader(new ByteArrayInputStream(html.getBytes("UTF-8")), "UTF-8")));*/
 
-
-            reader.setContentHandler(tparser);
-            reader.setErrorHandler(tparser);
-            html = "<html>" + html + "</html>";
-            reader.parse(new InputSource(new InputStreamReader(new ByteArrayInputStream(html.getBytes("UTF-8")), "UTF-8")));
         } catch (Exception e) {
             Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Error while converting HTML", e);
         }
@@ -2493,7 +2760,47 @@ public class XFLConverter {
         private String url = null;
         private String target = null;
 
+        @Override
+        public void error(SAXParseException e) throws SAXException {
+        }
+
+        @Override
+        public void fatalError(SAXParseException e) throws SAXException {
+        }
+
+        @Override
+        public void warning(SAXParseException e) throws SAXException {
+        }
+
         public HTMLTextParser(List<Tag> tags, DefineEditTextTag det) {
+            if (det.hasFont) {
+                String fontName = null;
+                FontTag ft = null;
+                for (Tag u : tags) {
+                    if (u instanceof DefineFontNameTag) {
+                        if (((DefineFontNameTag) u).fontId == det.fontId) {
+                            fontName = ((DefineFontNameTag) u).fontName;
+                        }
+                    }
+                    if (u instanceof FontTag) {
+                        if (((FontTag) u).getFontId() == det.fontId) {
+                            ft = (FontTag) u;
+                        }
+                    }
+                    if (fontName != null && ft != null) {
+                        break;
+                    }
+                }
+                if (ft != null) {
+                    if (fontName == null) {
+                        fontName = ft.getFontName(tags);
+                    }
+                    italic = ft.isItalic();
+                    bold = ft.isBold();
+                    size = det.fontHeight;
+                    fontFace = new Font(fontName, (italic ? Font.ITALIC : 0) | (bold ? Font.BOLD : 0) | (!italic && !bold ? Font.PLAIN : 0), size < 0 ? 10 : size).getPSName();
+                }
+            }
             if (det.hasLayout) {
                 leftMargin = det.leftMargin;
                 rightMargin = det.rightMargin;

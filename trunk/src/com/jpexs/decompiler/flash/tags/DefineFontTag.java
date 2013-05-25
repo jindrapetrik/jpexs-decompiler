@@ -172,4 +172,26 @@ public class DefineFontTag extends CharacterTag implements FontTag {
         }
         return null;
     }
+
+    @Override
+    public boolean isBold() {
+        if (fontInfo2Tag != null) {
+            return fontInfo2Tag.fontFlagsBold;
+        }
+        if (fontInfoTag != null) {
+            return fontInfoTag.fontFlagsBold;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isItalic() {
+        if (fontInfo2Tag != null) {
+            return fontInfo2Tag.fontFlagsItalic;
+        }
+        if (fontInfoTag != null) {
+            return fontInfoTag.fontFlagsItalic;
+        }
+        return false;
+    }
 }

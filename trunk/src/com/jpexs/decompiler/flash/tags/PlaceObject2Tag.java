@@ -118,7 +118,7 @@ public class PlaceObject2Tag extends Tag implements Container, PlaceObjectTypeTa
 
     @Override
     public List<FILTER> getFilters() {
-        return new ArrayList<FILTER>();
+        return null;
     }
 
     /**
@@ -341,5 +341,10 @@ public class PlaceObject2Tag extends Tag implements Container, PlaceObjectTypeTa
     @Override
     public RGBA getBackgroundColor() {
         return null;
+    }
+
+    @Override
+    public boolean flagMove() {
+        return placeFlagMove;
     }
 }

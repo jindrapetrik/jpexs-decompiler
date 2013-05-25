@@ -38,4 +38,6 @@ public interface PlaceObjectTypeTag {
     public boolean isVisible();
 
     public RGBA getBackgroundColor();
+
+    public boolean flagMove();
 }

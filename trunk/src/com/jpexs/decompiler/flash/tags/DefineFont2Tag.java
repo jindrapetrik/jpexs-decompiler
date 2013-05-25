@@ -260,4 +260,14 @@ public class DefineFont2Tag extends CharacterTag implements FontTag {
         }
         return ret;
     }
+
+    @Override
+    public boolean isBold() {
+        return fontFlagsBold;
+    }
+
+    @Override
+    public boolean isItalic() {
+        return fontFlagsItalic;
+    }
 }

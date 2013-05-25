@@ -41,4 +41,8 @@ public interface FontTag extends AloneTag {
     public String getFontName(List<Tag> tags);
 
     public boolean isSmall();
+
+    public boolean isBold();
+
+    public boolean isItalic();
 }

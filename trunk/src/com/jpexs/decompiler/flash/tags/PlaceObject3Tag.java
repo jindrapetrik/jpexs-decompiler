@@ -173,7 +173,7 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
         if (placeFlagHasFilterList) {
             return surfaceFilterList;
         } else {
-            return new ArrayList<FILTER>();
+            return null;
         }
     }
 
@@ -457,5 +457,10 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
             return backgroundColor;
         }
         return null;
+    }
+
+    @Override
+    public boolean flagMove() {
+        return placeFlagMove;
     }
 }

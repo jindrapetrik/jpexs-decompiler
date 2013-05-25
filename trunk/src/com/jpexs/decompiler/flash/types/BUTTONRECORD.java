@@ -75,4 +75,9 @@ public class BUTTONRECORD {
      * If within DefineButton2Tag and buttonHasBlendMode: Blend mode
      */
     public int blendMode;
+
+    @Override
+    public String toString() {
+        return "[BUTTONRECORD character:" + characterId + ", depth:" + placeDepth + ", state:" + ((buttonStateDown ? "down " : "") + (buttonStateHitTest ? "hit " : "") + (buttonStateOver ? "over " : "") + (buttonStateUp ? "up " : "")) + "]";
+    }
 }

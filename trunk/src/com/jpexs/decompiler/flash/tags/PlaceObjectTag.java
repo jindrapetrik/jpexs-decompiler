@@ -27,7 +27,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -58,7 +57,7 @@ public class PlaceObjectTag extends Tag implements PlaceObjectTypeTag {
 
     @Override
     public List<FILTER> getFilters() {
-        return new ArrayList<FILTER>();
+        return null;
     }
 
     @Override
@@ -175,5 +174,10 @@ public class PlaceObjectTag extends Tag implements PlaceObjectTypeTag {
     @Override
     public RGBA getBackgroundColor() {
         return null;
+    }
+
+    @Override
+    public boolean flagMove() {
+        return false;
     }
 }
