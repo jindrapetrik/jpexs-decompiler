@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.gui.MainFrame;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -355,7 +354,7 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag {
             //this.textBounds.Xmin = minX;
             //this.textBounds.Xmax = maxX;
         } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DefineTextTag.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
         }
     }
