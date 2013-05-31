@@ -81,7 +81,7 @@ public class ActionJump extends Action {
     }
 
     @Override
-    public String getASMSource(List<GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+    public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
         String ofsStr = Helper.formatAddress(getAddress() + getBytes(version).length + offset);
         return "Jump loc" + ofsStr;
     }

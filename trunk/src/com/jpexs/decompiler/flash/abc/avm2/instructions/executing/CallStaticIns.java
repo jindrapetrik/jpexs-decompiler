@@ -37,10 +37,10 @@ public class CallStaticIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+    public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
         /*int methodIndex = (int) ((Long) arguments.get(0)).longValue(); //index of method_info
          int argCount = (int) ((Long) arguments.get(1)).longValue();
-         List passArguments = new ArrayList();
+         List<Object> passArguments = new ArrayList<Object>();
          for (int i = argCount - 1; i >= 0; i--) {
          passArguments.set(i, lda.operandStack.pop());
          }

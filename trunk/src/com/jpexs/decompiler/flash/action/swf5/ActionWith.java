@@ -86,7 +86,7 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
     }
 
     @Override
-    public String getASMSource(List<GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+    public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
         return "With {"; // + "\r\n" + Action.actionsToString(getAddress() + 2, getItems(container), knownAddreses, constantPool, version, hex, containerSWFOffset + getAddress() + 2) + "}";
     }
 

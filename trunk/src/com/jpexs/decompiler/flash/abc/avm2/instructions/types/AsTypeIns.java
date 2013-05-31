@@ -37,7 +37,7 @@ public class AsTypeIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+    public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
         Long typeIndex = (Long) arguments.get(0);
         Object obj = lda.operandStack.pop();
         //if multiname[typeIndex]==obj

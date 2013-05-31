@@ -28,7 +28,7 @@ public class AddTreeItem extends BinaryOpItem {
     }
 
     @Override
-    public String toString(List localData) {
+    public String toString(List<Object> localData) {
         if (rightSide.precedence >= precedence) {
             String ret = "";
             if (leftSide.precedence > precedence) {

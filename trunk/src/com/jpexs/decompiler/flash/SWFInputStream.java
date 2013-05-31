@@ -529,7 +529,7 @@ public class SWFInputStream extends InputStream {
         return readActionList(listeners, address, containerSWFOffset, rri, version, rri.getPos(), rri.getPos() + maxlen);
     }
 
-    private static void getConstantPool(List<DisassemblyListener> listeners, ConstantPool cpool, List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, int lastIp, List<ConstantPool> constantPools, List<Integer> visited, int version, int endIp) {
+    private static void getConstantPool(List<DisassemblyListener> listeners, ConstantPool cpool, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, int lastIp, List<ConstantPool> constantPools, List<Integer> visited, int version, int endIp) {
         boolean debugMode = false;
         boolean deobfuscate = (Boolean) Configuration.getConfig("autoDeobfuscate", true);
         while (((endIp == -1) || (endIp > ip)) && (ip > -1) && ip < code.size()) {
@@ -556,7 +556,7 @@ public class SWFInputStream extends InputStream {
                             output2s.add(new ArrayList<GraphTargetItem>());
                             continue;
                         }
-                        List localData2 = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
+                        List<Object> localData2 = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
                         List<GraphTargetItem> output2 = new ArrayList<GraphTargetItem>();
                         output2s.add(output2);
                         getConstantPool(listeners, cpool, localData2, new Stack<GraphTargetItem>(), output2, code, code.adr2pos(endAddr), lastIp, constantPools, visited, version, code.adr2pos(endAddr + size));
@@ -595,7 +595,7 @@ public class SWFInputStream extends InputStream {
                 if (ins instanceof ActionJump) {
                     add += " change:" + (((ActionJump) ins).getJumpOffset());
                 }
-                System.err.println("getConstantPool ip " + ip + ", addr " + Helper.formatAddress(((Action) ins).getAddress()) + ": " + ((Action) ins).getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), Helper.toList(cpool), version, false) + add + " stack:" + Helper.stackToString(stack, Helper.toList(cpool)));
+                System.err.println("getConstantPool ip " + ip + ", addr " + Helper.formatAddress(((Action) ins).getAddress()) + ": " + ((Action) ins).getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), cpool.constants, version, false) + add + " stack:" + Helper.stackToString(stack, Helper.toList(cpool)));
                 if (ip == 116) {
                     System.err.println("kok");
                 }
@@ -693,7 +693,7 @@ public class SWFInputStream extends InputStream {
 
     public static List<ConstantPool> getConstantPool(List<DisassemblyListener> listeners, ActionGraphSource code, int addr, int version) {
         List<ConstantPool> ret = new ArrayList<ConstantPool>();
-        List localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
+        List<Object> localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
         try {
             getConstantPool(listeners, null, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0, ret, new ArrayList<Integer>(), version, -1);
         } catch (Exception ex) {
@@ -715,7 +715,7 @@ public class SWFInputStream extends InputStream {
 
         Stack<GraphTargetItem> stack = new Stack<GraphTargetItem>();
 
-        List localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
+        List<Object> localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
 
 
         SWFInputStream sis = new SWFInputStream(rri, version);
@@ -737,7 +737,7 @@ public class SWFInputStream extends InputStream {
                 }
             }
         }
-        List<GraphSourceItem> ret = new ArrayList<GraphSourceItem>();
+        List<Action> ret = new ArrayList<Action>();
         Action last = null;
         for (Action a : retdups) {
             if (a != last) {
@@ -794,7 +794,7 @@ public class SWFInputStream extends InputStream {
         return reta;
     }
 
-    private static boolean readActionListAtPos(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, long address, long containerSWFOffset, boolean notCompileTime, boolean enableVariables, List localData, Stack<GraphTargetItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret, int startIp, int endip) throws IOException {
+    private static boolean readActionListAtPos(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, long address, long containerSWFOffset, boolean notCompileTime, boolean enableVariables, List<Object> localData, Stack<GraphTargetItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret, int startIp, int endip) throws IOException {
         boolean debugMode = false;
         boolean decideBranch = false;
 
@@ -1047,7 +1047,7 @@ public class SWFInputStream extends InputStream {
                             output2s.add(new ArrayList<GraphTargetItem>());
                             continue;
                         }
-                        List localData2 = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
+                        List<Object> localData2 = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
                         List<GraphTargetItem> output2 = new ArrayList<GraphTargetItem>();
                         readActionListAtPos(listeners, output2, containers, address, containerSWFOffset, notCompileTime, enableVariables, localData2, new Stack<GraphTargetItem>(), cpool, sis, rri, (int) endAddr, ret, startIp, (int) (endAddr + size));
                         output2s.add(output2);

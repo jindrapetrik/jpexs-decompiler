@@ -35,7 +35,7 @@ public class DecrementIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+    public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
         Object obj = lda.operandStack.pop();
         if (obj instanceof Long) {
             Long obj2 = ((Long) obj).longValue() - 1;

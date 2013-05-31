@@ -115,7 +115,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
     }
 
     public void exec() {
-        HashMap args = new HashMap();
+        HashMap<Integer, Object> args = new HashMap<Integer, Object>();
         args.put(0, new Object()); //object "this"
         args.put(1, new Long(466561)); //param1
         Object o = abc.bodies[bodyIndex].code.execute(args, abc.constants);

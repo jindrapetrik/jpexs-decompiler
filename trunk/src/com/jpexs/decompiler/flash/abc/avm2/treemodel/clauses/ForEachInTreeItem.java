@@ -65,7 +65,7 @@ public class ForEachInTreeItem extends LoopItem implements Block {
     }
 
     @Override
-    public String toString(List localData) {
+    public String toString(List<Object> localData) {
         String ret = "";
         ret += "loop" + loop.id + ":\r\n";
         ret += hilight("for each (") + expression.toString(localData) + ")\r\n{\r\n";

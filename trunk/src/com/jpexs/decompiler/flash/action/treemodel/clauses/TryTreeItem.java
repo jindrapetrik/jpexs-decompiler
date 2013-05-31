@@ -52,7 +52,7 @@ public class TryTreeItem extends TreeItem implements Block {
     public String toString(ConstantPool constants) {
         String ret = "";
         ret += "try\r\n{\r\n";
-        List localData = new ArrayList();
+        List<Object> localData = new ArrayList<Object>();
         localData.add(constants);
         for (GraphTargetItem ti : tryCommands) {
             if (!ti.isEmpty()) {

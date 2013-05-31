@@ -35,7 +35,7 @@ public abstract class TreeItem extends GraphTargetItem {
     }
 
     @Override
-    public String toString(List localData) {
+    public String toString(List<Object> localData) {
         return toString((ConstantPool) localData.get(0), (HashMap<Integer, String>) localData.get(1), (List<String>) localData.get(2));
     }
 

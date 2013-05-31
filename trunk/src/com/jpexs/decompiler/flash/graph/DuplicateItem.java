@@ -40,7 +40,7 @@ public class DuplicateItem extends GraphTargetItem {
     }
 
     @Override
-    public String toString(List localData) {
+    public String toString(List<Object> localData) {
         return value.toString(localData);
     }
 

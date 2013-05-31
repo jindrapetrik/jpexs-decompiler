@@ -280,8 +280,8 @@ public class Helper {
         }
     }
 
-    public static List toList(Object... rest) {
-        List ret = new ArrayList();
+    public static List<Object> toList(Object... rest) {
+        List<Object> ret = new ArrayList<Object>();
         for (Object o : rest) {
             ret.add(o);
         }
@@ -338,7 +338,7 @@ public class Helper {
         return str.replaceAll("<ffdec:hex>([^\r\n]*)</ffdec:hex>(\r?\n)", "; $1$2");
     }
 
-    public static String stackToString(Stack<GraphTargetItem> stack, List localData) {
+    public static String stackToString(Stack<GraphTargetItem> stack, List<Object> localData) {
         String ret = "[";
         for (int i = stack.size() - 1; i >= 0; i--) {
             if (i < stack.size() - 1) {

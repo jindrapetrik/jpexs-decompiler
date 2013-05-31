@@ -68,7 +68,7 @@ public class InstructionDefinition implements Serializable {
         return s;
     }
 
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+    public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
         throw new UnsupportedOperationException("Instruction " + instructionName + " not implemented");
     }
 

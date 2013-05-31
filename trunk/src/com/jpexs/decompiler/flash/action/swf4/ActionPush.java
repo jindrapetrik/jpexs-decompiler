@@ -199,7 +199,7 @@ public class ActionPush extends Action {
     }
 
     @Override
-    public String getASMSourceReplaced(List<GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+    public String getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
         if (replacement == null || replacement.size() < values.size()) {
             return toString();
         }
@@ -210,7 +210,7 @@ public class ActionPush extends Action {
         return ts;
     }
 
-    public String paramsToStringReplaced(List<GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+    public String paramsToStringReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
         if (replacement == null || replacement.size() < values.size()) {
             return paramsToString();
         }

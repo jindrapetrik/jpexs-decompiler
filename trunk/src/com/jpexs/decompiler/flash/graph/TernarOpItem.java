@@ -32,7 +32,7 @@ public class TernarOpItem extends GraphTargetItem {
     }
 
     @Override
-    public String toString(List localData) {
+    public String toString(List<Object> localData) {
         return expression.toString(localData) + hilight("?") + onTrue.toString(localData) + hilight(":") + onFalse.toString(localData);
     }
 }

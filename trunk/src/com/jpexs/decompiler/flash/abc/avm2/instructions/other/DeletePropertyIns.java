@@ -38,7 +38,7 @@ public class DeletePropertyIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+    public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
         int multiIndex = (int) ((Long) arguments.get(0)).longValue();
         //if multiname[multinameIndex] is runtime
         //pop(name) pop(ns)

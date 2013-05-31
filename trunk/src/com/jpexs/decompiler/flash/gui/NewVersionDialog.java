@@ -17,8 +17,6 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.Main;
-import static com.jpexs.decompiler.flash.Main.projectPage;
-import static com.jpexs.decompiler.flash.Main.shortApplicationName;
 import com.jpexs.decompiler.flash.Version;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -130,7 +128,7 @@ public class NewVersionDialog extends JDialog implements ActionListener {
                 }
             }
             if (desktop == null) {
-                JOptionPane.showMessageDialog(null, "New version of " + shortApplicationName + " is available: " + latestVersion.appName + ".\r\nPlease go to " + projectPage + " to download it.", "New version", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "New version of " + Main.shortApplicationName + " is available: " + latestVersion.appName + ".\r\nPlease go to " + Main.projectPage + " to download it.", "New version", JOptionPane.INFORMATION_MESSAGE);
             }
         }
         setVisible(false);

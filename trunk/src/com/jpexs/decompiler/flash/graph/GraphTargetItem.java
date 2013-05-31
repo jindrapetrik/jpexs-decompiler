@@ -64,12 +64,12 @@ public abstract class GraphTargetItem {
         return Highlighting.hilighOffset(str, src.getOffset());
     }
 
-    public String toStringSemicoloned(List localData) {
+    public String toStringSemicoloned(List<Object> localData) {
         return toString(localData) + (needsSemicolon() ? ";" : "");
     }
 
     public String toStringSemicoloned(Object... localData) {
-        List localData2 = new ArrayList();
+        List<Object> localData2 = new ArrayList<Object>();
         for (Object o : localData) {
             localData2.add(o);
         }
@@ -85,10 +85,10 @@ public abstract class GraphTargetItem {
         return this.getClass().getName();
     }
 
-    public abstract String toString(List localData);
+    public abstract String toString(List<Object> localData);
 
     public String toString(Object... localData) {
-        List localData2 = new ArrayList();
+        List<Object> localData2 = new ArrayList<Object>();
         for (Object o : localData) {
             localData2.add(o);
         }
@@ -119,12 +119,12 @@ public abstract class GraphTargetItem {
         return Double.compare(toNumber(), 0.0) != 0;
     }
 
-    public String toStringNoQuotes(List localData) {
+    public String toStringNoQuotes(List<Object> localData) {
         return toString(localData);
     }
 
     public String toStringNoQuotes(Object... localData) {
-        List localData2 = new ArrayList();
+        List<Object> localData2 = new ArrayList<Object>();
         for (Object o : localData) {
             localData2.add(o);
         }
@@ -144,7 +144,7 @@ public abstract class GraphTargetItem {
     }
 
     public String toStringNL(Object... localData) {
-        List localData2 = new ArrayList();
+        List<Object> localData2 = new ArrayList<Object>();
         for (Object o : localData) {
             localData2.add(o);
         }

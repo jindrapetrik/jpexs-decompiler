@@ -35,7 +35,7 @@ public class BitXorIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+    public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
         Long value2 = (Long) lda.operandStack.pop();
         Long value1 = (Long) lda.operandStack.pop();
         Long value3 = value1 ^ value2;

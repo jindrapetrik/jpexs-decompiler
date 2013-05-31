@@ -609,7 +609,7 @@ public interface WinDef extends StdCallLibrary {
          * @see com.sun.jna.Structure#getFieldOrder()
          */
         @Override
-        protected List getFieldOrder() {
+        protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{"left", "top", "right",
                 "bottom"});
         }
@@ -870,7 +870,7 @@ public interface WinDef extends StdCallLibrary {
          * @see com.sun.jna.Structure#getFieldOrder()
          */
         @Override
-        protected List getFieldOrder() {
+        protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{"x", "y"});
         }
     }

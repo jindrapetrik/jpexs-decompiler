@@ -30,7 +30,7 @@ public abstract class UnaryOpItem extends GraphTargetItem {
     }
 
     @Override
-    public String toString(List localData) {
+    public String toString(List<Object> localData) {
         String s = (value == null ? "null" : value.toString(localData));
         if (value != null) {
             if (value.precedence > precedence) {

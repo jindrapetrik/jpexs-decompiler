@@ -16,7 +16,7 @@ public class BreakItem extends GraphTargetItem {
     }
 
     @Override
-    public String toString(List localData) {
+    public String toString(List<Object> localData) {
         return hilight("break") + " " + "loop" + loopId;
     }
 }

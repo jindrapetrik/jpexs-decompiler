@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import static com.jpexs.decompiler.flash.tags.DefineBitsLosslessTag.FORMAT_24BIT_RGB;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.ALPHABITMAPDATA;
@@ -57,7 +56,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
     public void setImage(byte data[]) throws IOException {
         BufferedImage image = ImageIO.read(new ByteArrayInputStream(data));
         ALPHABITMAPDATA bitmapData = new ALPHABITMAPDATA();
-        bitmapFormat = FORMAT_24BIT_RGB;
+        bitmapFormat = DefineBitsLosslessTag.FORMAT_24BIT_RGB;
         bitmapWidth = image.getWidth();
         bitmapHeight = image.getHeight();
         bitmapData.bitmapPixelData = new ARGB[bitmapWidth * bitmapHeight];

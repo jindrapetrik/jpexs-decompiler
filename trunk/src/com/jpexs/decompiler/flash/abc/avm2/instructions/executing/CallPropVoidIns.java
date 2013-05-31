@@ -38,12 +38,12 @@ public class CallPropVoidIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+    public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
         //same as callproperty
 /*
          int multinameIndex = (int) ((Long) arguments.get(0)).longValue();
          int argCount = (int) ((Long) arguments.get(1)).longValue();
-         List passArguments = new ArrayList();
+         List<Object> passArguments = new ArrayList<Object>();
          for (int i = argCount - 1; i >= 0; i--) {
          passArguments.set(i, lda.operandStack.pop());
          }
