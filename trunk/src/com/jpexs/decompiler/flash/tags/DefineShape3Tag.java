@@ -22,9 +22,11 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 public class DefineShape3Tag extends CharacterTag implements BoundedTag, ShapeTag {
@@ -56,6 +58,11 @@ public class DefineShape3Tag extends CharacterTag implements BoundedTag, ShapeTa
     @Override
     public String toSVG() {
         return shapes.toSVG(3);
+    }
+
+    @Override
+    public BufferedImage toImage(List<Tag> tags) {
+        return shapes.toImage(3, tags);
     }
 
     @Override

@@ -65,7 +65,7 @@ public class MATRIX implements Serializable {
 
     @Override
     public String toString() {
-        return "[MATRIX scale:" + scaleX + "," + scaleY + ", rotate:" + rotateSkew0 + "," + rotateSkew1 + ", translate:" + translateX + "," + translateY + "]";
+        return "[MATRIX scale:" + getScaleXFloat() + "," + getScaleYFloat() + ", rotate:" + getRotateSkew0Float() + "," + getRotateSkew1Float() + ", translate:" + translateX + "," + translateY + "]";
     }
 
     public float toFloat(int i) {
@@ -77,6 +77,22 @@ public class MATRIX implements Serializable {
         ret.x = (int) (p.x * (hasScale ? toFloat(scaleX) : 1) + p.y * (hasRotate ? toFloat(rotateSkew1) : 0) + translateX);
         ret.y = (int) (p.x * (hasRotate ? toFloat(rotateSkew0) : 0) + p.y * (hasScale ? toFloat(scaleY) : 1) + translateY);
         return ret;
+    }
+
+    public float getRotateSkew0Float() {
+        return (hasRotate ? toFloat(rotateSkew0) : 0);
+    }
+
+    public float getRotateSkew1Float() {
+        return (hasRotate ? toFloat(rotateSkew1) : 0);
+    }
+
+    public float getScaleXFloat() {
+        return (hasScale ? toFloat(scaleX) : 1);
+    }
+
+    public float getScaleYFloat() {
+        return (hasScale ? toFloat(scaleY) : 1);
     }
 
     public MATRIX merge(MATRIX m) {

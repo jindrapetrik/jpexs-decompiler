@@ -16,7 +16,10 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import java.awt.image.BufferedImage;
+import java.util.List;
 
 /**
  *
@@ -29,4 +32,6 @@ public interface ShapeTag {
     public String toSVG();
 
     public int getShapeNum();
+
+    public BufferedImage toImage(List<Tag> tags);
 }

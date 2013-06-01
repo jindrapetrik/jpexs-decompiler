@@ -76,6 +76,7 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
@@ -161,7 +162,9 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     public FlashPlayerPanel flashPanel;
     public JPanel displayPanel;
     public ImagePanel imagePanel;
+    public ImagePanel shapeImagePanel;
     final static String CARDFLASHPANEL = "Flash card";
+    final static String CARDSHAPEPANEL = "Shape card";
     final static String CARDIMAGEPANEL = "Image card";
     final static String CARDEMPTYPANEL = "Empty card";
     final static String CARDACTIONSCRIPTPANEL = "ActionScript card";
@@ -628,6 +631,12 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         imagesCard.add(imageButtonsPanel, BorderLayout.SOUTH);
 
         displayPanel.add(imagesCard, CARDIMAGEPANEL);
+
+        JPanel shapesCard = new JPanel(new BorderLayout());
+        shapeImagePanel = new ImagePanel();
+        shapesCard.add(shapeImagePanel, BorderLayout.CENTER);
+        displayPanel.add(shapesCard, CARDSHAPEPANEL);
+
         displayPanel.add(new JPanel(), CARDEMPTYPANEL);
         if (actionPanel != null) {
             displayPanel.add(actionPanel, CARDACTIONSCRIPTPANEL);
@@ -1814,6 +1823,9 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             imageButtonsPanel.setVisible(((ImageTag) tagObj).importSupported());
             showCard(CARDIMAGEPANEL);
             imagePanel.setImage(((ImageTag) tagObj).getImage(swf.tags));
+        } else if (tagObj instanceof ShapeTag) {
+            showCard(CARDSHAPEPANEL);
+            shapeImagePanel.setImage(((ShapeTag) tagObj).toImage(swf.tags));
         } else if ((tagObj instanceof FrameNode && ((FrameNode) tagObj).isDisplayed()) || (((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag))) {
             try {
 
