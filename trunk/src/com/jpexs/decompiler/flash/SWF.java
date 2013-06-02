@@ -1384,6 +1384,17 @@ public class SWF {
         ret.Xmax = rect.Xmax;
         ret.Ymin = rect.Ymin;
         ret.Ymax = rect.Ymax;
+
+
+
+        if (ret.Xmax <= 0) {
+            ret.Xmax = ret.getWidth();
+            ret.Xmin = 0;
+        }
+        if (ret.Ymax <= 0) {
+            ret.Ymax = ret.getHeight();
+            ret.Ymin = 0;
+        }
         if (ret.Xmin < 0) {
             ret.Xmax += (-ret.Xmin);
             ret.Xmin = 0;
@@ -1392,11 +1403,19 @@ public class SWF {
             ret.Ymax += (-ret.Ymin);
             ret.Ymin = 0;
         }
+
+        if (ret.getWidth() < 1 || ret.getHeight() < 1) {
+            ret.Xmin = 0;
+            ret.Ymin = 0;
+            ret.Xmax = 20;
+            ret.Ymax = 20;
+        }
         return ret;
     }
 
     public static BufferedImage frameToImage(int containerId, int maxDepth, HashMap<Integer, Layer> layers, Color backgroundColor, HashMap<Integer, CharacterTag> characters, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect) {
         displayRect = fixRect(displayRect);
+
         String key = "frame_" + frame + "_" + containerId;
         if (cache.contains(key)) {
             return ((CachedImage) cache.get(key)).getImage();

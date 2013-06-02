@@ -66,6 +66,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
 
     private RECT getCharacterBounds(HashMap<Integer, CharacterTag> allCharacters, Set<Integer> characters) {
         RECT ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
+        boolean foundSomething = false;
         for (int c : characters) {
             Tag t = allCharacters.get(c);
             RECT r = null;
@@ -73,11 +74,15 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
                 r = ((BoundedTag) t).getRect(allCharacters);
             }
             if (r != null) {
+                foundSomething = true;
                 ret.Xmin = Math.min(r.Xmin, ret.Xmin);
                 ret.Ymin = Math.min(r.Ymin, ret.Ymin);
                 ret.Xmax = Math.max(r.Xmax, ret.Xmax);
                 ret.Ymax = Math.max(r.Ymax, ret.Ymax);
             }
+        }
+        if (!foundSomething) {
+            return new RECT();
         }
         return ret;
     }
@@ -86,6 +91,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
     public RECT getRect(HashMap<Integer, CharacterTag> characters) {
         RECT ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
         HashMap<Integer, Integer> depthMap = new HashMap<Integer, Integer>();
+        boolean foundSomething = false;
         for (Tag t : subTags) {
             MATRIX m = null;
             int characterId = -1;
@@ -129,6 +135,10 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
             ret.Ymin = Math.min(r.Ymin, ret.Ymin);
             ret.Xmax = Math.max(r.Xmax, ret.Xmax);
             ret.Ymax = Math.max(r.Ymax, ret.Ymax);
+            foundSomething = true;
+        }
+        if (!foundSomething) {
+            return new RECT();
         }
         return ret;
     }

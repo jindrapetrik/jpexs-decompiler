@@ -164,16 +164,28 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                     }
                     break;
                 case FILLSTYLE.FOCAL_RADIAL_GRADIENT:
-                    float focRadFractions[] = new float[fillStyle0.focalGradient.gradientRecords.length];
-                    Color focRadColors[] = new Color[fillStyle0.focalGradient.gradientRecords.length];
-                    for (int i = 0; i < fillStyle0.focalGradient.gradientRecords.length; i++) {
-                        focRadFractions[i] = fillStyle0.focalGradient.gradientRecords[i].getRatioFloat();
+
+                    List<Color> colorsFocRad = new ArrayList<Color>();
+                    List<Float> ratiosFocRad = new ArrayList<Float>();
+                    for (int i = 0; i < fillStyle0.gradient.gradientRecords.length; i++) {
+                        if ((i > 0) && (fillStyle0.gradient.gradientRecords[i - 1].ratio == fillStyle0.gradient.gradientRecords[i].ratio)) {
+                            continue;
+                        }
+                        ratiosFocRad.add(fillStyle0.gradient.gradientRecords[i].getRatioFloat());
                         if (shapeNum >= 3) {
-                            focRadColors[i] = new Color(fillStyle0.focalGradient.gradientRecords[i].colorA.red, fillStyle0.focalGradient.gradientRecords[i].colorA.green, fillStyle0.focalGradient.gradientRecords[i].colorA.blue, fillStyle0.focalGradient.gradientRecords[i].colorA.alpha);
+                            colorsFocRad.add(new Color(fillStyle0.gradient.gradientRecords[i].colorA.red, fillStyle0.gradient.gradientRecords[i].colorA.green, fillStyle0.gradient.gradientRecords[i].colorA.blue, fillStyle0.gradient.gradientRecords[i].colorA.alpha));
                         } else {
-                            focRadColors[i] = new Color(fillStyle0.focalGradient.gradientRecords[i].color.red, fillStyle0.focalGradient.gradientRecords[i].color.green, fillStyle0.focalGradient.gradientRecords[i].color.blue);
+                            colorsFocRad.add(new Color(fillStyle0.gradient.gradientRecords[i].color.red, fillStyle0.gradient.gradientRecords[i].color.green, fillStyle0.gradient.gradientRecords[i].color.blue));
                         }
                     }
+
+
+                    float focRadFractions[] = new float[ratiosFocRad.size()];
+                    for (int i = 0; i < ratiosFocRad.size(); i++) {
+                        focRadFractions[i] = ratiosFocRad.get(i);
+                    }
+                    Color focRadColors[] = colorsFocRad.toArray(new Color[colorsFocRad.size()]);
+
                     RGB focEndColor = fillStyle0.focalGradient.gradientRecords[fillStyle0.focalGradient.gradientRecords.length - 1].color;
                     RGBA focEndColorA = fillStyle0.focalGradient.gradientRecords[fillStyle0.focalGradient.gradientRecords.length - 1].colorA;
                     if (shapeNum >= 3) {
@@ -204,16 +216,28 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                     g.setClip(null);
                     return;
                 case FILLSTYLE.RADIAL_GRADIENT:
-                    float radFractions[] = new float[fillStyle0.gradient.gradientRecords.length];
-                    Color radColors[] = new Color[fillStyle0.gradient.gradientRecords.length];
+                    List<Color> colorsRad = new ArrayList<Color>();
+                    List<Float> ratiosRad = new ArrayList<Float>();
                     for (int i = 0; i < fillStyle0.gradient.gradientRecords.length; i++) {
-                        radFractions[i] = fillStyle0.gradient.gradientRecords[i].getRatioFloat();
+                        if ((i > 0) && (fillStyle0.gradient.gradientRecords[i - 1].ratio == fillStyle0.gradient.gradientRecords[i].ratio)) {
+                            continue;
+                        }
+                        ratiosRad.add(fillStyle0.gradient.gradientRecords[i].getRatioFloat());
                         if (shapeNum >= 3) {
-                            radColors[i] = new Color(fillStyle0.gradient.gradientRecords[i].colorA.red, fillStyle0.gradient.gradientRecords[i].colorA.green, fillStyle0.gradient.gradientRecords[i].colorA.blue, fillStyle0.gradient.gradientRecords[i].colorA.alpha);
+                            colorsRad.add(new Color(fillStyle0.gradient.gradientRecords[i].colorA.red, fillStyle0.gradient.gradientRecords[i].colorA.green, fillStyle0.gradient.gradientRecords[i].colorA.blue, fillStyle0.gradient.gradientRecords[i].colorA.alpha));
                         } else {
-                            radColors[i] = new Color(fillStyle0.gradient.gradientRecords[i].color.red, fillStyle0.gradient.gradientRecords[i].color.green, fillStyle0.gradient.gradientRecords[i].color.blue);
+                            colorsRad.add(new Color(fillStyle0.gradient.gradientRecords[i].color.red, fillStyle0.gradient.gradientRecords[i].color.green, fillStyle0.gradient.gradientRecords[i].color.blue));
                         }
                     }
+
+
+
+                    float ratiosRadAr[] = new float[ratiosRad.size()];
+                    for (int i = 0; i < ratiosRad.size(); i++) {
+                        ratiosRadAr[i] = ratiosRad.get(i);
+                    }
+                    Color colorsRadArr[] = colorsRad.toArray(new Color[colorsRad.size()]);
+
                     RGB endColor = fillStyle0.gradient.gradientRecords[fillStyle0.gradient.gradientRecords.length - 1].color;
                     RGBA endColorA = fillStyle0.gradient.gradientRecords[fillStyle0.gradient.gradientRecords.length - 1].colorA;
                     if (shapeNum >= 3) {
@@ -238,22 +262,34 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                         cmRad = CycleMethod.REPEAT;
                     }
 
-                    g.setPaint(new RadialGradientPaint(new Point(0, 0), 16384, radFractions, radColors, cmRad));
+                    g.setPaint(new RadialGradientPaint(new Point(0, 0), 16384, ratiosRadAr, colorsRadArr, cmRad));
                     g.fill(new Rectangle(-16384 * maxRepeat, -16384 * maxRepeat, 16384 * 2 * maxRepeat, 16384 * 2 * maxRepeat));
                     g.setTransform(oldAf);
                     g.setClip(null);
                     return;
                 case FILLSTYLE.LINEAR_GRADIENT:
-                    float fractions[] = new float[fillStyle0.gradient.gradientRecords.length];
-                    Color colors[] = new Color[fillStyle0.gradient.gradientRecords.length];
+                    List<Color> colors = new ArrayList<Color>();
+                    List<Float> ratios = new ArrayList<Float>();
                     for (int i = 0; i < fillStyle0.gradient.gradientRecords.length; i++) {
-                        fractions[i] = fillStyle0.gradient.gradientRecords[i].getRatioFloat();
+                        if ((i > 0) && (fillStyle0.gradient.gradientRecords[i - 1].ratio == fillStyle0.gradient.gradientRecords[i].ratio)) {
+                            continue;
+                        }
+                        ratios.add(fillStyle0.gradient.gradientRecords[i].getRatioFloat());
                         if (shapeNum >= 3) {
-                            colors[i] = new Color(fillStyle0.gradient.gradientRecords[i].colorA.red, fillStyle0.gradient.gradientRecords[i].colorA.green, fillStyle0.gradient.gradientRecords[i].colorA.blue, fillStyle0.gradient.gradientRecords[i].colorA.alpha);
+                            colors.add(new Color(fillStyle0.gradient.gradientRecords[i].colorA.red, fillStyle0.gradient.gradientRecords[i].colorA.green, fillStyle0.gradient.gradientRecords[i].colorA.blue, fillStyle0.gradient.gradientRecords[i].colorA.alpha));
                         } else {
-                            colors[i] = new Color(fillStyle0.gradient.gradientRecords[i].color.red, fillStyle0.gradient.gradientRecords[i].color.green, fillStyle0.gradient.gradientRecords[i].color.blue);
+                            colors.add(new Color(fillStyle0.gradient.gradientRecords[i].color.red, fillStyle0.gradient.gradientRecords[i].color.green, fillStyle0.gradient.gradientRecords[i].color.blue));
                         }
                     }
+
+
+
+                    float ratiosAr[] = new float[ratios.size()];
+                    for (int i = 0; i < ratios.size(); i++) {
+                        ratiosAr[i] = ratios.get(i);
+                    }
+                    Color colorsArr[] = colors.toArray(new Color[colors.size()]);
+
                     GeneralPath pathLin = toGeneralPath(startX, startY);
                     g.fill(pathLin);
                     g.setClip(pathLin);
@@ -272,7 +308,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                     }
 
 
-                    g.setPaint(new LinearGradientPaint(new Point(-16384, 0), new Point(16384, 0), fractions, colors, cmLin));
+                    g.setPaint(new LinearGradientPaint(new Point(-16384, 0), new Point(16384, 0), ratiosAr, colorsArr, cmLin));
                     g.fill(new Rectangle(-16384 * maxRepeat, -16384 * maxRepeat, 16384 * 2 * maxRepeat, 16384 * 2 * maxRepeat));
                     g.setTransform(oldAf);
                     g.setClip(null);
@@ -307,6 +343,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
             GeneralPath ret = new GeneralPath();
             int x = startX;
             int y = startY;
+            boolean wasMoveTo = false;
             for (SHAPERECORD rec : edges) {
                 int nx = rec.changeX(x);
                 int ny = rec.changeY(y);
@@ -316,12 +353,21 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                         nx += startX;
                         ny += startY;
                         ret.moveTo(nx, ny);
+                        wasMoveTo = true;
                     }
                 }
                 if (rec instanceof StraightEdgeRecord) {
+                    if (!wasMoveTo) {
+                        ret.moveTo(x, y);
+                        wasMoveTo = true;
+                    }
                     ret.lineTo(nx, ny);
                 }
                 if (rec instanceof CurvedEdgeRecord) {
+                    if (!wasMoveTo) {
+                        ret.moveTo(x, y);
+                        wasMoveTo = true;
+                    }
                     CurvedEdgeRecord cer = (CurvedEdgeRecord) rec;
                     ret.quadTo((x + cer.controlDeltaX), (y + cer.controlDeltaY), (x + cer.controlDeltaX + cer.anchorDeltaX), (y + cer.controlDeltaY + cer.anchorDeltaY));
                 }

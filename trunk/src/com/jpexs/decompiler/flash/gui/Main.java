@@ -97,12 +97,11 @@ public class Main {
     public static boolean isCommandLineMode() {
         return commandLineMode;
     }
+
     /**
      * Dump tags to stdout
      */
     //
-    
-
     public static String getFileTitle() {
         if (maskURL != null) {
             return maskURL;

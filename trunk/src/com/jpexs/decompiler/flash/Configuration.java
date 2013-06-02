@@ -29,9 +29,7 @@ public class Configuration {
 
     public static final boolean DISPLAY_FILENAME = true;
     public static boolean DEBUG_COPY = false;
-    
     public static boolean dump_tags = false;
-    
     /**
      * Debug mode = throwing an error when comparing original file and
      * recompiled
@@ -54,14 +52,12 @@ public class Configuration {
      * Find latest constant pool in the code
      */
     public static final boolean LATEST_CONSTANTPOOL_HACK = false;
-    
     /**
      * Limit of code subs (for obfuscated code)
      */
     public static final int SUBLIMITER = 500;
     //using parameter names in decompiling may cause problems because oficial programs like Flash CS 5.5 inserts wrong parameter names indices
     public static final boolean PARAM_NAMES_ENABLE = false;
-    
     private static HashMap<String, Object> config = new HashMap<String, Object>();
     /**
      * List of replacements
