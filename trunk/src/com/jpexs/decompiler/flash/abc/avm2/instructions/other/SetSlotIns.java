@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.treemodel.ClassTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.DecrementTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.GetSlotTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.IncrementTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.treemodel.LocalRegTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.NewActivationTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.PostDecrementTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.PostIncrementTreeItem;
@@ -91,9 +92,15 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
         }
 
         if (slotname != null) {
-            if (localRegNames.containsValue(slotname.getName(constants, fullyQualifiedNames))) {
-                return;
-            };
+            if (value instanceof LocalRegTreeItem) {
+                LocalRegTreeItem lr = (LocalRegTreeItem) value;
+                String slotNameStr = slotname.getName(constants, fullyQualifiedNames);
+                if (localRegNames.containsKey(lr.regIndex)) {
+                    if (localRegNames.get(lr.regIndex).equals(slotNameStr)) {
+                        return; //Register with same name to slot
+                    }
+                }
+            }
         }
 
         if (value.getNotCoerced().getThroughDuplicate() instanceof IncrementTreeItem) {
