@@ -463,6 +463,21 @@ public class Graph {
         return ret;
     }
 
+    private void markBranchEnd(List<GraphTargetItem> items) {
+        if (!items.isEmpty()) {
+            if (items.get(items.size() - 1) instanceof BreakItem) {
+                return;
+            }
+            if (items.get(items.size() - 1) instanceof ContinueItem) {
+                return;
+            }
+            if (items.get(items.size() - 1) instanceof ExitItem) {
+                return;
+            }
+        }
+        items.add(new MarkItem("finish"));
+    }
+
     protected List<GraphTargetItem> printGraph(List<GraphPart> visited, List localData, Stack<GraphTargetItem> stack, List<GraphPart> allParts, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, HashMap<Loop, List<GraphTargetItem>> forFinalCommands) {
         if (visited.contains(part)) {
             //return new ArrayList<GraphTargetItem>();
@@ -862,6 +877,9 @@ public class Graph {
                             System.err.println("ONTRUE: (inside " + part + ")");
                         }
                         onTrue = printGraph(visited, prepareBranchLocalData(localData), trueStack, allParts, part, part.nextParts.get(1), next == null ? stopPart : next, loops, forFinalCommands);
+                        if (next == null) {
+                            markBranchEnd(onTrue);
+                        }
                         if (debugMode) {
                             System.err.println("/ONTRUE (inside " + part + ")");
                         }
@@ -880,6 +898,9 @@ public class Graph {
                                 onFalse = new ArrayList<GraphTargetItem>();
                             } else {
                                 onFalse = (printGraph(visited, prepareBranchLocalData(localData), falseStack, allParts, part, part.nextParts.get(0), next == null ? stopPart : next, loops, forFinalCommands));
+                                if (next == null) {
+                                    markBranchEnd(onFalse);
+                                }
                             }
                             if (debugMode) {
                                 System.err.println("/ONFALSE (inside " + part + ")");
@@ -991,7 +1012,7 @@ public class Graph {
                             List<GraphTargetItem> nextcmds = new ArrayList<GraphTargetItem>();
                             if ((!loopBody.isEmpty()) && (loopBody.get(loopBody.size() - 1) instanceof IfItem)) {
                                 IfItem ift = (IfItem) loopBody.get(loopBody.size() - 1);
-                                if ((!ift.onFalse.isEmpty()) && (ift.onFalse.get(ift.onFalse.size() - 1) instanceof ExitItem)) {//((ift.onFalse.size() == 1) && (ift.onFalse.get(0) instanceof ContinueItem) && (((ContinueItem) ift.onFalse.get(0)).loopId == currentLoop.id))) {
+                                if ((!ift.onFalse.isEmpty()) && ((ift.onFalse.get(ift.onFalse.size() - 1) instanceof ExitItem) || ((ift.onFalse.get(ift.onFalse.size() - 1) instanceof MarkItem) && ((MarkItem) (ift.onFalse.get(ift.onFalse.size() - 1))).getMark().equals("finish")))) {//((ift.onFalse.size() == 1) && (ift.onFalse.get(0) instanceof ContinueItem) && (((ContinueItem) ift.onFalse.get(0)).loopId == currentLoop.id))) {
                                     if (ift.expression != null) {
                                         expr = ift.expression;
                                         /*if (expr instanceof LogicalOpItem) {
@@ -1004,7 +1025,7 @@ public class Graph {
                                     newBody = ift.onTrue;
 
                                     loopBody.remove(loopBody.size() - 1);
-                                } else if ((!ift.onTrue.isEmpty()) && (ift.onTrue.get(ift.onTrue.size() - 1) instanceof ExitItem)) {//((ift.onTrue.size() == 1) && (ift.onTrue.get(0) instanceof ContinueItem) && (((ContinueItem) ift.onTrue.get(0)).loopId == currentLoop.id))) {
+                                } else if ((!ift.onTrue.isEmpty()) && ((ift.onTrue.get(ift.onTrue.size() - 1) instanceof ExitItem) || ((ift.onTrue.get(ift.onTrue.size() - 1) instanceof MarkItem) && ((MarkItem) (ift.onTrue.get(ift.onTrue.size() - 1))).getMark().equals("finish")))) {//((ift.onTrue.size() == 1) && (ift.onTrue.get(0) instanceof ContinueItem) && (((ContinueItem) ift.onTrue.get(0)).loopId == currentLoop.id))) {
                                     if (ift.expression != null) {
                                         expr = ift.expression;
                                         if (expr instanceof LogicalOpItem) {
@@ -1135,13 +1156,16 @@ public class Graph {
                                 }
                             }
                             if ((nearestLoop != null)) {// && (nearestLoop.loopBreak != null)) {
-                                GraphPart oldCont = nearestLoop.loopContinue;
+                                List<GraphTargetItem> finalCommands = printGraph(visited, localData, stack, allParts, part, p, nearestLoop.loopContinue, loops, forFinalCommands);
                                 nearestLoop.loopContinue = p;
-                                List<GraphTargetItem> finalCommands = printGraph(visited, localData, stack, allParts, part, p, oldCont, loops, forFinalCommands);
                                 forFinalCommands.put(nearestLoop, finalCommands);
                                 ContinueItem cti = new ContinueItem(null, nearestLoop.id);
                                 ret.add(cti);
+                            } else {
+                                //ret.add(new MarkItem("nextloop_notfound"));
                             }
+                        } else {
+                            //ret.add(new MarkItem("stoppart_reached"));
                         }
                     }
                 } else {
