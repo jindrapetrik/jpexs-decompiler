@@ -595,7 +595,7 @@ public class Graph {
                         ret.add(ti);
                     } else {
 
-                        printGraph(visited, localData, stack, allParts, parent, next, reversed ? sp1 : sp0, loops, forFinalCommands);
+                        printGraph(visited, localData, stack, allParts, parent, next, reversed ? sp1 : sp0, new ArrayList<Loop>()/*ignore loops*/, forFinalCommands);
                         GraphTargetItem second = stack.pop();
                         GraphTargetItem first = stack.pop();
 
@@ -644,7 +644,7 @@ public class Graph {
                     if ((ti = checkLoop(next, stopPart, loops)) != null) {
                         ret.add(ti);
                     } else {
-                        printGraph(visited, localData, stack, allParts, parent, next, reversed ? sp1 : sp0, loops, forFinalCommands);
+                        printGraph(visited, localData, stack, allParts, parent, next, reversed ? sp1 : sp0, new ArrayList<Loop>()/*ignore loops*/, forFinalCommands);
                         GraphTargetItem second = stack.pop();
                         GraphTargetItem first = stack.pop();
 
@@ -970,6 +970,7 @@ public class Graph {
                     }
                     checkContinueAtTheEnd(loopBody, currentLoop);
                     finalCommands = forFinalCommands.get(currentLoop);
+                    checkContinueAtTheEnd(finalCommands, currentLoop);
                     if (!finalCommands.isEmpty()) {
                         ret.add(new ForTreeItem(null, currentLoop, new ArrayList<GraphTargetItem>(), expr, finalCommands, loopBody));
                     } else {
@@ -1134,8 +1135,9 @@ public class Graph {
                                 }
                             }
                             if ((nearestLoop != null)) {// && (nearestLoop.loopBreak != null)) {
-                                List<GraphTargetItem> finalCommands = printGraph(visited, localData, stack, allParts, part, p, nearestLoop.loopContinue, loops, forFinalCommands);
+                                GraphPart oldCont = nearestLoop.loopContinue;
                                 nearestLoop.loopContinue = p;
+                                List<GraphTargetItem> finalCommands = printGraph(visited, localData, stack, allParts, part, p, oldCont, loops, forFinalCommands);
                                 forFinalCommands.put(nearestLoop, finalCommands);
                                 ContinueItem cti = new ContinueItem(null, nearestLoop.id);
                                 ret.add(cti);
