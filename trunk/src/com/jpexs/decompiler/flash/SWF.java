@@ -1514,7 +1514,7 @@ public class SWF {
                 g.drawImage(img, imgPos.x, imgPos.y, null);
             } else if (character instanceof BoundedTag) {
                 BoundedTag b = (BoundedTag) character;
-                g.setPaint(new Color(255, 255, 255, 128));                
+                g.setPaint(new Color(255, 255, 255, 128));
                 g.setComposite(BlendComposite.Invert);
                 RECT r = b.getRect(characters);
                 g.drawString(character.toString(), (r.Xmin) / 20 + 3, (r.Ymin) / 20 + 15);
