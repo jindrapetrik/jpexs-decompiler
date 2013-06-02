@@ -1368,12 +1368,12 @@ public class Graph {
         String parts[] = ret.toString().split("\r\n");
         ret = new StringBuilder();
 
-        String labelPattern="loop(switch)?[0-9]*:";
+        String labelPattern = "loop(switch)?[0-9]*:";
         try {
             Stack<String> loopStack = new Stack<String>();
             for (int p = 0; p < parts.length; p++) {
                 String stripped = Highlighting.stripHilights(parts[p]);
-                if (stripped.matches(labelPattern)){ // && (!stripped.startsWith("case ")) && (!stripped.equals("default:"))) {
+                if (stripped.matches(labelPattern)) {
                     loopStack.add(stripped.substring(0, stripped.length() - 1));
                 }
                 if (stripped.startsWith("break ")) {
