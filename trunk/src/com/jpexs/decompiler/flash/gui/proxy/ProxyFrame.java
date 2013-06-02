@@ -71,9 +71,10 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
     /**
      * Constructor
      */
+    @SuppressWarnings("unchecked")
     public ProxyFrame() {
 
-        listModel = new SWFListModel(Configuration.getReplacements());
+        listModel = new SWFListModel(Configuration.getReplacements());        
         swfList = new JList(listModel);
         swfList.addMouseListener(this);
         swfList.setFont(new Font("Monospaced", Font.PLAIN, 12));

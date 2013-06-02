@@ -63,7 +63,7 @@ public class ExportDialog extends JDialog {
             JLabel lab = new JLabel(optionNames[i]);
             lab.setBounds(10, top, 75, 25);
             cnt.add(lab);
-            combos[i] = new JComboBox(options[i]);
+            combos[i] = new JComboBox<String>(options[i]);
             combos[i].setBounds(90, top, 125, 25);
             cnt.add(combos[i]);
             top += 25;

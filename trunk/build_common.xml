@@ -43,8 +43,9 @@
     <target name="compile">
         <!--<delete dir="${COMPILEDIR}"/>-->
         <mkdir dir="${COMPILEDIR}"/>
-        <javac srcdir="${SOURCEDIR}" destdir="${COMPILEDIR}" includes="**/*.java" target="1.6" source="1.6" debug="true"
+        <javac srcdir="${SOURCEDIR}" destdir="${COMPILEDIR}" includes="**/*.java" target="${TARGETJAVA}" source="${TARGETJAVA}" debug="true"
                debuglevel="lines,vars,source" includeantruntime="false">
+            <compilerarg line="-Xlint:unchecked"/>
             <classpath>
                 <fileset dir="${LIBRARIESDIR}" includes="**/*.jar"/>
             </classpath>
@@ -63,7 +64,7 @@
         <mkdir dir="${TESTRESULTSDIR}/raw/"/>
         <delete dir="${COMPILETESTSDIR}"/>
         <mkdir dir="${COMPILETESTSDIR}"/>
-        <javac srcdir="${TESTDIR}" destdir="${COMPILETESTSDIR}" includes="**/*.java" target="1.6" debug="true" includeantruntime="false">
+        <javac srcdir="${TESTDIR}" destdir="${COMPILETESTSDIR}" includes="**/*.java" target="${TARGETJAVA}" debug="true" includeantruntime="false">            
             <classpath>
                 <pathelement path="${COMPILEDIR}"/>
                 <fileset dir="${LIBRARIESDIR}" includes="**/*.jar"/>

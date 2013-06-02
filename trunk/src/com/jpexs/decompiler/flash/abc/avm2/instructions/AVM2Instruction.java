@@ -243,6 +243,7 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
     public List<Object> replaceWith;
 
     @Override
+    @SuppressWarnings("unchecked")
     public void translate(List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output) {
         definition.translate((Boolean) localData.get(0),
                 (Integer) localData.get(13),

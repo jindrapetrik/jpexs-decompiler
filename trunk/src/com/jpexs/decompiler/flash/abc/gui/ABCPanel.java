@@ -227,6 +227,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
 
     }
 
+    @SuppressWarnings("unchecked")
     public ABCPanel(List<ABCContainerTag> list) {
 
 
@@ -379,7 +380,8 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
 
         JPanel panConstants = new JPanel();
         panConstants.setLayout(new BorderLayout());
-        constantTypeList = new JComboBox(new String[]{"UINT", "INT", "DOUBLE", "DECIMAL", "STRING", "NAMESPACE", "NAMESPACESET", "MULTINAME"});
+        
+        constantTypeList = new JComboBox(new Object[]{"UINT", "INT", "DOUBLE", "DECIMAL", "STRING", "NAMESPACE", "NAMESPACESET", "MULTINAME"});
         constantTable = new JTable();
         if (abc != null) {
             autoResizeColWidth(constantTable, new UIntTableModel(abc));

@@ -437,6 +437,7 @@ public class Graph {
         return part;
     }
 
+    @SuppressWarnings("unchecked")
     protected GraphTargetItem translatePartGetStack(List<Object> localData, GraphPart part, Stack<GraphTargetItem> stack) {
         stack = (Stack<GraphTargetItem>) stack.clone();
         translatePart(localData, part, stack);
@@ -862,7 +863,9 @@ public class Graph {
 
                     }
                     int stackSizeBefore = stack.size();
+                    @SuppressWarnings("unchecked")
                     Stack<GraphTargetItem> trueStack = (Stack<GraphTargetItem>) stack.clone();
+                    @SuppressWarnings("unchecked")
                     Stack<GraphTargetItem> falseStack = (Stack<GraphTargetItem>) stack.clone();
                     GraphTargetItem lopTrue = checkLoop(part.nextParts.get(1), stopPart, loops);
                     GraphTargetItem lopFalse = null;

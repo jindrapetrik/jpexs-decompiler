@@ -24,7 +24,7 @@ import javax.swing.JList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-public class TraitsList extends JList implements ListSelectionListener {
+public class TraitsList extends JList<Object> implements ListSelectionListener {
 
     ABC abc;
     List<ABCContainerTag> abcTags;
@@ -49,13 +49,15 @@ public class TraitsList extends JList implements ListSelectionListener {
         setCellRenderer(new IconListRenderer());
     }
 
+    @SuppressWarnings("unchecked")
     public void setABC(List<ABCContainerTag> abcTags, ABC abc) {
         this.abc = abc;
-        this.abcTags = abcTags;
+        this.abcTags = abcTags;        
         setModel(new DefaultListModel());
         setClassIndex(-1, -1);
     }
 
+    @SuppressWarnings("unchecked")
     public void setClassIndex(int classIndex, int scriptIndex) {
         this.classIndex = classIndex;
         if (classIndex == -1) {

@@ -26,7 +26,7 @@ import javax.swing.DefaultListModel;
  *
  * @author JPEXS
  */
-public class UsageListModel extends DefaultListModel {
+public class UsageListModel extends DefaultListModel<Object> {
 
     private ABC abc;
     private List<ABCContainerTag> abcTags;
@@ -37,15 +37,18 @@ public class UsageListModel extends DefaultListModel {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Object get(int index) {
         return ((MultinameUsage) super.get(index)).toString(abcTags, abc);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Object getElementAt(int index) {
         return ((MultinameUsage) super.getElementAt(index)).toString(abcTags, abc);
     }
 
+    @SuppressWarnings("unchecked")
     public MultinameUsage getUsage(int index) {
         return ((MultinameUsage) super.getElementAt(index));
     }

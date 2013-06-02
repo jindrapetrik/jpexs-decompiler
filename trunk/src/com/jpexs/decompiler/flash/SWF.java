@@ -1244,6 +1244,7 @@ public class SWF {
                 visited.add(ip);
                 List<Integer> branches = ins.getBranches(code);
                 for (int b : branches) {
+                    @SuppressWarnings("unchecked")
                     Stack<GraphTargetItem> brStack = (Stack<GraphTargetItem>) stack.clone();
                     if (b >= 0) {
                         getVariables(constantPool, localData, brStack, output, code, b, ip, variables, functions, visited);

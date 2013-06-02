@@ -22,7 +22,7 @@ import java.util.List;
 import javax.swing.ComboBoxModel;
 import javax.swing.event.ListDataListener;
 
-public class ABCComboBoxModel implements ComboBoxModel {
+public class ABCComboBoxModel implements ComboBoxModel<Object> {
 
     public List<ABCContainerTag> list;
     public int itemIndex = 0;

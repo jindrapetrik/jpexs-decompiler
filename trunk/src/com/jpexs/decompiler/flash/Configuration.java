@@ -123,10 +123,12 @@ public class Configuration {
         config.putAll(map);
     }
 
+    @SuppressWarnings("unchecked")
     public static void loadFromFile(String file, String replacementsFile) {
         ObjectInputStream ois = null;
         try {
             ois = new ObjectInputStream(new FileInputStream(file));
+            
             config = (HashMap<String, Object>) ois.readObject();
         } catch (FileNotFoundException ex) {
         } catch (ClassNotFoundException cnf) {

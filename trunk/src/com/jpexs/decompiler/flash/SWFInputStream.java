@@ -529,6 +529,7 @@ public class SWFInputStream extends InputStream {
         return readActionList(listeners, address, containerSWFOffset, rri, version, rri.getPos(), rri.getPos() + maxlen);
     }
 
+    @SuppressWarnings("unchecked")
     private static void getConstantPool(List<DisassemblyListener> listeners, ConstantPool cpool, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, int lastIp, List<ConstantPool> constantPools, List<Integer> visited, int version, int endIp) {
         boolean debugMode = false;
         boolean deobfuscate = (Boolean) Configuration.getConfig("autoDeobfuscate", true);
@@ -669,6 +670,7 @@ public class SWFInputStream extends InputStream {
                     visited.add(ip);
                     List<Integer> branches = ins.getBranches(code);
                     for (int b : branches) {
+                        @SuppressWarnings("unchecked")
                         Stack<GraphTargetItem> brStack = (Stack<GraphTargetItem>) stack.clone();
                         if (b >= 0) {
                             getConstantPool(listeners, cpool, localData, brStack, output, code, b, ip, constantPools, visited, version, endIp);
@@ -794,6 +796,7 @@ public class SWFInputStream extends InputStream {
         return reta;
     }
 
+    @SuppressWarnings("unchecked")
     private static boolean readActionListAtPos(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, long address, long containerSWFOffset, boolean notCompileTime, boolean enableVariables, List<Object> localData, Stack<GraphTargetItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret, int startIp, int endip) throws IOException {
         boolean debugMode = false;
         boolean decideBranch = false;
@@ -866,6 +869,7 @@ public class SWFInputStream extends InputStream {
                     atos = a.toString();
                 }
                 System.err.println("readActionListAtPos ip: " + (ip - startIp) + " (0x" + Helper.formatAddress(ip - startIp) + ") " + " action(len " + a.actionLength + "): " + atos + (a.isIgnored() ? " (ignored)" : "") + " stack:" + Helper.stackToString(stack, Helper.toList(cpool)) + " " + Helper.byteArrToString(a.getBytes(SWF.DEFAULT_VERSION)));
+                @SuppressWarnings("unchecked")
                 HashMap<String, GraphTargetItem> vars = (HashMap<String, GraphTargetItem>) localData.get(1);
                 System.err.print("variables: ");
                 for (String v : vars.keySet()) {
@@ -1082,6 +1086,7 @@ public class SWFInputStream extends InputStream {
                 aif.ignoreUsed = true;
                 aif.jumpUsed = true;
                 int oldPos = rri.getPos();
+                @SuppressWarnings("unchecked")
                 Stack<GraphTargetItem> substack = (Stack<GraphTargetItem>) stack.clone();
                 if (readActionListAtPos(listeners, output, containers, address, containerSWFOffset, true, enableVariables, localData, substack, cpool, sis, rri, rri.getPos() + aif.getJumpOffset(), ret, startIp, endip)) {
                     retv = true;

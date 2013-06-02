@@ -42,6 +42,7 @@ public class DeobfuscationDialog extends JDialog implements ActionListener {
     public static final int LEVEL_REMOVE_TRAPS = 2;
     public static final int LEVEL_RESTORE_CONTROL_FLOW = 3;
 
+    @SuppressWarnings("unchecked")
     public DeobfuscationDialog() {
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setSize(new Dimension(300, 270));
@@ -58,6 +59,7 @@ public class DeobfuscationDialog extends JDialog implements ActionListener {
         cp.add(lab1);
         Hashtable labelTable = new Hashtable();
         //labelTable.put(new Integer(LEVEL_NONE), new JLabel("None"));
+        
         labelTable.put(new Integer(LEVEL_REMOVE_DEAD_CODE), new JLabel("Remove dead code"));
         labelTable.put(new Integer(LEVEL_REMOVE_TRAPS), new JLabel("Remove traps"));
         labelTable.put(new Integer(LEVEL_RESTORE_CONTROL_FLOW), new JLabel("Restore control flow"));

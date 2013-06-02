@@ -46,6 +46,7 @@ public class UsageFrame extends JFrame implements ActionListener, MouseListener 
     private ABC abc;
     private ABCPanel abcPanel;
 
+    @SuppressWarnings("unchecked")
     public UsageFrame(List<ABCContainerTag> abcTags, ABC abc, int multinameIndex, ABCPanel abcPanel) {
         this.abcPanel = abcPanel;
         List<MultinameUsage> usages = abc.findMultinameUsage(multinameIndex);

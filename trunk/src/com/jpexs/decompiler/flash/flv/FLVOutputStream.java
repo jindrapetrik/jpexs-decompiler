@@ -188,6 +188,7 @@ public class FLVOutputStream extends OutputStream {
                 writeSCRIPTDATASTRING((String) v.value);
                 break;
             case 3:
+                @SuppressWarnings("unchecked")
                 List<SCRIPTDATAOBJECT> objects = (List<SCRIPTDATAOBJECT>) v.value;
                 for (SCRIPTDATAOBJECT o : objects) {
                     writeSCRIPTDATAOBJECT(o);
@@ -207,6 +208,7 @@ public class FLVOutputStream extends OutputStream {
                 writeUI16((int) (Integer) v.value);
                 break;
             case 8:
+                @SuppressWarnings("unchecked")
                 List<SCRIPTDATAVARIABLE> variables = (List<SCRIPTDATAVARIABLE>) v.value;
                 writeUI32(variables.size());
                 for (SCRIPTDATAVARIABLE var : variables) {
@@ -218,6 +220,7 @@ public class FLVOutputStream extends OutputStream {
                 //reserved
                 break;
             case 10:
+                @SuppressWarnings("unchecked")
                 List<SCRIPTDATAVARIABLE> stvariables = (List<SCRIPTDATAVARIABLE>) v.value;
                 writeUI32(stvariables.size());
                 for (SCRIPTDATAVARIABLE var : stvariables) {

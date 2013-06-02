@@ -9,7 +9,8 @@
     <property name="JARFILENAME" value="ffdec"/>
     <property name="EXEFILENAME" value="ffdec"/>
     <property name="EXEICON" value="${basedir}/graphics/icon_ffdec.ico"/>
-    <property name="MINJAVAVERSION" value="1.6.0"/>
+    <property name="TARGETJAVA" value="1.7"/>
+    <property name="MINJAVAVERSION" value="1.7.0"/>
     <property name="VENDOR" value="JPEXS" />
     <property name="INTERNALNAME" value="FFDec" />
     <property name="PRODUCTNAME" value="JPEXS Free Flash Decompiler" />

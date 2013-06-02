@@ -109,7 +109,7 @@ public class AVM2Graph extends Graph {
         for (GraphPart head : g.heads) {
             populateParts(head, allParts);
         }
-        List<Object> localData = new ArrayList();
+        List<Object> localData = new ArrayList<Object>();
         localData.add((Boolean) isStatic);
         localData.add((Integer) classIndex);
         localData.add(localRegs);
@@ -1152,8 +1152,11 @@ public class AVM2Graph extends Graph {
 
 
 
+        @SuppressWarnings("unchecked")
         List<ABCException> parsedExceptions = (List<ABCException>) localData.get(DATA_PARSEDEXCEPTIONS);
+        @SuppressWarnings("unchecked")
         List<Integer> finallyJumps = (List<Integer>) localData.get(DATA_FINALLYJUMPS);
+        @SuppressWarnings("unchecked")
         List<Integer> ignoredSwitches = (List<Integer>) localData.get(DATA_IGNOREDSWITCHES);
         int ip = part.start;
         int addr = code.fixAddrAfterDebugLine(code.pos2adr(part.start));
@@ -1268,7 +1271,7 @@ public class AVM2Graph extends Graph {
                         }
                     }
                     stack.add(new ExceptionTreeItem(catchedExceptions.get(e)));
-                    List<Object> localData2 = new ArrayList();
+                    List<Object> localData2 = new ArrayList<Object>();
                     localData2.addAll(localData);
                     localData2.set(DATA_SCOPESTACK, new Stack<GraphTargetItem>());
                     catchedCommands.add(printGraph(new ArrayList<GraphPart>(), localData2, stack, allParts, parent, npart, nepart, loops, forFinalCommands));
@@ -1493,6 +1496,7 @@ public class AVM2Graph extends Graph {
 
     @Override
     protected GraphPart checkPart(List<Object> localData, GraphPart next) {
+        @SuppressWarnings("unchecked")
         List<Integer> finallyJumps = (List<Integer>) localData.get(DATA_FINALLYJUMPS);
         for (int f : finallyJumps) {
             if (next.start == f) {
@@ -1564,8 +1568,9 @@ public class AVM2Graph extends Graph {
 
     @Override
     public List<Object> prepareBranchLocalData(List<Object> localData) {
-        List<Object> ret = new ArrayList();
+        List<Object> ret = new ArrayList<Object>();
         ret.addAll(localData);
+        @SuppressWarnings("unchecked")
         Stack<GraphTargetItem> scopeStack = (Stack<GraphTargetItem>) ret.get(DATA_SCOPESTACK);
         Stack<GraphTargetItem> copyScopeStack = new Stack<GraphTargetItem>();
         copyScopeStack.addAll(scopeStack);

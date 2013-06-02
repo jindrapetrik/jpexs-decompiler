@@ -2160,6 +2160,7 @@ public class AVM2Code implements Serializable {
         public boolean skipUsed = false;
     }
 
+    @SuppressWarnings("unchecked")
     private static int removeTraps(boolean secondPass, boolean useVisited, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, int lastIp, HashMap<Integer, Integer> visited, HashMap<Integer, HashMap<Integer, GraphTargetItem>> visitedStates, HashMap<GraphSourceItem, Decision> decisions) {
         boolean debugMode = false;
         int ret = 0;

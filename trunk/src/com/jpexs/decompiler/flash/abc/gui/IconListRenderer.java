@@ -20,8 +20,7 @@ import com.jpexs.decompiler.flash.gui.View;
 import java.awt.Component;
 import javax.swing.*;
 
-public class IconListRenderer
-        extends DefaultListCellRenderer {
+public class IconListRenderer extends DefaultListCellRenderer {
 
     private Icon constIcon;
     private Icon functionIcon;
