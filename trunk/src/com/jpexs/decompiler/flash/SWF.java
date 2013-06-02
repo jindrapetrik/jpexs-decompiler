@@ -1162,7 +1162,7 @@ public class SWF {
         return null;
     }
 
-    private static void getVariables(ConstantPool constantPool, List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, int lastIp, HashMap<DirectValueTreeItem, ConstantPool> variables, List<GraphSourceItem> functions, List<Integer> visited) {
+    private static void getVariables(ConstantPool constantPool, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, int lastIp, HashMap<DirectValueTreeItem, ConstantPool> variables, List<GraphSourceItem> functions, List<Integer> visited) {
         boolean debugMode = false;
         while ((ip > -1) && ip < code.size()) {
             if (visited.contains(ip)) {
@@ -1263,7 +1263,7 @@ public class SWF {
     }
 
     private static void getVariables(HashMap<DirectValueTreeItem, ConstantPool> variables, List<GraphSourceItem> functions, ActionGraphSource code, int addr) {
-        List localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
+        List<Object> localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
         try {
             getVariables(null, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0, variables, functions, new ArrayList<Integer>());
         } catch (Exception ex) {
@@ -1275,9 +1275,7 @@ public class SWF {
         HashMap<DirectValueTreeItem, ConstantPool> ret = new HashMap<DirectValueTreeItem, ConstantPool>();
         List<Action> actions = src.getActions(version);
         actionsMap.put(src, actions);
-        List<GraphSourceItem> ss = new ArrayList<GraphSourceItem>();
-        ss.addAll(actions);
-        getVariables(variables, functions, new ActionGraphSource(ss, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0);
+        getVariables(variables, functions, new ActionGraphSource(actions, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0);
         return ret;
     }
     private HashMap<ASMSource, List<Action>> actionsMap = new HashMap<ASMSource, List<Action>>();

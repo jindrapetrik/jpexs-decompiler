@@ -379,19 +379,13 @@ public class Action implements GraphSourceItem {
      * @param hex Add hexadecimal?
      * @return ASM source as String
      */
-    public static String actionsToString(List<DisassemblyListener> listeners, long address, List list, List<Long> importantOffsets, List<String> constantPool, int version, boolean hex, long swfPos) {
+    public static String actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, List<String> constantPool, int version, boolean hex, long swfPos) {
         long offset;
         if (importantOffsets == null) {
             //setActionsAddresses(list, 0, version);
             importantOffsets = getActionsAllRefs(list, version);
         }
-        List<GraphSourceItem> srcList = new ArrayList<GraphSourceItem>();
-        for (Object o : list) {
-            if (o instanceof Action) {
-                srcList.add((Action) o);
-            }
-        }
-        List<ConstantPool> cps = SWFInputStream.getConstantPool(new ArrayList<DisassemblyListener>(), new ActionGraphSource(srcList, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, version);
+        List<ConstantPool> cps = SWFInputStream.getConstantPool(new ArrayList<DisassemblyListener>(), new ActionGraphSource(list, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, version);
         if (!cps.isEmpty()) {
             setConstantPool(list, cps.get(cps.size() - 1));
         }
@@ -401,9 +395,9 @@ public class Action implements GraphSourceItem {
         int pos = -1;
         boolean lastPush = false;
         StringBuilder ret = new StringBuilder();
-        for (GraphSourceItem s : srcList) {
+        for (GraphSourceItem s : list) {
             for (int i = 0; i < listeners.size(); i++) {
-                listeners.get(i).progress("toString", pos + 2, srcList.size());
+                listeners.get(i).progress("toString", pos + 2, list.size());
             }
             Action a = null;
             if (s instanceof Action) {
@@ -552,7 +546,7 @@ public class Action implements GraphSourceItem {
      * @param hex Add hexadecimal
      * @return String of P-code source
      */
-    public String getASMSource(List<GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+    public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
         return toString();
     }
 
@@ -669,7 +663,7 @@ public class Action implements GraphSourceItem {
     }
 
     @Override
-    public void translate(List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output) {
+    public void translate(List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output) {
         translate(stack, output, (HashMap<Integer, String>) localData.get(0), (HashMap<String, GraphTargetItem>) localData.get(1), (HashMap<String, GraphTargetItem>) localData.get(2));
     }
 
@@ -730,17 +724,11 @@ public class Action implements GraphSourceItem {
         logger.fine(s);
     }
 
-    public static List<GraphTargetItem> actionsPartToTree(HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, Stack<GraphTargetItem> stack, List<GraphSourceItem> src, int start, int end, int version) {
-        List<Action> actions = new ArrayList<Action>();
-        for (GraphSourceItem s : src) {
-            if (s instanceof Action) {
-                actions.add((Action) s);
-            }
-        }
+    public static List<GraphTargetItem> actionsPartToTree(HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, Stack<GraphTargetItem> stack, List<Action> actions, int start, int end, int version) {
         if (start < actions.size() && (end > 0) && (start > 0)) {
             log("Entering " + start + "-" + end + (actions.size() > 0 ? (" (" + actions.get(start).toString() + " - " + actions.get(end == actions.size() ? end - 1 : end) + ")") : ""));
         }
-        List localData = new ArrayList();
+        List<Object> localData = new ArrayList<Object>();
         localData.add(registerNames);
         localData.add(variables);
         localData.add(functions);
@@ -807,7 +795,7 @@ public class Action implements GraphSourceItem {
                         outs.add(new ArrayList<GraphTargetItem>());
                         continue;
                     }
-                    List<GraphTargetItem> out = ActionGraph.translateViaGraph(cnt.getRegNames(), variables, functions, src.subList(adr2ip(actions, endAddr, version), adr2ip(actions, endAddr + size, version)), version);
+                    List<GraphTargetItem> out = ActionGraph.translateViaGraph(cnt.getRegNames(), variables, functions, actions.subList(adr2ip(actions, endAddr, version), adr2ip(actions, endAddr + size, version)), version);
                     outs.add(out);
                     endAddr += size;
                 }
@@ -1251,7 +1239,7 @@ public class Action implements GraphSourceItem {
         return ret;
     }
 
-    public static void setConstantPool(List<GraphSourceItem> actions, ConstantPool cpool) {
+    public static void setConstantPool(List<? extends GraphSourceItem> actions, ConstantPool cpool) {
         for (GraphSourceItem a : actions) {
             if (a instanceof ActionPush) {
                 if (cpool != null) {
@@ -1271,7 +1259,7 @@ public class Action implements GraphSourceItem {
         }
     }
 
-    public String getASMSourceReplaced(List<GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+    public String getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
         return getASMSource(container, knownAddreses, constantPool, version, hex);
     }
 }

@@ -37,7 +37,7 @@ public class FindPropertyStrictIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+    public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
         int multiIndex = (int) ((Long) arguments.get(0)).longValue();
         //if is runtime
         //pop(name), pop(ns)

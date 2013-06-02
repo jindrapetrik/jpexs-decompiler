@@ -124,8 +124,8 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
         return ret;
     }
 
-    public List getParamsAsList(ConstantPool constants) {
-        List s = new ArrayList();
+    public List<Object> getParamsAsList(ConstantPool constants) {
+        List<Object> s = new ArrayList<Object>();
         for (int i = 0; i < definition.operands.length; i++) {
             switch (definition.operands[i]) {
                 case AVM2Code.DAT_MULTINAME_INDEX:
@@ -240,10 +240,10 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
         s += getParams(constants, fullyQualifiedNames) + getComment();
         return s;
     }
-    public List replaceWith;
+    public List<Object> replaceWith;
 
     @Override
-    public void translate(List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output) {
+    public void translate(List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output) {
         definition.translate((Boolean) localData.get(0),
                 (Integer) localData.get(13),
                 (Integer) localData.get(1),

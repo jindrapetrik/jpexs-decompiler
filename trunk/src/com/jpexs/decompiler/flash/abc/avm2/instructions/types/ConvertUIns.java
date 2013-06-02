@@ -35,7 +35,7 @@ public class ConvertUIns extends InstructionDefinition implements CoerceOrConver
     }
 
     @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+    public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
         throw new UnsupportedOperationException("Cannot convert to uint ");
     }
 

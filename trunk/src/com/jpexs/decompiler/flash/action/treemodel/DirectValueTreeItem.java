@@ -124,7 +124,7 @@ public class DirectValueTreeItem extends TreeItem {
     }
 
     @Override
-    public String toStringNoQuotes(List localData) {
+    public String toStringNoQuotes(List<Object> localData) {
         if (value instanceof Double) {
             if (Double.compare((double) (Double) value, 0) == 0) {
                 return hilight("0");

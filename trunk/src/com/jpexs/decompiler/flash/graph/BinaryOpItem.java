@@ -41,7 +41,7 @@ public abstract class BinaryOpItem extends GraphTargetItem {
     }
 
     @Override
-    public String toString(List localData) {
+    public String toString(List<Object> localData) {
         String ret = "";
         if (leftSide.getPrecedence() > precedence) {
             ret += "(" + leftSide.toString(localData) + ")";

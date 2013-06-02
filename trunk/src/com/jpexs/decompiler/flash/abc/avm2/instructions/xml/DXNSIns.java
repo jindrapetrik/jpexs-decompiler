@@ -38,7 +38,7 @@ public class DXNSIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+    public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
         int strIndex = (int) ((Long) arguments.get(0)).longValue();
         String s = constants.constant_string[strIndex];
         System.out.println("Set default XML space " + s);

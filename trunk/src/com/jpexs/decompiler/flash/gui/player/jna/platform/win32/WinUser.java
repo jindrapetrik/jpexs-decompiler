@@ -88,7 +88,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
         public RECT rcCaret;
 
         @Override
-        protected List getFieldOrder() {
+        protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{"cbSize", "flags",
                 "hwndActive", "hwndFocus", "hwndCapture", "hwndMenuOwner",
                 "hwndMoveSize", "hwndCaret", "rcCaret"});
@@ -109,7 +109,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
         public short wCreatorVersion;
 
         @Override
-        protected List getFieldOrder() {
+        protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{"cbSize", "rcWindow",
                 "rcClient", "dwStyle", "dwExStyle", "dwWindowStatus",
                 "cxWindowBorders", "cyWindowBorders", "atomWindowType",
@@ -155,7 +155,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
         }
 
         @Override
-        protected List getFieldOrder() {
+        protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{"x", "y"});
         }
     }
@@ -170,7 +170,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
         public POINT pt;
 
         @Override
-        protected List getFieldOrder() {
+        protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{"hWnd", "message", "wParam",
                 "lParam", "time", "pt"});
         }
@@ -185,7 +185,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
         public int dwTimeout;
 
         @Override
-        protected List getFieldOrder() {
+        protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{"cbSize", "hWnd", "dwFlags",
                 "uCount", "dwTimeout"});
         }
@@ -220,7 +220,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
         }
 
         @Override
-        protected List getFieldOrder() {
+        protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{"cx", "cy"});
         }
     }
@@ -237,7 +237,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
         public byte AlphaFormat;
 
         @Override
-        protected List getFieldOrder() {
+        protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{"BlendOp", "BlendFlags",
                 "SourceConstantAlpha", "AlphaFormat"});
         }
@@ -338,7 +338,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
         public ULONG_PTR dwExtraInfo;
 
         @Override
-        protected List getFieldOrder() {
+        protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{"vkCode", "scanCode", "flags",
                 "time", "dwExtraInfo"});
         }
@@ -571,7 +571,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
         public WinDef.WORD wParamH;
 
         @Override
-        protected List getFieldOrder() {
+        protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{"uMsg", "wParamL", "wParamH"});
         }
     }
@@ -608,7 +608,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
         public INPUT_UNION input = new INPUT_UNION();
 
         @Override
-        protected List getFieldOrder() {
+        protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{"type", "input"});
         }
 
@@ -699,7 +699,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
         public BaseTSD.ULONG_PTR dwExtraInfo;
 
         @Override
-        protected List getFieldOrder() {
+        protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{"wVk", "wScan", "dwFlags",
                 "time", "dwExtraInfo"});
         }
@@ -736,7 +736,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
         public BaseTSD.ULONG_PTR dwExtraInfo;
 
         @Override
-        protected List getFieldOrder() {
+        protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{"dx", "dy", "mouseData",
                 "dwFlags", "time", "dwExtraInfo"});
         }
@@ -752,7 +752,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
         public int dwTime;
 
         @Override
-        protected List getFieldOrder() {
+        protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{"cbSize", "dwTime"});
         }
     }
@@ -845,7 +845,7 @@ public interface WinUser extends StdCallLibrary, WinDef {
          * @see com.sun.jna.Structure#getFieldOrder()
          */
         @Override
-        protected List getFieldOrder() {
+        protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{"cbSize", "style",
                 "lpfnWndProc", "cbClsExtra", "cbWndExtra", "hInstance",
                 "hIcon", "hCursor", "hbrBackground", "lpszMenuName",

@@ -35,7 +35,7 @@ public class EqualsIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+    public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
         Object obj1 = lda.operandStack.pop();
         Object obj2 = lda.operandStack.pop();
         Boolean res = obj1.equals(obj2);

@@ -35,7 +35,7 @@ public class CheckFilterIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+    public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
         //if pop() is not XML|XMLList throw
     }
 

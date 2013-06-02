@@ -71,7 +71,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         return "Class " + abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " slot=" + slot_id + " class_info=" + class_info + " metadata=" + Helper.intArrToString(metadata);
     }
 
-    private boolean parseUsagesFromNS(List<ABCContainerTag> abcTags, ABC abc, List imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
+    private boolean parseUsagesFromNS(List<ABCContainerTag> abcTags, ABC abc, List<String> imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
         Namespace ns = abc.constants.constant_namespace[namespace_index];
         if (name.equals("")) {
             name = "*";
@@ -116,7 +116,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         return false;
     }
 
-    private void parseImportsUsagesFromNS(List<ABCContainerTag> abcTags, ABC abc, List imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
+    private void parseImportsUsagesFromNS(List<ABCContainerTag> abcTags, ABC abc, List<String> imports, List<String> uses, int namespace_index, String ignorePackage, String name) {
         Namespace ns = abc.constants.constant_namespace[namespace_index];
         if (name.equals("")) {
             name = "*";
@@ -269,7 +269,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
     }
 
-    private List getImportsUsages(List<ABCContainerTag> abcTags, ABC abc, List<String> imports, List<String> uses, List<String> fullyQualifiedNames) {
+    private List<String> getImportsUsages(List<ABCContainerTag> abcTags, ABC abc, List<String> imports, List<String> uses, List<String> fullyQualifiedNames) {
         //constructor
 
 

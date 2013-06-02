@@ -32,7 +32,7 @@ public class MarkItem extends GraphTargetItem {
     }
 
     @Override
-    public String toString(List localData) {
+    public String toString(List<Object> localData) {
         return "//decompiler mark:" + mark;
     }
 

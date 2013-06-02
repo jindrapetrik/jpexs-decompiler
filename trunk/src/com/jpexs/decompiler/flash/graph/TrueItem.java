@@ -13,7 +13,7 @@ public class TrueItem extends GraphTargetItem {
     }
 
     @Override
-    public String toString(List localData) {
+    public String toString(List<Object> localData) {
         return "true";
     }
 }

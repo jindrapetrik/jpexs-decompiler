@@ -109,7 +109,7 @@ public class AVM2Graph extends Graph {
         for (GraphPart head : g.heads) {
             populateParts(head, allParts);
         }
-        List localData = new ArrayList();
+        List<Object> localData = new ArrayList();
         localData.add((Boolean) isStatic);
         localData.add((Integer) classIndex);
         localData.add(localRegs);
@@ -1147,7 +1147,7 @@ public class AVM2Graph extends Graph {
      }*/
 
     @Override
-    protected List<GraphTargetItem> check(GraphSource srcCode, List localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, List<GraphTargetItem> output, HashMap<Loop, List<GraphTargetItem>> forFinalCommands) {
+    protected List<GraphTargetItem> check(GraphSource srcCode, List<Object> localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, List<GraphTargetItem> output, HashMap<Loop, List<GraphTargetItem>> forFinalCommands) {
         List<GraphTargetItem> ret = null;
 
 
@@ -1268,7 +1268,7 @@ public class AVM2Graph extends Graph {
                         }
                     }
                     stack.add(new ExceptionTreeItem(catchedExceptions.get(e)));
-                    List localData2 = new ArrayList();
+                    List<Object> localData2 = new ArrayList();
                     localData2.addAll(localData);
                     localData2.set(DATA_SCOPESTACK, new Stack<GraphTargetItem>());
                     catchedCommands.add(printGraph(new ArrayList<GraphPart>(), localData2, stack, allParts, parent, npart, nepart, loops, forFinalCommands));
@@ -1492,7 +1492,7 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    protected GraphPart checkPart(List localData, GraphPart next) {
+    protected GraphPart checkPart(List<Object> localData, GraphPart next) {
         List<Integer> finallyJumps = (List<Integer>) localData.get(DATA_FINALLYJUMPS);
         for (int f : finallyJumps) {
             if (next.start == f) {
@@ -1563,8 +1563,8 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    public List prepareBranchLocalData(List localData) {
-        List ret = new ArrayList();
+    public List<Object> prepareBranchLocalData(List<Object> localData) {
+        List<Object> ret = new ArrayList();
         ret.addAll(localData);
         Stack<GraphTargetItem> scopeStack = (Stack<GraphTargetItem>) ret.get(DATA_SCOPESTACK);
         Stack<GraphTargetItem> copyScopeStack = new Stack<GraphTargetItem>();

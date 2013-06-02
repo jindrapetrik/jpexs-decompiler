@@ -29,7 +29,7 @@ public class SHELLEXECUTEINFO extends Structure {
     public HANDLE hProcess;
 
     @Override
-    protected List getFieldOrder() {
+    protected List<String> getFieldOrder() {
         return Arrays.asList(new String[]{"cbSize", "fMask", "hwnd", "lpVerb", "lpFile", "lpParameters", "lpDirectory", "nShow", "hInstApp", "lpIDList",
             "lpClass", "hKeyClass", "dwHotKey", "hMonitor", "hProcess"});
     }

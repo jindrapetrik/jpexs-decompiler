@@ -39,7 +39,7 @@ public class CoerceAIns extends InstructionDefinition implements CoerceOrConvert
     }
 
     @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+    public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
         //coerce any type
     }
 

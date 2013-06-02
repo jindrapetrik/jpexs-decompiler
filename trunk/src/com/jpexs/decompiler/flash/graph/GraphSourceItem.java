@@ -9,7 +9,7 @@ import java.util.Stack;
  */
 public interface GraphSourceItem {
 
-    public void translate(List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output);
+    public void translate(List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output);
 
     public boolean isJump();
 

@@ -18,17 +18,17 @@ import java.util.logging.Logger;
  */
 public class ActionGraphSource extends GraphSource {
 
-    private List<GraphSourceItem> actions;
+    private List<Action> actions;
     public int version;
     private HashMap<Integer, String> registerNames;
     private HashMap<String, GraphTargetItem> variables;
     private HashMap<String, GraphTargetItem> functions;
 
-    public List<GraphSourceItem> getActions() {
+    public List<Action> getActions() {
         return actions;
     }
 
-    public ActionGraphSource(List<GraphSourceItem> actions, int version, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+    public ActionGraphSource(List<Action> actions, int version, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
         this.actions = actions;
         this.version = version;
         this.registerNames = registerNames;
@@ -56,7 +56,7 @@ public class ActionGraphSource extends GraphSource {
     }
 
     @Override
-    public List<GraphTargetItem> translatePart(GraphPart part, List localData, Stack<GraphTargetItem> stack, int start, int end) {
+    public List<GraphTargetItem> translatePart(GraphPart part, List<Object> localData, Stack<GraphTargetItem> stack, int start, int end) {
         return (Action.actionsPartToTree(registerNames, variables, functions, stack, actions, start, end, version));
     }
     private List<Long> posCache = null;

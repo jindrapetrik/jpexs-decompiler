@@ -35,7 +35,7 @@ public class AddIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+    public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
         Object o1 = lda.operandStack.pop();
         Object o2 = lda.operandStack.pop();
         if ((o1 instanceof Long) && ((o2 instanceof Long))) {

@@ -23,5 +23,5 @@ public class LocalDataArea {
 
     public Stack operandStack = new Stack();
     public Stack scopeStack = new Stack();
-    public HashMap localRegisters = new HashMap<Integer, Object>();
+    public HashMap<Integer, Object> localRegisters = new HashMap<Integer, Object>();
 }

@@ -46,7 +46,7 @@ public class IfItem extends GraphTargetItem implements Block {
     }
 
     @Override
-    public String toString(List localData) {
+    public String toString(List<Object> localData) {
         String ret;
         ret = hilight("if(") + expression.toString(localData) + hilight(")") + "\r\n{\r\n";
         for (GraphTargetItem ti : onTrue) {

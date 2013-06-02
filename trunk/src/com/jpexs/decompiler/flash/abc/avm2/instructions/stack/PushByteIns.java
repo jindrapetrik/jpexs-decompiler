@@ -36,7 +36,7 @@ public class PushByteIns extends InstructionDefinition implements PushIntegerTyp
     }
 
     @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+    public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
         lda.operandStack.push(arguments.get(0));
     }
 

@@ -8,7 +8,7 @@ set ISDEBUG=true
 set COMPILERPATH=..\..\flex_sdk\bin\mxmlc.exe
 if not exist %COMPILERPATH% goto notex
 %COMPILERPATH% -warnings=false -debug=%ISDEBUG% TestMovie.as>out.txt
-start notepad out.txt
+rem start notepad out.txt
 if errorlevel==1 goto failed
 goto end
 :notex

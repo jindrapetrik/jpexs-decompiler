@@ -35,7 +35,7 @@ public class DXNSLateIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+    public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
         String s = lda.operandStack.pop().toString();
         System.out.println("Set default XML space " + s);
     }

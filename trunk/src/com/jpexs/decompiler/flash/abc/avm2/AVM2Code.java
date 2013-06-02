@@ -551,7 +551,7 @@ public class AVM2Code implements Serializable {
     public AVM2Code() {
     }
 
-    public Object execute(HashMap arguments, ConstantPool constants) {
+    public Object execute(HashMap<Integer, Object> arguments, ConstantPool constants) {
         int pos = 0;
         LocalDataArea lda = new LocalDataArea();
         lda.localRegisters = arguments;
@@ -830,7 +830,7 @@ public class AVM2Code implements Serializable {
         cacheActual = false;
     }
 
-    private static String innerStackToString(List stack) {
+    private static String innerStackToString(List<Object> stack) {
         String ret = "";
         for (int d = 0; d < stack.size(); d++) {
             Object o = stack.get(d);
@@ -940,7 +940,7 @@ public class AVM2Code implements Serializable {
          }
          Stack cstack = new Stack<TreeItem>();
          cstack.push("catched " + body.exceptions[g].getVarName(constants));
-         List outcatch = toSource(cstack, new Stack<TreeItem>(), abc, constants, method_info, body, pos, endpos).output;
+         List<Object> outcatch = toSource(cstack, new Stack<TreeItem>(), abc, constants, method_info, body, pos, endpos).output;
          output.addAll(outcatch);
          newip = endpos + 1;
          }
@@ -1597,7 +1597,7 @@ public class AVM2Code implements Serializable {
 
     public int removeTraps(ConstantPool constants, MethodBody body, ABC abc, int scriptIndex, int classIndex, boolean isStatic) {
         removeDeadCode(constants, body);
-        List localData = new ArrayList();
+        List<Object> localData = new ArrayList<Object>();
         localData.add((Boolean) isStatic); //isStatic
         localData.add((Integer) (classIndex)); //classIndex
         localData.add(new HashMap<Integer, GraphTargetItem>());
@@ -1922,8 +1922,8 @@ public class AVM2Code implements Serializable {
         }
     }
 
-    public void restoreControlFlow(int ip, HashMap<Integer, List<Integer>> refs, int visited2[], HashMap<Integer, List> appended) throws ConvertException {
-        List buf = new ArrayList();
+    public void restoreControlFlow(int ip, HashMap<Integer, List<Integer>> refs, int visited2[], HashMap<Integer, List<Object>> appended) throws ConvertException {
+        List<Object> buf = new ArrayList<Object>();
         boolean cont = false;
         int continueip = 0;
         AVM2Instruction prev = null;
@@ -1983,7 +1983,7 @@ public class AVM2Code implements Serializable {
                 if ((newip < code.size()) && (refs.containsKey(newip) && refs.get(newip).size() == 1)) {
                     if (!cont) {
                         continueip = ip;
-                        buf = new ArrayList<AVM2Instruction>();
+                        buf = new ArrayList<Object>();
                         appended.put(continueip, buf);
                     }
                     cont = true;
@@ -2019,7 +2019,7 @@ public class AVM2Code implements Serializable {
             HashMap<Integer, List<Integer>> refs;
             int visited2[] = new int[code.size()];
             refs = visitCode(body);
-            HashMap<Integer, List> appended = new HashMap<Integer, List>();
+            HashMap<Integer, List<Object>> appended = new HashMap<Integer, List<Object>>();
             /*if (secondpass) {
              restoreControlFlow(code.size() - 1, refs, visited2, appended);
              } else*/ {
@@ -2160,7 +2160,7 @@ public class AVM2Code implements Serializable {
         public boolean skipUsed = false;
     }
 
-    private static int removeTraps(boolean secondPass, boolean useVisited, List localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, int lastIp, HashMap<Integer, Integer> visited, HashMap<Integer, HashMap<Integer, GraphTargetItem>> visitedStates, HashMap<GraphSourceItem, Decision> decisions) {
+    private static int removeTraps(boolean secondPass, boolean useVisited, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, int lastIp, HashMap<Integer, Integer> visited, HashMap<Integer, HashMap<Integer, GraphTargetItem>> visitedStates, HashMap<GraphSourceItem, Decision> decisions) {
         boolean debugMode = false;
         int ret = 0;
         iploop:
@@ -2339,7 +2339,7 @@ public class AVM2Code implements Serializable {
         return ret;
     }
 
-    public static int removeTraps(List localData, AVM2GraphSource code, int addr) {
+    public static int removeTraps(List<Object> localData, AVM2GraphSource code, int addr) {
         HashMap<GraphSourceItem, AVM2Code.Decision> decisions = new HashMap<GraphSourceItem, AVM2Code.Decision>();
         removeTraps(false, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0, new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions);
         localData.set(2, new HashMap<Integer, GraphTargetItem>());

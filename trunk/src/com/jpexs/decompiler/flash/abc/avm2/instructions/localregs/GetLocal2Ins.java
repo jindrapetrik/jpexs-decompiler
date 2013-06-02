@@ -35,7 +35,7 @@ public class GetLocal2Ins extends InstructionDefinition implements GetLocalTypeI
     }
 
     @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+    public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
         lda.operandStack.push(lda.localRegisters.get(2));
     }
 

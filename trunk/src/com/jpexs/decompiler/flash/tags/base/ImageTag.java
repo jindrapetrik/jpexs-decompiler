@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
-import static com.jpexs.decompiler.flash.SWF.hasErrorHeader;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.Tag;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -43,7 +43,7 @@ public abstract class ImageTag extends CharacterTag {
     }
 
     public static String getImageFormat(byte data[]) {
-        if (hasErrorHeader(data)) {
+        if (SWF.hasErrorHeader(data)) {
             return "jpg";
         }
         if (data.length > 2 && ((data[0] & 0xff) == 0xff) && ((data[1] & 0xff) == 0xd8)) {

@@ -35,7 +35,7 @@ public class ConvertSIns extends InstructionDefinition implements CoerceOrConver
     }
 
     @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+    public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
         Object obj = lda.operandStack.pop();
         lda.operandStack.push(obj.toString());
     }

@@ -60,7 +60,7 @@ public abstract class TreeItem extends GraphTargetItem {
     }
 
     @Override
-    public String toString(List localData) {
+    public String toString(List<Object> localData) {
         if (localData.isEmpty()) {
             ConstantPool c = null;
             return toString(c);

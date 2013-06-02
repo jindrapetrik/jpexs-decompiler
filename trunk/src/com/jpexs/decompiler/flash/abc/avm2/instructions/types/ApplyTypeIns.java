@@ -34,9 +34,9 @@ public class ApplyTypeIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+    public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
         int argCount = (int) ((Long) arguments.get(0)).longValue();
-        List params = new ArrayList();
+        List<Object> params = new ArrayList<Object>();
         for (int i = 0; i < argCount; i++) {
             params.add(lda.operandStack.pop());
         }

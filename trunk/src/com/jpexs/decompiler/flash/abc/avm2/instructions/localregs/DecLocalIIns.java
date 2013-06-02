@@ -38,7 +38,7 @@ public class DecLocalIIns extends InstructionDefinition {
     }
 
     @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List arguments) {
+    public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
         int locRegIndex = (int) ((Long) arguments.get(0)).longValue();
         Object obj = lda.localRegisters.get(locRegIndex);
         if (obj instanceof Long) {

@@ -58,7 +58,6 @@ import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
-import static com.jpexs.decompiler.flash.types.FILLSTYLE.*;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.GRADIENT;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
@@ -263,7 +262,7 @@ public class XFLConverter {
         String ret = "";
         //ret += "<FillStyle index=\"" + index + "\">";
         switch (fs.fillStyleType) {
-            case SOLID:
+            case FILLSTYLE.SOLID:
                 ret += "<SolidColor color=\"";
                 if (shapeNum >= 3) {
                     ret += fs.colorA.toHexRGB();
@@ -276,10 +275,10 @@ public class XFLConverter {
                 }
                 ret += " />";
                 break;
-            case REPEATING_BITMAP:
-            case CLIPPED_BITMAP:
-            case NON_SMOOTHED_REPEATING_BITMAP:
-            case NON_SMOOTHED_CLIPPED_BITMAP:
+            case FILLSTYLE.REPEATING_BITMAP:
+            case FILLSTYLE.CLIPPED_BITMAP:
+            case FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP:
+            case FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP:
                 ret += "<BitmapFill";
                 ret += " bitmapPath=\"";
                 CharacterTag bitmapCh = characters.get(fs.bitmapId);
@@ -289,7 +288,7 @@ public class XFLConverter {
                 }
                 ret += "\"";
 
-                if ((fs.fillStyleType == CLIPPED_BITMAP) || (fs.fillStyleType == NON_SMOOTHED_CLIPPED_BITMAP)) {
+                if ((fs.fillStyleType == FILLSTYLE.CLIPPED_BITMAP) || (fs.fillStyleType == FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP)) {
                     ret += " bitmapIsClipped=\"true\"";
                 }
 
@@ -297,16 +296,16 @@ public class XFLConverter {
                 ret += "<matrix>" + convertMatrix(fs.bitmapMatrix) + "</matrix>";
                 ret += "</BitmapFill>";
                 break;
-            case LINEAR_GRADIENT:
-            case RADIAL_GRADIENT:
-            case FOCAL_RADIAL_GRADIENT:
+            case FILLSTYLE.LINEAR_GRADIENT:
+            case FILLSTYLE.RADIAL_GRADIENT:
+            case FILLSTYLE.FOCAL_RADIAL_GRADIENT:
 
-                if (fs.fillStyleType == LINEAR_GRADIENT) {
+                if (fs.fillStyleType == FILLSTYLE.LINEAR_GRADIENT) {
                     ret += "<LinearGradient";
                 } else {
                     ret += "<RadialGradient";
                     ret += " focalPointRatio=\"";
-                    if (fs.fillStyleType == FOCAL_RADIAL_GRADIENT) {
+                    if (fs.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
                         ret += fs.focalGradient.focalPoint;
                     } else {
                         ret += "0";
@@ -315,13 +314,13 @@ public class XFLConverter {
                 }
 
                 int interpolationMode;
-                if (fs.fillStyleType == FOCAL_RADIAL_GRADIENT) {
+                if (fs.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
                     interpolationMode = fs.focalGradient.interPolationMode;
                 } else {
                     interpolationMode = fs.gradient.interPolationMode;
                 }
                 int spreadMode;
-                if (fs.fillStyleType == FOCAL_RADIAL_GRADIENT) {
+                if (fs.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
                     spreadMode = fs.focalGradient.spreadMode;
                 } else {
                     spreadMode = fs.gradient.spreadMode;
@@ -345,7 +344,7 @@ public class XFLConverter {
 
                 ret += "<matrix>" + convertMatrix(fs.gradientMatrix) + "</matrix>";
                 GRADRECORD records[];
-                if (fs.fillStyleType == FOCAL_RADIAL_GRADIENT) {
+                if (fs.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT) {
                     records = fs.focalGradient.gradientRecords;
                 } else {
                     records = fs.gradient.gradientRecords;
@@ -359,7 +358,7 @@ public class XFLConverter {
                     ret += " ratio=\"" + rec.getRatioFloat() + "\"";
                     ret += " />";
                 }
-                if (fs.fillStyleType == LINEAR_GRADIENT) {
+                if (fs.fillStyleType == FILLSTYLE.LINEAR_GRADIENT) {
                     ret += "</LinearGradient>";
                 } else {
                     ret += "</RadialGradient>";

@@ -297,12 +297,12 @@ public class Graph {
         return part;
     }
 
-    public static List<GraphTargetItem> translateViaGraph(List localData, String path, GraphSource code, List<Integer> alternateEntries) {
+    public static List<GraphTargetItem> translateViaGraph(List<Object> localData, String path, GraphSource code, List<Integer> alternateEntries) {
         Graph g = new Graph(code, alternateEntries);
         return g.translate(localData);
     }
 
-    public List<GraphTargetItem> translate(List localData) {
+    public List<GraphTargetItem> translate(List<Object> localData) {
         List<GraphPart> allParts = new ArrayList<GraphPart>();
         for (GraphPart head : heads) {
             populateParts(head, allParts);
@@ -429,21 +429,21 @@ public class Graph {
         return false;
     }
 
-    protected List<GraphTargetItem> check(GraphSource code, List localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, List<GraphTargetItem> output, HashMap<Loop, List<GraphTargetItem>> forFinalCommands) {
+    protected List<GraphTargetItem> check(GraphSource code, List<Object> localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, List<GraphTargetItem> output, HashMap<Loop, List<GraphTargetItem>> forFinalCommands) {
         return null;
     }
 
-    protected GraphPart checkPart(List localData, GraphPart part) {
+    protected GraphPart checkPart(List<Object> localData, GraphPart part) {
         return part;
     }
 
-    protected GraphTargetItem translatePartGetStack(List localData, GraphPart part, Stack<GraphTargetItem> stack) {
+    protected GraphTargetItem translatePartGetStack(List<Object> localData, GraphPart part, Stack<GraphTargetItem> stack) {
         stack = (Stack<GraphTargetItem>) stack.clone();
         translatePart(localData, part, stack);
         return stack.pop();
     }
 
-    protected List<GraphTargetItem> translatePart(List localData, GraphPart part, Stack<GraphTargetItem> stack) {
+    protected List<GraphTargetItem> translatePart(List<Object> localData, GraphPart part, Stack<GraphTargetItem> stack) {
         List<GraphPart> sub = part.getSubParts();
         List<GraphTargetItem> ret = new ArrayList<GraphTargetItem>();
         int end = 0;
@@ -478,7 +478,7 @@ public class Graph {
         items.add(new MarkItem("finish"));
     }
 
-    protected List<GraphTargetItem> printGraph(List<GraphPart> visited, List localData, Stack<GraphTargetItem> stack, List<GraphPart> allParts, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, HashMap<Loop, List<GraphTargetItem>> forFinalCommands) {
+    protected List<GraphTargetItem> printGraph(List<GraphPart> visited, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphPart> allParts, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, HashMap<Loop, List<GraphTargetItem>> forFinalCommands) {
         if (visited.contains(part)) {
             //return new ArrayList<GraphTargetItem>();
         } else {
@@ -1381,7 +1381,7 @@ public class Graph {
      */
     public static String graphToString(List<GraphTargetItem> tree, Object... localData) {
         StringBuilder ret = new StringBuilder();
-        List localDataList = new ArrayList();
+        List<Object> localDataList = new ArrayList<Object>();
         for (Object o : localData) {
             localDataList.add(o);
         }
@@ -1478,7 +1478,7 @@ public class Graph {
         return ret.toString();
     }
 
-    public List prepareBranchLocalData(List localData) {
+    public List<Object> prepareBranchLocalData(List<Object> localData) {
         return localData;
     }
 }
