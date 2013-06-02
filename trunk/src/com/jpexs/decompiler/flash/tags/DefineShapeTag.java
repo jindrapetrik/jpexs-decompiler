@@ -22,6 +22,9 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import java.awt.Point;
+import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -74,7 +77,17 @@ public class DefineShapeTag extends CharacterTag implements BoundedTag, ShapeTag
     }
 
     @Override
-    public BufferedImage toImage(List<Tag> tags) {
+    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters) {
         return shapes.toImage(1, tags);
+    }
+
+    @Override
+    public Point getImagePos(HashMap<Integer, CharacterTag> characters) {
+        return new Point(shapeBounds.Xmin / 20, shapeBounds.Ymin / 20);
+    }
+
+    @Override
+    public List<GeneralPath> getPaths(List<Tag> tags) {
+        return SHAPERECORD.shapeToPaths(tags, 1, shapes.shapeRecords);
     }
 }

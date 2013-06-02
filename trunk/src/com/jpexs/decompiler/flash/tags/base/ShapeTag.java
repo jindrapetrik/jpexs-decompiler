@@ -18,14 +18,14 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
-import java.awt.image.BufferedImage;
+import java.awt.geom.GeneralPath;
 import java.util.List;
 
 /**
  *
  * @author JPEXS
  */
-public interface ShapeTag {
+public interface ShapeTag extends DrawableTag {
 
     public SHAPEWITHSTYLE getShapes();
 
@@ -33,5 +33,5 @@ public interface ShapeTag {
 
     public int getShapeNum();
 
-    public BufferedImage toImage(List<Tag> tags);
+    public List<GeneralPath> getPaths(List<Tag> tags);
 }

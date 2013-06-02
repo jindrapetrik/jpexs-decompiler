@@ -74,9 +74,9 @@ import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
+import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
-import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
@@ -162,9 +162,11 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     public FlashPlayerPanel flashPanel;
     public JPanel displayPanel;
     public ImagePanel imagePanel;
-    public ImagePanel shapeImagePanel;
+    public ImagePanel previewImagePanel;
+    public SWFPreviwPanel swfPreviewPanel;
     final static String CARDFLASHPANEL = "Flash card";
-    final static String CARDSHAPEPANEL = "Shape card";
+    final static String CARDSWFPREVIEWPANEL = "SWF card";
+    final static String CARDDRAWPREVIEWPANEL = "Draw card";
     final static String CARDIMAGEPANEL = "Image card";
     final static String CARDEMPTYPANEL = "Empty card";
     final static String CARDACTIONSCRIPTPANEL = "ActionScript card";
@@ -189,6 +191,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     private JSplitPane previewSplitPane;
     private JButton imageReplaceButton;
     private JPanel imageButtonsPanel;
+    private JCheckBoxMenuItem miInternalViewer;
 
     public void setPercent(int percent) {
         progressBar.setValue(percent);
@@ -250,6 +253,12 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         });
         setTitle(Main.applicationVerName + (Main.DISPLAY_FILENAME ? " - " + Main.getFileTitle() : ""));
         JMenuBar menuBar = new JMenuBar();
+
+
+        try {
+            flashPanel = new FlashPlayerPanel(this);
+        } catch (FlashUnsupportedException fue) {
+        }
 
         JMenu menuFile = new JMenu("File");
         JMenuItem miOpen = new JMenuItem("Open...");
@@ -364,6 +373,13 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         miSearchScript.setIcon(View.getIcon("search16"));
 
         menuTools.add(miSearchScript);
+
+        miInternalViewer = new JCheckBoxMenuItem("Use own Flash viewer");
+        miInternalViewer.setSelected((Boolean) Configuration.getConfig("internalFlashViewer", (Boolean) (flashPanel == null)));
+        miInternalViewer.setActionCommand("INTERNALVIEWERSWITCH");
+        miInternalViewer.addActionListener(this);
+        menuTools.add(miInternalViewer);
+
         menuTools.add(miProxy);
 
         //menuTools.add(menuDeobfuscation);
@@ -431,7 +447,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         }
 
 
-        tagTree = new JTree(new TagTreeModel(createTagList(objs, null), (new File(Main.file)).getName()));
+        tagTree = new JTree(new TagTreeModel(createTagList(objs, null), new SWFRoot((new File(Main.file)).getName())));
         tagTree.addTreeSelectionListener(this);
         final JPopupMenu spritePopupMenu = new JPopupMenu();
         JMenuItem removeMenuItem = new JMenuItem("Remove");
@@ -577,10 +593,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
         Component leftComponent = null;
 
-        try {
-            flashPanel = new FlashPlayerPanel(this);
-        } catch (FlashUnsupportedException fue) {
-        }
+
         displayPanel = new JPanel(new CardLayout());
 
         if (flashPanel != null) {
@@ -633,9 +646,21 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         displayPanel.add(imagesCard, CARDIMAGEPANEL);
 
         JPanel shapesCard = new JPanel(new BorderLayout());
-        shapeImagePanel = new ImagePanel();
-        shapesCard.add(shapeImagePanel, BorderLayout.CENTER);
-        displayPanel.add(shapesCard, CARDSHAPEPANEL);
+
+        JPanel previewPanel = new JPanel(new BorderLayout());
+
+        previewImagePanel = new ImagePanel();
+        previewPanel.add(previewImagePanel, BorderLayout.CENTER);
+        JLabel prevIntLabel = new JLabel("SWF preview (Internal viewer)");
+        prevIntLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        prevIntLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        previewPanel.add(prevIntLabel, BorderLayout.NORTH);
+        shapesCard.add(previewPanel, BorderLayout.CENTER);
+        displayPanel.add(shapesCard, CARDDRAWPREVIEWPANEL);
+
+        swfPreviewPanel = new SWFPreviwPanel();
+        displayPanel.add(swfPreviewPanel, CARDSWFPREVIEWPANEL);
+
 
         displayPanel.add(new JPanel(), CARDEMPTYPANEL);
         if (actionPanel != null) {
@@ -1146,6 +1171,9 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     @Override
     public void actionPerformed(ActionEvent e) {
 
+        if (e.getActionCommand().equals("INTERNALVIEWERSWITCH")) {
+            Configuration.setConfig("internalFlashViewer", (Boolean) miInternalViewer.isSelected());
+        }
         if (e.getActionCommand().equals("SEARCHAS")) {
             if (searchDialog == null) {
                 searchDialog = new SearchDialog();
@@ -1810,7 +1838,12 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         } else {
             showDetail(DETAILCARDEMPTYPANEL);
         }
-        if (tagObj instanceof DefineVideoStreamTag) {
+        swfPreviewPanel.stop();
+        if ((tagObj instanceof SWFRoot) && miInternalViewer.isSelected()) {
+            showCard(CARDSWFPREVIEWPANEL);
+            swfPreviewPanel.load(swf);
+            swfPreviewPanel.play();
+        } else if (tagObj instanceof DefineVideoStreamTag) {
             showCard(CARDEMPTYPANEL);
         } else if ((tagObj instanceof DefineSoundTag) || (tagObj instanceof SoundStreamHeadTag) || (tagObj instanceof SoundStreamHead2Tag)) {
             showCard(CARDEMPTYPANEL);
@@ -1823,10 +1856,22 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             imageButtonsPanel.setVisible(((ImageTag) tagObj).importSupported());
             showCard(CARDIMAGEPANEL);
             imagePanel.setImage(((ImageTag) tagObj).getImage(swf.tags));
-        } else if (tagObj instanceof ShapeTag) {
-            showCard(CARDSHAPEPANEL);
-            shapeImagePanel.setImage(((ShapeTag) tagObj).toImage(swf.tags));
-        } else if ((tagObj instanceof FrameNode && ((FrameNode) tagObj).isDisplayed()) || (((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag))) {
+        } else if ((tagObj instanceof DrawableTag) && (!(tagObj instanceof TextTag)) && (miInternalViewer.isSelected())) {
+            showCard(CARDDRAWPREVIEWPANEL);
+            previewImagePanel.setImage(((DrawableTag) tagObj).toImage(1, swf.tags, swf.displayRect, characters));
+        } else if (tagObj instanceof FrameNode && ((FrameNode) tagObj).isDisplayed() && (miInternalViewer.isSelected())) {
+            showCard(CARDDRAWPREVIEWPANEL);
+            FrameNode fn = (FrameNode) tagObj;
+            List<Tag> controlTags = swf.tags;
+            int containerId = 0;
+            RECT rect = swf.displayRect;
+            if (fn.getParent() instanceof DefineSpriteTag) {
+                controlTags = ((DefineSpriteTag) fn.getParent()).subTags;
+                containerId = ((DefineSpriteTag) fn.getParent()).spriteId;
+                rect = ((DefineSpriteTag) fn.getParent()).getRect(characters);
+            }
+            previewImagePanel.setImage(SWF.frameToImage(containerId, ((FrameNode) tagObj).getFrame(), swf.tags, controlTags, rect, swf.frameCount));
+        } else if (((tagObj instanceof FrameNode) && ((FrameNode) tagObj).isDisplayed()) || ((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag)) {
             try {
 
                 if (tempFile != null) {
@@ -2025,7 +2070,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     public void refreshTree() {
         List<Object> objs = new ArrayList<Object>();
         objs.addAll(swf.tags);
-        tagTree.setModel(new TagTreeModel(createTagList(objs, null), (new File(Main.file)).getName()));
+        tagTree.setModel(new TagTreeModel(createTagList(objs, null), new SWFRoot((new File(Main.file)).getName())));
     }
 
     public void setEditText(boolean edit) {

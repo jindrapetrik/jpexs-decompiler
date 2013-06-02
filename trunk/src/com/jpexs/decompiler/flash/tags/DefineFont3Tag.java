@@ -270,4 +270,33 @@ public class DefineFont3Tag extends CharacterTag implements FontTag {
     public boolean isItalic() {
         return fontFlagsItalic;
     }
+
+    @Override
+    public int getDivider() {
+        return 20;
+    }
+
+    @Override
+    public int getAscent() {
+        if (fontFlagsHasLayout) {
+            return fontAscent;
+        }
+        return -1;
+    }
+
+    @Override
+    public int getDescent() {
+        if (fontFlagsHasLayout) {
+            return fontDescent;
+        }
+        return -1;
+    }
+
+    @Override
+    public int getLeading() {
+        if (fontFlagsHasLayout) {
+            return fontLeading;
+        }
+        return -1;
+    }
 }

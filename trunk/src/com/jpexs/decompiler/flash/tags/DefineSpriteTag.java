@@ -17,15 +17,19 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.Main;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
+import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import java.awt.Point;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -39,7 +43,7 @@ import java.util.Set;
 /**
  * Defines a sprite character
  */
-public class DefineSpriteTag extends CharacterTag implements Container, BoundedTag {
+public class DefineSpriteTag extends CharacterTag implements Container, BoundedTag, DrawableTag {
 
     /**
      * Character ID of sprite
@@ -83,30 +87,43 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
         RECT ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
         HashMap<Integer, Integer> depthMap = new HashMap<Integer, Integer>();
         for (Tag t : subTags) {
-            Set<Integer> needed = t.getNeededCharacters();
             MATRIX m = null;
+            int characterId = -1;
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag pot = (PlaceObjectTypeTag) t;
                 m = pot.getMatrix();
                 int charId = pot.getCharacterId();
                 if (charId > -1) {
                     depthMap.put(pot.getDepth(), charId);
+                    characterId = (charId);
                 } else {
-                    needed.add(depthMap.get(pot.getDepth()));
+                    characterId = (depthMap.get(pot.getDepth()));
                 }
             }
-            if (needed.isEmpty()) {
+            if (characterId == -1) {
                 continue;
             }
-            RECT r = getCharacterBounds(characters, needed);
+            HashSet<Integer> need = new HashSet<Integer>();
+            need.add(characterId);
+            RECT r = getCharacterBounds(characters, need);
 
             if (m != null) {
-                Point topleft = m.apply(new Point(r.Xmin, r.Ymin));
-                Point bottomright = m.apply(new Point(r.Xmax, r.Ymax));
-                r.Xmin = Math.min(topleft.x, bottomright.x);
-                r.Ymin = Math.min(topleft.y, bottomright.y);
-                r.Xmax = Math.max(topleft.x, bottomright.x);
-                r.Ymax = Math.max(topleft.y, bottomright.y);
+                AffineTransform trans = SWF.matrixToTransform(m);
+
+                Point topleft = new Point();
+                trans.transform(new Point(r.Xmin, r.Ymin), topleft);
+                Point topright = new Point();
+                trans.transform(new Point(r.Xmax, r.Ymin), topright);
+                Point bottomright = new Point();
+                trans.transform(new Point(r.Xmax, r.Ymax), bottomright);
+                Point bottomleft = new Point();
+                trans.transform(new Point(r.Xmin, r.Ymax), bottomleft);
+
+                r.Xmin = Math.min(Math.min(Math.min(topleft.x, topright.x), bottomleft.x), bottomright.x);
+                r.Ymin = Math.min(Math.min(Math.min(topleft.y, topright.y), bottomleft.y), bottomright.y);
+                r.Xmax = Math.max(Math.max(Math.max(topleft.x, topright.x), bottomleft.x), bottomright.x);
+                r.Ymax = Math.max(Math.max(Math.max(topleft.y, topright.y), bottomleft.y), bottomright.y);
+
             }
             ret.Xmin = Math.min(r.Xmin, ret.Xmin);
             ret.Ymin = Math.min(r.Ymin, ret.Ymin);
@@ -199,5 +216,24 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
             ret.addAll(t.getNeededCharacters());
         }
         return ret;
+    }
+
+    @Override
+    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters) {
+        /* 
+         rect.Xmax=displayRect.Xmin+rect.getWidth();
+         rect.Ymax=displayRect.Ymin+rect.getWidth();
+         rect.Xmin=displayRect.Xmin;
+         rect.Ymin=displayRect.Ymin;
+         RECT rect=getRect(characters);
+         SWF.fixRect(rect);*/
+        RECT rect = getRect(characters);
+        return SWF.frameToImage(spriteId, frame, tags, subTags, rect, frameCount);
+    }
+
+    @Override
+    public Point getImagePos(HashMap<Integer, CharacterTag> characters) {
+        RECT displayRect = getRect(characters);
+        return new Point(0, 0); //displayRect.Xmin,displayRect.Ymin);
     }
 }

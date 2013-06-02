@@ -14,18 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.tags.base;
-
-import com.jpexs.decompiler.flash.types.BUTTONRECORD;
-import java.util.List;
+package com.jpexs.decompiler.flash.gui;
 
 /**
  *
  * @author JPEXS
  */
-public interface ButtonTag extends DrawableTag {
+public class SWFRoot {
 
-    public List<BUTTONRECORD> getRecords();
+    private String name;
 
-    public boolean trackAsMenu();
+    public SWFRoot(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

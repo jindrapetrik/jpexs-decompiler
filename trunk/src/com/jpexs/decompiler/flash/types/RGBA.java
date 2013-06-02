@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import java.awt.Color;
+
 /**
  * Represents 32-bit red, green, blue and alpha value
  *
@@ -87,6 +89,17 @@ public class RGBA {
         this.alpha = alpha;
     }
 
+    public RGBA(Color color) {
+        this.red = color.getRed();
+        this.green = color.getGreen();
+        this.blue = color.getBlue();
+        this.alpha = color.getAlpha();
+    }
+
     public RGBA() {
+    }
+
+    public Color toColor() {
+        return new Color(red, green, blue, alpha);
     }
 }

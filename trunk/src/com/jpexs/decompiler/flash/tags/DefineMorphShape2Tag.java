@@ -25,12 +25,14 @@ import com.jpexs.decompiler.flash.types.MORPHFILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.MORPHLINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
+import java.awt.geom.GeneralPath;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -168,5 +170,10 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
     @Override
     public int getShapeNum() {
         return 2;
+    }
+
+    //@Override
+    public List<GeneralPath> getPaths(List<Tag> tags) {
+        return null; //FIXME
     }
 }

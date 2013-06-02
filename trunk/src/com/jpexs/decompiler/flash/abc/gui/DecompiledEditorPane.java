@@ -46,7 +46,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     private ABCPanel abcPanel;
     private int classIndex = -1;
     private boolean isStatic = false;
-    private Cache cache = new Cache();
+    private Cache cache = new Cache(true);
 
     public ScriptPack getScriptLeaf() {
         return script;

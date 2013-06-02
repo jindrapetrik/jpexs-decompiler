@@ -45,4 +45,12 @@ public interface FontTag extends AloneTag {
     public boolean isBold();
 
     public boolean isItalic();
+
+    public int getDivider();
+
+    public int getAscent();
+
+    public int getDescent();
+
+    public int getLeading();
 }

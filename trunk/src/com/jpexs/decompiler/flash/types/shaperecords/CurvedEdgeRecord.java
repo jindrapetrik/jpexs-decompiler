@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.types.shaperecords;
 
+import com.jpexs.decompiler.flash.SWF;
+
 /**
  *
  * @author JPEXS
@@ -37,7 +39,7 @@ public class CurvedEdgeRecord extends SHAPERECORD {
 
     @Override
     public String toSWG(int oldX, int oldY) {
-        return "Q " + twipToPixel(oldX + controlDeltaX) + " " + twipToPixel(oldY + controlDeltaY) + " " + twipToPixel(oldX + controlDeltaX + anchorDeltaX) + " " + twipToPixel(oldY + controlDeltaY + anchorDeltaY);
+        return "Q " + SWF.twipToPixel(oldX + controlDeltaX) + " " + SWF.twipToPixel(oldY + controlDeltaY) + " " + SWF.twipToPixel(oldX + controlDeltaX + anchorDeltaX) + " " + SWF.twipToPixel(oldY + controlDeltaY + anchorDeltaY);
 
     }
 

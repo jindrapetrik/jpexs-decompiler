@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
@@ -30,7 +31,15 @@ import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
+import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
+import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -52,7 +61,7 @@ import java.util.regex.Pattern;
  *
  * @author JPEXS
  */
-public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag {
+public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, DrawableTag {
 
     public int characterID;
     public RECT textBounds;
@@ -436,5 +445,57 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag {
             }
         }
         return ret;
+    }
+
+    @Override
+    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters) {
+        RECT bound = getBounds();
+        BufferedImage ret = new BufferedImage(bound.Xmax / 20, bound.Ymax / 20, BufferedImage.TYPE_INT_ARGB);
+
+        Color textColor = new Color(0, 0, 0);
+        FontTag font = null;
+        int textHeight = 12;
+        int x = bound.Xmin;
+        int y = 0;
+        Graphics2D g = (Graphics2D) ret.getGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        SHAPE glyphs[] = new SHAPE[0];
+        for (TEXTRECORD rec : textRecords) {
+            if (rec.styleFlagsHasColor) {
+                textColor = rec.textColor.toColor();
+            }
+            if (rec.styleFlagsHasFont) {
+                font = (FontTag) characters.get(rec.fontId);
+                glyphs = font.getGlyphShapeTable();
+                textHeight = rec.textHeight;
+            }
+            if (rec.styleFlagsHasXOffset) {
+                x = rec.xOffset * 1000 / textHeight;
+            }
+            if (rec.styleFlagsHasYOffset) {
+                y = rec.yOffset * 1000 / textHeight;
+            }
+
+            for (GLYPHENTRY entry : rec.glyphEntries) {
+                RECT rect = SHAPERECORD.getBounds(glyphs[entry.glyphIndex].shapeRecords);
+                rect.Xmax /= font.getDivider();
+                rect.Xmin /= font.getDivider();
+                rect.Ymax /= font.getDivider();
+                rect.Ymin /= font.getDivider();
+                BufferedImage img = SHAPERECORD.shapeToImage(tags, 1, null, null, glyphs[entry.glyphIndex].shapeRecords, textColor);
+                g.setTransform(AffineTransform.getScaleInstance(textHeight / 1000f / 20, textHeight / 1000f / 20));
+
+                g.drawImage(img, x, y + rect.Ymin, null);
+                x += entry.glyphAdvance * 1000 / textHeight;
+            }
+        }
+        return ret;
+    }
+
+    @Override
+    public Point getImagePos(HashMap<Integer, CharacterTag> characters) {
+        return new Point(0, 0);
     }
 }

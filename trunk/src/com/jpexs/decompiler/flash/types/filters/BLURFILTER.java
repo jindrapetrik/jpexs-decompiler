@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.types.filters;
 
+import java.awt.image.BufferedImage;
+
 /**
  * Blur filter based on a sub-pixel precise median filter
  *
@@ -38,5 +40,10 @@ public class BLURFILTER extends FILTER {
 
     public BLURFILTER() {
         super(1);
+    }
+
+    @Override
+    public BufferedImage apply(BufferedImage src) {
+        return Filtering.blur(src, (int) blurX, (int) blurY, passes);
     }
 }

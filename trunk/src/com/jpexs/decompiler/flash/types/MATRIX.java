@@ -63,6 +63,23 @@ public class MATRIX implements Serializable {
     public int bitsRotate;
     public int bitsScale;
 
+    public MATRIX() {
+    }
+
+    public MATRIX(MATRIX m) {
+        if (m == null) {
+            return;
+        }
+        hasScale = m.hasScale;
+        hasRotate = m.hasRotate;
+        scaleX = m.scaleX;
+        scaleY = m.scaleY;
+        rotateSkew0 = m.rotateSkew0;
+        rotateSkew1 = m.rotateSkew1;
+        translateX = m.translateX;
+        translateY = m.translateY;
+    }
+
     @Override
     public String toString() {
         return "[MATRIX scale:" + getScaleXFloat() + "," + getScaleYFloat() + ", rotate:" + getRotateSkew0Float() + "," + getRotateSkew1Float() + ", translate:" + translateX + "," + translateY + "]";

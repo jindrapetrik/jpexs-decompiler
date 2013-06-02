@@ -16,16 +16,20 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
-import com.jpexs.decompiler.flash.types.BUTTONRECORD;
+import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.types.RECT;
+import java.awt.Point;
+import java.awt.image.BufferedImage;
+import java.util.HashMap;
 import java.util.List;
 
 /**
  *
  * @author JPEXS
  */
-public interface ButtonTag extends DrawableTag {
+public interface DrawableTag {
 
-    public List<BUTTONRECORD> getRecords();
+    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters);
 
-    public boolean trackAsMenu();
+    public Point getImagePos(HashMap<Integer, CharacterTag> characters);
 }

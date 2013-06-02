@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.tags.text.ParsedSymbol;
 import com.jpexs.decompiler.flash.tags.text.TextLexer;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGBA;
+import java.awt.geom.GeneralPath;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -511,5 +512,10 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextT
             needed.add(fontId);
         }
         return needed;
+    }
+
+    //@Override
+    public List<GeneralPath> getPaths(List<Tag> tags) {
+        return null; //FIXME
     }
 }

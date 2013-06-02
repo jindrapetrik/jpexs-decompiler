@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.types.shaperecords;
 
+import com.jpexs.decompiler.flash.SWF;
+
 /**
  *
  * @author JPEXS
@@ -38,11 +40,11 @@ public class StraightEdgeRecord extends SHAPERECORD {
     @Override
     public String toSWG(int oldX, int oldY) {
         if (generalLineFlag) {
-            return "L " + twipToPixel(oldX + deltaX) + " " + twipToPixel(oldY + deltaY);
+            return "L " + SWF.twipToPixel(oldX + deltaX) + " " + SWF.twipToPixel(oldY + deltaY);
         } else if (vertLineFlag) {
-            return "V " + twipToPixel(oldY + deltaY);
+            return "V " + SWF.twipToPixel(oldY + deltaY);
         } else {
-            return "H " + twipToPixel(oldX + deltaX);
+            return "H " + SWF.twipToPixel(oldX + deltaX);
         }
     }
 

@@ -26,10 +26,10 @@ import javax.swing.tree.TreePath;
 
 public class TagTreeModel implements TreeModel {
 
-    private String root = "";
+    private Object root;
     private List<TagNode> list = new ArrayList<TagNode>();
 
-    public TagTreeModel(List<TagNode> list, String rootName) {
+    public TagTreeModel(List<TagNode> list, Object rootName) {
         this.root = rootName;
         this.list = list;
     }

@@ -22,6 +22,9 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import java.awt.Point;
+import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -34,6 +37,11 @@ public class DefineShape3Tag extends CharacterTag implements BoundedTag, ShapeTa
     public int shapeId;
     public RECT shapeBounds;
     public SHAPEWITHSTYLE shapes;
+
+    @Override
+    public Point getImagePos(HashMap<Integer, CharacterTag> characters) {
+        return new Point(shapeBounds.Xmin / 20, shapeBounds.Ymin / 20);
+    }
 
     @Override
     public int getShapeNum() {
@@ -61,7 +69,7 @@ public class DefineShape3Tag extends CharacterTag implements BoundedTag, ShapeTa
     }
 
     @Override
-    public BufferedImage toImage(List<Tag> tags) {
+    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters) {
         return shapes.toImage(3, tags);
     }
 
@@ -76,5 +84,10 @@ public class DefineShape3Tag extends CharacterTag implements BoundedTag, ShapeTa
         shapeId = sis.readUI16();
         shapeBounds = sis.readRECT();
         shapes = sis.readSHAPEWITHSTYLE(3);
+    }
+
+    @Override
+    public List<GeneralPath> getPaths(List<Tag> tags) {
+        return SHAPERECORD.shapeToPaths(tags, 3, shapes.shapeRecords);
     }
 }

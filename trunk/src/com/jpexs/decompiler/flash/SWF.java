@@ -50,6 +50,7 @@ import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.gui.FrameNode;
 import com.jpexs.decompiler.flash.gui.TagNode;
+import com.jpexs.decompiler.flash.helpers.Cache;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
@@ -61,6 +62,8 @@ import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
+import com.jpexs.decompiler.flash.tags.PlaceObjectTypeTag;
+import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHeadTypeTag;
@@ -68,14 +71,31 @@ import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
+import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.types.CXFORM;
+import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
+import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.filters.BlendComposite;
+import com.jpexs.decompiler.flash.types.filters.FILTER;
+import com.jpexs.decompiler.flash.types.filters.Filtering;
 import com.jpexs.decompiler.flash.types.sound.AdpcmDecoder;
 import com.jpexs.decompiler.flash.xfl.XFLConverter;
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1328,5 +1348,321 @@ public class SWF {
 
     public void exportXfl(String outfile, String swfName) {
         XFLConverter.convertSWF(this, swfName, outfile, false);
+    }
+
+    public static float twipToPixel(int twip) {
+        return ((float) twip) / 20.0f;
+    }
+
+    private static class CachedImage implements Serializable {
+
+        private int data[];
+        private int width;
+        private int height;
+        private int type;
+
+        public CachedImage(BufferedImage img) {
+            width = img.getWidth();
+            height = img.getHeight();
+            type = img.getType();
+            data = Filtering.getRGB(img, 0, 0, width, height);
+        }
+
+        public BufferedImage getImage() {
+            BufferedImage ret = new BufferedImage(width, height, type);
+            Filtering.setRGB(ret, 0, 0, width, height, data);
+            return ret;
+        }
+    }
+
+    public static AffineTransform matrixToTransform(MATRIX mat) {
+        return new AffineTransform(mat.getScaleXFloat(), mat.getRotateSkew0Float(),
+                mat.getRotateSkew1Float(), mat.getScaleYFloat(),
+                mat.translateX, mat.translateY);
+    }
+    private static Cache cache = new Cache(false);
+
+    public static RECT fixRect(RECT rect) {
+        RECT ret = new RECT();
+        ret.Xmin = rect.Xmin;
+        ret.Xmax = rect.Xmax;
+        ret.Ymin = rect.Ymin;
+        ret.Ymax = rect.Ymax;
+        if (ret.Xmin < 0) {
+            ret.Xmax += (-ret.Xmin);
+            ret.Xmin = 0;
+        }
+        if (ret.Ymin < 0) {
+            ret.Ymax += (-ret.Ymin);
+            ret.Ymin = 0;
+        }
+        return ret;
+    }
+
+    public static BufferedImage frameToImage(int containerId, int maxDepth, HashMap<Integer, Layer> layers, Color backgroundColor, HashMap<Integer, CharacterTag> characters, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect) {
+        displayRect = fixRect(displayRect);
+        String key = "frame_" + frame + "_" + containerId;
+        if (cache.contains(key)) {
+            return ((CachedImage) cache.get(key)).getImage();
+        }
+        float unzoom = 20;
+        BufferedImage ret = new BufferedImage((int) (displayRect.Xmax / unzoom), (int) (displayRect.Ymax / unzoom), BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D g = (Graphics2D) ret.getGraphics();
+        g.setPaint(backgroundColor);
+        g.fill(new Rectangle(ret.getWidth(), ret.getHeight()));
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        for (int i = 1; i <= maxDepth; i++) {
+            if (!layers.containsKey(i)) {
+                continue;
+            }
+            Layer layer = layers.get(i);
+            if (!characters.containsKey(layer.characterId)) {
+                continue;
+            }
+            if (!layer.visible) {
+                continue;
+            }
+            CharacterTag character = characters.get(layer.characterId);
+            MATRIX mat = new MATRIX(layer.matrix);
+            if (mat == null) {
+                mat = new MATRIX();
+            }
+            mat.translateX /= 20;
+            mat.translateY /= 20;
+
+            AffineTransform trans = matrixToTransform(mat);
+
+            //trans.translate(transX, transY);
+            g.setTransform(trans);
+            if (character instanceof DrawableTag) {
+                DrawableTag drawable = (DrawableTag) character;
+                BufferedImage img = drawable.toImage(1/*layer.duration*/, allTags, displayRect, characters);
+
+
+                if (layer.filters != null) {
+                    for (FILTER filter : layer.filters) {
+                        img = filter.apply(img);
+                    }
+                }
+                if (layer.colorTransForm != null) {
+                    img = layer.colorTransForm.apply(img);
+                }
+
+                if (layer.colorTransFormAlpha != null) {
+                    img = layer.colorTransFormAlpha.apply(img);
+                }
+                Point imgPos = drawable.getImagePos(characters);
+                if (imgPos.x < 0) {
+                    imgPos.x = 0;
+                }
+                if (imgPos.y < 0) {
+                    imgPos.y = 0;
+                }
+                switch (layer.blendMode) {
+                    case 0:
+                    case 1:
+                        g.setComposite(AlphaComposite.SrcOver);
+                        break;
+                    case 2: //TODO:Layer
+                        g.setComposite(AlphaComposite.SrcOver);
+                        break;
+                    case 3:
+                        g.setComposite(BlendComposite.Multiply);
+                        break;
+                    case 4:
+                        g.setComposite(BlendComposite.Screen);
+                        break;
+                    case 5:
+                        g.setComposite(BlendComposite.Lighten);
+                        break;
+                    case 6:
+                        g.setComposite(BlendComposite.Darken);
+                        break;
+                    case 7:
+                        g.setComposite(BlendComposite.Difference);
+                        break;
+                    case 8:
+                        g.setComposite(BlendComposite.Add);
+                        break;
+                    case 9:
+                        g.setComposite(BlendComposite.Subtract);
+                        break;
+                    case 10:
+                        g.setComposite(BlendComposite.Invert);
+                        break;
+                    case 11:
+                        g.setComposite(BlendComposite.Alpha);
+                        break;
+                    case 12:
+                        g.setComposite(BlendComposite.Erase);
+                        break;
+                    case 13:
+                        g.setComposite(BlendComposite.Overlay);
+                        break;
+                    case 14:
+                        g.setComposite(BlendComposite.HardLight);
+                        break;
+                    default: //Not implemented
+                        g.setComposite(AlphaComposite.SrcOver);
+                        break;
+                }
+
+                g.drawImage(img, imgPos.x, imgPos.y, null);
+            } else if (character instanceof BoundedTag) {
+                BoundedTag b = (BoundedTag) character;
+                g.setPaint(new Color(255, 255, 255, 128));                
+                g.setComposite(BlendComposite.Invert);
+                RECT r = b.getRect(characters);
+                g.drawString(character.toString(), (r.Xmin) / 20 + 3, (r.Ymin) / 20 + 15);
+                g.draw(new Rectangle(r.Xmin / 20, r.Ymin / 20, r.getWidth() / 20, r.getHeight() / 20));
+                g.drawLine(r.Xmin / 20, r.Ymin / 20, r.Xmax / 20, r.Ymax / 20);
+                g.drawLine(r.Xmax / 20, r.Ymin / 20, r.Xmin / 20, r.Ymax / 20);
+                g.setComposite(AlphaComposite.Dst);
+            }
+        }
+        g.setTransform(AffineTransform.getScaleInstance(1, 1));
+        /*g.setPaint(Color.yellow);
+         g.draw(new Rectangle(ret.getWidth()-1,ret.getHeight()-1));*/
+        cache.put(key, new CachedImage(ret));
+        return ret;
+    }
+
+    public static BufferedImage frameToImage(int containerId, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount) {
+        List<BufferedImage> ret = new ArrayList<BufferedImage>();
+        framesToImage(containerId, ret, frame, frame, allTags, controlTags, displayRect, totalFrameCount);
+        if (ret.isEmpty()) {
+            return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        }
+        return ret.get(0);
+    }
+
+    public static void framesToImage(int containerId, List<BufferedImage> ret, int startFrame, int stopFrame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount) {
+        for (int i = startFrame; i <= stopFrame; i++) {
+            String key = "frame_" + i + "_" + containerId;
+            if (cache.contains(key)) {
+                ret.add(((CachedImage) cache.get(key)).getImage());
+                startFrame++;
+            } else {
+                break;
+            }
+        }
+        if (startFrame > stopFrame) {
+            return;
+        }
+        if (totalFrameCount == 0) {
+            return;
+        }
+
+        while (startFrame > totalFrameCount) {
+            startFrame -= totalFrameCount;
+        }
+
+        while (stopFrame > totalFrameCount) {
+            stopFrame -= totalFrameCount;
+        }
+
+
+        HashMap<Integer, CharacterTag> characters = new HashMap<Integer, CharacterTag>();
+        for (Tag t : allTags) {
+            if (t instanceof CharacterTag) {
+                CharacterTag ch = (CharacterTag) t;
+                characters.put(ch.getCharacterID(), ch);
+            }
+        }
+
+        HashMap<Integer, Layer> layers = new HashMap<Integer, Layer>();
+
+        int maxDepth = 0;
+        int f = 1;
+        Color backgroundColor = new Color(0, 0, 0, 0);
+        for (Tag t : controlTags) {
+            if (t instanceof SetBackgroundColorTag) {
+                SetBackgroundColorTag c = (SetBackgroundColorTag) t;
+                backgroundColor = new Color(c.backgroundColor.red, c.backgroundColor.green, c.backgroundColor.blue);
+            }
+
+            if (t instanceof PlaceObjectTypeTag) {
+                PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
+                int depth = po.getDepth();
+                if (depth > maxDepth) {
+                    maxDepth = depth;
+                }
+
+                if (!layers.containsKey(depth)) {
+                    layers.put(depth, new Layer());
+                }
+                Layer layer = layers.get(depth);
+                int characterId = po.getCharacterId();
+                if (characterId != -1) {
+                    layer.characterId = characterId;
+                }
+                layer.visible = po.isVisible();
+                if (po.flagMove()) {
+                    MATRIX matrix2 = po.getMatrix();
+                    if (matrix2 != null) {
+                        layer.matrix = matrix2;
+                    }
+                    String instanceName = po.getInstanceName();
+                    if (instanceName != null) {
+                        layer.instanceName = instanceName;
+                    }
+                    CXFORM colorTransForm = po.getColorTransform();
+                    if (colorTransForm != null) {
+                        layer.colorTransForm = colorTransForm;
+                    }
+                    CXFORMWITHALPHA colorTransFormAlpha = po.getColorTransformWithAlpha();
+                    if (colorTransFormAlpha != null) {
+                        layer.colorTransFormAlpha = colorTransFormAlpha;
+                    }
+                    if (po.cacheAsBitmap()) {
+                        layer.cacheAsBitmap = true;
+                    }
+                    int blendMode = po.getBlendMode();
+                    if (blendMode != 0) {
+                        layer.blendMode = blendMode;
+                    }
+                    List<FILTER> filters = po.getFilters();
+                    if (filters != null) {
+                        layer.filters = filters;
+                    }
+                    int ratio = po.getRatio();
+                    if (ratio != -1) {
+                        layer.ratio = ratio;
+                    }
+                } else {
+                    layer.matrix = po.getMatrix();
+                    layer.instanceName = po.getInstanceName();
+                    layer.colorTransForm = po.getColorTransform();
+                    layer.colorTransFormAlpha = po.getColorTransformWithAlpha();
+                    layer.cacheAsBitmap = po.cacheAsBitmap();
+                    layer.blendMode = po.getBlendMode();
+                    layer.filters = po.getFilters();
+                    layer.ratio = po.getRatio();
+                }
+            }
+
+            if (t instanceof RemoveTag) {
+                RemoveTag rt = (RemoveTag) t;
+                layers.remove(rt.getDepth());
+
+            }
+            for (Layer l : layers.values()) {
+                l.duration++;
+            }
+            if (t instanceof ShowFrameTag) {
+                if (f > stopFrame) {
+                    break;
+                }
+                if ((f >= startFrame) && (f <= stopFrame)) {
+                    ret.add(frameToImage(containerId, maxDepth, layers, backgroundColor, characters, f, allTags, controlTags, displayRect));
+                }
+                f++;
+            }
+        }
+        return;
     }
 }

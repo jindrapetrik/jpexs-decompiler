@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types.shaperecords;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import java.util.Set;
@@ -62,7 +63,7 @@ public class StyleChangeRecord extends SHAPERECORD {
     @Override
     public String toSWG(int oldX, int oldY) {
         if (stateMoveTo) {
-            return "M " + twipToPixel(moveDeltaX) + " " + twipToPixel(moveDeltaY);
+            return "M " + SWF.twipToPixel(moveDeltaX) + " " + SWF.twipToPixel(moveDeltaY);
         }
         return "";
     }

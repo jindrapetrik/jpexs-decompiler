@@ -17,6 +17,10 @@
 package com.jpexs.decompiler.flash.types.filters;
 
 import com.jpexs.decompiler.flash.types.RGBA;
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Bevel filter with gradient instead of single color
@@ -76,5 +80,30 @@ public class GRADIENTBEVELFILTER extends FILTER {
 
     public GRADIENTBEVELFILTER() {
         super(7);
+    }
+
+    @Override
+    public BufferedImage apply(BufferedImage src) {
+        List<Color> colors = new ArrayList<Color>();
+        List<Float> ratios = new ArrayList<Float>();
+        for (int i = 0; i < gradientColors.length; i++) {
+            if ((i > 0) && (gradientRatio[i - 1] == gradientRatio[i])) {
+                continue;
+            }
+            colors.add(gradientColors[i].toColor());
+            ratios.add(gradientRatio[i] / 255f);
+        }
+        int type = Filtering.INNER;
+        if (onTop && !innerShadow) {
+            type = Filtering.FULL;
+        } else if (!innerShadow) {
+            type = Filtering.OUTER;
+        }
+
+        float ratiosAr[] = new float[ratios.size()];
+        for (int i = 0; i < ratios.size(); i++) {
+            ratiosAr[i] = ratios.get(i);
+        }
+        return Filtering.gradientBevel(src, colors.toArray(new Color[colors.size()]), ratiosAr, (int) blurX, (int) blurY, strength, type, (int) (angle * 180 / Math.PI), (float) distance, knockout, passes);
     }
 }

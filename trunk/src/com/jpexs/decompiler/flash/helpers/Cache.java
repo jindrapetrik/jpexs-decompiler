@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
@@ -33,7 +34,15 @@ import java.util.logging.Logger;
  */
 public class Cache {
 
-    private Map<Object, File> cacheFiles = new WeakHashMap<Object, File>();
+    private Map<Object, File> cacheFiles;
+
+    public Cache(boolean weak) {
+        if (weak) {
+            cacheFiles = new WeakHashMap<Object, File>();
+        } else {
+            cacheFiles = new HashMap<Object, File>();
+        }
+    }
 
     public boolean contains(Object key) {
         return cacheFiles.containsKey(key);

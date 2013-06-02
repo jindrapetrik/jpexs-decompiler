@@ -17,6 +17,10 @@
 package com.jpexs.decompiler.flash.types.filters;
 
 import com.jpexs.decompiler.flash.types.RGBA;
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Glow filter with gradient instead of single color
@@ -79,5 +83,30 @@ public class GRADIENTGLOWFILTER extends FILTER {
      */
     public GRADIENTGLOWFILTER() {
         super(4);
+    }
+
+    @Override
+    public BufferedImage apply(BufferedImage src) {
+        List<Color> colors = new ArrayList<Color>();
+        List<Float> ratios = new ArrayList<Float>();
+        for (int i = 0; i < gradientColors.length; i++) {
+            if ((i > 0) && (gradientRatio[i - 1] == gradientRatio[i])) {
+                continue;
+            }
+            colors.add(gradientColors[i].toColor());
+            ratios.add(gradientRatio[i] / 255f);
+        }
+        int type = Filtering.INNER;
+        if (onTop && !innerShadow) {
+            type = Filtering.FULL;
+        } else if (!innerShadow) {
+            type = Filtering.OUTER;
+        }
+
+        float ratiosAr[] = new float[ratios.size()];
+        for (int i = 0; i < ratios.size(); i++) {
+            ratiosAr[i] = ratios.get(i);
+        }
+        return Filtering.gradientGlow(src, (int) blurX, (int) blurY, (int) (angle * 180 / Math.PI), distance, colors.toArray(new Color[colors.size()]), ratiosAr, type, passes, strength, knockout);
     }
 }

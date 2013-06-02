@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import java.awt.Color;
+
 /**
  * Represents 24-bit red, green, blue value
  *
@@ -59,5 +61,15 @@ public class RGB {
             bh = "0" + bh;
         }
         return "#" + rh + gh + bh;
+    }
+
+    public Color toColor() {
+        return new Color(red, green, blue);
+    }
+
+    public RGB(Color color) {
+        this.red = color.getRed();
+        this.green = color.getGreen();
+        this.blue = color.getBlue();
     }
 }

@@ -64,10 +64,10 @@ public class RECT {
     }
 
     public int getWidth() {
-        return Xmax - Xmin;
+        return (Xmax - Xmin) < 0 ? 0 : Xmax - Xmin;
     }
 
     public int getHeight() {
-        return Ymax - Ymin;
+        return (Ymax - Ymin) < 0 ? 0 : Ymax - Ymin;
     }
 }

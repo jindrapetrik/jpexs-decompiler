@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types.shaperecords;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
@@ -25,7 +26,6 @@ import com.jpexs.decompiler.flash.types.GRADIENT;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
-import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
@@ -37,11 +37,13 @@ import java.awt.MultipleGradientPaint.CycleMethod;
 import java.awt.Point;
 import java.awt.RadialGradientPaint;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -54,9 +56,7 @@ import java.util.logging.Logger;
  */
 public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
 
-    public static float twipToPixel(int twip) {
-        return ((float) twip) / 20.0f;
-    }
+    private static final float DESCALE = 20; //20
 
     @Override
     public Set<Integer> getNeededCharacters() {
@@ -75,7 +75,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
 
         public void draw(int startX, int startY, Graphics2D g, int shapeNum) {
             AffineTransform oldAf = g.getTransform();
-            AffineTransform trans20 = AffineTransform.getScaleInstance(1 / 20.0, 1 / 20.0);
+            AffineTransform trans20 = AffineTransform.getScaleInstance(1 / DESCALE, 1 / DESCALE);
             //g.setTransform(trans20);
             boolean ok = false;
             if (shapeNum == 4) {
@@ -108,9 +108,9 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                             break;
                     }
                     if (joinStyle == BasicStroke.JOIN_MITER) {
-                        g.setStroke(new BasicStroke(lineStyle2.width / 20, capStyle, joinStyle, lineStyle2.miterLimitFactor));
+                        g.setStroke(new BasicStroke(lineStyle2.width / DESCALE, capStyle, joinStyle, lineStyle2.miterLimitFactor));
                     } else {
-                        g.setStroke(new BasicStroke(lineStyle2.width / 20, capStyle, joinStyle));
+                        g.setStroke(new BasicStroke(lineStyle2.width / DESCALE, capStyle, joinStyle));
                     }
                     ok = true;
                 }
@@ -118,7 +118,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                 if (lineStyle == null) {
                     ok = false;
                 } else {
-                    g.setStroke(new BasicStroke(lineStyle.width / 20, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                    g.setStroke(new BasicStroke(lineStyle.width / DESCALE, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                     ok = true;
                 }
             }
@@ -129,29 +129,11 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
             g.setClip(null);
         }
 
-        private AffineTransform matrixToTransform(MATRIX mat) {
-            return new AffineTransform(mat.getScaleXFloat(), mat.getRotateSkew0Float(),
-                    mat.getRotateSkew1Float(), mat.getScaleYFloat(),
-                    mat.translateX, mat.translateY);
-            //mat.translateX,mat.translateY);
-            /*AffineTransform move=AffineTransform.getTranslateInstance(mat.translateX, mat.translateY);
-             AffineTransform rotate =AffineTransform.getRotateInstance(mat.getRotateSkew0Float(), mat.getRotateSkew1Float());
-             AffineTransform scale=AffineTransform.getScaleInstance(mat.getScaleXFloat(), mat.getScaleYFloat());
-             AffineTransform af=scale;
-             AffineTransform scale20=AffineTransform.getScaleInstance(1/20.0, 1/20.0);
-            
-             //af.concatenate(move);
-             //af.concatenate(scale20);
-             af.concatenate(rotate);
-             af.concatenate(scale);           
-             return af;*/
-        }
-
         public void fill(List<Tag> tags, int startX, int startY, Graphics2D g, int shapeNum) {
             AffineTransform oldAf = g.getTransform();
-            AffineTransform trans20 = AffineTransform.getScaleInstance(1 / 20.0, 1 / 20.0);
+            AffineTransform trans20 = AffineTransform.getScaleInstance(1 / DESCALE, 1 / DESCALE);
             g.setTransform(trans20);
-            int maxRepeat = 200;
+            int maxRepeat = 10; //TODO:better handle gradient repeating
             boolean ok = false;
             switch (fillStyle0.fillStyleType) {
                 case FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP:
@@ -170,9 +152,9 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                     }
                     if (image != null) {
                         g.setClip(toGeneralPath(startX, startY));
-                        AffineTransform btrans = matrixToTransform(fillStyle0.bitmapMatrix);
-                        btrans.preConcatenate(AffineTransform.getScaleInstance(1 / 20.0, 1 / 20.0));
-                        btrans.preConcatenate(AffineTransform.getTranslateInstance(startX / 20, startY / 20));
+                        AffineTransform btrans = SWF.matrixToTransform(fillStyle0.bitmapMatrix);
+                        btrans.preConcatenate(AffineTransform.getScaleInstance(1 / DESCALE, 1 / DESCALE));
+                        btrans.preConcatenate(AffineTransform.getTranslateInstance(startX / DESCALE, startY / DESCALE));
                         g.setTransform(btrans);
                         BufferedImage img = image.getImage(tags);
                         g.setPaint(new TexturePaint(img, new Rectangle(img.getWidth(), img.getHeight())));
@@ -202,9 +184,9 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                     GeneralPath focPath = toGeneralPath(startX, startY);
                     g.fill(focPath);
                     g.setClip(focPath);
-                    AffineTransform focTrans = matrixToTransform(fillStyle0.gradientMatrix);
-                    focTrans.preConcatenate(AffineTransform.getScaleInstance(1 / 20.0, 1 / 20.0));
-                    focTrans.preConcatenate(AffineTransform.getTranslateInstance(startX / 20, startY / 20));
+                    AffineTransform focTrans = SWF.matrixToTransform(fillStyle0.gradientMatrix);
+                    focTrans.preConcatenate(AffineTransform.getScaleInstance(1 / DESCALE, 1 / DESCALE));
+                    focTrans.preConcatenate(AffineTransform.getTranslateInstance(startX / DESCALE, startY / DESCALE));
                     g.setTransform(focTrans);
                     CycleMethod cm = CycleMethod.NO_CYCLE;
                     if (fillStyle0.focalGradient.spreadMode == GRADIENT.SPREAD_PAD_MODE) {
@@ -242,9 +224,9 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                     GeneralPath path = toGeneralPath(startX, startY);
                     g.fill(path);
                     g.setClip(path);
-                    AffineTransform trans = matrixToTransform(fillStyle0.gradientMatrix);
-                    trans.preConcatenate(AffineTransform.getScaleInstance(1 / 20.0, 1 / 20.0));
-                    trans.preConcatenate(AffineTransform.getTranslateInstance(startX / 20, startY / 20));
+                    AffineTransform trans = SWF.matrixToTransform(fillStyle0.gradientMatrix);
+                    trans.preConcatenate(AffineTransform.getScaleInstance(1 / DESCALE, 1 / DESCALE));
+                    trans.preConcatenate(AffineTransform.getTranslateInstance(startX / DESCALE, startY / DESCALE));
                     g.setTransform(trans);
 
                     CycleMethod cmRad = CycleMethod.NO_CYCLE;
@@ -275,9 +257,9 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                     GeneralPath pathLin = toGeneralPath(startX, startY);
                     g.fill(pathLin);
                     g.setClip(pathLin);
-                    AffineTransform transLin = matrixToTransform(fillStyle0.gradientMatrix);
-                    transLin.preConcatenate(AffineTransform.getScaleInstance(1 / 20.0, 1 / 20.0));
-                    transLin.preConcatenate(AffineTransform.getTranslateInstance(startX / 20, startY / 20));
+                    AffineTransform transLin = SWF.matrixToTransform(fillStyle0.gradientMatrix);
+                    transLin.preConcatenate(AffineTransform.getScaleInstance(1 / DESCALE, 1 / DESCALE));
+                    transLin.preConcatenate(AffineTransform.getTranslateInstance(startX / DESCALE, startY / DESCALE));
                     g.setTransform(transLin);
 
                     CycleMethod cmLin = CycleMethod.NO_CYCLE;
@@ -367,7 +349,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                 params += " stroke=\"" + ((shapeNum >= 3) ? lineStyle.colorA.toHexRGB() : lineStyle.color.toHexRGB()) + "\"";
             }
             if (useLineStyle2 && lineStyle2 != null) {
-                params += " stroke-width=\"" + twipToPixel(lineStyle2.width) + "\"" + (lineStyle2.color != null ? " stroke=\"" + lineStyle2.color.toHexRGB() + "\"" : "");
+                params += " stroke-width=\"" + SWF.twipToPixel(lineStyle2.width) + "\"" + (lineStyle2.color != null ? " stroke=\"" + lineStyle2.color.toHexRGB() + "\"" : "");
             }
             String points = "";
             int x = 0;
@@ -422,7 +404,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
         return new RECT(min_x, max_x, min_y, max_y);
     }
 
-    private static List<Path> getPaths(RECT bounds, int shapeNum, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStylesList, int numFillBits, int numLineBits, List<SHAPERECORD> records) {
+    private static List<Path> getPaths(RECT bounds, int shapeNum, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStylesList, List<SHAPERECORD> records) {
         List<Path> paths = new ArrayList<Path>();
         Path path = new Path();
         int x = 0;
@@ -441,18 +423,18 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                 if (scr.stateNewStyles) {
                     fillStyles = scr.fillStyles;
                     lineStylesList = scr.lineStyles;
-                    numFillBits = scr.numFillBits;
-                    numLineBits = scr.numLineBits;
+                    //numFillBits = scr.numFillBits;
+                    //numLineBits = scr.numLineBits;
                 }
                 if (scr.stateFillStyle0) {
-                    if (scr.fillStyle0 == 0) {
+                    if ((scr.fillStyle0 == 0) || (fillStyles == null)) {
                         path.fillStyle0 = null;
                     } else {
                         path.fillStyle0 = fillStyles.fillStyles[scr.fillStyle0 - 1];
                     }
                 }
                 if (scr.stateFillStyle1) {
-                    if (scr.fillStyle1 == 0) {
+                    if ((scr.fillStyle1 == 0) || (fillStyles == null)) {
                         path.fillStyle1 = null;
                     } else {
                         path.fillStyle1 = fillStyles.fillStyles[scr.fillStyle1 - 1];
@@ -500,6 +482,9 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
         paths.add(path);
         List<Path> paths2 = new ArrayList<Path>();
         for (Path p : paths) {
+            if ((p.fillStyle0 == null) && (p.fillStyle1 == null)) {
+                paths2.add(p);
+            }
             if (p.fillStyle0 != null) {
                 paths2.add(p);
             }
@@ -570,30 +555,61 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
     public static String shapeToSVG(int shapeNum, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStylesList, int numFillBits, int numLineBits, List<SHAPERECORD> records) {
         String ret = "";
         RECT bounds = new RECT();
-        List<Path> paths = getPaths(bounds, shapeNum, fillStyles, lineStylesList, numFillBits, numLineBits, records);
+        List<Path> paths = getPaths(bounds, shapeNum, fillStyles, lineStylesList, /*numFillBits, numLineBits,*/ records);
         ret = "";
         for (Path p : paths) {
             ret += p.toSVG(shapeNum);
         }
         ret = "<?xml version='1.0' encoding='UTF-8' ?> \n"
                 + "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\n"
-                + "<svg width=\"" + (int) Math.ceil(twipToPixel(bounds.Xmax)) + "\"\n"
-                + "     height=\"" + (int) Math.ceil(twipToPixel(bounds.Ymax)) + "\"\n"
-                + "     viewBox=\"0 0 " + (int) Math.ceil(twipToPixel(bounds.Xmax)) + " " + (int) Math.ceil(twipToPixel(bounds.Ymax) + 50) + "\"\n"
+                + "<svg width=\"" + (int) Math.ceil(SWF.twipToPixel(bounds.Xmax)) + "\"\n"
+                + "     height=\"" + (int) Math.ceil(SWF.twipToPixel(bounds.Ymax)) + "\"\n"
+                + "     viewBox=\"0 0 " + (int) Math.ceil(SWF.twipToPixel(bounds.Xmax)) + " " + (int) Math.ceil(SWF.twipToPixel(bounds.Ymax) + 50) + "\"\n"
                 + "     xmlns=\"http://www.w3.org/2000/svg\"\n"
                 + "     xmlns:xlink=\"http://www.w3.org/1999/xlink\">" + ret + ""
                 + "</svg>";
         return ret;
     }
+    private static HashMap<String, BufferedImage> cache = new HashMap<String, BufferedImage>();
 
-    public static BufferedImage shapeToImage(List<Tag> tags, int shapeNum, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStylesList, int numFillBits, int numLineBits, List<SHAPERECORD> records) {
+    public static BufferedImage shapeToImage(List<Tag> tags, int shapeNum, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStylesList, List<SHAPERECORD> records) {
+        return shapeToImage(tags, shapeNum, fillStyles, lineStylesList, records, Color.black);
+    }
+
+    public static List<GeneralPath> shapeToPaths(List<Tag> tags, int shapeNum, List<SHAPERECORD> records) {
         RECT rect = new RECT();
-        List<Path> paths = getPaths(rect, shapeNum, fillStyles, lineStylesList, numFillBits, numLineBits, records);
-        BufferedImage ret = new BufferedImage(rect.getWidth() / 20 + 2, rect.getHeight() / 20 + 2, BufferedImage.TYPE_4BYTE_ABGR);
-        Graphics2D g = (Graphics2D) ret.getGraphics();
+        List<Path> paths = getPaths(rect, shapeNum, null, null, records);
+        List<GeneralPath> ret = new ArrayList<GeneralPath>();
         for (Path p : paths) {
-            p.drawTo(tags, -rect.Xmin, -rect.Ymin, g, shapeNum);
+            ret.add(p.toGeneralPath(-rect.Xmin, -rect.Ymin));
         }
+        return ret;
+    }
+
+    public static BufferedImage shapeToImage(List<Tag> tags, int shapeNum, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStylesList, List<SHAPERECORD> records, Color defaultColor) {
+        String key = "shape_" + records.hashCode() + "_" + defaultColor.hashCode();
+        if (cache.containsKey(key)) {
+            return cache.get(key);
+        }
+        RECT rect = new RECT();
+        List<Path> paths = getPaths(rect, shapeNum, fillStyles, lineStylesList, /*numFillBits, numLineBits,*/ records);
+        BufferedImage ret = new BufferedImage(
+                //(int)((rect.Xmax-rect.Xmin)/DESCALE),(int)((rect.Ymax-rect.Ymin)/DESCALE)
+                (int) (rect.getWidth() / DESCALE + 2), (int) (rect.getHeight() / DESCALE + 2), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = (Graphics2D) ret.getGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        for (Path p : paths) {
+            if (p.fillStyle0 == null) {
+                p.fillStyle0 = new FILLSTYLE();
+                p.fillStyle0.fillStyleType = FILLSTYLE.SOLID;
+                p.fillStyle0.color = new RGB(defaultColor);
+                p.fillStyle0.colorA = new RGBA(defaultColor);
+            }
+            p.drawTo(tags, -rect.Xmin, -rect.Ymin/*-rect.Xmin, -rect.Ymin*/, g, shapeNum);
+        }
+        cache.put(key, ret);
         return ret;
     }
 

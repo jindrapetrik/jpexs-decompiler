@@ -194,4 +194,24 @@ public class DefineFontTag extends CharacterTag implements FontTag {
         }
         return false;
     }
+
+    @Override
+    public int getAscent() {
+        return -1;
+    }
+
+    @Override
+    public int getDescent() {
+        return -1;
+    }
+
+    @Override
+    public int getLeading() {
+        return -1;
+    }
+
+    @Override
+    public int getDivider() {
+        return 1;
+    }
 }

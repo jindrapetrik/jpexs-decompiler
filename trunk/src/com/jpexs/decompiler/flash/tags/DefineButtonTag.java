@@ -18,8 +18,10 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.DisassemblyListener;
+import com.jpexs.decompiler.flash.Layer;
 import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.ReReadableInputStream;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
@@ -30,6 +32,9 @@ import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.RECT;
+import java.awt.Color;
+import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -226,5 +231,31 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     @Override
     public boolean trackAsMenu() {
         return false;
+    }
+
+    @Override
+    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters) {
+        HashMap<Integer, Layer> layers = new HashMap<Integer, Layer>();
+        int maxDepth = 0;
+        for (BUTTONRECORD r : this.characters) {
+            if (r.buttonStateUp) {
+                Layer layer = new Layer();
+                layer.colorTransFormAlpha = r.colorTransform;
+                layer.blendMode = r.blendMode;
+                layer.filters = r.filterList;
+                layer.matrix = r.placeMatrix;
+                layer.characterId = r.characterId;
+                if (r.placeDepth > maxDepth) {
+                    maxDepth = r.placeDepth;
+                }
+                layers.put(r.placeDepth, layer);
+            }
+        }
+        return SWF.frameToImage(buttonId, maxDepth, layers, new Color(0, 0, 0, 0), characters, 1, tags, tags, displayRect);
+    }
+
+    @Override
+    public Point getImagePos(HashMap<Integer, CharacterTag> characters) {
+        return new Point(0, 0);
     }
 }

@@ -54,7 +54,7 @@ public class SHAPE implements NeedsCharacters {
     }
 
     public BufferedImage toImage(int shapeNum, List<Tag> tags) {
-        return SHAPERECORD.shapeToImage(tags, shapeNum, null, null, numFillBits, numLineBits, shapeRecords);
+        return SHAPERECORD.shapeToImage(tags, shapeNum, null, null,/* numFillBits, numLineBits, */ shapeRecords);
     }
 
     public RECT getBounds() {
