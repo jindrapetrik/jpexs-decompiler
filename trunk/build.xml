@@ -13,7 +13,7 @@
     <property name="VENDOR" value="JPEXS" />
     <property name="INTERNALNAME" value="FFDec" />
     <property name="PRODUCTNAME" value="JPEXS Free Flash Decompiler" />
-    <property name="MAINCLASS" value="com.jpexs.decompiler.flash.Main"/>
+    <property name="MAINCLASS" value="com.jpexs.decompiler.flash.gui.Main"/>
     <property name="INNOSETUPPATH" value="c:\program files (x86)\inno setup 5"/>
     <property name="LAUNCH4JPATH" value="c:\program files (x86)\launch4j" />
     
@@ -40,11 +40,6 @@
     <property name="INSTALLERPROJECT" value="${basedir}/installer.iss"/>
     <property name="EXECONFIG" value="${basedir}/build_exe.xml"/>
     
-     <property name="RUNPARAMS" value="&quot;D:\swf\infinite_loops.swf&quot;" />    
-    <!--D:\swf\empty_if.swf-->
-    <!-- <property name="RUNPARAMS" value="testdata/as2/as2.swf" />    
-    -->
-    <!-- c:\Program Files (x86)\Sothink SWF Decompiler\SWF Decompiler Intro.swf -->
-    <!-- testdata/as2/as2.swf -->
+     <property name="RUNPARAMS" value="" />    
     <import file="build_common.xml"/>
 </project>

@@ -14,15 +14,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash;
+package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.Configuration;
+import com.jpexs.decompiler.flash.EventListener;
+import com.jpexs.decompiler.flash.PercentListener;
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.Version;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import com.jpexs.decompiler.flash.gui.AboutDialog;
-import com.jpexs.decompiler.flash.gui.LoadingDialog;
-import com.jpexs.decompiler.flash.gui.MainFrame;
-import com.jpexs.decompiler.flash.gui.ModeFrame;
-import com.jpexs.decompiler.flash.gui.NewVersionDialog;
-import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.flash.helpers.Helper;
@@ -33,6 +32,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.*;
 import java.net.Socket;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Properties;
@@ -96,40 +97,11 @@ public class Main {
     public static boolean isCommandLineMode() {
         return commandLineMode;
     }
-    public static final boolean DISPLAY_FILENAME = true;
-    public static boolean DEBUG_COPY = false;
-    /**
-     * Debug mode = throwing an error when comparing original file and
-     * recompiled
-     */
-    public static boolean debugMode = false;
-    /**
-     * Turn off reading unsafe tags (tags which can cause problems with
-     * recompiling)
-     */
-    public static boolean DISABLE_DANGEROUS = false;
-    /**
-     * Turn off resolving constants in ActionScript 2
-     */
-    public static final boolean RESOLVE_CONSTANTS = true;
-    /**
-     * Turn off decompiling if needed
-     */
-    public static final boolean DO_DECOMPILE = true;
-    /**
-     * Find latest constant pool in the code
-     */
-    public static final boolean LATEST_CONSTANTPOOL_HACK = false;
     /**
      * Dump tags to stdout
      */
-    public static boolean dump_tags = false;
-    /**
-     * Limit of code subs (for obfuscated code)
-     */
-    public static final int SUBLIMITER = 500;
-    //using parameter names in decompiling may cause problems because oficial programs like Flash CS 5.5 inserts wrong parameter names indices
-    public static final boolean PARAM_NAMES_ENABLE = false;
+    //
+    
 
     public static String getFileTitle() {
         if (maskURL != null) {
@@ -140,7 +112,7 @@ public class Main {
 
     public static void setSubLimiter(boolean value) {
         if (value) {
-            AVM2Code.toSourceLimit = Main.SUBLIMITER;
+            AVM2Code.toSourceLimit = Configuration.SUBLIMITER;
         } else {
             AVM2Code.toSourceLimit = -1;
         }
@@ -228,16 +200,6 @@ public class Main {
                 Main.startWork("Reading SWF...");
                 swf = parseSWF(Main.file);
                 FileInputStream fis = new FileInputStream(file);
-                DEBUG_COPY = true;
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                /*try {
-                 swf.saveTo(baos);
-                 } catch (NotSameException nse) {
-                 Logger.getLogger(Main.class.getName()).log(Level.FINE, null, nse);
-                 JOptionPane.showMessageDialog(null, "WARNING: The SWF decompiler may have problems saving this file. Recommended usage is READ ONLY.");
-                 }*/
-                DEBUG_COPY = false;
-                //DEBUG_COPY=true;
             } catch (Exception ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 JOptionPane.showMessageDialog(null, "Cannot load SWF file.");
@@ -468,16 +430,16 @@ public class Main {
     public static void main(String[] args) throws IOException {
         loadProperties();
         View.setLookAndFeel();
-        Configuration.load();
+        Configuration.loadFromFile(getConfigFile(), getReplacementsFile());
 
         int pos = 0;
         if (args.length > 0) {
             if (args[0].equals("-debug")) {
-                debugMode = true;
+                Configuration.debugMode = true;
                 pos++;
             }
         }
-        initLogging(debugMode);
+        initLogging(Configuration.debugMode);
         if (args.length < pos + 1) {
             autoCheckForUpdates();
             showModeFrame();
@@ -599,10 +561,10 @@ public class Main {
                         exfile.exportTexts(outDir.getAbsolutePath(), false);
                         exportOK = true;
                     } else if (exportFormat.equals("fla")) {
-                        exfile.exportFla(outDir.getAbsolutePath(), inFile.getName());
+                        exfile.exportFla(outDir.getAbsolutePath(), inFile.getName(), applicationName, applicationVerName, version);
                         exportOK = true;
                     } else if (exportFormat.equals("xfl")) {
-                        exfile.exportXfl(outDir.getAbsolutePath(), inFile.getName());
+                        exfile.exportXfl(outDir.getAbsolutePath(), inFile.getName(), applicationName, applicationVerName, version);
                         exportOK = true;
                     } else {
                         exportOK = false;
@@ -647,7 +609,7 @@ public class Main {
                     badArguments();
                 }
                 try {
-                    dump_tags = true;
+                    Configuration.dump_tags = true;
                     SWF swf = parseSWF(args[pos + 1]);
                 } catch (Exception ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
@@ -668,11 +630,11 @@ public class Main {
     }
 
     public static String tempFile(String url) {
-        File f = new File(Configuration.getASDecHome() + "saved" + File.separator);
+        File f = new File(getFFDecHome() + "saved" + File.separator);
         if (!f.exists()) {
             f.mkdirs();
         }
-        return Configuration.getASDecHome() + "saved" + File.separator + "asdec_" + Integer.toHexString(url.hashCode()) + ".tmp";
+        return getFFDecHome() + "saved" + File.separator + "asdec_" + Integer.toHexString(url.hashCode()) + ".tmp";
 
     }
 
@@ -761,7 +723,7 @@ public class Main {
     }
 
     public static void exit() {
-        Configuration.save();
+        Configuration.saveToFile(getConfigFile(), getReplacementsFile());
         FlashPlayerPanel.unload();
         System.exit(0);
     }
@@ -875,7 +837,7 @@ public class Main {
         try {
             Logger logger = Logger.getLogger("");
             logger.setLevel(debug ? Level.CONFIG : Level.WARNING);
-            FileHandler fileTxt = new FileHandler(Configuration.getASDecHome() + File.separator + "log.txt");
+            FileHandler fileTxt = new FileHandler(getFFDecHome() + File.separator + "log.txt");
 
             SimpleFormatter formatterTxt = new SimpleFormatter();
             fileTxt.setFormatter(formatterTxt);
@@ -890,5 +852,92 @@ public class Main {
         } catch (Exception ex) {
             throw new RuntimeException("Problems with creating the log files");
         }
+    }
+    private static final String CONFIG_NAME = "config.bin";
+    private static final String REPLACEMENTS_NAME = "replacements.cfg";
+    private static final File unspecifiedFile = new File("unspecified");
+    private static File directory = unspecifiedFile;
+
+    private enum OSId {
+
+        WINDOWS, OSX, UNIX
+    }
+
+    private static OSId getOSId() {
+        PrivilegedAction<String> doGetOSName = new PrivilegedAction<String>() {
+            @Override
+            public String run() {
+                return System.getProperty("os.name");
+            }
+        };
+        OSId id = OSId.UNIX;
+        String osName = AccessController.doPrivileged(doGetOSName);
+        if (osName != null) {
+            if (osName.toLowerCase().startsWith("mac os x")) {
+                id = OSId.OSX;
+            } else if (osName.contains("Windows")) {
+                id = OSId.WINDOWS;
+            }
+        }
+        return id;
+    }
+
+    public static String getFFDecHome() {
+        if (directory == unspecifiedFile) {
+            directory = null;
+            String userHome = null;
+            try {
+                userHome = System.getProperty("user.home");
+            } catch (SecurityException ignore) {
+            }
+            if (userHome != null) {
+                String applicationId = Main.shortApplicationName;
+                OSId osId = getOSId();
+                if (osId == OSId.WINDOWS) {
+                    File appDataDir = null;
+                    try {
+                        String appDataEV = System.getenv("APPDATA");
+                        if ((appDataEV != null) && (appDataEV.length() > 0)) {
+                            appDataDir = new File(appDataEV);
+                        }
+                    } catch (SecurityException ignore) {
+                    }
+                    String vendorId = Main.vendor;
+                    if ((appDataDir != null) && appDataDir.isDirectory()) {
+                        // ${APPDATA}\{vendorId}\${applicationId}
+                        String path = vendorId + "\\" + applicationId + "\\";
+                        directory = new File(appDataDir, path);
+                    } else {
+                        // ${userHome}\Application Data\${vendorId}\${applicationId}
+                        String path = "Application Data\\" + vendorId + "\\" + applicationId + "\\";
+                        directory = new File(userHome, path);
+                    }
+                } else if (osId == OSId.OSX) {
+                    // ${userHome}/Library/Application Support/${applicationId}
+                    String path = "Library/Application Support/" + applicationId + "/";
+                    directory = new File(userHome, path);
+                } else {
+                    // ${userHome}/.${applicationId}/
+                    String path = "." + applicationId + "/";
+                    directory = new File(userHome, path);
+                }
+            }
+        }
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        String ret = directory.getAbsolutePath();
+        if (!ret.endsWith(File.separator)) {
+            ret += File.separator;
+        }
+        return ret;
+    }
+
+    private static String getReplacementsFile() {
+        return getFFDecHome() + REPLACEMENTS_NAME;
+    }
+
+    private static String getConfigFile() {
+        return getFFDecHome() + CONFIG_NAME;
     }
 }

@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.Main;
+import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -80,7 +80,7 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             OutputStream os = bos;
-            if (Main.DEBUG_COPY) {
+            if (Configuration.DEBUG_COPY) {
                 os = new CopyOutputStream(os, new ByteArrayInputStream(super.data));
             }
             SWFOutputStream sos = new SWFOutputStream(os, version);

@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.gui.proxy;
 
 import com.jpexs.decompiler.flash.Configuration;
-import com.jpexs.decompiler.flash.Main;
+import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.proxy.CatchedListener;
 import com.jpexs.proxy.ReplacedListener;

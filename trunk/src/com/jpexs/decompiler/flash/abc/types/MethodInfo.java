@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.types;
 
-import com.jpexs.decompiler.flash.Main;
+import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.helpers.Helper;
@@ -241,7 +241,7 @@ public class MethodInfo {
             }
             if (!localRegNames.isEmpty()) {
                 paramStr += localRegNames.get(i + 1);
-            } else if ((paramNames.length > i) && (paramNames[i] != 0) && Main.PARAM_NAMES_ENABLE) {
+            } else if ((paramNames.length > i) && (paramNames[i] != 0) && Configuration.PARAM_NAMES_ENABLE) {
                 paramStr += constants.constant_string[paramNames[i]];
             } else {
                 paramStr += "param" + (i + 1);

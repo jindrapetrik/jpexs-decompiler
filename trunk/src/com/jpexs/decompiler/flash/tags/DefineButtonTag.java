@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.Layer;
-import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.ReReadableInputStream;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -104,12 +103,12 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
      */
     @Override
     public byte[] getData(int version) {
-        if (Main.DISABLE_DANGEROUS) {
+        if (Configuration.DISABLE_DANGEROUS) {
             return super.getData(version);
         }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
-        if (Main.DEBUG_COPY) {
+        if (Configuration.DEBUG_COPY) {
             os = new CopyOutputStream(os, new ByteArrayInputStream(super.data));
         }
         SWFOutputStream sos = new SWFOutputStream(os, version);

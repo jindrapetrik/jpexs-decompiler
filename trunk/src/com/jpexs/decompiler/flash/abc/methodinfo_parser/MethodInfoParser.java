@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.methodinfo_parser;
 
-import com.jpexs.decompiler.flash.Main;
+import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
@@ -297,7 +297,7 @@ public class MethodInfoParser {
                 useParamNames = true;
             }
         }
-        if (!Main.PARAM_NAMES_ENABLE) {
+        if (!Configuration.PARAM_NAMES_ENABLE) {
             useParamNames = false;
         }
         if (useParamNames) {

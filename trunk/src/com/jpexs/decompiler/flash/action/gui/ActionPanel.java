@@ -16,9 +16,10 @@
  */
 package com.jpexs.decompiler.flash.action.gui;
 
+import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.DisassemblyListener;
-import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.TagNode;
 import com.jpexs.decompiler.flash.abc.gui.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraph;
@@ -27,7 +28,7 @@ import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
-import com.jpexs.decompiler.flash.gui.TagNode;
+import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.Cache;
@@ -214,7 +215,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             @Override
             public void run() {
                 editor.setText("; Disassembling...");
-                if (Main.DO_DECOMPILE) {
+                if (Configuration.DO_DECOMPILE) {
                     decompiledEditor.setText("//Waiting for dissasembly...");
                 }
                 DisassemblyListener listener = new DisassemblyListener() {
@@ -242,7 +243,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                 srcNoHex = Helper.stripComments(lastDisasm);
                 editor.setText("; Disassembling - setting");
                 setHex(hexButton.isSelected());
-                if (Main.DO_DECOMPILE) {
+                if (Configuration.DO_DECOMPILE) {
                     decompiledEditor.setText("//Decompiling...");
                     String stripped = "";
                     if (!useCache) {

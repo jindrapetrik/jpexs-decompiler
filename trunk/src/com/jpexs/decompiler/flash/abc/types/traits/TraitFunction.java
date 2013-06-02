@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.types.traits;
 
-import com.jpexs.decompiler.flash.Main;
+import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -52,7 +52,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
 
     @Override
     public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
-        if (!Main.DO_DECOMPILE) {
+        if (!Configuration.DO_DECOMPILE) {
             return "";
         }
         String header = convertHeader(path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlight, fullyQualifiedNames);

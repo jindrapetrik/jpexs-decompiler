@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.swf4;
 
-import com.jpexs.decompiler.flash.Main;
+import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ public class ConstantIndex {
     }
 
     public String toStringNoQ() {
-        if (Main.RESOLVE_CONSTANTS) {
+        if (Configuration.RESOLVE_CONSTANTS) {
             if (constantPool != null) {
                 if (index < constantPool.size()) {
                     return constantPool.get(index);
@@ -49,7 +49,7 @@ public class ConstantIndex {
 
     @Override
     public String toString() {
-        if (Main.RESOLVE_CONSTANTS) {
+        if (Configuration.RESOLVE_CONSTANTS) {
             if (constantPool != null) {
                 if (index < constantPool.size()) {
                     return "\"" + Helper.escapeString(constantPool.get(index)) + "\"";

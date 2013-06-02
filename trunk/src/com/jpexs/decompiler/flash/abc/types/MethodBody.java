@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.Configuration;
-import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.CodeStats;
@@ -80,7 +79,7 @@ public class MethodBody implements Cloneable, Serializable {
         HashMap<Integer, String> ret = new HashMap<Integer, String>();
         for (int i = 1; i <= abc.method_info[this.method_info].param_types.length; i++) {
             String paramName = "param" + i;
-            if (abc.method_info[this.method_info].flagHas_paramnames() && Main.PARAM_NAMES_ENABLE) {
+            if (abc.method_info[this.method_info].flagHas_paramnames() && Configuration.PARAM_NAMES_ENABLE) {
                 paramName = abc.constants.constant_string[abc.method_info[this.method_info].paramNames[i - 1]];
             }
             ret.put(i, paramName);
@@ -104,7 +103,7 @@ public class MethodBody implements Cloneable, Serializable {
 
     public String toString(String path, boolean pcode, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, boolean hilight, List<String> fullyQualifiedNames, Traits initTraits) {
         String s = "";
-        if (!Main.DO_DECOMPILE) {
+        if (!Configuration.DO_DECOMPILE) {
             s = "//NOT DECOMPILED";
             if (hilight) {
                 s = Highlighting.hilighMethod(s, this.method_info);

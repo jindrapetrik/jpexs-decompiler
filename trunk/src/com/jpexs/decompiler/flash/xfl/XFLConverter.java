@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.xfl;
 
-import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
@@ -2368,7 +2367,7 @@ public class XFLConverter {
         return ret;
     }
 
-    public static void convertSWF(SWF swf, String swfFileName, String outfile, boolean compressed) {
+    public static void convertSWF(SWF swf, String swfFileName, String outfile, boolean compressed, String generator, String generatorVerName, String generatorVersion) {
         String domDocument = "";
         String baseName = swfFileName;
         File f = new File(baseName);
@@ -2402,7 +2401,7 @@ public class XFLConverter {
                 backgroundColor = sbc.backgroundColor.toHexRGB();
             }
         }
-        domDocument += "<DOMDocument xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://ns.adobe.com/xfl/2008/\" currentTimeline=\"1\" xflVersion=\"2.2\" creatorInfo=\"" + Main.applicationName + "\" platform=\"Windows\" versionInfo=\"Saved by " + Main.applicationVerName + "\" majorVersion=\"" + Main.version + "\" buildNumber=\"\" nextSceneIdentifier=\"2\" playOptionsPlayLoop=\"false\" playOptionsPlayPages=\"false\" playOptionsPlayFrameActions=\"false\" autoSaveHasPrompted=\"true\"";
+        domDocument += "<DOMDocument xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://ns.adobe.com/xfl/2008/\" currentTimeline=\"1\" xflVersion=\"2.2\" creatorInfo=\"" + generator + "\" platform=\"Windows\" versionInfo=\"Saved by " + generatorVerName + "\" majorVersion=\"" + generatorVersion + "\" buildNumber=\"\" nextSceneIdentifier=\"2\" playOptionsPlayLoop=\"false\" playOptionsPlayPages=\"false\" playOptionsPlayFrameActions=\"false\" autoSaveHasPrompted=\"true\"";
         domDocument += " backgroundColor=\"" + backgroundColor + "\"";
         domDocument += " frameRate=\"" + swf.frameRate + "\"";
         domDocument += ">";

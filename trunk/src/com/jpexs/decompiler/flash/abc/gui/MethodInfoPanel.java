@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.gui;
 
-import com.jpexs.decompiler.flash.Main;
+import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.methodinfo_parser.MethodInfoParser;
 import com.jpexs.decompiler.flash.abc.methodinfo_parser.ParseException;
@@ -83,7 +83,7 @@ public class MethodInfoPanel extends JPanel {
             if (p > 0) {
                 ret += ",\n";
             }
-            if (methodInfo.flagHas_paramnames() && Main.PARAM_NAMES_ENABLE) {
+            if (methodInfo.flagHas_paramnames() && Configuration.PARAM_NAMES_ENABLE) {
                 ret = ret + abc.constants.constant_string[methodInfo.paramNames[p]];
             } else {
                 ret = ret + "param" + (p + 1);

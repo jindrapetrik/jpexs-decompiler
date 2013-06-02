@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.Main;
+import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
@@ -161,7 +161,7 @@ public class DefineFont3Tag extends CharacterTag implements FontTag {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
         SWFOutputStream sos = new SWFOutputStream(os, version);
-        if (Main.DEBUG_COPY) {
+        if (Configuration.DEBUG_COPY) {
             sos = new SWFOutputStream(new CopyOutputStream(sos, new ByteArrayInputStream(data)), 10);
         }
         try {

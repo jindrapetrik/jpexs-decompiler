@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.Main;
 import com.jpexs.decompiler.flash.Version;
 import java.awt.Container;
 import java.awt.Dimension;

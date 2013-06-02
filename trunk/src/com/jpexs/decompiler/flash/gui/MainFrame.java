@@ -17,9 +17,10 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.Configuration;
-import com.jpexs.decompiler.flash.Main;
+import com.jpexs.decompiler.flash.FrameNode;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.TagNode;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.gui.ABCPanel;
 import com.jpexs.decompiler.flash.abc.gui.ClassesListTreeModel;
@@ -251,7 +252,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                 Main.exit();
             }
         });
-        setTitle(Main.applicationVerName + (Main.DISPLAY_FILENAME ? " - " + Main.getFileTitle() : ""));
+        setTitle(Main.applicationVerName + (Configuration.DISPLAY_FILENAME ? " - " + Main.getFileTitle() : ""));
         JMenuBar menuBar = new JMenuBar();
 
 
@@ -1360,7 +1361,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         }
         if (e.getActionCommand().equals("SAVEAS")) {
             if (Main.saveFileDialog()) {
-                setTitle(Main.applicationVerName + (Main.DISPLAY_FILENAME ? " - " + Main.getFileTitle() : ""));
+                setTitle(Main.applicationVerName + (Configuration.DISPLAY_FILENAME ? " - " + Main.getFileTitle() : ""));
             }
         }
         if (e.getActionCommand().equals("OPEN")) {
@@ -1414,9 +1415,9 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                     @Override
                     public void run() {
                         if (compressed) {
-                            swf.exportFla(selfile.getAbsolutePath(), new File(Main.file).getName());
+                            swf.exportFla(selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version);
                         } else {
-                            swf.exportXfl(selfile.getAbsolutePath(), new File(Main.file).getName());
+                            swf.exportXfl(selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version);
                         }
                         Main.stopWork();
                     }

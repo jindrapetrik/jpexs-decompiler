@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
-import com.jpexs.decompiler.flash.Main;
+import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
@@ -129,12 +129,12 @@ public class PlaceObject2Tag extends Tag implements Container, PlaceObjectTypeTa
      */
     @Override
     public byte[] getData(int version) {
-        if (Main.DISABLE_DANGEROUS) {
+        if (Configuration.DISABLE_DANGEROUS) {
             return super.getData(version);
         }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream os = baos;
-        if (Main.DEBUG_COPY) {
+        if (Configuration.DEBUG_COPY) {
             os = new CopyOutputStream(os, new ByteArrayInputStream(super.data));
         }
         SWFOutputStream sos = new SWFOutputStream(os, version);

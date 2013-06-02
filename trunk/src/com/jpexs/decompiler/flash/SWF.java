@@ -48,8 +48,6 @@ import com.jpexs.decompiler.flash.flv.VIDEODATA;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
-import com.jpexs.decompiler.flash.gui.FrameNode;
-import com.jpexs.decompiler.flash.gui.TagNode;
 import com.jpexs.decompiler.flash.helpers.Cache;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
@@ -1340,12 +1338,12 @@ public class SWF {
         return ret;
     }
 
-    public void exportFla(String outfile, String swfName) {
-        XFLConverter.convertSWF(this, swfName, outfile, true);
+    public void exportFla(String outfile, String swfName, String generator, String generatorVerName, String generatorVersion) {
+        XFLConverter.convertSWF(this, swfName, outfile, true, generator, generatorVerName, generatorVersion);
     }
 
-    public void exportXfl(String outfile, String swfName) {
-        XFLConverter.convertSWF(this, swfName, outfile, false);
+    public void exportXfl(String outfile, String swfName, String generator, String generatorVerName, String generatorVersion) {
+        XFLConverter.convertSWF(this, swfName, outfile, false, generator, generatorVerName, generatorVersion);
     }
 
     public static float twipToPixel(int twip) {

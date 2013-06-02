@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.Main;
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;

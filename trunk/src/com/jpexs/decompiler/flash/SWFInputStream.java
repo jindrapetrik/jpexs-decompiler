@@ -1145,7 +1145,7 @@ public class SWFInputStream extends InputStream {
                 break;
             }
             tags.add(tag);
-            if (Main.dump_tags && level == 0) {
+            if (Configuration.dump_tags && level == 0) {
                 dumpTag(System.out, version, tag, level);
             }
             tag.previousTag = previousTag;

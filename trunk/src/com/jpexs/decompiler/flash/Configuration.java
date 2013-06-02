@@ -18,104 +18,51 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.proxy.Replacement;
 import java.io.*;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 public class Configuration {
 
-    private static final String CONFIG_NAME = "config.bin";
-    private static final String REPLACEMENTS_NAME = "replacements.cfg";
+    public static final boolean DISPLAY_FILENAME = true;
+    public static boolean DEBUG_COPY = false;
+    
+    public static boolean dump_tags = false;
+    
+    /**
+     * Debug mode = throwing an error when comparing original file and
+     * recompiled
+     */
+    public static boolean debugMode = false;
+    /**
+     * Turn off reading unsafe tags (tags which can cause problems with
+     * recompiling)
+     */
+    public static boolean DISABLE_DANGEROUS = false;
+    /**
+     * Turn off resolving constants in ActionScript 2
+     */
+    public static final boolean RESOLVE_CONSTANTS = true;
+    /**
+     * Turn off decompiling if needed
+     */
+    public static final boolean DO_DECOMPILE = true;
+    /**
+     * Find latest constant pool in the code
+     */
+    public static final boolean LATEST_CONSTANTPOOL_HACK = false;
+    
+    /**
+     * Limit of code subs (for obfuscated code)
+     */
+    public static final int SUBLIMITER = 500;
+    //using parameter names in decompiling may cause problems because oficial programs like Flash CS 5.5 inserts wrong parameter names indices
+    public static final boolean PARAM_NAMES_ENABLE = false;
+    
     private static HashMap<String, Object> config = new HashMap<String, Object>();
-    private static final File unspecifiedFile = new File("unspecified");
-    private static File directory = unspecifiedFile;
-
-    private enum OSId {
-
-        WINDOWS, OSX, UNIX
-    }
-
-    private static OSId getOSId() {
-        PrivilegedAction<String> doGetOSName = new PrivilegedAction<String>() {
-            @Override
-            public String run() {
-                return System.getProperty("os.name");
-            }
-        };
-        OSId id = OSId.UNIX;
-        String osName = AccessController.doPrivileged(doGetOSName);
-        if (osName != null) {
-            if (osName.toLowerCase().startsWith("mac os x")) {
-                id = OSId.OSX;
-            } else if (osName.contains("Windows")) {
-                id = OSId.WINDOWS;
-            }
-        }
-        return id;
-    }
-
-    public static String getASDecHome() {
-        if (directory == unspecifiedFile) {
-            directory = null;
-            String userHome = null;
-            try {
-                userHome = System.getProperty("user.home");
-            } catch (SecurityException ignore) {
-            }
-            if (userHome != null) {
-                String applicationId = Main.shortApplicationName;
-                OSId osId = getOSId();
-                if (osId == OSId.WINDOWS) {
-                    File appDataDir = null;
-                    try {
-                        String appDataEV = System.getenv("APPDATA");
-                        if ((appDataEV != null) && (appDataEV.length() > 0)) {
-                            appDataDir = new File(appDataEV);
-                        }
-                    } catch (SecurityException ignore) {
-                    }
-                    String vendorId = Main.vendor;
-                    if ((appDataDir != null) && appDataDir.isDirectory()) {
-                        // ${APPDATA}\{vendorId}\${applicationId}
-                        String path = vendorId + "\\" + applicationId + "\\";
-                        directory = new File(appDataDir, path);
-                    } else {
-                        // ${userHome}\Application Data\${vendorId}\${applicationId}
-                        String path = "Application Data\\" + vendorId + "\\" + applicationId + "\\";
-                        directory = new File(userHome, path);
-                    }
-                } else if (osId == OSId.OSX) {
-                    // ${userHome}/Library/Application Support/${applicationId}
-                    String path = "Library/Application Support/" + applicationId + "/";
-                    directory = new File(userHome, path);
-                } else {
-                    // ${userHome}/.${applicationId}/
-                    String path = "." + applicationId + "/";
-                    directory = new File(userHome, path);
-                }
-            }
-        }
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
-        String ret = directory.getAbsolutePath();
-        if (!ret.endsWith(File.separator)) {
-            ret += File.separator;
-        }
-        return ret;
-    }
-
-    private static String getReplacementsFile() {
-        return getASDecHome() + REPLACEMENTS_NAME;
-    }
-
-    private static String getConfigFile() {
-        return getASDecHome() + CONFIG_NAME;
-    }
     /**
      * List of replacements
      */
@@ -124,19 +71,15 @@ public class Configuration {
     /**
      * Saves replacements to file for future use
      */
-    private static void saveReplacements() {
+    private static void saveReplacements(String replacementsFile) {
         try {
             if (replacements.isEmpty()) {
-                File rf = new File(getReplacementsFile());
+                File rf = new File(replacementsFile);
                 if (rf.exists()) {
                     rf.delete();
                 }
             } else {
-                File f = new File(getASDecHome());
-                if (!f.exists()) {
-                    f.mkdir();
-                }
-                PrintWriter pw = new PrintWriter(new FileWriter(getReplacementsFile()));
+                PrintWriter pw = new PrintWriter(new FileWriter(replacementsFile));
                 for (Replacement r : replacements) {
                     pw.println(r.urlPattern);
                     pw.println(r.targetFile);
@@ -150,10 +93,10 @@ public class Configuration {
     /**
      * Load replacements from file
      */
-    private static void loadReplacements() {
+    private static void loadReplacements(String replacementsFile) {
         replacements = new ArrayList<Replacement>();
         try {
-            BufferedReader br = new BufferedReader(new FileReader(getReplacementsFile()));
+            BufferedReader br = new BufferedReader(new FileReader(replacementsFile));
             String s;
             while ((s = br.readLine()) != null) {
                 Replacement r = new Replacement(s, br.readLine());
@@ -179,10 +122,15 @@ public class Configuration {
         return config.put(cfg, value);
     }
 
-    public static void load() {
+    public static void loadFromMap(Map<String, Object> map) {
+        config.clear();
+        config.putAll(map);
+    }
+
+    public static void loadFromFile(String file, String replacementsFile) {
         ObjectInputStream ois = null;
         try {
-            ois = new ObjectInputStream(new FileInputStream(getConfigFile()));
+            ois = new ObjectInputStream(new FileInputStream(file));
             config = (HashMap<String, Object>) ois.readObject();
         } catch (FileNotFoundException ex) {
         } catch (ClassNotFoundException cnf) {
@@ -196,17 +144,15 @@ public class Configuration {
                 }
             }
         }
-        loadReplacements();
+        if (replacementsFile != null) {
+            loadReplacements(replacementsFile);
+        }
     }
 
-    public static void save() {
-        File f = new File(getASDecHome());
-        if (!f.exists()) {
-            f.mkdir();
-        }
+    public static void saveToFile(String file, String replacementsFile) {
         ObjectOutputStream oos = null;
         try {
-            oos = new ObjectOutputStream(new FileOutputStream(getConfigFile()));
+            oos = new ObjectOutputStream(new FileOutputStream(file));
             oos.writeObject(config);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, "Cannot save configuration.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -220,7 +166,9 @@ public class Configuration {
                 }
             }
         }
-        saveReplacements();
+        if (replacementsFile != null) {
+            saveReplacements(replacementsFile);
+        }
     }
 
     public static List<Replacement> getReplacements() {
