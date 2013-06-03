@@ -16,7 +16,7 @@ public class RecompileTest {
     private void testRecompileOne(String filename) {
         try {
             SWF swf = new SWF(new FileInputStream(TESTDATADIR + File.separator + filename));
-            Main.DEBUG_COPY = true;
+            Configuration.DEBUG_COPY = true;
             swf.saveTo(new ByteArrayOutputStream());
         } catch (IOException ex) {
             fail();
