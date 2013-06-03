@@ -377,6 +377,10 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
         miInternalViewer = new JCheckBoxMenuItem("Use own Flash viewer");
         miInternalViewer.setSelected((Boolean) Configuration.getConfig("internalFlashViewer", (Boolean) (flashPanel == null)));
+        if (flashPanel == null) {
+            miInternalViewer.setSelected(true);
+            miInternalViewer.setEnabled(false);
+        }
         miInternalViewer.setActionCommand("INTERNALVIEWERSWITCH");
         miInternalViewer.addActionListener(this);
         menuTools.add(miInternalViewer);
