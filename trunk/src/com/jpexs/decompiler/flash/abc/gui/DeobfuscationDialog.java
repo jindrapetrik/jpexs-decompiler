@@ -59,7 +59,7 @@ public class DeobfuscationDialog extends JDialog implements ActionListener {
         cp.add(lab1);
         Hashtable labelTable = new Hashtable();
         //labelTable.put(new Integer(LEVEL_NONE), new JLabel("None"));
-        
+
         labelTable.put(new Integer(LEVEL_REMOVE_DEAD_CODE), new JLabel("Remove dead code"));
         labelTable.put(new Integer(LEVEL_REMOVE_TRAPS), new JLabel("Remove traps"));
         labelTable.put(new Integer(LEVEL_RESTORE_CONTROL_FLOW), new JLabel("Restore control flow"));

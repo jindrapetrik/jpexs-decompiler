@@ -479,6 +479,32 @@ public class Graph {
         items.add(new MarkItem("finish"));
     }
 
+    private static GraphTargetItem getLastNoEnd(List<GraphTargetItem> list) {
+        if (list.isEmpty()) {
+            return null;
+        }
+        if (list.get(list.size() - 1) instanceof ScriptEndItem) {
+            if (list.size() >= 2) {
+                return list.get(list.size() - 2);
+            }
+            return list.get(list.size() - 1);
+        }
+        return list.get(list.size() - 1);
+    }
+
+    private static void removeLastNoEnd(List<GraphTargetItem> list) {
+        if (list.isEmpty()) {
+            return;
+        }
+        if (list.get(list.size() - 1) instanceof ScriptEndItem) {
+            if (list.size() >= 2) {
+                list.remove(list.size() - 2);
+            }
+            return;
+        }
+        list.remove(list.size() - 1);
+    }
+
     protected List<GraphTargetItem> printGraph(List<GraphPart> visited, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphPart> allParts, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, HashMap<Loop, List<GraphTargetItem>> forFinalCommands) {
         if (visited.contains(part)) {
             //return new ArrayList<GraphTargetItem>();
@@ -1013,9 +1039,9 @@ public class Graph {
 
                             List<GraphTargetItem> newBody = new ArrayList<GraphTargetItem>();
                             List<GraphTargetItem> nextcmds = new ArrayList<GraphTargetItem>();
-                            if ((!loopBody.isEmpty()) && (loopBody.get(loopBody.size() - 1) instanceof IfItem)) {
-                                IfItem ift = (IfItem) loopBody.get(loopBody.size() - 1);
-                                if ((!ift.onFalse.isEmpty()) && ((ift.onFalse.get(ift.onFalse.size() - 1) instanceof ExitItem) || ((ift.onFalse.get(ift.onFalse.size() - 1) instanceof MarkItem) && ((MarkItem) (ift.onFalse.get(ift.onFalse.size() - 1))).getMark().equals("finish")))) {//((ift.onFalse.size() == 1) && (ift.onFalse.get(0) instanceof ContinueItem) && (((ContinueItem) ift.onFalse.get(0)).loopId == currentLoop.id))) {
+                            if (getLastNoEnd(loopBody) instanceof IfItem) {
+                                IfItem ift = (IfItem) getLastNoEnd(loopBody);
+                                if (getLastNoEnd(ift.onTrue) instanceof ContinueItem) {//||)))/*(getLastNoEnd(ift.onFalse)!=null) && */(!(getLastNoEnd(ift.onFalse) instanceof ContinueItem))){ //((ift.onFalse.get(ift.onFalse.size() - 1) instanceof ExitItem) || ((ift.onFalse.get(ift.onFalse.size() - 1) instanceof MarkItem) && ((MarkItem) (ift.onFalse.get(ift.onFalse.size() - 1))).getMark().equals("finish")))) {//((ift.onFalse.size() == 1) && (ift.onFalse.get(0) instanceof ContinueItem) && (((ContinueItem) ift.onFalse.get(0)).loopId == currentLoop.id))) {
                                     if (ift.expression != null) {
                                         expr = ift.expression;
                                         /*if (expr instanceof LogicalOpItem) {
@@ -1027,8 +1053,8 @@ public class Graph {
                                     nextcmds = ift.onFalse;
                                     newBody = ift.onTrue;
 
-                                    loopBody.remove(loopBody.size() - 1);
-                                } else if ((!ift.onTrue.isEmpty()) && ((ift.onTrue.get(ift.onTrue.size() - 1) instanceof ExitItem) || ((ift.onTrue.get(ift.onTrue.size() - 1) instanceof MarkItem) && ((MarkItem) (ift.onTrue.get(ift.onTrue.size() - 1))).getMark().equals("finish")))) {//((ift.onTrue.size() == 1) && (ift.onTrue.get(0) instanceof ContinueItem) && (((ContinueItem) ift.onTrue.get(0)).loopId == currentLoop.id))) {
+                                    removeLastNoEnd(loopBody);
+                                } else { //if (/*(getLastNoEnd(ift.onTrue)!=null) &&*/((!(getLastNoEnd(ift.onTrue) instanceof ContinueItem)))) { //((ift.onTrue.get(ift.onTrue.size() - 1) instanceof ExitItem) || ((ift.onTrue.get(ift.onTrue.size() - 1) instanceof MarkItem) && ((MarkItem) (ift.onTrue.get(ift.onTrue.size() - 1))).getMark().equals("finish")))) {//((ift.onTrue.size() == 1) && (ift.onTrue.get(0) instanceof ContinueItem) && (((ContinueItem) ift.onTrue.get(0)).loopId == currentLoop.id))) {
                                     if (ift.expression != null) {
                                         expr = ift.expression;
                                         if (expr instanceof LogicalOpItem) {
@@ -1039,18 +1065,20 @@ public class Graph {
                                     }
                                     newBody = ift.onFalse;
                                     nextcmds = ift.onTrue;
-                                    loopBody.remove(loopBody.size() - 1);
+                                    removeLastNoEnd(loopBody);
                                     if (newBody.isEmpty()) {
                                         //addIf.addAll(loopBody);
                                     }
                                 }
                             }
-                            checkContinueAtTheEnd(newBody, currentLoop);
-                            if ((!newBody.isEmpty()) && (!(newBody.get(0) instanceof ScriptEndItem))) { // && (addIf.get(addIf.size() - 1) instanceof ContinueItem) && (((ContinueItem) addIf.get(addIf.size() - 1)).loopId == currentLoop.id)) {
+
+                            if ((!newBody.isEmpty()) && (newBody.get(newBody.size() - 1) instanceof ContinueItem)) {//(!(newBody.get(0) instanceof ScriptEndItem))) { // && (addIf.get(addIf.size() - 1) instanceof ContinueItem) && (((ContinueItem) addIf.get(addIf.size() - 1)).loopId == currentLoop.id)) {
+                                checkContinueAtTheEnd(newBody, currentLoop);
                                 loopBody.add(expr);
                                 ret.add(new WhileItem(null, currentLoop, loopBody, newBody));
                                 ret.addAll(nextcmds);
                             } else {
+                                checkContinueAtTheEnd(newBody, currentLoop);
                                 List<GraphTargetItem> ex = new ArrayList<GraphTargetItem>();
                                 ex.add(expr);
                                 ret.add(new DoWhileItem(null, currentLoop, loopBody, ex));

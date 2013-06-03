@@ -664,7 +664,7 @@ public class Action implements GraphSourceItem {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void translate(List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output) {        
+    public void translate(List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output) {
         translate(stack, output, (HashMap<Integer, String>) localData.get(0), (HashMap<String, GraphTargetItem>) localData.get(1), (HashMap<String, GraphTargetItem>) localData.get(2));
     }
 

@@ -52,7 +52,7 @@ public class TraitsList extends JList<Object> implements ListSelectionListener {
     @SuppressWarnings("unchecked")
     public void setABC(List<ABCContainerTag> abcTags, ABC abc) {
         this.abc = abc;
-        this.abcTags = abcTags;        
+        this.abcTags = abcTags;
         setModel(new DefaultListModel());
         setClassIndex(-1, -1);
     }

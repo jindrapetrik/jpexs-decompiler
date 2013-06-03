@@ -55,20 +55,31 @@ public class ForTreeItem extends LoopItem implements Block {
         String ret = "";
         ret += "loop" + loop.id + ":\r\n";
         ret += hilight("for(");
+        int p = 0;
         for (int i = 0; i < firstCommands.size(); i++) {
-            if (i > 0) {
+            if (firstCommands.get(i).isEmpty()) {
+                continue;
+            }
+
+            if (p > 0) {
                 ret += ",";
             }
             ret += stripSemicolon(firstCommands.get(i).toString(localData));
+            p++;
         }
         ret += ";";
         ret += expression.toString(localData);
         ret += ";";
+        p = 0;
         for (int i = 0; i < finalCommands.size(); i++) {
-            if (i > 0) {
+            if (finalCommands.get(i).isEmpty()) {
+                continue;
+            }
+            if (p > 0) {
                 ret += ",";
             }
             ret += stripSemicolon(finalCommands.get(i).toString(localData));
+            p++;
         }
         ret += hilight(")") + "\r\n{\r\n";
         for (GraphTargetItem ti : commands) {

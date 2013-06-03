@@ -128,7 +128,7 @@ public class Configuration {
         ObjectInputStream ois = null;
         try {
             ois = new ObjectInputStream(new FileInputStream(file));
-            
+
             config = (HashMap<String, Object>) ois.readObject();
         } catch (FileNotFoundException ex) {
         } catch (ClassNotFoundException cnf) {

@@ -380,7 +380,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
 
         JPanel panConstants = new JPanel();
         panConstants.setLayout(new BorderLayout());
-        
+
         constantTypeList = new JComboBox(new Object[]{"UINT", "INT", "DOUBLE", "DECIMAL", "STRING", "NAMESPACE", "NAMESPACESET", "MULTINAME"});
         constantTable = new JTable();
         if (abc != null) {

@@ -62,12 +62,12 @@ public class AVM2GraphSource extends GraphSource {
         return code.code.isEmpty();
     }
 
-    @Override    
+    @Override
     @SuppressWarnings("unchecked")
     public List<GraphTargetItem> translatePart(GraphPart part, List<Object> localData, Stack<GraphTargetItem> stack, int start, int end) {
-        List<GraphTargetItem> ret = new ArrayList<GraphTargetItem>();        
-        Object o=localData.get(AVM2Graph.DATA_SCOPESTACK);
-        Stack<GraphTargetItem> newstack=(Stack<GraphTargetItem>)o ;
+        List<GraphTargetItem> ret = new ArrayList<GraphTargetItem>();
+        Object o = localData.get(AVM2Graph.DATA_SCOPESTACK);
+        Stack<GraphTargetItem> newstack = (Stack<GraphTargetItem>) o;
         ConvertOutput co = code.toSourceOutput(part, false, isStatic, scriptIndex, classIndex, localRegs, stack, newstack, abc, abc.constants, abc.method_info, body, start, end, localRegNames, fullyQualifiedNames, new boolean[size()]);
         ret.addAll(co.output);
         return ret;

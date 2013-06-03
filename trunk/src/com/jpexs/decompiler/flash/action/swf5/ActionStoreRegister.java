@@ -22,7 +22,11 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
+import com.jpexs.decompiler.flash.action.treemodel.DecrementTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.IncrementTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.PostDecrementTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.PostIncrementTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.StoreRegisterTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -70,28 +74,50 @@ public class ActionStoreRegister extends Action {
 
     @Override
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-        GraphTargetItem item = stack.pop();
+        GraphTargetItem value = stack.pop();
         RegisterNumber rn = new RegisterNumber(registerNumber);
         if (regNames.containsKey(registerNumber)) {
             rn.name = regNames.get(registerNumber);
         }
-        item.moreSrc.add(new GraphSourceItemPos(this, 0));
+        value.moreSrc.add(new GraphSourceItemPos(this, 0));
         boolean define = !variables.containsKey("__register" + registerNumber);
-        variables.put("__register" + registerNumber, item);
-        if (item instanceof DirectValueTreeItem) {
-            if (((DirectValueTreeItem) item).value instanceof RegisterNumber) {
-                if (((RegisterNumber) ((DirectValueTreeItem) item).value).number == registerNumber) {
-                    stack.push(item);
+        variables.put("__register" + registerNumber, value);
+        if (value instanceof DirectValueTreeItem) {
+            if (((DirectValueTreeItem) value).value instanceof RegisterNumber) {
+                if (((RegisterNumber) ((DirectValueTreeItem) value).value).number == registerNumber) {
+                    stack.push(value);
                     return;
                 }
             }
         }
-        if (item instanceof StoreRegisterTreeItem) {
-            if (((StoreRegisterTreeItem) item).register.number == registerNumber) {
-                stack.push(item);
+        if (value instanceof StoreRegisterTreeItem) {
+            if (((StoreRegisterTreeItem) value).register.number == registerNumber) {
+                stack.push(value);
                 return;
             }
         }
-        stack.push(new StoreRegisterTreeItem(this, rn, item, define));
+
+        if (value instanceof IncrementTreeItem) {
+            GraphTargetItem obj = ((IncrementTreeItem) value).object;
+            if (!stack.isEmpty()) {
+                if (stack.peek().equals(obj)) {
+                    stack.pop();
+                    stack.push(new PostIncrementTreeItem(this, obj));
+                    return;
+                }
+            }
+        }
+        if (value instanceof DecrementTreeItem) {
+            GraphTargetItem obj = ((DecrementTreeItem) value).object;
+            if (!stack.isEmpty()) {
+                if (stack.peek().equals(obj)) {
+                    stack.pop();
+                    stack.push(new PostDecrementTreeItem(this, obj));
+                    stack.push(obj);
+                    return;
+                }
+            }
+        }
+        stack.push(new StoreRegisterTreeItem(this, rn, value, define));
     }
 }

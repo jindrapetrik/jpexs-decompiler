@@ -46,7 +46,7 @@ public class WhileItem extends LoopItem implements Block {
             if (expression.get(i).isEmpty()) {
                 continue;
             }
-            if (i > 0) {
+            if (!expStr.equals("")) {
                 expStr += ", ";
             }
             expStr += expression.get(i).toString(localData);
