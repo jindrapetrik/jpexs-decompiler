@@ -64,7 +64,7 @@
         <mkdir dir="${TESTRESULTSDIR}/raw/"/>
         <delete dir="${COMPILETESTSDIR}"/>
         <mkdir dir="${COMPILETESTSDIR}"/>
-        <javac srcdir="${TESTDIR}" destdir="${COMPILETESTSDIR}" includes="**/*.java" target="${TARGETJAVA}" debug="true" includeantruntime="false">            
+        <javac srcdir="${TESTDIR}" destdir="${COMPILETESTSDIR}" includes="**/*.java" target="${TARGETJAVA}" debug="true" includeantruntime="false">                        
             <classpath>
                 <pathelement path="${COMPILEDIR}"/>
                 <fileset dir="${LIBRARIESDIR}" includes="**/*.jar"/>
@@ -87,6 +87,7 @@
                 <fileset dir="${LIBRARIESDIR}" includes="**/*.jar"/>
                 <fileset dir="${TESTLIBDIR}" includes="**/*.jar"/>
             </classpath>
+            <jvmarg value="-noverify" />
             <jvmarg value="-Demma.coverage.out.file=${COVERAGEDIR}/coverage.emma"/>
             <jvmarg value="-Demma.coverage.out.merge=true"/>
             <classfileset dir="${COMPILETESTSDIR}" includes="**/*.class" />                        
