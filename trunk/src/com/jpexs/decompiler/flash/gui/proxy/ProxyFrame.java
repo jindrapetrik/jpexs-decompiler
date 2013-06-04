@@ -154,7 +154,7 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
                 setVisible(false);
             }
         });
-        java.util.List<Image> images = new ArrayList<Image>();
+        java.util.List<Image> images = new ArrayList<>();
         images.add(View.loadImage("proxy16"));
         images.add(View.loadImage("proxy32"));
         setIconImages(images);
@@ -236,7 +236,7 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
                 started = false;
                 return;
             }
-            java.util.List<String> catchedContentTypes = new ArrayList<String>();
+            java.util.List<String> catchedContentTypes = new ArrayList<>();
             catchedContentTypes.add("application/x-shockwave-flash");
             catchedContentTypes.add("application/x-javascript");
             catchedContentTypes.add("application/javascript");

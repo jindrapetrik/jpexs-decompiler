@@ -58,11 +58,11 @@ public class Configuration {
     public static final int SUBLIMITER = 500;
     //using parameter names in decompiling may cause problems because oficial programs like Flash CS 5.5 inserts wrong parameter names indices
     public static final boolean PARAM_NAMES_ENABLE = false;
-    private static HashMap<String, Object> config = new HashMap<String, Object>();
+    private static HashMap<String, Object> config = new HashMap<>();
     /**
      * List of replacements
      */
-    public static java.util.List<Replacement> replacements = new ArrayList<Replacement>();
+    public static java.util.List<Replacement> replacements = new ArrayList<>();
 
     /**
      * Saves replacements to file for future use
@@ -90,7 +90,7 @@ public class Configuration {
      * Load replacements from file
      */
     private static void loadReplacements(String replacementsFile) {
-        replacements = new ArrayList<Replacement>();
+        replacements = new ArrayList<>();
         try {
             BufferedReader br = new BufferedReader(new FileReader(replacementsFile));
             String s;

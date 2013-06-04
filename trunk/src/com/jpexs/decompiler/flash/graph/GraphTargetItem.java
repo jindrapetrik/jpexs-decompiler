@@ -30,7 +30,7 @@ public abstract class GraphTargetItem {
     public GraphSourceItem src;
     public int pos = 0;
     public int precedence;
-    public List<GraphSourceItemPos> moreSrc = new ArrayList<GraphSourceItemPos>();
+    public List<GraphSourceItemPos> moreSrc = new ArrayList<>();
     public GraphPart firstPart;
     public GraphTargetItem value;
 
@@ -51,7 +51,7 @@ public abstract class GraphTargetItem {
     }
 
     public List<GraphSourceItemPos> getNeededSources() {
-        List<GraphSourceItemPos> ret = new ArrayList<GraphSourceItemPos>();
+        List<GraphSourceItemPos> ret = new ArrayList<>();
         ret.add(new GraphSourceItemPos(src, pos));
         ret.addAll(moreSrc);
         return ret;
@@ -69,7 +69,7 @@ public abstract class GraphTargetItem {
     }
 
     public String toStringSemicoloned(Object... localData) {
-        List<Object> localData2 = new ArrayList<Object>();
+        List<Object> localData2 = new ArrayList<>();
         for (Object o : localData) {
             localData2.add(o);
         }
@@ -88,7 +88,7 @@ public abstract class GraphTargetItem {
     public abstract String toString(List<Object> localData);
 
     public String toString(Object... localData) {
-        List<Object> localData2 = new ArrayList<Object>();
+        List<Object> localData2 = new ArrayList<>();
         for (Object o : localData) {
             localData2.add(o);
         }
@@ -124,7 +124,7 @@ public abstract class GraphTargetItem {
     }
 
     public String toStringNoQuotes(Object... localData) {
-        List<Object> localData2 = new ArrayList<Object>();
+        List<Object> localData2 = new ArrayList<>();
         for (Object o : localData) {
             localData2.add(o);
         }
@@ -144,7 +144,7 @@ public abstract class GraphTargetItem {
     }
 
     public String toStringNL(Object... localData) {
-        List<Object> localData2 = new ArrayList<Object>();
+        List<Object> localData2 = new ArrayList<>();
         for (Object o : localData) {
             localData2.add(o);
         }

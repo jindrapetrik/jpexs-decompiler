@@ -87,8 +87,8 @@ public class GRADIENTGLOWFILTER extends FILTER {
 
     @Override
     public BufferedImage apply(BufferedImage src) {
-        List<Color> colors = new ArrayList<Color>();
-        List<Float> ratios = new ArrayList<Float>();
+        List<Color> colors = new ArrayList<>();
+        List<Float> ratios = new ArrayList<>();
         for (int i = 0; i < gradientColors.length; i++) {
             if ((i > 0) && (gradientRatio[i - 1] == gradientRatio[i])) {
                 continue;

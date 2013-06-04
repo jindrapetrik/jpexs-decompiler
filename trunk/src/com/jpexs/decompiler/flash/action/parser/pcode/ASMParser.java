@@ -41,11 +41,11 @@ import java.util.logging.Logger;
 public class ASMParser {
 
     public static List<Action> parse(long containerSWFOffset, boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
-        List<Action> list = new ArrayList<Action>();
-        Stack<GraphSourceItemContainer> containers = new Stack<GraphSourceItemContainer>();
-        HashMap<GraphSourceItemContainer, Integer> containerPos = new HashMap<GraphSourceItemContainer, Integer>();
-        Stack<ActionStore> stores = new Stack<ActionStore>();
-        Stack<Integer> storeLengths = new Stack<Integer>();
+        List<Action> list = new ArrayList<>();
+        Stack<GraphSourceItemContainer> containers = new Stack<>();
+        HashMap<GraphSourceItemContainer, Integer> containerPos = new HashMap<>();
+        Stack<ActionStore> stores = new Stack<>();
+        Stack<Integer> storeLengths = new Stack<>();
         int actualLen = 0;
         while (true) {
             ASMParsedSymbol symb = lexer.yylex();
@@ -333,7 +333,7 @@ public class ASMParser {
 
     public static List<Action> parse(long address, long containerSWFOffset, boolean ignoreNops, InputStream is, int version) throws IOException, ParseException {
         FlasmLexer lexer = new FlasmLexer(is);
-        List<Label> labels = new ArrayList<Label>();
+        List<Label> labels = new ArrayList<>();
         List<Action> ret = parse(containerSWFOffset, ignoreNops, labels, address, lexer, new ArrayList<String>(), version);
         List<Action> links = Action.getActionsAllIfsOrJumps(ret);
         //Action.setActionsAddresses(ret, address, version);

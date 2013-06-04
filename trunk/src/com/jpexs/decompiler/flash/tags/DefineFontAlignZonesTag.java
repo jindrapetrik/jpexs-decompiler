@@ -38,7 +38,7 @@ public class DefineFontAlignZonesTag extends Tag {
         fontID = sis.readUI16();
         CSMTableHint = (int) sis.readUB(2);
         sis.readUB(6);
-        zoneTable = new ArrayList<ZONERECORD>();
+        zoneTable = new ArrayList<>();
         while (sis.available() > 0) {
             ZONERECORD zr = sis.readZONERECORD();
             zoneTable.add(zr);

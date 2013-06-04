@@ -39,7 +39,7 @@ public class ClassTreeItem extends TreeItem implements Block {
 
     @Override
     public List<List<GraphTargetItem>> getSubs() {
-        List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
+        List<List<GraphTargetItem>> ret = new ArrayList<>();
         ret.add(functions);
         ret.add(staticFunctions);
         return ret;
@@ -93,7 +93,7 @@ public class ClassTreeItem extends TreeItem implements Block {
 
     @Override
     public List<ContinueItem> getContinues() {
-        List<ContinueItem> ret = new ArrayList<ContinueItem>();
+        List<ContinueItem> ret = new ArrayList<>();
         return ret;
     }
 

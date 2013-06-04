@@ -281,7 +281,7 @@ public class Helper {
     }
 
     public static List<Object> toList(Object... rest) {
-        List<Object> ret = new ArrayList<Object>();
+        List<Object> ret = new ArrayList<>();
         for (Object o : rest) {
             ret.add(o);
         }

@@ -37,7 +37,7 @@ public class WithTreeItem extends TreeItem {
     public WithTreeItem(AVM2Instruction instruction, GraphTargetItem scope) {
         super(instruction, NOPRECEDENCE);
         this.scope = scope;
-        this.items = new ArrayList<GraphTargetItem>();
+        this.items = new ArrayList<>();
     }
 
     @Override

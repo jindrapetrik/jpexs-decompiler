@@ -46,7 +46,7 @@ public class MethodBody implements Cloneable, Serializable {
     public Traits traits = new Traits();
 
     public List<Integer> getExceptionEntries() {
-        List<Integer> ret = new ArrayList<Integer>();
+        List<Integer> ret = new ArrayList<>();
         for (ABCException e : exceptions) {
             ret.add(code.adr2pos(e.start));
             ret.add(code.adr2pos(e.end));
@@ -76,7 +76,7 @@ public class MethodBody implements Cloneable, Serializable {
     }
 
     public HashMap<Integer, String> getLocalRegNames(ABC abc) {
-        HashMap<Integer, String> ret = new HashMap<Integer, String>();
+        HashMap<Integer, String> ret = new HashMap<>();
         for (int i = 1; i <= abc.method_info[this.method_info].param_types.length; i++) {
             String paramName = "param" + i;
             if (abc.method_info[this.method_info].flagHas_paramnames() && Configuration.PARAM_NAMES_ENABLE) {

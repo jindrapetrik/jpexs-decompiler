@@ -52,7 +52,7 @@ public class CallIns extends InstructionDefinition {
     @Override
     public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         int argCount = ins.operands[0];
-        List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
+        List<GraphTargetItem> args = new ArrayList<>();
         for (int a = 0; a < argCount; a++) {
             args.add(0, (GraphTargetItem) stack.pop());
         }

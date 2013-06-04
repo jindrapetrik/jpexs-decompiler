@@ -68,7 +68,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
     public JTabbedPane tabbedPane;
     public JPanel searchPanel;
     public JLabel searchPos;
-    private List<ScriptPack> found = new ArrayList<ScriptPack>();
+    private List<ScriptPack> found = new ArrayList<>();
     private int foundPos = 0;
     private JLabel searchForLabel;
     private String searchFor;
@@ -81,7 +81,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
             searchRegexp = regexp;
             ClassesListTreeModel clModel = (ClassesListTreeModel) classTree.getModel();
             HashMap<String, ScriptPack> allpacks = clModel.getList();
-            found = new ArrayList<ScriptPack>();
+            found = new ArrayList<>();
             Pattern pat = null;
             if (regexp) {
                 pat = Pattern.compile(txt, ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
@@ -202,7 +202,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
         if (index == -1) {
             classTree.setDoABCTags(list);
         } else {
-            List<ABCContainerTag> oneList = new ArrayList<ABCContainerTag>();
+            List<ABCContainerTag> oneList = new ArrayList<>();
             oneList.add(list.get(index));
             this.abc = list.get(index).getABC();
             classTree.setDoABCTags(oneList);
@@ -475,7 +475,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
         if (e.getActionCommand().equals("SEARCHCANCEL")) {
             foundPos = 0;
             searchPanel.setVisible(false);
-            found = new ArrayList<ScriptPack>();
+            found = new ArrayList<>();
             searchFor = null;
         }
         if (e.getActionCommand().equals("SEARCHPREV")) {

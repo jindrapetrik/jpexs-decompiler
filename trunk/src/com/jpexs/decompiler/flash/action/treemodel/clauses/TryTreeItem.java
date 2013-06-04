@@ -33,7 +33,7 @@ public class TryTreeItem extends TreeItem implements Block {
 
     @Override
     public List<List<GraphTargetItem>> getSubs() {
-        List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
+        List<List<GraphTargetItem>> ret = new ArrayList<>();
         ret.add(tryCommands);
         ret.addAll(catchCommands);
         ret.add(finallyCommands);
@@ -52,7 +52,7 @@ public class TryTreeItem extends TreeItem implements Block {
     public String toString(ConstantPool constants) {
         String ret = "";
         ret += "try\r\n{\r\n";
-        List<Object> localData = new ArrayList<Object>();
+        List<Object> localData = new ArrayList<>();
         localData.add(constants);
         for (GraphTargetItem ti : tryCommands) {
             if (!ti.isEmpty()) {
@@ -84,7 +84,7 @@ public class TryTreeItem extends TreeItem implements Block {
 
     @Override
     public List<ContinueItem> getContinues() {
-        List<ContinueItem> ret = new ArrayList<ContinueItem>();
+        List<ContinueItem> ret = new ArrayList<>();
         for (GraphTargetItem ti : tryCommands) {
             if (ti instanceof ContinueItem) {
                 ret.add((ContinueItem) ti);

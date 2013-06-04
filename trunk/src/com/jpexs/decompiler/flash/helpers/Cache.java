@@ -38,9 +38,9 @@ public class Cache {
 
     public Cache(boolean weak) {
         if (weak) {
-            cacheFiles = new WeakHashMap<Object, File>();
+            cacheFiles = new WeakHashMap<>();
         } else {
-            cacheFiles = new HashMap<Object, File>();
+            cacheFiles = new HashMap<>();
         }
     }
 

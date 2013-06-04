@@ -88,8 +88,8 @@ public class ActionPanel extends JPanel implements ActionListener {
     public JButton loadHexButton = new JButton("Load hex");
     public JLabel asmLabel = new JLabel("P-code source");
     public JLabel decLabel = new JLabel("ActionScript source");
-    public List<Highlighting> decompiledHilights = new ArrayList<Highlighting>();
-    public List<Highlighting> disassembledHilights = new ArrayList<Highlighting>();
+    public List<Highlighting> decompiledHilights = new ArrayList<>();
+    public List<Highlighting> disassembledHilights = new ArrayList<>();
     public String lastDisasm = "";
     private boolean ignoreCarret = false;
     private boolean editMode = false;
@@ -102,7 +102,7 @@ public class ActionPanel extends JPanel implements ActionListener {
     private String lastDecompiled = "";
     public JPanel searchPanel;
     public JLabel searchPos;
-    private List<ASMSource> found = new ArrayList<ASMSource>();
+    private List<ASMSource> found = new ArrayList<>();
     private int foundPos = 0;
     private JLabel searchForLabel;
     private String searchFor;
@@ -125,7 +125,7 @@ public class ActionPanel extends JPanel implements ActionListener {
     }
 
     private List<ASMSource> getASMs(List<TagNode> nodes) {
-        List<ASMSource> ret = new ArrayList<ASMSource>();
+        List<ASMSource> ret = new ArrayList<>();
         for (TagNode n : nodes) {
             if (n.tag instanceof ASMSource) {
                 //cacheScript((ASMSource) n.tag);
@@ -143,7 +143,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             List<Object> tags = new ArrayList<Object>(Main.swf.tags);
             List<TagNode> list = Main.swf.createASTagList(tags, null);
             List<ASMSource> asms = getASMs(list);
-            found = new ArrayList<ASMSource>();
+            found = new ArrayList<>();
             Pattern pat = null;
             if (regexp) {
                 pat = Pattern.compile(txt, ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
@@ -550,7 +550,7 @@ public class ActionPanel extends JPanel implements ActionListener {
         if (e.getActionCommand().equals("SEARCHCANCEL")) {
             foundPos = 0;
             searchPanel.setVisible(false);
-            found = new ArrayList<ASMSource>();
+            found = new ArrayList<>();
             searchFor = null;
         }
         if (e.getActionCommand().equals("SEARCHPREV")) {

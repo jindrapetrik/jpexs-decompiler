@@ -33,7 +33,7 @@ import java.util.Stack;
 
 public class ActionConstantPool extends Action {
 
-    public List<String> constantPool = new ArrayList<String>();
+    public List<String> constantPool = new ArrayList<>();
 
     public ActionConstantPool(List<String> constantPool) {
         super(0x88, 0);

@@ -507,7 +507,7 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextT
 
     @Override
     public Set<Integer> getNeededCharacters() {
-        HashSet<Integer> needed = new HashSet<Integer>();
+        HashSet<Integer> needed = new HashSet<>();
         if (hasFont) {
             needed.add(fontId);
         }

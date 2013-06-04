@@ -36,7 +36,7 @@ public class SHAPE implements NeedsCharacters {
 
     @Override
     public Set<Integer> getNeededCharacters() {
-        Set<Integer> ret = new HashSet<Integer>();
+        Set<Integer> ret = new HashSet<>();
         for (SHAPERECORD r : shapeRecords) {
             ret.addAll(r.getNeededCharacters());
         }

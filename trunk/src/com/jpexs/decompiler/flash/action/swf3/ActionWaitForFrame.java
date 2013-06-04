@@ -44,7 +44,7 @@ public class ActionWaitForFrame extends Action implements ActionStore {
         super(0x8A, 3);
         frame = sis.readUI16();
         skipCount = sis.readUI8();
-        skipped = new ArrayList<Action>();
+        skipped = new ArrayList<>();
         for (int i = 0; i < skipCount; i++) {
             skipped.add(sis.readAction());
         }
@@ -79,7 +79,7 @@ public class ActionWaitForFrame extends Action implements ActionStore {
         super(0x8A, -1);
         frame = (int) lexLong(lexer);
         skipCount = (int) lexLong(lexer);
-        skipped = new ArrayList<Action>();
+        skipped = new ArrayList<>();
     }
 
     @Override

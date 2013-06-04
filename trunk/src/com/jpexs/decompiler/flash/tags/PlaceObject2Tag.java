@@ -244,7 +244,7 @@ public class PlaceObject2Tag extends Tag implements Container, PlaceObjectTypeTa
      */
     @Override
     public List<Object> getSubItems() {
-        List<Object> ret = new ArrayList<Object>();
+        List<Object> ret = new ArrayList<>();
         if (placeFlagHasClipActions) {
             ret.addAll(clipActions.clipActionRecords);
         }
@@ -266,7 +266,7 @@ public class PlaceObject2Tag extends Tag implements Container, PlaceObjectTypeTa
 
     @Override
     public Set<Integer> getNeededCharacters() {
-        Set<Integer> ret = new HashSet<Integer>();
+        Set<Integer> ret = new HashSet<>();
         if (placeFlagHasCharacter) {
             ret.add(characterId);
         }

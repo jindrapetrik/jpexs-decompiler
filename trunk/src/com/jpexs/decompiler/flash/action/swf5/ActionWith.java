@@ -107,7 +107,7 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
 
     @Override
     public List<Long> getContainerSizes() {
-        List<Long> ret = new ArrayList<Long>();
+        List<Long> ret = new ArrayList<>();
         ret.add((Long) (long) codeSize);
         return ret;
     }
@@ -124,6 +124,6 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
 
     @Override
     public HashMap<Integer, String> getRegNames() {
-        return new HashMap<Integer, String>();
+        return new HashMap<>();
     }
 }

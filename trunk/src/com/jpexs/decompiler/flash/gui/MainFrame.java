@@ -421,7 +421,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         menuBar.add(menuHelp);
 
         setJMenuBar(menuBar);
-        List<Object> objs = new ArrayList<Object>();
+        List<Object> objs = new ArrayList<>();
         objs.addAll(swf.tags);
 
 
@@ -439,7 +439,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         cl2.show(detailPanel, DETAILCARDEMPTYPANEL);
 
 
-        abcList = new ArrayList<ABCContainerTag>();
+        abcList = new ArrayList<>();
         getActionScript3(objs, abcList);
         if (!abcList.isEmpty()) {
             addTab(tabPane, abcPanel = new ABCPanel(abcList), "ActionScript3", View.getIcon("as16"));
@@ -531,8 +531,8 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                 jtt = (JPEGTablesTag) t;
             }
         }
-        characters = new HashMap<Integer, CharacterTag>();
-        List<Object> list2 = new ArrayList<Object>();
+        characters = new HashMap<>();
+        List<Object> list2 = new ArrayList<>();
         list2.addAll(swf.tags);
         parseCharacters(list2);
         JPanel textTopPanel = new JPanel(new BorderLayout());
@@ -879,7 +879,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     }
 
     public List<TagNode> getSelectedNodes() {
-        List<TagNode> ret = new ArrayList<TagNode>();
+        List<TagNode> ret = new ArrayList<>();
         TreePath tps[] = tagTree.getSelectionPaths();
         if (tps == null) {
             return ret;
@@ -963,7 +963,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     }
 
     public List<Object> getTagsWithType(List<Object> list, String type) {
-        List<Object> ret = new ArrayList<Object>();
+        List<Object> ret = new ArrayList<>();
         for (Object o : list) {
             String ttype = getTagType(o);
             if (type.equals(ttype)) {
@@ -974,7 +974,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     }
 
     public List<TagNode> getTagNodesWithType(List<Object> list, String type, Object parent, boolean display) {
-        List<TagNode> ret = new ArrayList<TagNode>();
+        List<TagNode> ret = new ArrayList<>();
         int frameCnt = 0;
         for (Object o : list) {
             String ttype = getTagType(o);
@@ -990,7 +990,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
     public List<Object> getAllSubs(JTree tree, Object o) {
         TreeModel tm = tree.getModel();
-        List<Object> ret = new ArrayList<Object>();
+        List<Object> ret = new ArrayList<>();
         for (int i = 0; i < tm.getChildCount(o); i++) {
             Object c = tm.getChild(o, i);
             ret.add(c);
@@ -1002,7 +1002,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     public List<Object> getAllSelected(JTree tree) {
         TreeSelectionModel tsm = tree.getSelectionModel();
         TreePath tps[] = tsm.getSelectionPaths();
-        List<Object> ret = new ArrayList<Object>();
+        List<Object> ret = new ArrayList<>();
         if (tps == null) {
             return ret;
         }
@@ -1033,7 +1033,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     }
 
     public List<TagNode> createTagList(List<Object> list, Object parent) {
-        List<TagNode> ret = new ArrayList<TagNode>();
+        List<TagNode> ret = new ArrayList<>();
         List<TagNode> frames = getTagNodesWithType(list, "frame", parent, true);
         List<TagNode> shapes = getTagNodesWithType(list, "shape", parent, true);
         List<TagNode> morphShapes = getTagNodesWithType(list, "morphshape", parent, true);
@@ -1045,11 +1045,11 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         List<TagNode> movies = getTagNodesWithType(list, "movie", parent, true);
         List<TagNode> sounds = getTagNodesWithType(list, "sound", parent, true);
         List<TagNode> binaryData = getTagNodesWithType(list, "binaryData", parent, true);
-        List<TagNode> actionScript = new ArrayList<TagNode>();
+        List<TagNode> actionScript = new ArrayList<>();
 
         for (int i = 0; i < sounds.size(); i++) {
             if (sounds.get(i).tag instanceof SoundStreamHeadTypeTag) {
-                List<SoundStreamBlockTag> blocks = new ArrayList<SoundStreamBlockTag>();
+                List<SoundStreamBlockTag> blocks = new ArrayList<>();
                 SWF.populateSoundStreamBlocks(list, (Tag) sounds.get(i).tag, blocks);
                 if (blocks.isEmpty()) {
                     sounds.remove(i);
@@ -1062,7 +1062,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             n.subItems = getTagNodesWithType(new ArrayList<Object>(((DefineSpriteTag) n.tag).subTags), "frame", n.tag, true);
         }
 
-        List<ExportAssetsTag> exportAssetsTags = new ArrayList<ExportAssetsTag>();
+        List<ExportAssetsTag> exportAssetsTags = new ArrayList<>();
         for (Object t : list) {
             if (t instanceof ExportAssetsTag) {
                 exportAssetsTags.add((ExportAssetsTag) t);
@@ -1452,7 +1452,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                 if (onlySel) {
                                     List<Object> sel = getAllSelected(tagTree);
 
-                                    List<ScriptPack> tlsList = new ArrayList<ScriptPack>();
+                                    List<ScriptPack> tlsList = new ArrayList<>();
                                     JPEGTablesTag jtt = null;
                                     for (Tag t : swf.tags) {
                                         if (t instanceof JPEGTablesTag) {
@@ -1460,13 +1460,13 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                             break;
                                         }
                                     }
-                                    List<Tag> images = new ArrayList<Tag>();
-                                    List<Tag> shapes = new ArrayList<Tag>();
-                                    List<Tag> movies = new ArrayList<Tag>();
-                                    List<Tag> sounds = new ArrayList<Tag>();
-                                    List<Tag> texts = new ArrayList<Tag>();
-                                    List<TagNode> actionNodes = new ArrayList<TagNode>();
-                                    List<Tag> binaryData = new ArrayList<Tag>();
+                                    List<Tag> images = new ArrayList<>();
+                                    List<Tag> shapes = new ArrayList<>();
+                                    List<Tag> movies = new ArrayList<>();
+                                    List<Tag> sounds = new ArrayList<>();
+                                    List<Tag> texts = new ArrayList<>();
+                                    List<TagNode> actionNodes = new ArrayList<>();
+                                    List<Tag> binaryData = new ArrayList<>();
                                     for (Object d : sel) {
                                         if (d instanceof TagNode) {
                                             TagNode n = (TagNode) d;
@@ -1511,7 +1511,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                             tls.export(selFile, abcList, isPcode);
                                         }
                                     } else {
-                                        List<TagNode> allNodes = new ArrayList<TagNode>();
+                                        List<TagNode> allNodes = new ArrayList<>();
                                         TagNode asn = getASTagNode(tagTree);
                                         if (asn != null) {
                                             allNodes.add(asn);
@@ -1685,7 +1685,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                             int cnt = 0;
 
                             if (abcPanel != null) {
-                                HashMap<String, String> namesMap = new HashMap<String, String>();
+                                HashMap<String, String> namesMap = new HashMap<>();
                                 for (ABCContainerTag tag : abcPanel.list) {
                                     cnt += tag.getABC().deobfuscateIdentifiers(namesMap);
                                 }
@@ -1903,7 +1903,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                 if (tagObj instanceof FrameNode) {
                     FrameNode fn = (FrameNode) tagObj;
                     Object parent = fn.getParent();
-                    List<Object> subs = new ArrayList<Object>();
+                    List<Object> subs = new ArrayList<>();
                     if (parent == null) {
                         subs.addAll(swf.tags);
                     } else {
@@ -1911,7 +1911,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                             subs = ((Container) parent).getSubItems();
                         }
                     }
-                    List<Integer> doneCharacters = new ArrayList<Integer>();
+                    List<Integer> doneCharacters = new ArrayList<>();
                     int frameCnt = 1;
                     for (Object o : subs) {
                         if (o instanceof ShowFrameTag) {
@@ -2007,7 +2007,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                 x = 0;
                                 y++;
                             }
-                            List<TEXTRECORD> rec = new ArrayList<TEXTRECORD>();
+                            List<TEXTRECORD> rec = new ArrayList<>();
                             TEXTRECORD tr = new TEXTRECORD();
                             int textHeight = height / radku;
                             tr.fontId = fontId;
@@ -2073,7 +2073,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     }
 
     public void refreshTree() {
-        List<Object> objs = new ArrayList<Object>();
+        List<Object> objs = new ArrayList<>();
         objs.addAll(swf.tags);
         tagTree.setModel(new TagTreeModel(createTagList(objs, null), new SWFRoot((new File(Main.file)).getName())));
     }

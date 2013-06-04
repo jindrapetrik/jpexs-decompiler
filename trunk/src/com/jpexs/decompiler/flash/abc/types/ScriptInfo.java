@@ -32,9 +32,9 @@ public class ScriptInfo {
     public Traits traits;
 
     public HashMap<String, ScriptPack> getPacks(ABC abc, int scriptIndex) {
-        HashMap<String, ScriptPack> ret = new HashMap<String, ScriptPack>();
+        HashMap<String, ScriptPack> ret = new HashMap<>();
 
-        List<Integer> otherTraits = new ArrayList<Integer>();
+        List<Integer> otherTraits = new ArrayList<>();
         for (int j = 0; j < traits.traits.length; j++) {
             Trait t = traits.traits[j];
             Multiname name = t.getName(abc);
@@ -53,13 +53,13 @@ public class ScriptInfo {
                 String packageName = ns.getName(abc.constants);
                 String objectName = name.getName(abc.constants, new ArrayList<String>());
                 String path = packageName + "." + objectName;
-                List<Integer> traitIndices = new ArrayList<Integer>();
+                List<Integer> traitIndices = new ArrayList<>();
 
                 traitIndices.add(j);
                 if (!otherTraits.isEmpty()) {
                     traitIndices.addAll(otherTraits);
                 }
-                otherTraits = new ArrayList<Integer>();
+                otherTraits = new ArrayList<>();
                 ret.put(path, new ScriptPack(abc, scriptIndex, traitIndices));
             }
         }

@@ -97,7 +97,7 @@ public class DefineFontInfo2Tag extends Tag {
         fontFlagsWideCodes = sis.readUB(1) == 1; //Always 1
         languageCode = sis.readLANGCODE();
         int ctLen = sis.available() / 2;
-        codeTable = new ArrayList<Integer>();
+        codeTable = new ArrayList<>();
         for (int i = 0; i < ctLen; i++) {
             codeTable.add(sis.readUI16());
         }

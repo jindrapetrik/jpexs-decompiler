@@ -33,8 +33,8 @@ public class TreeElement {
         this.path = path;
         this.item = item;
         this.parent = parent;
-        branches = new TreeMap<String, TreeElement>();
-        leafs = new TreeMap<String, TreeElement>();
+        branches = new TreeMap<>();
+        leafs = new TreeMap<>();
     }
 
     public TreeElement getParent() {
@@ -50,7 +50,7 @@ public class TreeElement {
     }
 
     public TreePath getTreePath() {
-        List<TreeElement> pathList = new ArrayList<TreeElement>();
+        List<TreeElement> pathList = new ArrayList<>();
         TreeElement temp = this;
         do {
             pathList.add(0, temp);

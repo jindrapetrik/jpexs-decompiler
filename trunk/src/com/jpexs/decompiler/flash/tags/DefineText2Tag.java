@@ -155,7 +155,7 @@ public class DefineText2Tag extends CharacterTag implements BoundedTag, TextTag,
         try {
             TextLexer lexer = new TextLexer(new InputStreamReader(new ByteArrayInputStream(text.getBytes("UTF-8")), "UTF-8"));
             ParsedSymbol s = null;
-            List<TEXTRECORD> textRecords = new ArrayList<TEXTRECORD>();
+            List<TEXTRECORD> textRecords = new ArrayList<>();
             RGBA colorA = null;
             int fontId = -1;
             int textHeight = -1;
@@ -419,7 +419,7 @@ public class DefineText2Tag extends CharacterTag implements BoundedTag, TextTag,
         textMatrix = sis.readMatrix();
         glyphBits = sis.readUI8();
         advanceBits = sis.readUI8();
-        textRecords = new ArrayList<TEXTRECORD>();
+        textRecords = new ArrayList<>();
         TEXTRECORD tr;
         while ((tr = sis.readTEXTRECORD(true, glyphBits, advanceBits)) != null) {
             textRecords.add(tr);
@@ -428,7 +428,7 @@ public class DefineText2Tag extends CharacterTag implements BoundedTag, TextTag,
 
     @Override
     public Set<Integer> getNeededCharacters() {
-        Set<Integer> ret = new HashSet<Integer>();
+        Set<Integer> ret = new HashSet<>();
         for (TEXTRECORD tr : textRecords) {
             if (tr.styleFlagsHasFont) {
                 ret.add(tr.fontId);

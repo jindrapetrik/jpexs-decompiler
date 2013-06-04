@@ -41,7 +41,7 @@ public class GraphFrame extends JFrame {
         private static final int SPACE_BACKLINKS = 5;
         private static final int BLOCK_WIDTH = 200;
         private static final int BLOCK_HEIGHT = 20;
-        private HashMap<GraphPart, Point> partPos = new HashMap<GraphPart, Point>();
+        private HashMap<GraphPart, Point> partPos = new HashMap<>();
         private Point size;
         private int backLinksLeft = 0;
         private int backLinksRight = 0;
@@ -138,7 +138,7 @@ public class GraphFrame extends JFrame {
             if (part.nextParts.size() > 0) {
                 int cx = x - totalWidth / 2;
                 for (int p = 0; p < part.nextParts.size(); p++) {
-                    HashSet<GraphPart> k = new HashSet<GraphPart>();
+                    HashSet<GraphPart> k = new HashSet<>();
                     k.addAll(used.keySet());
                     int partWidth = getPartWidth(part.nextParts.get(p), k);
                     int cellWidth = partWidth * (BLOCK_WIDTH + SPACE_HORIZONTAL);
@@ -154,11 +154,11 @@ public class GraphFrame extends JFrame {
                 }
                 cx = x - totalWidth / 2;
                 for (int p = 0; p < part.nextParts.size(); p++) {
-                    HashSet<GraphPart> k = new HashSet<GraphPart>();
+                    HashSet<GraphPart> k = new HashSet<>();
                     k.addAll(used.keySet());
                     int cellWidth = getPartWidth(part.nextParts.get(p), k) * (BLOCK_WIDTH + SPACE_HORIZONTAL);
 
-                    HashSet<GraphPart> hs = new HashSet<GraphPart>();
+                    HashSet<GraphPart> hs = new HashSet<>();
                     hs.addAll(used.keySet());
                     int totalWidthParts2 = getPartWidth(part.nextParts.get(p), hs);
                     int totalWidth2 = totalWidthParts2 * (BLOCK_WIDTH + SPACE_HORIZONTAL);
@@ -178,9 +178,9 @@ public class GraphFrame extends JFrame {
         }
 
         private Point getPartPositions(GraphPart part, int y, int x, HashMap<GraphPart, Point> used, boolean goSub) {
-            HashMap<GraphPart, Point> l = new HashMap<GraphPart, Point>();
+            HashMap<GraphPart, Point> l = new HashMap<>();
             l.putAll(used);
-            HashSet<GraphPart> hs = new HashSet<GraphPart>();
+            HashSet<GraphPart> hs = new HashSet<>();
             hs.addAll(l.keySet());
             int totalWidthParts = getPartWidth(part, hs);
             int totalWidth = totalWidthParts * (BLOCK_WIDTH + SPACE_HORIZONTAL);

@@ -40,7 +40,7 @@ public class ActionNewMethod extends Action {
         GraphTargetItem methodName = stack.pop();
         GraphTargetItem scriptObject = stack.pop();
         long numArgs = popLong(stack);
-        List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
+        List<GraphTargetItem> args = new ArrayList<>();
         for (long l = 0; l < numArgs; l++) {
             args.add(stack.pop());
         }

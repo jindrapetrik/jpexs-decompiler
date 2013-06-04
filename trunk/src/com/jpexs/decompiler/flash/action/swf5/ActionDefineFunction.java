@@ -39,7 +39,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
 
     public String functionName;
     public String replacedFunctionName;
-    public List<String> paramNames = new ArrayList<String>();
+    public List<String> paramNames = new ArrayList<>();
     public List<String> replacedParamNames;
     //public List<Action> code;
     public int codeSize;
@@ -199,7 +199,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
 
     @Override
     public HashMap<Integer, String> getRegNames() {
-        return new HashMap<Integer, String>();
+        return new HashMap<>();
     }
 
     @Override
@@ -223,7 +223,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
 
     @Override
     public List<Long> getContainerSizes() {
-        List<Long> ret = new ArrayList<Long>();
+        List<Long> ret = new ArrayList<>();
         ret.add((Long) (long) codeSize);
         return ret;
     }

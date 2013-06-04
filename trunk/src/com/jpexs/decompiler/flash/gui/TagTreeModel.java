@@ -28,7 +28,7 @@ import javax.swing.tree.TreePath;
 public class TagTreeModel implements TreeModel {
 
     private Object root;
-    private List<TagNode> list = new ArrayList<TagNode>();
+    private List<TagNode> list = new ArrayList<>();
 
     public TagTreeModel(List<TagNode> list, Object rootName) {
         this.root = rootName;
@@ -40,7 +40,7 @@ public class TagTreeModel implements TreeModel {
         int cnt = getChildCount(parent);
         for (int i = 0; i < cnt; i++) {
             Object n = getChild(parent, i);
-            List<Object> newPath = new ArrayList<Object>();
+            List<Object> newPath = new ArrayList<>();
             newPath.addAll(path);
             newPath.add(n);
 
@@ -66,7 +66,7 @@ public class TagTreeModel implements TreeModel {
     }
 
     public TreePath getTagPath(Object obj) {
-        List<Object> path = new ArrayList<Object>();
+        List<Object> path = new ArrayList<>();
         path.add(getRoot());
         path = searchTag(obj, getRoot(), path);
         TreePath tp = new TreePath(path.toArray(new Object[path.size()]));

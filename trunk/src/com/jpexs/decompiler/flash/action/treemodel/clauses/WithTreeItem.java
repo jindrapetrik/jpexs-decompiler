@@ -37,13 +37,13 @@ public class WithTreeItem extends TreeItem {
     public WithTreeItem(Action instruction, TreeItem scope) {
         super(instruction, NOPRECEDENCE);
         this.scope = scope;
-        this.items = new ArrayList<GraphTargetItem>();
+        this.items = new ArrayList<>();
     }
 
     @Override
     public String toString(ConstantPool constants) {
         String ret;
-        List<Object> localData = new ArrayList<Object>();
+        List<Object> localData = new ArrayList<>();
         localData.add(constants);
         ret = hilight("with(") + scope.toString(localData) + hilight(")\r\n{\r\n");
         for (GraphTargetItem ti : items) {

@@ -28,7 +28,7 @@ public class ForTreeItem extends LoopItem implements Block {
 
     @Override
     public List<List<GraphTargetItem>> getSubs() {
-        List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
+        List<List<GraphTargetItem>> ret = new ArrayList<>();
         ret.add(firstCommands);
         ret.add(commands);
         ret.add(finalCommands);
@@ -99,7 +99,7 @@ public class ForTreeItem extends LoopItem implements Block {
 
     @Override
     public List<ContinueItem> getContinues() {
-        List<ContinueItem> ret = new ArrayList<ContinueItem>();
+        List<ContinueItem> ret = new ArrayList<>();
         for (GraphTargetItem ti : commands) {
             if (ti instanceof ContinueItem) {
                 ret.add((ContinueItem) ti);

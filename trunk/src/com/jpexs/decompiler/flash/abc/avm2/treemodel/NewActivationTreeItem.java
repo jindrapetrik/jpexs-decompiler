@@ -24,7 +24,7 @@ import java.util.List;
 
 public class NewActivationTreeItem extends TreeItem {
 
-    public HashMap<Integer, GraphTargetItem> slots = new HashMap<Integer, GraphTargetItem>();
+    public HashMap<Integer, GraphTargetItem> slots = new HashMap<>();
 
     public NewActivationTreeItem(AVM2Instruction instruction) {
         super(instruction, NOPRECEDENCE);

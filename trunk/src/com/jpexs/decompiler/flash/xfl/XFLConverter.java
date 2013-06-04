@@ -410,7 +410,7 @@ public class XFLConverter {
         if (mat == null) {
             mat = new MATRIX();
         }
-        List<SHAPERECORD> edges = new ArrayList<SHAPERECORD>();
+        List<SHAPERECORD> edges = new ArrayList<>();
         //int fillStyleCount = 0;
         int lineStyleCount = 0;
         int lastFillStyleCount = 0;
@@ -426,7 +426,7 @@ public class XFLConverter {
         strokesStr += "<strokes>";
         edgesStr += "<edges>";
 
-        List<String> fillStylesStr = new ArrayList<String>();
+        List<String> fillStylesStr = new ArrayList<>();
         if (fillStyles != null) {
             for (FILLSTYLE fs : fillStyles.fillStyles) {
                 //fillsStr += "<FillStyle index=\"" + (fillStylesStr.size() + 1) + "\">";
@@ -489,7 +489,7 @@ public class XFLConverter {
         }
 
         int mapPos = 0;
-        HashMap<Integer, Integer> fillStylesMap = new HashMap<Integer, Integer>();
+        HashMap<Integer, Integer> fillStylesMap = new HashMap<>();
         for (int f = 0; f < fillStyleCount; f++) {
             if (usedFillStyles[f]) {
                 fillStylesMap.put(f, mapPos);
@@ -683,7 +683,7 @@ public class XFLConverter {
     }
 
     private static List<Integer> getOneInstanceShapes(List<Tag> tags, HashMap<Integer, CharacterTag> characters) {
-        HashMap<Integer, Integer> usages = new HashMap<Integer, Integer>();
+        HashMap<Integer, Integer> usages = new HashMap<>();
         for (Tag t : tags) {
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
@@ -715,7 +715,7 @@ public class XFLConverter {
                 }
             }
         }
-        List<Integer> ret = new ArrayList<Integer>();
+        List<Integer> ret = new ArrayList<>();
         for (int ch : usages.keySet()) {
             if (usages.get(ch) < 2) {
                 ret.add(ch);
@@ -725,7 +725,7 @@ public class XFLConverter {
     }
 
     private static HashMap<Integer, CharacterTag> getCharacters(List<Tag> tags) {
-        HashMap<Integer, CharacterTag> ret = new HashMap<Integer, CharacterTag>();
+        HashMap<Integer, CharacterTag> ret = new HashMap<>();
         int maxId = 0;
         for (Tag t : tags) {
             if (t instanceof CharacterTag) {
@@ -1025,7 +1025,7 @@ public class XFLConverter {
             if (!db2.actions.isEmpty()) {
                 ret += "<Actionscript><script><![CDATA[";
                 for (BUTTONCONDACTION bca : db2.actions) {
-                    List<String> events = new ArrayList<String>();
+                    List<String> events = new ArrayList<>();
                     if (bca.condOverUpToOverDown) {
                         events.add("press");
                     }
@@ -1121,8 +1121,8 @@ public class XFLConverter {
         //TODO: Imported assets
         //linkageImportForRS="true" linkageIdentifier="xxx" linkageURL="yyy.swf"
         String ret = "";
-        List<String> media = new ArrayList<String>();
-        List<String> symbols = new ArrayList<String>();
+        List<String> media = new ArrayList<>();
+        List<String> symbols = new ArrayList<>();
         for (int ch : characters.keySet()) {
             CharacterTag symbol = characters.get(ch);
             if ((symbol instanceof ShapeTag) && oneInstanceShapes.contains(symbol.getCharacterID())) {
@@ -1202,7 +1202,7 @@ public class XFLConverter {
                                     }
                                     CXFORMWITHALPHA colorTransformAlpha = null;
                                     int blendMode = 0;
-                                    List<FILTER> filters = new ArrayList<FILTER>();
+                                    List<FILTER> filters = new ArrayList<>();
                                     if (button instanceof DefineButton2Tag) {
                                         colorTransformAlpha = rec.colorTransform;
                                         if (rec.buttonHasBlendMode) {
@@ -1693,7 +1693,7 @@ public class XFLConverter {
         CXFORMWITHALPHA colorTransFormAlpha = null;
         boolean cacheAsBitmap = false;
         int blendMode = 0;
-        List<FILTER> filters = new ArrayList<FILTER>();
+        List<FILTER> filters = new ArrayList<>();
         boolean isVisible = true;
         RGBA backGroundColor = null;
         int characterId = -1;
@@ -1772,7 +1772,7 @@ public class XFLConverter {
                     colorTransFormAlpha = null;
                     cacheAsBitmap = false;
                     blendMode = 0;
-                    filters = new ArrayList<FILTER>();
+                    filters = new ArrayList<>();
                     isVisible = true;
                     backGroundColor = null;
                     characterId = -1;
@@ -1952,7 +1952,7 @@ public class XFLConverter {
         ret += "<DOMTimeline name=\"" + name + "\">";
         ret += "<layers>";
         int layerCount = getLayerCount(timelineTags);
-        Stack<Integer> parentLayers = new Stack<Integer>();
+        Stack<Integer> parentLayers = new Stack<>();
         int index = 0;
         for (int d = layerCount; d >= 1; d--, index++) {
             for (Tag t : timelineTags) {
@@ -2046,7 +2046,7 @@ public class XFLConverter {
     }
 
     private static Map<Integer, String> getCharacterClasses(List<Tag> tags) {
-        Map<Integer, String> ret = new HashMap<Integer, String>();
+        Map<Integer, String> ret = new HashMap<>();
         for (Tag t : tags) {
             if (t instanceof SymbolClassTag) {
                 SymbolClassTag sc = (SymbolClassTag) t;
@@ -2061,7 +2061,7 @@ public class XFLConverter {
     }
 
     private static Map<Integer, String> getCharacterVariables(List<Tag> tags) {
-        Map<Integer, String> ret = new HashMap<Integer, String>();
+        Map<Integer, String> ret = new HashMap<>();
         for (Tag t : tags) {
             if (t instanceof ExportAssetsTag) {
                 ExportAssetsTag ea = (ExportAssetsTag) t;
@@ -2114,7 +2114,7 @@ public class XFLConverter {
         matStr += convertMatrix(matrix);
         matStr += "</matrix>";
         if ((tag instanceof DefineTextTag) || (tag instanceof DefineText2Tag)) {
-            List<TEXTRECORD> textRecords = new ArrayList<TEXTRECORD>();
+            List<TEXTRECORD> textRecords = new ArrayList<>();
             if (tag instanceof DefineTextTag) {
                 textRecords = ((DefineTextTag) tag).textRecords;
             } else if (tag instanceof DefineText2Tag) {
@@ -2375,7 +2375,7 @@ public class XFLConverter {
         if (baseName.contains(".")) {
             baseName = baseName.substring(0, baseName.lastIndexOf("."));
         }
-        HashMap<String, byte[]> files = new HashMap<String, byte[]>();
+        HashMap<String, byte[]> files = new HashMap<>();
         HashMap<Integer, CharacterTag> characters = getCharacters(swf.tags);
         List<Integer> oneInstaceShapes = getOneInstanceShapes(swf.tags, characters);
         Map<Integer, String> characterClasses = getCharacterClasses(swf.tags);

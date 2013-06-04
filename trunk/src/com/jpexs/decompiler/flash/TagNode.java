@@ -58,7 +58,7 @@ public class TagNode {
     public boolean export = false;
 
     public List<TagNode> getAllSubs() {
-        List<TagNode> ret = new ArrayList<TagNode>();
+        List<TagNode> ret = new ArrayList<>();
         ret.addAll(subItems);
         for (TagNode n : subItems) {
             ret.addAll(n.getAllSubs());
@@ -68,7 +68,7 @@ public class TagNode {
 
     public TagNode(Object tag) {
         this.tag = tag;
-        this.subItems = new ArrayList<TagNode>();
+        this.subItems = new ArrayList<>();
     }
 
     @Override
@@ -77,19 +77,19 @@ public class TagNode {
     }
 
     public static List<TagNode> createTagList(List<Object> list) {
-        List<TagNode> ret = new ArrayList<TagNode>();
+        List<TagNode> ret = new ArrayList<>();
         int frame = 1;
-        List<TagNode> frames = new ArrayList<TagNode>();
-        List<TagNode> shapes = new ArrayList<TagNode>();
-        List<TagNode> morphShapes = new ArrayList<TagNode>();
-        List<TagNode> sprites = new ArrayList<TagNode>();
-        List<TagNode> buttons = new ArrayList<TagNode>();
-        List<TagNode> images = new ArrayList<TagNode>();
-        List<TagNode> fonts = new ArrayList<TagNode>();
-        List<TagNode> texts = new ArrayList<TagNode>();
+        List<TagNode> frames = new ArrayList<>();
+        List<TagNode> shapes = new ArrayList<>();
+        List<TagNode> morphShapes = new ArrayList<>();
+        List<TagNode> sprites = new ArrayList<>();
+        List<TagNode> buttons = new ArrayList<>();
+        List<TagNode> images = new ArrayList<>();
+        List<TagNode> fonts = new ArrayList<>();
+        List<TagNode> texts = new ArrayList<>();
 
 
-        List<ExportAssetsTag> exportAssetsTags = new ArrayList<ExportAssetsTag>();
+        List<ExportAssetsTag> exportAssetsTags = new ArrayList<>();
         for (Object t : list) {
             if (t instanceof ExportAssetsTag) {
                 exportAssetsTags.add((ExportAssetsTag) t);
@@ -237,7 +237,7 @@ public class TagNode {
         if (!outdir.endsWith(File.separator)) {
             outdir = outdir + File.separator;
         }
-        List<String> existingNames = new ArrayList<String>();
+        List<String> existingNames = new ArrayList<>();
         for (TagNode node : nodeList) {
             String name = "";
             if (node.tag instanceof Tag) {

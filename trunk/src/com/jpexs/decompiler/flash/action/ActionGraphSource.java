@@ -62,7 +62,7 @@ public class ActionGraphSource extends GraphSource {
     private List<Long> posCache = null;
 
     private void rebuildCache() {
-        posCache = new ArrayList<Long>();
+        posCache = new ArrayList<>();
         for (int i = 0; i < size(); i++) {
             posCache.add(pos2adr(i));
         }

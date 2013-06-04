@@ -33,10 +33,10 @@ import javax.swing.event.CaretListener;
 
 public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretListener {
 
-    private List<Highlighting> highlights = new ArrayList<Highlighting>();
-    private List<Highlighting> traitHighlights = new ArrayList<Highlighting>();
-    private List<Highlighting> methodHighlights = new ArrayList<Highlighting>();
-    private List<Highlighting> classHighlights = new ArrayList<Highlighting>();
+    private List<Highlighting> highlights = new ArrayList<>();
+    private List<Highlighting> traitHighlights = new ArrayList<>();
+    private List<Highlighting> methodHighlights = new ArrayList<>();
+    private List<Highlighting> classHighlights = new ArrayList<>();
     private Highlighting currentMethodHighlight;
     private ABC abc;
     private ScriptPack script;
@@ -309,9 +309,9 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             script = abc.script_info[scriptIndex];
         }
         if (script == null) {
-            highlights = new ArrayList<Highlighting>();
-            traitHighlights = new ArrayList<Highlighting>();
-            methodHighlights = new ArrayList<Highlighting>();
+            highlights = new ArrayList<>();
+            traitHighlights = new ArrayList<>();
+            methodHighlights = new ArrayList<>();
             this.script = scriptLeaf;
             return;
         }

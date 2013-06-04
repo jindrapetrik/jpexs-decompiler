@@ -25,8 +25,8 @@ import java.util.List;
  */
 public class GraphPath {
 
-    private List<Integer> keys = new ArrayList<Integer>();
-    private List<Integer> vals = new ArrayList<Integer>();
+    private List<Integer> keys = new ArrayList<>();
+    private List<Integer> vals = new ArrayList<>();
     public String rootName = "";
 
     public GraphPath(String rootName, List<Integer> keys, List<Integer> vals) {
@@ -46,8 +46,8 @@ public class GraphPath {
         }
 
 
-        List<Integer> otherKeys = new ArrayList<Integer>(p.keys);
-        List<Integer> otherVals = new ArrayList<Integer>(p.vals);
+        List<Integer> otherKeys = new ArrayList<>(p.keys);
+        List<Integer> otherVals = new ArrayList<>(p.vals);
 
         for (int i = 0; i < p.length(); i++) {
             if (keys.get(i) != otherKeys.get(i)) {

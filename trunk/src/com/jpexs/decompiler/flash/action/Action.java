@@ -128,7 +128,7 @@ public class Action implements GraphSourceItem {
      * @return List of addresses
      */
     public List<Long> getAllRefs(int version) {
-        List<Long> ret = new ArrayList<Long>();
+        List<Long> ret = new ArrayList<>();
         return ret;
     }
 
@@ -138,7 +138,7 @@ public class Action implements GraphSourceItem {
      * @return List of actions
      */
     public List<Action> getAllIfsOrJumps() {
-        List<Action> ret = new ArrayList<Action>();
+        List<Action> ret = new ArrayList<>();
         return ret;
     }
 
@@ -149,7 +149,7 @@ public class Action implements GraphSourceItem {
      * @return List of actions
      */
     public static List<Action> getActionsAllIfsOrJumps(List<Action> list) {
-        List<Action> ret = new ArrayList<Action>();
+        List<Action> ret = new ArrayList<>();
         for (Action a : list) {
             List<Action> part = a.getAllIfsOrJumps();
             ret.addAll(part);
@@ -165,7 +165,7 @@ public class Action implements GraphSourceItem {
      * @return List of addresses
      */
     public static List<Long> getActionsAllRefs(List<Action> list, int version) {
-        List<Long> ret = new ArrayList<Long>();
+        List<Long> ret = new ArrayList<>();
         for (Action a : list) {
             if (a.replaceWith != null) {
                 a.replaceWith.setAddress(a.getAddress(), version, false);
@@ -389,8 +389,8 @@ public class Action implements GraphSourceItem {
         if (!cps.isEmpty()) {
             setConstantPool(list, cps.get(cps.size() - 1));
         }
-        HashMap<Long, List<GraphSourceItemContainer>> containers = new HashMap<Long, List<GraphSourceItemContainer>>();
-        HashMap<GraphSourceItemContainer, Integer> containersPos = new HashMap<GraphSourceItemContainer, Integer>();
+        HashMap<Long, List<GraphSourceItemContainer>> containers = new HashMap<>();
+        HashMap<GraphSourceItemContainer, Integer> containersPos = new HashMap<>();
         offset = address;
         int pos = -1;
         boolean lastPush = false;
@@ -690,7 +690,7 @@ public class Action implements GraphSourceItem {
 
     @Override
     public List<Integer> getBranches(GraphSource code) {
-        return new ArrayList<Integer>();
+        return new ArrayList<>();
     }
 
     @Override
@@ -729,11 +729,11 @@ public class Action implements GraphSourceItem {
         if (start < actions.size() && (end > 0) && (start > 0)) {
             log("Entering " + start + "-" + end + (actions.size() > 0 ? (" (" + actions.get(start).toString() + " - " + actions.get(end == actions.size() ? end - 1 : end) + ")") : ""));
         }
-        List<Object> localData = new ArrayList<Object>();
+        List<Object> localData = new ArrayList<>();
         localData.add(registerNames);
         localData.add(variables);
         localData.add(functions);
-        List<GraphTargetItem> output = new ArrayList<GraphTargetItem>();
+        List<GraphTargetItem> output = new ArrayList<>();
         int ip = start;
         boolean isWhile = false;
         boolean isForIn = false;
@@ -790,7 +790,7 @@ public class Action implements GraphSourceItem {
                 GraphSourceItemContainer cnt = (GraphSourceItemContainer) action;
                 //List<GraphTargetItem> out=actionsPartToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(),new HashMap<String, GraphTargetItem>(), new Stack<GraphTargetItem>(), src, ip+1,endip-1 , version);            
                 long endAddr = action.getAddress() + cnt.getHeaderSize();
-                List<List<GraphTargetItem>> outs = new ArrayList<List<GraphTargetItem>>();
+                List<List<GraphTargetItem>> outs = new ArrayList<>();
                 for (long size : cnt.getContainerSizes()) {
                     if (size == 0) {
                         outs.add(new ArrayList<GraphTargetItem>());
@@ -954,14 +954,14 @@ public class Action implements GraphSourceItem {
         if (true) {
             //return output;
         }
-        List<GraphTargetItem> ret = new ArrayList<GraphTargetItem>();
-        List<GraphTargetItem> functions = new ArrayList<GraphTargetItem>();
-        List<GraphTargetItem> staticFunctions = new ArrayList<GraphTargetItem>();
-        HashMap<GraphTargetItem, GraphTargetItem> vars = new HashMap<GraphTargetItem, GraphTargetItem>();
-        HashMap<GraphTargetItem, GraphTargetItem> staticVars = new HashMap<GraphTargetItem, GraphTargetItem>();
+        List<GraphTargetItem> ret = new ArrayList<>();
+        List<GraphTargetItem> functions = new ArrayList<>();
+        List<GraphTargetItem> staticFunctions = new ArrayList<>();
+        HashMap<GraphTargetItem, GraphTargetItem> vars = new HashMap<>();
+        HashMap<GraphTargetItem, GraphTargetItem> staticVars = new HashMap<>();
         GraphTargetItem className;
         GraphTargetItem extendsOp = null;
-        List<GraphTargetItem> implementsOp = new ArrayList<GraphTargetItem>();
+        List<GraphTargetItem> implementsOp = new ArrayList<>();
         boolean ok = true;
         int prevCount = 0;
         for (GraphTargetItem t : output) {
@@ -1015,7 +1015,7 @@ public class Action implements GraphSourceItem {
                                                     }
 
                                                     if (parts.size() <= pos) {
-                                                        List<GraphTargetItem> output2 = new ArrayList<GraphTargetItem>();
+                                                        List<GraphTargetItem> output2 = new ArrayList<>();
                                                         for (int i = 0; i < prevCount; i++) {
                                                             output2.add(output.get(i));
                                                         }
@@ -1083,7 +1083,7 @@ public class Action implements GraphSourceItem {
                                                         }
                                                         pos++;
                                                         if (parts.size() <= pos) {
-                                                            List<GraphTargetItem> output2 = new ArrayList<GraphTargetItem>();
+                                                            List<GraphTargetItem> output2 = new ArrayList<>();
                                                             for (int i = 0; i < prevCount; i++) {
                                                                 output2.add(output.get(i));
                                                             }
@@ -1146,7 +1146,7 @@ public class Action implements GraphSourceItem {
                                                             pos++;
                                                         }
                                                         if (ok) {
-                                                            List<GraphTargetItem> output2 = new ArrayList<GraphTargetItem>();
+                                                            List<GraphTargetItem> output2 = new ArrayList<>();
                                                             for (int i = 0; i < prevCount; i++) {
                                                                 output2.add(output.get(i));
                                                             }
@@ -1180,7 +1180,7 @@ public class Action implements GraphSourceItem {
                                                         break;
                                                     }
                                                 }
-                                                List<GraphTargetItem> output2 = new ArrayList<GraphTargetItem>();
+                                                List<GraphTargetItem> output2 = new ArrayList<>();
                                                 for (int i = 0; i < prevCount; i++) {
                                                     output2.add(output.get(i));
                                                 }

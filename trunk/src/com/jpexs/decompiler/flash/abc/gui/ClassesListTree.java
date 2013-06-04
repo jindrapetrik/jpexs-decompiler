@@ -62,7 +62,7 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
 
     public List<ScriptPack> getSelectedScripts() {
         TreeSelectionModel tsm = getSelectionModel();
-        final List<ScriptPack> selectedScripts = new ArrayList<ScriptPack>();
+        final List<ScriptPack> selectedScripts = new ArrayList<>();
         TreePath tps[] = tsm.getSelectionPaths();
         if (tps == null) {
             return selectedScripts;
@@ -96,7 +96,7 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
     }
 
     public HashMap<String, ScriptPack> getTreeList(List<ABCContainerTag> list) {
-        HashMap<String, ScriptPack> ret = new HashMap<String, ScriptPack>();
+        HashMap<String, ScriptPack> ret = new HashMap<>();
         for (ABCContainerTag tag : list) {
             ABC abc = tag.getABC();
             for (int i = 0; i < abc.script_info.length; i++) {

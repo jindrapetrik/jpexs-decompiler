@@ -30,7 +30,7 @@ import javax.swing.event.ListDataListener;
  */
 public class SWFListModel implements ListModel {
 
-    private List<ListDataListener> listeners = new ArrayList<ListDataListener>();
+    private List<ListDataListener> listeners = new ArrayList<>();
     private List<Replacement> replacements;
 
     /**

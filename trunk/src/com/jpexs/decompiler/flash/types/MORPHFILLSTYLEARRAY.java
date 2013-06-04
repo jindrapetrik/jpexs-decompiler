@@ -30,7 +30,7 @@ public class MORPHFILLSTYLEARRAY implements NeedsCharacters {
 
     @Override
     public Set<Integer> getNeededCharacters() {
-        HashSet<Integer> ret = new HashSet<Integer>();
+        HashSet<Integer> ret = new HashSet<>();
         for (MORPHFILLSTYLE fs : fillStyles) {
             ret.addAll(fs.getNeededCharacters());
         }

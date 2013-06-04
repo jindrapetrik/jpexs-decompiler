@@ -47,7 +47,7 @@ public class TraitsListModel implements ListModel {
     }
 
     private void reset() {
-        items = new ArrayList<TraitsListItem>();
+        items = new ArrayList<>();
         for (int t = 0; t < abc.class_info[classIndex].static_traits.traits.length; t++) {
             items.add(new TraitsListItem(TraitsListItem.Type.getTypeForTrait(abc.class_info[classIndex].static_traits.traits[t]), t, true, abcTags, abc, classIndex, scriptIndex));
         }

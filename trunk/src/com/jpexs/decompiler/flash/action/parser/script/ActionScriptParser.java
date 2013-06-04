@@ -73,11 +73,11 @@ public class ActionScriptParser {
     }
 
     private List<Action> commands(HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forinlevel) throws IOException, ParseException {
-        List<Action> ret = new ArrayList<Action>();
+        List<Action> ret = new ArrayList<>();
         if (debugMode) {
             System.out.println("commands:");
         }
-        List<Action> cmd = new ArrayList<Action>();
+        List<Action> cmd = new ArrayList<>();
         while ((cmd = command(registerVars, inFunction, inMethod, forinlevel)) != null) {
             ret.addAll(cmd);
         }
@@ -120,13 +120,13 @@ public class ActionScriptParser {
 
     private List<Action> nonempty(List<Action> list) {
         if (list == null) {
-            return new ArrayList<Action>();
+            return new ArrayList<>();
         }
         return list;
     }
 
     private List<Action> typeToActions(List<String> type, List<Action> value) throws IOException, ParseException {
-        List<Action> ret = new ArrayList<Action>();
+        List<Action> ret = new ArrayList<>();
         if (type.isEmpty()) {
             return ret;
         }
@@ -150,7 +150,7 @@ public class ActionScriptParser {
     }
 
     private List<String> type() throws IOException, ParseException {
-        List<String> ret = new ArrayList<String>();
+        List<String> ret = new ArrayList<>();
 
         ParsedSymbol s = lex();
         expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
@@ -167,7 +167,7 @@ public class ActionScriptParser {
     }
 
     private List<Action> variable(HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod) throws IOException, ParseException {
-        List<Action> ret = new ArrayList<Action>();
+        List<Action> ret = new ArrayList<>();
         ParsedSymbol s = lex();
         expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.THIS, SymbolType.SUPER);
         if (registerVars.containsKey(s.value.toString())) {
@@ -250,7 +250,7 @@ public class ActionScriptParser {
     }
 
     private List<Action> call(HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod) throws IOException, ParseException {
-        List<Action> ret = new ArrayList<Action>();
+        List<Action> ret = new ArrayList<>();
         //expected(SymbolType.PARENT_OPEN); //MUST BE HANDLED BY CALLER
         int cnt = 0;
         ParsedSymbol s = lex();
@@ -268,11 +268,11 @@ public class ActionScriptParser {
     }
 
     private List<Action> function(boolean withBody, String functionName, boolean isMethod) throws IOException, ParseException {
-        List<Action> ret = new ArrayList<Action>();
+        List<Action> ret = new ArrayList<>();
         ParsedSymbol s = null;
         expected(SymbolType.PARENT_OPEN);
         s = lex();
-        List<String> paramNames = new ArrayList<String>();
+        List<String> paramNames = new ArrayList<>();
 
         while (s.type != SymbolType.PARENT_CLOSE) {
             if (s.type != SymbolType.COMMA) {
@@ -293,8 +293,8 @@ public class ActionScriptParser {
         }
 
 
-        List<Integer> paramRegs = new ArrayList<Integer>();
-        HashMap<String, Integer> registerVars = new HashMap<String, Integer>();
+        List<Integer> paramRegs = new ArrayList<>();
+        HashMap<String, Integer> registerVars = new HashMap<>();
         registerVars.put("_parent", REGISTER_PARENT);
         registerVars.put("_root", REGISTER_ROOT);
         registerVars.put("super", REGISTER_SUPER);
@@ -314,7 +314,7 @@ public class ActionScriptParser {
         boolean suppressParentFlag = false;
         boolean suppressArgumentsFlag = false;
         boolean suppressThisFlag = false;
-        TreeSet<Integer> usedRegisters = new TreeSet<Integer>();
+        TreeSet<Integer> usedRegisters = new TreeSet<>();
         if (withBody) {
 
             expected(SymbolType.CURLY_OPEN);
@@ -358,7 +358,7 @@ public class ActionScriptParser {
             }
 
             int newpos = 1;
-            HashMap<Integer, Integer> registerMap = new HashMap<Integer, Integer>();
+            HashMap<Integer, Integer> registerMap = new HashMap<>();
             if (preloadThisFlag) {
                 registerMap.put(REGISTER_THIS, newpos);
                 newpos++;
@@ -400,7 +400,7 @@ public class ActionScriptParser {
                 }
             }
 
-            TreeSet<Integer> usedRegisters2 = new TreeSet<Integer>();
+            TreeSet<Integer> usedRegisters2 = new TreeSet<>();
             for (int i : usedRegisters) {
                 if (registerMap.get(i) == null) {
                     usedRegisters2.add(i);
@@ -463,7 +463,7 @@ public class ActionScriptParser {
     }
 
     private List<Action> gettoset(List<Action> get, List<Action> value) {
-        List<Action> ret = new ArrayList<Action>();
+        List<Action> ret = new ArrayList<>();
         ret.addAll(get);
         if (!ret.isEmpty()) {
             Action a = ret.get(ret.size() - 1);
@@ -491,16 +491,16 @@ public class ActionScriptParser {
 
     private List<Action> traits(boolean isInterface, List<String> nameStr, List<String> extendsStr, List<List<String>> implementsStr) throws IOException, ParseException {
 
-        List<Action> ret = new ArrayList<Action>();
+        List<Action> ret = new ArrayList<>();
         for (int i = 0; i < nameStr.size() - 1; i++) {
-            List<Action> notBody = new ArrayList<Action>();
-            List<String> globalClassTypeStr = new ArrayList<String>();
+            List<Action> notBody = new ArrayList<>();
+            List<String> globalClassTypeStr = new ArrayList<>();
             globalClassTypeStr.add("_global");
             for (int j = 0; j <= i; j++) {
                 globalClassTypeStr.add(nameStr.get(j));
             }
 
-            List<Action> val = new ArrayList<Action>();
+            List<Action> val = new ArrayList<>();
             val.add(new ActionPush((Long) 0L));
             val.add(pushConst("Object"));
             val.add(new ActionNewObject());
@@ -511,14 +511,14 @@ public class ActionScriptParser {
             ret.add(new ActionIf(Action.actionsToBytes(notBody, false, SWF.DEFAULT_VERSION).length));
             ret.addAll(notBody);
         }
-        List<Action> ifbody = new ArrayList<Action>();
-        List<String> globalClassTypeStr = new ArrayList<String>();
+        List<Action> ifbody = new ArrayList<>();
+        List<String> globalClassTypeStr = new ArrayList<>();
         globalClassTypeStr.add("_global");
         globalClassTypeStr.addAll(nameStr);
 
 
         ParsedSymbol s = null;
-        List<Action> constr = new ArrayList<Action>();
+        List<Action> constr = new ArrayList<>();
         looptrait:
         while (true) {
             s = lex();
@@ -535,7 +535,7 @@ public class ActionScriptParser {
                     expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
                     String fname = s.value.toString();
                     if (fname.equals(nameStr.get(nameStr.size() - 1))) { //constructor
-                        constr = new ArrayList<Action>();
+                        constr = new ArrayList<>();
                         constr.addAll(function(!isInterface, "", true));
                         constr.add(new ActionStoreRegister(1));
                         constr = (typeToActions(globalClassTypeStr, constr));
@@ -588,7 +588,7 @@ public class ActionScriptParser {
         }
 
         if (constr.isEmpty()) {
-            List<Action> val = new ArrayList<Action>();
+            List<Action> val = new ArrayList<>();
             val.add(new ActionDefineFunction("", new ArrayList<String>(), 0, SWF.DEFAULT_VERSION));
             if (!isInterface) {
                 val.add(new ActionStoreRegister(1));
@@ -610,7 +610,7 @@ public class ActionScriptParser {
 
         if (!implementsStr.isEmpty()) {
             for (List<String> imp : implementsStr) {
-                List<String> globImp = new ArrayList<String>();
+                List<String> globImp = new ArrayList<>();
                 globImp.add("_global");
                 globImp.addAll(imp);
                 constr.addAll(typeToActions(globImp, null));
@@ -631,7 +631,7 @@ public class ActionScriptParser {
     }
 
     private List<Action> expressionCommands(ParsedSymbol s, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forinlevel) throws IOException, ParseException {
-        List<Action> ret = new ArrayList<Action>();
+        List<Action> ret = new ArrayList<>();
         switch (s.type) {
             case MBORD:
                 expected(SymbolType.PARENT_OPEN);
@@ -742,7 +742,7 @@ public class ActionScriptParser {
     }
 
     private List<Action> command(HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forinlevel) throws IOException, ParseException {
-        List<Action> ret = new ArrayList<Action>();
+        List<Action> ret = new ArrayList<>();
         if (debugMode) {
             System.out.println("command:");
         }
@@ -970,12 +970,12 @@ public class ActionScriptParser {
             case CLASS:
                 List<String> classTypeStr = type();
                 s = lex();
-                List<String> extendsTypeStr = new ArrayList<String>();
+                List<String> extendsTypeStr = new ArrayList<>();
                 if (s.type == SymbolType.EXTENDS) {
                     extendsTypeStr = type();
                     s = lex();
                 }
-                List<List<String>> implementsTypeStrs = new ArrayList<List<String>>();
+                List<List<String>> implementsTypeStrs = new ArrayList<>();
                 if (s.type == SymbolType.IMPLEMENTS) {
                     do {
                         List<String> implementsTypeStr = type();
@@ -990,7 +990,7 @@ public class ActionScriptParser {
             case INTERFACE:
                 List<String> interfaceTypeStr = type();
                 s = lex();
-                List<List<String>> intExtendsTypeStrs = new ArrayList<List<String>>();
+                List<List<String>> intExtendsTypeStrs = new ArrayList<>();
 
                 if (s.type == SymbolType.EXTENDS) {
                     do {
@@ -1009,7 +1009,7 @@ public class ActionScriptParser {
                 ret.addAll(function(true, s.value.toString(), false));
                 break;
             case NEW:
-                List<Action> newcmds = new ArrayList<Action>();
+                List<Action> newcmds = new ArrayList<>();
                 newcmds.addAll(typeToActions(type(), null));
                 expected(SymbolType.PARENT_OPEN);
                 if (newcmds.get(newcmds.size() - 1) instanceof ActionGetMember) {
@@ -1073,7 +1073,7 @@ public class ActionScriptParser {
             case INCREMENT:
             case DECREMENT:
                 List<Action> varincdec = variable(registerVars, inFunction, inMethod);
-                List<Action> incdecval = new ArrayList<Action>();
+                List<Action> incdecval = new ArrayList<>();
                 incdecval.addAll(varincdec);
                 if (s.type == SymbolType.INCREMENT) {
                     incdecval.add(new ActionIncrement());
@@ -1105,7 +1105,7 @@ public class ActionScriptParser {
                     case ASSIGN_SHIFT_RIGHT:
                     case ASSIGN_USHIFT_RIGHT:
                     case ASSIGN_XOR:
-                        List<Action> varset = new ArrayList<Action>();
+                        List<Action> varset = new ArrayList<>();
                         varset.addAll(var);
                         var.addAll(expression(registerVars, inFunction, inMethod, true));
                         switch (s.type) {
@@ -1137,7 +1137,7 @@ public class ActionScriptParser {
                     case INCREMENT:
                     case DECREMENT:
                         ret.addAll(var);
-                        List<Action> val = new ArrayList<Action>();
+                        List<Action> val = new ArrayList<>();
                         val.addAll(var);
 
                         if (s.type == SymbolType.INCREMENT) {
@@ -1149,7 +1149,7 @@ public class ActionScriptParser {
                         ret = gettoset(ret, val);
                         break;
                     case PARENT_OPEN: //function call
-                        List<Action> callcmds = new ArrayList<Action>();
+                        List<Action> callcmds = new ArrayList<>();
                         callcmds.addAll(var);
                         if (callcmds.get(callcmds.size() - 1) instanceof ActionPush) { //push register
                             callcmds.addAll(0, call(registerVars, inFunction, inMethod));
@@ -1252,7 +1252,7 @@ public class ActionScriptParser {
                 expected(SymbolType.PARENT_OPEN);
                 s = lex();
                 boolean forin = false;
-                List<Action> collection = new ArrayList<Action>();
+                List<Action> collection = new ArrayList<>();
                 String objIdent = null;
                 int innerExprReg = 0;
                 if (s.type == SymbolType.VAR) {
@@ -1285,8 +1285,8 @@ public class ActionScriptParser {
                 } else {
                     lexer.pushback(s);
                 }
-                List<Action> forFinalCommands = new ArrayList<Action>();
-                List<Action> forExpr = new ArrayList<Action>();
+                List<Action> forFinalCommands = new ArrayList<>();
+                List<Action> forExpr = new ArrayList<>();
                 if (!forin) {
                     ret.addAll(nonempty(command(registerVars, inFunction, inMethod, forinlevel)));
                     forExpr = expression(registerVars, inFunction, inMethod, true);
@@ -1298,7 +1298,7 @@ public class ActionScriptParser {
                 if (forin) {
                     ret.addAll(collection);
                     ret.add(new ActionEnumerate2());
-                    List<Action> loopExpr = new ArrayList<Action>();
+                    List<Action> loopExpr = new ArrayList<>();
                     int exprReg = 0;
                     for (int i = 0; i < 256; i++) {
                         if (!registerVars.containsValue(i)) {
@@ -1314,7 +1314,7 @@ public class ActionScriptParser {
                     loopExpr.add(new ActionEquals2());
                     ActionIf forInEndIf = new ActionIf(0);
                     loopExpr.add(forInEndIf);
-                    List<Action> loopBody = new ArrayList<Action>();
+                    List<Action> loopBody = new ArrayList<>();
                     loopBody.add(new ActionPush(new RegisterNumber(exprReg)));
                     if (inFunction) {
                         loopBody.add(new ActionStoreRegister(innerExprReg));
@@ -1367,12 +1367,12 @@ public class ActionScriptParser {
                     }
                 }
                 boolean firstCase = true;
-                List<List<ActionIf>> caseIfs = new ArrayList<List<ActionIf>>();
-                List<List<Action>> caseCmds = new ArrayList<List<Action>>();
-                List<List<List<Action>>> caseExprsAll = new ArrayList<List<List<Action>>>();
+                List<List<ActionIf>> caseIfs = new ArrayList<>();
+                List<List<Action>> caseCmds = new ArrayList<>();
+                List<List<List<Action>>> caseExprsAll = new ArrayList<>();
                 while (s.type == SymbolType.CASE) {
-                    List<List<Action>> caseExprs = new ArrayList<List<Action>>();
-                    List<ActionIf> caseIfsOne = new ArrayList<ActionIf>();
+                    List<List<Action>> caseExprs = new ArrayList<>();
+                    List<ActionIf> caseIfsOne = new ArrayList<>();
                     while (s.type == SymbolType.CASE) {
                         List<Action> curCaseExpr = expression(registerVars, inFunction, inMethod, true);
                         caseExprs.add(curCaseExpr);
@@ -1399,7 +1399,7 @@ public class ActionScriptParser {
                 }
                 ActionJump defJump = new ActionJump(0);
                 ret.add(defJump);
-                List<Action> defCmd = new ArrayList<Action>();
+                List<Action> defCmd = new ArrayList<>();
                 if (s.type == SymbolType.DEFAULT) {
                     expected(SymbolType.COLON);
                     defCmd = commands(registerVars, inFunction, inMethod, forinlevel);
@@ -1410,15 +1410,15 @@ public class ActionScriptParser {
                 }
                 ret.addAll(defCmd);
 
-                List<List<Integer>> exprLengths = new ArrayList<List<Integer>>();
+                List<List<Integer>> exprLengths = new ArrayList<>();
                 for (List<List<Action>> caseExprs : caseExprsAll) {
-                    List<Integer> lengths = new ArrayList<Integer>();
+                    List<Integer> lengths = new ArrayList<>();
                     for (List<Action> caseExpr : caseExprs) {
                         lengths.add(Action.actionsToBytes(caseExpr, false, SWF.DEFAULT_VERSION).length);
                     }
                     exprLengths.add(lengths);
                 }
-                List<Integer> caseLengths = new ArrayList<Integer>();
+                List<Integer> caseLengths = new ArrayList<>();
                 for (List<Action> caseCmd : caseCmds) {
                     caseLengths.add(Action.actionsToBytes(caseCmd, false, SWF.DEFAULT_VERSION).length);
                 }
@@ -1448,7 +1448,7 @@ public class ActionScriptParser {
                 }
 
                 defJump.setJumpOffset(defJmpPos);
-                List<Action> caseCmdsAll = new ArrayList<Action>();
+                List<Action> caseCmdsAll = new ArrayList<>();
                 int breakOffset = 0;
                 for (int i = 0; i < caseCmds.size(); i++) {
                     caseCmdsAll.addAll(caseCmds.get(i));
@@ -1471,7 +1471,7 @@ public class ActionScriptParser {
                 break;
             case RETURN:
                 for (int i = 0; i < forinlevel; i++) {
-                    List<Action> forinret = new ArrayList<Action>();
+                    List<Action> forinret = new ArrayList<>();
                     forinret.add(new ActionPush(new Null()));
                     forinret.add(new ActionEquals2());
                     forinret.add(new ActionNot());
@@ -1568,7 +1568,7 @@ public class ActionScriptParser {
     }
 
     private List<Action> expressionRemainder(List<Action> expr, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder) throws IOException, ParseException {
-        List<Action> ret = new ArrayList<Action>();
+        List<Action> ret = new ArrayList<>();
         ParsedSymbol s = lex();
         switch (s.type) {
             case TERNAR:
@@ -1699,7 +1699,7 @@ public class ActionScriptParser {
     }
 
     private List<Action> expression(boolean allowEmpty, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder) throws IOException, ParseException {
-        List<Action> ret = new ArrayList<Action>();
+        List<Action> ret = new ArrayList<>();
         ParsedSymbol s = lex();
         boolean existsRemainder = false;
         boolean assocRight = false;
@@ -1809,7 +1809,7 @@ public class ActionScriptParser {
                 existsRemainder = true;
                 break;
             case NEW:
-                List<Action> newcmds = new ArrayList<Action>();
+                List<Action> newcmds = new ArrayList<>();
                 newcmds.addAll(variable(registerVars, inFunction, inMethod));
                 expected(SymbolType.PARENT_OPEN);
                 if (newcmds.get(newcmds.size() - 1) instanceof ActionGetMember) {
@@ -1855,7 +1855,7 @@ public class ActionScriptParser {
                     case ASSIGN_MULTIPLY:
                     case ASSIGN_PLUS:
                     case ASSIGN_XOR:
-                        List<Action> varset = new ArrayList<Action>();
+                        List<Action> varset = new ArrayList<>();
                         varset.addAll(var);
                         var.addAll(expression(registerVars, inFunction, inMethod, true));
                         switch (s.type) {
@@ -1941,7 +1941,7 @@ public class ActionScriptParser {
                 }
                 lexer.pushback(s);
         }
-        List<Action> rem = new ArrayList<Action>();
+        List<Action> rem = new ArrayList<>();
         if (allowRemainder && existsRemainder) {
             do {
                 rem = expressionRemainder(registerVars, inFunction, inMethod, assocRight);
@@ -1963,7 +1963,7 @@ public class ActionScriptParser {
     private List<String> constantPool;
 
     public List<Action> parse(String str) throws ParseException, IOException {
-        List<Action> ret = new ArrayList<Action>();
+        List<Action> ret = new ArrayList<>();
 
         try {
             lexer = new ActionScriptLexer(new InputStreamReader(new ByteArrayInputStream(str.getBytes("UTF8")), "UTF8"));
@@ -1972,7 +1972,7 @@ public class ActionScriptParser {
             return ret;
         }
 
-        constantPool = new ArrayList<String>();
+        constantPool = new ArrayList<>();
         ret.addAll(commands(new HashMap<String, Integer>(), false, false, 0));
         if (!constantPool.isEmpty()) {
             ret.add(0, new ActionConstantPool(constantPool));
@@ -1980,7 +1980,7 @@ public class ActionScriptParser {
         if (lexer.lex().type != SymbolType.EOF) {
             throw new ParseException("Parsing finisned before end of the file", lexer.yyline());
         }
-        List<GraphSourceItem> retgs = new ArrayList<GraphSourceItem>();
+        List<GraphSourceItem> retgs = new ArrayList<>();
         retgs.addAll(ret);
         if (!constantPool.isEmpty()) {
             Action.setConstantPool(retgs, new ConstantPool(constantPool));

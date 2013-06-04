@@ -116,7 +116,7 @@ public class PlaceObjectTag extends Tag implements PlaceObjectTypeTag {
 
     @Override
     public Set<Integer> getNeededCharacters() {
-        Set<Integer> ret = new HashSet<Integer>();
+        Set<Integer> ret = new HashSet<>();
         ret.add(characterId);
         return ret;
     }

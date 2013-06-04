@@ -147,9 +147,9 @@ public class MethodInfoParser {
 
     public static boolean parseParams(String text, MethodInfo update, ABC abc) throws ParseException {
         MethodInfoLexer lexer = new MethodInfoLexer(new ByteArrayInputStream(text.getBytes()));
-        List<String> paramNames = new ArrayList<String>();
-        List<Long> paramTypes = new ArrayList<Long>();
-        List<ValueKind> optionalValues = new ArrayList<ValueKind>();
+        List<String> paramNames = new ArrayList<>();
+        List<Long> paramTypes = new ArrayList<>();
+        List<ValueKind> optionalValues = new ArrayList<>();
         boolean hasOptional = false;
         boolean needsRest = false;
         try {

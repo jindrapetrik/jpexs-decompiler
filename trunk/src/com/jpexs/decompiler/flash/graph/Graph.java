@@ -73,7 +73,7 @@ public class Graph {
 
         if (!doChildren) {
 
-            List<GraphPart> uniqueRefs = new ArrayList<GraphPart>();
+            List<GraphPart> uniqueRefs = new ArrayList<>();
             for (GraphPart r : part.refs) {
                 if (!uniqueRefs.contains(r)) {
                     uniqueRefs.add(r);
@@ -179,7 +179,7 @@ public class Graph {
         }
         visited.add(part);
         GraphPart p = part;
-        List<GraphPart> multiList = new ArrayList<GraphPart>();
+        List<GraphPart> multiList = new ArrayList<>();
         multiList.add(p);
         while ((p.nextParts.size() == 1) && (p.nextParts.get(0).refs.size() == 1)) {
             p = p.nextParts.get(0);
@@ -218,10 +218,10 @@ public class Graph {
 
     public GraphPart deepCopy(GraphPart part, List<GraphPart> visited, List<GraphPart> copies) {
         if (visited == null) {
-            visited = new ArrayList<GraphPart>();
+            visited = new ArrayList<>();
         }
         if (copies == null) {
-            copies = new ArrayList<GraphPart>();
+            copies = new ArrayList<>();
         }
         if (visited.contains(part)) {
             return copies.get(visited.indexOf(part));
@@ -230,7 +230,7 @@ public class Graph {
         GraphPart copy = new GraphPart(part.start, part.end);
         copy.path = part.path;
         copies.add(copy);
-        copy.nextParts = new ArrayList<GraphPart>();
+        copy.nextParts = new ArrayList<>();
         for (int i = 0; i < part.nextParts.size(); i++) {
             copy.nextParts.add(deepCopy(part.nextParts.get(i), visited, copies));
         }
@@ -258,7 +258,7 @@ public class Graph {
     public GraphPart getCommonPart(List<GraphPart> parts) {
         GraphPart head = new GraphPart(0, 0);
         head.nextParts.addAll(parts);
-        List<GraphPart> allVisited = new ArrayList<GraphPart>();
+        List<GraphPart> allVisited = new ArrayList<>();
         head = deepCopy(head, allVisited, null);
         for (GraphPart g : head.nextParts) {
             for (GraphPart r : g.refs) {
@@ -303,11 +303,11 @@ public class Graph {
     }
 
     public List<GraphTargetItem> translate(List<Object> localData) {
-        List<GraphPart> allParts = new ArrayList<GraphPart>();
+        List<GraphPart> allParts = new ArrayList<>();
         for (GraphPart head : heads) {
             populateParts(head, allParts);
         }
-        Stack<GraphTargetItem> stack = new Stack<GraphTargetItem>();
+        Stack<GraphTargetItem> stack = new Stack<>();
         List<GraphTargetItem> ret = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, heads.get(0), null, new ArrayList<Loop>(), new HashMap<Loop, List<GraphTargetItem>>());
         processIfs(ret);
         finalProcessStack(stack, ret);
@@ -388,7 +388,7 @@ public class Graph {
     }
 
     protected List<GraphPart> getLoopsContinues(List<Loop> loops) {
-        List<GraphPart> ret = new ArrayList<GraphPart>();
+        List<GraphPart> ret = new ArrayList<>();
         for (Loop l : loops) {
             if (l.loopContinue != null) {
                 ret.add(l.loopContinue);
@@ -446,7 +446,7 @@ public class Graph {
 
     protected List<GraphTargetItem> translatePart(List<Object> localData, GraphPart part, Stack<GraphTargetItem> stack) {
         List<GraphPart> sub = part.getSubParts();
-        List<GraphTargetItem> ret = new ArrayList<GraphTargetItem>();
+        List<GraphTargetItem> ret = new ArrayList<>();
         int end = 0;
         for (GraphPart p : sub) {
             if (p.end == -1) {
@@ -511,7 +511,7 @@ public class Graph {
         } else {
             visited.add(part);
         }
-        List<GraphTargetItem> ret = new ArrayList<GraphTargetItem>();
+        List<GraphTargetItem> ret = new ArrayList<>();
         try {
             boolean debugMode = false;
 
@@ -551,13 +551,13 @@ public class Graph {
             if (part.ignored) {
                 return ret;
             }
-            List<String> fqn = new ArrayList<String>();
+            List<String> fqn = new ArrayList<>();
             //HashMap<Integer, String> lrn = new HashMap<Integer, String>();
-            List<GraphTargetItem> output = new ArrayList<GraphTargetItem>();
+            List<GraphTargetItem> output = new ArrayList<>();
             //boolean isSwitch = false;
 
             // code.initToSource();
-            List<GraphPart> parts = new ArrayList<GraphPart>();
+            List<GraphPart> parts = new ArrayList<>();
             if (part instanceof GraphPartMulti) {
                 parts = ((GraphPartMulti) part).parts;
             } else {
@@ -759,7 +759,7 @@ public class Graph {
             List<GraphTargetItem> retChecked = null;
             if ((retChecked = check(code, localData, allParts, stack, parent, part, stopPart, loops, output, forFinalCommands)) != null) {
                 if (lc != null) {
-                    List<GraphTargetItem> trueExp = new ArrayList<GraphTargetItem>();
+                    List<GraphTargetItem> trueExp = new ArrayList<>();
                     trueExp.add(new TrueItem(null));
                     boolean chwt = true;
 
@@ -781,7 +781,7 @@ public class Graph {
                                 if (!ifi.onTrue.isEmpty()) {
                                     if (ifi.onTrue.get(ifi.onTrue.size() - 1) instanceof ExitItem) {
                                         whileTrue = false;
-                                        List<GraphTargetItem> tr = new ArrayList<GraphTargetItem>();
+                                        List<GraphTargetItem> tr = new ArrayList<>();
                                         GraphTargetItem ex = ifi.expression;
                                         if (ex instanceof LogicalOpItem) {
                                             ex = ((LogicalOpItem) ex).invert();
@@ -898,7 +898,7 @@ public class Graph {
                     if (next != part.nextParts.get(0)) {
                         lopFalse = checkLoop(part.nextParts.get(0), stopPart, loops);
                     }
-                    List<GraphTargetItem> onTrue = new ArrayList<GraphTargetItem>();
+                    List<GraphTargetItem> onTrue = new ArrayList<>();
                     if (lopTrue != null) {
                         onTrue.add(lopTrue);
                     } else {
@@ -913,7 +913,7 @@ public class Graph {
                             System.err.println("/ONTRUE (inside " + part + ")");
                         }
                     }
-                    List<GraphTargetItem> onFalse = new ArrayList<GraphTargetItem>();
+                    List<GraphTargetItem> onFalse = new ArrayList<>();
                     if ((!onTrue.isEmpty()) && onTrue.get(onTrue.size() - 1) instanceof ExitItem) {
                         next = part.nextParts.get(0);
                     } else {
@@ -924,7 +924,7 @@ public class Graph {
                                 System.err.println("ONFALSE: (inside " + part + ")");
                             }
                             if ((next == part.nextParts.get(0)) || (part.nextParts.get(0).path.equals(part.path) || part.nextParts.get(0).path.length() < part.path.length())) {
-                                onFalse = new ArrayList<GraphTargetItem>();
+                                onFalse = new ArrayList<>();
                             } else {
                                 onFalse = (printGraph(visited, prepareBranchLocalData(localData), falseStack, allParts, part, part.nextParts.get(0), next == null ? stopPart : next, loops, forFinalCommands));
                                 if (next == null) {
@@ -941,10 +941,10 @@ public class Graph {
                     } else {
                         List<GraphTargetItem> retw = retx;
                         if (whileTrue) {
-                            retw = new ArrayList<GraphTargetItem>();
+                            retw = new ArrayList<>();
                             retw.add(new IfItem(null, expr, onTrue, onFalse));
 
-                            List<GraphTargetItem> body = new ArrayList<GraphTargetItem>();
+                            List<GraphTargetItem> body = new ArrayList<>();
                             if (next != null) {
                                 body = printGraph(visited, prepareBranchLocalData(localData), stack, allParts, part, next, stopPart, loops, forFinalCommands);
                             }
@@ -969,7 +969,7 @@ public class Graph {
                                         if (!ifi.onTrue.isEmpty()) {
                                             if (ifi.onTrue.get(ifi.onTrue.size() - 1) instanceof ExitItem) {
                                                 whileTrue = false;
-                                                List<GraphTargetItem> tr = new ArrayList<GraphTargetItem>();
+                                                List<GraphTargetItem> tr = new ArrayList<>();
                                                 GraphTargetItem ex = ifi.expression;
                                                 if (ex instanceof LogicalOpItem) {
                                                     ex = ((LogicalOpItem) ex).invert();
@@ -989,7 +989,7 @@ public class Graph {
                                 }
                             }
                             if (whileTrue) {
-                                List<GraphTargetItem> tr = new ArrayList<GraphTargetItem>();
+                                List<GraphTargetItem> tr = new ArrayList<>();
                                 tr.add(new TrueItem(null));
                                 retx.add(new WhileItem(null, whileTrueLoop, tr, retw));
                                 next = null;
@@ -1007,7 +1007,7 @@ public class Graph {
                     }
                 }
                 if (loop) { // && (!doWhile)) {
-                    List<GraphTargetItem> loopBody = new ArrayList<GraphTargetItem>();
+                    List<GraphTargetItem> loopBody = new ArrayList<>();
                     List<GraphTargetItem> finalCommands = null;
                     GraphPart finalPart = null;
                     GraphTargetItem ti;
@@ -1037,8 +1037,8 @@ public class Graph {
 
                             checkContinueAtTheEnd(loopBody, currentLoop);
 
-                            List<GraphTargetItem> newBody = new ArrayList<GraphTargetItem>();
-                            List<GraphTargetItem> nextcmds = new ArrayList<GraphTargetItem>();
+                            List<GraphTargetItem> newBody = new ArrayList<>();
+                            List<GraphTargetItem> nextcmds = new ArrayList<>();
                             if (getLastNoEnd(loopBody) instanceof IfItem) {
                                 IfItem ift = (IfItem) getLastNoEnd(loopBody);
                                 if (getLastNoEnd(ift.onTrue) instanceof ContinueItem) {//||)))/*(getLastNoEnd(ift.onFalse)!=null) && */(!(getLastNoEnd(ift.onFalse) instanceof ContinueItem))){ //((ift.onFalse.get(ift.onFalse.size() - 1) instanceof ExitItem) || ((ift.onFalse.get(ift.onFalse.size() - 1) instanceof MarkItem) && ((MarkItem) (ift.onFalse.get(ift.onFalse.size() - 1))).getMark().equals("finish")))) {//((ift.onFalse.size() == 1) && (ift.onFalse.get(0) instanceof ContinueItem) && (((ContinueItem) ift.onFalse.get(0)).loopId == currentLoop.id))) {
@@ -1079,14 +1079,14 @@ public class Graph {
                                 ret.addAll(nextcmds);
                             } else {
                                 checkContinueAtTheEnd(newBody, currentLoop);
-                                List<GraphTargetItem> ex = new ArrayList<GraphTargetItem>();
+                                List<GraphTargetItem> ex = new ArrayList<>();
                                 ex.add(expr);
                                 ret.add(new DoWhileItem(null, currentLoop, loopBody, ex));
                                 ret.addAll(nextcmds);
                             }
 
                         } else {
-                            List<GraphTargetItem> ex = new ArrayList<GraphTargetItem>();
+                            List<GraphTargetItem> ex = new ArrayList<>();
                             ex.add(expr);
                             ret.add(new WhileItem(null, currentLoop, ex, loopBody));
                         }
@@ -1174,7 +1174,7 @@ public class Graph {
                         ret.addAll(printGraph(visited, localData, stack, allParts, part, p, stopPart, loops, forFinalCommands));
                     } else {
                         if ((p != stopPart) && (p.refs.size() > 1)) {
-                            List<GraphPart> nextList = new ArrayList<GraphPart>();
+                            List<GraphPart> nextList = new ArrayList<>();
                             populateParts(p, nextList);
                             Loop nearestLoop = null;
                             loopn:
@@ -1268,7 +1268,7 @@ public class Graph {
 
     private List<GraphPart> makeGraph(GraphSource code, List<GraphPart> allBlocks, List<Integer> alternateEntries) {
         HashMap<Integer, List<Integer>> refs = code.visitCode(alternateEntries);
-        List<GraphPart> ret = new ArrayList<GraphPart>();
+        List<GraphPart> ret = new ArrayList<>();
         boolean visited[] = new boolean[code.size()];
         ret.add(makeGraph(null, new GraphPath(), code, 0, 0, allBlocks, refs, visited));
         for (int pos : alternateEntries) {
@@ -1412,7 +1412,7 @@ public class Graph {
      */
     public static String graphToString(List<GraphTargetItem> tree, Object... localData) {
         StringBuilder ret = new StringBuilder();
-        List<Object> localDataList = new ArrayList<Object>();
+        List<Object> localDataList = new ArrayList<>();
         for (Object o : localData) {
             localDataList.add(o);
         }
@@ -1427,7 +1427,7 @@ public class Graph {
 
         String labelPattern = "loop(switch)?[0-9]*:";
         try {
-            Stack<String> loopStack = new Stack<String>();
+            Stack<String> loopStack = new Stack<>();
             for (int p = 0; p < parts.length; p++) {
                 String stripped = Highlighting.stripHilights(parts[p]);
                 if (stripped.matches(labelPattern)) {

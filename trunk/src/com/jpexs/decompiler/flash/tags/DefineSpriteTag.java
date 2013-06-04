@@ -90,7 +90,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
     @Override
     public RECT getRect(HashMap<Integer, CharacterTag> characters) {
         RECT ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
-        HashMap<Integer, Integer> depthMap = new HashMap<Integer, Integer>();
+        HashMap<Integer, Integer> depthMap = new HashMap<>();
         boolean foundSomething = false;
         for (Tag t : subTags) {
             MATRIX m = null;
@@ -109,7 +109,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
             if (characterId == -1) {
                 continue;
             }
-            HashSet<Integer> need = new HashSet<Integer>();
+            HashSet<Integer> need = new HashSet<>();
             need.add(characterId);
             RECT r = getCharacterBounds(characters, need);
 
@@ -194,7 +194,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
      */
     @Override
     public List<Object> getSubItems() {
-        List<Object> ret = new ArrayList<Object>();
+        List<Object> ret = new ArrayList<>();
         ret.addAll(subTags);
         return ret;
     }
@@ -221,7 +221,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
 
     @Override
     public Set<Integer> getNeededCharacters() {
-        Set<Integer> ret = new HashSet<Integer>();
+        Set<Integer> ret = new HashSet<>();
         for (Tag t : subTags) {
             ret.addAll(t.getNeededCharacters());
         }

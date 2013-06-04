@@ -46,7 +46,7 @@ public class DetailPanel extends JPanel implements ActionListener {
     public JButton saveButton = new JButton("Save", View.getIcon("save16"));
     public JButton editButton = new JButton("Edit", View.getIcon("edit16"));
     public JButton cancelButton = new JButton("Cancel", View.getIcon("cancel16"));
-    private HashMap<String, JComponent> cardMap = new HashMap<String, JComponent>();
+    private HashMap<String, JComponent> cardMap = new HashMap<>();
     private String selectedCard;
     private JLabel selectedLabel;
     private boolean editMode = false;

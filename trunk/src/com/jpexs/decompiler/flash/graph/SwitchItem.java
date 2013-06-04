@@ -29,7 +29,7 @@ public class SwitchItem extends LoopItem implements Block {
 
     @Override
     public List<List<GraphTargetItem>> getSubs() {
-        List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
+        List<List<GraphTargetItem>> ret = new ArrayList<>();
         ret.addAll(caseCommands);
         ret.add(defaultCommands);
         return ret;
@@ -82,7 +82,7 @@ public class SwitchItem extends LoopItem implements Block {
 
     @Override
     public List<ContinueItem> getContinues() {
-        List<ContinueItem> ret = new ArrayList<ContinueItem>();
+        List<ContinueItem> ret = new ArrayList<>();
 
         for (List<GraphTargetItem> onecase : caseCommands) {
             for (GraphTargetItem ti : onecase) {

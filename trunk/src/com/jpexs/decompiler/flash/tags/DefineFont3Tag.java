@@ -122,7 +122,7 @@ public class DefineFont3Tag extends CharacterTag implements FontTag {
         for (int i = 0; i < numGlyphs; i++) {
             glyphShapeTable[i] = sis.readSHAPE(1);
         }
-        codeTable = new ArrayList<Integer>(); //int[numGlyphs];
+        codeTable = new ArrayList<>(); //int[numGlyphs];
         for (int i = 0; i < numGlyphs; i++) {
             if (fontFlagsWideCodes) {
                 codeTable.add(sis.readUI16());

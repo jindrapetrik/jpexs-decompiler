@@ -53,7 +53,7 @@ public class ABC {
     public long stringOffsets[];
     public static String IDENT_STRING = "   ";
     public static final int MINORwithDECIMAL = 17;
-    protected HashSet<EventListener> listeners = new HashSet<EventListener>();
+    protected HashSet<EventListener> listeners = new HashSet<>();
     private static Logger logger = Logger.getLogger(ABC.class.getName());
 
     public void addEventListener(EventListener listener) {
@@ -521,7 +521,7 @@ public class ABC {
     private HashMap<String, String> namespaceMap;
 
     private void loadNamespaceMap() {
-        namespaceMap = new HashMap<String, String>();
+        namespaceMap = new HashMap<>();
         for (ScriptInfo si : script_info) {
             for (Trait t : si.traits.traits) {
                 if (t instanceof TraitSlotConst) {
@@ -612,7 +612,7 @@ public class ABC {
     public static final String validNsCharacters = ".:$";
     public static final String fooCharacters = "bcdfghjklmnpqrstvwz";
     public static final String fooJoinCharacters = "aeiouy";
-    private HashMap<String, String> deobfuscated = new HashMap<String, String>();
+    private HashMap<String, String> deobfuscated = new HashMap<>();
     private Random rnd = new Random();
     private final int DEFAULT_FOO_SIZE = 10;
 
@@ -815,7 +815,7 @@ public class ABC {
     }
 
     public List<MultinameUsage> findMultinameUsage(int multinameIndex) {
-        List<MultinameUsage> ret = new ArrayList<MultinameUsage>();
+        List<MultinameUsage> ret = new ArrayList<>();
         if (multinameIndex == 0) {
             return ret;
         }
@@ -893,7 +893,7 @@ public class ABC {
             for (int t = 0; t < script_info[c].traits.traits.length; t++) {
                 Trait tr = script_info[c].traits.traits[t];
                 if (tr.getPath(this).equals(name)) {
-                    List<Integer> indices = new ArrayList<Integer>();
+                    List<Integer> indices = new ArrayList<>();
                     indices.add(t);
                     return new ScriptPack(this, c, indices);
                 }

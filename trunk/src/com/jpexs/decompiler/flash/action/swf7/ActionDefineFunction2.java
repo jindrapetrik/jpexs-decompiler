@@ -39,9 +39,9 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
 
     public String functionName;
     public String replacedFunctionName;
-    public List<String> paramNames = new ArrayList<String>();
+    public List<String> paramNames = new ArrayList<>();
     public List<String> replacedParamNames;
-    public List<Integer> paramRegisters = new ArrayList<Integer>();
+    public List<Integer> paramRegisters = new ArrayList<>();
     public boolean preloadParentFlag;
     public boolean preloadRootFlag;
     public boolean suppressSuperFlag;
@@ -304,7 +304,7 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
 
     @Override
     public HashMap<Integer, String> getRegNames() {
-        HashMap<Integer, String> funcRegNames = new HashMap<Integer, String>();
+        HashMap<Integer, String> funcRegNames = new HashMap<>();
         for (int f = 0; f < paramNames.size(); f++) {
             int reg = paramRegisters.get(f);
             if (reg != 0) {
@@ -358,7 +358,7 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
 
     @Override
     public List<Long> getContainerSizes() {
-        List<Long> ret = new ArrayList<Long>();
+        List<Long> ret = new ArrayList<>();
         ret.add((Long) (long) codeSize);
         return ret;
     }

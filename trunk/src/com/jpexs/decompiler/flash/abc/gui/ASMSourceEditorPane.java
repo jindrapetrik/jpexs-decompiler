@@ -40,7 +40,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
 
     public ABC abc;
     public int bodyIndex = -1;
-    private List<Highlighting> disassembledHilights = new ArrayList<Highlighting>();
+    private List<Highlighting> disassembledHilights = new ArrayList<>();
     private DecompiledEditorPane decompiledEditor;
     private boolean ignoreCarret = false;
     private String name;
@@ -115,7 +115,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
     }
 
     public void exec() {
-        HashMap<Integer, Object> args = new HashMap<Integer, Object>();
+        HashMap<Integer, Object> args = new HashMap<>();
         args.put(0, new Object()); //object "this"
         args.put(1, new Long(466561)); //param1
         Object o = abc.bodies[bodyIndex].code.execute(args, abc.constants);

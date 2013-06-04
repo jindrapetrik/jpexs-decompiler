@@ -67,7 +67,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
     /**
      * Actions to execute at particular button events
      */
-    public List<BUTTONCONDACTION> actions = new ArrayList<BUTTONCONDACTION>();
+    public List<BUTTONCONDACTION> actions = new ArrayList<>();
 
     @Override
     public int getCharacterID() {
@@ -173,7 +173,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
      */
     @Override
     public List<Object> getSubItems() {
-        List<Object> ret = new ArrayList<Object>();
+        List<Object> ret = new ArrayList<>();
         ret.addAll(actions);
         return ret;
     }
@@ -190,7 +190,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
 
     @Override
     public Set<Integer> getNeededCharacters() {
-        HashSet<Integer> needed = new HashSet<Integer>();
+        HashSet<Integer> needed = new HashSet<>();
         for (BUTTONRECORD r : characters) {
             needed.add(r.characterId);
         }
@@ -220,7 +220,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
 
     @Override
     public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters) {
-        HashMap<Integer, Layer> layers = new HashMap<Integer, Layer>();
+        HashMap<Integer, Layer> layers = new HashMap<>();
         int maxDepth = 0;
         for (BUTTONRECORD r : this.characters) {
             if (r.buttonStateUp) {

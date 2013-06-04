@@ -56,7 +56,7 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
 
     @Override
     public Set<Integer> getNeededCharacters() {
-        HashSet<Integer> ret = new HashSet<Integer>();
+        HashSet<Integer> ret = new HashSet<>();
         ret.addAll(morphFillStyles.getNeededCharacters());
         ret.addAll(startEdges.getNeededCharacters());
         ret.addAll(endEdges.getNeededCharacters());

@@ -33,5 +33,5 @@ public class Version {
     public String appName;
     public String appFullName;
     public String updateLink;
-    public Map<String, List<String>> changes = new HashMap<String, List<String>>();
+    public Map<String, List<String>> changes = new HashMap<>();
 }

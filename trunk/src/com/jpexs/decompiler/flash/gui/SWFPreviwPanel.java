@@ -37,7 +37,7 @@ public class SWFPreviwPanel extends JPanel {
     ImagePanel pan;
     Timer timer;
     int frame = 0;
-    List<BufferedImage> frameImages = new ArrayList<BufferedImage>();
+    List<BufferedImage> frameImages = new ArrayList<>();
     JLabel buffering = new JLabel("Buffering...");
 
     public SWFPreviwPanel() {

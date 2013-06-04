@@ -45,7 +45,7 @@ public class MORPHFILLSTYLE implements NeedsCharacters {
 
     @Override
     public Set<Integer> getNeededCharacters() {
-        HashSet<Integer> ret = new HashSet<Integer>();
+        HashSet<Integer> ret = new HashSet<>();
         if ((fillStyleType == REPEATING_BITMAP)
                 || (fillStyleType == CLIPPED_BITMAP)
                 || (fillStyleType == NON_SMOOTHED_REPEATING_BITMAP)

@@ -170,13 +170,13 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
 
     @Override
     public List<Long> getAllRefs(int version) {
-        List<Long> ret = new ArrayList<Long>();
+        List<Long> ret = new ArrayList<>();
         return ret;
     }
 
     @Override
     public List<Action> getAllIfsOrJumps() {
-        List<Action> ret = new ArrayList<Action>();
+        List<Action> ret = new ArrayList<>();
         return ret;
     }
 
@@ -208,7 +208,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
 
     @Override
     public List<Long> getContainerSizes() {
-        List<Long> ret = new ArrayList<Long>();
+        List<Long> ret = new ArrayList<>();
         ret.add(trySize);
         ret.add(catchSize);
         ret.add(finallySize);
@@ -269,11 +269,11 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
         } else {
             catchName = new DirectValueTreeItem(this, -1, this.catchName, new ArrayList<String>());
         }
-        List<GraphTargetItem> catchExceptions = new ArrayList<GraphTargetItem>();
+        List<GraphTargetItem> catchExceptions = new ArrayList<>();
         if (catchBlockFlag) {
             catchExceptions.add(catchName);
         }
-        List<List<GraphTargetItem>> catchCommands = new ArrayList<List<GraphTargetItem>>();
+        List<List<GraphTargetItem>> catchCommands = new ArrayList<>();
         if (catchBlockFlag) {
             catchCommands.add(contents.get(1));
         }
@@ -290,6 +290,6 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
 
     @Override
     public HashMap<Integer, String> getRegNames() {
-        return new HashMap<Integer, String>();
+        return new HashMap<>();
     }
 }

@@ -969,7 +969,7 @@ public final class ActionScriptLexer {
     public int yychar() {
         return yychar;
     }
-    private Stack<ParsedSymbol> pushedBack = new Stack<ParsedSymbol>();
+    private Stack<ParsedSymbol> pushedBack = new Stack<>();
 
     public int yyline() {
         return yyline + 1;

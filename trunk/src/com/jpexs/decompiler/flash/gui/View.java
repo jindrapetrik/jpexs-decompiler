@@ -67,7 +67,7 @@ public class View {
      * @param f Frame to set icon in
      */
     public static void setWindowIcon(Window f) {
-        java.util.List<Image> images = new ArrayList<Image>();
+        java.util.List<Image> images = new ArrayList<>();
         images.add(loadImage("icon16"));
         images.add(loadImage("icon32"));
         images.add(loadImage("icon48"));

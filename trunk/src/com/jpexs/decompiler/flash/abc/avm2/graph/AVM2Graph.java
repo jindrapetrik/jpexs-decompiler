@@ -105,11 +105,11 @@ public class AVM2Graph extends Graph {
 
     public static List<GraphTargetItem> translateViaGraph(String path, AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> scopeStack, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         AVM2Graph g = new AVM2Graph(code, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, fullyQualifiedNames);
-        List<GraphPart> allParts = new ArrayList<GraphPart>();
+        List<GraphPart> allParts = new ArrayList<>();
         for (GraphPart head : g.heads) {
             populateParts(head, allParts);
         }
-        List<Object> localData = new ArrayList<Object>();
+        List<Object> localData = new ArrayList<>();
         localData.add((Boolean) isStatic);
         localData.add((Integer) classIndex);
         localData.add(localRegs);
@@ -1161,7 +1161,7 @@ public class AVM2Graph extends Graph {
         int ip = part.start;
         int addr = code.fixAddrAfterDebugLine(code.pos2adr(part.start));
         int maxend = -1;
-        List<ABCException> catchedExceptions = new ArrayList<ABCException>();
+        List<ABCException> catchedExceptions = new ArrayList<>();
         for (int e = 0; e < body.exceptions.length; e++) {
             if (addr == code.fixAddrAfterDebugLine(body.exceptions[e].start)) {
                 if (!body.exceptions[e].isFinally()) {
@@ -1181,7 +1181,7 @@ public class AVM2Graph extends Graph {
             int endposStartBlock = code.adr2pos(catchedExceptions.get(0).end);
 
 
-            List<List<GraphTargetItem>> catchedCommands = new ArrayList<List<GraphTargetItem>>();
+            List<List<GraphTargetItem>> catchedCommands = new ArrayList<>();
             if (code.code.get(endpos).definition instanceof JumpIns) {
                 int afterCatchAddr = code.pos2adr(endpos + 1) + code.code.get(endpos).operands[0];
                 int afterCatchPos = code.adr2pos(afterCatchAddr);
@@ -1193,7 +1193,7 @@ public class AVM2Graph extends Graph {
                 });
 
 
-                List<GraphTargetItem> finallyCommands = new ArrayList<GraphTargetItem>();
+                List<GraphTargetItem> finallyCommands = new ArrayList<>();
                 int returnPos = afterCatchPos;
                 for (int e = 0; e < body.exceptions.length; e++) {
                     if (body.exceptions[e].isFinally()) {
@@ -1271,7 +1271,7 @@ public class AVM2Graph extends Graph {
                         }
                     }
                     stack.add(new ExceptionTreeItem(catchedExceptions.get(e)));
-                    List<Object> localData2 = new ArrayList<Object>();
+                    List<Object> localData2 = new ArrayList<>();
                     localData2.addAll(localData);
                     localData2.set(DATA_SCOPESTACK, new Stack<GraphTargetItem>());
                     catchedCommands.add(printGraph(new ArrayList<GraphPart>(), localData2, stack, allParts, parent, npart, nepart, loops, forFinalCommands));
@@ -1305,7 +1305,7 @@ public class AVM2Graph extends Graph {
                     }
                 }
             }
-            ret = new ArrayList<GraphTargetItem>();
+            ret = new ArrayList<>();
             ret.addAll(output);
             GraphTargetItem lop = checkLoop(part, stopPart, loops);
             if (lop == null) {
@@ -1323,7 +1323,7 @@ public class AVM2Graph extends Graph {
                         if (code.code.get(part.getPosAt(part.getHeight() - 3)).definition instanceof GetLocalTypeIns) {
                             if (output.size() >= 2) {
                                 if (output.get(output.size() - 2) instanceof SetLocalTreeItem) {
-                                    ret = new ArrayList<GraphTargetItem>();
+                                    ret = new ArrayList<>();
                                     ret.addAll(output);
                                     ret.remove(ret.size() - 1);
                                     ret.add(new ReturnValueTreeItem(code.code.get(part.end), ((SetLocalTreeItem) output.get(output.size() - 2)).value));
@@ -1336,7 +1336,7 @@ public class AVM2Graph extends Graph {
             }
         }
         if (code.code.get(part.end).definition instanceof LookupSwitchIns) {
-            ret = new ArrayList<GraphTargetItem>();
+            ret = new ArrayList<>();
             ret.addAll(output);
             return ret;
         }
@@ -1353,7 +1353,7 @@ public class AVM2Graph extends Graph {
                 && (part.nextParts.get(1).getHeight() >= 2)
                 && (code.code.get(code.fixIPAfterDebugLine(part.nextParts.get(1).start)).definition instanceof PushIntegerTypeIns)
                 && (code.code.get(part.nextParts.get(1).nextParts.get(0).end).definition instanceof LookupSwitchIns))) {
-            ret = new ArrayList<GraphTargetItem>();
+            ret = new ArrayList<>();
             ret.addAll(output);
             boolean reversed = false;
             if (stack.peek() instanceof StrictEqTreeItem) {
@@ -1368,7 +1368,7 @@ public class AVM2Graph extends Graph {
             if (switchedObject == null) {
                 switchedObject = new NullTreeItem(null);
             }
-            HashMap<Integer, GraphTargetItem> caseValuesMap = new HashMap<Integer, GraphTargetItem>();
+            HashMap<Integer, GraphTargetItem> caseValuesMap = new HashMap<>();
 
             GraphTargetItem tar = stack.pop();
             if (tar instanceof StrictEqTreeItem) {
@@ -1412,7 +1412,7 @@ public class AVM2Graph extends Graph {
             if (code.code.get(dp.start).definition instanceof PushIntegerTypeIns) {
                 hasDefault = true;
             }
-            List<GraphTargetItem> caseValues = new ArrayList<GraphTargetItem>();
+            List<GraphTargetItem> caseValues = new ArrayList<>();
             for (int i = 0; i < switchLoc.nextParts.size() - 1; i++) {
                 if (caseValuesMap.containsKey(i)) {
                     caseValues.add(caseValuesMap.get(i));
@@ -1421,7 +1421,7 @@ public class AVM2Graph extends Graph {
                 }
             }
 
-            List<List<GraphTargetItem>> caseCommands = new ArrayList<List<GraphTargetItem>>();
+            List<List<GraphTargetItem>> caseCommands = new ArrayList<>();
             GraphPart next = null;
 
             List<GraphPart> loopContinues = getLoopsContinues(loops);
@@ -1435,8 +1435,8 @@ public class AVM2Graph extends Graph {
             Loop currentLoop = new Loop(loops.size(), null, next);
             loops.add(currentLoop);
             //switchLoc.getNextPartPath(new ArrayList<GraphPart>());
-            List<Integer> valuesMapping = new ArrayList<Integer>();
-            List<GraphPart> caseBodies = new ArrayList<GraphPart>();
+            List<Integer> valuesMapping = new ArrayList<>();
+            List<GraphPart> caseBodies = new ArrayList<>();
             for (int i = 0; i < caseValues.size(); i++) {
                 GraphPart cur = switchLoc.nextParts.get(1 + i);
                 if (!caseBodies.contains(cur)) {
@@ -1445,20 +1445,20 @@ public class AVM2Graph extends Graph {
                 valuesMapping.add(caseBodies.indexOf(cur));
             }
 
-            List<GraphTargetItem> defaultCommands = new ArrayList<GraphTargetItem>();
+            List<GraphTargetItem> defaultCommands = new ArrayList<>();
             GraphPart defaultPart = null;
             if (hasDefault) {
                 defaultPart = switchLoc.nextParts.get(switchLoc.nextParts.size() - 1);
                 defaultCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, switchLoc, defaultPart, next, loops, forFinalCommands);
             }
 
-            List<GraphPart> ignored = new ArrayList<GraphPart>();
+            List<GraphPart> ignored = new ArrayList<>();
             for (Loop l : loops) {
                 ignored.add(l.loopContinue);
             }
 
             for (int i = 0; i < caseBodies.size(); i++) {
-                List<GraphTargetItem> cc = new ArrayList<GraphTargetItem>();
+                List<GraphTargetItem> cc = new ArrayList<>();
                 GraphPart nextCase = null;
                 nextCase = next;
                 if (next != null) {
@@ -1568,11 +1568,11 @@ public class AVM2Graph extends Graph {
 
     @Override
     public List<Object> prepareBranchLocalData(List<Object> localData) {
-        List<Object> ret = new ArrayList<Object>();
+        List<Object> ret = new ArrayList<>();
         ret.addAll(localData);
         @SuppressWarnings("unchecked")
         Stack<GraphTargetItem> scopeStack = (Stack<GraphTargetItem>) ret.get(DATA_SCOPESTACK);
-        Stack<GraphTargetItem> copyScopeStack = new Stack<GraphTargetItem>();
+        Stack<GraphTargetItem> copyScopeStack = new Stack<>();
         copyScopeStack.addAll(scopeStack);
         ret.set(DATA_SCOPESTACK, copyScopeStack);
         return ret;

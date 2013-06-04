@@ -103,7 +103,7 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
     }
 
     public List<Long> getOffsets() {
-        List<Long> ret = new ArrayList<Long>();
+        List<Long> ret = new ArrayList<>();
         String s = "";
         for (int i = 0; i < definition.operands.length; i++) {
             switch (definition.operands[i]) {
@@ -125,7 +125,7 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
     }
 
     public List<Object> getParamsAsList(ConstantPool constants) {
-        List<Object> s = new ArrayList<Object>();
+        List<Object> s = new ArrayList<>();
         for (int i = 0; i < definition.operands.length; i++) {
             switch (definition.operands[i]) {
                 case AVM2Code.DAT_MULTINAME_INDEX:
@@ -276,7 +276,7 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
 
     @Override
     public List<Integer> getBranches(GraphSource code) {
-        List<Integer> ret = new ArrayList<Integer>();
+        List<Integer> ret = new ArrayList<>();
         if (definition instanceof IfTypeIns) {
             ret.add(code.adr2pos(offset + getBytes().length + operands[0]));
             if (!(definition instanceof JumpIns)) {

@@ -39,7 +39,7 @@ public class ActionImplementsOp extends Action {
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
         GraphTargetItem subclass = stack.pop();
         long inCount = popLong(stack);
-        List<GraphTargetItem> superclasses = new ArrayList<GraphTargetItem>();
+        List<GraphTargetItem> superclasses = new ArrayList<>();
         for (long l = 0; l < inCount; l++) {
             superclasses.add(stack.pop());
         }

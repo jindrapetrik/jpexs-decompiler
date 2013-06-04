@@ -203,7 +203,7 @@ public class ABCInputStream extends InputStream {
         int name_index = -1;
         int namespace_set_index = -1;
         int qname_index = -1;
-        List<Integer> params = new ArrayList<Integer>();
+        List<Integer> params = new ArrayList<>();
 
         if ((kind == 7) || (kind == 0xd)) { // CONSTANT_QName and CONSTANT_QNameA.
             namespace_index = readU30();

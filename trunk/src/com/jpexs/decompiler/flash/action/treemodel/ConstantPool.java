@@ -21,9 +21,9 @@ import java.util.List;
 
 public class ConstantPool {
 
-    public List<List<String>> archive = new ArrayList<List<String>>();
-    public List<Integer> archiveCounts = new ArrayList<Integer>();
-    public List<String> constants = new ArrayList<String>();
+    public List<List<String>> archive = new ArrayList<>();
+    public List<Integer> archiveCounts = new ArrayList<>();
+    public List<String> constants = new ArrayList<>();
     public int count;
 
     public ConstantPool() {

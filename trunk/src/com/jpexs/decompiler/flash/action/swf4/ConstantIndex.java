@@ -28,7 +28,7 @@ public class ConstantIndex {
 
     public ConstantIndex(int index) {
         this.index = index;
-        this.constantPool = new ArrayList<String>();
+        this.constantPool = new ArrayList<>();
     }
 
     public ConstantIndex(int index, List<String> constantPool) {

@@ -60,7 +60,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
 
     @Override
     public Set<Integer> getNeededCharacters() {
-        HashSet<Integer> ret = new HashSet<Integer>();
+        HashSet<Integer> ret = new HashSet<>();
         return ret;
     }
 
@@ -71,7 +71,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
         public boolean useLineStyle2;
         public FILLSTYLE fillStyle0;
         public FILLSTYLE fillStyle1;
-        public List<SHAPERECORD> edges = new ArrayList<SHAPERECORD>();
+        public List<SHAPERECORD> edges = new ArrayList<>();
 
         public void draw(int startX, int startY, Graphics2D g, int shapeNum) {
             AffineTransform oldAf = g.getTransform();
@@ -165,8 +165,8 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                     break;
                 case FILLSTYLE.FOCAL_RADIAL_GRADIENT:
 
-                    List<Color> colorsFocRad = new ArrayList<Color>();
-                    List<Float> ratiosFocRad = new ArrayList<Float>();
+                    List<Color> colorsFocRad = new ArrayList<>();
+                    List<Float> ratiosFocRad = new ArrayList<>();
                     for (int i = 0; i < fillStyle0.gradient.gradientRecords.length; i++) {
                         if ((i > 0) && (fillStyle0.gradient.gradientRecords[i - 1].ratio == fillStyle0.gradient.gradientRecords[i].ratio)) {
                             continue;
@@ -216,8 +216,8 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                     g.setClip(null);
                     return;
                 case FILLSTYLE.RADIAL_GRADIENT:
-                    List<Color> colorsRad = new ArrayList<Color>();
-                    List<Float> ratiosRad = new ArrayList<Float>();
+                    List<Color> colorsRad = new ArrayList<>();
+                    List<Float> ratiosRad = new ArrayList<>();
                     for (int i = 0; i < fillStyle0.gradient.gradientRecords.length; i++) {
                         if ((i > 0) && (fillStyle0.gradient.gradientRecords[i - 1].ratio == fillStyle0.gradient.gradientRecords[i].ratio)) {
                             continue;
@@ -268,8 +268,8 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                     g.setClip(null);
                     return;
                 case FILLSTYLE.LINEAR_GRADIENT:
-                    List<Color> colors = new ArrayList<Color>();
-                    List<Float> ratios = new ArrayList<Float>();
+                    List<Color> colors = new ArrayList<>();
+                    List<Float> ratios = new ArrayList<>();
                     for (int i = 0; i < fillStyle0.gradient.gradientRecords.length; i++) {
                         if ((i > 0) && (fillStyle0.gradient.gradientRecords[i - 1].ratio == fillStyle0.gradient.gradientRecords[i].ratio)) {
                             continue;
@@ -451,7 +451,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
     }
 
     private static List<Path> getPaths(RECT bounds, int shapeNum, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStylesList, List<SHAPERECORD> records) {
-        List<Path> paths = new ArrayList<Path>();
+        List<Path> paths = new ArrayList<>();
         Path path = new Path();
         int x = 0;
         int y = 0;
@@ -526,7 +526,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
             }
         }
         paths.add(path);
-        List<Path> paths2 = new ArrayList<Path>();
+        List<Path> paths2 = new ArrayList<>();
         for (Path p : paths) {
             if ((p.fillStyle0 == null) && (p.fillStyle1 == null)) {
                 paths2.add(p);
@@ -536,7 +536,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
             }
             if (p.fillStyle1 != null) {
                 Path f = new Path();
-                f.edges = new ArrayList<SHAPERECORD>();
+                f.edges = new ArrayList<>();
                 f.fillStyle0 = p.fillStyle1;
                 f.lineStyle = p.lineStyle;
                 f.lineStyle2 = p.lineStyle2;
@@ -563,7 +563,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                 paths2.add(f);
             }
         }
-        List<Path> paths3 = new ArrayList<Path>();
+        List<Path> paths3 = new ArrayList<>();
         for (Path p1 : paths2) {
             boolean found = false;
             for (Path p2 : paths3) {
@@ -616,7 +616,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                 + "</svg>";
         return ret;
     }
-    private static HashMap<String, BufferedImage> cache = new HashMap<String, BufferedImage>();
+    private static HashMap<String, BufferedImage> cache = new HashMap<>();
 
     public static BufferedImage shapeToImage(List<Tag> tags, int shapeNum, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStylesList, List<SHAPERECORD> records) {
         return shapeToImage(tags, shapeNum, fillStyles, lineStylesList, records, Color.black);
@@ -625,7 +625,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
     public static List<GeneralPath> shapeToPaths(List<Tag> tags, int shapeNum, List<SHAPERECORD> records) {
         RECT rect = new RECT();
         List<Path> paths = getPaths(rect, shapeNum, null, null, records);
-        List<GeneralPath> ret = new ArrayList<GeneralPath>();
+        List<GeneralPath> ret = new ArrayList<>();
         for (Path p : paths) {
             ret.add(p.toGeneralPath(-rect.Xmin, -rect.Ymin));
         }

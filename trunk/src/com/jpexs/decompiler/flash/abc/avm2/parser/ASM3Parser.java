@@ -75,10 +75,10 @@ public class ASM3Parser {
     public static AVM2Code parse(InputStream is, ConstantPool constants, MissingSymbolHandler missingHandler, MethodBody body) throws IOException, ParseException {
         AVM2Code code = new AVM2Code();
 
-        List<OffsetItem> offsetItems = new ArrayList<OffsetItem>();
-        List<LabelItem> labelItems = new ArrayList<LabelItem>();
-        List<ABCException> exceptions = new ArrayList<ABCException>();
-        List<Integer> exceptionIndices = new ArrayList<Integer>();
+        List<OffsetItem> offsetItems = new ArrayList<>();
+        List<LabelItem> labelItems = new ArrayList<>();
+        List<ABCException> exceptions = new ArrayList<>();
+        List<Integer> exceptionIndices = new ArrayList<>();
         int offset = 0;
 
         Flasm3Lexer lexer = new Flasm3Lexer(new InputStreamReader(is, "UTF-8"));
@@ -149,7 +149,7 @@ public class ASM3Parser {
                 for (InstructionDefinition def : AVM2Code.instructionSet) {
                     if (def.instructionName.equals((String) symb.value)) {
                         insFound = true;
-                        List<Integer> operandsList = new ArrayList<Integer>();
+                        List<Integer> operandsList = new ArrayList<>();
 
                         for (int i = 0; i < def.operands.length; i++) {
                             ParsedSymbol parsedOperand = lexer.yylex();

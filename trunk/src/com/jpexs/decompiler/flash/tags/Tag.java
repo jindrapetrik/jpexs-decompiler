@@ -123,11 +123,11 @@ public class Tag implements NeedsCharacters {
 
     @Override
     public Set<Integer> getNeededCharacters() {
-        return new HashSet<Integer>();
+        return new HashSet<>();
     }
 
     public Set<Integer> getDeepNeededCharacters(HashMap<Integer, CharacterTag> characters) {
-        Set<Integer> ret = new HashSet<Integer>();
+        Set<Integer> ret = new HashSet<>();
         Set<Integer> needed = getNeededCharacters();
         for (int ch : needed) {
             if (!characters.containsKey(ch)) { //TODO: use Import tag (?)

@@ -123,7 +123,7 @@ public class SWF {
     /**
      * Tags inside of file
      */
-    public List<Tag> tags = new ArrayList<Tag>();
+    public List<Tag> tags = new ArrayList<>();
     /**
      * Rectangle for the display
      */
@@ -168,7 +168,7 @@ public class SWF {
      * @return List of tags
      */
     public List<Tag> getTagData(int tagId) {
-        List<Tag> ret = new ArrayList<Tag>();
+        List<Tag> ret = new ArrayList<>();
         for (Tag tag : tags) {
             if (tag.getId() == tagId) {
                 ret.add(tag);
@@ -309,7 +309,7 @@ public class SWF {
     }
 
     public void assignClassesToSymbols() {
-        HashMap<Integer, String> classes = new HashMap<Integer, String>();
+        HashMap<Integer, String> classes = new HashMap<>();
         for (Tag t : tags) {
             if (t instanceof SymbolClassTag) {
                 SymbolClassTag sct = (SymbolClassTag) t;
@@ -424,7 +424,7 @@ public class SWF {
     }
 
     public boolean exportAS3Class(String className, String outdir, boolean isPcode) throws Exception {
-        List<ABCContainerTag> abcTags = new ArrayList<ABCContainerTag>();
+        List<ABCContainerTag> abcTags = new ArrayList<>();
 
         for (Tag t : tags) {
             if (t instanceof ABCContainerTag) {
@@ -459,7 +459,7 @@ public class SWF {
                 }
             }
         };
-        List<ABCContainerTag> abcTags = new ArrayList<ABCContainerTag>();
+        List<ABCContainerTag> abcTags = new ArrayList<>();
         for (Tag t : tags) {
             if (t instanceof ABCContainerTag) {
                 abcTags.add((ABCContainerTag) t);
@@ -473,7 +473,7 @@ public class SWF {
         }
 
         if (!asV3Found) {
-            List<Object> list2 = new ArrayList<Object>();
+            List<Object> list2 = new ArrayList<>();
             list2.addAll(tags);
             List<TagNode> list = createASTagList(list2, null);
 
@@ -488,11 +488,11 @@ public class SWF {
     }
 
     public static List<TagNode> createASTagList(List<Object> list, Object parent) {
-        List<TagNode> ret = new ArrayList<TagNode>();
+        List<TagNode> ret = new ArrayList<>();
         int frame = 1;
-        List<TagNode> frames = new ArrayList<TagNode>();
+        List<TagNode> frames = new ArrayList<>();
 
-        List<ExportAssetsTag> exportAssetsTags = new ArrayList<ExportAssetsTag>();
+        List<ExportAssetsTag> exportAssetsTags = new ArrayList<>();
         for (Object t : list) {
             if (t instanceof ExportAssetsTag) {
                 exportAssetsTags.add((ExportAssetsTag) t);
@@ -555,7 +555,7 @@ public class SWF {
         }
         return ret;
     }
-    private HashSet<EventListener> listeners = new HashSet<EventListener>();
+    private HashSet<EventListener> listeners = new HashSet<>();
 
     public final void addEventListener(EventListener listener) {
         listeners.add(listener);
@@ -654,7 +654,7 @@ public class SWF {
         }
         if (t instanceof SoundStreamHeadTypeTag) {
             SoundStreamHeadTypeTag shead = (SoundStreamHeadTypeTag) t;
-            List<SoundStreamBlockTag> blocks = new ArrayList<SoundStreamBlockTag>();
+            List<SoundStreamBlockTag> blocks = new ArrayList<>();
             List<Object> objs = new ArrayList<Object>(this.tags);
             populateSoundStreamBlocks(objs, t, blocks);
             if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_ADPCM) && wave) {
@@ -778,7 +778,7 @@ public class SWF {
                 }
                 if (t instanceof SoundStreamHeadTypeTag) {
                     SoundStreamHeadTypeTag shead = (SoundStreamHeadTypeTag) t;
-                    List<SoundStreamBlockTag> blocks = new ArrayList<SoundStreamBlockTag>();
+                    List<SoundStreamBlockTag> blocks = new ArrayList<>();
                     List<Object> objs = new ArrayList<Object>(this.tags);
                     populateSoundStreamBlocks(objs, t, blocks);
                     if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_ADPCM) && wave) {
@@ -824,7 +824,7 @@ public class SWF {
     }
 
     public byte[] exportMovie(DefineVideoStreamTag videoStream) throws IOException {
-        HashMap<Integer, VideoFrameTag> frames = new HashMap<Integer, VideoFrameTag>();
+        HashMap<Integer, VideoFrameTag> frames = new HashMap<>();
         List<Object> os = new ArrayList<Object>(this.tags);
         populateVideoFrames(videoStream.characterID, os, frames);
 
@@ -1076,16 +1076,16 @@ public class SWF {
         }
         return false;
     }
-    private HashMap<String, String> deobfuscated = new HashMap<String, String>();
+    private HashMap<String, String> deobfuscated = new HashMap<>();
     private Random rnd = new Random();
     private final int DEFAULT_FOO_SIZE = 10;
     public static final String validFirstCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
     public static final String validNextCharacters = validFirstCharacters + "0123456789";
     public static final String fooCharacters = "bcdfghjklmnpqrstvwz";
     public static final String fooJoinCharacters = "aeiouy";
-    private HashMap<DirectValueTreeItem, ConstantPool> allVariableNames = new HashMap<DirectValueTreeItem, ConstantPool>();
-    private HashSet<String> allVariableNamesStr = new HashSet<String>();
-    private List<GraphSourceItem> allFunctions = new ArrayList<GraphSourceItem>();
+    private HashMap<DirectValueTreeItem, ConstantPool> allVariableNames = new HashMap<>();
+    private HashSet<String> allVariableNamesStr = new HashSet<>();
+    private List<GraphSourceItem> allFunctions = new ArrayList<>();
 
     private String fooString(String orig, boolean firstUppercase, int rndSize) {
         boolean exists;
@@ -1271,13 +1271,13 @@ public class SWF {
     }
 
     private HashMap<DirectValueTreeItem, ConstantPool> getVariables(HashMap<DirectValueTreeItem, ConstantPool> variables, List<GraphSourceItem> functions, ASMSource src) {
-        HashMap<DirectValueTreeItem, ConstantPool> ret = new HashMap<DirectValueTreeItem, ConstantPool>();
+        HashMap<DirectValueTreeItem, ConstantPool> ret = new HashMap<>();
         List<Action> actions = src.getActions(version);
         actionsMap.put(src, actions);
         getVariables(variables, functions, new ActionGraphSource(actions, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0);
         return ret;
     }
-    private HashMap<ASMSource, List<Action>> actionsMap = new HashMap<ASMSource, List<Action>>();
+    private HashMap<ASMSource, List<Action>> actionsMap = new HashMap<>();
 
     private void getVariables(List<Object> objs, String path) {
         for (Object o : objs) {
@@ -1292,10 +1292,10 @@ public class SWF {
     }
 
     public int deobfuscateAS2Identifiers() {
-        actionsMap = new HashMap<ASMSource, List<Action>>();
-        allFunctions = new ArrayList<GraphSourceItem>();
-        allVariableNames = new HashMap<DirectValueTreeItem, ConstantPool>();
-        List<Object> objs = new ArrayList<Object>();
+        actionsMap = new HashMap<>();
+        allFunctions = new ArrayList<>();
+        allVariableNames = new HashMap<>();
+        List<Object> objs = new ArrayList<>();
         int ret = 0;
         objs.addAll(tags);
         getVariables(objs, "");
@@ -1325,7 +1325,7 @@ public class SWF {
             if (changed != null) {
                 ActionPush pu = (ActionPush) ti.src;
                 if (pu.replacement == null) {
-                    pu.replacement = new ArrayList<Object>();
+                    pu.replacement = new ArrayList<>();
                     pu.replacement.addAll(pu.values);
                 }
                 pu.replacement.set(ti.pos, changed);
@@ -1548,7 +1548,7 @@ public class SWF {
     }
 
     public static BufferedImage frameToImage(int containerId, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount) {
-        List<BufferedImage> ret = new ArrayList<BufferedImage>();
+        List<BufferedImage> ret = new ArrayList<>();
         framesToImage(containerId, ret, frame, frame, allTags, controlTags, displayRect, totalFrameCount);
         if (ret.isEmpty()) {
             return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
@@ -1582,7 +1582,7 @@ public class SWF {
         }
 
 
-        HashMap<Integer, CharacterTag> characters = new HashMap<Integer, CharacterTag>();
+        HashMap<Integer, CharacterTag> characters = new HashMap<>();
         for (Tag t : allTags) {
             if (t instanceof CharacterTag) {
                 CharacterTag ch = (CharacterTag) t;
@@ -1590,7 +1590,7 @@ public class SWF {
             }
         }
 
-        HashMap<Integer, Layer> layers = new HashMap<Integer, Layer>();
+        HashMap<Integer, Layer> layers = new HashMap<>();
 
         int maxDepth = 0;
         int f = 1;

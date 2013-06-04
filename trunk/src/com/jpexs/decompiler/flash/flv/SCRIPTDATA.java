@@ -60,8 +60,8 @@ public class SCRIPTDATA extends DATA {
     }
 
     public static SCRIPTDATA onMetaData(double duration, double width, double height, double videodatarate, double framerate, double videocodecid, double audiosamplerate, double audiosamplesize, boolean stereo, double audiocodecid, double filesize) {
-        List<SCRIPTDATAOBJECT> list = new ArrayList<SCRIPTDATAOBJECT>();
-        List<SCRIPTDATAVARIABLE> values = new ArrayList<SCRIPTDATAVARIABLE>();
+        List<SCRIPTDATAOBJECT> list = new ArrayList<>();
+        List<SCRIPTDATAVARIABLE> values = new ArrayList<>();
         values.add(new SCRIPTDATAVARIABLE("duration", new SCRIPTDATAVALUE(duration)));
         values.add(new SCRIPTDATAVARIABLE("width", new SCRIPTDATAVALUE(width)));
         values.add(new SCRIPTDATAVARIABLE("height", new SCRIPTDATAVALUE(height)));

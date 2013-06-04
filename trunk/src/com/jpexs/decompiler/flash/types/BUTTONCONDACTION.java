@@ -175,7 +175,7 @@ public class BUTTONCONDACTION implements ASMSource {
 
         } catch (Exception ex) {
             Logger.getLogger(BUTTONCONDACTION.class.getName()).log(Level.SEVERE, null, ex);
-            return new ArrayList<Action>();
+            return new ArrayList<>();
         }
     }
 
@@ -193,7 +193,7 @@ public class BUTTONCONDACTION implements ASMSource {
     public void setActionBytes(byte[] actionBytes) {
         this.actionBytes = actionBytes;
     }
-    List<DisassemblyListener> listeners = new ArrayList<DisassemblyListener>();
+    List<DisassemblyListener> listeners = new ArrayList<>();
 
     @Override
     public void addDisassemblyListener(DisassemblyListener listener) {

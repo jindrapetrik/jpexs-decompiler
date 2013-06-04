@@ -38,7 +38,7 @@ public class SHAPEWITHSTYLE implements NeedsCharacters {
 
     @Override
     public Set<Integer> getNeededCharacters() {
-        HashSet<Integer> ret = new HashSet<Integer>();
+        HashSet<Integer> ret = new HashSet<>();
         ret.addAll(fillStyles.getNeededCharacters());
         for (SHAPERECORD r : shapeRecords) {
             ret.addAll(r.getNeededCharacters());

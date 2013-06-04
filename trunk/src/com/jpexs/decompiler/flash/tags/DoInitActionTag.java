@@ -126,7 +126,7 @@ public class DoInitActionTag extends Tag implements ASMSource {
             return list;
         } catch (Exception ex) {
             Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex);
-            return new ArrayList<Action>();
+            return new ArrayList<>();
         }
     }
 
@@ -148,7 +148,7 @@ public class DoInitActionTag extends Tag implements ASMSource {
     public int getCharacterID() {
         return spriteId;
     }
-    List<DisassemblyListener> listeners = new ArrayList<DisassemblyListener>();
+    List<DisassemblyListener> listeners = new ArrayList<>();
 
     @Override
     public void addDisassemblyListener(DisassemblyListener listener) {

@@ -60,6 +60,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Stack;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.InflaterInputStream;
@@ -72,13 +76,13 @@ import java.util.zip.InflaterInputStream;
 public class SWFInputStream extends InputStream {
 
     private InputStream is;
-    private Stack<Integer> margedPos = new Stack<Integer>();
+    private Stack<Integer> margedPos = new Stack<>();
     private long pos;
     private int version;
     private static final Logger log = Logger.getLogger(SWFInputStream.class.getName());
-    private List<PercentListener> listeners = new ArrayList<PercentListener>();
+    private List<PercentListener> listeners = new ArrayList<>();
     private long percentMax;
-    private List<byte[]> buffered = new ArrayList<byte[]>();
+    private List<byte[]> buffered = new ArrayList<>();
     private ByteArrayOutputStream buffer;
     private static boolean DEOBFUSCATION_ALL_CODE_IN_PREVIOUS_TAG = (Boolean) Configuration.getConfig("deobfuscateUsePrevTagOnly", true);
 
@@ -550,7 +554,7 @@ public class SWFInputStream extends InputStream {
             if (ins instanceof GraphSourceItemContainer) {
                 GraphSourceItemContainer cnt = (GraphSourceItemContainer) ins;
                 if (ins instanceof Action) {
-                    List<List<GraphTargetItem>> output2s = new ArrayList<List<GraphTargetItem>>();
+                    List<List<GraphTargetItem>> output2s = new ArrayList<>();
                     long endAddr = ((Action) ins).getAddress() + cnt.getHeaderSize();
                     for (long size : cnt.getContainerSizes()) {
                         if (size == 0) {
@@ -558,7 +562,7 @@ public class SWFInputStream extends InputStream {
                             continue;
                         }
                         List<Object> localData2 = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
-                        List<GraphTargetItem> output2 = new ArrayList<GraphTargetItem>();
+                        List<GraphTargetItem> output2 = new ArrayList<>();
                         output2s.add(output2);
                         getConstantPool(listeners, cpool, localData2, new Stack<GraphTargetItem>(), output2, code, code.adr2pos(endAddr), lastIp, constantPools, visited, version, code.adr2pos(endAddr + size));
                         endAddr += size;
@@ -694,7 +698,7 @@ public class SWFInputStream extends InputStream {
     }
 
     public static List<ConstantPool> getConstantPool(List<DisassemblyListener> listeners, ActionGraphSource code, int addr, int version) {
-        List<ConstantPool> ret = new ArrayList<ConstantPool>();
+        List<ConstantPool> ret = new ArrayList<>();
         List<Object> localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
         try {
             getConstantPool(listeners, null, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0, ret, new ArrayList<Integer>(), version, -1);
@@ -712,10 +716,10 @@ public class SWFInputStream extends InputStream {
      * @throws IOException
      */
     public static List<Action> readActionList(List<DisassemblyListener> listeners, long address, long containerSWFOffset, ReReadableInputStream rri, int version, int ip, int endip) throws IOException {
-        List<Action> retdups = new ArrayList<Action>();
+        List<Action> retdups = new ArrayList<>();
         ConstantPool cpool = new ConstantPool();
 
-        Stack<GraphTargetItem> stack = new Stack<GraphTargetItem>();
+        Stack<GraphTargetItem> stack = new Stack<>();
 
         List<Object> localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
 
@@ -739,7 +743,7 @@ public class SWFInputStream extends InputStream {
                 }
             }
         }
-        List<Action> ret = new ArrayList<Action>();
+        List<Action> ret = new ArrayList<>();
         Action last = null;
         for (Action a : retdups) {
             if (a != last) {
@@ -759,7 +763,7 @@ public class SWFInputStream extends InputStream {
             }
         }
 
-        List<ConstantPool> pools = new ArrayList<ConstantPool>();
+        List<ConstantPool> pools = new ArrayList<>();
         StringBuilder br = new StringBuilder();
         for (int i = 0; i < ret.size(); i++) {
             br.append(i);
@@ -787,7 +791,7 @@ public class SWFInputStream extends InputStream {
             ret.add(0, aj);
         }
         String s = null;
-        List<Action> reta = new ArrayList<Action>();
+        List<Action> reta = new ArrayList<>();
         for (Object o : ret) {
             if (o instanceof Action) {
                 reta.add((Action) o);
@@ -1045,14 +1049,14 @@ public class SWFInputStream extends InputStream {
                      }
                      containers.get(endAddr).add((ActionContainer)a);
                      */
-                    List<List<GraphTargetItem>> output2s = new ArrayList<List<GraphTargetItem>>();
+                    List<List<GraphTargetItem>> output2s = new ArrayList<>();
                     for (long size : cnt.getContainerSizes()) {
                         if (size == 0) {
                             output2s.add(new ArrayList<GraphTargetItem>());
                             continue;
                         }
                         List<Object> localData2 = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
-                        List<GraphTargetItem> output2 = new ArrayList<GraphTargetItem>();
+                        List<GraphTargetItem> output2 = new ArrayList<>();
                         readActionListAtPos(listeners, output2, containers, address, containerSWFOffset, notCompileTime, enableVariables, localData2, new Stack<GraphTargetItem>(), cpool, sis, rri, (int) endAddr, ret, startIp, (int) (endAddr + size));
                         output2s.add(output2);
                         endAddr += size;
@@ -1132,6 +1136,24 @@ public class SWFInputStream extends InputStream {
         }
     }
 
+    private class TagResolutionTask implements Callable<Tag> {
+
+        private final Tag tag;
+        private final int version;
+        private final int level;
+
+        public TagResolutionTask(Tag tag, int version, int level) {
+            this.tag = tag;
+            this.version = version;
+            this.level = level;
+        }
+
+        @Override
+        public Tag call() throws Exception {
+            return SWFInputStream.resolveTag(tag, version, level);
+        }
+    }
+
     /**
      * Reads list of tags from the stream. Reading ends with End tag(=0) or end
      * of the stream.
@@ -1140,47 +1162,45 @@ public class SWFInputStream extends InputStream {
      * @throws IOException
      */
     public List<Tag> readTagList(int level) throws IOException {
-        List<Tag> tags = new ArrayList<Tag>();
+        ExecutorService executor = Executors.newCachedThreadPool();
+        List<Future<Tag>> futureResults = new ArrayList<>();
+        List<Tag> tags = new ArrayList<>();
         Tag tag;
         Tag previousTag = null;
         while (true) {
             long pos = getPos();
-            tag = readTag(level, pos);
+            tag = readTag(level, pos, false);
             if (tag == null) {
                 break;
             }
-            tags.add(tag);
             if (Configuration.dump_tags && level == 0) {
                 dumpTag(System.out, version, tag, level);
             }
             tag.previousTag = previousTag;
             previousTag = tag;
+
+            Future<Tag> future = executor.submit(new TagResolutionTask(tag, version, level));
+            futureResults.add(future);
+        }
+        executor.shutdown();
+
+        for (Future<Tag> future : futureResults) {
+            try {
+                tags.add(future.get());
+            } catch (Exception e) {
+                Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "Error during tag reading", e);
+            }
         }
         return tags;
     }
 
-    /**
-     * Reads one Tag from the stream
-     *
-     * @return Tag or null when End tag
-     * @throws IOException
-     */
-    public Tag readTag(int level, long pos) throws IOException {
-        int tagIDTagLength = readUI16();
-        int tagID = (tagIDTagLength) >> 6;
-        if (tagID == 0) {
-            return null;
-        }
-        long tagLength = (tagIDTagLength & 0x003F);
-        boolean readLong = false;
-        if (tagLength == 0x3f) {
-            tagLength = readSI32();
-            readLong = true;
-        }
-        byte data[] = readBytes((int) tagLength);
+    public static Tag resolveTag(Tag tag, int version, int level) {
         Tag ret;
+
+        byte data[] = tag.getData(version);
+        long pos = tag.getPos();
         try {
-            switch (tagID) {
+            switch (tag.getId()) {
                 case 0:
                     ret = new EndTag(data, version, pos);
                     break;
@@ -1399,12 +1419,48 @@ public class SWFInputStream extends InputStream {
                     ret = new DefineFont4Tag(data, version, pos);
                     break;
                 default:
-                    ret = new Tag(tagID, "Unknown", data, pos);
+                    ret = new Tag(tag.getId(), "Unknown", data, pos);
             }
         } catch (Exception ex) {
             Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "Error during tag reading", ex);
-            ret = new Tag(tagID, "ErrorTag", data, pos);
+            ret = new Tag(tag.getId(), "ErrorTag", data, pos);
         }
+        ret.previousTag = tag.previousTag;
+        ret.forceWriteAsLong = tag.forceWriteAsLong;
+        return ret;
+    }
+
+    /**
+     * Reads one Tag from the stream
+     *
+     * @return Tag or null when End tag
+     * @throws IOException
+     */
+    public Tag readTag(int level, long pos) throws IOException {
+        return readTag(level, pos, true);
+    }
+
+    /**
+     * Reads one Tag from the stream with optional resolving (= reading tag
+     * content)
+     *
+     * @return Tag or null when End tag
+     * @throws IOException
+     */
+    public Tag readTag(int level, long pos, boolean resolve) throws IOException {
+        int tagIDTagLength = readUI16();
+        int tagID = (tagIDTagLength) >> 6;
+        if (tagID == 0) {
+            return null;
+        }
+        long tagLength = (tagIDTagLength & 0x003F);
+        boolean readLong = false;
+        if (tagLength == 0x3f) {
+            tagLength = readSI32();
+            readLong = true;
+        }
+        byte data[] = readBytes((int) tagLength);
+        Tag ret = new Tag(tagID, "Unknown", data, pos);
         ret.forceWriteAsLong = readLong;
         byte dataNew[] = ret.getData(version);
 
@@ -1438,6 +1494,9 @@ public class SWFInputStream extends InputStream {
                 }
                 log.fine(e);
             }
+        }
+        if (resolve) {
+            return resolveTag(ret, version, level);
         }
         return ret;
     }
@@ -1833,7 +1892,7 @@ public class SWFInputStream extends InputStream {
         readUI16();//reserved
         ret.allEventFlags = readCLIPEVENTFLAGS();
         CLIPACTIONRECORD cr;
-        ret.clipActionRecords = new ArrayList<CLIPACTIONRECORD>();
+        ret.clipActionRecords = new ArrayList<>();
         while ((cr = readCLIPACTIONRECORD()) != null) {
             ret.clipActionRecords.add(cr);
         }
@@ -2069,7 +2128,7 @@ public class SWFInputStream extends InputStream {
      * @throws IOException
      */
     public List<FILTER> readFILTERLIST() throws IOException {
-        List<FILTER> ret = new ArrayList<FILTER>();
+        List<FILTER> ret = new ArrayList<>();
         int numberOfFilters = readUI8();
         for (int i = 0; i < numberOfFilters; i++) {
             ret.add(readFILTER());
@@ -2116,7 +2175,7 @@ public class SWFInputStream extends InputStream {
      * @throws IOException
      */
     public List<BUTTONRECORD> readBUTTONRECORDList(boolean inDefineButton2) throws IOException {
-        List<BUTTONRECORD> ret = new ArrayList<BUTTONRECORD>();
+        List<BUTTONRECORD> ret = new ArrayList<>();
         BUTTONRECORD br;
         while ((br = readBUTTONRECORD(inDefineButton2)) != null) {
             ret.add(br);
@@ -2178,7 +2237,7 @@ public class SWFInputStream extends InputStream {
      * @throws IOException
      */
     public List<BUTTONCONDACTION> readBUTTONCONDACTIONList() throws IOException {
-        List<BUTTONCONDACTION> ret = new ArrayList<BUTTONCONDACTION>();
+        List<BUTTONCONDACTION> ret = new ArrayList<>();
         BUTTONCONDACTION bc;
         while (!(bc = readBUTTONCONDACTION()).isLast) {
             ret.add(bc);
@@ -2498,7 +2557,7 @@ public class SWFInputStream extends InputStream {
      * @throws IOException
      */
     public List<SHAPERECORD> readSHAPERECORDS(int shapeNum, int fillBits, int lineBits) throws IOException {
-        List<SHAPERECORD> ret = new ArrayList<SHAPERECORD>();
+        List<SHAPERECORD> ret = new ArrayList<>();
         SHAPERECORD rec;
         do {
             rec = readSHAPERECORD(fillBits, lineBits, shapeNum);
@@ -2907,8 +2966,8 @@ public class SWFInputStream extends InputStream {
      */
     public BITMAPDATA readBITMAPDATA(int bitmapFormat, int bitmapWidth, int bitmapHeight) throws IOException {
         BITMAPDATA ret = new BITMAPDATA();
-        List<PIX15> pix15 = new ArrayList<PIX15>();
-        List<PIX24> pix24 = new ArrayList<PIX24>();
+        List<PIX15> pix15 = new ArrayList<>();
+        List<PIX24> pix24 = new ArrayList<>();
         int dataLen = 0;
         for (int y = 0; y < bitmapHeight; y++) {
             int x = 0;

@@ -71,7 +71,7 @@ public abstract class GraphSource {
     }
 
     public HashMap<Integer, List<Integer>> visitCode(List<Integer> alternateEntries) {
-        HashMap<Integer, List<Integer>> refs = new HashMap<Integer, List<Integer>>();
+        HashMap<Integer, List<Integer>> refs = new HashMap<>();
         for (int i = 0; i < size(); i++) {
             refs.put(i, new ArrayList<Integer>());
         }

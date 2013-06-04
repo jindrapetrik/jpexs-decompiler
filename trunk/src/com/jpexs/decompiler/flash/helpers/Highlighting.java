@@ -227,7 +227,7 @@ public class Highlighting implements Serializable {
     }
 
     private static List<Highlighting> getSpecificHighlights(String text, String txtOpen, String txtClose, String txtEnd) {
-        List<Highlighting> ret = new ArrayList<Highlighting>();
+        List<Highlighting> ret = new ArrayList<>();
         int pos = 0;
         while (true) {
             int openpos = text.indexOf(txtOpen);

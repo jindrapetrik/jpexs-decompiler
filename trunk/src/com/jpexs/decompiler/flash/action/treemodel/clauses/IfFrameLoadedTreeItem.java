@@ -53,12 +53,12 @@ public class IfFrameLoadedTreeItem extends TreeItem implements Block {
 
     @Override
     public List<ContinueItem> getContinues() {
-        return new ArrayList<ContinueItem>();
+        return new ArrayList<>();
     }
 
     @Override
     public List<List<GraphTargetItem>> getSubs() {
-        List<List<GraphTargetItem>> ret = new ArrayList<List<GraphTargetItem>>();
+        List<List<GraphTargetItem>> ret = new ArrayList<>();
         ret.add(actions);
         return ret;
     }

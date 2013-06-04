@@ -324,7 +324,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         if (debugMode) {
             System.err.println("Decompiling " + packageName + "." + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames));
         }
-        List<String> namesInThisPackage = new ArrayList<String>();
+        List<String> namesInThisPackage = new ArrayList<>();
         for (ABCContainerTag tag : abcTags) {
             for (ScriptInfo si : tag.getABC().script_info) {
                 for (Trait t : si.traits.traits) {
@@ -343,13 +343,13 @@ public class TraitClass extends Trait implements TraitWithSlot {
             }
         }
         //imports
-        List<String> imports = new ArrayList<String>();
-        List<String> uses = new ArrayList<String>();
+        List<String> imports = new ArrayList<>();
+        List<String> uses = new ArrayList<>();
         getImportsUsages(abcTags, abc, imports, uses, new ArrayList<String>());
 
-        fullyQualifiedNames = new ArrayList<String>();
+        fullyQualifiedNames = new ArrayList<>();
 
-        List<String> importnames = new ArrayList<String>();
+        List<String> importnames = new ArrayList<>();
         importnames.addAll(namesInThisPackage);
         for (String ipath : imports) {
             String name = ipath;
@@ -399,7 +399,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         out.println(ABC.IDENT_STRING + "{");
 
         String toPrint;
-        List<String> outTraits = new LinkedList<String>();
+        List<String> outTraits = new LinkedList<>();
 
 
         int bodyIndex;

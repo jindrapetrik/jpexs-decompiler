@@ -39,7 +39,7 @@ public class ActionFSCommand2 extends Action {
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
         long numArgs = popLong(stack);
         GraphTargetItem command = stack.pop();
-        List<GraphTargetItem> args = new ArrayList<GraphTargetItem>();
+        List<GraphTargetItem> args = new ArrayList<>();
         for (long l = 0; l < numArgs; l++) {
             args.add(stack.pop());
         }

@@ -35,7 +35,7 @@ public abstract class CharacterTag extends Tag {
     /**
      * List of ExportAssetsTag used for converting to String
      */
-    public List<ExportAssetsTag> exportAssetsTags = new ArrayList<ExportAssetsTag>();
+    public List<ExportAssetsTag> exportAssetsTags = new ArrayList<>();
     private String className;
 
     public void setClassName(String className) {

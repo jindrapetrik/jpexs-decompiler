@@ -230,7 +230,7 @@ public class MethodInfo {
     }
 
     public String getParamStr(ConstantPool constants, MethodBody body, ABC abc, List<String> fullyQualifiedNames) {
-        HashMap<Integer, String> localRegNames = new HashMap<Integer, String>();
+        HashMap<Integer, String> localRegNames = new HashMap<>();
         if (body != null) {
             localRegNames = body.code.getLocalRegNamesFromDebug(abc);
         }

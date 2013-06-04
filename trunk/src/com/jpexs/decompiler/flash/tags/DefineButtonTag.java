@@ -172,7 +172,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
             return list;
         } catch (Exception ex) {
             Logger.getLogger(DoActionTag.class.getName()).log(Level.SEVERE, null, ex);
-            return new ArrayList<Action>();
+            return new ArrayList<>();
         }
     }
 
@@ -193,7 +193,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
 
     @Override
     public Set<Integer> getNeededCharacters() {
-        HashSet<Integer> needed = new HashSet<Integer>();
+        HashSet<Integer> needed = new HashSet<>();
         for (BUTTONRECORD r : characters) {
             needed.add(r.characterId);
         }
@@ -215,7 +215,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
         }
         return rect;
     }
-    List<DisassemblyListener> listeners = new ArrayList<DisassemblyListener>();
+    List<DisassemblyListener> listeners = new ArrayList<>();
 
     @Override
     public void addDisassemblyListener(DisassemblyListener listener) {
@@ -234,7 +234,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
 
     @Override
     public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters) {
-        HashMap<Integer, Layer> layers = new HashMap<Integer, Layer>();
+        HashMap<Integer, Layer> layers = new HashMap<>();
         int maxDepth = 0;
         for (BUTTONRECORD r : this.characters) {
             if (r.buttonStateUp) {

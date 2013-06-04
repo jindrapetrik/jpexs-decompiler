@@ -96,7 +96,7 @@ public class DefineFontInfoTag extends Tag {
         fontFlagsItalic = sis.readUB(1) == 1;
         fontFlagsBold = sis.readUB(1) == 1;
         fontFlagsWideCodes = sis.readUB(1) == 1;
-        codeTable = new ArrayList<Integer>();
+        codeTable = new ArrayList<>();
         do {
             if (fontFlagsWideCodes) {
                 codeTable.add(sis.readUI16());

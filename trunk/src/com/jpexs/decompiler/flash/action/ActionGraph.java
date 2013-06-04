@@ -66,7 +66,7 @@ public class ActionGraph extends Graph {
     public static List<GraphTargetItem> translateViaGraph(HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version) {
 
         ActionGraph g = new ActionGraph(code, registerNames, variables, functions, version);
-        List<Object> localData = new ArrayList<Object>();
+        List<Object> localData = new ArrayList<>();
         localData.add(registerNames);
         return g.translate(localData);
     }
@@ -145,7 +145,7 @@ public class ActionGraph extends Graph {
             if (switchedObject == null) {
                 switchedObject = new DirectValueTreeItem(null, -1, new Null(), null);
             }
-            HashMap<Integer, GraphTargetItem> caseValuesMap = new HashMap<Integer, GraphTargetItem>();
+            HashMap<Integer, GraphTargetItem> caseValuesMap = new HashMap<>();
 
             int pos = 0;
             StrictEqTreeItem set = (StrictEqTreeItem) stack.pop();
@@ -154,7 +154,7 @@ public class ActionGraph extends Graph {
                 switchedObject = ((StoreRegisterTreeItem) set.leftSide).value;
             }
             //GraphPart switchLoc = part.nextParts.get(1).nextParts.get(0);
-            List<GraphPart> caseBodyParts = new ArrayList<GraphPart>();
+            List<GraphPart> caseBodyParts = new ArrayList<>();
             caseBodyParts.add(part.nextParts.get(0));
             GraphTargetItem top = null;
             int cnt = 1;
@@ -180,25 +180,25 @@ public class ActionGraph extends Graph {
 
 
 
-                List<GraphPart> defaultAndLastPart = new ArrayList<GraphPart>();
+                List<GraphPart> defaultAndLastPart = new ArrayList<>();
                 defaultAndLastPart.add(defaultPart);
                 defaultAndLastPart.add(caseBodyParts.get(caseBodyParts.size() - 1));
 
                 GraphPart defaultPart2 = getCommonPart(defaultAndLastPart);
 
-                List<GraphTargetItem> defaultCommands = new ArrayList<GraphTargetItem>();
+                List<GraphTargetItem> defaultCommands = new ArrayList<>();
 
                 defaultCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, defaultPart, defaultPart2, loops, forFinalCommands);
 
 
-                List<GraphPart> loopContinues = new ArrayList<GraphPart>();
+                List<GraphPart> loopContinues = new ArrayList<>();
                 for (Loop l : loops) {
                     if (l.loopContinue != null) {
                         loopContinues.add(l.loopContinue);
                     }
                 }
 
-                List<GraphPart> breakParts = new ArrayList<GraphPart>();
+                List<GraphPart> breakParts = new ArrayList<>();
                 for (int g = 0; g < caseBodyParts.size(); g++) {
                     if (g < caseBodyParts.size() - 1) {
                         if (caseBodyParts.get(g).leadsTo(code, caseBodyParts.get(g + 1), loopContinues)) {
@@ -223,7 +223,7 @@ public class ActionGraph extends Graph {
                 }
 
 
-                List<GraphTargetItem> caseValues = new ArrayList<GraphTargetItem>();
+                List<GraphTargetItem> caseValues = new ArrayList<>();
                 for (int i = 0; i < caseBodyParts.size(); i++) {
                     if (caseValuesMap.containsKey(i)) {
                         caseValues.add(caseValuesMap.get(i));
@@ -232,7 +232,7 @@ public class ActionGraph extends Graph {
                     }
                 }
 
-                List<List<GraphTargetItem>> caseCommands = new ArrayList<List<GraphTargetItem>>();
+                List<List<GraphTargetItem>> caseCommands = new ArrayList<>();
                 GraphPart next = null;
 
 
@@ -243,8 +243,8 @@ public class ActionGraph extends Graph {
                 Loop currentLoop = new Loop(loops.size(), null, next);
                 loops.add(currentLoop);
                 //switchLoc.getNextPartPath(new ArrayList<GraphPart>());
-                List<Integer> valuesMapping = new ArrayList<Integer>();
-                List<GraphPart> caseBodies = new ArrayList<GraphPart>();
+                List<Integer> valuesMapping = new ArrayList<>();
+                List<GraphPart> caseBodies = new ArrayList<>();
                 for (int i = 0; i < caseValues.size(); i++) {
                     GraphPart cur = caseBodyParts.get(i);
                     if (!caseBodies.contains(cur)) {
@@ -263,13 +263,13 @@ public class ActionGraph extends Graph {
                     defaultCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, defaultPart, next, loops, forFinalCommands);
                 }
 
-                List<GraphPart> ignored = new ArrayList<GraphPart>();
+                List<GraphPart> ignored = new ArrayList<>();
                 for (Loop l : loops) {
                     ignored.add(l.loopContinue);
                 }
 
                 for (int i = 0; i < caseBodies.size(); i++) {
-                    List<GraphTargetItem> cc = new ArrayList<GraphTargetItem>();
+                    List<GraphTargetItem> cc = new ArrayList<>();
                     GraphPart nextCase = null;
                     nextCase = next;
                     if (next != null) {
@@ -297,7 +297,7 @@ public class ActionGraph extends Graph {
                     }
                     caseCommands.add(cc);
                 }
-                ret = new ArrayList<GraphTargetItem>();
+                ret = new ArrayList<>();
                 if (!output.isEmpty()) {
                     if (output.get(output.size() - 1) instanceof StoreRegisterTreeItem) {
                         output.remove(output.size() - 1);

@@ -49,8 +49,8 @@ public class ExportAssetsTag extends Tag {
         super(56, "ExportAssets", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         int count = sis.readUI16();
-        tags = new ArrayList<Integer>();
-        names = new ArrayList<String>();
+        tags = new ArrayList<>();
+        names = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             int characterId = sis.readUI16();
             tags.add(characterId);

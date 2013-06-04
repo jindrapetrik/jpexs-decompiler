@@ -28,13 +28,13 @@ public class GraphPart {
     public int start = 0;
     public int end = 0;
     public int instanceCount = 0;
-    public List<GraphPart> nextParts = new ArrayList<GraphPart>();
+    public List<GraphPart> nextParts = new ArrayList<>();
     public int posX = -1;
     public int posY = -1;
     public GraphPath path = new GraphPath();
-    public List<GraphPart> refs = new ArrayList<GraphPart>();
+    public List<GraphPart> refs = new ArrayList<>();
     public boolean ignored = false;
-    public List<Object> forContinues = new ArrayList<Object>();
+    public List<Object> forContinues = new ArrayList<>();
 
     private boolean leadsTo(GraphSource code, GraphPart part, List<GraphPart> visited, List<GraphPart> ignored) {
         if (visited.contains(this)) {
@@ -93,7 +93,7 @@ public class GraphPart {
     }
 
     public GraphPart getNextPartPath(List<GraphPart> ignored) {
-        List<GraphPart> visited = new ArrayList<GraphPart>();
+        List<GraphPart> visited = new ArrayList<>();
         visited.addAll(ignored);
         if (visited.contains(this)) {
             visited.remove(this);
@@ -102,7 +102,7 @@ public class GraphPart {
     }
 
     public GraphPart getNextSuperPartPath(List<GraphPart> ignored) {
-        List<GraphPart> visited = new ArrayList<GraphPart>();
+        List<GraphPart> visited = new ArrayList<>();
         visited.addAll(ignored);
         return getNextSuperPartPath(this, path, visited);
     }
@@ -169,7 +169,7 @@ public class GraphPart {
     }
 
     public List<GraphPart> getSubParts() {
-        List<GraphPart> ret = new ArrayList<GraphPart>();
+        List<GraphPart> ret = new ArrayList<>();
         ret.add(this);
         return ret;
     }

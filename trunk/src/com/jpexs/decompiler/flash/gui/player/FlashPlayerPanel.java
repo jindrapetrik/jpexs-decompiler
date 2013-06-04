@@ -28,8 +28,8 @@ public class FlashPlayerPanel extends Panel {
     private boolean executed = false;
     private String flash;
     private HANDLE pipe;
-    private static List<HANDLE> processes = new ArrayList<HANDLE>();
-    private static List<HANDLE> pipes = new ArrayList<HANDLE>();
+    private static List<HANDLE> processes = new ArrayList<>();
+    private static List<HANDLE> pipes = new ArrayList<>();
     private JFrame frame;
 
     private synchronized void resize() {

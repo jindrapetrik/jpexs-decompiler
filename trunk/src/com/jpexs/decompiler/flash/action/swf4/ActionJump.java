@@ -59,7 +59,7 @@ public class ActionJump extends Action {
 
     @Override
     public List<Long> getAllRefs(int version) {
-        List<Long> ret = new ArrayList<Long>();
+        List<Long> ret = new ArrayList<>();
         ret.add(getRef(version));
         return ret;
     }
@@ -93,7 +93,7 @@ public class ActionJump extends Action {
 
     @Override
     public List<Action> getAllIfsOrJumps() {
-        List<Action> ret = new ArrayList<Action>();
+        List<Action> ret = new ArrayList<>();
         ret.add(this);
         return ret;
     }

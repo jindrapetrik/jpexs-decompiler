@@ -40,12 +40,12 @@ public class ActionPush extends Action {
     public List<Object> values;
     public List<Object> replacement;
     public List<String> constantPool;
-    public List<Integer> ignoredParts = new ArrayList<Integer>();
+    public List<Integer> ignoredParts = new ArrayList<>();
 
     public ActionPush(int actionLength, SWFInputStream sis, int version) throws IOException {
         super(0x96, actionLength);
         int type;
-        values = new ArrayList<Object>();
+        values = new ArrayList<>();
         sis = new SWFInputStream(new ByteArrayInputStream(sis.readBytes(actionLength)), version);
         try {
             while ((type = sis.readUI8()) > -1) {
@@ -148,7 +148,7 @@ public class ActionPush extends Action {
 
     public ActionPush(Object... values) throws IOException, ParseException {
         super(0x96, 0);
-        this.values = new ArrayList<Object>();
+        this.values = new ArrayList<>();
         for (Object o : values) {
             this.values.add(o);
         }
@@ -157,7 +157,7 @@ public class ActionPush extends Action {
     public ActionPush(FlasmLexer lexer, List<String> constantPool) throws IOException, ParseException {
         super(0x96, 0);
         this.constantPool = constantPool;
-        values = new ArrayList<Object>();
+        values = new ArrayList<>();
         int count = 0;
         loop:
         while (true) {

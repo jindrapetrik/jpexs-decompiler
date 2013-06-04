@@ -131,7 +131,7 @@ public class CLIPACTIONRECORD implements ASMSource {
             return list;
         } catch (Exception ex) {
             Logger.getLogger(BUTTONCONDACTION.class.getName()).log(Level.SEVERE, null, ex);
-            return new ArrayList<Action>();
+            return new ArrayList<>();
         }
     }
 
@@ -149,7 +149,7 @@ public class CLIPACTIONRECORD implements ASMSource {
     public void setActionBytes(byte[] actionBytes) {
         this.actionBytes = actionBytes;
     }
-    List<DisassemblyListener> listeners = new ArrayList<DisassemblyListener>();
+    List<DisassemblyListener> listeners = new ArrayList<>();
 
     @Override
     public void addDisassemblyListener(DisassemblyListener listener) {

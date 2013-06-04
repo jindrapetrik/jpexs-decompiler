@@ -746,7 +746,7 @@ public class Main {
             BufferedReader br = new BufferedReader(new InputStreamReader(sock.getInputStream()));
             String s;
             boolean start = false;
-            java.util.List<Version> versions = new ArrayList<Version>();
+            java.util.List<Version> versions = new ArrayList<>();
             String header = "";
             Pattern headerPat = Pattern.compile("\\[([a-zA-Z0-9]+)\\]");
             int updateMajor = 0;

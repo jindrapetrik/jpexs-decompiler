@@ -35,7 +35,7 @@ public class ExtendsTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        List<Object> localData = new ArrayList<Object>();
+        List<Object> localData = new ArrayList<>();
         localData.add(constants);
         return subclass.toString(localData) + hilight(" extends ") + stripQuotes(superclass, constants);
     }
