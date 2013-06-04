@@ -80,10 +80,10 @@ public class Cache {
     public void put(Object key, Object value) {
         File temp = null;
         try {
-            File.createTempFile("ffdec_cache", ".tmp");
-            return;
+            temp = File.createTempFile("ffdec_cache", ".tmp");
         } catch (IOException ex) {
             Logger.getLogger(Cache.class.getName()).log(Level.SEVERE, null, ex);
+            return;
         }
         temp.deleteOnExit();
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(temp))) {
