@@ -135,9 +135,9 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
                     os2 = new CopyOutputStream(os2, new ByteArrayInputStream(origbrdata));
                 }
             }
-            SWFOutputStream sos2 = new SWFOutputStream(os2, version);
-            sos2.writeBUTTONRECORDList(characters, true);
-            sos2.close();
+            try (SWFOutputStream sos2 = new SWFOutputStream(os2, version)) {
+                sos2.writeBUTTONRECORDList(characters, true);
+            }
             byte brdata[] = baos2.toByteArray();
             if (Configuration.DEBUG_COPY) {
                 if (origbrdata != null) {

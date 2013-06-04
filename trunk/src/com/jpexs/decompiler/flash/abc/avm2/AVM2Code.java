@@ -2140,10 +2140,10 @@ public class AVM2Code implements Serializable {
     public AVM2Code deepCopy() {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(this);
-            oos.flush();
-            oos.close();
+            try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+                oos.writeObject(this);
+                oos.flush();
+            }
             ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));
             AVM2Code copy = (AVM2Code) ois.readObject();
             ois.close();

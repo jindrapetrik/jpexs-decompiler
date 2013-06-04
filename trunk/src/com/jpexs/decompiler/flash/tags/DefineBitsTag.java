@@ -66,10 +66,7 @@ public class DefineBitsTag extends ImageTag {
     public BufferedImage getImage(List<Tag> tags) {
         getJPEGTables(tags);
         if ((jtt != null)) {
-            ByteArrayOutputStream baos = null;
-
-            try {
-                baos = new ByteArrayOutputStream();
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
                 byte jttdata[] = jtt.getData(10);
                 if (jttdata.length != 0) {
                     baos.write(jttdata, SWF.hasErrorHeader(jttdata) ? 4 : 0, jttdata.length - (SWF.hasErrorHeader(jttdata) ? 6 : 2));
@@ -77,20 +74,6 @@ public class DefineBitsTag extends ImageTag {
                 } else {
                     baos.write(jpegData, 0, jpegData.length);
                 }
-
-            } finally {
-                if (baos != null) {
-                    try {
-                        baos.close();
-                    } catch (Exception ex) {
-                        //ignore
-                    }
-                }
-            }
-            if (baos == null) {
-                return null;
-            }
-            try {
                 return ImageIO.read(new ByteArrayInputStream(baos.toByteArray()));
             } catch (IOException ex) {
                 return null;

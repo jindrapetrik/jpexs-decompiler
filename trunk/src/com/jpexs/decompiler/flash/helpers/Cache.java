@@ -68,48 +68,31 @@ public class Cache {
             return null;
         }
         File f = cacheFiles.get(key);
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(f);
+        try (FileInputStream fis = new FileInputStream(f)) {
             ObjectInputStream ois = new ObjectInputStream(fis);
             return ois.readObject();
-        } catch (IOException ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            if (fis != null) {
-                try {
-                    fis.close();
-                } catch (IOException ex) {
-                    //ignore
-                }
-            }
         }
         return null;
     }
 
     public void put(Object key, Object value) {
         File temp = null;
-        ObjectOutputStream oos = null;
         try {
-            temp = File.createTempFile("ffdec_cache", ".tmp");
-            temp.deleteOnExit();
-            oos = new ObjectOutputStream(new FileOutputStream(temp));
+            File.createTempFile("ffdec_cache", ".tmp");
+            return;
+        } catch (IOException ex) {
+            Logger.getLogger(Cache.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        temp.deleteOnExit();
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(temp))) {
             oos.writeObject(value);
             oos.flush();
 
             cacheFiles.put(key, temp);
         } catch (IOException ex) {
             Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            if (oos != null) {
-                try {
-                    oos.close();
-                } catch (IOException ex) {
-                    //ignore
-                }
-            }
         }
     }
 }

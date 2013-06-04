@@ -1884,169 +1884,168 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                 }
                 tempFile = File.createTempFile("temp", ".swf");
                 tempFile.deleteOnExit();
+                try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+                    SWFOutputStream sos = new SWFOutputStream(fos, 10);
+                    sos.write("FWS".getBytes());
+                    sos.write(13);
 
-                FileOutputStream fos = new FileOutputStream(tempFile);
-                SWFOutputStream sos = new SWFOutputStream(fos, 10);
-                sos.write("FWS".getBytes());
-                sos.write(13);
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    SWFOutputStream sos2 = new SWFOutputStream(baos, 10);
+                    int width = swf.displayRect.Xmax - swf.displayRect.Xmin;
+                    int height = swf.displayRect.Ymax - swf.displayRect.Ymin;
+                    sos2.writeRECT(swf.displayRect);
+                    sos2.writeUI8(0);
+                    sos2.writeUI8(swf.frameRate);
+                    sos2.writeUI16(100); //framecnt
+                    sos2.writeTag(new SetBackgroundColorTag(new RGB(255, 255, 255)));
 
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                SWFOutputStream sos2 = new SWFOutputStream(baos, 10);
-                int width = swf.displayRect.Xmax - swf.displayRect.Xmin;
-                int height = swf.displayRect.Ymax - swf.displayRect.Ymin;
-                sos2.writeRECT(swf.displayRect);
-                sos2.writeUI8(0);
-                sos2.writeUI8(swf.frameRate);
-                sos2.writeUI16(100); //framecnt
-                sos2.writeTag(new SetBackgroundColorTag(new RGB(255, 255, 255)));
+                    if (tagObj instanceof FrameNode) {
+                        FrameNode fn = (FrameNode) tagObj;
+                        Object parent = fn.getParent();
+                        List<Object> subs = new ArrayList<>();
+                        if (parent == null) {
+                            subs.addAll(swf.tags);
+                        } else {
+                            if (parent instanceof Container) {
+                                subs = ((Container) parent).getSubItems();
+                            }
+                        }
+                        List<Integer> doneCharacters = new ArrayList<>();
+                        int frameCnt = 1;
+                        for (Object o : subs) {
+                            if (o instanceof ShowFrameTag) {
+                                frameCnt++;
+                                continue;
+                            }
+                            if (frameCnt > fn.getFrame()) {
+                                break;
+                            }
+                            Tag t = (Tag) o;
+                            Set<Integer> needed = t.getDeepNeededCharacters(characters);
+                            for (int n : needed) {
+                                if (!doneCharacters.contains(n)) {
+                                    sos2.writeTag(characters.get(n));
+                                    doneCharacters.add(n);
+                                }
+                            }
+                            if (t instanceof CharacterTag) {
+                                doneCharacters.add(((CharacterTag) t).getCharacterID());
+                            }
+                            sos2.writeTag(t);
 
-                if (tagObj instanceof FrameNode) {
-                    FrameNode fn = (FrameNode) tagObj;
-                    Object parent = fn.getParent();
-                    List<Object> subs = new ArrayList<>();
-                    if (parent == null) {
-                        subs.addAll(swf.tags);
+                            if (parent != null) {
+                                if (t instanceof PlaceObjectTypeTag) {
+                                    PlaceObjectTypeTag pot = (PlaceObjectTypeTag) t;
+                                    int chid = pot.getCharacterId();
+                                    int depth = pot.getDepth();
+                                    MATRIX mat = pot.getMatrix();
+                                    if (mat == null) {
+                                        mat = new MATRIX();
+                                    }
+                                    mat = (MATRIX) Helper.deepCopy(mat);
+                                    if (parent instanceof BoundedTag) {
+                                        RECT r = ((BoundedTag) parent).getRect(characters);
+                                        mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
+                                        mat.translateY = mat.translateY + height / 2 - r.getHeight() / 2;
+                                    } else {
+                                        mat.translateX = mat.translateX + width / 2;
+                                        mat.translateY = mat.translateY + height / 2;
+                                    }
+                                    sos2.writeTag(new PlaceObject2Tag(false, false, false, false, false, true, false, true, depth, chid, mat, null, 0, null, 0, null));
+
+                                }
+                            }
+                        }
+                        sos2.writeTag(new ShowFrameTag());
                     } else {
-                        if (parent instanceof Container) {
-                            subs = ((Container) parent).getSubItems();
-                        }
-                    }
-                    List<Integer> doneCharacters = new ArrayList<>();
-                    int frameCnt = 1;
-                    for (Object o : subs) {
-                        if (o instanceof ShowFrameTag) {
-                            frameCnt++;
-                            continue;
-                        }
-                        if (frameCnt > fn.getFrame()) {
-                            break;
-                        }
-                        Tag t = (Tag) o;
-                        Set<Integer> needed = t.getDeepNeededCharacters(characters);
-                        for (int n : needed) {
-                            if (!doneCharacters.contains(n)) {
+
+                        if (tagObj instanceof DefineBitsTag) {
+                            if (jtt != null) {
+                                sos2.writeTag(jtt);
+                            }
+                        } else if (tagObj instanceof AloneTag) {
+                        } else {
+                            Set<Integer> needed = ((Tag) tagObj).getDeepNeededCharacters(characters);
+                            for (int n : needed) {
                                 sos2.writeTag(characters.get(n));
-                                doneCharacters.add(n);
                             }
                         }
-                        if (t instanceof CharacterTag) {
-                            doneCharacters.add(((CharacterTag) t).getCharacterID());
-                        }
-                        sos2.writeTag(t);
 
-                        if (parent != null) {
-                            if (t instanceof PlaceObjectTypeTag) {
-                                PlaceObjectTypeTag pot = (PlaceObjectTypeTag) t;
-                                int chid = pot.getCharacterId();
-                                int depth = pot.getDepth();
-                                MATRIX mat = pot.getMatrix();
-                                if (mat == null) {
-                                    mat = new MATRIX();
+                        sos2.writeTag(((Tag) tagObj));
+
+                        int chtId = 0;
+                        if (tagObj instanceof CharacterTag) {
+                            chtId = ((CharacterTag) tagObj).getCharacterID();
+                        }
+
+                        MATRIX mat = new MATRIX();
+                        mat.hasRotate = false;
+                        mat.hasScale = false;
+                        mat.translateX = 0;
+                        mat.translateY = 0;
+                        if (tagObj instanceof BoundedTag) {
+                            RECT r = ((BoundedTag) tagObj).getRect(characters);
+                            mat.translateX = -r.Xmin;
+                            mat.translateY = -r.Ymin;
+                            mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
+                            mat.translateY = mat.translateY + height / 2 - r.getHeight() / 2;
+                        } else {
+                            mat.translateX = width / 4;
+                            mat.translateY = height / 4;
+                        }
+                        if (tagObj instanceof FontTag) {
+
+                            int countGlyphs = ((FontTag) tagObj).getGlyphShapeTable().length;
+                            int fontId = ((FontTag) tagObj).getFontId();
+                            int sloupcu = (int) Math.ceil(Math.sqrt(countGlyphs));
+                            int radku = (int) Math.ceil(((float) countGlyphs) / ((float) sloupcu));
+                            int x = 0;
+                            int y = 1;
+                            for (int f = 0; f < countGlyphs; f++) {
+                                if (x >= sloupcu) {
+                                    x = 0;
+                                    y++;
                                 }
-                                mat = (MATRIX) Helper.deepCopy(mat);
-                                if (parent instanceof BoundedTag) {
-                                    RECT r = ((BoundedTag) parent).getRect(characters);
-                                    mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
-                                    mat.translateY = mat.translateY + height / 2 - r.getHeight() / 2;
-                                } else {
-                                    mat.translateX = mat.translateX + width / 2;
-                                    mat.translateY = mat.translateY + height / 2;
-                                }
-                                sos2.writeTag(new PlaceObject2Tag(false, false, false, false, false, true, false, true, depth, chid, mat, null, 0, null, 0, null));
-
+                                List<TEXTRECORD> rec = new ArrayList<>();
+                                TEXTRECORD tr = new TEXTRECORD();
+                                int textHeight = height / radku;
+                                tr.fontId = fontId;
+                                tr.styleFlagsHasFont = true;
+                                tr.textHeight = textHeight;
+                                tr.glyphEntries = new GLYPHENTRY[1];
+                                tr.styleFlagsHasColor = true;
+                                tr.textColor = new RGB(0, 0, 0);
+                                tr.glyphEntries[0] = new GLYPHENTRY();
+                                tr.glyphEntries[0].glyphAdvance = 0;
+                                tr.glyphEntries[0].glyphIndex = f;
+                                rec.add(tr);
+                                mat.translateX = x * width / sloupcu;
+                                mat.translateY = y * height / radku;
+                                sos2.writeTag(new DefineTextTag(999 + f, new RECT(0, width, 0, height), new MATRIX(), SWFOutputStream.getNeededBitsU(countGlyphs - 1), SWFOutputStream.getNeededBitsU(0), rec));
+                                sos2.writeTag(new PlaceObject2Tag(false, false, false, true, false, true, true, false, 1 + f, 999 + f, mat, null, 0, null, 0, null));
+                                x++;
                             }
-                        }
-                    }
-                    sos2.writeTag(new ShowFrameTag());
-                } else {
-
-                    if (tagObj instanceof DefineBitsTag) {
-                        if (jtt != null) {
-                            sos2.writeTag(jtt);
-                        }
-                    } else if (tagObj instanceof AloneTag) {
-                    } else {
-                        Set<Integer> needed = ((Tag) tagObj).getDeepNeededCharacters(characters);
-                        for (int n : needed) {
-                            sos2.writeTag(characters.get(n));
-                        }
-                    }
-
-                    sos2.writeTag(((Tag) tagObj));
-
-                    int chtId = 0;
-                    if (tagObj instanceof CharacterTag) {
-                        chtId = ((CharacterTag) tagObj).getCharacterID();
-                    }
-
-                    MATRIX mat = new MATRIX();
-                    mat.hasRotate = false;
-                    mat.hasScale = false;
-                    mat.translateX = 0;
-                    mat.translateY = 0;
-                    if (tagObj instanceof BoundedTag) {
-                        RECT r = ((BoundedTag) tagObj).getRect(characters);
-                        mat.translateX = -r.Xmin;
-                        mat.translateY = -r.Ymin;
-                        mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
-                        mat.translateY = mat.translateY + height / 2 - r.getHeight() / 2;
-                    } else {
-                        mat.translateX = width / 4;
-                        mat.translateY = height / 4;
-                    }
-                    if (tagObj instanceof FontTag) {
-
-                        int countGlyphs = ((FontTag) tagObj).getGlyphShapeTable().length;
-                        int fontId = ((FontTag) tagObj).getFontId();
-                        int sloupcu = (int) Math.ceil(Math.sqrt(countGlyphs));
-                        int radku = (int) Math.ceil(((float) countGlyphs) / ((float) sloupcu));
-                        int x = 0;
-                        int y = 1;
-                        for (int f = 0; f < countGlyphs; f++) {
-                            if (x >= sloupcu) {
-                                x = 0;
-                                y++;
+                            sos2.writeTag(new ShowFrameTag());
+                        } else if ((tagObj instanceof DefineMorphShapeTag) || (tagObj instanceof DefineMorphShape2Tag)) {
+                            sos2.writeTag(new PlaceObject2Tag(false, false, false, true, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null));
+                            sos2.writeTag(new ShowFrameTag());
+                            int numFrames = 100;
+                            for (int ratio = 0; ratio < 65536; ratio += 65536 / numFrames) {
+                                sos2.writeTag(new PlaceObject2Tag(false, false, false, true, false, true, false, true, 1, chtId, mat, null, ratio, null, 0, null));
+                                sos2.writeTag(new ShowFrameTag());
                             }
-                            List<TEXTRECORD> rec = new ArrayList<>();
-                            TEXTRECORD tr = new TEXTRECORD();
-                            int textHeight = height / radku;
-                            tr.fontId = fontId;
-                            tr.styleFlagsHasFont = true;
-                            tr.textHeight = textHeight;
-                            tr.glyphEntries = new GLYPHENTRY[1];
-                            tr.styleFlagsHasColor = true;
-                            tr.textColor = new RGB(0, 0, 0);
-                            tr.glyphEntries[0] = new GLYPHENTRY();
-                            tr.glyphEntries[0].glyphAdvance = 0;
-                            tr.glyphEntries[0].glyphIndex = f;
-                            rec.add(tr);
-                            mat.translateX = x * width / sloupcu;
-                            mat.translateY = y * height / radku;
-                            sos2.writeTag(new DefineTextTag(999 + f, new RECT(0, width, 0, height), new MATRIX(), SWFOutputStream.getNeededBitsU(countGlyphs - 1), SWFOutputStream.getNeededBitsU(0), rec));
-                            sos2.writeTag(new PlaceObject2Tag(false, false, false, true, false, true, true, false, 1 + f, 999 + f, mat, null, 0, null, 0, null));
-                            x++;
-                        }
-                        sos2.writeTag(new ShowFrameTag());
-                    } else if ((tagObj instanceof DefineMorphShapeTag) || (tagObj instanceof DefineMorphShape2Tag)) {
-                        sos2.writeTag(new PlaceObject2Tag(false, false, false, true, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null));
-                        sos2.writeTag(new ShowFrameTag());
-                        int numFrames = 100;
-                        for (int ratio = 0; ratio < 65536; ratio += 65536 / numFrames) {
-                            sos2.writeTag(new PlaceObject2Tag(false, false, false, true, false, true, false, true, 1, chtId, mat, null, ratio, null, 0, null));
+                        } else {
+                            sos2.writeTag(new PlaceObject2Tag(false, false, false, true, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null));
                             sos2.writeTag(new ShowFrameTag());
                         }
-                    } else {
-                        sos2.writeTag(new PlaceObject2Tag(false, false, false, true, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null));
-                        sos2.writeTag(new ShowFrameTag());
-                    }
-                }//not showframe
+                    }//not showframe
 
-                sos2.writeTag(new EndTag());
-                byte data[] = baos.toByteArray();
+                    sos2.writeTag(new EndTag());
+                    byte data[] = baos.toByteArray();
 
-                sos.writeUI32(sos.getPos() + data.length + 4);
-                sos.write(data);
-                fos.close();
+                    sos.writeUI32(sos.getPos() + data.length + 4);
+                    sos.write(data);
+                }
                 showCard(CARDFLASHPANEL);
                 if (flashPanel != null) {
                     if (flashPanel instanceof FlashPlayerPanel) {

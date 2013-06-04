@@ -244,7 +244,6 @@ public class SWF {
                 os.close();
             }
         }
-
     }
 
     public SWF(InputStream is) throws IOException {
@@ -404,12 +403,12 @@ public class SWF {
                 if (!decoder.Code(sis, baos, fileSize - 8)) {
                     throw new IOException("LZMA:Error in data stream");
                 }
-                SWFOutputStream sos = new SWFOutputStream(fos, version);
-                sos.write("FWS".getBytes());
-                sos.write(version);
-                sos.writeUI32(fileSize);
-                sos.write(baos.toByteArray());
-                sos.close();
+                try (SWFOutputStream sos = new SWFOutputStream(fos, version)) {
+                    sos.write("FWS".getBytes());
+                    sos.write(version);
+                    sos.writeUI32(fileSize);
+                    sos.write(baos.toByteArray());
+                }
                 fis.close();
                 fos.close();
             } else {
@@ -929,9 +928,9 @@ public class SWF {
         for (Tag t : tags) {
             if (t instanceof DefineVideoStreamTag) {
                 DefineVideoStreamTag videoStream = (DefineVideoStreamTag) t;
-                FileOutputStream fos = new FileOutputStream(outdir + File.separator + ((DefineVideoStreamTag) t).characterID + ".flv");
-                fos.write(exportMovie(videoStream));
-                fos.close();
+                try (FileOutputStream fos = new FileOutputStream(outdir + File.separator + ((DefineVideoStreamTag) t).characterID + ".flv")) {
+                    fos.write(exportMovie(videoStream));
+                }
             }
         }
     }
@@ -945,21 +944,11 @@ public class SWF {
         }
         for (Tag t : tags) {
             if (t instanceof TextTag) {
-                FileOutputStream fos = null;
-                try {
-                    fos = new FileOutputStream(outdir + File.separator + ((TextTag) t).getCharacterID() + ".txt");
+                try (FileOutputStream fos = new FileOutputStream(outdir + File.separator + ((TextTag) t).getCharacterID() + ".txt")) {
                     if (formatted) {
                         fos.write(((TextTag) t).getFormattedText(this.tags).getBytes("UTF-8"));
                     } else {
                         fos.write(((TextTag) t).getText(this.tags).getBytes("UTF-8"));
-                    }
-                } finally {
-                    if (fos != null) {
-                        try {
-                            fos.close();
-                        } catch (Exception ex) {
-                            //ignore
-                        }
                     }
                 }
             }
@@ -983,18 +972,8 @@ public class SWF {
                 if (t instanceof CharacterTag) {
                     characterID = ((CharacterTag) t).getCharacterID();
                 }
-                FileOutputStream fos = null;
-                try {
-                    fos = new FileOutputStream(outdir + File.separator + characterID + ".svg");
+                try (FileOutputStream fos = new FileOutputStream(outdir + File.separator + characterID + ".svg")) {
                     fos.write(((ShapeTag) t).toSVG().getBytes());
-                } finally {
-                    if (fos != null) {
-                        try {
-                            fos.close();
-                        } catch (Exception ex) {
-                            //ignore
-                        }
-                    }
                 }
             }
         }
@@ -1013,18 +992,8 @@ public class SWF {
                 if (t instanceof CharacterTag) {
                     characterID = ((CharacterTag) t).getCharacterID();
                 }
-                FileOutputStream fos = null;
-                try {
-                    fos = new FileOutputStream(outdir + File.separator + characterID + ".bin");
+                try (FileOutputStream fos = new FileOutputStream(outdir + File.separator + characterID + ".bin")) {
                     fos.write(((DefineBinaryDataTag) t).binaryData);
-                } finally {
-                    if (fos != null) {
-                        try {
-                            fos.close();
-                        } catch (Exception ex) {
-                            //ignore
-                        }
-                    }
                 }
             }
         }

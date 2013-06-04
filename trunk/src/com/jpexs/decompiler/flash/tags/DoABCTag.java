@@ -69,9 +69,9 @@ public class DoABCTag extends Tag implements ABCContainerTag {
             if (Configuration.DEBUG_COPY) {
                 os = new CopyOutputStream(os, new ByteArrayInputStream(super.data));
             }
-            SWFOutputStream sos = new SWFOutputStream(os, version);
-            abc.saveToStream(sos);
-            sos.close();
+            try (SWFOutputStream sos = new SWFOutputStream(os, version)) {
+                abc.saveToStream(sos);
+            }
             return bos.toByteArray();
         } catch (IOException e) {
         }

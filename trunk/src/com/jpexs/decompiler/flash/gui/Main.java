@@ -319,37 +319,37 @@ public class Main {
                     } catch (UnsupportedEncodingException ex) {
                     }
                     try {
-                        BufferedReader br = new BufferedReader(new FileReader(f));
-                        String s;
-                        boolean packageFound = false;
-                        String author = defaultAuthor;
-                        String yearStr = defaultYearStr;
-                        while ((s = br.readLine()) != null) {
-                            if (!packageFound) {
-                                if (s.trim().startsWith("package")) {
-                                    packageFound = true;
-                                    pw.println(license.replace("{year}", yearStr).replace("{author}", author));
-                                } else {
-                                    Matcher mAuthor = Pattern.compile("^.*Copyright \\(C\\) ([0-9]+)(-[0-9]+)? (.*)$").matcher(s);
-                                    if (mAuthor.matches()) {
-                                        author = mAuthor.group(3).trim();
-                                        int startYear = Integer.parseInt(mAuthor.group(1).trim());
-                                        if (startYear == defaultFinalYear) {
-                                            yearStr = "" + startYear;
-                                        } else {
-                                            yearStr = "" + startYear + "-" + defaultFinalYear;
-                                        }
-                                        if (!author.equals(defaultAuthor)) {
-                                            System.out.println("Detected nodefault author:" + author + " in " + f.getAbsolutePath());
+                        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+                            String s;
+                            boolean packageFound = false;
+                            String author = defaultAuthor;
+                            String yearStr = defaultYearStr;
+                            while ((s = br.readLine()) != null) {
+                                if (!packageFound) {
+                                    if (s.trim().startsWith("package")) {
+                                        packageFound = true;
+                                        pw.println(license.replace("{year}", yearStr).replace("{author}", author));
+                                    } else {
+                                        Matcher mAuthor = Pattern.compile("^.*Copyright \\(C\\) ([0-9]+)(-[0-9]+)? (.*)$").matcher(s);
+                                        if (mAuthor.matches()) {
+                                            author = mAuthor.group(3).trim();
+                                            int startYear = Integer.parseInt(mAuthor.group(1).trim());
+                                            if (startYear == defaultFinalYear) {
+                                                yearStr = "" + startYear;
+                                            } else {
+                                                yearStr = "" + startYear + "-" + defaultFinalYear;
+                                            }
+                                            if (!author.equals(defaultAuthor)) {
+                                                System.out.println("Detected nodefault author:" + author + " in " + f.getAbsolutePath());
+                                            }
                                         }
                                     }
                                 }
-                            }
-                            if (packageFound) {
-                                pw.println(s);
+                                if (packageFound) {
+                                    pw.println(s);
+                                }
                             }
                         }
-                        br.close();
                         pw.close();
                     } catch (IOException ex) {
                     }
@@ -409,18 +409,6 @@ public class Main {
         System.out.println("java -jar ffdec.jar -dumpSWF myfile.swf");
         System.out.println("java -jar ffdec.jar -compress myfile.swf myfiledec.swf");
         System.out.println("java -jar ffdec.jar -decompress myfiledec.swf myfile.swf");
-    }
-
-    private static void copyFile(String from, String to) throws IOException {
-        FileInputStream fis = new FileInputStream(from);
-        FileOutputStream fos = new FileOutputStream(to);
-        byte buf[] = new byte[4096];
-        int cnt = 0;
-        while ((cnt = fis.read(buf)) > 0) {
-            fos.write(buf, 0, cnt);
-        }
-        fis.close();
-        fos.close();
     }
 
     /**

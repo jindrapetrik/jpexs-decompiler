@@ -64,16 +64,16 @@ public class ScriptPack {
             outDir.mkdirs();
         }
         String fileName = outDir.toString() + File.separator + scriptName + ".as";
-        FileOutputStream fos = new FileOutputStream(fileName);
-        for (int t : traitIndices) {
-            Multiname name = abc.script_info[scriptIndex].traits.traits[t].getName(abc);
-            Namespace ns = name.getNamespace(abc.constants);
-            if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                fos.write(abc.script_info[scriptIndex].traits.traits[t].convertPackaged("", abcList, abc, false, pcode, scriptIndex, -1, false, new ArrayList<String>()).getBytes());
-            } else {
-                fos.write(abc.script_info[scriptIndex].traits.traits[t].convert("", abcList, abc, false, pcode, scriptIndex, -1, false, new ArrayList<String>()).getBytes());
+        try (FileOutputStream fos = new FileOutputStream(fileName)) {
+            for (int t : traitIndices) {
+                Multiname name = abc.script_info[scriptIndex].traits.traits[t].getName(abc);
+                Namespace ns = name.getNamespace(abc.constants);
+                if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
+                    fos.write(abc.script_info[scriptIndex].traits.traits[t].convertPackaged("", abcList, abc, false, pcode, scriptIndex, -1, false, new ArrayList<String>()).getBytes());
+                } else {
+                    fos.write(abc.script_info[scriptIndex].traits.traits[t].convert("", abcList, abc, false, pcode, scriptIndex, -1, false, new ArrayList<String>()).getBytes());
+                }
             }
         }
-        fos.close();
     }
 }

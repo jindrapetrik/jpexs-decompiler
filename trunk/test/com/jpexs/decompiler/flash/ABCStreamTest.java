@@ -16,10 +16,9 @@ public class ABCStreamTest {
 
     @Test
     public void testU30() {
-        try {
+        try(ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ABCOutputStream aos = new ABCOutputStream(baos)) {
             long number = 1531;
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ABCOutputStream aos = new ABCOutputStream(baos);
             aos.writeU30(number);
             aos.close();
             ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());

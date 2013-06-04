@@ -38,23 +38,13 @@ public class SCRIPTDATA extends DATA {
     @Override
     public byte[] getBytes() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        FLVOutputStream fos = null;
-        try {
-            fos = new FLVOutputStream(baos);
+        try (FLVOutputStream fos = new FLVOutputStream(baos)) {
             for (SCRIPTDATAOBJECT d : data) {
                 fos.writeSCRIPTDATAOBJECT(d);
             }
             fos.writeUI24(9); //SCRIPTDATAOBJECTEND
         } catch (IOException ex) {
             Logger.getLogger(SCRIPTDATA.class.getName()).log(Level.SEVERE, "i/o error", ex);
-        } finally {
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException ex) {
-                    //ignore
-                }
-            }
         }
         return baos.toByteArray();
     }

@@ -340,14 +340,14 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
                 }
 
                 File f = new File(Main.tempFile(url));
-                FileOutputStream fos = new FileOutputStream(f);
-                fos.write(hdr);
-                byte buf[] = new byte[2048];
-                int count;
-                while ((count = data.read(buf)) > 0) {
-                    fos.write(buf, 0, count);
+                try (FileOutputStream fos = new FileOutputStream(f)) {
+                    fos.write(hdr);
+                    byte buf[] = new byte[2048];
+                    int count;
+                    while ((count = data.read(buf)) > 0) {
+                        fos.write(buf, 0, count);
+                    }
                 }
-                fos.close();
                 Replacement r = new Replacement(url, Main.tempFile(url));
                 r.lastAccess = Calendar.getInstance();
                 listModel.addURL(r);

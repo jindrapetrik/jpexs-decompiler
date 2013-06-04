@@ -39,10 +39,7 @@ public class View {
 
             UIManager.setLookAndFeel(
                     UIManager.getSystemLookAndFeelClassName());
-        } catch (UnsupportedLookAndFeelException ignored) {
-        } catch (ClassNotFoundException ignored) {
-        } catch (InstantiationException ignored) {
-        } catch (IllegalAccessException ignored) {
+        } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException ignored) {
         }
 
 

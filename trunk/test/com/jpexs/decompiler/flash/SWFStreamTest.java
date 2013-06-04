@@ -29,9 +29,9 @@ public class SWFStreamTest {
     public void testFB() throws IOException {
         double f = 5.25;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, 10);
-        sos.writeFB(20, f);
-        sos.close();
+        try (SWFOutputStream sos = new SWFOutputStream(baos, 10)) {
+            sos.writeFB(20, f);
+        }
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
         SWFInputStream sis = new SWFInputStream(bais, 10);
         assertTrue(Double.compare(f, sis.readFB(20)) == 0);
@@ -41,13 +41,13 @@ public class SWFStreamTest {
     @Test
     public void testUB() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, 10);
-        sos.writeUB(5, 1);
-        sos.writeUB(6, 2);
-        sos.writeUB(7, 3);
-        sos.writeUB(8, 4);
-        sos.writeUB(9, 5);
-        sos.close();
+        try (SWFOutputStream sos = new SWFOutputStream(baos, 10)) {
+            sos.writeUB(5, 1);
+            sos.writeUB(6, 2);
+            sos.writeUB(7, 3);
+            sos.writeUB(8, 4);
+            sos.writeUB(9, 5);
+        }
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
         SWFInputStream sis = new SWFInputStream(bais, 10);
         assertEquals(1, sis.readUB(5));
@@ -61,13 +61,13 @@ public class SWFStreamTest {
     @Test
     public void testSB() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, 10);
-        sos.writeSB(5, -1);
-        sos.writeSB(6, 2);
-        sos.writeSB(7, -3);
-        sos.writeSB(8, 4);
-        sos.writeSB(9, -5);
-        sos.close();
+        try (SWFOutputStream sos = new SWFOutputStream(baos, 10)) {
+            sos.writeSB(5, -1);
+            sos.writeSB(6, 2);
+            sos.writeSB(7, -3);
+            sos.writeSB(8, 4);
+            sos.writeSB(9, -5);
+        }
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
         SWFInputStream sis = new SWFInputStream(bais, 10);
         assertEquals(-1, sis.readSB(5));

@@ -261,9 +261,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                         try {
                             ActionScriptParser ps = new ActionScriptParser();
                             recompiledEditor.setText(Highlighting.stripHilights(com.jpexs.decompiler.flash.action.Action.actionsToString(new ArrayList<DisassemblyListener>(), 0, ps.parse(stripped), null, SWF.DEFAULT_VERSION, false, 0)));
-                        } catch (ParseException ex) {
-                            Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (IOException ex) {
+                        } catch (ParseException | IOException ex) {
                             Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }

@@ -57,10 +57,9 @@ public class Generator {
                     s.append("}");
                 }
             }
-
-            PrintWriter pw = new PrintWriter("src.as");
-            pw.println(s.toString());
-            pw.close();
+            try (PrintWriter pw = new PrintWriter("src.as")) {
+                pw.println(s.toString());
+            }
         }
     }
 }

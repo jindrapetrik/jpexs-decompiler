@@ -266,10 +266,10 @@ public class Helper {
     public static Object deepCopy(Object o) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(o);
-            oos.flush();
-            oos.close();
+            try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+                oos.writeObject(o);
+                oos.flush();
+            }
             ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));
             Object copy = ois.readObject();
             ois.close();
@@ -303,30 +303,26 @@ public class Helper {
     public static byte[] readFile(String... file) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         for (String f : file) {
-            try {
-                FileInputStream fis = new FileInputStream(f);
+            try (FileInputStream fis = new FileInputStream(f)) {
                 byte buf[] = new byte[4096];
                 int cnt = 0;
                 while ((cnt = fis.read(buf)) > 0) {
                     baos.write(buf, 0, cnt);
                 }
-                fis.close();
             } catch (IOException ex) {
                 Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
             }
-
         }
         return baos.toByteArray();
     }
 
     public static void writeFile(String file, byte[]... data) {
-        try {
-            FileOutputStream fos = new FileOutputStream(file);
+        try (FileOutputStream fos = new FileOutputStream(file)) {
             for (byte d[] : data) {
                 fos.write(d);
             }
-            fos.close();
-        } catch (Exception ex) {
+        } catch (IOException ex) {
+            //ignore
         }
     }
 

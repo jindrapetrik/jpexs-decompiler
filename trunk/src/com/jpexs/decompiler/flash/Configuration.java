@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
@@ -68,21 +69,20 @@ public class Configuration {
      * Saves replacements to file for future use
      */
     private static void saveReplacements(String replacementsFile) {
-        try {
-            if (replacements.isEmpty()) {
-                File rf = new File(replacementsFile);
-                if (rf.exists()) {
-                    rf.delete();
-                }
-            } else {
-                PrintWriter pw = new PrintWriter(new FileWriter(replacementsFile));
+        if (replacements.isEmpty()) {
+            File rf = new File(replacementsFile);
+            if (rf.exists()) {
+                rf.delete();
+            }
+        } else {
+            try (PrintWriter pw = new PrintWriter(new FileWriter(replacementsFile))) {
                 for (Replacement r : replacements) {
                     pw.println(r.urlPattern);
                     pw.println(r.targetFile);
                 }
-                pw.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, "Exception during saving replacements", ex);
             }
-        } catch (IOException e) {
         }
     }
 
@@ -91,15 +91,14 @@ public class Configuration {
      */
     private static void loadReplacements(String replacementsFile) {
         replacements = new ArrayList<>();
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(replacementsFile));
+        try (BufferedReader br = new BufferedReader(new FileReader(replacementsFile))) {
             String s;
             while ((s = br.readLine()) != null) {
                 Replacement r = new Replacement(s, br.readLine());
                 replacements.add(r);
             }
-            br.close();
         } catch (IOException e) {
+            Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, "Error during load replacements", e);
         }
     }
 
@@ -125,22 +124,12 @@ public class Configuration {
 
     @SuppressWarnings("unchecked")
     public static void loadFromFile(String file, String replacementsFile) {
-        ObjectInputStream ois = null;
-        try {
-            ois = new ObjectInputStream(new FileInputStream(file));
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
 
             config = (HashMap<String, Object>) ois.readObject();
         } catch (FileNotFoundException ex) {
         } catch (ClassNotFoundException cnf) {
         } catch (IOException ex) {
-        } finally {
-            if (ois != null) {
-                try {
-                    ois.close();
-                } catch (IOException ex1) {
-                    //ignore
-                }
-            }
         }
         if (replacementsFile != null) {
             loadReplacements(replacementsFile);
@@ -148,21 +137,11 @@ public class Configuration {
     }
 
     public static void saveToFile(String file, String replacementsFile) {
-        ObjectOutputStream oos = null;
-        try {
-            oos = new ObjectOutputStream(new FileOutputStream(file));
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
             oos.writeObject(config);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, "Cannot save configuration.", "Error", JOptionPane.ERROR_MESSAGE);
             Logger.getLogger(SWFInputStream.class.getName()).severe("Configuration directory is read only.");
-        } finally {
-            if (oos != null) {
-                try {
-                    oos.close();
-                } catch (IOException ex1) {
-                    //ignore
-                }
-            }
         }
         if (replacementsFile != null) {
             saveReplacements(replacementsFile);

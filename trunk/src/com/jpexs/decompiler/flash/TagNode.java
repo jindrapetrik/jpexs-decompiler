@@ -270,11 +270,9 @@ public class TagNode {
                             Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
                             ret = (Highlighting.stripHilights(Action.actionsToSource(as, SWF.DEFAULT_VERSION)));
                         }
-
-
-                        FileOutputStream fos = new FileOutputStream(f);
-                        fos.write(ret.getBytes());
-                        fos.close();
+                        try (FileOutputStream fos = new FileOutputStream(f)) {
+                            fos.write(ret.getBytes());
+                        }
                     } catch (Exception ex) {
                     }
                 }

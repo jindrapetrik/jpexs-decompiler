@@ -2028,20 +2028,10 @@ public class XFLConverter {
     }
 
     private static void writeFile(byte data[], String file) {
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(file);
+        try (FileOutputStream fos = new FileOutputStream(file)) {
             fos.write(data);
         } catch (IOException iex) {
             Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Error during file write", iex);
-        } finally {
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException ex) {
-                    //ignore
-                }
-            }
         }
     }
 
@@ -2622,9 +2612,7 @@ public class XFLConverter {
                 + "</flash_profiles>";
 
         if (compressed) {
-            ZipOutputStream out = null;
-            try {
-                out = new ZipOutputStream(new FileOutputStream(outfile));
+            try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outfile))) {
                 out.putNextEntry(new ZipEntry("DOMDocument.xml"));
                 out.write(domDocument.getBytes("UTF-8"));
                 out.putNextEntry(new ZipEntry("PublishSettings.xml"));
@@ -2635,14 +2623,6 @@ public class XFLConverter {
                 }
             } catch (IOException ex) {
                 Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                if (out != null) {
-                    try {
-                        out.close();
-                    } catch (IOException ex) {
-                        //ignore
-                    }
-                }
             }
 
         } else {

@@ -163,8 +163,8 @@ public abstract class Trait implements Serializable {
             outDir.mkdirs();
         }
         String fileName = outDir.toString() + File.separator + objectName + ".as";
-        FileOutputStream fos = new FileOutputStream(fileName);
-        fos.write(convertPackaged("", abcList, abc, isStatic, pcode, scriptIndex, classIndex, false, new ArrayList<String>()).getBytes());
-        fos.close();
+        try (FileOutputStream fos = new FileOutputStream(fileName)) {
+            fos.write(convertPackaged("", abcList, abc, isStatic, pcode, scriptIndex, classIndex, false, new ArrayList<String>()).getBytes());
+        }
     }
 }

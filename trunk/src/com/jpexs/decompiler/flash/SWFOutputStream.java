@@ -664,14 +664,12 @@ public class SWFOutputStream extends OutputStream {
     public void writeCLIPACTIONRECORD(CLIPACTIONRECORD value) throws IOException {
         writeCLIPEVENTFLAGS(value.eventFlags);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
-
-        if (value.eventFlags.clipEventKeyPress) {
-            sos.writeUI8(value.keyCode);
+        try (SWFOutputStream sos = new SWFOutputStream(baos, version)) {
+            if (value.eventFlags.clipEventKeyPress) {
+                sos.writeUI8(value.keyCode);
+            }
+            sos.write(value.actionBytes);
         }
-        sos.write(value.actionBytes);
-        //sos.write(Action.actionsToBytes(value.actions, true, version));
-        sos.close();
         byte data[] = baos.toByteArray();
         writeUI32(data.length);     //actionRecordSize
         write(data);
@@ -1003,20 +1001,19 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeBUTTONCONDACTION(BUTTONCONDACTION value, boolean isLast) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
-        sos.writeUB(1, value.condIdleToOverDown ? 1 : 0);
-        sos.writeUB(1, value.condOutDownToIdle ? 1 : 0);
-        sos.writeUB(1, value.condOutDownToOverDown ? 1 : 0);
-        sos.writeUB(1, value.condOverDownToOutDown ? 1 : 0);
-        sos.writeUB(1, value.condOverDownToOverUp ? 1 : 0);
-        sos.writeUB(1, value.condOverUpToOverDown ? 1 : 0);
-        sos.writeUB(1, value.condOverUpToIddle ? 1 : 0);
-        sos.writeUB(1, value.condIdleToOverUp ? 1 : 0);
-        sos.writeUB(7, value.condKeyPress);
-        sos.writeUB(1, value.condOverDownToIddle ? 1 : 0);
-        sos.write(value.actionBytes);
-        //sos.write(Action.actionsToBytes(value.actions, true, version));
-        sos.close();
+        try (SWFOutputStream sos = new SWFOutputStream(baos, version)) {
+            sos.writeUB(1, value.condIdleToOverDown ? 1 : 0);
+            sos.writeUB(1, value.condOutDownToIdle ? 1 : 0);
+            sos.writeUB(1, value.condOutDownToOverDown ? 1 : 0);
+            sos.writeUB(1, value.condOverDownToOutDown ? 1 : 0);
+            sos.writeUB(1, value.condOverDownToOverUp ? 1 : 0);
+            sos.writeUB(1, value.condOverUpToOverDown ? 1 : 0);
+            sos.writeUB(1, value.condOverUpToIddle ? 1 : 0);
+            sos.writeUB(1, value.condIdleToOverUp ? 1 : 0);
+            sos.writeUB(7, value.condKeyPress);
+            sos.writeUB(1, value.condOverDownToIddle ? 1 : 0);
+            sos.write(value.actionBytes);
+        }
         byte data[] = baos.toByteArray();
         if (isLast) {
             writeUI16(0);
