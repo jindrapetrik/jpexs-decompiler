@@ -584,9 +584,8 @@ public class Graph {
                         output.add(new ScriptEndItem());
                     }
                 } catch (Exception ex) {
-                    //Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, "error during printgraph", ex);
-                    throw ex;
-                    //return ret;
+                    Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, "error during printgraph", ex);
+                    return ret;
                 }
             }
             if (part.nextParts.size() == 2) {
