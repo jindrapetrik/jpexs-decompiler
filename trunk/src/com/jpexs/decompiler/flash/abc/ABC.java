@@ -34,6 +34,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -563,19 +567,55 @@ public class ABC {
         export(directory, pcode, abcList, "");
     }
 
-    public void export(String directory, boolean pcode, List<ABCContainerTag> abcList, String abcStr) throws IOException {
-        for (int i = 0; i < script_info.length; i++) {
+    private class ExportPackTask implements Runnable {
 
-            String cnt = "";
-            if (script_info.length > 1) {
-                cnt = "script " + (i + 1) + "/" + script_info.length + " ";
+        ScriptPack pack;
+        String directory;
+        List<ABCContainerTag> abcList;
+        boolean pcode;
+        String informStr;
+        String path;
+        AtomicInteger index;
+        int count;
+
+        public ExportPackTask(AtomicInteger index, int count, String path, ScriptPack pack, String directory, List<ABCContainerTag> abcList, boolean pcode, String informStr) {
+            this.pack = pack;
+            this.directory = directory;
+            this.abcList = abcList;
+            this.pcode = pcode;
+            this.informStr = informStr;
+            this.path = path;
+            this.index = index;
+            this.count = count;
+        }
+
+        @Override
+        public void run() {
+            try {
+                pack.export(directory, abcList, pcode);
+            } catch (IOException ex) {
+                Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, ex);
             }
+            synchronized (ABC.class) {
+                informListeners("export", "Exported " + informStr + " script " + index.getAndIncrement() + "/" + count + " " + path);
+            }
+        }
+    }
+
+    public void export(String directory, boolean pcode, List<ABCContainerTag> abcList, String abcStr) throws IOException {
+        ExecutorService executor = Executors.newFixedThreadPool(20);
+        AtomicInteger cnt = new AtomicInteger(1);
+        for (int i = 0; i < script_info.length; i++) {
             HashMap<String, ScriptPack> packs = script_info[i].getPacks(this, i);
             for (String path : packs.keySet()) {
-                String exStr = "Exporting " + abcStr + cnt + path + " ...";
-                informListeners("export", exStr);
-                packs.get(path).export(directory, abcList, pcode);
+                executor.execute(new ExportPackTask(cnt, script_info.length, path, packs.get(path), directory, abcList, pcode, abcStr));
             }
+        }
+        try {
+            executor.shutdown();
+            executor.awaitTermination(30, TimeUnit.MINUTES);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, "30 minutes ActionScript export limit reached", ex);
         }
     }
 
