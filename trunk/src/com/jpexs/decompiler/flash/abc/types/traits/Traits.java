@@ -20,7 +20,15 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Traits implements Serializable {
 
@@ -57,34 +65,82 @@ public class Traits implements Serializable {
         return s;
     }
 
-    public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, boolean makePackages, int scriptIndex, int classIndex, boolean highlighting, List<String> fullyQualifiedNames) {
-        String s = "";
-        for (int t = 0; t < traits.length; t++) {
-            if (t > 0) {
-                s += "\r\n\r\n";
-            }
+    private class TraitConvertTask implements Callable<String> {
+
+        Trait trait;
+        boolean makePackages;
+        String path;
+        List<ABCContainerTag> abcTags;
+        ABC abc;
+        boolean isStatic;
+        boolean pcode;
+        int scriptIndex;
+        int classIndex;
+        boolean highlighting;
+        List<String> fullyQualifiedNames;
+        int traitIndex;
+
+        public TraitConvertTask(Trait trait, boolean makePackages, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlighting, List<String> fullyQualifiedNames, int traitIndex) {
+            this.trait = trait;
+            this.makePackages = makePackages;
+            this.path = path;
+            this.abcTags = abcTags;
+            this.abc = abc;
+            this.isStatic = isStatic;
+            this.pcode = pcode;
+            this.scriptIndex = scriptIndex;
+            this.classIndex = classIndex;
+            this.highlighting = highlighting;
+            this.fullyQualifiedNames = fullyQualifiedNames;
+            this.traitIndex = traitIndex;
+        }
+
+        @Override
+        public String call() throws Exception {
             String plus;
-            //System.out.println(path+":"+traits[t].convertHeader(path, abcTags, abc, isStatic, pcode, classIndex, highlighting, fullyQualifiedNames));
             if (makePackages) {
-                plus = traits[t].convertPackaged(path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlighting, fullyQualifiedNames);
+                plus = trait.convertPackaged(path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlighting, fullyQualifiedNames);
             } else {
-                plus = traits[t].convert(path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlighting, fullyQualifiedNames);
+                plus = trait.convert(path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlighting, fullyQualifiedNames);
             }
             if (highlighting) {
-                int h = t;
+                int h = traitIndex;
                 if (classIndex != -1) {
                     if (!isStatic) {
                         h = h + abc.class_info[classIndex].static_traits.traits.length;
                     }
                 }
-                if (traits[t] instanceof TraitClass) {
-                    plus = Highlighting.hilighClass(plus, ((TraitClass) traits[t]).class_info);
+                if (trait instanceof TraitClass) {
+                    plus = Highlighting.hilighClass(plus, ((TraitClass) trait).class_info);
                 } else {
                     plus = Highlighting.hilighTrait(plus, h);
                 }
             }
-            s += plus;
+            return plus;
         }
+    }
+
+    public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, boolean makePackages, int scriptIndex, int classIndex, boolean highlighting, List<String> fullyQualifiedNames) {
+        String s = "";
+        ExecutorService executor = Executors.newFixedThreadPool(20);
+        List<Future<String>> futureResults = new ArrayList<>();
+        for (int t = 0; t < traits.length; t++) {
+            Future<String> future = executor.submit(new TraitConvertTask(traits[t], makePackages, path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlighting, fullyQualifiedNames, t));
+            futureResults.add(future);
+        }
+        executor.shutdown();
+
+        for (int f = 0; f < futureResults.size(); f++) {
+            if (f > 0) {
+                s += "\r\n\r\n";
+            }
+            try {
+                s += futureResults.get(f).get();
+            } catch (InterruptedException | ExecutionException ex) {
+                Logger.getLogger(Traits.class.getName()).log(Level.SEVERE, "Errod during traits converting", ex);
+            }
+        }
+
         return s;
     }
 }
