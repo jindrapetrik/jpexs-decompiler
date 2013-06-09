@@ -133,6 +133,7 @@ public class XFLConverter {
     public static final int KEY_MODE_CLASSIC_TWEEN = 22017;
     public static final int KEY_MODE_SHAPE_TWEEN = 17922;
     public static final int KEY_MODE_MOTION_TWEEN = 8195;
+    public static final int KEY_MODE_SHAPE_LAYERS = 8192;
 
     private XFLConverter() {
     }
@@ -204,6 +205,9 @@ public class XFLConverter {
         if (ls.pixelHintingFlag) {
             params += " pixelHinting=\"true\"";
         }
+        if (ls.width == 1) {
+            params += " solidStyle=\"hairline\"";
+        }
         if ((!ls.noHScaleFlag) && (!ls.noVScaleFlag)) {
             params += " scaleMode=\"normal\"";
         } else if ((!ls.noHScaleFlag) && ls.noVScaleFlag) {
@@ -212,7 +216,7 @@ public class XFLConverter {
             params += " scaleMode=\"vertical\"";
         }
 
-        switch (ls.startCapStyle) {  //What about endCapStyle?
+        switch (ls.endCapStyle) {  //What about endCapStyle?
             case LINESTYLE2.NO_CAP:
                 params += " caps=\"none\"";
                 break;
@@ -413,28 +417,27 @@ public class XFLConverter {
         List<SHAPERECORD> edges = new ArrayList<>();
         //int fillStyleCount = 0;
         int lineStyleCount = 0;
-        int lastFillStyleCount = 0;
-        int lastLineStyleCount = 0;
-        String edgeStyle = "";
         int fillStyle0 = -1;
         int fillStyle1 = -1;
         int strokeStyle = -1;
-        String edgesStr = "";
+        //String edgesStr = "";
         String fillsStr = "";
         String strokesStr = "";
         fillsStr += "<fills>";
         strokesStr += "<strokes>";
-        edgesStr += "<edges>";
+        //edgesStr += "<edges>";
+        List<String> layers = new ArrayList<>();
+        String currentLayer = "";
 
-        List<String> fillStylesStr = new ArrayList<>();
+        int fillStyleCount = 0;
+        //List<String> fillStylesStr = new ArrayList<>();
         if (fillStyles != null) {
             for (FILLSTYLE fs : fillStyles.fillStyles) {
-                //fillsStr += "<FillStyle index=\"" + (fillStylesStr.size() + 1) + "\">";
-                fillStylesStr.add(convertFillStyle(mat, characters, fs, shapeNum));
-                //fillsStr += "</FillStyle>";
-                //fillStyleCount++;
+                fillsStr += "<FillStyle index=\"" + (fillStyleCount + 1) + "\">";
+                fillsStr += convertFillStyle(mat, characters, fs, shapeNum);
+                fillsStr += "</FillStyle>";
+                fillStyleCount++;
             }
-            lastFillStyleCount = fillStyles.fillStyles.length;
         }
         if (lineStyles != null) {
             if (lineStyles.lineStyles2 != null) { //(shapeNum == 4) {
@@ -452,71 +455,148 @@ public class XFLConverter {
                     lineStyleCount++;
                 }
             }
-            lastLineStyleCount = lineStyleCount;
         }
 
-        for (SHAPERECORD edge : shapeRecords) {
-            if (edge instanceof StyleChangeRecord) {
-                StyleChangeRecord scr = (StyleChangeRecord) edge;
-                if (scr.stateNewStyles) {
-                    for (int f = 0; f < scr.fillStyles.fillStyles.length; f++) {
-                        fillStylesStr.add(convertFillStyle(mat, characters, scr.fillStyles.fillStyles[f], shapeNum));
-                    }
-                }
-            }
-        }
-        boolean usedFillStyles[] = new boolean[fillStylesStr.size()];
-        int fillStyleCount = 0;
-        lastFillStyleCount = 0;
-        if (fillStyles != null) {
-            lastFillStyleCount = fillStyles.fillStyles.length;
-            fillStyleCount += lastFillStyleCount;
-        }
-        for (SHAPERECORD edge : shapeRecords) {
-            if (edge instanceof StyleChangeRecord) {
-                StyleChangeRecord scr = (StyleChangeRecord) edge;
-                if (scr.stateNewStyles) {
-                    lastFillStyleCount = scr.fillStyles.fillStyles.length;
-                    fillStyleCount += lastFillStyleCount;
-                }
-                if (scr.stateFillStyle0 && scr.fillStyle0 > 0) {
-                    usedFillStyles[fillStyleCount - lastFillStyleCount + scr.fillStyle0 - 1] = true;
-                }
-                if (scr.stateFillStyle1 && scr.fillStyle1 > 0) {
-                    usedFillStyles[fillStyleCount - lastFillStyleCount + scr.fillStyle1 - 1] = true;
-                }
-            }
-        }
+        fillsStr += "</fills>";
+        strokesStr += "</strokes>";
 
-        int mapPos = 0;
-        HashMap<Integer, Integer> fillStylesMap = new HashMap<>();
-        for (int f = 0; f < fillStyleCount; f++) {
-            if (usedFillStyles[f]) {
-                fillStylesMap.put(f, mapPos);
-                mapPos++;
-                fillsStr += "<FillStyle index=\"" + mapPos + "\">";
-                fillsStr += fillStylesStr.get(f);
-                fillsStr += "</FillStyle>";
-            }
+        int layer = 1;
+
+        if ((fillStyleCount > 0) || (lineStyleCount > 0)) {
+            currentLayer += "<DOMLayer name=\"Layer " + (layer++) + "\">"; //color=\"#4FFF4F\"
+            currentLayer += "<frames>";
+            currentLayer += "<DOMFrame index=\"0\" motionTweenScale=\"false\" keyMode=\"" + KEY_MODE_SHAPE_LAYERS + "\">";
+            currentLayer += "<elements>";
+            currentLayer += "<DOMShape isFloating=\"true\">";
+            currentLayer += fillsStr;
+            currentLayer += strokesStr;
+            currentLayer += "<edges>";
         }
+        //edgesStr += "</edges>";
+
+        /*for (SHAPERECORD edge : shapeRecords) {
+         if (edge instanceof StyleChangeRecord) {
+         StyleChangeRecord scr = (StyleChangeRecord) edge;
+         if (scr.stateNewStyles) {
+         for (int f = 0; f < scr.fillStyles.fillStyles.length; f++) {
+         fillStylesStr.add(convertFillStyle(mat, characters, scr.fillStyles.fillStyles[f], shapeNum));
+         }
+         }
+         }
+         }
+         boolean usedFillStyles[] = new boolean[fillStylesStr.size()];
+         int fillStyleCount = 0;
+         lastFillStyleCount = 0;
+         if (fillStyles != null) {
+         lastFillStyleCount = fillStyles.fillStyles.length;
+         fillStyleCount += lastFillStyleCount;
+         }
+         for (SHAPERECORD edge : shapeRecords) {
+         if (edge instanceof StyleChangeRecord) {
+         StyleChangeRecord scr = (StyleChangeRecord) edge;
+         if (scr.stateNewStyles) {
+         lastFillStyleCount = scr.fillStyles.fillStyles.length;
+         fillStyleCount += lastFillStyleCount;
+         }
+         if (scr.stateFillStyle0 && scr.fillStyle0 > 0) {
+         usedFillStyles[fillStyleCount - lastFillStyleCount + scr.fillStyle0 - 1] = true;
+         }
+         if (scr.stateFillStyle1 && scr.fillStyle1 > 0) {
+         usedFillStyles[fillStyleCount - lastFillStyleCount + scr.fillStyle1 - 1] = true;
+         }
+         }
+         }
+         */
+        /*int mapPos = 0;
+         HashMap<Integer, Integer> fillStylesMap = new HashMap<>();
+         for (int f = 0; f < fillStyleCount; f++) {
+         if (usedFillStyles[f]) {
+         fillStylesMap.put(f, mapPos);
+         mapPos++;
+         fillsStr += "<FillStyle index=\"" + mapPos + "\">";
+         fillsStr += fillStylesStr.get(f);
+         fillsStr += "</FillStyle>";
+         }
+         }*/
 
         int x = 0;
         int y = 0;
+        int startEdgeX = 0;
+        int startEdgeY = 0;
+
 
         LINESTYLEARRAY actualLinestyles = lineStyles;
         int strokeStyleOrig = 0;
         fillStyleCount = fillStyles.fillStyles.length;
-        lastFillStyleCount = fillStyleCount;
         for (SHAPERECORD edge : shapeRecords) {
             if (edge instanceof StyleChangeRecord) {
                 StyleChangeRecord scr = (StyleChangeRecord) edge;
+                boolean styleChange = false;
+                int lastFillStyle1 = fillStyle1;
+                int lastFillStyle0 = fillStyle0;
+                int lastStrokeStyle = strokeStyle;
                 if (scr.stateNewStyles) {
-                    /*for (int f = 0; f < scr.fillStyles.fillStyles.length; f++) {
-                     //fillsStr += "<FillStyle index=\"" + (fillStyleCount + 1) + "\">";
-                     fillStylesStr.add(convertFillStyle(mat, characters, scr.fillStyles.fillStyles[f], shapeNum));
-                     //fillsStr += "</FillStyle>";
-                     //fillStyleCount++;
-                     }*/
+                    fillsStr = "<fills>";
+                    strokesStr = "<strokes>";
+                    if (fillStyleCount > 0) {
+
+                        if ((fillStyle0 > 0) || (fillStyle1 > 0) || (strokeStyle > 0)) {
+
+                            boolean empty = false;
+                            if ((fillStyle0 <= 0) && (fillStyle1 <= 0) && (strokeStyle > 0) && morphshape) {
+                                if (shapeNum == 4) {
+                                    if (strokeStyleOrig > 0) {
+                                        if (!actualLinestyles.lineStyles2[strokeStyleOrig].hasFillFlag) {
+                                            if (actualLinestyles.lineStyles2[strokeStyleOrig].color.alpha == 0) {
+                                                if (actualLinestyles.lineStyles2[strokeStyleOrig].color.red == 0) {
+                                                    if (actualLinestyles.lineStyles2[strokeStyleOrig].color.green == 0) {
+                                                        if (actualLinestyles.lineStyles2[strokeStyleOrig].color.blue == 0) {
+                                                            empty = true;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            if (!empty) {
+                                currentLayer += "<Edge";
+                                if (fillStyle0 > -1) {
+                                    currentLayer += " fillStyle0=\"" + fillStyle0 + "\"";
+                                }
+                                if (fillStyle1 > -1) {
+                                    currentLayer += " fillStyle1=\"" + fillStyle1 + "\"";
+                                }
+                                if (strokeStyle > -1) {
+                                    currentLayer += " strokeStyle=\"" + strokeStyle + "\"";
+                                }
+                                currentLayer += " edges=\"" + convertShapeEdges(startEdgeX, startEdgeY, mat, edges) + "\" />";
+                            }
+                        }
+
+                        currentLayer += "</edges>";
+                        currentLayer += "</DOMShape>";
+                        currentLayer += "</elements>";
+                        currentLayer += "</DOMFrame>";
+                        currentLayer += "</frames>";
+                        currentLayer += "</DOMLayer>";
+                        layers.add(currentLayer);
+                        currentLayer = "";
+                    }
+
+                    currentLayer += "<DOMLayer name=\"Layer " + (layer++) + "\">"; //color=\"#4FFF4F\"
+                    currentLayer += "<frames>";
+                    currentLayer += "<DOMFrame index=\"0\" motionTweenScale=\"false\" keyMode=\"" + KEY_MODE_SHAPE_LAYERS + "\">";
+                    currentLayer += "<elements>";
+                    currentLayer += "<DOMShape isFloating=\"true\">";
+                    //ret += convertShape(characters, null, shape);
+                    for (int f = 0; f < scr.fillStyles.fillStyles.length; f++) {
+                        fillsStr += "<FillStyle index=\"" + (f + 1) + "\">";
+                        fillsStr += convertFillStyle(mat, characters, scr.fillStyles.fillStyles[f], shapeNum);
+                        fillsStr += "</FillStyle>";
+                        fillStyleCount++;
+                    }
 
                     if (shapeNum == 4) {
                         for (int l = 0; l < scr.lineStyles.lineStyles2.length; l++) {
@@ -533,41 +613,49 @@ public class XFLConverter {
                             lineStyleCount++;
                         }
                     }
-                    lastFillStyleCount = scr.fillStyles.fillStyles.length;
-                    fillStyleCount += lastFillStyleCount;
-                    lastLineStyleCount = (shapeNum == 4) ? scr.lineStyles.lineStyles2.length : scr.lineStyles.lineStyles.length;
+                    fillsStr += "</fills>";
+                    strokesStr += "</strokes>";
+                    currentLayer += fillsStr;
+                    currentLayer += strokesStr;
+                    currentLayer += "<edges>";
+                    //lastFillStyleCount = scr.fillStyles.fillStyles.length;
+                    //fillStyleCount += lastFillStyleCount;
+                    //lastLineStyleCount = (shapeNum == 4) ? scr.lineStyles.lineStyles2.length : scr.lineStyles.lineStyles.length;
                     actualLinestyles = scr.lineStyles;
                 }
                 if (scr.stateFillStyle0) {
                     /*edgeStyle += " fillStyle0=\"";
                      edgeStyle += fillStyleCount - lastFillStyleCount + scr.fillStyle0;
                      edgeStyle += "\"";*/
-                    int fillStyle0_new = scr.fillStyle0 == 0 ? 0 : fillStylesMap.get(fillStyleCount - lastFillStyleCount + scr.fillStyle0 - 1) + 1;
+                    int fillStyle0_new = scr.fillStyle0;// == 0 ? 0 : fillStylesMap.get(fillStyleCount - lastFillStyleCount + scr.fillStyle0 - 1) + 1;
                     //fillStyle0 = fillStyle0_new;
                     if (morphshape) { //???
                         fillStyle1 = fillStyle0_new;
                     } else {
                         fillStyle0 = fillStyle0_new;
                     }
+                    styleChange = true;
                 }
                 if (scr.stateFillStyle1) {
                     /*edgeStyle += " fillStyle1=\"";
                      edgeStyle += fillStyleCount - lastFillStyleCount + scr.fillStyle1;
                      edgeStyle += "\"";*/
-                    int fillStyle1_new = scr.fillStyle1 == 0 ? 0 : fillStylesMap.get(fillStyleCount - lastFillStyleCount + scr.fillStyle1 - 1) + 1;
+                    int fillStyle1_new = scr.fillStyle1;// == 0 ? 0 : fillStylesMap.get(fillStyleCount - lastFillStyleCount + scr.fillStyle1 - 1) + 1;
                     if (morphshape) {
                         fillStyle0 = fillStyle1_new;
                     } else {
                         fillStyle1 = fillStyle1_new;
                     }
                     //fillStyle1 = fillStyle1_new;
+                    styleChange = true;
                 }
                 if (scr.stateLineStyle) {
                     /*edgeStyle += " strokeStyle=\"";
                      edgeStyle += lineStyleCount - lastLineStyleCount + scr.lineStyle;
                      edgeStyle += "\"";*/
-                    strokeStyle = scr.lineStyle == 0 ? 0 : lineStyleCount - lastLineStyleCount + scr.lineStyle;
+                    strokeStyle = scr.lineStyle;// == 0 ? 0 : lineStyleCount - lastLineStyleCount + scr.lineStyle;
                     strokeStyleOrig = scr.lineStyle - 1;
+                    styleChange = true;
                 }
                 if (!edges.isEmpty()) {
                     if ((fillStyle0 > 0) || (fillStyle1 > 0) || (strokeStyle > 0)) {
@@ -575,37 +663,40 @@ public class XFLConverter {
                         boolean empty = false;
                         if ((fillStyle0 <= 0) && (fillStyle1 <= 0) && (strokeStyle > 0) && morphshape) {
                             if (shapeNum == 4) {
-
-                                if (!actualLinestyles.lineStyles2[strokeStyleOrig].hasFillFlag) {
-                                    if (actualLinestyles.lineStyles2[strokeStyleOrig].color.alpha == 0) {
-                                        if (actualLinestyles.lineStyles2[strokeStyleOrig].color.red == 0) {
-                                            if (actualLinestyles.lineStyles2[strokeStyleOrig].color.green == 0) {
-                                                if (actualLinestyles.lineStyles2[strokeStyleOrig].color.blue == 0) {
-                                                    empty = true;
+                                if (strokeStyleOrig > 0) {
+                                    if (!actualLinestyles.lineStyles2[strokeStyleOrig].hasFillFlag) {
+                                        if (actualLinestyles.lineStyles2[strokeStyleOrig].color.alpha == 0) {
+                                            if (actualLinestyles.lineStyles2[strokeStyleOrig].color.red == 0) {
+                                                if (actualLinestyles.lineStyles2[strokeStyleOrig].color.green == 0) {
+                                                    if (actualLinestyles.lineStyles2[strokeStyleOrig].color.blue == 0) {
+                                                        empty = true;
+                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
                             }
-                            if (!empty) {
-                                edgesStr += "<Edge";
-                                if (fillStyle0 > -1) {
-                                    edgesStr += " fillStyle0=\"" + fillStyle0 + "\"";
-                                }
-                                if (fillStyle1 > -1) {
-                                    edgesStr += " fillStyle1=\"" + fillStyle1 + "\"";
-                                }
-                                if (strokeStyle > -1) {
-                                    edgesStr += " strokeStyle=\"" + strokeStyle + "\"";
-                                }
-                                edgesStr += " edges=\"" + convertShapeEdges(x, y, mat, edges) + "\" />";
-                            }
                         }
-                        edgeStyle = "";
-                        strokeStyle = -1;
-                        fillStyle0 = -1;
-                        fillStyle1 = -1;
+                        if (!empty) {
+                            currentLayer += "<Edge";
+                            if (fillStyle0 > -1) {
+                                currentLayer += " fillStyle0=\"" + lastFillStyle0 + "\"";
+                            }
+                            if (fillStyle1 > -1) {
+                                currentLayer += " fillStyle1=\"" + lastFillStyle1 + "\"";
+                            }
+                            if (strokeStyle > -1) {
+                                currentLayer += " strokeStyle=\"" + lastStrokeStyle + "\"";
+                            }
+                            currentLayer += " edges=\"" + convertShapeEdges(startEdgeX, startEdgeY, mat, edges) + "\" />";
+                        }
+
+                        startEdgeX = x;
+                        startEdgeY = y;
+                        //strokeStyle = -1;
+                        //fillStyle0 = -1;
+                        //fillStyle1 = -1;
                     }
                     edges.clear();
                 }
@@ -620,12 +711,14 @@ public class XFLConverter {
                 boolean empty = false;
                 if ((fillStyle0 <= 0) && (fillStyle1 <= 0) && (strokeStyle > 0) && morphshape) {
                     if (shapeNum == 4) {
-                        if (!actualLinestyles.lineStyles2[strokeStyleOrig].hasFillFlag) {
-                            if (actualLinestyles.lineStyles2[strokeStyleOrig].color.alpha == 0) {
-                                if (actualLinestyles.lineStyles2[strokeStyleOrig].color.red == 0) {
-                                    if (actualLinestyles.lineStyles2[strokeStyleOrig].color.green == 0) {
-                                        if (actualLinestyles.lineStyles2[strokeStyleOrig].color.blue == 0) {
-                                            empty = true;
+                        if (strokeStyleOrig > 0) {
+                            if (!actualLinestyles.lineStyles2[strokeStyleOrig].hasFillFlag) {
+                                if (actualLinestyles.lineStyles2[strokeStyleOrig].color.alpha == 0) {
+                                    if (actualLinestyles.lineStyles2[strokeStyleOrig].color.red == 0) {
+                                        if (actualLinestyles.lineStyles2[strokeStyleOrig].color.green == 0) {
+                                            if (actualLinestyles.lineStyles2[strokeStyleOrig].color.blue == 0) {
+                                                empty = true;
+                                            }
                                         }
                                     }
                                 }
@@ -634,34 +727,33 @@ public class XFLConverter {
                     }
                 }
                 if (!empty) {
-                    edgesStr += "<Edge";
+                    currentLayer += "<Edge";
                     if (fillStyle0 > -1) {
-                        edgesStr += " fillStyle0=\"" + fillStyle0 + "\"";
+                        currentLayer += " fillStyle0=\"" + fillStyle0 + "\"";
                     }
                     if (fillStyle1 > -1) {
-                        edgesStr += " fillStyle1=\"" + fillStyle1 + "\"";
+                        currentLayer += " fillStyle1=\"" + fillStyle1 + "\"";
                     }
                     if (strokeStyle > -1) {
-                        edgesStr += " strokeStyle=\"" + strokeStyle + "\"";
+                        currentLayer += " strokeStyle=\"" + strokeStyle + "\"";
                     }
-                    edgesStr += " edges=\"" + convertShapeEdges(x, y, mat, edges) + "\" />";
+                    currentLayer += " edges=\"" + convertShapeEdges(startEdgeX, startEdgeY, mat, edges) + "\" />";
                 }
             }
-            edgeStyle = "";
         }
         edges.clear();
         fillsStr += "</fills>";
         strokesStr += "</strokes>";
-        edgesStr += "</edges>";
-
-        ret += "<DOMShape>";
-        /*ret+="<matrix>";
-         ret+=convertMatrix(mat);
-         ret+="</matrix>";*/
-        ret += fillsStr;
-        ret += strokesStr;
-        ret += edgesStr;
-        ret += "</DOMShape>";
+        currentLayer += "</edges>";
+        currentLayer += "</DOMShape>";
+        currentLayer += "</elements>";
+        currentLayer += "</DOMFrame>";
+        currentLayer += "</frames>";
+        currentLayer += "</DOMLayer>";
+        layers.add(currentLayer);
+        for (int l = layers.size() - 1; l >= 0; l--) {
+            ret += layers.get(l);
+        }
         return ret;
     }
 
@@ -683,6 +775,9 @@ public class XFLConverter {
     }
 
     private static List<Integer> getOneInstanceShapes(List<Tag> tags, HashMap<Integer, CharacterTag> characters) {
+        if (true) { //the feature was removed due to multiple layers in some shapes            
+            return new ArrayList<>();
+        }
         HashMap<Integer, Integer> usages = new HashMap<>();
         for (Tag t : tags) {
             if (t instanceof PlaceObjectTypeTag) {
@@ -1262,15 +1357,7 @@ public class XFLConverter {
                     ShapeTag shape = (ShapeTag) symbol;
                     symbolStr += "<DOMTimeline name=\"Symbol " + symbol.getCharacterID() + "\" currentFrame=\"0\">";
                     symbolStr += "<layers>";
-                    symbolStr += "<DOMLayer name=\"Layer 1\" current=\"true\" isSelected=\"true\">"; //color=\"#4FFF4F\"
-                    symbolStr += "<frames>";
-                    symbolStr += "<DOMFrame index=\"0\" keyMode=\"" + KEY_MODE_NORMAL + "\">";
-                    symbolStr += "<elements>";
                     symbolStr += convertShape(characters, null, shape);
-                    symbolStr += "</elements>";
-                    symbolStr += "</DOMFrame>";
-                    symbolStr += "</frames>";
-                    symbolStr += "</DOMLayer>";
                     symbolStr += "</layers>";
                     symbolStr += "</DOMTimeline>";
                 }
@@ -1539,6 +1626,7 @@ public class XFLConverter {
             transformer.transform(xmlInput, xmlOutput);
             return xmlOutput.getWriter().toString();
         } catch (Exception e) {
+            System.err.println(input);
             Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Pretty print error", e);
             return input;
         }
