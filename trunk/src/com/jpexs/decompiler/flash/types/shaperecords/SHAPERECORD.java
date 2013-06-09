@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -46,6 +47,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -64,14 +66,30 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
         return ret;
     }
 
+    private static String edgesToStr(List<SHAPERECORD> records) {
+        int x = 0;
+        int y = 0;
+        String ret = "";
+        for (SHAPERECORD rec : records) {
+            x = rec.changeX(x);
+            y = rec.changeY(y);
+            ret += ("[" + x + "," + y + "],");
+        }
+        return ret;
+
+    }
+
     private static class Path {
 
+        public boolean used = false;
         public LINESTYLE lineStyle;
         public LINESTYLE2 lineStyle2;
         public boolean useLineStyle2;
         public FILLSTYLE fillStyle0;
         public FILLSTYLE fillStyle1;
         public List<SHAPERECORD> edges = new ArrayList<>();
+        public Point start;
+        public Point end;
 
         public void draw(int startX, int startY, Graphics2D g, int shapeNum) {
             AffineTransform oldAf = g.getTransform();
@@ -327,6 +345,8 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
             }
             if (ok) {
                 GeneralPath path = toGeneralPath(startX, startY);
+                path.closePath();
+                //path.setWindingRule(GeneralPath.WIND_EVEN_ODD);
                 g.fill(path);
             }
             g.setTransform(oldAf);
@@ -334,6 +354,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
         }
 
         public void drawTo(List<Tag> tags, int startX, int startY, Graphics2D g, int shapeNum) {
+            g.setComposite(AlphaComposite.SrcOver);
             fill(tags, startX, startY, g, shapeNum);
             draw(startX, startY, g, shapeNum);
         }
@@ -352,7 +373,9 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                     if (scr.stateMoveTo) {
                         nx += startX;
                         ny += startY;
-                        ret.moveTo(nx, ny);
+                        if ((!wasMoveTo) || ((nx != x) || (ny != y))) {
+                            ret.moveTo(nx, ny);
+                        }
                         wasMoveTo = true;
                     }
                 }
@@ -449,10 +472,11 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
         }
         return new RECT(min_x, max_x, min_y, max_y);
     }
+    static int cnt = 0;
 
     private static List<Path> getPaths(RECT bounds, int shapeNum, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStylesList, List<SHAPERECORD> records) {
         List<Path> paths = new ArrayList<>();
-        Path path = new Path();
+        Path path = null;
         int x = 0;
         int y = 0;
         int max_x = 0;
@@ -460,11 +484,19 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
         int min_x = Integer.MAX_VALUE;
         int min_y = Integer.MAX_VALUE;
         boolean started = false;
+        FILLSTYLE lastFillStyle0 = null;
+        FILLSTYLE lastFillStyle1 = null;
+        LINESTYLE lastLineStyle = null;
+        LINESTYLE2 lastLineStyle2 = null;
         for (SHAPERECORD r : records) {
             if (r instanceof StyleChangeRecord) {
                 StyleChangeRecord scr = (StyleChangeRecord) r;
-                paths.add(path);
+                if (path != null) {
+                    path.end = new Point(x, y);
+                    paths.add(path);
+                }
                 path = new Path();
+
 
                 if (scr.stateNewStyles) {
                     fillStyles = scr.fillStyles;
@@ -478,14 +510,21 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                     } else {
                         path.fillStyle0 = fillStyles.fillStyles[scr.fillStyle0 - 1];
                     }
+                } else {
+                    path.fillStyle0 = lastFillStyle0;
                 }
+
+                lastFillStyle0 = path.fillStyle0;
                 if (scr.stateFillStyle1) {
                     if ((scr.fillStyle1 == 0) || (fillStyles == null)) {
                         path.fillStyle1 = null;
                     } else {
                         path.fillStyle1 = fillStyles.fillStyles[scr.fillStyle1 - 1];
                     }
+                } else {
+                    path.fillStyle1 = lastFillStyle1;
                 }
+                lastFillStyle1 = path.fillStyle1;
                 if (scr.stateLineStyle) {
                     if (shapeNum >= 4) {
                         path.useLineStyle2 = true;
@@ -502,11 +541,32 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                             path.lineStyle = lineStylesList.lineStyles[scr.lineStyle - 1];
                         }
                     }
+                } else {
+                    if (shapeNum >= 4) {
+                        path.lineStyle2 = lastLineStyle2;
+                    } else {
+                        path.lineStyle = lastLineStyle;
+                    }
                 }
+
+                lastLineStyle = path.lineStyle;
+                lastLineStyle2 = path.lineStyle2;
+                if (started && (!scr.stateMoveTo)) {
+                    scr.stateMoveTo = true;
+                    scr.moveDeltaX = x;
+                    scr.moveDeltaY = y;
+                }
+            }
+            if (path == null) {
+                path = new Path();
+                path.start = new Point(x, y);
             }
             path.edges.add(r);
             x = r.changeX(x);
             y = r.changeY(y);
+            if (path.start == null) {
+                path.start = new Point(x, y);
+            }
             if (r.isMove()) {
                 started = true;
             }
@@ -525,6 +585,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                 }
             }
         }
+        path.end = new Point(x, y);
         paths.add(path);
         List<Path> paths2 = new ArrayList<>();
         for (Path p : paths) {
@@ -536,55 +597,182 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
             }
             if (p.fillStyle1 != null) {
                 Path f = new Path();
-                f.edges = new ArrayList<>();
+                boolean flip = true;
                 f.fillStyle0 = p.fillStyle1;
                 f.lineStyle = p.lineStyle;
                 f.lineStyle2 = p.lineStyle2;
                 f.useLineStyle2 = p.useLineStyle2;
-                x = 0;
-                y = 0;
-                for (SHAPERECORD r : p.edges) {
-                    x = r.changeX(x);
-                    y = r.changeY(y);
-                    SHAPERECORD r2 = null;
-                    try {
-                        r2 = (SHAPERECORD) r.clone();
-                    } catch (CloneNotSupportedException ex) {
-                        Logger.getLogger(SHAPERECORD.class.getName()).log(Level.SEVERE, null, ex);
+                f.edges = new ArrayList<>();
+                f.start = p.end;
+                f.end = p.start;
+                if (!flip) {
+                    f.edges = p.edges;
+                } else {
+                    x = 0;
+                    y = 0;
+                    boolean revstarted = false;
+                    List<SHAPERECORD> chedges = new ArrayList<>();
+                    for (SHAPERECORD r : p.edges) {
+                        int oldX = x;
+                        int oldY = y;
+                        x = r.changeX(x);
+                        y = r.changeY(y);
+                        if (r instanceof StyleChangeRecord) {
+                            StyleChangeRecord mv = (StyleChangeRecord) r;
+                            if (mv.stateMoveTo) {
+                                StyleChangeRecord mv2 = null;
+                                try {
+                                    mv2 = (StyleChangeRecord) mv.clone();
+                                } catch (CloneNotSupportedException ex) {
+                                    Logger.getLogger(SHAPERECORD.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                                mv2.moveDeltaX = oldX;
+                                mv2.moveDeltaY = oldY;
+                                r = mv2;
+                                if (!revstarted) {
+                                    revstarted = true;
+                                    continue;
+                                }
+                            }
+                        }
+                        chedges.add(r);
                     }
-                    r2.flip();
-                    f.edges.add(0, r2);
+                    int finishX = x;
+                    int finishY = y;
+                    StyleChangeRecord scr = new StyleChangeRecord();
+                    scr.stateMoveTo = true;
+                    scr.moveDeltaX = finishX;
+                    scr.moveDeltaY = finishY;
+                    f.edges.add(scr);
+
+                    x = finishX;
+                    y = finishY;
+                    for (int e = chedges.size() - 1; e >= 0; e--) {
+                        SHAPERECORD r = chedges.get(e);
+                        SHAPERECORD r2 = null;
+                        try {
+                            r2 = (SHAPERECORD) r.clone();
+                        } catch (CloneNotSupportedException ex) {
+                            Logger.getLogger(SHAPERECORD.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        r2.flip();
+
+                        x = r.changeX(x);
+                        y = r.changeY(y);
+                        f.edges.add(r2);
+                    }
                 }
-                StyleChangeRecord scr = new StyleChangeRecord();
-                scr.stateMoveTo = true;
-                scr.moveDeltaX = x;
-                scr.moveDeltaY = y;
-                f.edges.add(0, scr);
                 paths2.add(f);
             }
         }
-        List<Path> paths3 = new ArrayList<>();
+        List<List<Path>> groupedPaths = new ArrayList<>();
         for (Path p1 : paths2) {
             boolean found = false;
-            for (Path p2 : paths3) {
-                if (p1 == p2) {
+            for (List<Path> list : groupedPaths) {
+                if (list.contains(p1)) {
                     continue;
                 }
-                if (p1.sameStyle(p2)) {
-                    p2.edges.addAll(p1.edges);
+                if (p1.sameStyle(list.get(0))) {
+                    list.add(p1);
                     found = true;
                     break;
                 }
             }
             if (!found) {
-                paths3.add(p1);
+                List<Path> newitem = new ArrayList<>();
+                newitem.add(p1);
+                groupedPaths.add(newitem);
+            }
+        }
+        List<Path> subpath;
+        List<Path> edges;
+        Point k2;
+        Point k1;
+
+        List<Path> ret = new ArrayList<>();
+
+        for (int e = 0; e < groupedPaths.size(); e++) {
+            List<Path> pathList = groupedPaths.get(e);
+            List<List<Path>> m = new ArrayList<>();
+            Map<Point, List<Path>> ind = new HashMap<>();
+            int usedCount = 0;
+            for (int f = 0; f < pathList.size(); f++) {
+                path = pathList.get(f);
+                if (path.start.equals(path.end)) {
+                    path.used = true;
+                    usedCount++;
+                    List<Path> psh = new ArrayList<>();
+                    psh.add(path);
+                    m.add(psh);
+                } else {
+                    path.used = false;
+                    if (!ind.containsKey(path.start)) {
+                        ind.put(path.start, new ArrayList<Path>());
+                    }
+                    ind.get(path.start).add(path);
+                }
+            }
+            for (int f = 0; f < pathList.size(); f++) {
+                if (usedCount == pathList.size()) {
+                    break;
+                }
+                path = pathList.get(f);
+                if (!path.used) {
+                    subpath = new ArrayList<>();
+                    subpath.add(path);
+                    path.used = true;
+                    usedCount++;
+                    edges = ind.get(path.start);
+                    for (int l = 0; l < edges.size(); l++) {
+                        if (edges.get(l) == path) {
+                            edges.remove(l);
+                        }
+                    }
+                    k1 = path.start;
+                    k2 = path.end;
+                    while (!k2.equals(k1)) {
+                        if (!ind.containsKey(k2)) {
+                            break;
+                        }
+                        edges = ind.get(k2);
+                        if (edges.isEmpty()) {
+                            break;
+                        }
+                        path = edges.remove(0);
+                        subpath.add(path);
+                        path.used = true;
+                        usedCount++;
+                        k2 = path.end;
+                    }
+                    m.add(subpath);
+                }
+            }
+
+            if (!m.isEmpty()) {
+                Path onepath = null;
+                for (List<Path> list : m) {
+                    for (Path p : list) {
+                        if (onepath == null) {
+                            onepath = new Path();
+                            onepath.fillStyle0 = p.fillStyle0;
+                        }
+                        if (onepath.start == null) {
+                            onepath.start = p.start;
+                        }
+                        onepath.edges.addAll(p.edges);
+                        onepath.end = p.end;
+                    }
+                }
+                if (onepath != null) {
+                    ret.add(onepath);
+                }
             }
         }
         bounds.Xmax = max_x;
         bounds.Ymax = max_y;
         bounds.Xmin = min_x;
         bounds.Ymin = min_y;
-        return paths3;
+        return ret;
     }
 
     /**
@@ -619,7 +807,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
     private static HashMap<String, BufferedImage> cache = new HashMap<>();
 
     public static BufferedImage shapeToImage(List<Tag> tags, int shapeNum, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStylesList, List<SHAPERECORD> records) {
-        return shapeToImage(tags, shapeNum, fillStyles, lineStylesList, records, Color.black);
+        return shapeToImage(tags, shapeNum, fillStyles, lineStylesList, records, null);
     }
 
     public static List<GeneralPath> shapeToPaths(List<Tag> tags, int shapeNum, List<SHAPERECORD> records) {
@@ -640,20 +828,20 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
         RECT rect = new RECT();
         List<Path> paths = getPaths(rect, shapeNum, fillStyles, lineStylesList, /*numFillBits, numLineBits,*/ records);
         BufferedImage ret = new BufferedImage(
-                //(int)((rect.Xmax-rect.Xmin)/DESCALE),(int)((rect.Ymax-rect.Ymin)/DESCALE)
                 (int) (rect.getWidth() / DESCALE + 2), (int) (rect.getHeight() / DESCALE + 2), BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = (Graphics2D) ret.getGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
         for (Path p : paths) {
-            if (p.fillStyle0 == null) {
+            if ((p.fillStyle0 == null) && (p.lineStyle == null) && (p.lineStyle2 == null) && (defaultColor != null)) {
                 p.fillStyle0 = new FILLSTYLE();
                 p.fillStyle0.fillStyleType = FILLSTYLE.SOLID;
                 p.fillStyle0.color = new RGB(defaultColor);
                 p.fillStyle0.colorA = new RGBA(defaultColor);
             }
-            p.drawTo(tags, -rect.Xmin, -rect.Ymin/*-rect.Xmin, -rect.Ymin*/, g, shapeNum);
+            p.drawTo(tags, -rect.Xmin, -rect.Ymin, g, shapeNum);
         }
         cache.put(key, ret);
         return ret;
