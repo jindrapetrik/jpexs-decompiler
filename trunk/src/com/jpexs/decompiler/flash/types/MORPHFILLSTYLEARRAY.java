@@ -37,6 +37,15 @@ public class MORPHFILLSTYLEARRAY implements NeedsCharacters {
         return ret;
     }
 
+    public FILLSTYLEARRAY getFillStylesAt(int ratio) {
+        FILLSTYLEARRAY ret = new FILLSTYLEARRAY();
+        ret.fillStyles = new FILLSTYLE[fillStyles.length];
+        for (int m = 0; m < fillStyles.length; m++) {
+            ret.fillStyles[m] = fillStyles[m].getFillStyleAt(ratio);
+        }
+        return ret;
+    }
+
     public FILLSTYLEARRAY getStartFillStyles() {
         FILLSTYLEARRAY ret = new FILLSTYLEARRAY();
         ret.fillStyles = new FILLSTYLE[fillStyles.length];

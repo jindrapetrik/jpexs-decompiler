@@ -20,12 +20,14 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author JPEXS
  */
-public class StyleChangeRecord extends SHAPERECORD {
+public class StyleChangeRecord extends SHAPERECORD implements Cloneable {
 
     public int typeFlag = 0;
     public boolean stateNewStyles;
@@ -91,5 +93,16 @@ public class StyleChangeRecord extends SHAPERECORD {
     @Override
     public boolean isMove() {
         return stateMoveTo;
+
+    }
+
+    @Override
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException ex) {
+            Logger.getLogger(StyleChangeRecord.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 }

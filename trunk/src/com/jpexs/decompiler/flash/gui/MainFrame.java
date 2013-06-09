@@ -1863,7 +1863,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             imagePanel.setImage(((ImageTag) tagObj).getImage(swf.tags));
         } else if ((tagObj instanceof DrawableTag) && (!(tagObj instanceof TextTag)) && (miInternalViewer.isSelected())) {
             showCard(CARDDRAWPREVIEWPANEL);
-            previewImagePanel.setImage(((DrawableTag) tagObj).toImage(1, swf.tags, swf.displayRect, characters));
+            previewImagePanel.setDrawable((DrawableTag) tagObj, swf, characters);//.setImage(((DrawableTag) tagObj).toImage(1, swf.tags, swf.displayRect, characters));
         } else if (tagObj instanceof FrameNode && ((FrameNode) tagObj).isDisplayed() && (miInternalViewer.isSelected())) {
             showCard(CARDDRAWPREVIEWPANEL);
             FrameNode fn = (FrameNode) tagObj;
@@ -1875,7 +1875,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                 containerId = ((DefineSpriteTag) fn.getParent()).spriteId;
                 rect = ((DefineSpriteTag) fn.getParent()).getRect(characters);
             }
-            previewImagePanel.setImage(SWF.frameToImage(containerId, ((FrameNode) tagObj).getFrame(), swf.tags, controlTags, rect, swf.frameCount));
+            previewImagePanel.setImage(SWF.frameToImage(containerId, ((FrameNode) tagObj).getFrame() - 1, swf.tags, controlTags, rect, swf.frameCount));
         } else if (((tagObj instanceof FrameNode) && ((FrameNode) tagObj).isDisplayed()) || ((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag)) {
             try {
 

@@ -96,6 +96,14 @@ public class MATRIX implements Serializable {
         return ret;
     }
 
+    public int getRotateSkew0() {
+        return hasRotate ? rotateSkew0 : 0;
+    }
+
+    public int getRotateSkew1() {
+        return hasRotate ? rotateSkew1 : 0;
+    }
+
     public float getRotateSkew0Float() {
         return (hasRotate ? toFloat(rotateSkew0) : 0);
     }
@@ -110,6 +118,14 @@ public class MATRIX implements Serializable {
 
     public float getScaleYFloat() {
         return (hasScale ? toFloat(scaleY) : 1);
+    }
+
+    public int getScaleX() {
+        return (hasScale ? (scaleX) : (1 << 16));
+    }
+
+    public int getScaleY() {
+        return (hasScale ? (scaleY) : (1 << 16));
     }
 
     public MATRIX merge(MATRIX m) {

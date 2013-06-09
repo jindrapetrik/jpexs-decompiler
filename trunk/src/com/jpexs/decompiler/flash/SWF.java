@@ -1425,7 +1425,7 @@ public class SWF {
             g.setTransform(trans);
             if (character instanceof DrawableTag) {
                 DrawableTag drawable = (DrawableTag) character;
-                BufferedImage img = drawable.toImage(1/*layer.duration*/, allTags, displayRect, characters);
+                BufferedImage img = drawable.toImage(layer.ratio < 0 ? 0 : layer.ratio/*layer.duration*/, allTags, displayRect, characters);
 
 
                 if (layer.filters != null) {
@@ -1440,7 +1440,7 @@ public class SWF {
                 if (layer.colorTransFormAlpha != null) {
                     img = layer.colorTransFormAlpha.apply(img);
                 }
-                Point imgPos = drawable.getImagePos(characters);
+                Point imgPos = drawable.getImagePos(layer.ratio < 0 ? 0 : layer.ratio, characters);
                 if (imgPos.x < 0) {
                     imgPos.x = 0;
                 }
@@ -1562,7 +1562,7 @@ public class SWF {
         HashMap<Integer, Layer> layers = new HashMap<>();
 
         int maxDepth = 0;
-        int f = 1;
+        int f = 0;
         Color backgroundColor = new Color(0, 0, 0, 0);
         for (Tag t : controlTags) {
             if (t instanceof SetBackgroundColorTag) {

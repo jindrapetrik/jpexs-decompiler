@@ -242,8 +242,13 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
     }
 
     @Override
-    public Point getImagePos(HashMap<Integer, CharacterTag> characters) {
+    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters) {
         RECT displayRect = getRect(characters);
         return new Point(0, 0); //displayRect.Xmin,displayRect.Ymin);
+    }
+
+    @Override
+    public int getNumFrames() {
+        return frameCount;
     }
 }

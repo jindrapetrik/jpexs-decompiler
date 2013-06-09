@@ -16,8 +16,14 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import java.awt.BorderLayout;
 import java.awt.Image;
+import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -25,6 +31,10 @@ import javax.swing.JPanel;
 public class ImagePanel extends JPanel {
 
     public JLabel label = new JLabel();
+    public DrawableTag drawable;
+    private Timer timer;
+    private int percent;
+    private int frame;
 
     public ImagePanel() {
         super(new BorderLayout());
@@ -33,11 +43,52 @@ public class ImagePanel extends JPanel {
     }
 
     public void setImage(byte data[]) {
+        if (timer != null) {
+            timer.cancel();
+        }
         ImageIcon icon = new ImageIcon(data);
         label.setIcon(icon);
     }
 
+    public void setDrawable(final DrawableTag drawable, final SWF swf, final HashMap<Integer, CharacterTag> characters) {
+        this.drawable = drawable;
+        if (timer != null) {
+            timer.cancel();
+        }
+
+        if (drawable.getNumFrames() == 0) {
+            label.setIcon(null);
+            return;
+        }
+        if (drawable.getNumFrames() == 1) {
+            setImage(drawable.toImage(0, swf.tags, swf.displayRect, characters));
+            return;
+        }
+        timer = new Timer();
+
+        percent = 0;
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                int nframe = percent * drawable.getNumFrames() / 100;
+                if (nframe != frame) {
+                    ImageIcon icon = new ImageIcon(drawable.toImage(nframe, swf.tags, swf.displayRect, characters));
+                    label.setIcon(icon);
+                }
+                if (percent == 100) {
+                    percent = 0;
+                } else {
+                    percent++;
+                }
+
+            }
+        }, 0, 20);
+    }
+
     public void setImage(Image image) {
+        if (timer != null) {
+            timer.cancel();
+        }
         ImageIcon icon = new ImageIcon(image);
         label.setIcon(icon);
     }

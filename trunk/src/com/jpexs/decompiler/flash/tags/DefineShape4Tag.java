@@ -43,7 +43,7 @@ public class DefineShape4Tag extends CharacterTag implements BoundedTag, ShapeTa
     public SHAPEWITHSTYLE shapes;
 
     @Override
-    public Point getImagePos(HashMap<Integer, CharacterTag> characters) {
+    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters) {
         return new Point(shapeBounds.Xmin / 20, shapeBounds.Ymin / 20);
     }
 
@@ -98,5 +98,10 @@ public class DefineShape4Tag extends CharacterTag implements BoundedTag, ShapeTa
     @Override
     public List<GeneralPath> getPaths(List<Tag> tags) {
         return SHAPERECORD.shapeToPaths(tags, 4, shapes.shapeRecords);
+    }
+
+    @Override
+    public int getNumFrames() {
+        return 1;
     }
 }

@@ -43,6 +43,25 @@ public class MORPHLINESTYLE2 {
     public RGBA endColor;
     public MORPHFILLSTYLE fillType;
 
+    public LINESTYLE2 getLineStyle2At(int ratio) {
+        LINESTYLE2 ret = new LINESTYLE2();
+        ret.width = startWidth + (endWidth - startWidth) * ratio / 65535;
+        ret.startCapStyle = startCapStyle;
+        ret.joinStyle = joinStyle;
+        ret.hasFillFlag = hasFillFlag;
+        ret.noHScaleFlag = noHScaleFlag;
+        ret.noVScaleFlag = noVScaleFlag;
+        ret.pixelHintingFlag = pixelHintingFlag;
+        ret.noClose = noClose;
+        ret.endCapStyle = endCapStyle;
+        ret.miterLimitFactor = miterLimitFactor;
+        ret.color = MORPHGRADIENT.morphColor(startColor, endColor, ratio);
+        if (hasFillFlag) {
+            ret.fillType = fillType.getFillStyleAt(ratio);
+        }
+        return ret;
+    }
+
     public LINESTYLE2 getStartLineStyle2() {
         LINESTYLE2 ret = new LINESTYLE2();
         ret.width = startWidth;

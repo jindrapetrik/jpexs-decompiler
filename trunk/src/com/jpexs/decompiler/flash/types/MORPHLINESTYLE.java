@@ -34,6 +34,13 @@ public class MORPHLINESTYLE {
         return ret;
     }
 
+    public LINESTYLE getLineStyleAt(int ratio) {
+        LINESTYLE ret = new LINESTYLE();
+        ret.colorA = MORPHGRADIENT.morphColor(startColor, endColor, ratio);
+        ret.width = startWidth + (endWidth - startWidth) * ratio / 65535;
+        return ret;
+    }
+
     public LINESTYLE getEndLineStyle() {
         LINESTYLE ret = new LINESTYLE();
         ret.colorA = endColor;

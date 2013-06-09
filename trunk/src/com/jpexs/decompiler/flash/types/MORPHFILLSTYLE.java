@@ -55,6 +55,38 @@ public class MORPHFILLSTYLE implements NeedsCharacters {
         return ret;
     }
 
+    private MATRIX morphMatrix(MATRIX a, MATRIX b, int ratio) {
+        if (a == null) {
+            return null;
+        }
+        if (b == null) {
+            return null;
+        }
+        MATRIX ret = new MATRIX();
+        ret.scaleX = a.getScaleX() + (b.getScaleX() - a.getScaleX()) * ratio / 65535;
+        ret.scaleY = a.getScaleY() + (b.getScaleY() - a.getScaleY()) * ratio / 65535;
+        ret.rotateSkew0 = a.getRotateSkew0() + (b.getRotateSkew0() - a.getRotateSkew0()) * ratio / 65535;
+        ret.rotateSkew1 = a.getRotateSkew1() + (b.getRotateSkew1() - a.getRotateSkew1()) * ratio / 65535;
+        ret.translateX = a.translateX + (b.translateX - a.translateX) * ratio / 65535;
+        ret.translateY = a.translateY + (b.translateY - a.translateY) * ratio / 65535;
+        ret.hasRotate = true;
+        ret.hasScale = true;
+        return ret;
+    }
+
+    public FILLSTYLE getFillStyleAt(int ratio) {
+        FILLSTYLE ret = new FILLSTYLE();
+        ret.bitmapId = bitmapId;
+        ret.bitmapMatrix = morphMatrix(startBitmapMatrix, endBitmapMatrix, ratio);
+        ret.colorA = MORPHGRADIENT.morphColor(startColor, endColor, ratio);
+        ret.fillStyleType = fillStyleType;
+        if (gradient != null) {
+            ret.gradient = gradient.getGradientAt(ratio);
+        }
+        ret.gradientMatrix = morphMatrix(startGradientMatrix, endGradientMatrix, ratio);
+        return ret;
+    }
+
     public FILLSTYLE getStartFillStyle() {
         FILLSTYLE ret = new FILLSTYLE();
         ret.bitmapId = bitmapId;

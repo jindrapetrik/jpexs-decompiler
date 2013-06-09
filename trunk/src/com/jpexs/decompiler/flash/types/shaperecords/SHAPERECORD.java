@@ -621,12 +621,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                         if (r instanceof StyleChangeRecord) {
                             StyleChangeRecord mv = (StyleChangeRecord) r;
                             if (mv.stateMoveTo) {
-                                StyleChangeRecord mv2 = null;
-                                try {
-                                    mv2 = (StyleChangeRecord) mv.clone();
-                                } catch (CloneNotSupportedException ex) {
-                                    Logger.getLogger(SHAPERECORD.class.getName()).log(Level.SEVERE, null, ex);
-                                }
+                                StyleChangeRecord mv2 = (StyleChangeRecord) mv.clone();
                                 mv2.moveDeltaX = oldX;
                                 mv2.moveDeltaY = oldY;
                                 r = mv2;
@@ -756,6 +751,8 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                         if (onepath == null) {
                             onepath = new Path();
                             onepath.fillStyle0 = p.fillStyle0;
+                            onepath.lineStyle = p.lineStyle;
+                            onepath.lineStyle2 = p.lineStyle2;
                         }
                         if (onepath.start == null) {
                             onepath.start = p.start;
@@ -773,6 +770,15 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
         bounds.Ymax = max_y;
         bounds.Xmin = min_x;
         bounds.Ymin = min_y;
+        return ret;
+    }
+
+    public static CurvedEdgeRecord straightToCurve(StraightEdgeRecord ser) {
+        CurvedEdgeRecord ret = new CurvedEdgeRecord();
+        ret.controlDeltaX = ser.deltaX / 2;
+        ret.controlDeltaY = ser.deltaY / 2;
+        ret.anchorDeltaX = ser.deltaX / 2;
+        ret.anchorDeltaY = ser.deltaY / 2;
         return ret;
     }
 

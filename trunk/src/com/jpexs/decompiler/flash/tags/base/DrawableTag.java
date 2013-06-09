@@ -31,5 +31,7 @@ public interface DrawableTag {
 
     public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters);
 
-    public Point getImagePos(HashMap<Integer, CharacterTag> characters);
+    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters);
+
+    public int getNumFrames();
 }

@@ -495,7 +495,12 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, 
     }
 
     @Override
-    public Point getImagePos(HashMap<Integer, CharacterTag> characters) {
+    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters) {
         return new Point(0, 0);
+    }
+
+    @Override
+    public int getNumFrames() {
+        return 1;
     }
 }

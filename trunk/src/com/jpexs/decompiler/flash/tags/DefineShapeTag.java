@@ -82,12 +82,17 @@ public class DefineShapeTag extends CharacterTag implements BoundedTag, ShapeTag
     }
 
     @Override
-    public Point getImagePos(HashMap<Integer, CharacterTag> characters) {
+    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters) {
         return new Point(shapeBounds.Xmin / 20, shapeBounds.Ymin / 20);
     }
 
     @Override
     public List<GeneralPath> getPaths(List<Tag> tags) {
         return SHAPERECORD.shapeToPaths(tags, 1, shapes.shapeRecords);
+    }
+
+    @Override
+    public int getNumFrames() {
+        return 1;
     }
 }

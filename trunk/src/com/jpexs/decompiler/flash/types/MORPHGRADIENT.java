@@ -26,6 +26,42 @@ public class MORPHGRADIENT {
     public MORPHGRADRECORD gradientRecords[];
     public int numGradientsExtra;
 
+    public static RGBA morphColor(RGBA c1, RGBA c2, int ratio) {
+        int r = (c1.red + (c2.red - c1.red) * ratio / 65535);
+        int g = (c1.green + (c2.green - c1.green) * ratio / 65535);
+        int b = (c1.blue + (c2.blue - c1.blue) * ratio / 65535);
+        int a = (c1.alpha + (c2.alpha - c1.alpha) * ratio / 65535);
+        if (r > 255) {
+            r = 255;
+        }
+        if (g > 255) {
+            g = 255;
+        }
+        if (b > 255) {
+            b = 255;
+        }
+        if (a > 255) {
+            a = 255;
+        }
+        return new RGBA(r, g, b, a);
+    }
+
+    public GRADIENT getGradientAt(int ratio) {
+        GRADIENT ret = new GRADIENT();
+        ret.gradientRecords = new GRADRECORD[gradientRecords.length];
+        for (int m = 0; m < gradientRecords.length; m++) {
+
+
+
+
+            int gratio = (gradientRecords[m].startRatio + (gradientRecords[m].endRatio - gradientRecords[m].startRatio) * ratio / 65535);
+            ret.gradientRecords[m] = new GRADRECORD();
+            ret.gradientRecords[m].colorA = morphColor(gradientRecords[m].startColor, gradientRecords[m].endColor, ratio);
+            ret.gradientRecords[m].ratio = gratio;
+        }
+        return ret;
+    }
+
     public GRADIENT getStartGradient() {
         GRADIENT ret = new GRADIENT();
         ret.gradientRecords = new GRADRECORD[gradientRecords.length];
