@@ -349,9 +349,6 @@ public class Graph {
     }
 
     private void processIfs(List<GraphTargetItem> list) {
-        if (true) {
-            return;
-        }
         for (int i = 0; i < list.size(); i++) {
             GraphTargetItem item = list.get(i);
             if (item instanceof Block) {
