@@ -1090,9 +1090,9 @@ public class Action implements GraphSourceItem {
                                                             output2.add(new ClassTreeItem(className, extendsOp, implementsOp, functions, vars, staticFunctions, staticVars));
                                                             return output2;
                                                         }
-                                                        if (parts.get(pos) instanceof PopTreeItem) {
-                                                            pos++;
-                                                        }
+                                                        /*if (parts.get(pos) instanceof PopTreeItem) {
+                                                         pos++;
+                                                         }*/
                                                         if (parts.size() <= pos) {
                                                             ok = false;
                                                             break;

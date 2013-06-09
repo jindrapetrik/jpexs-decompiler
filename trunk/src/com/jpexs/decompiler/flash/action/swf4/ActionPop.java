@@ -49,7 +49,7 @@ public class ActionPop extends Action {
         } else if (val instanceof SetTypeTreeItem) {
             output.add(val);
         } else {
-            output.add(new PopTreeItem(this));
+            //output.add(new PopTreeItem(this));
         }
         /*if (!(val instanceof DirectValueTreeItem)) {
          output.add(new VoidTreeItem(this, val));
