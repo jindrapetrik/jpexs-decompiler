@@ -33,9 +33,9 @@ public class SWFStreamTest {
             sos.writeFB(20, f);
         }
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        SWFInputStream sis = new SWFInputStream(bais, 10);
-        assertTrue(Double.compare(f, sis.readFB(20)) == 0);
-        sis.close();
+        try (SWFInputStream sis = new SWFInputStream(bais, 10)) {
+            assertTrue(Double.compare(f, sis.readFB(20)) == 0);
+        }
     }
 
     @Test
@@ -49,13 +49,13 @@ public class SWFStreamTest {
             sos.writeUB(9, 5);
         }
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        SWFInputStream sis = new SWFInputStream(bais, 10);
-        assertEquals(1, sis.readUB(5));
-        assertEquals(2, sis.readUB(6));
-        assertEquals(3, sis.readUB(7));
-        assertEquals(4, sis.readUB(8));
-        assertEquals(5, sis.readUB(9));
-        sis.close();
+        try (SWFInputStream sis = new SWFInputStream(bais, 10)) {
+            assertEquals(1, sis.readUB(5));
+            assertEquals(2, sis.readUB(6));
+            assertEquals(3, sis.readUB(7));
+            assertEquals(4, sis.readUB(8));
+            assertEquals(5, sis.readUB(9));
+        }
     }
 
     @Test
@@ -69,13 +69,13 @@ public class SWFStreamTest {
             sos.writeSB(9, -5);
         }
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        SWFInputStream sis = new SWFInputStream(bais, 10);
-        assertEquals(-1, sis.readSB(5));
-        assertEquals(2, sis.readSB(6));
-        assertEquals(-3, sis.readSB(7));
-        assertEquals(4, sis.readSB(8));
-        assertEquals(-5, sis.readSB(9));
-        sis.close();
+        try (SWFInputStream sis = new SWFInputStream(bais, 10)) {
+            assertEquals(-1, sis.readSB(5));
+            assertEquals(2, sis.readSB(6));
+            assertEquals(-3, sis.readSB(7));
+            assertEquals(4, sis.readSB(8));
+            assertEquals(-5, sis.readSB(9));
+        }
     }
 
     @Test

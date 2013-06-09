@@ -55,9 +55,7 @@ public class TraitMethodGetterSetter extends Trait {
 
     @Override
     public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
-        if (!Configuration.DO_DECOMPILE) {
-            return "";
-        }
+
         if (debugMode) {
             System.err.println("Decompiling " + path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames));
         }
@@ -65,7 +63,7 @@ public class TraitMethodGetterSetter extends Trait {
 
         String bodyStr = "";
         int bodyIndex = abc.findBodyIndex(method_info);
-        if (bodyIndex != -1) {
+        if ((bodyIndex != -1) && Configuration.DO_DECOMPILE) {
             bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames), pcode, isStatic, scriptIndex, classIndex, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, highlight, fullyQualifiedNames, null), 3);
         }
         return ABC.IDENT_STRING + ABC.IDENT_STRING + header + ((classIndex != -1 && abc.instance_info[classIndex].isInterface()) ? ";" : " {\r\n" + bodyStr + "\r\n" + ABC.IDENT_STRING + ABC.IDENT_STRING + "}");

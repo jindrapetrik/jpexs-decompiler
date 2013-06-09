@@ -47,7 +47,7 @@ public class SwitchItem extends LoopItem implements Block {
     @Override
     public String toString(List<Object> localData) {
         String ret = "";
-        ret += "loopswitch" + loop.id + ":\r\n";
+        ret += "loop" + loop.id + ":\r\n";
         ret += hilight("switch(") + switchedObject.toString(localData) + hilight(")") + "\r\n{\r\n";
         for (int i = 0; i < caseCommands.size(); i++) {
             for (int k = 0; k < valuesMapping.size(); k++) {

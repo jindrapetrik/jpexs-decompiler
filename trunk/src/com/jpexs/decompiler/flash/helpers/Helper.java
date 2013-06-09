@@ -270,9 +270,10 @@ public class Helper {
                 oos.writeObject(o);
                 oos.flush();
             }
-            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));
-            Object copy = ois.readObject();
-            ois.close();
+            Object copy;
+            try (ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()))) {
+                copy = ois.readObject();
+            }
             return copy;
         } catch (Exception ex) {
             ex.printStackTrace();

@@ -122,7 +122,7 @@ public class Traits implements Serializable {
 
     public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, boolean makePackages, int scriptIndex, int classIndex, boolean highlighting, List<String> fullyQualifiedNames) {
         String s = "";
-        ExecutorService executor = Executors.newFixedThreadPool(20);
+        ExecutorService executor = Executors.newFixedThreadPool(Trait.debugMode ? 1 : 20);
         List<Future<String>> futureResults = new ArrayList<>();
         for (int t = 0; t < traits.length; t++) {
             Future<String> future = executor.submit(new TraitConvertTask(traits[t], makePackages, path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlighting, fullyQualifiedNames, t));

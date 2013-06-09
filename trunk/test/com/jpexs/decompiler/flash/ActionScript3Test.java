@@ -143,12 +143,13 @@ public class ActionScript3Test {
                 + "}\r\n"
                 + "if(a==9)\r\n"
                 + "{\r\n"
-                + "return;\r\n"
+                + "break;\r\n"
                 + "}\r\n"
                 + "trace(\"hello 1\");\r\n"
                 + "}\r\n"
                 + "trace(\"hello2\");\r\n"
-                + "}\r\n", false);
+                + "}\r\n"
+                + "return;\r\n", false);
     }
 
     @Test
@@ -179,6 +180,7 @@ public class ActionScript3Test {
                 + "var d:* = undefined;\r\n"
                 + "var e:* = undefined;\r\n"
                 + "var a:* = 5;\r\n"
+                + "loop3:\r\n"
                 + "switch(a)\r\n"
                 + "{\r\n"
                 + "case 57*a:\r\n"
@@ -192,12 +194,9 @@ public class ActionScript3Test {
                 + "}\r\n"
                 + "if(b==15)\r\n"
                 + "{\r\n"
+                + "break loop3;\r\n"
                 + "}\r\n"
-                + "else\r\n"
-                + "{\r\n"
                 + "b=b+1;\r\n"
-                + "continue;\r\n"
-                + "}\r\n"
                 + "}\r\n"
                 + "break;\r\n"
                 + "case 13:\r\n"

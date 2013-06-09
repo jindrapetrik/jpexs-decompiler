@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.graph;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author JPEXS
@@ -24,7 +27,12 @@ public class Loop {
 
     public GraphPart loopContinue;
     public GraphPart loopBreak;
+    public GraphPart loopPreContinue;
+    public int precoPhase;
+    public List<GraphPart> breakCandidates = new ArrayList<>();
     public long id;
+    public boolean used = false;
+    public boolean finished = false;
 
     public Loop(long id, GraphPart loopContinue, GraphPart loopBreak) {
         this.loopContinue = loopContinue;
@@ -34,6 +42,6 @@ public class Loop {
 
     @Override
     public String toString() {
-        return "loop(id:" + id + ",continue:" + loopContinue + ", break:" + loopBreak + ")";
+        return "loop(id:" + id + (loopPreContinue != null ? ",precontinue:" + loopPreContinue : "") + ",continue:" + loopContinue + ", break:" + loopBreak + ")";
     }
 }

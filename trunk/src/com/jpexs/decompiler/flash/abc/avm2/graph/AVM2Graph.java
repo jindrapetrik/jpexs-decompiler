@@ -27,16 +27,21 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalTypeIn
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.KillIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnValueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushIntegerTypeIns;
+import com.jpexs.decompiler.flash.abc.avm2.treemodel.FilteredCheckTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.HasNextTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.InTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.treemodel.LocalRegTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.NextNameTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.NextValueTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.NullTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.ReturnValueTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.ReturnVoidTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.SetLocalTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.treemodel.SetPropertyTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.SetTypeTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.treemodel.WithTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.ExceptionTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.FilterTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.ForEachInTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.ForInTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.TryTreeItem;
@@ -50,7 +55,9 @@ import com.jpexs.decompiler.flash.graph.GraphPart;
 import com.jpexs.decompiler.flash.graph.GraphPartMulti;
 import com.jpexs.decompiler.flash.graph.GraphSource;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.IfItem;
 import com.jpexs.decompiler.flash.graph.Loop;
+import com.jpexs.decompiler.flash.graph.LoopItem;
 import com.jpexs.decompiler.flash.graph.SwitchItem;
 import com.jpexs.decompiler.flash.graph.WhileItem;
 import java.util.ArrayList;
@@ -1147,7 +1154,7 @@ public class AVM2Graph extends Graph {
      }*/
 
     @Override
-    protected List<GraphTargetItem> check(GraphSource srcCode, List<Object> localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, List<GraphTargetItem> output, HashMap<Loop, List<GraphTargetItem>> forFinalCommands) {
+    protected List<GraphTargetItem> check(GraphSource srcCode, List<Object> localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, List<GraphTargetItem> output) {
         List<GraphTargetItem> ret = null;
 
 
@@ -1227,7 +1234,7 @@ public class AVM2Graph extends Graph {
                                                         }
                                                         //code.code.get(f).ignored = true;
                                                         ignoredSwitches.add(f);
-                                                        finallyCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, parent, fpart, fepart, loops, forFinalCommands);
+                                                        finallyCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, parent, fpart, fepart, loops);
                                                         returnPos = f + 1;
                                                         break;
                                                     }
@@ -1236,7 +1243,7 @@ public class AVM2Graph extends Graph {
                                         }
                                     }
                                     if (!switchFound) {
-                                        finallyCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, parent, fpart, null, loops, forFinalCommands);
+                                        finallyCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, parent, fpart, null, loops);
                                     }
                                     finallyJumps.add(finStart);
                                     break;
@@ -1274,7 +1281,7 @@ public class AVM2Graph extends Graph {
                     List<Object> localData2 = new ArrayList<>();
                     localData2.addAll(localData);
                     localData2.set(DATA_SCOPESTACK, new Stack<GraphTargetItem>());
-                    catchedCommands.add(printGraph(new ArrayList<GraphPart>(), localData2, stack, allParts, parent, npart, nepart, loops, forFinalCommands));
+                    catchedCommands.add(printGraph(new ArrayList<GraphPart>(), localData2, stack, allParts, parent, npart, nepart, loops));
                 }
 
                 GraphPart nepart = null;
@@ -1285,7 +1292,7 @@ public class AVM2Graph extends Graph {
                         break;
                     }
                 }
-                List<GraphTargetItem> tryCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, parent, part, nepart, loops, forFinalCommands);
+                List<GraphTargetItem> tryCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, parent, part, nepart, loops);
 
                 output.clear();
                 output.add(new TryTreeItem(tryCommands, catchedExceptions, catchedCommands, finallyCommands));
@@ -1309,7 +1316,7 @@ public class AVM2Graph extends Graph {
             ret.addAll(output);
             GraphTargetItem lop = checkLoop(part, stopPart, loops);
             if (lop == null) {
-                ret.addAll(printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, part, stopPart, loops, forFinalCommands));
+                ret.addAll(printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, part, stopPart, loops));
             } else {
                 ret.add(lop);
             }
@@ -1433,6 +1440,7 @@ public class AVM2Graph extends Graph {
 
             GraphTargetItem ti = checkLoop(next, stopPart, loops);
             Loop currentLoop = new Loop(loops.size(), null, next);
+            currentLoop.used = true;
             loops.add(currentLoop);
             //switchLoc.getNextPartPath(new ArrayList<GraphPart>());
             List<Integer> valuesMapping = new ArrayList<>();
@@ -1449,7 +1457,14 @@ public class AVM2Graph extends Graph {
             GraphPart defaultPart = null;
             if (hasDefault) {
                 defaultPart = switchLoc.nextParts.get(switchLoc.nextParts.size() - 1);
-                defaultCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, switchLoc, defaultPart, next, loops, forFinalCommands);
+                defaultCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, switchLoc, defaultPart, next, loops);
+                if (!defaultCommands.isEmpty()) {
+                    if (defaultCommands.get(defaultCommands.size() - 1) instanceof BreakItem) {
+                        if (((BreakItem) defaultCommands.get(defaultCommands.size() - 1)).loopId == currentLoop.id) {
+                            defaultCommands.remove(defaultCommands.size() - 1);
+                        }
+                    }
+                }
             }
 
             List<GraphPart> ignored = new ArrayList<>();
@@ -1464,19 +1479,19 @@ public class AVM2Graph extends Graph {
                 if (next != null) {
                     if (i < caseBodies.size() - 1) {
                         if (!caseBodies.get(i).leadsTo(srcCode, caseBodies.get(i + 1), ignored)) {
-                            cc.add(new BreakItem(null, currentLoop.id));
+                            //cc.add(new BreakItem(null, currentLoop.id));
                         } else {
                             nextCase = caseBodies.get(i + 1);
                         }
                     } else if (hasDefault) {
                         if (!caseBodies.get(i).leadsTo(srcCode, defaultPart, ignored)) {
-                            cc.add(new BreakItem(null, currentLoop.id));
+                            //cc.add(new BreakItem(null, currentLoop.id));
                         } else {
                             nextCase = defaultPart;
                         }
                     }
                 }
-                cc.addAll(0, printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, switchLoc, caseBodies.get(i), nextCase, loops, forFinalCommands));
+                cc.addAll(0, printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, switchLoc, caseBodies.get(i), nextCase, loops));
                 caseCommands.add(cc);
             }
 
@@ -1487,7 +1502,7 @@ public class AVM2Graph extends Graph {
                 if (ti != null) {
                     ret.add(ti);
                 } else {
-                    ret.addAll(printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, next, stopPart, loops, forFinalCommands));
+                    ret.addAll(printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, next, stopPart, loops));
                 }
             }
         }
@@ -1507,6 +1522,57 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
+    protected GraphTargetItem checkLoop(LoopItem loopItem, List<Object> localData, List<Loop> loops) {
+        if (loopItem instanceof WhileItem) {
+            WhileItem w = (WhileItem) loopItem;
+
+            if ((!w.expression.isEmpty()) && (w.expression.get(w.expression.size() - 1) instanceof HasNextTreeItem)) {
+                if (((HasNextTreeItem) w.expression.get(w.expression.size() - 1)).collection.getNotCoerced().getThroughRegister() instanceof FilteredCheckTreeItem) {
+                    GraphTargetItem gti = ((HasNextTreeItem) ((HasNextTreeItem) w.expression.get(w.expression.size() - 1))).collection.getNotCoerced().getThroughRegister();
+                    if (w.commands.size() >= 3) { //((w.commands.size() == 3) || (w.commands.size() == 4)) {
+                        int pos = 0;
+                        while (w.commands.get(pos) instanceof SetLocalTreeItem) {
+                            pos++;
+                        }
+                        GraphTargetItem ft = w.commands.get(pos);
+                        if (ft instanceof WithTreeItem) {
+                            ft = w.commands.get(pos + 1);
+                            if (ft instanceof IfItem) {
+                                IfItem ift = (IfItem) ft;
+                                if (ift.onTrue.size() > 0) {
+                                    ft = ift.onTrue.get(0);
+                                    if (ft instanceof SetPropertyTreeItem) {
+                                        SetPropertyTreeItem spt = (SetPropertyTreeItem) ft;
+                                        if (spt.object instanceof LocalRegTreeItem) {
+                                            int regIndex = ((LocalRegTreeItem) spt.object).regIndex;
+                                            HasNextTreeItem iti = (HasNextTreeItem) w.expression.get(w.expression.size() - 1);
+                                            @SuppressWarnings("unchecked")
+                                            HashMap<Integer, GraphTargetItem> localRegs = (HashMap<Integer, GraphTargetItem>) localData.get(DATA_LOCALREGS);
+                                            localRegs.put(regIndex, new FilterTreeItem(null, iti.collection.getThroughRegister(), ift.expression));
+                                            return null;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else if (!w.commands.isEmpty()) {
+                    if (w.commands.get(0) instanceof SetTypeTreeItem) {
+                        SetTypeTreeItem sti = (SetTypeTreeItem) w.commands.remove(0);
+                        GraphTargetItem gti = sti.getValue().getNotCoerced();
+                        if (gti instanceof NextValueTreeItem) {
+                            return new ForEachInTreeItem(w.src, w.loop, new InTreeItem(null, sti.getObject(), ((HasNextTreeItem) w.expression.get(w.expression.size() - 1)).collection), w.commands);
+                        } else if (gti instanceof NextNameTreeItem) {
+                            return new ForInTreeItem(w.src, w.loop, new InTreeItem(null, sti.getObject(), ((HasNextTreeItem) w.expression.get(w.expression.size() - 1)).collection), w.commands);
+                        }
+                    }
+                }
+            }
+        }
+        return loopItem;
+    }
+
+    @Override
     protected void finalProcess(List<GraphTargetItem> list, int level) {
         if (level == 0) {
             if (!list.isEmpty()) {
@@ -1515,24 +1581,14 @@ public class AVM2Graph extends Graph {
                 }
             }
         }
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i) instanceof WhileItem) {
-                WhileItem w = (WhileItem) list.get(i);
-                if ((!w.expression.isEmpty()) && (w.expression.get(w.expression.size() - 1) instanceof HasNextTreeItem)) {
-                    if (!w.commands.isEmpty()) {
-                        if (w.commands.get(0) instanceof SetTypeTreeItem) {
-                            SetTypeTreeItem sti = (SetTypeTreeItem) w.commands.remove(0);
-                            GraphTargetItem gti = sti.getValue().getNotCoerced();
-                            if (gti instanceof NextValueTreeItem) {
-                                list.set(i, new ForEachInTreeItem(w.src, w.loop, new InTreeItem(null, sti.getObject(), ((HasNextTreeItem) w.expression.get(w.expression.size() - 1)).collection), w.commands));
-                            } else if (gti instanceof NextNameTreeItem) {
-                                list.set(i, new ForInTreeItem(w.src, w.loop, new InTreeItem(null, sti.getObject(), ((HasNextTreeItem) w.expression.get(w.expression.size() - 1)).collection), w.commands));
-                            }
-                        }
-                    }
-                }
-            }
-        }
+
+        /*for (int i = 0; i < list.size(); i++) {
+
+         if (list.get(i) instanceof WhileItem) {
+         WhileItem w = (WhileItem) list.get(i);
+                
+         }
+         }*/
 
 
         List<GraphTargetItem> ret = code.clearTemporaryRegisters(list);
