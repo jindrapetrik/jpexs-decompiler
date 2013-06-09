@@ -148,6 +148,9 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
         }
 
         public void fill(List<Tag> tags, int startX, int startY, Graphics2D g, int shapeNum) {
+            if (fillStyle0 == null) {
+                return;
+            }
             AffineTransform oldAf = g.getTransform();
             AffineTransform trans20 = AffineTransform.getScaleInstance(1 / DESCALE, 1 / DESCALE);
             g.setTransform(trans20);
@@ -345,8 +348,6 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
             }
             if (ok) {
                 GeneralPath path = toGeneralPath(startX, startY);
-                path.closePath();
-                //path.setWindingRule(GeneralPath.WIND_EVEN_ODD);
                 g.fill(path);
             }
             g.setTransform(oldAf);
@@ -821,7 +822,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
     }
 
     public static BufferedImage shapeToImage(List<Tag> tags, int shapeNum, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStylesList, List<SHAPERECORD> records, Color defaultColor) {
-        String key = "shape_" + records.hashCode() + "_" + defaultColor.hashCode();
+        String key = "shape_" + records.hashCode() + "_" + (defaultColor == null ? "null" : defaultColor.hashCode());
         if (cache.containsKey(key)) {
             return cache.get(key);
         }
