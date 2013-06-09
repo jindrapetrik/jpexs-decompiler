@@ -1103,6 +1103,9 @@ public class Action implements GraphSourceItem {
                                                             pos++;
                                                         }
                                                         while ((parts.size() > pos) && ok) {
+                                                            if (parts.get(pos) instanceof ScriptEndItem) {
+                                                                break;
+                                                            }
                                                             if (parts.get(pos) instanceof SetMemberTreeItem) {
                                                                 SetMemberTreeItem smt = (SetMemberTreeItem) parts.get(pos);
                                                                 if (smt.object instanceof DirectValueTreeItem) {
