@@ -124,7 +124,7 @@ public class ActionGraph extends Graph {
     }
 
     @Override
-    protected List<GraphTargetItem> check(GraphSource code, List<Object> localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, GraphPart stopPart, List<Loop> loops, List<GraphTargetItem> output) {
+    protected List<GraphTargetItem> check(GraphSource code, List<Object> localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output) {
         if (!output.isEmpty()) {
             if (output.get(output.size() - 1) instanceof StoreRegisterTreeItem) {
                 StoreRegisterTreeItem str = (StoreRegisterTreeItem) output.get(output.size() - 1);
@@ -184,11 +184,12 @@ public class ActionGraph extends Graph {
                 defaultAndLastPart.add(defaultPart);
                 defaultAndLastPart.add(caseBodyParts.get(caseBodyParts.size() - 1));
 
-                GraphPart defaultPart2 = getCommonPart(defaultAndLastPart);
+                GraphPart defaultPart2 = getCommonPart(defaultAndLastPart,new ArrayList<Loop>());
 
                 List<GraphTargetItem> defaultCommands = new ArrayList<>();
-
-                defaultCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, defaultPart, defaultPart2, loops);
+                List<GraphPart> stopPart2=new ArrayList<>(stopPart);
+                                                        stopPart2.add(defaultPart2);
+                defaultCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, defaultPart, stopPart2, loops);
 
 
                 List<GraphPart> loopContinues = new ArrayList<>();
@@ -201,7 +202,7 @@ public class ActionGraph extends Graph {
                 List<GraphPart> breakParts = new ArrayList<>();
                 for (int g = 0; g < caseBodyParts.size(); g++) {
                     if (g < caseBodyParts.size() - 1) {
-                        if (caseBodyParts.get(g).leadsTo(code, caseBodyParts.get(g + 1), loopContinues)) {
+                        if (caseBodyParts.get(g).leadsTo(code, caseBodyParts.get(g + 1), loops)) {
                             continue;
                         }
                     }
@@ -260,7 +261,9 @@ public class ActionGraph extends Graph {
                     defaultPart = null;
                 }
                 if ((defaultPart != null) && (defaultCommands.isEmpty())) {
-                    defaultCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, defaultPart, next, loops);
+                    List<GraphPart> stopPart2x=new ArrayList<>(stopPart);
+                                                        stopPart2x.add(next);
+                    defaultCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, defaultPart, stopPart2x, loops);
                 }
 
                 List<GraphPart> ignored = new ArrayList<>();
@@ -274,20 +277,22 @@ public class ActionGraph extends Graph {
                     nextCase = next;
                     if (next != null) {
                         if (i < caseBodies.size() - 1) {
-                            if (!caseBodies.get(i).leadsTo(code, caseBodies.get(i + 1), ignored)) {
+                            if (!caseBodies.get(i).leadsTo(code, caseBodies.get(i + 1), loops)) {
                                 cc.add(new BreakItem(null, currentLoop.id));
                             } else {
                                 nextCase = caseBodies.get(i + 1);
                             }
                         } else if (!defaultCommands.isEmpty()) {
-                            if (!caseBodies.get(i).leadsTo(code, defaultPart, ignored)) {
+                            if (!caseBodies.get(i).leadsTo(code, defaultPart, loops)) {
                                 cc.add(new BreakItem(null, currentLoop.id));
                             } else {
                                 nextCase = defaultPart;
                             }
                         }
                     }
-                    cc.addAll(0, printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, caseBodies.get(i), nextCase, loops));
+                    List<GraphPart> stopPart2x=new ArrayList<>(stopPart);
+                                                        stopPart2.add(nextCase);
+                    cc.addAll(0, printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, caseBodies.get(i), stopPart2x, loops));
                     if (cc.size() >= 2) {
                         if (cc.get(cc.size() - 1) instanceof BreakItem) {
                             if ((cc.get(cc.size() - 2) instanceof ContinueItem) || (cc.get(cc.size() - 2) instanceof BreakItem)) {

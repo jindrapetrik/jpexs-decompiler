@@ -35,14 +35,57 @@ public class GraphPart {
     public List<GraphPart> refs = new ArrayList<>();
     public boolean ignored = false;
     public List<Object> forContinues = new ArrayList<>();
-
-    private boolean leadsTo(GraphSource code, GraphPart part, List<GraphPart> visited, List<GraphPart> ignored) {
+    public int level;
+    
+    public int discoveredTime;
+    public int finishedTime;
+    public int order;
+    
+    
+    public int setTime(int time,List<GraphPart> ordered,List<GraphPart> visited){
+        discoveredTime = time;
+        visited.add(this);
+        for(GraphPart next:nextParts){
+            if(!visited.contains(next)){
+                time=next.setTime(time+1, ordered, visited);
+            }
+        }
+        time++;
+        finishedTime = time;
+        order=ordered.size();
+        ordered.add(this);        
+        return time;
+    }
+    
+    private boolean leadsTo(GraphSource code, GraphPart part, List<GraphPart> visited, List<Loop> loops) {
+        Loop currentLoop=null;
+        for(Loop l:loops){
+            /*if(l.phase==0){
+                if(l.loopContinue==this){
+                    l.leadsToMark = 1;
+                    next = l.loopBreak;
+                    currentLoop = l;
+                    continue;
+                }
+            }*/
+            if(l.phase==1){
+                if(l.loopContinue==this){
+                    return false;
+                }
+                if(l.loopPreContinue==this){
+                    return false;
+                }
+                if(l.loopBreak==this){
+                    return false;
+                }
+            }
+        }
         if (visited.contains(this)) {
             return false;
         }
-        if (ignored.contains(this)) {
+        /*if (loops.contains(this)) {
             return false;
-        }
+        }*/
         visited.add(this);
         if (end < code.size() && code.get(end).isBranch() && (code.get(end).ignoredLoops())) {
             return false;
@@ -51,7 +94,7 @@ public class GraphPart {
             if (p == part) {
                 return true;
             } else {
-                if (p.leadsTo(code, part, visited, ignored)) {
+                if (p.leadsTo(code, part, visited, loops)) {
                     return true;
                 }
             }
@@ -59,8 +102,11 @@ public class GraphPart {
         return false;
     }
 
-    public boolean leadsTo(GraphSource code, GraphPart part, List<GraphPart> ignored) {
-        return leadsTo(code, part, new ArrayList<GraphPart>(), ignored);
+    public boolean leadsTo(GraphSource code, GraphPart part, List<Loop> loops) {
+        for(Loop l:loops){
+            l.leadsToMark = 0;
+        }
+        return leadsTo(code, part, new ArrayList<GraphPart>(), loops);
     }
 
     public GraphPart(int start, int end) {

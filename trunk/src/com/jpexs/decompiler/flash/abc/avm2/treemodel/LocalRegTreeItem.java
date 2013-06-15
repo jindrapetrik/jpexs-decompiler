@@ -33,7 +33,7 @@ public class LocalRegTreeItem extends TreeItem {
         super(instruction, PRECEDENCE_PRIMARY);
         this.regIndex = regIndex;
         if (computedValue == null) {
-            computedValue = new UndefinedTreeItem(instruction);
+            //computedValue = new UndefinedTreeItem(instruction);
         }
         this.computedValue = computedValue;
     }
@@ -48,21 +48,33 @@ public class LocalRegTreeItem extends TreeItem {
 
     @Override
     public GraphTargetItem getThroughRegister() {
+        if(computedValue == null){
+            return this;
+        }
         return computedValue.getThroughRegister();
     }
 
     @Override
     public double toNumber() {
+        if(computedValue==null){
+            return 0;
+        }
         return computedValue.toNumber();
     }
 
     @Override
     public boolean toBoolean() {
+        if(computedValue==null){
+            return false;
+        }
         return computedValue.toBoolean();
     }
 
     @Override
     public boolean isCompileTime() {
+        if(computedValue==null){
+            return false;
+        }
         return computedValue.isCompileTime();
     }
 }
