@@ -103,6 +103,7 @@ public class ActionStoreRegister extends Action {
                 if (stack.peek().equals(obj)) {
                     stack.pop();
                     stack.push(new PostIncrementTreeItem(this, obj));
+                    stack.push(obj);
                     return;
                 }
             }
