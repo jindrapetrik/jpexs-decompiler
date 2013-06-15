@@ -1166,10 +1166,14 @@ public class SWFInputStream extends InputStream {
         List<Future<Tag>> futureResults = new ArrayList<>();
         List<Tag> tags = new ArrayList<>();
         Tag tag;
-        Tag previousTag = null;
+        Tag previousTag = null;        
         while (true) {
             long pos = getPos();
-            tag = readTag(level, pos, false);
+            try{
+                tag = readTag(level, pos, false);
+            }catch(EndOfStreamException ex){
+                tag=null;
+            }
             if (tag == null) {
                 break;
             }
@@ -1181,8 +1185,7 @@ public class SWFInputStream extends InputStream {
 
             Future<Tag> future = executor.submit(new TagResolutionTask(tag, version, level));
             futureResults.add(future);
-        }
-        executor.shutdown();
+        }        
 
         for (Future<Tag> future : futureResults) {
             try {
@@ -1191,6 +1194,7 @@ public class SWFInputStream extends InputStream {
                 Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "Error during tag reading", e);
             }
         }
+        executor.shutdown();
         return tags;
     }
 
