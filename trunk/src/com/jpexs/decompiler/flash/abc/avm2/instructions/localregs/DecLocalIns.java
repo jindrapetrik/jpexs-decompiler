@@ -63,7 +63,7 @@ public class DecLocalIns extends InstructionDefinition {
         if (localRegs.containsKey(regIndex)) {
             localRegs.put(regIndex, new NotCompileTimeTreeItem(ins, new SubtractTreeItem(ins, localRegs.get(regIndex), new IntegerValueTreeItem(ins, new Long(1)))));
         } else {
-            localRegs.put(regIndex, new SubtractTreeItem(ins, new IntegerValueTreeItem(ins, new Long(0)), new IntegerValueTreeItem(ins, new Long(1))));
+            //localRegs.put(regIndex, new SubtractTreeItem(ins, new IntegerValueTreeItem(ins, new Long(0)), new IntegerValueTreeItem(ins, new Long(1))));
         }
     }
 }

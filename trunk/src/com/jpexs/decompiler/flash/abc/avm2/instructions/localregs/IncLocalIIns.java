@@ -43,7 +43,7 @@ public class IncLocalIIns extends InstructionDefinition {
         if (localRegs.containsKey(regIndex)) {
             localRegs.put(regIndex, new NotCompileTimeTreeItem(ins, new AddTreeItem(ins, localRegs.get(regIndex), new IntegerValueTreeItem(ins, new Long(1)))));
         } else {
-            localRegs.put(regIndex, new AddTreeItem(ins, new IntegerValueTreeItem(ins, new Long(0)), new IntegerValueTreeItem(ins, new Long(1))));
+            //localRegs.put(regIndex, new AddTreeItem(ins, null, new IntegerValueTreeItem(ins, new Long(1))));
         }
     }
 }
