@@ -90,6 +90,9 @@ public class Configuration {
      * Load replacements from file
      */
     private static void loadReplacements(String replacementsFile) {
+        if(!(new File(replacementsFile)).exists()){
+            return;
+        }
         replacements = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(replacementsFile))) {
             String s;
