@@ -143,6 +143,7 @@
                     <minVersion>${MINJAVAVERSION}</minVersion>
                     <maxVersion></maxVersion>
                     <jdkPreference>preferJre</jdkPreference>
+                    <maxHeapSize>${MAXHEAPSIZE}</maxHeapSize>
                 </jre>
                 <versionInfo>
                     <fileVersion>${VERSIONNUMBER}</fileVersion>
@@ -237,6 +238,7 @@
 
     <target name="run" depends="build">
         <java jar="${DISTRIBUTIONDIR}/${JARFILENAME}.jar" fork="true">
+            <jvmarg value="-Xmx${MAXHEAPSIZE}m"/>
             <arg line="${RUNPARAMS}" />
         </java>
     </target>

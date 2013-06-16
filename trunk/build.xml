@@ -17,7 +17,8 @@
     <property name="MAINCLASS" value="com.jpexs.decompiler.flash.gui.Main"/>
     <property name="INNOSETUPPATH" value="c:\program files (x86)\inno setup 5"/>
     <property name="LAUNCH4JPATH" value="c:\program files (x86)\launch4j" />
-    
+    <property name="MAXHEAPSIZE" value="1024"/> <!-- MB -->
+        
     <property name="SOURCEDIR" value="${basedir}/src"/>
     <property name="RESOURCESDIR" value="${basedir}/resources"/>
     <property name="TESTDIR" value="${basedir}/test"/>
