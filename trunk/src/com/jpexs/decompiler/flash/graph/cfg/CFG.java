@@ -81,7 +81,9 @@ public class CFG {
         BasicBlock retNode = findRetNode();
         assert (retNode != null);
         revOrdering.clear();
-        retNode.setRevOrder(revOrdering);
+        if(retNode!=null){
+            retNode.setRevOrder(revOrdering);
+        }
     }
 
     public void getReachableBlocks(BasicBlock b, List<BasicBlock> ret) {
