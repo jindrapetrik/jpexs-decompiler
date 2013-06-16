@@ -1881,6 +1881,7 @@ public class Graph {
         if ((part.endAddress == -1) && (ip >= code.size())) {
             if (part.startAddress == code.size()) {
                 part.endAddress = code.size();
+                part.setType(BBType.RET);
                 allBlocks.add(part);
             } else {
                 part.endAddress = ip - 1;
@@ -1892,6 +1893,7 @@ public class Graph {
                         return ret;
                     }
                 }
+                part.setType(BBType.RET);
                 BasicBlock gp = new BasicBlock();
                 gp.startAddress=ip;
                 gp.endAddress=ip;
