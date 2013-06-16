@@ -45,7 +45,7 @@ public class Highlighting implements Serializable {
     /**
      * Turn hignlighting on/off
      */
-    public static boolean doHighlight = true;
+    private static boolean doHighlight = true;
 
     /**
      * Returns a string representation of the object

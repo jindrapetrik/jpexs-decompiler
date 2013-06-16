@@ -128,7 +128,7 @@ public class Traits implements Serializable {
             Future<String> future = executor.submit(new TraitConvertTask(traits[t], makePackages, path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlighting, fullyQualifiedNames, t));
             futureResults.add(future);
         }
-        
+
         for (int f = 0; f < futureResults.size(); f++) {
             if (f > 0) {
                 s += "\r\n\r\n";

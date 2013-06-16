@@ -309,7 +309,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
     public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
 
         if (!highlight) {
-            Highlighting.doHighlight = false;
+            //Highlighting.doHighlight = false;
         }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream out = null;
@@ -408,6 +408,9 @@ public class TraitClass extends Trait implements TraitWithSlot {
         if (bodyIndex != -1) {
             if (Configuration.DO_DECOMPILE) {
                 bodyStr = abc.bodies[bodyIndex].toString(packageName + "." + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".staticinitializer", pcode, true, scriptIndex, class_info, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), true, highlight, fullyQualifiedNames, abc.class_info[class_info].static_traits);
+                if (!highlight) {
+                    bodyStr = Highlighting.stripHilights(bodyStr);
+                }
             }
         }
         if (Highlighting.stripHilights(bodyStr).equals("")) {
@@ -444,6 +447,9 @@ public class TraitClass extends Trait implements TraitWithSlot {
             if (bodyIndex != -1) {
                 if (Configuration.DO_DECOMPILE) {
                     bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(packageName + "." + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".initializer", pcode, false, scriptIndex, class_info, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, highlight, fullyQualifiedNames, abc.instance_info[class_info].instance_traits), 3);
+                    if (!highlight) {
+                        bodyStr = Highlighting.stripHilights(bodyStr);
+                    }
                 }
                 constructorParams = abc.method_info[abc.instance_info[class_info].iinit_index].getParamStr(abc.constants, abc.bodies[bodyIndex], abc, fullyQualifiedNames);
             } else {
@@ -485,7 +491,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         out.println(bui.toString());
         out.println(ABC.IDENT_STRING + "}");//class
         out.flush();
-        Highlighting.doHighlight = true;
+        //Highlighting.doHighlight = true;
         try {
             if (highlight) {
                 return Highlighting.hilighClass(new String(baos.toByteArray(), "UTF-8"), class_info);
