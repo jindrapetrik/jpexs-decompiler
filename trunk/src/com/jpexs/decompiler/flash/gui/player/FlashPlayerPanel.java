@@ -1,6 +1,7 @@
 package com.jpexs.decompiler.flash.gui.player;
 
 import com.jpexs.decompiler.flash.gui.FlashUnsupportedException;
+import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.Kernel32;
 import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.SHELLEXECUTEINFO;
 import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.Shell32;
@@ -15,8 +16,13 @@ import java.awt.Graphics;
 import java.awt.Panel;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 
 /**
@@ -83,7 +89,16 @@ public class FlashPlayerPanel extends Panel {
 
         SHELLEXECUTEINFO sei = new SHELLEXECUTEINFO();
         sei.fMask = 0x00000040;
-        sei.lpFile = new WString("lib\\FlashPlayer.exe");
+        String appDir="";
+        try {
+            appDir=new File(URLDecoder.decode(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath(),"UTF-8")).getParentFile().getAbsolutePath();
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(FlashPlayerPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if(!appDir.endsWith("\\")){
+            appDir+="\\";
+        }
+        sei.lpFile = new WString(appDir+"lib\\FlashPlayer.exe");
         sei.lpParameters = new WString(hwnd.getPointer().hashCode() + " " + hwndFrame.getPointer().hashCode());
         sei.nShow = WinUser.SW_NORMAL;
         Shell32.INSTANCE.ShellExecuteEx(sei);
