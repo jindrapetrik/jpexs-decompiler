@@ -18,6 +18,10 @@ package com.jpexs.decompiler.flash.graph;
 
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.CommentTreeItem;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.cfg.BBType;
+import com.jpexs.decompiler.flash.graph.cfg.BasicBlock;
+import com.jpexs.decompiler.flash.graph.cfg.CFG;
+import com.jpexs.decompiler.flash.graph.cfg.StructType;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,10 +41,17 @@ public class Graph {
 
     public List<GraphPart> heads;
     protected GraphSource code;
+    public List<CFG> headsCFG;
 
     public Graph(GraphSource code, List<Integer> alternateEntries) {
         this.code = code;
+        headsCFG = new ArrayList<>();
         heads = makeGraph(code, new ArrayList<GraphPart>(), alternateEntries);
+        List<BasicBlock> blocks=new ArrayList<>();
+        List<BasicBlock> headsbb = makeCFG(code, blocks, alternateEntries);
+        CFG cfg=new CFG(blocks, headsbb.get(0));
+        cfg.structure();
+        headsCFG.add(cfg);
         for (GraphPart head : heads) {
             fixGraph(head);
             makeMulti(head, new ArrayList<GraphPart>());
@@ -399,16 +410,51 @@ public class Graph {
         Graph g = new Graph(code, alternateEntries);
         return g.translate(localData);
     }
+    
+    private List<Loop> getLoopsFromCFG(){
+        List<Loop> ret=new ArrayList<>();
+        List<GraphPart> allParts=new ArrayList<>();
+        for(GraphPart h:heads){
+            populateParts(h, allParts);
+        }
+        for(CFG cfg:headsCFG){
+            for(BasicBlock bb:cfg.m_listBB){
+                if(bb.getStructType()== StructType.Loop
+                        || bb.getStructType()== StructType.LoopCond){
+                    GraphPart loopContinue=null;
+                    GraphPart loopBreak=null;                    
+                    for(GraphPart p:allParts){
+                        if(p.start==bb.startAddress){
+                            loopContinue=p;
+                            break;
+                        }
+                    }
+                    if(bb.loopFollow!=null){
+                    for(GraphPart p:allParts){
+                        if(p.start==bb.loopFollow.startAddress){
+                            loopBreak=p;
+                            break;
+                        }
+                    }
+                    }
+                    ret.add(new Loop(ret.size(),loopContinue,loopBreak));
+                }
+            }
+        }
+        return ret;
+    }
 
     public List<GraphTargetItem> translate(List<Object> localData) {
+        try{
         List<GraphPart> allParts = new ArrayList<>();
         for (GraphPart head : heads) {
             populateParts(head, allParts);
         }
         Stack<GraphTargetItem> stack = new Stack<>();
         List<Loop> loops = new ArrayList<>();
-        /*getLoops(heads.get(0), loops, null);
-        System.out.println("<loops>");
+        loops=getLoopsFromCFG();
+        //getLoops(heads.get(0), loops, null);
+        /*System.out.println("<loops>");
         for (Loop el : loops) {
             System.out.println(el);
         }
@@ -419,11 +465,19 @@ public class Graph {
             System.out.println(el);
         }
         System.out.println("</loopspre>");*/
+        
         List<GraphTargetItem> ret = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, heads.get(0), null, loops);
         processIfs(ret);
         finalProcessStack(stack, ret);
         finalProcessAll(ret, 0);
         return ret;
+        } catch (StackOverflowError soe) {
+            List<GraphTargetItem> ret =new ArrayList<>();
+            ret.add(new CommentTreeItem(null, "StackOverflowError"));
+            Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, "error during printGraph", soe);
+            return ret;
+        }
+        
     }
 
     public void finalProcessStack(Stack<GraphTargetItem> stack, List<GraphTargetItem> output) {
@@ -690,10 +744,8 @@ public class Graph {
             stopPart = new ArrayList<>();
         }
 
-        //System.err.println("prec part:"+part);
         for (Loop el : loops) {
             if (el.phase != 1) {
-                //System.err.println("Ignored loop "+el);
                 continue;
             }
             if (el.loopContinue == part) {
@@ -1021,7 +1073,7 @@ public class Graph {
         if (ret == null) {
             ret = new ArrayList<>();
         }
-        try {
+        //try {
             boolean debugMode = false;
 
             if (debugMode) {
@@ -1056,10 +1108,6 @@ public class Graph {
             if (part.ignored) {
                 return ret;
             }
-
-
-
-            //System.out.println("part:" + part);
 
 
             /*    if ((parent != null) && (part.path.length() < parent.path.length())) {
@@ -1418,25 +1466,7 @@ public class Graph {
                 //Loop with condition at the beginning (While)
                 if (!loopTypeFound && (!loopItem.commands.isEmpty())) {
                     if (loopItem.commands.get(0) instanceof IfItem) {
-                        IfItem ifi = (IfItem) loopItem.commands.get(0);
-                        
-                       /*if(loopItem.commands.get(loopItem.commands.size()-1) instanceof BreakItem){
-                            BreakItem bi = (BreakItem)loopItem.commands.get(loopItem.commands.size()-1);
-                            if(bi.loopId==currentLoop.id){
-                                if(!ifi.onFalse.isEmpty()){
-                                    if(ifi.onFalse.get(ifi.onFalse.size()-1) instanceof ContinueItem){
-                                        ContinueItem ci=(ContinueItem)ifi.onFalse.get(ifi.onFalse.size()-1);
-                                        if(ci.loopId==currentLoop.id){
-                                            if(ifi.onTrue.isEmpty()){
-                                                while(1<loopItem.commands.size()){
-                                                    ifi.onTrue.add(loopItem.commands.remove(1));
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }*/
+                        IfItem ifi = (IfItem) loopItem.commands.get(0);                                              
                         
                         
                         List<GraphTargetItem> bodyBranch = null;
@@ -1531,11 +1561,11 @@ public class Graph {
                             List<GraphTargetItem> commands = new ArrayList<>();
                             loopItem.commands.remove(loopItem.commands.size() - 1);
                             if (!bodyBranch.isEmpty()) {
-                                exprList.addAll(loopItem.commands);
+                                /*exprList.addAll(loopItem.commands);
                                 commands.addAll(bodyBranch);
                                 exprList.add(expr);
                                 checkContinueAtTheEnd(commands, currentLoop);
-                                ret.add(index, li = new WhileItem(null, currentLoop, exprList, commands));
+                                ret.add(index, li = new WhileItem(null, currentLoop, exprList, commands));*/
                             } else {
                                 commands.addAll(loopItem.commands);
                                 commands.addAll(bodyBranch);
@@ -1548,7 +1578,7 @@ public class Graph {
                         }
                     }
                 }
-
+                
                 if (!loopTypeFound) {
                     if (currentLoop.loopPreContinue != null) {
                         loopTypeFound = true;
@@ -1615,11 +1645,7 @@ public class Graph {
             }
 
             return ret;
-        } catch (StackOverflowError soe) {
-            ret.add(new CommentTreeItem(null, "StackOverflowError"));
-            Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, "error during printGraph", soe);
-            return ret;
-        }
+        
     }
 
     private List<GraphPart> makeGraph(GraphSource code, List<GraphPart> allBlocks, List<Integer> alternateEntries) {
@@ -1634,11 +1660,27 @@ public class Graph {
         }
         return ret;
     }
+    
+    private List<BasicBlock> makeCFG(GraphSource code, List<BasicBlock> allBlocks, List<Integer> alternateEntries) {
+        HashMap<Integer, List<Integer>> refs = code.visitCode(alternateEntries);
+        List<BasicBlock> ret = new ArrayList<>();
+        boolean visited[] = new boolean[code.size()];
+        ret.add(makeCFG(null, new GraphPath(), code, 0, 0, allBlocks, refs, visited));
+        for (int pos : alternateEntries) {
+            BasicBlock e1 = new BasicBlock();
+            e1.startAddress=-1;
+            e1.endAddress=-1;
+            //e1.path = new GraphPath("e");
+            ret.add(makeCFG(e1, new GraphPath("e"), code, pos, pos, allBlocks, refs, visited));
+        }
+        return ret;
+    }
 
     protected int checkIp(int ip) {
         return ip;
     }
 
+    
     private GraphPart makeGraph(GraphPart parent, GraphPath path, GraphSource code, int startip, int lastIp, List<GraphPart> allBlocks, HashMap<Integer, List<Integer>> refs, boolean visited2[]) {
 
         int ip = startip;
@@ -1737,6 +1779,125 @@ public class Graph {
                 allBlocks.add(gp);
                 gp.refs.add(part);
                 part.nextParts.add(gp);
+                allBlocks.add(part);
+            }
+        }
+        return ret;
+    }
+    
+    private BasicBlock makeCFG(BasicBlock parent, GraphPath path, GraphSource code, int startip, int lastIp, List<BasicBlock> allBlocks, HashMap<Integer, List<Integer>> refs, boolean visited2[]) {
+
+        int ip = startip;
+        for (BasicBlock p : allBlocks) {
+            if (p.startAddress == ip) {
+                p.addInEdge(parent);
+                return p;
+            }
+        }
+        BasicBlock g;
+        BasicBlock ret = new BasicBlock();
+        ret.startAddress=ip;
+        ret.endAddress=-1;
+        //ret.path = path;
+        BasicBlock part = ret;
+        while (ip < code.size()) {
+            if (visited2[ip] || ((ip != startip) && (refs.get(ip).size() > 1))) {
+                part.endAddress = lastIp;
+                BasicBlock found = null;
+                for (BasicBlock p : allBlocks) {
+                    if (p.startAddress == ip) {
+                        found = p;
+                        break;
+                    }
+                }
+
+                allBlocks.add(part);
+
+                if (found != null) {
+                    part.addOutEdge(found);
+                    found.addInEdge(part);
+                    break;
+                } else {
+                    BasicBlock gp = new BasicBlock();
+                    gp.startAddress=ip;
+                    gp.endAddress=-1;
+                    //gp.path = path;
+                    part.addOutEdge(gp);
+                    gp.addInEdge(part);
+                    part = gp;
+                }
+            }
+
+            ip = checkIp(ip);
+            lastIp = ip;
+            GraphSourceItem ins = code.get(ip);
+            if (ins.isIgnored()) {
+                ip++;
+                continue;
+            }
+            if (ins instanceof GraphSourceItemContainer) {
+                GraphSourceItemContainer cnt = (GraphSourceItemContainer) ins;
+                if (ins instanceof Action) { //TODO: Remove dependency of AVM1
+                    long endAddr = ((Action) ins).getAddress() + cnt.getHeaderSize();
+                    for (long size : cnt.getContainerSizes()) {
+                        endAddr += size;
+                    }
+                    ip = code.adr2pos(endAddr);
+                }
+                continue;
+            } else if (ins.isExit()) {
+                part.endAddress = ip;
+                allBlocks.add(part);
+                part.setType(BBType.RET);
+                break;
+            } else if (ins.isJump()) {
+                part.endAddress = ip;
+                allBlocks.add(part);
+                part.setType(BBType.ONEWAY);
+                ip = ins.getBranches(code).get(0);
+                part.addOutEdge(g = makeCFG(part, path, code, ip, lastIp, allBlocks, refs, visited2));
+                g.addInEdge(part);
+                
+                break;
+            } else if (ins.isBranch()) {
+                part.endAddress = ip;
+
+                
+                allBlocks.add(part);
+                List<Integer> branches = ins.getBranches(code);
+                if(branches.size()==2){
+                        part.setType(BBType.TWOWAY);
+                    }else{
+                        part.setType(BBType.NWAY);
+                    }
+                for (int i = 0; i < branches.size(); i++) {
+                    part.addOutEdge(g = makeCFG(part, path.sub(i, ip), code, branches.get(i), ip, allBlocks, refs, visited2));
+                    g.addInEdge(part);                    
+                }
+                break;
+            }
+            ip++;
+        }
+        if ((part.endAddress == -1) && (ip >= code.size())) {
+            if (part.startAddress == code.size()) {
+                part.endAddress = code.size();
+                allBlocks.add(part);
+            } else {
+                part.endAddress = ip - 1;
+                for (BasicBlock p : allBlocks) {
+                    if (p.startAddress == ip) {
+                        p.addInEdge(part);
+                        part.addOutEdge(p);
+                        allBlocks.add(part);
+                        return ret;
+                    }
+                }
+                BasicBlock gp = new BasicBlock();
+                gp.startAddress=ip;
+                gp.endAddress=ip;
+                allBlocks.add(gp);
+                gp.addInEdge(part);
+                part.addOutEdge(gp);
                 allBlocks.add(part);
             }
         }
