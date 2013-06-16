@@ -77,6 +77,13 @@ public class TraitClass extends Trait implements TraitWithSlot {
             name = "*";
         }
         String newimport = ns.getName(abc.constants);
+        System.out.println(newimport + ":" + name + ":" + ns.getKindStr());
+        if ((ns.kind != Namespace.KIND_PACKAGE)
+                && (ns.kind != Namespace.KIND_NAMESPACE)
+                && (ns.kind != Namespace.KIND_STATIC_PROTECTED)) {
+            return false;
+        }
+        System.out.println(newimport);
         /*if (ns.kind == Namespace.KIND_NAMESPACE)*/ {
             String oldimport = newimport;
             newimport = null;
@@ -90,7 +97,18 @@ public class TraitClass extends Trait implements TraitWithSlot {
                     break;
                 }
             }
+            if (newimport == null) {
+                newimport = oldimport;
+                newimport += "." + name;
+            }
+            if (newimport.equals("")) {
+                newimport = null;
+            }
             if (newimport != null) {
+                /*                if(ns.kind==Namespace.KIND_PACKAGE){
+                 newimport+=".*";
+                 }*/
+
                 if (!imports.contains(newimport)) {
                     if (newimport.contains(":")) {
                         return true;
@@ -103,11 +121,15 @@ public class TraitClass extends Trait implements TraitWithSlot {
                     if (usname.contains(".")) {
                         usname = usname.substring(usname.lastIndexOf(".") + 1);
                     }
-                    if (!pkg.equals(ignorePackage)) {
-                        imports.add(newimport);
+                    if (ns.kind == Namespace.KIND_PACKAGE) {
+                        if (!pkg.equals(ignorePackage)) {
+                            imports.add(newimport);
+                        }
                     }
-                    if (!uses.contains(usname)) {
-                        uses.add(usname);
+                    if (ns.kind == Namespace.KIND_NAMESPACE) {
+                        if (!uses.contains(usname)) {
+                            uses.add(usname);
+                        }
                     }
                 }
                 return true;
@@ -166,6 +188,10 @@ public class TraitClass extends Trait implements TraitWithSlot {
             if (nss != null) {
                 if (nss.namespaces.length == 1) {
                     parseUsagesFromNS(abcTags, abc, imports, uses, nss.namespaces[0], ignorePackage, name);
+                } else {
+                    for (int n : nss.namespaces) {
+                        parseUsagesFromNS(abcTags, abc, imports, uses, n, ignorePackage, "");
+                    }
                 }
             }
         }
@@ -379,6 +405,19 @@ public class TraitClass extends Trait implements TraitWithSlot {
          }
          imports = imports2;*/
 
+        for(int i=0;i<imports.size();i++){
+            String imp=imports.get(i);
+            String pkg=imp.substring(0,imp.lastIndexOf("."));
+            String name=imp.substring(imp.lastIndexOf(".")+1);
+            if(name.equals("*")){
+                continue;
+            }
+            if(imports.contains(pkg+".*")){
+                imports.remove(i);
+                i--;
+            }
+        }
+        
         for (String imp : imports) {
             if (!imp.startsWith(".")) {
                 out.println(ABC.IDENT_STRING + "import " + imp + ";");
