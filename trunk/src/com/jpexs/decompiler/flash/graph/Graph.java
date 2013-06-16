@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.graph;
 
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.CommentTreeItem;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.graph.cfg.BBType;
 import com.jpexs.decompiler.flash.graph.cfg.BasicBlock;
@@ -473,7 +472,7 @@ public class Graph {
         return ret;
         } catch (StackOverflowError soe) {
             List<GraphTargetItem> ret =new ArrayList<>();
-            ret.add(new CommentTreeItem(null, "StackOverflowError"));
+            ret.add(new CommentItem("StackOverflowError"));
             Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, "error during printGraph", soe);
             return ret;
         }
@@ -1932,8 +1931,12 @@ public class Graph {
     public static String graphToString(List<GraphTargetItem> tree, Object... localData) {
         StringBuilder ret = new StringBuilder();
         List<Object> localDataList = new ArrayList<>();
-        for (Object o : localData) {
-            localDataList.add(o);
+        if((localData.length==1)&&(localData[0] instanceof List)){
+            localDataList=(List<Object>)localData[0];
+        }else{
+            for (Object o : localData) {
+                localDataList.add(o);
+            }
         }
         for (GraphTargetItem ti : tree) {
             if (!ti.isEmpty()) {
