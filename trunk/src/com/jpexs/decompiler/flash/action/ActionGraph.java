@@ -184,11 +184,11 @@ public class ActionGraph extends Graph {
                 defaultAndLastPart.add(defaultPart);
                 defaultAndLastPart.add(caseBodyParts.get(caseBodyParts.size() - 1));
 
-                GraphPart defaultPart2 = getCommonPart(defaultAndLastPart,new ArrayList<Loop>());
+                GraphPart defaultPart2 = getCommonPart(defaultAndLastPart, new ArrayList<Loop>());
 
                 List<GraphTargetItem> defaultCommands = new ArrayList<>();
-                List<GraphPart> stopPart2=new ArrayList<>(stopPart);
-                                                        stopPart2.add(defaultPart2);
+                List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
+                stopPart2.add(defaultPart2);
                 defaultCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, defaultPart, stopPart2, loops);
 
 
@@ -261,8 +261,8 @@ public class ActionGraph extends Graph {
                     defaultPart = null;
                 }
                 if ((defaultPart != null) && (defaultCommands.isEmpty())) {
-                    List<GraphPart> stopPart2x=new ArrayList<>(stopPart);
-                                                        stopPart2x.add(next);
+                    List<GraphPart> stopPart2x = new ArrayList<>(stopPart);
+                    stopPart2x.add(next);
                     defaultCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, defaultPart, stopPart2x, loops);
                 }
 
@@ -290,8 +290,8 @@ public class ActionGraph extends Graph {
                             }
                         }
                     }
-                    List<GraphPart> stopPart2x=new ArrayList<>(stopPart);
-                                                        stopPart2.add(nextCase);
+                    List<GraphPart> stopPart2x = new ArrayList<>(stopPart);
+                    stopPart2.add(nextCase);
                     cc.addAll(0, printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, caseBodies.get(i), stopPart2x, loops));
                     if (cc.size() >= 2) {
                         if (cc.get(cc.size() - 1) instanceof BreakItem) {

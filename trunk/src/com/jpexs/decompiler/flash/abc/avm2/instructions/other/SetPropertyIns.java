@@ -58,8 +58,9 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                 if (insideProp.propertyName.compareSame(multiname)) {
                     GraphTargetItem insideObj = obj.getThroughDuplicate();
                     if (insideObj instanceof LocalRegTreeItem) {
-                        if(((LocalRegTreeItem) insideObj).computedValue!=null)
-                        insideObj = ((LocalRegTreeItem) insideObj).computedValue.getThroughNotCompilable().getThroughDuplicate();
+                        if (((LocalRegTreeItem) insideObj).computedValue != null) {
+                            insideObj = ((LocalRegTreeItem) insideObj).computedValue.getThroughNotCompilable().getThroughDuplicate();
+                        }
                     }
                     if (insideProp.object.getThroughDuplicate() == insideObj) {
                         if (stack.size() > 0) {
@@ -89,8 +90,9 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                 if (insideProp.propertyName.compareSame(multiname)) {
                     GraphTargetItem insideObj = obj.getThroughDuplicate();
                     if (insideObj instanceof LocalRegTreeItem) {
-                        if(((LocalRegTreeItem) insideObj).computedValue!=null)
-                        insideObj = ((LocalRegTreeItem) insideObj).computedValue.getThroughNotCompilable().getThroughDuplicate();
+                        if (((LocalRegTreeItem) insideObj).computedValue != null) {
+                            insideObj = ((LocalRegTreeItem) insideObj).computedValue.getThroughNotCompilable().getThroughDuplicate();
+                        }
                     }
                     if (insideProp.object.getThroughDuplicate() == insideObj) {
                         if (stack.size() > 0) {

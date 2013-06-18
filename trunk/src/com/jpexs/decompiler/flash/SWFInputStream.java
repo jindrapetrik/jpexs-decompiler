@@ -1166,13 +1166,13 @@ public class SWFInputStream extends InputStream {
         List<Future<Tag>> futureResults = new ArrayList<>();
         List<Tag> tags = new ArrayList<>();
         Tag tag;
-        Tag previousTag = null;        
+        Tag previousTag = null;
         while (true) {
             long pos = getPos();
-            try{
+            try {
                 tag = readTag(level, pos, false);
-            }catch(EndOfStreamException ex){
-                tag=null;
+            } catch (EndOfStreamException ex) {
+                tag = null;
             }
             if (tag == null) {
                 break;
@@ -1185,7 +1185,7 @@ public class SWFInputStream extends InputStream {
 
             Future<Tag> future = executor.submit(new TagResolutionTask(tag, version, level));
             futureResults.add(future);
-        }        
+        }
 
         for (Future<Tag> future : futureResults) {
             try {

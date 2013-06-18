@@ -35,12 +35,86 @@ public class ConvertTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        //return hilight("("+type+")")+
         return value.toString(constants, localRegNames, fullyQualifiedNames);
     }
 
     @Override
     public GraphTargetItem getNotCoerced() {
         return value.getNotCoerced();
+    }
+
+    @Override
+    public double toNumber() {
+        return toBoolean() ? 1 : 0;
+    }
+
+    @Override
+    public boolean toBoolean() {
+        if (type.contains("Boolean")) {
+            if (value instanceof UndefinedTreeItem) {
+                return false;
+            }
+            if (value instanceof NullTreeItem) {
+                return false;
+            }
+            if (value instanceof BooleanTreeItem) {
+                return ((BooleanTreeItem) value).value;
+            }
+            if (value instanceof IntegerValueTreeItem) {
+                IntegerValueTreeItem iv = (IntegerValueTreeItem) value;
+                return iv.value != 0;
+            }
+            if (value instanceof FloatValueTreeItem) {
+                FloatValueTreeItem fv = (FloatValueTreeItem) value;
+                return !(fv.value == 0 || fv.value.isNaN());
+            }
+            if (value instanceof StringTreeItem) {
+                StringTreeItem sv = (StringTreeItem) value;
+                return !sv.value.equals("");
+            }
+
+            if (value instanceof ThisTreeItem) {
+                return true;
+            }
+            if (value instanceof ClassTreeItem) {
+                return true;
+            }
+            //object
+            return false;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isCompileTime() {
+        if (type.contains("Boolean")) {
+            if (value instanceof UndefinedTreeItem) {
+                return true;
+            }
+            if (value instanceof NullTreeItem) {
+                return true;
+            }
+            if (value instanceof BooleanTreeItem) {
+                return true;
+            }
+            if (value instanceof IntegerValueTreeItem) {
+                return true;
+            }
+            if (value instanceof FloatValueTreeItem) {
+                return true;
+            }
+            if (value instanceof StringTreeItem) {
+                return true;
+            }
+            if (value instanceof ThisTreeItem) {
+                return true;
+            }
+            if (value instanceof ClassTreeItem) {
+                return true;
+            }
+            //object
+            return false;
+        }
+        return false;
     }
 }

@@ -174,7 +174,7 @@ public class Multiname {
     }
 
     private String typeNameToStr(ConstantPool constants, List<String> fullyQualifiedNames) {
-        if(constants.constant_multiname[qname_index].name_index==name_index){
+        if (constants.constant_multiname[qname_index].name_index == name_index) {
             return "ambiguousTypeName";
         }
         String typeNameStr = constants.constant_multiname[qname_index].getName(constants, fullyQualifiedNames);

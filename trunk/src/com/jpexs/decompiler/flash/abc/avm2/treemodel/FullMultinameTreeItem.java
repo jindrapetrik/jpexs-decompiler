@@ -101,8 +101,9 @@ public class FullMultinameTreeItem extends TreeItem {
             name = name.getThroughDuplicate();
         }
         while (tiName instanceof LocalRegTreeItem) {
-            if(((LocalRegTreeItem) tiName).computedValue!=null)
-            tiName = ((LocalRegTreeItem) tiName).computedValue.getThroughNotCompilable().getThroughDuplicate();
+            if (((LocalRegTreeItem) tiName).computedValue != null) {
+                tiName = ((LocalRegTreeItem) tiName).computedValue.getThroughNotCompilable().getThroughDuplicate();
+            }
         }
 
         GraphTargetItem tiName2 = other.name;
@@ -110,8 +111,9 @@ public class FullMultinameTreeItem extends TreeItem {
             tiName2 = tiName2.getThroughDuplicate();
         }
         while (tiName2 instanceof LocalRegTreeItem) {
-            if(((LocalRegTreeItem) tiName2).computedValue!=null)
-            tiName2 = ((LocalRegTreeItem) tiName2).computedValue.getThroughNotCompilable().getThroughDuplicate();
+            if (((LocalRegTreeItem) tiName2).computedValue != null) {
+                tiName2 = ((LocalRegTreeItem) tiName2).computedValue.getThroughNotCompilable().getThroughDuplicate();
+            }
         }
         if (tiName != tiName2) {
             return false;
@@ -122,8 +124,9 @@ public class FullMultinameTreeItem extends TreeItem {
             tiNameSpace = tiNameSpace.getThroughDuplicate();
         }
         while (tiNameSpace instanceof LocalRegTreeItem) {
-            if(((LocalRegTreeItem) tiNameSpace).computedValue!=null)
-            tiNameSpace = ((LocalRegTreeItem) tiNameSpace).computedValue.getThroughNotCompilable().getThroughDuplicate();
+            if (((LocalRegTreeItem) tiNameSpace).computedValue != null) {
+                tiNameSpace = ((LocalRegTreeItem) tiNameSpace).computedValue.getThroughNotCompilable().getThroughDuplicate();
+            }
         }
 
         GraphTargetItem tiNameSpace2 = other.namespace;
@@ -131,8 +134,9 @@ public class FullMultinameTreeItem extends TreeItem {
             tiNameSpace2 = tiNameSpace2.getThroughDuplicate();
         }
         while (tiNameSpace2 instanceof LocalRegTreeItem) {
-            if(((LocalRegTreeItem) tiNameSpace2).computedValue!=null)
-            tiNameSpace2 = ((LocalRegTreeItem) tiNameSpace2).computedValue.getThroughNotCompilable().getThroughDuplicate();
+            if (((LocalRegTreeItem) tiNameSpace2).computedValue != null) {
+                tiNameSpace2 = ((LocalRegTreeItem) tiNameSpace2).computedValue.getThroughNotCompilable().getThroughDuplicate();
+            }
         }
         if (tiNameSpace != tiNameSpace2) {
             return false;

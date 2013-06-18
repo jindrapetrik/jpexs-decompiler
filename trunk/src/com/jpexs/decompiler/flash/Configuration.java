@@ -90,7 +90,7 @@ public class Configuration {
      * Load replacements from file
      */
     private static void loadReplacements(String replacementsFile) {
-        if(!(new File(replacementsFile)).exists()){
+        if (!(new File(replacementsFile)).exists()) {
             return;
         }
         replacements = new ArrayList<>();

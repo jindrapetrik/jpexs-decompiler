@@ -48,7 +48,7 @@ public class LocalRegTreeItem extends TreeItem {
 
     @Override
     public GraphTargetItem getThroughRegister() {
-        if(computedValue == null){
+        if (computedValue == null) {
             return this;
         }
         return computedValue.getThroughRegister();
@@ -56,7 +56,7 @@ public class LocalRegTreeItem extends TreeItem {
 
     @Override
     public double toNumber() {
-        if(computedValue==null){
+        if (computedValue == null) {
             return 0;
         }
         return computedValue.toNumber();
@@ -64,7 +64,7 @@ public class LocalRegTreeItem extends TreeItem {
 
     @Override
     public boolean toBoolean() {
-        if(computedValue==null){
+        if (computedValue == null) {
             return false;
         }
         return computedValue.toBoolean();
@@ -72,7 +72,7 @@ public class LocalRegTreeItem extends TreeItem {
 
     @Override
     public boolean isCompileTime() {
-        if(computedValue==null){
+        if (computedValue == null) {
             return false;
         }
         return computedValue.isCompileTime();

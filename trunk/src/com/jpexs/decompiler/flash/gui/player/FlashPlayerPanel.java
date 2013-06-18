@@ -89,16 +89,16 @@ public class FlashPlayerPanel extends Panel {
 
         SHELLEXECUTEINFO sei = new SHELLEXECUTEINFO();
         sei.fMask = 0x00000040;
-        String appDir="";
+        String appDir = "";
         try {
-            appDir=new File(URLDecoder.decode(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath(),"UTF-8")).getParentFile().getAbsolutePath();
+            appDir = new File(URLDecoder.decode(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8")).getParentFile().getAbsolutePath();
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(FlashPlayerPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        if(!appDir.endsWith("\\")){
-            appDir+="\\";
+        if (!appDir.endsWith("\\")) {
+            appDir += "\\";
         }
-        sei.lpFile = new WString(appDir+"lib\\FlashPlayer.exe");
+        sei.lpFile = new WString(appDir + "lib\\FlashPlayer.exe");
         sei.lpParameters = new WString(hwnd.getPointer().hashCode() + " " + hwndFrame.getPointer().hashCode());
         sei.nShow = WinUser.SW_NORMAL;
         Shell32.INSTANCE.ShellExecuteEx(sei);

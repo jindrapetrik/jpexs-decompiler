@@ -403,19 +403,19 @@ public class TraitClass extends Trait implements TraitWithSlot {
          }
          imports = imports2;*/
 
-        for(int i=0;i<imports.size();i++){
-            String imp=imports.get(i);
-            String pkg=imp.substring(0,imp.lastIndexOf("."));
-            String name=imp.substring(imp.lastIndexOf(".")+1);
-            if(name.equals("*")){
+        for (int i = 0; i < imports.size(); i++) {
+            String imp = imports.get(i);
+            String pkg = imp.substring(0, imp.lastIndexOf("."));
+            String name = imp.substring(imp.lastIndexOf(".") + 1);
+            if (name.equals("*")) {
                 continue;
             }
-            if(imports.contains(pkg+".*")){
+            if (imports.contains(pkg + ".*")) {
                 imports.remove(i);
                 i--;
             }
         }
-        
+
         for (String imp : imports) {
             if (!imp.startsWith(".")) {
                 out.println(ABC.IDENT_STRING + "import " + imp + ";");

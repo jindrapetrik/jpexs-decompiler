@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.abc.types.traits;
 
-import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -63,7 +62,7 @@ public class TraitMethodGetterSetter extends Trait {
 
         String bodyStr = "";
         int bodyIndex = abc.findBodyIndex(method_info);
-        if ((bodyIndex != -1) && (Configuration.DO_DECOMPILE)) {
+        if (bodyIndex != -1) {
             try {
                 bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames), pcode, isStatic, scriptIndex, classIndex, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, highlight, fullyQualifiedNames, null), 3);
             } catch (StackOverflowError er) {
