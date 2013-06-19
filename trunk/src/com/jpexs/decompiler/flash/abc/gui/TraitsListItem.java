@@ -64,9 +64,9 @@ public class TraitsListItem {
     @Override
     public String toString() {
         if ((type != Type.INITIALIZER) && isStatic) {
-            return abc.class_info[classIndex].static_traits.traits[index].convertHeader("", abcTags, abc, true, false, scriptIndex, classIndex, false, new ArrayList<String>());
+            return abc.class_info[classIndex].static_traits.traits[index].convertHeader("", abcTags, abc, true, false, scriptIndex, classIndex, false, new ArrayList<String>(), false);
         } else if ((type != Type.INITIALIZER) && (!isStatic)) {
-            return abc.instance_info[classIndex].instance_traits.traits[index].convertHeader("", abcTags, abc, false, false, scriptIndex, classIndex, false, new ArrayList<String>());
+            return abc.instance_info[classIndex].instance_traits.traits[index].convertHeader("", abcTags, abc, false, false, scriptIndex, classIndex, false, new ArrayList<String>(), false);
         } else if (!isStatic) {
             return STR_INSTANCE_INITIALIZER;
         } else {

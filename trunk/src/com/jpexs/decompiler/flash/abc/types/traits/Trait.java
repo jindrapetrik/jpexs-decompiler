@@ -114,16 +114,16 @@ public abstract class Trait implements Serializable {
         return abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
     }
 
-    public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+    public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames, boolean paralel) {
         return abc.constants.constant_multiname[name_index].toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
     }
 
-    public String convertPackaged(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcod, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
-        return makePackageFromIndex(abc, name_index, convert(path, abcTags, abc, isStatic, pcod, scriptIndex, classIndex, highlight, fullyQualifiedNames));
+    public String convertPackaged(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcod, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames, boolean paralel) {
+        return makePackageFromIndex(abc, name_index, convert(path, abcTags, abc, isStatic, pcod, scriptIndex, classIndex, highlight, fullyQualifiedNames, paralel));
     }
 
-    public String convertHeader(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
-        return convert(path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlight, fullyQualifiedNames).trim();
+    public String convertHeader(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames, boolean paralel) {
+        return convert(path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlight, fullyQualifiedNames, paralel).trim();
     }
 
     protected String makePackageFromIndex(ABC abc, int name_index, String value) {
@@ -153,7 +153,7 @@ public abstract class Trait implements Serializable {
         return packageName + "." + objectName;
     }
 
-    public void export(String directory, ABC abc, List<ABCContainerTag> abcList, boolean pcode, int scriptIndex, int classIndex, boolean isStatic) throws IOException {
+    public void export(String directory, ABC abc, List<ABCContainerTag> abcList, boolean pcode, int scriptIndex, int classIndex, boolean isStatic, boolean paralel) throws IOException {
         Multiname name = getName(abc);
         Namespace ns = name.getNamespace(abc.constants);
         String packageName = ns.getName(abc.constants);
@@ -164,7 +164,7 @@ public abstract class Trait implements Serializable {
         }
         String fileName = outDir.toString() + File.separator + objectName + ".as";
         try (FileOutputStream fos = new FileOutputStream(fileName)) {
-            fos.write(convertPackaged("", abcList, abc, isStatic, pcode, scriptIndex, classIndex, false, new ArrayList<String>()).getBytes());
+            fos.write(convertPackaged("", abcList, abc, isStatic, pcode, scriptIndex, classIndex, false, new ArrayList<String>(), paralel).getBytes());
         }
     }
 }

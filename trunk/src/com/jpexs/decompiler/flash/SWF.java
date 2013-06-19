@@ -246,8 +246,8 @@ public class SWF {
         }
     }
 
-    public SWF(InputStream is) throws IOException {
-        this(is, null);
+    public SWF(InputStream is, boolean paralelRead) throws IOException {
+        this(is, null, paralelRead);
     }
 
     /**
@@ -256,7 +256,7 @@ public class SWF {
      * @param is Stream to read SWF from
      * @throws IOException
      */
-    public SWF(InputStream is, PercentListener listener) throws IOException {
+    public SWF(InputStream is, PercentListener listener, boolean paralelRead) throws IOException {
         byte hdr[] = new byte[3];
         is.read(hdr);
         String shdr = new String(hdr);
@@ -303,7 +303,7 @@ public class SWF {
         int tmpFirstByetOfFrameRate = sis.readUI8();
         frameRate = sis.readUI8();
         frameCount = sis.readUI16();
-        tags = sis.readTagList(0);
+        tags = sis.readTagList(0, paralelRead);
         assignClassesToSymbols();
     }
 
@@ -422,7 +422,7 @@ public class SWF {
         return true;
     }
 
-    public boolean exportAS3Class(String className, String outdir, boolean isPcode) throws Exception {
+    public boolean exportAS3Class(String className, String outdir, boolean isPcode, boolean paralel) throws Exception {
         List<ABCContainerTag> abcTags = new ArrayList<>();
 
         for (Tag t : tags) {
@@ -441,14 +441,14 @@ public class SWF {
                 }
                 String exStr = "Exporting " + "tag " + (i + 1) + "/" + abcTags.size() + " " + cnt + scr.getPath() + " ...";
                 informListeners("export", exStr);
-                scr.export(outdir, abcTags, isPcode);
+                scr.export(outdir, abcTags, isPcode, paralel);
                 return true;
             }
         }
         return false;
     }
 
-    public boolean exportActionScript(String outdir, boolean isPcode) throws Exception {
+    public boolean exportActionScript(String outdir, boolean isPcode, boolean paralel) throws Exception {
         boolean asV3Found = false;
         final EventListener evl = new EventListener() {
             @Override
@@ -468,7 +468,7 @@ public class SWF {
         for (int i = 0; i < abcTags.size(); i++) {
             ABCContainerTag t = abcTags.get(i);
             t.getABC().addEventListener(evl);
-            t.getABC().export(outdir, isPcode, abcTags, "tag " + (i + 1) + "/" + abcTags.size() + " ");
+            t.getABC().export(outdir, isPcode, abcTags, "tag " + (i + 1) + "/" + abcTags.size() + " ", paralel);
         }
 
         if (!asV3Found) {
@@ -1308,12 +1308,12 @@ public class SWF {
         return ret;
     }
 
-    public void exportFla(String outfile, String swfName, String generator, String generatorVerName, String generatorVersion) {
-        XFLConverter.convertSWF(this, swfName, outfile, true, generator, generatorVerName, generatorVersion);
+    public void exportFla(String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean paralel) {
+        XFLConverter.convertSWF(this, swfName, outfile, true, generator, generatorVerName, generatorVersion, paralel);
     }
 
-    public void exportXfl(String outfile, String swfName, String generator, String generatorVerName, String generatorVersion) {
-        XFLConverter.convertSWF(this, swfName, outfile, false, generator, generatorVerName, generatorVersion);
+    public void exportXfl(String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean paralel) {
+        XFLConverter.convertSWF(this, swfName, outfile, false, generator, generatorVerName, generatorVersion, paralel);
     }
 
     public static float twipToPixel(int twip) {

@@ -563,8 +563,8 @@ public class ABC {
         }
     }
 
-    public void export(String directory, boolean pcode, List<ABCContainerTag> abcList) throws IOException {
-        export(directory, pcode, abcList, "");
+    public void export(String directory, boolean pcode, List<ABCContainerTag> abcList, boolean paralel) throws IOException {
+        export(directory, pcode, abcList, "", paralel);
     }
 
     private class ExportPackTask implements Runnable {
@@ -577,8 +577,9 @@ public class ABC {
         String path;
         AtomicInteger index;
         int count;
+        boolean paralel;
 
-        public ExportPackTask(AtomicInteger index, int count, String path, ScriptPack pack, String directory, List<ABCContainerTag> abcList, boolean pcode, String informStr) {
+        public ExportPackTask(AtomicInteger index, int count, String path, ScriptPack pack, String directory, List<ABCContainerTag> abcList, boolean pcode, String informStr, boolean paralel) {
             this.pack = pack;
             this.directory = directory;
             this.abcList = abcList;
@@ -587,12 +588,13 @@ public class ABC {
             this.path = path;
             this.index = index;
             this.count = count;
+            this.paralel = paralel;
         }
 
         @Override
         public void run() {
             try {
-                pack.export(directory, abcList, pcode);
+                pack.export(directory, abcList, pcode, paralel);
             } catch (IOException ex) {
                 Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -602,13 +604,13 @@ public class ABC {
         }
     }
 
-    public void export(String directory, boolean pcode, List<ABCContainerTag> abcList, String abcStr) throws IOException {
+    public void export(String directory, boolean pcode, List<ABCContainerTag> abcList, String abcStr, boolean paralel) throws IOException {
         ExecutorService executor = Executors.newFixedThreadPool(20);
         AtomicInteger cnt = new AtomicInteger(1);
         for (int i = 0; i < script_info.length; i++) {
             HashMap<String, ScriptPack> packs = script_info[i].getPacks(this, i);
             for (String path : packs.keySet()) {
-                executor.execute(new ExportPackTask(cnt, script_info.length, path, packs.get(path), directory, abcList, pcode, abcStr));
+                executor.execute(new ExportPackTask(cnt, script_info.length, path, packs.get(path), directory, abcList, pcode, abcStr, paralel));
             }
         }
         try {

@@ -1141,16 +1141,18 @@ public class SWFInputStream extends InputStream {
         private final Tag tag;
         private final int version;
         private final int level;
+        private boolean paralel;
 
-        public TagResolutionTask(Tag tag, int version, int level) {
+        public TagResolutionTask(Tag tag, int version, int level, boolean paralel) {
             this.tag = tag;
             this.version = version;
             this.level = level;
+            this.paralel = paralel;
         }
 
         @Override
         public Tag call() throws Exception {
-            return SWFInputStream.resolveTag(tag, version, level);
+            return SWFInputStream.resolveTag(tag, version, level, paralel);
         }
     }
 
@@ -1161,8 +1163,13 @@ public class SWFInputStream extends InputStream {
      * @return List of tags
      * @throws IOException
      */
-    public List<Tag> readTagList(int level) throws IOException {
-        ExecutorService executor = Executors.newCachedThreadPool();
+    public List<Tag> readTagList(int level, boolean paralel) throws IOException {
+        ExecutorService executor = null;
+        if (paralel) {
+            executor = Executors.newFixedThreadPool(20);
+        } else {
+            executor = Executors.newFixedThreadPool(1);
+        }
         List<Future<Tag>> futureResults = new ArrayList<>();
         List<Tag> tags = new ArrayList<>();
         Tag tag;
@@ -1170,7 +1177,7 @@ public class SWFInputStream extends InputStream {
         while (true) {
             long pos = getPos();
             try {
-                tag = readTag(level, pos, false);
+                tag = readTag(level, pos, false, paralel);
             } catch (EndOfStreamException ex) {
                 tag = null;
             }
@@ -1183,7 +1190,7 @@ public class SWFInputStream extends InputStream {
             tag.previousTag = previousTag;
             previousTag = tag;
 
-            Future<Tag> future = executor.submit(new TagResolutionTask(tag, version, level));
+            Future<Tag> future = executor.submit(new TagResolutionTask(tag, version, level, paralel));
             futureResults.add(future);
         }
 
@@ -1198,7 +1205,7 @@ public class SWFInputStream extends InputStream {
         return tags;
     }
 
-    public static Tag resolveTag(Tag tag, int version, int level) {
+    public static Tag resolveTag(Tag tag, int version, int level, boolean paralel) {
         Tag ret;
 
         byte data[] = tag.getData(version);
@@ -1307,7 +1314,7 @@ public class SWFInputStream extends InputStream {
                     break;
                 //case 38:
                 case 39:
-                    ret = new DefineSpriteTag(data, version, level, pos);
+                    ret = new DefineSpriteTag(data, version, level, pos, paralel);
                     break;
                 //case 40:
                 case 41:
@@ -1440,8 +1447,8 @@ public class SWFInputStream extends InputStream {
      * @return Tag or null when End tag
      * @throws IOException
      */
-    public Tag readTag(int level, long pos) throws IOException {
-        return readTag(level, pos, true);
+    public Tag readTag(int level, long pos, boolean paralel) throws IOException {
+        return readTag(level, pos, true, paralel);
     }
 
     /**
@@ -1451,7 +1458,7 @@ public class SWFInputStream extends InputStream {
      * @return Tag or null when End tag
      * @throws IOException
      */
-    public Tag readTag(int level, long pos, boolean resolve) throws IOException {
+    public Tag readTag(int level, long pos, boolean resolve, boolean paralel) throws IOException {
         int tagIDTagLength = readUI16();
         int tagID = (tagIDTagLength) >> 6;
         if (tagID == 0) {
@@ -1500,7 +1507,7 @@ public class SWFInputStream extends InputStream {
             }
         }
         if (resolve) {
-            return resolveTag(ret, version, level);
+            return resolveTag(ret, version, level, paralel);
         }
         return ret;
     }

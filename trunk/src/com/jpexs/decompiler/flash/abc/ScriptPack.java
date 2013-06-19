@@ -55,7 +55,7 @@ public class ScriptPack {
         return packageName + "." + scriptName;
     }
 
-    public void export(String directory, List<ABCContainerTag> abcList, boolean pcode) throws IOException {
+    public void export(String directory, List<ABCContainerTag> abcList, boolean pcode, boolean paralel) throws IOException {
         String path = getPath();
         String scriptName = path.substring(path.lastIndexOf(".") + 1);
         String packageName = path.substring(0, path.lastIndexOf("."));
@@ -69,9 +69,9 @@ public class ScriptPack {
                 Multiname name = abc.script_info[scriptIndex].traits.traits[t].getName(abc);
                 Namespace ns = name.getNamespace(abc.constants);
                 if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                    fos.write(abc.script_info[scriptIndex].traits.traits[t].convertPackaged("", abcList, abc, false, pcode, scriptIndex, -1, false, new ArrayList<String>()).getBytes());
+                    fos.write(abc.script_info[scriptIndex].traits.traits[t].convertPackaged("", abcList, abc, false, pcode, scriptIndex, -1, false, new ArrayList<String>(), paralel).getBytes());
                 } else {
-                    fos.write(abc.script_info[scriptIndex].traits.traits[t].convert("", abcList, abc, false, pcode, scriptIndex, -1, false, new ArrayList<String>()).getBytes());
+                    fos.write(abc.script_info[scriptIndex].traits.traits[t].convert("", abcList, abc, false, pcode, scriptIndex, -1, false, new ArrayList<String>(), paralel).getBytes());
                 }
             }
         }

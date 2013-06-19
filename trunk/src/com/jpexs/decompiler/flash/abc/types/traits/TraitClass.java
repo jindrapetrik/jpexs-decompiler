@@ -324,13 +324,13 @@ public class TraitClass extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public String convertHeader(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+    public String convertHeader(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames, boolean paralel) {
         String classHeader = abc.instance_info[class_info].getClassHeaderStr(abc, fullyQualifiedNames);
         return classHeader;
     }
 
     @Override
-    public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+    public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames, boolean paralel) {
 
         if (!highlight) {
             //Highlighting.doHighlight = false;
@@ -501,9 +501,9 @@ public class TraitClass extends Trait implements TraitWithSlot {
         //}
 
         //static variables,constants & methods
-        outTraits.add(abc.class_info[class_info].static_traits.convert(packageName + "." + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, true, pcode, false, scriptIndex, class_info, highlight, fullyQualifiedNames));
+        outTraits.add(abc.class_info[class_info].static_traits.convert(packageName + "." + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, true, pcode, false, scriptIndex, class_info, highlight, fullyQualifiedNames, paralel));
 
-        outTraits.add(abc.instance_info[class_info].instance_traits.convert(packageName + "." + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, false, pcode, false, scriptIndex, class_info, highlight, fullyQualifiedNames));
+        outTraits.add(abc.instance_info[class_info].instance_traits.convert(packageName + "." + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, false, pcode, false, scriptIndex, class_info, highlight, fullyQualifiedNames, paralel));
 
 
         StringBuilder bui = new StringBuilder();

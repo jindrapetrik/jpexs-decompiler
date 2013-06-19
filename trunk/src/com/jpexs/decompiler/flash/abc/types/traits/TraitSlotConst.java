@@ -110,7 +110,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+    public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames, boolean paralel) {
         String modifier = getModifiers(abcTags, abc, isStatic) + " ";
         if (modifier.equals(" ")) {
             modifier = "";

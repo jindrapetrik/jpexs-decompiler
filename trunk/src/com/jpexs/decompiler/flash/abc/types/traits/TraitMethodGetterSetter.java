@@ -35,7 +35,7 @@ public class TraitMethodGetterSetter extends Trait {
     }
 
     @Override
-    public String convertHeader(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+    public String convertHeader(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames, boolean paralel) {
         String modifier = getModifiers(abcTags, abc, isStatic) + " ";
         if (modifier.equals(" ")) {
             modifier = "";
@@ -53,12 +53,12 @@ public class TraitMethodGetterSetter extends Trait {
     }
 
     @Override
-    public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames) {
+    public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames, boolean paralel) {
 
         if (debugMode) {
             System.err.println("Decompiling " + path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames));
         }
-        String header = convertHeader(path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlight, fullyQualifiedNames);
+        String header = convertHeader(path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlight, fullyQualifiedNames, paralel);
 
         String bodyStr = "";
         int bodyIndex = abc.findBodyIndex(method_info);

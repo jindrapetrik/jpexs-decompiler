@@ -174,7 +174,7 @@ public class Main {
             public void percent(int p) {
                 startWork("Reading SWF", p);
             }
-        });
+        }, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
         locswf.addEventListener(new EventListener() {
             @Override
             public void handleEvent(String event, Object data) {
@@ -492,7 +492,7 @@ public class Main {
                 boolean exportOK;
                 try {
                     printHeader();
-                    SWF exfile = new SWF(new FileInputStream(inFile));
+                    SWF exfile = new SWF(new FileInputStream(inFile), (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
                     exfile.addEventListener(new EventListener() {
                         @Override
                         public void handleEvent(String event, Object data) {
@@ -507,7 +507,7 @@ public class Main {
                         System.out.println("Exporting shapes...");
                         exfile.exportShapes(outDir.getAbsolutePath() + File.separator + "shapes");
                         System.out.println("Exporting scripts...");
-                        exfile.exportActionScript(outDir.getAbsolutePath() + File.separator + "scripts", false);
+                        exfile.exportActionScript(outDir.getAbsolutePath() + File.separator + "scripts", false, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
                         System.out.println("Exporting movies...");
                         exfile.exportMovies(outDir.getAbsolutePath() + File.separator + "movies");
                         System.out.println("Exporting sounds...");
@@ -527,10 +527,10 @@ public class Main {
                         if ((pos + 5 < args.length) && (args[pos + 4].equals("-selectas3class"))) {
                             exportOK = true;
                             for (int i = pos + 5; i < args.length; i++) {
-                                exportOK = exportOK && exfile.exportAS3Class(args[i], outDir.getAbsolutePath(), exportFormat.equals("pcode"));
+                                exportOK = exportOK && exfile.exportAS3Class(args[i], outDir.getAbsolutePath(), exportFormat.equals("pcode"), (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
                             }
                         } else {
-                            exportOK = exfile.exportActionScript(outDir.getAbsolutePath(), exportFormat.equals("pcode"));
+                            exportOK = exfile.exportActionScript(outDir.getAbsolutePath(), exportFormat.equals("pcode"), (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
                         }
                     } else if (exportFormat.equals("movie")) {
                         exfile.exportMovies(outDir.getAbsolutePath());
@@ -548,10 +548,10 @@ public class Main {
                         exfile.exportTexts(outDir.getAbsolutePath(), false);
                         exportOK = true;
                     } else if (exportFormat.equals("fla")) {
-                        exfile.exportFla(outDir.getAbsolutePath(), inFile.getName(), applicationName, applicationVerName, version);
+                        exfile.exportFla(outDir.getAbsolutePath(), inFile.getName(), applicationName, applicationVerName, version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
                         exportOK = true;
                     } else if (exportFormat.equals("xfl")) {
-                        exfile.exportXfl(outDir.getAbsolutePath(), inFile.getName(), applicationName, applicationVerName, version);
+                        exfile.exportXfl(outDir.getAbsolutePath(), inFile.getName(), applicationName, applicationVerName, version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
                         exportOK = true;
                     } else {
                         exportOK = false;

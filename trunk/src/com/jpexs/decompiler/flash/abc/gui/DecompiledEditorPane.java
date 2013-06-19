@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.gui;
 
+import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
@@ -293,7 +294,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         }
         if (!cache.contains(scriptLeaf)) {
             for (int scriptTraitIndex : scriptLeaf.traitIndices) {
-                hilightedCodeBuf.append(script.traits.traits[scriptTraitIndex].convertPackaged("", abcList, abc, false, false, scriptIndex, -1, true, new ArrayList<String>()));
+                hilightedCodeBuf.append(script.traits.traits[scriptTraitIndex].convertPackaged("", abcList, abc, false, false, scriptIndex, -1, true, new ArrayList<String>(), (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE)));
             }
 
             hilightedCode = hilightedCodeBuf.toString();

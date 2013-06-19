@@ -2445,7 +2445,7 @@ public class XFLConverter {
         return ret;
     }
 
-    public static void convertSWF(SWF swf, String swfFileName, String outfile, boolean compressed, String generator, String generatorVerName, String generatorVersion) {
+    public static void convertSWF(SWF swf, String swfFileName, String outfile, boolean compressed, String generator, String generatorVerName, String generatorVersion, boolean paralel) {
         String domDocument = "";
         String baseName = swfFileName;
         File f = new File(baseName);
@@ -2739,7 +2739,7 @@ public class XFLConverter {
             File outF = new File(outfile);
             File outDir = outF.getParentFile();
             try {
-                swf.exportActionScript(outDir.getAbsolutePath(), false);
+                swf.exportActionScript(outDir.getAbsolutePath(), false, paralel);
             } catch (Exception ex) {
                 Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Error during ActionScript3 export", ex);
             }

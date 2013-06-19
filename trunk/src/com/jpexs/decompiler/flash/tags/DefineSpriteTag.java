@@ -150,12 +150,12 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
      * @param version SWF version
      * @throws IOException
      */
-    public DefineSpriteTag(byte[] data, int version, int level, long pos) throws IOException {
+    public DefineSpriteTag(byte[] data, int version, int level, long pos, boolean paralel) throws IOException {
         super(39, "DefineSprite", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version, pos);
         spriteId = sis.readUI16();
         frameCount = sis.readUI16();
-        subTags = sis.readTagList(level + 1);
+        subTags = sis.readTagList(level + 1, paralel);
     }
     static int c = 0;
 

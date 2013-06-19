@@ -193,6 +193,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     private JButton imageReplaceButton;
     private JPanel imageButtonsPanel;
     private JCheckBoxMenuItem miInternalViewer;
+    private JCheckBoxMenuItem miParallelSpeedUp;
 
     public void setPercent(int percent) {
         progressBar.setValue(percent);
@@ -384,6 +385,12 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         miInternalViewer.setActionCommand("INTERNALVIEWERSWITCH");
         miInternalViewer.addActionListener(this);
         menuTools.add(miInternalViewer);
+
+        miParallelSpeedUp = new JCheckBoxMenuItem("Parallel SpeedUp");
+        miParallelSpeedUp.setSelected((Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+        miParallelSpeedUp.setActionCommand("PARALLELSPEEDUP");
+        miParallelSpeedUp.addActionListener(this);
+        menuTools.add(miParallelSpeedUp);
 
         menuTools.add(miProxy);
 
@@ -1176,6 +1183,19 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     @Override
     public void actionPerformed(ActionEvent e) {
 
+        if (e.getActionCommand().equals("PARALLELSPEEDUP")) {
+            String confStr = "Parallelism can speed up loading and decompilation but uses more memory.\r\n";
+            if (miParallelSpeedUp.isSelected()) {
+                confStr += " Do you want to turn this ON?";
+            } else {
+                confStr += " Do you want to turn this OFF?";
+            }
+            if (JOptionPane.showConfirmDialog(null, confStr, "Parallelism", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                Configuration.setConfig("paralelSpeedUp", (Boolean) miParallelSpeedUp.isSelected());
+            } else {
+                miParallelSpeedUp.setSelected(!miParallelSpeedUp.isSelected());
+            }
+        }
         if (e.getActionCommand().equals("INTERNALVIEWERSWITCH")) {
             Configuration.setConfig("internalFlashViewer", (Boolean) miInternalViewer.isSelected());
         }
@@ -1419,9 +1439,9 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                     @Override
                     public void run() {
                         if (compressed) {
-                            swf.exportFla(selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version);
+                            swf.exportFla(selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
                         } else {
-                            swf.exportXfl(selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version);
+                            swf.exportXfl(selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
                         }
                         Main.stopWork();
                     }
@@ -1508,7 +1528,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                         for (int i = 0; i < tlsList.size(); i++) {
                                             ScriptPack tls = tlsList.get(i);
                                             Main.startWork("Exporting " + (i + 1) + "/" + tlsList.size() + " " + tls.getPath() + " ...");
-                                            tls.export(selFile, abcList, isPcode);
+                                            tls.export(selFile, abcList, isPcode, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
                                         }
                                     } else {
                                         List<TagNode> allNodes = new ArrayList<>();
@@ -1527,7 +1547,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                     swf.exportMovies(selFile + File.separator + "movies");
                                     swf.exportSounds(selFile + File.separator + "sounds", isMp3OrWav, isMp3OrWav);
                                     swf.exportBinaryData(selFile + File.separator + "binaryData");
-                                    swf.exportActionScript(selFile, isPcode);
+                                    swf.exportActionScript(selFile, isPcode, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
                                 }
                             } catch (Exception ex) {
                                 Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Error during export", ex);
