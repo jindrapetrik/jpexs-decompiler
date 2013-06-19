@@ -21,7 +21,7 @@ public class Generator {
 
     public static void main(String[] args) throws Exception {
         Configuration.setConfig("autoDeobfuscate", false);
-        SWF swf = new SWF(new FileInputStream("testdata/as3/TestMovie.swf"));
+        SWF swf = new SWF(new FileInputStream("testdata/as3/TestMovie.swf"),false);
         DoABCDefineTag tag = null;
         for (Tag t : swf.tags) {
             if (t instanceof DoABCDefineTag) {

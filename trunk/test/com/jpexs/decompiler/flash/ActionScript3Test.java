@@ -24,7 +24,7 @@ public class ActionScript3Test {
 
     @BeforeClass
     public void init() throws IOException {
-        swf = new SWF(new FileInputStream("testdata/as3/TestMovie.swf"));
+        swf = new SWF(new FileInputStream("testdata/as3/TestMovie.swf"),false);
         DoABCDefineTag tag = null;
         for (Tag t : swf.tags) {
             if (t instanceof DoABCDefineTag) {
