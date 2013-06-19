@@ -1,1 +1,1 @@
-java -Xmx1024m -jar ffdec.jar %*
+java -Xmx2048m -jar ffdec.jar %*
