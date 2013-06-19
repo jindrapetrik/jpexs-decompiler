@@ -1092,7 +1092,7 @@ public class Graph {
             ret = new ArrayList<>();
         }
         //try {
-        boolean debugMode = true;
+        boolean debugMode = false;
 
 
         if (debugMode) {
