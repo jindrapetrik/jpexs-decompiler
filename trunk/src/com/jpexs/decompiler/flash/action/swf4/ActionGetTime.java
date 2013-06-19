@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.treemodel.GetTimeTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.SimpleActionTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
@@ -36,6 +37,6 @@ public class ActionGetTime extends Action {
 
     @Override
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-        stack.push(new SimpleActionTreeItem(this, "getTimer()"));
+        stack.push(new GetTimeTreeItem(this));
     }
 }

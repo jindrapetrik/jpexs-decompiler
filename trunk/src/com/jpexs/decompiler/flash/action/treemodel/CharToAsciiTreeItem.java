@@ -40,4 +40,38 @@ public class CharToAsciiTreeItem extends TreeItem {
         ret.addAll(value.getNeededSources());
         return ret;
     }
+
+    @Override
+    public boolean isCompileTime() {
+        if (value instanceof DirectValueTreeItem) {
+            DirectValueTreeItem dv = (DirectValueTreeItem) value;
+            if (dv.value instanceof String) {
+                String s = (String) dv.value;
+                if (s.length() > 0) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public double toNumber() {
+        if (value instanceof DirectValueTreeItem) {
+            DirectValueTreeItem dv = (DirectValueTreeItem) value;
+            if (dv.value instanceof String) {
+                String s = (String) dv.value;
+                if (s.length() > 0) {
+                    char c = s.charAt(0);
+                    return (int) c;
+                }
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean toBoolean() {
+        return toNumber() != 0;
+    }
 }
