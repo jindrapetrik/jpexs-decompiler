@@ -24,7 +24,7 @@ public class ActionScript3Test {
 
     @BeforeClass
     public void init() throws IOException {
-        swf = new SWF(new FileInputStream("testdata/as3/TestMovie.swf"),false);
+        swf = new SWF(new FileInputStream("testdata/as3/TestMovie.swf"), false);
         DoABCDefineTag tag = null;
         for (Tag t : swf.tags) {
             if (t instanceof DoABCDefineTag) {
@@ -211,7 +211,7 @@ public class ActionScript3Test {
                 + "trace(\"default clause\");\r\n"
                 + "}\r\n"
                 + "c=0;\r\n"
-                + "loop0:\r\n"
+                + "loop1:\r\n"
                 + "for(;c<8;c=c+1)\r\n"
                 + "{\r\n"
                 + "d=0;\r\n"
@@ -229,14 +229,14 @@ public class ActionScript3Test {
                 + "}\r\n"
                 + "if(e==20)\r\n"
                 + "{\r\n"
-                + "continue loop0;\r\n"
+                + "continue loop1;\r\n"
                 + "}\r\n"
                 + "if(e==8)\r\n"
                 + "{\r\n"
                 + "}\r\n"
                 + "else\r\n"
                 + "{\r\n"
-                + "break loop0;\r\n"
+                + "break loop1;\r\n"
                 + "}\r\n"
                 + "}\r\n"
                 + "d++;\r\n"
