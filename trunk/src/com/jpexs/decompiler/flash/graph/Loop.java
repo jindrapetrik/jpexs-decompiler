@@ -29,6 +29,7 @@ public class Loop {
     public GraphPart loopBreak;
     public GraphPart loopPreContinue;
     public List<GraphPart> breakCandidates = new ArrayList<>();
+    public List<Integer> breakCandidatesLevels = new ArrayList<>();
     public long id;
     public boolean used = false;
     public boolean finished = false;
