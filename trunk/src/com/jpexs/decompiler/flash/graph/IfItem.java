@@ -67,7 +67,7 @@ public class IfItem extends GraphTargetItem implements Block {
             }
         }
         ret += hilight("}");
-        if (onFalse.size() > 0) {
+        if (elseBranch.size() > 0) {
             ret += "\r\n" + hilight("else") + "\r\n" + hilight("{") + "\r\n";
             for (GraphTargetItem ti : elseBranch) {
                 if (!ti.isEmpty()) {
