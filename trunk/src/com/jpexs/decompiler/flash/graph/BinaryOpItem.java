@@ -48,9 +48,6 @@ public abstract class BinaryOpItem extends GraphTargetItem {
         } else {
             ret += leftSide.toString(localData);
         }
-        if (ret.length() > 500) {
-            return "/*line too long*/";
-        }
         ret += hilight(operator);
 
         if (rightSide.getPrecedence() > precedence) {
