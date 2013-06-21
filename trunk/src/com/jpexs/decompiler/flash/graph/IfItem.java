@@ -48,8 +48,20 @@ public class IfItem extends GraphTargetItem implements Block {
     @Override
     public String toString(List<Object> localData) {
         String ret;
-        ret = hilight("if(") + expression.toString(localData) + hilight(")") + "\r\n{\r\n";
-        for (GraphTargetItem ti : onTrue) {
+        GraphTargetItem expr = expression;
+        List<GraphTargetItem> ifBranch = onTrue;
+        List<GraphTargetItem> elseBranch = onFalse;
+        if (onTrue.isEmpty()) {
+            if (expr instanceof LogicalOpItem) {
+                expr = ((LogicalOpItem) expr).invert();
+            } else {
+                expr = new NotItem(null, expr);
+            }
+            ifBranch = onFalse;
+            elseBranch = onTrue;
+        }
+        ret = hilight("if(") + expr.toString(localData) + hilight(")") + "\r\n{\r\n";
+        for (GraphTargetItem ti : ifBranch) {
             if (!ti.isEmpty()) {
                 ret += ti.toStringSemicoloned(localData) + "\r\n";
             }
@@ -57,7 +69,7 @@ public class IfItem extends GraphTargetItem implements Block {
         ret += hilight("}");
         if (onFalse.size() > 0) {
             ret += "\r\n" + hilight("else") + "\r\n" + hilight("{") + "\r\n";
-            for (GraphTargetItem ti : onFalse) {
+            for (GraphTargetItem ti : elseBranch) {
                 if (!ti.isEmpty()) {
                     ret += ti.toStringSemicoloned(localData) + "\r\n";
                 }
