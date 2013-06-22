@@ -1873,7 +1873,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             showCard(CARDEMPTYPANEL);
         } else if (tagObj instanceof ASMSource) {
             showCard(CARDACTIONSCRIPTPANEL);
-            actionPanel.setSource((ASMSource) tagObj, true);
+            actionPanel.setSource((ASMSource) tagObj, !forceReload);
         } else if (tagObj instanceof ImageTag) {
             imageButtonsPanel.setVisible(((ImageTag) tagObj).importSupported());
             showCard(CARDIMAGEPANEL);
