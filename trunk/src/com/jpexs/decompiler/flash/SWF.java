@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionGetVariable;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ActionSetVariable;
+import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.action.swf4.Null;
 import com.jpexs.decompiler.flash.action.swf5.ActionCallFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionCallMethod;
@@ -1055,6 +1056,7 @@ public class SWF {
     private HashMap<DirectValueTreeItem, ConstantPool> allVariableNames = new HashMap<>();
     private HashSet<String> allVariableNamesStr = new HashSet<>();
     private List<GraphSourceItem> allFunctions = new ArrayList<>();
+    private HashMap<DirectValueTreeItem, ConstantPool> allStrings = new HashMap<>();
 
     private String fooString(String orig, boolean firstUppercase, int rndSize) {
         boolean exists;
@@ -1129,7 +1131,7 @@ public class SWF {
         return null;
     }
 
-    private static void getVariables(ConstantPool constantPool, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, int lastIp, HashMap<DirectValueTreeItem, ConstantPool> variables, List<GraphSourceItem> functions, List<Integer> visited) {
+    private static void getVariables(ConstantPool constantPool, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, int lastIp, HashMap<DirectValueTreeItem, ConstantPool> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, List<Integer> visited) {
         boolean debugMode = false;
         while ((ip > -1) && ip < code.size()) {
             if (visited.contains(ip)) {
@@ -1174,7 +1176,7 @@ public class SWF {
                     ip = code.adr2pos(addr);
                     addr += size;
                     int nextip = code.adr2pos(addr);
-                    getVariables(variables, functions, new ActionGraphSource(code.getActions().subList(ip, nextip), code.version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0);
+                    getVariables(variables, functions, strings, new ActionGraphSource(code.getActions().subList(ip, nextip), code.version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0);
                     ip = nextip;
                 }
                 ((GraphSourceItemContainer) ins).translateContainer(new ArrayList<List<GraphTargetItem>>(), stack, output, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
@@ -1206,6 +1208,18 @@ public class SWF {
                 break;
             }
 
+            if (ins instanceof ActionPush) {
+                if (!stack.isEmpty()) {
+                    GraphTargetItem top = stack.peek();
+                    if (top instanceof DirectValueTreeItem) {
+                        DirectValueTreeItem dvt = (DirectValueTreeItem) top;
+                        if ((dvt.value instanceof String) || (dvt.value instanceof ConstantIndex)) {
+                            strings.put(dvt, constantPool);
+                        }
+                    }
+                }
+            }
+
             if (ins.isBranch() || ins.isJump()) {
                 if (ins instanceof ActionIf) {
                     stack.pop();
@@ -1216,7 +1230,7 @@ public class SWF {
                     @SuppressWarnings("unchecked")
                     Stack<GraphTargetItem> brStack = (Stack<GraphTargetItem>) stack.clone();
                     if (b >= 0) {
-                        getVariables(constantPool, localData, brStack, output, code, b, ip, variables, functions, visited);
+                        getVariables(constantPool, localData, brStack, output, code, b, ip, variables, functions, strings, visited);
                     } else {
                         if (debugMode) {
                             System.out.println("Negative branch:" + b);
@@ -1230,20 +1244,20 @@ public class SWF {
         };
     }
 
-    private static void getVariables(HashMap<DirectValueTreeItem, ConstantPool> variables, List<GraphSourceItem> functions, ActionGraphSource code, int addr) {
+    private static void getVariables(HashMap<DirectValueTreeItem, ConstantPool> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, ActionGraphSource code, int addr) {
         List<Object> localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
         try {
-            getVariables(null, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0, variables, functions, new ArrayList<Integer>());
+            getVariables(null, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0, variables, functions, strings, new ArrayList<Integer>());
         } catch (Exception ex) {
             Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Getting variables error", ex);
         }
     }
 
-    private HashMap<DirectValueTreeItem, ConstantPool> getVariables(HashMap<DirectValueTreeItem, ConstantPool> variables, List<GraphSourceItem> functions, ASMSource src) {
+    private HashMap<DirectValueTreeItem, ConstantPool> getVariables(HashMap<DirectValueTreeItem, ConstantPool> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, ASMSource src) {
         HashMap<DirectValueTreeItem, ConstantPool> ret = new HashMap<>();
         List<Action> actions = src.getActions(version);
         actionsMap.put(src, actions);
-        getVariables(variables, functions, new ActionGraphSource(actions, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0);
+        getVariables(variables, functions, strings, new ActionGraphSource(actions, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0);
         return ret;
     }
     private HashMap<ASMSource, List<Action>> actionsMap = new HashMap<>();
@@ -1252,7 +1266,7 @@ public class SWF {
         for (Object o : objs) {
             if (o instanceof ASMSource) {
                 informListeners("getVariables", path + "/" + o.toString());
-                getVariables(allVariableNames, allFunctions, (ASMSource) o);
+                getVariables(allVariableNames, allFunctions, allStrings, (ASMSource) o);
             }
             if (o instanceof Container) {
                 getVariables(((Container) o).getSubItems(), path + "/" + o.toString());
@@ -1260,10 +1274,56 @@ public class SWF {
         }
     }
 
+    public int deobfuscateAS3Identifiers() {
+        HashMap<String, String> namesMap = new HashMap<>();
+        for (Tag tag : tags) {
+            if (tag instanceof ABCContainerTag) {
+                ((ABCContainerTag) tag).getABC().deobfuscateIdentifiers(namesMap);
+            }
+        }
+        for (Tag tag : tags) {
+            if (tag instanceof SymbolClassTag) {
+                SymbolClassTag sc = (SymbolClassTag) tag;
+                for (int i = 0; i < sc.classNames.length; i++) {
+                    String pkg = null;
+                    String name = "";
+                    if (sc.classNames[i].contains(".")) {
+                        pkg = sc.classNames[i].substring(0, sc.classNames[i].lastIndexOf("."));
+                        name = sc.classNames[i].substring(sc.classNames[i].lastIndexOf(".") + 1);
+                    } else {
+                        name = sc.classNames[i];
+                    }
+                    boolean changed = false;
+                    if ((pkg != null) && (!pkg.equals(""))) {
+                        if (namesMap.containsKey(pkg)) {
+                            changed = true;
+                            pkg = namesMap.get(pkg);
+                        }
+                    }
+                    if (namesMap.containsKey(name)) {
+                        changed = true;
+                        name = namesMap.get(name);
+                    }
+                    if (changed) {
+                        String newClassName = "";
+                        if (pkg == null) {
+                            newClassName = name;
+                        } else {
+                            newClassName = pkg + "." + name;
+                        }
+                        sc.classNames[i] = newClassName;
+                    }
+                }
+            }
+        }
+        return namesMap.size();
+    }
+
     public int deobfuscateAS2Identifiers() {
         actionsMap = new HashMap<>();
         allFunctions = new ArrayList<>();
         allVariableNames = new HashMap<>();
+        allStrings = new HashMap<>();
         List<Object> objs = new ArrayList<>();
         int ret = 0;
         objs.addAll(tags);
@@ -1288,10 +1348,26 @@ public class SWF {
             String name = ti.toStringNoH(allVariableNames.get(ti));
             allVariableNamesStr.add(name);
         }
+        //Ommit variables from all strings
+        HashMap<DirectValueTreeItem, ConstantPool> stringsNoVar = new HashMap<>();
+        for (DirectValueTreeItem ti : allStrings.keySet()) {
+            if (!allVariableNames.containsKey(ti)) {
+                stringsNoVar.put(ti, allStrings.get(ti));
+            }
+        }
         for (DirectValueTreeItem ti : allVariableNames.keySet()) {
             String name = ti.toStringNoH(allVariableNames.get(ti));
             String changed = deobfuscateName(deobfuscated, name, false);
             if (changed != null) {
+                /*boolean addNew=false;
+                 for (DirectValueTreeItem snv : stringsNoVar.keySet()) {
+                 if (stringsNoVar.get(snv) == allVariableNames.get(ti)) { //Same constantpool
+                 if(snv.toStringNoH(stringsNoVar.get(snv)).equals(name)){ //Same string
+                 addNew = true;
+                 break;
+                 }
+                 }
+                 }*/
                 ActionPush pu = (ActionPush) ti.src;
                 if (pu.replacement == null) {
                     pu.replacement = new ArrayList<>();

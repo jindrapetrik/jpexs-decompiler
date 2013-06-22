@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -41,6 +42,30 @@ public class ScriptPack {
         this.traitIndices = traitIndices;
     }
 
+    public String getPathPackage() {
+        String packageName = "";
+        for (int t : traitIndices) {
+            Multiname name = abc.script_info[scriptIndex].traits.traits[t].getName(abc);
+            Namespace ns = name.getNamespace(abc.constants);
+            if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
+                packageName = ns.getName(abc.constants);
+            }
+        }
+        return packageName;
+    }
+
+    public String getPathScriptName() {
+        String scriptName = "";
+        for (int t : traitIndices) {
+            Multiname name = abc.script_info[scriptIndex].traits.traits[t].getName(abc);
+            Namespace ns = name.getNamespace(abc.constants);
+            if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
+                scriptName = name.getName(abc.constants, new ArrayList<String>());
+            }
+        }
+        return scriptName;
+    }
+
     public String getPath() {
         String packageName = "";
         String scriptName = "";
@@ -55,15 +80,31 @@ public class ScriptPack {
         return packageName + "." + scriptName;
     }
 
+    private static String makeDirPath(String packageName) {
+        if (packageName.equals("")) {
+            return "";
+        }
+        String pathParts[];
+        if (packageName.contains(".")) {
+            pathParts = packageName.split("\\.");
+        } else {
+            pathParts = new String[]{packageName};
+        }
+        for (int i = 0; i < pathParts.length; i++) {
+            pathParts[i] = Helper.makeFileName(pathParts[i]);
+        }
+        return Helper.joinStrings(pathParts, File.separator);
+    }
+
     public void export(String directory, List<ABCContainerTag> abcList, boolean pcode, boolean paralel) throws IOException {
-        String path = getPath();
-        String scriptName = path.substring(path.lastIndexOf(".") + 1);
-        String packageName = path.substring(0, path.lastIndexOf("."));
-        File outDir = new File(directory + File.separatorChar + packageName.replace('.', File.separatorChar));
+        String scriptName = getPathScriptName();
+        String packageName = getPathPackage();
+
+        File outDir = new File(directory + File.separatorChar + makeDirPath(packageName));
         if (!outDir.exists()) {
             outDir.mkdirs();
         }
-        String fileName = outDir.toString() + File.separator + scriptName + ".as";
+        String fileName = outDir.toString() + File.separator + Helper.makeFileName(scriptName) + ".as";
         try (FileOutputStream fos = new FileOutputStream(fileName)) {
             for (int t : traitIndices) {
                 Multiname name = abc.script_info[scriptIndex].traits.traits[t].getName(abc);

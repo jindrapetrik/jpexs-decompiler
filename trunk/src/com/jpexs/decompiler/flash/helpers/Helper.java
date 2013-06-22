@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 import java.util.Stack;
 import java.util.logging.Level;
@@ -355,5 +356,61 @@ public class Helper {
             f = new File(m.group(1));
         }
         return f;
+    }
+    private static BitSet fileNameInvalidChars;
+    private static final List<String> invalidFilenamesParts;
+
+    static {
+        BitSet toEncode = new BitSet(256);
+
+        for (int i = 0; i < 32; i++) {
+            toEncode.set(i);
+        }
+
+        toEncode.set('\\');
+        toEncode.set('/');
+        toEncode.set(':');
+        toEncode.set('*');
+        toEncode.set('?');
+        toEncode.set('"');
+        toEncode.set('<');
+        toEncode.set('>');
+        toEncode.set('|');
+
+        fileNameInvalidChars = toEncode;
+
+        //windows reserved filenames:
+        invalidFilenamesParts = new ArrayList<>();
+        invalidFilenamesParts.add("CON");
+        invalidFilenamesParts.add("PRN");
+        invalidFilenamesParts.add("AUX");
+        invalidFilenamesParts.add("CLOCK$");
+        invalidFilenamesParts.add("NUL");
+        for (int i = 1; i <= 9; i++) {
+            invalidFilenamesParts.add("COM" + i);
+            invalidFilenamesParts.add("LPT" + i);
+        }
+    }
+
+    public static String makeFileName(String str) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < str.length(); i++) {
+            int ch = (int) str.charAt(i);
+            if (ch < 256 && fileNameInvalidChars.get(ch)) {
+                sb.append("%").append(String.format("%02X", ch));
+            } else {
+                sb.append((char) ch);
+            }
+        }
+        str = sb.toString();
+        str = "." + str + ".";
+        for (String inv : invalidFilenamesParts) {
+            str = Pattern.compile("\\." + Pattern.quote(inv) + "\\.", Pattern.CASE_INSENSITIVE).matcher(str).replaceAll("._" + inv + ".");
+        }
+        str = str.substring(1, str.length() - 1); //remove dots
+        if (str.equals("")) {
+            str = "unnamed";
+        }
+        return str;
     }
 }

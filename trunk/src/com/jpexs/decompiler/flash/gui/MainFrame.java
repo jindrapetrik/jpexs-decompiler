@@ -1705,10 +1705,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                             int cnt = 0;
 
                             if (abcPanel != null) {
-                                HashMap<String, String> namesMap = new HashMap<>();
-                                for (ABCContainerTag tag : abcPanel.list) {
-                                    cnt += tag.getABC().deobfuscateIdentifiers(namesMap);
-                                }
+                                cnt = swf.deobfuscateAS3Identifiers();
                             } else {
                                 cnt = swf.deobfuscateAS2Identifiers();
                             }

@@ -752,7 +752,7 @@ public class Graph {
                 }
             }
         }
-        
+
         if (!visited.contains(part)) {
             visited.add(part);
         }
@@ -840,11 +840,11 @@ public class Graph {
 
     private void getLoops(GraphPart part, List<Loop> loops, List<GraphPart> stopPart) {
         clearLoops(loops);
-        getLoops(part, loops, stopPart, true,1);
+        getLoops(part, loops, stopPart, true, 1);
         clearLoops(loops);
     }
 
-    private void getLoops(GraphPart part, List<Loop> loops, List<GraphPart> stopPart, boolean first,int level) {
+    private void getLoops(GraphPart part, List<Loop> loops, List<GraphPart> stopPart, boolean first, int level) {
         boolean debugMode = false;
 
         if (stopPart == null) {
@@ -853,7 +853,7 @@ public class Graph {
         if (part == null) {
             return;
         }
-        
+
         if (debugMode) {
             System.err.println("getloops: " + part);
         }
@@ -913,13 +913,13 @@ public class Graph {
                 stopPart2.add(next);
             }
             if (next != part.nextParts.get(0)) {
-                getLoops(part.nextParts.get(0), loops, stopPart2, false,level+1);
+                getLoops(part.nextParts.get(0), loops, stopPart2, false, level + 1);
             }
             if (next != part.nextParts.get(1)) {
-                getLoops(part.nextParts.get(1), loops, stopPart2, false,level+1);
+                getLoops(part.nextParts.get(1), loops, stopPart2, false, level + 1);
             }
             if (next != null) {
-                getLoops(next, loops, stopPart, false,level);
+                getLoops(next, loops, stopPart, false, level);
             }
         }
         if (part.nextParts.size() > 2) {
@@ -940,15 +940,15 @@ public class Graph {
                     }
                 }
                 if (next != p) {
-                    getLoops(p, loops, stopPart2, false,level+1);
+                    getLoops(p, loops, stopPart2, false, level + 1);
                 }
             }
             if (next != null) {
-                getLoops(next, loops, stopPart, false,level);
+                getLoops(next, loops, stopPart, false, level);
             }
         }
         if (part.nextParts.size() == 1) {
-            getLoops(part.nextParts.get(0), loops, stopPart, false,level);
+            getLoops(part.nextParts.get(0), loops, stopPart, false, level);
         }
 
 
@@ -996,23 +996,23 @@ public class Graph {
                             /*if (cand.path.equals(cand2.path)) {
                              found = cand2;
                              } else {*/
-                            int lev1=Integer.MAX_VALUE;
-                            int lev2=Integer.MAX_VALUE;
-                            for(int i=0;i<currentLoop.breakCandidates.size();i++){
-                                if(currentLoop.breakCandidates.get(i)==cand){
-                                    if(currentLoop.breakCandidatesLevels.get(i)<lev1){
-                                        lev1=currentLoop.breakCandidatesLevels.get(i);
+                            int lev1 = Integer.MAX_VALUE;
+                            int lev2 = Integer.MAX_VALUE;
+                            for (int i = 0; i < currentLoop.breakCandidates.size(); i++) {
+                                if (currentLoop.breakCandidates.get(i) == cand) {
+                                    if (currentLoop.breakCandidatesLevels.get(i) < lev1) {
+                                        lev1 = currentLoop.breakCandidatesLevels.get(i);
                                     }
                                 }
-                                if(currentLoop.breakCandidates.get(i)==cand2){
-                                    if(currentLoop.breakCandidatesLevels.get(i)<lev2){
-                                        lev2=currentLoop.breakCandidatesLevels.get(i);
+                                if (currentLoop.breakCandidates.get(i) == cand2) {
+                                    if (currentLoop.breakCandidatesLevels.get(i) < lev2) {
+                                        lev2 = currentLoop.breakCandidatesLevels.get(i);
                                     }
                                 }
                             }
-                            if(lev1<lev2){
-                                found=cand2;
-                            }else{
+                            if (lev1 < lev2) {
+                                found = cand2;
+                            } else {
                                 found = cand;
                             }
                             //}
@@ -1021,8 +1021,8 @@ public class Graph {
                     }
                 }
                 if (found != null) {
-                    while(currentLoop.breakCandidates.contains(found)){
-                        int ind=currentLoop.breakCandidates.indexOf(found);
+                    while (currentLoop.breakCandidates.contains(found)) {
+                        int ind = currentLoop.breakCandidates.indexOf(found);
                         currentLoop.breakCandidates.remove(ind);
                         currentLoop.breakCandidatesLevels.remove(ind);
                     }
@@ -1089,7 +1089,7 @@ public class Graph {
                 }
             }
             for (GraphPart r : removed) {
-                getLoops(r, loops, stopPart, false,1/*FIXME?*/);
+                getLoops(r, loops, stopPart, false, 1/*FIXME?*/);
             }
             start = false;
             for (int l = 0; l < loops.size(); l++) {
@@ -1102,7 +1102,7 @@ public class Graph {
                 }
             }
             //currentLoop.phase = 2;
-            getLoops(currentLoop.loopBreak, loops, stopPart, false,level);
+            getLoops(currentLoop.loopBreak, loops, stopPart, false, level);
         }
     }
 

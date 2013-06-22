@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -96,31 +97,36 @@ public class ABC {
         }
     }
 
-    public int deobfuscateIdentifiers(HashMap<String, String> namesMap) {
-        int ret = 0;
-        for (int i = 1; i < instance_info.length; i++) {
-            if (instance_info[i].name_index != 0) {
-                if (deobfuscateName(namesMap, constants.constant_multiname[instance_info[i].name_index].name_index, true)) {
-                    ret++;
+    public Set<Integer> getStringUsages() {
+        Set<Integer> ret = new HashSet<>();
+        for (MethodBody body : bodies) {
+            for (AVM2Instruction ins : body.code.code) {
+                for (int i = 0; i < ins.definition.operands.length; i++) {
+                    if (ins.definition.operands[i] == AVM2Code.DAT_STRING_INDEX) {
+                        ret.add(ins.operands[i]);
+                    }
                 }
-            }
-            if (instance_info[i].super_index != 0) {
-                if (deobfuscateName(namesMap, constants.constant_multiname[instance_info[i].super_index].name_index, true)) {
-                    ret++;
-                }
-            }
-        }
-        for (int i = 1; i < constants.constant_multiname.length; i++) {
-            if (deobfuscateName(namesMap, constants.constant_multiname[i].name_index, false)) {
-                ret++;
-            }
-        }
-        for (int i = 1; i < constants.constant_namespace.length; i++) {
-            if (deobfuscateNameSpace(namesMap, constants.constant_namespace[i].name_index)) {
-                ret++;
             }
         }
         return ret;
+    }
+
+    public void deobfuscateIdentifiers(HashMap<String, String> namesMap) {
+        Set<Integer> stringUsages = getStringUsages();
+        for (int i = 1; i < instance_info.length; i++) {
+            if (instance_info[i].name_index != 0) {
+                constants.constant_multiname[instance_info[i].name_index].name_index = deobfuscateName(stringUsages, namesMap, constants.constant_multiname[instance_info[i].name_index].name_index, true);
+            }
+            if (instance_info[i].super_index != 0) {
+                constants.constant_multiname[instance_info[i].super_index].name_index = deobfuscateName(stringUsages, namesMap, constants.constant_multiname[instance_info[i].super_index].name_index, true);
+            }
+        }
+        for (int i = 1; i < constants.constant_multiname.length; i++) {
+            constants.constant_multiname[i].name_index = deobfuscateName(stringUsages, namesMap, constants.constant_multiname[i].name_index, false);
+        }
+        for (int i = 1; i < constants.constant_namespace.length; i++) {
+            constants.constant_namespace[i].name_index = deobfuscateNameSpace(stringUsages, namesMap, constants.constant_namespace[i].name_index);
+        }
     }
 
     public ABC(InputStream is) throws IOException {
@@ -732,15 +738,16 @@ public class ABC {
         return isValid;
     }
 
-    public boolean deobfuscateNameSpace(HashMap<String, String> namesMap, int strIndex) {
+    public int deobfuscateNameSpace(Set<Integer> stringUsages, HashMap<String, String> namesMap, int strIndex) {
         if (strIndex <= 0) {
-            return false;
+            return strIndex;
         }
         String s = constants.constant_string[strIndex];
         boolean isValid = isValidNSPart(s);
         if (!isValid) {
+            String newName;
             if (namesMap.containsKey(s)) {
-                constants.constant_string[strIndex] = namesMap.get(s);
+                newName = constants.constant_string[strIndex] = namesMap.get(s);
             } else {
                 String parts[] = null;
                 if (s.contains(".")) {
@@ -759,16 +766,22 @@ public class ABC {
                         ret += parts[p];
                     }
                 }
-                constants.constant_string[strIndex] = ret;
-                namesMap.put(s, constants.constant_string[strIndex]);
+                newName = ret;
+                namesMap.put(s, newName);
             }
+            if (stringUsages.contains(strIndex)) {
+                strIndex = constants.addString(newName);
+            } else {
+                constants.constant_string[strIndex] = newName;
+            }
+
         }
-        return !isValid;
+        return strIndex;
     }
 
-    public boolean deobfuscateName(HashMap<String, String> namesMap, int strIndex, boolean firstUppercase) {
+    public int deobfuscateName(Set<Integer> stringUsages, HashMap<String, String> namesMap, int strIndex, boolean firstUppercase) {
         if (strIndex <= 0) {
-            return false;
+            return strIndex;
         }
         String s = constants.constant_string[strIndex];
         boolean isValid = true;
@@ -793,14 +806,21 @@ public class ABC {
         }
 
         if (!isValid) {
+            String newname;
             if (namesMap.containsKey(s)) {
-                constants.constant_string[strIndex] = namesMap.get(s);
+                newname = namesMap.get(s);
             } else {
-                constants.constant_string[strIndex] = fooString(constants.constant_string[strIndex], firstUppercase, DEFAULT_FOO_SIZE);
+                newname = fooString(constants.constant_string[strIndex], firstUppercase, DEFAULT_FOO_SIZE);
+            }
+            if (stringUsages.contains(strIndex)) { //this name is already referenced as String
+                strIndex = constants.addString(s); //add new index
+            }
+            constants.constant_string[strIndex] = newname;
+            if (!namesMap.containsKey(s)) {
                 namesMap.put(s, constants.constant_string[strIndex]);
             }
         }
-        return !isValid;
+        return strIndex;
     }
 
     private void checkMultinameUsedInMethod(int multinameIndex, int methodInfo, List<MultinameUsage> ret, int classIndex, int traitIndex, boolean isStatic, boolean isInitializer, Traits traits, int parentTraitIndex) {
