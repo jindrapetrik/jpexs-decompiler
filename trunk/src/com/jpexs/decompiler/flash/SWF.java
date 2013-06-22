@@ -1359,21 +1359,32 @@ public class SWF {
             String name = ti.toStringNoH(allVariableNames.get(ti));
             String changed = deobfuscateName(deobfuscated, name, false);
             if (changed != null) {
-                /*boolean addNew=false;
-                 for (DirectValueTreeItem snv : stringsNoVar.keySet()) {
-                 if (stringsNoVar.get(snv) == allVariableNames.get(ti)) { //Same constantpool
-                 if(snv.toStringNoH(stringsNoVar.get(snv)).equals(name)){ //Same string
-                 addNew = true;
-                 break;
-                 }
-                 }
-                 }*/
+                boolean addNew = false;
+                for (DirectValueTreeItem snv : stringsNoVar.keySet()) {
+                    if (stringsNoVar.get(snv) == allVariableNames.get(ti)) { //Same constantpool
+                        if (snv.toStringNoH(stringsNoVar.get(snv)).equals(name)) { //Same string
+                            addNew = true;
+                            break;
+                        }
+                    }
+                }
                 ActionPush pu = (ActionPush) ti.src;
                 if (pu.replacement == null) {
                     pu.replacement = new ArrayList<>();
                     pu.replacement.addAll(pu.values);
                 }
-                pu.replacement.set(ti.pos, changed);
+                if (pu.replacement.get(ti.pos) instanceof ConstantIndex) {
+                    ConstantIndex ci = (ConstantIndex) pu.replacement.get(ti.pos);
+                    ConstantPool pool = allVariableNames.get(ti);
+                    if (addNew) {
+                        pool.constants.add(changed);
+                        ci.index = pool.constants.size() - 1;
+                    } else {
+                        pool.constants.set(ci.index, changed);
+                    }
+                } else {
+                    pu.replacement.set(ti.pos, changed);
+                }
                 ret++;
             }
         }

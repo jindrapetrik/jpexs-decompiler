@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.List;
+import java.util.Objects;
 
 public class DirectValueTreeItem extends TreeItem {
 
@@ -194,7 +195,6 @@ public class DirectValueTreeItem extends TreeItem {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 97 * hash + (this.value != null ? this.value.hashCode() : 0);
         return hash;
     }
 
@@ -207,9 +207,16 @@ public class DirectValueTreeItem extends TreeItem {
             return false;
         }
         final DirectValueTreeItem other = (DirectValueTreeItem) obj;
-        if (this.value != other.value && (this.value == null || !this.value.equals(other.value))) {
+        if (!Objects.equals(this.value, other.value)) {
+            return false;
+        }
+        if (!Objects.equals(this.constants, other.constants)) {
+            return false;
+        }
+        if(other.pos!=this.pos){
             return false;
         }
         return true;
     }
+    
 }
