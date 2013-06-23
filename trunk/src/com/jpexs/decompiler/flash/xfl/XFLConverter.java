@@ -1551,6 +1551,10 @@ public class XFLConverter {
                         mediaLinkStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterID()) + "\"";
                     }
 
+                    if (characterVariables.containsKey(symbol.getCharacterID())) {
+                        mediaLinkStr += " linkageExportForAS=\"true\" linkageIdentifier=\"" + xmlString(characterVariables.get(symbol.getCharacterID())) + "\"";
+                    }
+
                     mediaLinkStr += "/>\n";
                     media.add(mediaLinkStr);
                 }
@@ -1590,6 +1594,9 @@ public class XFLConverter {
                 mediaLinkStr += " length=\"" + len + "\"";
                 if (characterClasses.containsKey(symbol.getCharacterID())) {
                     mediaLinkStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterID()) + "\"";
+                }
+                if (characterVariables.containsKey(symbol.getCharacterID())) {
+                    mediaLinkStr += " linkageExportForAS=\"true\" linkageIdentifier=\"" + xmlString(characterVariables.get(symbol.getCharacterID())) + "\"";
                 }
                 mediaLinkStr += "/>\n";
                 media.add(mediaLinkStr);

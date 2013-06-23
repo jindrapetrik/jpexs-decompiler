@@ -861,13 +861,13 @@ public class SWF {
                     DefineSoundTag st = (DefineSoundTag) t;
 
                     if ((st.soundFormat == DefineSoundTag.FORMAT_ADPCM) && wave) {
-                        fos = new FileOutputStream(outdir + File.separator + id + ".wav");
+                        fos = new FileOutputStream(outdir + File.separator + st.getCharacterExportFileName() + ".wav");
                         createWavFromAdpcm(fos, st.soundRate, st.soundSize, st.soundType, st.soundData);
                     } else if ((st.soundFormat == DefineSoundTag.FORMAT_MP3) && mp3) {
-                        fos = new FileOutputStream(outdir + File.separator + id + ".mp3");
+                        fos = new FileOutputStream(outdir + File.separator + st.getCharacterExportFileName() + ".mp3");
                         fos.write(st.soundData, 2, st.soundData.length - 2);
                     } else {
-                        fos = new FileOutputStream(outdir + File.separator + id + ".flv");
+                        fos = new FileOutputStream(outdir + File.separator + st.getCharacterExportFileName() + ".flv");
                         FLVOutputStream flv = new FLVOutputStream(fos);
                         flv.writeHeader(true, false);
                         flv.writeTag(new FLVTAG(0, new AUDIODATA(st.soundFormat, st.soundRate, st.soundSize, st.soundType, st.soundData)));
@@ -1026,7 +1026,7 @@ public class SWF {
         for (Tag t : tags) {
             if (t instanceof DefineVideoStreamTag) {
                 DefineVideoStreamTag videoStream = (DefineVideoStreamTag) t;
-                try (FileOutputStream fos = new FileOutputStream(outdir + File.separator + ((DefineVideoStreamTag) t).characterID + ".flv")) {
+                try (FileOutputStream fos = new FileOutputStream(outdir + File.separator + ((DefineVideoStreamTag) t).getCharacterExportFileName() + ".flv")) {
                     fos.write(exportMovie(videoStream));
                 }
             }
