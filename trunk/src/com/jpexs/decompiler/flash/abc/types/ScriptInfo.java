@@ -52,7 +52,7 @@ public class ScriptInfo {
                     || (ns.kind == Namespace.KIND_PACKAGE)) {
                 String packageName = ns.getName(abc.constants);
                 String objectName = name.getName(abc.constants, new ArrayList<String>());
-                String path = packageName + "." + objectName;
+                String path = packageName.equals("") ? objectName : packageName + "." + objectName;
                 List<Integer> traitIndices = new ArrayList<>();
 
                 traitIndices.add(j);

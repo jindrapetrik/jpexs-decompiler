@@ -94,8 +94,8 @@ public class ClassesListTreeModel implements TreeModel {
                     }
                 }
             }
-            String nsName = path.substring(path.lastIndexOf(".") + 1);
-            String packageName = path.substring(0, path.lastIndexOf("."));
+            String nsName = path.contains(".") ? path.substring(path.lastIndexOf(".") + 1) : path;
+            String packageName = path.contains(".") ? path.substring(0, path.lastIndexOf(".")) : "";
             classTree.add(nsName, packageName, list.get(path));
         }
         this.list = list;

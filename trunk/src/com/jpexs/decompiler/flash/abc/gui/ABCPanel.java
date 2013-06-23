@@ -446,13 +446,25 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
         setVisible(true);
     }
 
+    public void hilightScript(String name) {
+        ClassesListTreeModel clModel = (ClassesListTreeModel) classTree.getModel();
+        ScriptPack pack = clModel.getList().get(name);
+        if (pack != null) {
+            hilightScript(pack);
+        }
+    }
+
+    public void hilightScript(ScriptPack pack) {
+        TagTreeModel ttm = (TagTreeModel) Main.mainFrame.tagTree.getModel();
+        TreePath tp = ttm.getTagPath(pack);
+        Main.mainFrame.tagTree.setSelectionPath(tp);
+        Main.mainFrame.tagTree.scrollPathToVisible(tp);
+    }
+
     public void updateSearchPos() {
         searchPos.setText((foundPos + 1) + "/" + found.size());
         decompiledTextArea.setScript(found.get(foundPos), list);
-        TagTreeModel ttm = (TagTreeModel) Main.mainFrame.tagTree.getModel();
-        TreePath tp = ttm.getTagPath(found.get(foundPos));
-        Main.mainFrame.tagTree.setSelectionPath(tp);
-        Main.mainFrame.tagTree.scrollPathToVisible(tp);
+        hilightScript(found.get(foundPos));
         decompiledTextArea.setCaretPosition(0);
         java.util.Timer t = new java.util.Timer();
         t.schedule(new TimerTask() {

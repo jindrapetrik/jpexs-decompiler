@@ -72,6 +72,7 @@ import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHead2Tag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHeadTypeTag;
+import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
@@ -403,6 +404,13 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
         //menuTools.add(menuDeobfuscation);
         menuTools.add(menuDeobfuscation);
+
+        JMenuItem miGotoDocumentClass = new JMenuItem("Go to document class");
+        miGotoDocumentClass.setActionCommand("GOTODOCUMENTCLASS");
+        miGotoDocumentClass.addActionListener(this);
+        if (swf.fileAttributes.actionScript3) {
+            menuTools.add(miGotoDocumentClass);
+        }
         menuBar.add(menuTools);
 
         JMenu menuHelp = new JMenu("Help");
@@ -1239,6 +1247,24 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
+            case "GOTODOCUMENTCLASS":
+                String documentClass = null;
+                loopdc:
+                for (Tag t : swf.tags) {
+                    if (t instanceof SymbolClassTag) {
+                        SymbolClassTag sc = (SymbolClassTag) t;
+                        for (int i = 0; i < sc.tagIDs.length; i++) {
+                            if (sc.tagIDs[i] == 0) {
+                                documentClass = sc.classNames[i];
+                                break loopdc;
+                            }
+                        }
+                    }
+                }
+                if (documentClass != null) {
+                    abcPanel.hilightScript(documentClass);
+                }
+                break;
             case "PARALLELSPEEDUP":
                 String confStr = "Parallelism can speed up loading and decompilation but uses more memory.\r\n";
                 if (miParallelSpeedUp.isSelected()) {

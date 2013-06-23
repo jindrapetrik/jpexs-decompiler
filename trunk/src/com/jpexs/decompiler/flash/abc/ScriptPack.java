@@ -77,7 +77,7 @@ public class ScriptPack {
                 scriptName = name.getName(abc.constants, new ArrayList<String>());
             }
         }
-        return packageName + "." + scriptName;
+        return packageName.equals("") ? scriptName : packageName + "." + scriptName;
     }
 
     private static String makeDirPath(String packageName) {
