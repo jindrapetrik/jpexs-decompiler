@@ -601,8 +601,19 @@ public class SWF {
                                 }
                             }
                         }
+                        int pkgCount = 0;
+                        for (; pkgCount < items.size(); pkgCount++) {
+                            if (items.get(pkgCount).tag instanceof PackageNode) {
+                                PackageNode pkg = (PackageNode) items.get(pkgCount).tag;
+                                if (pkg.packageName.compareTo(pathParts[pos]) > 0) {
+                                    break;
+                                }
+                            } else {
+                                break;
+                            }
+                        }
                         if (selNode == null) {
-                            items.add(selNode = new TagNode(new PackageNode(pathParts[pos])));
+                            items.add(pkgCount, selNode = new TagNode(new PackageNode(pathParts[pos])));
                         }
                         pos++;
                         if (selNode != null) {
@@ -610,7 +621,24 @@ public class SWF {
                         }
 
                     } while (selNode != null);
-                    items.add(addNode);
+
+                    int clsCount = 0;
+                    for (; clsCount < items.size(); clsCount++) {
+                        if (items.get(clsCount).tag instanceof CharacterIdTag) {
+                            CharacterIdTag ct = (CharacterIdTag) items.get(clsCount).tag;
+                            String expName = ct.getExportName();
+                            if (expName == null) {
+                                expName = "";
+                            }
+                            if (expName.contains(".")) {
+                                expName = expName.substring(expName.lastIndexOf(".") + 1);
+                            }
+                            if ((ct.getClass().getName() + "_" + expName).compareTo(addNode.tag.getClass().getName() + "_" + pathParts[pos]) > 0) {
+                                break;
+                            }
+                        }
+                    }
+                    items.add(clsCount, addNode);
                 } else {
                     ret.add(addNode);
                 }
