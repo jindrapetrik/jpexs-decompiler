@@ -40,9 +40,9 @@ import com.jpexs.decompiler.flash.graph.NotItem;
 import com.jpexs.decompiler.flash.graph.ScriptEndItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1239,8 +1239,7 @@ public class Action implements GraphSourceItem {
         String s = null;
         try {
             s = Highlighting.stripHilights(Action.actionsToString(new ArrayList<DisassemblyListener>(), address, ret, null, version, false, swfPos));
-
-            ret = ASMParser.parse(address, swfPos, true, new ByteArrayInputStream(s.getBytes()), SWF.DEFAULT_VERSION);
+            ret = ASMParser.parse(address, swfPos, true, new StringReader(s), SWF.DEFAULT_VERSION);
         } catch (Exception ex) {
             Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error", ex);
         }

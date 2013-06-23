@@ -57,8 +57,8 @@ public class DefineFontInfo2Tag extends Tag {
         SWFOutputStream sos = new SWFOutputStream(os, version);
         try {
             sos.writeUI16(fontID);
-            sos.writeUI8(fontName.getBytes().length);
-            sos.write(fontName.getBytes());
+            sos.writeUI8(fontName.getBytes("utf-8").length);
+            sos.write(fontName.getBytes("utf-8"));
             sos.writeUB(2, 0);
             sos.writeUB(1, fontFlagsSmallText ? 1 : 0);
             sos.writeUB(1, fontFlagsShiftJIS ? 1 : 0);

@@ -271,7 +271,7 @@ public class TagNode {
                             ret = (Highlighting.stripHilights(Action.actionsToSource(as, SWF.DEFAULT_VERSION)));
                         }
                         try (FileOutputStream fos = new FileOutputStream(f)) {
-                            fos.write(ret.getBytes());
+                            fos.write(ret.getBytes("utf-8"));
                         }
                     } catch (Exception ex) {
                     }

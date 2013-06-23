@@ -16,11 +16,6 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
-import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
-import com.jpexs.decompiler.flash.tags.Tag;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  *
  * @author JPEXS

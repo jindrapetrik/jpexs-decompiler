@@ -30,7 +30,7 @@ import com.jpexs.decompiler.flash.action.swf7.*;
 import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -331,7 +331,7 @@ public class ASMParser {
         }
     }
 
-    public static List<Action> parse(long address, long containerSWFOffset, boolean ignoreNops, InputStream is, int version) throws IOException, ParseException {
+    public static List<Action> parse(long address, long containerSWFOffset, boolean ignoreNops, Reader is, int version) throws IOException, ParseException {
         FlasmLexer lexer = new FlasmLexer(is);
         List<Label> labels = new ArrayList<>();
         List<Action> ret = parse(containerSWFOffset, ignoreNops, labels, address, lexer, new ArrayList<String>(), version);

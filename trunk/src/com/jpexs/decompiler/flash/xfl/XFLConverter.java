@@ -2775,8 +2775,11 @@ public class XFLConverter {
             for (String fileName : files.keySet()) {
                 writeFile(files.get(fileName), libraryDir.getAbsolutePath() + File.separator + fileName);
             }
-
-            writeFile("PROXY-CS5".getBytes(), outfile);
+            try {
+                writeFile("PROXY-CS5".getBytes("utf-8"), outfile);
+            } catch (UnsupportedEncodingException ex) {
+                Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         if (useAS3) {
             try {

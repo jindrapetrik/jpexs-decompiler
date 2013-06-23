@@ -1438,6 +1438,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                     final String identifier = actionPanel.getStringUnderCursor();
                     if (identifier != null) {
                         (new Thread() {
+                            @Override
                             public void run() {
                                 Main.startWork("Renaming...");
                                 renameIdentifier(identifier);

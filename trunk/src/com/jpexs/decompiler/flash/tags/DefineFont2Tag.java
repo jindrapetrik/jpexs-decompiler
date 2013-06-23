@@ -99,8 +99,8 @@ public class DefineFont2Tag extends CharacterTag implements FontTag {
             sos.writeUB(1, fontFlagsItalic ? 1 : 0);
             sos.writeUB(1, fontFlagsBold ? 1 : 0);
             sos.writeLANGCODE(languageCode);
-            sos.writeUI8(fontName.getBytes().length);
-            sos.write(fontName.getBytes());
+            sos.writeUI8(fontName.getBytes("utf-8").length);
+            sos.write(fontName.getBytes("utf-8"));
             sos.writeUI16(numGlyphs);
 
             ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
