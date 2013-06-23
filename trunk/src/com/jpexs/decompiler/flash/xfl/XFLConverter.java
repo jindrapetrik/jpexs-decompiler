@@ -538,7 +538,7 @@ public class XFLConverter {
                 if (scr.stateNewStyles) {
                     fillsStr = "<fills>";
                     strokesStr = "<strokes>";
-                    if (fillStyleCount > 0) {
+                    if (fillStyleCount > 0 || lineStyleCount > 0) {
 
                         if ((fillStyle0 > 0) || (fillStyle1 > 0) || (strokeStyle > 0)) {
 
@@ -1033,7 +1033,7 @@ public class XFLConverter {
 
         ret += "<DOMSymbolInstance libraryItemName=\"" + "Symbol " + tag.getCharacterID() + "\"";
         if (name != null) {
-            ret += " name=\"" + name + "\"";
+            ret += " name=\"" + xmlString(name) + "\"";
         }
         String blendModeStr = null;
         if (blendMode < BLENDMODES.length) {
@@ -1238,11 +1238,11 @@ public class XFLConverter {
                 boolean linkageExportForAS = false;
                 if (characterClasses.containsKey(symbol.getCharacterID())) {
                     linkageExportForAS = true;
-                    symbolStr += " linkageClassName=\"" + characterClasses.get(symbol.getCharacterID()) + "\"";
+                    symbolStr += " linkageClassName=\"" + xmlString(characterClasses.get(symbol.getCharacterID())) + "\"";
                 }
                 if (characterVariables.containsKey(symbol.getCharacterID())) {
                     linkageExportForAS = true;
-                    symbolStr += " linkageIdentifier=\"" + characterVariables.get(symbol.getCharacterID()) + "\"";
+                    symbolStr += " linkageIdentifier=\"" + xmlString(characterVariables.get(symbol.getCharacterID())) + "\"";
                 }
                 if (linkageExportForAS) {
                     symbolStr += " linkageExportForAS=\"true\"";
@@ -1349,8 +1349,9 @@ public class XFLConverter {
                     symbolStr += "</DOMTimeline>";
                 } else if (symbol instanceof DefineSpriteTag) {
                     DefineSpriteTag sprite = (DefineSpriteTag) symbol;
-                    String initActionScript = "";
-
+                    if (sprite.subTags.isEmpty()) { //probably AS2 class
+                        continue;
+                    }
                     symbolStr += convertTimeline(sprite.spriteId, oneInstanceShapes, backgroundColor, tags, sprite.getSubTags(), characters, "Symbol " + symbol.getCharacterID());
                 } else if (symbol instanceof ShapeTag) {
                     itemIcon = "1";
@@ -2446,6 +2447,8 @@ public class XFLConverter {
     }
 
     public static void convertSWF(SWF swf, String swfFileName, String outfile, boolean compressed, String generator, String generatorVerName, String generatorVersion, boolean paralel) {
+        File file = new File(outfile);
+        File outDir = file.getParentFile();
         String domDocument = "";
         String baseName = swfFileName;
         File f = new File(baseName);
@@ -2491,6 +2494,40 @@ public class XFLConverter {
         domDocument += "</DOMDocument>";
         domDocument = prettyFormatXML(domDocument);
 
+        for (Tag t : swf.tags) {
+            if (t instanceof DoInitActionTag) {
+                DoInitActionTag dia = (DoInitActionTag) t;
+                int chid = dia.getCharacterID();
+                if (characters.containsKey(chid)) {
+                    if (characters.get(chid) instanceof DefineSpriteTag) {
+                        DefineSpriteTag sprite = (DefineSpriteTag) characters.get(chid);
+                        if (sprite.subTags.isEmpty()) {
+                            String data = convertActionScript(dia);
+                            String expPath = dia.getExportName();
+                            final String prefix = "__Packages.";
+                            if (expPath.startsWith(prefix)) {
+                                expPath = expPath.substring(prefix.length());
+                            }
+                            String expDir = "";
+                            if (expPath.contains(".")) {
+                                expDir = expPath.substring(0, expPath.lastIndexOf("."));
+                                expDir = expDir.replace(".", File.separator);
+                            }
+                            expPath = expPath.replace(".", File.separator);
+                            File cdir = new File(outDir.getAbsolutePath() + File.separator + expDir);
+                            if (!cdir.exists()) {
+                                cdir.mkdirs();
+                            }
+                            try {
+                                writeFile(data.getBytes("UTF-8"), outDir.getAbsolutePath() + File.separator + expPath + ".as");
+                            } catch (UnsupportedEncodingException ex) {
+                                Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         String publishSettings = "<flash_profiles>\n"
                 + "<flash_profile version=\"1.0\" name=\"Default\" current=\"true\">\n"
@@ -2582,7 +2619,7 @@ public class XFLConverter {
                 + "    <StreamUse8kSampleRate>0</StreamUse8kSampleRate>\n"
                 + "    <EventUse8kSampleRate>0</EventUse8kSampleRate>\n"
                 + "    <UseNetwork>" + (useNetwork ? 1 : 0) + "</UseNetwork>\n"
-                + "    <DocumentClass>" + (characterClasses.containsKey(0) ? characterClasses.get(0) : "") + "</DocumentClass>\n"
+                + "    <DocumentClass>" + xmlString(characterClasses.containsKey(0) ? characterClasses.get(0) : "") + "</DocumentClass>\n"
                 + "    <AS3Strict>2</AS3Strict>\n"
                 + "    <AS3Coach>4</AS3Coach>\n"
                 + "    <AS3AutoDeclare>4096</AS3AutoDeclare>\n"
@@ -2714,8 +2751,7 @@ public class XFLConverter {
             }
 
         } else {
-            File xfl = new File(outfile);
-            File outDir = xfl.getParentFile();
+
             outDir.mkdirs();
             try {
                 writeFile(domDocument.getBytes("UTF-8"), outDir.getAbsolutePath() + File.separator + "DOMDocument.xml");
@@ -2736,8 +2772,6 @@ public class XFLConverter {
             writeFile("PROXY-CS5".getBytes(), outfile);
         }
         if (useAS3) {
-            File outF = new File(outfile);
-            File outDir = outF.getParentFile();
             try {
                 swf.exportActionScript(outDir.getAbsolutePath(), false, paralel);
             } catch (Exception ex) {
