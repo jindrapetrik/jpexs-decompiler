@@ -535,6 +535,7 @@ public class SWF {
             if (t instanceof ExportAssetsTag) {
                 exportAssetsTags.add((ExportAssetsTag) t);
             }
+            TagNode addNode = null;
             if (t instanceof ShowFrameTag) {
                 TagNode tti = new TagNode(new FrameNode(frame, parent, false));
 
@@ -543,8 +544,10 @@ public class SWF {
                         if (!(ret.get(r).tag instanceof DefineButtonTag)) {
                             if (!(ret.get(r).tag instanceof DefineButton2Tag)) {
                                 if (!(ret.get(r).tag instanceof DoInitActionTag)) {
-                                    tti.subItems.add(ret.get(r));
-                                    ret.remove(r);
+                                    if (!(ret.get(r).tag instanceof PackageNode)) {
+                                        tti.subItems.add(ret.get(r));
+                                        ret.remove(r);
+                                    }
                                 }
                             }
                         }
@@ -554,7 +557,8 @@ public class SWF {
                 frames.add(tti);
             } else if (t instanceof ASMSource) {
                 TagNode tti = new TagNode(t);
-                ret.add(tti);
+                //ret.add(tti);
+                addNode = tti;
             } else if (t instanceof Container) {
                 if (((Container) t).getItemCount() > 0) {
 
@@ -562,7 +566,52 @@ public class SWF {
                     List<Object> subItems = ((Container) t).getSubItems();
 
                     tti.subItems = createASTagList(subItems, t);
-                    ret.add(tti);
+                    addNode = tti;
+                    //ret.add(tti);
+                }
+            }
+            if (addNode != null) {
+                if (addNode.tag instanceof CharacterIdTag) {
+                    CharacterIdTag cit = (CharacterIdTag) addNode.tag;
+                    String path = cit.getExportName();
+                    if(path==null){
+                        path="";
+                    }
+                    String pathParts[];
+                    if (path.contains(".")) {
+                        pathParts = path.split("\\.");
+                    } else {
+                        pathParts = new String[]{path};
+                    }
+                    List<TagNode> items = ret;
+                    int pos = 0;
+                    TagNode selNode = null;
+                    do {
+                        if(pos==pathParts.length-1){                            
+                            break;
+                        }
+                        selNode = null;
+                        for (TagNode node : items) {
+                            if (node.tag instanceof PackageNode) {
+                                PackageNode pkg = (PackageNode) node.tag;
+                                if (pkg.packageName.equals(pathParts[pos])) {
+                                    selNode = node;
+                                    break;
+                                }
+                            }                            
+                        }
+                        if (selNode == null) {
+                            items.add(selNode=new TagNode(new PackageNode(pathParts[pos])));
+                        }
+                        pos++;
+                        if(selNode!=null){
+                            items=selNode.subItems;
+                        }
+                        
+                    } while (selNode != null);
+                    items.add(addNode);
+                }else{
+                    ret.add(addNode);
                 }
             }
 
@@ -1430,6 +1479,21 @@ public class SWF {
     }
     HashMap<String, Integer> typeCounts = new HashMap<>();
 
+    public int deobfuscateIdentifiers(RenameType renameType){
+        if(fileAttributes==null){
+            int cnt=0;
+            cnt+=deobfuscateAS2Identifiers(renameType);
+            cnt+=deobfuscateAS3Identifiers(renameType);
+            return cnt;
+        }else{
+            if(fileAttributes.actionScript3){
+                return deobfuscateAS3Identifiers(renameType);
+            }else{
+                return deobfuscateAS2Identifiers(renameType);
+            }
+        }
+    }
+    
     public int deobfuscateAS2Identifiers(RenameType renameType) {
         actionsMap = new HashMap<>();
         allFunctions = new ArrayList<>();

@@ -25,44 +25,11 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public abstract class CharacterTag extends Tag {
+public abstract class CharacterTag extends CharacterIdTag {
 
     public CharacterTag(int id, String name, byte[] data, long pos) {
         super(id, name, data, pos);
     }
 
-    public abstract int getCharacterID();
-    /**
-     * List of ExportAssetsTag used for converting to String
-     */
-    public List<ExportAssetsTag> exportAssetsTags = new ArrayList<>();
-    private String className;
-
-    public void setClassName(String className) {
-        this.className = className;
-    }
-
-    public String getClassName() {
-        return className;
-    }
-
-    @Override
-    public String getName() {
-        String nameAppend = "";
-        for (ExportAssetsTag eat : exportAssetsTags) {
-            int pos = eat.tags.indexOf(getCharacterID());
-            if (pos > -1) {
-                nameAppend = ": " + eat.names.get(pos);
-            }
-        }
-        if (className != null) {
-            nameAppend = ": " + className;
-        }
-        return super.getName() + " (" + getCharacterID() + nameAppend + ")";
-    }
-
-    @Override
-    public String getExportName() {
-        return super.getName() + "_" + getCharacterID();
-    }
+    
 }

@@ -49,7 +49,7 @@ public class Tag implements NeedsCharacters {
         return name;
     }
 
-    public String getExportName() {
+    public String getExportFileName() {
         return getName();
     }
 

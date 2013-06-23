@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
@@ -251,4 +252,15 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
     public int getNumFrames() {
         return frameCount;
     }
+
+    @Override
+    public String getExportFileName() {
+        String expName=getExportName();
+        if((expName==null) || expName.equals("")){
+            return super.getExportFileName();
+        }
+        return Helper.makeFileName(super.getExportFileName()+"_"+expName);
+    }
+    
+    
 }

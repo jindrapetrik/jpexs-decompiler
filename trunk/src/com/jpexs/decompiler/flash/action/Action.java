@@ -628,6 +628,10 @@ public class Action implements GraphSourceItem {
         return -1;
     }
 
+    public static List<GraphTargetItem> actionsToTree(List<Action> actions, int version) {
+        return actionsToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), actions, version);
+    }
+
     /**
      * Converts list of actions to ActionScript source code
      *

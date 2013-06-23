@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.FrameNode;
+import com.jpexs.decompiler.flash.PackageNode;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.TagNode;
@@ -948,6 +949,9 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                 return "package";
             }
         }
+        if(t instanceof PackageNode){
+            return "package";
+        }
         if (t instanceof FrameNode) {
             return "frame";
         }
@@ -1705,12 +1709,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                         protected Object doInBackground() throws Exception {
                             try {
                                 int cnt = 0;
-
-                                if (abcPanel != null) {
-                                    cnt = swf.deobfuscateAS3Identifiers(renameType);
-                                } else {
-                                    cnt = swf.deobfuscateAS2Identifiers(renameType);
-                                }
+                                cnt = swf.deobfuscateIdentifiers(renameType);
                                 Main.stopWork();
                                 JOptionPane.showMessageDialog(null, "Identifiers renamed: " + cnt);
                                 if (abcPanel != null) {

@@ -29,7 +29,7 @@ import java.util.List;
 
 public class ClassTreeItem extends TreeItem implements Block {
 
-    private List<GraphTargetItem> functions;
+    public List<GraphTargetItem> functions;
     public List<GraphTargetItem> staticFunctions;
     public GraphTargetItem extendsOp;
     public List<GraphTargetItem> implementsOp;

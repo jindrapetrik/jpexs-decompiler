@@ -22,7 +22,9 @@ import com.jpexs.decompiler.flash.ReReadableInputStream;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,7 +33,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DoInitActionTag extends Tag implements ASMSource {
+public class DoInitActionTag extends CharacterIdTag implements ASMSource {
 
     /**
      * Identifier of Sprite
@@ -145,6 +147,7 @@ public class DoInitActionTag extends Tag implements ASMSource {
         this.actionBytes = actionBytes;
     }
 
+    @Override
     public int getCharacterID() {
         return spriteId;
     }
@@ -159,4 +162,38 @@ public class DoInitActionTag extends Tag implements ASMSource {
     public void removeDisassemblyListener(DisassemblyListener listener) {
         listeners.remove(listener);
     }
+
+    @Override
+    public String getExportFileName() {
+        String expName=getExportName();
+        if((expName==null) || expName.equals("")){
+            return super.toString();
+        }
+        String pathParts[];
+        if(expName.contains(".")){
+            pathParts = expName.split("\\.");
+        }else{
+            pathParts = new String[]{expName};
+        }
+        return Helper.makeFileName(pathParts[pathParts.length-1]);
+    }
+
+    
+    
+    @Override
+    public String toString() {
+        String expName=getExportName();
+        if((expName==null) || expName.equals("")){
+            return super.toString();
+        }
+        String pathParts[];
+        if(expName.contains(".")){
+            pathParts = expName.split("\\.");
+        }else{
+            pathParts = new String[]{expName};
+        }
+        return pathParts[pathParts.length-1];
+    }
+    
+    
 }
