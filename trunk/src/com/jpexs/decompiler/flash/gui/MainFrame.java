@@ -96,6 +96,10 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Insets;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -759,6 +763,22 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             }
         });
         detailPanel.setVisible(false);
+        
+        //Opening files with drag&drop to main window
+        setDropTarget(new DropTarget() {
+            @Override
+            public synchronized void drop(DropTargetDropEvent dtde) {
+                try {
+                    dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
+                    @SuppressWarnings("unchecked")
+                    List<File> droppedFiles = (List<File>) dtde.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+                    if (!droppedFiles.isEmpty()) {
+                        Main.openFile(droppedFiles.get(0).getAbsolutePath());
+                    }
+                } catch (Exception ex) {
+                }
+            }
+        });
 
     }
 
