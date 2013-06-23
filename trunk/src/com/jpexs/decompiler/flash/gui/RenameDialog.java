@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -25,6 +26,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
@@ -53,6 +55,7 @@ public class RenameDialog extends JDialog implements ActionListener {
     public RenameDialog() {
         setSize(300, 150);
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+        int renameType = (Integer) Configuration.getConfig("lastRenameType", (Integer) 1);
         ButtonGroup group = new ButtonGroup();
         group.add(typeNumberRadioButton);
         group.add(randomWordRadioButton);
@@ -60,8 +63,10 @@ public class RenameDialog extends JDialog implements ActionListener {
         pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));
         pan.add(typeNumberRadioButton);
         pan.add(randomWordRadioButton);
-        typeNumberRadioButton.setSelected(true);
+        typeNumberRadioButton.setSelected(renameType == 1);
+        randomWordRadioButton.setSelected(renameType == 2);
         setLayout(new BorderLayout());
+        add(new JLabel("Rename type:"), BorderLayout.NORTH);
         add(pan, BorderLayout.CENTER);
         JPanel panButtons = new JPanel(new FlowLayout());
         panButtons.add(okButton);
@@ -91,6 +96,7 @@ public class RenameDialog extends JDialog implements ActionListener {
         switch (e.getActionCommand()) {
             case "OK":
                 confirmed = true;
+                Configuration.setConfig("lastRenameType", (Integer) (getRenameType() == RenameType.TYPENUMBER ? 1 : 2));
                 setVisible(false);
                 break;
             case "CANCEL":

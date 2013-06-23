@@ -61,7 +61,7 @@ public abstract class GraphTargetItem {
         if (src == null) {
             return str;
         }
-        return Highlighting.hilighOffset(str, src.getOffset()+pos+1);
+        return Highlighting.hilighOffset(str, src.getOffset() + pos + 1);
     }
 
     public String toStringSemicoloned(List<Object> localData) {

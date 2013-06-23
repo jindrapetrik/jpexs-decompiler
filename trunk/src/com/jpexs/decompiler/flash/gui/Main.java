@@ -187,6 +187,9 @@ public class Main {
                 if (event.equals("deobfuscate")) {
                     startWork("Deobfuscating..." + (String) data);
                 }
+                if (event.equals("rename")) {
+                    startWork("Renaming..." + (String) data);
+                }
             }
         });
         return locswf;

@@ -177,6 +177,20 @@ public class ABC {
         }
     }
 
+    public void renameMultiname(int multinameIndex, String newname) {
+        if (multinameIndex <= 0 || multinameIndex >= constants.constant_multiname.length) {
+            throw new IllegalArgumentException("Multiname with index " + multinameIndex + " does not exist");
+        }
+        Set<Integer> stringUsages = getStringUsages();
+        int strIndex = constants.constant_multiname[multinameIndex].name_index;
+        if (stringUsages.contains(strIndex)) { //name is used elsewhere as string literal            
+            strIndex = constants.forceGetStringId(newname);
+            constants.constant_multiname[multinameIndex].name_index = strIndex;
+        } else {
+            constants.constant_string[strIndex] = newname;
+        }
+    }
+
     public void deobfuscateIdentifiers(HashMap<String, String> namesMap, RenameType renameType) {
         Set<Integer> stringUsages = getStringUsages();
         Map<Integer, String> stringUsageTypes = new HashMap<>();

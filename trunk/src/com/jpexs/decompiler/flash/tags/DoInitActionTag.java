@@ -165,35 +165,31 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
 
     @Override
     public String getExportFileName() {
-        String expName=getExportName();
-        if((expName==null) || expName.equals("")){
+        String expName = getExportName();
+        if ((expName == null) || expName.equals("")) {
             return super.toString();
         }
         String pathParts[];
-        if(expName.contains(".")){
+        if (expName.contains(".")) {
             pathParts = expName.split("\\.");
-        }else{
+        } else {
             pathParts = new String[]{expName};
         }
-        return Helper.makeFileName(pathParts[pathParts.length-1]);
+        return Helper.makeFileName(pathParts[pathParts.length - 1]);
     }
 
-    
-    
     @Override
     public String toString() {
-        String expName=getExportName();
-        if((expName==null) || expName.equals("")){
+        String expName = getExportName();
+        if ((expName == null) || expName.equals("")) {
             return super.toString();
         }
         String pathParts[];
-        if(expName.contains(".")){
+        if (expName.contains(".")) {
             pathParts = expName.split("\\.");
-        }else{
+        } else {
             pathParts = new String[]{expName};
         }
-        return pathParts[pathParts.length-1];
+        return pathParts[pathParts.length - 1];
     }
-    
-    
 }

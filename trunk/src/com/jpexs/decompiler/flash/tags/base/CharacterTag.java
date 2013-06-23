@@ -30,6 +30,4 @@ public abstract class CharacterTag extends CharacterIdTag {
     public CharacterTag(int id, String name, byte[] data, long pos) {
         super(id, name, data, pos);
     }
-
-    
 }

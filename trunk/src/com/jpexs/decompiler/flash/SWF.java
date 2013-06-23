@@ -109,6 +109,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Stack;
 import java.util.logging.Level;
@@ -574,8 +575,8 @@ public class SWF {
                 if (addNode.tag instanceof CharacterIdTag) {
                     CharacterIdTag cit = (CharacterIdTag) addNode.tag;
                     String path = cit.getExportName();
-                    if(path==null){
-                        path="";
+                    if (path == null) {
+                        path = "";
                     }
                     String pathParts[];
                     if (path.contains(".")) {
@@ -587,7 +588,7 @@ public class SWF {
                     int pos = 0;
                     TagNode selNode = null;
                     do {
-                        if(pos==pathParts.length-1){                            
+                        if (pos == pathParts.length - 1) {
                             break;
                         }
                         selNode = null;
@@ -598,19 +599,19 @@ public class SWF {
                                     selNode = node;
                                     break;
                                 }
-                            }                            
+                            }
                         }
                         if (selNode == null) {
-                            items.add(selNode=new TagNode(new PackageNode(pathParts[pos])));
+                            items.add(selNode = new TagNode(new PackageNode(pathParts[pos])));
                         }
                         pos++;
-                        if(selNode!=null){
-                            items=selNode.subItems;
+                        if (selNode != null) {
+                            items = selNode.subItems;
                         }
-                        
+
                     } while (selNode != null);
                     items.add(addNode);
-                }else{
+                } else {
                     ret.add(addNode);
                 }
             }
@@ -1196,8 +1197,15 @@ public class SWF {
         return ret;
     }
 
-    public String deobfuscateName(HashMap<String, String> namesMap, String s, boolean firstUppercase, String usageType, RenameType renameType) {
+    public String deobfuscateName(HashMap<String, String> namesMap, String s, boolean firstUppercase, String usageType, RenameType renameType, Map<String, String> selected) {
         boolean isValid = true;
+
+        if (selected != null) {
+            if (selected.containsKey(s)) {
+                return selected.get(s);
+            }
+        }
+
         if (isReserved(s)) {
             isValid = false;
         }
@@ -1226,7 +1234,7 @@ public class SWF {
                     cnt = 0;
                 }
 
-                String ret;
+                String ret = null;
                 if (renameType == RenameType.TYPENUMBER) {
 
                     boolean found;
@@ -1237,7 +1245,7 @@ public class SWF {
                         found = allVariableNamesStr.contains(ret);
                     } while (found);
                     typeCounts.put(usageType, cnt);
-                } else {
+                } else if (renameType == RenameType.RANDOMWORD) {
                     ret = fooString(s, firstUppercase, DEFAULT_FOO_SIZE);
                 }
                 return ret;
@@ -1479,22 +1487,32 @@ public class SWF {
     }
     HashMap<String, Integer> typeCounts = new HashMap<>();
 
-    public int deobfuscateIdentifiers(RenameType renameType){
-        if(fileAttributes==null){
-            int cnt=0;
-            cnt+=deobfuscateAS2Identifiers(renameType);
-            cnt+=deobfuscateAS3Identifiers(renameType);
+    public int deobfuscateIdentifiers(RenameType renameType) {
+        if (fileAttributes == null) {
+            int cnt = 0;
+            cnt += deobfuscateAS2Identifiers(renameType);
+            cnt += deobfuscateAS3Identifiers(renameType);
             return cnt;
-        }else{
-            if(fileAttributes.actionScript3){
+        } else {
+            if (fileAttributes.actionScript3) {
                 return deobfuscateAS3Identifiers(renameType);
-            }else{
+            } else {
                 return deobfuscateAS2Identifiers(renameType);
             }
         }
     }
-    
+
+    public void renameAS2Identifier(String identifier, String newname) {
+        Map<String, String> selected = new HashMap<>();
+        selected.put(identifier, newname);
+        renameAS2Identifiers(null, selected);
+    }
+
     public int deobfuscateAS2Identifiers(RenameType renameType) {
+        return renameAS2Identifiers(renameType, null);
+    }
+
+    private int renameAS2Identifiers(RenameType renameType, Map<String, String> selected) {
         actionsMap = new HashMap<>();
         allFunctions = new ArrayList<>();
         allVariableNames = new HashMap<>();
@@ -1504,14 +1522,14 @@ public class SWF {
         int ret = 0;
         objs.addAll(tags);
         getVariables(objs, "");
-        informListeners("deobfuscate", "");
+        informListeners("rename", "");
         int fc = 0;
         for (DirectValueTreeItem ti : allVariableNames.keySet()) {
             String name = ti.toStringNoH(allVariableNames.get(ti));
             allVariableNamesStr.add(name);
         }
 
-        informListeners("deobfuscate", "classes");
+        informListeners("rename", "classes");
         int classCount = 0;
         for (Tag t : tags) {
             if (t instanceof DoInitActionTag) {
@@ -1522,7 +1540,7 @@ public class SWF {
         for (Tag t : tags) {
             if (t instanceof DoInitActionTag) {
                 cnt++;
-                informListeners("deobfuscate", "class " + cnt + "/" + classCount);
+                informListeners("rename", "class " + cnt + "/" + classCount);
                 DoInitActionTag dia = (DoInitActionTag) t;
                 String exportName = dia.getExportName();
                 final String pkgPrefix = "__Packages.";
@@ -1550,7 +1568,7 @@ public class SWF {
                                 if (fun.calculatedFunctionName instanceof DirectValueTreeItem) {
                                     DirectValueTreeItem dvf = (DirectValueTreeItem) fun.calculatedFunctionName;
                                     String fname = dvf.toStringNoH(null);
-                                    String changed = deobfuscateName(deobfuscated, fname, false, "method", renameType);
+                                    String changed = deobfuscateName(deobfuscated, fname, false, "method", renameType, selected);
                                     if (changed != null) {
                                         deobfuscated.put(fname, changed);
                                     }
@@ -1566,7 +1584,7 @@ public class SWF {
                             if (gti instanceof DirectValueTreeItem) {
                                 DirectValueTreeItem dvf = (DirectValueTreeItem) gti;
                                 String vname = dvf.toStringNoH(null);
-                                String changed = deobfuscateName(deobfuscated, vname, false, "attribute", renameType);
+                                String changed = deobfuscateName(deobfuscated, vname, false, "attribute", renameType, selected);
                                 if (changed != null) {
                                     deobfuscated.put(vname, changed);
                                 }
@@ -1600,7 +1618,7 @@ public class SWF {
                             if (classNameParts != null) {
                                 changedNameStr = classNameParts[classNameParts.length - 1 - pos];
                             }
-                            String changedNameStr2 = deobfuscateName(deobfuscated, changedNameStr, pos == 0, pos == 0 ? "class" : "package", renameType);
+                            String changedNameStr2 = deobfuscateName(deobfuscated, changedNameStr, pos == 0, pos == 0 ? "class" : "package", renameType, selected);
                             if (changedNameStr2 != null) {
                                 changedNameStr = changedNameStr2;
                             }
@@ -1623,7 +1641,7 @@ public class SWF {
                             if (classNameParts != null) {
                                 changedNameStr = classNameParts[classNameParts.length - 1 - pos];
                             }
-                            String changedNameStr2 = deobfuscateName(deobfuscated, changedNameStr, pos == 0, pos == 0 ? "class" : "package", renameType);
+                            String changedNameStr2 = deobfuscateName(deobfuscated, changedNameStr, pos == 0, pos == 0 ? "class" : "package", renameType, selected);
                             if (changedNameStr2 != null) {
                                 changedNameStr = changedNameStr2;
                             }
@@ -1637,17 +1655,17 @@ public class SWF {
 
         for (GraphSourceItem fun : allFunctions) {
             fc++;
-            informListeners("deobfuscate", "function " + fc + "/" + allFunctions.size());
+            informListeners("rename", "function " + fc + "/" + allFunctions.size());
             if (fun instanceof ActionDefineFunction) {
                 ActionDefineFunction f = (ActionDefineFunction) fun;
-                String changed = deobfuscateName(deobfuscated, f.functionName, false, "function", renameType);
+                String changed = deobfuscateName(deobfuscated, f.functionName, false, "function", renameType, selected);
                 if (changed != null) {
                     f.replacedFunctionName = changed;
                 }
             }
             if (fun instanceof ActionDefineFunction2) {
                 ActionDefineFunction2 f = (ActionDefineFunction2) fun;
-                String changed = deobfuscateName(deobfuscated, f.functionName, false, "function", renameType);
+                String changed = deobfuscateName(deobfuscated, f.functionName, false, "function", renameType, selected);
                 if (changed != null) {
                     f.replacedFunctionName = changed;
                 }
@@ -1664,9 +1682,9 @@ public class SWF {
         int vc = 0;
         for (DirectValueTreeItem ti : allVariableNames.keySet()) {
             vc++;
-            informListeners("deobfuscate", "variable " + vc + "/" + allVariableNames.size());
+            informListeners("rename", "variable " + vc + "/" + allVariableNames.size());
             String name = ti.toStringNoH(allVariableNames.get(ti));
-            String changed = deobfuscateName(deobfuscated, name, false, usageTypes.get(ti), renameType);
+            String changed = deobfuscateName(deobfuscated, name, false, usageTypes.get(ti), renameType, selected);
             if (changed != null) {
                 boolean addNew = false;
                 String h = System.identityHashCode(allVariableNames.get(ti)) + "_" + name;

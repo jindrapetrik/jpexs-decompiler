@@ -26,6 +26,8 @@ import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
+import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.gui.Main;
@@ -109,6 +111,45 @@ public class ActionPanel extends JPanel implements ActionListener {
     private boolean searchIgnoreCase;
     private boolean searchRegexp;
     private Cache cache = new Cache(true);
+
+    public String getStringUnderCursor() {
+        int pos = decompiledEditor.getCaretPosition();
+        for (Highlighting h : decompiledHilights) {
+            if ((pos >= h.startPos) && (pos < h.startPos + h.len)) {
+                List<Action> list = lastCode;
+                Action lastIns = null;
+                int inspos = 0;
+                Action selIns = null;
+                for (Action ins : list) {
+                    if (h.offset == ins.getOffset()) {
+                        selIns = ins;
+                        break;
+                    }
+                    if (ins.getOffset() > h.offset) {
+                        inspos = (int) (h.offset - lastIns.getAddress());
+                        selIns = lastIns;
+                        break;
+                    }
+                    lastIns = ins;
+                }
+                if (selIns != null) {
+                    if (selIns instanceof ActionPush) {
+                        ActionPush ap = (ActionPush) selIns;
+                        Object var = ap.values.get(inspos - 1);
+                        String identifier = null;
+                        if (var instanceof String) {
+                            identifier = (String) var;
+                        }
+                        if (var instanceof ConstantIndex) {
+                            identifier = ap.constantPool.get(((ConstantIndex) var).index);
+                        }
+                        return identifier;
+                    }
+                }
+            }
+        }
+        return null;
+    }
 
     private CachedScript getCached(ASMSource pack) {
         return (CachedScript) cache.get(pack);

@@ -262,7 +262,7 @@ public class ActionPush extends Action {
             if (pos > 0) {
                 ret += " ";
             }
-            ret += Highlighting.hilighOffset(toString(i), getAddress()+pos+1);
+            ret += Highlighting.hilighOffset(toString(i), getAddress() + pos + 1);
             pos++;
         }
         return ret;

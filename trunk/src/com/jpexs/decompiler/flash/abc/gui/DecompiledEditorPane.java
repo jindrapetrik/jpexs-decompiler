@@ -19,9 +19,12 @@ package com.jpexs.decompiler.flash.abc.gui;
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.helpers.Cache;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
@@ -122,6 +125,38 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         reset = true;
         caretUpdate(null);
         reset = false;
+    }
+
+    public int getMultinameUnderCursor() {
+        int pos = getCaretPosition();
+        for (Highlighting h : highlights) {
+            if ((pos >= h.startPos) && (pos < h.startPos + h.len)) {
+                List<AVM2Instruction> list = abc.bodies[abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex()].code.code;
+                AVM2Instruction lastIns = null;
+                long inspos = 0;
+                AVM2Instruction selIns = null;
+                for (AVM2Instruction ins : list) {
+                    if (h.offset == ins.getOffset()) {
+                        selIns = ins;
+                        break;
+                    }
+                    if (ins.getOffset() > h.offset) {
+                        inspos = h.offset - lastIns.offset;
+                        selIns = lastIns;
+                        break;
+                    }
+                    lastIns = ins;
+                }
+                if (selIns != null) {
+                    for (int i = 0; i < selIns.definition.operands.length; i++) {
+                        if (selIns.definition.operands[i] == AVM2Code.DAT_MULTINAME_INDEX) {
+                            return selIns.operands[i];
+                        }
+                    }
+                }
+            }
+        }
+        return -1;
     }
 
     @Override

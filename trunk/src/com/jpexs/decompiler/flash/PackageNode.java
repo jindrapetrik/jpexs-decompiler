@@ -21,6 +21,7 @@ package com.jpexs.decompiler.flash;
  * @author JPEXS
  */
 public class PackageNode {
+
     public String packageName;
 
     public PackageNode(String packageName) {
@@ -31,6 +32,4 @@ public class PackageNode {
     public String toString() {
         return packageName;
     }
-    
-    
 }

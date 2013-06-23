@@ -26,10 +26,11 @@ import java.util.List;
  * @author JPEXS
  */
 public abstract class CharacterIdTag extends Tag {
+
     public CharacterIdTag(int id, String name, byte[] data, long pos) {
         super(id, name, data, pos);
     }
-    
+
     public abstract int getCharacterID();
     /**
      * List of ExportAssetsTag used for converting to String
@@ -38,10 +39,10 @@ public abstract class CharacterIdTag extends Tag {
     private String className;
     private String exportName;
 
-    public void setExportName(String exportName){
+    public void setExportName(String exportName) {
         this.exportName = exportName;
     }
-    
+
     public void setClassName(String className) {
         this.className = className;
     }
@@ -64,16 +65,14 @@ public abstract class CharacterIdTag extends Tag {
 
     @Override
     public String getExportFileName() {
-        return super.getName() + "_" + getCharacterID()+(((exportName!=null) && (!exportName.equals("")))?"_"+exportName:"");
+        return super.getName() + "_" + getCharacterID() + (((exportName != null) && (!exportName.equals(""))) ? "_" + exportName : "");
     }
-    
+
     public String getCharacterExportFileName() {
-        return getCharacterID()+(((exportName!=null) && (!exportName.equals("")))?"_"+exportName:"");
+        return getCharacterID() + (((exportName != null) && (!exportName.equals(""))) ? "_" + exportName : "");
     }
 
     public String getExportName() {
         return exportName;
     }
-    
-    
 }

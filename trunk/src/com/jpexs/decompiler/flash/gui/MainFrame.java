@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.PackageNode;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.TagNode;
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.gui.ABCPanel;
@@ -324,7 +325,11 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         miSubLimiter.setActionCommand("SUBLIMITER");
         miSubLimiter.addActionListener(this);
 
-        JMenuItem miRenameIdentifiers = new JMenuItem("Rename identifiers");
+        JMenuItem miRenameOneIdentifier = new JMenuItem("Globally rename identifier");
+        miRenameOneIdentifier.setActionCommand("RENAMEONEIDENTIFIER");
+        miRenameOneIdentifier.addActionListener(this);
+
+        JMenuItem miRenameIdentifiers = new JMenuItem("Rename invalid identifiers");
         miRenameIdentifiers.setActionCommand("RENAMEIDENTIFIERS");
         miRenameIdentifiers.addActionListener(this);
 
@@ -352,7 +357,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         miControlFlowAll.setActionCommand("RESTORECONTROLFLOWALL");
         miControlFlowAll.addActionListener(this);
 
-
+        menuDeobfuscation.add(miRenameOneIdentifier);
         menuDeobfuscation.add(miRenameIdentifiers);
         //menuDeobfuscation.add(miSubLimiter);
         menuDeobfuscation.add(miDeobfuscation);
@@ -949,7 +954,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                 return "package";
             }
         }
-        if(t instanceof PackageNode){
+        if (t instanceof PackageNode) {
             return "package";
         }
         if (t instanceof FrameNode) {
@@ -998,6 +1003,52 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             }
         }
         return ret;
+    }
+
+    public void renameIdentifier(String identifier) {
+        String oldName = identifier;
+        String newName = JOptionPane.showInputDialog("Enter new name:", oldName);
+        if (newName != null) {
+            if (!oldName.equals(newName)) {
+                swf.renameAS2Identifier(oldName, newName);
+                JOptionPane.showMessageDialog(null, "Identifier renamed.");
+                doFilter();
+                reload(true);
+            }
+        }
+    }
+
+    public void renameMultiname(int multiNameIndex) {
+        String oldName = "";
+        if (abcPanel.abc.constants.constant_multiname[multiNameIndex].name_index > 0) {
+            oldName = abcPanel.abc.constants.constant_string[abcPanel.abc.constants.constant_multiname[multiNameIndex].name_index];
+        }
+        String newName = JOptionPane.showInputDialog("Enter new name:", oldName);
+        if (newName != null) {
+            if (!oldName.equals(newName)) {
+                int mulCount = 0;
+                for (ABCContainerTag cnt : abcList) {
+                    ABC abc = cnt.getABC();
+                    for (int m = 1; m < abc.constants.constant_multiname.length; m++) {
+                        int ni = abc.constants.constant_multiname[m].name_index;
+                        String n = "";
+                        if (ni > 0) {
+                            n = abc.constants.constant_string[ni];
+                        }
+                        if (n.equals(oldName)) {
+                            abc.renameMultiname(m, newName);
+                            mulCount++;
+                        }
+                    }
+                }
+                JOptionPane.showMessageDialog(null, mulCount + " multiname(s) renamed.");
+                if (abcPanel != null) {
+                    abcPanel.reload();
+                }
+                doFilter();
+                reload(true);
+            }
+        }
     }
 
     public List<Object> getAllSubs(JTree tree, Object o) {
@@ -1187,594 +1238,635 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
-        if (e.getActionCommand().equals("PARALLELSPEEDUP")) {
-            String confStr = "Parallelism can speed up loading and decompilation but uses more memory.\r\n";
-            if (miParallelSpeedUp.isSelected()) {
-                confStr += " Do you want to turn this ON?";
-            } else {
-                confStr += " Do you want to turn this OFF?";
-            }
-            if (JOptionPane.showConfirmDialog(null, confStr, "Parallelism", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-                Configuration.setConfig("paralelSpeedUp", (Boolean) miParallelSpeedUp.isSelected());
-            } else {
-                miParallelSpeedUp.setSelected(!miParallelSpeedUp.isSelected());
-            }
-        }
-        if (e.getActionCommand().equals("INTERNALVIEWERSWITCH")) {
-            Configuration.setConfig("internalFlashViewer", (Boolean) miInternalViewer.isSelected());
-        }
-        if (e.getActionCommand().equals("SEARCHAS")) {
-            if (searchDialog == null) {
-                searchDialog = new SearchDialog();
-            }
-            searchDialog.setVisible(true);
-            if (searchDialog.result) {
-                final String txt = searchDialog.searchField.getText();
-                if (!txt.equals("")) {
-                    Main.startWork("Searching \"" + txt + "\"...");
-                    if (abcPanel != null) {
-                        (new Thread() {
-                            @Override
-                            public void run() {
-                                if (abcPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
-                                    showDetail(DETAILCARDAS3NAVIGATOR);
-                                    showCard(CARDACTIONSCRIPTPANEL);
-                                } else {
-                                    JOptionPane.showMessageDialog(null, "String \"" + txt + "\" not found.", "Not found", JOptionPane.INFORMATION_MESSAGE);
+        switch (e.getActionCommand()) {
+            case "PARALLELSPEEDUP":
+                String confStr = "Parallelism can speed up loading and decompilation but uses more memory.\r\n";
+                if (miParallelSpeedUp.isSelected()) {
+                    confStr += " Do you want to turn this ON?";
+                } else {
+                    confStr += " Do you want to turn this OFF?";
+                }
+                if (JOptionPane.showConfirmDialog(null, confStr, "Parallelism", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                    Configuration.setConfig("paralelSpeedUp", (Boolean) miParallelSpeedUp.isSelected());
+                } else {
+                    miParallelSpeedUp.setSelected(!miParallelSpeedUp.isSelected());
+                }
+                break;
+            case "INTERNALVIEWERSWITCH":
+                Configuration.setConfig("internalFlashViewer", (Boolean) miInternalViewer.isSelected());
+                break;
+            case "SEARCHAS":
+                if (searchDialog == null) {
+                    searchDialog = new SearchDialog();
+                }
+                searchDialog.setVisible(true);
+                if (searchDialog.result) {
+                    final String txt = searchDialog.searchField.getText();
+                    if (!txt.equals("")) {
+                        Main.startWork("Searching \"" + txt + "\"...");
+                        if (abcPanel != null) {
+                            (new Thread() {
+                                @Override
+                                public void run() {
+                                    if (abcPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
+                                        showDetail(DETAILCARDAS3NAVIGATOR);
+                                        showCard(CARDACTIONSCRIPTPANEL);
+                                    } else {
+                                        JOptionPane.showMessageDialog(null, "String \"" + txt + "\" not found.", "Not found", JOptionPane.INFORMATION_MESSAGE);
+                                    }
+                                    Main.stopWork();
                                 }
-                                Main.stopWork();
-                            }
-                        }).start();
-                    } else {
-                        (new Thread() {
-                            @Override
-                            public void run() {
-                                if (actionPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
-                                    showCard(CARDACTIONSCRIPTPANEL);
-                                } else {
-                                    JOptionPane.showMessageDialog(null, "String \"" + txt + "\" not found.", "Not found", JOptionPane.INFORMATION_MESSAGE);
+                            }).start();
+                        } else {
+                            (new Thread() {
+                                @Override
+                                public void run() {
+                                    if (actionPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
+                                        showCard(CARDACTIONSCRIPTPANEL);
+                                    } else {
+                                        JOptionPane.showMessageDialog(null, "String \"" + txt + "\" not found.", "Not found", JOptionPane.INFORMATION_MESSAGE);
+                                    }
+                                    Main.stopWork();
                                 }
-                                Main.stopWork();
-                            }
-                        }).start();
-                    }
-                }
-            }
-        }
-        if (e.getActionCommand().equals("REPLACEIMAGE")) {
-            Object tagObj = tagTree.getLastSelectedPathComponent();
-            if (tagObj == null) {
-                return;
-            }
-
-            if (tagObj instanceof TagNode) {
-                tagObj = ((TagNode) tagObj).tag;
-            }
-            if (tagObj instanceof ImageTag) {
-                ImageTag it = (ImageTag) tagObj;
-                if (it.importSupported()) {
-                    JFileChooser fc = new JFileChooser();
-                    fc.setCurrentDirectory(new File((String) Configuration.getConfig("lastOpenDir", ".")));
-                    fc.setFileFilter(new FileFilter() {
-                        @Override
-                        public boolean accept(File f) {
-                            return (f.getName().toLowerCase().endsWith(".jpg"))
-                                    || (f.getName().toLowerCase().endsWith(".jpeg"))
-                                    || (f.getName().toLowerCase().endsWith(".gif"))
-                                    || (f.getName().toLowerCase().endsWith(".png"))
-                                    || (f.isDirectory());
-                        }
-
-                        @Override
-                        public String getDescription() {
-                            return "Images (*.jpg,*.gif,*.png)";
-                        }
-                    });
-                    JFrame f = new JFrame();
-                    View.setWindowIcon(f);
-                    int returnVal = fc.showOpenDialog(f);
-                    if (returnVal == JFileChooser.APPROVE_OPTION) {
-                        Configuration.setConfig("lastOpenDir", Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
-                        File selfile = Helper.fixDialogFile(fc.getSelectedFile());
-                        byte data[] = Helper.readFile(selfile.getAbsolutePath());
-                        try {
-                            it.setImage(data);
-                        } catch (IOException ex) {
-                            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "message", ex);
-                            JOptionPane.showMessageDialog(null, "Invalid image.", "Error", JOptionPane.ERROR_MESSAGE);
-                        }
-                        reload(true);
-                    }
-                }
-            }
-        }
-        if (e.getActionCommand().equals("REMOVEITEM")) {
-            Object tagObj = tagTree.getLastSelectedPathComponent();
-            if (tagObj == null) {
-                return;
-            }
-
-            if (tagObj instanceof TagNode) {
-                tagObj = ((TagNode) tagObj).tag;
-            }
-            if (tagObj instanceof DefineSpriteTag) {
-                DefineSpriteTag sprite = (DefineSpriteTag) tagObj;
-                for (int i = 0; i < swf.tags.size(); i++) {
-                    Tag t = swf.tags.get(i);
-                    if (t == sprite) {
-                        swf.tags.remove(i);
-                        i--;
-                    } else if (t instanceof DefineSpriteTag) {
-                        DefineSpriteTag st = (DefineSpriteTag) t;
-                        for (int j = 0; j < st.subTags.size(); j++) {
-                            Tag t2 = st.subTags.get(j);
-                            Set<Integer> needed = t2.getNeededCharacters();
-                            if (needed.contains(sprite.spriteId)) {
-                                st.subTags.remove(j);
-                                j--;
-                            }
-                        }
-                    } else {
-                        Set<Integer> needed = t.getNeededCharacters();
-                        if (needed.contains(sprite.spriteId)) {
-                            swf.tags.remove(i);
-                            i--;
+                            }).start();
                         }
                     }
                 }
-                showCard(CARDEMPTYPANEL);
-                refreshTree();
-            }
-        }
-        if (e.getActionCommand().equals("EDITTEXT")) {
-            setEditText(true);
-        }
-        if (e.getActionCommand().equals("CANCELTEXT")) {
-            setEditText(false);
-        }
-        if (e.getActionCommand().equals("SAVETEXT")) {
-            if (oldValue instanceof TextTag) {
-                try {
-                    ((TextTag) oldValue).setFormattedText(swf.tags, textValue.getText());
-                    setEditText(false);
-                } catch (ParseException ex) {
-                    JOptionPane.showMessageDialog(null, "Invalid text: " + ex.text + " on line " + ex.line, "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        }
-
-        if (e.getActionCommand().equals("AUTODEOBFUSCATE")) {
-            if (JOptionPane.showConfirmDialog(this, "Automatic deobfuscation is a way to decompile obfuscated code.\r\nDeobfuscation leads to slower decompilation and some of the dead code may be eliminated.\r\nIf the code is not obfuscated, it's better to turn autodeobfuscation off.\r\nDo you really want to " + (autoDeobfuscateMenuItem.getState() ? "turn ON" : "turn OFF") + " automatic debfuscation?", "Confirm", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-                Configuration.setConfig("autoDeobfuscate", autoDeobfuscateMenuItem.getState());
-            } else {
-                autoDeobfuscateMenuItem.setState(!autoDeobfuscateMenuItem.getState());
-            }
-        }
-        if (e.getActionCommand().equals("EXIT")) {
-            setVisible(false);
-            if (Main.proxyFrame != null) {
-                if (Main.proxyFrame.isVisible()) {
+                break;
+            case "REPLACEIMAGE":
+                Object tagObj = tagTree.getLastSelectedPathComponent();
+                if (tagObj == null) {
                     return;
                 }
-            }
-            Main.exit();
+
+                if (tagObj instanceof TagNode) {
+                    tagObj = ((TagNode) tagObj).tag;
+                }
+                if (tagObj instanceof ImageTag) {
+                    ImageTag it = (ImageTag) tagObj;
+                    if (it.importSupported()) {
+                        JFileChooser fc = new JFileChooser();
+                        fc.setCurrentDirectory(new File((String) Configuration.getConfig("lastOpenDir", ".")));
+                        fc.setFileFilter(new FileFilter() {
+                            @Override
+                            public boolean accept(File f) {
+                                return (f.getName().toLowerCase().endsWith(".jpg"))
+                                        || (f.getName().toLowerCase().endsWith(".jpeg"))
+                                        || (f.getName().toLowerCase().endsWith(".gif"))
+                                        || (f.getName().toLowerCase().endsWith(".png"))
+                                        || (f.isDirectory());
+                            }
+
+                            @Override
+                            public String getDescription() {
+                                return "Images (*.jpg,*.gif,*.png)";
+                            }
+                        });
+                        JFrame f = new JFrame();
+                        View.setWindowIcon(f);
+                        int returnVal = fc.showOpenDialog(f);
+                        if (returnVal == JFileChooser.APPROVE_OPTION) {
+                            Configuration.setConfig("lastOpenDir", Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
+                            File selfile = Helper.fixDialogFile(fc.getSelectedFile());
+                            byte data[] = Helper.readFile(selfile.getAbsolutePath());
+                            try {
+                                it.setImage(data);
+                            } catch (IOException ex) {
+                                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "message", ex);
+                                JOptionPane.showMessageDialog(null, "Invalid image.", "Error", JOptionPane.ERROR_MESSAGE);
+                            }
+                            reload(true);
+                        }
+                    }
+                }
+                break;
+            case "REMOVEITEM":
+                tagObj = tagTree.getLastSelectedPathComponent();
+                if (tagObj == null) {
+                    return;
+                }
+
+                if (tagObj instanceof TagNode) {
+                    tagObj = ((TagNode) tagObj).tag;
+                }
+                if (tagObj instanceof DefineSpriteTag) {
+                    DefineSpriteTag sprite = (DefineSpriteTag) tagObj;
+                    for (int i = 0; i < swf.tags.size(); i++) {
+                        Tag t = swf.tags.get(i);
+                        if (t == sprite) {
+                            swf.tags.remove(i);
+                            i--;
+                        } else if (t instanceof DefineSpriteTag) {
+                            DefineSpriteTag st = (DefineSpriteTag) t;
+                            for (int j = 0; j < st.subTags.size(); j++) {
+                                Tag t2 = st.subTags.get(j);
+                                Set<Integer> needed = t2.getNeededCharacters();
+                                if (needed.contains(sprite.spriteId)) {
+                                    st.subTags.remove(j);
+                                    j--;
+                                }
+                            }
+                        } else {
+                            Set<Integer> needed = t.getNeededCharacters();
+                            if (needed.contains(sprite.spriteId)) {
+                                swf.tags.remove(i);
+                                i--;
+                            }
+                        }
+                    }
+                    showCard(CARDEMPTYPANEL);
+                    refreshTree();
+                }
+                break;
+            case "EDITTEXT":
+                setEditText(true);
+                break;
+            case "CANCELTEXT":
+                setEditText(false);
+                break;
+            case "SAVETEXT":
+                if (oldValue instanceof TextTag) {
+                    try {
+                        ((TextTag) oldValue).setFormattedText(swf.tags, textValue.getText());
+                        setEditText(false);
+                    } catch (ParseException ex) {
+                        JOptionPane.showMessageDialog(null, "Invalid text: " + ex.text + " on line " + ex.line, "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+                break;
+
+            case "AUTODEOBFUSCATE":
+                if (JOptionPane.showConfirmDialog(this, "Automatic deobfuscation is a way to decompile obfuscated code.\r\nDeobfuscation leads to slower decompilation and some of the dead code may be eliminated.\r\nIf the code is not obfuscated, it's better to turn autodeobfuscation off.\r\nDo you really want to " + (autoDeobfuscateMenuItem.getState() ? "turn ON" : "turn OFF") + " automatic debfuscation?", "Confirm", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                    Configuration.setConfig("autoDeobfuscate", autoDeobfuscateMenuItem.getState());
+                } else {
+                    autoDeobfuscateMenuItem.setState(!autoDeobfuscateMenuItem.getState());
+                }
+                break;
+            case "EXIT":
+                setVisible(false);
+                if (Main.proxyFrame != null) {
+                    if (Main.proxyFrame.isVisible()) {
+                        return;
+                    }
+                }
+                Main.exit();
+                break;
         }
         if (Main.isWorking()) {
             return;
         }
 
-        if (e.getActionCommand().equals("ABOUT")) {
-            Main.about();
-        }
+        switch (e.getActionCommand()) {
+            case "RENAMEONEIDENTIFIER":
 
+                if (swf.fileAttributes.actionScript3) {
+                    final int multiName = abcPanel.decompiledTextArea.getMultinameUnderCursor();
+                    if (multiName > 0) {
+                        (new Thread() {
+                            @Override
+                            public void run() {
+                                Main.startWork("Renaming...");
+                                renameMultiname(multiName);
+                                Main.stopWork();
+                            }
+                        }).start();
 
-        if (e.getActionCommand().equals("SHOWPROXY")) {
-            Main.showProxy();
-        }
-
-        if (e.getActionCommand().equals("SUBLIMITER")) {
-            if (e.getSource() instanceof JCheckBoxMenuItem) {
-                Main.setSubLimiter(((JCheckBoxMenuItem) e.getSource()).getState());
-            }
-
-        }
-
-        if (e.getActionCommand().equals("SAVE")) {
-            try {
-                Main.saveFile(Main.file);
-            } catch (IOException ex) {
-                Logger.getLogger(com.jpexs.decompiler.flash.abc.gui.ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
-                JOptionPane.showMessageDialog(null, "Cannot save file", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-        if (e.getActionCommand().equals("SAVEAS")) {
-            if (Main.saveFileDialog()) {
-                setTitle(Main.applicationVerName + (Configuration.DISPLAY_FILENAME ? " - " + Main.getFileTitle() : ""));
-            }
-        }
-        if (e.getActionCommand().equals("OPEN")) {
-            Main.openFileDialog();
-
-        }
-        if (e.getActionCommand().equals("EXPORTFLA")) {
-            JFileChooser fc = new JFileChooser();
-            String selDir = (String) Configuration.getConfig("lastOpenDir", ".");
-            fc.setCurrentDirectory(new File(selDir));
-            if (!selDir.endsWith(File.separator)) {
-                selDir += File.separator;
-            }
-            String fileName = (new File(Main.file).getName());
-            fileName = fileName.substring(0, fileName.length() - 4) + ".fla";
-            fc.setSelectedFile(new File(selDir + fileName));
-            FileFilter fla = new FileFilter() {
-                @Override
-                public boolean accept(File f) {
-                    return f.isDirectory() || (f.getName().toLowerCase().endsWith(".fla"));
-                }
-
-                @Override
-                public String getDescription() {
-                    return "Flash CS 6 Document (*.fla)";
-                }
-            };
-            FileFilter xfl = new FileFilter() {
-                @Override
-                public boolean accept(File f) {
-                    return f.isDirectory() || (f.getName().toLowerCase().endsWith(".xfl"));
-                }
-
-                @Override
-                public String getDescription() {
-                    return "Flash CS 6 Uncompressed Document (*.xfl)";
-                }
-            };
-            fc.setFileFilter(fla);
-            fc.addChoosableFileFilter(xfl);
-            fc.setAcceptAllFileFilterUsed(false);
-            JFrame f = new JFrame();
-            View.setWindowIcon(f);
-            int returnVal = fc.showSaveDialog(f);
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                Configuration.setConfig("lastOpenDir", Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
-                final File selfile = Helper.fixDialogFile(fc.getSelectedFile());
-                Main.startWork("Exporting FLA...");
-                final boolean compressed = fc.getFileFilter() == fla;
-                (new Thread() {
-                    @Override
-                    public void run() {
-                        if (compressed) {
-                            swf.exportFla(selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
-                        } else {
-                            swf.exportXfl(selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
-                        }
-                        Main.stopWork();
+                    } else {
+                        JOptionPane.showMessageDialog(null, "No Multiname found under cursor", "Not found", JOptionPane.INFORMATION_MESSAGE);
                     }
-                }).start();
-            }
-        } else if (e.getActionCommand().startsWith("EXPORT")) {
-            final ExportDialog export = new ExportDialog();
-            export.setVisible(true);
-            if (!export.cancelled) {
-                JFileChooser chooser = new JFileChooser();
-                chooser.setCurrentDirectory(new java.io.File((String) Configuration.getConfig("lastExportDir", ".")));
-                chooser.setDialogTitle("Select directory to export");
-                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                chooser.setAcceptAllFileFilterUsed(false);
-                if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-                    final long timeBefore = System.currentTimeMillis();
-                    Main.startWork("Exporting...");
-                    final String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
-                    Configuration.setConfig("lastExportDir", Helper.fixDialogFile(chooser.getSelectedFile()).getParentFile().getAbsolutePath());
-                    final boolean isPcode = export.getOption(ExportDialog.OPTION_ACTIONSCRIPT) == 1;
-                    final boolean isMp3OrWav = export.getOption(ExportDialog.OPTION_SOUNDS) == 0;
-                    final boolean isFormatted = export.getOption(ExportDialog.OPTION_TEXTS) == 1;
-                    final boolean onlySel = e.getActionCommand().endsWith("SEL");
+                } else {
+                    final String identifier = actionPanel.getStringUnderCursor();
+                    if (identifier != null) {
+                        (new Thread() {
+                            public void run() {
+                                Main.startWork("Renaming...");
+                                renameIdentifier(identifier);
+                                Main.stopWork();
+                            }
+                        }).start();
+                    } else {
+                        JOptionPane.showMessageDialog(null, "No identifier found under cursor", "Not found", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }
+                break;
+            case "ABOUT":
+                Main.about();
+                break;
+
+            case "SHOWPROXY":
+                Main.showProxy();
+                break;
+
+            case "SUBLIMITER":
+                if (e.getSource() instanceof JCheckBoxMenuItem) {
+                    Main.setSubLimiter(((JCheckBoxMenuItem) e.getSource()).getState());
+                }
+
+                break;
+
+            case "SAVE":
+                try {
+                    Main.saveFile(Main.file);
+                } catch (IOException ex) {
+                    Logger.getLogger(com.jpexs.decompiler.flash.abc.gui.ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    JOptionPane.showMessageDialog(null, "Cannot save file", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+            case "SAVEAS":
+                if (Main.saveFileDialog()) {
+                    setTitle(Main.applicationVerName + (Configuration.DISPLAY_FILENAME ? " - " + Main.getFileTitle() : ""));
+                }
+                break;
+            case "OPEN":
+                Main.openFileDialog();
+                break;
+            case "EXPORTFLA":
+                JFileChooser fc = new JFileChooser();
+                String selDir = (String) Configuration.getConfig("lastOpenDir", ".");
+                fc.setCurrentDirectory(new File(selDir));
+                if (!selDir.endsWith(File.separator)) {
+                    selDir += File.separator;
+                }
+                String fileName = (new File(Main.file).getName());
+                fileName = fileName.substring(0, fileName.length() - 4) + ".fla";
+                fc.setSelectedFile(new File(selDir + fileName));
+                FileFilter fla = new FileFilter() {
+                    @Override
+                    public boolean accept(File f) {
+                        return f.isDirectory() || (f.getName().toLowerCase().endsWith(".fla"));
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        return "Flash CS 6 Document (*.fla)";
+                    }
+                };
+                FileFilter xfl = new FileFilter() {
+                    @Override
+                    public boolean accept(File f) {
+                        return f.isDirectory() || (f.getName().toLowerCase().endsWith(".xfl"));
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        return "Flash CS 6 Uncompressed Document (*.xfl)";
+                    }
+                };
+                fc.setFileFilter(fla);
+                fc.addChoosableFileFilter(xfl);
+                fc.setAcceptAllFileFilterUsed(false);
+                JFrame f = new JFrame();
+                View.setWindowIcon(f);
+                int returnVal = fc.showSaveDialog(f);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    Configuration.setConfig("lastOpenDir", Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
+                    final File selfile = Helper.fixDialogFile(fc.getSelectedFile());
+                    Main.startWork("Exporting FLA...");
+                    final boolean compressed = fc.getFileFilter() == fla;
                     (new Thread() {
                         @Override
                         public void run() {
-                            try {
-                                if (onlySel) {
-                                    List<Object> sel = getAllSelected(tagTree);
-
-                                    List<ScriptPack> tlsList = new ArrayList<>();
-                                    JPEGTablesTag jtt = null;
-                                    for (Tag t : swf.tags) {
-                                        if (t instanceof JPEGTablesTag) {
-                                            jtt = (JPEGTablesTag) t;
-                                            break;
-                                        }
-                                    }
-                                    List<Tag> images = new ArrayList<>();
-                                    List<Tag> shapes = new ArrayList<>();
-                                    List<Tag> movies = new ArrayList<>();
-                                    List<Tag> sounds = new ArrayList<>();
-                                    List<Tag> texts = new ArrayList<>();
-                                    List<TagNode> actionNodes = new ArrayList<>();
-                                    List<Tag> binaryData = new ArrayList<>();
-                                    for (Object d : sel) {
-                                        if (d instanceof TagNode) {
-                                            TagNode n = (TagNode) d;
-                                            if ("image".equals(getTagType(n.tag))) {
-                                                images.add((Tag) n.tag);
-                                            }
-                                            if ("shape".equals(getTagType(n.tag))) {
-                                                shapes.add((Tag) n.tag);
-                                            }
-                                            if ("as".equals(getTagType(n.tag))) {
-                                                actionNodes.add(n);
-                                            }
-                                            if ("movie".equals(getTagType(n.tag))) {
-                                                movies.add((Tag) n.tag);
-                                            }
-                                            if ("sound".equals(getTagType(n.tag))) {
-                                                sounds.add((Tag) n.tag);
-                                            }
-                                            if ("binaryData".equals(getTagType(n.tag))) {
-                                                binaryData.add((Tag) n.tag);
-                                            }
-                                            if ("text".equals(getTagType(n.tag))) {
-                                                texts.add((Tag) n.tag);
-                                            }
-                                        }
-                                        if (d instanceof TreeElement) {
-                                            if (((TreeElement) d).isLeaf()) {
-                                                tlsList.add((ScriptPack) ((TreeElement) d).getItem());
-                                            }
-                                        }
-                                    }
-                                    swf.exportImages(selFile + File.separator + "images", images);
-                                    SWF.exportShapes(selFile + File.separator + "shapes", shapes);
-                                    swf.exportTexts(selFile + File.separator + "texts", texts, isFormatted);
-                                    swf.exportMovies(selFile + File.separator + "movies", movies);
-                                    swf.exportSounds(selFile + File.separator + "sounds", sounds, isMp3OrWav, isMp3OrWav);
-                                    swf.exportBinaryData(selFile + File.separator + "binaryData", binaryData);
-                                    if (abcPanel != null) {
-                                        for (int i = 0; i < tlsList.size(); i++) {
-                                            ScriptPack tls = tlsList.get(i);
-                                            Main.startWork("Exporting " + (i + 1) + "/" + tlsList.size() + " " + tls.getPath() + " ...");
-                                            tls.export(selFile, abcList, isPcode, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
-                                        }
-                                    } else {
-                                        List<TagNode> allNodes = new ArrayList<>();
-                                        TagNode asn = getASTagNode(tagTree);
-                                        if (asn != null) {
-                                            allNodes.add(asn);
-                                            TagNode.setExport(allNodes, false);
-                                            TagNode.setExport(actionNodes, true);
-                                            TagNode.exportNodeAS(allNodes, selFile, isPcode);
-                                        }
-                                    }
-                                } else {
-                                    swf.exportImages(selFile + File.separator + "images");
-                                    swf.exportShapes(selFile + File.separator + "shapes");
-                                    swf.exportTexts(selFile + File.separator + "texts", isFormatted);
-                                    swf.exportMovies(selFile + File.separator + "movies");
-                                    swf.exportSounds(selFile + File.separator + "sounds", isMp3OrWav, isMp3OrWav);
-                                    swf.exportBinaryData(selFile + File.separator + "binaryData");
-                                    swf.exportActionScript(selFile, isPcode, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
-                                }
-                            } catch (Exception ex) {
-                                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Error during export", ex);
-                                JOptionPane.showMessageDialog(null, "Error during export");
+                            if (compressed) {
+                                swf.exportFla(selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                            } else {
+                                swf.exportXfl(selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
                             }
                             Main.stopWork();
-                            long timeAfter = System.currentTimeMillis();
-                            long timeMs = timeAfter - timeBefore;
-                            long timeS = timeMs / 1000;
-                            timeMs = timeMs % 1000;
-                            long timeM = timeS / 60;
-                            timeS = timeS % 60;
-                            long timeH = timeM / 60;
-                            timeM = timeM % 60;
-                            String timeStr = "";
-                            if (timeH > 0) {
-                                timeStr += Helper.padZeros(timeH, 2) + ":";
-                            }
-                            timeStr += Helper.padZeros(timeM, 2) + ":";
-                            timeStr += Helper.padZeros(timeS, 2) + "." + Helper.padZeros(timeMs, 3);
-                            setStatus("Exported in " + timeStr);
                         }
                     }).start();
-
                 }
-            }
-        }
+                break;
+            case "EXPORT":
+                final ExportDialog export = new ExportDialog();
+                export.setVisible(true);
+                if (!export.cancelled) {
+                    JFileChooser chooser = new JFileChooser();
+                    chooser.setCurrentDirectory(new java.io.File((String) Configuration.getConfig("lastExportDir", ".")));
+                    chooser.setDialogTitle("Select directory to export");
+                    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                    chooser.setAcceptAllFileFilterUsed(false);
+                    if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                        final long timeBefore = System.currentTimeMillis();
+                        Main.startWork("Exporting...");
+                        final String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
+                        Configuration.setConfig("lastExportDir", Helper.fixDialogFile(chooser.getSelectedFile()).getParentFile().getAbsolutePath());
+                        final boolean isPcode = export.getOption(ExportDialog.OPTION_ACTIONSCRIPT) == 1;
+                        final boolean isMp3OrWav = export.getOption(ExportDialog.OPTION_SOUNDS) == 0;
+                        final boolean isFormatted = export.getOption(ExportDialog.OPTION_TEXTS) == 1;
+                        final boolean onlySel = e.getActionCommand().endsWith("SEL");
+                        (new Thread() {
+                            @Override
+                            public void run() {
+                                try {
+                                    if (onlySel) {
+                                        List<Object> sel = getAllSelected(tagTree);
 
-        if (e.getActionCommand().equals("CHECKUPDATES")) {
-            if (!Main.checkForUpdates()) {
-                JOptionPane.showMessageDialog(null, "No new version available.");
-            }
-        }
+                                        List<ScriptPack> tlsList = new ArrayList<>();
+                                        JPEGTablesTag jtt = null;
+                                        for (Tag t : swf.tags) {
+                                            if (t instanceof JPEGTablesTag) {
+                                                jtt = (JPEGTablesTag) t;
+                                                break;
+                                            }
+                                        }
+                                        List<Tag> images = new ArrayList<>();
+                                        List<Tag> shapes = new ArrayList<>();
+                                        List<Tag> movies = new ArrayList<>();
+                                        List<Tag> sounds = new ArrayList<>();
+                                        List<Tag> texts = new ArrayList<>();
+                                        List<TagNode> actionNodes = new ArrayList<>();
+                                        List<Tag> binaryData = new ArrayList<>();
+                                        for (Object d : sel) {
+                                            if (d instanceof TagNode) {
+                                                TagNode n = (TagNode) d;
+                                                if ("image".equals(getTagType(n.tag))) {
+                                                    images.add((Tag) n.tag);
+                                                }
+                                                if ("shape".equals(getTagType(n.tag))) {
+                                                    shapes.add((Tag) n.tag);
+                                                }
+                                                if ("as".equals(getTagType(n.tag))) {
+                                                    actionNodes.add(n);
+                                                }
+                                                if ("movie".equals(getTagType(n.tag))) {
+                                                    movies.add((Tag) n.tag);
+                                                }
+                                                if ("sound".equals(getTagType(n.tag))) {
+                                                    sounds.add((Tag) n.tag);
+                                                }
+                                                if ("binaryData".equals(getTagType(n.tag))) {
+                                                    binaryData.add((Tag) n.tag);
+                                                }
+                                                if ("text".equals(getTagType(n.tag))) {
+                                                    texts.add((Tag) n.tag);
+                                                }
+                                            }
+                                            if (d instanceof TreeElement) {
+                                                if (((TreeElement) d).isLeaf()) {
+                                                    tlsList.add((ScriptPack) ((TreeElement) d).getItem());
+                                                }
+                                            }
+                                        }
+                                        swf.exportImages(selFile + File.separator + "images", images);
+                                        SWF.exportShapes(selFile + File.separator + "shapes", shapes);
+                                        swf.exportTexts(selFile + File.separator + "texts", texts, isFormatted);
+                                        swf.exportMovies(selFile + File.separator + "movies", movies);
+                                        swf.exportSounds(selFile + File.separator + "sounds", sounds, isMp3OrWav, isMp3OrWav);
+                                        swf.exportBinaryData(selFile + File.separator + "binaryData", binaryData);
+                                        if (abcPanel != null) {
+                                            for (int i = 0; i < tlsList.size(); i++) {
+                                                ScriptPack tls = tlsList.get(i);
+                                                Main.startWork("Exporting " + (i + 1) + "/" + tlsList.size() + " " + tls.getPath() + " ...");
+                                                tls.export(selFile, abcList, isPcode, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                                            }
+                                        } else {
+                                            List<TagNode> allNodes = new ArrayList<>();
+                                            TagNode asn = getASTagNode(tagTree);
+                                            if (asn != null) {
+                                                allNodes.add(asn);
+                                                TagNode.setExport(allNodes, false);
+                                                TagNode.setExport(actionNodes, true);
+                                                TagNode.exportNodeAS(allNodes, selFile, isPcode);
+                                            }
+                                        }
+                                    } else {
+                                        swf.exportImages(selFile + File.separator + "images");
+                                        swf.exportShapes(selFile + File.separator + "shapes");
+                                        swf.exportTexts(selFile + File.separator + "texts", isFormatted);
+                                        swf.exportMovies(selFile + File.separator + "movies");
+                                        swf.exportSounds(selFile + File.separator + "sounds", isMp3OrWav, isMp3OrWav);
+                                        swf.exportBinaryData(selFile + File.separator + "binaryData");
+                                        swf.exportActionScript(selFile, isPcode, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                                    }
+                                } catch (Exception ex) {
+                                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Error during export", ex);
+                                    JOptionPane.showMessageDialog(null, "Error during export");
+                                }
+                                Main.stopWork();
+                                long timeAfter = System.currentTimeMillis();
+                                long timeMs = timeAfter - timeBefore;
+                                long timeS = timeMs / 1000;
+                                timeMs = timeMs % 1000;
+                                long timeM = timeS / 60;
+                                timeS = timeS % 60;
+                                long timeH = timeM / 60;
+                                timeM = timeM % 60;
+                                String timeStr = "";
+                                if (timeH > 0) {
+                                    timeStr += Helper.padZeros(timeH, 2) + ":";
+                                }
+                                timeStr += Helper.padZeros(timeM, 2) + ":";
+                                timeStr += Helper.padZeros(timeS, 2) + "." + Helper.padZeros(timeMs, 3);
+                                setStatus("Exported in " + timeStr);
+                            }
+                        }).start();
 
-        if (e.getActionCommand().equals("HELPUS")) {
-            String helpUsURL = Main.projectPage + "/help_us.html";
-            if (java.awt.Desktop.isDesktopSupported()) {
-                java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
-                try {
-                    java.net.URI uri = new java.net.URI(helpUsURL);
-                    desktop.browse(uri);
-                } catch (Exception ex) {
+                    }
                 }
-            } else {
-                JOptionPane.showMessageDialog(null, "Please visit\r\n" + helpUsURL + "\r\nfor details.");
-            }
-        }
+                break;
 
-        if (e.getActionCommand().equals("HOMEPAGE")) {
-            String homePageURL = Main.projectPage;
-            if (java.awt.Desktop.isDesktopSupported()) {
-                java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
-                try {
-                    java.net.URI uri = new java.net.URI(homePageURL);
-                    desktop.browse(uri);
-                } catch (Exception ex) {
+            case "CHECKUPDATES":
+                if (!Main.checkForUpdates()) {
+                    JOptionPane.showMessageDialog(null, "No new version available.");
                 }
-            } else {
-                JOptionPane.showMessageDialog(null, "Visit homepage at: \r\n" + homePageURL);
-            }
-        }
+                break;
 
-        if (e.getActionCommand().startsWith("RESTORECONTROLFLOW")) {
-            Main.startWork("Restoring control flow...");
-            final boolean all = e.getActionCommand().endsWith("ALL");
-            if ((!all) || confirmExperimental()) {
-                new SwingWorker() {
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        int cnt = 0;
-                        if (all) {
-                            for (ABCContainerTag tag : abcPanel.list) {
-                                tag.getABC().restoreControlFlow();
-                            }
-                        } else {
-                            int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
-                            if (bi != -1) {
-                                abcPanel.abc.bodies[bi].restoreControlFlow(abcPanel.abc.constants);
-                            }
-                            abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc);
-                        }
-                        Main.stopWork();
-                        JOptionPane.showMessageDialog(null, "Control flow restored");
-                        abcPanel.reload();
-                        return true;
+            case "HELPUS":
+                String helpUsURL = Main.projectPage + "/help_us.html";
+                if (java.awt.Desktop.isDesktopSupported()) {
+                    java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+                    try {
+                        java.net.URI uri = new java.net.URI(helpUsURL);
+                        desktop.browse(uri);
+                    } catch (Exception ex) {
                     }
-                }.execute();
-            }
-        }
+                } else {
+                    JOptionPane.showMessageDialog(null, "Please visit\r\n" + helpUsURL + "\r\nfor details.");
+                }
+                break;
 
-        if (e.getActionCommand().startsWith("REMOVETRAPS")) {
-            Main.startWork("Removing traps...");
-            final boolean all = e.getActionCommand().endsWith("ALL");
-            if ((!all) || confirmExperimental()) {
-                new SwingWorker() {
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        int cnt = 0;
-                        if (all) {
-                            for (ABCContainerTag tag : abcPanel.list) {
-                                cnt += tag.getABC().removeTraps();
-                            }
-                        } else {
-                            int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
-                            if (bi != -1) {
-                                cnt += abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, abcPanel.decompiledTextArea.getScriptLeaf().scriptIndex, abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic());
-                            }
-                            abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc);
-                        }
-                        Main.stopWork();
-                        JOptionPane.showMessageDialog(null, "Traps removed: " + cnt);
-                        abcPanel.reload();
-                        return true;
+            case "HOMEPAGE":
+                String homePageURL = Main.projectPage;
+                if (java.awt.Desktop.isDesktopSupported()) {
+                    java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+                    try {
+                        java.net.URI uri = new java.net.URI(homePageURL);
+                        desktop.browse(uri);
+                    } catch (Exception ex) {
                     }
-                }.execute();
-            }
-        }
+                } else {
+                    JOptionPane.showMessageDialog(null, "Visit homepage at: \r\n" + homePageURL);
+                }
+                break;
 
-        if (e.getActionCommand().startsWith("REMOVEDEADCODE")) {
-            Main.startWork("Removing dead code...");
-            final boolean all = e.getActionCommand().endsWith("ALL");
-            if ((!all) || confirmExperimental()) {
-                new SwingWorker() {
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        int cnt = 0;
-                        if (all) {
-                            for (ABCContainerTag tag : abcPanel.list) {
-                                cnt += tag.getABC().removeDeadCode();
-                            }
-                        } else {
-                            int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
-                            if (bi != -1) {
-                                cnt += abcPanel.abc.bodies[bi].removeDeadCode(abcPanel.abc.constants);
-                            }
-                            abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc);
-                        }
-                        Main.stopWork();
-                        JOptionPane.showMessageDialog(null, "Instructions removed: " + cnt);
-                        abcPanel.reload();
-                        return true;
-                    }
-                }.execute();
-            }
-        }
-
-        if (e.getActionCommand().equals("RENAMEIDENTIFIERS")) {
-            if (confirmExperimental()) {
-                final RenameType renameType = new RenameDialog().display();
-                if (renameType != null) {
-                    Main.startWork("Renaming identifiers...");
+            case "RESTORECONTROLFLOW":
+            case "RESTORECONTROLFLOWALL":
+                Main.startWork("Restoring control flow...");
+                final boolean all = e.getActionCommand().endsWith("ALL");
+                if ((!all) || confirmExperimental()) {
                     new SwingWorker() {
                         @Override
                         protected Object doInBackground() throws Exception {
-                            try {
-                                int cnt = 0;
-                                cnt = swf.deobfuscateIdentifiers(renameType);
-                                Main.stopWork();
-                                JOptionPane.showMessageDialog(null, "Identifiers renamed: " + cnt);
-                                if (abcPanel != null) {
-                                    abcPanel.reload();
-                                }
-                                doFilter();
-                                reload(true);
-                            } catch (Exception ex) {
-                                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "message", ex);
-                            }
-                            return true;
-                        }
-                    }.execute();
-
-                }
-            }
-        }
-
-        if (e.getActionCommand().startsWith("DEOBFUSCATE")) {
-            if (deobfuscationDialog == null) {
-                deobfuscationDialog = new DeobfuscationDialog();
-            }
-            deobfuscationDialog.setVisible(true);
-            if (deobfuscationDialog.ok) {
-                Main.startWork("Deobfuscating...");
-                new SwingWorker() {
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        try {
-                            if (deobfuscationDialog.processAllCheckbox.isSelected()) {
+                            int cnt = 0;
+                            if (all) {
                                 for (ABCContainerTag tag : abcPanel.list) {
-                                    if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
-                                        tag.getABC().removeDeadCode();
-                                    } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
-                                        tag.getABC().removeTraps();
-                                    } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_RESTORE_CONTROL_FLOW) {
-                                        tag.getABC().removeTraps();
-                                        tag.getABC().restoreControlFlow();
-                                    }
+                                    tag.getABC().restoreControlFlow();
                                 }
                             } else {
                                 int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
                                 if (bi != -1) {
-                                    if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
-                                        abcPanel.abc.bodies[bi].removeDeadCode(abcPanel.abc.constants);
-                                    } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
-                                        abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, abcPanel.decompiledTextArea.getScriptLeaf().scriptIndex, abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic());
-                                    } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_RESTORE_CONTROL_FLOW) {
-                                        abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, abcPanel.decompiledTextArea.getScriptLeaf().scriptIndex, abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic());
-                                        abcPanel.abc.bodies[bi].restoreControlFlow(abcPanel.abc.constants);
-                                    }
+                                    abcPanel.abc.bodies[bi].restoreControlFlow(abcPanel.abc.constants);
                                 }
                                 abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc);
                             }
-                        } catch (Exception ex) {
-                            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Deobfuscation error", ex);
+                            Main.stopWork();
+                            JOptionPane.showMessageDialog(null, "Control flow restored");
+                            abcPanel.reload();
+                            return true;
                         }
-                        Main.stopWork();
-                        JOptionPane.showMessageDialog(null, "Deobfuscation complete");
-                        abcPanel.reload();
-                        return true;
+                    }.execute();
+                }
+                break;
+            case "RENAMEIDENTIFIERS":
+                if (confirmExperimental()) {
+                    final RenameType renameType = new RenameDialog().display();
+                    if (renameType != null) {
+                        Main.startWork("Renaming identifiers...");
+                        new SwingWorker() {
+                            @Override
+                            protected Object doInBackground() throws Exception {
+                                try {
+                                    int cnt = 0;
+                                    cnt = swf.deobfuscateIdentifiers(renameType);
+                                    Main.stopWork();
+                                    JOptionPane.showMessageDialog(null, "Identifiers renamed: " + cnt);
+                                    if (abcPanel != null) {
+                                        abcPanel.reload();
+                                    }
+                                    doFilter();
+                                    reload(true);
+                                } catch (Exception ex) {
+                                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "message", ex);
+                                }
+                                return true;
+                            }
+                        }.execute();
+
                     }
-                }.execute();
-            }
+                }
+                break;
+            case "DEOBFUSCATE":
+            case "DEOBFUSCATEALL":
+                if (deobfuscationDialog == null) {
+                    deobfuscationDialog = new DeobfuscationDialog();
+                }
+                deobfuscationDialog.setVisible(true);
+                if (deobfuscationDialog.ok) {
+                    Main.startWork("Deobfuscating...");
+                    new SwingWorker() {
+                        @Override
+                        protected Object doInBackground() throws Exception {
+                            try {
+                                if (deobfuscationDialog.processAllCheckbox.isSelected()) {
+                                    for (ABCContainerTag tag : abcPanel.list) {
+                                        if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
+                                            tag.getABC().removeDeadCode();
+                                        } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
+                                            tag.getABC().removeTraps();
+                                        } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_RESTORE_CONTROL_FLOW) {
+                                            tag.getABC().removeTraps();
+                                            tag.getABC().restoreControlFlow();
+                                        }
+                                    }
+                                } else {
+                                    int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
+                                    if (bi != -1) {
+                                        if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_DEAD_CODE) {
+                                            abcPanel.abc.bodies[bi].removeDeadCode(abcPanel.abc.constants);
+                                        } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_REMOVE_TRAPS) {
+                                            abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, abcPanel.decompiledTextArea.getScriptLeaf().scriptIndex, abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic());
+                                        } else if (deobfuscationDialog.codeProcessingLevel.getValue() == DeobfuscationDialog.LEVEL_RESTORE_CONTROL_FLOW) {
+                                            abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, abcPanel.decompiledTextArea.getScriptLeaf().scriptIndex, abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic());
+                                            abcPanel.abc.bodies[bi].restoreControlFlow(abcPanel.abc.constants);
+                                        }
+                                    }
+                                    abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc);
+                                }
+                            } catch (Exception ex) {
+                                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Deobfuscation error", ex);
+                            }
+                            Main.stopWork();
+                            JOptionPane.showMessageDialog(null, "Deobfuscation complete");
+                            abcPanel.reload();
+                            return true;
+                        }
+                    }.execute();
+                }
+                break;
+
+            case "REMOVETRAPS":
+            case "REMOVETRAPSALL":
+                Main.startWork("Removing traps...");
+                final boolean rall = e.getActionCommand().endsWith("ALL");
+                if ((!rall) || confirmExperimental()) {
+                    new SwingWorker() {
+                        @Override
+                        protected Object doInBackground() throws Exception {
+                            int cnt = 0;
+                            if (rall) {
+                                for (ABCContainerTag tag : abcPanel.list) {
+                                    cnt += tag.getABC().removeTraps();
+                                }
+                            } else {
+                                int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
+                                if (bi != -1) {
+                                    cnt += abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, abcPanel.decompiledTextArea.getScriptLeaf().scriptIndex, abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic());
+                                }
+                                abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc);
+                            }
+                            Main.stopWork();
+                            JOptionPane.showMessageDialog(null, "Traps removed: " + cnt);
+                            abcPanel.reload();
+                            return true;
+                        }
+                    }.execute();
+                }
+                break;
+
+            case "REMOVEDEADCODE":
+            case "REMOVEDEADCODEALL":
+                Main.startWork("Removing dead code...");
+                final boolean dall = e.getActionCommand().endsWith("ALL");
+                if ((!dall) || confirmExperimental()) {
+                    new SwingWorker() {
+                        @Override
+                        protected Object doInBackground() throws Exception {
+                            int cnt = 0;
+                            if (dall) {
+                                for (ABCContainerTag tag : abcPanel.list) {
+                                    cnt += tag.getABC().removeDeadCode();
+                                }
+                            } else {
+                                int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
+                                if (bi != -1) {
+                                    cnt += abcPanel.abc.bodies[bi].removeDeadCode(abcPanel.abc.constants);
+                                }
+                                abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc);
+                            }
+                            Main.stopWork();
+                            JOptionPane.showMessageDialog(null, "Instructions removed: " + cnt);
+                            abcPanel.reload();
+                            return true;
+                        }
+                    }.execute();
+                }
+                break;
+
         }
+
+
+
+
     }
     private int splitPos = 0;
 

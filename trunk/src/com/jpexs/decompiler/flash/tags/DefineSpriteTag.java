@@ -255,12 +255,10 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
 
     @Override
     public String getExportFileName() {
-        String expName=getExportName();
-        if((expName==null) || expName.equals("")){
+        String expName = getExportName();
+        if ((expName == null) || expName.equals("")) {
             return super.getExportFileName();
         }
-        return Helper.makeFileName(super.getExportFileName()+"_"+expName);
+        return Helper.makeFileName(super.getExportFileName() + "_" + expName);
     }
-    
-    
 }
