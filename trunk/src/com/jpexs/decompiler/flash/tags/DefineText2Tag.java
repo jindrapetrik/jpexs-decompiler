@@ -95,6 +95,11 @@ public class DefineText2Tag extends CharacterTag implements BoundedTag, TextTag,
                     }
                 }
             }
+            if (rec.styleFlagsHasXOffset || rec.styleFlagsHasYOffset) {
+                if (!rec.equals("")) {
+                    ret += "\r\n";
+                }
+            }
             ret += rec.getText(tags, fnt);
         }
         return ret;
