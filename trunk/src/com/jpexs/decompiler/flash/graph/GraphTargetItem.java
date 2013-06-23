@@ -28,7 +28,7 @@ public abstract class GraphTargetItem {
     public static final int PRECEDENCE_COMMA = 15;
     public static final int NOPRECEDENCE = 16;
     public GraphSourceItem src;
-    public int pos = 0;
+    public int pos = -1;
     public int precedence;
     public List<GraphSourceItemPos> moreSrc = new ArrayList<>();
     public GraphPart firstPart;
@@ -61,7 +61,7 @@ public abstract class GraphTargetItem {
         if (src == null) {
             return str;
         }
-        return Highlighting.hilighOffset(str, src.getOffset());
+        return Highlighting.hilighOffset(str, src.getOffset()+pos+1);
     }
 
     public String toStringSemicoloned(List<Object> localData) {

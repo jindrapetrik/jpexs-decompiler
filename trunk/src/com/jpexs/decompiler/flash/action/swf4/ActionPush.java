@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
+import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -261,8 +262,8 @@ public class ActionPush extends Action {
             if (pos > 0) {
                 ret += " ";
             }
+            ret += Highlighting.hilighOffset(toString(i), getAddress()+pos+1);
             pos++;
-            ret += toString(i);
         }
         return ret;
     }
