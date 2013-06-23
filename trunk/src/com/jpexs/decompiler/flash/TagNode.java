@@ -241,7 +241,7 @@ public class TagNode {
         for (TagNode node : nodeList) {
             String name = "";
             if (node.tag instanceof Tag) {
-                name = ((Tag) node.tag).getExportName();
+                name = ((Tag) node.tag).getExportFileName();
             } else {
                 name = node.tag.toString();
             }

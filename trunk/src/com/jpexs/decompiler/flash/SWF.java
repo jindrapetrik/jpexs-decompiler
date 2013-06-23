@@ -43,6 +43,11 @@ import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
 import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.FunctionTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.GetMemberTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.GetVariableTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.clauses.ClassTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.clauses.InterfaceTreeItem;
 import com.jpexs.decompiler.flash.flv.AUDIODATA;
 import com.jpexs.decompiler.flash.flv.FLVOutputStream;
 import com.jpexs.decompiler.flash.flv.FLVTAG;
@@ -61,6 +66,7 @@ import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
+import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
@@ -72,6 +78,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
@@ -162,6 +169,7 @@ public class SWF {
      * LZMA Properties
      */
     public byte lzmaProperties[];
+    public FileAttributesTag fileAttributes;
 
     /**
      * Gets all tags with specified id
@@ -306,10 +314,39 @@ public class SWF {
         frameRate = sis.readUI8();
         frameCount = sis.readUI16();
         tags = sis.readTagList(0, paralelRead);
+        assignExportNamesToSymbols();
         assignClassesToSymbols();
+        for (Tag t : tags) {
+            if (t instanceof FileAttributesTag) {
+                fileAttributes = (FileAttributesTag) t;
+                break;
+            }
+        }
     }
 
-    public void assignClassesToSymbols() {
+    private void assignExportNamesToSymbols() {
+        HashMap<Integer, String> exportNames = new HashMap<>();
+        for (Tag t : tags) {
+            if (t instanceof ExportAssetsTag) {
+                ExportAssetsTag eat = (ExportAssetsTag) t;
+                for (int i = 0; i < eat.tags.size(); i++) {
+                    if ((!exportNames.containsKey(eat.tags.get(i))) && (!exportNames.containsValue(eat.names.get(i)))) {
+                        exportNames.put(eat.tags.get(i), eat.names.get(i));
+                    }
+                }
+            }
+        }
+        for (Tag t : tags) {
+            if (t instanceof CharacterIdTag) {
+                CharacterIdTag ct = (CharacterIdTag) t;
+                if (exportNames.containsKey(ct.getCharacterID())) {
+                    ct.setExportName(exportNames.get(ct.getCharacterID()));
+                }
+            }
+        }
+    }
+
+    private void assignClassesToSymbols() {
         HashMap<Integer, String> classes = new HashMap<>();
         for (Tag t : tags) {
             if (t instanceof SymbolClassTag) {
@@ -322,8 +359,8 @@ public class SWF {
             }
         }
         for (Tag t : tags) {
-            if (t instanceof CharacterTag) {
-                CharacterTag ct = (CharacterTag) t;
+            if (t instanceof CharacterIdTag) {
+                CharacterIdTag ct = (CharacterIdTag) t;
                 if (classes.containsKey(ct.getCharacterID())) {
                     ct.setClassName(classes.get(ct.getCharacterID()));
                 }
@@ -1214,6 +1251,7 @@ public class SWF {
                 GraphSourceItemContainer cnt = (GraphSourceItemContainer) ins;
                 List<Long> cntSizes = cnt.getContainerSizes();
                 long addr = code.pos2adr(ip + 1);
+                ip = code.adr2pos(addr);
                 for (Long size : cntSizes) {
                     if (size == 0) {
                         continue;
@@ -1229,7 +1267,7 @@ public class SWF {
                 r.add(new ArrayList<GraphTargetItem>());
                 r.add(new ArrayList<GraphTargetItem>());
                 ((GraphSourceItemContainer) ins).translateContainer(r, stack, output, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
-                ip++;
+                //ip++;
                 continue;
             }
 
@@ -1274,6 +1312,9 @@ public class SWF {
                     if (top instanceof DirectValueTreeItem) {
                         DirectValueTreeItem dvt = (DirectValueTreeItem) top;
                         if ((dvt.value instanceof String) || (dvt.value instanceof ConstantIndex)) {
+                            if (constantPool == null) {
+                                constantPool = new ConstantPool(dvt.constants);
+                            }
                             strings.put(dvt, constantPool);
                         }
                     }
@@ -1405,6 +1446,131 @@ public class SWF {
             String name = ti.toStringNoH(allVariableNames.get(ti));
             allVariableNamesStr.add(name);
         }
+
+        informListeners("deobfuscate", "classes");
+        int classCount = 0;
+        for (Tag t : tags) {
+            if (t instanceof DoInitActionTag) {
+                classCount++;
+            }
+        }
+        int cnt = 0;
+        for (Tag t : tags) {
+            if (t instanceof DoInitActionTag) {
+                cnt++;
+                informListeners("deobfuscate", "class " + cnt + "/" + classCount);
+                DoInitActionTag dia = (DoInitActionTag) t;
+                String exportName = dia.getExportName();
+                final String pkgPrefix = "__Packages.";
+                String classNameParts[] = null;
+                if ((exportName != null) && exportName.startsWith(pkgPrefix)) {
+                    String className = exportName.substring(pkgPrefix.length());
+                    if (className.contains(".")) {
+                        classNameParts = className.split("\\.");
+                    } else {
+                        classNameParts = new String[]{className};
+                    }
+                }
+                List<GraphTargetItem> dec = Action.actionsToTree(dia.getActions(version), version);
+                GraphTargetItem name = null;
+                for (GraphTargetItem it : dec) {
+                    if (it instanceof ClassTreeItem) {
+                        ClassTreeItem cti = (ClassTreeItem) it;
+                        List<GraphTargetItem> methods = new ArrayList<>();
+                        methods.addAll(cti.functions);
+                        methods.addAll(cti.staticFunctions);
+
+                        for (GraphTargetItem gti : methods) {
+                            if (gti instanceof FunctionTreeItem) {
+                                FunctionTreeItem fun = (FunctionTreeItem) gti;
+                                if (fun.calculatedFunctionName instanceof DirectValueTreeItem) {
+                                    DirectValueTreeItem dvf = (DirectValueTreeItem) fun.calculatedFunctionName;
+                                    String fname = dvf.toStringNoH(null);
+                                    String changed = deobfuscateName(deobfuscated, fname, false, "method", renameType);
+                                    if (changed != null) {
+                                        deobfuscated.put(fname, changed);
+                                    }
+                                }
+                            }
+                        }
+
+
+                        List<GraphTargetItem> vars = new ArrayList<>();
+                        vars.addAll(cti.vars.keySet());
+                        vars.addAll(cti.staticVars.keySet());
+                        for (GraphTargetItem gti : vars) {
+                            if (gti instanceof DirectValueTreeItem) {
+                                DirectValueTreeItem dvf = (DirectValueTreeItem) gti;
+                                String vname = dvf.toStringNoH(null);
+                                String changed = deobfuscateName(deobfuscated, vname, false, "attribute", renameType);
+                                if (changed != null) {
+                                    deobfuscated.put(vname, changed);
+                                }
+                            }
+                        }
+
+                        name = cti.className;
+                        break;
+                    }
+                    if (it instanceof InterfaceTreeItem) {
+                        InterfaceTreeItem ift = (InterfaceTreeItem) it;
+                        name = ift.name;
+                    }
+                }
+
+
+                if (name != null) {
+                    int pos = 0;
+                    while (name instanceof GetMemberTreeItem) {
+                        GetMemberTreeItem mem = (GetMemberTreeItem) name;
+                        GraphTargetItem memberName = mem.memberName;
+                        if (memberName instanceof DirectValueTreeItem) {
+                            DirectValueTreeItem dvt = (DirectValueTreeItem) memberName;
+                            String nameStr = dvt.toStringNoH(null);
+                            if (classNameParts != null) {
+                                if (classNameParts.length - 1 - pos < 0) {
+                                    break;
+                                }
+                            }
+                            String changedNameStr = nameStr;
+                            if (classNameParts != null) {
+                                changedNameStr = classNameParts[classNameParts.length - 1 - pos];
+                            }
+                            String changedNameStr2 = deobfuscateName(deobfuscated, changedNameStr, pos == 0, pos == 0 ? "class" : "package", renameType);
+                            if (changedNameStr2 != null) {
+                                changedNameStr = changedNameStr2;
+                            }
+                            deobfuscated.put(nameStr, changedNameStr);
+                            pos++;
+                        }
+                        name = mem.object;
+                    }
+                    if (name instanceof GetVariableTreeItem) {
+                        GetVariableTreeItem var = (GetVariableTreeItem) name;
+                        if (var.name instanceof DirectValueTreeItem) {
+                            DirectValueTreeItem dvt = (DirectValueTreeItem) var.name;
+                            String nameStr = dvt.toStringNoH(null);
+                            if (classNameParts != null) {
+                                if (classNameParts.length - 1 - pos < 0) {
+                                    break;
+                                }
+                            }
+                            String changedNameStr = nameStr;
+                            if (classNameParts != null) {
+                                changedNameStr = classNameParts[classNameParts.length - 1 - pos];
+                            }
+                            String changedNameStr2 = deobfuscateName(deobfuscated, changedNameStr, pos == 0, pos == 0 ? "class" : "package", renameType);
+                            if (changedNameStr2 != null) {
+                                changedNameStr = changedNameStr2;
+                            }
+                            deobfuscated.put(nameStr, changedNameStr);
+                            pos++;
+                        }
+                    }
+                }
+            }
+        }
+
         for (GraphSourceItem fun : allFunctions) {
             fc++;
             informListeners("deobfuscate", "function " + fc + "/" + allFunctions.size());
