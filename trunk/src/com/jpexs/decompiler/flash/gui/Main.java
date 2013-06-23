@@ -181,6 +181,12 @@ public class Main {
                 if (event.equals("export")) {
                     startWork((String) data);
                 }
+                if (event.equals("getVariables")) {
+                    startWork("Getting variables..." + (String) data);
+                }
+                if (event.equals("deobfuscate")) {
+                    startWork("Deobfuscating..." + (String) data);
+                }
             }
         });
         return locswf;

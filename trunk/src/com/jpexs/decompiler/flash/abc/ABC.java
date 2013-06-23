@@ -23,6 +23,8 @@ import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCode;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.types.*;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
@@ -33,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -111,21 +114,90 @@ public class ABC {
         return ret;
     }
 
-    public void deobfuscateIdentifiers(HashMap<String, String> namesMap) {
+    private void setStringUsageType(Map<Integer, String> ret, int strIndex, String usageType) {
+        if (ret.containsKey(strIndex)) {
+            if (!ret.get(strIndex).equals(usageType)) {
+                ret.put(strIndex, "name");
+            }
+        } else {
+            ret.put(strIndex, usageType);
+        }
+    }
+
+    private void getStringUsageTypes(Map<Integer, String> ret, Traits traits) {
+        for (Trait t : traits.traits) {
+            int strIndex = constants.constant_multiname[t.name_index].name_index;
+            String usageType = "";
+            if (t instanceof TraitClass) {
+                TraitClass tc = (TraitClass) t;
+                getStringUsageTypes(ret, class_info[tc.class_info].static_traits);
+                getStringUsageTypes(ret, instance_info[tc.class_info].instance_traits);
+
+                if (instance_info[tc.class_info].name_index != 0) {
+                    setStringUsageType(ret, constants.constant_multiname[instance_info[tc.class_info].name_index].name_index, "class");
+                }
+                if (instance_info[tc.class_info].super_index != 0) {
+                    setStringUsageType(ret, constants.constant_multiname[instance_info[tc.class_info].super_index].name_index, "class");
+                }
+
+                usageType = "class";
+            }
+            if (t instanceof TraitMethodGetterSetter) {
+                TraitMethodGetterSetter tm = (TraitMethodGetterSetter) t;
+                usageType = "method";
+                MethodBody body = findBody(tm.method_info);
+                if (body != null) {
+                    getStringUsageTypes(ret, body.traits);
+                }
+            }
+            if (t instanceof TraitFunction) {
+                TraitFunction tf = (TraitFunction) t;
+                MethodBody body = findBody(tf.method_info);
+                if (body != null) {
+                    getStringUsageTypes(ret, body.traits);
+                }
+                usageType = "function";
+            }
+            if (t instanceof TraitSlotConst) {
+                TraitSlotConst ts = (TraitSlotConst) t;
+                if (ts.isVar()) {
+                    usageType = "var";
+                }
+                if (ts.isConst()) {
+                    usageType = "const";
+                }
+            }
+            setStringUsageType(ret, strIndex, usageType);
+        }
+    }
+
+    public void getStringUsageTypes(Map<Integer, String> ret) {
+        for (ScriptInfo script : script_info) {
+            getStringUsageTypes(ret, script.traits);
+        }
+    }
+
+    public void deobfuscateIdentifiers(HashMap<String, String> namesMap, RenameType renameType) {
         Set<Integer> stringUsages = getStringUsages();
+        Map<Integer, String> stringUsageTypes = new HashMap<>();
+        informListeners("deobfuscate", "Getting usage types...");
+        getStringUsageTypes(stringUsageTypes);
         for (int i = 1; i < instance_info.length; i++) {
+            informListeners("deobfuscate", "class " + i + "/" + instance_info.length);
             if (instance_info[i].name_index != 0) {
-                constants.constant_multiname[instance_info[i].name_index].name_index = deobfuscateName(stringUsages, namesMap, constants.constant_multiname[instance_info[i].name_index].name_index, true);
+                constants.constant_multiname[instance_info[i].name_index].name_index = deobfuscateName(stringUsageTypes, stringUsages, namesMap, constants.constant_multiname[instance_info[i].name_index].name_index, true, renameType);
             }
             if (instance_info[i].super_index != 0) {
-                constants.constant_multiname[instance_info[i].super_index].name_index = deobfuscateName(stringUsages, namesMap, constants.constant_multiname[instance_info[i].super_index].name_index, true);
+                constants.constant_multiname[instance_info[i].super_index].name_index = deobfuscateName(stringUsageTypes, stringUsages, namesMap, constants.constant_multiname[instance_info[i].super_index].name_index, true, renameType);
             }
         }
         for (int i = 1; i < constants.constant_multiname.length; i++) {
-            constants.constant_multiname[i].name_index = deobfuscateName(stringUsages, namesMap, constants.constant_multiname[i].name_index, false);
+            informListeners("deobfuscate", "name " + i + "/" + constants.constant_multiname.length);
+            constants.constant_multiname[i].name_index = deobfuscateName(stringUsageTypes, stringUsages, namesMap, constants.constant_multiname[i].name_index, false, renameType);
         }
         for (int i = 1; i < constants.constant_namespace.length; i++) {
-            constants.constant_namespace[i].name_index = deobfuscateNameSpace(stringUsages, namesMap, constants.constant_namespace[i].name_index);
+            informListeners("deobfuscate", "namespace " + i + "/" + constants.constant_namespace.length);
+            constants.constant_namespace[i].name_index = deobfuscateNameSpace(stringUsageTypes, stringUsages, namesMap, constants.constant_namespace[i].name_index, renameType);
         }
     }
 
@@ -654,7 +726,7 @@ public class ABC {
         "extends", "false", "finally", "for", "function", "get", "if", "implements", "import", "in", "instanceof",
         "interface", "internal", "is", "native", "new", "null", "override", "package", "private", "protected", "public",
         "return", "set", "super", "switch", "this", "throw", "true", "try", "typeof", "use", "var", /*"void",*/ "while",
-        "with", "dynamic", "default", "final", "in"};
+        "with", "dynamic", "default", "final", "in", "static"};
     public static final String validFirstCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
     public static final String validNextCharacters = validFirstCharacters + "0123456789";
     public static final String validNsCharacters = ".:$";
@@ -663,26 +735,42 @@ public class ABC {
     private HashMap<String, String> deobfuscated = new HashMap<>();
     private Random rnd = new Random();
     private final int DEFAULT_FOO_SIZE = 10;
+    private Map<String, Integer> usageTypesCount = new HashMap<>();
 
-    private String fooString(String orig, boolean firstUppercase, int rndSize) {
+    private String fooString(String orig, boolean firstUppercase, int rndSize, String usageType, RenameType renameType) {
         boolean exists;
         String ret;
+        int pos = 0;
+
+        if (usageType == null) {
+            usageType = "name";
+        }
+        if (usageTypesCount.containsKey(usageType)) {
+            pos = usageTypesCount.get(usageType);
+        }
+
         loopfoo:
         do {
             exists = false;
-            int len = 3 + rnd.nextInt(rndSize - 3);
             ret = "";
-            for (int i = 0; i < len; i++) {
-                String c = "";
-                if ((i % 2) == 0) {
-                    c = "" + fooCharacters.charAt(rnd.nextInt(fooCharacters.length()));
-                } else {
-                    c = "" + fooJoinCharacters.charAt(rnd.nextInt(fooJoinCharacters.length()));
+            if (renameType == RenameType.TYPENUMBER) {
+                pos++;
+                ret = usageType + "_" + pos;
+            } else if (renameType == RenameType.RANDOMWORD) {
+                int len = 3 + rnd.nextInt(rndSize - 3);
+
+                for (int i = 0; i < len; i++) {
+                    String c = "";
+                    if ((i % 2) == 0) {
+                        c = "" + fooCharacters.charAt(rnd.nextInt(fooCharacters.length()));
+                    } else {
+                        c = "" + fooJoinCharacters.charAt(rnd.nextInt(fooJoinCharacters.length()));
+                    }
+                    if (i == 0 && firstUppercase) {
+                        c = c.toUpperCase();
+                    }
+                    ret += c;
                 }
-                if (i == 0 && firstUppercase) {
-                    c = c.toUpperCase();
-                }
-                ret += c;
             }
             for (int i = 1; i < constants.constant_string.length; i++) {
                 if (constants.constant_string[i].equals(ret)) {
@@ -702,6 +790,7 @@ public class ABC {
                 continue;
             }
         } while (exists);
+        usageTypesCount.put(usageType, pos);
         deobfuscated.put(orig, ret);
         return ret;
     }
@@ -738,7 +827,7 @@ public class ABC {
         return isValid;
     }
 
-    public int deobfuscateNameSpace(Set<Integer> stringUsages, HashMap<String, String> namesMap, int strIndex) {
+    public int deobfuscateNameSpace(Map<Integer, String> stringUsageTypes, Set<Integer> stringUsages, HashMap<String, String> namesMap, int strIndex, RenameType renameType) {
         if (strIndex <= 0) {
             return strIndex;
         }
@@ -761,7 +850,7 @@ public class ABC {
                         ret += ".";
                     }
                     if (!isValidNSPart(parts[p])) {
-                        ret += fooString(constants.constant_string[strIndex], false, DEFAULT_FOO_SIZE);
+                        ret += fooString(constants.constant_string[strIndex], false, DEFAULT_FOO_SIZE, "package", renameType);
                     } else {
                         ret += parts[p];
                     }
@@ -779,7 +868,7 @@ public class ABC {
         return strIndex;
     }
 
-    public int deobfuscateName(Set<Integer> stringUsages, HashMap<String, String> namesMap, int strIndex, boolean firstUppercase) {
+    public int deobfuscateName(Map<Integer, String> stringUsageTypes, Set<Integer> stringUsages, HashMap<String, String> namesMap, int strIndex, boolean firstUppercase, RenameType renameType) {
         if (strIndex <= 0) {
             return strIndex;
         }
@@ -810,7 +899,7 @@ public class ABC {
             if (namesMap.containsKey(s)) {
                 newname = namesMap.get(s);
             } else {
-                newname = fooString(constants.constant_string[strIndex], firstUppercase, DEFAULT_FOO_SIZE);
+                newname = fooString(constants.constant_string[strIndex], firstUppercase, DEFAULT_FOO_SIZE, stringUsageTypes.get(strIndex), renameType);
             }
             if (stringUsages.contains(strIndex)) { //this name is already referenced as String
                 strIndex = constants.addString(s); //add new index

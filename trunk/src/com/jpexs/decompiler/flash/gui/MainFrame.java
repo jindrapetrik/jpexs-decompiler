@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.FrameNode;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.TagNode;
+import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.gui.ABCPanel;
 import com.jpexs.decompiler.flash.abc.gui.ClassesListTreeModel;
@@ -1696,34 +1697,35 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
         if (e.getActionCommand().equals("RENAMEIDENTIFIERS")) {
             if (confirmExperimental()) {
+                final RenameType renameType = new RenameDialog().display();
+                if (renameType != null) {
+                    Main.startWork("Renaming identifiers...");
+                    new SwingWorker() {
+                        @Override
+                        protected Object doInBackground() throws Exception {
+                            try {
+                                int cnt = 0;
 
-                Main.startWork("Renaming identifiers...");
-                new SwingWorker() {
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        try {
-                            int cnt = 0;
-
-                            if (abcPanel != null) {
-                                cnt = swf.deobfuscateAS3Identifiers();
-                            } else {
-                                cnt = swf.deobfuscateAS2Identifiers();
+                                if (abcPanel != null) {
+                                    cnt = swf.deobfuscateAS3Identifiers(renameType);
+                                } else {
+                                    cnt = swf.deobfuscateAS2Identifiers(renameType);
+                                }
+                                Main.stopWork();
+                                JOptionPane.showMessageDialog(null, "Identifiers renamed: " + cnt);
+                                if (abcPanel != null) {
+                                    abcPanel.reload();
+                                }
+                                doFilter();
+                                reload(true);
+                            } catch (Exception ex) {
+                                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "message", ex);
                             }
-                            Main.stopWork();
-                            JOptionPane.showMessageDialog(null, "Identifiers renamed: " + cnt);
-                            if (abcPanel != null) {
-                                abcPanel.reload();
-                            }
-                            doFilter();
-                            reload(true);
-                        } catch (Exception ex) {
-                            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "message", ex);
+                            return true;
                         }
-                        return true;
-                    }
-                }.execute();
+                    }.execute();
 
-
+                }
             }
         }
 

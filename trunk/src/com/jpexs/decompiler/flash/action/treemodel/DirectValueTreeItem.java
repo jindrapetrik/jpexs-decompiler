@@ -213,10 +213,9 @@ public class DirectValueTreeItem extends TreeItem {
         if (!Objects.equals(this.constants, other.constants)) {
             return false;
         }
-        if(other.pos!=this.pos){
+        if (other.pos != this.pos) {
             return false;
         }
         return true;
     }
-    
 }
