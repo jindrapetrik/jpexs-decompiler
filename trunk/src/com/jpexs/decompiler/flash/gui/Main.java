@@ -539,7 +539,7 @@ public class Main {
                                 exportOK = exportOK && exfile.exportAS3Class(args[i], outDir.getAbsolutePath(), exportFormat.equals("pcode"), (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
                             }
                         } else {
-                            exportOK = exfile.exportActionScript(outDir.getAbsolutePath(), exportFormat.equals("pcode"), (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                            exportOK = !exfile.exportActionScript(outDir.getAbsolutePath(), exportFormat.equals("pcode"), (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE)).isEmpty();
                         }
                     } else if (exportFormat.equals("movie")) {
                         exfile.exportMovies(outDir.getAbsolutePath());

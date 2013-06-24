@@ -97,7 +97,16 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceDragEvent;
+import java.awt.dnd.DragSourceDropEvent;
+import java.awt.dnd.DragSourceEvent;
+import java.awt.dnd.DragSourceListener;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
@@ -115,6 +124,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -480,6 +490,83 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
         tagTree = new JTree(new TagTreeModel(createTagList(objs, null), new SWFRoot((new File(Main.file)).getName())));
         tagTree.addTreeSelectionListener(this);
+
+        DragSource dragSource = DragSource.getDefaultDragSource();
+        dragSource.createDefaultDragGestureRecognizer(tagTree, DnDConstants.ACTION_COPY_OR_MOVE, new DragGestureListener() {
+            @Override
+            public void dragGestureRecognized(DragGestureEvent dge) {
+                dge.startDrag(DragSource.DefaultCopyDrop, new Transferable() {
+                    @Override
+                    public DataFlavor[] getTransferDataFlavors() {
+                        return new DataFlavor[]{DataFlavor.javaFileListFlavor};
+                    }
+
+                    @Override
+                    public boolean isDataFlavorSupported(DataFlavor flavor) {
+                        return flavor.equals(DataFlavor.javaFileListFlavor);
+                    }
+
+                    @Override
+                    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+                        if (flavor.equals(DataFlavor.javaFileListFlavor)) {
+                            List<File> files = new ArrayList<>();
+                            String tempDir = System.getProperty("java.io.tmpdir");
+                            if (!tempDir.endsWith(File.separator)) {
+                                tempDir += File.separator;
+                            }
+                            Random rnd = new Random();
+                            tempDir += "ffdec" + File.separator + "export" + File.separator + System.currentTimeMillis() + "_" + rnd.nextInt(1000);
+                            new File(tempDir).mkdirs();
+                            final ExportDialog export = new ExportDialog();
+
+                            try {
+                                File ftemp = new File(tempDir);
+                                files = exportSelection(tempDir, export);
+                                files.clear();
+
+                                File fs[] = ftemp.listFiles();
+                                for (File f : fs) {
+                                    files.add(f);
+                                }
+
+                                Main.stopWork();
+                            } catch (IOException ex) {
+                                return null;
+                            }
+                            for (File f : files) {
+                                f.deleteOnExit();
+                            }
+                            new File(tempDir).deleteOnExit();
+                            return files;
+
+                        }
+                        return null;
+                    }
+                }, new DragSourceListener() {
+                    @Override
+                    public void dragEnter(DragSourceDragEvent dsde) {
+                        enableDrop(false);
+                    }
+
+                    @Override
+                    public void dragOver(DragSourceDragEvent dsde) {
+                    }
+
+                    @Override
+                    public void dropActionChanged(DragSourceDragEvent dsde) {
+                    }
+
+                    @Override
+                    public void dragExit(DragSourceEvent dse) {
+                    }
+
+                    @Override
+                    public void dragDropEnd(DragSourceDropEvent dsde) {
+                        enableDrop(true);
+                    }
+                });
+            }
+        });
         final JPopupMenu spritePopupMenu = new JPopupMenu();
         JMenuItem removeMenuItem = new JMenuItem("Remove");
         removeMenuItem.addActionListener(this);
@@ -763,23 +850,31 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             }
         });
         detailPanel.setVisible(false);
-        
-        //Opening files with drag&drop to main window
-        setDropTarget(new DropTarget() {
-            @Override
-            public synchronized void drop(DropTargetDropEvent dtde) {
-                try {
-                    dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
-                    @SuppressWarnings("unchecked")
-                    List<File> droppedFiles = (List<File>) dtde.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
-                    if (!droppedFiles.isEmpty()) {
-                        Main.openFile(droppedFiles.get(0).getAbsolutePath());
-                    }
-                } catch (Exception ex) {
-                }
-            }
-        });
 
+        //Opening files with drag&drop to main window
+        enableDrop(true);
+
+    }
+
+    public void enableDrop(boolean value) {
+        if (value) {
+            setDropTarget(new DropTarget() {
+                @Override
+                public synchronized void drop(DropTargetDropEvent dtde) {
+                    try {
+                        dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
+                        @SuppressWarnings("unchecked")
+                        List<File> droppedFiles = (List<File>) dtde.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+                        if (!droppedFiles.isEmpty()) {
+                            Main.openFile(droppedFiles.get(0).getAbsolutePath());
+                        }
+                    } catch (Exception ex) {
+                    }
+                }
+            });
+        } else {
+            setDropTarget(null);
+        }
     }
 
     public void doFilter() {
@@ -1264,6 +1359,85 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     }
     private SearchDialog searchDialog;
 
+    public List<File> exportSelection(String selFile, ExportDialog export) throws IOException {
+        final boolean isPcode = export.getOption(ExportDialog.OPTION_ACTIONSCRIPT) == 1;
+        final boolean isMp3OrWav = export.getOption(ExportDialog.OPTION_SOUNDS) == 0;
+        final boolean isFormatted = export.getOption(ExportDialog.OPTION_TEXTS) == 1;
+
+        List<File> ret = new ArrayList<>();
+        List<Object> sel = getAllSelected(tagTree);
+
+        List<ScriptPack> tlsList = new ArrayList<>();
+        JPEGTablesTag jtt = null;
+        for (Tag t : swf.tags) {
+            if (t instanceof JPEGTablesTag) {
+                jtt = (JPEGTablesTag) t;
+                break;
+            }
+        }
+        List<Tag> images = new ArrayList<>();
+        List<Tag> shapes = new ArrayList<>();
+        List<Tag> movies = new ArrayList<>();
+        List<Tag> sounds = new ArrayList<>();
+        List<Tag> texts = new ArrayList<>();
+        List<TagNode> actionNodes = new ArrayList<>();
+        List<Tag> binaryData = new ArrayList<>();
+        for (Object d : sel) {
+            if (d instanceof TagNode) {
+                TagNode n = (TagNode) d;
+                if ("image".equals(getTagType(n.tag))) {
+                    images.add((Tag) n.tag);
+                }
+                if ("shape".equals(getTagType(n.tag))) {
+                    shapes.add((Tag) n.tag);
+                }
+                if ("as".equals(getTagType(n.tag))) {
+                    actionNodes.add(n);
+                }
+                if ("movie".equals(getTagType(n.tag))) {
+                    movies.add((Tag) n.tag);
+                }
+                if ("sound".equals(getTagType(n.tag))) {
+                    sounds.add((Tag) n.tag);
+                }
+                if ("binaryData".equals(getTagType(n.tag))) {
+                    binaryData.add((Tag) n.tag);
+                }
+                if ("text".equals(getTagType(n.tag))) {
+                    texts.add((Tag) n.tag);
+                }
+            }
+            if (d instanceof TreeElement) {
+                if (((TreeElement) d).isLeaf()) {
+                    tlsList.add((ScriptPack) ((TreeElement) d).getItem());
+                }
+            }
+        }
+        ret.addAll(swf.exportImages(selFile + File.separator + "images", images));
+        ret.addAll(SWF.exportShapes(selFile + File.separator + "shapes", shapes));
+        ret.addAll(swf.exportTexts(selFile + File.separator + "texts", texts, isFormatted));
+        ret.addAll(swf.exportMovies(selFile + File.separator + "movies", movies));
+        ret.addAll(swf.exportSounds(selFile + File.separator + "sounds", sounds, isMp3OrWav, isMp3OrWav));
+        ret.addAll(swf.exportBinaryData(selFile + File.separator + "binaryData", binaryData));
+        if (abcPanel != null) {
+            for (int i = 0; i < tlsList.size(); i++) {
+                ScriptPack tls = tlsList.get(i);
+                Main.startWork("Exporting " + (i + 1) + "/" + tlsList.size() + " " + tls.getPath() + " ...");
+                ret.add(tls.export(selFile, abcList, isPcode, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE)));
+            }
+        } else {
+            List<TagNode> allNodes = new ArrayList<>();
+            TagNode asn = getASTagNode(tagTree);
+            if (asn != null) {
+                allNodes.add(asn);
+                TagNode.setExport(allNodes, false);
+                TagNode.setExport(actionNodes, true);
+                ret.addAll(TagNode.exportNodeAS(allNodes, selFile, isPcode));
+            }
+        }
+        return ret;
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
@@ -1567,9 +1741,16 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                 int returnVal = fc.showSaveDialog(f);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     Configuration.setConfig("lastOpenDir", Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
-                    final File selfile = Helper.fixDialogFile(fc.getSelectedFile());
+                    File sf = Helper.fixDialogFile(fc.getSelectedFile());
+
                     Main.startWork("Exporting FLA...");
                     final boolean compressed = fc.getFileFilter() == fla;
+                    if (!compressed) {
+                        if (sf.getName().endsWith(".fla")) {
+                            sf = new File(sf.getAbsolutePath().substring(0, sf.getAbsolutePath().length() - 4) + ".xfl");
+                        }
+                    }
+                    final File selfile = sf;
                     (new Thread() {
                         @Override
                         public void run() {
@@ -1583,6 +1764,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                     }).start();
                 }
                 break;
+            case "EXPORTSEL":
             case "EXPORT":
                 final ExportDialog export = new ExportDialog();
                 export.setVisible(true);
@@ -1606,76 +1788,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                             public void run() {
                                 try {
                                     if (onlySel) {
-                                        List<Object> sel = getAllSelected(tagTree);
-
-                                        List<ScriptPack> tlsList = new ArrayList<>();
-                                        JPEGTablesTag jtt = null;
-                                        for (Tag t : swf.tags) {
-                                            if (t instanceof JPEGTablesTag) {
-                                                jtt = (JPEGTablesTag) t;
-                                                break;
-                                            }
-                                        }
-                                        List<Tag> images = new ArrayList<>();
-                                        List<Tag> shapes = new ArrayList<>();
-                                        List<Tag> movies = new ArrayList<>();
-                                        List<Tag> sounds = new ArrayList<>();
-                                        List<Tag> texts = new ArrayList<>();
-                                        List<TagNode> actionNodes = new ArrayList<>();
-                                        List<Tag> binaryData = new ArrayList<>();
-                                        for (Object d : sel) {
-                                            if (d instanceof TagNode) {
-                                                TagNode n = (TagNode) d;
-                                                if ("image".equals(getTagType(n.tag))) {
-                                                    images.add((Tag) n.tag);
-                                                }
-                                                if ("shape".equals(getTagType(n.tag))) {
-                                                    shapes.add((Tag) n.tag);
-                                                }
-                                                if ("as".equals(getTagType(n.tag))) {
-                                                    actionNodes.add(n);
-                                                }
-                                                if ("movie".equals(getTagType(n.tag))) {
-                                                    movies.add((Tag) n.tag);
-                                                }
-                                                if ("sound".equals(getTagType(n.tag))) {
-                                                    sounds.add((Tag) n.tag);
-                                                }
-                                                if ("binaryData".equals(getTagType(n.tag))) {
-                                                    binaryData.add((Tag) n.tag);
-                                                }
-                                                if ("text".equals(getTagType(n.tag))) {
-                                                    texts.add((Tag) n.tag);
-                                                }
-                                            }
-                                            if (d instanceof TreeElement) {
-                                                if (((TreeElement) d).isLeaf()) {
-                                                    tlsList.add((ScriptPack) ((TreeElement) d).getItem());
-                                                }
-                                            }
-                                        }
-                                        swf.exportImages(selFile + File.separator + "images", images);
-                                        SWF.exportShapes(selFile + File.separator + "shapes", shapes);
-                                        swf.exportTexts(selFile + File.separator + "texts", texts, isFormatted);
-                                        swf.exportMovies(selFile + File.separator + "movies", movies);
-                                        swf.exportSounds(selFile + File.separator + "sounds", sounds, isMp3OrWav, isMp3OrWav);
-                                        swf.exportBinaryData(selFile + File.separator + "binaryData", binaryData);
-                                        if (abcPanel != null) {
-                                            for (int i = 0; i < tlsList.size(); i++) {
-                                                ScriptPack tls = tlsList.get(i);
-                                                Main.startWork("Exporting " + (i + 1) + "/" + tlsList.size() + " " + tls.getPath() + " ...");
-                                                tls.export(selFile, abcList, isPcode, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
-                                            }
-                                        } else {
-                                            List<TagNode> allNodes = new ArrayList<>();
-                                            TagNode asn = getASTagNode(tagTree);
-                                            if (asn != null) {
-                                                allNodes.add(asn);
-                                                TagNode.setExport(allNodes, false);
-                                                TagNode.setExport(actionNodes, true);
-                                                TagNode.exportNodeAS(allNodes, selFile, isPcode);
-                                            }
-                                        }
+                                        exportSelection(selFile, export);
                                     } else {
                                         swf.exportImages(selFile + File.separator + "images");
                                         swf.exportShapes(selFile + File.separator + "shapes");
