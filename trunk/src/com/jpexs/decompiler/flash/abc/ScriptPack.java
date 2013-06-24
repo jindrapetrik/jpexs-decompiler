@@ -96,16 +96,16 @@ public class ScriptPack {
         return Helper.joinStrings(pathParts, File.separator);
     }
 
-    public void export(String directory, List<ABCContainerTag> abcList, boolean pcode, boolean paralel) throws IOException {
+    public File export(String directory, List<ABCContainerTag> abcList, boolean pcode, boolean paralel) throws IOException {
         String scriptName = getPathScriptName();
         String packageName = getPathPackage();
-
         File outDir = new File(directory + File.separatorChar + makeDirPath(packageName));
         if (!outDir.exists()) {
             outDir.mkdirs();
         }
         String fileName = outDir.toString() + File.separator + Helper.makeFileName(scriptName) + ".as";
-        try (FileOutputStream fos = new FileOutputStream(fileName)) {
+        File file = new File(fileName);
+        try (FileOutputStream fos = new FileOutputStream(file)) {
             for (int t : traitIndices) {
                 Multiname name = abc.script_info[scriptIndex].traits.traits[t].getName(abc);
                 Namespace ns = name.getNamespace(abc.constants);
@@ -116,5 +116,6 @@ public class ScriptPack {
                 }
             }
         }
+        return file;
     }
 }

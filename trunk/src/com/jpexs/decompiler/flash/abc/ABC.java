@@ -38,8 +38,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
@@ -659,7 +662,7 @@ public class ABC {
         export(directory, pcode, abcList, "", paralel);
     }
 
-    private class ExportPackTask implements Runnable {
+    private class ExportPackTask implements Callable<File> {
 
         ScriptPack pack;
         String directory;
@@ -683,34 +686,49 @@ public class ABC {
             this.paralel = paralel;
         }
 
+
         @Override
-        public void run() {
+        public File call() throws Exception {
             try {
-                pack.export(directory, abcList, pcode, paralel);
+                return pack.export(directory, abcList, pcode, paralel);
             } catch (IOException ex) {
                 Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, ex);
             }
             synchronized (ABC.class) {
                 informListeners("export", "Exported " + informStr + " script " + index.getAndIncrement() + "/" + count + " " + path);
             }
+            return null;
         }
     }
 
-    public void export(String directory, boolean pcode, List<ABCContainerTag> abcList, String abcStr, boolean paralel) throws IOException {
+    public List<File> export(String directory, boolean pcode, List<ABCContainerTag> abcList, String abcStr, boolean paralel) throws IOException {    
         ExecutorService executor = Executors.newFixedThreadPool(20);
+        List<Future<File>> futureResults = new ArrayList<>();
         AtomicInteger cnt = new AtomicInteger(1);
         for (int i = 0; i < script_info.length; i++) {
             HashMap<String, ScriptPack> packs = script_info[i].getPacks(this, i);
             for (String path : packs.keySet()) {
-                executor.execute(new ExportPackTask(cnt, script_info.length, path, packs.get(path), directory, abcList, pcode, abcStr, paralel));
+                Future<File> future = executor.submit(new ExportPackTask(cnt, script_info.length, path, packs.get(path), directory, abcList, pcode, abcStr, paralel));
+                futureResults.add(future);
             }
         }
+        
+        List<File> ret=new ArrayList<>();
+        for (int f = 0; f < futureResults.size(); f++) {
+            try {
+                ret.add(futureResults.get(f).get());
+            } catch (InterruptedException | ExecutionException ex) {
+                Logger.getLogger(Traits.class.getName()).log(Level.SEVERE, "Error during ABC export", ex);
+            }
+        }
+        
         try {
             executor.shutdown();
             executor.awaitTermination(30, TimeUnit.MINUTES);
         } catch (InterruptedException ex) {
             Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, "30 minutes ActionScript export limit reached", ex);
         }
+        return ret;
     }
 
     public void dump(OutputStream os) {
