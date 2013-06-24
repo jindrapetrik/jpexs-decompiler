@@ -227,13 +227,13 @@ public class TagNode {
         }
     }
 
-    public static boolean exportNodeAS(List<TagNode> nodeList, String outdir, boolean isPcode) {
+    public static List<File> exportNodeAS(List<TagNode> nodeList, String outdir, boolean isPcode) {
         return exportNodeAS(nodeList, outdir, isPcode, null);
     }
 
-    public static boolean exportNodeAS(List<TagNode> nodeList, String outdir, boolean isPcode, EventListener ev) {
+    public static List<File> exportNodeAS(List<TagNode> nodeList, String outdir, boolean isPcode, EventListener ev) {
         File dir = new File(outdir);
-
+        List<File> ret=new ArrayList<>();
         if (!outdir.endsWith(File.separator)) {
             outdir = outdir + File.separator;
         }
@@ -259,28 +259,30 @@ public class TagNode {
                     }
                     try {
                         String f = outdir + name + ".as";
+                        File file=new File(f);
                         if (ev != null) {
                             ev.handleEvent("export", "Exporting " + f + " ...");
                         }
-                        String ret;
+                        String res;
                         if (isPcode) {
-                            ret = Highlighting.stripHilights(((ASMSource) node.tag).getASMSource(SWF.DEFAULT_VERSION, false));
+                            res = Highlighting.stripHilights(((ASMSource) node.tag).getASMSource(SWF.DEFAULT_VERSION, false));
                         } else {
                             List<Action> as = ((ASMSource) node.tag).getActions(SWF.DEFAULT_VERSION);
                             Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
-                            ret = (Highlighting.stripHilights(Action.actionsToSource(as, SWF.DEFAULT_VERSION)));
+                            res = (Highlighting.stripHilights(Action.actionsToSource(as, SWF.DEFAULT_VERSION)));
                         }
                         try (FileOutputStream fos = new FileOutputStream(f)) {
-                            fos.write(ret.getBytes("utf-8"));
+                            fos.write(res.getBytes("utf-8"));
                         }
+                        ret.add(file);
                     } catch (Exception ex) {
                     }
                 }
             } else {
-                exportNodeAS(node.subItems, outdir + name, isPcode, ev);
+                ret.addAll(exportNodeAS(node.subItems, outdir + name, isPcode, ev));
             }
 
         }
-        return true;
+        return ret;
     }
 }
