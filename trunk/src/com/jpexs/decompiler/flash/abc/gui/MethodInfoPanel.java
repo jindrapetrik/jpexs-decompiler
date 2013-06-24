@@ -102,7 +102,10 @@ public class MethodInfoPanel extends JPanel {
             p++;
         }
         if (methodInfo.flagNeed_rest()) {
-            ret += ",\n... rest";
+            if (p > 0) {
+                ret += ",\n";
+            }
+            ret += "... rest";
         }
         paramEditor.setText(ret);
         if (methodInfo.ret_type == 0) {
