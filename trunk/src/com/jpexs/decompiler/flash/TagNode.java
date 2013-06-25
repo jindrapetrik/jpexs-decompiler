@@ -233,7 +233,7 @@ public class TagNode {
 
     public static List<File> exportNodeAS(List<TagNode> nodeList, String outdir, boolean isPcode, EventListener ev) {
         File dir = new File(outdir);
-        List<File> ret=new ArrayList<>();
+        List<File> ret = new ArrayList<>();
         if (!outdir.endsWith(File.separator)) {
             outdir = outdir + File.separator;
         }
@@ -259,7 +259,7 @@ public class TagNode {
                     }
                     try {
                         String f = outdir + name + ".as";
-                        File file=new File(f);
+                        File file = new File(f);
                         if (ev != null) {
                             ev.handleEvent("export", "Exporting " + f + " ...");
                         }

@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.abc.gui.TreeElement;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.action.gui.ActionPanel;
+import static com.jpexs.decompiler.flash.gui.Main.isAssociated;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
@@ -89,6 +90,7 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
+import com.sun.jna.Platform;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -126,6 +128,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BoxLayout;
@@ -212,6 +216,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     private JPanel imageButtonsPanel;
     private JCheckBoxMenuItem miInternalViewer;
     private JCheckBoxMenuItem miParallelSpeedUp;
+    private JCheckBoxMenuItem miAssociate;
 
     public void setPercent(int percent) {
         progressBar.setValue(percent);
@@ -335,7 +340,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         autoDeobfuscateMenuItem.addActionListener(this);
         autoDeobfuscateMenuItem.setActionCommand("AUTODEOBFUSCATE");
 
-        menuDeobfuscation.add(autoDeobfuscateMenuItem);
+
         JCheckBoxMenuItem miSubLimiter = new JCheckBoxMenuItem("Enable sub limiter");
         miSubLimiter.setActionCommand("SUBLIMITER");
         miSubLimiter.addActionListener(this);
@@ -406,13 +411,12 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         }
         miInternalViewer.setActionCommand("INTERNALVIEWERSWITCH");
         miInternalViewer.addActionListener(this);
-        menuTools.add(miInternalViewer);
 
         miParallelSpeedUp = new JCheckBoxMenuItem("Parallel SpeedUp");
         miParallelSpeedUp.setSelected((Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
         miParallelSpeedUp.setActionCommand("PARALLELSPEEDUP");
         miParallelSpeedUp.addActionListener(this);
-        menuTools.add(miParallelSpeedUp);
+
 
         menuTools.add(miProxy);
 
@@ -427,6 +431,21 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         }
         menuBar.add(menuTools);
 
+        JMenu menuSettings = new JMenu("Settings");
+        menuSettings.add(autoDeobfuscateMenuItem);
+        menuSettings.add(miInternalViewer);
+        menuSettings.add(miParallelSpeedUp);
+
+
+        miAssociate = new JCheckBoxMenuItem("Add FFDec to SWF files context menu");
+        miAssociate.setActionCommand("ASSOCIATE");
+        miAssociate.addActionListener(this);
+        miAssociate.setState(isAssociated());
+        if (Platform.isWindows()) {
+            menuSettings.add(miAssociate);
+        }
+
+        menuBar.add(menuSettings);
         JMenu menuHelp = new JMenu("Help");
         JMenuItem miAbout = new JMenuItem("About...");
         miAbout.setIcon(View.getIcon("about16"));
@@ -1441,6 +1460,20 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
+            case "ASSOCIATE":
+                if (miAssociate.getState() == Main.isAssociated()) {
+                    return;
+                }
+                Main.associate(miAssociate.getState());
+
+                //Update checkbox menuitem accordingly (User can cancel rights elevation)
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        miAssociate.setState(Main.isAssociated());
+                    }
+                }, 500); //It takes some time registry change to apply
+                break;
             case "GOTODOCUMENTCLASS":
                 String documentClass = null;
                 loopdc:

@@ -686,7 +686,6 @@ public class ABC {
             this.paralel = paralel;
         }
 
-
         @Override
         public File call() throws Exception {
             try {
@@ -701,7 +700,7 @@ public class ABC {
         }
     }
 
-    public List<File> export(String directory, boolean pcode, List<ABCContainerTag> abcList, String abcStr, boolean paralel) throws IOException {    
+    public List<File> export(String directory, boolean pcode, List<ABCContainerTag> abcList, String abcStr, boolean paralel) throws IOException {
         ExecutorService executor = Executors.newFixedThreadPool(20);
         List<Future<File>> futureResults = new ArrayList<>();
         AtomicInteger cnt = new AtomicInteger(1);
@@ -712,8 +711,8 @@ public class ABC {
                 futureResults.add(future);
             }
         }
-        
-        List<File> ret=new ArrayList<>();
+
+        List<File> ret = new ArrayList<>();
         for (int f = 0; f < futureResults.size(); f++) {
             try {
                 ret.add(futureResults.get(f).get());
@@ -721,7 +720,7 @@ public class ABC {
                 Logger.getLogger(Traits.class.getName()).log(Level.SEVERE, "Error during ABC export", ex);
             }
         }
-        
+
         try {
             executor.shutdown();
             executor.awaitTermination(30, TimeUnit.MINUTES);

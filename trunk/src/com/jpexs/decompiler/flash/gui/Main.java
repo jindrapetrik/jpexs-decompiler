@@ -22,9 +22,17 @@ import com.jpexs.decompiler.flash.PercentListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.Version;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.Advapi32Util;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.Kernel32;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.SHELLEXECUTEINFO;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.Shell32;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinReg;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinUser;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.flash.helpers.Helper;
+import com.sun.jna.Platform;
+import com.sun.jna.WString;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,9 +40,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.*;
 import java.net.Socket;
+import java.net.URLDecoder;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Properties;
 import java.util.logging.ConsoleHandler;
@@ -420,6 +430,18 @@ public class Main {
         System.out.println("java -jar ffdec.jar -decompress myfiledec.swf myfile.swf");
     }
 
+    private static void offerAssociation() {
+        boolean offered = (Boolean) Configuration.getConfig("offeredAssociation", Boolean.FALSE);
+        if (!offered) {
+            if (Platform.isWindows()) {
+                if ((!isAssociated()) && JOptionPane.showConfirmDialog(null, "Do you want to add FFDec to context menu of SWF files?\n(Can be changed later from main menu)", "Context menu", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                    associate(true);
+                }
+            }
+        }
+        Configuration.setConfig("offeredAssociation", Boolean.TRUE);
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -438,9 +460,14 @@ public class Main {
         initLogging(Configuration.debugMode);
         if (args.length < pos + 1) {
             autoCheckForUpdates();
+            offerAssociation();
             showModeFrame();
         } else {
-            if (args[pos].equals("-proxy")) {
+            if (args[pos].equals("-unassociate")) {
+                associate(false);
+            } else if (args[pos].equals("-associate")) {
+                associate(true);
+            } else if (args[pos].equals("-proxy")) {
                 int port = 55555;
                 for (int i = pos; i < args.length; i++) {
                     if (args[i].startsWith("-P")) {
@@ -461,35 +488,24 @@ public class Main {
                 if (args.length < pos + 4) {
                     badArguments();
                 }
-                String exportFormat = args[pos + 1];
-                if (!exportFormat.toLowerCase().equals("as")) {
-                    if (!exportFormat.toLowerCase().equals("pcode")) {
-                        if (!exportFormat.toLowerCase().equals("image")) {
-                            if (!exportFormat.toLowerCase().equals("shape")) {
-                                if (!exportFormat.toLowerCase().equals("movie")) {
-                                    if (!exportFormat.toLowerCase().equals("sound")) {
-                                        if (!exportFormat.toLowerCase().equals("binaryData")) {
-                                            if (!exportFormat.toLowerCase().equals("text")) {
-                                                if (!exportFormat.toLowerCase().equals("textplain")) {
-                                                    if (!exportFormat.toLowerCase().equals("all")) {
-                                                        if (!exportFormat.toLowerCase().equals("fla")) {
-                                                            if (!exportFormat.toLowerCase().equals("xfl")) {
-                                                                System.err.println("Invalid export format:" + exportFormat);
-                                                                badArguments();
-                                                            }
-                                                        }
-
-                                                    }
-
-                                                }
-                                            }
-
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                String validExportFormats[] = new String[]{
+                    "as",
+                    "pcode",
+                    "image",
+                    "shape",
+                    "movie",
+                    "sound",
+                    "binarydata",
+                    "text",
+                    "textplain",
+                    "all",
+                    "fla",
+                    "xfl"
+                };
+                String exportFormat = args[pos + 1].toLowerCase();
+                if (!Arrays.asList(validExportFormats).contains(exportFormat)) {
+                    System.err.println("Invalid export format:" + exportFormat);
+                    badArguments();
                 }
                 File outDir = new File(args[pos + 2]);
                 File inFile = new File(args[pos + 3]);
@@ -510,60 +526,74 @@ public class Main {
                             }
                         }
                     });
-                    if (exportFormat.equals("all")) {
-                        System.out.println("Exporting images...");
-                        exfile.exportImages(outDir.getAbsolutePath() + File.separator + "images");
-                        System.out.println("Exporting shapes...");
-                        exfile.exportShapes(outDir.getAbsolutePath() + File.separator + "shapes");
-                        System.out.println("Exporting scripts...");
-                        exfile.exportActionScript(outDir.getAbsolutePath() + File.separator + "scripts", false, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
-                        System.out.println("Exporting movies...");
-                        exfile.exportMovies(outDir.getAbsolutePath() + File.separator + "movies");
-                        System.out.println("Exporting sounds...");
-                        exfile.exportSounds(outDir.getAbsolutePath() + File.separator + "sounds", true, true);
-                        System.out.println("Exporting binaryData...");
-                        exfile.exportBinaryData(outDir.getAbsolutePath() + File.separator + "binaryData");
-                        System.out.println("Exporting texts...");
-                        exfile.exportTexts(outDir.getAbsolutePath() + File.separator + "texts", true);
-                        exportOK = true;
-                    } else if (exportFormat.equals("image")) {
-                        exfile.exportImages(outDir.getAbsolutePath());
-                        exportOK = true;
-                    } else if (exportFormat.equals("shape")) {
-                        exfile.exportShapes(outDir.getAbsolutePath());
-                        exportOK = true;
-                    } else if (exportFormat.equals("as") || exportFormat.equals("pcode")) {
-                        if ((pos + 5 < args.length) && (args[pos + 4].equals("-selectas3class"))) {
+
+                    switch (exportFormat) {
+                        case "all":
+                            System.out.println("Exporting images...");
+                            exfile.exportImages(outDir.getAbsolutePath() + File.separator + "images");
+                            System.out.println("Exporting shapes...");
+                            exfile.exportShapes(outDir.getAbsolutePath() + File.separator + "shapes");
+                            System.out.println("Exporting scripts...");
+                            exfile.exportActionScript(outDir.getAbsolutePath() + File.separator + "scripts", false, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                            System.out.println("Exporting movies...");
+                            exfile.exportMovies(outDir.getAbsolutePath() + File.separator + "movies");
+                            System.out.println("Exporting sounds...");
+                            exfile.exportSounds(outDir.getAbsolutePath() + File.separator + "sounds", true, true);
+                            System.out.println("Exporting binaryData...");
+                            exfile.exportBinaryData(outDir.getAbsolutePath() + File.separator + "binaryData");
+                            System.out.println("Exporting texts...");
+                            exfile.exportTexts(outDir.getAbsolutePath() + File.separator + "texts", true);
                             exportOK = true;
-                            for (int i = pos + 5; i < args.length; i++) {
-                                exportOK = exportOK && exfile.exportAS3Class(args[i], outDir.getAbsolutePath(), exportFormat.equals("pcode"), (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                            break;
+                        case "image":
+                            exfile.exportImages(outDir.getAbsolutePath());
+                            exportOK = true;
+                            break;
+                        case "shape":
+                            exfile.exportShapes(outDir.getAbsolutePath());
+                            exportOK = true;
+                            break;
+                        case "as":
+                        case "pcode":
+                            if ((pos + 5 < args.length) && (args[pos + 4].equals("-selectas3class"))) {
+                                exportOK = true;
+                                for (int i = pos + 5; i < args.length; i++) {
+                                    exportOK = exportOK && exfile.exportAS3Class(args[i], outDir.getAbsolutePath(), exportFormat.equals("pcode"), (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                                }
+                            } else {
+                                exportOK = !exfile.exportActionScript(outDir.getAbsolutePath(), exportFormat.equals("pcode"), (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE)).isEmpty();
                             }
-                        } else {
-                            exportOK = !exfile.exportActionScript(outDir.getAbsolutePath(), exportFormat.equals("pcode"), (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE)).isEmpty();
-                        }
-                    } else if (exportFormat.equals("movie")) {
-                        exfile.exportMovies(outDir.getAbsolutePath());
-                        exportOK = true;
-                    } else if (exportFormat.equals("sound")) {
-                        exfile.exportSounds(outDir.getAbsolutePath(), true, true);
-                        exportOK = true;
-                    } else if (exportFormat.equals("binaryData")) {
-                        exfile.exportBinaryData(outDir.getAbsolutePath());
-                        exportOK = true;
-                    } else if (exportFormat.equals("text")) {
-                        exfile.exportTexts(outDir.getAbsolutePath(), true);
-                        exportOK = true;
-                    } else if (exportFormat.equals("textplain")) {
-                        exfile.exportTexts(outDir.getAbsolutePath(), false);
-                        exportOK = true;
-                    } else if (exportFormat.equals("fla")) {
-                        exfile.exportFla(outDir.getAbsolutePath(), inFile.getName(), applicationName, applicationVerName, version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
-                        exportOK = true;
-                    } else if (exportFormat.equals("xfl")) {
-                        exfile.exportXfl(outDir.getAbsolutePath(), inFile.getName(), applicationName, applicationVerName, version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
-                        exportOK = true;
-                    } else {
-                        exportOK = false;
+                            break;
+                        case "movie":
+                            exfile.exportMovies(outDir.getAbsolutePath());
+                            exportOK = true;
+                            break;
+                        case "sound":
+                            exfile.exportSounds(outDir.getAbsolutePath(), true, true);
+                            exportOK = true;
+                            break;
+                        case "binarydata":
+                            exfile.exportBinaryData(outDir.getAbsolutePath());
+                            exportOK = true;
+                            break;
+                        case "text":
+                            exfile.exportTexts(outDir.getAbsolutePath(), true);
+                            exportOK = true;
+                            break;
+                        case "textplain":
+                            exfile.exportTexts(outDir.getAbsolutePath(), false);
+                            exportOK = true;
+                            break;
+                        case "fla":
+                            exfile.exportFla(outDir.getAbsolutePath(), inFile.getName(), applicationName, applicationVerName, version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                            exportOK = true;
+                            break;
+                        case "xfl":
+                            exfile.exportXfl(outDir.getAbsolutePath(), inFile.getName(), applicationName, applicationVerName, version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                            exportOK = true;
+                            break;
+                        default:
+                            exportOK = false;
                     }
                 } catch (Exception ex) {
                     exportOK = false;
@@ -618,6 +648,7 @@ public class Main {
                 System.exit(0);
             } else if (args.length == pos + 1) {
                 autoCheckForUpdates();
+                offerAssociation();
                 openFile(args[pos]);
             } else {
                 badArguments();
@@ -935,5 +966,82 @@ public class Main {
 
     private static String getConfigFile() {
         return getFFDecHome() + CONFIG_NAME;
+    }
+
+    public static boolean isAssociated() {
+        if (!Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, ".swf")) {
+            return false;
+        }
+        String clsName = Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, ".swf", "");
+        if (clsName == null) {
+            return false;
+        }
+        return Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, clsName + "\\shell\\ffdec");
+    }
+
+    public static String getAppDir() {
+        String appDir = "";
+        try {
+            appDir = new File(URLDecoder.decode(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8")).getParentFile().getAbsolutePath();
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(FlashPlayerPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if (!appDir.endsWith("\\")) {
+            appDir += "\\";
+        }
+        return appDir;
+    }
+
+    public static boolean associate(boolean value) {
+        if (value == isAssociated()) {
+            return true;
+        }
+
+        String appDir = getAppDir();
+
+        try {
+            if (!Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, ".swf")) {
+                Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, ".swf");
+                Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, ".swf", "", "ShockwaveFlash.ShockwaveFlash");
+            }
+
+            String clsName = Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, ".swf", "");
+            if (!Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, clsName)) {
+                Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, clsName);
+                Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, clsName, "", "Flash Movie");
+            }
+
+            if (!Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, clsName + "\\shell")) {
+                Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, clsName + "\\shell");
+            }
+
+            boolean exists = Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, clsName + "\\shell\\ffdec");
+
+            //String shellName = WinRegistry.readString(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\Classes\\" + clsName + "\\shell\\ffdec", "");
+            if ((!exists) && value) {
+                Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, clsName + "\\shell\\ffdec");
+                Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, clsName + "\\shell\\ffdec", "", "Open with FFDec");
+                Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, clsName + "\\shell\\ffdec\\command");
+                Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, clsName + "\\shell\\ffdec\\command", "", "\"" + appDir + "ffdec.exe\" \"%1\"");
+                return true;
+            }
+            if (exists && (!value)) { //unassociate
+                Advapi32Util.registryDeleteKey(WinReg.HKEY_CLASSES_ROOT, clsName + "\\shell\\ffdec\\command");
+                Advapi32Util.registryDeleteKey(WinReg.HKEY_CLASSES_ROOT, clsName + "\\shell\\ffdec");
+                return true;
+            }
+        } catch (Exception ex) {
+            //Updating registry failed, try elevating rights
+            SHELLEXECUTEINFO sei = new SHELLEXECUTEINFO();
+            sei.fMask = 0x00000040;
+            sei.lpVerb = new WString("runas");
+            sei.lpFile = new WString(appDir + "ffdec.exe");
+            sei.lpParameters = new WString(value ? "-associate" : "-unassociate");
+            sei.nShow = WinUser.SW_NORMAL;
+            Shell32.INSTANCE.ShellExecuteEx(sei);
+            //Wait till exit
+            Kernel32.INSTANCE.WaitForSingleObject(sei.hProcess, 1000 * 60 * 60 * 24 /*1 day max*/);
+        }
+        return false;
     }
 }

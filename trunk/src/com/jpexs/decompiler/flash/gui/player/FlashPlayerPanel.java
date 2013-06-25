@@ -2,12 +2,12 @@ package com.jpexs.decompiler.flash.gui.player;
 
 import com.jpexs.decompiler.flash.gui.FlashUnsupportedException;
 import com.jpexs.decompiler.flash.gui.Main;
-import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.Kernel32;
-import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.SHELLEXECUTEINFO;
-import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.Shell32;
-import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.WinDef;
-import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.WinNT.HANDLE;
-import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.WinUser;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.Kernel32;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.SHELLEXECUTEINFO;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.Shell32;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinDef;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinNT.HANDLE;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinUser;
 import com.sun.jna.Native;
 import com.sun.jna.Platform;
 import com.sun.jna.WString;

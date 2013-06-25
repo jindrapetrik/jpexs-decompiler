@@ -10,10 +10,10 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  */
-package com.jpexs.decompiler.flash.gui.player.jna.platform.win32;
+package com.jpexs.decompiler.flash.gui.jna.platform.win32;
 
-import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.BaseTSD.LONG_PTR;
-import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.WinNT.HANDLE;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.BaseTSD.LONG_PTR;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.IntegerType;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;

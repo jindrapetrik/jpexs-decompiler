@@ -10,18 +10,18 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the GNU
  * Lesser General Public License for more details.
  */
-package com.jpexs.decompiler.flash.gui.player.jna.platform.win32;
+package com.jpexs.decompiler.flash.gui.jna.platform.win32;
 
-import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.BaseTSD.ULONG_PTR;
-import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.WinDef.HBRUSH;
-import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.WinDef.HCURSOR;
-import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.WinDef.HICON;
-import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.WinDef.HINSTANCE;
-import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.WinDef.HWND;
-import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.WinDef.LPARAM;
-import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.WinDef.LRESULT;
-import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.WinDef.WPARAM;
-import com.jpexs.decompiler.flash.gui.player.jna.platform.win32.WinNT.HANDLE;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.BaseTSD.ULONG_PTR;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinDef.HBRUSH;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinDef.HCURSOR;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinDef.HICON;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinDef.HINSTANCE;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinDef.HWND;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinDef.LPARAM;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinDef.LRESULT;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinDef.WPARAM;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.Callback;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;

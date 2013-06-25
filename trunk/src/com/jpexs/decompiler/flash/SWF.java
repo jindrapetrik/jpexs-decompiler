@@ -490,7 +490,7 @@ public class SWF {
 
     public List<File> exportActionScript(String outdir, boolean isPcode, boolean paralel) throws Exception {
         boolean asV3Found = false;
-        List<File> ret=new ArrayList<>();
+        List<File> ret = new ArrayList<>();
         final EventListener evl = new EventListener() {
             @Override
             public void handleEvent(String event, Object data) {
@@ -954,7 +954,7 @@ public class SWF {
                     }
                 }
             }
-            if(file!=null){
+            if (file != null) {
                 ret.add(file);
             }
         }
@@ -1130,7 +1130,7 @@ public class SWF {
     }
 
     public static List<File> exportBinaryData(String outdir, List<Tag> tags) throws IOException {
-        List<File> ret=new ArrayList<>();
+        List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
         }
@@ -1143,7 +1143,7 @@ public class SWF {
                 if (t instanceof CharacterTag) {
                     characterID = ((CharacterTag) t).getCharacterID();
                 }
-                File file=new File(outdir + File.separator + characterID + ".bin");
+                File file = new File(outdir + File.separator + characterID + ".bin");
                 try (FileOutputStream fos = new FileOutputStream(file)) {
                     fos.write(((DefineBinaryDataTag) t).binaryData);
                 }

@@ -10,7 +10,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  */
-package com.jpexs.decompiler.flash.gui.player.jna.platform.win32;
+package com.jpexs.decompiler.flash.gui.jna.platform.win32;
 
 import com.sun.jna.Native;
 import com.sun.jna.ptr.IntByReference;
@@ -139,4 +139,26 @@ public interface Kernel32 extends WinNT {
 //        __in HANDLE hNamedPipe
 //        );
     boolean DisconnectNamedPipe(HANDLE hNamedPipe);
+
+    /**
+     * Waits until the specified object is in the signaled state or the time-out
+     * interval elapses. To enter an alertable wait state, use the
+     * WaitForSingleObjectEx function. To wait for multiple objects, use the
+     * WaitForMultipleObjects.
+     *
+     * @param hHandle A handle to the object. For a list of the object types
+     * whose handles can be specified, see the following Remarks section. If
+     * this handle is closed while the wait is still pending, the function's
+     * behavior is undefined. The handle must have the SYNCHRONIZE access right.
+     * For more information, see Standard Access Rights.
+     * @param dwMilliseconds The time-out interval, in milliseconds. If a
+     * nonzero value is specified, the function waits until the object is
+     * signaled or the interval elapses. If dwMilliseconds is zero, the function
+     * does not enter a wait state if the object is not signaled; it always
+     * returns immediately. If dwMilliseconds is INFINITE, the function will
+     * return only when the object is signaled.
+     * @return If the function succeeds, the return value indicates the event
+     * that caused the function to return.
+     */
+    int WaitForSingleObject(HANDLE hHandle, int dwMilliseconds);
 }

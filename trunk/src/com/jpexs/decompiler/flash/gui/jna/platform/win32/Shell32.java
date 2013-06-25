@@ -10,7 +10,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.  
  */
-package com.jpexs.decompiler.flash.gui.player.jna.platform.win32;
+package com.jpexs.decompiler.flash.gui.jna.platform.win32;
 
 import com.sun.jna.Native;
 import com.sun.jna.win32.StdCallLibrary;
