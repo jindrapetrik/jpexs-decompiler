@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.action.treemodel.*;
 import com.jpexs.decompiler.flash.action.treemodel.clauses.*;
+import com.jpexs.decompiler.flash.graph.CommentItem;
 import com.jpexs.decompiler.flash.graph.Graph;
 import com.jpexs.decompiler.flash.graph.GraphSource;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
@@ -800,7 +801,14 @@ public class Action implements GraphSourceItem {
                         outs.add(new ArrayList<GraphTargetItem>());
                         continue;
                     }
-                    List<GraphTargetItem> out = ActionGraph.translateViaGraph(cnt.getRegNames(), variables, functions, actions.subList(adr2ip(actions, endAddr, version), adr2ip(actions, endAddr + size, version)), version);
+                    List<GraphTargetItem> out;
+                    try {
+                        out = ActionGraph.translateViaGraph(cnt.getRegNames(), variables, functions, actions.subList(adr2ip(actions, endAddr, version), adr2ip(actions, endAddr + size, version)), version);
+                    } catch (RuntimeException re) {
+                        out = new ArrayList<>();
+                        out.add(new CommentItem("Error " + re.getMessage()));
+                        Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Error during container translation", re);
+                    }
                     outs.add(out);
                     endAddr += size;
                 }

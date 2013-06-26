@@ -100,7 +100,7 @@ public class ActionStoreRegister extends Action {
         if (value instanceof IncrementTreeItem) {
             GraphTargetItem obj = ((IncrementTreeItem) value).object;
             if (!stack.isEmpty()) {
-                if (stack.peek().equals(obj)) {
+                if (stack.peek().valueEquals(obj)) {
                     stack.pop();
                     stack.push(new PostIncrementTreeItem(this, obj));
                     stack.push(obj);
@@ -111,7 +111,7 @@ public class ActionStoreRegister extends Action {
         if (value instanceof DecrementTreeItem) {
             GraphTargetItem obj = ((DecrementTreeItem) value).object;
             if (!stack.isEmpty()) {
-                if (stack.peek().equals(obj)) {
+                if (stack.peek().valueEquals(obj)) {
                     stack.pop();
                     stack.push(new PostDecrementTreeItem(this, obj));
                     stack.push(obj);

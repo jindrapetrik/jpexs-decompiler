@@ -195,7 +195,25 @@ public class DirectValueTreeItem extends TreeItem {
     @Override
     public int hashCode() {
         int hash = 7;
+        hash = 71 * hash + Objects.hashCode(this.value);
+        hash = 71 * hash + Objects.hashCode(this.constants);
+        hash = 71 * hash + pos;
         return hash;
+    }
+
+    @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (obj == null) {
+            return false;
+        }
+        final DirectValueTreeItem other = (DirectValueTreeItem) obj;
+        if (!Objects.equals(this.value, other.value)) {
+            return false;
+        }
+        if (!Objects.equals(this.constants, other.constants)) {
+            return false;
+        }
+        return true;
     }
 
     @Override

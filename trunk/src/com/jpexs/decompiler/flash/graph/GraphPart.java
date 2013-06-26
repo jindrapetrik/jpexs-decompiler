@@ -74,7 +74,7 @@ public class GraphPart {
                     return false;
                 }
                 if (l.loopBreak == this) {
-                    return false;
+                    //return false;    //?
                 }
             }
         }

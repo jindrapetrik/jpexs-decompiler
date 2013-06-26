@@ -162,4 +162,8 @@ public abstract class GraphTargetItem {
     public GraphTargetItem getThroughDuplicate() {
         return this;
     }
+
+    public boolean valueEquals(GraphTargetItem target) {
+        return equals(target);
+    }
 }

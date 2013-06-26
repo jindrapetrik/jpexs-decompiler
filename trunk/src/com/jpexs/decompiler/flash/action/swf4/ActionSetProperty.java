@@ -54,7 +54,7 @@ public class ActionSetProperty extends Action {
         if (value.getThroughDuplicate() instanceof IncrementTreeItem) {
             GraphTargetItem obj = ((IncrementTreeItem) value).object;
             if (!stack.isEmpty()) {
-                if (stack.peek().equals(obj)) {
+                if (stack.peek().valueEquals(obj)) {
                     stack.pop();
                     stack.push(new PostIncrementTreeItem(this, obj));
                     return;
@@ -64,7 +64,7 @@ public class ActionSetProperty extends Action {
         if (value instanceof DecrementTreeItem) {
             GraphTargetItem obj = ((DecrementTreeItem) value).object;
             if (!stack.isEmpty()) {
-                if (stack.peek().equals(obj)) {
+                if (stack.peek().valueEquals(obj)) {
                     stack.pop();
                     stack.push(new PostDecrementTreeItem(this, obj));
                     return;

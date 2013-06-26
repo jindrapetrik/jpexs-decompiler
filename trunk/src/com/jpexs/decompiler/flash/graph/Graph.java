@@ -343,7 +343,12 @@ public class Graph {
             return null;
         }
 
-        List<GraphPart> loopContinues = getLoopsContinues(loops);
+        List<GraphPart> loopContinues = new ArrayList<>();//getLoopsContinues(loops);
+        for (Loop l : loops) {
+            if (l.phase == 1) {
+                loopContinues.add(l.loopContinue);
+            }
+        }
 
         for (GraphPart p : parts) {
             if (loopContinues.contains(p)) {
@@ -417,9 +422,9 @@ public class Graph {
              System.out.println("</loops>");*/
             getPrecontinues(null, heads.get(0), loops, null);
             /*System.out.println("<loopspre>");
-             for (Loop el : loops) {
-             System.out.println(el);
-             }
+            for (Loop el : loops) {
+                System.out.println(el);
+            }
              System.out.println("</loopspre>");*/
 
             List<GraphTargetItem> ret = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, heads.get(0), null, loops);
@@ -962,6 +967,9 @@ public class Graph {
             }
             for (int i = currentLoop.breakCandidates.size() - 1; i >= 0; i--) {
                 if (spcheck.contains(currentLoop.breakCandidates.get(i))) {
+                    if (currentLoop.breakCandidates.get(i).start >= code.size()) {
+                        continue;
+                    }
                     currentLoop.breakCandidatesLevels.remove(i);
                     backupCandidates.add(currentLoop.breakCandidates.remove(i));
                 }
@@ -1028,7 +1036,7 @@ public class Graph {
                     }
                     removed.add(found);
                 }
-            } while (found != null);
+            } while ((found != null) && (currentLoop.breakCandidates.size() > 1));
 
             Map<GraphPart, Integer> count = new HashMap<>();
             GraphPart winner = null;
@@ -1237,14 +1245,23 @@ public class Graph {
                 continue;
             }
             if (el.loopBreak == part) {
+                if (currentLoop != null) {
+                    currentLoop.phase = 0;
+                }
                 ret.add(new BreakItem(null, el.id));
                 return ret;
             }
             if (el.loopPreContinue == part) {
+                if (currentLoop != null) {
+                    currentLoop.phase = 0;
+                }
                 ret.add(new ContinueItem(null, el.id));
                 return ret;
             }
             if (el.loopContinue == part) {
+                if (currentLoop != null) {
+                    currentLoop.phase = 0;
+                }
                 ret.add(new ContinueItem(null, el.id));
                 return ret;
             }
@@ -1253,6 +1270,9 @@ public class Graph {
 
 
         if (stopPart.contains(part)) {
+            if (currentLoop != null) {
+                currentLoop.phase = 0;
+            }
             return ret;
         }
 
@@ -1613,14 +1633,18 @@ public class Graph {
 
 
                         List<GraphTargetItem> commands = new ArrayList<>();
-                        loopItem.commands.remove(loopItem.commands.size() - 1);
+
                         if (!bodyBranch.isEmpty()) {
-                            /*exprList.addAll(loopItem.commands);
+                            ret.add(index, loopItem);
+                            /*
+                             loopItem.commands.remove(loopItem.commands.size() - 1);
+                             exprList.addAll(loopItem.commands);
                              commands.addAll(bodyBranch);
                              exprList.add(expr);
                              checkContinueAtTheEnd(commands, currentLoop);
                              ret.add(index, li = new WhileItem(null, currentLoop, exprList, commands));*/
                         } else {
+                            loopItem.commands.remove(loopItem.commands.size() - 1);
                             commands.addAll(loopItem.commands);
                             commands.addAll(bodyBranch);
                             exprList.add(expr);

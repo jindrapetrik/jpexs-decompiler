@@ -426,9 +426,6 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         JMenuItem miGotoDocumentClass = new JMenuItem("Go to document class");
         miGotoDocumentClass.setActionCommand("GOTODOCUMENTCLASS");
         miGotoDocumentClass.addActionListener(this);
-        if (swf.fileAttributes.actionScript3) {
-            menuTools.add(miGotoDocumentClass);
-        }
         menuBar.add(menuTools);
 
         JMenu menuSettings = new JMenu("Settings");
@@ -499,6 +496,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         if (!abcList.isEmpty()) {
             addTab(tabPane, abcPanel = new ABCPanel(abcList), "ActionScript3", View.getIcon("as16"));
             detailPanel.add(abcPanel.tabbedPane, DETAILCARDAS3NAVIGATOR);
+            menuTools.add(miGotoDocumentClass);
         } else {
             actionPanel = new ActionPanel();
             addTab(tabPane, actionPanel, "ActionScript", View.getIcon("as16"));

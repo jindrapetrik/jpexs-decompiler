@@ -50,7 +50,7 @@ public class ActionSetVariable extends Action {
         if (value instanceof IncrementTreeItem) {
             GraphTargetItem obj = ((IncrementTreeItem) value).object;
             if (!stack.isEmpty()) {
-                if (stack.peek().equals(obj)) {
+                if (stack.peek().valueEquals(obj)) {
                     stack.pop();
                     stack.push(new PostIncrementTreeItem(this, obj));
                     return;
@@ -60,7 +60,7 @@ public class ActionSetVariable extends Action {
         if (value instanceof DecrementTreeItem) {
             GraphTargetItem obj = ((DecrementTreeItem) value).object;
             if (!stack.isEmpty()) {
-                if (stack.peek().equals(obj)) {
+                if (stack.peek().valueEquals(obj)) {
                     stack.pop();
                     stack.push(new PostDecrementTreeItem(this, obj));
                     return;
@@ -69,7 +69,7 @@ public class ActionSetVariable extends Action {
         }
         if (value instanceof IncrementTreeItem) {
             if (((IncrementTreeItem) value).object instanceof GetVariableTreeItem) {
-                if (((GetVariableTreeItem) ((IncrementTreeItem) value).object).name.equals(name)) {
+                if (((GetVariableTreeItem) ((IncrementTreeItem) value).object).name.valueEquals(name)) {
                     output.add(new PostIncrementTreeItem(this, ((IncrementTreeItem) value).object));
                     return;
                 }
@@ -77,7 +77,7 @@ public class ActionSetVariable extends Action {
         }
         if (value instanceof DecrementTreeItem) {
             if (((DecrementTreeItem) value).object instanceof GetVariableTreeItem) {
-                if (((GetVariableTreeItem) ((DecrementTreeItem) value).object).name.equals(name)) {
+                if (((GetVariableTreeItem) ((DecrementTreeItem) value).object).name.valueEquals(name)) {
                     output.add(new PostDecrementTreeItem(this, ((DecrementTreeItem) value).object));
                     return;
                 }

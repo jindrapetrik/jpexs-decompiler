@@ -48,7 +48,7 @@ public class ActionSetMember extends Action {
         if (value instanceof IncrementTreeItem) {
             GraphTargetItem obj = ((IncrementTreeItem) value).object;
             if (!stack.isEmpty()) {
-                if (stack.peek().equals(obj)) {
+                if (stack.peek().valueEquals(obj)) {
                     stack.pop();
                     stack.push(new PostIncrementTreeItem(this, obj));
                     return;
@@ -58,7 +58,7 @@ public class ActionSetMember extends Action {
         if (value instanceof DecrementTreeItem) {
             GraphTargetItem obj = ((DecrementTreeItem) value).object;
             if (!stack.isEmpty()) {
-                if (stack.peek().equals(obj)) {
+                if (stack.peek().valueEquals(obj)) {
                     stack.pop();
                     stack.push(new PostDecrementTreeItem(this, obj));
                     return;
@@ -78,7 +78,7 @@ public class ActionSetMember extends Action {
         }
         if (value instanceof DecrementTreeItem) {
             if (((DecrementTreeItem) value).object instanceof GetMemberTreeItem) {
-                if (((GetMemberTreeItem) ((DecrementTreeItem) value).object).object.equals(object)) {
+                if (((GetMemberTreeItem) ((DecrementTreeItem) value).object).object.valueEquals(object)) {
                     if (((GetMemberTreeItem) ((DecrementTreeItem) value).object).memberName.equals(memberName)) {
                         output.add(new PostDecrementTreeItem(this, ((DecrementTreeItem) value).object));
                         return;
