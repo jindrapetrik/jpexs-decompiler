@@ -432,7 +432,7 @@ public class ActionScript2Test {
                 + "var i=0;\r\n"
                 + "for(;i<5;i++)\r\n"
                 + "{\r\n"
-                + "if(i!=7)\r\n"
+                + "if(i==7)\r\n"
                 + "{\r\n"
                 + "}\r\n"
                 + "}\r\n");
