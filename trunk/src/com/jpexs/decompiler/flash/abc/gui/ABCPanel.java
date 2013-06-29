@@ -467,15 +467,14 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
         decompiledTextArea.setScript(found.get(foundPos), list);
         hilightScript(found.get(foundPos));
         decompiledTextArea.setCaretPosition(0);
-        java.util.Timer t = new java.util.Timer();
-        t.schedule(new TimerTask() {
+        SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 DocumentSearchData dsd = DocumentSearchData.getFromEditor(decompiledTextArea);
                 dsd.setPattern(searchFor, searchRegexp, searchIgnoreCase);
                 dsd.showQuickFindDialogEx(decompiledTextArea, searchIgnoreCase, searchRegexp);
             }
-        }, 1000);
+        });
 
 
     }

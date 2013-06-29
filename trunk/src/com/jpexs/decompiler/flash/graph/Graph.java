@@ -68,15 +68,15 @@ public class Graph {
 
     private void fixGraph(GraphPart part) {
         //if(true) return;
-        try{
+        try {
             while (fixGraphOnce(part, new ArrayList<GraphPart>(), false)) {
-        }
-        }catch(Exception | Error ex){
+            }
+        } catch (Exception | Error ex) {
             //ignore
         }
     }
 
-    private boolean fixGraphOnce(GraphPart part, List<GraphPart> visited, boolean doChildren) {        
+    private boolean fixGraphOnce(GraphPart part, List<GraphPart> visited, boolean doChildren) {
         if (visited.contains(part)) {
             return false;
         }

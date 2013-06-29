@@ -62,6 +62,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -663,14 +664,14 @@ public class ActionPanel extends JPanel implements ActionListener {
         Main.mainFrame.tagTree.scrollPathToVisible(tp);
         decompiledEditor.setCaretPosition(0);
         java.util.Timer t = new java.util.Timer();
-        t.schedule(new TimerTask() {
+        SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 DocumentSearchData dsd = DocumentSearchData.getFromEditor(decompiledEditor);
                 dsd.setPattern(searchFor, searchRegexp, searchIgnoreCase);
                 dsd.showQuickFindDialogEx(decompiledEditor, searchIgnoreCase, searchRegexp);
             }
-        }, 1000);
+        });
     }
 
     private void uncache(ASMSource pack) {
