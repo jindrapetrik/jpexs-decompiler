@@ -45,7 +45,7 @@ public class Graph {
     }
 
     public void init() {
-        if(heads!=null){
+        if (heads != null) {
             return;
         }
         heads = makeGraph(code, new ArrayList<GraphPart>(), alternateEntries);

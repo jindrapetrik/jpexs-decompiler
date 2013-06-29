@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.gui;
 
+import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
@@ -30,6 +31,8 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,9 +59,9 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
     public int listIndex = -1;
     public DecompiledEditorPane decompiledTextArea;
     public JScrollPane decompiledScrollPane;
-    public JSplitPane splitPaneDecompiledVSDetail;
-    public JSplitPane splitPaneTreeVSNavigator;
-    public JSplitPane splitPaneTreeNavVSDecompiledDetail;
+    public JSplitPane splitPane;
+    //public JSplitPane splitPaneTreeVSNavigator;
+    //public JSplitPane splitPaneTreeNavVSDecompiledDetail;
     private JTable constantTable;
     public JComboBox constantTypeList;
     public JLabel asmLabel = new JLabel("P-code source");
@@ -224,7 +227,9 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
         } catch (InterruptedException ex) {
             Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        splitPaneDecompiledVSDetail.setDividerLocation(splitPaneDecompiledVSDetail.getWidth() * 1 / 2);
+
+
+        splitPane.setDividerLocation((Integer) Configuration.getConfig("gui.avm2.splitPane.dividerLocation", splitPane.getWidth() * 1 / 2));
 
     }
 
@@ -262,10 +267,17 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
         panB.add(decLabel, BorderLayout.NORTH);
         decLabel.setHorizontalAlignment(SwingConstants.CENTER);
         decLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
-        splitPaneDecompiledVSDetail = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                 panB, detailPanel);
-        splitPaneDecompiledVSDetail.setResizeWeight(0.5);
-        splitPaneDecompiledVSDetail.setContinuousLayout(true);
+        splitPane.setResizeWeight(0.5);
+        splitPane.setContinuousLayout(true);
+
+        splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent pce) {
+                Configuration.setConfig("gui.avm2.splitPane.dividerLocation", pce.getNewValue());
+            }
+        });
         decompiledTextArea.setContentType("text/actionscript");
         decompiledTextArea.setFont(new Font("Monospaced", Font.PLAIN, decompiledTextArea.getFont().getSize()));
 
@@ -352,11 +364,11 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
         filterPanel.add(picLabel, BorderLayout.EAST);
         treePanel.add(filterPanel, BorderLayout.NORTH);
 
-        splitPaneTreeVSNavigator = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                treePanel,
-                navPanel);
-        splitPaneTreeVSNavigator.setResizeWeight(0.5);
-        splitPaneTreeVSNavigator.setContinuousLayout(true);
+        /* splitPaneTreeVSNavigator = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+         treePanel,
+         navPanel);
+         splitPaneTreeVSNavigator.setResizeWeight(0.5);
+         splitPaneTreeVSNavigator.setContinuousLayout(true);*/
         tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Traits", navPanel);
         //tabbedPane.setTabPlacement(JTabbedPane.BOTTOM);
@@ -377,7 +389,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
 
 
          add(splitPaneTreeNavVSDecompiledDetail, BorderLayout.CENTER);*/
-        add(splitPaneDecompiledVSDetail, BorderLayout.CENTER);
+        add(splitPane, BorderLayout.CENTER);
 
         JPanel panConstants = new JPanel();
         panConstants.setLayout(new BorderLayout());

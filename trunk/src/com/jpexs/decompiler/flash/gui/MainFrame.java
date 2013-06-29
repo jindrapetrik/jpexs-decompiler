@@ -113,12 +113,16 @@ import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -262,9 +266,25 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     }
 
     public MainFrame(SWF swf) {
-        setSize(1000, 700);
+        int w = (Integer) Configuration.getConfig("gui.window.width", 1000);
+        int h = (Integer) Configuration.getConfig("gui.window.height", 700);
+        Dimension dim = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        if (w > dim.width) {
+            w = dim.width;
+        }
+        if (h > dim.height) {
+            h = dim.height;
+        }
+        setSize(w, h);
         tabPane = new JTabbedPane();
         View.setWindowIcon(this);
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                Configuration.setConfig("gui.window.width", getWidth());
+                Configuration.setConfig("gui.window.height", getHeight());
+            }
+        });
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -854,8 +874,25 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         //displayPanel.setBorder(BorderFactory.createLineBorder(Color.black));
         splitPane2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT, pan1, detailPanel);
         splitPane1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitPane2, displayPanel);
+
+
+
         cnt.add(splitPane1, BorderLayout.CENTER);
         splitPane1.setDividerLocation(0.5);
+
+        splitPane1.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent pce) {
+                Configuration.setConfig("gui.splitPane1.dividerLocation", pce.getNewValue());
+            }
+        });
+
+        splitPane2.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent pce) {
+                Configuration.setConfig("gui.splitPane2.dividerLocation", pce.getNewValue());
+            }
+        });
         View.centerScreen(this);
         tagTree.addKeyListener(new KeyAdapter() {
             @Override
@@ -914,8 +951,10 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             if (actionPanel != null) {
                 actionPanel.initSplits();
             }
-            splitPane1.setDividerLocation(getWidth() / 3);
-            splitPane2.setDividerLocation(splitPane2.getHeight() * 3 / 5);
+
+            splitPane1.setDividerLocation((Integer) Configuration.getConfig("gui.splitPane1.dividerLocation", getWidth() / 3));
+            splitPane2.setDividerLocation((Integer) Configuration.getConfig("gui.splitPane2.dividerLocation", splitPane2.getHeight() * 3 / 5));
+
             splitPos = splitPane2.getDividerLocation();
         }
     }

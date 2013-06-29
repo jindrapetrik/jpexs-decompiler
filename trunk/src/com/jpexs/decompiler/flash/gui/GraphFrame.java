@@ -74,8 +74,6 @@ public class GraphFrame extends JFrame {
             setPreferredSize(new Dimension(size.x, size.y));
         }
 
-        
-       
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
@@ -250,7 +248,7 @@ public class GraphFrame extends JFrame {
         gp = new GraphPanel(graph);
         setTitle("Graph " + name);
         cnt.add(new JScrollPane(gp));
-      
+
         View.setWindowIcon(this);
 
     }
@@ -289,12 +287,12 @@ public class GraphFrame extends JFrame {
         arrowHead.addPoint(3, -8);
         Line2D.Double line = new Line2D.Double(x1, y1, x2, y2);
         AffineTransform tx = new AffineTransform();
-        tx.setToIdentity();        
+        tx.setToIdentity();
         double angle = Math.atan2(line.y2 - line.y1, line.x2 - line.x1);
         tx.translate(line.x2, line.y2);
         tx.rotate((angle - Math.PI / 2d));
 
-        Graphics2D g2d = (Graphics2D) g;        
+        Graphics2D g2d = (Graphics2D) g;
         AffineTransform oldTransform = g2d.getTransform();
         g2d.draw(line);
         tx.preConcatenate(oldTransform);

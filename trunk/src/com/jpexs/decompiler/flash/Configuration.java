@@ -105,6 +105,10 @@ public class Configuration {
         }
     }
 
+    public static boolean containsConfig(String cfg) {
+        return config.containsKey(cfg);
+    }
+
     public static Object getConfig(String cfg) {
         return getConfig(cfg, null);
     }
