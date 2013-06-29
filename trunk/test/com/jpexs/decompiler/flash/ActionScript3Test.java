@@ -24,7 +24,7 @@ public class ActionScript3Test {
 
     @BeforeClass
     public void init() throws IOException {
-        swf = new SWF(new FileInputStream("testdata/as3/TestMovie.swf"), false);
+        swf = new SWF(new FileInputStream("testdata/as3/as3.swf"), false);
         DoABCDefineTag tag = null;
         for (Tag t : swf.tags) {
             if (t instanceof DoABCDefineTag) {
@@ -215,11 +215,13 @@ public class ActionScript3Test {
                 + "for(;c<8;c=c+1)\r\n"
                 + "{\r\n"
                 + "d=0;\r\n"
-                + "while(d<25)\r\n"
+                + "for(;d<25;d++)\r\n"
                 + "{\r\n"
                 + "e=0;\r\n"
-                + "if(e<50)\r\n"
+                + "if(e>=50)\r\n"
                 + "{\r\n"
+                + "continue;\r\n"
+                + "}\r\n"
                 + "if(e==9)\r\n"
                 + "{\r\n"
                 + "break;\r\n"
@@ -228,12 +230,11 @@ public class ActionScript3Test {
                 + "{\r\n"
                 + "continue loop1;\r\n"
                 + "}\r\n"
-                + "if(e!=8)\r\n"
+                + "if(e==8)\r\n"
                 + "{\r\n"
+                + "continue;\r\n"
+                + "}\r\n"
                 + "break loop1;\r\n"
-                + "}\r\n"
-                + "}\r\n"
-                + "d++;\r\n"
                 + "}\r\n"
                 + "trace(\"hello\");\r\n"
                 + "}\r\n"
@@ -805,6 +806,57 @@ public class ActionScript3Test {
                 + "this.traceIt(\"hello\"+5*6);\r\n"
                 + "this.traceIt(\"hello\"+(k-1));\r\n"
                 + "this.traceIt(\"hello\"+5+6);\r\n"
+                + "return;\r\n", false);
+    }
+
+    @Test
+    public void testWhileTry() {
+        decompileMethod("testWhileTry", "while(true)\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "while(true)\r\n"
+                + "{\r\n"
+                + "trace(\"a\");\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "catch(e:EOFError)\r\n"
+                + "{\r\n"
+                + "continue;\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "continue;\r\n"
+                + "}\r\n"
+                + "}\r\n", false);
+    }
+
+    @Test
+    public void testWhileTry2() {
+        decompileMethod("testWhileTry2", "var j:* = undefined;\r\n"
+                + "var i:* = 0;\r\n"
+                + "for(;i<100;i++)\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "j=0;\r\n"
+                + "while(j<20)\r\n"
+                + "{\r\n"
+                + "trace(\"a\");\r\n"
+                + "j++;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "catch(e:EOFError)\r\n"
+                + "{\r\n"
+                + "continue;\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "continue;\r\n"
+                + "}\r\n"
+                + "trace(\"after_try\");\r\n"
+                + "}\r\n"
+                + "trace(\"end\");\r\n"
                 + "return;\r\n", false);
     }
 }

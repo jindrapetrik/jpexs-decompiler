@@ -1,5 +1,7 @@
-package com.jpexs.decompiler.flash;
+package com.jpexs.decompiler.flash.generators;
 
+import com.jpexs.decompiler.flash.Configuration;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
@@ -17,11 +19,11 @@ import java.util.Stack;
  *
  * @author JPEXS
  */
-public class Generator {
+public class AS3Generator {
 
     public static void main(String[] args) throws Exception {
         Configuration.setConfig("autoDeobfuscate", false);
-        SWF swf = new SWF(new FileInputStream("testdata/as3/TestMovie.swf"),false);
+        SWF swf = new SWF(new FileInputStream("testdata/as3/as3.swf"),false);
         DoABCDefineTag tag = null;
         for (Tag t : swf.tags) {
             if (t instanceof DoABCDefineTag) {
@@ -57,7 +59,7 @@ public class Generator {
                     s.append("}");
                 }
             }
-            try (PrintWriter pw = new PrintWriter("src.as")) {
+            try (PrintWriter pw = new PrintWriter("as3_teststub.java")) {
                 pw.println(s.toString());
             }
         }
