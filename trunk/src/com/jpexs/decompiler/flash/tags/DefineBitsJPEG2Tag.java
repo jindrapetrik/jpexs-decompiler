@@ -17,11 +17,14 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import javax.imageio.ImageIO;
 
@@ -59,5 +62,18 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
     @Override
     public void setImage(byte data[]) {
         imageData = data;
+    }
+
+    @Override
+    public byte[] getData(int version) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStream os = baos;
+        SWFOutputStream sos = new SWFOutputStream(os, version);
+        try {
+            sos.writeUI16(characterID);
+            sos.write(imageData);
+        } catch (IOException e) {
+        }
+        return baos.toByteArray();
     }
 }
