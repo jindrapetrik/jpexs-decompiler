@@ -181,11 +181,11 @@ public class Main {
         try (FileInputStream fis = new FileInputStream(file)) {
             InputStream bis = new BufferedInputStream(fis);
             locswf = new SWF(bis, new PercentListener() {
-            @Override
-            public void percent(int p) {
-                startWork("Reading SWF", p);
-            }
-        }, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                @Override
+                public void percent(int p) {
+                    startWork("Reading SWF", p);
+                }
+            }, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
             locswf.addEventListener(new EventListener() {
                 @Override
                 public void handleEvent(String event, Object data) {

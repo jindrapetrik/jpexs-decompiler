@@ -132,8 +132,12 @@ public class MethodBody implements Cloneable, Serializable {
                     s = Highlighting.hilighMethod(s, this.method_info);
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Exception during decompilation", ex);
                 s = "//error:" + ex.toString();
+            } catch (OutOfMemoryError er) {
+                Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Error during decompilation", er);
+                s = "//error:" + er.toString();
+                System.gc();
             }
         }
         return s;
