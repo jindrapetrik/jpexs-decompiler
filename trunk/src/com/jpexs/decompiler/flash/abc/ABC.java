@@ -669,12 +669,12 @@ public class ABC {
         List<ABCContainerTag> abcList;
         boolean pcode;
         String informStr;
-        String path;
+        ClassPath path;
         AtomicInteger index;
         int count;
         boolean paralel;
 
-        public ExportPackTask(AtomicInteger index, int count, String path, ScriptPack pack, String directory, List<ABCContainerTag> abcList, boolean pcode, String informStr, boolean paralel) {
+        public ExportPackTask(AtomicInteger index, int count, ClassPath path, ScriptPack pack, String directory, List<ABCContainerTag> abcList, boolean pcode, String informStr, boolean paralel) {
             this.pack = pack;
             this.directory = directory;
             this.abcList = abcList;
@@ -705,8 +705,8 @@ public class ABC {
         List<Future<File>> futureResults = new ArrayList<>();
         AtomicInteger cnt = new AtomicInteger(1);
         for (int i = 0; i < script_info.length; i++) {
-            HashMap<String, ScriptPack> packs = script_info[i].getPacks(this, i);
-            for (String path : packs.keySet()) {
+            HashMap<ClassPath, ScriptPack> packs = script_info[i].getPacks(this, i);
+            for (ClassPath path : packs.keySet()) {
                 Future<File> future = executor.submit(new ExportPackTask(cnt, script_info.length, path, packs.get(path), directory, abcList, pcode, abcStr, paralel));
                 futureResults.add(future);
             }

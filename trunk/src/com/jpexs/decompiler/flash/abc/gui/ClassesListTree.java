@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.gui;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
@@ -37,7 +38,7 @@ import javax.swing.tree.TreeSelectionModel;
 public class ClassesListTree extends JTree implements TreeSelectionListener {
 
     private List<ABCContainerTag> abcList;
-    public HashMap<String, ScriptPack> treeList;
+    public HashMap<ClassPath, ScriptPack> treeList;
     private ABCPanel abcPanel;
 
     public void selectClass(int classIndex) {
@@ -95,14 +96,14 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
         return selectedScripts;
     }
 
-    public HashMap<String, ScriptPack> getTreeList(List<ABCContainerTag> list) {
-        HashMap<String, ScriptPack> ret = new HashMap<>();
+    public HashMap<ClassPath, ScriptPack> getTreeList(List<ABCContainerTag> list) {
+        HashMap<ClassPath, ScriptPack> ret = new HashMap<>();
         for (ABCContainerTag tag : list) {
             ABC abc = tag.getABC();
             for (int i = 0; i < abc.script_info.length; i++) {
                 ScriptInfo script = abc.script_info[i];
-                HashMap<String, ScriptPack> packs = script.getPacks(abc, i);
-                for (String path : packs.keySet()) {
+                HashMap<ClassPath, ScriptPack> packs = script.getPacks(abc, i);
+                for (ClassPath path : packs.keySet()) {
                     ret.put(path, packs.get(path));
                 }
             }

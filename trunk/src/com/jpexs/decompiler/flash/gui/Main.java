@@ -177,32 +177,33 @@ public class Main {
     }
 
     public static SWF parseSWF(String file) throws Exception {
-        FileInputStream fis = new FileInputStream(file);
-        InputStream bis = new BufferedInputStream(fis);
-        SWF locswf = new SWF(bis, new PercentListener() {
+        SWF locswf;
+        try (FileInputStream fis = new FileInputStream(file)) {
+            InputStream bis = new BufferedInputStream(fis);
+            locswf = new SWF(bis, new PercentListener() {
             @Override
             public void percent(int p) {
                 startWork("Reading SWF", p);
             }
         }, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
-        locswf.addEventListener(new EventListener() {
-            @Override
-            public void handleEvent(String event, Object data) {
-                if (event.equals("export")) {
-                    startWork((String) data);
+            locswf.addEventListener(new EventListener() {
+                @Override
+                public void handleEvent(String event, Object data) {
+                    if (event.equals("export")) {
+                        startWork((String) data);
+                    }
+                    if (event.equals("getVariables")) {
+                        startWork("Getting variables..." + (String) data);
+                    }
+                    if (event.equals("deobfuscate")) {
+                        startWork("Deobfuscating..." + (String) data);
+                    }
+                    if (event.equals("rename")) {
+                        startWork("Renaming..." + (String) data);
+                    }
                 }
-                if (event.equals("getVariables")) {
-                    startWork("Getting variables..." + (String) data);
-                }
-                if (event.equals("deobfuscate")) {
-                    startWork("Deobfuscating..." + (String) data);
-                }
-                if (event.equals("rename")) {
-                    startWork("Renaming..." + (String) data);
-                }
-            }
-        });
-        fis.close();
+            });
+        }
         return locswf;
     }
 

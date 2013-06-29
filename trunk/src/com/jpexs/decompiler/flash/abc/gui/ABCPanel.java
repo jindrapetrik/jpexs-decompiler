@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.gui;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.gui.tablemodels.*;
 import com.jpexs.decompiler.flash.gui.Main;
@@ -80,7 +81,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
             searchIgnoreCase = ignoreCase;
             searchRegexp = regexp;
             ClassesListTreeModel clModel = (ClassesListTreeModel) classTree.getModel();
-            HashMap<String, ScriptPack> allpacks = clModel.getList();
+            HashMap<ClassPath, ScriptPack> allpacks = clModel.getList();
             found = new ArrayList<>();
             Pattern pat = null;
             if (regexp) {

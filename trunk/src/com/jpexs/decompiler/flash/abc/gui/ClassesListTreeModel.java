@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.gui;
 
+import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
@@ -75,28 +76,28 @@ class ClassIndexVisitor implements TreeVisitor {
 public class ClassesListTreeModel implements TreeModel {
 
     private Tree classTree = new Tree();
-    private HashMap<String, ScriptPack> list;
+    private HashMap<ClassPath, ScriptPack> list;
 
-    public HashMap<String, ScriptPack> getList() {
+    public HashMap<ClassPath, ScriptPack> getList() {
         return list;
     }
 
-    public ClassesListTreeModel(HashMap<String, ScriptPack> list) {
+    public ClassesListTreeModel(HashMap<ClassPath, ScriptPack> list) {
         this(list, null);
     }
 
-    public ClassesListTreeModel(HashMap<String, ScriptPack> list, String filter) {
-        for (String path : list.keySet()) {
+    public ClassesListTreeModel(HashMap<ClassPath, ScriptPack> list, String filter) {
+        for (ClassPath path : list.keySet()) {
             if (filter != null) {
                 if (!filter.equals("")) {
-                    if (!path.contains(filter)) {
+                    if (!path.toString().contains(filter)) {
                         continue;
                     }
                 }
             }
-            String nsName = path.contains(".") ? path.substring(path.lastIndexOf(".") + 1) : path;
-            String packageName = path.contains(".") ? path.substring(0, path.lastIndexOf(".")) : "";
-            classTree.add(nsName, packageName, list.get(path));
+            //String nsName = path.contains(".") ? path.substring(path.lastIndexOf(".") + 1) : path;
+            //String packageName = path.contains(".") ? path.substring(0, path.lastIndexOf(".")) : "";
+            classTree.add(path.className, path.packageStr, list.get(path));
         }
         this.list = list;
 
