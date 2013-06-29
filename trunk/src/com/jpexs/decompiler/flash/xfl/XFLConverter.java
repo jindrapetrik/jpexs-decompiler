@@ -2197,6 +2197,9 @@ public class XFLConverter {
         }
         String matStr = "";
         matStr += "<matrix>";
+        RECT bounds = tag.getBounds();
+        matrix.translateX += bounds.Xmin;
+        matrix.translateY += bounds.Ymin;
         matStr += convertMatrix(matrix);
         matStr += "</matrix>";
         if ((tag instanceof DefineTextTag) || (tag instanceof DefineText2Tag)) {
