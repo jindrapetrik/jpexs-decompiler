@@ -190,7 +190,7 @@ public class GraphPart {
         if (end < start) {
             return "<-> " + (start + 1) + "-" + (end + 1);
         }
-        return "" + (start + 1) + "-" + (end + 1) + (instanceCount > 1 ? "(" + instanceCount + " links)" : "") + "  p" + path;
+        return "" + (start + 1) + "-" + (end + 1) + (instanceCount > 1 ? "(" + instanceCount + " links)" : "");// + "  p" + path;
     }
 
     public boolean containsIP(int ip) {

@@ -19,6 +19,11 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.graph.Graph;
 import com.jpexs.decompiler.flash.graph.GraphPart;
 import java.awt.*;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.util.HashMap;
@@ -48,6 +53,7 @@ public class GraphFrame extends JFrame {
         private GraphPart head;
 
         public GraphPanel(Graph graph) {
+            graph.init();
             size = getPartPositions(head = graph.heads.get(0), SPACE_VERTICAL + SPACE_VERTICAL + BLOCK_HEIGHT / 2, getPartWidth(graph.heads.get(0), new HashSet<GraphPart>()) * (BLOCK_WIDTH + SPACE_HORIZONTAL) / 2 - SPACE_HORIZONTAL, partPos, true);
             backLinksLeft = 1;
             backLinksRight = 1;
@@ -68,6 +74,8 @@ public class GraphFrame extends JFrame {
             setPreferredSize(new Dimension(size.x, size.y));
         }
 
+        
+       
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
@@ -242,7 +250,7 @@ public class GraphFrame extends JFrame {
         gp = new GraphPanel(graph);
         setTitle("Graph " + name);
         cnt.add(new JScrollPane(gp));
-
+      
         View.setWindowIcon(this);
 
     }
@@ -281,16 +289,17 @@ public class GraphFrame extends JFrame {
         arrowHead.addPoint(3, -8);
         Line2D.Double line = new Line2D.Double(x1, y1, x2, y2);
         AffineTransform tx = new AffineTransform();
-        tx.setToIdentity();
+        tx.setToIdentity();        
         double angle = Math.atan2(line.y2 - line.y1, line.x2 - line.x1);
         tx.translate(line.x2, line.y2);
         tx.rotate((angle - Math.PI / 2d));
 
-        Graphics2D g2d = (Graphics2D) g;
+        Graphics2D g2d = (Graphics2D) g;        
+        AffineTransform oldTransform = g2d.getTransform();
         g2d.draw(line);
-        Graphics2D g2 = (Graphics2D) g2d.create();
-        g2.setTransform(tx);
-        g2.fill(arrowHead);
-        g2.dispose();
+        tx.preConcatenate(oldTransform);
+        g2d.setTransform(tx);
+        g2d.fill(arrowHead);
+        g2d.setTransform(oldTransform);
     }
 }

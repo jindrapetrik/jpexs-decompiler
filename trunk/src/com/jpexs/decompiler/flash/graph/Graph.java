@@ -45,6 +45,9 @@ public class Graph {
     }
 
     public void init() {
+        if(heads!=null){
+            return;
+        }
         heads = makeGraph(code, new ArrayList<GraphPart>(), alternateEntries);
         int time = 1;
         List<GraphPart> ordered = new ArrayList<>();
