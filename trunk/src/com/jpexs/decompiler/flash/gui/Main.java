@@ -202,6 +202,7 @@ public class Main {
                 }
             }
         });
+        fis.close();
         return locswf;
     }
 
@@ -217,7 +218,6 @@ public class Main {
             try {
                 Main.startWork("Reading SWF...");
                 swf = parseSWF(Main.file);
-                FileInputStream fis = new FileInputStream(file);
             } catch (Exception ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 JOptionPane.showMessageDialog(null, "Cannot load SWF file.");
