@@ -52,13 +52,19 @@ public class IfItem extends GraphTargetItem implements Block {
         List<GraphTargetItem> ifBranch = onTrue;
         List<GraphTargetItem> elseBranch = onFalse;
         if (onTrue.isEmpty()) {
-            if (expr instanceof LogicalOpItem) {
-                expr = ((LogicalOpItem) expr).invert();
+            if (onFalse.isEmpty()) {
+                if (expr instanceof NotItem) {
+                    expr = ((NotItem) expr).getOriginal();
+                }
             } else {
-                expr = new NotItem(null, expr);
+                if (expr instanceof LogicalOpItem) {
+                    expr = ((LogicalOpItem) expr).invert();
+                } else {
+                    expr = new NotItem(null, expr);
+                }
+                ifBranch = onFalse;
+                elseBranch = onTrue;
             }
-            ifBranch = onFalse;
-            elseBranch = onTrue;
         }
         ret = hilight("if(") + expr.toString(localData) + hilight(")") + "\r\n{\r\n";
         for (GraphTargetItem ti : ifBranch) {
