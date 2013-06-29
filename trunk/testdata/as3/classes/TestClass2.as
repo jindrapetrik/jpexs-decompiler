@@ -1,4 +1,4 @@
-package classes
+﻿package classes
 {
 	
 	public dynamic class TestClass2
@@ -16,5 +16,5 @@ package classes
 		{
 			return new TestClass2(a1);
 		}
-	}
+        }
 }

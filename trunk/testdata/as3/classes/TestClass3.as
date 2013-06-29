@@ -1,10 +1,6 @@
 ﻿package classes
 {
 	import flash.utils.ByteArray;
-	import flash.utils.Dictionary;
-	import com.hurlant.math.BigInteger;
-	import flash.filters.ColorMatrixFilter;
-	import com.wirelust.as3zlib.Inflate;
 
 	public class TestClass3
 	{
@@ -43,33 +39,36 @@
 		private static var svgxml:Class;
 		
 		[Embed(source="text.txt",
-		   mimeType="application/octet-stream")]
+		   mimeType="application/octet-stream")]		
 		private static var txt:Class;*/
-		
-		    /*var c = [1, 2, 3, 4, 5];
-			var b = 1;
-			trace("++arr");
-			b = ++c[2];
-			trace("arr++");
-			b = c[2]++;
-			trace("--arr");
-			b = --c[2];
-			trace("arr--");
-			b = c[2]--;*/
-		
-		
-		public function testIncDec()
+		/*public function testContinueLevels()
 		{
-			var a = 5;
-			var b = 0;
-			trace("++var");
-			b = ++a;
-			trace("var++");
-			b = a++;
-			trace("--var");
-			b = --a;
-			trace("var--");
-			b = a--;			
-		}
+			
+			loop182: for (var c = 0; c < 8; c = c + 1)
+			{
+				
+				loop165: for (var d = 0; d < 25; d++)
+				{
+					
+					for (var e = 0; e < 50; e++)
+					{
+						if (e == 9)
+						{
+							break loop165;
+						}
+						if (e == 20)
+						{
+							continue loop182;
+						}
+						if (e == 8)
+						{
+							break;
+						}
+						break loop182;
+					}
+				}
+				trace("hello");
+			}
+		}*/
 	}
 }

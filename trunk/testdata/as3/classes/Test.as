@@ -3,6 +3,7 @@
 	
 	import flash.utils.Dictionary;
 	import classes.myInternal;
+	import flash.errors.EOFError;
 	
 	public class Test
 	{
@@ -793,5 +794,49 @@
 			traceIt("hello"+(k-1));
 			traceIt("hello"+5+6);
 		}
-	}
+		
+		public function testWhileTry() {
+                        while(true)
+                        {
+                           try
+                           {
+                              while(true)
+                              {
+                                    trace("a")
+                              }
+                           }
+                           catch(e:EOFError)
+                           {
+                              continue;
+                           }
+                           catch(e:Error)
+                           {
+                              continue;
+                           }
+                        }
+                  }
+	  
+	  public function testWhileTry2() {
+                for(var i=0;i<100;i++)
+                {
+                   try
+                   {
+                      for(var j=0;j<20;j++)
+                                      {
+                            trace("a")
+                      }
+                   }
+                   catch(e:EOFError)
+                   {
+                      continue;
+                   }
+                   catch(e:Error)
+                   {
+                      continue;
+                   }
+                   trace("after_try");
+                }
+                trace("end");
+          }
+    }
 }
