@@ -13,7 +13,7 @@ import java.io.FileOutputStream;
 
 /**
  *
- * Generates stub for ActionScript3Test
+ * Generates stub for ActionScript2Test
  *
  * @author JPEXS
  */
