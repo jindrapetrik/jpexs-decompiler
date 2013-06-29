@@ -103,8 +103,8 @@ public class MethodBody implements Cloneable, Serializable {
 
     public String toString(String path, boolean pcode, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, boolean hilight, List<String> fullyQualifiedNames, Traits initTraits) {
         String s = "";
-        if (!Configuration.DO_DECOMPILE) {
-            s = "//NOT DECOMPILED";
+        if (!(Boolean) Configuration.getConfig("decompile", Boolean.TRUE)) {
+            s = "//Decompilation skipped";
             if (hilight) {
                 s = Highlighting.hilighMethod(s, this.method_info);
             }

@@ -114,6 +114,10 @@ public class ActionPanel extends JPanel implements ActionListener {
     private boolean searchRegexp;
     private Cache cache = new Cache(true);
 
+    public void clearCache() {
+        cache.clear();
+    }
+
     public String getStringUnderCursor() {
         int pos = decompiledEditor.getCaretPosition();
         for (Highlighting h : decompiledHilights) {
@@ -258,7 +262,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             @Override
             public void run() {
                 editor.setText("; Disassembling...");
-                if (Configuration.DO_DECOMPILE) {
+                if ((Boolean) Configuration.getConfig("decompile", Boolean.TRUE)) {
                     decompiledEditor.setText("//Waiting for dissasembly...");
                 }
                 DisassemblyListener listener = new DisassemblyListener() {
@@ -286,7 +290,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                 srcNoHex = Helper.stripComments(lastDisasm);
                 editor.setText("; Disassembling - setting");
                 setHex(hexButton.isSelected());
-                if (Configuration.DO_DECOMPILE) {
+                if ((Boolean) Configuration.getConfig("decompile", Boolean.TRUE)) {
                     decompiledEditor.setText("//Decompiling...");
                     String stripped = "";
                     if (!useCache) {

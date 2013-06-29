@@ -221,6 +221,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     private JCheckBoxMenuItem miInternalViewer;
     private JCheckBoxMenuItem miParallelSpeedUp;
     private JCheckBoxMenuItem miAssociate;
+    private JCheckBoxMenuItem miDecompile;
 
     public void setPercent(int percent) {
         progressBar.setValue(percent);
@@ -448,10 +449,16 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         miGotoDocumentClass.addActionListener(this);
         menuBar.add(menuTools);
 
+        miDecompile = new JCheckBoxMenuItem("Disable decompilation (Disassemble only)");
+        miDecompile.setSelected(!(Boolean) Configuration.getConfig("decompile", Boolean.TRUE));
+        miDecompile.setActionCommand("DISABLEDECOMPILATION");
+        miDecompile.addActionListener(this);
+
         JMenu menuSettings = new JMenu("Settings");
         menuSettings.add(autoDeobfuscateMenuItem);
         menuSettings.add(miInternalViewer);
         menuSettings.add(miParallelSpeedUp);
+        menuSettings.add(miDecompile);
 
 
         miAssociate = new JCheckBoxMenuItem("Add FFDec to SWF files context menu");
@@ -1494,9 +1501,26 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         return ret;
     }
 
+    private void clearCache() {
+        if (abcPanel != null) {
+            abcPanel.decompiledTextArea.clearScriptCache();
+        }
+        if (actionPanel != null) {
+            actionPanel.clearCache();
+        }
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
+            case "DISABLEDECOMPILATION":
+                Configuration.setConfig("decompile", !miDecompile.isSelected());
+                clearCache();
+                if (abcPanel != null) {
+                    abcPanel.reload();
+                }
+                reload(true);
+                break;
             case "ASSOCIATE":
                 if (miAssociate.getState() == Main.isAssociated()) {
                     return;
@@ -1688,6 +1712,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             case "AUTODEOBFUSCATE":
                 if (JOptionPane.showConfirmDialog(this, "Automatic deobfuscation is a way to decompile obfuscated code.\r\nDeobfuscation leads to slower decompilation and some of the dead code may be eliminated.\r\nIf the code is not obfuscated, it's better to turn autodeobfuscation off.\r\nDo you really want to " + (autoDeobfuscateMenuItem.getState() ? "turn ON" : "turn OFF") + " automatic debfuscation?", "Confirm", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
                     Configuration.setConfig("autoDeobfuscate", autoDeobfuscateMenuItem.getState());
+                    clearCache();
                 } else {
                     autoDeobfuscateMenuItem.setState(!autoDeobfuscateMenuItem.getState());
                 }
@@ -1970,6 +1995,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                     cnt = swf.deobfuscateIdentifiers(renameType);
                                     Main.stopWork();
                                     JOptionPane.showMessageDialog(null, "Identifiers renamed: " + cnt);
+                                    clearCache();
                                     if (abcPanel != null) {
                                         abcPanel.reload();
                                     }
@@ -2027,6 +2053,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                             }
                             Main.stopWork();
                             JOptionPane.showMessageDialog(null, "Deobfuscation complete");
+                            clearCache();
                             abcPanel.reload();
                             return true;
                         }

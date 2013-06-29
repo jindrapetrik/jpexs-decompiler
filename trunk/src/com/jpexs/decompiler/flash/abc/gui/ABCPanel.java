@@ -461,7 +461,17 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
 
     public void hilightScript(String name) {
         ClassesListTreeModel clModel = (ClassesListTreeModel) classTree.getModel();
-        ScriptPack pack = clModel.getList().get(name);
+        HashMap<ClassPath, ScriptPack> list = clModel.getList();
+        ClassPath path = null;
+        for (ClassPath p : list.keySet()) {
+            if (p.toString().equals(name)) {
+                path = p;
+            }
+        }
+        if (path == null) {
+            return;
+        }
+        ScriptPack pack = clModel.getList().get(path);
         if (pack != null) {
             hilightScript(pack);
         }
