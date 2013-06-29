@@ -39,8 +39,12 @@ public class GraphPart {
     public int discoveredTime;
     public int finishedTime;
     public int order;
+    public List<GraphPart> throwParts = new ArrayList<>();
 
     public int setTime(int time, List<GraphPart> ordered, List<GraphPart> visited) {
+        if (visited.contains(this)) {
+            return time;
+        }
         discoveredTime = time;
         visited.add(this);
         for (GraphPart next : nextParts) {
@@ -89,6 +93,15 @@ public class GraphPart {
             return false;
         }
         for (GraphPart p : nextParts) {
+            if (p == part) {
+                return true;
+            } else {
+                if (p.leadsTo(code, part, visited, loops)) {
+                    return true;
+                }
+            }
+        }
+        for (GraphPart p : throwParts) {
             if (p == part) {
                 return true;
             } else {

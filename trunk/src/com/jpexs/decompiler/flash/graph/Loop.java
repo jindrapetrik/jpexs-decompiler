@@ -31,11 +31,10 @@ public class Loop {
     public List<GraphPart> breakCandidates = new ArrayList<>();
     public List<Integer> breakCandidatesLevels = new ArrayList<>();
     public long id;
-    public boolean used = false;
-    public boolean finished = false;
     public int leadsToMark;
     public int reachableMark;
     public int phase;
+    public int breakCandidatesLocked = 0;
 
     public Loop(long id, GraphPart loopContinue, GraphPart loopBreak) {
         this.loopContinue = loopContinue;

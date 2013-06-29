@@ -112,6 +112,7 @@ public class AVM2Graph extends Graph {
 
     public static List<GraphTargetItem> translateViaGraph(String path, AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> scopeStack, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         AVM2Graph g = new AVM2Graph(code, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, fullyQualifiedNames);
+        g.init();
         List<GraphPart> allParts = new ArrayList<>();
         for (GraphPart head : g.heads) {
             populateParts(head, allParts);
@@ -135,7 +136,49 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    protected List<GraphTargetItem> check(GraphSource srcCode, List<Object> localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output) {
+    protected void checkGraph(List<GraphPart> allBlocks) {
+        for (ABCException ex : body.exceptions) {
+            int startIp = code.adr2pos(ex.start);
+            int endIp = code.adr2pos(ex.end);
+            int targetIp = code.adr2pos(ex.target);
+            GraphPart target = null;
+            for (GraphPart p : allBlocks) {
+                if (p.start == targetIp) {
+                    target = p;
+                    break;
+                }
+            }
+            for (GraphPart p : allBlocks) {
+                if (p.start >= startIp && p.end <= endIp) {
+                    p.throwParts.add(target);
+                    target.refs.add(p);
+                }
+            }
+        }
+
+        /*for(ABCException ex:body.exceptions){ 
+         for(GraphPart p:allBlocks){
+         boolean next_is_ex_start=false;
+         for(GraphPart n:p.nextParts){
+         if(n.start==code.adr2pos(ex.start)){
+         next_is_ex_start = true;
+         break;
+         }
+         }
+         if(next_is_ex_start){
+         for(GraphPart q:allBlocks){ //find target part
+         if(q.start==code.adr2pos(ex.target)){
+         p.nextParts.add(q);
+         break;
+         }
+         }
+         }
+         }
+         }*/
+    }
+
+    @Override
+    protected List<GraphTargetItem> check(GraphSource srcCode, List<Object> localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop) {
         List<GraphTargetItem> ret = null;
 
 
@@ -164,6 +207,9 @@ public class AVM2Graph extends Graph {
             }
         }
         if (catchedExceptions.size() > 0) {
+            if (currentLoop != null) {
+                //currentLoop.phase=0;
+            }
             parsedExceptions.addAll(catchedExceptions);
             int endpos = code.adr2pos(code.fixAddrAfterDebugLine(catchedExceptions.get(0).end));
             int endposStartBlock = code.adr2pos(catchedExceptions.get(0).end);
@@ -235,7 +281,7 @@ public class AVM2Graph extends Graph {
                         }
                     }
                 }
-
+                List<GraphPart> catchParts = new ArrayList<>();
                 for (int e = 0; e < catchedExceptions.size(); e++) {
                     int eendpos;
                     if (e < catchedExceptions.size() - 1) {
@@ -249,6 +295,7 @@ public class AVM2Graph extends Graph {
                     for (GraphPart p : allParts) {
                         if (p.start == findpos) {
                             npart = p;
+                            catchParts.add(p);
                             break;
                         }
                     }
@@ -279,6 +326,7 @@ public class AVM2Graph extends Graph {
                 }
                 List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
                 stopPart2.add(nepart);
+                stopPart2.addAll(catchParts);
                 List<GraphTargetItem> tryCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, parent, part, stopPart2, loops);
 
                 output.clear();
@@ -432,9 +480,8 @@ public class AVM2Graph extends Graph {
             }
 
             GraphTargetItem ti = checkLoop(next, stopPart, loops);
-            Loop currentLoop = new Loop(loops.size(), null, next);
+            currentLoop = new Loop(loops.size(), null, next);
             currentLoop.phase = 1;
-            currentLoop.used = true;
             loops.add(currentLoop);
             //switchLoc.getNextPartPath(new ArrayList<GraphPart>());
             List<Integer> valuesMapping = new ArrayList<>();

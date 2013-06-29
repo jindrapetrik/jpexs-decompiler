@@ -206,6 +206,9 @@ public class DirectValueTreeItem extends TreeItem {
         if (obj == null) {
             return false;
         }
+        if (!(obj instanceof DirectValueTreeItem)) {
+            return false;
+        }
         final DirectValueTreeItem other = (DirectValueTreeItem) obj;
         if (!Objects.equals(this.value, other.value)) {
             return false;
