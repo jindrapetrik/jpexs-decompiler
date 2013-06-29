@@ -1520,6 +1520,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                     abcPanel.reload();
                 }
                 reload(true);
+                doFilter();
                 break;
             case "ASSOCIATE":
                 if (miAssociate.getState() == Main.isAssociated()) {
@@ -1977,6 +1978,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                             Main.stopWork();
                             JOptionPane.showMessageDialog(null, "Control flow restored");
                             abcPanel.reload();
+                            doFilter();
                             return true;
                         }
                     }.execute();
@@ -2055,6 +2057,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                             JOptionPane.showMessageDialog(null, "Deobfuscation complete");
                             clearCache();
                             abcPanel.reload();
+                            doFilter();
                             return true;
                         }
                     }.execute();
@@ -2084,6 +2087,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                             Main.stopWork();
                             JOptionPane.showMessageDialog(null, "Traps removed: " + cnt);
                             abcPanel.reload();
+                            doFilter();
                             return true;
                         }
                     }.execute();
@@ -2113,6 +2117,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                             Main.stopWork();
                             JOptionPane.showMessageDialog(null, "Instructions removed: " + cnt);
                             abcPanel.reload();
+                            doFilter();
                             return true;
                         }
                     }.execute();

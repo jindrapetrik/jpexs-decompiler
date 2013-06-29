@@ -203,13 +203,10 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
 
     public void switchAbc(int index) {
         listIndex = index;
-        if (index == -1) {
-            classTree.setDoABCTags(list);
-        } else {
-            List<ABCContainerTag> oneList = new ArrayList<>();
-            oneList.add(list.get(index));
+        classTree.setDoABCTags(list);
+
+        if (index != -1) {
             this.abc = list.get(index).getABC();
-            classTree.setDoABCTags(oneList);
         }
         updateConstList();
     }
@@ -480,6 +477,8 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
     public void hilightScript(ScriptPack pack) {
         TagTreeModel ttm = (TagTreeModel) Main.mainFrame.tagTree.getModel();
         TreePath tp = ttm.getTagPath(pack);
+        if (tp == null) {
+        }
         Main.mainFrame.tagTree.setSelectionPath(tp);
         Main.mainFrame.tagTree.scrollPathToVisible(tp);
     }
