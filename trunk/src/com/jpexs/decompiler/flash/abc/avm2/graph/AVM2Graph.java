@@ -377,7 +377,7 @@ public class AVM2Graph extends Graph {
                 }
             }
         }
-        if (code.code.get(part.end).definition instanceof LookupSwitchIns) {
+        if ((code.code.get(part.end).definition instanceof LookupSwitchIns) && ignoredSwitches.contains(part.end)) {
             ret = new ArrayList<>();
             ret.addAll(output);
             return ret;
@@ -395,6 +395,12 @@ public class AVM2Graph extends Graph {
                 && (part.nextParts.get(1).getHeight() >= 2)
                 && (code.code.get(code.fixIPAfterDebugLine(part.nextParts.get(1).start)).definition instanceof PushIntegerTypeIns)
                 && (code.code.get(part.nextParts.get(1).nextParts.get(0).end).definition instanceof LookupSwitchIns))) {
+
+            if (stack.peek() instanceof StrictEqTreeItem) {
+                ignoredSwitches.add(part.nextParts.get(0).nextParts.get(0).end);
+            } else {
+                ignoredSwitches.add(part.nextParts.get(1).nextParts.get(0).end);
+            }
             ret = new ArrayList<>();
             ret.addAll(output);
             boolean reversed = false;
