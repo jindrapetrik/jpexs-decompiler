@@ -430,11 +430,12 @@ public class ActionScript2Test {
                 + "}\r\n"
                 + "trace(d+1);\r\n"
                 + "var i=0;\r\n"
-                + "for(;i<5;i++)\r\n"
+                + "while(i<5)\r\n"
                 + "{\r\n"
                 + "if(i==7)\r\n"
                 + "{\r\n"
                 + "}\r\n"
+                + "i++;\r\n"
                 + "}\r\n");
     }
 
