@@ -2,8 +2,8 @@
 
 <project name="FFDec" basedir="." default="all">
     <description>Builds project FFDec</description>    
-    <property name="VERSION" value="1.6.3u2" />
-    <property name="VERSIONNUMBER" value="1.6.3.2" />
+    <property name="VERSION" value="1.6.4" />
+    <property name="VERSIONNUMBER" value="1.6.4.0" />
     <property name="BUILDER" value="jpexs" />
     <property name="PROJECTNAME" value="FFDec"/>
     <property name="JARFILENAME" value="ffdec"/>
@@ -42,6 +42,6 @@
     <property name="INSTALLERPROJECT" value="${basedir}/installer.iss"/>
     <property name="EXECONFIG" value="${basedir}/build_exe.xml"/>
     
-     <property name="RUNPARAMS" value="" />    
+     <property name="RUNPARAMS" value="testdata/as3/as3.swf" />    
     <import file="build_common.xml"/>
 </project>
