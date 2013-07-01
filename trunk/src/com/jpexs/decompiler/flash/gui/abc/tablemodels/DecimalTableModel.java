@@ -14,19 +14,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.abc.gui.tablemodels;
+package com.jpexs.decompiler.flash.gui.abc.tablemodels;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
-public class UIntTableModel implements TableModel {
+public class DecimalTableModel implements TableModel {
 
     private ABC abc;
     private static final String columnNames[] = new String[]{"Index", "Value"};
-    private static final Class classes[] = new Class[]{Long.class, Long.class};
+    private static final Class classes[] = new Class[]{Long.class, String.class};
 
-    public UIntTableModel(ABC abc) {
+    public DecimalTableModel(ABC abc) {
         this.abc = abc;
     }
 
@@ -44,7 +44,7 @@ public class UIntTableModel implements TableModel {
         if (abc == null) {
             return 0;
         }
-        return abc.constants.constant_uint.length;
+        return abc.constants.constant_decimal.length;
     }
 
     /**
@@ -119,7 +119,7 @@ public class UIntTableModel implements TableModel {
         if (columnIndex == 0) {
             return rowIndex;
         } else {
-            return abc.constants.constant_uint[rowIndex];
+            return abc.constants.constant_decimal[rowIndex];
         }
     }
 

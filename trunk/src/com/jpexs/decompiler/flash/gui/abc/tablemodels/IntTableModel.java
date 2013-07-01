@@ -14,20 +14,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.abc.gui.tablemodels;
+package com.jpexs.decompiler.flash.gui.abc.tablemodels;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import java.util.ArrayList;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
-public class MultinameTableModel implements TableModel {
+public class IntTableModel implements TableModel {
 
     private ABC abc;
-    private static final String columnNames[] = new String[]{"Index", "Kind", "Name", "Namespace", "NamespaceSet"};
-    private static final Class classes[] = new Class[]{Long.class, String.class, String.class, String.class, String.class};
+    private static final String columnNames[] = new String[]{"Index", "Value"};
+    private static final Class classes[] = new Class[]{Long.class, Long.class};
 
-    public MultinameTableModel(ABC abc) {
+    public IntTableModel(ABC abc) {
         this.abc = abc;
     }
 
@@ -45,7 +44,7 @@ public class MultinameTableModel implements TableModel {
         if (abc == null) {
             return 0;
         }
-        return abc.constants.constant_multiname.length;
+        return abc.constants.constant_int.length;
     }
 
     /**
@@ -58,7 +57,7 @@ public class MultinameTableModel implements TableModel {
      */
     @Override
     public int getColumnCount() {
-        return 5;
+        return 2;
     }
 
     /**
@@ -117,40 +116,10 @@ public class MultinameTableModel implements TableModel {
      */
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        switch (columnIndex) {
-            case 0:
-                return rowIndex;
-            case 1:
-                if (rowIndex == 0) {
-                    return "";
-                }
-                return abc.constants.constant_multiname[rowIndex].getKindStr();
-            case 2:
-                if (rowIndex == 0) {
-                    return "";
-                }
-                if (abc.constants.constant_multiname[rowIndex].name_index == -1) {
-                    return "";
-                }
-                return abc.constants.constant_multiname[rowIndex].getName(abc.constants, new ArrayList<String>());
-            case 3:
-                if (rowIndex == 0) {
-                    return "";
-                }
-                if (abc.constants.constant_multiname[rowIndex].namespace_index == -1) {
-                    return "";
-                }
-                return abc.constants.constant_multiname[rowIndex].getNamespace(abc.constants).getNameWithKind(abc.constants);
-            case 4:
-                if (rowIndex == 0) {
-                    return "";
-                }
-                if (abc.constants.constant_multiname[rowIndex].namespace_set_index == -1) {
-                    return "";
-                }
-                return abc.constants.constant_multiname[rowIndex].getNamespaceSet(abc.constants).toString(abc.constants);
-            default:
-                return null;
+        if (columnIndex == 0) {
+            return rowIndex;
+        } else {
+            return abc.constants.constant_int[rowIndex];
         }
     }
 

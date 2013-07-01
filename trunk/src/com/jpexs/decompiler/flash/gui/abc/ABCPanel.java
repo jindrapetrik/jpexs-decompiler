@@ -16,11 +16,18 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
+import com.jpexs.decompiler.flash.gui.abc.tablemodels.UIntTableModel;
+import com.jpexs.decompiler.flash.gui.abc.tablemodels.DoubleTableModel;
+import com.jpexs.decompiler.flash.gui.abc.tablemodels.NamespaceTableModel;
+import com.jpexs.decompiler.flash.gui.abc.tablemodels.IntTableModel;
+import com.jpexs.decompiler.flash.gui.abc.tablemodels.NamespaceSetTableModel;
+import com.jpexs.decompiler.flash.gui.abc.tablemodels.MultinameTableModel;
+import com.jpexs.decompiler.flash.gui.abc.tablemodels.DecimalTableModel;
+import com.jpexs.decompiler.flash.gui.abc.tablemodels.StringTableModel;
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
-import com.jpexs.decompiler.flash.abc.gui.tablemodels.*;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.View;

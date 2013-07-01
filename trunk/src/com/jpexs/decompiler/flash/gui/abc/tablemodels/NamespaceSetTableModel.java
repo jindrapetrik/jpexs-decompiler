@@ -14,19 +14,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.abc.gui.tablemodels;
+package com.jpexs.decompiler.flash.gui.abc.tablemodels;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
-public class DecimalTableModel implements TableModel {
+public class NamespaceSetTableModel implements TableModel {
 
     private ABC abc;
-    private static final String columnNames[] = new String[]{"Index", "Value"};
-    private static final Class classes[] = new Class[]{Long.class, String.class};
+    private static final String columnNames[] = new String[]{"Index", "NameSpaces"};
+    private static final Class classes[] = new Class[]{Long.class, String.class, String.class};
 
-    public DecimalTableModel(ABC abc) {
+    public NamespaceSetTableModel(ABC abc) {
         this.abc = abc;
     }
 
@@ -44,7 +44,7 @@ public class DecimalTableModel implements TableModel {
         if (abc == null) {
             return 0;
         }
-        return abc.constants.constant_decimal.length;
+        return abc.constants.constant_namespace_set.length;
     }
 
     /**
@@ -116,10 +116,16 @@ public class DecimalTableModel implements TableModel {
      */
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        if (columnIndex == 0) {
-            return rowIndex;
-        } else {
-            return abc.constants.constant_decimal[rowIndex];
+        switch (columnIndex) {
+            case 0:
+                return rowIndex;
+            case 1:
+                if (rowIndex == 0) {
+                    return "";
+                }
+                return abc.constants.constant_namespace_set[rowIndex].toString(abc.constants);
+            default:
+                return null;
         }
     }
 
