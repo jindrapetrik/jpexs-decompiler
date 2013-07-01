@@ -14,24 +14,24 @@ import javax.swing.JLabel;
  *
  * @author JPEXS
  */
-public class ExportDialog extends JDialog {
+public class ExportDialog extends AppDialog {
 
     boolean cancelled = false;
     String options[][] = {
-        {"SVG"},
-        {"Plain Text", "Formatted text"},
-        {"PNG/JPEG"},
-        {"FLV (No audio)"},
-        {"MP3/WAV/FLV", "FLV (Audio only)"},
-        {"AS", "PCODE"}
+        {translate("shapes.svg")},
+        {translate("texts.plain"), translate("texts.formatted")},
+        {translate("images.pngjpeg")},
+        {translate("movies.flv")},
+        {translate("sounds.mp3wavflv"), translate("sounds.flv")},
+        {translate("actionscript.as"), translate("actionscript.pcode")}
     };
     String optionNames[] = {
-        "Shapes",
-        "Texts",
-        "Images",
-        "Movies",
-        "Sounds",
-        "ActionScript"
+        translate("shapes"),
+        translate("texts"),
+        translate("images"),
+        translate("movies"),
+        translate("sounds"),
+        translate("actionscript")
     };
     public static final int OPTION_SHAPES = 0;
     public static final int OPTION_TEXTS = 1;
@@ -46,7 +46,7 @@ public class ExportDialog extends JDialog {
     }
 
     public ExportDialog() {
-        setTitle("Export...");
+        setTitle(translate("dialog.title"));
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -71,7 +71,7 @@ public class ExportDialog extends JDialog {
         top += 10;
 
 
-        JButton okButton = new JButton("OK");
+        JButton okButton = new JButton(translate("button.ok"));
         okButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -80,7 +80,7 @@ public class ExportDialog extends JDialog {
         });
         okButton.setBounds(43, top, 75, 25);
 
-        JButton cancelButton = new JButton("Cancel");
+        JButton cancelButton = new JButton(translate("button.cancel"));
         cancelButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

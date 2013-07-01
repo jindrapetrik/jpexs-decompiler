@@ -37,7 +37,7 @@ import javax.swing.JScrollPane;
  *
  * @author JPEXS
  */
-public class GraphFrame extends JFrame {
+public class GraphFrame extends AppFrame {
 
     private class GraphPanel extends JPanel {
 
@@ -246,7 +246,7 @@ public class GraphFrame extends JFrame {
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
         gp = new GraphPanel(graph);
-        setTitle("Graph " + name);
+        setTitle(translate("graph") + " " + name);
         cnt.add(new JScrollPane(gp));
 
         View.setWindowIcon(this);

@@ -1358,7 +1358,7 @@ public class Graph {
 
 
         if (debugMode) {
-            System.err.println("PART " + part+" nextsize:"+part.nextParts.size());
+            System.err.println("PART " + part + " nextsize:" + part.nextParts.size());
         }
 
         /*while (((part != null) && (part.getHeight() == 1)) && (code.size() > part.start) && (code.get(part.start).isJump())) {  //Parts with only jump in it gets ignored

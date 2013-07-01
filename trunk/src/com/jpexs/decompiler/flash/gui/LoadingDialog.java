@@ -21,7 +21,6 @@ import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.ImageObserver;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -32,7 +31,7 @@ import javax.swing.SwingConstants;
  *
  * @author JPEXS
  */
-public class LoadingDialog extends JFrame implements ImageObserver {
+public class LoadingDialog extends AppDialog implements ImageObserver {
 
     private JLabel detailLabel = new JLabel("", JLabel.CENTER);
     private LoadingPanel loadingPanel;
@@ -60,7 +59,7 @@ public class LoadingDialog extends JFrame implements ImageObserver {
     public LoadingDialog() {
         setResizable(false);
         setTitle(Main.shortApplicationVerName);
-        setSize(250, 150);
+        setSize(275, 150);
         setLayout(new BorderLayout());
 
         loadingPanel = new LoadingPanel(50, 50);
@@ -69,10 +68,10 @@ public class LoadingDialog extends JFrame implements ImageObserver {
         JPanel pan = new JPanel();
         pan.setLayout(null);
         pan.setPreferredSize(new Dimension(120, 150));
-        JLabel loadingLabel = new JLabel("Loading, please wait...");
-        loadingLabel.setBounds(0, 30, 125, 20);
+        JLabel loadingLabel = new JLabel(translate("loadingpleasewait"));
+        loadingLabel.setBounds(0, 30, 150, 20);
         loadingLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        detailLabel.setBounds(0, 45, 125, 20);
+        detailLabel.setBounds(0, 45, 150, 20);
         progressBar.setBounds(0, 70, 125, 25);
         pan.add(loadingLabel);
         pan.add(detailLabel);

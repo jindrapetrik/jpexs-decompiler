@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.TagNode;
-import com.jpexs.decompiler.flash.abc.gui.ClassesListTreeModel;
-import com.jpexs.decompiler.flash.abc.gui.TreeElement;
+import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
+import com.jpexs.decompiler.flash.gui.abc.TreeElement;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.event.TreeModelListener;

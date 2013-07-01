@@ -59,6 +59,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
+import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 
 /**
  * Main executable class
@@ -193,13 +194,13 @@ public class Main {
                         startWork((String) data);
                     }
                     if (event.equals("getVariables")) {
-                        startWork("Getting variables..." + (String) data);
+                        startWork(translate("work.gettingvariables") + "..." + (String) data);
                     }
                     if (event.equals("deobfuscate")) {
-                        startWork("Deobfuscating..." + (String) data);
+                        startWork(translate("work.deobfuscating") + "..." + (String) data);
                     }
                     if (event.equals("rename")) {
-                        startWork("Renaming..." + (String) data);
+                        startWork(translate("work.renaming") + "..." + (String) data);
                     }
                 }
             });
@@ -217,17 +218,18 @@ public class Main {
         @Override
         protected Object doInBackground() throws Exception {
             try {
-                Main.startWork("Reading SWF...");
+                Main.startWork(translate("work.reading.swf") + "...");
                 swf = parseSWF(Main.file);
             } catch (Exception ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 JOptionPane.showMessageDialog(null, "Cannot load SWF file.");
                 loadingDialog.setVisible(false);
+                exit();
                 return false;
             }
 
             try {
-                Main.startWork("Creating window...");
+                Main.startWork(translate("work.creatingwindow") + "...");
                 mainFrame = new MainFrame(swf);
                 loadingDialog.setVisible(false);
                 mainFrame.setVisible(true);
@@ -255,6 +257,18 @@ public class Main {
     public static boolean saveFileDialog() {
         JFileChooser fc = new JFileChooser();
         fc.setCurrentDirectory(new File((String) Configuration.getConfig("lastSaveDir", ".")));
+        fc.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return (f.getName().endsWith(".swf")) || (f.isDirectory());
+            }
+
+            @Override
+            public String getDescription() {
+                return translate("filter.swf");
+            }
+        });
+        fc.setAcceptAllFileFilterUsed(false);
         JFrame f = new JFrame();
         View.setWindowIcon(f);
         int returnVal = fc.showSaveDialog(f);
@@ -266,7 +280,7 @@ public class Main {
                 maskURL = null;
                 return true;
             } catch (IOException ex) {
-                JOptionPane.showMessageDialog(null, "Cannot write to the file");
+                JOptionPane.showMessageDialog(null, translate("error.file.write"));
             }
         }
         return false;
@@ -284,7 +298,7 @@ public class Main {
 
             @Override
             public String getDescription() {
-                return "SWF files (*.swf)";
+                return translate("filter.swf");
             }
         });
         JFrame f = new JFrame();
@@ -680,9 +694,9 @@ public class Main {
         proxyFrame.switchState();
         if (stopMenuItem != null) {
             if (proxyFrame.isRunning()) {
-                stopMenuItem.setLabel("Stop proxy");
+                stopMenuItem.setLabel(translate("proxy.stop"));
             } else {
-                stopMenuItem.setLabel("Start proxy");
+                stopMenuItem.setLabel(translate("proxy.start"));
             }
         }
     }
@@ -693,7 +707,7 @@ public class Main {
         }
         if (SystemTray.isSupported()) {
             SystemTray tray = SystemTray.getSystemTray();
-            trayIcon = new TrayIcon(View.loadImage("proxy16"), vendor + " " + shortApplicationName + " Proxy");
+            trayIcon = new TrayIcon(View.loadImage("proxy16"), vendor + " " + shortApplicationName + " " + translate("proxy"));
             trayIcon.setImageAutoSize(true);
             PopupMenu trayPopup = new PopupMenu();
 
@@ -717,16 +731,16 @@ public class Main {
             };
 
 
-            MenuItem showMenuItem = new MenuItem("Show proxy");
+            MenuItem showMenuItem = new MenuItem(translate("proxy.show"));
             showMenuItem.setActionCommand("SHOW");
             showMenuItem.addActionListener(trayListener);
             trayPopup.add(showMenuItem);
-            stopMenuItem = new MenuItem("Start proxy");
+            stopMenuItem = new MenuItem(translate("proxy.start"));
             stopMenuItem.setActionCommand("SWITCH");
             stopMenuItem.addActionListener(trayListener);
             trayPopup.add(stopMenuItem);
             trayPopup.addSeparator();
-            MenuItem exitMenuItem = new MenuItem("Exit");
+            MenuItem exitMenuItem = new MenuItem(translate("exit"));
             exitMenuItem.setActionCommand("EXIT");
             exitMenuItem.addActionListener(trayListener);
             trayPopup.add(exitMenuItem);

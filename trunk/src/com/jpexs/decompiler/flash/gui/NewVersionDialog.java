@@ -38,7 +38,7 @@ import javax.swing.UIManager;
  *
  * @author JPEXS
  */
-public class NewVersionDialog extends JDialog implements ActionListener {
+public class NewVersionDialog extends AppDialog implements ActionListener {
 
     Version latestVersion;
 
@@ -51,9 +51,9 @@ public class NewVersionDialog extends JDialog implements ActionListener {
         changesText.setFont(UIManager.getFont("TextField.font"));
         String changesStr = "";
         for (Version v : versions) {
-            changesStr += "version " + v.versionName + "\r\n";
+            changesStr += translate("version") + " " + v.versionName + "\r\n";
             changesStr += "-----------------------\r\n";
-            changesStr += "Release date:" + v.releaseDate + "\r\n";
+            changesStr += translate("releasedate") + v.releaseDate + "\r\n";
             for (String type : v.changes.keySet()) {
                 changesStr += type + ":" + "\r\n";
                 for (String ch : v.changes.get(type)) {
@@ -67,11 +67,11 @@ public class NewVersionDialog extends JDialog implements ActionListener {
             latestVersion = versions.get(0);
         }
         changesText.setText(changesStr);
-        JLabel newAvailableLabel = new JLabel("<html><b><center>New version is available: " + latestVersion.appName + " version " + latestVersion.versionName + "</center></b></html>", SwingConstants.CENTER);
+        JLabel newAvailableLabel = new JLabel("<html><b><center>" + translate("newversionavailable") + " " + latestVersion.appName + " " + translate("version") + " " + latestVersion.versionName + "</center></b></html>", SwingConstants.CENTER);
         newAvailableLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         cnt.add(newAvailableLabel);
 
-        JLabel changeslogLabel = new JLabel("<html>Changeslog:</html>");
+        JLabel changeslogLabel = new JLabel("<html>" + translate("changeslog") + "</html>");
         changeslogLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         cnt.add(changeslogLabel);
 
@@ -79,11 +79,11 @@ public class NewVersionDialog extends JDialog implements ActionListener {
         span.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         cnt.add(span);
         JPanel buttonsPanel = new JPanel(new FlowLayout());
-        JButton buttonOk = new JButton("OK");
+        JButton buttonOk = new JButton(translate("button.ok"));
         buttonOk.setActionCommand("OK");
         buttonOk.addActionListener(this);
 
-        JButton buttonCancel = new JButton("Cancel");
+        JButton buttonCancel = new JButton(translate("button.cancel"));
         buttonCancel.setActionCommand("CANCEL");
         buttonCancel.addActionListener(this);
 
@@ -91,13 +91,13 @@ public class NewVersionDialog extends JDialog implements ActionListener {
         buttonsPanel.add(buttonCancel);
         buttonsPanel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 
-        JLabel downloadNowLabel = new JLabel("<html><b><center>Download now?</center></b></html>", SwingConstants.CENTER);
+        JLabel downloadNowLabel = new JLabel("<html><b><center>" + translate("downloadnow") + "</center></b></html>", SwingConstants.CENTER);
         downloadNowLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         cnt.add(downloadNowLabel);
         cnt.add(buttonsPanel);
 
         setResizable(false);
-        setTitle("New version available");
+        setTitle(translate("dialog.title"));
         this.getRootPane().setDefaultButton(buttonOk);
         View.centerScreen(this);
         setModalityType(ModalityType.APPLICATION_MODAL);
@@ -127,7 +127,7 @@ public class NewVersionDialog extends JDialog implements ActionListener {
                 }
             }
             if (desktop == null) {
-                JOptionPane.showMessageDialog(null, "New version of " + Main.shortApplicationName + " is available: " + latestVersion.appName + ".\r\nPlease go to " + Main.projectPage + " to download it.", "New version", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, translate("newvermessage").replace("%oldAppName%", Main.shortApplicationName).replace("%newAppName%", latestVersion.appName).replace("%projectPage%", Main.projectPage), translate("newversion"), JOptionPane.INFORMATION_MESSAGE);
             }
         }
         setVisible(false);

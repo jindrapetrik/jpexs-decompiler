@@ -30,7 +30,7 @@ import javax.swing.tree.TreePath;
  *
  * @author JPEXS
  */
-public class GraphTreeFrame extends JFrame {
+public class GraphTreeFrame extends AppFrame {
 
     public JTree graphTree;
 

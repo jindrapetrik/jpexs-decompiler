@@ -31,11 +31,11 @@ import javax.swing.JLabel;
  *
  * @author JPEXS
  */
-public class ModeFrame extends JFrame implements ActionListener {
+public class ModeFrame extends AppFrame implements ActionListener {
 
-    private JButton openButton = new JButton("Open local file");
-    private JButton proxyButton = new JButton("Open via proxy");
-    private JButton exitButton = new JButton("Exit application");
+    private JButton openButton = new JButton(translate("button.open"));
+    private JButton proxyButton = new JButton(translate("button.proxy"));
+    private JButton exitButton = new JButton(translate("button.exit"));
 
     /**
      * Constructor

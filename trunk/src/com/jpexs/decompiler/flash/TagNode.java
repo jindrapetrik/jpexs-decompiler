@@ -56,6 +56,7 @@ public class TagNode {
     public List<TagNode> subItems;
     public Object tag;
     public boolean export = false;
+    public String mark;
 
     public List<TagNode> getAllSubs() {
         List<TagNode> ret = new ArrayList<>();

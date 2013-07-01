@@ -34,12 +34,12 @@ import javax.swing.JRadioButton;
  *
  * @author JPEXS
  */
-public class RenameDialog extends JDialog implements ActionListener {
+public class RenameDialog extends AppDialog implements ActionListener {
 
-    private JRadioButton typeNumberRadioButton = new JRadioButton("Type + Number (class_27, method_456,...)");
-    private JRadioButton randomWordRadioButton = new JRadioButton("Random word (abada, kof, supo, kosuri,...)");
-    private JButton okButton = new JButton("OK");
-    private JButton cancelButton = new JButton("Cancel");
+    private JRadioButton typeNumberRadioButton = new JRadioButton(translate("rename.type.typenumber"));
+    private JRadioButton randomWordRadioButton = new JRadioButton(translate("rename.type.randomword"));
+    private JButton okButton = new JButton(translate("button.ok"));
+    private JButton cancelButton = new JButton(translate("button.cancel"));
     private boolean confirmed = false;
 
     public RenameType getRenameType() {
@@ -66,7 +66,7 @@ public class RenameDialog extends JDialog implements ActionListener {
         typeNumberRadioButton.setSelected(renameType == 1);
         randomWordRadioButton.setSelected(renameType == 2);
         setLayout(new BorderLayout());
-        add(new JLabel("Rename type:"), BorderLayout.NORTH);
+        add(new JLabel(translate("rename.type")), BorderLayout.NORTH);
         add(pan, BorderLayout.CENTER);
         JPanel panButtons = new JPanel(new FlowLayout());
         panButtons.add(okButton);
@@ -79,7 +79,7 @@ public class RenameDialog extends JDialog implements ActionListener {
         setModalityType(ModalityType.APPLICATION_MODAL);
         View.centerScreen(this);
         View.setWindowIcon(this);
-        setTitle("Rename Identifiers");
+        setTitle(translate("dialog.title"));
         getRootPane().setDefaultButton(okButton);
     }
 

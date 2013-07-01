@@ -27,6 +27,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
+import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 
 /**
  *
@@ -38,7 +39,7 @@ public class SWFPreviwPanel extends JPanel {
     Timer timer;
     int frame = 0;
     List<BufferedImage> frameImages = new ArrayList<>();
-    JLabel buffering = new JLabel("Buffering...");
+    JLabel buffering = new JLabel(translate("work.buffering") + "...");
 
     public SWFPreviwPanel() {
         pan = new ImagePanel();

@@ -25,14 +25,14 @@ import com.jpexs.decompiler.flash.TagNode;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
-import com.jpexs.decompiler.flash.abc.gui.ABCPanel;
-import com.jpexs.decompiler.flash.abc.gui.ClassesListTreeModel;
-import com.jpexs.decompiler.flash.abc.gui.DeobfuscationDialog;
-import com.jpexs.decompiler.flash.abc.gui.LineMarkedEditorPane;
-import com.jpexs.decompiler.flash.abc.gui.TreeElement;
+import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
+import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
+import com.jpexs.decompiler.flash.gui.abc.DeobfuscationDialog;
+import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
+import com.jpexs.decompiler.flash.gui.abc.TreeElement;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
-import com.jpexs.decompiler.flash.action.gui.ActionPanel;
+import com.jpexs.decompiler.flash.gui.action.ActionPanel;
 import static com.jpexs.decompiler.flash.gui.Main.isAssociated;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.helpers.Helper;
@@ -174,12 +174,11 @@ import javax.swing.tree.TreeSelectionModel;
  *
  * @author Jindra
  */
-public class MainFrame extends JFrame implements ActionListener, TreeSelectionListener {
+public class MainFrame extends AppFrame implements ActionListener, TreeSelectionListener {
 
     private SWF swf;
     public ABCPanel abcPanel;
     public ActionPanel actionPanel;
-    private JTabbedPane tabPane;
     public LoadingPanel loadingPanel = new LoadingPanel(20, 20);
     public JLabel statusLabel = new JLabel("");
     public JPanel statusPanel = new JPanel();
@@ -277,7 +276,6 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             h = dim.height;
         }
         setSize(w, h);
-        tabPane = new JTabbedPane();
         View.setWindowIcon(this);
         addComponentListener(new ComponentAdapter() {
             @Override
@@ -306,29 +304,29 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         } catch (FlashUnsupportedException fue) {
         }
 
-        JMenu menuFile = new JMenu("File");
-        JMenuItem miOpen = new JMenuItem("Open...");
+        JMenu menuFile = new JMenu(translate("menu.file"));
+        JMenuItem miOpen = new JMenuItem(translate("menu.file.open"));
         miOpen.setIcon(View.getIcon("open16"));
         miOpen.setActionCommand("OPEN");
         miOpen.addActionListener(this);
-        JMenuItem miSave = new JMenuItem("Save");
+        JMenuItem miSave = new JMenuItem(translate("menu.file.save"));
         miSave.setIcon(View.getIcon("save16"));
         miSave.setActionCommand("SAVE");
         miSave.addActionListener(this);
-        JMenuItem miSaveAs = new JMenuItem("Save as...");
+        JMenuItem miSaveAs = new JMenuItem(translate("menu.file.saveas"));
         miSaveAs.setIcon(View.getIcon("saveas16"));
         miSaveAs.setActionCommand("SAVEAS");
         miSaveAs.addActionListener(this);
 
-        JMenuItem menuExportFla = new JMenuItem("Export to FLA");
+        JMenuItem menuExportFla = new JMenuItem(translate("menu.file.export.fla"));
         menuExportFla.setActionCommand("EXPORTFLA");
         menuExportFla.addActionListener(this);
         menuExportFla.setIcon(View.getIcon("flash16"));
 
-        JMenuItem menuExportAll = new JMenuItem("Export all parts");
+        JMenuItem menuExportAll = new JMenuItem(translate("menu.file.export.all"));
         menuExportAll.setActionCommand("EXPORT");
         menuExportAll.addActionListener(this);
-        JMenuItem menuExportSel = new JMenuItem("Export selection");
+        JMenuItem menuExportSel = new JMenuItem(translate("menu.file.export.selection"));
         menuExportSel.setActionCommand("EXPORTSEL");
         menuExportSel.addActionListener(this);
         menuExportAll.setIcon(View.getIcon("export16"));
@@ -343,60 +341,60 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         menuFile.add(menuExportAll);
         menuFile.add(menuExportSel);
         menuFile.addSeparator();
-        JMenuItem miClose = new JMenuItem("Exit");
+        JMenuItem miClose = new JMenuItem(translate("menu.file.exit"));
         miClose.setIcon(View.getIcon("exit16"));
         miClose.setActionCommand("EXIT");
         miClose.addActionListener(this);
         menuFile.add(miClose);
         menuBar.add(menuFile);
-        JMenu menuDeobfuscation = new JMenu("Deobfuscation");
+        JMenu menuDeobfuscation = new JMenu(translate("menu.tools.deobfuscation"));
         menuDeobfuscation.setIcon(View.getIcon("deobfuscate16"));
 
-        JMenuItem miDeobfuscation = new JMenuItem("PCode deobfuscation...");
+        JMenuItem miDeobfuscation = new JMenuItem(translate("menu.tools.deobfuscation.pcode"));
         miDeobfuscation.setActionCommand("DEOBFUSCATE");
         miDeobfuscation.addActionListener(this);
 
-        autoDeobfuscateMenuItem = new JCheckBoxMenuItem("Automatic deobfuscation");
+        autoDeobfuscateMenuItem = new JCheckBoxMenuItem(translate("menu.settings.autodeobfuscation"));
         autoDeobfuscateMenuItem.setState((Boolean) Configuration.getConfig("autoDeobfuscate", true));
         autoDeobfuscateMenuItem.addActionListener(this);
         autoDeobfuscateMenuItem.setActionCommand("AUTODEOBFUSCATE");
 
 
-        JCheckBoxMenuItem miSubLimiter = new JCheckBoxMenuItem("Enable sub limiter");
-        miSubLimiter.setActionCommand("SUBLIMITER");
-        miSubLimiter.addActionListener(this);
-
-        JMenuItem miRenameOneIdentifier = new JMenuItem("Globally rename identifier");
+        /*     JCheckBoxMenuItem miSubLimiter = new JCheckBoxMenuItem("Enable sub limiter");
+         miSubLimiter.setActionCommand("SUBLIMITER");
+         miSubLimiter.addActionListener(this);
+         */
+        JMenuItem miRenameOneIdentifier = new JMenuItem(translate("menu.tools.deobfuscation.globalrename"));
         miRenameOneIdentifier.setActionCommand("RENAMEONEIDENTIFIER");
         miRenameOneIdentifier.addActionListener(this);
 
-        JMenuItem miRenameIdentifiers = new JMenuItem("Rename invalid identifiers");
+        JMenuItem miRenameIdentifiers = new JMenuItem(translate("menu.tools.deobfuscation.renameinvalid"));
         miRenameIdentifiers.setActionCommand("RENAMEIDENTIFIERS");
         miRenameIdentifiers.addActionListener(this);
 
-        JMenuItem miRemoveDeadCode = new JMenuItem("Remove dead code");
-        miRemoveDeadCode.setActionCommand("REMOVEDEADCODE");
-        miRemoveDeadCode.addActionListener(this);
+        /*JMenuItem miRemoveDeadCode = new JMenuItem("Remove dead code");
+         miRemoveDeadCode.setActionCommand("REMOVEDEADCODE");
+         miRemoveDeadCode.addActionListener(this);
 
-        JMenuItem miRemoveDeadCodeAll = new JMenuItem("Remove all dead code");
-        miRemoveDeadCodeAll.setActionCommand("REMOVEDEADCODEALL");
-        miRemoveDeadCodeAll.addActionListener(this);
+         JMenuItem miRemoveDeadCodeAll = new JMenuItem("Remove all dead code");
+         miRemoveDeadCodeAll.setActionCommand("REMOVEDEADCODEALL");
+         miRemoveDeadCodeAll.addActionListener(this);
 
-        JMenuItem miTraps = new JMenuItem("Remove traps");
-        miTraps.setActionCommand("REMOVETRAPS");
-        miTraps.addActionListener(this);
+         JMenuItem miTraps = new JMenuItem("Remove traps");
+         miTraps.setActionCommand("REMOVETRAPS");
+         miTraps.addActionListener(this);
 
-        JMenuItem miTrapsAll = new JMenuItem("Remove all traps");
-        miTrapsAll.setActionCommand("REMOVETRAPSALL");
-        miTrapsAll.addActionListener(this);
+         JMenuItem miTrapsAll = new JMenuItem("Remove all traps");
+         miTrapsAll.setActionCommand("REMOVETRAPSALL");
+         miTrapsAll.addActionListener(this);
 
-        JMenuItem miControlFlow = new JMenuItem("Restore control flow");
-        miControlFlow.setActionCommand("RESTORECONTROLFLOW");
-        miControlFlow.addActionListener(this);
+         JMenuItem miControlFlow = new JMenuItem("Restore control flow");
+         miControlFlow.setActionCommand("RESTORECONTROLFLOW");
+         miControlFlow.addActionListener(this);
 
-        JMenuItem miControlFlowAll = new JMenuItem("Restore all control flow");
-        miControlFlowAll.setActionCommand("RESTORECONTROLFLOWALL");
-        miControlFlowAll.addActionListener(this);
+         JMenuItem miControlFlowAll = new JMenuItem("Restore all control flow");
+         miControlFlowAll.setActionCommand("RESTORECONTROLFLOWALL");
+         miControlFlowAll.addActionListener(this);*/
 
         menuDeobfuscation.add(miRenameOneIdentifier);
         menuDeobfuscation.add(miRenameIdentifiers);
@@ -411,20 +409,20 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
          menuDeobfuscation.add(miControlFlow);
          menuDeobfuscation.add(miControlFlowAll);
          */
-        JMenu menuTools = new JMenu("Tools");
-        JMenuItem miProxy = new JMenuItem("Proxy");
+        JMenu menuTools = new JMenu(translate("menu.tools"));
+        JMenuItem miProxy = new JMenuItem(translate("menu.tools.proxy"));
         miProxy.setActionCommand("SHOWPROXY");
         miProxy.setIcon(View.getIcon("proxy16"));
         miProxy.addActionListener(this);
 
-        JMenuItem miSearchScript = new JMenuItem("Search All ActionScript...");
+        JMenuItem miSearchScript = new JMenuItem(translate("menu.tools.searchas"));
         miSearchScript.addActionListener(this);
         miSearchScript.setActionCommand("SEARCHAS");
         miSearchScript.setIcon(View.getIcon("search16"));
 
         menuTools.add(miSearchScript);
 
-        miInternalViewer = new JCheckBoxMenuItem("Use own Flash viewer");
+        miInternalViewer = new JCheckBoxMenuItem(translate("menu.settings.internalflashviewer"));
         miInternalViewer.setSelected((Boolean) Configuration.getConfig("internalFlashViewer", (Boolean) (flashPanel == null)));
         if (flashPanel == null) {
             miInternalViewer.setSelected(true);
@@ -433,7 +431,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         miInternalViewer.setActionCommand("INTERNALVIEWERSWITCH");
         miInternalViewer.addActionListener(this);
 
-        miParallelSpeedUp = new JCheckBoxMenuItem("Parallel SpeedUp");
+        miParallelSpeedUp = new JCheckBoxMenuItem(translate("menu.settings.parallelspeedup"));
         miParallelSpeedUp.setSelected((Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
         miParallelSpeedUp.setActionCommand("PARALLELSPEEDUP");
         miParallelSpeedUp.addActionListener(this);
@@ -444,50 +442,57 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         //menuTools.add(menuDeobfuscation);
         menuTools.add(menuDeobfuscation);
 
-        JMenuItem miGotoDocumentClass = new JMenuItem("Go to document class");
+        JMenuItem miGotoDocumentClass = new JMenuItem(translate("menu.tools.gotodocumentclass"));
         miGotoDocumentClass.setActionCommand("GOTODOCUMENTCLASS");
         miGotoDocumentClass.addActionListener(this);
         menuBar.add(menuTools);
 
-        miDecompile = new JCheckBoxMenuItem("Disable decompilation (Disassemble only)");
+        miDecompile = new JCheckBoxMenuItem(translate("menu.settings.disabledecompilation"));
         miDecompile.setSelected(!(Boolean) Configuration.getConfig("decompile", Boolean.TRUE));
         miDecompile.setActionCommand("DISABLEDECOMPILATION");
         miDecompile.addActionListener(this);
 
-        JMenu menuSettings = new JMenu("Settings");
+        JMenu menuSettings = new JMenu(translate("menu.settings"));
         menuSettings.add(autoDeobfuscateMenuItem);
         menuSettings.add(miInternalViewer);
         menuSettings.add(miParallelSpeedUp);
         menuSettings.add(miDecompile);
 
 
-        miAssociate = new JCheckBoxMenuItem("Add FFDec to SWF files context menu");
+        miAssociate = new JCheckBoxMenuItem(translate("menu.settings.addtocontextmenu"));
         miAssociate.setActionCommand("ASSOCIATE");
         miAssociate.addActionListener(this);
         miAssociate.setState(isAssociated());
+
+
+        JMenuItem miLanguage = new JMenuItem(translate("menu.settings.language"));
+        miLanguage.setActionCommand("SETLANGUAGE");
+        miLanguage.addActionListener(this);
+
         if (Platform.isWindows()) {
             menuSettings.add(miAssociate);
         }
+        menuSettings.add(miLanguage);
 
         menuBar.add(menuSettings);
-        JMenu menuHelp = new JMenu("Help");
-        JMenuItem miAbout = new JMenuItem("About...");
+        JMenu menuHelp = new JMenu(translate("menu.help"));
+        JMenuItem miAbout = new JMenuItem(translate("menu.help.about"));
         miAbout.setIcon(View.getIcon("about16"));
 
         miAbout.setActionCommand("ABOUT");
         miAbout.addActionListener(this);
 
-        JMenuItem miCheckUpdates = new JMenuItem("Check for updates...");
+        JMenuItem miCheckUpdates = new JMenuItem(translate("menu.help.checkupdates"));
         miCheckUpdates.setActionCommand("CHECKUPDATES");
         miCheckUpdates.setIcon(View.getIcon("update16"));
         miCheckUpdates.addActionListener(this);
 
-        JMenuItem miHelpUs = new JMenuItem("Help us!");
+        JMenuItem miHelpUs = new JMenuItem(translate("menu.help.helpus"));
         miHelpUs.setActionCommand("HELPUS");
         miHelpUs.setIcon(View.getIcon("donate16"));
         miHelpUs.addActionListener(this);
 
-        JMenuItem miHomepage = new JMenuItem("Visit homepage");
+        JMenuItem miHomepage = new JMenuItem(translate("menu.help.homepage"));
         miHomepage.setActionCommand("HOMEPAGE");
         miHomepage.setIcon(View.getIcon("homepage16"));
         miHomepage.addActionListener(this);
@@ -521,13 +526,11 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         abcList = new ArrayList<>();
         getActionScript3(objs, abcList);
         if (!abcList.isEmpty()) {
-            addTab(tabPane, abcPanel = new ABCPanel(abcList), "ActionScript3", View.getIcon("as16"));
+            abcPanel = new ABCPanel(abcList);
             detailPanel.add(abcPanel.tabbedPane, DETAILCARDAS3NAVIGATOR);
             menuTools.add(miGotoDocumentClass);
         } else {
             actionPanel = new ActionPanel();
-            addTab(tabPane, actionPanel, "ActionScript", View.getIcon("as16"));
-
             miDeobfuscation.setEnabled(false);
         }
 
@@ -612,7 +615,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             }
         });
         final JPopupMenu spritePopupMenu = new JPopupMenu();
-        JMenuItem removeMenuItem = new JMenuItem("Remove");
+        JMenuItem removeMenuItem = new JMenuItem(translate("contextmenu.remove"));
         removeMenuItem.addActionListener(this);
         removeMenuItem.setActionCommand("REMOVEITEM");
         spritePopupMenu.add(removeMenuItem);
@@ -715,17 +718,17 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         buttonsPanel.setLayout(new FlowLayout());
 
 
-        textSaveButton = new JButton("Save", View.getIcon("save16"));
+        textSaveButton = new JButton(translate("button.save"), View.getIcon("save16"));
         textSaveButton.setMargin(new Insets(3, 3, 3, 10));
         textSaveButton.setActionCommand("SAVETEXT");
         textSaveButton.addActionListener(this);
 
-        textEditButton = new JButton("Edit", View.getIcon("edit16"));
+        textEditButton = new JButton(translate("button.edit"), View.getIcon("edit16"));
         textEditButton.setMargin(new Insets(3, 3, 3, 10));
         textEditButton.setActionCommand("EDITTEXT");
         textEditButton.addActionListener(this);
 
-        textCancelButton = new JButton("Cancel", View.getIcon("cancel16"));
+        textCancelButton = new JButton(translate("button.cancel"), View.getIcon("cancel16"));
         textCancelButton.setMargin(new Insets(3, 3, 3, 10));
         textCancelButton.setActionCommand("CANCELTEXT");
         textCancelButton.addActionListener(this);
@@ -762,7 +765,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             leftComponent = flashPanel;
         } else {
             JPanel swtPanel = new JPanel(new BorderLayout());
-            swtPanel.add(new JLabel("<html><center>Preview of this object is not available on this platform. (Windows only)</center></html>", JLabel.CENTER), BorderLayout.CENTER);
+            swtPanel.add(new JLabel("<html><center>" + translate("notavailonthisplatform") + "</center></html>", JLabel.CENTER), BorderLayout.CENTER);
             swtPanel.setBackground(Color.white);
             leftComponent = swtPanel;
         }
@@ -772,11 +775,11 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         previewSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         previewSplitPane.setDividerLocation(300);
         JPanel pan = new JPanel(new BorderLayout());
-        JLabel prevLabel = new JLabel("SWF preview");
+        JLabel prevLabel = new JLabel(translate("swfpreview"));
         prevLabel.setHorizontalAlignment(SwingConstants.CENTER);
         prevLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
 
-        JLabel paramsLabel = new JLabel("Parameters");
+        JLabel paramsLabel = new JLabel(translate("parameters"));
         paramsLabel.setHorizontalAlignment(SwingConstants.CENTER);
         paramsLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
         pan.add(prevLabel, BorderLayout.NORTH);
@@ -796,7 +799,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
 
 
-        imageReplaceButton = new JButton("Replace...", View.getIcon("edit16"));
+        imageReplaceButton = new JButton(translate("button.replace"), View.getIcon("edit16"));
         imageReplaceButton.setMargin(new Insets(3, 3, 3, 10));
         imageReplaceButton.setActionCommand("REPLACEIMAGE");
         imageReplaceButton.addActionListener(this);
@@ -813,7 +816,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
         previewImagePanel = new ImagePanel();
         previewPanel.add(previewImagePanel, BorderLayout.CENTER);
-        JLabel prevIntLabel = new JLabel("SWF preview (Internal viewer)");
+        JLabel prevIntLabel = new JLabel(translate("swfpreview.internal"));
         prevIntLabel.setHorizontalAlignment(SwingConstants.CENTER);
         prevIntLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
         previewPanel.add(prevIntLabel, BorderLayout.NORTH);
@@ -1193,11 +1196,11 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
     public void renameIdentifier(String identifier) {
         String oldName = identifier;
-        String newName = JOptionPane.showInputDialog("Enter new name:", oldName);
+        String newName = JOptionPane.showInputDialog(translate("rename.enternew"), oldName);
         if (newName != null) {
             if (!oldName.equals(newName)) {
                 swf.renameAS2Identifier(oldName, newName);
-                JOptionPane.showMessageDialog(null, "Identifier renamed.");
+                JOptionPane.showMessageDialog(null, translate("rename.finished.identifier"));
                 doFilter();
                 reload(true);
             }
@@ -1209,7 +1212,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         if (abcPanel.abc.constants.constant_multiname[multiNameIndex].name_index > 0) {
             oldName = abcPanel.abc.constants.constant_string[abcPanel.abc.constants.constant_multiname[multiNameIndex].name_index];
         }
-        String newName = JOptionPane.showInputDialog("Enter new name:", oldName);
+        String newName = JOptionPane.showInputDialog(translate("rename.enternew"), oldName);
         if (newName != null) {
             if (!oldName.equals(newName)) {
                 int mulCount = 0;
@@ -1227,7 +1230,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                         }
                     }
                 }
-                JOptionPane.showMessageDialog(null, mulCount + " multiname(s) renamed.");
+                JOptionPane.showMessageDialog(null, translate("rename.finished.multiname").replace("%count%", "" + mulCount));
                 if (abcPanel != null) {
                     abcPanel.reload();
                 }
@@ -1272,7 +1275,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
             if (node instanceof TagNode) {
                 Object tag = ((TagNode) tm.getChild(root, i)).tag;
                 if (tag != null) {
-                    if (tag.toString().equals("scripts")) {
+                    if (tag.toString().equals("scripts".equals(((TagNode) node).mark))) {
                         return (TagNode) node;
                     }
                 }
@@ -1331,42 +1334,43 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         }
 
         actionScript = SWF.createASTagList(list, null);
-        TagNode textsNode = new TagNode("texts");
+        TagNode textsNode = new TagNode(translate("node.texts"));
         textsNode.subItems.addAll(texts);
 
-        TagNode imagesNode = new TagNode("images");
+        TagNode imagesNode = new TagNode(translate("node.images"));
         imagesNode.subItems.addAll(images);
 
-        TagNode moviesNode = new TagNode("movies");
+        TagNode moviesNode = new TagNode(translate("node.movies"));
         moviesNode.subItems.addAll(movies);
 
-        TagNode soundsNode = new TagNode("sounds");
+        TagNode soundsNode = new TagNode(translate("node.sounds"));
         soundsNode.subItems.addAll(sounds);
 
 
-        TagNode binaryDataNode = new TagNode("binaryData");
+        TagNode binaryDataNode = new TagNode(translate("node.binaryData"));
         binaryDataNode.subItems.addAll(binaryData);
 
-        TagNode fontsNode = new TagNode("fonts");
+        TagNode fontsNode = new TagNode(translate("node.fonts"));
         fontsNode.subItems.addAll(fonts);
 
 
-        TagNode spritesNode = new TagNode("sprites");
+        TagNode spritesNode = new TagNode(translate("node.sprites"));
         spritesNode.subItems.addAll(sprites);
 
-        TagNode shapesNode = new TagNode("shapes");
+        TagNode shapesNode = new TagNode(translate("node.shapes"));
         shapesNode.subItems.addAll(shapes);
 
-        TagNode morphShapesNode = new TagNode("morphshapes");
+        TagNode morphShapesNode = new TagNode(translate("node.morphshapes"));
         morphShapesNode.subItems.addAll(morphShapes);
 
-        TagNode buttonsNode = new TagNode("buttons");
+        TagNode buttonsNode = new TagNode(translate("node.buttons"));
         buttonsNode.subItems.addAll(buttons);
 
-        TagNode framesNode = new TagNode("frames");
+        TagNode framesNode = new TagNode(translate("node.frames"));
         framesNode.subItems.addAll(frames);
 
-        TagNode actionScriptNode = new TagNode("scripts");
+        TagNode actionScriptNode = new TagNode(translate("node.scripts"));
+        actionScriptNode.mark = "scripts";
         actionScriptNode.subItems.addAll(actionScript);
 
         if (!shapesNode.subItems.isEmpty()) {
@@ -1418,7 +1422,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     }
 
     public boolean confirmExperimental() {
-        return JOptionPane.showConfirmDialog(null, "Following procedure can damage SWF file which can be then unplayable.\r\nUSE IT ON YOUR OWN RISK. Do you want to continue?", "Warning", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION;
+        return JOptionPane.showConfirmDialog(null, translate("message.confirm.experimental"), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION;
     }
     private SearchDialog searchDialog;
 
@@ -1485,7 +1489,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         if (abcPanel != null) {
             for (int i = 0; i < tlsList.size(); i++) {
                 ScriptPack tls = tlsList.get(i);
-                Main.startWork("Exporting " + (i + 1) + "/" + tlsList.size() + " " + tls.getPath() + " ...");
+                Main.startWork(translate("work.exporting") + " " + (i + 1) + "/" + tlsList.size() + " " + tls.getPath() + " ...");
                 ret.add(tls.export(selFile, abcList, isPcode, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE)));
             }
         } else {
@@ -1513,6 +1517,17 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
+            case "SETLANGUAGE":
+                String newLanguage = new SelectLanguageDialog().display();
+                if (newLanguage != null) {
+                    if (newLanguage.equals("en")) {
+                        newLanguage = "";
+                    }
+                    Configuration.setConfig("locale", newLanguage);
+                    JOptionPane.showMessageDialog(null, "Changing language needs application restart.\r\nApplication will exit now, please run it again.");
+                    Main.exit();
+                }
+                break;
             case "DISABLEDECOMPILATION":
                 Configuration.setConfig("decompile", !miDecompile.isSelected());
                 clearCache();
@@ -1555,13 +1570,13 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                 }
                 break;
             case "PARALLELSPEEDUP":
-                String confStr = "Parallelism can speed up loading and decompilation but uses more memory.\r\n";
+                String confStr = translate("message.confirm.parallel") + "\r\n";
                 if (miParallelSpeedUp.isSelected()) {
-                    confStr += " Do you want to turn this ON?";
+                    confStr += " " + translate("message.confirm.on");
                 } else {
-                    confStr += " Do you want to turn this OFF?";
+                    confStr += " " + translate("message.confirm.off");
                 }
-                if (JOptionPane.showConfirmDialog(null, confStr, "Parallelism", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                if (JOptionPane.showConfirmDialog(null, confStr, translate("message.parallel"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
                     Configuration.setConfig("paralelSpeedUp", (Boolean) miParallelSpeedUp.isSelected());
                 } else {
                     miParallelSpeedUp.setSelected(!miParallelSpeedUp.isSelected());
@@ -1578,7 +1593,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                 if (searchDialog.result) {
                     final String txt = searchDialog.searchField.getText();
                     if (!txt.equals("")) {
-                        Main.startWork("Searching \"" + txt + "\"...");
+                        Main.startWork(translate("work.searching") + " \"" + txt + "\"...");
                         if (abcPanel != null) {
                             (new Thread() {
                                 @Override
@@ -1587,7 +1602,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                         showDetail(DETAILCARDAS3NAVIGATOR);
                                         showCard(CARDACTIONSCRIPTPANEL);
                                     } else {
-                                        JOptionPane.showMessageDialog(null, "String \"" + txt + "\" not found.", "Not found", JOptionPane.INFORMATION_MESSAGE);
+                                        JOptionPane.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
                                     }
                                     Main.stopWork();
                                 }
@@ -1599,7 +1614,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                     if (actionPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
                                         showCard(CARDACTIONSCRIPTPANEL);
                                     } else {
-                                        JOptionPane.showMessageDialog(null, "String \"" + txt + "\" not found.", "Not found", JOptionPane.INFORMATION_MESSAGE);
+                                        JOptionPane.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
                                     }
                                     Main.stopWork();
                                 }
@@ -1634,7 +1649,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
                             @Override
                             public String getDescription() {
-                                return "Images (*.jpg,*.gif,*.png)";
+                                return translate("filter.images");
                             }
                         });
                         JFrame f = new JFrame();
@@ -1647,8 +1662,8 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                             try {
                                 it.setImage(data);
                             } catch (IOException ex) {
-                                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "message", ex);
-                                JOptionPane.showMessageDialog(null, "Invalid image.", "Error", JOptionPane.ERROR_MESSAGE);
+                                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Invalid image", ex);
+                                JOptionPane.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
                             }
                             reload(true);
                         }
@@ -1705,13 +1720,13 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                         ((TextTag) oldValue).setFormattedText(swf.tags, textValue.getText());
                         setEditText(false);
                     } catch (ParseException ex) {
-                        JOptionPane.showMessageDialog(null, "Invalid text: " + ex.text + " on line " + ex.line, "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, translate("error.text.invalid").replace("%text%", ex.text).replace("%line%", "" + ex.line), translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
                 }
                 break;
 
             case "AUTODEOBFUSCATE":
-                if (JOptionPane.showConfirmDialog(this, "Automatic deobfuscation is a way to decompile obfuscated code.\r\nDeobfuscation leads to slower decompilation and some of the dead code may be eliminated.\r\nIf the code is not obfuscated, it's better to turn autodeobfuscation off.\r\nDo you really want to " + (autoDeobfuscateMenuItem.getState() ? "turn ON" : "turn OFF") + " automatic debfuscation?", "Confirm", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                if (JOptionPane.showConfirmDialog(this, translate("message.confirm.autodeobfuscate") + "\r\n" + (autoDeobfuscateMenuItem.getState() ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
                     Configuration.setConfig("autoDeobfuscate", autoDeobfuscateMenuItem.getState());
                     clearCache();
                 } else {
@@ -1741,14 +1756,14 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                         (new Thread() {
                             @Override
                             public void run() {
-                                Main.startWork("Renaming...");
+                                Main.startWork(translate("work.renaming") + "...");
                                 renameMultiname(multiName);
                                 Main.stopWork();
                             }
                         }).start();
 
                     } else {
-                        JOptionPane.showMessageDialog(null, "No Multiname found under cursor", "Not found", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(null, translate("message.rename.notfound.multiname"), translate("message.rename.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
                     }
                 } else {
                     final String identifier = actionPanel.getStringUnderCursor();
@@ -1756,13 +1771,13 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                         (new Thread() {
                             @Override
                             public void run() {
-                                Main.startWork("Renaming...");
+                                Main.startWork(translate("work.renaming") + "...");
                                 renameIdentifier(identifier);
                                 Main.stopWork();
                             }
                         }).start();
                     } else {
-                        JOptionPane.showMessageDialog(null, "No identifier found under cursor", "Not found", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(null, translate("message.rename.notfound.identifier"), translate("message.rename.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
                     }
                 }
                 break;
@@ -1785,8 +1800,8 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                 try {
                     Main.saveFile(Main.file);
                 } catch (IOException ex) {
-                    Logger.getLogger(com.jpexs.decompiler.flash.abc.gui.ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
-                    JOptionPane.showMessageDialog(null, "Cannot save file", "Error", JOptionPane.ERROR_MESSAGE);
+                    Logger.getLogger(com.jpexs.decompiler.flash.gui.abc.ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    JOptionPane.showMessageDialog(null, translate("error.file.save"), translate("error"), JOptionPane.ERROR_MESSAGE);
                 }
                 break;
             case "SAVEAS":
@@ -1815,7 +1830,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
                     @Override
                     public String getDescription() {
-                        return "Flash CS 6 Document (*.fla)";
+                        return translate("filter.fla");
                     }
                 };
                 FileFilter xfl = new FileFilter() {
@@ -1826,7 +1841,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
                     @Override
                     public String getDescription() {
-                        return "Flash CS 6 Uncompressed Document (*.xfl)";
+                        return translate("filter.xfl");
                     }
                 };
                 fc.setFileFilter(fla);
@@ -1839,7 +1854,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                     Configuration.setConfig("lastOpenDir", Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
                     File sf = Helper.fixDialogFile(fc.getSelectedFile());
 
-                    Main.startWork("Exporting FLA...");
+                    Main.startWork(translate("work.exporting.fla") + "...");
                     final boolean compressed = fc.getFileFilter() == fla;
                     if (!compressed) {
                         if (sf.getName().endsWith(".fla")) {
@@ -1867,12 +1882,12 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                 if (!export.cancelled) {
                     JFileChooser chooser = new JFileChooser();
                     chooser.setCurrentDirectory(new java.io.File((String) Configuration.getConfig("lastExportDir", ".")));
-                    chooser.setDialogTitle("Select directory to export");
+                    chooser.setDialogTitle(translate("export.select.directory"));
                     chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                     chooser.setAcceptAllFileFilterUsed(false);
                     if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                         final long timeBefore = System.currentTimeMillis();
-                        Main.startWork("Exporting...");
+                        Main.startWork(translate("work.exporting") + "...");
                         final String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
                         Configuration.setConfig("lastExportDir", Helper.fixDialogFile(chooser.getSelectedFile()).getParentFile().getAbsolutePath());
                         final boolean isPcode = export.getOption(ExportDialog.OPTION_ACTIONSCRIPT) == 1;
@@ -1896,7 +1911,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                     }
                                 } catch (Exception ex) {
                                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Error during export", ex);
-                                    JOptionPane.showMessageDialog(null, "Error during export");
+                                    JOptionPane.showMessageDialog(null, translate("error.export"));
                                 }
                                 Main.stopWork();
                                 long timeAfter = System.currentTimeMillis();
@@ -1913,7 +1928,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                 }
                                 timeStr += Helper.padZeros(timeM, 2) + ":";
                                 timeStr += Helper.padZeros(timeS, 2) + "." + Helper.padZeros(timeMs, 3);
-                                setStatus("Exported in " + timeStr);
+                                setStatus(translate("export.finishedin").replace("%time%", timeStr));
                             }
                         }).start();
 
@@ -1923,7 +1938,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
 
             case "CHECKUPDATES":
                 if (!Main.checkForUpdates()) {
-                    JOptionPane.showMessageDialog(null, "No new version available.");
+                    JOptionPane.showMessageDialog(null, translate("update.check.nonewversion"), translate("update.check.title"), JOptionPane.INFORMATION_MESSAGE);
                 }
                 break;
 
@@ -1937,7 +1952,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                     } catch (Exception ex) {
                     }
                 } else {
-                    JOptionPane.showMessageDialog(null, "Please visit\r\n" + helpUsURL + "\r\nfor details.");
+                    JOptionPane.showMessageDialog(null, translate("message.helpus").replace("%url%", helpUsURL));
                 }
                 break;
 
@@ -1951,7 +1966,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                     } catch (Exception ex) {
                     }
                 } else {
-                    JOptionPane.showMessageDialog(null, "Visit homepage at: \r\n" + homePageURL);
+                    JOptionPane.showMessageDialog(null, translate("message.homepage").replace("%url%", homePageURL));
                 }
                 break;
 
@@ -1988,7 +2003,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                 if (confirmExperimental()) {
                     final RenameType renameType = new RenameDialog().display();
                     if (renameType != null) {
-                        Main.startWork("Renaming identifiers...");
+                        Main.startWork(translate("work.renaming.identifiers") + "...");
                         new SwingWorker() {
                             @Override
                             protected Object doInBackground() throws Exception {
@@ -1996,7 +2011,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                     int cnt = 0;
                                     cnt = swf.deobfuscateIdentifiers(renameType);
                                     Main.stopWork();
-                                    JOptionPane.showMessageDialog(null, "Identifiers renamed: " + cnt);
+                                    JOptionPane.showMessageDialog(null, translate("message.rename.renamed").replace("%count%", "" + cnt));
                                     clearCache();
                                     if (abcPanel != null) {
                                         abcPanel.reload();
@@ -2004,7 +2019,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                     doFilter();
                                     reload(true);
                                 } catch (Exception ex) {
-                                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "message", ex);
+                                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Error during renaming identifiers", ex);
                                 }
                                 return true;
                             }
@@ -2020,7 +2035,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                 }
                 deobfuscationDialog.setVisible(true);
                 if (deobfuscationDialog.ok) {
-                    Main.startWork("Deobfuscating...");
+                    Main.startWork(translate("work.deobfuscating") + "...");
                     new SwingWorker() {
                         @Override
                         protected Object doInBackground() throws Exception {
@@ -2054,7 +2069,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                                 Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Deobfuscation error", ex);
                             }
                             Main.stopWork();
-                            JOptionPane.showMessageDialog(null, "Deobfuscation complete");
+                            JOptionPane.showMessageDialog(null, translate("work.deobfuscating.complete"));
                             clearCache();
                             abcPanel.reload();
                             doFilter();
@@ -2063,67 +2078,6 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
                     }.execute();
                 }
                 break;
-
-            case "REMOVETRAPS":
-            case "REMOVETRAPSALL":
-                Main.startWork("Removing traps...");
-                final boolean rall = e.getActionCommand().endsWith("ALL");
-                if ((!rall) || confirmExperimental()) {
-                    new SwingWorker() {
-                        @Override
-                        protected Object doInBackground() throws Exception {
-                            int cnt = 0;
-                            if (rall) {
-                                for (ABCContainerTag tag : abcPanel.list) {
-                                    cnt += tag.getABC().removeTraps();
-                                }
-                            } else {
-                                int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
-                                if (bi != -1) {
-                                    cnt += abcPanel.abc.bodies[bi].removeTraps(abcPanel.abc.constants, abcPanel.abc, abcPanel.decompiledTextArea.getScriptLeaf().scriptIndex, abcPanel.decompiledTextArea.getClassIndex(), abcPanel.decompiledTextArea.getIsStatic());
-                                }
-                                abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc);
-                            }
-                            Main.stopWork();
-                            JOptionPane.showMessageDialog(null, "Traps removed: " + cnt);
-                            abcPanel.reload();
-                            doFilter();
-                            return true;
-                        }
-                    }.execute();
-                }
-                break;
-
-            case "REMOVEDEADCODE":
-            case "REMOVEDEADCODEALL":
-                Main.startWork("Removing dead code...");
-                final boolean dall = e.getActionCommand().endsWith("ALL");
-                if ((!dall) || confirmExperimental()) {
-                    new SwingWorker() {
-                        @Override
-                        protected Object doInBackground() throws Exception {
-                            int cnt = 0;
-                            if (dall) {
-                                for (ABCContainerTag tag : abcPanel.list) {
-                                    cnt += tag.getABC().removeDeadCode();
-                                }
-                            } else {
-                                int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
-                                if (bi != -1) {
-                                    cnt += abcPanel.abc.bodies[bi].removeDeadCode(abcPanel.abc.constants);
-                                }
-                                abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc);
-                            }
-                            Main.stopWork();
-                            JOptionPane.showMessageDialog(null, "Instructions removed: " + cnt);
-                            abcPanel.reload();
-                            doFilter();
-                            return true;
-                        }
-                    }.execute();
-                }
-                break;
-
         }
 
 
@@ -2187,7 +2141,7 @@ public class MainFrame extends JFrame implements ActionListener, TreeSelectionLi
         if (tagObj instanceof ScriptPack) {
             final ScriptPack scriptLeaf = (ScriptPack) tagObj;
             if (!Main.isWorking()) {
-                Main.startWork("Decompiling...");
+                Main.startWork(translate("work.decompiling") + "...");
                 (new Thread() {
                     @Override
                     public void run() {

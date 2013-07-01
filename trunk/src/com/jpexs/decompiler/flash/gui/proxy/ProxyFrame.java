@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.proxy;
 
 import com.jpexs.decompiler.flash.Configuration;
+import com.jpexs.decompiler.flash.gui.AppFrame;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.proxy.CatchedListener;
@@ -38,11 +39,11 @@ import javax.swing.*;
  *
  * @author JPEXS
  */
-public class ProxyFrame extends JFrame implements ActionListener, CatchedListener, MouseListener, ReplacedListener {
+public class ProxyFrame extends AppFrame implements ActionListener, CatchedListener, MouseListener, ReplacedListener {
 
     private JList swfList;
     private SWFListModel listModel;
-    private JButton switchButton = new JButton("Start proxy");
+    private JButton switchButton = new JButton(translate("proxy.start"));
     private boolean started = false;
     private JTextField portField = new JTextField("55555");
     private JCheckBox sniffSWFCheckBox = new JCheckBox("SWF", false);
@@ -88,7 +89,7 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
         portField.setPreferredSize(new Dimension(60, 22));
         JPanel buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new FlowLayout());
-        buttonsPanel.add(new Label("Port:"));
+        buttonsPanel.add(new Label(translate("port")));
         buttonsPanel.add(portField);
         buttonsPanel.add(switchButton);
         cnt.add(buttonsPanel, BorderLayout.NORTH);
@@ -99,19 +100,19 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
 
         JPanel buttonsPanel2 = new JPanel();
         buttonsPanel2.setLayout(new FlowLayout());
-        JButton openButton = new JButton("Open");
+        JButton openButton = new JButton(translate("open"));
         openButton.setActionCommand("OPEN");
         openButton.addActionListener(this);
         buttonsPanel2.add(openButton);
-        JButton clearButton = new JButton("Clear");
+        JButton clearButton = new JButton(translate("clear"));
         clearButton.setActionCommand("CLEAR");
         clearButton.addActionListener(this);
         buttonsPanel2.add(clearButton);
-        JButton renameButton = new JButton("Rename");
+        JButton renameButton = new JButton(translate("rename"));
         renameButton.setActionCommand("RENAME");
         renameButton.addActionListener(this);
         buttonsPanel2.add(renameButton);
-        JButton removeButton = new JButton("Remove");
+        JButton removeButton = new JButton(translate("remove"));
         removeButton.setActionCommand("REMOVE");
         removeButton.addActionListener(this);
         buttonsPanel2.add(removeButton);
@@ -119,7 +120,7 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
 
         JPanel buttonsPanel3 = new JPanel();
         buttonsPanel3.setLayout(new FlowLayout());
-        buttonsPanel3.add(new JLabel("Sniff:"));
+        buttonsPanel3.add(new JLabel(translate("sniff")));
         buttonsPanel3.add(sniffSWFCheckBox);
         buttonsPanel3.add(sniffOSCheckBox);
         //buttonsPanel3.add(sniffJSCheckBox);
@@ -132,7 +133,7 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
         setSize(400, 300);
         View.centerScreen(this);
         View.setWindowIcon(this);
-        setTitle("Proxy");
+        setTitle(translate("dialog.title"));
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -232,7 +233,7 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
             } catch (NumberFormatException nfe) {
             }
             if ((port <= 0) || (port > 65535)) {
-                JOptionPane.showMessageDialog(this, "Wrong format for port number.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, translate("error.port"), translate("error"), JOptionPane.ERROR_MESSAGE);
                 started = false;
                 return;
             }
@@ -246,11 +247,11 @@ public class ProxyFrame extends JFrame implements ActionListener, CatchedListene
             catchedContentTypes.add("application/xml");
             catchedContentTypes.add("application/octet-stream");
             Server.startServer(port, Configuration.getReplacements(), catchedContentTypes, this, this);
-            switchButton.setText("Stop proxy");
+            switchButton.setText(translate("proxy.stop"));
             portField.setEditable(false);
         } else {
             Server.stopServer();
-            switchButton.setText("Start proxy");
+            switchButton.setText(translate("proxy.start"));
             portField.setEditable(true);
         }
     }

@@ -17,10 +17,18 @@
 package com.jpexs.decompiler.flash.gui;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JRootPane;
+import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -85,5 +93,21 @@ public class View {
 
     public static ImageIcon getIcon(String name) {
         return new ImageIcon(View.class.getClassLoader().getResource("com/jpexs/decompiler/flash/gui/graphics/" + name + ".png"));
+    }
+    private static final KeyStroke escapeStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+    private static final String dispatchWindowClosingActionMapKey = "com.jpexs.dispatch:WINDOW_CLOSING";
+
+    public static void installEscapeCloseOperation(final JDialog dialog) {
+        Action dispatchClosing = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                dialog.dispatchEvent(new WindowEvent(
+                        dialog, WindowEvent.WINDOW_CLOSING));
+            }
+        };
+        JRootPane root = dialog.getRootPane();
+        root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                escapeStroke, dispatchWindowClosingActionMapKey);
+        root.getActionMap().put(dispatchWindowClosingActionMapKey, dispatchClosing);
     }
 }

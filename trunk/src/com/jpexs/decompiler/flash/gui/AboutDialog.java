@@ -28,12 +28,12 @@ import javax.swing.SwingConstants;
  *
  * @author JPEXS
  */
-public class AboutDialog extends JDialog {
+public class AboutDialog extends AppDialog {
 
     public AboutDialog() {
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setSize(new Dimension(300, 270));
-        setTitle("About");
+        setTitle(translate("dialog.title"));
 
 
         Container cp = getContentPane();
@@ -56,14 +56,14 @@ public class AboutDialog extends JDialog {
         decLabel.setHorizontalAlignment(SwingConstants.CENTER);
         cp.add(decLabel);
 
-        JLabel verLabel = new JLabel("version " + Main.version);
+        JLabel verLabel = new JLabel(translate("version") + " " + Main.version);
         verLabel.setPreferredSize(new Dimension(300, 15));
         verLabel.setFont(new Font("Tahoma", Font.BOLD, 15));
         verLabel.setHorizontalAlignment(SwingConstants.CENTER);
         cp.add(verLabel);
 
 
-        JLabel byLabel = new JLabel("by");
+        JLabel byLabel = new JLabel(translate("by"));
         byLabel.setPreferredSize(new Dimension(300, 15));
         byLabel.setHorizontalAlignment(SwingConstants.CENTER);
         cp.add(byLabel);
@@ -86,7 +86,7 @@ public class AboutDialog extends JDialog {
         wwwLabel.setHorizontalAlignment(SwingConstants.CENTER);
         cp.add(wwwLabel);
 
-        JButton okButton = new JButton("OK");
+        JButton okButton = new JButton(translate("button.ok"));
         cp.add(okButton);
         okButton.addActionListener(new ActionListener() {
             @Override
@@ -98,5 +98,6 @@ public class AboutDialog extends JDialog {
         setModal(true);
         View.centerScreen(this);
         View.setWindowIcon(this);
+        setResizable(false);
     }
 }

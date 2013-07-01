@@ -1,0 +1,48 @@
+/*
+ * Copyright (C) 2013 JPEXS
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.jpexs.decompiler.flash.gui;
+
+import com.jpexs.decompiler.flash.Configuration;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+/**
+ *
+ * @author JPEXS
+ */
+public class AppStrings {
+
+    private static ResourceBundle resourceBundle = ResourceBundle.getBundle(getResourcePath(MainFrame.class), Configuration.containsConfig("locale") ? Locale.forLanguageTag((String) Configuration.getConfig("locale", "en")) : Locale.getDefault());
+
+    public static String getResourcePath(Class cls) {
+        String name = cls.getName();
+        if (name.startsWith("com.jpexs.decompiler.flash.gui.")) {
+            name = name.substring("com.jpexs.decompiler.flash.gui.".length());
+            name = "com.jpexs.decompiler.flash.gui.resources." + name;
+        }
+        return name;
+    }
+
+    public static String translate(String key) {
+        return resourceBundle.getString(key);
+    }
+
+    public static String translate(String bundle, String key) {
+        ResourceBundle b = ResourceBundle.getBundle(bundle, Configuration.containsConfig("locale") ? Locale.forLanguageTag((String) Configuration.getConfig("locale", "en")) : Locale.getDefault());
+        return b.getString(key);
+    }
+}

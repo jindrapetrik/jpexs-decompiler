@@ -36,11 +36,11 @@ import javax.swing.JTextField;
  *
  * @author JPEXS
  */
-public class SearchDialog extends JDialog implements ActionListener {
+public class SearchDialog extends AppDialog implements ActionListener {
 
     public JTextField searchField = new JTextField();
-    public JCheckBox ignoreCaseCheckBox = new JCheckBox("Ignore case");
-    public JCheckBox regexpCheckBox = new JCheckBox("Regular expression");
+    public JCheckBox ignoreCaseCheckBox = new JCheckBox(translate("checkbox.ignorecase"));
+    public JCheckBox regexpCheckBox = new JCheckBox(translate("checkbox.regexp"));
     public boolean result = false;
 
     public SearchDialog() {
@@ -49,17 +49,17 @@ public class SearchDialog extends JDialog implements ActionListener {
         setSize(400, 150);
         cnt.setLayout(new BoxLayout(cnt, BoxLayout.PAGE_AXIS));
         JPanel panButtons = new JPanel(new FlowLayout());
-        JButton okButton = new JButton("OK");
+        JButton okButton = new JButton(translate("button.ok"));
         okButton.setActionCommand("OK");
         okButton.addActionListener(this);
-        JButton cancelButton = new JButton("Cancel");
+        JButton cancelButton = new JButton(translate("button.cancel"));
         cancelButton.setActionCommand("CANCEL");
         cancelButton.addActionListener(this);
         panButtons.add(okButton);
         panButtons.add(cancelButton);
         JPanel panField = new JPanel(new FlowLayout());
         searchField.setPreferredSize(new Dimension(250, 25));
-        panField.add(new JLabel("Search text:"));
+        panField.add(new JLabel(translate("label.searchtext")));
         panField.add(searchField);
         cnt.add(panField);
         JPanel checkPanel = new JPanel(new FlowLayout());
@@ -70,7 +70,7 @@ public class SearchDialog extends JDialog implements ActionListener {
         getRootPane().setDefaultButton(okButton);
         View.centerScreen(this);
         View.setWindowIcon(this);
-        setTitle("ActionScript search");
+        setTitle(translate("dialog.title"));
         setModalityType(ModalityType.APPLICATION_MODAL);
     }
 
@@ -90,7 +90,7 @@ public class SearchDialog extends JDialog implements ActionListener {
                 try {
                     Pattern pat = Pattern.compile(searchField.getText());
                 } catch (PatternSyntaxException ex) {
-                    JOptionPane.showMessageDialog(null, "Invalid pattern", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, translate("error.invalidregexp"), translate("error"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
             }
