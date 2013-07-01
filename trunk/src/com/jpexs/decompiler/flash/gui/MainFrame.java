@@ -1275,7 +1275,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
             if (node instanceof TagNode) {
                 Object tag = ((TagNode) tm.getChild(root, i)).tag;
                 if (tag != null) {
-                    if (tag.toString().equals("scripts".equals(((TagNode) node).mark))) {
+                    if ("scripts".equals(((TagNode) node).mark)) {
                         return (TagNode) node;
                     }
                 }
