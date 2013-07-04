@@ -984,6 +984,9 @@ public class Main {
     }
 
     public static boolean isAssociated() {
+        if(!Platform.isWindows()){
+            return false;
+        }
         if (!Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, ".swf")) {
             return false;
         }

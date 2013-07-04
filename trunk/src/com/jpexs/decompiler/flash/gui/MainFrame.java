@@ -755,7 +755,6 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
 
 
 
-
         Component leftComponent = null;
 
 
