@@ -129,7 +129,7 @@ public class ActionGraph extends Graph {
     protected List<GraphPart> checkPrecoNextParts(GraphPart part) {
         List<GraphSourceItem> items = getPartItems(part);
         part = makeMultiPart(part);
-        if (!items.isEmpty()) {
+        if (items.size() > 1) {
             if (items.get(items.size() - 1) instanceof ActionIf) {
                 if (items.get(items.size() - 2) instanceof ActionStrictEquals) {
                     List<Integer> storeRegisters = new ArrayList<>();

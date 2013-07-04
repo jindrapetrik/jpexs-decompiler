@@ -2311,7 +2311,10 @@ public class Graph {
             }
         } while (part != null);
         if (parts.size() > 1) {
-            return new GraphPartMulti(parts);
+            GraphPartMulti ret = new GraphPartMulti(parts);
+            ret.refs.addAll(parts.get(0).refs);
+            ret.nextParts.addAll(parts.get(parts.size() - 1).nextParts);
+            return ret;
         } else {
             return parts.get(0);
         }
