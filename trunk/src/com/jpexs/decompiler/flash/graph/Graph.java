@@ -992,7 +992,18 @@ public class Graph {
 
         for (GraphPart t : part.throwParts) {
             if (!visited.contains(t)) {
-                markLevels(t, loops, stopPart, level, visited);
+                List<GraphPart> stopPart2 = new ArrayList<>();
+                List<GraphPart> cmn = new ArrayList<>();
+                cmn.add(part);
+                cmn.add(t);
+                GraphPart next = getCommonPart(cmn, loops);
+                if (next != null) {
+                    stopPart2.add(next);
+                } else {
+                    stopPart2 = stopPart;
+                }
+
+                markLevels(t, loops, stopPart2, level, visited);
             }
         }
 
