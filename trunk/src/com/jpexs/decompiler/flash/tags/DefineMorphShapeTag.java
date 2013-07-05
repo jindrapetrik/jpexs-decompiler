@@ -110,6 +110,7 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos 
      * @throws IOException
      */
     public DefineMorphShapeTag(byte data[], int version, long pos) throws IOException {

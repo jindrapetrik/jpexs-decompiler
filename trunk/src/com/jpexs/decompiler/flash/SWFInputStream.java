@@ -130,6 +130,7 @@ public class SWFInputStream extends InputStream {
      *
      * @param is Existing inputstream
      * @param version Version of SWF to read
+     * @param startingPos
      */
     public SWFInputStream(InputStream is, int version, long startingPos) {
         this.version = version;
@@ -712,6 +713,13 @@ public class SWFInputStream extends InputStream {
      * Reads list of actions from the stream. Reading ends with
      * ActionEndFlag(=0) or end of the stream.
      *
+     * @param listeners
+     * @param address
+     * @param ip
+     * @param rri
+     * @param version
+     * @param containerSWFOffset
+     * @param endip
      * @return List of actions
      * @throws IOException
      */
@@ -818,7 +826,7 @@ public class SWFInputStream extends InputStream {
             if ((ip < ret.size()) && (!(ret.get(ip) instanceof ActionNop))) {
                 a = ret.get(ip);
                 if (a.getAddress() != ip) {
-                    new Exception("Jump to the middle of the instruction ip " + ip + " ins " + a.getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), new ArrayList<String>(), SWF.DEFAULT_VERSION, false)).printStackTrace();
+                    Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "Jump to the middle of the instruction ip " + ip + " ins " + a.getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), new ArrayList<String>(), SWF.DEFAULT_VERSION, false));
                 }
             }
             a.containerSWFOffset = containerSWFOffset;
@@ -1153,6 +1161,8 @@ public class SWFInputStream extends InputStream {
      * Reads list of tags from the stream. Reading ends with End tag(=0) or end
      * of the stream.
      *
+     * @param level
+     * @param paralel
      * @return List of tags
      * @throws IOException
      */
@@ -1437,6 +1447,9 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one Tag from the stream
      *
+     * @param level
+     * @param pos
+     * @param paralel
      * @return Tag or null when End tag
      * @throws IOException
      */
@@ -1448,6 +1461,10 @@ public class SWFInputStream extends InputStream {
      * Reads one Tag from the stream with optional resolving (= reading tag
      * content)
      *
+     * @param level
+     * @param pos
+     * @param resolve
+     * @param paralel
      * @return Tag or null when End tag
      * @throws IOException
      */
@@ -1512,6 +1529,7 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one Action from the stream
      *
+     * @param rri
      * @return Action or null when ActionEndFlag or end of the stream
      * @throws IOException
      */
@@ -2190,6 +2208,7 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one BUTTONRECORD value from the stream
      *
+     * @param inDefineButton2 True when in DefineButton2
      * @return BUTTONRECORD value
      * @throws IOException
      */
@@ -2265,6 +2284,7 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one GRADRECORD value from the stream
      *
+     * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
      * @return GRADRECORD value
      * @throws IOException
      */
@@ -2282,6 +2302,7 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one GRADIENT value from the stream
      *
+     * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
      * @return GRADIENT value
      * @throws IOException
      */
@@ -2301,6 +2322,7 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one FOCALGRADIENT value from the stream
      *
+     * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
      * @return FOCALGRADIENT value
      * @throws IOException
      */
@@ -2320,6 +2342,7 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one FILLSTYLE value from the stream
      *
+     * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
      * @return FILLSTYLE value
      * @throws IOException
      */
@@ -2359,6 +2382,7 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one FILLSTYLEARRAY value from the stream
      *
+     * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
      * @return FILLSTYLEARRAY value
      * @throws IOException
      */
@@ -2379,6 +2403,7 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one LINESTYLE value from the stream
      *
+     * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
      * @return LINESTYLE value
      * @throws IOException
      */
@@ -2397,6 +2422,7 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one LINESTYLE2 value from the stream
      *
+     * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
      * @return LINESTYLE2 value
      * @throws IOException
      */
@@ -2426,6 +2452,7 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one LINESTYLEARRAY value from the stream
      *
+     * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
      * @return LINESTYLEARRAY value
      * @throws IOException
      */
@@ -2452,6 +2479,9 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one SHAPERECORD value from the stream
      *
+     * @param fillBits
+     * @param lineBits
+     * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
      * @return SHAPERECORD value
      * @throws IOException
      */
@@ -2527,6 +2557,7 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one SHAPE value from the stream
      *
+     * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
      * @return SHAPE value
      * @throws IOException
      */
@@ -2541,6 +2572,7 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one SHAPEWITHSTYLE value from the stream
      *
+     * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
      * @return SHAPEWITHSTYLE value
      * @throws IOException
      */
@@ -2557,6 +2589,9 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads list of SHAPERECORDs from the stream
      *
+     * @param shapeNum 1 in DefineShape, 2 in DefineShape2...
+     * @param fillBits
+     * @param lineBits
      * @return SHAPERECORDs array
      * @throws IOException
      */
@@ -2628,6 +2663,8 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one GLYPHENTRY value from the stream
      *
+     * @param glyphBits
+     * @param advanceBits
      * @return GLYPHENTRY value
      * @throws IOException
      */
@@ -2641,6 +2678,9 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one TEXTRECORD value from the stream
      *
+     * @param inDefineText2
+     * @param glyphBits
+     * @param advanceBits
      * @return TEXTRECORD value
      * @throws IOException
      */
@@ -2707,8 +2747,6 @@ public class SWFInputStream extends InputStream {
     public MORPHGRADIENT readMORPHGRADIENT() throws IOException {
         MORPHGRADIENT ret = new MORPHGRADIENT();
         int numGradients = (int) readUI8();
-        ret.numGradientsExtra = numGradients & 0xf8;  //some extra data. Are these the same as in GRADIENT or just obfuscator junk???
-        numGradients = numGradients & 0x7;
         ret.gradientRecords = new MORPHGRADRECORD[numGradients];
         for (int i = 0; i < numGradients; i++) {
             ret.gradientRecords[i] = readMORPHGRADRECORD();
@@ -2819,6 +2857,7 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one MORPHLINESTYLEARRAY value from the stream
      *
+     * @param morphShapeNum 1 on DefineMorphShape, 2 on DefineMorphShape2
      * @return MORPHLINESTYLEARRAY value
      * @throws IOException
      */
@@ -2845,6 +2884,7 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one KERNINGRECORD value from the stream
      *
+     * @param fontFlagsWideCodes
      * @return KERNINGRECORD value
      * @throws IOException
      */
@@ -2938,6 +2978,9 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one COLORMAPDATA value from the stream
      *
+     * @param colorTableSize
+     * @param bitmapWidth
+     * @param bitmapHeight
      * @return COLORMAPDATA value
      * @throws IOException
      */
@@ -2965,6 +3008,9 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one BITMAPDATA value from the stream
      *
+     * @param bitmapFormat
+     * @param bitmapWidth
+     * @param bitmapHeight
      * @return COLORMAPDATA value
      * @throws IOException
      */
@@ -3001,6 +3047,9 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one BITMAPDATA value from the stream
      *
+     * @param bitmapFormat
+     * @param bitmapWidth
+     * @param bitmapHeight
      * @return COLORMAPDATA value
      * @throws IOException
      */
@@ -3018,6 +3067,9 @@ public class SWFInputStream extends InputStream {
     /**
      * Reads one ALPHACOLORMAPDATA value from the stream
      *
+     * @param colorTableSize
+     * @param bitmapWidth
+     * @param bitmapHeight
      * @return ALPHACOLORMAPDATA value
      * @throws IOException
      */

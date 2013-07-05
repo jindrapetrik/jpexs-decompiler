@@ -265,7 +265,7 @@ public class SWF {
      * Construct SWF from stream
      *
      * @param is Stream to read SWF from
-     * @param listener 
+     * @param listener
      * @param paralelRead Use parallel threads?
      * @throws IOException
      */
@@ -376,7 +376,7 @@ public class SWF {
      *
      * @param fis Input stream
      * @param fos Output stream
-     * @return True on success 
+     * @return True on success
      */
     public static boolean fws2cws(InputStream fis, OutputStream fos) {
         try {

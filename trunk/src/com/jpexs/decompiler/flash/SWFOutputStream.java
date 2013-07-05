@@ -997,6 +997,7 @@ public class SWFOutputStream extends OutputStream {
      * Writes FILLSTYLE value to the stream
      *
      * @param value FILLSTYLE value
+     * @param shapeNum 1 in DefineShape, 2 in DefineShape2,...
      * @throws IOException
      */
     public void writeFILLSTYLE(FILLSTYLE value, int shapeNum) throws IOException {
@@ -1034,6 +1035,7 @@ public class SWFOutputStream extends OutputStream {
      * Writes FILLSTYLEARRAY value to the stream
      *
      * @param value FILLSTYLEARRAY value
+     * @param shapeNum 1 in DefineShape, 2 in DefineShape2,...
      * @throws IOException
      */
     public void writeFILLSTYLEARRAY(FILLSTYLEARRAY value, int shapeNum) throws IOException {
@@ -1057,6 +1059,7 @@ public class SWFOutputStream extends OutputStream {
      * Writes FOCALGRADIENT value to the stream
      *
      * @param value FILLSTYLEARRAY value
+     * @param shapeNum 1 in DefineShape, 2 in DefineShape2,...
      * @throws IOException
      */
     public void writeFOCALGRADIENT(FOCALGRADIENT value, int shapeNum) throws IOException {
@@ -1073,6 +1076,7 @@ public class SWFOutputStream extends OutputStream {
      * Writes GRADIENT value to the stream
      *
      * @param value GRADIENT value
+     * @param shapeNum 1 in DefineShape, 2 in DefineShape2,...
      * @throws IOException
      */
     public void writeGRADIENT(GRADIENT value, int shapeNum) throws IOException {
@@ -1088,6 +1092,7 @@ public class SWFOutputStream extends OutputStream {
      * Writes GRADRECORD value to the stream
      *
      * @param value GRADRECORD value
+     * @param shapeNum 1 in DefineShape, 2 in DefineShape2,...
      * @throws IOException
      */
     public void writeGRADRECORD(GRADRECORD value, int shapeNum) throws IOException {
@@ -1103,6 +1108,7 @@ public class SWFOutputStream extends OutputStream {
      * Writes LINESTYLE value to the stream
      *
      * @param value LINESTYLE value
+     * @param shapeNum 1 in DefineShape, 2 in DefineShape2,...
      * @throws IOException
      */
     public void writeLINESTYLE(LINESTYLE value, int shapeNum) throws IOException {
@@ -1118,6 +1124,7 @@ public class SWFOutputStream extends OutputStream {
      * Writes LINESTYLE2 value to the stream
      *
      * @param value LINESTYLE2 value
+     * @param shapeNum 1 in DefineShape, 2 in DefineShape2,...
      * @throws IOException
      */
     public void writeLINESTYLE2(LINESTYLE2 value, int shapeNum) throws IOException {
@@ -1145,6 +1152,7 @@ public class SWFOutputStream extends OutputStream {
      * Writes LINESTYLEARRAY value to the stream
      *
      * @param value FILLSTYLEARRAY value
+     * @param shapeNum 1 in DefineShape, 2 in DefineShape2,...
      * @throws IOException
      */
     public void writeLINESTYLEARRAY(LINESTYLEARRAY value, int shapeNum) throws IOException {
@@ -1178,6 +1186,7 @@ public class SWFOutputStream extends OutputStream {
      * Writes SHAPE value to the stream
      *
      * @param value SHAPE value
+     * @param shapeNum 1 in DefineShape, 2 in DefineShape2,...
      * @throws IOException
      */
     public void writeSHAPE(SHAPE value, int shapeNum) throws IOException {
@@ -1190,6 +1199,7 @@ public class SWFOutputStream extends OutputStream {
      * Writes SHAPEWITHSTYLE value to the stream
      *
      * @param value SHAPEWITHSTYLE value
+     * @param shapeNum 1 in DefineShape, 2 in DefineShape2,...
      * @throws IOException
      */
     public void writeSHAPEWITHSTYLE(SHAPEWITHSTYLE value, int shapeNum) throws IOException {
@@ -1204,6 +1214,9 @@ public class SWFOutputStream extends OutputStream {
      * Writes SHAPERECORDs value to the stream
      *
      * @param value SHAPERECORDS value
+     * @param fillBits
+     * @param lineBits
+     * @param shapeNum 1 in DefineShape, 2 in DefineShape2,...
      * @throws IOException
      */
     public void writeSHAPERECORDS(List<SHAPERECORD> value, int fillBits, int lineBits, int shapeNum) throws IOException {
@@ -1316,6 +1329,9 @@ public class SWFOutputStream extends OutputStream {
      * Writes TEXTRECORD value to the stream
      *
      * @param value TEXTRECORD value
+     * @param inDefineText2
+     * @param glyphBits
+     * @param advanceBits
      * @throws IOException
      */
     public void writeTEXTRECORD(TEXTRECORD value, boolean inDefineText2, int glyphBits, int advanceBits) throws IOException {
@@ -1355,6 +1371,8 @@ public class SWFOutputStream extends OutputStream {
      * Writes GLYPHENTRY value to the stream
      *
      * @param value GLYPHENTRY value
+     * @param glyphBits
+     * @param advanceBits
      * @throws IOException
      */
     public void writeGLYPHENTRY(GLYPHENTRY value, int glyphBits, int advanceBits) throws IOException {
@@ -1366,6 +1384,7 @@ public class SWFOutputStream extends OutputStream {
      * Writes MORPHFILLSTYLE value to the stream
      *
      * @param value MORPHFILLSTYLE value
+     * @param shapeNum 1 in DefineMorphShape, 2 in DefineMorphShape2,...
      * @throws IOException
      */
     public void writeMORPHFILLSTYLE(MORPHFILLSTYLE value, int shapeNum) throws IOException {
@@ -1398,6 +1417,7 @@ public class SWFOutputStream extends OutputStream {
      * WritesMORPH FILLSTYLEARRAY value to the stream
      *
      * @param value MORPHFILLSTYLEARRAY value
+     * @param morphShapeNum 1 on DefineMorphShape, 2 on DefineMorphShape
      * @throws IOException
      */
     public void writeMORPHFILLSTYLEARRAY(MORPHFILLSTYLEARRAY value, int morphShapeNum) throws IOException {
@@ -1417,10 +1437,11 @@ public class SWFOutputStream extends OutputStream {
      * Writes MORPHGRADIENT value to the stream
      *
      * @param value MORPHGRADIENT value
+     * @param shapeNum 1 in DefineMorphShape, 2 in DefineMorphShape2,...
      * @throws IOException
      */
     public void writeMORPHGRADIENT(MORPHGRADIENT value, int shapeNum) throws IOException {
-        writeUI8(value.gradientRecords.length + value.numGradientsExtra);
+        writeUI8(value.gradientRecords.length);
         for (int i = 0; i < value.gradientRecords.length; i++) {
             writeMORPHGRADRECORD(value.gradientRecords[i]);
         }
@@ -1443,6 +1464,7 @@ public class SWFOutputStream extends OutputStream {
      * Writes MORPHLINESTYLE value to the stream
      *
      * @param value LINESTYLE value
+     * @param shapeNum 1 in DefineMorphShape, 2 in DefineMorphShape2,...
      * @throws IOException
      */
     public void writeMORPHLINESTYLE(MORPHLINESTYLE value, int shapeNum) throws IOException {
@@ -1457,6 +1479,7 @@ public class SWFOutputStream extends OutputStream {
      * Writes MORPHLINESTYLE2 value to the stream
      *
      * @param value MORPHLINESTYLE2 value
+     * @param shapeNum 1 in DefineMorphShape, 2 in DefineMorphShape2,...
      * @throws IOException
      */
     public void writeMORPHLINESTYLE2(MORPHLINESTYLE2 value, int shapeNum) throws IOException {
@@ -1486,6 +1509,7 @@ public class SWFOutputStream extends OutputStream {
      * Writes MORPHLINESTYLEARRAY value to the stream
      *
      * @param value MORPHFILLSTYLEARRAY value
+     * @param morphShapeNum 1 in DefineMorphShape, 2 in DefineMorphShape2,...
      * @throws IOException
      */
     public void writeMORPHLINESTYLEARRAY(MORPHLINESTYLEARRAY value, int morphShapeNum) throws IOException {
@@ -1519,6 +1543,7 @@ public class SWFOutputStream extends OutputStream {
      * Writes KERNINGRECORD value to the stream
      *
      * @param value KERNINGRECORD value
+     * @param fontFlagsWideCodes
      * @throws IOException
      */
     public void writeKERNINGRECORD(KERNINGRECORD value, boolean fontFlagsWideCodes) throws IOException {
@@ -1578,6 +1603,10 @@ public class SWFOutputStream extends OutputStream {
     /**
      * Reads one BITMAPDATA value from the stream
      *
+     * @param value
+     * @param bitmapFormat
+     * @param bitmapWidth
+     * @param bitmapHeight
      * @throws IOException
      */
     public void writeBITMAPDATA(BITMAPDATA value, int bitmapFormat, int bitmapWidth, int bitmapHeight) throws IOException {
@@ -1606,6 +1635,10 @@ public class SWFOutputStream extends OutputStream {
     /**
      * Reads one ALPHABITMAPDATA value from the stream
      *
+     * @param value
+     * @param bitmapFormat
+     * @param bitmapWidth
+     * @param bitmapHeight
      * @throws IOException
      */
     public void writeALPHABITMAPDATA(ALPHABITMAPDATA value, int bitmapFormat, int bitmapWidth, int bitmapHeight) throws IOException {
