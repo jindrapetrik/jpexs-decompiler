@@ -2198,8 +2198,8 @@ public class XFLConverter {
         String matStr = "";
         matStr += "<matrix>";
         RECT bounds = tag.getBounds();
-        matrix.translateX += bounds.Xmin;
-        matrix.translateY += bounds.Ymin;
+        matrix.translateX += bounds.Xmin + 40/*??*/;
+        matrix.translateY += bounds.Ymin + 40/*??*/;
         matStr += convertMatrix(matrix);
         matStr += "</matrix>";
         if ((tag instanceof DefineTextTag) || (tag instanceof DefineText2Tag)) {
@@ -2334,12 +2334,16 @@ public class XFLConverter {
                 ret += " fontRenderingMode=\"" + fontRenderingMode + "\"";
             }
             ret += antiAlias;
-            double width = twipToPixel(det.getBounds().getWidth());
-            double height = twipToPixel(det.getBounds().getHeight());
+            double width = twipToPixel(bounds.getWidth());
+            double height = twipToPixel(bounds.getHeight());
+            //There is usually 4px difference between width/height and XML width/height
+            //If somebody knows what that means, tell me
+            double padding = 2;
+            width -= 2 * padding;
+            height -= 2 * padding;
             if (det.hasLayout) {
                 width -= twipToPixel(det.rightMargin);
                 width -= twipToPixel(det.leftMargin);
-                //height-=det.
             }
             ret += " width=\"" + width + "\"";
             ret += " height=\"" + height + "\"";
