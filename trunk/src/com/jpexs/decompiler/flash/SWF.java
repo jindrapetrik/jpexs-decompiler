@@ -1502,7 +1502,12 @@ public class SWF {
         HashMap<String, String> namesMap = new HashMap<>();
         for (Tag tag : tags) {
             if (tag instanceof ABCContainerTag) {
-                ((ABCContainerTag) tag).getABC().deobfuscateIdentifiers(namesMap, renameType);
+                ((ABCContainerTag) tag).getABC().deobfuscateIdentifiers(namesMap, renameType, true);
+            }
+        }
+        for (Tag tag : tags) {
+            if (tag instanceof ABCContainerTag) {
+                ((ABCContainerTag) tag).getABC().deobfuscateIdentifiers(namesMap, renameType, false);
             }
         }
         for (Tag tag : tags) {
