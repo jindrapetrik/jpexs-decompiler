@@ -124,7 +124,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                         }
                     }
                     if (ns.kind == Namespace.KIND_NAMESPACE) {
-                        if(!usname.equals("*")){
+                        if (!usname.equals("*")) {
                             if (!uses.contains(usname)) {
                                 uses.add(usname);
                             }

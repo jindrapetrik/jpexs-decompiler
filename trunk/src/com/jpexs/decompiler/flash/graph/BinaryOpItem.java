@@ -90,6 +90,22 @@ public abstract class BinaryOpItem extends GraphTargetItem {
         return hash;
     }
 
+    public GraphTargetItem getLeftMostItem(GraphTargetItem item) {
+        GraphTargetItem ret = item;
+        if (ret instanceof BinaryOpItem) {
+            ret = ((BinaryOpItem) ret).getLeftMostItem();
+        }
+        return ret;
+    }
+
+    public GraphTargetItem getLeftMostItem() {
+        GraphTargetItem ret = leftSide;
+        if (ret instanceof BinaryOpItem) {
+            ret = ((BinaryOpItem) ret).getLeftMostItem();
+        }
+        return ret;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {

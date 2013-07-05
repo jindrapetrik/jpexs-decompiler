@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.graph.BinaryOpItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import java.util.List;
 
 public class SubtractTreeItem extends BinaryOpItem {
 
@@ -29,5 +30,21 @@ public class SubtractTreeItem extends BinaryOpItem {
     @Override
     public double toNumber() {
         return leftSide.toNumber() - rightSide.toNumber();
+    }
+
+    @Override
+    public String toString(List<Object> localData) {
+        if (!(getLeftMostItem(rightSide) instanceof NegTreeItem)) { // a - (-b*c*d)
+            return super.toString(localData);
+        }
+        String ret = "";
+        if (leftSide.getPrecedence() > precedence) {
+            ret += "(" + leftSide.toString(localData) + ")";
+        } else {
+            ret += leftSide.toString(localData);
+        }
+        ret += hilight(operator);
+        ret += "(" + rightSide.toString(localData) + ")";
+        return ret;
     }
 }
