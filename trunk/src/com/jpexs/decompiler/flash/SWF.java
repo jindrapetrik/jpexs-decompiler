@@ -349,7 +349,7 @@ public class SWF {
         }
     }
 
-    private void assignClassesToSymbols() {
+    public void assignClassesToSymbols() {
         HashMap<Integer, String> classes = new HashMap<>();
         for (Tag t : tags) {
             if (t instanceof SymbolClassTag) {

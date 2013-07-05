@@ -105,6 +105,14 @@ public class ABC {
         }
     }
 
+    public Set<Integer> getNsStringUsages() {
+        Set<Integer> ret = new HashSet<>();
+        for (int n = 1; n < constants.constant_namespace.length; n++) {
+            ret.add(constants.constant_namespace[n].name_index);
+        }
+        return ret;
+    }
+
     public Set<Integer> getStringUsages() {
         Set<Integer> ret = new HashSet<>();
         for (MethodBody body : bodies) {
@@ -187,8 +195,9 @@ public class ABC {
             throw new IllegalArgumentException("Multiname with index " + multinameIndex + " does not exist");
         }
         Set<Integer> stringUsages = getStringUsages();
+        Set<Integer> namespaceUsages = getNsStringUsages();
         int strIndex = constants.constant_multiname[multinameIndex].name_index;
-        if (stringUsages.contains(strIndex)) { //name is used elsewhere as string literal            
+        if (stringUsages.contains(strIndex) || namespaceUsages.contains(strIndex)) { //name is used elsewhere as string literal            
             strIndex = constants.forceGetStringId(newname);
             constants.constant_multiname[multinameIndex].name_index = strIndex;
         } else {
@@ -198,21 +207,26 @@ public class ABC {
 
     public void deobfuscateIdentifiers(HashMap<String, String> namesMap, RenameType renameType) {
         Set<Integer> stringUsages = getStringUsages();
+        Set<Integer> namespaceUsages = getNsStringUsages();
         Map<Integer, String> stringUsageTypes = new HashMap<>();
         informListeners("deobfuscate", "Getting usage types...");
         getStringUsageTypes(stringUsageTypes);
         for (int i = 1; i < instance_info.length; i++) {
             informListeners("deobfuscate", "class " + i + "/" + instance_info.length);
             if (instance_info[i].name_index != 0) {
-                constants.constant_multiname[instance_info[i].name_index].name_index = deobfuscateName(stringUsageTypes, stringUsages, namesMap, constants.constant_multiname[instance_info[i].name_index].name_index, true, renameType);
+                constants.constant_multiname[instance_info[i].name_index].name_index = deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, constants.constant_multiname[instance_info[i].name_index].name_index, true, renameType);
+                if (constants.constant_multiname[instance_info[i].name_index].namespace_index != 0) {
+                    constants.constant_namespace[constants.constant_multiname[instance_info[i].name_index].namespace_index].name_index =
+                            deobfuscateNameSpace(stringUsageTypes, stringUsages, namesMap, constants.constant_namespace[constants.constant_multiname[instance_info[i].name_index].namespace_index].name_index, renameType);
+                }
             }
             if (instance_info[i].super_index != 0) {
-                constants.constant_multiname[instance_info[i].super_index].name_index = deobfuscateName(stringUsageTypes, stringUsages, namesMap, constants.constant_multiname[instance_info[i].super_index].name_index, true, renameType);
+                constants.constant_multiname[instance_info[i].super_index].name_index = deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, constants.constant_multiname[instance_info[i].super_index].name_index, true, renameType);
             }
         }
         for (int i = 1; i < constants.constant_multiname.length; i++) {
             informListeners("deobfuscate", "name " + i + "/" + constants.constant_multiname.length);
-            constants.constant_multiname[i].name_index = deobfuscateName(stringUsageTypes, stringUsages, namesMap, constants.constant_multiname[i].name_index, false, renameType);
+            constants.constant_multiname[i].name_index = deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, constants.constant_multiname[i].name_index, false, renameType);
         }
         for (int i = 1; i < constants.constant_namespace.length; i++) {
             informListeners("deobfuscate", "namespace " + i + "/" + constants.constant_namespace.length);
@@ -864,6 +878,9 @@ public class ABC {
             return strIndex;
         }
         String s = constants.constant_string[strIndex];
+        if (builtInNs(s) != null) {
+            return strIndex;
+        }
         boolean isValid = isValidNSPart(s);
         if (!isValid) {
             String newName;
@@ -900,7 +917,7 @@ public class ABC {
         return strIndex;
     }
 
-    public int deobfuscateName(Map<Integer, String> stringUsageTypes, Set<Integer> stringUsages, HashMap<String, String> namesMap, int strIndex, boolean firstUppercase, RenameType renameType) {
+    public int deobfuscateName(Map<Integer, String> stringUsageTypes, Set<Integer> stringUsages, Set<Integer> namespaceUsages, HashMap<String, String> namesMap, int strIndex, boolean firstUppercase, RenameType renameType) {
         if (strIndex <= 0) {
             return strIndex;
         }
@@ -933,7 +950,7 @@ public class ABC {
             } else {
                 newname = fooString(constants.constant_string[strIndex], firstUppercase, DEFAULT_FOO_SIZE, stringUsageTypes.get(strIndex), renameType);
             }
-            if (stringUsages.contains(strIndex)) { //this name is already referenced as String
+            if (stringUsages.contains(strIndex) || namespaceUsages.contains(strIndex)) { //this name is already referenced as String
                 strIndex = constants.addString(s); //add new index
             }
             constants.constant_string[strIndex] = newname;
