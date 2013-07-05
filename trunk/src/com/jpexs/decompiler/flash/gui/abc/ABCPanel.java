@@ -439,6 +439,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
         switchAbc(listIndex);
         decompiledTextArea.clearScriptCache();
         decompiledTextArea.reloadClass();
+        detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(-1, abc);
     }
 
     @Override
