@@ -32,6 +32,8 @@ import java.util.Stack;
 
 public class InstructionDefinition implements Serializable {
 
+    public static final long serialVersionUID = 1L;
+
     protected String hilighOffset(String text, long offset) {
         return Highlighting.hilighOffset(text, offset);
     }
@@ -47,25 +49,26 @@ public class InstructionDefinition implements Serializable {
 
     @Override
     public String toString() {
-        String s = instructionName;
+        StringBuilder s = new StringBuilder();
+        s.append(instructionName);
         for (int i = 0; i < operands.length; i++) {
             if ((operands[i] & 0xff00) == AVM2Code.OPT_U30) {
-                s += " U30";
+                s.append(" U30");
             }
             if ((operands[i] & 0xff00) == AVM2Code.OPT_U8) {
-                s += " U8";
+                s.append(" U8");
             }
             if ((operands[i] & 0xff00) == AVM2Code.OPT_BYTE) {
-                s += " BYTE";
+                s.append(" BYTE");
             }
             if ((operands[i] & 0xff00) == AVM2Code.OPT_S24) {
-                s += " S24";
+                s.append(" S24");
             }
             if ((operands[i] & 0xff00) == AVM2Code.OPT_CASE_OFFSETS) {
-                s += " U30 S24,[S24]...";
+                s.append(" U30 S24,[S24]...");
             }
         }
-        return s;
+        return s.toString();
     }
 
     public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {

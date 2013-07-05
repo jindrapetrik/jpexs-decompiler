@@ -17,13 +17,13 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.text.NumberFormat;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 
 /**
  *

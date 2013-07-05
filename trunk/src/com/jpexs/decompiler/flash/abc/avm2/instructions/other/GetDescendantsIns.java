@@ -38,10 +38,10 @@ public class GetDescendantsIns extends InstructionDefinition {
 
     @Override
     public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
-        int multiIndex = (int) ((Long) arguments.get(0)).longValue();
-        //if is runtime
-        //pop(name), pop(ns)
-        Object obj = lda.operandStack.pop();
+        /*int multiIndex = (int) ((Long) arguments.get(0)).longValue();
+         //if is runtime
+         //pop(name), pop(ns)
+         Object obj = lda.operandStack.pop();*/
         throw new RuntimeException("getdescentants not working");
     }
 

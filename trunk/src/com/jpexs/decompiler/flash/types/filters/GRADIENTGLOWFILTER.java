@@ -32,7 +32,7 @@ public class GRADIENTGLOWFILTER extends FILTER {
     /**
      * Gradient colors
      */
-    public RGBA gradientColors[];
+    public RGBA gradientColors[] = new RGBA[0];
     /**
      * Gradient ratios
      */

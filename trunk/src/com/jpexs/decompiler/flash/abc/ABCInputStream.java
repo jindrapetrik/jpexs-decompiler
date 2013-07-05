@@ -31,7 +31,7 @@ public class ABCInputStream extends InputStream {
     private InputStream is;
     private long bytesRead = 0;
     private ByteArrayOutputStream bufferOs = null;
-    public static boolean DEBUG_READ = false;
+    public static final boolean DEBUG_READ = false;
 
     public void startBuffer() {
         bufferOs = new ByteArrayOutputStream();
@@ -225,8 +225,7 @@ public class ABCInputStream extends InputStream {
                 params.add(readU30()); //multiname indices!
             }
         } else {
-            System.err.println("Unknown kind of Multiname:0x" + Integer.toHexString(kind));
-            System.exit(1);
+            throw new IOException("Unknown kind of Multiname:0x" + Integer.toHexString(kind));
         }
 
         return new Multiname(kind, name_index, namespace_index, namespace_set_index, qname_index, params);

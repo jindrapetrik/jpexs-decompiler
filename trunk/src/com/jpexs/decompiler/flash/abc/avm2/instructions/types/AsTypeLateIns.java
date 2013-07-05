@@ -36,7 +36,7 @@ public class AsTypeLateIns extends InstructionDefinition {
 
     @Override
     public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
-        Object objClass = lda.operandStack.pop();
+        //Object objClass = lda.operandStack.pop();
         Object obj = lda.operandStack.pop();
         //if obj.class=objClass
         lda.operandStack.push(obj);

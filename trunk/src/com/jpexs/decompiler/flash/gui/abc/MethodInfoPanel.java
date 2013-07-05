@@ -21,13 +21,13 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.methodinfo_parser.MethodInfoParser;
 import com.jpexs.decompiler.flash.abc.methodinfo_parser.ParseException;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
+import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.util.ArrayList;
 import javax.swing.*;
 import jsyntaxpane.syntaxkits.Flasm3MethodInfoSyntaxKit;
-import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 
 /**
  *

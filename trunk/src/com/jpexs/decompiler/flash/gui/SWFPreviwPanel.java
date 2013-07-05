@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
+import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import java.awt.BorderLayout;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -27,7 +28,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
-import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 
 /**
  *

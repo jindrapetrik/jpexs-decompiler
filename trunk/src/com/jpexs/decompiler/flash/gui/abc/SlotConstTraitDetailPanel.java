@@ -21,12 +21,12 @@ import com.jpexs.decompiler.flash.abc.methodinfo_parser.MethodInfoParser;
 import com.jpexs.decompiler.flash.abc.methodinfo_parser.ParseException;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 import javax.swing.*;
 import jsyntaxpane.syntaxkits.Flasm3MethodInfoSyntaxKit;
-import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 
 /**
  *

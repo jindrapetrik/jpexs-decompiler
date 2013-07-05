@@ -14,30 +14,30 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.abc.avm2.instructions.comparsion;
+package com.jpexs.decompiler.flash.abc.avm2.instructions.comparison;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.LeTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.GtTreeItem;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-public class LessEqualsIns extends InstructionDefinition {
+public class GreaterThanIns extends InstructionDefinition {
 
-    public LessEqualsIns() {
-        super(0xae, "lessequals", new int[]{});
+    public GreaterThanIns() {
+        super(0xaf, "greaterthan", new int[]{});
     }
 
     @Override
     public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         GraphTargetItem v2 = (GraphTargetItem) stack.pop();
         GraphTargetItem v1 = (GraphTargetItem) stack.pop();
-        stack.push(new LeTreeItem(ins, v1, v2));
+        stack.push(new GtTreeItem(ins, v1, v2));
     }
 
     @Override

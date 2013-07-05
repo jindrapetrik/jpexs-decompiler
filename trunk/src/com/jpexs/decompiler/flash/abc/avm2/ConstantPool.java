@@ -22,8 +22,11 @@ import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ConstantPool {
 
@@ -81,7 +84,7 @@ public class ConstantPool {
 
     public int getDoubleId(double value) {
         for (int i = 1; i < constant_double.length; i++) {
-            if (constant_double[i] == value) {
+            if (Double.compare(constant_double[i], value) == 0) {
                 return i;
             }
         }
@@ -130,7 +133,13 @@ public class ConstantPool {
     }
 
     public void dump(OutputStream os) {
-        PrintStream output = new PrintStream(os);
+        PrintStream output;
+        try {
+            output = new PrintStream(os, false, "utf-8");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(ConstantPool.class.getName()).log(Level.SEVERE, null, ex);
+            return;
+        }
         String s = "";
         for (int i = 1; i < constant_int.length; i++) {
             output.println("INT[" + i + "]=" + constant_int[i]);

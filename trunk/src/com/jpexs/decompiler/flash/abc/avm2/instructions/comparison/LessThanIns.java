@@ -14,39 +14,30 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.abc.avm2.instructions.comparsion;
+package com.jpexs.decompiler.flash.abc.avm2.instructions.comparison;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
-import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.EqTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.LtTreeItem;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-public class EqualsIns extends InstructionDefinition {
+public class LessThanIns extends InstructionDefinition {
 
-    public EqualsIns() {
-        super(0xab, "equals", new int[]{});
-    }
-
-    @Override
-    public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
-        Object obj1 = lda.operandStack.pop();
-        Object obj2 = lda.operandStack.pop();
-        Boolean res = obj1.equals(obj2);
-        lda.operandStack.push(res);
+    public LessThanIns() {
+        super(0xad, "lessthan", new int[]{});
     }
 
     @Override
     public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         GraphTargetItem v2 = (GraphTargetItem) stack.pop();
         GraphTargetItem v1 = (GraphTargetItem) stack.pop();
-        stack.push(new EqTreeItem(ins, v1, v2));
+        stack.push(new LtTreeItem(ins, v1, v2));
     }
 
     @Override

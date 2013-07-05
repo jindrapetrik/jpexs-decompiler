@@ -19,17 +19,11 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.graph.Graph;
 import com.jpexs.decompiler.flash.graph.GraphPart;
 import java.awt.*;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.WindowAdapter;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 

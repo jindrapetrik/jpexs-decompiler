@@ -68,10 +68,12 @@ public class Configuration {
         if (replacements.isEmpty()) {
             File rf = new File(replacementsFile);
             if (rf.exists()) {
-                rf.delete();
+                if (!rf.delete()) {
+                    Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, "Cannot delete replacements file");
+                }
             }
         } else {
-            try (PrintWriter pw = new PrintWriter(new FileWriter(replacementsFile))) {
+            try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(replacementsFile), "utf-8"))) {
                 for (Replacement r : replacements) {
                     pw.println(r.urlPattern);
                     pw.println(r.targetFile);
@@ -90,7 +92,7 @@ public class Configuration {
             return;
         }
         replacements = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(replacementsFile))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(replacementsFile), "utf-8"))) {
             String s;
             while ((s = br.readLine()) != null) {
                 Replacement r = new Replacement(s, br.readLine());

@@ -55,7 +55,7 @@ public class ConvertDIns extends InstructionDefinition implements CoerceOrConver
         } else {
             ret = 1; //must call toPrimitive
         }
-        lda.operandStack.push(new Double(ret));
+        lda.operandStack.push(Double.valueOf(ret));
     }
 
     @Override

@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.graph;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
-import java.awt.GradientPaint;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;

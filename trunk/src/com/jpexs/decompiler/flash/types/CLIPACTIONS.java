@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,5 +33,5 @@ public class CLIPACTIONS {
     /**
      * Individual event handlers
      */
-    public List<CLIPACTIONRECORD> clipActionRecords;
+    public List<CLIPACTIONRECORD> clipActionRecords = new ArrayList<>();
 }

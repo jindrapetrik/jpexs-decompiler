@@ -26,7 +26,6 @@ import java.awt.event.ActionListener;
 import java.util.Hashtable;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 

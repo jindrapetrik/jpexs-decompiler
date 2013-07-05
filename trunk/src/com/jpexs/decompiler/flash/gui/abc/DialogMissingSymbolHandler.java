@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.avm2.parser.MissingSymbolHandler;
-import javax.swing.JOptionPane;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
+import javax.swing.JOptionPane;
 
 public class DialogMissingSymbolHandler implements MissingSymbolHandler {
 

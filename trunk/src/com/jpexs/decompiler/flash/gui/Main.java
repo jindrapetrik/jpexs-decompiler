@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.PercentListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.Version;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.Advapi32Util;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.Kernel32;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.SHELLEXECUTEINFO;
@@ -59,7 +60,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
-import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 
 /**
  * Main executable class
@@ -984,7 +984,7 @@ public class Main {
     }
 
     public static boolean isAssociated() {
-        if(!Platform.isWindows()){
+        if (!Platform.isWindows()) {
             return false;
         }
         if (!Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, ".swf")) {

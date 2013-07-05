@@ -22,6 +22,8 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions;
  */
 public class TagInstruction extends InstructionDefinition {
 
+    public static final long serialVersionUID = 1L;
+
     public TagInstruction(String tagName) {
         super(-1, tagName, new int[0]);
     }

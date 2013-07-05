@@ -23,7 +23,7 @@ package com.jpexs.decompiler.flash.types;
  */
 public class ZONERECORD {
 
-    public ZONEDATA zonedata[];
+    public ZONEDATA zonedata[] = new ZONEDATA[0];
     public boolean zoneMaskX;
     public boolean zoneMaskY;
 

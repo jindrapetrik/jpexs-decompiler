@@ -36,22 +36,23 @@ public class ApplyTypeTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        String ret = object.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
+        StringBuilder ret = new StringBuilder();
+        ret.append(object.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)));
         if (!params.isEmpty()) {
-            ret += hilight(".<");
+            ret.append(hilight(".<"));
             for (int i = 0; i < params.size(); i++) {
                 if (i > 0) {
-                    ret += hilight(",");
+                    ret.append(hilight(","));
                 }
                 GraphTargetItem p = params.get(i);
                 if (p instanceof NullTreeItem) {
-                    ret += "*";
+                    ret.append("*");
                 } else {
-                    ret += p.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
+                    ret.append(p.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)));
                 }
             }
-            ret += hilight(">");
+            ret.append(">");
         }
-        return ret;
+        return ret.toString();
     }
 }

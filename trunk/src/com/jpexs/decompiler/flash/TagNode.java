@@ -40,7 +40,6 @@ import com.jpexs.decompiler.flash.tags.DefineShapeTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
-import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -205,9 +204,9 @@ public class TagNode {
             if (ret.get(i).tag instanceof DefineButton2Tag) {
                 ((DefineButton2Tag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
             }
-            if (ret.get(i).tag instanceof DoInitActionTag) {
-                //((DoInitActionTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
-            }
+            /*if (ret.get(i).tag instanceof DoInitActionTag) {
+             //((DoInitActionTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
+             }*/
             if (ret.get(i).tag instanceof ASMSource) {
                 ASMSource ass = (ASMSource) ret.get(i).tag;
                 if (ass.containsSource()) {
@@ -256,7 +255,9 @@ public class TagNode {
             if (node.subItems.isEmpty()) {
                 if ((node.tag instanceof ASMSource) && (node.export)) {
                     if (!dir.exists()) {
-                        dir.mkdirs();
+                        if (!dir.mkdirs()) {
+                            continue;
+                        }
                     }
                     try {
                         String f = outdir + name + ".as";

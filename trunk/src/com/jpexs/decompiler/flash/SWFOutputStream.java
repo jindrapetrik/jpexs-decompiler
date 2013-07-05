@@ -316,11 +316,6 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeSB(int nBits, long value) throws IOException {
-        long tmp = value & 0x7FFFFFFF;
-
-        if (value < 0) {
-            tmp = tmp | (1L << (nBits - 1));
-        }
         writeUB(nBits, value);
     }
 
@@ -436,9 +431,9 @@ public class SWFOutputStream extends OutputStream {
      * @return Number of bits
      */
     public static int getNeededBitsS(int v) {
-        if (v == 0) {
-            //return 0;
-        }
+        /*if (v == 0) {
+         //return 0;
+         }*/
         int counter = 32;
         int mask = 0x80000000;
         final int val = (v < 0) ? -v : v;
@@ -454,13 +449,6 @@ public class SWFOutputStream extends OutputStream {
             return (long) Math.ceil(value);
         }
         return (long) Math.floor(value);
-    }
-
-    private static double getFloatPart(double value) {
-        if (value < 0) {
-            return value - getIntPart(value);
-        }
-        return value + getIntPart(value);
     }
 
     public static int unsignedSize(final int value) {
@@ -490,24 +478,8 @@ public class SWFOutputStream extends OutputStream {
         return getNeededBitsS(k) + 16;
     }
 
-    private int enlargeBitCountU(int currentBitCount, int value) {
-        int neededNew = getNeededBitsU(value);
-        if (neededNew > currentBitCount) {
-            return neededNew;
-        }
-        return currentBitCount;
-    }
-
     private int enlargeBitCountS(int currentBitCount, int value) {
         int neededNew = getNeededBitsS(value);
-        if (neededNew > currentBitCount) {
-            return neededNew;
-        }
-        return currentBitCount;
-    }
-
-    private int enlargeBitCountF(int currentBitCount, float value) {
-        int neededNew = getNeededBitsF(value);
         if (neededNew > currentBitCount) {
             return neededNew;
         }
@@ -909,31 +881,29 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeFILTER(FILTER value) throws IOException {
         writeUI8(value.id);
-        switch (value.id) {
-            case 0:
-                writeDROPSHADOWFILTER((DROPSHADOWFILTER) value);
-                break;
-            case 1:
-                writeBLURFILTER((BLURFILTER) value);
-                break;
-            case 2:
-                writeGLOWFILTER((GLOWFILTER) value);
-                break;
-            case 3:
-                writeBEVELFILTER((BEVELFILTER) value);
-                break;
-            case 4:
-                writeGRADIENTGLOWFILTER((GRADIENTGLOWFILTER) value);
-                break;
-            case 5:
-                writeCONVOLUTIONFILTER((CONVOLUTIONFILTER) value);
-                break;
-            case 6:
-                writeCOLORMATRIXFILTER((COLORMATRIXFILTER) value);
-                break;
-            case 7:
-                writeGRADIENTBEVELFILTER((GRADIENTBEVELFILTER) value);
-                break;
+        if (value instanceof DROPSHADOWFILTER) {
+            writeDROPSHADOWFILTER((DROPSHADOWFILTER) value);
+        }
+        if (value instanceof BLURFILTER) {
+            writeBLURFILTER((BLURFILTER) value);
+        }
+        if (value instanceof GLOWFILTER) {
+            writeGLOWFILTER((GLOWFILTER) value);
+        }
+        if (value instanceof BEVELFILTER) {
+            writeBEVELFILTER((BEVELFILTER) value);
+        }
+        if (value instanceof GRADIENTGLOWFILTER) {
+            writeGRADIENTGLOWFILTER((GRADIENTGLOWFILTER) value);
+        }
+        if (value instanceof CONVOLUTIONFILTER) {
+            writeCONVOLUTIONFILTER((CONVOLUTIONFILTER) value);
+        }
+        if (value instanceof COLORMATRIXFILTER) {
+            writeCOLORMATRIXFILTER((COLORMATRIXFILTER) value);
+        }
+        if (value instanceof GRADIENTBEVELFILTER) {
+            writeGRADIENTBEVELFILTER((GRADIENTBEVELFILTER) value);
         }
     }
 

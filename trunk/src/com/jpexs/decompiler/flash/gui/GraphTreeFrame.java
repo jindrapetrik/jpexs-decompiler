@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
 import com.jpexs.decompiler.flash.graph.GraphPart;
 import java.awt.BorderLayout;
 import java.awt.Container;
-import javax.swing.JFrame;
 import javax.swing.JTree;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;

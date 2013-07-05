@@ -41,7 +41,7 @@ public class IncLocalIns extends InstructionDefinition {
         int regIndex = ins.operands[0];
         output.add(new IncLocalTreeItem(ins, regIndex));
         if (localRegs.containsKey(regIndex)) {
-            localRegs.put(regIndex, new NotCompileTimeTreeItem(ins, new AddTreeItem(ins, localRegs.get(regIndex), new IntegerValueTreeItem(ins, new Long(1)))));
+            localRegs.put(regIndex, new NotCompileTimeTreeItem(ins, new AddTreeItem(ins, localRegs.get(regIndex), new IntegerValueTreeItem(ins, Long.valueOf(1)))));
         } else {
             //localRegs.put(regIndex, new AddTreeItem(ins, null, new IntegerValueTreeItem(ins, new Long(1))));
         }

@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import com.jpexs.decompiler.flash.helpers.Cache;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
@@ -33,7 +34,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 
 public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretListener {
 

@@ -16,21 +16,22 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
-import com.jpexs.decompiler.flash.gui.abc.tablemodels.UIntTableModel;
-import com.jpexs.decompiler.flash.gui.abc.tablemodels.DoubleTableModel;
-import com.jpexs.decompiler.flash.gui.abc.tablemodels.NamespaceTableModel;
-import com.jpexs.decompiler.flash.gui.abc.tablemodels.IntTableModel;
-import com.jpexs.decompiler.flash.gui.abc.tablemodels.NamespaceSetTableModel;
-import com.jpexs.decompiler.flash.gui.abc.tablemodels.MultinameTableModel;
-import com.jpexs.decompiler.flash.gui.abc.tablemodels.DecimalTableModel;
-import com.jpexs.decompiler.flash.gui.abc.tablemodels.StringTableModel;
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
+import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.abc.tablemodels.DecimalTableModel;
+import com.jpexs.decompiler.flash.gui.abc.tablemodels.DoubleTableModel;
+import com.jpexs.decompiler.flash.gui.abc.tablemodels.IntTableModel;
+import com.jpexs.decompiler.flash.gui.abc.tablemodels.MultinameTableModel;
+import com.jpexs.decompiler.flash.gui.abc.tablemodels.NamespaceSetTableModel;
+import com.jpexs.decompiler.flash.gui.abc.tablemodels.NamespaceTableModel;
+import com.jpexs.decompiler.flash.gui.abc.tablemodels.StringTableModel;
+import com.jpexs.decompiler.flash.gui.abc.tablemodels.UIntTableModel;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -43,7 +44,6 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -55,7 +55,6 @@ import javax.swing.table.*;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.actions.DocumentSearchData;
-import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 
 public class ABCPanel extends JPanel implements ItemListener, ActionListener {
 

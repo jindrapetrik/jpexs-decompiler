@@ -20,12 +20,11 @@ import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
-import com.jpexs.decompiler.flash.gui.MainFrame;
+import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import java.util.HashMap;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
-import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 
 class ClassIndexVisitor implements TreeVisitor {
 

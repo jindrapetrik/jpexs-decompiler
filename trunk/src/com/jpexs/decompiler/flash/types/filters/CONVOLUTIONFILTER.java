@@ -45,7 +45,7 @@ public class CONVOLUTIONFILTER extends FILTER {
     /**
      * Matrix values
      */
-    public float matrix[][];
+    public float matrix[][] = new float[0][0];
     /**
      * Default color for pixels outside the image
      */

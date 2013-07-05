@@ -16,9 +16,9 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
+import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 
 /**
  *

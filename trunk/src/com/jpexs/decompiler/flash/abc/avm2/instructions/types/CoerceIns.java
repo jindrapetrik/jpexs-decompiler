@@ -37,7 +37,7 @@ public class CoerceIns extends InstructionDefinition implements CoerceOrConvertT
 
     @Override
     public void execute(LocalDataArea lda, ConstantPool constants, List<Object> arguments) {
-        int multinameIndex = (int) ((Long) arguments.get(0)).longValue();
+        //int multinameIndex = (int) ((Long) arguments.get(0)).longValue();
         //push and pop coerced value to specified type
     }
 

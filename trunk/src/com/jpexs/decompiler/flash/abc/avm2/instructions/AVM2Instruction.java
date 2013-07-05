@@ -41,6 +41,7 @@ import java.util.Stack;
 
 public class AVM2Instruction implements Serializable, GraphSourceItem {
 
+    public static final long serialVersionUID = 1L;
     public InstructionDefinition definition;
     public int operands[];
     public long offset;
@@ -95,11 +96,13 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
 
     @Override
     public String toString() {
-        String s = definition.instructionName;
+        StringBuffer s = new StringBuffer();
+        s.append(definition.instructionName);
         for (int i = 0; i < operands.length; i++) {
-            s += " " + operands[i];
+            s.append(" ");
+            s.append(operands[i]);
         }
-        return s;
+        return s.toString();
     }
 
     public List<Long> getOffsets() {
@@ -135,13 +138,13 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
                     s.add(constants.constant_string[operands[i]]);
                     break;
                 case AVM2Code.DAT_INT_INDEX:
-                    s.add(new Long(constants.constant_int[operands[i]]));
+                    s.add(Long.valueOf(constants.constant_int[operands[i]]));
                     break;
                 case AVM2Code.DAT_UINT_INDEX:
                     s.add(new Long(constants.constant_uint[operands[i]]));
                     break;
                 case AVM2Code.DAT_DOUBLE_INDEX:
-                    s.add(new Double(constants.constant_double[operands[i]]));
+                    s.add(Double.valueOf(constants.constant_double[operands[i]]));
                     break;
                 case AVM2Code.DAT_OFFSET:
                     s.add(new Long(offset + operands[i] + getBytes().length));
@@ -164,54 +167,59 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
     }
 
     public String getParams(ConstantPool constants, List<String> fullyQualifiedNames) {
-        String s = "";
+        StringBuilder s = new StringBuilder();
         for (int i = 0; i < definition.operands.length; i++) {
             switch (definition.operands[i]) {
                 case AVM2Code.DAT_MULTINAME_INDEX:
-                    s += " m[" + operands[i] + "]\"" + Helper.escapeString(constants.constant_multiname[operands[i]].toString(constants, fullyQualifiedNames)) + "\"";
+                    s.append(" m[");
+                    s.append(operands[i]);
+                    s.append("]\"");
+                    s.append(Helper.escapeString(constants.constant_multiname[operands[i]].toString(constants, fullyQualifiedNames)));
+                    s.append("\"");
                     break;
                 case AVM2Code.DAT_STRING_INDEX:
-                    s += " \"" + Helper.escapeString(constants.constant_string[operands[i]]) + "\"";
+                    s.append(" \"");
+                    s.append(Helper.escapeString(constants.constant_string[operands[i]]));
+                    s.append("\"");
                     break;
                 case AVM2Code.DAT_INT_INDEX:
-                    s += " " + constants.constant_int[operands[i]] + "";
+                    s.append(" ");
+                    s.append(constants.constant_int[operands[i]]);
                     break;
                 case AVM2Code.DAT_UINT_INDEX:
-                    s += " " + constants.constant_uint[operands[i]] + "";
+                    s.append(" ");
+                    s.append(constants.constant_uint[operands[i]]);
                     break;
                 case AVM2Code.DAT_DOUBLE_INDEX:
-                    s += " " + constants.constant_double[operands[i]] + "";
+                    s.append(" ");
+                    s.append(constants.constant_double[operands[i]]);
                     break;
                 case AVM2Code.DAT_OFFSET:
-                    s += " ";
-                    if (operands[i] > 0) {
-                        //s += "+";
-                    }//operands[i]
-                    s += "ofs" + Helper.formatAddress(offset + operands[i] + getBytes().length) + "";
+                    s.append(" ");
+                    s.append("ofs");
+                    s.append(Helper.formatAddress(offset + operands[i] + getBytes().length));
                     break;
                 case AVM2Code.DAT_CASE_BASEOFFSET:
-                    s += " ";
-                    if (operands[i] > 0) {
-                        //s += "+";
-                    }//operands[i]
-                    s += "ofs" + Helper.formatAddress(offset + operands[i]) + "";
+                    s.append(" ");
+                    s.append("ofs");
+                    s.append(Helper.formatAddress(offset + operands[i]));
                     break;
                 case AVM2Code.OPT_CASE_OFFSETS:
-                    s += " " + operands[i];
+                    s.append(" ");
+                    s.append(operands[i]);
                     for (int j = i + 1; j < operands.length; j++) {
-                        s += " ";
-                        if (operands[j] > 0) {
-                            //s += "+";
-                        }//operands[j]
-                        s += "ofs" + Helper.formatAddress(offset + operands[j]) + "";
+                        s.append(" ");
+                        s.append("ofs");
+                        s.append(Helper.formatAddress(offset + operands[j]));
                     }
                     break;
                 default:
-                    s += " " + operands[i];
+                    s.append(" ");
+                    s.append(operands[i]);
             }
 
         }
-        return s;
+        return s.toString();
     }
 
     public String getComment() {

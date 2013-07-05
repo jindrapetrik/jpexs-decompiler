@@ -35,7 +35,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -62,7 +64,7 @@ public class ABC {
     public MethodBody bodies[];
     private int bodyIdxFromMethodIdx[];
     public long stringOffsets[];
-    public static String IDENT_STRING = "   ";
+    public static final String IDENT_STRING = "   ";
     public static final int MINORwithDECIMAL = 17;
     protected HashSet<EventListener> listeners = new HashSet<>();
     private static Logger logger = Logger.getLogger(ABC.class.getName());
@@ -356,8 +358,7 @@ public class ABC {
             mb.init_scope_depth = ais.readU30();
             mb.max_scope_depth = ais.readU30();
             int code_length = ais.readU30();
-            mb.codeBytes = new byte[code_length];
-            ais.read(mb.codeBytes);
+            mb.codeBytes = ais.readBytes(code_length);
             try {
                 mb.code = new AVM2Code(new ByteArrayInputStream(mb.codeBytes));
             } catch (UnknownInstructionCode re) {
@@ -473,13 +474,7 @@ public class ABC {
             aos.writeU30(bodies[i].max_scope_depth);
             byte codeBytes[] = bodies[i].code.getBytes();
             aos.writeU30(codeBytes.length);
-            try {
-                aos.write(codeBytes);
-            } catch (NotSameException ex) {
-                System.out.println(bodies[i].code.toString(constants));
-                System.exit(0);
-                return;
-            }
+            aos.write(codeBytes);
             aos.writeU30(bodies[i].exceptions.length);
             for (int j = 0; j < bodies[i].exceptions.length; j++) {
                 aos.writeU30(bodies[i].exceptions[j].start);
@@ -706,8 +701,8 @@ public class ABC {
         AtomicInteger cnt = new AtomicInteger(1);
         for (int i = 0; i < script_info.length; i++) {
             HashMap<ClassPath, ScriptPack> packs = script_info[i].getPacks(this, i);
-            for (ClassPath path : packs.keySet()) {
-                Future<File> future = executor.submit(new ExportPackTask(cnt, script_info.length, path, packs.get(path), directory, abcList, pcode, abcStr, paralel));
+            for (Entry<ClassPath, ScriptPack> entry : packs.entrySet()) {
+                Future<File> future = executor.submit(new ExportPackTask(cnt, script_info.length, entry.getKey(), entry.getValue(), directory, abcList, pcode, abcStr, paralel));
                 futureResults.add(future);
             }
         }
@@ -731,7 +726,13 @@ public class ABC {
     }
 
     public void dump(OutputStream os) {
-        PrintStream output = new PrintStream(os);
+        PrintStream output;
+        try {
+            output = new PrintStream(os, false, "utf-8");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, ex);
+            return;
+        }
         constants.dump(output);
         for (int i = 0; i < method_info.length; i++) {
             output.println("MethodInfo[" + i + "]:" + method_info[i].toString(constants, new ArrayList<String>()));
@@ -798,7 +799,7 @@ public class ABC {
                         c = "" + fooJoinCharacters.charAt(rnd.nextInt(fooJoinCharacters.length()));
                     }
                     if (i == 0 && firstUppercase) {
-                        c = c.toUpperCase();
+                        c = c.toUpperCase(Locale.ENGLISH);
                     }
                     ret += c;
                 }

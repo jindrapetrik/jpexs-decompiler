@@ -67,7 +67,6 @@ import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
-import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
@@ -109,6 +108,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.Stack;
@@ -270,7 +270,7 @@ public class SWF {
     public SWF(InputStream is, PercentListener listener, boolean paralelRead) throws IOException {
         byte hdr[] = new byte[3];
         is.read(hdr);
-        String shdr = new String(hdr);
+        String shdr = new String(hdr, "utf-8");
         if ((!shdr.equals("FWS")) && (!shdr.equals("CWS")) && (!shdr.equals("ZWS"))) {
             throw new IOException("Invalid SWF file");
         }
@@ -285,7 +285,7 @@ public class SWF {
 
         if (hdr[0] == 'Z') {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            long outSize = sis.readUI32();
+            sis.readUI32(); //outSize
             int propertiesSize = 5;
             lzmaProperties = new byte[propertiesSize];
             if (sis.read(lzmaProperties, 0, propertiesSize) != propertiesSize) {
@@ -311,7 +311,7 @@ public class SWF {
         sis.setPercentMax(fileSize);
         displayRect = sis.readRECT();
         // FIXED8 (16 bit fixed point) frameRate
-        int tmpFirstByetOfFrameRate = sis.readUI8();
+        sis.readUI8(); //tmpFirstByetOfFrameRate
         frameRate = sis.readUI8();
         frameCount = sis.readUI16();
         tags = sis.readTagList(0, paralelRead);
@@ -406,13 +406,13 @@ public class SWF {
         try {
             byte hdr[] = new byte[3];
             fis.read(hdr);
-            String shdr = new String(hdr);
+            String shdr = new String(hdr, "utf-8");
             if (shdr.equals("CWS")) {
                 int version = fis.read();
                 SWFInputStream sis = new SWFInputStream(fis, version, 4);
                 long fileSize = sis.readUI32();
                 SWFOutputStream sos = new SWFOutputStream(fos, version);
-                sos.write("FWS".getBytes());
+                sos.write("FWS".getBytes("utf-8"));
                 sos.writeUI8(version);
                 sos.writeUI32(fileSize);
                 InflaterInputStream iis = new InflaterInputStream(fis);
@@ -429,7 +429,7 @@ public class SWF {
                 long fileSize = sis.readUI32();
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                long outSize = sis.readUI32();
+                sis.readUI32(); //outSize
                 int propertiesSize = 5;
                 byte lzmaProperties[] = new byte[propertiesSize];
                 if (sis.read(lzmaProperties, 0, propertiesSize) != propertiesSize) {
@@ -444,7 +444,7 @@ public class SWF {
                     throw new IOException("LZMA:Error in data stream");
                 }
                 try (SWFOutputStream sos = new SWFOutputStream(fos, version)) {
-                    sos.write("FWS".getBytes());
+                    sos.write("FWS".getBytes("utf-8"));
                     sos.write(version);
                     sos.writeUI32(fileSize);
                     sos.write(baos.toByteArray());
@@ -657,9 +657,9 @@ public class SWF {
             if (ret.get(i).tag instanceof DefineButton2Tag) {
                 ((DefineButton2Tag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
             }
-            if (ret.get(i).tag instanceof DoInitActionTag) {
-                //((DoInitActionTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
-            }
+            /*if (ret.get(i).tag instanceof DoInitActionTag) {
+             //((DoInitActionTag) ret.get(i).tag).exportAssetsTags = exportAssetsTags;
+             }*/
             if (ret.get(i).tag instanceof ASMSource) {
                 ASMSource ass = (ASMSource) ret.get(i).tag;
                 if (ass.containsSource()) {
@@ -758,11 +758,6 @@ public class SWF {
         boolean mp3 = true;
         boolean wave = true;
         ByteArrayOutputStream fos = new ByteArrayOutputStream();
-        int id = 0;
-        if (t instanceof DefineSoundTag) {
-            id = ((DefineSoundTag) t).soundId;
-        }
-
 
         if (t instanceof DefineSoundTag) {
             DefineSoundTag st = (DefineSoundTag) t;
@@ -843,20 +838,20 @@ public class SWF {
             writeLE(subChunk1Data, bitsPerSample, 2);
 
             ByteArrayOutputStream chunks = new ByteArrayOutputStream();
-            chunks.write("fmt ".getBytes());
+            chunks.write("fmt ".getBytes("utf-8"));
             byte subChunk1DataBytes[] = subChunk1Data.toByteArray();
             writeLE(chunks, subChunk1DataBytes.length, 4);
             chunks.write(subChunk1DataBytes);
 
 
-            chunks.write("data".getBytes());
+            chunks.write("data".getBytes("utf-8"));
             writeLE(chunks, pcmData.length, 4);
             chunks.write(pcmData);
 
-            fos.write("RIFF".getBytes());
+            fos.write("RIFF".getBytes("utf-8"));
             byte chunkBytes[] = chunks.toByteArray();
             writeLE(fos, 4 + chunkBytes.length, 4);
-            fos.write("WAVE".getBytes());
+            fos.write("WAVE".getBytes("utf-8"));
             fos.write(chunkBytes);
             //size1=>16bit*/
         } finally {
@@ -876,9 +871,10 @@ public class SWF {
             return ret;
         }
         if (!(new File(outdir)).exists()) {
-            (new File(outdir)).mkdirs();
+            if (!(new File(outdir)).mkdirs()) {
+                throw new IOException("Cannot create directory " + outdir);
+            }
         }
-        List<Object> os = new ArrayList<Object>(this.tags);
         for (Tag t : tags) {
             FileOutputStream fos = null;
             File file = null;
@@ -903,9 +899,10 @@ public class SWF {
                     } else {
                         file = new File(outdir + File.separator + st.getCharacterExportFileName() + ".flv");
                         fos = new FileOutputStream(file);
-                        FLVOutputStream flv = new FLVOutputStream(fos);
-                        flv.writeHeader(true, false);
-                        flv.writeTag(new FLVTAG(0, new AUDIODATA(st.soundFormat, st.soundRate, st.soundSize, st.soundType, st.soundData)));
+                        try (FLVOutputStream flv = new FLVOutputStream(fos)) {
+                            flv.writeHeader(true, false);
+                            flv.writeTag(new FLVTAG(0, new AUDIODATA(st.soundFormat, st.soundRate, st.soundSize, st.soundType, st.soundData)));
+                        }
                     }
                 }
                 if (t instanceof SoundStreamHeadTypeTag) {
@@ -949,7 +946,7 @@ public class SWF {
                 if (fos != null) {
                     try {
                         fos.close();
-                    } catch (Exception ex) {
+                    } catch (Exception ignore) {
                         //ignore
                     }
                 }
@@ -968,12 +965,9 @@ public class SWF {
 
 
 
-        long fileSize = 0;
-
         //double ms = 1000.0f / ((float) frameRate);
 
         ByteArrayOutputStream fos = new ByteArrayOutputStream();
-        fos = new ByteArrayOutputStream();
         //CopyOutputStream cos = new CopyOutputStream(fos, new FileInputStream("f:\\trunk\\testdata\\xfl\\xfl\\_obj\\streamvideo 7.flv"));
         OutputStream tos = fos;
         FLVOutputStream flv = new FLVOutputStream(tos);
@@ -1000,19 +994,19 @@ public class SWF {
                 } else {
                     frameType = 2; //inter
                 }
-                int qp = (int) sis.readUB(6);
+                sis.readUB(6); //qp
                 int marker = (int) sis.readUB(1);
                 if (frameMode == 0) {
                     int version = (int) sis.readUB(5);
                     int version2 = (int) sis.readUB(2);
-                    boolean interlace = sis.readUB(1) == 1;//interlace
+                    sis.readUB(1);//interlace
                     if (marker == 1 || version2 == 0) {
                         sis.readUI16();//offset
                     }
                     int dim_y = sis.readUI8();
                     int dim_x = sis.readUI8();
-                    int render_y = sis.readUI8();
-                    int render_x = sis.readUI8();
+                    sis.readUI8(); //render_y
+                    sis.readUI8(); //render_x
                     horizontalAdjustment = (int) (dim_x * Math.ceil(((double) videoStream.width) / (double) dim_x)) - videoStream.width;
                     verticalAdjustment = (int) (dim_y * Math.ceil(((double) videoStream.height) / (double) dim_y)) - videoStream.height;
 
@@ -1053,7 +1047,6 @@ public class SWF {
             baos.write(tag.videoData);
             flv.writeTag(new FLVTAG((int) Math.floor(i * 1000.0f / ((float) frameRate)), new VIDEODATA(frameType, videoStream.codecID, baos.toByteArray())));
         }
-        fileSize = fos.toByteArray().length;
         return fos.toByteArray();
     }
 
@@ -1063,7 +1056,9 @@ public class SWF {
             return ret;
         }
         if (!(new File(outdir)).exists()) {
-            (new File(outdir)).mkdirs();
+            if (!(new File(outdir)).mkdirs()) {
+                throw new IOException("Cannot create directory " + outdir);
+            }
         }
         for (Tag t : tags) {
             if (t instanceof DefineVideoStreamTag) {
@@ -1083,7 +1078,9 @@ public class SWF {
             return ret;
         }
         if (!(new File(outdir)).exists()) {
-            (new File(outdir)).mkdirs();
+            if (!(new File(outdir)).mkdirs()) {
+                throw new IOException("Cannot create directory " + outdir);
+            }
         }
         for (Tag t : tags) {
             if (t instanceof TextTag) {
@@ -1111,7 +1108,9 @@ public class SWF {
             return ret;
         }
         if (!(new File(outdir)).exists()) {
-            (new File(outdir)).mkdirs();
+            if (!(new File(outdir)).mkdirs()) {
+                throw new IOException("Cannot create directory " + outdir);
+            }
         }
         for (Tag t : tags) {
             if (t instanceof ShapeTag) {
@@ -1121,7 +1120,7 @@ public class SWF {
                 }
                 File file = new File(outdir + File.separator + characterID + ".svg");
                 try (FileOutputStream fos = new FileOutputStream(file)) {
-                    fos.write(((ShapeTag) t).toSVG().getBytes());
+                    fos.write(((ShapeTag) t).toSVG().getBytes("utf-8"));
                 }
                 ret.add(file);
             }
@@ -1135,14 +1134,13 @@ public class SWF {
             return ret;
         }
         if (!(new File(outdir)).exists()) {
-            (new File(outdir)).mkdirs();
+            if (!(new File(outdir)).mkdirs()) {
+                throw new IOException("Cannot create directory " + outdir);
+            }
         }
         for (Tag t : tags) {
             if (t instanceof DefineBinaryDataTag) {
-                int characterID = 0;
-                if (t instanceof CharacterTag) {
-                    characterID = ((CharacterTag) t).getCharacterID();
-                }
+                int characterID = ((DefineBinaryDataTag) t).getCharacterID();
                 File file = new File(outdir + File.separator + characterID + ".bin");
                 try (FileOutputStream fos = new FileOutputStream(file)) {
                     fos.write(((DefineBinaryDataTag) t).binaryData);
@@ -1159,12 +1157,14 @@ public class SWF {
             return ret;
         }
         if (!(new File(outdir)).exists()) {
-            (new File(outdir)).mkdirs();
+            if (!(new File(outdir)).mkdirs()) {
+                throw new IOException("Cannot create directory " + outdir);
+            }
         }
         for (Tag t : tags) {
             if (t instanceof ImageTag) {
                 File file = new File(outdir + File.separator + ((ImageTag) t).getCharacterID() + "." + ((ImageTag) t).getImageFormat());
-                ImageIO.write(((ImageTag) t).getImage(this.tags), ((ImageTag) t).getImageFormat().toUpperCase(), file);
+                ImageIO.write(((ImageTag) t).getImage(this.tags), ((ImageTag) t).getImageFormat().toUpperCase(Locale.ENGLISH), file);
                 ret.add(file);
             }
         }
@@ -1172,12 +1172,6 @@ public class SWF {
     }
 
     public void exportImages(String outdir) throws IOException {
-        JPEGTablesTag jtt = null;
-        for (Tag t : tags) {
-            if (t instanceof JPEGTablesTag) {
-                jtt = (JPEGTablesTag) t;
-            }
-        }
         exportImages(outdir, tags);
     }
 
@@ -1232,7 +1226,7 @@ public class SWF {
                     c = "" + fooJoinCharacters.charAt(rnd.nextInt(fooJoinCharacters.length()));
                 }
                 if (i == 0 && firstUppercase) {
-                    c = c.toUpperCase();
+                    c = c.toUpperCase(Locale.ENGLISH);
                 }
                 ret += c;
             }
@@ -1313,14 +1307,12 @@ public class SWF {
         return null;
     }
 
-    private static void getVariables(ConstantPool constantPool, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, int lastIp, HashMap<DirectValueTreeItem, ConstantPool> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, List<Integer> visited, HashMap<DirectValueTreeItem, String> usageTypes) {
+    private static void getVariables(ConstantPool constantPool, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, HashMap<DirectValueTreeItem, ConstantPool> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, List<Integer> visited, HashMap<DirectValueTreeItem, String> usageTypes) {
         boolean debugMode = false;
         while ((ip > -1) && ip < code.size()) {
             if (visited.contains(ip)) {
                 break;
             }
-
-            lastIp = ip;
             GraphSourceItem ins = code.get(ip);
 
             if (debugMode) {
@@ -1447,7 +1439,7 @@ public class SWF {
                     @SuppressWarnings("unchecked")
                     Stack<GraphTargetItem> brStack = (Stack<GraphTargetItem>) stack.clone();
                     if (b >= 0) {
-                        getVariables(constantPool, localData, brStack, output, code, b, ip, variables, functions, strings, visited, usageTypes);
+                        getVariables(constantPool, localData, brStack, output, code, b, variables, functions, strings, visited, usageTypes);
                     } else {
                         if (debugMode) {
                             System.out.println("Negative branch:" + b);
@@ -1464,7 +1456,7 @@ public class SWF {
     private static void getVariables(HashMap<DirectValueTreeItem, ConstantPool> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, HashMap<DirectValueTreeItem, String> usageType, ActionGraphSource code, int addr) {
         List<Object> localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
         try {
-            getVariables(null, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), 0, variables, functions, strings, new ArrayList<Integer>(), usageType);
+            getVariables(null, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), variables, functions, strings, new ArrayList<Integer>(), usageType);
         } catch (Exception ex) {
             Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Getting variables error", ex);
         }
@@ -1801,6 +1793,7 @@ public class SWF {
         private int width;
         private int height;
         private int type;
+        public static final long serialVersionUID = 1L;
 
         public CachedImage(BufferedImage img) {
             width = img.getWidth();
@@ -1888,9 +1881,6 @@ public class SWF {
             }
             CharacterTag character = characters.get(layer.characterId);
             MATRIX mat = new MATRIX(layer.matrix);
-            if (mat == null) {
-                mat = new MATRIX();
-            }
             mat.translateX /= 20;
             mat.translateY /= 20;
 

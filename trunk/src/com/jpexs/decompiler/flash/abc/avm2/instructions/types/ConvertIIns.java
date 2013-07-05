@@ -53,7 +53,7 @@ public class ConvertIIns extends InstructionDefinition implements CoerceOrConver
         } else {
             ret = 1; //must call toPrimitive
         }
-        lda.operandStack.push(new Long(ret));
+        lda.operandStack.push(Long.valueOf(ret));
     }
 
     @Override

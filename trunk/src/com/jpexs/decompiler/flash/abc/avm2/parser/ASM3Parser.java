@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class ASM3Parser {
 
@@ -124,7 +125,7 @@ public class ASM3Parser {
                 continue;
             }
             if (symb.type == ParsedSymbol.TYPE_INSTRUCTION_NAME) {
-                if (((String) symb.value).toLowerCase().equals("exception")) {
+                if (((String) symb.value).toLowerCase(Locale.ENGLISH).equals("exception")) {
                     ParsedSymbol exIndex = lexer.yylex();
                     if (exIndex.type != ParsedSymbol.TYPE_INTEGER) {
                         throw new ParseException("Index expected", lexer.yyline());

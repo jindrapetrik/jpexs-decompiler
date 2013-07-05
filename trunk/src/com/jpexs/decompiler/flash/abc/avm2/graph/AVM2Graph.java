@@ -207,9 +207,9 @@ public class AVM2Graph extends Graph {
             }
         }
         if (catchedExceptions.size() > 0) {
-            if (currentLoop != null) {
-                //currentLoop.phase=0;
-            }
+            /*if (currentLoop != null) {
+             //currentLoop.phase=0;
+             }*/
             parsedExceptions.addAll(catchedExceptions);
             int endpos = code.adr2pos(code.fixAddrAfterDebugLine(catchedExceptions.get(0).end));
             int endposStartBlock = code.adr2pos(catchedExceptions.get(0).end);
@@ -580,7 +580,7 @@ public class AVM2Graph extends Graph {
 
             if ((!w.expression.isEmpty()) && (w.expression.get(w.expression.size() - 1) instanceof HasNextTreeItem)) {
                 if (((HasNextTreeItem) w.expression.get(w.expression.size() - 1)).collection.getNotCoerced().getThroughRegister() instanceof FilteredCheckTreeItem) {
-                    GraphTargetItem gti = ((HasNextTreeItem) ((HasNextTreeItem) w.expression.get(w.expression.size() - 1))).collection.getNotCoerced().getThroughRegister();
+                    //GraphTargetItem gti = ((HasNextTreeItem) ((HasNextTreeItem) w.expression.get(w.expression.size() - 1))).collection.getNotCoerced().getThroughRegister();
                     if (w.commands.size() >= 3) { //((w.commands.size() == 3) || (w.commands.size() == 4)) {
                         int pos = 0;
                         while (w.commands.get(pos) instanceof SetLocalTreeItem) {
