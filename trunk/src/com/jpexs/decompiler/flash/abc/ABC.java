@@ -21,6 +21,8 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCode;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropertyIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushStringIns;
 import com.jpexs.decompiler.flash.abc.types.*;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
@@ -231,6 +233,41 @@ public class ABC {
         for (int i = 1; i < constants.constant_namespace.length; i++) {
             informListeners("deobfuscate", "namespace " + i + "/" + constants.constant_namespace.length);
             constants.constant_namespace[i].name_index = deobfuscateNameSpace(stringUsageTypes, stringUsages, namesMap, constants.constant_namespace[i].name_index, renameType);
+        }
+
+        //process reflection using getDefinitionByName too
+        for (MethodBody body : bodies) {
+            for (int ip = 0; ip < body.code.code.size(); ip++) {
+                if (body.code.code.get(ip).definition instanceof CallPropertyIns) {
+                    if (ip > 0) {
+                        if (body.code.code.get(ip - 1).definition instanceof PushStringIns) {
+                            int strIndex = body.code.code.get(ip - 1).operands[0];
+                            String fullname = constants.constant_string[strIndex];
+                            String pkg = "";
+                            String name = fullname;
+                            if (fullname.contains(".")) {
+                                pkg = fullname.substring(0, fullname.lastIndexOf("."));
+                                name = fullname.substring(fullname.lastIndexOf(".") + 1);
+                            }
+                            if (!pkg.equals("")) {
+                                int pkgStrIndex = constants.forceGetStringId(pkg);
+                                pkgStrIndex = deobfuscateNameSpace(stringUsageTypes, stringUsages, namesMap, pkgStrIndex, renameType);
+                                pkg = constants.constant_string[pkgStrIndex];
+                            }
+                            int nameStrIndex = constants.forceGetStringId(name);
+                            nameStrIndex = deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, nameStrIndex, true, renameType);
+                            name = constants.constant_string[nameStrIndex];
+                            String fullChanged = "";
+                            if (!pkg.equals("")) {
+                                fullChanged = pkg + ".";
+                            }
+                            fullChanged += name;
+                            strIndex = constants.forceGetStringId(fullChanged);
+                            body.code.code.get(ip - 1).operands[0] = strIndex;
+                        }
+                    }
+                }
+            }
         }
     }
 
