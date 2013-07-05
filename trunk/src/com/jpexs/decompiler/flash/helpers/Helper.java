@@ -277,7 +277,6 @@ public class Helper {
             }
             return copy;
         } catch (Exception ex) {
-            ex.printStackTrace();
             return null;
         }
     }
@@ -412,5 +411,13 @@ public class Helper {
             str = "unnamed";
         }
         return str;
+    }
+
+    public static String strToHex(String s) {
+        String sn = "";
+        for (int i = 0; i < s.length(); i++) {
+            sn += "0x" + Integer.toHexString(s.charAt(i)) + " ";
+        }
+        return sn;
     }
 }

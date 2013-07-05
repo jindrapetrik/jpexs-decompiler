@@ -265,6 +265,8 @@ public class SWF {
      * Construct SWF from stream
      *
      * @param is Stream to read SWF from
+     * @param listener 
+     * @param paralelRead Use parallel threads?
      * @throws IOException
      */
     public SWF(InputStream is, PercentListener listener, boolean paralelRead) throws IOException {
@@ -374,6 +376,7 @@ public class SWF {
      *
      * @param fis Input stream
      * @param fos Output stream
+     * @return True on success 
      */
     public static boolean fws2cws(InputStream fis, OutputStream fos) {
         try {
@@ -1246,12 +1249,14 @@ public class SWF {
                 continue;
             }
         } while (exists);
-        deobfuscated.put(orig, ret);
         return ret;
     }
 
-    public String deobfuscateName(HashMap<String, String> namesMap, String s, boolean firstUppercase, String usageType, RenameType renameType, Map<String, String> selected) {
+    public String deobfuscateName(String s, boolean firstUppercase, String usageType, RenameType renameType, Map<String, String> selected) {
         boolean isValid = true;
+        if (usageType == null) {
+            usageType = "name";
+        }
 
         if (selected != null) {
             if (selected.containsKey(s)) {
@@ -1279,8 +1284,8 @@ public class SWF {
             }
         }
         if (!isValid) {
-            if (namesMap.containsKey(s)) {
-                return namesMap.get(s);
+            if (deobfuscated.containsKey(s)) {
+                return deobfuscated.get(s);
             } else {
                 Integer cnt = typeCounts.get(usageType);
                 if (cnt == null) {
@@ -1301,6 +1306,7 @@ public class SWF {
                 } else if (renameType == RenameType.RANDOMWORD) {
                     ret = fooString(s, firstUppercase, DEFAULT_FOO_SIZE);
                 }
+                deobfuscated.put(s, ret);
                 return ret;
             }
         }
@@ -1619,7 +1625,7 @@ public class SWF {
                                 if (fun.calculatedFunctionName instanceof DirectValueTreeItem) {
                                     DirectValueTreeItem dvf = (DirectValueTreeItem) fun.calculatedFunctionName;
                                     String fname = dvf.toStringNoH(null);
-                                    String changed = deobfuscateName(deobfuscated, fname, false, "method", renameType, selected);
+                                    String changed = deobfuscateName(fname, false, "method", renameType, selected);
                                     if (changed != null) {
                                         deobfuscated.put(fname, changed);
                                     }
@@ -1635,7 +1641,7 @@ public class SWF {
                             if (gti instanceof DirectValueTreeItem) {
                                 DirectValueTreeItem dvf = (DirectValueTreeItem) gti;
                                 String vname = dvf.toStringNoH(null);
-                                String changed = deobfuscateName(deobfuscated, vname, false, "attribute", renameType, selected);
+                                String changed = deobfuscateName(vname, false, "attribute", renameType, selected);
                                 if (changed != null) {
                                     deobfuscated.put(vname, changed);
                                 }
@@ -1669,7 +1675,7 @@ public class SWF {
                             if (classNameParts != null) {
                                 changedNameStr = classNameParts[classNameParts.length - 1 - pos];
                             }
-                            String changedNameStr2 = deobfuscateName(deobfuscated, changedNameStr, pos == 0, pos == 0 ? "class" : "package", renameType, selected);
+                            String changedNameStr2 = deobfuscateName(changedNameStr, pos == 0, pos == 0 ? "class" : "package", renameType, selected);
                             if (changedNameStr2 != null) {
                                 changedNameStr = changedNameStr2;
                             }
@@ -1692,7 +1698,7 @@ public class SWF {
                             if (classNameParts != null) {
                                 changedNameStr = classNameParts[classNameParts.length - 1 - pos];
                             }
-                            String changedNameStr2 = deobfuscateName(deobfuscated, changedNameStr, pos == 0, pos == 0 ? "class" : "package", renameType, selected);
+                            String changedNameStr2 = deobfuscateName(changedNameStr, pos == 0, pos == 0 ? "class" : "package", renameType, selected);
                             if (changedNameStr2 != null) {
                                 changedNameStr = changedNameStr2;
                             }
@@ -1709,14 +1715,14 @@ public class SWF {
             informListeners("rename", "function " + fc + "/" + allFunctions.size());
             if (fun instanceof ActionDefineFunction) {
                 ActionDefineFunction f = (ActionDefineFunction) fun;
-                String changed = deobfuscateName(deobfuscated, f.functionName, false, "function", renameType, selected);
+                String changed = deobfuscateName(f.functionName, false, "function", renameType, selected);
                 if (changed != null) {
                     f.replacedFunctionName = changed;
                 }
             }
             if (fun instanceof ActionDefineFunction2) {
                 ActionDefineFunction2 f = (ActionDefineFunction2) fun;
-                String changed = deobfuscateName(deobfuscated, f.functionName, false, "function", renameType, selected);
+                String changed = deobfuscateName(f.functionName, false, "function", renameType, selected);
                 if (changed != null) {
                     f.replacedFunctionName = changed;
                 }
@@ -1733,9 +1739,8 @@ public class SWF {
         int vc = 0;
         for (DirectValueTreeItem ti : allVariableNames.keySet()) {
             vc++;
-            informListeners("rename", "variable " + vc + "/" + allVariableNames.size());
             String name = ti.toStringNoH(allVariableNames.get(ti));
-            String changed = deobfuscateName(deobfuscated, name, false, usageTypes.get(ti), renameType, selected);
+            String changed = deobfuscateName(name, false, usageTypes.get(ti), renameType, selected);
             if (changed != null) {
                 boolean addNew = false;
                 String h = System.identityHashCode(allVariableNames.get(ti)) + "_" + name;

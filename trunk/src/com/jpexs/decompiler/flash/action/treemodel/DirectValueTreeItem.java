@@ -196,7 +196,7 @@ public class DirectValueTreeItem extends TreeItem {
     public int hashCode() {
         int hash = 7;
         hash = 71 * hash + Objects.hashCode(this.value);
-        hash = 71 * hash + Objects.hashCode(this.constants);
+        hash = 71 * hash + System.identityHashCode(this.constants);
         hash = 71 * hash + pos;
         return hash;
     }
