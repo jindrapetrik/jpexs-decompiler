@@ -419,6 +419,7 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, 
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public DefineTextTag(byte data[], int version, long pos) throws IOException {
@@ -490,9 +491,12 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, 
                 rect.Ymax /= font.getDivider();
                 rect.Ymin /= font.getDivider();
                 BufferedImage img = SHAPERECORD.shapeToImage(tags, 1, null, null, glyphs[entry.glyphIndex].shapeRecords, textColor);
-                g.setTransform(AffineTransform.getScaleInstance(textHeight / 1000f / 20, textHeight / 1000f / 20));
-
-                g.drawImage(img, x, y + rect.Ymin, null);
+                AffineTransform tr = new AffineTransform();
+                tr.setToIdentity();
+                float rat = textHeight / 1000f;
+                tr.translate(rat * x / 20, rat * (y + rect.Ymin) / 20);
+                tr.scale(rat / font.getDivider(), rat / font.getDivider());
+                g.drawImage(img, tr, null);
                 x += entry.glyphAdvance * 1000 / textHeight;
             }
         }
