@@ -92,6 +92,7 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextT
     private String stripTags(String inp) {
         boolean intag = false;
         String outp = "";
+        inp = inp.replaceAll("<br ?/?>", "\r\n");
         for (int i = 0; i < inp.length(); ++i) {
             if (!intag && inp.charAt(i) == '<') {
                 intag = true;
@@ -118,7 +119,10 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextT
 
     @Override
     public String getText(List<Tag> tags) {
-        String ret = getFormattedText(tags);
+        String ret = "";
+        if (hasText) {
+            ret = initialText;
+        }
         if (html) {
             ret = stripTags(ret);
             ret = entitiesReplace(ret);
