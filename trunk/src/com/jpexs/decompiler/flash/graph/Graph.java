@@ -1725,9 +1725,9 @@ public class Graph {
                     }
                     if (next != p) {
                         if (first) {
-                            defaultCommands = printGraph(visited, localData, stack, allParts, part, p, stopPart2, loops);
+                            defaultCommands = printGraph(visited, prepareBranchLocalData(localData), stack, allParts, part, p, stopPart2, loops);
                         } else {
-                            caseCommands.add(printGraph(visited, localData, stack, allParts, part, p, stopPart2, loops));
+                            caseCommands.add(printGraph(visited, prepareBranchLocalData(localData), stack, allParts, part, p, stopPart2, loops));
                         }
                         vis.add(p);
                     }
@@ -1780,12 +1780,12 @@ public class Graph {
                     stopPart2.add(next);
                 }
                 if (!isEmpty) {
-                    onTrue = printGraph(visited, localData, trueStack, allParts, part, part.nextParts.get(1), stopPart2, loops);
+                    onTrue = printGraph(visited, prepareBranchLocalData(localData), trueStack, allParts, part, part.nextParts.get(1), stopPart2, loops);
                 }
                 List<GraphTargetItem> onFalse = new ArrayList<>();
 
                 if (!isEmpty) {
-                    onFalse = printGraph(visited, localData, falseStack, allParts, part, part.nextParts.get(0), stopPart2, loops);
+                    onFalse = printGraph(visited, prepareBranchLocalData(localData), falseStack, allParts, part, part.nextParts.get(0), stopPart2, loops);
                 }
                 if (isEmpty(onTrue) && isEmpty(onFalse) && (trueStack.size() > trueStackSizeBefore) && (falseStack.size() > falseStackSizeBefore)) {
                     stack.push(new TernarOpItem(null, expr, trueStack.pop(), falseStack.pop()));
@@ -2190,6 +2190,7 @@ public class Graph {
      * Converts list of TreeItems to string
      *
      * @param tree List of TreeItem
+     * @param localData
      * @return String
      */
     public static String graphToString(List<GraphTargetItem> tree, Object... localData) {
