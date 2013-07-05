@@ -27,7 +27,7 @@ import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
-import static com.jpexs.decompiler.flash.gui.Main.isAssociated;
+import static com.jpexs.decompiler.flash.gui.Main.isAddedToContextMenu;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.abc.DeobfuscationDialog;
@@ -462,7 +462,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         miAssociate = new JCheckBoxMenuItem(translate("menu.settings.addtocontextmenu"));
         miAssociate.setActionCommand("ASSOCIATE");
         miAssociate.addActionListener(this);
-        miAssociate.setState(isAssociated());
+        miAssociate.setState(isAddedToContextMenu());
 
 
         JMenuItem miLanguage = new JMenuItem(translate("menu.settings.language"));
@@ -1537,16 +1537,16 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                 doFilter();
                 break;
             case "ASSOCIATE":
-                if (miAssociate.getState() == Main.isAssociated()) {
+                if (miAssociate.getState() == Main.isAddedToContextMenu()) {
                     return;
                 }
-                Main.associate(miAssociate.getState());
+                Main.addToContextMenu(miAssociate.getState());
 
                 //Update checkbox menuitem accordingly (User can cancel rights elevation)
                 new Timer().schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        miAssociate.setState(Main.isAssociated());
+                        miAssociate.setState(Main.isAddedToContextMenu());
                     }
                 }, 500); //It takes some time registry change to apply
                 break;

@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -110,9 +111,10 @@ public class Main {
     }
 
     /**
-     * Dump tags to stdout
+     * Get title of the file
+     *
+     * @return file title
      */
-    //
     public static String getFileTitle() {
         if (maskURL != null) {
             return maskURL;
@@ -449,8 +451,8 @@ public class Main {
         boolean offered = (Boolean) Configuration.getConfig("offeredAssociation", Boolean.FALSE);
         if (!offered) {
             if (Platform.isWindows()) {
-                if ((!isAssociated()) && JOptionPane.showConfirmDialog(null, "Do you want to add FFDec to context menu of SWF files?\n(Can be changed later from main menu)", "Context menu", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-                    associate(true);
+                if ((!isAddedToContextMenu()) && JOptionPane.showConfirmDialog(null, "Do you want to add FFDec to context menu of SWF files?\n(Can be changed later from main menu)", "Context menu", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                    addToContextMenu(true);
                 }
             }
         }
@@ -459,6 +461,7 @@ public class Main {
 
     /**
      * @param args the command line arguments
+     * @throws IOException
      */
     public static void main(String[] args) throws IOException {
         loadProperties();
@@ -478,10 +481,10 @@ public class Main {
             offerAssociation();
             showModeFrame();
         } else {
-            if (args[pos].equals("-unassociate")) {
-                associate(false);
-            } else if (args[pos].equals("-associate")) {
-                associate(true);
+            if (args[pos].equals("-removefromcontextmenu")) {
+                addToContextMenu(false);
+            } else if (args[pos].equals("-addtocontextmenu")) {
+                addToContextMenu(true);
             } else if (args[pos].equals("-proxy")) {
                 int port = 55555;
                 for (int i = pos; i < args.length; i++) {
@@ -983,18 +986,19 @@ public class Main {
         return getFFDecHome() + CONFIG_NAME;
     }
 
-    public static boolean isAssociated() {
+    public static boolean isAddedToContextMenu() {
         if (!Platform.isWindows()) {
             return false;
         }
-        if (!Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, ".swf")) {
+        final String classesPath = "Software\\Classes\\";
+        if (!Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, classesPath + ".swf")) {
             return false;
         }
-        String clsName = Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, ".swf", "");
+        String clsName = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, classesPath + ".swf", "");
         if (clsName == null) {
             return false;
         }
-        return Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, clsName + "\\shell\\ffdec");
+        return Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName + "\\shell\\ffdec");
     }
 
     public static String getAppDir() {
@@ -1010,51 +1014,99 @@ public class Main {
         return appDir;
     }
 
-    public static boolean associate(boolean value) {
-        if (value == isAssociated()) {
+    public static boolean addToContextMenu(boolean add) {
+        if (add == isAddedToContextMenu()) {
             return true;
         }
 
         String appDir = getAppDir();
+        String exeName = "ffdec.exe";
+        final String classesPath = "Software\\Classes\\";
 
         try {
-            if (!Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, ".swf")) {
-                Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, ".swf");
-                Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, ".swf", "", "ShockwaveFlash.ShockwaveFlash");
+            // 1) Add to context menu of SWF
+            if (!Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, classesPath + ".swf")) {
+                Advapi32Util.registryCreateKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + ".swf");
+                Advapi32Util.registrySetStringValue(WinReg.HKEY_LOCAL_MACHINE, classesPath + ".swf", "", "ShockwaveFlash.ShockwaveFlash");
             }
 
-            String clsName = Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, ".swf", "");
-            if (!Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, clsName)) {
-                Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, clsName);
-                Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, clsName, "", "Flash Movie");
+            String clsName = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, classesPath + ".swf", "");
+            if (!Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName)) {
+                Advapi32Util.registryCreateKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName);
+                Advapi32Util.registrySetStringValue(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName, "", "Flash Movie");
             }
 
-            if (!Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, clsName + "\\shell")) {
-                Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, clsName + "\\shell");
+            if (!Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName + "\\shell")) {
+                Advapi32Util.registryCreateKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName + "\\shell");
             }
 
-            boolean exists = Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, clsName + "\\shell\\ffdec");
+            boolean exists = Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName + "\\shell\\ffdec");
 
-            //String shellName = WinRegistry.readString(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\Classes\\" + clsName + "\\shell\\ffdec", "");
-            if ((!exists) && value) {
-                Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, clsName + "\\shell\\ffdec");
-                Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, clsName + "\\shell\\ffdec", "", "Open with FFDec");
-                Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, clsName + "\\shell\\ffdec\\command");
-                Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, clsName + "\\shell\\ffdec\\command", "", "\"" + appDir + "ffdec.exe\" \"%1\"");
+            if ((!exists) && add) { //add
+                Advapi32Util.registryCreateKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName + "\\shell\\ffdec");
+                Advapi32Util.registrySetStringValue(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName + "\\shell\\ffdec", "", "Open with FFDec");
+                Advapi32Util.registryCreateKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName + "\\shell\\ffdec\\command");
+                Advapi32Util.registrySetStringValue(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName + "\\shell\\ffdec\\command", "", "\"" + appDir + exeName + "\" \"%1\"");
+            }
+            if (exists && (!add)) { //remove
+                Advapi32Util.registryDeleteKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName + "\\shell\\ffdec\\command");
+                Advapi32Util.registryDeleteKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName + "\\shell\\ffdec");
+            }
+
+            exists = Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, classesPath + "Applications\\" + exeName);
+            if ((!exists) && add) { //add
+                Advapi32Util.registryCreateKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + "Applications\\" + exeName);
+                Advapi32Util.registryCreateKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + "Applications\\" + exeName + "\\shell");
+                Advapi32Util.registryCreateKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + "Applications\\" + exeName + "\\shell\\open");
+                Advapi32Util.registrySetStringValue(WinReg.HKEY_LOCAL_MACHINE, classesPath + "Applications\\" + exeName + "\\shell\\open", "", "Open with FFDec");
+                Advapi32Util.registryCreateKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + "Applications\\" + exeName + "\\shell\\open\\command");
+                Advapi32Util.registrySetStringValue(WinReg.HKEY_LOCAL_MACHINE, classesPath + "Applications\\" + exeName + "\\shell\\open\\command", "", "\"" + appDir + "ffdec.exe\" \"%1\"");
+
+            }
+            if (exists && (!add)) { //remove
+                Advapi32Util.registryDeleteKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + "Applications\\" + exeName + "\\shell\\open\\command");
+                Advapi32Util.registryDeleteKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + "Applications\\" + exeName + "\\shell\\open");
+                Advapi32Util.registryDeleteKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + "Applications\\" + exeName + "\\shell");
+                Advapi32Util.registryDeleteKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + "Applications\\" + exeName);
+            }
+            //2) Add to OpenWith list
+            String mruList = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\.swf\\OpenWithList", "MRUList");
+            if (mruList != null) {
+                exists = false;
+                char appChar = 0;
+                for (int i = 0; i < mruList.length(); i++) {
+                    String app = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\.swf\\OpenWithList", "" + mruList.charAt(i));
+                    if (app.equals(exeName)) {
+                        appChar = mruList.charAt(i);
+                        exists = true;
+                        break;
+                    }
+                }
+                if ((!exists) && add) { //add
+                    for (int c = 'a'; c <= 'z'; c++) {
+                        if (mruList.indexOf(c) == -1) {
+                            mruList += (char) c;
+                            Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\.swf\\OpenWithList", "" + (char) c, exeName);
+                            Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\.swf\\OpenWithList", "MRUList", mruList);
+                            break;
+                        }
+                    }
+                }
+                if (exists && (!add)) { //remove
+                    mruList = mruList.replace("" + appChar, "");
+                    Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\.swf\\OpenWithList", "MRUList", mruList);
+                    Advapi32Util.registryDeleteValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\.swf\\OpenWithList", "" + appChar);
+                }
                 return true;
             }
-            if (exists && (!value)) { //unassociate
-                Advapi32Util.registryDeleteKey(WinReg.HKEY_CLASSES_ROOT, clsName + "\\shell\\ffdec\\command");
-                Advapi32Util.registryDeleteKey(WinReg.HKEY_CLASSES_ROOT, clsName + "\\shell\\ffdec");
-                return true;
-            }
+
         } catch (Exception ex) {
             //Updating registry failed, try elevating rights
             SHELLEXECUTEINFO sei = new SHELLEXECUTEINFO();
             sei.fMask = 0x00000040;
             sei.lpVerb = new WString("runas");
-            sei.lpFile = new WString(appDir + "ffdec.exe");
-            sei.lpParameters = new WString(value ? "-associate" : "-unassociate");
+            sei.lpFile = new WString(appDir + exeName);
+            sei.lpParameters = new WString(add ? "-addtocontextmenu" : "-removefromcontextmenu");
             sei.nShow = WinUser.SW_NORMAL;
             Shell32.INSTANCE.ShellExecuteEx(sei);
             //Wait till exit
