@@ -671,6 +671,10 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                 } else {
                     //setToolTipText(null); //no tool tip
                 }
+
+                String tos = value.toString();
+                int sw = getFontMetrics(getFont()).stringWidth(tos);
+                setPreferredSize(new Dimension(18 + sw, 32));
                 return this;
             }
         };
@@ -2011,6 +2015,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                                     cnt = swf.deobfuscateIdentifiers(renameType);
                                     Main.stopWork();
                                     JOptionPane.showMessageDialog(null, translate("message.rename.renamed").replace("%count%", "" + cnt));
+                                    swf.assignClassesToSymbols();
                                     clearCache();
                                     if (abcPanel != null) {
                                         abcPanel.reload();
