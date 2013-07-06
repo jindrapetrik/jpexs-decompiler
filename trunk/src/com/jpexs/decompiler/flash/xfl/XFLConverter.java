@@ -102,6 +102,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1211,7 +1212,7 @@ public class XFLConverter {
         return new Date().getTime() / 1000;
     }
 
-    public static String convertLibrary(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> oneInstanceShapes, String backgroundColor, List<Tag> tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files) {
+    public static String convertLibrary(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> oneInstanceShapes, String backgroundColor, List<Tag> tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles) {
 
         //TODO: Imported assets
         //linkageImportForRS="true" linkageIdentifier="xxx" linkageURL="yyy.swf"
@@ -1270,7 +1271,7 @@ public class XFLConverter {
                         if (i == 1) {
                             symbolStr += " current=\"true\" isSelected=\"true\"";
                         }
-                        symbolStr += ">"; //color=\"#4FFF4F\"
+                        symbolStr += " color=\"" + randomOutlineColor() + "\">";
                         symbolStr += "<frames>";
                         int lastFrame = 0;
                         loopframes:
@@ -1311,9 +1312,9 @@ public class XFLConverter {
                                     MATRIX matrix = rec.placeMatrix;
                                     String recCharStr = "";
                                     if (character instanceof TextTag) {
-                                        recCharStr = convertText(tags, (TextTag) character, matrix, filters);
+                                        recCharStr = convertText(null, tags, (TextTag) character, matrix, filters);
                                     } else if (character instanceof DefineVideoStreamTag) {
-                                        recCharStr = convertVideoInstance(matrix, (DefineVideoStreamTag) character);
+                                        recCharStr = convertVideoInstance(null, matrix, (DefineVideoStreamTag) character);
                                     } else {
                                         recCharStr = convertSymbolInstance(null, matrix, null, colorTransformAlpha, false, blendMode, filters, true, null, characters.get(rec.characterId), characters, tags);
                                     }
@@ -1583,22 +1584,45 @@ public class XFLConverter {
                     Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 String symbolFile = "movie" + symbol.getCharacterID() + "." + "flv";
-                files.put(symbolFile, data);
-                String mediaLinkStr = "<DOMVideoItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp() + "\" externalFileSize=\"" + data.length + "\"";
-                mediaLinkStr += " href=\"" + symbolFile + "\"";
-                mediaLinkStr += " videoType=\"" + videoType + "\"";
-                mediaLinkStr += " fps=\"" + swf.frameRate + "\"";
-                mediaLinkStr += " width=\"" + video.width + "\"";
-                mediaLinkStr += " height=\"" + video.height + "\"";
-                double len = ((double) video.numFrames) / ((double) swf.frameRate);
-                mediaLinkStr += " length=\"" + len + "\"";
-                if (characterClasses.containsKey(symbol.getCharacterID())) {
-                    mediaLinkStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterID()) + "\"";
+                String mediaLinkStr = "";
+                if (data.length == 0) { //Video has zero length, this probably means it is "Video - Actionscript-controlled"                    
+                    long ts = getTimestamp();
+                    String datFileName = "M " + (datfiles.size() + 1) + " " + ts + ".dat";
+                    mediaLinkStr = "<DOMVideoItem name=\"" + symbolFile + "\" sourceExternalFilepath=\"./LIBRARY/" + symbolFile + "\" sourceLastImported=\"" + ts + "\" videoDataHRef=\"" + datFileName + "\" channels=\"0\" isSpecial=\"true\" />";
+                    //Use the dat file, otherwise it does not work
+                    datfiles.put(datFileName, new byte[]{ //Magic numbers, if anybody knows why, please tell me
+                        (byte) 0x03, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0xA0, (byte) 0x00, (byte) 0x00,
+                        (byte) 0x00, (byte) 0x78, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x00,
+                        (byte) 0x00, (byte) 0x01, (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01,
+                        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                        (byte) 0x00, (byte) 0x59, (byte) 0x40, (byte) 0x18, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                        (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0xFF, (byte) 0xFE, (byte) 0xFF,
+                        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00
+                    });
+                } else {
+                    files.put(symbolFile, data);
+                    mediaLinkStr = "<DOMVideoItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp() + "\" externalFileSize=\"" + data.length + "\"";
+                    mediaLinkStr += " href=\"" + symbolFile + "\"";
+                    mediaLinkStr += " videoType=\"" + videoType + "\"";
+                    mediaLinkStr += " fps=\"" + swf.frameRate + "\"";
+                    mediaLinkStr += " width=\"" + video.width + "\"";
+                    mediaLinkStr += " height=\"" + video.height + "\"";
+                    double len = ((double) video.numFrames) / ((double) swf.frameRate);
+                    mediaLinkStr += " length=\"" + len + "\"";
+                    if (characterClasses.containsKey(symbol.getCharacterID())) {
+                        mediaLinkStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterID()) + "\"";
+                    }
+                    if (characterVariables.containsKey(symbol.getCharacterID())) {
+                        mediaLinkStr += " linkageExportForAS=\"true\" linkageIdentifier=\"" + xmlString(characterVariables.get(symbol.getCharacterID())) + "\"";
+                    }
+                    mediaLinkStr += "/>\n";
                 }
-                if (characterVariables.containsKey(symbol.getCharacterID())) {
-                    mediaLinkStr += " linkageExportForAS=\"true\" linkageIdentifier=\"" + xmlString(characterVariables.get(symbol.getCharacterID())) + "\"";
-                }
-                mediaLinkStr += "/>\n";
                 media.add(mediaLinkStr);
             }
 
@@ -1759,8 +1783,12 @@ public class XFLConverter {
         return ret;
     }
 
-    private static String convertVideoInstance(MATRIX matrix, DefineVideoStreamTag video) {
-        String ret = "<DOMVideoInstance libraryItemName=\"movie" + video.characterID + ".flv\" frameRight=\"" + (20 * video.width) + "\" frameBottom=\"" + (20 * video.height) + "\">";
+    private static String convertVideoInstance(String instanceName, MATRIX matrix, DefineVideoStreamTag video) {
+        String ret = "<DOMVideoInstance libraryItemName=\"movie" + video.characterID + ".flv\" frameRight=\"" + (20 * video.width) + "\" frameBottom=\"" + (20 * video.height) + "\"";
+        if (instanceName != null) {
+            ret += " name=\"" + xmlString(instanceName) + "\"";
+        }
+        ret += ">";
         ret += "<matrix>";
         ret += convertMatrix(matrix);
         ret += "</matrix>";
@@ -1899,9 +1927,9 @@ public class XFLConverter {
                     } else {
                         shapeTween = false;
                         if (character instanceof TextTag) {
-                            elements += convertText(tags, (TextTag) character, matrix, filters);
+                            elements += convertText(instanceName, tags, (TextTag) character, matrix, filters);
                         } else if (character instanceof DefineVideoStreamTag) {
-                            elements += convertVideoInstance(matrix, (DefineVideoStreamTag) character);
+                            elements += convertVideoInstance(instanceName, matrix, (DefineVideoStreamTag) character);
                         } else {
                             elements += convertSymbolInstance(instanceName, matrix, colorTransForm, colorTransFormAlpha, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, character, characters, tags);
                         }
@@ -1927,7 +1955,7 @@ public class XFLConverter {
             }
         }
         if (!lastElements.equals("")) {
-            ret += convertFrame(lastShapeTween, characters, tags, null, null, (frame < 0 ? 0 : frame) - duration, frameName, isAnchor, duration, "", lastElements);
+            ret += convertFrame(lastShapeTween, characters, tags, null, null, (frame - duration < 0 ? 0 : frame - duration), frameName, isAnchor, duration, "", lastElements);
         }
         afterStr = "</frames>" + afterStr;
         if (!ret.equals("")) {
@@ -1988,7 +2016,7 @@ public class XFLConverter {
             }
         }
         if (!ret.equals("")) {
-            ret = "<DOMLayer name=\"Layer " + (layerIndex + 1) + "\" color=\"" + backgroundColor + "\">"
+            ret = "<DOMLayer name=\"Layer " + (layerIndex + 1) + "\" color=\"" + randomOutlineColor() + "\">"
                     + "<frames>"
                     + ret
                     + "</frames>"
@@ -2036,11 +2064,22 @@ public class XFLConverter {
             ret += convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, null, false, duration, "", "");
         }
         if (!ret.equals("")) {
-            ret = "<DOMLayer name=\"Layer " + layerIndex + "\" color=\"" + backgroundColor + "\">"
+            ret = "<DOMLayer name=\"Layer " + layerIndex + "\" color=\"" + randomOutlineColor() + "\">"
                     + "<frames>" + ret + "</frames>"
                     + "</DOMLayer>";
         }
         return ret;
+    }
+
+    private static String randomOutlineColor() {
+        RGB outlineColor = new RGB();
+        Random rnd = new Random();
+        do {
+            outlineColor.red = rnd.nextInt(256);
+            outlineColor.green = rnd.nextInt(256);
+            outlineColor.blue = rnd.nextInt(256);
+        } while ((outlineColor.red + outlineColor.green + outlineColor.blue) / 3 < 128);
+        return outlineColor.toHexRGB();
     }
 
     public static String convertTimeline(int spriteId, List<Integer> oneInstanceShapes, String backgroundColor, List<Tag> tags, List<Tag> timelineTags, HashMap<Integer, CharacterTag> characters, String name) {
@@ -2059,7 +2098,7 @@ public class XFLConverter {
                             parentLayers.push(index);
                         }
 
-                        ret += "<DOMLayer name=\"Layer " + (index + 1) + "\" color=\"" + backgroundColor + "\" ";
+                        ret += "<DOMLayer name=\"Layer " + (index + 1) + "\" color=\"" + randomOutlineColor() + "\" ";
                         ret += " layerType=\"mask\" locked=\"true\"";
                         ret += ">";
                         ret += convertFrames("", "", oneInstanceShapes, tags, timelineTags, characters, po.getDepth());
@@ -2092,7 +2131,8 @@ public class XFLConverter {
                 parentLayer = parentLayers.pop();
             }
             String layerPrev = "";
-            layerPrev += "<DOMLayer name=\"Layer " + (index + 1) + "\" color=\"" + backgroundColor + "\" ";
+
+            layerPrev += "<DOMLayer name=\"Layer " + (index + 1) + "\" color=\"" + randomOutlineColor() + "\" ";
             if (d == 1) {
                 layerPrev += " current=\"true\" isSelected=\"true\"";
             }
@@ -2161,7 +2201,7 @@ public class XFLConverter {
         return ret;
     }
 
-    public static String convertText(List<Tag> tags, TextTag tag, MATRIX matrix, List<FILTER> filters) {
+    public static String convertText(String instanceName, List<Tag> tags, TextTag tag, MATRIX matrix, List<FILTER> filters) {
         String ret = "";
         if (matrix == null) {
             matrix = new MATRIX();
@@ -2231,6 +2271,9 @@ public class XFLConverter {
             ret += "<DOMStaticText";
             if (fontRenderingMode != null) {
                 ret += " fontRenderingMode=\"" + fontRenderingMode + "\"";
+            }
+            if (instanceName != null) {
+                ret += " instanceName=\"" + xmlString(instanceName) + "\"";
             }
             ret += antiAlias;
             ret += " width=\"" + tag.getBounds().getWidth() / 2 + "\" height=\"" + tag.getBounds().getHeight() + "\" autoExpand=\"true\" isSelectable=\"false\">";
@@ -2332,6 +2375,9 @@ public class XFLConverter {
             ret += "<" + tagName;
             if (fontRenderingMode != null) {
                 ret += " fontRenderingMode=\"" + fontRenderingMode + "\"";
+            }
+            if (instanceName != null) {
+                ret += " name=\"" + xmlString(instanceName) + "\"";
             }
             ret += antiAlias;
             double width = twipToPixel(bounds.getWidth());
@@ -2471,6 +2517,7 @@ public class XFLConverter {
             baseName = baseName.substring(0, baseName.lastIndexOf("."));
         }
         HashMap<String, byte[]> files = new HashMap<>();
+        HashMap<String, byte[]> datfiles = new HashMap<>();
         HashMap<Integer, CharacterTag> characters = getCharacters(swf.tags);
         List<Integer> oneInstaceShapes = getOneInstanceShapes(swf.tags, characters);
         Map<Integer, String> characterClasses = getCharacterClasses(swf.tags);
@@ -2510,7 +2557,7 @@ public class XFLConverter {
         }
         domDocument += ">";
 
-        domDocument += convertLibrary(swf, characterVariables, characterClasses, oneInstaceShapes, backgroundColor, swf.tags, characters, files);
+        domDocument += convertLibrary(swf, characterVariables, characterClasses, oneInstaceShapes, backgroundColor, swf.tags, characters, files, datfiles);
         domDocument += "<timelines>";
         domDocument += convertTimeline(0, oneInstaceShapes, backgroundColor, swf.tags, swf.tags, characters, "Scene 1");
         domDocument += "</timelines>";
@@ -2769,6 +2816,10 @@ public class XFLConverter {
                     out.putNextEntry(new ZipEntry("LIBRARY/" + fileName));
                     out.write(files.get(fileName));
                 }
+                for (String fileName : datfiles.keySet()) {
+                    out.putNextEntry(new ZipEntry("bin/" + fileName));
+                    out.write(datfiles.get(fileName));
+                }
             } catch (IOException ex) {
                 Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -2788,8 +2839,13 @@ public class XFLConverter {
             }
             File libraryDir = new File(outDir.getAbsolutePath() + File.separator + "LIBRARY");
             libraryDir.mkdir();
+            File binDir = new File(outDir.getAbsolutePath() + File.separator + "bin");
+            binDir.mkdir();
             for (String fileName : files.keySet()) {
                 writeFile(files.get(fileName), libraryDir.getAbsolutePath() + File.separator + fileName);
+            }
+            for (String fileName : datfiles.keySet()) {
+                writeFile(datfiles.get(fileName), binDir.getAbsolutePath() + File.separator + fileName);
             }
             try {
                 writeFile("PROXY-CS5".getBytes("utf-8"), outfile);
