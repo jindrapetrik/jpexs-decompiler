@@ -188,15 +188,15 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
 
                     List<Color> colorsFocRad = new ArrayList<>();
                     List<Float> ratiosFocRad = new ArrayList<>();
-                    for (int i = 0; i < fillStyle0.gradient.gradientRecords.length; i++) {
-                        if ((i > 0) && (fillStyle0.gradient.gradientRecords[i - 1].ratio == fillStyle0.gradient.gradientRecords[i].ratio)) {
+                    for (int i = 0; i < fillStyle0.focalGradient.gradientRecords.length; i++) {
+                        if ((i > 0) && (fillStyle0.focalGradient.gradientRecords[i - 1].ratio == fillStyle0.focalGradient.gradientRecords[i].ratio)) {
                             continue;
                         }
-                        ratiosFocRad.add(fillStyle0.gradient.gradientRecords[i].getRatioFloat());
+                        ratiosFocRad.add(fillStyle0.focalGradient.gradientRecords[i].getRatioFloat());
                         if (shapeNum >= 3) {
-                            colorsFocRad.add(new Color(fillStyle0.gradient.gradientRecords[i].colorA.red, fillStyle0.gradient.gradientRecords[i].colorA.green, fillStyle0.gradient.gradientRecords[i].colorA.blue, fillStyle0.gradient.gradientRecords[i].colorA.alpha));
+                            colorsFocRad.add(new Color(fillStyle0.focalGradient.gradientRecords[i].colorA.red, fillStyle0.focalGradient.gradientRecords[i].colorA.green, fillStyle0.focalGradient.gradientRecords[i].colorA.blue, fillStyle0.focalGradient.gradientRecords[i].colorA.alpha));
                         } else {
-                            colorsFocRad.add(new Color(fillStyle0.gradient.gradientRecords[i].color.red, fillStyle0.gradient.gradientRecords[i].color.green, fillStyle0.gradient.gradientRecords[i].color.blue));
+                            colorsFocRad.add(new Color(fillStyle0.focalGradient.gradientRecords[i].color.red, fillStyle0.focalGradient.gradientRecords[i].color.green, fillStyle0.focalGradient.gradientRecords[i].color.blue));
                         }
                     }
 
