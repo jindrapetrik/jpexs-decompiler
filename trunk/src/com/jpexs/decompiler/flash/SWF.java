@@ -1503,54 +1503,117 @@ public class SWF {
         }
     }
 
+    public void deobfuscateInstanceNames(RenameType renameType, List<Tag> tags, Map<String, String> selected) {
+        for (Tag t : tags) {
+            if (t instanceof DefineSpriteTag) {
+                deobfuscateInstanceNames(renameType, ((DefineSpriteTag) t).subTags, selected);
+            }
+            if (t instanceof PlaceObjectTypeTag) {
+                PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
+                String name = po.getInstanceName();
+                if (name != null) {
+                    String changedName = deobfuscateName(name, false, "instance", renameType, selected);
+                    if (changedName != null) {
+                        po.setInstanceName(changedName);
+                    }
+                }
+                String className = po.getClassName();
+                if (className != null) {
+                    String changedClassName = deobfuscateNameWithPackage(className, renameType, selected);
+                    if (changedClassName != null) {
+                        po.setClassName(changedClassName);
+                    }
+                }
+            }
+        }
+    }
+
+    public String deobfuscatePackage(String pkg, RenameType renameType, Map<String, String> selected) {
+        if (deobfuscated.containsKey(pkg)) {
+            return deobfuscated.get(pkg);
+        }
+        String parts[] = null;
+        if (pkg.contains(".")) {
+            parts = pkg.split("\\.");
+        } else {
+            parts = new String[]{pkg};
+        }
+        String ret = "";
+        boolean isChanged = false;
+        for (int p = 0; p < parts.length; p++) {
+            if (p > 0) {
+                ret += ".";
+            }
+            String partChanged = deobfuscateName(parts[p], false, "package", renameType, selected);
+            if (partChanged != null) {
+                ret += partChanged;
+                isChanged = true;
+            } else {
+                ret += parts[p];
+            }
+        }
+        if (isChanged) {
+            deobfuscated.put(pkg, ret);
+            return ret;
+        }
+        return null;
+    }
+
+    public String deobfuscateNameWithPackage(String n, RenameType renameType, Map<String, String> selected) {
+        String pkg = null;
+        String name = "";
+        if (n.contains(".")) {
+            pkg = n.substring(0, n.lastIndexOf("."));
+            name = n.substring(n.lastIndexOf(".") + 1);
+        } else {
+            name = n;
+        }
+        boolean changed = false;
+        if ((pkg != null) && (!pkg.equals(""))) {
+            String changedPkg = deobfuscatePackage(pkg, renameType, selected);
+            if (changedPkg != null) {
+                changed = true;
+                pkg = changedPkg;
+            }
+        }
+        String changedName = deobfuscateName(name, true, "class", renameType, selected);
+        if (changedName != null) {
+            changed = true;
+            name = changedName;
+        }
+        if (changed) {
+            String newClassName = "";
+            if (pkg == null) {
+                newClassName = name;
+            } else {
+                newClassName = pkg + "." + name;
+            }
+            return newClassName;
+        }
+        return null;
+    }
+
     public int deobfuscateAS3Identifiers(RenameType renameType) {
-        HashMap<String, String> namesMap = new HashMap<>();
         for (Tag tag : tags) {
             if (tag instanceof ABCContainerTag) {
-                ((ABCContainerTag) tag).getABC().deobfuscateIdentifiers(namesMap, renameType, true);
+                ((ABCContainerTag) tag).getABC().deobfuscateIdentifiers(deobfuscated, renameType, true);
             }
         }
         for (Tag tag : tags) {
             if (tag instanceof ABCContainerTag) {
-                ((ABCContainerTag) tag).getABC().deobfuscateIdentifiers(namesMap, renameType, false);
+                ((ABCContainerTag) tag).getABC().deobfuscateIdentifiers(deobfuscated, renameType, false);
             }
         }
         for (Tag tag : tags) {
             if (tag instanceof SymbolClassTag) {
                 SymbolClassTag sc = (SymbolClassTag) tag;
                 for (int i = 0; i < sc.classNames.length; i++) {
-                    String pkg = null;
-                    String name = "";
-                    if (sc.classNames[i].contains(".")) {
-                        pkg = sc.classNames[i].substring(0, sc.classNames[i].lastIndexOf("."));
-                        name = sc.classNames[i].substring(sc.classNames[i].lastIndexOf(".") + 1);
-                    } else {
-                        name = sc.classNames[i];
-                    }
-                    boolean changed = false;
-                    if ((pkg != null) && (!pkg.equals(""))) {
-                        if (namesMap.containsKey(pkg)) {
-                            changed = true;
-                            pkg = namesMap.get(pkg);
-                        }
-                    }
-                    if (namesMap.containsKey(name)) {
-                        changed = true;
-                        name = namesMap.get(name);
-                    }
-                    if (changed) {
-                        String newClassName = "";
-                        if (pkg == null) {
-                            newClassName = name;
-                        } else {
-                            newClassName = pkg + "." + name;
-                        }
-                        sc.classNames[i] = newClassName;
-                    }
+                    sc.classNames[i] = deobfuscateNameWithPackage(sc.classNames[i], renameType, deobfuscated);
                 }
             }
         }
-        return namesMap.size();
+        deobfuscateInstanceNames(renameType, tags, new HashMap<String, String>());
+        return deobfuscated.size();
     }
     HashMap<String, Integer> typeCounts = new HashMap<>();
 
@@ -1791,6 +1854,7 @@ public class SWF {
             actionsMap.put(src, Action.removeNops(0, actionsMap.get(src), version, 0));
             src.setActions(actionsMap.get(src), version);
         }
+        deobfuscateInstanceNames(renameType, tags, selected);
         return ret;
     }
 

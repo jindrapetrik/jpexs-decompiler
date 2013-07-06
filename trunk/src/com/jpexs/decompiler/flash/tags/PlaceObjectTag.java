@@ -93,6 +93,7 @@ public class PlaceObjectTag extends Tag implements PlaceObjectTypeTag {
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public PlaceObjectTag(byte data[], int version, long pos) throws IOException {
@@ -184,5 +185,15 @@ public class PlaceObjectTag extends Tag implements PlaceObjectTypeTag {
     @Override
     public int getRatio() {
         return -1;
+    }
+
+    @Override
+    public void setInstanceName(String name) {
+        //not supported
+    }
+
+    @Override
+    public void setClassName(String className) {
+        //not supported
     }
 }

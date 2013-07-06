@@ -272,6 +272,7 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos 
      * @throws IOException
      */
     public PlaceObject3Tag(byte data[], int version, long pos) throws IOException {
@@ -470,5 +471,17 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
             return -1;
         }
         return ratio;
+    }
+
+    @Override
+    public void setInstanceName(String name) {
+        placeFlagHasName = true;
+        this.name = name;
+    }
+
+    @Override
+    public void setClassName(String className) {
+        placeFlagHasClassName = true;
+        this.className = className;
     }
 }

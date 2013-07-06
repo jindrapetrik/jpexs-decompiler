@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -414,9 +415,16 @@ public class Helper {
     }
 
     public static String strToHex(String s) {
-        String sn = "";
-        for (int i = 0; i < s.length(); i++) {
-            sn += "0x" + Integer.toHexString(s.charAt(i)) + " ";
+        byte bs[];
+        try {
+            bs = s.getBytes("utf-8");
+        } catch (UnsupportedEncodingException ex) {
+            bs = new byte[0];
+            Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        String sn="";
+        for (int i = 0; i < bs.length; i++) {
+            sn += "0x" + Integer.toHexString(bs[i]&0xff) + " ";
         }
         return sn;
     }
