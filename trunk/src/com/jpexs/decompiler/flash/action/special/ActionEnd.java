@@ -35,6 +35,11 @@ public class ActionEnd extends Action {
     }
 
     @Override
+    public boolean isExit() {
+        return true;
+    }
+
+    @Override
     public void translate(Stack<com.jpexs.decompiler.flash.graph.GraphTargetItem> stack, List<com.jpexs.decompiler.flash.graph.GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
         //output.add(new SimpleActionTreeItem(this, "end()"));
     }

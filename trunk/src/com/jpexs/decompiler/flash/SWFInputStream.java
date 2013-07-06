@@ -548,7 +548,10 @@ public class SWFInputStream extends InputStream {
             }
             GraphSourceItem ins = code.get(ip);
             if (ins.isIgnored()) {
-                ip++;
+                if(ins.isExit()){
+                    break;
+                }
+                ip++;                
                 continue;
             }
 
@@ -601,10 +604,7 @@ public class SWFInputStream extends InputStream {
                 if (ins instanceof ActionJump) {
                     add += " change:" + (((ActionJump) ins).getJumpOffset());
                 }
-                System.err.println("getConstantPool ip " + ip + ", addr " + Helper.formatAddress(((Action) ins).getAddress()) + ": " + ((Action) ins).getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), cpool.constants, version, false) + add + " stack:" + Helper.stackToString(stack, Helper.toList(cpool)));
-                if (ip == 116) {
-                    System.err.println("kok");
-                }
+                System.err.println("getConstantPool ip " + ip + ", addr " + Helper.formatAddress(((Action) ins).getAddress()) + ": " + ((Action) ins).getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), cpool==null?null:cpool.constants, version, false) + add + " stack:" + Helper.stackToString(stack, Helper.toList(cpool)));
             }
             if (ins instanceof ActionConstantPool) {
                 constantPools.add(new ConstantPool(((ActionConstantPool) ins).constantPool));
