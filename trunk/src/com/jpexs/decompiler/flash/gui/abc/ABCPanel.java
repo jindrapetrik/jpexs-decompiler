@@ -493,7 +493,9 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
 
     public void updateSearchPos() {
         searchPos.setText((foundPos + 1) + "/" + found.size());
-        decompiledTextArea.setScript(found.get(foundPos), list);
+        ScriptPack pack = found.get(foundPos);
+        setAbc(pack.abc);
+        decompiledTextArea.setScript(pack, list);
         hilightScript(found.get(foundPos));
         decompiledTextArea.setCaretPosition(0);
         SwingUtilities.invokeLater(new Runnable() {
