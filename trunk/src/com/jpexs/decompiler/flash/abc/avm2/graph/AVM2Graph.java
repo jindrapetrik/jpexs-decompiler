@@ -58,6 +58,7 @@ import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.graph.IfItem;
 import com.jpexs.decompiler.flash.graph.Loop;
 import com.jpexs.decompiler.flash.graph.LoopItem;
+import com.jpexs.decompiler.flash.graph.NotItem;
 import com.jpexs.decompiler.flash.graph.SwitchItem;
 import com.jpexs.decompiler.flash.graph.WhileItem;
 import java.util.ArrayList;
@@ -653,6 +654,47 @@ public class AVM2Graph extends Graph {
                 if (((SetTypeTreeItem) list.get(i)).getValue() instanceof ExceptionTreeItem) {
                     list.remove(i);
                     i--;
+                    continue;
+                }
+            }
+            if (list.get(i) instanceof IfItem) {
+                IfItem ifi = (IfItem) list.get(i);
+                if (((ifi.expression instanceof HasNextTreeItem)
+                        || ((ifi.expression instanceof NotItem)
+                        && (((NotItem) ifi.expression).getOriginal() instanceof HasNextTreeItem)))) {
+                    HasNextTreeItem hnt = null;
+                    List<GraphTargetItem> body = new ArrayList<>();
+                    List<GraphTargetItem> nextbody = new ArrayList<>();
+                    if (ifi.expression instanceof NotItem) {
+                        hnt = (HasNextTreeItem) ((NotItem) ifi.expression).getOriginal();
+                        body.addAll(ifi.onFalse);
+                        for (int j = i + 1; j < list.size();) {
+                            body.add(list.remove(i + 1));
+                        }
+                        nextbody = ifi.onTrue;
+                    } else {
+                        hnt = (HasNextTreeItem) ifi.expression;
+                        body = ifi.onTrue;
+                        nextbody = ifi.onFalse;
+                    }
+                    if (!body.isEmpty()) {
+                        if (body.get(0) instanceof SetTypeTreeItem) {
+                            SetTypeTreeItem sti = (SetTypeTreeItem) body.remove(0);
+                            GraphTargetItem gti = sti.getValue().getNotCoerced();
+                            GraphTargetItem repl = null;
+
+                            if (gti instanceof NextValueTreeItem) {
+                                repl = new ForEachInTreeItem(ifi.src, new Loop(0, null, null), new InTreeItem(null, sti.getObject(), hnt.collection), body);
+                            } else if (gti instanceof NextNameTreeItem) {
+                                repl = new ForInTreeItem(ifi.src, new Loop(0, null, null), new InTreeItem(null, sti.getObject(), hnt.collection), body);
+                            }
+                            if (repl != null) {
+                                list.remove(i);
+                                list.add(i, repl);
+                                list.addAll(i + 1, nextbody);
+                            }
+                        }
+                    }
                 }
             }
         }

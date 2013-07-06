@@ -59,7 +59,7 @@ public class TraitsList extends JList<Object> implements ListSelectionListener {
 
     @SuppressWarnings("unchecked")
     public void setClassIndex(int classIndex, int scriptIndex) {
-        if(classIndex>=abc.instance_info.length){
+        if (classIndex >= abc.instance_info.length) {
             return;
         }
         this.classIndex = classIndex;
