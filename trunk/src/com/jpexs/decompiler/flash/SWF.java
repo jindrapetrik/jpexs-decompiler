@@ -1209,7 +1209,7 @@ public class SWF {
     public static final String validNextCharacters = validFirstCharacters + "0123456789";
     public static final String fooCharacters = "bcdfghjklmnpqrstvwz";
     public static final String fooJoinCharacters = "aeiouy";
-    private HashMap<DirectValueTreeItem, ConstantPool> allVariableNames = new HashMap<>();
+    private List<KeyValue<DirectValueTreeItem, ConstantPool>> allVariableNames = new ArrayList<>();
     private HashSet<String> allVariableNamesStr = new HashSet<>();
     private List<GraphSourceItem> allFunctions = new ArrayList<>();
     private HashMap<DirectValueTreeItem, ConstantPool> allStrings = new HashMap<>();
@@ -1315,7 +1315,7 @@ public class SWF {
         return null;
     }
 
-    private static void getVariables(ConstantPool constantPool, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, HashMap<DirectValueTreeItem, ConstantPool> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, List<Integer> visited, HashMap<DirectValueTreeItem, String> usageTypes) {
+    private static void getVariables(ConstantPool constantPool, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, List<KeyValue<DirectValueTreeItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, List<Integer> visited, HashMap<DirectValueTreeItem, String> usageTypes) {
         boolean debugMode = false;
         while ((ip > -1) && ip < code.size()) {
             if (visited.contains(ip)) {
@@ -1325,6 +1325,9 @@ public class SWF {
 
             if (debugMode) {
                 System.err.println("Visit " + ip + ": ofs" + Helper.formatAddress(((Action) ins).getAddress()) + ":" + ((Action) ins).getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), new ArrayList<String>(), code.version, false) + " stack:" + Helper.stackToString(stack, Helper.toList(new ConstantPool())));
+            }
+            if (ins.isExit()) {
+                break;
             }
             if (ins.isIgnored()) {
                 ip++;
@@ -1400,7 +1403,7 @@ public class SWF {
             }
 
             if (name instanceof DirectValueTreeItem) {
-                variables.put((DirectValueTreeItem) name, constantPool);
+                variables.add(new KeyValue<DirectValueTreeItem, ConstantPool>((DirectValueTreeItem) name, constantPool));
                 usageTypes.put((DirectValueTreeItem) name, usageType);
             }
 
@@ -1461,7 +1464,7 @@ public class SWF {
         };
     }
 
-    private static void getVariables(HashMap<DirectValueTreeItem, ConstantPool> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, HashMap<DirectValueTreeItem, String> usageType, ActionGraphSource code, int addr) {
+    private static void getVariables(List<KeyValue<DirectValueTreeItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, HashMap<DirectValueTreeItem, String> usageType, ActionGraphSource code, int addr) {
         List<Object> localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
         try {
             getVariables(null, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), variables, functions, strings, new ArrayList<Integer>(), usageType);
@@ -1470,8 +1473,8 @@ public class SWF {
         }
     }
 
-    private HashMap<DirectValueTreeItem, ConstantPool> getVariables(HashMap<DirectValueTreeItem, ConstantPool> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, HashMap<DirectValueTreeItem, String> usageType, ASMSource src) {
-        HashMap<DirectValueTreeItem, ConstantPool> ret = new HashMap<>();
+    private List<KeyValue<DirectValueTreeItem, ConstantPool>> getVariables(List<KeyValue<DirectValueTreeItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, HashMap<DirectValueTreeItem, String> usageType, ASMSource src) {
+        List<KeyValue<DirectValueTreeItem, ConstantPool>> ret = new ArrayList<>();
         List<Action> actions = src.getActions(version);
         actionsMap.put(src, actions);
         getVariables(variables, functions, strings, usageType, new ActionGraphSource(actions, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0);
@@ -1579,7 +1582,7 @@ public class SWF {
     private int renameAS2Identifiers(RenameType renameType, Map<String, String> selected) {
         actionsMap = new HashMap<>();
         allFunctions = new ArrayList<>();
-        allVariableNames = new HashMap<>();
+        allVariableNames = new ArrayList<>();
         allStrings = new HashMap<>();
 
         List<Object> objs = new ArrayList<>();
@@ -1588,8 +1591,8 @@ public class SWF {
         getVariables(objs, "");
         informListeners("rename", "");
         int fc = 0;
-        for (DirectValueTreeItem ti : allVariableNames.keySet()) {
-            String name = ti.toStringNoH(allVariableNames.get(ti));
+        for (KeyValue<DirectValueTreeItem, ConstantPool> it : allVariableNames) {
+            String name = it.key.toStringNoH(it.value);
             allVariableNamesStr.add(name);
         }
 
@@ -1737,31 +1740,35 @@ public class SWF {
         }
 
         HashSet<String> stringsNoVarH = new HashSet<>();
+        List<DirectValueTreeItem> allVariableNamesDv = new ArrayList<>();
+        for (KeyValue<DirectValueTreeItem, ConstantPool> it : allVariableNames) {
+            allVariableNamesDv.add(it.key);
+        }
         for (DirectValueTreeItem ti : allStrings.keySet()) {
-            if (!allVariableNames.containsKey(ti)) {
+            if (!allVariableNamesDv.contains(ti)) {
                 stringsNoVarH.add(System.identityHashCode(allStrings.get(ti)) + "_" + ti.toStringNoH(allStrings.get(ti)));
             }
         }
 
         int vc = 0;
-        for (DirectValueTreeItem ti : allVariableNames.keySet()) {
+        for (KeyValue<DirectValueTreeItem, ConstantPool> it : allVariableNames) {
             vc++;
-            String name = ti.toStringNoH(allVariableNames.get(ti));
-            String changed = deobfuscateName(name, false, usageTypes.get(ti), renameType, selected);
+            String name = it.key.toStringNoH(it.value);
+            String changed = deobfuscateName(name, false, usageTypes.get(it.key), renameType, selected);
             if (changed != null) {
                 boolean addNew = false;
-                String h = System.identityHashCode(allVariableNames.get(ti)) + "_" + name;
+                String h = System.identityHashCode(it.key) + "_" + name;
                 if (stringsNoVarH.contains(h)) {
                     addNew = true;
                 }
-                ActionPush pu = (ActionPush) ti.src;
+                ActionPush pu = (ActionPush) it.key.src;
                 if (pu.replacement == null) {
                     pu.replacement = new ArrayList<>();
                     pu.replacement.addAll(pu.values);
                 }
-                if (pu.replacement.get(ti.pos) instanceof ConstantIndex) {
-                    ConstantIndex ci = (ConstantIndex) pu.replacement.get(ti.pos);
-                    ConstantPool pool = allVariableNames.get(ti);
+                if (pu.replacement.get(it.key.pos) instanceof ConstantIndex) {
+                    ConstantIndex ci = (ConstantIndex) pu.replacement.get(it.key.pos);
+                    ConstantPool pool = it.value;
                     if (pool == null) {
                         continue;
                     }
@@ -1775,7 +1782,7 @@ public class SWF {
                         pool.constants.set(ci.index, changed);
                     }
                 } else {
-                    pu.replacement.set(ti.pos, changed);
+                    pu.replacement.set(it.key.pos, changed);
                 }
                 ret++;
             }

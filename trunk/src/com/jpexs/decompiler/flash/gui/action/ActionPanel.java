@@ -52,6 +52,8 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -277,7 +279,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                     }
                 };
                 asm.addDisassemblyListener(listener);
-                lastDisasm = asm.getASMSource(SWF.DEFAULT_VERSION, true);
+                    lastDisasm = asm.getASMSource(SWF.DEFAULT_VERSION, true);
                 asm.removeDisassemblyListener(listener);
                 srcWithHex = Helper.hexToComments(lastDisasm);
                 srcNoHex = Helper.stripComments(lastDisasm);
