@@ -965,7 +965,9 @@ public class SWF {
         HashMap<Integer, VideoFrameTag> frames = new HashMap<>();
         List<Object> os = new ArrayList<Object>(this.tags);
         populateVideoFrames(videoStream.characterID, os, frames);
-
+        if (frames.isEmpty()) {
+            return new byte[0];
+        }
 
 
         //double ms = 1000.0f / ((float) frameRate);
