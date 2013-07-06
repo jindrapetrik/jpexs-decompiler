@@ -128,6 +128,9 @@ public class TraitClass extends Trait implements TraitWithSlot {
                             if (!uses.contains(usname)) {
                                 uses.add(usname);
                             }
+                            if (!pkg.equals(ignorePackage)) {
+                                imports.add(newimport);
+                            }
                         }
                     }
                 }
