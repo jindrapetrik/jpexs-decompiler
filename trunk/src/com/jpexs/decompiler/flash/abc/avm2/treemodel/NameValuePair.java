@@ -34,9 +34,6 @@ public class NameValuePair extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        if (name instanceof StringTreeItem) {
-            return ((StringTreeItem) name).value + ":" + value.toString(constants, localRegNames, fullyQualifiedNames);
-        }
         return name.toString(constants, localRegNames, fullyQualifiedNames) + ":" + value.toString(constants, localRegNames, fullyQualifiedNames);
     }
 }
