@@ -103,6 +103,8 @@ public class FullMultinameTreeItem extends TreeItem {
         while (tiName instanceof LocalRegTreeItem) {
             if (((LocalRegTreeItem) tiName).computedValue != null) {
                 tiName = ((LocalRegTreeItem) tiName).computedValue.getThroughNotCompilable().getThroughDuplicate();
+            } else {
+                break;
             }
         }
 
@@ -113,6 +115,8 @@ public class FullMultinameTreeItem extends TreeItem {
         while (tiName2 instanceof LocalRegTreeItem) {
             if (((LocalRegTreeItem) tiName2).computedValue != null) {
                 tiName2 = ((LocalRegTreeItem) tiName2).computedValue.getThroughNotCompilable().getThroughDuplicate();
+            } else {
+                break;
             }
         }
         if (tiName != tiName2) {
