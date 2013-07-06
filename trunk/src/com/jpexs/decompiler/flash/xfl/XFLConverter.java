@@ -2499,6 +2499,15 @@ public class XFLConverter {
         domDocument += "<DOMDocument xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://ns.adobe.com/xfl/2008/\" currentTimeline=\"1\" xflVersion=\"2.2\" creatorInfo=\"" + generator + "\" platform=\"Windows\" versionInfo=\"Saved by " + generatorVerName + "\" majorVersion=\"" + generatorVersion + "\" buildNumber=\"\" nextSceneIdentifier=\"2\" playOptionsPlayLoop=\"false\" playOptionsPlayPages=\"false\" playOptionsPlayFrameActions=\"false\" autoSaveHasPrompted=\"true\"";
         domDocument += " backgroundColor=\"" + backgroundColor + "\"";
         domDocument += " frameRate=\"" + swf.frameRate + "\"";
+
+        double width = twipToPixel(swf.displayRect.getWidth());
+        double height = twipToPixel(swf.displayRect.getHeight());
+        if (Double.compare(width, 550) != 0) {
+            domDocument += " width=\"" + width + "\"";
+        }
+        if (Double.compare(height, 400) != 0) {
+            domDocument += " height=\"" + height + "\"";
+        }
         domDocument += ">";
 
         domDocument += convertLibrary(swf, characterVariables, characterClasses, oneInstaceShapes, backgroundColor, swf.tags, characters, files);
@@ -2576,7 +2585,7 @@ public class XFLConverter {
                 + "    <pngFileName>" + baseName + ".png</pngFileName>\n"
                 + "    <qtFileName>" + baseName + ".mov</qtFileName>\n"
                 + "    <rnwkFileName>" + baseName + ".smil</rnwkFileName>\n"
-                + "    <swcFileName>Untitled-4.swc</swcFileName>\n"
+                + "    <swcFileName>" + baseName + ".swc</swcFileName>\n"
                 + "  </PublishFormatProperties>\n"
                 + "  <PublishHtmlProperties enabled=\"true\">\n"
                 + "    <VersionDetectionIfAvailable>0</VersionDetectionIfAvailable>\n"
@@ -2587,8 +2596,8 @@ public class XFLConverter {
                 + "    <AlternateFilename>" + baseName + "_alternate.html</AlternateFilename>\n"
                 + "    <UsingOwnAlternateFile>0</UsingOwnAlternateFile>\n"
                 + "    <OwnAlternateFilename></OwnAlternateFilename>\n"
-                + "    <Width>" + twipToPixel(swf.displayRect.getWidth()) + "</Width>\n"
-                + "    <Height>" + twipToPixel(swf.displayRect.getHeight()) + "</Height>\n"
+                + "    <Width>" + width + "</Width>\n"
+                + "    <Height>" + height + "</Height>\n"
                 + "    <Align>0</Align>\n"
                 + "    <Units>0</Units>\n"
                 + "    <Loop>1</Loop>\n"
@@ -2672,8 +2681,8 @@ public class XFLConverter {
                 + "    </LibraryVersions>\n"
                 + "  </PublishFlashProperties>\n"
                 + "  <PublishJpegProperties enabled=\"true\">\n"
-                + "    <Width>" + twipToPixel(swf.displayRect.getWidth()) + "</Width>\n"
-                + "    <Height>" + twipToPixel(swf.displayRect.getHeight()) + "</Height>\n"
+                + "    <Width>" + width + "</Width>\n"
+                + "    <Height>" + height + "</Height>\n"
                 + "    <Progressive>0</Progressive>\n"
                 + "    <DPI>4718592</DPI>\n"
                 + "    <Size>0</Size>\n"
@@ -2698,8 +2707,8 @@ public class XFLConverter {
                 + "    <exportSMIL>1</exportSMIL>\n"
                 + "  </PublishRNWKProperties>\n"
                 + "  <PublishGifProperties enabled=\"true\">\n"
-                + "    <Width>" + twipToPixel(swf.displayRect.getWidth()) + "</Width>\n"
-                + "    <Height>" + twipToPixel(swf.displayRect.getHeight()) + "</Height>\n"
+                + "    <Width>" + width + "</Width>\n"
+                + "    <Height>" + height + "</Height>\n"
                 + "    <Animated>0</Animated>\n"
                 + "    <MatchMovieDim>1</MatchMovieDim>\n"
                 + "    <Loop>1</Loop>\n"
@@ -2717,8 +2726,8 @@ public class XFLConverter {
                 + "    <PaletteName></PaletteName>\n"
                 + "  </PublishGifProperties>\n"
                 + "  <PublishPNGProperties enabled=\"true\">\n"
-                + "    <Width>" + twipToPixel(swf.displayRect.getWidth()) + "</Width>\n"
-                + "    <Height>" + twipToPixel(swf.displayRect.getHeight()) + "</Height>\n"
+                + "    <Width>" + width + "</Width>\n"
+                + "    <Height>" + height + "</Height>\n"
                 + "    <OptimizeColors>1</OptimizeColors>\n"
                 + "    <Interlace>0</Interlace>\n"
                 + "    <Transparent>0</Transparent>\n"
@@ -2734,8 +2743,8 @@ public class XFLConverter {
                 + "    <PaletteName></PaletteName>\n"
                 + "  </PublishPNGProperties>\n"
                 + "  <PublishQTProperties enabled=\"true\">\n"
-                + "    <Width>" + twipToPixel(swf.displayRect.getWidth()) + "</Width>\n"
-                + "    <Height>" + twipToPixel(swf.displayRect.getHeight()) + "</Height>\n"
+                + "    <Width>" + width + "</Width>\n"
+                + "    <Height>" + height + "</Height>\n"
                 + "    <MatchMovieDim>1</MatchMovieDim>\n"
                 + "    <UseQTSoundCompression>0</UseQTSoundCompression>\n"
                 + "    <AlphaOption></AlphaOption>\n"
