@@ -2503,10 +2503,10 @@ public class XFLConverter {
         double width = twipToPixel(swf.displayRect.getWidth());
         double height = twipToPixel(swf.displayRect.getHeight());
         if (Double.compare(width, 550) != 0) {
-            domDocument += " width=\"" + width + "\"";
+            domDocument += " width=\"" + doubleToString(width) + "\"";
         }
         if (Double.compare(height, 400) != 0) {
-            domDocument += " height=\"" + height + "\"";
+            domDocument += " height=\"" + doubleToString(height) + "\"";
         }
         domDocument += ">";
 
