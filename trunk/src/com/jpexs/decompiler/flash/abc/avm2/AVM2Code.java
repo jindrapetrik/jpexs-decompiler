@@ -1858,7 +1858,7 @@ public class AVM2Code implements Serializable {
                 code.get(ip).replaceWith = appended.get(ip);
             }
         } catch (ConvertException cex) {
-            cex.printStackTrace();
+            Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, "Error during restore control flow", cex);
         }
         invalidateCache();
         try {
@@ -1970,7 +1970,7 @@ public class AVM2Code implements Serializable {
             }
             return copy;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, "Error during deepCopy", ex);
             return null;
         }
     }
@@ -1979,6 +1979,7 @@ public class AVM2Code implements Serializable {
 
         public boolean jumpUsed = false;
         public boolean skipUsed = false;
+        public Set<Integer> casesUsed = new HashSet<>();
     }
 
     @SuppressWarnings("unchecked")
@@ -2029,7 +2030,53 @@ public class AVM2Code implements Serializable {
 
             if (ins.isBranch() || ins.isJump()) {
                 List<Integer> branches = ins.getBranches(code);
-                if ((ins instanceof AVM2Instruction) && ((AVM2Instruction) ins).definition instanceof IfTypeIns
+                if ((ins instanceof AVM2Instruction) && (((AVM2Instruction) ins).definition instanceof LookupSwitchIns)
+                        && (!stack.isEmpty()) && (stack.peek().isCompileTime()) && (!stack.peek().hasSideEffect())) {
+                    int c = (int) stack.peek().toNumber();
+                    Decision dec = new Decision();
+                    if (decisions.containsKey(ins)) {
+                        dec = decisions.get(ins);
+                    } else {
+                        decisions.put(ins, dec);
+                    }
+                    dec.casesUsed.add(c);
+                    GraphTargetItem tar = stack.pop();
+
+                    int numcases = branches.size() - 1;
+                    int selCase = -1;
+                    if (c < 0 || c >= numcases) {
+                        selCase = 0;
+                    } else {
+                        selCase = 1 + c;
+                    }
+
+                    if (secondPass) {
+                        if (dec.casesUsed.size() == 1) {
+                            int sel = -1;
+                            for (int u : dec.casesUsed) {
+                                sel = u;
+                            }
+                            int selOperand = -1;
+                            if (sel < 0 || sel >= numcases) {
+                                selOperand = 0;
+                            } else {
+                                selOperand = 2 + sel;
+                            }
+                            AVM2Instruction ains = (AVM2Instruction) ins;
+                            if (ains.replaceWith == null) {
+                                ains.replaceWith = new ArrayList<>();
+                            }
+                            ains.replaceWith.add(new ControlFlowTag("appendjump", code.adr2pos(code.pos2adr(ip) + ((AVM2Instruction) ins).operands[selOperand])));
+                            for (GraphSourceItemPos pos : tar.getNeededSources()) {
+                                if (pos.item != ins) {
+                                    pos.item.setIgnored(true);
+                                }
+                            }
+                        }
+                    }
+                    ip = branches.get(selCase);
+                    continue;
+                } else if ((ins instanceof AVM2Instruction) && ((AVM2Instruction) ins).definition instanceof IfTypeIns
                         && (!(((AVM2Instruction) ins).definition instanceof JumpIns)) && (!stack.isEmpty()) && (stack.peek().isCompileTime()) && (!stack.peek().hasSideEffect())) {
                     boolean condition = stack.peek().toBoolean();
                     if (debugMode) {

@@ -34,6 +34,6 @@ public class StrictNeqTreeItem extends BinaryOpItem implements LogicalOpItem {
 
     @Override
     public boolean toBoolean() {
-        return (leftSide.toBoolean() != rightSide.toBoolean()) && (leftSide.toNumber() != rightSide.toNumber());
+        return !((leftSide.toBoolean() == rightSide.toBoolean()) && (leftSide.toNumber() == rightSide.toNumber()));
     }
 }

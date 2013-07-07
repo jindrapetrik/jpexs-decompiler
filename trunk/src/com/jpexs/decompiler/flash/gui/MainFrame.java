@@ -1732,6 +1732,11 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                 if (JOptionPane.showConfirmDialog(this, translate("message.confirm.autodeobfuscate") + "\r\n" + (autoDeobfuscateMenuItem.getState() ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
                     Configuration.setConfig("autoDeobfuscate", autoDeobfuscateMenuItem.getState());
                     clearCache();
+                    if (abcPanel != null) {
+                        abcPanel.reload();
+                    }
+                    reload(true);
+                    doFilter();
                 } else {
                     autoDeobfuscateMenuItem.setState(!autoDeobfuscateMenuItem.getState());
                 }

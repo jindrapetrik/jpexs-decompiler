@@ -1743,8 +1743,8 @@ public class Graph {
                         vis.add(p);
                     }
                     first = false;
-                }
-                SwitchItem sw = new SwitchItem(null, null, switchedItem, caseValues, caseCommands, defaultCommands, valueMappings);
+                }                
+                SwitchItem sw = new SwitchItem(null, swLoop, switchedItem, caseValues, caseCommands, defaultCommands, valueMappings);
                 currentRet.add(sw);
                 swLoop.phase = 2;
                 if (next != null) {

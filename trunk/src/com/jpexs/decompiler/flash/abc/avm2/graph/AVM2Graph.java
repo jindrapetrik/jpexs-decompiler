@@ -383,7 +383,20 @@ public class AVM2Graph extends Graph {
             ret.addAll(output);
             return ret;
         }
-
+        if(part.nextParts.size() == 2){
+            if(stack.peek() instanceof StrictNeqTreeItem){
+                System.out.println("1");
+                if(part.nextParts.get(1).getHeight() >= 2){
+                    System.out.println("2");
+                    if(code.code.get(code.fixIPAfterDebugLine(part.nextParts.get(1).start)).definition instanceof PushIntegerTypeIns){
+                        System.out.println("3");
+                        if(code.code.get(part.nextParts.get(1).nextParts.get(0).end).definition instanceof LookupSwitchIns){
+                            System.out.println("4");
+                        }
+                    }
+                }
+            }
+        }
         if (((part.nextParts.size() == 2)
                 && (!stack.isEmpty())
                 && (stack.peek() instanceof StrictEqTreeItem)
