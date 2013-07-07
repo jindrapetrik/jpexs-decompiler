@@ -192,4 +192,14 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
         }
         return pathParts[pathParts.length - 1];
     }
+
+    @Override
+    public String getActionSourcePrefix() {
+        return "";
+    }
+
+    @Override
+    public String getActionSourceSuffix() {
+        return "";
+    }
 }

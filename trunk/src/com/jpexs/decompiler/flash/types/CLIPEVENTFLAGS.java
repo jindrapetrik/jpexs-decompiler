@@ -16,6 +16,10 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.helpers.Helper;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Specifies one or more sprite events to which an event handler applies.
  *
@@ -100,72 +104,75 @@ public class CLIPEVENTFLAGS {
      */
     public boolean clipEventDragOut = false;
 
-    /**
-     * Returns a string representation of the object
-     *
-     * @return a string representation of the object.
-     */
-    @Override
-    public String toString() {
+    public String getHeader(int key, boolean asFileName) {
         String ret = "";
+        List<String> onList = new ArrayList<>();
         if (clipEventKeyUp) {
-            ret += "onClipEvent(keyUp)";
+            ret = "onClipEvent(keyUp)";
         }
         if (clipEventKeyDown) {
-            ret += "onClipEvent(keyDown)";
+            ret = "onClipEvent(keyDown)";
         }
         if (clipEventMouseUp) {
-            ret += "onClipEvent(mouseUp)";
+            ret = "onClipEvent(mouseUp)";
         }
         if (clipEventMouseDown) {
-            ret += "onClipEvent(mouseDown)";
+            ret = "onClipEvent(mouseDown)";
         }
         if (clipEventMouseMove) {
-            ret += "onClipEvent(mouseMove)";
+            ret = "onClipEvent(mouseMove)";
         }
         if (clipEventUnload) {
-            ret += "onClipEvent(unload)";
+            ret = "onClipEvent(unload)";
         }
         if (clipEventEnterFrame) {
-            ret += "onClipEvent(enterFrame)";
+            ret = "onClipEvent(enterFrame)";
         }
         if (clipEventLoad) {
-            ret += "onClipEvent(load)";
-        }
-        if (clipEventDragOver) {
-            ret += "on(dragOver)";
-        }
-        if (clipEventRollOut) {
-            ret += "on(rollOut)";
-        }
-        if (clipEventRollOver) {
-            ret += "on(rollOver)";
-        }
-        if (clipEventReleaseOutside) {
-            ret += "on(releaseOutside)";
-        }
-        if (clipEventRelease) {
-            ret += "on(release)";
-        }
-        if (clipEventPress) {
-            ret += "on(press)";
-        }
-        if (clipEventInitialize) {
-            ret += "on(initialize)";
+            ret = "onClipEvent(load)";
         }
         if (clipEventData) {
-            ret += "onClipEvent(data)";
+            ret = "onClipEvent(data)";
         }
-        if (clipEventConstruct) {
-            ret += "on(construct)";
+        if (clipEventDragOver) {
+            onList.add("dragOver");
         }
-        if (clipEventKeyPress) {
-            ret += "on(keyPress)";
+        if (clipEventRollOut) {
+            onList.add("rollOut");
         }
-        if (clipEventDragOut) {
-            ret += "on(dragOut)";
+        if (clipEventRollOver) {
+            onList.add("rollOver");
+        }
+        if (clipEventReleaseOutside) {
+            onList.add("releaseOutside");
+        }
+        if (clipEventRelease) {
+            onList.add("release");
+        }
+        if (clipEventPress) {
+            onList.add("press");
+        }
+        if (clipEventInitialize) {
+            onList.add("initialize");
         }
 
+        if (clipEventConstruct) {
+            onList.add("construct");
+        }
+        if (clipEventKeyPress) {
+            if (asFileName) {
+                onList.add("keyPress " + Helper.makeFileName(CLIPACTIONRECORD.keyToString(key).replace("<", "").replace(">", "")) + "");
+            } else {
+                onList.add("keyPress \"" + CLIPACTIONRECORD.keyToString(key) + "\"");
+            }
+        }
+        if (clipEventDragOut) {
+            onList.add("dragOut");
+        }
+
+        if (!onList.isEmpty()) {
+            ret = "on(" + Helper.joinStrings(onList, ",") + ")";
+        }
         return ret.trim();
     }
 

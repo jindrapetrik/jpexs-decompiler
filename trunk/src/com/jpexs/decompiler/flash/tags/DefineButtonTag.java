@@ -83,6 +83,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public DefineButtonTag(byte[] data, int version, long pos) throws IOException {
@@ -261,5 +262,15 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     @Override
     public int getNumFrames() {
         return 1;
+    }
+
+    @Override
+    public String getActionSourcePrefix() {
+        return "";
+    }
+
+    @Override
+    public String getActionSourceSuffix() {
+        return "";
     }
 }

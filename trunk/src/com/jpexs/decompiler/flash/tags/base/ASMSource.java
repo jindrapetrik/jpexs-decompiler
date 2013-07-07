@@ -68,4 +68,8 @@ public interface ASMSource {
     public void addDisassemblyListener(DisassemblyListener listener);
 
     public void removeDisassemblyListener(DisassemblyListener listener);
+
+    public String getActionSourcePrefix();
+
+    public String getActionSourceSuffix();
 }

@@ -52,8 +52,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -100,6 +98,7 @@ public class ActionPanel extends JPanel implements ActionListener {
     private String srcWithHex;
     private String srcNoHex;
     private String lastDecompiled = "";
+    private ASMSource lastASM;
     public JPanel searchPanel;
     public JLabel searchPos;
     private List<ASMSource> found = new ArrayList<>();
@@ -295,8 +294,9 @@ public class ActionPanel extends JPanel implements ActionListener {
                     lastCode = asm.getActions(SWF.DEFAULT_VERSION);
                     decompiledHilights = sc.hilights;
                     lastDecompiled = sc.text;
+                    lastASM = asm;
                     stripped = lastDecompiled;
-                    decompiledEditor.setText(lastDecompiled);
+                    decompiledEditor.setText(asm.getActionSourcePrefix() + lastDecompiled + asm.getActionSourceSuffix());
                 }
                 setEditMode(false);
                 setDecompiledEditMode(false);
@@ -540,7 +540,17 @@ public class ActionPanel extends JPanel implements ActionListener {
     }
 
     public void setDecompiledEditMode(boolean val) {
+        String pref = lastASM.getActionSourcePrefix();
+        int lastPos = decompiledEditor.getCaretPosition();
         if (val) {
+            String newText = lastDecompiled;
+            decompiledEditor.setText(newText);
+            if (lastPos > -1) {
+                int newpos = lastPos - pref.length();
+                if (newpos < newText.length() && newpos >= 0) {
+                    decompiledEditor.setCaretPosition(newpos);
+                }
+            }
             decompiledEditor.setEditable(true);
             saveDecompiledButton.setVisible(true);
             editDecompiledButton.setVisible(false);
@@ -549,6 +559,14 @@ public class ActionPanel extends JPanel implements ActionListener {
             decompiledEditor.getCaret().setVisible(true);
             decLabel.setIcon(View.getIcon("editing16"));
         } else {
+            String newText = pref + lastDecompiled + lastASM.getActionSourceSuffix();
+            decompiledEditor.setText(newText);
+            if (lastPos > -1) {
+                int newpos = lastPos + pref.length();
+                if (newpos < newText.length()) {
+                    decompiledEditor.setCaretPosition(newpos);
+                }
+            }
             decompiledEditor.setEditable(false);
             saveDecompiledButton.setVisible(false);
             editDecompiledButton.setVisible(true);
@@ -610,19 +628,13 @@ public class ActionPanel extends JPanel implements ActionListener {
             setDecompiledEditMode(true);
         } else if (e.getActionCommand().equals("CANCELDECOMPILED")) {
             setDecompiledEditMode(false);
-            decompiledEditor.setText(lastDecompiled);
         } else if (e.getActionCommand().equals("SAVEDECOMPILED")) {
             try {
                 ActionScriptParser par = new ActionScriptParser();
                 src.setActions(par.parse(decompiledEditor.getText()), SWF.DEFAULT_VERSION);
                 setSource(this.src, false);
                 JOptionPane.showMessageDialog(this, translate("message.action.saved"));
-                saveDecompiledButton.setVisible(false);
-                cancelDecompiledButton.setVisible(false);
-                editDecompiledButton.setVisible(true);
-                experimentalLabel.setVisible(true);
-                decompiledEditor.setEditable(false);
-                editDecompiledMode = false;
+                setDecompiledEditMode(false);
             } catch (IOException ex) {
             } catch (ParseException ex) {
                 JOptionPane.showMessageDialog(this, translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), translate("error"), JOptionPane.ERROR_MESSAGE);

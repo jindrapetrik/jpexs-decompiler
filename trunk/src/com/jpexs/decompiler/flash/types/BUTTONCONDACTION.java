@@ -21,7 +21,9 @@ import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.ReReadableInputStream;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.tags.base.Exportable;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +37,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class BUTTONCONDACTION implements ASMSource {
+public class BUTTONCONDACTION implements ASMSource, Exportable {
 
     private long pos;
 
@@ -203,5 +205,60 @@ public class BUTTONCONDACTION implements ASMSource {
     @Override
     public void removeDisassemblyListener(DisassemblyListener listener) {
         listeners.remove(listener);
+    }
+
+    private String getHeader(boolean asFilename) {
+        List<String> events = new ArrayList<>();
+        if (condOverUpToOverDown) {
+            events.add("press");
+        }
+        if (condOverDownToOverUp) {
+            events.add("release");
+        }
+        if (condOutDownToIdle) {
+            events.add("releaseOutside");
+        }
+        if (condIdleToOverUp) {
+            events.add("rollOver");
+        }
+        if (condOverUpToIddle) {
+            events.add("rollOut");
+        }
+        if (condOverDownToOutDown) {
+            events.add("dragOut");
+        }
+        if (condOutDownToOverDown) {
+            events.add("dragOver");
+        }
+        if (condKeyPress > 0) {
+            if (asFilename) {
+                events.add("keyPress " + Helper.makeFileName(CLIPACTIONRECORD.keyToString(condKeyPress).replace("<", "").replace(">", "")) + "");
+            } else {
+                events.add("keyPress \"" + CLIPACTIONRECORD.keyToString(condKeyPress) + "\"");
+            }
+        }
+        String onStr = "";
+        for (int i = 0; i < events.size(); i++) {
+            if (i > 0) {
+                onStr += ", ";
+            }
+            onStr += events.get(i);
+        }
+        return "on(" + onStr + ")";
+    }
+
+    @Override
+    public String getActionSourcePrefix() {
+        return getHeader(false) + "{\r\n";
+    }
+
+    @Override
+    public String getActionSourceSuffix() {
+        return "}\r\n";
+    }
+
+    @Override
+    public String getExportFileName() {
+        return getHeader(true);
     }
 }

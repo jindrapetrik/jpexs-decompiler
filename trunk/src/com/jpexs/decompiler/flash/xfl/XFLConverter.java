@@ -54,6 +54,8 @@ import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
+import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
+import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
@@ -1015,7 +1017,7 @@ public class XFLConverter {
         return ret;
     }
 
-    public static String convertSymbolInstance(String name, MATRIX matrix, CXFORM colorTransform, CXFORMWITHALPHA colorTransformAlpha, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, boolean isVisible, RGBA backgroundColor, CharacterTag tag, HashMap<Integer, CharacterTag> characters, List<Tag> tags) {
+    public static String convertSymbolInstance(String name, MATRIX matrix, CXFORM colorTransform, CXFORMWITHALPHA colorTransformAlpha, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, boolean isVisible, RGBA backgroundColor, CLIPACTIONS clipActions, CharacterTag tag, HashMap<Integer, CharacterTag> characters, List<Tag> tags) {
         String ret = "";
         if (matrix == null) {
             matrix = new MATRIX();
@@ -1121,83 +1123,17 @@ public class XFLConverter {
             if (!db2.actions.isEmpty()) {
                 ret += "<Actionscript><script><![CDATA[";
                 for (BUTTONCONDACTION bca : db2.actions) {
-                    List<String> events = new ArrayList<>();
-                    if (bca.condOverUpToOverDown) {
-                        events.add("press");
-                    }
-                    if (bca.condOverDownToOverUp) {
-                        events.add("release");
-                    }
-                    if (bca.condOutDownToIdle) {
-                        events.add("releaseOutside");
-                    }
-                    if (bca.condIdleToOverUp) {
-                        events.add("rollOver");
-                    }
-                    if (bca.condOverUpToIddle) {
-                        events.add("rollOut");
-                    }
-                    if (bca.condOverDownToOutDown) {
-                        events.add("dragOut");
-                    }
-                    if (bca.condOutDownToOverDown) {
-                        events.add("dragOver");
-                    }
-                    if (bca.condKeyPress > 0) {
-                        String keyNames[] = {
-                            null,
-                            "<Left>",
-                            "<Right>",
-                            "<Home>",
-                            "<End>",
-                            "<Insert>",
-                            "<Delete>",
-                            null,
-                            "<Backspace>",
-                            null,
-                            null,
-                            null,
-                            null,
-                            "<Enter>",
-                            "<Up>",
-                            "<Down>",
-                            "<PageUp>",
-                            "<PageDown>",
-                            "<Tab>",
-                            "<Escape>",
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            "<Space>"
-                        };
-                        if ((bca.condKeyPress < keyNames.length) && (bca.condKeyPress > 0) && (keyNames[bca.condKeyPress] != null)) {
-                            events.add("keyPress \"" + keyNames[bca.condKeyPress] + "\"");
-                        } else {
-                            events.add("keyPress \"" + (char) bca.condKeyPress + "\"");
-                        }
-                    }
-                    String onStr = "";
-                    for (int i = 0; i < events.size(); i++) {
-                        if (i > 0) {
-                            onStr += ", ";
-                        }
-                        onStr += events.get(i);
-                    }
-                    ret += "on(" + onStr + "){\r\n";
                     ret += convertActionScript(bca);
-                    ret += "}";
                 }
                 ret += "]]></script></Actionscript>";
             }
+        }
+        if (clipActions != null) {
+            ret += "<Actionscript><script><![CDATA[";
+            for (CLIPACTIONRECORD rec : clipActions.clipActionRecords) {
+                ret += convertActionScript(rec);
+            }
+            ret += "]]></script></Actionscript>";
         }
         ret += "</DOMSymbolInstance>";
         return ret;
@@ -1205,7 +1141,7 @@ public class XFLConverter {
 
     private static String convertActionScript(ASMSource as) {
         String decompiledASHilighted = com.jpexs.decompiler.flash.action.Action.actionsToSource(as.getActions(SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION);
-        return Highlighting.stripHilights(decompiledASHilighted);
+        return as.getActionSourcePrefix() + Highlighting.stripHilights(decompiledASHilighted) + as.getActionSourceSuffix();
     }
 
     private static long getTimestamp() {
@@ -1312,11 +1248,11 @@ public class XFLConverter {
                                     MATRIX matrix = rec.placeMatrix;
                                     String recCharStr = "";
                                     if (character instanceof TextTag) {
-                                        recCharStr = convertText(null, tags, (TextTag) character, matrix, filters);
+                                        recCharStr = convertText(null, tags, (TextTag) character, matrix, filters, null);
                                     } else if (character instanceof DefineVideoStreamTag) {
-                                        recCharStr = convertVideoInstance(null, matrix, (DefineVideoStreamTag) character);
+                                        recCharStr = convertVideoInstance(null, matrix, (DefineVideoStreamTag) character, null);
                                     } else {
-                                        recCharStr = convertSymbolInstance(null, matrix, null, colorTransformAlpha, false, blendMode, filters, true, null, characters.get(rec.characterId), characters, tags);
+                                        recCharStr = convertSymbolInstance(null, matrix, null, colorTransformAlpha, false, blendMode, filters, true, null, null, characters.get(rec.characterId), characters, tags);
                                     }
                                     int duration = frame - lastFrame;
                                     lastFrame = frame;
@@ -1783,7 +1719,7 @@ public class XFLConverter {
         return ret;
     }
 
-    private static String convertVideoInstance(String instanceName, MATRIX matrix, DefineVideoStreamTag video) {
+    private static String convertVideoInstance(String instanceName, MATRIX matrix, DefineVideoStreamTag video, CLIPACTIONS clipActions) {
         String ret = "<DOMVideoInstance libraryItemName=\"movie" + video.characterID + ".flv\" frameRight=\"" + (20 * video.width) + "\" frameBottom=\"" + (20 * video.height) + "\"";
         if (instanceName != null) {
             ret += " name=\"" + xmlString(instanceName) + "\"";
@@ -1820,6 +1756,7 @@ public class XFLConverter {
         List<FILTER> filters = new ArrayList<>();
         boolean isVisible = true;
         RGBA backGroundColor = null;
+        CLIPACTIONS clipActions = null;
         int characterId = -1;
         int ratio = -1;
         boolean shapeTween = false;
@@ -1854,6 +1791,11 @@ public class XFLConverter {
                             if (colorTransFormAlpha2 != null) {
                                 colorTransFormAlpha = colorTransFormAlpha2;
                             }
+
+                            CLIPACTIONS clipActions2 = po.getClipActions();
+                            if (clipActions2 != null) {
+                                clipActions = clipActions2;
+                            }
                             if (po.cacheAsBitmap()) {
                                 cacheAsBitmap = true;
                             }
@@ -1878,6 +1820,7 @@ public class XFLConverter {
                             blendMode = po.getBlendMode();
                             filters = po.getFilters();
                             ratio = po.getRatio();
+                            clipActions = po.getClipActions();
                         }
 
 
@@ -1900,6 +1843,7 @@ public class XFLConverter {
                     isVisible = true;
                     backGroundColor = null;
                     characterId = -1;
+                    clipActions = null;
                 }
             }
             if (t instanceof FrameLabelTag) {
@@ -1927,11 +1871,11 @@ public class XFLConverter {
                     } else {
                         shapeTween = false;
                         if (character instanceof TextTag) {
-                            elements += convertText(instanceName, tags, (TextTag) character, matrix, filters);
+                            elements += convertText(instanceName, tags, (TextTag) character, matrix, filters, clipActions);
                         } else if (character instanceof DefineVideoStreamTag) {
-                            elements += convertVideoInstance(instanceName, matrix, (DefineVideoStreamTag) character);
+                            elements += convertVideoInstance(instanceName, matrix, (DefineVideoStreamTag) character, clipActions);
                         } else {
-                            elements += convertSymbolInstance(instanceName, matrix, colorTransForm, colorTransFormAlpha, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, character, characters, tags);
+                            elements += convertSymbolInstance(instanceName, matrix, colorTransForm, colorTransFormAlpha, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, character, characters, tags);
                         }
                     }
                 }
@@ -2201,7 +2145,7 @@ public class XFLConverter {
         return ret;
     }
 
-    public static String convertText(String instanceName, List<Tag> tags, TextTag tag, MATRIX matrix, List<FILTER> filters) {
+    public static String convertText(String instanceName, List<Tag> tags, TextTag tag, MATRIX matrix, List<FILTER> filters, CLIPACTIONS clipActions) {
         String ret = "";
         if (matrix == null) {
             matrix = new MATRIX();

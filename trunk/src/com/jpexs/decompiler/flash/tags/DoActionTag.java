@@ -150,4 +150,14 @@ public class DoActionTag extends Tag implements ASMSource {
     public void removeDisassemblyListener(DisassemblyListener listener) {
         listeners.remove(listener);
     }
+
+    @Override
+    public String getActionSourcePrefix() {
+        return "";
+    }
+
+    @Override
+    public String getActionSourceSuffix() {
+        return "";
+    }
 }

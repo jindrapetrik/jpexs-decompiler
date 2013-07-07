@@ -367,4 +367,22 @@ public class PlaceObject2Tag extends Tag implements Container, PlaceObjectTypeTa
     public void setClassName(String className) {
         //not supported
     }
+
+    @Override
+    public String toString() {
+        if (name != null) {
+            return super.toString() + " (" + name + ")";
+        } else {
+            return super.toString();
+        }
+    }
+
+    @Override
+    public CLIPACTIONS getClipActions() {
+        if (placeFlagHasClipActions) {
+            return clipActions;
+        } else {
+            return null;
+        }
+    }
 }

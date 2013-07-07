@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
@@ -42,9 +43,9 @@ import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
-import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.Container;
+import com.jpexs.decompiler.flash.tags.base.Exportable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -240,10 +241,10 @@ public class TagNode {
         List<String> existingNames = new ArrayList<>();
         for (TagNode node : nodeList) {
             String name = "";
-            if (node.tag instanceof Tag) {
-                name = ((Tag) node.tag).getExportFileName();
+            if (node.tag instanceof Exportable) {
+                name = ((Exportable) node.tag).getExportFileName();
             } else {
-                name = node.tag.toString();
+                name = Helper.makeFileName(node.tag.toString());
             }
             int i = 1;
             String baseName = name;
@@ -266,12 +267,13 @@ public class TagNode {
                             ev.handleEvent("export", "Exporting " + f + " ...");
                         }
                         String res;
+                        ASMSource asm = ((ASMSource) node.tag);
                         if (isPcode) {
-                            res = Highlighting.stripHilights(((ASMSource) node.tag).getASMSource(SWF.DEFAULT_VERSION, false));
+                            res = asm.getActionSourcePrefix() + Highlighting.stripHilights(asm.getASMSource(SWF.DEFAULT_VERSION, false)) + asm.getActionSourceSuffix();
                         } else {
-                            List<Action> as = ((ASMSource) node.tag).getActions(SWF.DEFAULT_VERSION);
+                            List<Action> as = asm.getActions(SWF.DEFAULT_VERSION);
                             Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
-                            res = (Highlighting.stripHilights(Action.actionsToSource(as, SWF.DEFAULT_VERSION)));
+                            res = asm.getActionSourcePrefix() + Highlighting.stripHilights(Action.actionsToSource(as, SWF.DEFAULT_VERSION)) + asm.getActionSourceSuffix();
                         }
                         try (FileOutputStream fos = new FileOutputStream(f)) {
                             fos.write(res.getBytes("utf-8"));

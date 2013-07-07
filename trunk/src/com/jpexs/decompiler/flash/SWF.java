@@ -1404,7 +1404,7 @@ public class SWF {
             }
 
             if (name instanceof DirectValueTreeItem) {
-                variables.add(new KeyValue<DirectValueTreeItem, ConstantPool>((DirectValueTreeItem) name, constantPool));
+                variables.add(new KeyValue<>((DirectValueTreeItem) name, constantPool));
                 usageTypes.put((DirectValueTreeItem) name, usageType);
             }
 

@@ -484,4 +484,22 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
         placeFlagHasClassName = true;
         this.className = className;
     }
+
+    @Override
+    public String toString() {
+        if (name != null) {
+            return super.toString() + " (" + name + ")";
+        } else {
+            return super.toString();
+        }
+    }
+
+    @Override
+    public CLIPACTIONS getClipActions() {
+        if (placeFlagHasClipActions) {
+            return clipActions;
+        } else {
+            return null;
+        }
+    }
 }

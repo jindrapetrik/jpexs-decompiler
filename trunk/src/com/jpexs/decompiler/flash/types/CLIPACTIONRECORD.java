@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.ReReadableInputStream;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.tags.base.Exportable;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,8 +36,50 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class CLIPACTIONRECORD implements ASMSource {
+public class CLIPACTIONRECORD implements ASMSource, Exportable {
 
+    public static String keyToString(int key) {
+        if ((key < CLIPACTIONRECORD.KEYNAMES.length) && (key > 0) && (CLIPACTIONRECORD.KEYNAMES[key] != null)) {
+            return CLIPACTIONRECORD.KEYNAMES[key];
+        } else {
+            return "" + (char) key;
+        }
+    }
+    public static final String KEYNAMES[] = {
+        null,
+        "<Left>",
+        "<Right>",
+        "<Home>",
+        "<End>",
+        "<Insert>",
+        "<Delete>",
+        null,
+        "<Backspace>",
+        null,
+        null,
+        null,
+        null,
+        "<Enter>",
+        "<Up>",
+        "<Down>",
+        "<PageUp>",
+        "<PageDown>",
+        "<Tab>",
+        "<Escape>",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        "<Space>"
+    };
     private long pos;
     private long hdrPos;
 
@@ -82,7 +125,7 @@ public class CLIPACTIONRECORD implements ASMSource {
      */
     @Override
     public String toString() {
-        return "CLIPACTIONRECORD";
+        return eventFlags.getHeader(keyCode, false);
     }
 
     /**
@@ -159,5 +202,20 @@ public class CLIPACTIONRECORD implements ASMSource {
     @Override
     public void removeDisassemblyListener(DisassemblyListener listener) {
         listeners.remove(listener);
+    }
+
+    @Override
+    public String getActionSourcePrefix() {
+        return eventFlags.getHeader(keyCode, false) + "{\r\n";
+    }
+
+    @Override
+    public String getActionSourceSuffix() {
+        return "}\r\n";
+    }
+
+    @Override
+    public String getExportFileName() {
+        return eventFlags.getHeader(keyCode, true);
     }
 }

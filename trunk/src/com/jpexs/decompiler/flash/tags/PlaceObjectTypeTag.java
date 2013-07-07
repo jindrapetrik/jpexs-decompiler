@@ -1,5 +1,6 @@
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.MATRIX;
@@ -46,4 +47,6 @@ public interface PlaceObjectTypeTag {
     public boolean flagMove();
 
     public int getRatio();
+
+    public CLIPACTIONS getClipActions();
 }

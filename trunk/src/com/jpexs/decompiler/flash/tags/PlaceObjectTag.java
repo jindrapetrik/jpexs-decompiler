@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.MATRIX;
@@ -195,5 +196,10 @@ public class PlaceObjectTag extends Tag implements PlaceObjectTypeTag {
     @Override
     public void setClassName(String className) {
         //not supported
+    }
+
+    @Override
+    public CLIPACTIONS getClipActions() {
+        return null;
     }
 }
