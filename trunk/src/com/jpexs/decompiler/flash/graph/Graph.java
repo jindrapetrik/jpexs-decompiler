@@ -551,10 +551,10 @@ public class Graph {
              System.out.println("</loops>");*/
             getPrecontinues(null, heads.get(0), loops, null);
             /*System.err.println("<loopspre>");
-            for (Loop el : loops) {
-                System.err.println(el);
-            }
-            System.err.println("</loopspre>");//*/
+             for (Loop el : loops) {
+             System.err.println(el);
+             }
+             System.err.println("</loopspre>");//*/
 
             List<GraphTargetItem> ret = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, heads.get(0), null, loops);
             processIfs(ret);

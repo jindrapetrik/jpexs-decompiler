@@ -1664,6 +1664,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                             byte data[] = Helper.readFile(selfile.getAbsolutePath());
                             try {
                                 it.setImage(data);
+                                swf.clearImageCache();
                             } catch (IOException ex) {
                                 Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Invalid image", ex);
                                 JOptionPane.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);

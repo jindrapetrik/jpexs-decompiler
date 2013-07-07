@@ -20,9 +20,9 @@ public interface PlaceObjectTypeTag {
     public MATRIX getMatrix();
 
     public String getInstanceName();
-    
+
     public void setInstanceName(String name);
-    
+
     public void setClassName(String className);
 
     public CXFORM getColorTransform();

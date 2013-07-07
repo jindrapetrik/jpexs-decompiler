@@ -382,7 +382,7 @@ public class AVM2Graph extends Graph {
             ret = new ArrayList<>();
             ret.addAll(output);
             return ret;
-        }        
+        }
         if (((part.nextParts.size() == 2)
                 && (!stack.isEmpty())
                 && (stack.peek() instanceof StrictEqTreeItem)

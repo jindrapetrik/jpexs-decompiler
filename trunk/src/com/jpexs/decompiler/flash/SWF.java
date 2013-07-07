@@ -92,6 +92,7 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.filters.BlendComposite;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.decompiler.flash.types.filters.Filtering;
+import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.sound.AdpcmDecoder;
 import com.jpexs.decompiler.flash.xfl.XFLConverter;
 import java.awt.AlphaComposite;
@@ -1898,6 +1899,11 @@ public class SWF {
                 mat.translateX, mat.translateY);
     }
     private static Cache cache = new Cache(false);
+
+    public void clearImageCache() {
+        cache.clear();
+        SHAPERECORD.clearShapeCache();
+    }
 
     public static RECT fixRect(RECT rect) {
         RECT ret = new RECT();

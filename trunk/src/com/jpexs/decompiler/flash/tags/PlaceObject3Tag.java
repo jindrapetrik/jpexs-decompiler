@@ -272,7 +272,7 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
      *
      * @param data Data bytes
      * @param version SWF version
-     * @param pos 
+     * @param pos
      * @throws IOException
      */
     public PlaceObject3Tag(byte data[], int version, long pos) throws IOException {

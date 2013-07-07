@@ -279,7 +279,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                     }
                 };
                 asm.addDisassemblyListener(listener);
-                    lastDisasm = asm.getASMSource(SWF.DEFAULT_VERSION, true);
+                lastDisasm = asm.getASMSource(SWF.DEFAULT_VERSION, true);
                 asm.removeDisassemblyListener(listener);
                 srcWithHex = Helper.hexToComments(lastDisasm);
                 srcNoHex = Helper.stripComments(lastDisasm);

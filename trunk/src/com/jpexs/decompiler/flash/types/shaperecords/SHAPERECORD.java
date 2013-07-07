@@ -813,6 +813,10 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
     }
     private static HashMap<String, BufferedImage> cache = new HashMap<>();
 
+    public static void clearShapeCache() {
+        cache.clear();
+    }
+
     public static BufferedImage shapeToImage(List<Tag> tags, int shapeNum, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStylesList, List<SHAPERECORD> records) {
         return shapeToImage(tags, shapeNum, fillStyles, lineStylesList, records, null);
     }

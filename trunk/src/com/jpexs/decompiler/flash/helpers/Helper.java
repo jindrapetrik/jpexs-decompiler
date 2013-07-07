@@ -422,9 +422,9 @@ public class Helper {
             bs = new byte[0];
             Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
         }
-        String sn="";
+        String sn = "";
         for (int i = 0; i < bs.length; i++) {
-            sn += "0x" + Integer.toHexString(bs[i]&0xff) + " ";
+            sn += "0x" + Integer.toHexString(bs[i] & 0xff) + " ";
         }
         return sn;
     }
