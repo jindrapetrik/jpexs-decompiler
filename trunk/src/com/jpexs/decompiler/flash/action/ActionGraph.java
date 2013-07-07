@@ -278,7 +278,10 @@ public class ActionGraph extends Graph {
                  });*/
 
                 //GraphPart breakPart = breakParts.isEmpty() ? null : breakParts.get(0);
-                GraphPart breakPart = getMostCommonPart(caseBodyParts, loops);
+                List<GraphPart> mcp=new ArrayList<>();
+                mcp.addAll(caseBodyParts);
+                mcp.add(defaultPart2);
+                GraphPart breakPart = getMostCommonPart(mcp, loops);
                 if ((defaultPart2 != breakPart) && (defaultCommands.isEmpty())) {
                     defaultPart = defaultPart2;
                 }
@@ -302,6 +305,7 @@ public class ActionGraph extends Graph {
 
                 GraphTargetItem ti = checkLoop(next, stopPart, loops);
                 currentLoop = new Loop(loops.size(), null, next);
+                currentLoop.phase = 1;
                 loops.add(currentLoop);
                 //switchLoc.getNextPartPath(new ArrayList<GraphPart>());
                 List<Integer> valuesMapping = new ArrayList<>();
@@ -324,6 +328,15 @@ public class ActionGraph extends Graph {
                     List<GraphPart> stopPart2x = new ArrayList<>(stopPart);
                     stopPart2x.add(next);
                     defaultCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, defaultPart, stopPart2x, loops);
+                }
+                
+                if(!defaultCommands.isEmpty()){
+                    if(defaultCommands.get(defaultCommands.size()-1) instanceof BreakItem){
+                        BreakItem bi=(BreakItem)defaultCommands.get(defaultCommands.size()-1);
+                        if(bi.loopId==currentLoop.id){
+                            defaultCommands.remove(defaultCommands.size()-1);
+                        }
+                    }
                 }
 
                 List<GraphPart> ignored = new ArrayList<>();
@@ -382,7 +395,7 @@ public class ActionGraph extends Graph {
                 ret.addAll(output);
                 SwitchItem sti = new SwitchItem(null, currentLoop, switchedObject, caseValues, caseCommands, defaultCommands, valuesMapping);
                 ret.add(sti);
-
+                currentLoop.phase = 2;
                 if (next != null) {
                     if (ti != null) {
                         ret.add(ti);
