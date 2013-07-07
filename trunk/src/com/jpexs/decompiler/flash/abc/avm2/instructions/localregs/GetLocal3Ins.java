@@ -16,19 +16,12 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.localregs;
 
-import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.LocalRegTreeItem;
-import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
-public class GetLocal3Ins extends InstructionDefinition implements GetLocalTypeIns {
+public class GetLocal3Ins extends GetLocalTypeIns {
 
     public GetLocal3Ins() {
         super(0xd3, "getlocal_3", new int[]{});
@@ -40,17 +33,7 @@ public class GetLocal3Ins extends InstructionDefinition implements GetLocalTypeI
     }
 
     @Override
-    public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        stack.push(new LocalRegTreeItem(ins, 3, localRegs.get(3)));
-    }
-
-    @Override
     public int getRegisterId(AVM2Instruction par0) {
         return 3;
-    }
-
-    @Override
-    public int getStackDelta(AVM2Instruction ins, ABC abc) {
-        return 1;
     }
 }

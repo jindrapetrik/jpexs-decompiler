@@ -25,8 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -536,37 +534,31 @@ public class Graph {
     }
 
     public List<GraphTargetItem> translate(List<Object> localData) {
-        try {
-            List<GraphPart> allParts = new ArrayList<>();
-            for (GraphPart head : heads) {
-                populateParts(head, allParts);
-            }
-            Stack<GraphTargetItem> stack = new Stack<>();
-            List<Loop> loops = new ArrayList<>();
-            getLoops(heads.get(0), loops, null);
-            /*System.out.println("<loops>");
-             for (Loop el : loops) {
-             System.out.println(el);
-             }
-             System.out.println("</loops>");*/
-            getPrecontinues(null, heads.get(0), loops, null);
-            /*System.err.println("<loopspre>");
-             for (Loop el : loops) {
-             System.err.println(el);
-             }
-             System.err.println("</loopspre>");//*/
-
-            List<GraphTargetItem> ret = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, heads.get(0), null, loops);
-            processIfs(ret);
-            finalProcessStack(stack, ret);
-            finalProcessAll(ret, 0);
-            return ret;
-        } catch (StackOverflowError soe) {
-            List<GraphTargetItem> ret = new ArrayList<>();
-            ret.add(new CommentItem("StackOverflowError"));
-            Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, "error during printGraph", soe);
-            return ret;
+        List<GraphPart> allParts = new ArrayList<>();
+        for (GraphPart head : heads) {
+            populateParts(head, allParts);
         }
+        Stack<GraphTargetItem> stack = new Stack<>();
+        List<Loop> loops = new ArrayList<>();
+        getLoops(heads.get(0), loops, null);
+        /*System.out.println("<loops>");
+         for (Loop el : loops) {
+         System.out.println(el);
+         }
+         System.out.println("</loops>");*/
+        getPrecontinues(null, heads.get(0), loops, null);
+        /*System.err.println("<loopspre>");
+         for (Loop el : loops) {
+         System.err.println(el);
+         }
+         System.err.println("</loopspre>");//*/
+
+        List<GraphTargetItem> ret = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, heads.get(0), null, loops);
+        processIfs(ret);
+        finalProcessStack(stack, ret);
+        finalProcessAll(ret, 0);
+        return ret;
+
 
     }
 
@@ -1543,14 +1535,9 @@ public class Graph {
             end = p.end;
             int start = p.start;
 
-            try {
-                output.addAll(code.translatePart(p, localData, stack, start, end));
-                if ((end >= code.size() - 1) && p.nextParts.isEmpty()) {
-                    output.add(new ScriptEndItem());
-                }
-            } catch (Exception ex) {
-                Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, "error during printgraph", ex);
-                return ret;
+            output.addAll(code.translatePart(p, localData, stack, start, end));
+            if ((end >= code.size() - 1) && p.nextParts.isEmpty()) {
+                output.add(new ScriptEndItem());
             }
         }
 

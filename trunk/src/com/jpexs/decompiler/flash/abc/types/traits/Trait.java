@@ -30,7 +30,6 @@ import java.util.List;
 
 public abstract class Trait implements Serializable {
 
-    public static boolean debugMode = false;
     public int name_index;
     public int kindType;
     public int kindFlags;

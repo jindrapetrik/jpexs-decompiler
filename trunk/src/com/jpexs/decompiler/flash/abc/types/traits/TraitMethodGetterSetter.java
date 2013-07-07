@@ -54,21 +54,12 @@ public class TraitMethodGetterSetter extends Trait {
 
     @Override
     public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlight, List<String> fullyQualifiedNames, boolean paralel) {
-
-        if (debugMode) {
-            System.err.println("Decompiling " + path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames));
-        }
         String header = convertHeader(path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlight, fullyQualifiedNames, paralel);
 
         String bodyStr = "";
         int bodyIndex = abc.findBodyIndex(method_info);
         if (bodyIndex != -1) {
-            try {
-                bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames), pcode, isStatic, scriptIndex, classIndex, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, highlight, fullyQualifiedNames, null), 3);
-            } catch (StackOverflowError er) {
-                er.printStackTrace();
-                bodyStr = "//StackOverflowError";
-            }
+            bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames), pcode, isStatic, scriptIndex, classIndex, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, highlight, fullyQualifiedNames, null), 3);
         }
         return ABC.IDENT_STRING + ABC.IDENT_STRING + header + ((classIndex != -1 && abc.instance_info[classIndex].isInterface()) ? ";" : " {\r\n" + bodyStr + "\r\n" + ABC.IDENT_STRING + ABC.IDENT_STRING + "}");
     }

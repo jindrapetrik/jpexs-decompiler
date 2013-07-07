@@ -1221,15 +1221,13 @@ public class AVM2Code implements Serializable {
 
         try {
             list = AVM2Graph.translateViaGraph(path, this, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, fullyQualifiedNames);
-        } catch (Exception ex2) {
+        } catch (Exception | OutOfMemoryError | StackOverflowError ex2) {
             Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, "Decompilation error in " + path, ex2);
-            return "/*\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error Message: " + ex2.getMessage() + "\r\n */";
+            if (ex2 instanceof OutOfMemoryError) {
+                System.gc();
+            }
+            return "/*\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error type: " + ex2.getClass().getSimpleName() + "\r\n */\r\nthrow new IllegalOperationError(\"Not decompiled due to error\");\r\n";
         }
-        /*try{
-         list=toSourceOutput(true,isStatic, classIndex, localRegs, new Stack<TreeItem>(), scopeStack, abc, constants, method_info, body, 0, code.size() - 1, localRegNames, fullyQualifiedNames, null).output;
-         }catch(Exception ex){
-            
-         }*/
         if (initTraits != null) {
             for (int i = 0; i < list.size(); i++) {
                 GraphTargetItem ti = list.get(i);

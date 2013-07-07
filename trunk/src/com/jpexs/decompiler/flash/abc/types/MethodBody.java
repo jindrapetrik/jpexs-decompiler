@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 
 public class MethodBody implements Cloneable, Serializable {
 
+    boolean debugMode = false;
     public int method_info;
     public int max_stack;
     public int max_regs;
@@ -102,6 +103,9 @@ public class MethodBody implements Cloneable, Serializable {
     }
 
     public String toString(String path, boolean pcode, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, boolean hilight, List<String> fullyQualifiedNames, Traits initTraits) {
+        if (debugMode) {
+            System.err.println("Decompiling " + path);
+        }
         String s = "";
         if (!(Boolean) Configuration.getConfig("decompile", Boolean.TRUE)) {
             s = "//Decompilation skipped";
@@ -125,20 +129,16 @@ public class MethodBody implements Cloneable, Serializable {
                 }
             }
             //deobfuscated.restoreControlFlow(constants, b);
-            try {
-                s += deobfuscated.toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, b, hilight, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
-                s = s.trim();
-                if (hilight) {
-                    s = Highlighting.hilighMethod(s, this.method_info);
-                }
-            } catch (Exception ex) {
-                Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Exception during decompilation", ex);
-                s = "//error:" + ex.toString();
-            } catch (OutOfMemoryError er) {
-                Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Error during decompilation", er);
-                s = "//error:" + er.toString();
-                System.gc();
+            //try {
+            s += deobfuscated.toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, b, hilight, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
+            s = s.trim();
+            if (hilight) {
+                s = Highlighting.hilighMethod(s, this.method_info);
             }
+            /*} catch (Exception|StackOverflowError|OutOfMemoryError er) {
+             Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Error during decompilation", er);
+             s = "//error:" + er.toString();
+             }*/
         }
         return s;
     }

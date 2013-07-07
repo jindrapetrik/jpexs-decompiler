@@ -16,11 +16,9 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.localregs;
 
-import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.ClassTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.ScriptTreeItem;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.ThisTreeItem;
@@ -30,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-public class GetLocal0Ins extends InstructionDefinition implements GetLocalTypeIns {
+public class GetLocal0Ins extends GetLocalTypeIns {
 
     public GetLocal0Ins() {
         super(0xd0, "getlocal_0", new int[]{});
@@ -57,10 +55,5 @@ public class GetLocal0Ins extends InstructionDefinition implements GetLocalTypeI
     @Override
     public int getRegisterId(AVM2Instruction par0) {
         return 0;
-    }
-
-    @Override
-    public int getStackDelta(AVM2Instruction ins, ABC abc) {
-        return 1;
     }
 }

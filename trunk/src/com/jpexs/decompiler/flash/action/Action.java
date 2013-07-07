@@ -360,10 +360,13 @@ public class Action implements GraphSourceItem {
     /**
      * Converts list of actions to ASM source
      *
+     * @param listeners
+     * @param address
      * @param list List of actions
      * @param importantOffsets List of important offsets to mark as labels
      * @param version SWF version
      * @param hex Add hexadecimal?
+     * @param swfPos
      * @return ASM source as String
      */
     public static String actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, int version, boolean hex, long swfPos) {
@@ -373,11 +376,14 @@ public class Action implements GraphSourceItem {
     /**
      * Converts list of actions to ASM source
      *
+     * @param listeners
+     * @param address
      * @param list List of actions
      * @param importantOffsets List of important offsets to mark as labels
      * @param constantPool Constant pool
      * @param version SWF version
      * @param hex Add hexadecimal?
+     * @param swfPos
      * @return ASM source as String
      */
     public static String actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, List<String> constantPool, int version, boolean hex, long swfPos) {
@@ -541,6 +547,7 @@ public class Action implements GraphSourceItem {
     /**
      * Convert action to ASM source
      *
+     * @param container
      * @param knownAddreses List of important offsets to mark as labels
      * @param constantPool Constant pool
      * @param version SWF version
@@ -647,9 +654,12 @@ public class Action implements GraphSourceItem {
 
 
             return Graph.graphToString(tree);
-        } catch (Exception ex) {
-            Logger.getLogger(Action.class.getName()).log(Level.SEVERE, null, ex);
-            return "//Decompilation error :" + ex.getLocalizedMessage();
+        } catch (Exception | OutOfMemoryError | StackOverflowError ex2) {
+            Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", ex2);
+            if (ex2 instanceof OutOfMemoryError) {
+                System.gc();
+            }
+            return "/*\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error type: " + ex2.getClass().getSimpleName() + "\r\n */";
         }
     }
 
@@ -657,6 +667,8 @@ public class Action implements GraphSourceItem {
      * Converts list of actions to List of treeItems
      *
      * @param regNames Register names
+     * @param variables
+     * @param functions
      * @param actions List of actions
      * @param version SWF version
      * @return List of treeItems
@@ -804,10 +816,13 @@ public class Action implements GraphSourceItem {
                     List<GraphTargetItem> out;
                     try {
                         out = ActionGraph.translateViaGraph(cnt.getRegNames(), variables, functions, actions.subList(adr2ip(actions, endAddr, version), adr2ip(actions, endAddr + size, version)), version);
-                    } catch (RuntimeException re) {
+                    } catch (Exception | OutOfMemoryError | StackOverflowError ex2) {
+                        Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", ex2);
+                        if (ex2 instanceof OutOfMemoryError) {
+                            System.gc();
+                        }
                         out = new ArrayList<>();
-                        out.add(new CommentItem("Error " + re.getMessage()));
-                        Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Error during container translation", re);
+                        out.add(new CommentItem("\r\n * Decompilation error\r\n * Code may be obfuscated\r\n * Error type: " + ex2.getClass().getSimpleName() + "\r\n"));
                     }
                     outs.add(out);
                     endAddr += size;

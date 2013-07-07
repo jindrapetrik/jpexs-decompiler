@@ -16,20 +16,13 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.localregs;
 
-import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.LocalRegTreeItem;
-import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
-public class GetLocalIns extends InstructionDefinition implements GetLocalTypeIns {
+public class GetLocalIns extends GetLocalTypeIns {
 
     public GetLocalIns() {
         super(0x62, "getlocal", new int[]{AVM2Code.DAT_LOCAL_REG_INDEX});
@@ -41,18 +34,7 @@ public class GetLocalIns extends InstructionDefinition implements GetLocalTypeIn
     }
 
     @Override
-    public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        int regIndex = ins.operands[0];
-        stack.push(new LocalRegTreeItem(ins, regIndex, localRegs.get(regIndex)));
-    }
-
-    @Override
     public int getRegisterId(AVM2Instruction ins) {
         return ins.operands[0];
-    }
-
-    @Override
-    public int getStackDelta(AVM2Instruction ins, ABC abc) {
-        return 1;
     }
 }

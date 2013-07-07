@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2013 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -157,7 +157,7 @@ public class AVM2Graph extends Graph {
             }
         }
 
-        /*for(ABCException ex:body.exceptions){ 
+        /*for(ABCException ex:body.exceptions){
          for(GraphPart p:allBlocks){
          boolean next_is_ex_start=false;
          for(GraphPart n:p.nextParts){
@@ -579,43 +579,45 @@ public class AVM2Graph extends Graph {
             WhileItem w = (WhileItem) loopItem;
 
             if ((!w.expression.isEmpty()) && (w.expression.get(w.expression.size() - 1) instanceof HasNextTreeItem)) {
-                if (((HasNextTreeItem) w.expression.get(w.expression.size() - 1)).collection.getNotCoerced().getThroughRegister() instanceof FilteredCheckTreeItem) {
-                    //GraphTargetItem gti = ((HasNextTreeItem) ((HasNextTreeItem) w.expression.get(w.expression.size() - 1))).collection.getNotCoerced().getThroughRegister();
-                    if (w.commands.size() >= 3) { //((w.commands.size() == 3) || (w.commands.size() == 4)) {
-                        int pos = 0;
-                        while (w.commands.get(pos) instanceof SetLocalTreeItem) {
-                            pos++;
-                        }
-                        GraphTargetItem ft = w.commands.get(pos);
-                        if (ft instanceof WithTreeItem) {
-                            ft = w.commands.get(pos + 1);
-                            if (ft instanceof IfItem) {
-                                IfItem ift = (IfItem) ft;
-                                if (ift.onTrue.size() > 0) {
-                                    ft = ift.onTrue.get(0);
-                                    if (ft instanceof SetPropertyTreeItem) {
-                                        SetPropertyTreeItem spt = (SetPropertyTreeItem) ft;
-                                        if (spt.object instanceof LocalRegTreeItem) {
-                                            int regIndex = ((LocalRegTreeItem) spt.object).regIndex;
-                                            HasNextTreeItem iti = (HasNextTreeItem) w.expression.get(w.expression.size() - 1);
-                                            @SuppressWarnings("unchecked")
-                                            HashMap<Integer, GraphTargetItem> localRegs = (HashMap<Integer, GraphTargetItem>) localData.get(DATA_LOCALREGS);
-                                            localRegs.put(regIndex, new FilterTreeItem(null, iti.collection.getThroughRegister(), ift.expression));
-                                            return null;
+                if (((HasNextTreeItem) w.expression.get(w.expression.size() - 1)).collection != null) {
+                    if (((HasNextTreeItem) w.expression.get(w.expression.size() - 1)).collection.getNotCoerced().getThroughRegister() instanceof FilteredCheckTreeItem) {
+                        //GraphTargetItem gti = ((HasNextTreeItem) ((HasNextTreeItem) w.expression.get(w.expression.size() - 1))).collection.getNotCoerced().getThroughRegister();
+                        if (w.commands.size() >= 3) { //((w.commands.size() == 3) || (w.commands.size() == 4)) {
+                            int pos = 0;
+                            while (w.commands.get(pos) instanceof SetLocalTreeItem) {
+                                pos++;
+                            }
+                            GraphTargetItem ft = w.commands.get(pos);
+                            if (ft instanceof WithTreeItem) {
+                                ft = w.commands.get(pos + 1);
+                                if (ft instanceof IfItem) {
+                                    IfItem ift = (IfItem) ft;
+                                    if (ift.onTrue.size() > 0) {
+                                        ft = ift.onTrue.get(0);
+                                        if (ft instanceof SetPropertyTreeItem) {
+                                            SetPropertyTreeItem spt = (SetPropertyTreeItem) ft;
+                                            if (spt.object instanceof LocalRegTreeItem) {
+                                                int regIndex = ((LocalRegTreeItem) spt.object).regIndex;
+                                                HasNextTreeItem iti = (HasNextTreeItem) w.expression.get(w.expression.size() - 1);
+                                                @SuppressWarnings("unchecked")
+                                                HashMap<Integer, GraphTargetItem> localRegs = (HashMap<Integer, GraphTargetItem>) localData.get(DATA_LOCALREGS);
+                                                localRegs.put(regIndex, new FilterTreeItem(null, iti.collection.getThroughRegister(), ift.expression));
+                                                return null;
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
-                } else if (!w.commands.isEmpty()) {
-                    if (w.commands.get(0) instanceof SetTypeTreeItem) {
-                        SetTypeTreeItem sti = (SetTypeTreeItem) w.commands.remove(0);
-                        GraphTargetItem gti = sti.getValue().getNotCoerced();
-                        if (gti instanceof NextValueTreeItem) {
-                            return new ForEachInTreeItem(w.src, w.loop, new InTreeItem(null, sti.getObject(), ((HasNextTreeItem) w.expression.get(w.expression.size() - 1)).collection), w.commands);
-                        } else if (gti instanceof NextNameTreeItem) {
-                            return new ForInTreeItem(w.src, w.loop, new InTreeItem(null, sti.getObject(), ((HasNextTreeItem) w.expression.get(w.expression.size() - 1)).collection), w.commands);
+                    } else if (!w.commands.isEmpty()) {
+                        if (w.commands.get(0) instanceof SetTypeTreeItem) {
+                            SetTypeTreeItem sti = (SetTypeTreeItem) w.commands.remove(0);
+                            GraphTargetItem gti = sti.getValue().getNotCoerced();
+                            if (gti instanceof NextValueTreeItem) {
+                                return new ForEachInTreeItem(w.src, w.loop, new InTreeItem(null, sti.getObject(), ((HasNextTreeItem) w.expression.get(w.expression.size() - 1)).collection), w.commands);
+                            } else if (gti instanceof NextNameTreeItem) {
+                                return new ForInTreeItem(w.src, w.loop, new InTreeItem(null, sti.getObject(), ((HasNextTreeItem) w.expression.get(w.expression.size() - 1)).collection), w.commands);
+                            }
                         }
                     }
                 }
@@ -638,7 +640,7 @@ public class AVM2Graph extends Graph {
 
          if (list.get(i) instanceof WhileItem) {
          WhileItem w = (WhileItem) list.get(i);
-                
+
          }
          }*/
 

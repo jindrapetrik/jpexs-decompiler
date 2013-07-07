@@ -349,9 +349,6 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
 
         String packageName = abc.instance_info[class_info].getName(abc.constants).getNamespace(abc.constants).getName(abc.constants);
-        if (debugMode) {
-            System.err.println("Decompiling " + packageName + "." + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames));
-        }
         List<String> namesInThisPackage = new ArrayList<>();
         for (ABCContainerTag tag : abcTags) {
             for (ScriptInfo si : tag.getABC().script_info) {
