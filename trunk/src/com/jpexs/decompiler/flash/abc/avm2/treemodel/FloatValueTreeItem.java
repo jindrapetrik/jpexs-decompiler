@@ -36,7 +36,7 @@ public class FloatValueTreeItem extends NumberValueTreeItem {
     }
 
     @Override
-    public double toNumber() {
+    public Object getResult() {
         return value;
     }
 

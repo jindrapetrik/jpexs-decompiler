@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.operations;
 
+import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.ecma.*;
 import com.jpexs.decompiler.flash.graph.BinaryOpItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -23,17 +25,25 @@ import com.jpexs.decompiler.flash.graph.LogicalOpItem;
 
 public class NeqTreeItem extends BinaryOpItem implements LogicalOpItem {
 
-    public NeqTreeItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+    boolean version2;
+
+    public NeqTreeItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide, boolean version2) {
         super(instruction, PRECEDENCE_EQUALITY, leftSide, rightSide, "!=");
+        this.version2 = version2;
     }
 
     @Override
-    public boolean toBoolean() {
-        return (leftSide.toNumber() != rightSide.toNumber()) || (leftSide.toBoolean() != rightSide.toBoolean());
+    public Object getResult() {
+        if (version2) {
+            return !EcmaScript.equals(leftSide.getResult(), rightSide.getResult());
+        } else {
+            //For SWF 4 and older, it should return 1 or 0
+            return (Action.toFloatPoint(leftSide.getResult()) != Action.toFloatPoint(rightSide.getResult()));
+        }
     }
 
     @Override
     public GraphTargetItem invert() {
-        return new EqTreeItem(src, leftSide, rightSide);
+        return new EqTreeItem(src, leftSide, rightSide, version2);
     }
 }

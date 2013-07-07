@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import java.util.HashMap;
 import java.util.List;
 
@@ -38,12 +39,7 @@ public class UndefinedTreeItem extends TreeItem {
     }
 
     @Override
-    public double toNumber() {
-        return 0;
-    }
-
-    @Override
-    public boolean toBoolean() {
-        return false;
+    public Object getResult() {
+        return new Undefined();
     }
 }

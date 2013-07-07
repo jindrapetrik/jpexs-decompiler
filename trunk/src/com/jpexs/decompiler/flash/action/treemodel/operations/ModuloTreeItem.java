@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.operations;
 
+import com.jpexs.decompiler.flash.ecma.*;
 import com.jpexs.decompiler.flash.graph.BinaryOpItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -27,10 +28,10 @@ public class ModuloTreeItem extends BinaryOpItem {
     }
 
     @Override
-    public double toNumber() {
-        if (Double.compare(rightSide.toNumber(), 0) == 0) {
+    public Object getResult() {
+        if (Double.compare(EcmaScript.toNumber(rightSide.getResult()), 0) == 0) {
             return Double.NaN;
         }
-        return ((int) leftSide.toNumber()) % ((int) rightSide.toNumber());
+        return ((long) (double) EcmaScript.toNumber(leftSide.getResult())) % ((long) (double) EcmaScript.toNumber(rightSide.getResult()));
     }
 }

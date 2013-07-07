@@ -16,17 +16,16 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
-import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.KeyValue;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
-import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
@@ -38,8 +37,9 @@ import javax.swing.tree.TreeSelectionModel;
 public class ClassesListTree extends JTree implements TreeSelectionListener {
 
     private List<ABCContainerTag> abcList;
-    public HashMap<ClassPath, ScriptPack> treeList;
+    public List<KeyValue<ClassPath, ScriptPack>> treeList;
     private ABCPanel abcPanel;
+    private SWF swf;
 
     public void selectClass(int classIndex) {
         ClassesListTreeModel model = (ClassesListTreeModel) getModel();
@@ -49,8 +49,9 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
         scrollPathToVisible(treePath);
     }
 
-    public ClassesListTree(List<ABCContainerTag> list, ABCPanel abcPanel) {
+    public ClassesListTree(List<ABCContainerTag> list, ABCPanel abcPanel, SWF swf) {
         this.abcList = list;
+        this.swf = swf;
         this.treeList = getTreeList(list);
         this.abcPanel = abcPanel;
         setModel(new ClassesListTreeModel(this.treeList));
@@ -96,19 +97,9 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
         return selectedScripts;
     }
 
-    public HashMap<ClassPath, ScriptPack> getTreeList(List<ABCContainerTag> list) {
-        HashMap<ClassPath, ScriptPack> ret = new HashMap<>();
-        for (ABCContainerTag tag : list) {
-            ABC abc = tag.getABC();
-            for (int i = 0; i < abc.script_info.length; i++) {
-                ScriptInfo script = abc.script_info[i];
-                HashMap<ClassPath, ScriptPack> packs = script.getPacks(abc, i);
-                for (ClassPath path : packs.keySet()) {
-                    ret.put(path, packs.get(path));
-                }
-            }
-        }
-        return ret;
+    public List<KeyValue<ClassPath, ScriptPack>> getTreeList(List<ABCContainerTag> list) {
+
+        return swf.getAS3Packs();
     }
 
     public void setDoABCTags(List<ABCContainerTag> list) {

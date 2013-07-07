@@ -17,7 +17,9 @@
 package com.jpexs.decompiler.flash.action.treemodel;
 
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
-import com.jpexs.decompiler.flash.action.swf4.Null;
+import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
+import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
@@ -46,82 +48,33 @@ public class DirectValueTreeItem extends TreeItem {
     }
 
     @Override
-    public double toNumber() {
+    public Object getResult() {
         if (computedRegValue != null) {
-            return computedRegValue.toNumber();
+            return computedRegValue.getResult();
         }
         if (value instanceof Double) {
             return (Double) value;
         }
         if (value instanceof Float) {
-            return (Float) value;
+            return (double) (Float) value;
         }
         if (value instanceof Long) {
-            return (Long) value;
+            return (double) (Long) value;
         }
         if (value instanceof Boolean) {
-            return ((Boolean) value) ? 1 : 0;
+            return value;
         }
 
         if (value instanceof String) {
-            String s = (String) value;
-            if (s.length() == 1) {
-                return s.charAt(0);
-            }
-            double ret = 0.0;
-            try {
-                ret = Double.parseDouble(s);
-            } catch (NumberFormatException nex) {
-            }
-            return ret;
+            return value;
         }
         if (value instanceof ConstantIndex) {
-            String s = (this.constants.get(((ConstantIndex) value).index));
-            if (s.length() == 1) {
-                return s.charAt(0);
-            }
-            double ret = 0.0;
-            try {
-                ret = Double.parseDouble(s);
-            } catch (NumberFormatException nex) {
-            }
-            return ret;
+            return (this.constants.get(((ConstantIndex) value).index));
         }
-        return super.toNumber();
-    }
-
-    @Override
-    public boolean toBoolean() {
-        if (computedRegValue != null) {
-            return computedRegValue.toBoolean();
+        if (value instanceof RegisterNumber) {
+            return new Undefined(); //has not computed value
         }
-        if (value instanceof Boolean) {
-            return (Boolean) value;
-        }
-        if (value instanceof Double) {
-            return Double.compare((Double) value, 0.0) != 0;
-        }
-        if (value instanceof Float) {
-            return Float.compare((Float) value, 0.0f) != 0;
-        }
-        if (value instanceof Long) {
-            return ((Long) value) != 0;
-        }
-        if (value instanceof String) {
-            String s = (String) value;
-            if (s.length() == 1) {
-                return toNumber() == 0;
-            }
-            return !s.equals("");
-        }
-        if (value instanceof ConstantIndex) {
-            String s = (this.constants.get(((ConstantIndex) value).index));
-            if (s.length() == 1) {
-                return toNumber() == 0;
-            }
-            return !s.equals("");
-        }
-        return false;
+        return value;
     }
 
     @Override

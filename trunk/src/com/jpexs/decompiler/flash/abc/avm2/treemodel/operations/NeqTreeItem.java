@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
 
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.graph.BinaryOpItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -28,8 +29,8 @@ public class NeqTreeItem extends BinaryOpItem implements LogicalOpItem {
     }
 
     @Override
-    public boolean toBoolean() {
-        return (leftSide.toNumber() != rightSide.toNumber()) || (leftSide.toBoolean() != rightSide.toBoolean());
+    public Object getResult() {
+        return !EcmaScript.equals(leftSide.getResult(), rightSide.getResult());
     }
 
     @Override

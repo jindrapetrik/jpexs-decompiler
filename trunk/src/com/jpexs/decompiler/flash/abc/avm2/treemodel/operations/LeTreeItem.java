@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
 
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.graph.BinaryOpItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -33,7 +34,14 @@ public class LeTreeItem extends BinaryOpItem implements LogicalOpItem {
     }
 
     @Override
-    public boolean toBoolean() {
-        return leftSide.toNumber() <= rightSide.toNumber();
+    public Object getResult() {
+        Object ret = EcmaScript.compare(rightSide.getResult(), leftSide.getResult());
+        if (ret == Boolean.TRUE) {
+            return Boolean.FALSE;
+        }
+        if (ret == Boolean.FALSE) {
+            return Boolean.TRUE;
+        }
+        return ret;//undefined
     }
 }

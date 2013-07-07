@@ -36,12 +36,7 @@ public class GetTimeTreeItem extends TreeItem {
     }
 
     @Override
-    public double toNumber() {
-        return new Random().nextInt(10000) + 1000;
-    }
-
-    @Override
-    public boolean toBoolean() {
-        return true;
+    public Object getResult() {
+        return (Double) (double) new Random().nextInt(10000) + 1000;
     }
 }

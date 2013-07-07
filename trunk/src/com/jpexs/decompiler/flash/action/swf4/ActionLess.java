@@ -38,6 +38,6 @@ public class ActionLess extends Action {
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
         GraphTargetItem a = stack.pop();
         GraphTargetItem b = stack.pop();
-        stack.push(new LtTreeItem(this, b, a));
+        stack.push(new LtTreeItem(this, b, a, false));
     }
 }

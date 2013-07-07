@@ -35,4 +35,14 @@ public class StringTreeItem extends TreeItem {
     public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         return hilight("\"" + Helper.escapeString(value) + "\"");
     }
+
+    @Override
+    public boolean isCompileTime() {
+        return true;
+    }
+
+    @Override
+    public Object getResult() {
+        return value;
+    }
 }

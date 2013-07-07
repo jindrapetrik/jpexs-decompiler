@@ -126,4 +126,16 @@ public abstract class BinaryOpItem extends GraphTargetItem {
         }
         return true;
     }
+
+    /*@Override
+     public boolean toBoolean() {
+     double val=toNumber();
+     if(Double.isNaN(val)){
+     return false;
+     }
+     if(Double.compare(val, 0)==0){
+     return false;
+     }
+     return true;
+     }*/
 }

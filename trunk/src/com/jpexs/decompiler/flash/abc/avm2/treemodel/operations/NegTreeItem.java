@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.graph.UnaryOpItem;
 
@@ -27,7 +28,7 @@ public class NegTreeItem extends UnaryOpItem {
     }
 
     @Override
-    public double toNumber() {
-        return -value.toNumber();
+    public Object getResult() {
+        return -EcmaScript.toNumber(value.getResult());
     }
 }

@@ -54,6 +54,7 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.graph.Graph;
 import com.jpexs.decompiler.flash.graph.GraphPart;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
@@ -2030,7 +2031,7 @@ public class AVM2Code implements Serializable {
                 List<Integer> branches = ins.getBranches(code);
                 if ((ins instanceof AVM2Instruction) && (((AVM2Instruction) ins).definition instanceof LookupSwitchIns)
                         && (!stack.isEmpty()) && (stack.peek().isCompileTime()) && (!stack.peek().hasSideEffect())) {
-                    int c = (int) stack.peek().toNumber();
+                    int c = (int) (double) EcmaScript.toNumber(stack.peek().getResult());
                     Decision dec = new Decision();
                     if (decisions.containsKey(ins)) {
                         dec = decisions.get(ins);
@@ -2076,7 +2077,7 @@ public class AVM2Code implements Serializable {
                     continue;
                 } else if ((ins instanceof AVM2Instruction) && ((AVM2Instruction) ins).definition instanceof IfTypeIns
                         && (!(((AVM2Instruction) ins).definition instanceof JumpIns)) && (!stack.isEmpty()) && (stack.peek().isCompileTime()) && (!stack.peek().hasSideEffect())) {
-                    boolean condition = stack.peek().toBoolean();
+                    boolean condition = EcmaScript.toBoolean(stack.peek().getResult());
                     if (debugMode) {
                         if (condition) {
                             System.out.println("JUMP");

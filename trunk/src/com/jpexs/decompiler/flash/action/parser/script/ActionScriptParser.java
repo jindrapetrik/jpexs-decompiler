@@ -37,6 +37,8 @@ import com.jpexs.decompiler.flash.action.swf7.ActionImplementsOp;
 import com.jpexs.decompiler.flash.action.swf7.ActionThrow;
 import com.jpexs.decompiler.flash.action.swf7.ActionTry;
 import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
+import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

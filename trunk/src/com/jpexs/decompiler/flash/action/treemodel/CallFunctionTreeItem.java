@@ -63,19 +63,11 @@ public class CallFunctionTreeItem extends TreeItem {
     }
 
     @Override
-    public boolean toBoolean() {
+    public Object getResult() {
         if (calculatedFunction == null) {
-            return false;
+            return null;
         }
-        return calculatedFunction.toBoolean();
-    }
-
-    @Override
-    public double toNumber() {
-        if (calculatedFunction == null) {
-            return 0;
-        }
-        return calculatedFunction.toNumber();
+        return calculatedFunction.getResult();
     }
 
     @Override

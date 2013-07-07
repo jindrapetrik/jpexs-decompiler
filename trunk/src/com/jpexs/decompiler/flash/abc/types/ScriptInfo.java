@@ -16,15 +16,14 @@
  */
 package com.jpexs.decompiler.flash.abc.types;
 
+import com.jpexs.decompiler.flash.KeyValue;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class ScriptInfo {
@@ -32,8 +31,8 @@ public class ScriptInfo {
     public int init_index; //MethodInfo
     public Traits traits;
 
-    public HashMap<ClassPath, ScriptPack> getPacks(ABC abc, int scriptIndex) {
-        HashMap<ClassPath, ScriptPack> ret = new HashMap<>();
+    public List<KeyValue<ClassPath, ScriptPack>> getPacks(ABC abc, int scriptIndex) {
+        List<KeyValue<ClassPath, ScriptPack>> ret = new ArrayList<>();
 
         List<Integer> otherTraits = new ArrayList<>();
         for (int j = 0; j < traits.traits.length; j++) {
@@ -60,7 +59,7 @@ public class ScriptInfo {
                     traitIndices.addAll(otherTraits);
                 }
                 otherTraits = new ArrayList<>();
-                ret.put(new ClassPath(packageName, objectName), new ScriptPack(abc, scriptIndex, traitIndices));
+                ret.add(new KeyValue<>(new ClassPath(packageName, objectName), new ScriptPack(abc, scriptIndex, traitIndices)));
             }
         }
         return ret;
@@ -81,12 +80,5 @@ public class ScriptInfo {
 
     public String convert(List<ABCContainerTag> abcTags, ABC abc, boolean pcode, boolean highlighting, int scriptIndex, boolean paralel) {
         return traits.convert("", abcTags, abc, false, pcode, true, scriptIndex, -1, highlighting, new ArrayList<String>(), paralel);
-    }
-
-    public void export(ABC abc, List<ABCContainerTag> abcList, String directory, boolean pcode, int scriptIndex, boolean paralel) throws IOException {
-        HashMap<ClassPath, ScriptPack> packs = getPacks(abc, scriptIndex);
-        for (ScriptPack pack : packs.values()) {
-            pack.export(directory, abcList, pcode, paralel);
-        }
     }
 }

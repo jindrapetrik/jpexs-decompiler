@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.graph.BinaryOpItem;
 import com.jpexs.decompiler.flash.graph.GraphPart;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -30,7 +31,7 @@ public class OrTreeItem extends BinaryOpItem {
     }
 
     @Override
-    public boolean toBoolean() {
-        return leftSide.toBoolean() || rightSide.toBoolean();
+    public Object getResult() {
+        return EcmaScript.toBoolean(leftSide.getResult()) || EcmaScript.toBoolean(rightSide.getResult());
     }
 }

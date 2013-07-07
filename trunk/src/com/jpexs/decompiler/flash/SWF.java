@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash;
 
 import SevenZip.Compression.LZMA.Encoder;
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.action.Action;
@@ -28,7 +29,6 @@ import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ActionSetVariable;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
-import com.jpexs.decompiler.flash.action.swf4.Null;
 import com.jpexs.decompiler.flash.action.swf5.ActionCallFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionCallMethod;
 import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
@@ -48,6 +48,7 @@ import com.jpexs.decompiler.flash.action.treemodel.GetMemberTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.GetVariableTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.clauses.ClassTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.clauses.InterfaceTreeItem;
+import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.flv.AUDIODATA;
 import com.jpexs.decompiler.flash.flv.FLVOutputStream;
 import com.jpexs.decompiler.flash.flv.FLVTAG;
@@ -113,6 +114,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.Stack;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -492,6 +500,123 @@ public class SWF {
         return false;
     }
 
+    private List<KeyValue<ClassPath, ScriptPack>> uniqueAS3Packs(List<KeyValue<ClassPath, ScriptPack>> packs) {
+        List<KeyValue<ClassPath, ScriptPack>> ret = new ArrayList<>();
+        for (KeyValue<ClassPath, ScriptPack> item : packs) {
+            System.err.println(item.key);
+            for (KeyValue<ClassPath, ScriptPack> itemOld : ret) {
+                if (item.key.equals(itemOld.key)) {
+                    Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Duplicate pack path found!");
+                    break;
+                }
+            }
+            ret.add(item);
+        }
+        return ret;
+    }
+
+    public List<KeyValue<ClassPath, ScriptPack>> getAS3Packs() {
+        List<ABCContainerTag> abcTags = new ArrayList<>();
+        for (Tag t : tags) {
+            if (t instanceof ABCContainerTag) {
+                abcTags.add((ABCContainerTag) t);
+            }
+        }
+        List<KeyValue<ClassPath, ScriptPack>> packs = new ArrayList<>();
+        for (int i = 0; i < abcTags.size(); i++) {
+            ABCContainerTag t = abcTags.get(i);
+            packs.addAll(t.getABC().getScriptPacks());
+        }
+        return uniqueAS3Packs(packs);
+    }
+
+    private class ExportPackTask implements Callable<File> {
+
+        ScriptPack pack;
+        String directory;
+        List<ABCContainerTag> abcList;
+        boolean pcode;
+        String informStr;
+        ClassPath path;
+        AtomicInteger index;
+        int count;
+        boolean paralel;
+
+        public ExportPackTask(AtomicInteger index, int count, ClassPath path, ScriptPack pack, String directory, List<ABCContainerTag> abcList, boolean pcode, String informStr, boolean paralel) {
+            this.pack = pack;
+            this.directory = directory;
+            this.abcList = abcList;
+            this.pcode = pcode;
+            this.informStr = informStr;
+            this.path = path;
+            this.index = index;
+            this.count = count;
+            this.paralel = paralel;
+        }
+
+        @Override
+        public File call() throws Exception {
+            try {
+                return pack.export(directory, abcList, pcode, paralel);
+            } catch (IOException ex) {
+                Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            synchronized (ABC.class) {
+                informListeners("export", "Exported " + informStr + " script " + index.getAndIncrement() + "/" + count + " " + path);
+            }
+            return null;
+        }
+    }
+
+    public List<File> exportActionScript2(String outdir, boolean isPcode, boolean paralel, EventListener evl) {
+        List<File> ret = new ArrayList<>();
+        List<Object> list2 = new ArrayList<>();
+        list2.addAll(tags);
+        List<TagNode> list = createASTagList(list2, null);
+
+        TagNode.setExport(list, true);
+        if (!outdir.endsWith(File.separator)) {
+            outdir += File.separator;
+        }
+        outdir += "scripts" + File.separator;
+        ret.addAll(TagNode.exportNodeAS(list, outdir, isPcode, evl));
+        return ret;
+    }
+
+    public List<File> exportActionScript3(String outdir, boolean isPcode, boolean paralel) {
+        ExecutorService executor = Executors.newFixedThreadPool(20);
+        List<Future<File>> futureResults = new ArrayList<>();
+        AtomicInteger cnt = new AtomicInteger(1);
+        List<ABCContainerTag> abcTags = new ArrayList<>();
+        for (Tag t : tags) {
+            if (t instanceof ABCContainerTag) {
+                abcTags.add((ABCContainerTag) t);
+            }
+        }
+        List<KeyValue<ClassPath, ScriptPack>> packs = getAS3Packs();
+        for (KeyValue<ClassPath, ScriptPack> item : packs) {
+            Future<File> future = executor.submit(new ExportPackTask(cnt, packs.size(), item.key, item.value, outdir, abcTags, isPcode, "", paralel));
+            futureResults.add(future);
+        }
+
+        List<File> ret = new ArrayList<>();
+        for (int f = 0; f < futureResults.size(); f++) {
+            try {
+                ret.add(futureResults.get(f).get());
+            } catch (InterruptedException | ExecutionException ex) {
+                Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Error during ABC export", ex);
+            }
+        }
+
+        try {
+            executor.shutdown();
+            executor.awaitTermination(30, TimeUnit.MINUTES);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, "30 minutes ActionScript export limit reached", ex);
+        }
+        return ret;
+    }
+
     public List<File> exportActionScript(String outdir, boolean isPcode, boolean paralel) throws Exception {
         boolean asV3Found = false;
         List<File> ret = new ArrayList<>();
@@ -503,30 +628,16 @@ public class SWF {
                 }
             }
         };
-        List<ABCContainerTag> abcTags = new ArrayList<>();
         for (Tag t : tags) {
             if (t instanceof ABCContainerTag) {
-                abcTags.add((ABCContainerTag) t);
                 asV3Found = true;
             }
         }
-        for (int i = 0; i < abcTags.size(); i++) {
-            ABCContainerTag t = abcTags.get(i);
-            t.getABC().addEventListener(evl);
-            ret.addAll(t.getABC().export(outdir, isPcode, abcTags, "tag " + (i + 1) + "/" + abcTags.size() + " ", paralel));
-        }
 
-        if (!asV3Found) {
-            List<Object> list2 = new ArrayList<>();
-            list2.addAll(tags);
-            List<TagNode> list = createASTagList(list2, null);
-
-            TagNode.setExport(list, true);
-            if (!outdir.endsWith(File.separator)) {
-                outdir += File.separator;
-            }
-            outdir += "scripts" + File.separator;
-            ret.addAll(TagNode.exportNodeAS(list, outdir, isPcode, evl));
+        if (asV3Found) {
+            ret.addAll(exportActionScript3(outdir, isPcode, paralel));
+        } else {
+            ret.addAll(exportActionScript2(outdir, isPcode, paralel, evl));
         }
         return ret;
     }

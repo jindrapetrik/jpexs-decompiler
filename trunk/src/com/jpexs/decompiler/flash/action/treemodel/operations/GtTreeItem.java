@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.operations;
 
+import com.jpexs.decompiler.flash.ecma.*;
 import com.jpexs.decompiler.flash.graph.BinaryOpItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -28,8 +29,8 @@ public class GtTreeItem extends BinaryOpItem implements LogicalOpItem {
     }
 
     @Override
-    public boolean toBoolean() {
-        return leftSide.toNumber() > rightSide.toNumber();
+    public Object getResult() {
+        return EcmaScript.compare(rightSide.getResult(), leftSide.getResult());
     }
 
     @Override

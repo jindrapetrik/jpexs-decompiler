@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.action.treemodel.*;
 import com.jpexs.decompiler.flash.action.treemodel.clauses.*;
+import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.graph.CommentItem;
 import com.jpexs.decompiler.flash.graph.Graph;
 import com.jpexs.decompiler.flash.graph.GraphSource;
@@ -1291,5 +1292,18 @@ public class Action implements GraphSourceItem {
 
     public String getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
         return getASMSource(container, knownAddreses, constantPool, version, hex);
+    }
+
+    public static double toFloatPoint(Object o) {
+        if (o instanceof Double) {
+            return (Double) o;
+        }
+        if (o instanceof Integer) {
+            return (Integer) o;
+        }
+        if (o instanceof Long) {
+            return (Long) o;
+        }
+        return 0;
     }
 }

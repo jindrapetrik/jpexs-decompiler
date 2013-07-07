@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
@@ -24,8 +25,7 @@ public class GetVariableTreeItem extends TreeItem {
 
     public GraphTargetItem name;
     private GraphTargetItem computedValue;
-    private double computedNumber = 0;
-    private boolean computedBool = false;
+    private Object computedResult;
     private boolean computedCompiletime = false;
     private boolean computedVariableComputed = false;
 
@@ -64,26 +64,17 @@ public class GetVariableTreeItem extends TreeItem {
     }
 
     @Override
-    public boolean toBoolean() {
+    public Object getResult() {
         if (computedValue == null) {
-            return false;
+            return new Undefined();
         }
-        return computedBool;
-    }
-
-    @Override
-    public double toNumber() {
-        if (computedValue == null) {
-            return 0;
-        }
-        return computedNumber;
+        return computedResult;
     }
 
     public void setComputedValue(GraphTargetItem computedValue) {
         this.computedValue = computedValue;
         if (computedValue != null) {
-            computedNumber = computedValue.toNumber();
-            computedBool = computedValue.toBoolean();
+            computedResult = computedValue.getResult();
             computedCompiletime = computedValue.isCompileTime();
             computedVariableComputed = computedValue.isVariableComputed();
         }

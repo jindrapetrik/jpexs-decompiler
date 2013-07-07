@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.FilterTreeItem;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.HashMap;
@@ -55,19 +56,12 @@ public class LocalRegTreeItem extends TreeItem {
     }
 
     @Override
-    public double toNumber() {
+    public Object getResult() {
         if (computedValue == null) {
-            return 0;
+            return new Undefined();
         }
-        return computedValue.toNumber();
-    }
+        return computedValue.getResult();
 
-    @Override
-    public boolean toBoolean() {
-        if (computedValue == null) {
-            return false;
-        }
-        return computedValue.toBoolean();
     }
 
     @Override

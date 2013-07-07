@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.abc;
 
+import java.util.Objects;
+
 /**
  *
  * @author JPEXS
@@ -33,5 +35,31 @@ public class ClassPath {
     @Override
     public String toString() {
         return (packageStr == null || packageStr.equals("")) ? className : packageStr + "." + className;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 37 * hash + Objects.hashCode(this.packageStr);
+        hash = 37 * hash + Objects.hashCode(this.className);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ClassPath other = (ClassPath) obj;
+        if (!Objects.equals(this.packageStr, other.packageStr)) {
+            return false;
+        }
+        if (!Objects.equals(this.className, other.className)) {
+            return false;
+        }
+        return true;
     }
 }

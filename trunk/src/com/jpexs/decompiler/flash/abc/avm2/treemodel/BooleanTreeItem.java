@@ -46,13 +46,8 @@ public class BooleanTreeItem extends TreeItem {
     }
 
     @Override
-    public boolean toBoolean() {
+    public Object getResult() {
         return value;
-    }
-
-    @Override
-    public double toNumber() {
-        return value ? 1 : 0;
     }
 
     @Override

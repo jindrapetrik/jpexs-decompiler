@@ -36,8 +36,8 @@ public class IntegerValueTreeItem extends NumberValueTreeItem {
     }
 
     @Override
-    public double toNumber() {
-        return value;
+    public Object getResult() {
+        return (Double) (double) (long) value;
     }
 
     @Override

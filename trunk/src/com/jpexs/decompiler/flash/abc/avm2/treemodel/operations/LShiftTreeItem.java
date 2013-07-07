@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.graph.BinaryOpItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
@@ -27,7 +28,7 @@ public class LShiftTreeItem extends BinaryOpItem {
     }
 
     @Override
-    public double toNumber() {
-        return ((int) leftSide.toNumber()) << ((int) rightSide.toNumber());
+    public Object getResult() {
+        return ((int) (double) EcmaScript.toNumber(leftSide.getResult())) << ((int) (double) EcmaScript.toNumber(rightSide.getResult()));
     }
 }

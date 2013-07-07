@@ -16,12 +16,13 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
+import com.jpexs.decompiler.flash.KeyValue;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
-import java.util.HashMap;
+import java.util.List;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -77,28 +78,28 @@ class ClassIndexVisitor implements TreeVisitor {
 public class ClassesListTreeModel implements TreeModel {
 
     private Tree classTree = new Tree();
-    private HashMap<ClassPath, ScriptPack> list;
+    private List<KeyValue<ClassPath, ScriptPack>> list;
 
-    public HashMap<ClassPath, ScriptPack> getList() {
+    public List<KeyValue<ClassPath, ScriptPack>> getList() {
         return list;
     }
 
-    public ClassesListTreeModel(HashMap<ClassPath, ScriptPack> list) {
+    public ClassesListTreeModel(List<KeyValue<ClassPath, ScriptPack>> list) {
         this(list, null);
     }
 
-    public ClassesListTreeModel(HashMap<ClassPath, ScriptPack> list, String filter) {
-        for (ClassPath path : list.keySet()) {
+    public ClassesListTreeModel(List<KeyValue<ClassPath, ScriptPack>> list, String filter) {
+        for (KeyValue<ClassPath, ScriptPack> item : list) {
             if (filter != null) {
                 if (!filter.equals("")) {
-                    if (!path.toString().contains(filter)) {
+                    if (!item.key.toString().contains(filter)) {
                         continue;
                     }
                 }
             }
             //String nsName = path.contains(".") ? path.substring(path.lastIndexOf(".") + 1) : path;
             //String packageName = path.contains(".") ? path.substring(0, path.lastIndexOf(".")) : "";
-            classTree.add(path.className, path.packageStr, list.get(path));
+            classTree.add(item.key.className, item.key.packageStr, item.value);
         }
         this.list = list;
 

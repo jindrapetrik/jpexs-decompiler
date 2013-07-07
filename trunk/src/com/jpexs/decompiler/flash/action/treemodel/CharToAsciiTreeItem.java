@@ -56,22 +56,13 @@ public class CharToAsciiTreeItem extends TreeItem {
     }
 
     @Override
-    public double toNumber() {
-        if (value instanceof DirectValueTreeItem) {
-            DirectValueTreeItem dv = (DirectValueTreeItem) value;
-            if (dv.value instanceof String) {
-                String s = (String) dv.value;
-                if (s.length() > 0) {
-                    char c = s.charAt(0);
-                    return (int) c;
-                }
-            }
+    public Object getResult() {
+        Object res = value.getResult();
+        String s = res.toString();
+        if (s.length() > 0) {
+            char c = s.charAt(0);
+            return (int) c;
         }
         return 0;
-    }
-
-    @Override
-    public boolean toBoolean() {
-        return toNumber() != 0;
     }
 }

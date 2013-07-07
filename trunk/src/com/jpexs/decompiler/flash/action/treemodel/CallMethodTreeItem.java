@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.swf4.Undefined;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;

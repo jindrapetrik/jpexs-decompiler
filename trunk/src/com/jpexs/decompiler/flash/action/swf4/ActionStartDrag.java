@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.swf4;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.StartDragTreeItem;
+import com.jpexs.decompiler.flash.ecma.*;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +44,7 @@ public class ActionStartDrag extends Action {
 
         boolean hasConstrains = true;
         if (constrain instanceof DirectValueTreeItem) {
-            if (Double.compare(constrain.toNumber(), 0) == 0) {
+            if (Double.compare(EcmaScript.toNumber(constrain.getResult()), 0) == 0) {
                 hasConstrains = false;
             }
         }

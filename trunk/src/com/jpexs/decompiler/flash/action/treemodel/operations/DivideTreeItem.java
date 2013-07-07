@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.operations;
 
+import com.jpexs.decompiler.flash.ecma.*;
 import com.jpexs.decompiler.flash.graph.BinaryOpItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -27,7 +28,10 @@ public class DivideTreeItem extends BinaryOpItem {
     }
 
     @Override
-    public double toNumber() {
-        return leftSide.toNumber() / rightSide.toNumber();
+    public Object getResult() {
+        if (Double.compare(EcmaScript.toNumber(rightSide.getResult()), 0) == 0) {
+            return Double.NaN;
+        }
+        return (EcmaScript.toNumber(leftSide.getResult())) / (EcmaScript.toNumber(rightSide.getResult()));
     }
 }

@@ -28,6 +28,8 @@ import com.jpexs.decompiler.flash.action.swf6.*;
 import com.jpexs.decompiler.flash.action.swf7.*;
 import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
 import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
@@ -658,7 +660,7 @@ public class SWFInputStream extends InputStream {
                             }
                         }
                     }
-                    boolean condition = stack.peek().toBoolean();
+                    boolean condition = EcmaScript.toBoolean(stack.peek().getResult());
                     if (debugMode) {
                         if (condition) {
                             System.err.println("JUMP");
@@ -945,7 +947,7 @@ public class SWFInputStream extends InputStream {
                             if (debugMode) {
                                 System.err.print("is compiletime -> ");
                             }
-                            if (top.toBoolean()) {
+                            if (EcmaScript.toBoolean(top.getResult())) {
                                 newip = rri.getPos() + aif.getJumpOffset();
                                 //rri.setPos(newip);
                                 if (((!enableVariables) || (!top.isVariableComputed())) && (!aif.ignoreUsed)) {
@@ -1156,7 +1158,11 @@ public class SWFInputStream extends InputStream {
 
         @Override
         public Tag call() throws Exception {
-            return SWFInputStream.resolveTag(tag, version, level, paralel);
+            try {
+                return SWFInputStream.resolveTag(tag, version, level, paralel);
+            } catch (Exception ex) {
+                return null;
+            }
         }
     }
 

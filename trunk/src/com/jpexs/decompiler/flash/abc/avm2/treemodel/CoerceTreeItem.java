@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
@@ -42,5 +44,29 @@ public class CoerceTreeItem extends TreeItem {
     @Override
     public GraphTargetItem getNotCoerced() {
         return value.getNotCoerced();
+    }
+
+    @Override
+    public boolean isCompileTime() {
+        return value.isCompileTime();
+    }
+
+    @Override
+    public Object getResult() {
+        Object ret = value.getResult();
+        switch (type) {
+            case "String":
+                if (ret instanceof Null) {
+                    return ret;
+                }
+                if (ret instanceof Undefined) {
+                    return new Null();
+                }
+                return ret.toString();
+            case "*":
+                break;
+        }
+        return ret;
+
     }
 }

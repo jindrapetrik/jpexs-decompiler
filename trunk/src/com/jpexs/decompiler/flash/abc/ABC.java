@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.EventListener;
+import com.jpexs.decompiler.flash.KeyValue;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCode;
@@ -31,7 +32,6 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.abc.usages.*;
-import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,16 +39,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -711,77 +703,45 @@ public class ABC {
         }
     }
 
-    public void export(String directory, boolean pcode, List<ABCContainerTag> abcList, boolean paralel) throws IOException {
-        export(directory, pcode, abcList, "", paralel);
-    }
-
-    private class ExportPackTask implements Callable<File> {
-
-        ScriptPack pack;
-        String directory;
-        List<ABCContainerTag> abcList;
-        boolean pcode;
-        String informStr;
-        ClassPath path;
-        AtomicInteger index;
-        int count;
-        boolean paralel;
-
-        public ExportPackTask(AtomicInteger index, int count, ClassPath path, ScriptPack pack, String directory, List<ABCContainerTag> abcList, boolean pcode, String informStr, boolean paralel) {
-            this.pack = pack;
-            this.directory = directory;
-            this.abcList = abcList;
-            this.pcode = pcode;
-            this.informStr = informStr;
-            this.path = path;
-            this.index = index;
-            this.count = count;
-            this.paralel = paralel;
-        }
-
-        @Override
-        public File call() throws Exception {
-            try {
-                return pack.export(directory, abcList, pcode, paralel);
-            } catch (IOException ex) {
-                Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            synchronized (ABC.class) {
-                informListeners("export", "Exported " + informStr + " script " + index.getAndIncrement() + "/" + count + " " + path);
-            }
-            return null;
-        }
-    }
-
-    public List<File> export(String directory, boolean pcode, List<ABCContainerTag> abcList, String abcStr, boolean paralel) throws IOException {
-        ExecutorService executor = Executors.newFixedThreadPool(20);
-        List<Future<File>> futureResults = new ArrayList<>();
-        AtomicInteger cnt = new AtomicInteger(1);
+    /*public void export(String directory, boolean pcode, List<ABCContainerTag> abcList, boolean paralel) throws IOException {
+     export(directory, pcode, abcList, "", paralel);
+     }*/
+    public List<KeyValue<ClassPath, ScriptPack>> getScriptPacks() {
+        List<KeyValue<ClassPath, ScriptPack>> ret = new ArrayList<>();
         for (int i = 0; i < script_info.length; i++) {
-            HashMap<ClassPath, ScriptPack> packs = script_info[i].getPacks(this, i);
-            for (Entry<ClassPath, ScriptPack> entry : packs.entrySet()) {
-                Future<File> future = executor.submit(new ExportPackTask(cnt, script_info.length, entry.getKey(), entry.getValue(), directory, abcList, pcode, abcStr, paralel));
-                futureResults.add(future);
-            }
-        }
-
-        List<File> ret = new ArrayList<>();
-        for (int f = 0; f < futureResults.size(); f++) {
-            try {
-                ret.add(futureResults.get(f).get());
-            } catch (InterruptedException | ExecutionException ex) {
-                Logger.getLogger(Traits.class.getName()).log(Level.SEVERE, "Error during ABC export", ex);
-            }
-        }
-
-        try {
-            executor.shutdown();
-            executor.awaitTermination(30, TimeUnit.MINUTES);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, "30 minutes ActionScript export limit reached", ex);
+            ret.addAll(script_info[i].getPacks(this, i));
         }
         return ret;
     }
+    /*public List<File> export(String directory, boolean pcode, List<ABCContainerTag> abcList, String abcStr, boolean paralel) throws IOException {
+     ExecutorService executor = Executors.newFixedThreadPool(20);
+     List<Future<File>> futureResults = new ArrayList<>();
+     AtomicInteger cnt = new AtomicInteger(1);
+     for (int i = 0; i < script_info.length; i++) {
+     HashMap<ClassPath, ScriptPack> packs = script_info[i].getPacks(this, i);
+     for (Entry<ClassPath, ScriptPack> entry : packs.entrySet()) {
+     Future<File> future = executor.submit(new ExportPackTask(cnt, script_info.length, entry.getKey(), entry.getValue(), directory, abcList, pcode, abcStr, paralel));
+     futureResults.add(future);
+     }
+     }
+
+     List<File> ret = new ArrayList<>();
+     for (int f = 0; f < futureResults.size(); f++) {
+     try {
+     ret.add(futureResults.get(f).get());
+     } catch (InterruptedException | ExecutionException ex) {
+     Logger.getLogger(Traits.class.getName()).log(Level.SEVERE, "Error during ABC export", ex);
+     }
+     }
+
+     try {
+     executor.shutdown();
+     executor.awaitTermination(30, TimeUnit.MINUTES);
+     } catch (InterruptedException ex) {
+     Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, "30 minutes ActionScript export limit reached", ex);
+     }
+     return ret;
+     }*/
 
     public void dump(OutputStream os) {
         PrintStream output;

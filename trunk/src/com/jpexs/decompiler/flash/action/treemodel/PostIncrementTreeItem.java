@@ -47,7 +47,7 @@ public class PostIncrementTreeItem extends TreeItem implements SetTypeTreeItem {
 
     @Override
     public GraphTargetItem getValue() {
-        return new AddTreeItem(null, object, new DirectValueTreeItem(null, 0, new Long(1), null));
+        return new AddTreeItem(null, object, new DirectValueTreeItem(null, 0, new Long(1), null), true);
     }
 
     @Override

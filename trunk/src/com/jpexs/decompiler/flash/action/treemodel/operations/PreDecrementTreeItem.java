@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.operations;
 
+import com.jpexs.decompiler.flash.ecma.*;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.graph.UnaryOpItem;
@@ -27,7 +28,7 @@ public class PreDecrementTreeItem extends UnaryOpItem {
     }
 
     @Override
-    public double toNumber() {
-        return value.toNumber() - 1;
+    public Object getResult() {
+        return EcmaScript.toNumber(value.getResult()) - 1;
     }
 }

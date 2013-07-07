@@ -16,18 +16,30 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.operations;
 
+import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.ecma.*;
 import com.jpexs.decompiler.flash.graph.BinaryOpItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
 public class AddTreeItem extends BinaryOpItem {
 
-    public AddTreeItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide) {
+    boolean version2;
+
+    public AddTreeItem(GraphSourceItem instruction, GraphTargetItem leftSide, GraphTargetItem rightSide, boolean version2) {
         super(instruction, PRECEDENCE_ADDITIVE, leftSide, rightSide, "+");
+        this.version2 = version2;
     }
 
     @Override
-    public double toNumber() {
-        return leftSide.toNumber() + rightSide.toNumber();
+    public Object getResult() {
+        if (version2) {
+            if (EcmaScript.type(leftSide.getResult()) == EcmaType.STRING || EcmaScript.type(rightSide.getResult()) == EcmaType.STRING) {
+                return leftSide.getResult().toString() + rightSide.getResult().toString();
+            }
+            return EcmaScript.toNumber(leftSide.getResult()) + EcmaScript.toNumber(rightSide.getResult());
+        } else {
+            return Action.toFloatPoint(leftSide.getResult()) + Action.toFloatPoint(rightSide.getResult());
+        }
     }
 }

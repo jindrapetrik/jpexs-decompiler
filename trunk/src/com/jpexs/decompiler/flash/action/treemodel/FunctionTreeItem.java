@@ -90,22 +90,11 @@ public class FunctionTreeItem extends TreeItem {
     }
 
     @Override
-    public boolean toBoolean() {
+    public Object getResult() {
         if (!actions.isEmpty()) {
             if (actions.get(actions.size() - 1) instanceof ReturnTreeItem) {
                 ReturnTreeItem r = (ReturnTreeItem) actions.get(actions.size() - 1);
-                return r.value.toBoolean();
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public double toNumber() {
-        if (!actions.isEmpty()) {
-            if (actions.get(actions.size() - 1) instanceof ReturnTreeItem) {
-                ReturnTreeItem r = (ReturnTreeItem) actions.get(actions.size() - 1);
-                return r.value.toNumber();
+                return r.value.getResult();
             }
         }
         return 0;

@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.treemodel.operations;
 
 import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.ecma.*;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.UnaryOpItem;
 
@@ -27,7 +28,7 @@ public class BitNotTreeItem extends UnaryOpItem {
     }
 
     @Override
-    public double toNumber() {
-        return ~((int) value.toNumber());
+    public Object getResult() {
+        return ~((long) (double) EcmaScript.toNumber(value.getResult()));
     }
 }

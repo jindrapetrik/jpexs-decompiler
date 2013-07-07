@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.treemodel.operations;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.graph.BinaryOpItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 
@@ -27,7 +28,10 @@ public class ModuloTreeItem extends BinaryOpItem {
     }
 
     @Override
-    public double toNumber() {
-        return ((int) leftSide.toNumber()) % ((int) rightSide.toNumber());
+    public Object getResult() {
+        if (Double.compare(EcmaScript.toNumber(rightSide.getResult()), 0) == 0) {
+            return Double.NaN;
+        }
+        return ((long) (double) EcmaScript.toNumber(leftSide.getResult())) % ((long) (double) EcmaScript.toNumber(rightSide.getResult()));
     }
 }

@@ -1,5 +1,7 @@
 package com.jpexs.decompiler.flash.graph;
 
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
+
 /**
  *
  * @author JPEXS
@@ -11,9 +13,20 @@ public class NotItem extends UnaryOpItem implements LogicalOpItem {
     }
 
     @Override
-    public boolean toBoolean() {
-        boolean ret = !value.toBoolean();
+    public Object getResult() {
+        Object ret = EcmaScript.toBoolean(value.getResult());
+        if (ret == Boolean.TRUE) {
+            return Boolean.FALSE;
+        }
+        if (ret == Boolean.FALSE) {
+            return Boolean.TRUE;
+        }
         return ret;
+    }
+
+    @Override
+    public boolean isCompileTime() {
+        return value.isCompileTime();
     }
 
     @Override

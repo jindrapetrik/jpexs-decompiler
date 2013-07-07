@@ -54,6 +54,9 @@ public abstract class GraphTargetItem {
         List<GraphSourceItemPos> ret = new ArrayList<>();
         ret.add(new GraphSourceItemPos(src, pos));
         ret.addAll(moreSrc);
+        if (value != null) {
+            ret.addAll(value.getNeededSources());
+        }
         return ret;
     }
 
@@ -111,12 +114,15 @@ public abstract class GraphTargetItem {
         return false;
     }
 
-    public double toNumber() {
-        return 0;
-    }
+    /*public double toNumber() {
+     return 0;
+     }
 
-    public boolean toBoolean() {
-        return Double.compare(toNumber(), 0.0) != 0;
+     public boolean toBoolean() {
+     return Double.compare(toNumber(), 0.0) != 0;
+     }*/
+    public Object getResult() {
+        return null;
     }
 
     public String toStringNoQuotes(List<Object> localData) {

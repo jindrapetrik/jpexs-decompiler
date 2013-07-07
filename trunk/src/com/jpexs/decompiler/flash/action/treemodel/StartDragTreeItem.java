@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.ecma.*;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.List;
@@ -45,7 +46,7 @@ public class StartDragTreeItem extends TreeItem {
     public String toString(ConstantPool constants) {
         boolean hasConstrains = true;
         if (constrain instanceof DirectValueTreeItem) {
-            if (Double.compare(constrain.toNumber(), 0) == 0) {
+            if (Double.compare(EcmaScript.toNumber(constrain.getResult()), 0) == 0) {
                 hasConstrains = false;
             }
         }

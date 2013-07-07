@@ -30,13 +30,8 @@ public class DuplicateItem extends GraphTargetItem {
     }
 
     @Override
-    public boolean toBoolean() {
-        return value.toBoolean();
-    }
-
-    @Override
-    public double toNumber() {
-        return value.toNumber();
+    public Object getResult() {
+        return value.getResult();
     }
 
     @Override

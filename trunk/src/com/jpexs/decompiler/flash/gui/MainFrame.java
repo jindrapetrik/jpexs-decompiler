@@ -526,7 +526,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         abcList = new ArrayList<>();
         getActionScript3(objs, abcList);
         if (!abcList.isEmpty()) {
-            abcPanel = new ABCPanel(abcList);
+            abcPanel = new ABCPanel(abcList, swf);
             detailPanel.add(abcPanel.tabbedPane, DETAILCARDAS3NAVIGATOR);
             menuTools.add(miGotoDocumentClass);
         } else {

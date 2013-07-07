@@ -17,6 +17,8 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.Configuration;
+import com.jpexs.decompiler.flash.KeyValue;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
@@ -42,7 +44,6 @@ import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -91,7 +92,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
             searchIgnoreCase = ignoreCase;
             searchRegexp = regexp;
             ClassesListTreeModel clModel = (ClassesListTreeModel) classTree.getModel();
-            HashMap<ClassPath, ScriptPack> allpacks = clModel.getList();
+            List<KeyValue<ClassPath, ScriptPack>> allpacks = clModel.getList();
             found = new ArrayList<>();
             Pattern pat = null;
             if (regexp) {
@@ -99,10 +100,10 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
             } else {
                 pat = Pattern.compile(Pattern.quote(txt), ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
             }
-            for (ScriptPack p : allpacks.values()) {
-                decompiledTextArea.cacheScriptPack(p, list);
-                if (pat.matcher(decompiledTextArea.getCachedText(p)).find()) {
-                    found.add(p);
+            for (KeyValue<ClassPath, ScriptPack> item : allpacks) {
+                decompiledTextArea.cacheScriptPack(item.value, list);
+                if (pat.matcher(decompiledTextArea.getCachedText(item.value)).find()) {
+                    found.add(item.value);
                 }
             }
 
@@ -238,7 +239,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
     }
 
     @SuppressWarnings("unchecked")
-    public ABCPanel(List<ABCContainerTag> list) {
+    public ABCPanel(List<ABCContainerTag> list, SWF swf) {
 
 
         DefaultSyntaxKit.initKit();
@@ -339,7 +340,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
 
         JPanel treePanel = new JPanel();
         treePanel.setLayout(new BorderLayout());
-        treePanel.add(new JScrollPane(classTree = new ClassesListTree(list, this)), BorderLayout.CENTER);
+        treePanel.add(new JScrollPane(classTree = new ClassesListTree(list, this, swf)), BorderLayout.CENTER);
         JPanel filterPanel = new JPanel();
         filterPanel.setLayout(new BorderLayout());
         filterPanel.add(filterField, BorderLayout.CENTER);
@@ -466,17 +467,13 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
 
     public void hilightScript(String name) {
         ClassesListTreeModel clModel = (ClassesListTreeModel) classTree.getModel();
-        HashMap<ClassPath, ScriptPack> list = clModel.getList();
-        ClassPath path = null;
-        for (ClassPath p : list.keySet()) {
-            if (p.toString().equals(name)) {
-                path = p;
+        ScriptPack pack = null;
+        for (KeyValue<ClassPath, ScriptPack> item : clModel.getList()) {
+            if (item.key.toString().equals(name)) {
+                pack = item.value;
+                break;
             }
         }
-        if (path == null) {
-            return;
-        }
-        ScriptPack pack = clModel.getList().get(path);
         if (pack != null) {
             hilightScript(pack);
         }

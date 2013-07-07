@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.EcmaType;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
@@ -40,5 +42,32 @@ public class TypeOfTreeItem extends TreeItem {
         List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
         ret.addAll(value.getNeededSources());
         return ret;
+    }
+
+    @Override
+    public Object getResult() {
+        Object res = value.getResult();
+        EcmaType type = EcmaScript.type(res);
+        switch (type) {
+            case STRING:
+                return "string";
+            case BOOLEAN:
+                return "boolean";
+            case NUMBER:
+                return "number";
+            case OBJECT:
+                return "object";
+            case UNDEFINED:
+                return "undefined";
+            case NULL:
+                return "null";
+        }
+        //TODO: function,movieclip
+        return "object";
+    }
+
+    @Override
+    public boolean isCompileTime() {
+        return value.isCompileTime();
     }
 }

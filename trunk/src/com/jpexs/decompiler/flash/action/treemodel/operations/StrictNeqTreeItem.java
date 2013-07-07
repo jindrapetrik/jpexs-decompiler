@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.operations;
 
+import com.jpexs.decompiler.flash.ecma.*;
 import com.jpexs.decompiler.flash.graph.BinaryOpItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -28,8 +29,11 @@ public class StrictNeqTreeItem extends BinaryOpItem implements LogicalOpItem {
     }
 
     @Override
-    public boolean toBoolean() {
-        return (leftSide.toBoolean() != rightSide.toBoolean()) && (leftSide.toNumber() != rightSide.toNumber());
+    public Object getResult() {
+        Object x = leftSide.getResult();
+        Object y = rightSide.getResult();
+        return EcmaScript.type(x) != EcmaScript.type(y)
+                || (!EcmaScript.equals(x, y));
     }
 
     @Override

@@ -17,9 +17,9 @@
 package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.swf4.Null;
 import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.EnumerateTreeItem;
+import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.ArrayList;
 import java.util.HashMap;
