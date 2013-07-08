@@ -107,7 +107,7 @@ public class ActionPanel extends JPanel implements ActionListener {
     private String searchFor;
     private boolean searchIgnoreCase;
     private boolean searchRegexp;
-    private Cache cache = new Cache(true);
+    private Cache cache = Cache.getInstance(true);
 
     public void clearCache() {
         cache.clear();

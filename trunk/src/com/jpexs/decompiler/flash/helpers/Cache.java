@@ -22,7 +22,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
@@ -35,12 +37,52 @@ import java.util.logging.Logger;
 public class Cache {
 
     private Map<Object, File> cacheFiles;
+    private Map<Object, Object> cacheMemory;
+    private static List<Cache> instances = new ArrayList<>();
+    public static final int STORAGE_FILES = 1;
+    public static final int STORAGE_MEMORY = 2;
 
-    public Cache(boolean weak) {
+    public static Cache getInstance(boolean weak) {
+        Cache instance = new Cache(weak);
+        instances.add(instance);
+        return instance;
+    }
+    private static int storageType = STORAGE_FILES;
+
+    public static void clearAll() {
+        for (Cache c : instances) {
+            c.clear();
+        }
+    }
+
+    public static void setStorageType(int storageType) {
+        if (storageType == Cache.storageType) {
+            return;
+        }
+        switch (storageType) {
+            case STORAGE_FILES:
+            case STORAGE_MEMORY:
+                break;
+            default:
+                throw new IllegalArgumentException("storageType must be one of STORAGE_FILES or STORAGE_MEMORY");
+        }
+        if (storageType != Cache.storageType) {
+            clearAll();
+        }
+        Cache.storageType = storageType;
+    }
+
+    public static int getStorageType() {
+        return storageType;
+    }
+
+    private Cache(boolean weak) {
         if (weak) {
             cacheFiles = new WeakHashMap<>();
+            cacheMemory = new WeakHashMap<>();
         } else {
             cacheFiles = new HashMap<>();
+            cacheMemory = new HashMap<>();
         }
     }
 
@@ -49,6 +91,7 @@ public class Cache {
     }
 
     public void clear() {
+        cacheMemory.clear();
         for (File f : cacheFiles.values()) {
             f.delete();
         }
@@ -56,43 +99,67 @@ public class Cache {
     }
 
     public void remove(Object key) {
-        if (cacheFiles.containsKey(key)) {
-            File f = cacheFiles.get(key);
-            f.delete();
-            cacheFiles.remove(key);
+        if (storageType == STORAGE_FILES) {
+            if (cacheFiles.containsKey(key)) {
+                File f = cacheFiles.get(key);
+                f.delete();
+                cacheFiles.remove(key);
+            }
+        } else if (storageType == STORAGE_MEMORY) {
+            if (cacheMemory.containsKey(key)) {
+                cacheMemory.remove(key);
+            }
         }
+
     }
 
     public Object get(Object key) {
-        if (!cacheFiles.containsKey(key)) {
+        if (storageType == STORAGE_FILES) {
+            if (!cacheFiles.containsKey(key)) {
+                return null;
+            }
+            File f = cacheFiles.get(key);
+            try (FileInputStream fis = new FileInputStream(f)) {
+                ObjectInputStream ois = new ObjectInputStream(fis);
+                return ois.readObject();
+            } catch (IOException | ClassNotFoundException ex) {
+                Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
+            }
             return null;
-        }
-        File f = cacheFiles.get(key);
-        try (FileInputStream fis = new FileInputStream(f)) {
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            return ois.readObject();
-        } catch (IOException | ClassNotFoundException ex) {
-            Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
+        } else if (storageType == STORAGE_MEMORY) {
+            if (!cacheMemory.containsKey(key)) {
+                return cacheMemory.get(key);
+            }
+            return null;
         }
         return null;
     }
 
     public void put(Object key, Object value) {
-        File temp = null;
-        try {
-            temp = File.createTempFile("ffdec_cache", ".tmp");
-        } catch (IOException ex) {
-            Logger.getLogger(Cache.class.getName()).log(Level.SEVERE, null, ex);
-            return;
-        }
-        temp.deleteOnExit();
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(temp))) {
-            oos.writeObject(value);
-            oos.flush();
+        if (storageType == STORAGE_FILES) {
+            File temp = null;
+            try {
+                temp = File.createTempFile("ffdec_cache", ".tmp");
+            } catch (IOException ex) {
+                Logger.getLogger(Cache.class
+                        .getName()).log(Level.SEVERE, null, ex);
 
-            cacheFiles.put(key, temp);
-        } catch (IOException ex) {
-            Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
+                return;
+            }
+            temp.deleteOnExit();
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(temp))) {
+                oos.writeObject(value);
+                oos.flush();
+
+                cacheFiles.put(key, temp);
+
+
+            } catch (IOException ex) {
+                Logger.getLogger(Helper.class
+                        .getName()).log(Level.SEVERE, null, ex);
+            }
+        } else if (storageType == STORAGE_MEMORY) {
+            cacheMemory.put(key, value);
         }
     }
 }

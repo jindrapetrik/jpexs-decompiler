@@ -50,7 +50,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     private ABCPanel abcPanel;
     private int classIndex = -1;
     private boolean isStatic = false;
-    private Cache cache = new Cache(true);
+    private Cache cache = Cache.getInstance(true);
 
     public ScriptPack getScriptLeaf() {
         return script;
@@ -254,6 +254,9 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     }
 
     private CachedDecompilation getCached(ScriptPack pack) {
+        if (!cache.contains(pack)) {
+            cacheScriptPack(pack, abcList);
+        }
         return (CachedDecompilation) cache.get(pack);
     }
 

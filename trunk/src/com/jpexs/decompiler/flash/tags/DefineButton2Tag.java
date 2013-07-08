@@ -201,7 +201,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
         }
         return needed;
     }
-    private static Cache rectCache = new Cache(true);
+    private static Cache rectCache = Cache.getInstance(true);
 
     @Override
     public RECT getRect(HashMap<Integer, CharacterTag> allCharacters, Stack<Integer> visited) {

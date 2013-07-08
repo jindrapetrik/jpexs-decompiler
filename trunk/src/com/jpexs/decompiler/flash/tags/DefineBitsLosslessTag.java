@@ -72,7 +72,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
                 bitmapData.bitmapPixelDataPix24[pos] = new PIX24();
                 bitmapData.bitmapPixelDataPix24[pos].red = r;
                 bitmapData.bitmapPixelDataPix24[pos].green = g;
-                bitmapData.bitmapPixelDataPix24[pos].blue = b;    
+                bitmapData.bitmapPixelDataPix24[pos].blue = b;
                 bitmapData.bitmapPixelDataPix24[pos].reserved = 0xff; //documentation says 0, but image is sometimes broken with 0, so there is 0xff, which works (maybe alpha?)
                 pos++;
             }
@@ -86,7 +86,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
         zlibBitmapData = zlibOS.toByteArray();
         decompressed = false;
     }
-    
+
     @Override
     public BufferedImage getImage(List<Tag> tags) {
         BufferedImage bi = new BufferedImage(bitmapWidth, bitmapHeight, BufferedImage.TYPE_INT_RGB);
@@ -168,8 +168,8 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
             bitmapColorTableSize = sis.readUI8();
         }
         zlibBitmapData = sis.readBytes(sis.available());
-       }
-       
+    }
+
     /**
      * Gets data bytes
      *

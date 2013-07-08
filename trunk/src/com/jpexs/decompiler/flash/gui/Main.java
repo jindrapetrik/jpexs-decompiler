@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinReg;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinUser;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
+import com.jpexs.decompiler.flash.helpers.Cache;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.sun.jna.Platform;
 import com.sun.jna.WString;
@@ -466,6 +467,12 @@ public class Main {
         loadProperties();
         View.setLookAndFeel();
         Configuration.loadFromFile(getConfigFile(), getReplacementsFile());
+
+        if ((Boolean) Configuration.getConfig("cacheOnDisk", Boolean.TRUE)) {
+            Cache.setStorageType(Cache.STORAGE_FILES);
+        } else {
+            Cache.setStorageType(Cache.STORAGE_MEMORY);
+        }
 
         int pos = 0;
         if (args.length > 0) {

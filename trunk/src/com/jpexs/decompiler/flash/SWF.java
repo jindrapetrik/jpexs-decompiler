@@ -2013,7 +2013,7 @@ public class SWF {
                 mat.getRotateSkew1Float(), mat.getScaleYFloat(),
                 mat.translateX, mat.translateY);
     }
-    private static Cache cache = new Cache(false);
+    private static Cache cache = Cache.getInstance(false);
 
     public void clearImageCache() {
         cache.clear();

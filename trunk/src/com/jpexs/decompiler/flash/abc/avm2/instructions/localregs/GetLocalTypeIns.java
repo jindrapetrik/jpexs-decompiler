@@ -39,7 +39,7 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
         GraphTargetItem computedValue = localRegs.get(getRegisterId(ins));
         if (computedValue == null) {
             if (!localRegNames.containsKey(getRegisterId(ins))) {
-                computedValue = new UndefinedTreeItem(null);
+                computedValue = new UndefinedTreeItem(null); //In some obfuscated code there seems to be reading of undefined registers
             }
         }
         stack.push(new LocalRegTreeItem(ins, getRegisterId(ins), computedValue));

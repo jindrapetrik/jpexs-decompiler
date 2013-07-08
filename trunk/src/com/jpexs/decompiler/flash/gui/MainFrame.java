@@ -35,6 +35,7 @@ import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.abc.TreeElement;
 import com.jpexs.decompiler.flash.gui.action.ActionPanel;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
+import com.jpexs.decompiler.flash.helpers.Cache;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
@@ -224,6 +225,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
     private JCheckBoxMenuItem miParallelSpeedUp;
     private JCheckBoxMenuItem miAssociate;
     private JCheckBoxMenuItem miDecompile;
+    private JCheckBoxMenuItem miCacheDisk;
 
     public void setPercent(int percent) {
         progressBar.setValue(percent);
@@ -482,11 +484,18 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         miDecompile.setActionCommand("DISABLEDECOMPILATION");
         miDecompile.addActionListener(this);
 
+
+        miCacheDisk = new JCheckBoxMenuItem(translate("menu.settings.cacheOnDisk"));
+        miCacheDisk.setSelected((Boolean) Configuration.getConfig("cacheOnDisk", Boolean.TRUE));
+        miCacheDisk.setActionCommand("CACHEONDISK");
+        miCacheDisk.addActionListener(this);
+
         JMenu menuSettings = new JMenu(translate("menu.settings"));
         menuSettings.add(autoDeobfuscateMenuItem);
         menuSettings.add(miInternalViewer);
         menuSettings.add(miParallelSpeedUp);
         menuSettings.add(miDecompile);
+        menuSettings.add(miCacheDisk);
 
 
         miAssociate = new JCheckBoxMenuItem(translate("menu.settings.addtocontextmenu"));
@@ -1566,6 +1575,14 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
+            case "CACHEONDISK":
+                Configuration.setConfig("cacheOnDisk", miCacheDisk.isSelected());
+                if (miCacheDisk.isSelected()) {
+                    Cache.setStorageType(Cache.STORAGE_FILES);
+                } else {
+                    Cache.setStorageType(Cache.STORAGE_MEMORY);
+                }
+                break;
             case "SETLANGUAGE":
                 String newLanguage = new SelectLanguageDialog().display();
                 if (newLanguage != null) {

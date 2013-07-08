@@ -1445,7 +1445,7 @@ public class AVM2Code implements Serializable {
         localData.add(abc.method_info);
         localData.add(body);
         localData.add(abc);
-        localData.add(new HashMap<Integer, String>()); //localRegNames
+        localData.add(body.getLocalRegNames(abc)); //localRegNames
         localData.add(new ArrayList<String>());  //fullyQualifiedNames
         localData.add(new ArrayList<ABCException>());
         localData.add(new ArrayList<Integer>());
