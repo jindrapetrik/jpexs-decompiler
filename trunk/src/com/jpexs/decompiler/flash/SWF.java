@@ -2202,7 +2202,11 @@ public class SWF {
         for (int i = startFrame; i <= stopFrame; i++) {
             String key = "frame_" + i + "_" + containerId;
             if (cache.contains(key)) {
-                ret.add(((CachedImage) cache.get(key)).getImage());
+                CachedImage g = (CachedImage) cache.get(key);
+                if (g == null) {
+                    break;
+                }
+                ret.add(g.getImage());
                 startFrame++;
             } else {
                 break;
