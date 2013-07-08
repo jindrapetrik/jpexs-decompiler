@@ -2241,12 +2241,14 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
             List<Tag> controlTags = swf.tags;
             int containerId = 0;
             RECT rect = swf.displayRect;
+            int totalFrameCount = swf.frameCount;
             if (fn.getParent() instanceof DefineSpriteTag) {
                 controlTags = ((DefineSpriteTag) fn.getParent()).subTags;
                 containerId = ((DefineSpriteTag) fn.getParent()).spriteId;
                 rect = ((DefineSpriteTag) fn.getParent()).getRect(characters, new Stack<Integer>());
+                totalFrameCount = ((DefineSpriteTag) fn.getParent()).frameCount;
             }
-            previewImagePanel.setImage(SWF.frameToImage(containerId, ((FrameNode) tagObj).getFrame() - 1, swf.tags, controlTags, rect, swf.frameCount, new Stack<Integer>()));
+            previewImagePanel.setImage(SWF.frameToImage(containerId, ((FrameNode) tagObj).getFrame() - 1, swf.tags, controlTags, rect, totalFrameCount, new Stack<Integer>()));
         } else if (((tagObj instanceof FrameNode) && ((FrameNode) tagObj).isDisplayed()) || ((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag)) {
             try {
 
@@ -2292,7 +2294,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                                 break;
                             }
                             Tag t = (Tag) o;
-                            Set<Integer> needed = t.getDeepNeededCharacters(characters,new ArrayList<Integer>());
+                            Set<Integer> needed = t.getDeepNeededCharacters(characters, new ArrayList<Integer>());
                             for (int n : needed) {
                                 if (!doneCharacters.contains(n)) {
                                     sos2.writeTag(characters.get(n));
@@ -2336,7 +2338,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                             }
                         } else if (tagObj instanceof AloneTag) {
                         } else {
-                            Set<Integer> needed = ((Tag) tagObj).getDeepNeededCharacters(characters,new ArrayList<Integer>());
+                            Set<Integer> needed = ((Tag) tagObj).getDeepNeededCharacters(characters, new ArrayList<Integer>());
                             for (int n : needed) {
                                 sos2.writeTag(characters.get(n));
                             }

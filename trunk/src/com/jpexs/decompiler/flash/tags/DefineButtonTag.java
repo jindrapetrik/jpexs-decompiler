@@ -286,8 +286,8 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
 
     @Override
     public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
-        RECT r=getRect(characters, visited);
-        return new Point(r.Xmin/20, r.Ymin/20);
+        RECT r = getRect(characters, visited);
+        return new Point(r.Xmin / 20, r.Ymin / 20);
     }
 
     @Override

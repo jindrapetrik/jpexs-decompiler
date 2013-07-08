@@ -110,7 +110,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
         if (visited.contains(spriteId)) {
             return new RECT();
         }
-        visited.push(spriteId);        
+        visited.push(spriteId);
         RECT emptyRet = new RECT();
         RECT ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
         HashMap<Integer, Integer> depthMap = new HashMap<>();

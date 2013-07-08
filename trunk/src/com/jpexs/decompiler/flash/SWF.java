@@ -331,7 +331,7 @@ public class SWF {
         findFileAttributes();
     }
 
-    private void findFileAttributes(){
+    private void findFileAttributes() {
         for (Tag t : tags) {
             if (t instanceof FileAttributesTag) {
                 fileAttributes = (FileAttributesTag) t;
@@ -339,7 +339,7 @@ public class SWF {
             }
         }
     }
-    
+
     private void assignExportNamesToSymbols() {
         HashMap<Integer, String> exportNames = new HashMap<>();
         for (Tag t : tags) {
@@ -2100,7 +2100,7 @@ public class SWF {
             g.setTransform(trans);
             if (character instanceof DrawableTag) {
                 DrawableTag drawable = (DrawableTag) character;
-                BufferedImage img = drawable.toImage(layer.ratio < 0 ? 0 : layer.ratio/*layer.duration*/, allTags, displayRect, characters, visited);                                
+                BufferedImage img = drawable.toImage(layer.ratio < 0 ? 0 : layer.ratio/*layer.duration*/, allTags, displayRect, characters, visited);
                 if (layer.filters != null) {
                     for (FILTER filter : layer.filters) {
                         img = filter.apply(img);
@@ -2114,62 +2114,54 @@ public class SWF {
                     img = layer.colorTransFormAlpha.apply(img);
                 }
                 Point imgPos = drawable.getImagePos(layer.ratio < 0 ? 0 : layer.ratio, characters, visited);
-                //imgPos.x+=fixX;
-                //imgPos.y+=fixY;
-                /*if (imgPos.x < 0) {
-                 imgPos.x = 0;
-                 }
-                 if (imgPos.y < 0) {
-                 imgPos.y = 0;
-                 }*/
-                /*switch (layer.blendMode) {
-                 case 0:
-                 case 1:
-                 g.setComposite(AlphaComposite.SrcOver);
-                 break;
-                 case 2: //TODO:Layer
-                 g.setComposite(AlphaComposite.SrcOver);
-                 break;
-                 case 3:
-                 g.setComposite(BlendComposite.Multiply);
-                 break;
-                 case 4:
-                 g.setComposite(BlendComposite.Screen);
-                 break;
-                 case 5:
-                 g.setComposite(BlendComposite.Lighten);
-                 break;
-                 case 6:
-                 g.setComposite(BlendComposite.Darken);
-                 break;
-                 case 7:
-                 g.setComposite(BlendComposite.Difference);
-                 break;
-                 case 8:
-                 g.setComposite(BlendComposite.Add);
-                 break;
-                 case 9:
-                 g.setComposite(BlendComposite.Subtract);
-                 break;
-                 case 10:
-                 g.setComposite(BlendComposite.Invert);
-                 break;
-                 case 11:
-                 g.setComposite(BlendComposite.Alpha);
-                 break;
-                 case 12:
-                 g.setComposite(BlendComposite.Erase);
-                 break;
-                 case 13:
-                 g.setComposite(BlendComposite.Overlay);
-                 break;
-                 case 14:
-                 g.setComposite(BlendComposite.HardLight);
-                 break;
-                 default: //Not implemented
-                 g.setComposite(AlphaComposite.SrcOver);
-                 break;
-                 }*/
+                switch (layer.blendMode) {
+                    case 0:
+                    case 1:
+                        g.setComposite(AlphaComposite.SrcOver);
+                        break;
+                    case 2: //TODO:Layer
+                        g.setComposite(AlphaComposite.SrcOver);
+                        break;
+                    case 3:
+                        g.setComposite(BlendComposite.Multiply);
+                        break;
+                    case 4:
+                        g.setComposite(BlendComposite.Screen);
+                        break;
+                    case 5:
+                        g.setComposite(BlendComposite.Lighten);
+                        break;
+                    case 6:
+                        g.setComposite(BlendComposite.Darken);
+                        break;
+                    case 7:
+                        g.setComposite(BlendComposite.Difference);
+                        break;
+                    case 8:
+                        g.setComposite(BlendComposite.Add);
+                        break;
+                    case 9:
+                        g.setComposite(BlendComposite.Subtract);
+                        break;
+                    case 10:
+                        g.setComposite(BlendComposite.Invert);
+                        break;
+                    case 11:
+                        g.setComposite(BlendComposite.Alpha);
+                        break;
+                    case 12:
+                        g.setComposite(BlendComposite.Erase);
+                        break;
+                    case 13:
+                        g.setComposite(BlendComposite.Overlay);
+                        break;
+                    case 14:
+                        g.setComposite(BlendComposite.HardLight);
+                        break;
+                    default: //Not implemented
+                        g.setComposite(AlphaComposite.SrcOver);
+                        break;
+                }
 
                 g.drawImage(img, imgPos.x, imgPos.y, null);
             } else if (character instanceof BoundedTag) {
@@ -2188,6 +2180,12 @@ public class SWF {
         /*g.setPaint(Color.yellow);
          g.draw(new Rectangle(ret.getWidth()-1,ret.getHeight()-1));*/
         cache.put(key, new CachedImage(ret));
+
+        /*try {
+         ImageIO.write(ret, "png", new File("tst_id_" + containerId + "_time_" + System.currentTimeMillis() + ".png"));
+         } catch (IOException ex) {
+         Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, null, ex);
+         }*/
         return ret;
     }
 
@@ -2217,11 +2215,11 @@ public class SWF {
             return;
         }
 
-        while (startFrame > totalFrameCount) {
+        while (startFrame >= totalFrameCount) {
             startFrame -= totalFrameCount;
         }
 
-        while (stopFrame > totalFrameCount) {
+        while (stopFrame >= totalFrameCount) {
             stopFrame -= totalFrameCount;
         }
 
