@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import java.awt.BorderLayout;
 import java.awt.Image;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
 import java.util.Timer;

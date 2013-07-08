@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
