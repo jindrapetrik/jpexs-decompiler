@@ -207,6 +207,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
     private List<ABCContainerTag> abcList;
     JSplitPane splitPane1;
     JSplitPane splitPane2;
+    private boolean splitsInited = false;
     private JPanel detailPanel;
     private JTextField filterField = new JTextField("");
     private JPanel searchPanel;
@@ -920,12 +921,14 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
 
 
         cnt.add(splitPane1, BorderLayout.CENTER);
-        splitPane1.setDividerLocation(0.5);
+        //splitPane1.setDividerLocation(0.5);
 
         splitPane1.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent pce) {
-                Configuration.setConfig("gui.splitPane1.dividerLocation", pce.getNewValue());
+                if (splitsInited) {
+                    Configuration.setConfig("gui.splitPane1.dividerLocation", pce.getNewValue());
+                }
             }
         });
 
@@ -996,14 +999,22 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                 actionPanel.initSplits();
             }
 
-            splitPane1.setDividerLocation((Integer) Configuration.getConfig("gui.splitPane1.dividerLocation", getWidth() / 3));
-            int confDivLoc = (Integer) Configuration.getConfig("gui.splitPane2.dividerLocation", splitPane2.getHeight() * 3 / 5);
-            if (confDivLoc > splitPane2.getHeight() - 10) { //In older releases, divider location was saved when detailPanel was invisible too
-                confDivLoc = splitPane2.getHeight() * 3 / 5;
-            }
-            splitPane2.setDividerLocation(confDivLoc);
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    splitPane1.setDividerLocation((Integer) Configuration.getConfig("gui.splitPane1.dividerLocation", getWidth() / 3));
+                    int confDivLoc = (Integer) Configuration.getConfig("gui.splitPane2.dividerLocation", splitPane2.getHeight() * 3 / 5);
+                    if (confDivLoc > splitPane2.getHeight() - 10) { //In older releases, divider location was saved when detailPanel was invisible too
+                        confDivLoc = splitPane2.getHeight() * 3 / 5;
+                    }
+                    splitPane2.setDividerLocation(confDivLoc);
 
-            splitPos = splitPane2.getDividerLocation();
+                    splitPos = splitPane2.getDividerLocation();
+                    splitsInited = true;
+                }
+            });
+
+
         }
     }
 
