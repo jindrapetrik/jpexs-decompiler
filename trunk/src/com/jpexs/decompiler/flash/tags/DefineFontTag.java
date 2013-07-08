@@ -158,7 +158,7 @@ public class DefineFontTag extends CharacterTag implements FontTag {
     }
 
     @Override
-    public int getCharacterID() {
+    public int getCharacterId() {
         return fontId;
     }
 

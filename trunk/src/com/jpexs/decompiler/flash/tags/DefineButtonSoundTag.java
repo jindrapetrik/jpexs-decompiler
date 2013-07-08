@@ -44,7 +44,7 @@ public class DefineButtonSoundTag extends CharacterTag {
     public static final int ID = 17;
 
     @Override
-    public int getCharacterID() {
+    public int getCharacterId() {
         return buttonId;
     }
 

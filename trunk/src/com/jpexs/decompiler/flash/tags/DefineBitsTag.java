@@ -103,7 +103,7 @@ public class DefineBitsTag extends ImageTag {
     }
 
     @Override
-    public int getCharacterID() {
+    public int getCharacterId() {
         return characterID;
     }
 

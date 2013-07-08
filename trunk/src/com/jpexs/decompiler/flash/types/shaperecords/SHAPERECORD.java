@@ -165,7 +165,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                     for (Tag t : tags) {
                         if (t instanceof ImageTag) {
                             ImageTag i = (ImageTag) t;
-                            if (i.getCharacterID() == fillStyle0.bitmapId) {
+                            if (i.getCharacterId() == fillStyle0.bitmapId) {
                                 image = i;
                                 break;
                             }

@@ -376,7 +376,7 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, 
     }
 
     @Override
-    public int getCharacterID() {
+    public int getCharacterId() {
         return characterID;
     }
 

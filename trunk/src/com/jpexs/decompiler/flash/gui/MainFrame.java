@@ -76,12 +76,14 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
+import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
@@ -130,7 +132,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.Stack;
@@ -658,11 +662,16 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                 });
             }
         });
-        final JPopupMenu spritePopupMenu = new JPopupMenu();
-        JMenuItem removeMenuItem = new JMenuItem(translate("contextmenu.remove"));
+        final JPopupMenu contextPopupMenu = new JPopupMenu();
+        final JMenuItem removeMenuItem = new JMenuItem(translate("contextmenu.remove"));
         removeMenuItem.addActionListener(this);
         removeMenuItem.setActionCommand("REMOVEITEM");
-        spritePopupMenu.add(removeMenuItem);
+        JMenuItem exportSelectionMenuItem = new JMenuItem(translate("menu.file.export.selection"));
+        exportSelectionMenuItem.setActionCommand("EXPORTSEL");
+        exportSelectionMenuItem.addActionListener(this);
+        contextPopupMenu.add(exportSelectionMenuItem);
+
+        contextPopupMenu.add(removeMenuItem);
         tagTree.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -678,9 +687,8 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                     if (tagObj instanceof TagNode) {
                         tagObj = ((TagNode) tagObj).tag;
                     }
-                    if (tagObj instanceof DefineSpriteTag) {
-                        spritePopupMenu.show(e.getComponent(), e.getX(), e.getY());
-                    }
+                    removeMenuItem.setVisible(tagObj instanceof Tag);
+                    contextPopupMenu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
         });
@@ -1037,7 +1045,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
     private void parseCharacters(List<Object> list) {
         for (Object t : list) {
             if (t instanceof CharacterTag) {
-                characters.put(((CharacterTag) t).getCharacterID(), (CharacterTag) t);
+                characters.put(((CharacterTag) t).getCharacterId(), (CharacterTag) t);
             }
             if (t instanceof Container) {
                 parseCharacters(((Container) t).getSubItems());
@@ -1762,33 +1770,12 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                 if (tagObj instanceof TagNode) {
                     tagObj = ((TagNode) tagObj).tag;
                 }
-                if (tagObj instanceof DefineSpriteTag) {
-                    DefineSpriteTag sprite = (DefineSpriteTag) tagObj;
-                    for (int i = 0; i < swf.tags.size(); i++) {
-                        Tag t = swf.tags.get(i);
-                        if (t == sprite) {
-                            swf.tags.remove(i);
-                            i--;
-                        } else if (t instanceof DefineSpriteTag) {
-                            DefineSpriteTag st = (DefineSpriteTag) t;
-                            for (int j = 0; j < st.subTags.size(); j++) {
-                                Tag t2 = st.subTags.get(j);
-                                Set<Integer> needed = t2.getNeededCharacters();
-                                if (needed.contains(sprite.spriteId)) {
-                                    st.subTags.remove(j);
-                                    j--;
-                                }
-                            }
-                        } else {
-                            Set<Integer> needed = t.getNeededCharacters();
-                            if (needed.contains(sprite.spriteId)) {
-                                swf.tags.remove(i);
-                                i--;
-                            }
-                        }
+                if (tagObj instanceof Tag) {
+                    if (JOptionPane.showConfirmDialog(this, translate("message.confirm.remove").replace("%item%", tagObj.toString()), translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                        swf.removeTag((Tag) tagObj);
+                        showCard(CARDEMPTYPANEL);
+                        refreshTree();
                     }
-                    showCard(CARDEMPTYPANEL);
-                    refreshTree();
                 }
                 break;
             case "EDITTEXT":
@@ -2346,7 +2333,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                                 }
                             }
                             if (t instanceof CharacterTag) {
-                                doneCharacters.add(((CharacterTag) t).getCharacterID());
+                                doneCharacters.add(((CharacterTag) t).getCharacterId());
                             }
                             sos2.writeTag(t);
 
@@ -2392,7 +2379,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
 
                         int chtId = 0;
                         if (tagObj instanceof CharacterTag) {
-                            chtId = ((CharacterTag) tagObj).getCharacterID();
+                            chtId = ((CharacterTag) tagObj).getCharacterId();
                         }
 
                         MATRIX mat = new MATRIX();

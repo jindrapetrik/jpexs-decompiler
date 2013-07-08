@@ -74,7 +74,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
     public static final int ID = 34;
 
     @Override
-    public int getCharacterID() {
+    public int getCharacterId() {
         return buttonId;
     }
 
@@ -216,7 +216,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
         for (BUTTONRECORD r : characters) {
             CharacterTag ch = allCharacters.get(r.characterId);
             if (ch instanceof BoundedTag) {
-                if (visited.contains(ch.getCharacterID())) {
+                if (visited.contains(ch.getCharacterId())) {
                     continue;
                 }
                 RECT r2 = ((BoundedTag) ch).getRect(allCharacters, visited);

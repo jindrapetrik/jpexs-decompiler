@@ -388,7 +388,7 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextT
     }
 
     @Override
-    public int getCharacterID() {
+    public int getCharacterId() {
         return characterID;
     }
 

@@ -46,7 +46,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
     public static final int ID = 90;
 
     @Override
-    public int getCharacterID() {
+    public int getCharacterId() {
         return characterID;
     }
 

@@ -149,7 +149,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
     }
 
     @Override
-    public int getCharacterID() {
+    public int getCharacterId() {
         return spriteId;
     }
     List<DisassemblyListener> listeners = new ArrayList<>();

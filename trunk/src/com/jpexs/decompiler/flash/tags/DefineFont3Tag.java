@@ -249,7 +249,7 @@ public class DefineFont3Tag extends CharacterTag implements FontTag {
     }
 
     @Override
-    public int getCharacterID() {
+    public int getCharacterId() {
         return fontId;
     }
 

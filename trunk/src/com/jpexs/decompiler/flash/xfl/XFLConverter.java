@@ -290,7 +290,7 @@ public class XFLConverter {
                 CharacterTag bitmapCh = characters.get(fs.bitmapId);
                 if (bitmapCh instanceof ImageTag) {
                     ImageTag it = (ImageTag) bitmapCh;
-                    ret += "bitmap" + bitmapCh.getCharacterID() + "." + it.getImageFormat();
+                    ret += "bitmap" + bitmapCh.getCharacterId() + "." + it.getImageFormat();
                 }
                 ret += "\"";
 
@@ -828,8 +828,8 @@ public class XFLConverter {
         for (Tag t : tags) {
             if (t instanceof CharacterTag) {
                 CharacterTag ct = (CharacterTag) t;
-                if (ct.getCharacterID() > maxId) {
-                    maxId = ct.getCharacterID();
+                if (ct.getCharacterId() > maxId) {
+                    maxId = ct.getCharacterId();
                 }
             }
         }
@@ -840,7 +840,7 @@ public class XFLConverter {
             }
             if (t instanceof CharacterTag) {
                 CharacterTag ct = (CharacterTag) t;
-                ret.put(ct.getCharacterID(), ct);
+                ret.put(ct.getCharacterId(), ct);
             }
         }
         return ret;
@@ -1034,7 +1034,7 @@ public class XFLConverter {
             }
         }
 
-        ret += "<DOMSymbolInstance libraryItemName=\"" + "Symbol " + tag.getCharacterID() + "\"";
+        ret += "<DOMSymbolInstance libraryItemName=\"" + "Symbol " + tag.getCharacterId() + "\"";
         if (name != null) {
             ret += " name=\"" + xmlString(name) + "\"";
         }
@@ -1157,13 +1157,13 @@ public class XFLConverter {
         List<String> symbols = new ArrayList<>();
         for (int ch : characters.keySet()) {
             CharacterTag symbol = characters.get(ch);
-            if ((symbol instanceof ShapeTag) && oneInstanceShapes.contains(symbol.getCharacterID())) {
+            if ((symbol instanceof ShapeTag) && oneInstanceShapes.contains(symbol.getCharacterId())) {
                 continue; //shapes with 1 ocurrence are not added to library
             }
             if ((symbol instanceof ShapeTag) || (symbol instanceof DefineSpriteTag) || (symbol instanceof ButtonTag)) {
                 String symbolStr = "";
 
-                symbolStr += "<DOMSymbolItem xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://ns.adobe.com/xfl/2008/\" name=\"Symbol " + symbol.getCharacterID() + "\" lastModified=\"" + getTimestamp() + "\""; //TODO:itemID
+                symbolStr += "<DOMSymbolItem xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://ns.adobe.com/xfl/2008/\" name=\"Symbol " + symbol.getCharacterId() + "\" lastModified=\"" + getTimestamp() + "\""; //TODO:itemID
                 if (symbol instanceof ShapeTag) {
                     symbolStr += " symbolType=\"graphic\"";
                 } else if (symbol instanceof ButtonTag) {
@@ -1173,13 +1173,13 @@ public class XFLConverter {
                     }
                 }
                 boolean linkageExportForAS = false;
-                if (characterClasses.containsKey(symbol.getCharacterID())) {
+                if (characterClasses.containsKey(symbol.getCharacterId())) {
                     linkageExportForAS = true;
-                    symbolStr += " linkageClassName=\"" + xmlString(characterClasses.get(symbol.getCharacterID())) + "\"";
+                    symbolStr += " linkageClassName=\"" + xmlString(characterClasses.get(symbol.getCharacterId())) + "\"";
                 }
-                if (characterVariables.containsKey(symbol.getCharacterID())) {
+                if (characterVariables.containsKey(symbol.getCharacterId())) {
                     linkageExportForAS = true;
-                    symbolStr += " linkageIdentifier=\"" + xmlString(characterVariables.get(symbol.getCharacterID())) + "\"";
+                    symbolStr += " linkageIdentifier=\"" + xmlString(characterVariables.get(symbol.getCharacterId())) + "\"";
                 }
                 if (linkageExportForAS) {
                     symbolStr += " linkageExportForAS=\"true\"";
@@ -1189,7 +1189,7 @@ public class XFLConverter {
                 String itemIcon = null;
                 if (symbol instanceof ButtonTag) {
                     itemIcon = "0";
-                    symbolStr += "<DOMTimeline name=\"Symbol " + symbol.getCharacterID() + "\" currentFrame=\"0\">";
+                    symbolStr += "<DOMTimeline name=\"Symbol " + symbol.getCharacterId() + "\" currentFrame=\"0\">";
                     symbolStr += "<layers>";
 
                     ButtonTag button = (ButtonTag) symbol;
@@ -1289,11 +1289,11 @@ public class XFLConverter {
                     if (sprite.subTags.isEmpty()) { //probably AS2 class
                         continue;
                     }
-                    symbolStr += convertTimeline(sprite.spriteId, oneInstanceShapes, backgroundColor, tags, sprite.getSubTags(), characters, "Symbol " + symbol.getCharacterID());
+                    symbolStr += convertTimeline(sprite.spriteId, oneInstanceShapes, backgroundColor, tags, sprite.getSubTags(), characters, "Symbol " + symbol.getCharacterId());
                 } else if (symbol instanceof ShapeTag) {
                     itemIcon = "1";
                     ShapeTag shape = (ShapeTag) symbol;
-                    symbolStr += "<DOMTimeline name=\"Symbol " + symbol.getCharacterID() + "\" currentFrame=\"0\">";
+                    symbolStr += "<DOMTimeline name=\"Symbol " + symbol.getCharacterId() + "\" currentFrame=\"0\">";
                     symbolStr += "<layers>";
                     symbolStr += convertShape(characters, null, shape);
                     symbolStr += "</layers>";
@@ -1302,7 +1302,7 @@ public class XFLConverter {
                 symbolStr += "</timeline>";
                 symbolStr += "</DOMSymbolItem>";
                 symbolStr = prettyFormatXML(symbolStr);
-                String symbolFile = "Symbol " + symbol.getCharacterID() + ".xml";
+                String symbolFile = "Symbol " + symbol.getCharacterId() + ".xml";
                 try {
                     files.put(symbolFile, symbolStr.getBytes("UTF-8"));
                 } catch (UnsupportedEncodingException ex) {
@@ -1325,7 +1325,7 @@ public class XFLConverter {
                 } catch (IOException ex) {
                     Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                String symbolFile = "bitmap" + symbol.getCharacterID() + "." + imageTag.getImageFormat();
+                String symbolFile = "bitmap" + symbol.getCharacterId() + "." + imageTag.getImageFormat();
                 files.put(symbolFile, baos.toByteArray());
                 String mediaLinkStr = "<DOMBitmapItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp() + "\" externalFileSize=\"" + baos.toByteArray().length + "\"";
                 if (format.equals("png") || format.equals("gif")) {
@@ -1333,8 +1333,8 @@ public class XFLConverter {
                 } else if (format.equals("jpg")) {
                     mediaLinkStr += " isJPEG=\"true\"";
                 }
-                if (characterClasses.containsKey(symbol.getCharacterID())) {
-                    mediaLinkStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterID()) + "\"";
+                if (characterClasses.containsKey(symbol.getCharacterId())) {
+                    mediaLinkStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterId()) + "\"";
                 }
                 mediaLinkStr += " quality=\"50\" href=\"" + symbolFile + "\" bitmapDataHRef=\"M " + (media.size() + 1) + " " + getTimestamp() + ".dat\" frameRight=\"" + image.getWidth() + "\" frameBottom=\"" + image.getHeight() + "\"/>\n";
                 media.add(mediaLinkStr);
@@ -1473,7 +1473,7 @@ public class XFLConverter {
                     Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 if (!exportFormat.equals("flv")) { //FLV import format unsupported
-                    String symbolFile = "sound" + symbol.getCharacterID() + "." + exportFormat;
+                    String symbolFile = "sound" + symbol.getCharacterId() + "." + exportFormat;
                     files.put(symbolFile, data);
                     String mediaLinkStr = "<DOMSoundItem name=\"" + symbolFile + "\" sourceLastImported=\"" + getTimestamp() + "\" externalFileSize=\"" + data.length + "\"";
                     mediaLinkStr += " href=\"" + symbolFile + "\"";
@@ -1484,12 +1484,12 @@ public class XFLConverter {
                     mediaLinkStr += "\"";
                     mediaLinkStr += " exportFormat=\"" + format + "\" exportBits=\"" + bits + "\" sampleCount=\"" + soundSampleCount + "\"";
 
-                    if (characterClasses.containsKey(symbol.getCharacterID())) {
-                        mediaLinkStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterID()) + "\"";
+                    if (characterClasses.containsKey(symbol.getCharacterId())) {
+                        mediaLinkStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterId()) + "\"";
                     }
 
-                    if (characterVariables.containsKey(symbol.getCharacterID())) {
-                        mediaLinkStr += " linkageExportForAS=\"true\" linkageIdentifier=\"" + xmlString(characterVariables.get(symbol.getCharacterID())) + "\"";
+                    if (characterVariables.containsKey(symbol.getCharacterId())) {
+                        mediaLinkStr += " linkageExportForAS=\"true\" linkageIdentifier=\"" + xmlString(characterVariables.get(symbol.getCharacterId())) + "\"";
                     }
 
                     mediaLinkStr += "/>\n";
@@ -1519,7 +1519,7 @@ public class XFLConverter {
                 } catch (IOException ex) {
                     Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                String symbolFile = "movie" + symbol.getCharacterID() + "." + "flv";
+                String symbolFile = "movie" + symbol.getCharacterId() + "." + "flv";
                 String mediaLinkStr = "";
                 if (data.length == 0) { //Video has zero length, this probably means it is "Video - Actionscript-controlled"                    
                     long ts = getTimestamp();
@@ -1551,11 +1551,11 @@ public class XFLConverter {
                     mediaLinkStr += " height=\"" + video.height + "\"";
                     double len = ((double) video.numFrames) / ((double) swf.frameRate);
                     mediaLinkStr += " length=\"" + len + "\"";
-                    if (characterClasses.containsKey(symbol.getCharacterID())) {
-                        mediaLinkStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterID()) + "\"";
+                    if (characterClasses.containsKey(symbol.getCharacterId())) {
+                        mediaLinkStr += " linkageExportForAS=\"true\" linkageClassName=\"" + characterClasses.get(symbol.getCharacterId()) + "\"";
                     }
-                    if (characterVariables.containsKey(symbol.getCharacterID())) {
-                        mediaLinkStr += " linkageExportForAS=\"true\" linkageIdentifier=\"" + xmlString(characterVariables.get(symbol.getCharacterID())) + "\"";
+                    if (characterVariables.containsKey(symbol.getCharacterId())) {
+                        mediaLinkStr += " linkageExportForAS=\"true\" linkageIdentifier=\"" + xmlString(characterVariables.get(symbol.getCharacterId())) + "\"";
                     }
                     mediaLinkStr += "/>\n";
                 }
@@ -1636,7 +1636,7 @@ public class XFLConverter {
         }
         String soundEnvelopeStr = "";
         if (soundStreamHead != null) {
-            ret += " soundName=\"sound" + soundStreamHead.getCharacterID() + "." + soundStreamHead.getExportFormat() + "\"";
+            ret += " soundName=\"sound" + soundStreamHead.getCharacterId() + "." + soundStreamHead.getExportFormat() + "\"";
             ret += " soundSync=\"stream\"";
             soundEnvelopeStr += "<SoundEnvelope>";
             soundEnvelopeStr += "<SoundEnvelopePoint level0=\"32768\" level1=\"32768\"/>";
@@ -2163,7 +2163,7 @@ public class XFLConverter {
         for (Tag t : tags) {
             if (t instanceof CSMTextSettingsTag) {
                 CSMTextSettingsTag c = (CSMTextSettingsTag) t;
-                if (c.textID == tag.getCharacterID()) {
+                if (c.textID == tag.getCharacterId()) {
                     csmts = c;
                     break;
                 }
@@ -2511,7 +2511,7 @@ public class XFLConverter {
         for (Tag t : swf.tags) {
             if (t instanceof DoInitActionTag) {
                 DoInitActionTag dia = (DoInitActionTag) t;
-                int chid = dia.getCharacterID();
+                int chid = dia.getCharacterId();
                 if (characters.containsKey(chid)) {
                     if (characters.get(chid) instanceof DefineSpriteTag) {
                         DefineSpriteTag sprite = (DefineSpriteTag) characters.get(chid);

@@ -60,7 +60,7 @@ public class DefineBinaryDataTag extends CharacterTag {
     }
 
     @Override
-    public int getCharacterID() {
+    public int getCharacterId() {
         return tag;
     }
 }

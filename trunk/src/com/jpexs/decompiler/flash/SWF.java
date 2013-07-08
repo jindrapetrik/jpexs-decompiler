@@ -113,6 +113,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -355,8 +356,8 @@ public class SWF {
         for (Tag t : tags) {
             if (t instanceof CharacterIdTag) {
                 CharacterIdTag ct = (CharacterIdTag) t;
-                if (exportNames.containsKey(ct.getCharacterID())) {
-                    ct.setExportName(exportNames.get(ct.getCharacterID()));
+                if (exportNames.containsKey(ct.getCharacterId())) {
+                    ct.setExportName(exportNames.get(ct.getCharacterId()));
                 }
             }
         }
@@ -377,8 +378,8 @@ public class SWF {
         for (Tag t : tags) {
             if (t instanceof CharacterIdTag) {
                 CharacterIdTag ct = (CharacterIdTag) t;
-                if (classes.containsKey(ct.getCharacterID())) {
-                    ct.setClassName(classes.get(ct.getCharacterID()));
+                if (classes.containsKey(ct.getCharacterId())) {
+                    ct.setClassName(classes.get(ct.getCharacterId()));
                 }
             }
         }
@@ -1204,7 +1205,7 @@ public class SWF {
         }
         for (Tag t : tags) {
             if (t instanceof TextTag) {
-                File file = new File(outdir + File.separator + ((TextTag) t).getCharacterID() + ".txt");
+                File file = new File(outdir + File.separator + ((TextTag) t).getCharacterId() + ".txt");
                 try (FileOutputStream fos = new FileOutputStream(file)) {
                     if (formatted) {
                         fos.write(((TextTag) t).getFormattedText(this.tags).getBytes("UTF-8"));
@@ -1236,7 +1237,7 @@ public class SWF {
             if (t instanceof ShapeTag) {
                 int characterID = 0;
                 if (t instanceof CharacterTag) {
-                    characterID = ((CharacterTag) t).getCharacterID();
+                    characterID = ((CharacterTag) t).getCharacterId();
                 }
                 File file = new File(outdir + File.separator + characterID + ".svg");
                 try (FileOutputStream fos = new FileOutputStream(file)) {
@@ -1260,7 +1261,7 @@ public class SWF {
         }
         for (Tag t : tags) {
             if (t instanceof DefineBinaryDataTag) {
-                int characterID = ((DefineBinaryDataTag) t).getCharacterID();
+                int characterID = ((DefineBinaryDataTag) t).getCharacterId();
                 File file = new File(outdir + File.separator + characterID + ".bin");
                 try (FileOutputStream fos = new FileOutputStream(file)) {
                     fos.write(((DefineBinaryDataTag) t).binaryData);
@@ -1283,7 +1284,7 @@ public class SWF {
         }
         for (Tag t : tags) {
             if (t instanceof ImageTag) {
-                File file = new File(outdir + File.separator + ((ImageTag) t).getCharacterID() + "." + ((ImageTag) t).getImageFormat());
+                File file = new File(outdir + File.separator + ((ImageTag) t).getCharacterId() + "." + ((ImageTag) t).getImageFormat());
                 ImageIO.write(((ImageTag) t).getImage(this.tags), ((ImageTag) t).getImageFormat().toUpperCase(Locale.ENGLISH), file);
                 ret.add(file);
             }
@@ -2232,7 +2233,7 @@ public class SWF {
         for (Tag t : allTags) {
             if (t instanceof CharacterTag) {
                 CharacterTag ch = (CharacterTag) t;
-                characters.put(ch.getCharacterID(), ch);
+                characters.put(ch.getCharacterId(), ch);
             }
         }
 
@@ -2326,5 +2327,87 @@ public class SWF {
             }
         }
         return;
+    }
+
+    public void removeTagFromTimeline(Tag toRemove, List<Tag> timeline) {
+        int characterId = 0;
+        if (toRemove instanceof CharacterTag) {
+            characterId = ((CharacterTag) toRemove).getCharacterId();
+        }
+        Map<Integer, Integer> stage = new HashMap<>();
+
+        Set<Integer> dependingChars = new HashSet<>();
+        if (characterId != 0) {
+            dependingChars.add(characterId);
+            for (int i = 0; i < timeline.size(); i++) {
+                Tag t = timeline.get(i);
+                if (t instanceof CharacterIdTag) {
+                    CharacterIdTag c = (CharacterIdTag) t;
+                    Set<Integer> needed = t.getNeededCharacters();
+                    if (needed.contains(characterId)) {
+                        dependingChars.add(c.getCharacterId());
+                    }
+                }
+
+            }
+        }
+
+        for (int i = 0; i < timeline.size(); i++) {
+            Tag t = timeline.get(i);
+            if (t instanceof RemoveTag) {
+                RemoveTag rt = (RemoveTag) t;
+                int currentCharId = stage.get(rt.getDepth());
+                stage.remove(rt.getDepth());
+                if (dependingChars.contains(currentCharId)) {
+                    timeline.remove(i);
+                    i--;
+                    continue;
+                }
+            }
+            if (t instanceof PlaceObjectTypeTag) {
+                PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
+                int placeCharId = po.getCharacterId();
+                int placeDepth = po.getDepth();
+                if (placeCharId != 0) {
+                    stage.put(placeDepth, placeCharId);
+                }
+                int currentCharId = stage.get(placeDepth);
+                if (dependingChars.contains(currentCharId)) {
+                    timeline.remove(i);
+                    i--;
+                    continue;
+                }
+            }
+            if (t instanceof CharacterIdTag) {
+                CharacterIdTag c = (CharacterIdTag) t;
+                if (dependingChars.contains(c.getCharacterId())) {
+                    timeline.remove(i);
+                    i--;
+                    continue;
+                }
+            }
+            Set<Integer> needed = t.getNeededCharacters();
+            for (int dep : dependingChars) {
+                if (needed.contains(dep)) {
+                    timeline.remove(i);
+                    i--;
+                    continue;
+                }
+            }
+            if (t == toRemove) {
+                timeline.remove(i);
+                i--;
+                continue;
+            }
+            if (t instanceof DefineSpriteTag) {
+                DefineSpriteTag spr = (DefineSpriteTag) t;
+                removeTagFromTimeline(toRemove, spr.subTags);
+            }
+
+        }
+    }
+
+    public void removeTag(Tag t) {
+        removeTagFromTimeline(t, tags);
     }
 }

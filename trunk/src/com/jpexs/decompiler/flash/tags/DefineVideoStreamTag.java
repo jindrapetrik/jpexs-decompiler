@@ -45,7 +45,7 @@ public class DefineVideoStreamTag extends CharacterTag {
     public static final int ID = 60;
 
     @Override
-    public int getCharacterID() {
+    public int getCharacterId() {
         return characterID;
     }
 

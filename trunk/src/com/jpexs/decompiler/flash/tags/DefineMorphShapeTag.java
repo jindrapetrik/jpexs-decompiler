@@ -73,7 +73,7 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
     }
 
     @Override
-    public int getCharacterID() {
+    public int getCharacterId() {
         return characterId;
     }
 

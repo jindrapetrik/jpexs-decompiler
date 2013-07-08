@@ -72,7 +72,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     public static final int ID = 7;
 
     @Override
-    public int getCharacterID() {
+    public int getCharacterId() {
         return buttonId;
     }
     private long hdrSize;
@@ -219,7 +219,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
         for (BUTTONRECORD r : characters) {
             CharacterTag ch = allCharacters.get(r.characterId);
             if (ch instanceof BoundedTag) {
-                if (visited.contains(ch.getCharacterID())) {
+                if (visited.contains(ch.getCharacterId())) {
                     continue;
                 }
                 RECT r2 = ((BoundedTag) ch).getRect(allCharacters, visited);

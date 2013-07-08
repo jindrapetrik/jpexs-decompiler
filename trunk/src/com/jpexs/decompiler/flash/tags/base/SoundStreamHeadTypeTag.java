@@ -18,7 +18,7 @@ public interface SoundStreamHeadTypeTag {
 
     public void setVirtualCharacterId(int ch);
 
-    public int getCharacterID();
+    public int getCharacterId();
 
     public String getExportFormat();
 }

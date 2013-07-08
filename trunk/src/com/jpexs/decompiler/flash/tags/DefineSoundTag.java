@@ -49,7 +49,7 @@ public class DefineSoundTag extends CharacterTag {
     public static final int ID = 14;
 
     @Override
-    public int getCharacterID() {
+    public int getCharacterId() {
         return soundId;
     }
 

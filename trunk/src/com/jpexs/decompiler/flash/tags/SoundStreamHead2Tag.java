@@ -45,7 +45,7 @@ public class SoundStreamHead2Tag extends CharacterTag implements SoundStreamHead
     public static final int ID = 45;
 
     @Override
-    public int getCharacterID() {
+    public int getCharacterId() {
         return virtualCharacterId;
     }
 
@@ -104,6 +104,7 @@ public class SoundStreamHead2Tag extends CharacterTag implements SoundStreamHead
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public SoundStreamHead2Tag(byte data[], int version, long pos) throws IOException {

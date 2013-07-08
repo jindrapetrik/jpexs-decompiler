@@ -56,7 +56,7 @@ public class SoundStreamHeadTag extends CharacterTag implements SoundStreamHeadT
     }
 
     @Override
-    public int getCharacterID() {
+    public int getCharacterId() {
         return virtualCharacterId;
     }
 

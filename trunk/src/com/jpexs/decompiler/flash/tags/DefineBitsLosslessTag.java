@@ -125,7 +125,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
     }
 
     @Override
-    public int getCharacterID() {
+    public int getCharacterId() {
         return characterID;
     }
 

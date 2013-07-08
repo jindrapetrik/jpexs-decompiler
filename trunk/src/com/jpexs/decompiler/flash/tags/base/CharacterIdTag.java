@@ -31,7 +31,7 @@ public abstract class CharacterIdTag extends Tag {
         super(id, name, data, pos);
     }
 
-    public abstract int getCharacterID();
+    public abstract int getCharacterId();
     /**
      * List of ExportAssetsTag used for converting to String
      */
@@ -60,16 +60,16 @@ public abstract class CharacterIdTag extends Tag {
         if (className != null) {
             nameAppend = ": " + className;
         }
-        return super.getName() + " (" + getCharacterID() + nameAppend + ")";
+        return super.getName() + " (" + getCharacterId() + nameAppend + ")";
     }
 
     @Override
     public String getExportFileName() {
-        return super.getName() + "_" + getCharacterID() + (((exportName != null) && (!exportName.equals(""))) ? "_" + exportName : "");
+        return super.getName() + "_" + getCharacterId() + (((exportName != null) && (!exportName.equals(""))) ? "_" + exportName : "");
     }
 
     public String getCharacterExportFileName() {
-        return getCharacterID() + (((exportName != null) && (!exportName.equals(""))) ? "_" + exportName : "");
+        return getCharacterId() + (((exportName != null) && (!exportName.equals(""))) ? "_" + exportName : "");
     }
 
     public String getExportName() {

@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORM;
@@ -38,7 +39,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class PlaceObjectTag extends Tag implements PlaceObjectTypeTag {
+public class PlaceObjectTag extends CharacterIdTag implements PlaceObjectTypeTag {
 
     /**
      * ID of character to place

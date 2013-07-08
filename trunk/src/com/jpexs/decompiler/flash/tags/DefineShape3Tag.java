@@ -76,7 +76,7 @@ public class DefineShape3Tag extends CharacterTag implements BoundedTag, ShapeTa
     }
 
     @Override
-    public int getCharacterID() {
+    public int getCharacterId() {
         return shapeId;
     }
 

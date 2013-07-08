@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -29,7 +30,7 @@ import java.io.OutputStream;
  *
  * @author JPEXS
  */
-public class RemoveObjectTag extends Tag implements RemoveTag {
+public class RemoveObjectTag extends CharacterIdTag implements RemoveTag {
 
     /**
      * ID of character to place
@@ -77,5 +78,10 @@ public class RemoveObjectTag extends Tag implements RemoveTag {
     @Override
     public int getDepth() {
         return depth;
+    }
+
+    @Override
+    public int getCharacterId() {
+        return characterId;
     }
 }

@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
@@ -43,7 +44,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTag {
+public class PlaceObject3Tag extends CharacterIdTag implements Container, PlaceObjectTypeTag {
 
     /**
      * @since SWF 5 has clip actions (sprite characters only)

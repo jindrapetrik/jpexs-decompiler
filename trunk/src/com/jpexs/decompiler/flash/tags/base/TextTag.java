@@ -33,7 +33,7 @@ public interface TextTag {
 
     public void setFormattedText(List<Tag> tags, String text) throws ParseException;
 
-    public int getCharacterID();
+    public int getCharacterId();
 
     public RECT getBounds();
 

@@ -35,7 +35,7 @@ public class DefineFont4Tag extends CharacterTag {
     public static final int ID = 91;
 
     @Override
-    public int getCharacterID() {
+    public int getCharacterId() {
         return fontID;
     }
 

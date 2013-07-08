@@ -49,7 +49,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
     public static final int ID = 36;
 
     @Override
-    public int getCharacterID() {
+    public int getCharacterId() {
         return characterID;
     }
 

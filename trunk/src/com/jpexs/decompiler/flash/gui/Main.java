@@ -186,7 +186,7 @@ public class Main {
             locswf = new SWF(bis, new PercentListener() {
                 @Override
                 public void percent(int p) {
-                    startWork("Reading SWF", p);
+                    startWork(translate("work.reading.swf"), p);
                 }
             }, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
             locswf.addEventListener(new EventListener() {

@@ -64,7 +64,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
     public static final int ID = 39;
 
     @Override
-    public int getCharacterID() {
+    public int getCharacterId() {
         return spriteId;
     }
 
@@ -80,7 +80,7 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
             RECT r = null;
             if (t instanceof BoundedTag) {
                 if (t instanceof CharacterTag) {
-                    if (visited.contains(((CharacterTag) t).getCharacterID())) {
+                    if (visited.contains(((CharacterTag) t).getCharacterId())) {
                         continue;
                     }
                 }
