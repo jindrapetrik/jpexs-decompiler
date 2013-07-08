@@ -121,6 +121,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.ByteArrayOutputStream;
@@ -266,6 +267,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
     }
 
     public MainFrame(SWF swf) {
+
         int w = (Integer) Configuration.getConfig("gui.window.width", 1000);
         int h = (Integer) Configuration.getConfig("gui.window.height", 700);
         Dimension dim = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
@@ -276,12 +278,38 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
             h = dim.height;
         }
         setSize(w, h);
+
+        boolean maximizedHorizontal = (Boolean) Configuration.getConfig("gui.window.maximized.horizontal", false);
+        boolean maximizedVertical = (Boolean) Configuration.getConfig("gui.window.maximized.vertical", false);
+
+        int state = 0;
+        if (maximizedHorizontal) {
+            state = state | JFrame.MAXIMIZED_HORIZ;
+        }
+        if (maximizedVertical) {
+            state = state | JFrame.MAXIMIZED_VERT;
+        }
+        setExtendedState(state);
+
         View.setWindowIcon(this);
+        addWindowStateListener(new WindowStateListener() {
+            @Override
+            public void windowStateChanged(WindowEvent e) {
+                int state = e.getNewState();
+                Configuration.setConfig("gui.window.maximized.horizontal", (state & JFrame.MAXIMIZED_HORIZ) == JFrame.MAXIMIZED_HORIZ);
+                Configuration.setConfig("gui.window.maximized.vertical", (state & JFrame.MAXIMIZED_VERT) == JFrame.MAXIMIZED_VERT);
+            }
+        });
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                Configuration.setConfig("gui.window.width", getWidth());
-                Configuration.setConfig("gui.window.height", getHeight());
+                int state = getExtendedState();
+                if ((state & JFrame.MAXIMIZED_HORIZ) == 0) {
+                    Configuration.setConfig("gui.window.width", getWidth());
+                }
+                if ((state & JFrame.MAXIMIZED_VERT) == 0) {
+                    Configuration.setConfig("gui.window.height", getHeight());
+                }
             }
         });
         addWindowListener(new WindowAdapter() {
