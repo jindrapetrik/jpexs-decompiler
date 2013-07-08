@@ -3041,7 +3041,7 @@ public class SWFInputStream extends InputStream {
      */
     public PIX24 readPIX24() throws IOException {
         PIX24 ret = new PIX24();
-        readUI8();
+        ret.reserved = readUI8();
         ret.red = readUI8();
         ret.green = readUI8();
         ret.blue = readUI8();

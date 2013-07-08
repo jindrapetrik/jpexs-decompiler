@@ -1658,7 +1658,7 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writePIX24(PIX24 value) throws IOException {
-        writeUI8(0);
+        writeUI8(value.reserved);
         writeUI8(value.red);
         writeUI8(value.green);
         writeUI8(value.blue);

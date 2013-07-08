@@ -23,6 +23,7 @@ package com.jpexs.decompiler.flash.types;
  */
 public class PIX24 {
 
+    public int reserved;
     /**
      * Red color value
      */
