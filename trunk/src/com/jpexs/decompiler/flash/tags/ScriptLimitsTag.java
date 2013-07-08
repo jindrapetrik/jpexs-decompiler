@@ -27,9 +27,10 @@ public class ScriptLimitsTag extends Tag {
 
     public int maxRecursionDepth;
     public int scriptTimeoutSeconds;
+    public static final int ID = 65;
 
     public ScriptLimitsTag(byte[] data, int version, long pos) throws IOException {
-        super(65, "ScriptLimits", data, pos);
+        super(ID, "ScriptLimits", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         maxRecursionDepth = sis.readUI16();
         scriptTimeoutSeconds = sis.readUI16();

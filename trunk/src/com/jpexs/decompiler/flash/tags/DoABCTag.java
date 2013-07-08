@@ -31,6 +31,7 @@ public class DoABCTag extends Tag implements ABCContainerTag {
      * ActionScript 3 bytecodes
      */
     private ABC abc;
+    public static final int ID = 72;
 
     @Override
     public ABC getABC() {
@@ -50,7 +51,7 @@ public class DoABCTag extends Tag implements ABCContainerTag {
      * @throws IOException
      */
     public DoABCTag(byte[] data, int version, long pos) throws IOException {
-        super(72, "DoABC", data, pos);
+        super(ID, "DoABC", data, pos);
         InputStream is = new ByteArrayInputStream(data);
         abc = new ABC(is);
     }

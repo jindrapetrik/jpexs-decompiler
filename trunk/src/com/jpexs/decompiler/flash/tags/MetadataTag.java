@@ -26,9 +26,10 @@ import java.io.OutputStream;
 public class MetadataTag extends Tag {
 
     public String xmlMetadata;
+    public static final int ID = 77;
 
     public MetadataTag(byte[] data, int version, long pos) {
-        super(77, "Metadata", data, pos);
+        super(ID, "Metadata", data, pos);
         try {
             SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
             xmlMetadata = sis.readString();

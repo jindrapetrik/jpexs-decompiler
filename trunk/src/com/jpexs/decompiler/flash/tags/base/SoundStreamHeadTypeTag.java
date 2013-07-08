@@ -1,4 +1,4 @@
-package com.jpexs.decompiler.flash.tags;
+package com.jpexs.decompiler.flash.tags.base;
 
 /**
  *

@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 /**
  *
@@ -64,6 +65,7 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
     public MORPHLINESTYLEARRAY morphLineStyles;
     public SHAPE startEdges;
     public SHAPE endEdges;
+    public static final int ID = 84;
 
     @Override
     public Set<Integer> getNeededCharacters() {
@@ -75,7 +77,7 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
     }
 
     @Override
-    public RECT getRect(HashMap<Integer, CharacterTag> characters) {
+    public RECT getRect(HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
         RECT rect = new RECT();
         rect.Xmin = Math.min(startBounds.Xmin, endBounds.Xmin);
         rect.Ymin = Math.min(startBounds.Ymin, endBounds.Ymin);
@@ -128,10 +130,11 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public DefineMorphShape2Tag(byte data[], int version, long pos) throws IOException {
-        super(84, "DefineMorphShape2", data, pos);
+        super(ID, "DefineMorphShape2", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterId = sis.readUI16();
         startBounds = sis.readRECT();
@@ -189,7 +192,7 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
     }
 
     @Override
-    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters) {
+    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
         List<SHAPERECORD> finalRecords = new ArrayList<>();
         FILLSTYLEARRAY fillStyles = morphFillStyles.getFillStylesAt(frame);
         LINESTYLEARRAY lineStyles = morphLineStyles.getLineStylesAt(getShapeNum(), frame);
@@ -262,7 +265,7 @@ public class DefineMorphShape2Tag extends CharacterTag implements BoundedTag, Mo
     }
 
     @Override
-    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters) {
+    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
         return new Point(
                 (startBounds.Xmin + (endBounds.Xmin - startBounds.Xmin) * frame / 65535) / 20,
                 (startBounds.Ymin + (endBounds.Ymin - startBounds.Ymin) * frame / 65535) / 20);

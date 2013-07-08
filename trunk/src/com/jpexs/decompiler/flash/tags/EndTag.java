@@ -35,6 +35,7 @@ public class EndTag extends Tag {
     public byte[] getData(int version) {
         return new byte[0];
     }
+    public static final int ID = 0;
 
     /**
      * Constructor
@@ -44,7 +45,7 @@ public class EndTag extends Tag {
      * @throws IOException
      */
     public EndTag(byte data[], int version, long pos) throws IOException {
-        super(0, "End", data, pos);
+        super(ID, "End", data, pos);
 
     }
 

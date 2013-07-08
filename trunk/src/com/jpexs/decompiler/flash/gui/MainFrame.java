@@ -66,13 +66,13 @@ import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
-import com.jpexs.decompiler.flash.tags.PlaceObjectTypeTag;
+import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHead2Tag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
-import com.jpexs.decompiler.flash.tags.SoundStreamHeadTypeTag;
+import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
@@ -133,6 +133,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -2243,9 +2244,9 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
             if (fn.getParent() instanceof DefineSpriteTag) {
                 controlTags = ((DefineSpriteTag) fn.getParent()).subTags;
                 containerId = ((DefineSpriteTag) fn.getParent()).spriteId;
-                rect = ((DefineSpriteTag) fn.getParent()).getRect(characters);
+                rect = ((DefineSpriteTag) fn.getParent()).getRect(characters, new Stack<Integer>());
             }
-            previewImagePanel.setImage(SWF.frameToImage(containerId, ((FrameNode) tagObj).getFrame() - 1, swf.tags, controlTags, rect, swf.frameCount));
+            previewImagePanel.setImage(SWF.frameToImage(containerId, ((FrameNode) tagObj).getFrame() - 1, swf.tags, controlTags, rect, swf.frameCount, new Stack<Integer>()));
         } else if (((tagObj instanceof FrameNode) && ((FrameNode) tagObj).isDisplayed()) || ((tagObj instanceof CharacterTag) || (tagObj instanceof FontTag)) && (tagObj instanceof Tag)) {
             try {
 
@@ -2291,7 +2292,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                                 break;
                             }
                             Tag t = (Tag) o;
-                            Set<Integer> needed = t.getDeepNeededCharacters(characters);
+                            Set<Integer> needed = t.getDeepNeededCharacters(characters,new ArrayList<Integer>());
                             for (int n : needed) {
                                 if (!doneCharacters.contains(n)) {
                                     sos2.writeTag(characters.get(n));
@@ -2314,7 +2315,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                                     }
                                     mat = (MATRIX) Helper.deepCopy(mat);
                                     if (parent instanceof BoundedTag) {
-                                        RECT r = ((BoundedTag) parent).getRect(characters);
+                                        RECT r = ((BoundedTag) parent).getRect(characters, new Stack<Integer>());
                                         mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
                                         mat.translateY = mat.translateY + height / 2 - r.getHeight() / 2;
                                     } else {
@@ -2335,7 +2336,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                             }
                         } else if (tagObj instanceof AloneTag) {
                         } else {
-                            Set<Integer> needed = ((Tag) tagObj).getDeepNeededCharacters(characters);
+                            Set<Integer> needed = ((Tag) tagObj).getDeepNeededCharacters(characters,new ArrayList<Integer>());
                             for (int n : needed) {
                                 sos2.writeTag(characters.get(n));
                             }
@@ -2354,7 +2355,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                         mat.translateX = 0;
                         mat.translateY = 0;
                         if (tagObj instanceof BoundedTag) {
-                            RECT r = ((BoundedTag) tagObj).getRect(characters);
+                            RECT r = ((BoundedTag) tagObj).getRect(characters, new Stack<Integer>());
                             mat.translateX = -r.Xmin;
                             mat.translateY = -r.Ymin;
                             mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;

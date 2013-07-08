@@ -31,12 +31,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 public class DefineShapeTag extends CharacterTag implements BoundedTag, ShapeTag {
 
     public int shapeId;
     public RECT shapeBounds;
     public SHAPEWITHSTYLE shapes;
+    public static final int ID = 2;
 
     @Override
     public int getShapeNum() {
@@ -54,12 +56,12 @@ public class DefineShapeTag extends CharacterTag implements BoundedTag, ShapeTag
     }
 
     @Override
-    public RECT getRect(HashMap<Integer, CharacterTag> characters) {
+    public RECT getRect(HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
         return shapeBounds;
     }
 
     public DefineShapeTag(byte[] data, int version, long pos) throws IOException {
-        super(2, "DefineShape", data, pos);
+        super(ID, "DefineShape", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         shapeId = sis.readUI16();
         shapeBounds = sis.readRECT();
@@ -77,12 +79,12 @@ public class DefineShapeTag extends CharacterTag implements BoundedTag, ShapeTag
     }
 
     @Override
-    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters) {
+    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
         return shapes.toImage(1, tags);
     }
 
     @Override
-    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters) {
+    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
         return new Point(shapeBounds.Xmin / 20, shapeBounds.Ymin / 20);
     }
 

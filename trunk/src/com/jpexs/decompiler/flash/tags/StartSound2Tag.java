@@ -33,6 +33,7 @@ public class StartSound2Tag extends Tag {
 
     public String soundClassName;
     public SOUNDINFO soundInfo;
+    public static final int ID = 89;
 
     /**
      * Gets data bytes
@@ -60,7 +61,7 @@ public class StartSound2Tag extends Tag {
      * @throws IOException
      */
     public StartSound2Tag(byte data[], int version, long pos) throws IOException {
-        super(89, "StartSound2", data, pos);
+        super(ID, "StartSound2", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         soundClassName = sis.readString();
         soundInfo = sis.readSOUNDINFO();

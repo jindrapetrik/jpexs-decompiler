@@ -31,9 +31,10 @@ public class DefineScalingGridTag extends Tag {
 
     private int characterId;
     private RECT splitter;
+    public static final int ID = 78;
 
     public DefineScalingGridTag(byte[] data, int version, long pos) throws IOException {
-        super(78, "DefineScalingGrid", data, pos);
+        super(ID, "DefineScalingGrid", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterId = sis.readUI16();
         splitter = sis.readRECT();

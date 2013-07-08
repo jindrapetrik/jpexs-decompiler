@@ -34,6 +34,7 @@ public class ProtectTag extends Tag {
      * MD5 hash of password
      */
     public String passwordHash;
+    public static final int ID = 24;
 
     /**
      * Gets data bytes
@@ -63,7 +64,7 @@ public class ProtectTag extends Tag {
      * @throws IOException
      */
     public ProtectTag(byte data[], int version, long pos) throws IOException {
-        super(24, "Protect", data, pos);
+        super(ID, "Protect", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         if (sis.available() > 0) {
             passwordHash = sis.readString();

@@ -41,6 +41,7 @@ public class DefineButtonSoundTag extends CharacterTag {
     public SOUNDINFO buttonSoundInfo2;
     public int buttonSoundChar3;
     public SOUNDINFO buttonSoundInfo3;
+    public static final int ID = 17;
 
     @Override
     public int getCharacterID() {
@@ -89,7 +90,7 @@ public class DefineButtonSoundTag extends CharacterTag {
      * @throws IOException
      */
     public DefineButtonSoundTag(byte data[], int version, long pos) throws IOException {
-        super(17, "DefineButtonSound", data, pos);
+        super(ID, "DefineButtonSound", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         buttonId = sis.readUI16();
         buttonSoundChar0 = sis.readUI16();

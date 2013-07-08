@@ -16,12 +16,15 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import java.awt.Point;
+import java.io.Serializable;
+
 /**
  * A rectangle value represents a rectangular region.
  *
  * @author JPEXS
  */
-public class RECT {
+public class RECT implements Serializable {
 
     /**
      * X minimum position for rectangle in twips
@@ -69,5 +72,13 @@ public class RECT {
 
     public int getHeight() {
         return (Ymax - Ymin) < 0 ? 0 : Ymax - Ymin;
+    }
+
+    public Point getTopLeft() {
+        return new Point(Xmin, Ymin);
+    }
+
+    public Point getBottomRight() {
+        return new Point(Xmax, Ymax);
     }
 }

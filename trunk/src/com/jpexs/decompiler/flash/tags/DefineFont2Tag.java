@@ -58,6 +58,7 @@ public class DefineFont2Tag extends CharacterTag implements FontTag {
     public int fontAdvanceTable[];
     public RECT fontBoundsTable[];
     public KERNINGRECORD fontKerningTable[];
+    public static final int ID = 48;
 
     @Override
     public boolean isSmall() {
@@ -166,7 +167,7 @@ public class DefineFont2Tag extends CharacterTag implements FontTag {
      * @throws IOException
      */
     public DefineFont2Tag(byte data[], int version, long pos) throws IOException {
-        super(48, "DefineFont2", data, pos);
+        super(ID, "DefineFont2", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         fontId = sis.readUI16();
         fontFlagsHasLayout = sis.readUB(1) == 1;

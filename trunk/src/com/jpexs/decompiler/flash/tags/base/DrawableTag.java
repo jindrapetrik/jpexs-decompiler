@@ -22,6 +22,7 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
 /**
  *
@@ -29,9 +30,9 @@ import java.util.List;
  */
 public interface DrawableTag {
 
-    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters);
+    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited);
 
-    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters);
+    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited);
 
     public int getNumFrames();
 }

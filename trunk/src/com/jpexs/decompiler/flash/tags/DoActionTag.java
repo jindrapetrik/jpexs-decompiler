@@ -42,16 +42,17 @@ public class DoActionTag extends Tag implements ASMSource {
      */
     //public List<Action> actions = new ArrayList<Action>();
     public byte[] actionBytes;
+    public static final int ID = 12;
 
     /**
      * Constructor
      *
      * @param data Data bytes
      * @param version SWF version
-     * @throws IOException
+     * @param pos
      */
     public DoActionTag(byte[] data, int version, long pos) {
-        super(12, "DoAction", data, pos);
+        super(ID, "DoAction", data, pos);
         actionBytes = data;
     }
 

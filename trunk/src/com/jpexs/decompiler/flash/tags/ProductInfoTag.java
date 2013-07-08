@@ -29,9 +29,10 @@ public class ProductInfoTag extends Tag {
     public long buildLow;
     public long buildHigh;
     public long compilationDate;
+    public static final int ID = 41;
 
     public ProductInfoTag(byte[] data, int version, long pos) throws IOException {
-        super(41, "ProductInfo", data, pos);
+        super(ID, "ProductInfo", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         /*
          * 0: Unknown

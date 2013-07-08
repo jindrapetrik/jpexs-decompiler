@@ -51,6 +51,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -69,6 +70,7 @@ public class DefineText2Tag extends CharacterTag implements BoundedTag, TextTag,
     public int glyphBits;
     public int advanceBits;
     public List<TEXTRECORD> textRecords;
+    public static final int ID = 33;
 
     @Override
     public RECT getBounds() {
@@ -374,7 +376,7 @@ public class DefineText2Tag extends CharacterTag implements BoundedTag, TextTag,
     }
 
     @Override
-    public RECT getRect(HashMap<Integer, CharacterTag> characters) {
+    public RECT getRect(HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
         return textBounds;
     }
 
@@ -418,7 +420,7 @@ public class DefineText2Tag extends CharacterTag implements BoundedTag, TextTag,
      * @throws IOException
      */
     public DefineText2Tag(byte data[], int version, long pos) throws IOException {
-        super(33, "DefineText2", data, pos);
+        super(ID, "DefineText2", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterID = sis.readUI16();
         textBounds = sis.readRECT();
@@ -444,7 +446,7 @@ public class DefineText2Tag extends CharacterTag implements BoundedTag, TextTag,
     }
 
     @Override
-    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters) {
+    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
         RECT bound = getBounds();
         BufferedImage ret = new BufferedImage(bound.Xmax / 20, bound.Ymax / 20, BufferedImage.TYPE_INT_ARGB);
         Color textColor = new Color(0, 0, 0);
@@ -493,8 +495,8 @@ public class DefineText2Tag extends CharacterTag implements BoundedTag, TextTag,
     }
 
     @Override
-    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters) {
-        return new Point(0, 0);
+    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+        return new Point(textBounds.Xmin / 20, textBounds.Ymin / 20);
     }
 
     @Override

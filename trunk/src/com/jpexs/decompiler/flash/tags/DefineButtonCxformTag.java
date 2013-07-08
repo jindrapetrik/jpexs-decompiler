@@ -33,6 +33,7 @@ public class DefineButtonCxformTag extends Tag {
 
     public int buttonId;
     public CXFORM buttonColorTransform;
+    public static final int ID = 23;
 
     /**
      * Gets data bytes
@@ -61,7 +62,7 @@ public class DefineButtonCxformTag extends Tag {
      * @throws IOException
      */
     public DefineButtonCxformTag(byte data[], int version, long pos) throws IOException {
-        super(23, "DefineButtonCxform", data, pos);
+        super(ID, "DefineButtonCxform", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         buttonId = sis.readUI16();
         buttonColorTransform = sis.readCXFORM();

@@ -47,6 +47,7 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
      * The name assigned to the bytecode.
      */
     public String name;
+    public static final int ID = 82;
 
     @Override
     public String getName() {
@@ -61,7 +62,7 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
      * @throws IOException
      */
     public DoABCDefineTag(byte[] data, int version, long pos) throws IOException {
-        super(82, "DoABCDefine", data, pos);
+        super(ID, "DoABCDefine", data, pos);
         InputStream is = new ByteArrayInputStream(data);
         SWFInputStream sis = new SWFInputStream(is, version);
         flags = sis.readUI32();

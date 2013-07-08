@@ -43,6 +43,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
     public int deblockParam;
     public byte imageData[];
     public byte bitmapAlphaData[];
+    public static final int ID = 90;
 
     @Override
     public int getCharacterID() {
@@ -129,7 +130,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
      * @throws IOException
      */
     public DefineBitsJPEG4Tag(byte data[], int version, long pos) throws IOException {
-        super(90, "DefineBitsJPEG4", data, pos);
+        super(ID, "DefineBitsJPEG4", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterID = sis.readUI16();
         long alphaDataOffset = sis.readUI32();

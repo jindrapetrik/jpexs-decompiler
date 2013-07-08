@@ -37,6 +37,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
     public int characterID;
     public byte imageData[];
     public byte bitmapAlphaData[];
+    public static final int ID = 35;
 
     @Override
     public int getCharacterID() {
@@ -94,7 +95,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
     }
 
     public DefineBitsJPEG3Tag(byte[] data, int version, long pos) throws IOException {
-        super(35, "DefineBitsJPEG3", data, pos);
+        super(ID, "DefineBitsJPEG3", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterID = sis.readUI16();
         long alphaDataOffset = sis.readUI32();

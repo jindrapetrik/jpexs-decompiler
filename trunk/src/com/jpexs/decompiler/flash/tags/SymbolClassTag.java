@@ -27,9 +27,10 @@ public class SymbolClassTag extends Tag {
 
     public int tagIDs[];
     public String classNames[];
+    public static final int ID = 76;
 
     public SymbolClassTag(byte[] data, int version, long pos) throws IOException {
-        super(76, "SymbolClass", data, pos);
+        super(ID, "SymbolClass", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         int numSymbols = sis.readUI16();
         tagIDs = new int[numSymbols];

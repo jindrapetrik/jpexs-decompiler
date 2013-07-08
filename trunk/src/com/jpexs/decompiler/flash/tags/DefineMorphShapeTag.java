@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 /**
  *
@@ -60,6 +61,7 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
     public MORPHLINESTYLEARRAY morphLineStyles;
     public SHAPE startEdges;
     public SHAPE endEdges;
+    public static final int ID = 46;
 
     @Override
     public Set<Integer> getNeededCharacters() {
@@ -114,7 +116,7 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
      * @throws IOException
      */
     public DefineMorphShapeTag(byte data[], int version, long pos) throws IOException {
-        super(46, "DefineMorphShape", data, pos);
+        super(ID, "DefineMorphShape", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterId = sis.readUI16();
         startBounds = sis.readRECT();
@@ -127,7 +129,7 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
     }
 
     @Override
-    public RECT getRect(HashMap<Integer, CharacterTag> characters) {
+    public RECT getRect(HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
         RECT rect = new RECT();
         rect.Xmin = Math.min(startBounds.Xmin, endBounds.Xmin);
         rect.Ymin = Math.min(startBounds.Ymin, endBounds.Ymin);
@@ -177,7 +179,7 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
     }
 
     @Override
-    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters) {
+    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
         List<SHAPERECORD> finalRecords = new ArrayList<>();
         FILLSTYLEARRAY fillStyles = morphFillStyles.getFillStylesAt(frame);
         LINESTYLEARRAY lineStyles = morphLineStyles.getLineStylesAt(getShapeNum(), frame);
@@ -250,7 +252,7 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
     }
 
     @Override
-    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters) {
+    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
         return new Point(
                 (startBounds.Xmin + (endBounds.Xmin - startBounds.Xmin) * frame / 65535) / 20,
                 (startBounds.Ymin + (endBounds.Ymin - startBounds.Ymin) * frame / 65535) / 20);

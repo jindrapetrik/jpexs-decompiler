@@ -33,6 +33,7 @@ public class DefineBitsTag extends ImageTag {
     public int characterID;
     public byte jpegData[];
     private JPEGTablesTag jtt = null;
+    public static final int ID = 6;
 
     @Override
     public void setImage(byte data[]) {
@@ -45,7 +46,7 @@ public class DefineBitsTag extends ImageTag {
     }
 
     public DefineBitsTag(byte[] data, int version, long pos) throws IOException {
-        super(6, "DefineBits", data, pos);
+        super(ID, "DefineBits", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterID = sis.readUI16();
         jpegData = sis.readBytes(sis.available());

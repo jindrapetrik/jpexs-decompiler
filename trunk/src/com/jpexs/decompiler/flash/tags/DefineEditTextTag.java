@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -78,6 +79,7 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextT
     public int leading;
     public String variableName;
     public String initialText;
+    public static final int ID = 37;
 
     @Override
     public RECT getBounds() {
@@ -381,7 +383,7 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextT
     }
 
     @Override
-    public RECT getRect(HashMap<Integer, CharacterTag> allCharacters) {
+    public RECT getRect(HashMap<Integer, CharacterTag> allCharacters, Stack<Integer> visited) {
         return bounds;
     }
 
@@ -457,10 +459,11 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextT
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public DefineEditTextTag(byte data[], int version, long pos) throws IOException {
-        super(37, "DefineEditText", data, pos);
+        super(ID, "DefineEditText", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterID = sis.readUI16();
         bounds = sis.readRECT();

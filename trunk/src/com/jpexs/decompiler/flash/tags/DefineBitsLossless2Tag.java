@@ -46,6 +46,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
     public byte zlibBitmapData[]; //TODO: Parse ALPHACOLORMAPDATA,ALPHABITMAPDATA
     public static final int FORMAT_8BIT_COLORMAPPED = 3;
     public static final int FORMAT_32BIT_ARGB = 5;
+    public static final int ID = 36;
 
     @Override
     public int getCharacterID() {
@@ -87,7 +88,7 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
     }
 
     public DefineBitsLossless2Tag(byte[] data, int version, long pos) throws IOException {
-        super(36, "DefineBitsLossless2", data, pos);
+        super(ID, "DefineBitsLossless2", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterID = sis.readUI16();
         bitmapFormat = sis.readUI8();

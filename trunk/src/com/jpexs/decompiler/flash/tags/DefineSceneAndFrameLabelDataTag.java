@@ -34,6 +34,7 @@ public class DefineSceneAndFrameLabelDataTag extends Tag {
     public String sceneNames[];
     public long frameNums[];
     public String frameNames[];
+    public static final int ID = 86;
 
     /**
      * Gets data bytes
@@ -72,7 +73,7 @@ public class DefineSceneAndFrameLabelDataTag extends Tag {
      * @throws IOException
      */
     public DefineSceneAndFrameLabelDataTag(byte data[], int version, long pos) throws IOException {
-        super(86, "DefineSceneAndFrameLabelData", data, pos);
+        super(ID, "DefineSceneAndFrameLabelData", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         int sceneCount = (int) sis.readEncodedU32();
         sceneOffsets = new long[sceneCount];

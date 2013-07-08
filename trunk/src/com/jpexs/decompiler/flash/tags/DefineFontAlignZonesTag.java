@@ -31,9 +31,10 @@ public class DefineFontAlignZonesTag extends Tag {
     public int fontID;
     public int CSMTableHint;
     public List<ZONERECORD> zoneTable;
+    public static final int ID = 73;
 
     public DefineFontAlignZonesTag(byte[] data, int version, long pos) throws IOException {
-        super(73, "DefineFontAlignZones", data, pos);
+        super(ID, "DefineFontAlignZones", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         fontID = sis.readUI16();
         CSMTableHint = (int) sis.readUB(2);

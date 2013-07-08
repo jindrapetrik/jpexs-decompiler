@@ -32,6 +32,7 @@ public class DefineFont4Tag extends CharacterTag {
     public boolean fontFlagsBold;
     public String fontName;
     public byte fontData[];
+    public static final int ID = 91;
 
     @Override
     public int getCharacterID() {
@@ -39,7 +40,7 @@ public class DefineFont4Tag extends CharacterTag {
     }
 
     public DefineFont4Tag(byte[] data, int version, long pos) throws IOException {
-        super(91, "DefineFont4", data, pos);
+        super(ID, "DefineFont4", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         fontID = sis.readUI16();
         sis.readUB(5);

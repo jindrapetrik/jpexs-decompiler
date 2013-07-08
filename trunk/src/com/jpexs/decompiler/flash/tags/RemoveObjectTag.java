@@ -39,6 +39,7 @@ public class RemoveObjectTag extends Tag implements RemoveTag {
      * Depth of character
      */
     public int depth;
+    public static final int ID = 5;
 
     /**
      * Gets data bytes
@@ -67,7 +68,7 @@ public class RemoveObjectTag extends Tag implements RemoveTag {
      * @throws IOException
      */
     public RemoveObjectTag(byte data[], int version, long pos) throws IOException {
-        super(5, "RemoveObject", data, pos);
+        super(ID, "RemoveObject", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterId = sis.readUI16();
         depth = sis.readUI16();

@@ -42,6 +42,7 @@ public class DefineVideoStreamTag extends CharacterTag {
     public static final int CODEC_SCREEN_VIDEO = 3;
     public static final int CODEC_VP6 = 4;
     public static final int CODEC_VP6_ALPHA = 5;
+    public static final int ID = 60;
 
     @Override
     public int getCharacterID() {
@@ -81,7 +82,7 @@ public class DefineVideoStreamTag extends CharacterTag {
      * @throws IOException
      */
     public DefineVideoStreamTag(byte data[], int version, long pos) throws IOException {
-        super(60, "DefineVideoStream", data, pos);
+        super(ID, "DefineVideoStream", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterID = sis.readUI16();
         numFrames = sis.readUI16();

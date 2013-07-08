@@ -22,12 +22,14 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
+import com.jpexs.decompiler.flash.helpers.Cache;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
+import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import java.awt.Color;
 import java.awt.Point;
@@ -41,6 +43,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -68,6 +71,7 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
      * Actions to execute at particular button events
      */
     public List<BUTTONCONDACTION> actions = new ArrayList<>();
+    public static final int ID = 34;
 
     @Override
     public int getCharacterID() {
@@ -84,10 +88,11 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public DefineButton2Tag(byte data[], int version, long pos) throws IOException {
-        super(34, "DefineButton2", data, pos);
+        super(ID, "DefineButton2", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         buttonId = sis.readUI16();
         sis.readUB(7); //reserved
@@ -196,20 +201,37 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
         }
         return needed;
     }
+    private static Cache rectCache = new Cache(true);
 
     @Override
-    public RECT getRect(HashMap<Integer, CharacterTag> allCharacters) {
+    public RECT getRect(HashMap<Integer, CharacterTag> allCharacters, Stack<Integer> visited) {
+        if (rectCache.contains(this)) {
+            return (RECT) rectCache.get(this);
+        }
+        if (visited.contains(buttonId)) {
+            return new RECT();
+        }
+        visited.push(buttonId);
         RECT rect = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
         for (BUTTONRECORD r : characters) {
             CharacterTag ch = allCharacters.get(r.characterId);
             if (ch instanceof BoundedTag) {
-                RECT r2 = ((BoundedTag) ch).getRect(allCharacters);
+                if (visited.contains(ch.getCharacterID())) {
+                    continue;
+                }
+                RECT r2 = ((BoundedTag) ch).getRect(allCharacters, visited);
+                MATRIX mat = r.placeMatrix;
+                if (mat != null) {
+                    r2 = mat.apply(r2);
+                }
                 rect.Xmin = Math.min(r2.Xmin, rect.Xmin);
                 rect.Ymin = Math.min(r2.Ymin, rect.Ymin);
                 rect.Xmax = Math.max(r2.Xmax, rect.Xmax);
                 rect.Ymax = Math.max(r2.Ymax, rect.Ymax);
             }
         }
+        visited.pop();
+        rectCache.put(this, rect);
         return rect;
     }
 
@@ -219,7 +241,11 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
     }
 
     @Override
-    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters) {
+    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+        if (visited.contains(buttonId)) {
+            return new BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
+        }
+        visited.push(buttonId);
         HashMap<Integer, Layer> layers = new HashMap<>();
         int maxDepth = 0;
         for (BUTTONRECORD r : this.characters) {
@@ -236,12 +262,18 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
                 layers.put(r.placeDepth, layer);
             }
         }
-        return SWF.frameToImage(buttonId, maxDepth, layers, new Color(0, 0, 0, 0), characters, 1, tags, tags, displayRect);
+        visited.pop();
+        displayRect = getRect(characters, visited);
+        visited.push(buttonId);
+        BufferedImage ret = SWF.frameToImage(buttonId, maxDepth, layers, new Color(0, 0, 0, 0), characters, 1, tags, tags, displayRect, visited);
+
+        return ret;
     }
 
     @Override
-    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters) {
-        return new Point(0, 0);
+    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+        RECT r=getRect(characters, visited);
+        return new Point(r.Xmin/20, r.Ymin/20);
     }
 
     @Override

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -41,6 +42,7 @@ public class SoundStreamHead2Tag extends CharacterTag implements SoundStreamHead
     public int streamSoundSampleCount;
     public int latencySeek;
     private int virtualCharacterId = 0;
+    public static final int ID = 45;
 
     @Override
     public int getCharacterID() {
@@ -105,7 +107,7 @@ public class SoundStreamHead2Tag extends CharacterTag implements SoundStreamHead
      * @throws IOException
      */
     public SoundStreamHead2Tag(byte data[], int version, long pos) throws IOException {
-        super(45, "SoundStreamHead2", data, pos);
+        super(ID, "SoundStreamHead2", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         sis.readUB(4);//reserved
         playBackSoundRate = (int) sis.readUB(2);

@@ -37,6 +37,7 @@ public class ExportAssetsTag extends Tag {
      */
     public List<Integer> tags;
     public List<String> names;
+    public static final int ID = 56;
 
     /**
      * Constructor
@@ -46,7 +47,7 @@ public class ExportAssetsTag extends Tag {
      * @throws IOException
      */
     public ExportAssetsTag(byte[] data, int version, long pos) throws IOException {
-        super(56, "ExportAssets", data, pos);
+        super(ID, "ExportAssets", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         int count = sis.readUI16();
         tags = new ArrayList<>();

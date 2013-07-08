@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.types.RECT;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Stack;
 
 /**
  *
@@ -25,6 +27,6 @@ import java.util.HashMap;
  */
 public interface BoundedTag {
 
-    public RECT getRect(HashMap<Integer, CharacterTag> characters);
+    public RECT getRect(HashMap<Integer, CharacterTag> characters, Stack<Integer> visited);
     //public List<GeneralPath> getPaths(List<Tag> tags);
 }

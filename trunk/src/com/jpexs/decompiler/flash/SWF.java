@@ -62,17 +62,19 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineButtonTag;
+import com.jpexs.decompiler.flash.tags.DefineShapeTag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
-import com.jpexs.decompiler.flash.tags.PlaceObjectTypeTag;
+import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
-import com.jpexs.decompiler.flash.tags.SoundStreamHeadTypeTag;
+import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
@@ -325,7 +327,7 @@ public class SWF {
         sis.readUI8(); //tmpFirstByetOfFrameRate
         frameRate = sis.readUI8();
         frameCount = sis.readUI16();
-        tags = sis.readTagList(0, paralelRead);
+        tags = sis.readTagList(0, paralelRead, true);
         assignExportNamesToSymbols();
         assignClassesToSymbols();
         for (Tag t : tags) {
@@ -503,7 +505,6 @@ public class SWF {
     private List<KeyValue<ClassPath, ScriptPack>> uniqueAS3Packs(List<KeyValue<ClassPath, ScriptPack>> packs) {
         List<KeyValue<ClassPath, ScriptPack>> ret = new ArrayList<>();
         for (KeyValue<ClassPath, ScriptPack> item : packs) {
-            System.err.println(item.key);
             for (KeyValue<ClassPath, ScriptPack> itemOld : ret) {
                 if (item.key.equals(itemOld.key)) {
                     Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Duplicate pack path found!");
@@ -2051,7 +2052,11 @@ public class SWF {
         return ret;
     }
 
-    public static BufferedImage frameToImage(int containerId, int maxDepth, HashMap<Integer, Layer> layers, Color backgroundColor, HashMap<Integer, CharacterTag> characters, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect) {
+    public static BufferedImage frameToImage(int containerId, int maxDepth, HashMap<Integer, Layer> layers, Color backgroundColor, HashMap<Integer, CharacterTag> characters, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, Stack<Integer> visited) {
+        int fixX = 0;
+        int fixY = 0;
+        fixX = -displayRect.Xmin / 20;
+        fixY = -displayRect.Ymin / 20;
         displayRect = fixRect(displayRect);
 
         String key = "frame_" + frame + "_" + containerId;
@@ -2083,6 +2088,8 @@ public class SWF {
             MATRIX mat = new MATRIX(layer.matrix);
             mat.translateX /= 20;
             mat.translateY /= 20;
+            mat.translateX += fixX;
+            mat.translateY += fixY;
 
             AffineTransform trans = matrixToTransform(mat);
 
@@ -2090,9 +2097,7 @@ public class SWF {
             g.setTransform(trans);
             if (character instanceof DrawableTag) {
                 DrawableTag drawable = (DrawableTag) character;
-                BufferedImage img = drawable.toImage(layer.ratio < 0 ? 0 : layer.ratio/*layer.duration*/, allTags, displayRect, characters);
-
-
+                BufferedImage img = drawable.toImage(layer.ratio < 0 ? 0 : layer.ratio/*layer.duration*/, allTags, displayRect, characters, visited);                                
                 if (layer.filters != null) {
                     for (FILTER filter : layer.filters) {
                         img = filter.apply(img);
@@ -2105,68 +2110,70 @@ public class SWF {
                 if (layer.colorTransFormAlpha != null) {
                     img = layer.colorTransFormAlpha.apply(img);
                 }
-                Point imgPos = drawable.getImagePos(layer.ratio < 0 ? 0 : layer.ratio, characters);
-                if (imgPos.x < 0) {
-                    imgPos.x = 0;
-                }
-                if (imgPos.y < 0) {
-                    imgPos.y = 0;
-                }
-                switch (layer.blendMode) {
-                    case 0:
-                    case 1:
-                        g.setComposite(AlphaComposite.SrcOver);
-                        break;
-                    case 2: //TODO:Layer
-                        g.setComposite(AlphaComposite.SrcOver);
-                        break;
-                    case 3:
-                        g.setComposite(BlendComposite.Multiply);
-                        break;
-                    case 4:
-                        g.setComposite(BlendComposite.Screen);
-                        break;
-                    case 5:
-                        g.setComposite(BlendComposite.Lighten);
-                        break;
-                    case 6:
-                        g.setComposite(BlendComposite.Darken);
-                        break;
-                    case 7:
-                        g.setComposite(BlendComposite.Difference);
-                        break;
-                    case 8:
-                        g.setComposite(BlendComposite.Add);
-                        break;
-                    case 9:
-                        g.setComposite(BlendComposite.Subtract);
-                        break;
-                    case 10:
-                        g.setComposite(BlendComposite.Invert);
-                        break;
-                    case 11:
-                        g.setComposite(BlendComposite.Alpha);
-                        break;
-                    case 12:
-                        g.setComposite(BlendComposite.Erase);
-                        break;
-                    case 13:
-                        g.setComposite(BlendComposite.Overlay);
-                        break;
-                    case 14:
-                        g.setComposite(BlendComposite.HardLight);
-                        break;
-                    default: //Not implemented
-                        g.setComposite(AlphaComposite.SrcOver);
-                        break;
-                }
+                Point imgPos = drawable.getImagePos(layer.ratio < 0 ? 0 : layer.ratio, characters, visited);
+                //imgPos.x+=fixX;
+                //imgPos.y+=fixY;
+                /*if (imgPos.x < 0) {
+                 imgPos.x = 0;
+                 }
+                 if (imgPos.y < 0) {
+                 imgPos.y = 0;
+                 }*/
+                /*switch (layer.blendMode) {
+                 case 0:
+                 case 1:
+                 g.setComposite(AlphaComposite.SrcOver);
+                 break;
+                 case 2: //TODO:Layer
+                 g.setComposite(AlphaComposite.SrcOver);
+                 break;
+                 case 3:
+                 g.setComposite(BlendComposite.Multiply);
+                 break;
+                 case 4:
+                 g.setComposite(BlendComposite.Screen);
+                 break;
+                 case 5:
+                 g.setComposite(BlendComposite.Lighten);
+                 break;
+                 case 6:
+                 g.setComposite(BlendComposite.Darken);
+                 break;
+                 case 7:
+                 g.setComposite(BlendComposite.Difference);
+                 break;
+                 case 8:
+                 g.setComposite(BlendComposite.Add);
+                 break;
+                 case 9:
+                 g.setComposite(BlendComposite.Subtract);
+                 break;
+                 case 10:
+                 g.setComposite(BlendComposite.Invert);
+                 break;
+                 case 11:
+                 g.setComposite(BlendComposite.Alpha);
+                 break;
+                 case 12:
+                 g.setComposite(BlendComposite.Erase);
+                 break;
+                 case 13:
+                 g.setComposite(BlendComposite.Overlay);
+                 break;
+                 case 14:
+                 g.setComposite(BlendComposite.HardLight);
+                 break;
+                 default: //Not implemented
+                 g.setComposite(AlphaComposite.SrcOver);
+                 break;
+                 }*/
 
                 g.drawImage(img, imgPos.x, imgPos.y, null);
             } else if (character instanceof BoundedTag) {
                 BoundedTag b = (BoundedTag) character;
                 g.setPaint(new Color(255, 255, 255, 128));
                 g.setComposite(BlendComposite.Invert);
-                RECT r = b.getRect(characters);
+                RECT r = b.getRect(characters, visited);
                 g.drawString(character.toString(), (r.Xmin) / 20 + 3, (r.Ymin) / 20 + 15);
                 g.draw(new Rectangle(r.Xmin / 20, r.Ymin / 20, r.getWidth() / 20, r.getHeight() / 20));
                 g.drawLine(r.Xmin / 20, r.Ymin / 20, r.Xmax / 20, r.Ymax / 20);
@@ -2181,16 +2188,16 @@ public class SWF {
         return ret;
     }
 
-    public static BufferedImage frameToImage(int containerId, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount) {
+    public static BufferedImage frameToImage(int containerId, int frame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited) {
         List<BufferedImage> ret = new ArrayList<>();
-        framesToImage(containerId, ret, frame, frame, allTags, controlTags, displayRect, totalFrameCount);
+        framesToImage(containerId, ret, frame, frame, allTags, controlTags, displayRect, totalFrameCount, visited);
         if (ret.isEmpty()) {
             return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
         }
         return ret.get(0);
     }
 
-    public static void framesToImage(int containerId, List<BufferedImage> ret, int startFrame, int stopFrame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount) {
+    public static void framesToImage(int containerId, List<BufferedImage> ret, int startFrame, int stopFrame, List<Tag> allTags, List<Tag> controlTags, RECT displayRect, int totalFrameCount, Stack<Integer> visited) {
         for (int i = startFrame; i <= stopFrame; i++) {
             String key = "frame_" + i + "_" + containerId;
             if (cache.contains(key)) {
@@ -2308,7 +2315,7 @@ public class SWF {
                     break;
                 }
                 if ((f >= startFrame) && (f <= stopFrame)) {
-                    ret.add(frameToImage(containerId, maxDepth, layers, backgroundColor, characters, f, allTags, controlTags, displayRect));
+                    ret.add(frameToImage(containerId, maxDepth, layers, backgroundColor, characters, f, allTags, controlTags, displayRect, visited));
                 }
                 f++;
             }

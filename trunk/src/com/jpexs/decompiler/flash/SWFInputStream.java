@@ -1148,18 +1148,20 @@ public class SWFInputStream extends InputStream {
         private final int version;
         private final int level;
         private boolean paralel;
+        private boolean skipUnusualTags;
 
-        public TagResolutionTask(Tag tag, int version, int level, boolean paralel) {
+        public TagResolutionTask(Tag tag, int version, int level, boolean paralel, boolean skipUnusualTags) {
             this.tag = tag;
             this.version = version;
             this.level = level;
             this.paralel = paralel;
+            this.skipUnusualTags = skipUnusualTags;
         }
 
         @Override
         public Tag call() throws Exception {
             try {
-                return SWFInputStream.resolveTag(tag, version, level, paralel);
+                return SWFInputStream.resolveTag(tag, version, level, paralel, skipUnusualTags);
             } catch (Exception ex) {
                 return null;
             }
@@ -1176,6 +1178,20 @@ public class SWFInputStream extends InputStream {
      * @throws IOException
      */
     public List<Tag> readTagList(int level, boolean paralel) throws IOException {
+        return readTagList(level, paralel, false);
+    }
+
+    /**
+     * Reads list of tags from the stream. Reading ends with End tag(=0) or end
+     * of the stream. Optinally can skip AS1/2 tags when file is AS3
+     *
+     * @param level
+     * @param paralel
+     * @param skipUnusualTags
+     * @return List of tags
+     * @throws IOException
+     */
+    public List<Tag> readTagList(int level, boolean paralel, boolean skipUnusualTags) throws IOException {
         ExecutorService executor = null;
         if (paralel) {
             executor = Executors.newFixedThreadPool(20);
@@ -1186,10 +1202,11 @@ public class SWFInputStream extends InputStream {
         List<Tag> tags = new ArrayList<>();
         Tag tag;
         Tag previousTag = null;
+        boolean isAS3 = false;
         while (true) {
             long pos = getPos();
             try {
-                tag = readTag(level, pos, false, paralel);
+                tag = readTag(level, pos, false, paralel, skipUnusualTags);
             } catch (EndOfStreamException ex) {
                 tag = null;
             }
@@ -1201,9 +1218,53 @@ public class SWFInputStream extends InputStream {
             }
             tag.previousTag = previousTag;
             previousTag = tag;
+            boolean doParse = false;
+            if (!skipUnusualTags) {
+                doParse = true;
+            } else {
+                switch (tag.getId()) {
+                    case FileAttributesTag.ID: //FileAttributes
+                        FileAttributesTag fileAttributes = (FileAttributesTag) resolveTag(tag, version, level, paralel, skipUnusualTags);
+                        if (fileAttributes.actionScript3) {
+                            isAS3 = true;
+                        }
+                        break;
+                    case DoActionTag.ID:
+                    case DoInitActionTag.ID:
+                        if (isAS3) {
+                            doParse = false;
+                        } else {
+                            doParse = true;
+                        }
+                        break;
+                    case ShowFrameTag.ID:
+                    case PlaceObjectTag.ID:
+                    case PlaceObject2Tag.ID:
+                    case RemoveObjectTag.ID:
+                    case RemoveObject2Tag.ID:
+                    case PlaceObject3Tag.ID: //?
+                    case StartSoundTag.ID:
+                    case FrameLabelTag.ID:
+                    case SoundStreamHeadTag.ID:
+                    case SoundStreamHead2Tag.ID:
+                    case SoundStreamBlockTag.ID:
+                        doParse = true;
+                        break;
+                    default:
+                        if (level > 0) { //No such tags in DefineSprite allowed
+                            Logger.getLogger(SWFInputStream.class.getName()).log(Level.FINE, "Tag({0}) found in DefineSprite => Ignored", tag.getId());
+                            doParse = false;
+                        } else {
+                            doParse = true;
+                        }
 
-            Future<Tag> future = executor.submit(new TagResolutionTask(tag, version, level, paralel));
-            futureResults.add(future);
+                }
+            }
+
+            if (doParse) {
+                Future<Tag> future = executor.submit(new TagResolutionTask(tag, version, level, paralel, skipUnusualTags));
+                futureResults.add(future);
+            }
         }
 
         for (Future<Tag> future : futureResults) {
@@ -1217,7 +1278,7 @@ public class SWFInputStream extends InputStream {
         return tags;
     }
 
-    public static Tag resolveTag(Tag tag, int version, int level, boolean paralel) {
+    public static Tag resolveTag(Tag tag, int version, int level, boolean paralel, boolean skipUnusualTags) {
         Tag ret;
 
         byte data[] = tag.getData(version);
@@ -1326,7 +1387,7 @@ public class SWFInputStream extends InputStream {
                     break;
                 //case 38:
                 case 39:
-                    ret = new DefineSpriteTag(data, version, level, pos, paralel);
+                    ret = new DefineSpriteTag(data, version, level, pos, paralel, skipUnusualTags);
                     break;
                 //case 40:
                 case 41:
@@ -1459,11 +1520,12 @@ public class SWFInputStream extends InputStream {
      * @param level
      * @param pos
      * @param paralel
+     * @param skipUnusualTags
      * @return Tag or null when End tag
      * @throws IOException
      */
-    public Tag readTag(int level, long pos, boolean paralel) throws IOException {
-        return readTag(level, pos, true, paralel);
+    public Tag readTag(int level, long pos, boolean paralel, boolean skipUnusualTags) throws IOException {
+        return readTag(level, pos, true, paralel, skipUnusualTags);
     }
 
     /**
@@ -1474,10 +1536,11 @@ public class SWFInputStream extends InputStream {
      * @param pos
      * @param resolve
      * @param paralel
+     * @param skipUnusualTags
      * @return Tag or null when End tag
      * @throws IOException
      */
-    public Tag readTag(int level, long pos, boolean resolve, boolean paralel) throws IOException {
+    public Tag readTag(int level, long pos, boolean resolve, boolean paralel, boolean skipUnusualTags) throws IOException {
         int tagIDTagLength = readUI16();
         int tagID = (tagIDTagLength) >> 6;
         if (tagID == 0) {
@@ -1526,7 +1589,7 @@ public class SWFInputStream extends InputStream {
             }
         }
         if (resolve) {
-            return resolveTag(ret, version, level, paralel);
+            return resolveTag(ret, version, level, paralel, skipUnusualTags);
         }
         return ret;
     }

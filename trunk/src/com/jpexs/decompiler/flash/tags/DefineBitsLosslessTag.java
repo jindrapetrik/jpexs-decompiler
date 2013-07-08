@@ -50,6 +50,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
     private COLORMAPDATA colorMapData;
     private BITMAPDATA bitmapData;
     private boolean decompressed = false;
+    public static final int ID = 20;
 
     @Override
     public void setImage(byte data[]) throws IOException {
@@ -154,7 +155,7 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
     }
 
     public DefineBitsLosslessTag(byte[] data, int version, long pos) throws IOException {
-        super(20, "DefineBitsLossless", data, pos);
+        super(ID, "DefineBitsLossless", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterID = sis.readUI16();
         bitmapFormat = sis.readUI8();

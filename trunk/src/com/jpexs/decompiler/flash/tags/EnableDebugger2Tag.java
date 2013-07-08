@@ -35,6 +35,7 @@ public class EnableDebugger2Tag extends Tag {
      * MD5 hash of password
      */
     public String passwordHash;
+    public static final int ID = 64;
 
     /**
      * Gets data bytes
@@ -64,7 +65,7 @@ public class EnableDebugger2Tag extends Tag {
      * @throws IOException
      */
     public EnableDebugger2Tag(byte data[], int version, long pos) throws IOException {
-        super(64, "EnableDebugger2", data, pos);
+        super(ID, "EnableDebugger2", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         reserved = sis.readUI16();
         passwordHash = sis.readString();

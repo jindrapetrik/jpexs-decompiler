@@ -21,7 +21,9 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import java.awt.BorderLayout;
 import java.awt.Image;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.ImageIcon;
@@ -61,7 +63,7 @@ public class ImagePanel extends JPanel {
             return;
         }
         if (drawable.getNumFrames() == 1) {
-            setImage(drawable.toImage(0, swf.tags, swf.displayRect, characters));
+            setImage(drawable.toImage(0, swf.tags, swf.displayRect, characters, new Stack<Integer>()));
             return;
         }
         timer = new Timer();
@@ -72,7 +74,7 @@ public class ImagePanel extends JPanel {
             public void run() {
                 int nframe = percent * drawable.getNumFrames() / 100;
                 if (nframe != frame) {
-                    ImageIcon icon = new ImageIcon(drawable.toImage(nframe, swf.tags, swf.displayRect, characters));
+                    ImageIcon icon = new ImageIcon(drawable.toImage(nframe, swf.tags, swf.displayRect, characters, new Stack<Integer>()));
                     label.setIcon(icon);
                 }
                 if (percent == 100) {

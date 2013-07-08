@@ -96,6 +96,17 @@ public class MATRIX implements Serializable {
         return ret;
     }
 
+    public RECT apply(RECT r) {
+        Point topLeft = apply(r.getTopLeft());
+        Point bottomRight = apply(r.getBottomRight());
+        int Xmin = Math.min(topLeft.x, bottomRight.x);
+        int Ymin = Math.min(topLeft.y, bottomRight.y);
+        int Xmax = Math.max(topLeft.x, bottomRight.x);
+        int Ymax = Math.max(topLeft.y, bottomRight.y);
+        return new RECT(Xmin, Xmax, Ymin, Ymax);
+
+    }
+
     public int getRotateSkew0() {
         return hasRotate ? rotateSkew0 : 0;
     }

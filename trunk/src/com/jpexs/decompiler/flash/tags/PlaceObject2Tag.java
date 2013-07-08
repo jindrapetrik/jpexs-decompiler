@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
@@ -107,6 +108,7 @@ public class PlaceObject2Tag extends Tag implements Container, PlaceObjectTypeTa
      * @since SWF 5 If PlaceFlagHasClipActions, Clip Actions Data
      */
     public CLIPACTIONS clipActions;
+    public static final int ID = 26;
 
     @Override
     public int getClipDepth() {
@@ -176,7 +178,7 @@ public class PlaceObject2Tag extends Tag implements Container, PlaceObjectTypeTa
     }
 
     public PlaceObject2Tag(boolean placeFlagHasClipActions, boolean placeFlagHasClipDepth, boolean placeFlagHasName, boolean placeFlagHasRatio, boolean placeFlagHasColorTransform, boolean placeFlagHasMatrix, boolean placeFlagHasCharacter, boolean placeFlagMove, int depth, int characterId, MATRIX matrix, CXFORMWITHALPHA colorTransform, int ratio, String name, int clipDepth, CLIPACTIONS clipActions) {
-        super(26, "PlaceObject2", new byte[0], 0);
+        super(ID, "PlaceObject2", new byte[0], 0);
         this.placeFlagHasClipActions = placeFlagHasClipActions;
         this.placeFlagHasClipDepth = placeFlagHasClipDepth;
         this.placeFlagHasName = placeFlagHasName;

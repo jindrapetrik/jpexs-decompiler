@@ -25,11 +25,13 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.helpers.Cache;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
+import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import java.awt.Color;
 import java.awt.Point;
@@ -43,6 +45,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -66,6 +69,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
      */
     //public List<Action> actions;
     public byte[] actionBytes;
+    public static final int ID = 7;
 
     @Override
     public int getCharacterID() {
@@ -87,7 +91,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
      * @throws IOException
      */
     public DefineButtonTag(byte[] data, int version, long pos) throws IOException {
-        super(7, "DefineButton", data, pos);
+        super(ID, "DefineButton", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         buttonId = sis.readUI16();
         characters = sis.readBUTTONRECORDList(false);
@@ -200,20 +204,37 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
         }
         return needed;
     }
+    private static Cache rectCache = new Cache(true);
 
     @Override
-    public RECT getRect(HashMap<Integer, CharacterTag> allCharacters) {
+    public RECT getRect(HashMap<Integer, CharacterTag> allCharacters, Stack<Integer> visited) {
+        if (rectCache.contains(this)) {
+            return (RECT) rectCache.get(this);
+        }
+        if (visited.contains(buttonId)) {
+            return new RECT();
+        }
+        visited.push(buttonId);
         RECT rect = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
         for (BUTTONRECORD r : characters) {
             CharacterTag ch = allCharacters.get(r.characterId);
             if (ch instanceof BoundedTag) {
-                RECT r2 = ((BoundedTag) ch).getRect(allCharacters);
+                if (visited.contains(ch.getCharacterID())) {
+                    continue;
+                }
+                RECT r2 = ((BoundedTag) ch).getRect(allCharacters, visited);
+                MATRIX mat = r.placeMatrix;
+                if (mat != null) {
+                    r2 = mat.apply(r2);
+                }
                 rect.Xmin = Math.min(r2.Xmin, rect.Xmin);
                 rect.Ymin = Math.min(r2.Ymin, rect.Ymin);
                 rect.Xmax = Math.max(r2.Xmax, rect.Xmax);
                 rect.Ymax = Math.max(r2.Ymax, rect.Ymax);
             }
         }
+        visited.pop();
+        rectCache.put(this, rect);
         return rect;
     }
     List<DisassemblyListener> listeners = new ArrayList<>();
@@ -234,7 +255,11 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     }
 
     @Override
-    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters) {
+    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+        if (visited.contains(buttonId)) {
+            return new BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
+        }
+        visited.push(buttonId);
         HashMap<Integer, Layer> layers = new HashMap<>();
         int maxDepth = 0;
         for (BUTTONRECORD r : this.characters) {
@@ -251,12 +276,18 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
                 layers.put(r.placeDepth, layer);
             }
         }
-        return SWF.frameToImage(buttonId, maxDepth, layers, new Color(0, 0, 0, 0), characters, 1, tags, tags, displayRect);
+        visited.pop();
+        displayRect = getRect(characters, visited);
+        visited.push(buttonId);
+        BufferedImage ret = SWF.frameToImage(buttonId, maxDepth, layers, new Color(0, 0, 0, 0), characters, 1, tags, tags, displayRect, visited);
+        visited.pop();
+        return ret;
     }
 
     @Override
-    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters) {
-        return new Point(0, 0);
+    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+        RECT r=getRect(characters, visited);
+        return new Point(r.Xmin/20, r.Ymin/20);
     }
 
     @Override

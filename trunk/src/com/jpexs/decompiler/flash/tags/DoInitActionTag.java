@@ -44,6 +44,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
      */
     //public List<Action> actions = new ArrayList<Action>();
     public byte[] actionBytes;
+    public static final int ID = 59;
 
     /**
      * Constructor
@@ -53,7 +54,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
      * @throws IOException
      */
     public DoInitActionTag(byte[] data, int version, long pos) throws IOException {
-        super(59, "DoInitAction", data, pos);
+        super(ID, "DoInitAction", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         spriteId = sis.readUI16();
         //actions = sis.readActionList();

@@ -23,15 +23,19 @@ package com.jpexs.decompiler.flash.tags;
  */
 public class ShowFrameTag extends Tag {
 
+    public static final int ID = 1;
+
     /**
      * Constructor
+     *
+     * @param pos
      */
     public ShowFrameTag(long pos) {
-        super(1, "ShowFrame", new byte[0], pos);
+        super(ID, "ShowFrame", new byte[0], pos);
     }
 
     public ShowFrameTag() {
-        super(1, "ShowFrame", new byte[0], 0);
+        super(ID, "ShowFrame", new byte[0], 0);
     }
 
     /**

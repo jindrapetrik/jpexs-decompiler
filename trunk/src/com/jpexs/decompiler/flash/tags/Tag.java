@@ -129,15 +129,20 @@ public class Tag implements NeedsCharacters, Exportable {
         return new HashSet<>();
     }
 
-    public Set<Integer> getDeepNeededCharacters(HashMap<Integer, CharacterTag> characters) {
+    public Set<Integer> getDeepNeededCharacters(HashMap<Integer, CharacterTag> characters,List<Integer> visited) {
         Set<Integer> ret = new HashSet<>();
         Set<Integer> needed = getNeededCharacters();
-        for (int ch : needed) {
+        for (int ch : needed) {            
             if (!characters.containsKey(ch)) { //TODO: use Import tag (?)
                 continue;
             }
+            if(visited.contains(ch)){
+                continue;
+            }else{
+                visited.add(ch);
+            }
             ret.add(ch);
-            ret.addAll(characters.get(ch).getDeepNeededCharacters(characters));
+            ret.addAll(characters.get(ch).getDeepNeededCharacters(characters,visited));
         }
         return ret;
     }

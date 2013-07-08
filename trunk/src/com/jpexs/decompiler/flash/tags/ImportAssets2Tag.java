@@ -37,6 +37,7 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
      * HashMap with assets
      */
     public HashMap<Integer, String> assets;
+    public static final int ID = 71;
 
     /**
      * Constructor
@@ -46,7 +47,7 @@ public class ImportAssets2Tag extends Tag implements ImportTag {
      * @throws IOException
      */
     public ImportAssets2Tag(byte data[], int version, long pos) throws IOException {
-        super(71, "ImportAssets2", data, pos);
+        super(ID, "ImportAssets2", data, pos);
         assets = new HashMap<>();
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         url = sis.readString();

@@ -33,6 +33,7 @@ public class VideoFrameTag extends Tag {
     public int streamID;
     public int frameNum;
     public byte[] videoData;
+    public static final int ID = 61;
 
     /**
      * Gets data bytes
@@ -62,7 +63,7 @@ public class VideoFrameTag extends Tag {
      * @throws IOException
      */
     public VideoFrameTag(byte data[], int version, long pos) throws IOException {
-        super(61, "VideoFrame", data, pos);
+        super(ID, "VideoFrame", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         streamID = sis.readUI16();
         frameNum = sis.readUI16();

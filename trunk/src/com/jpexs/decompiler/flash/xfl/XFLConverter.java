@@ -35,11 +35,11 @@ import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.FrameLabelTag;
-import com.jpexs.decompiler.flash.tags.PlaceObjectTypeTag;
+import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
-import com.jpexs.decompiler.flash.tags.SoundStreamHeadTypeTag;
+import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -1049,7 +1049,7 @@ public class XFLConverter {
             ret += " symbolType=\"graphic\" loop=\"loop\"";
         } else if (tag instanceof DefineSpriteTag) {
             DefineSpriteTag sprite = (DefineSpriteTag) tag;
-            RECT spriteRect = sprite.getRect(characters);
+            RECT spriteRect = sprite.getRect(characters, new Stack<Integer>());
             double centerPoint3DX = twipToPixel(matrix.translateX + spriteRect.getWidth() / 2);
             double centerPoint3DY = twipToPixel(matrix.translateY + spriteRect.getHeight() / 2);
             ret += " centerPoint3DX=\"" + centerPoint3DX + "\" centerPoint3DY=\"" + centerPoint3DY + "\"";

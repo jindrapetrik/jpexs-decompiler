@@ -43,6 +43,7 @@ public class DefineFontInfo2Tag extends Tag {
     public boolean fontFlagsWideCodes;
     public LANGCODE languageCode;
     public List<Integer> codeTable;
+    public static final int ID = 62;
 
     /**
      * Gets data bytes
@@ -83,7 +84,7 @@ public class DefineFontInfo2Tag extends Tag {
      * @throws IOException
      */
     public DefineFontInfo2Tag(byte data[], int version, long pos) throws IOException {
-        super(62, "DefineFontInfo2", data, pos);
+        super(ID, "DefineFontInfo2", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         fontID = sis.readUI16();
         int fontNameLen = sis.readUI8();

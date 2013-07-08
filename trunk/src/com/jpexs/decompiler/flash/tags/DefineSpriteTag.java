@@ -16,11 +16,13 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
+import com.jpexs.decompiler.flash.helpers.Cache;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
@@ -39,6 +41,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Defines a sprite character
@@ -58,20 +63,30 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
      */
     public List<Tag> subTags;
     private int level;
+    public static final int ID = 39;
 
     @Override
     public int getCharacterID() {
         return spriteId;
     }
 
-    private RECT getCharacterBounds(HashMap<Integer, CharacterTag> allCharacters, Set<Integer> characters) {
+    private RECT getCharacterBounds(HashMap<Integer, CharacterTag> allCharacters, Set<Integer> characters, Stack<Integer> visited) {
+        if (visited.contains(spriteId)) {
+            return new RECT();
+        }
+        visited.push(spriteId);
         RECT ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
         boolean foundSomething = false;
         for (int c : characters) {
             Tag t = allCharacters.get(c);
             RECT r = null;
             if (t instanceof BoundedTag) {
-                r = ((BoundedTag) t).getRect(allCharacters);
+                if (t instanceof CharacterTag) {
+                    if (visited.contains(((CharacterTag) t).getCharacterID())) {
+                        continue;
+                    }
+                }
+                r = ((BoundedTag) t).getRect(allCharacters, visited);
             }
             if (r != null) {
                 foundSomething = true;
@@ -81,18 +96,30 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
                 ret.Ymax = Math.max(r.Ymax, ret.Ymax);
             }
         }
+        visited.pop();
         if (!foundSomething) {
             return new RECT();
         }
         return ret;
     }
+    private static Cache rectCache = new Cache(true);
 
     @Override
-    public RECT getRect(HashMap<Integer, CharacterTag> characters) {
+    public RECT getRect(HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+        if (rectCache.contains(this)) {
+            return (RECT) rectCache.get(this);
+        }
+        if (visited.contains(spriteId)) {
+            return new RECT();
+        }
+        visited.push(spriteId);        
+        RECT emptyRet = new RECT();
         RECT ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
         HashMap<Integer, Integer> depthMap = new HashMap<>();
         boolean foundSomething = false;
+        int pos = 0;
         for (Tag t : subTags) {
+            pos++;
             MATRIX m = null;
             int characterId = -1;
             if (t instanceof PlaceObjectTypeTag) {
@@ -110,8 +137,13 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
                 continue;
             }
             HashSet<Integer> need = new HashSet<>();
+            if (visited.contains(characterId)) {
+                continue;
+            }
             need.add(characterId);
-            RECT r = getCharacterBounds(characters, need);
+            visited.pop();
+            RECT r = getCharacterBounds(characters, need, visited);
+            visited.push(spriteId);
 
             if (m != null) {
                 AffineTransform trans = SWF.matrixToTransform(m);
@@ -137,9 +169,12 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
             ret.Ymax = Math.max(r.Ymax, ret.Ymax);
             foundSomething = true;
         }
+        visited.pop();
+
         if (!foundSomething) {
-            return new RECT();
+            ret = new RECT();
         }
+        rectCache.put(this, ret);
         return ret;
     }
 
@@ -148,14 +183,18 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param level
+     * @param pos
+     * @param paralel
+     * @param skipUnusualTags
      * @throws IOException
      */
-    public DefineSpriteTag(byte[] data, int version, int level, long pos, boolean paralel) throws IOException {
-        super(39, "DefineSprite", data, pos);
+    public DefineSpriteTag(byte[] data, int version, int level, long pos, boolean paralel, boolean skipUnusualTags) throws IOException {
+        super(ID, "DefineSprite", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version, pos);
         spriteId = sis.readUI16();
         frameCount = sis.readUI16();
-        subTags = sis.readTagList(level + 1, paralel);
+        subTags = sis.readTagList(level + 1, paralel, skipUnusualTags);
     }
     static int c = 0;
 
@@ -229,7 +268,10 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
     }
 
     @Override
-    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters) {
+    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+        if (visited.contains(spriteId)) {
+            return new BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
+        }
         /* 
          rect.Xmax=displayRect.Xmin+rect.getWidth();
          rect.Ymax=displayRect.Ymin+rect.getWidth();
@@ -237,13 +279,16 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
          rect.Ymin=displayRect.Ymin;
          RECT rect=getRect(characters);
          SWF.fixRect(rect);*/
-        RECT rect = getRect(characters);
-        return SWF.frameToImage(spriteId, frame, tags, subTags, rect, frameCount);
+        RECT rect = getRect(characters, visited);
+        visited.push(spriteId);
+        BufferedImage ret = SWF.frameToImage(spriteId, frame, tags, subTags, rect, frameCount, visited);
+        visited.pop();
+        return ret;
     }
 
     @Override
-    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters) {
-        RECT displayRect = getRect(characters);
+    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+        //RECT displayRect = getRect(characters, visited); //use visited
         return new Point(0, 0); //displayRect.Xmin,displayRect.Ymin);
     }
 

@@ -29,6 +29,7 @@ public class DefineBinaryDataTag extends CharacterTag {
     public int tag;
     public byte binaryData[];
     public long reserved;
+    public static final int ID = 87;
 
     /**
      * Gets data bytes
@@ -51,7 +52,7 @@ public class DefineBinaryDataTag extends CharacterTag {
     }
 
     public DefineBinaryDataTag(byte[] data, int version, long pos) throws IOException {
-        super(87, "DefineBinaryData", data, pos);
+        super(ID, "DefineBinaryData", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         tag = sis.readUI16();
         reserved = sis.readUI32();

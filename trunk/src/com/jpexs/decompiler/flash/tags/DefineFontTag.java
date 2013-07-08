@@ -25,6 +25,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -127,6 +130,7 @@ public class DefineFontTag extends CharacterTag implements FontTag {
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public DefineFontTag(byte data[], int version, long pos) throws IOException {

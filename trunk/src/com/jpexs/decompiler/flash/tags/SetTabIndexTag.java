@@ -38,6 +38,7 @@ public class SetTabIndexTag extends Tag {
      * Tab order value
      */
     public int tabIndex;
+    public static final int ID = 66;
 
     /**
      * Gets data bytes
@@ -63,10 +64,11 @@ public class SetTabIndexTag extends Tag {
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public SetTabIndexTag(byte data[], int version, long pos) throws IOException {
-        super(66, "SetTabIndex", data, pos);
+        super(ID, "SetTabIndex", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         depth = sis.readUI16();
         tabIndex = sis.readUI16();

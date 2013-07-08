@@ -25,6 +25,8 @@ import java.io.IOException;
  */
 public class SoundStreamBlockTag extends Tag {
 
+    public static final int ID = 19;
+
     /**
      * Constructor
      *
@@ -33,6 +35,6 @@ public class SoundStreamBlockTag extends Tag {
      * @throws IOException
      */
     public SoundStreamBlockTag(byte data[], int version, long pos) throws IOException {
-        super(19, "SoundStreamBlock", data, pos);      //all data is streamSoundData
+        super(ID, "SoundStreamBlock", data, pos);      //all data is streamSoundData
     }
 }

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -167,6 +168,7 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
     // FIXME bug found in ecoDrive.swf, 
     private boolean bitmapCacheBug;
     private int reserved;
+    public static final int ID = 70;
 
     @Override
     public List<FILTER> getFilters() {
@@ -276,7 +278,7 @@ public class PlaceObject3Tag extends Tag implements Container, PlaceObjectTypeTa
      * @throws IOException
      */
     public PlaceObject3Tag(byte data[], int version, long pos) throws IOException {
-        super(70, "PlaceObject3", data, pos);
+        super(ID, "PlaceObject3", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         placeFlagHasClipActions = sis.readUB(1) == 1;
         placeFlagHasClipDepth = sis.readUB(1) == 1;

@@ -22,6 +22,7 @@ import java.awt.BorderLayout;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.JLabel;
@@ -61,7 +62,7 @@ public class SWFPreviwPanel extends JPanel {
             @Override
             public void run() {
                 buffering.setVisible(true);
-                SWF.framesToImage(0, frameImages, 1, swf.frameCount, swf.tags, swf.tags, swf.displayRect, swf.frameCount);
+                SWF.framesToImage(0, frameImages, 1, swf.frameCount, swf.tags, swf.tags, swf.displayRect, swf.frameCount, new Stack<Integer>());
                 buffering.setVisible(false);
             }
         }.start();

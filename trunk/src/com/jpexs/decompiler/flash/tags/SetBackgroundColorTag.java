@@ -26,15 +26,16 @@ import java.io.IOException;
 public class SetBackgroundColorTag extends Tag {
 
     public RGB backgroundColor;
+    public static final int ID = 9;
 
     public SetBackgroundColorTag(byte[] data, int version, long pos) throws IOException {
-        super(9, "SetBackgroundColor", data, pos);
+        super(ID, "SetBackgroundColor", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         backgroundColor = sis.readRGB();
     }
 
     public SetBackgroundColorTag(RGB backgroundColor) {
-        super(9, "SetBackgroundColor", new byte[0], 0);
+        super(ID, "SetBackgroundColor", new byte[0], 0);
         this.backgroundColor = backgroundColor;
     }
 

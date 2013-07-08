@@ -51,6 +51,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -69,6 +70,7 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, 
     public int glyphBits;
     public int advanceBits;
     public List<TEXTRECORD> textRecords;
+    public static final int ID = 11;
 
     @Override
     public RECT getBounds() {
@@ -379,7 +381,7 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, 
     }
 
     public DefineTextTag(int characterID, RECT textBounds, MATRIX textMatrix, int glyphBits, int advanceBits, List<TEXTRECORD> textRecords) {
-        super(11, "DefineText", new byte[0], 0);
+        super(ID, "DefineText", new byte[0], 0);
         this.characterID = characterID;
         this.textBounds = textBounds;
         this.textMatrix = textMatrix;
@@ -438,7 +440,7 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, 
     }
 
     @Override
-    public RECT getRect(HashMap<Integer, CharacterTag> characters) {
+    public RECT getRect(HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
         return textBounds;
     }
 
@@ -454,9 +456,11 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, 
     }
 
     @Override
-    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters) {
+    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
         RECT bound = getBounds();
-        BufferedImage ret = new BufferedImage(bound.Xmax / 20, bound.Ymax / 20, BufferedImage.TYPE_INT_ARGB);
+        int fixX = -bound.Xmin;
+        int fixY = -bound.Ymin;
+        BufferedImage ret = new BufferedImage(bound.getWidth() / 20, bound.getHeight() / 20, BufferedImage.TYPE_INT_ARGB);
 
         Color textColor = new Color(0, 0, 0);
         FontTag font = null;
@@ -496,6 +500,7 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, 
                 float rat = textHeight / 1000f;
                 tr.translate(rat * x / 20, rat * (y + rect.Ymin) / 20);
                 tr.scale(rat / font.getDivider(), rat / font.getDivider());
+                tr.translate(fixX, fixY);
                 g.drawImage(img, tr, null);
                 x += entry.glyphAdvance * 1000 / textHeight;
             }
@@ -504,8 +509,8 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, 
     }
 
     @Override
-    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters) {
-        return new Point(0, 0);
+    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+        return new Point(textBounds.Xmin / 20, textBounds.Ymin / 20);
     }
 
     @Override

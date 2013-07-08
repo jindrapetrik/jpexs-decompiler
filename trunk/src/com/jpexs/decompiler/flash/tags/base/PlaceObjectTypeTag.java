@@ -1,4 +1,4 @@
-package com.jpexs.decompiler.flash.tags;
+package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORM;

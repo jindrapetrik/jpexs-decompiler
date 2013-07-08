@@ -20,7 +20,9 @@ import java.io.IOException;
 
 public class JPEGTablesTag extends Tag {
 
+    public static final int ID = 8;
+
     public JPEGTablesTag(byte[] data, long pos) throws IOException {
-        super(8, "JPEGTables", data, pos); //data is JPEG data   
+        super(ID, "JPEGTables", data, pos); //data is JPEG data   
     }
 }

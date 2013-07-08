@@ -41,6 +41,7 @@ public class DefineFontInfoTag extends Tag {
     public boolean fontFlagsBold;
     public boolean fontFlagsWideCodes;
     public List<Integer> codeTable;
+    public static final int ID = 13;
 
     /**
      * Gets data bytes
@@ -81,10 +82,11 @@ public class DefineFontInfoTag extends Tag {
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public DefineFontInfoTag(byte data[], int version, long pos) throws IOException {
-        super(13, "DefineFontInfo", data, pos);
+        super(ID, "DefineFontInfo", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         fontId = sis.readUI16();
         int fontNameLen = sis.readUI8();

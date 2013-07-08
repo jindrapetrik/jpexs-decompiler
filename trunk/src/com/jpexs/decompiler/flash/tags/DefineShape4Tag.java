@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 public class DefineShape4Tag extends CharacterTag implements BoundedTag, ShapeTag {
 
@@ -41,9 +42,10 @@ public class DefineShape4Tag extends CharacterTag implements BoundedTag, ShapeTa
     public boolean usesNonScalingStrokes;
     public boolean usesScalingStrokes;
     public SHAPEWITHSTYLE shapes;
+    public static final int ID = 83;
 
     @Override
-    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters) {
+    public Point getImagePos(int frame, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
         return new Point(shapeBounds.Xmin / 20, shapeBounds.Ymin / 20);
     }
 
@@ -68,7 +70,7 @@ public class DefineShape4Tag extends CharacterTag implements BoundedTag, ShapeTa
     }
 
     @Override
-    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters) {
+    public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
         return shapes.toImage(4, tags);
     }
 
@@ -78,12 +80,12 @@ public class DefineShape4Tag extends CharacterTag implements BoundedTag, ShapeTa
     }
 
     @Override
-    public RECT getRect(HashMap<Integer, CharacterTag> characters) {
+    public RECT getRect(HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
         return shapeBounds;
     }
 
     public DefineShape4Tag(byte[] data, int version, long pos) throws IOException {
-        super(83, "DefineShape4", data, pos);
+        super(ID, "DefineShape4", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         shapeId = sis.readUI16();
         shapeBounds = sis.readRECT();
