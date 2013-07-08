@@ -27,7 +27,6 @@ import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
-import static com.jpexs.decompiler.flash.gui.Main.isAddedToContextMenu;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.abc.DeobfuscationDialog;
@@ -226,6 +225,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
     private JCheckBoxMenuItem miAssociate;
     private JCheckBoxMenuItem miDecompile;
     private JCheckBoxMenuItem miCacheDisk;
+    private JCheckBoxMenuItem miGotoMainClassOnStartup;
 
     public void setPercent(int percent) {
         progressBar.setValue(percent);
@@ -490,18 +490,23 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         miCacheDisk.setActionCommand("CACHEONDISK");
         miCacheDisk.addActionListener(this);
 
+        miGotoMainClassOnStartup = new JCheckBoxMenuItem(translate("menu.settings.gotoMainClassOnStartup"));
+        miGotoMainClassOnStartup.setSelected((Boolean) Configuration.getConfig("gotoMainClassOnStartup", Boolean.FALSE));
+        miGotoMainClassOnStartup.setActionCommand("GOTODOCUMENTCLASSONSTARTUP");
+        miGotoMainClassOnStartup.addActionListener(this);
+
         JMenu menuSettings = new JMenu(translate("menu.settings"));
         menuSettings.add(autoDeobfuscateMenuItem);
         menuSettings.add(miInternalViewer);
         menuSettings.add(miParallelSpeedUp);
         menuSettings.add(miDecompile);
         menuSettings.add(miCacheDisk);
-
+        menuSettings.add(miGotoMainClassOnStartup);
 
         miAssociate = new JCheckBoxMenuItem(translate("menu.settings.addtocontextmenu"));
         miAssociate.setActionCommand("ASSOCIATE");
         miAssociate.addActionListener(this);
-        miAssociate.setState(isAddedToContextMenu());
+        miAssociate.setState(Main.isAddedToContextMenu());
 
 
         JMenuItem miLanguage = new JMenuItem(translate("menu.settings.language"));
@@ -963,7 +968,6 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
 
         //Opening files with drag&drop to main window
         enableDrop(true);
-
     }
 
     public void enableDrop(boolean value) {
@@ -1020,6 +1024,9 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
 
                     splitPos = splitPane2.getDividerLocation();
                     splitsInited = true;
+                    if (miGotoMainClassOnStartup.isSelected()) {
+                        gotoDocumentClass();
+                    }
                 }
             });
 
@@ -1572,9 +1579,33 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         }
     }
 
+    public void gotoDocumentClass() {
+        String documentClass = null;
+        loopdc:
+        for (Tag t : swf.tags) {
+            if (t instanceof SymbolClassTag) {
+                SymbolClassTag sc = (SymbolClassTag) t;
+                for (int i = 0; i < sc.tagIDs.length; i++) {
+                    if (sc.tagIDs[i] == 0) {
+                        documentClass = sc.classNames[i];
+                        break loopdc;
+                    }
+                }
+            }
+        }
+        if (documentClass != null) {
+            showDetail(DETAILCARDAS3NAVIGATOR);
+            showCard(CARDACTIONSCRIPTPANEL);
+            abcPanel.hilightScript(documentClass);
+        }
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
+            case "GOTODOCUMENTCLASSONSTARTUP":
+                Configuration.setConfig("gotoMainClassOnStartup", miGotoMainClassOnStartup.isSelected());
+                break;
             case "CACHEONDISK":
                 Configuration.setConfig("cacheOnDisk", miCacheDisk.isSelected());
                 if (miCacheDisk.isSelected()) {
@@ -1618,22 +1649,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                 }, 500); //It takes some time registry change to apply
                 break;
             case "GOTODOCUMENTCLASS":
-                String documentClass = null;
-                loopdc:
-                for (Tag t : swf.tags) {
-                    if (t instanceof SymbolClassTag) {
-                        SymbolClassTag sc = (SymbolClassTag) t;
-                        for (int i = 0; i < sc.tagIDs.length; i++) {
-                            if (sc.tagIDs[i] == 0) {
-                                documentClass = sc.classNames[i];
-                                break loopdc;
-                            }
-                        }
-                    }
-                }
-                if (documentClass != null) {
-                    abcPanel.hilightScript(documentClass);
-                }
+                gotoDocumentClass();
                 break;
             case "PARALLELSPEEDUP":
                 String confStr = translate("message.confirm.parallel") + "\r\n";
