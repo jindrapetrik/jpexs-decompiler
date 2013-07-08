@@ -51,7 +51,7 @@ public class SwitchItem extends LoopItem implements Block {
         ret += hilight("switch(") + switchedObject.toString(localData) + hilight(")") + "\r\n{\r\n";
         for (int i = 0; i < caseCommands.size(); i++) {
             for (int k = 0; k < valuesMapping.size(); k++) {
-                if (valuesMapping.get(k) == i) {
+                if (valuesMapping.get(k) == i) {                    
                     ret += "case " + caseValues.get(k).toString(localData) + ":\r\n";
                 }
             }

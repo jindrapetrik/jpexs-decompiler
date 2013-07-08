@@ -328,6 +328,10 @@ public class SWF {
         tags = sis.readTagList(0, paralelRead, true);
         assignExportNamesToSymbols();
         assignClassesToSymbols();
+        findFileAttributes();
+    }
+
+    private void findFileAttributes(){
         for (Tag t : tags) {
             if (t instanceof FileAttributesTag) {
                 fileAttributes = (FileAttributesTag) t;
@@ -335,7 +339,7 @@ public class SWF {
             }
         }
     }
-
+    
     private void assignExportNamesToSymbols() {
         HashMap<Integer, String> exportNames = new HashMap<>();
         for (Tag t : tags) {
@@ -1729,6 +1733,7 @@ public class SWF {
     HashMap<String, Integer> typeCounts = new HashMap<>();
 
     public int deobfuscateIdentifiers(RenameType renameType) {
+        findFileAttributes();
         if (fileAttributes == null) {
             int cnt = 0;
             cnt += deobfuscateAS2Identifiers(renameType);

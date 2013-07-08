@@ -1228,6 +1228,7 @@ public class SWFInputStream extends InputStream {
                         if (fileAttributes.actionScript3) {
                             isAS3 = true;
                         }
+                        doParse = true;
                         break;
                     case DoActionTag.ID:
                     case DoInitActionTag.ID:
