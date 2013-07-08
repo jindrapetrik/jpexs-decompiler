@@ -903,7 +903,9 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         splitPane2.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent pce) {
-                Configuration.setConfig("gui.splitPane2.dividerLocation", pce.getNewValue());
+                if (detailPanel.isVisible()) {
+                    Configuration.setConfig("gui.splitPane2.dividerLocation", pce.getNewValue());
+                }
             }
         });
         View.centerScreen(this);
@@ -966,7 +968,11 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
             }
 
             splitPane1.setDividerLocation((Integer) Configuration.getConfig("gui.splitPane1.dividerLocation", getWidth() / 3));
-            splitPane2.setDividerLocation((Integer) Configuration.getConfig("gui.splitPane2.dividerLocation", splitPane2.getHeight() * 3 / 5));
+            int confDivLoc = (Integer) Configuration.getConfig("gui.splitPane2.dividerLocation", splitPane2.getHeight() * 3 / 5);
+            if (confDivLoc > splitPane2.getHeight() - 10) { //In older releases, divider location was saved when detailPanel was invisible too
+                confDivLoc = splitPane2.getHeight() * 3 / 5;
+            }
+            splitPane2.setDividerLocation(confDivLoc);
 
             splitPos = splitPane2.getDividerLocation();
         }
