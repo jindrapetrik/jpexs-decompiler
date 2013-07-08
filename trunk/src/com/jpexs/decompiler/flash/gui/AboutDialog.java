@@ -31,7 +31,7 @@ public class AboutDialog extends AppDialog {
 
     public AboutDialog() {
         setDefaultCloseOperation(HIDE_ON_CLOSE);
-        setSize(new Dimension(300, 270));
+        setSize(new Dimension(300, 320));
         setTitle(translate("dialog.title"));
 
 
@@ -85,6 +85,15 @@ public class AboutDialog extends AppDialog {
         wwwLabel.setHorizontalAlignment(SwingConstants.CENTER);
         cp.add(wwwLabel);
 
+
+        JLabel transAuthorLabel = new JLabel(translate("translation.author.label"));
+        transAuthorLabel.setPreferredSize(new Dimension(300, 20));
+        transAuthorLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        JLabel transAuthor = new JLabel(translate("translation.author"));
+        transAuthor.setPreferredSize(new Dimension(300, 20));
+        transAuthor.setHorizontalAlignment(SwingConstants.CENTER);
+        cp.add(transAuthorLabel);
+        cp.add(transAuthor);
         JButton okButton = new JButton(translate("button.ok"));
         cp.add(okButton);
         okButton.addActionListener(new ActionListener() {

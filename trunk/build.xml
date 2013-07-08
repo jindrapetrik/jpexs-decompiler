@@ -18,8 +18,10 @@
     <property name="INNOSETUPPATH" value="c:\program files (x86)\inno setup 5"/>
     <property name="LAUNCH4JPATH" value="c:\program files (x86)\launch4j" />
     <property name="MAXHEAPSIZE" value="1024"/> <!-- MB -->
-        
+       
+    
     <property name="SOURCEDIR" value="${basedir}/src"/>
+    <property name="LOCALESDIR" value="${SOURCEDIR}/com/jpexs/decompiler/flash/gui/locales"/> 
     <property name="RESOURCESDIR" value="${basedir}/resources"/>
     <property name="TESTDIR" value="${basedir}/test"/>
     <property name="TESTLIBDIR" value="${basedir}/testlib"/>
@@ -37,6 +39,7 @@
     <property name="DISTLIBRARIESDIRNAME" value="lib"/>
     <property name="JAVADOCDIR" value="${basedir}/javadoc"/>
     <property name="ZIPNAME" value="ffdec_${VERSION}.zip"/>
+    <property name="LOCALESZIP" value="ffdec_${VERSION}_lang.zip"/> 
     
     <property name="INSTALLERCONFIG" value="${basedir}/installer.cfg"/>
     <property name="INSTALLERPROJECT" value="${basedir}/installer.iss"/>

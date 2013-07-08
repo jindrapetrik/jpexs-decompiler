@@ -32,7 +32,7 @@ public class AppStrings {
         String name = cls.getName();
         if (name.startsWith("com.jpexs.decompiler.flash.gui.")) {
             name = name.substring("com.jpexs.decompiler.flash.gui.".length());
-            name = "com.jpexs.decompiler.flash.gui.resources." + name;
+            name = "com.jpexs.decompiler.flash.gui.locales." + name;
         }
         return name;
     }

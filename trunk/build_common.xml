@@ -175,6 +175,7 @@
     </target>
 
     <target name="release">
+        <antcall target="locales" />
         <antcall target="archive" />
         <antcall target="installer" />
     </target>
@@ -191,6 +192,10 @@
         <copy todir="${DISTRIBUTIONDIR}">
             <fileset dir="${RESOURCESDIR}" includes="**/*.*"/>
         </copy>
+    </target>
+    
+    <target name="locales">
+        <zip destfile="${RELEASESDIR}/${LOCALESZIP}" basedir="${LOCALESDIR}" includes="**/*.properties"/>
     </target>
     
     <target name="build" depends="compile">
