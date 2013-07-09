@@ -2,8 +2,8 @@
 
 <project name="FFDec" basedir="." default="all">
     <description>Builds project FFDec</description>    
-    <property name="VERSION" value="1.6.5" />
-    <property name="VERSIONNUMBER" value="1.6.5.0" />
+    <property name="VERSION" value="1.6.5u1" />
+    <property name="VERSIONNUMBER" value="1.6.5.1" />
     <property name="BUILDER" value="jpexs" />
     <property name="PROJECTNAME" value="FFDec"/>
     <property name="JARFILENAME" value="ffdec"/>
