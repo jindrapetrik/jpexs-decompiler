@@ -203,4 +203,9 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
     public String getActionSourceSuffix() {
         return "";
     }
+
+    @Override
+    public int getActionSourceIndent() {
+        return 0;
+    }
 }

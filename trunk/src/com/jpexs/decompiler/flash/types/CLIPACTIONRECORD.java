@@ -218,4 +218,9 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable {
     public String getExportFileName() {
         return eventFlags.getHeader(keyCode, true);
     }
+
+    @Override
+    public int getActionSourceIndent() {
+        return 1;
+    }
 }

@@ -72,4 +72,6 @@ public interface ASMSource {
     public String getActionSourcePrefix();
 
     public String getActionSourceSuffix();
+
+    public int getActionSourceIndent();
 }

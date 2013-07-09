@@ -23,6 +23,7 @@ import javax.swing.JEditorPane;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.Element;
+import jsyntaxpane.actions.ActionUtils;
 
 /**
  *
@@ -31,6 +32,14 @@ import javax.swing.text.Element;
 public class LineMarkedEditorPane extends JEditorPane {
 
     int lastLine = -1;
+
+    public int getLine() {
+        return lastLine;
+    }
+
+    public void gotoLine(int line) {
+        setCaretPosition(ActionUtils.getDocumentPosition(this, line, 0));
+    }
 
     public LineMarkedEditorPane() {
         setOpaque(false);

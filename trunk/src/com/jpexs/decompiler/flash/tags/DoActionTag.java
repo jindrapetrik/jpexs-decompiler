@@ -160,4 +160,9 @@ public class DoActionTag extends Tag implements ASMSource {
     public String getActionSourceSuffix() {
         return "";
     }
+
+    @Override
+    public int getActionSourceIndent() {
+        return 0;
+    }
 }

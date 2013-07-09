@@ -304,4 +304,9 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
     public String getActionSourceSuffix() {
         return "";
     }
+
+    @Override
+    public int getActionSourceIndent() {
+        return 0;
+    }
 }

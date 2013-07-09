@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.graph.Graph;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
@@ -271,11 +272,11 @@ public class TagNode {
                         String res;
                         ASMSource asm = ((ASMSource) node.tag);
                         if (isPcode) {
-                            res = asm.getActionSourcePrefix() + Highlighting.stripHilights(asm.getASMSource(SWF.DEFAULT_VERSION, false)) + asm.getActionSourceSuffix();
+                            res = asm.getActionSourcePrefix() + Helper.indentRows(asm.getActionSourceIndent(), Highlighting.stripHilights(asm.getASMSource(SWF.DEFAULT_VERSION, false)), Graph.INDENT_STRING) + asm.getActionSourceSuffix();
                         } else {
                             List<Action> as = asm.getActions(SWF.DEFAULT_VERSION);
                             Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
-                            res = asm.getActionSourcePrefix() + Highlighting.stripHilights(Action.actionsToSource(as, SWF.DEFAULT_VERSION)) + asm.getActionSourceSuffix();
+                            res = asm.getActionSourcePrefix() + Helper.indentRows(asm.getActionSourceIndent(), Highlighting.stripHilights(Action.actionsToSource(as, SWF.DEFAULT_VERSION)), Graph.INDENT_STRING) + asm.getActionSourceSuffix();
                         }
                         try (FileOutputStream fos = new FileOutputStream(f)) {
                             fos.write(res.getBytes("utf-8"));

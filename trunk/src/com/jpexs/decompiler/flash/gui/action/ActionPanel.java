@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2013 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
+import com.jpexs.decompiler.flash.graph.Graph;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
@@ -296,7 +297,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                     lastDecompiled = sc.text;
                     lastASM = asm;
                     stripped = lastDecompiled;
-                    decompiledEditor.setText(asm.getActionSourcePrefix() + lastDecompiled + asm.getActionSourceSuffix());
+                    decompiledEditor.setText(asm.getActionSourcePrefix() + Helper.indentRows(asm.getActionSourceIndent(), lastDecompiled, Graph.INDENT_STRING) + asm.getActionSourceSuffix());
                 }
                 setEditMode(false);
                 setDecompiledEditMode(false);
@@ -542,13 +543,15 @@ public class ActionPanel extends JPanel implements ActionListener {
     public void setDecompiledEditMode(boolean val) {
         String pref = lastASM.getActionSourcePrefix();
         int lastPos = decompiledEditor.getCaretPosition();
+        int lastLine = decompiledEditor.getLine();
+        int prefLines = Helper.getLineCount(pref);
         if (val) {
             String newText = lastDecompiled;
             decompiledEditor.setText(newText);
-            if (lastPos > -1) {
+            if (lastLine > -1) {
                 int newpos = lastPos - pref.length();
-                if (newpos < newText.length() && newpos >= 0) {
-                    decompiledEditor.setCaretPosition(newpos);
+                if (lastLine - prefLines >= 0) {
+                    decompiledEditor.gotoLine(lastLine - prefLines + 1);
                 }
             }
             decompiledEditor.setEditable(true);
@@ -559,13 +562,10 @@ public class ActionPanel extends JPanel implements ActionListener {
             decompiledEditor.getCaret().setVisible(true);
             decLabel.setIcon(View.getIcon("editing16"));
         } else {
-            String newText = pref + lastDecompiled + lastASM.getActionSourceSuffix();
+            String newText = pref + Helper.indentRows(lastASM.getActionSourceIndent(), lastDecompiled, Graph.INDENT_STRING) + lastASM.getActionSourceSuffix();
             decompiledEditor.setText(newText);
-            if (lastPos > -1) {
-                int newpos = lastPos + pref.length();
-                if (newpos < newText.length()) {
-                    decompiledEditor.setCaretPosition(newpos);
-                }
+            if (lastLine > -1) {
+                decompiledEditor.gotoLine(lastLine + prefLines + 1);
             }
             decompiledEditor.setEditable(false);
             saveDecompiledButton.setVisible(false);

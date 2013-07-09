@@ -175,13 +175,41 @@ public class Helper {
         return sb.toString();
     }
 
-    public static String indent(int level, String ss) {
+    public static String indent(int level, String ss, String indentStr) {
         StringBuilder sb = new StringBuilder();
-        for (int ii = 0; ii < level * 2; ii++) {
-            sb.append(' ');
+        for (int ii = 0; ii < level; ii++) {
+            sb.append(indentStr);
         }
         sb.append(ss);
         return sb.toString();
+    }
+
+    public static String indentRows(int level, String ss, String indentStr) {
+        StringBuilder sb = new StringBuilder();
+        for (int ii = 0; ii < level; ii++) {
+            sb.append(indentStr);
+        }
+        ss = ss.replaceAll("(\r\n|\r|\n)", "\r\n");
+        ss = "\r\n" + ss;
+        String repl = "\r\n" + sb.toString();
+        ss = ss.replace("\r\n", repl);
+        if (ss.endsWith(repl)) {
+            ss = ss.substring(0, ss.length() - sb.toString().length());
+        }
+        ss = ss.substring(2);
+        return ss;
+    }
+
+    public static int getLineCount(String s) {
+        if (s.endsWith("\r\n")) {
+            s = s.substring(0, s.length() - 2);
+        } else if (s.endsWith("\r")) {
+            s = s.substring(0, s.length() - 1);
+        } else if (s.endsWith("\n")) {
+            s = s.substring(0, s.length() - 1);
+        }
+        String parts[] = s.split("(\r\n|\r|\n)");
+        return parts.length;
     }
 
     public static String padZeros(long number, int length) {

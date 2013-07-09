@@ -2174,7 +2174,7 @@ public class Graph {
      * String used to unindent line when converting to string
      */
     public static final String INDENTCLOSE = "INDENTCLOSE";
-    private static final String INDENT_STRING = "   ";
+    public static final String INDENT_STRING = "   ";
 
     private static String tabString(int len) {
         String ret = "";

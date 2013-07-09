@@ -1743,7 +1743,7 @@ public class SWF {
                 SymbolClassTag sc = (SymbolClassTag) tag;
                 for (int i = 0; i < sc.classNames.length; i++) {
                     String newname = deobfuscateNameWithPackage(sc.classNames[i], renameType, deobfuscated);
-                    if(newname!=null){
+                    if (newname != null) {
                         sc.classNames[i] = newname;
                     }
                 }

@@ -261,4 +261,9 @@ public class BUTTONCONDACTION implements ASMSource, Exportable {
     public String getExportFileName() {
         return getHeader(true);
     }
+
+    @Override
+    public int getActionSourceIndent() {
+        return 1;
+    }
 }

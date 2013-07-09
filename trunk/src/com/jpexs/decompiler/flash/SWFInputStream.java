@@ -1126,7 +1126,7 @@ public class SWFInputStream extends InputStream {
         StringBuilder sb = new StringBuilder();
         sb.append(Helper.formatHex((int) tag.getPos(), 8));
         sb.append(": ");
-        sb.append(Helper.indent(level, ""));
+        sb.append(Helper.indent(level, "", "  "));
         sb.append(Helper.format(tag.toString(), 25 - 2 * level));
         sb.append(" tagId=");
         sb.append(Helper.formatInt(tag.getId(), 3));
