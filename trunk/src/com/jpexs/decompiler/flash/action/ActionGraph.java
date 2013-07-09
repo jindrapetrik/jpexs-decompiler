@@ -280,7 +280,9 @@ public class ActionGraph extends Graph {
                 //GraphPart breakPart = breakParts.isEmpty() ? null : breakParts.get(0);
                 List<GraphPart> mcp = new ArrayList<>();
                 mcp.addAll(caseBodyParts);
-                mcp.add(defaultPart2);
+                if (defaultPart2 != null) {
+                    mcp.add(defaultPart2);
+                }
                 GraphPart breakPart = getMostCommonPart(mcp, loops);
                 if ((defaultPart2 != breakPart) && (defaultCommands.isEmpty())) {
                     defaultPart = defaultPart2;

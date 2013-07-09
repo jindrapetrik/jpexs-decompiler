@@ -83,10 +83,10 @@ public class ClassTreeItem extends TreeItem implements Block {
             ret += "static " + f.toString(constants) + "\r\n";
         }
         for (KeyValue<GraphTargetItem, GraphTargetItem> item : vars) {
-            ret += "var " + item.key.toStringNoQuotes(constants) + " = " + item.value.toStringNoQuotes(constants) + ";\r\n";
+            ret += "var " + item.key.toStringNoQuotes(constants) + " = " + item.value.toString(constants) + ";\r\n";
         }
         for (KeyValue<GraphTargetItem, GraphTargetItem> item : staticVars) {
-            ret += "static var " + item.key.toStringNoQuotes(constants) + " = " + item.value.toStringNoQuotes(constants) + ";\r\n";
+            ret += "static var " + item.key.toStringNoQuotes(constants) + " = " + item.value.toString(constants) + ";\r\n";
         }
         ret += "}\r\n";
         return ret;
