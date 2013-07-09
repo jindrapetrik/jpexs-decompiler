@@ -782,7 +782,8 @@ public class SWFInputStream extends InputStream {
             br.append(((Action) ret.get(i)).getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), cpool.constants, version, false));
             br.append("\r\n");
         }
-        pools = getConstantPool(listeners, new ActionGraphSource(ret, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), ip, version);
+        ret = Action.removeNops(0, ret, version, 0);
+        pools = getConstantPool(listeners, new ActionGraphSource(ret, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, version);
 
         if (pools.size() == 1) {
             Action.setConstantPool(ret, pools.get(0));
