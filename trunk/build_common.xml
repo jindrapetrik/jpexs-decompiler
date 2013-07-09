@@ -211,7 +211,8 @@ If you want to create new language follow these steps:
    to new file which has your language code suffix (_cs is for czech, etc...)
 3) Translate these files
 4) Don't forget to place your name in AboutDialog_xx.properties file.
-5) When you are finished, send me translated files via mail or issue tracker.
+5) When you are finished, send me translated files via mail
+    (flash@free-decompiler.com) or issue tracker (http://www.free-decompiler.com/flash/issues.html).
 6) Wait for next release where your translation will be included
 </echo>
         <zip destfile="${RELEASESDIR}/${LOCALESZIP}" basedir="${LOCALESTARGETDIR}"/>
