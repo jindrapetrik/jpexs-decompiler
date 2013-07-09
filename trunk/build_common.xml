@@ -202,18 +202,7 @@
         </copy>
         <echo file="${LOCALESTARGETDIR}/readme.txt">${PROJECTNAME} ${VERSION} localization pack
 -------------------------------------------------------------------            
-This archive contains all language files for version ${PROJECTNAME} version ${VERSION}.
-Each language in this pack has files with its own suffix which is standard language code
-(See http://www.loc.gov/standards/iso639-2/php/code_list.php)
-If you want to create new language follow these steps:
-1) Find out your language code
-2) Copy each .properties file without _xx suffix (english),
-   to new file which has your language code suffix (_cs is for czech, etc...)
-3) Translate these files
-4) Don't forget to place your name in AboutDialog_xx.properties file.
-5) When you are finished, send me translated files via mail
-    (flash@free-decompiler.com) or issue tracker (http://www.free-decompiler.com/flash/issues.html).
-6) Wait for next release where your translation will be included
+Please follow instructions on http://www.free-decompiler.com/flash/translations.html
 </echo>
         <zip destfile="${RELEASESDIR}/${LOCALESZIP}" basedir="${LOCALESTARGETDIR}"/>
     </target>
