@@ -102,7 +102,9 @@ public class ScriptPack {
         File outDir = new File(directory + File.separatorChar + makeDirPath(packageName));
         if (!outDir.exists()) {
             if (!outDir.mkdirs()) {
-                throw new IOException("cannot create directory " + outDir);
+                if (!outDir.exists()) {
+                    throw new IOException("cannot create directory " + outDir);
+                }
             }
         }
         String fileName = outDir.toString() + File.separator + Helper.makeFileName(scriptName) + ".as";

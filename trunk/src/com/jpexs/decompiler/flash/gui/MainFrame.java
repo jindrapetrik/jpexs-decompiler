@@ -611,7 +611,14 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                             }
                             Random rnd = new Random();
                             tempDir += "ffdec" + File.separator + "export" + File.separator + System.currentTimeMillis() + "_" + rnd.nextInt(1000);
-                            new File(tempDir).mkdirs();
+                            File fTempDir = new File(tempDir);
+                            if (!fTempDir.exists()) {
+                                if (!fTempDir.mkdirs()) {
+                                    if (!fTempDir.exists()) {
+                                        throw new IOException("cannot create directory " + fTempDir);
+                                    }
+                                }
+                            }
                             final ExportDialog export = new ExportDialog();
 
                             try {
@@ -1940,10 +1947,14 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                     (new Thread() {
                         @Override
                         public void run() {
-                            if (compressed) {
-                                swf.exportFla(selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
-                            } else {
-                                swf.exportXfl(selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                            try {
+                                if (compressed) {
+                                    swf.exportFla(selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                                } else {
+                                    swf.exportXfl(selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                                }
+                            } catch (IOException ex) {
+                                JOptionPane.showMessageDialog(null, translate("error.export") + ": " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
                             }
                             Main.stopWork();
                         }

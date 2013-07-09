@@ -2450,7 +2450,7 @@ public class XFLConverter {
         return ret;
     }
 
-    public static void convertSWF(SWF swf, String swfFileName, String outfile, boolean compressed, String generator, String generatorVerName, String generatorVersion, boolean paralel) {
+    public static void convertSWF(SWF swf, String swfFileName, String outfile, boolean compressed, String generator, String generatorVerName, String generatorVersion, boolean paralel) throws IOException {
         File file = new File(outfile);
         File outDir = file.getParentFile();
         String domDocument = "";
@@ -2530,7 +2530,11 @@ public class XFLConverter {
                             expPath = expPath.replace(".", File.separator);
                             File cdir = new File(outDir.getAbsolutePath() + File.separator + expDir);
                             if (!cdir.exists()) {
-                                cdir.mkdirs();
+                                if (!cdir.mkdirs()) {
+                                    if (!cdir.exists()) {
+                                        throw new IOException("cannot create directory " + cdir);
+                                    }
+                                }
                             }
                             try {
                                 writeFile(data.getBytes("UTF-8"), outDir.getAbsolutePath() + File.separator + expPath + ".as");
@@ -2770,7 +2774,13 @@ public class XFLConverter {
 
         } else {
 
-            outDir.mkdirs();
+            if (!outDir.exists()) {
+                if (!outDir.mkdirs()) {
+                    if (!outDir.exists()) {
+                        throw new IOException("cannot create directory " + outDir);
+                    }
+                }
+            }
             try {
                 writeFile(domDocument.getBytes("UTF-8"), outDir.getAbsolutePath() + File.separator + "DOMDocument.xml");
             } catch (UnsupportedEncodingException ex) {

@@ -159,7 +159,11 @@ public abstract class Trait implements Serializable {
         String objectName = name.getName(abc.constants, new ArrayList<String>());
         File outDir = new File(directory + File.separatorChar + packageName.replace('.', File.separatorChar));
         if (!outDir.exists()) {
-            outDir.mkdirs();
+            if (!outDir.mkdirs()) {
+                if (!outDir.exists()) {
+                    throw new IOException("Cannot create directory " + outDir);
+                }
+            }
         }
         String fileName = outDir.toString() + File.separator + objectName + ".as";
         try (FileOutputStream fos = new FileOutputStream(fileName)) {

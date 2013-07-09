@@ -680,10 +680,14 @@ public class Main {
         }
     }
 
-    public static String tempFile(String url) {
+    public static String tempFile(String url) throws IOException {
         File f = new File(getFFDecHome() + "saved" + File.separator);
         if (!f.exists()) {
-            f.mkdirs();
+            if (!f.mkdirs()) {
+                if (!f.exists()) {
+                    throw new IOException("cannot create directory " + f);
+                }
+            }
         }
         return getFFDecHome() + "saved" + File.separator + "asdec_" + Integer.toHexString(url.hashCode()) + ".tmp";
 
@@ -774,7 +778,11 @@ public class Main {
     }
 
     public static void exit() {
-        Configuration.saveToFile(getConfigFile(), getReplacementsFile());
+        try {
+            Configuration.saveToFile(getConfigFile(), getReplacementsFile());
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
         FlashPlayerPanel.unload();
         System.exit(0);
     }
@@ -933,7 +941,7 @@ public class Main {
         return id;
     }
 
-    public static String getFFDecHome() {
+    public static String getFFDecHome() throws IOException {
         if (directory == unspecifiedFile) {
             directory = null;
             String userHome = null;
@@ -975,7 +983,11 @@ public class Main {
             }
         }
         if (!directory.exists()) {
-            directory.mkdirs();
+            if (!directory.mkdirs()) {
+                if (!directory.exists()) {
+                    throw new IOException("cannot create directory " + directory);
+                }
+            }
         }
         String ret = directory.getAbsolutePath();
         if (!ret.endsWith(File.separator)) {
@@ -984,11 +996,11 @@ public class Main {
         return ret;
     }
 
-    private static String getReplacementsFile() {
+    private static String getReplacementsFile() throws IOException {
         return getFFDecHome() + REPLACEMENTS_NAME;
     }
 
-    private static String getConfigFile() {
+    private static String getConfigFile() throws IOException {
         return getFFDecHome() + CONFIG_NAME;
     }
 

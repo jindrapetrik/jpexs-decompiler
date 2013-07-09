@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 
 /**
@@ -190,10 +192,16 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
         if (e.getActionCommand().equals("CLEAR")) {
             for (int i = 0; i < listModel.getSize(); i++) {
                 Replacement r = (Replacement) listModel.getElementAt(i);
-                File f = (new File(Main.tempFile(r.targetFile)));
-                if (f.exists()) {
-                    f.delete();
+                File f;
+                try {
+                    f = (new File(Main.tempFile(r.targetFile)));
+                    if (f.exists()) {
+                        f.delete();
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(ProxyFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
+
             }
             listModel.clear();
         }

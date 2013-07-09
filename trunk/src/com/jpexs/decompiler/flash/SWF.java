@@ -989,9 +989,12 @@ public class SWF {
         if (tags.isEmpty()) {
             return ret;
         }
-        if (!(new File(outdir)).exists()) {
-            if (!(new File(outdir)).mkdirs()) {
-                throw new IOException("Cannot create directory " + outdir);
+        File foutdir = new File(outdir);
+        if (!foutdir.exists()) {
+            if (!foutdir.mkdirs()) {
+                if (!foutdir.exists()) {
+                    throw new IOException("Cannot create directory " + outdir);
+                }
             }
         }
         for (Tag t : tags) {
@@ -1176,9 +1179,12 @@ public class SWF {
         if (tags.isEmpty()) {
             return ret;
         }
-        if (!(new File(outdir)).exists()) {
-            if (!(new File(outdir)).mkdirs()) {
-                throw new IOException("Cannot create directory " + outdir);
+        File foutdir = new File(outdir);
+        if (!foutdir.exists()) {
+            if (!foutdir.mkdirs()) {
+                if (!foutdir.exists()) {
+                    throw new IOException("Cannot create directory " + outdir);
+                }
             }
         }
         for (Tag t : tags) {
@@ -1198,9 +1204,12 @@ public class SWF {
         if (tags.isEmpty()) {
             return ret;
         }
-        if (!(new File(outdir)).exists()) {
-            if (!(new File(outdir)).mkdirs()) {
-                throw new IOException("Cannot create directory " + outdir);
+        File foutdir = new File(outdir);
+        if (!foutdir.exists()) {
+            if (!foutdir.mkdirs()) {
+                if (!foutdir.exists()) {
+                    throw new IOException("Cannot create directory " + outdir);
+                }
             }
         }
         for (Tag t : tags) {
@@ -1228,9 +1237,12 @@ public class SWF {
         if (tags.isEmpty()) {
             return ret;
         }
-        if (!(new File(outdir)).exists()) {
-            if (!(new File(outdir)).mkdirs()) {
-                throw new IOException("Cannot create directory " + outdir);
+        File foutdir = new File(outdir);
+        if (!foutdir.exists()) {
+            if (!foutdir.mkdirs()) {
+                if (!foutdir.exists()) {
+                    throw new IOException("Cannot create directory " + outdir);
+                }
             }
         }
         for (Tag t : tags) {
@@ -1254,9 +1266,12 @@ public class SWF {
         if (tags.isEmpty()) {
             return ret;
         }
-        if (!(new File(outdir)).exists()) {
-            if (!(new File(outdir)).mkdirs()) {
-                throw new IOException("Cannot create directory " + outdir);
+        File foutdir = new File(outdir);
+        if (!foutdir.exists()) {
+            if (!foutdir.mkdirs()) {
+                if (!foutdir.exists()) {
+                    throw new IOException("Cannot create directory " + outdir);
+                }
             }
         }
         for (Tag t : tags) {
@@ -1277,9 +1292,12 @@ public class SWF {
         if (tags.isEmpty()) {
             return ret;
         }
-        if (!(new File(outdir)).exists()) {
-            if (!(new File(outdir)).mkdirs()) {
-                throw new IOException("Cannot create directory " + outdir);
+        File foutdir = new File(outdir);
+        if (!foutdir.exists()) {
+            if (!foutdir.mkdirs()) {
+                if (!foutdir.exists()) {
+                    throw new IOException("Cannot create directory " + outdir);
+                }
             }
         }
         for (Tag t : tags) {
@@ -1975,11 +1993,11 @@ public class SWF {
         return ret;
     }
 
-    public void exportFla(String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean paralel) {
+    public void exportFla(String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean paralel) throws IOException {
         XFLConverter.convertSWF(this, swfName, outfile, true, generator, generatorVerName, generatorVersion, paralel);
     }
 
-    public void exportXfl(String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean paralel) {
+    public void exportXfl(String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean paralel) throws IOException {
         XFLConverter.convertSWF(this, swfName, outfile, false, generator, generatorVerName, generatorVersion, paralel);
     }
 

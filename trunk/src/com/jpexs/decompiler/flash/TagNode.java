@@ -257,7 +257,9 @@ public class TagNode {
                 if ((node.tag instanceof ASMSource) && (node.export)) {
                     if (!dir.exists()) {
                         if (!dir.mkdirs()) {
-                            continue;
+                            if (!dir.exists()) {
+                                continue;
+                            }
                         }
                     }
                     try {
