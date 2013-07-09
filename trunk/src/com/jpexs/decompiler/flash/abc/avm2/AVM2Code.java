@@ -55,6 +55,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.graph.DuplicateItem;
 import com.jpexs.decompiler.flash.graph.Graph;
 import com.jpexs.decompiler.flash.graph.GraphPart;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
@@ -2017,11 +2018,24 @@ public class AVM2Code implements Serializable {
             if (debugMode) {
                 System.out.println((useVisited ? "useV " : "") + (secondPass ? "secondPass " : "") + "Visit " + ip + ": " + ins + " stack:" + Highlighting.stripHilights(stack.toString()));
             }
+            if (secondPass) {
+                if ((ins instanceof AVM2Instruction) && (((AVM2Instruction) ins).definition instanceof PopIns)) {
+                    GraphTargetItem top = stack.peek();
+                    for (GraphSourceItemPos p : top.getNeededSources()) {
+                        if (p.item.isIgnored()) {
+                            ins.setIgnored(true);
+                            break;
+                        }
+                    }
+                }
+            }
+
             if ((ins instanceof AVM2Instruction) && (((AVM2Instruction) ins).definition instanceof NewFunctionIns)) {
                 stack.push(new BooleanTreeItem(null, true));
             } else {
                 ins.translate(localData, stack, output);
             }
+
             if (ins.isExit()) {
                 break;
             }
@@ -2108,14 +2122,20 @@ public class AVM2Code implements Serializable {
                     GraphTargetItem tar = stack.pop();
                     if (secondPass && (dec.jumpUsed != dec.skipUsed)) {
                         for (GraphSourceItemPos pos : tar.getNeededSources()) {
+                            if (pos.item instanceof AVM2Instruction) {
+                                if (((AVM2Instruction) pos.item).definition instanceof DupIns) {
+                                    pos.item.setIgnored(true);
+                                    break;
+                                }
+                            }
                             if (pos.item != ins) {
                                 pos.item.setIgnored(true);
                             }
                         }
+
                     }
                     ip = condition ? branches.get(0) : branches.get(1);
                     continue;
-                    //ret += removeTraps(secondPass, useVisited, localData, stack, output, code, condition ? branches.get(0) : branches.get(1), ip, visited, visitedStates, decisions);
                 } else {
                     if (ins.isBranch() && (!ins.isJump())) {
                         stack.pop();
