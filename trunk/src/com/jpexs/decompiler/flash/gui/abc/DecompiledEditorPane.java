@@ -356,6 +356,10 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         }
         setText("//" + translate("pleasewait") + "...");
 
+        this.abc = abc;
+        this.abcList = abcList;
+        this.script = scriptLeaf;
+        
         String hilightedCode = "";
         cacheScriptPack(scriptLeaf, abcList);
         CachedDecompilation cd = getCached(scriptLeaf);
@@ -363,10 +367,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         highlights = cd.getHighlights();
         traitHighlights = cd.getTraitHighlights();
         methodHighlights = cd.getMethodHighlights();
-        classHighlights = cd.getClassHighlights();
-        this.abc = abc;
-        this.abcList = abcList;
-        this.script = scriptLeaf;
+        classHighlights = cd.getClassHighlights();        
         setText(hilightedCode);
     }
 

@@ -127,7 +127,7 @@ public class Cache {
             }
             return null;
         } else if (storageType == STORAGE_MEMORY) {
-            if (!cacheMemory.containsKey(key)) {
+            if (cacheMemory.containsKey(key)) {
                 return cacheMemory.get(key);
             }
             return null;
