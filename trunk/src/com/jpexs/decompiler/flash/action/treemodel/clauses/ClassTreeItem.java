@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.clauses;
 
+import com.jpexs.decompiler.flash.KeyValue;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
 import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
@@ -34,8 +35,8 @@ public class ClassTreeItem extends TreeItem implements Block {
     public GraphTargetItem extendsOp;
     public List<GraphTargetItem> implementsOp;
     public GraphTargetItem className;
-    public HashMap<GraphTargetItem, GraphTargetItem> vars;
-    public HashMap<GraphTargetItem, GraphTargetItem> staticVars;
+    public List<KeyValue<GraphTargetItem, GraphTargetItem>> vars;
+    public List<KeyValue<GraphTargetItem, GraphTargetItem>> staticVars;
 
     @Override
     public List<List<GraphTargetItem>> getSubs() {
@@ -45,7 +46,7 @@ public class ClassTreeItem extends TreeItem implements Block {
         return ret;
     }
 
-    public ClassTreeItem(GraphTargetItem className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, List<GraphTargetItem> functions, HashMap<GraphTargetItem, GraphTargetItem> vars, List<GraphTargetItem> staticFunctions, HashMap<GraphTargetItem, GraphTargetItem> staticVars) {
+    public ClassTreeItem(GraphTargetItem className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, List<GraphTargetItem> functions, List<KeyValue<GraphTargetItem, GraphTargetItem>> vars, List<GraphTargetItem> staticFunctions, List<KeyValue<GraphTargetItem, GraphTargetItem>> staticVars) {
         super(null, NOPRECEDENCE);
         this.className = className;
         this.functions = functions;
@@ -81,11 +82,11 @@ public class ClassTreeItem extends TreeItem implements Block {
         for (GraphTargetItem f : staticFunctions) {
             ret += "static " + f.toString(constants) + "\r\n";
         }
-        for (GraphTargetItem v : vars.keySet()) {
-            ret += "var " + v.toStringNoQuotes(constants) + " = " + vars.get(v).toStringNoQuotes(constants) + ";\r\n";
+        for (KeyValue<GraphTargetItem, GraphTargetItem> item : vars) {
+            ret += "var " + item.key.toStringNoQuotes(constants) + " = " + item.value.toStringNoQuotes(constants) + ";\r\n";
         }
-        for (GraphTargetItem v : staticVars.keySet()) {
-            ret += "static var " + v.toStringNoQuotes(constants) + " = " + staticVars.get(v).toStringNoQuotes(constants) + ";\r\n";
+        for (KeyValue<GraphTargetItem, GraphTargetItem> item : staticVars) {
+            ret += "static var " + item.key.toStringNoQuotes(constants) + " = " + item.value.toStringNoQuotes(constants) + ";\r\n";
         }
         ret += "}\r\n";
         return ret;

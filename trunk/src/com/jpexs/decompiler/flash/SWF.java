@@ -1846,8 +1846,12 @@ public class SWF {
 
 
                         List<GraphTargetItem> vars = new ArrayList<>();
-                        vars.addAll(cti.vars.keySet());
-                        vars.addAll(cti.staticVars.keySet());
+                        for (KeyValue<GraphTargetItem, GraphTargetItem> item : cti.vars) {
+                            vars.add(item.key);
+                        }
+                        for (KeyValue<GraphTargetItem, GraphTargetItem> item : cti.staticVars) {
+                            vars.add(item.key);
+                        }
                         for (GraphTargetItem gti : vars) {
                             if (gti instanceof DirectValueTreeItem) {
                                 DirectValueTreeItem dvf = (DirectValueTreeItem) gti;
