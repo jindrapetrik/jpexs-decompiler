@@ -22,6 +22,8 @@
     
     <property name="SOURCEDIR" value="${basedir}/src"/>
     <property name="LOCALESDIR" value="${SOURCEDIR}/com/jpexs/decompiler/flash/gui/locales"/> 
+    <property name="LOCALESTARGETDIR" value="${basedir}/locales"/> 
+    
     <property name="RESOURCESDIR" value="${basedir}/resources"/>
     <property name="TESTDIR" value="${basedir}/test"/>
     <property name="TESTLIBDIR" value="${basedir}/testlib"/>
