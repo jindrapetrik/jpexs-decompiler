@@ -2453,6 +2453,13 @@ public class XFLConverter {
     public static void convertSWF(SWF swf, String swfFileName, String outfile, boolean compressed, String generator, String generatorVerName, String generatorVersion, boolean paralel) throws IOException {
         File file = new File(outfile);
         File outDir = file.getParentFile();
+        if (!outDir.exists()) {
+            if (!outDir.mkdirs()) {
+                if (!outDir.exists()) {
+                    throw new IOException("cannot create directory " + outDir);
+                }
+            }
+        }
         String domDocument = "";
         String baseName = swfFileName;
         File f = new File(baseName);
