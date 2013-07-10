@@ -869,74 +869,74 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
         GlyphVector v = f.createGlyphVector((new JPanel()).getFontMetrics(f).getFontRenderContext(), "" + character);
         Shape shp = v.getOutline();
         double points[] = new double[6];
-        double lastX = 0;
-        double lastY = 0;
-        double startX = 0;
-        double startY = 0;
+        int lastX = 0;
+        int lastY = 0;
+        int startX = 0;
+        int startY = 0;
         for (PathIterator it = shp.getPathIterator(null); !it.isDone(); it.next()) {
             int type = it.currentSegment(points);
             switch (type) {
                 case PathIterator.SEG_MOVETO:
-                    lastX = points[0];
-                    lastY = points[1];
-                    startX = lastX;
-                    startY = lastY;
                     StyleChangeRecord scr = new StyleChangeRecord();
                     scr.stateMoveTo = true;
                     scr.moveDeltaX = (int) Math.round(points[0]);
                     scr.moveDeltaY = (int) Math.round(points[1]);
                     scr.moveBits = SWFOutputStream.getNeededBitsS(scr.moveDeltaX, scr.moveDeltaY);
                     retList.add(scr);
+                    lastX = (int) Math.round(points[0]);
+                    lastY = (int) Math.round(points[1]);
+                    startX = lastX;
+                    startY = lastY;
                     break;
                 case PathIterator.SEG_LINETO:
                     StraightEdgeRecord ser = new StraightEdgeRecord();
                     ser.generalLineFlag = true;
-                    ser.deltaX = (int) Math.round((points[0] - lastX));
-                    ser.deltaY = (int) Math.round((points[1] - lastY));
+                    ser.deltaX = ((int) Math.round(points[0])) - lastX;
+                    ser.deltaY = ((int) Math.round(points[1])) - lastY;
                     ser.numBits = SWFOutputStream.getNeededBitsS(ser.deltaX, ser.deltaY) - 2;
                     if (ser.numBits < 0) {
                         ser.numBits = 0;
                     }
                     retList.add(ser);
-                    lastX = points[0];
-                    lastY = points[1];
+                    lastX = (int) Math.round(points[0]);
+                    lastY = (int) Math.round(points[1]);
                     break;
                 case PathIterator.SEG_CUBICTO:
                     double cubicCoords[] = new double[]{
                         lastX, lastY,
-                        points[0], points[1],
-                        points[2], points[3],
-                        points[4], points[5]
+                        Math.round(points[0]), Math.round(points[1]),
+                        Math.round(points[2]), Math.round(points[3]),
+                        Math.round(points[4]), Math.round(points[5])
                     };
                     double quadCoords[][] = approximateCubic(cubicCoords);
                     for (int i = 0; i < quadCoords.length; i++) {
                         CurvedEdgeRecord cer = new CurvedEdgeRecord();
-                        cer.controlDeltaX = (int) Math.round((quadCoords[i][0] - lastX));
-                        cer.controlDeltaY = (int) Math.round((quadCoords[i][1] - lastY));
-                        cer.anchorDeltaX = (int) Math.round((quadCoords[i][2] - quadCoords[i][0]));
-                        cer.anchorDeltaY = (int) Math.round((quadCoords[i][3] - quadCoords[i][1]));
+                        cer.controlDeltaX = ((int) Math.round(quadCoords[i][0])) - lastX;
+                        cer.controlDeltaY = ((int) Math.round(quadCoords[i][1])) - lastY;
+                        cer.anchorDeltaX = ((int) Math.round(quadCoords[i][2])) - ((int) Math.round(quadCoords[i][0]));
+                        cer.anchorDeltaY = ((int) Math.round(quadCoords[i][3])) - ((int) Math.round(quadCoords[i][1]));
                         cer.numBits = SWFOutputStream.getNeededBitsS(cer.controlDeltaX, cer.controlDeltaY, cer.anchorDeltaX, cer.anchorDeltaY) - 2;
                         if (cer.numBits < 0) {
                             cer.numBits = 0;
                         }
-                        lastX = quadCoords[i][2];
-                        lastY = quadCoords[i][3];
+                        lastX = (int) Math.round(quadCoords[i][2]);
+                        lastY = (int) Math.round(quadCoords[i][3]);
                         retList.add(cer);
                     }
                     break;
                 case PathIterator.SEG_QUADTO:
                     CurvedEdgeRecord cer = new CurvedEdgeRecord();
-                    cer.controlDeltaX = (int) Math.round((points[0] - lastX));
-                    cer.controlDeltaY = (int) Math.round((points[1] - lastY));
-                    cer.anchorDeltaX = (int) Math.round((points[2] - points[0]));
-                    cer.anchorDeltaY = (int) Math.round((points[3] - points[1]));
+                    cer.controlDeltaX = ((int) Math.round(points[0])) - lastX;
+                    cer.controlDeltaY = ((int) Math.round(points[1])) - lastY;
+                    cer.anchorDeltaX = ((int) Math.round(points[2])) - (int) Math.round(points[0]);
+                    cer.anchorDeltaY = ((int) Math.round(points[3])) - (int) Math.round(points[1]);
                     cer.numBits = SWFOutputStream.getNeededBitsS(cer.controlDeltaX, cer.controlDeltaY, cer.anchorDeltaX, cer.anchorDeltaY) - 2;
                     if (cer.numBits < 0) {
                         cer.numBits = 0;
                     }
                     retList.add(cer);
-                    lastX = points[2];
-                    lastY = points[3];
+                    lastX = (int) Math.round(points[2]);
+                    lastY = (int) Math.round(points[3]);
                     break;
                 case PathIterator.SEG_CLOSE: //Closing line back to last SEG_MOVETO
                     if ((startX == lastX) && (startY == lastY)) {
