@@ -431,9 +431,6 @@ public class SWFOutputStream extends OutputStream {
      * @return Number of bits
      */
     public static int getNeededBitsS(int v) {
-        /*if (v == 0) {
-         //return 0;
-         }*/
         int counter = 32;
         int mask = 0x80000000;
         final int val = (v < 0) ? -v : v;
@@ -442,6 +439,22 @@ public class SWFOutputStream extends OutputStream {
             counter -= 1;
         }
         return counter + 1;
+    }
+
+    /**
+     * Calculates number of bits needed for representing signed values
+     *
+     * @param first First Signed value
+     * @param params Next Signed values
+     * @return Number of bits
+     */
+    public static int getNeededBitsS(int first, int... params) {
+        int nBits = 0;
+        nBits = enlargeBitCountS(nBits, first);
+        for (int i = 0; i < params.length; i++) {
+            nBits = enlargeBitCountS(nBits, params[i]);
+        }
+        return nBits;
     }
 
     private static long getIntPart(double value) {
@@ -478,7 +491,7 @@ public class SWFOutputStream extends OutputStream {
         return getNeededBitsS(k) + 16;
     }
 
-    private int enlargeBitCountS(int currentBitCount, int value) {
+    private static int enlargeBitCountS(int currentBitCount, int value) {
         int neededNew = getNeededBitsS(value);
         if (neededNew > currentBitCount) {
             return neededNew;

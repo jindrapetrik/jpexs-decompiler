@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.types.shaperecords;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
@@ -29,9 +30,11 @@ import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.SHAPE;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;
 import java.awt.MultipleGradientPaint.CycleMethod;
@@ -39,9 +42,13 @@ import java.awt.Point;
 import java.awt.RadialGradientPaint;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.TexturePaint;
+import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,6 +58,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JPanel;
 
 /**
  *
@@ -64,19 +72,6 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
     public Set<Integer> getNeededCharacters() {
         HashSet<Integer> ret = new HashSet<>();
         return ret;
-    }
-
-    private static String edgesToStr(List<SHAPERECORD> records) {
-        int x = 0;
-        int y = 0;
-        String ret = "";
-        for (SHAPERECORD rec : records) {
-            x = rec.changeX(x);
-            y = rec.changeY(y);
-            ret += ("[" + x + "," + y + "],");
-        }
-        return ret;
-
     }
 
     private static class Path {
@@ -859,4 +854,185 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
     }
 
     public abstract boolean isMove();
+
+    public static List<SHAPE> systemFontCharactersToSHAPES(String fontName, int fontStyle, int fontSize, String characters) {
+        List<SHAPE> ret = new ArrayList<>();
+        for (int i = 0; i < characters.length(); i++) {
+            ret.add(systemFontCharacterToSHAPE(fontName, fontStyle, fontSize, characters.charAt(i)));
+        }
+        return ret;
+    }
+
+    public static SHAPE systemFontCharacterToSHAPE(String fontName, int fontStyle, int fontSize, char character) {
+        List<SHAPERECORD> retList = new ArrayList<>();
+        Font f = new Font(fontName, fontStyle, fontSize);
+        GlyphVector v = f.createGlyphVector((new JPanel()).getFontMetrics(f).getFontRenderContext(), "" + character);
+        Shape shp = v.getOutline();
+        double points[] = new double[6];
+        double lastX = 0;
+        double lastY = 0;
+        double startX = 0;
+        double startY = 0;
+        for (PathIterator it = shp.getPathIterator(null); !it.isDone(); it.next()) {
+            int type = it.currentSegment(points);
+            switch (type) {
+                case PathIterator.SEG_MOVETO:
+                    lastX = points[0];
+                    lastY = points[1];
+                    startX = lastX;
+                    startY = lastY;
+                    StyleChangeRecord scr = new StyleChangeRecord();
+                    scr.stateMoveTo = true;
+                    scr.moveDeltaX = (int) Math.round(points[0]);
+                    scr.moveDeltaY = (int) Math.round(points[1]);
+                    scr.moveBits = SWFOutputStream.getNeededBitsS(scr.moveDeltaX, scr.moveDeltaY);
+                    retList.add(scr);
+                    break;
+                case PathIterator.SEG_LINETO:
+                    StraightEdgeRecord ser = new StraightEdgeRecord();
+                    ser.generalLineFlag = true;
+                    ser.deltaX = (int) Math.round((points[0] - lastX));
+                    ser.deltaY = (int) Math.round((points[1] - lastY));
+                    ser.numBits = SWFOutputStream.getNeededBitsS(ser.deltaX, ser.deltaY) - 2;
+                    if (ser.numBits < 0) {
+                        ser.numBits = 0;
+                    }
+                    retList.add(ser);
+                    lastX = points[0];
+                    lastY = points[1];
+                    break;
+                case PathIterator.SEG_CUBICTO:
+                    double cubicCoords[] = new double[]{
+                        lastX, lastY,
+                        points[0], points[1],
+                        points[2], points[3],
+                        points[4], points[5]
+                    };
+                    double quadCoords[][] = approximateCubic(cubicCoords);
+                    for (int i = 0; i < quadCoords.length; i++) {
+                        CurvedEdgeRecord cer = new CurvedEdgeRecord();
+                        cer.controlDeltaX = (int) Math.round((quadCoords[i][0] - lastX));
+                        cer.controlDeltaY = (int) Math.round((quadCoords[i][1] - lastY));
+                        cer.anchorDeltaX = (int) Math.round((quadCoords[i][2] - quadCoords[i][0]));
+                        cer.anchorDeltaY = (int) Math.round((quadCoords[i][3] - quadCoords[i][1]));
+                        cer.numBits = SWFOutputStream.getNeededBitsS(cer.controlDeltaX, cer.controlDeltaY, cer.anchorDeltaX, cer.anchorDeltaY) - 2;
+                        if (cer.numBits < 0) {
+                            cer.numBits = 0;
+                        }
+                        lastX = quadCoords[i][2];
+                        lastY = quadCoords[i][3];
+                        retList.add(cer);
+                    }
+                    break;
+                case PathIterator.SEG_QUADTO:
+                    CurvedEdgeRecord cer = new CurvedEdgeRecord();
+                    cer.controlDeltaX = (int) Math.round((points[0] - lastX));
+                    cer.controlDeltaY = (int) Math.round((points[1] - lastY));
+                    cer.anchorDeltaX = (int) Math.round((points[2] - points[0]));
+                    cer.anchorDeltaY = (int) Math.round((points[3] - points[1]));
+                    cer.numBits = SWFOutputStream.getNeededBitsS(cer.controlDeltaX, cer.controlDeltaY, cer.anchorDeltaX, cer.anchorDeltaY) - 2;
+                    if (cer.numBits < 0) {
+                        cer.numBits = 0;
+                    }
+                    retList.add(cer);
+                    lastX = points[2];
+                    lastY = points[3];
+                    break;
+                case PathIterator.SEG_CLOSE: //Closing line back to last SEG_MOVETO
+                    if ((startX == lastX) && (startY == lastY)) {
+                        break;
+                    }
+                    StraightEdgeRecord closeSer = new StraightEdgeRecord();
+                    closeSer.generalLineFlag = true;
+                    closeSer.deltaX = (int) Math.round((startX - lastX));
+                    closeSer.deltaY = (int) Math.round((startY - lastY));
+                    closeSer.numBits = SWFOutputStream.getNeededBitsS(closeSer.deltaX, closeSer.deltaY) - 2;
+                    if (closeSer.numBits < 0) {
+                        closeSer.numBits = 0;
+                    }
+                    retList.add(closeSer);
+                    lastX = startX;
+                    lastY = startY;
+                    break;
+            }
+        }
+        SHAPE shape = new SHAPE();
+        StyleChangeRecord init;
+        if (!retList.isEmpty() && retList.get(0) instanceof StyleChangeRecord) {
+            init = (StyleChangeRecord) retList.get(0);
+        } else {
+            init = new StyleChangeRecord();
+            retList.add(0, init);
+        }
+
+
+        retList.add(new EndShapeRecord());
+        init.stateFillStyle0 = true;
+        init.fillStyle0 = 1;
+        shape.shapeRecords = retList;
+        shape.numFillBits = 1;
+        shape.numLineBits = 0;
+        return shape;
+    }
+
+    // Taken from org.apache.fop.afp.util
+    private static double[][] approximateCubic(double[] cubicControlPointCoords) {
+        if (cubicControlPointCoords.length < 8) {
+            throw new IllegalArgumentException("Must have at least 8 coordinates");
+        }
+
+        //extract point objects from source array
+        Point2D p0 = new Point2D.Double(cubicControlPointCoords[0], cubicControlPointCoords[1]);
+        Point2D p1 = new Point2D.Double(cubicControlPointCoords[2], cubicControlPointCoords[3]);
+        Point2D p2 = new Point2D.Double(cubicControlPointCoords[4], cubicControlPointCoords[5]);
+        Point2D p3 = new Point2D.Double(cubicControlPointCoords[6], cubicControlPointCoords[7]);
+
+        //calculates the useful base points
+        Point2D pa = getPointOnSegment(p0, p1, 3.0 / 4.0);
+        Point2D pb = getPointOnSegment(p3, p2, 3.0 / 4.0);
+
+        //get 1/16 of the [P3, P0] segment
+        double dx = (p3.getX() - p0.getX()) / 16.0;
+        double dy = (p3.getY() - p0.getY()) / 16.0;
+
+        //calculates control point 1
+        Point2D pc1 = getPointOnSegment(p0, p1, 3.0 / 8.0);
+
+        //calculates control point 2
+        Point2D pc2 = getPointOnSegment(pa, pb, 3.0 / 8.0);
+        pc2 = movePoint(pc2, -dx, -dy);
+
+        //calculates control point 3
+        Point2D pc3 = getPointOnSegment(pb, pa, 3.0 / 8.0);
+        pc3 = movePoint(pc3, dx, dy);
+
+        //calculates control point 4
+        Point2D pc4 = getPointOnSegment(p3, p2, 3.0 / 8.0);
+
+        //calculates the 3 anchor points
+        Point2D pa1 = getMidPoint(pc1, pc2);
+        Point2D pa2 = getMidPoint(pa, pb);
+        Point2D pa3 = getMidPoint(pc3, pc4);
+
+        //return the points for the four quadratic curves
+        return new double[][]{
+            {pc1.getX(), pc1.getY(), pa1.getX(), pa1.getY()},
+            {pc2.getX(), pc2.getY(), pa2.getX(), pa2.getY()},
+            {pc3.getX(), pc3.getY(), pa3.getX(), pa3.getY()},
+            {pc4.getX(), pc4.getY(), p3.getX(), p3.getY()}};
+    }
+
+    private static Point2D.Double movePoint(Point2D point, double dx, double dy) {
+        return new Point2D.Double(point.getX() + dx, point.getY() + dy);
+    }
+
+    private static Point2D getMidPoint(Point2D p0, Point2D p1) {
+        return getPointOnSegment(p0, p1, 0.5);
+    }
+
+    private static Point2D getPointOnSegment(Point2D p0, Point2D p1, double ratio) {
+        double x = p0.getX() + ((p1.getX() - p0.getX()) * ratio);
+        double y = p0.getY() + ((p1.getY() - p0.getY()) * ratio);
+        return new Point2D.Double(x, y);
+    }
 }

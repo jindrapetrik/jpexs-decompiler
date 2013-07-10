@@ -76,14 +76,12 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
-import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
-import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
@@ -132,9 +130,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.Stack;
@@ -205,6 +201,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
     final static String DETAILCARDAS3NAVIGATOR = "Traits list";
     final static String DETAILCARDEMPTYPANEL = "Empty card";
     final static String CARDTEXTPANEL = "Text card";
+    final static String CARDFONTPANEL = "Font card";
     private LineMarkedEditorPane textValue;
     private JPEGTablesTag jtt;
     private HashMap<Integer, CharacterTag> characters;
@@ -230,6 +227,14 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
     private JCheckBoxMenuItem miDecompile;
     private JCheckBoxMenuItem miCacheDisk;
     private JCheckBoxMenuItem miGotoMainClassOnStartup;
+    private JLabel fontNameLabel;
+    private JLabel fontIsBoldLabel;
+    private JLabel fontIsItalicLabel;
+    private JLabel fontAscentLabel;
+    private JLabel fontDescentLabel;
+    private JLabel fontLeadingLabel;
+    private JLabel fontCharactersLabel;
+    private JTextField fontAddCharactersField;
 
     public void setPercent(int percent) {
         progressBar.setValue(percent);
@@ -777,8 +782,8 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
 
 
 
-        JPanel buttonsPanel = new JPanel();
-        buttonsPanel.setLayout(new FlowLayout());
+        JPanel textButtonsPanel = new JPanel();
+        textButtonsPanel.setLayout(new FlowLayout());
 
 
         textSaveButton = new JButton(translate("button.save"), View.getIcon("save16"));
@@ -796,26 +801,65 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         textCancelButton.setActionCommand("CANCELTEXT");
         textCancelButton.addActionListener(this);
 
-        buttonsPanel.add(textEditButton);
-        buttonsPanel.add(textSaveButton);
-        buttonsPanel.add(textCancelButton);
+        textButtonsPanel.add(textEditButton);
+        textButtonsPanel.add(textSaveButton);
+        textButtonsPanel.add(textCancelButton);
 
         textSaveButton.setVisible(false);
         textCancelButton.setVisible(false);
 
-        textTopPanel.add(buttonsPanel, BorderLayout.SOUTH);
+        textTopPanel.add(textButtonsPanel, BorderLayout.SOUTH);
 
         displayWithPreview = new JPanel(new CardLayout());
 
+        displayWithPreview.add(textTopPanel, CARDTEXTPANEL);
 
-        JPanel textPanel = new JPanel();
-        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
-        textPanel.add(textTopPanel);
-        //textPanel.add(textBottomPanel);
 
-        displayWithPreview.add(textPanel, CARDTEXTPANEL);
-        //displayWithPreview.setVisible(false);
+        JPanel fontPanel = new JPanel();
+        JPanel fontParams2 = new JPanel();
+        fontParams2.setLayout(null);
+        Component ctable[][] = new Component[][]{
+            {new JLabel(translate("font.name")), fontNameLabel = new JLabel(translate("value.unknown"))},
+            {new JLabel(translate("font.isbold")), fontIsBoldLabel = new JLabel(translate("value.unknown"))},
+            {new JLabel(translate("font.isitalic")), fontIsItalicLabel = new JLabel(translate("value.unknown"))},
+            {new JLabel(translate("font.ascent")), fontAscentLabel = new JLabel(translate("value.unknown"))},
+            {new JLabel(translate("font.descent")), fontDescentLabel = new JLabel(translate("value.unknown"))},
+            {new JLabel(translate("font.leading")), fontLeadingLabel = new JLabel(translate("value.unknown"))},
+            {new JLabel(translate("font.characters")), fontCharactersLabel = new JLabel("")}
+        };
 
+        int headerWidth = 100;
+        int borderLeft = 10;
+
+        for (int i = 0; i < ctable.length; i++) {
+            ctable[i][0].setBounds(borderLeft, 25 * i, headerWidth, 25);
+            ctable[i][1].setBounds(borderLeft + headerWidth + borderLeft, 25 * i, 400, 25);
+            fontParams2.add(ctable[i][0]);
+            fontParams2.add(ctable[i][1]);
+        }
+        fontParams2.setPreferredSize(new Dimension(600, ctable.length * 25));
+
+
+        JPanel fontParams1 = new JPanel();
+
+        fontParams1.setLayout(new BoxLayout(fontParams1, BoxLayout.Y_AXIS));
+        fontParams1.add(fontParams2);
+
+        JPanel fontAddCharsPanel = new JPanel(new FlowLayout());
+        fontAddCharsPanel.add(new JLabel(translate("font.characters.add")));
+        fontAddCharactersField = new JTextField();
+        fontAddCharactersField.setPreferredSize(new Dimension(100, 25));
+        fontAddCharsPanel.add(fontAddCharactersField);
+        JButton fontAddCharsButton = new JButton(translate("button.ok"));
+        fontAddCharsButton.setActionCommand("FONTADDCHARS");
+        fontAddCharsButton.addActionListener(this);
+        fontAddCharsPanel.add(fontAddCharsButton);
+
+        fontParams1.add(fontAddCharsPanel);
+        fontPanel.setLayout(new BorderLayout());
+        fontPanel.add(fontParams1, BorderLayout.NORTH);
+
+        displayWithPreview.add(fontPanel, CARDFONTPANEL);
 
 
         Component leftComponent = null;
@@ -1618,6 +1662,21 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
+            case "FONTADDCHARS":
+                String newchars = fontAddCharactersField.getText();
+                if (oldValue instanceof FontTag) {
+                    FontTag f = (FontTag) oldValue;
+                    String oldchars = f.getCharacters(swf.tags);
+                    for (int i = 0; i < newchars.length(); i++) {
+                        char c = newchars.charAt(i);
+                        if (oldchars.indexOf((int) c) == -1) {
+                            f.addCharacter(swf.tags, c);
+                        }
+                    }
+                    fontAddCharactersField.setText("");
+                    reload(true);
+                }
+                break;
             case "GOTODOCUMENTCLASSONSTARTUP":
                 Configuration.setConfig("gotoMainClassOnStartup", miGotoMainClassOnStartup.isSelected());
                 break;
@@ -2276,7 +2335,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
             imagePanel.setImage(((ImageTag) tagObj).getImage(swf.tags));
         } else if ((tagObj instanceof DrawableTag) && (!(tagObj instanceof TextTag)) && (miInternalViewer.isSelected())) {
             showCard(CARDDRAWPREVIEWPANEL);
-            previewImagePanel.setDrawable((DrawableTag) tagObj, swf, characters);//.setImage(((DrawableTag) tagObj).toImage(1, swf.tags, swf.displayRect, characters));
+            previewImagePanel.setDrawable((DrawableTag) tagObj, swf, characters);
         } else if (tagObj instanceof FrameNode && ((FrameNode) tagObj).isDisplayed() && (miInternalViewer.isSelected())) {
             showCard(CARDDRAWPREVIEWPANEL);
             FrameNode fn = (FrameNode) tagObj;
@@ -2410,7 +2469,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                         }
                         if (tagObj instanceof FontTag) {
 
-                            int countGlyphs = ((FontTag) tagObj).getGlyphShapeTable().length;
+                            int countGlyphs = ((FontTag) tagObj).getGlyphShapeTable().size();
                             int fontId = ((FontTag) tagObj).getFontId();
                             int sloupcu = (int) Math.ceil(Math.sqrt(countGlyphs));
                             int radku = (int) Math.ceil(((float) countGlyphs) / ((float) sloupcu));
@@ -2477,6 +2536,18 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                 previewSplitPane.setDividerLocation(previewSplitPane.getWidth() / 2);
                 showDetailWithPreview(CARDTEXTPANEL);
                 textValue.setText(((TextTag) tagObj).getFormattedText(swf.tags));
+            } else if (tagObj instanceof FontTag) {
+                parametersPanel.setVisible(true);
+                previewSplitPane.setDividerLocation(previewSplitPane.getWidth() / 2);
+                FontTag ft = (FontTag) tagObj;
+                fontNameLabel.setText(ft.getFontName(swf.tags));
+                fontIsBoldLabel.setText(ft.isBold() ? translate("yes") : translate("no"));
+                fontIsItalicLabel.setText(ft.isItalic() ? translate("yes") : translate("no"));
+                fontDescentLabel.setText("" + ft.getDescent());
+                fontAscentLabel.setText("" + ft.getDescent());
+                fontLeadingLabel.setText("" + ft.getDescent());
+                fontCharactersLabel.setText("" + ft.getCharacters(swf.tags));
+                showDetailWithPreview(CARDFONTPANEL);
             } else {
                 parametersPanel.setVisible(false);
             }

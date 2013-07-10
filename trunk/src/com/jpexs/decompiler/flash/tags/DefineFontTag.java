@@ -18,13 +18,14 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,11 +33,10 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class DefineFontTag extends CharacterTag implements FontTag {
+public class DefineFontTag extends FontTag {
 
     public int fontId;
-    public int offsetTable[];
-    public SHAPE glyphShapeTable[];
+    public List<SHAPE> glyphShapeTable;
     private DefineFontInfoTag fontInfoTag = null;
     private DefineFontInfo2Tag fontInfo2Tag = null;
 
@@ -52,7 +52,7 @@ public class DefineFontTag extends CharacterTag implements FontTag {
 
     @Override
     public int getGlyphWidth(int glyphIndex) {
-        return glyphShapeTable[glyphIndex].getBounds().getWidth();
+        return glyphShapeTable.get(glyphIndex).getBounds().getWidth();
     }
 
     private void ensureFontInfo(List<Tag> tags) {
@@ -111,12 +111,17 @@ public class DefineFontTag extends CharacterTag implements FontTag {
         SWFOutputStream sos = new SWFOutputStream(os, version);
         try {
             sos.writeUI16(fontId);
+            ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+            List<Integer> offsetTable = new ArrayList<>();
+            SWFOutputStream sos2 = new SWFOutputStream(baos2, version);
+            for (SHAPE shape : glyphShapeTable) {
+                offsetTable.add(glyphShapeTable.size() * 2 + (int) sos2.getPos());
+                sos2.writeSHAPE(shape, 1);
+            }
             for (int offset : offsetTable) {
                 sos.writeUI16(offset);
             }
-            for (SHAPE shape : glyphShapeTable) {
-                sos.writeSHAPE(shape, 1);
-            }
+            sos.write(baos2.toByteArray());
         } catch (IOException e) {
         }
         return baos.toByteArray();
@@ -136,14 +141,13 @@ public class DefineFontTag extends CharacterTag implements FontTag {
         fontId = sis.readUI16();
         int firstOffset = sis.readUI16();
         int nGlyphs = firstOffset / 2;
-        offsetTable = new int[nGlyphs];
-        glyphShapeTable = new SHAPE[nGlyphs];
-        offsetTable[0] = firstOffset;
+        glyphShapeTable = new ArrayList<>();
+
         for (int i = 1; i < nGlyphs; i++) {
-            offsetTable[i] = sis.readUI16();
+            sis.readUI16(); //offset
         }
         for (int i = 0; i < nGlyphs; i++) {
-            glyphShapeTable[i] = sis.readSHAPE(1);
+            glyphShapeTable.add(sis.readSHAPE(1));
         }
     }
 
@@ -153,7 +157,7 @@ public class DefineFontTag extends CharacterTag implements FontTag {
     }
 
     @Override
-    public SHAPE[] getGlyphShapeTable() {
+    public List<SHAPE> getGlyphShapeTable() {
         return glyphShapeTable;
     }
 
@@ -214,5 +218,34 @@ public class DefineFontTag extends CharacterTag implements FontTag {
     @Override
     public int getDivider() {
         return 1;
+    }
+
+    @Override
+    public void addCharacter(List<Tag> tags, char character) {
+        glyphShapeTable.add(SHAPERECORD.systemFontCharacterToSHAPE(getFontName(tags), getFontStyle(), getDivider() * 1000, character));
+        ensureFontInfo(tags);
+        if (fontInfoTag != null) {
+            fontInfoTag.codeTable.add((int) character);
+        }
+        if (fontInfo2Tag != null) {
+            fontInfo2Tag.codeTable.add((int) character);
+        }
+    }
+
+    @Override
+    public String getCharacters(List<Tag> tags) {
+        String ret = "";
+        ensureFontInfo(tags);
+        if (fontInfoTag != null) {
+            for (int i : fontInfoTag.codeTable) {
+                ret += (char) i;
+            }
+        }
+        if (fontInfo2Tag != null) {
+            for (int i : fontInfo2Tag.codeTable) {
+                ret += (char) i;
+            }
+        }
+        return ret;
     }
 }

@@ -18,39 +18,63 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.SHAPE;
+import java.awt.Font;
 import java.util.List;
 
 /**
  *
  * @author JPEXS
  */
-public interface FontTag extends AloneTag {
+public abstract class FontTag extends CharacterTag implements AloneTag {
 
-    public int getFontId();
+    public FontTag(int id, String name, byte data[], long pos) {
+        super(id, name, data, pos);
+    }
 
-    public SHAPE[] getGlyphShapeTable();
+    public abstract int getFontId();
 
-    public char glyphToChar(List<Tag> tags, int glyphIndex);
+    public abstract List<SHAPE> getGlyphShapeTable();
 
-    public int charToGlyph(List<Tag> tags, char c);
+    public abstract void addCharacter(List<Tag> tags, char character);
 
-    public int getGlyphAdvance(int glyphIndex);
+    public abstract char glyphToChar(List<Tag> tags, int glyphIndex);
 
-    public int getGlyphWidth(int glyphIndex);
+    public abstract int charToGlyph(List<Tag> tags, char c);
 
-    public String getFontName(List<Tag> tags);
+    public abstract int getGlyphAdvance(int glyphIndex);
 
-    public boolean isSmall();
+    public abstract int getGlyphWidth(int glyphIndex);
 
-    public boolean isBold();
+    public abstract String getFontName(List<Tag> tags);
 
-    public boolean isItalic();
+    public abstract boolean isSmall();
 
-    public int getDivider();
+    public abstract boolean isBold();
 
-    public int getAscent();
+    public abstract boolean isItalic();
 
-    public int getDescent();
+    public abstract int getDivider();
 
-    public int getLeading();
+    public abstract int getAscent();
+
+    public abstract int getDescent();
+
+    public abstract int getLeading();
+
+    public boolean containsChar(List<Tag> tags, char character) {
+        return charToGlyph(tags, character) > -1;
+    }
+
+    public int getFontStyle() {
+        int fontStyle = 0;
+        if (isBold()) {
+            fontStyle |= Font.BOLD;
+        }
+        if (isItalic()) {
+            fontStyle |= Font.ITALIC;
+        }
+        return fontStyle;
+    }
+
+    public abstract String getCharacters(List<Tag> tags);
 }

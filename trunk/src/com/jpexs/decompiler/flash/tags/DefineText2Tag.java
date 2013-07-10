@@ -329,13 +329,16 @@ public class DefineText2Tag extends CharacterTag implements BoundedTag, TextTag,
                         for (int i = 0; i < txt.length(); i++) {
                             char c = txt.charAt(i);
                             tr.glyphEntries[i] = new GLYPHENTRY();
+                            if (!font.containsChar(tags, c)) {
+                                font.addCharacter(tags, c);
+                            }
                             tr.glyphEntries[i].glyphIndex = font.charToGlyph(tags, c);
 
 
 
-                            if (tr.glyphEntries[i].glyphIndex == -1) {
-                                throw new ParseException("Font does not contain glyph for character '" + c + "'", lexer.yyline());
-                            }
+                            /*if (tr.glyphEntries[i].glyphIndex == -1) {
+                             throw new ParseException("Font does not contain glyph for character '" + c + "'", lexer.yyline());
+                             }*/
                             tr.glyphEntries[i].glyphAdvance = textHeight * font.getGlyphAdvance(tr.glyphEntries[i].glyphIndex) / 1024;
 
                             int gw = textHeight * font.getGlyphWidth(tr.glyphEntries[i].glyphIndex) / 1024;
@@ -458,7 +461,7 @@ public class DefineText2Tag extends CharacterTag implements BoundedTag, TextTag,
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        SHAPE glyphs[] = new SHAPE[0];
+        List<SHAPE> glyphs = new ArrayList<>();
         for (TEXTRECORD rec : textRecords) {
             if (rec.styleFlagsHasColor) {
                 textColor = rec.textColorA.toColor();
@@ -476,12 +479,12 @@ public class DefineText2Tag extends CharacterTag implements BoundedTag, TextTag,
             }
 
             for (GLYPHENTRY entry : rec.glyphEntries) {
-                RECT rect = SHAPERECORD.getBounds(glyphs[entry.glyphIndex].shapeRecords);
+                RECT rect = SHAPERECORD.getBounds(glyphs.get(entry.glyphIndex).shapeRecords);
                 rect.Xmax /= font.getDivider();
                 rect.Xmin /= font.getDivider();
                 rect.Ymax /= font.getDivider();
                 rect.Ymin /= font.getDivider();
-                BufferedImage img = SHAPERECORD.shapeToImage(tags, 4, null, null, glyphs[entry.glyphIndex].shapeRecords, textColor);
+                BufferedImage img = SHAPERECORD.shapeToImage(tags, 4, null, null, glyphs.get(entry.glyphIndex).shapeRecords, textColor);
                 AffineTransform tr = new AffineTransform();
                 tr.setToIdentity();
                 float rat = textHeight / 1000f;

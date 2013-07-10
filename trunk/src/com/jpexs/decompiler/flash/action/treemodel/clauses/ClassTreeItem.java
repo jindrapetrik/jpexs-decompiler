@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.graph.ContinueItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class ClassTreeItem extends TreeItem implements Block {
