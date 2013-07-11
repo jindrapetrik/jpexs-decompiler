@@ -1895,6 +1895,7 @@ public class SWF {
                             if (changedNameStr2 != null) {
                                 changedNameStr = changedNameStr2;
                             }
+                            ret++;
                             deobfuscated.put(nameStr, changedNameStr);
                             pos++;
                         }
@@ -1918,6 +1919,7 @@ public class SWF {
                             if (changedNameStr2 != null) {
                                 changedNameStr = changedNameStr2;
                             }
+                            ret++;
                             deobfuscated.put(nameStr, changedNameStr);
                             pos++;
                         }
@@ -1931,16 +1933,24 @@ public class SWF {
             informListeners("rename", "function " + fc + "/" + allFunctions.size());
             if (fun instanceof ActionDefineFunction) {
                 ActionDefineFunction f = (ActionDefineFunction) fun;
+                if (f.functionName.equals("")) { //anonymous function, leave as is
+                    continue;
+                }
                 String changed = deobfuscateName(f.functionName, false, "function", renameType, selected);
                 if (changed != null) {
                     f.replacedFunctionName = changed;
+                    ret++;
                 }
             }
             if (fun instanceof ActionDefineFunction2) {
                 ActionDefineFunction2 f = (ActionDefineFunction2) fun;
+                if (f.functionName.equals("")) { //anonymous function, leave as is
+                    continue;
+                }
                 String changed = deobfuscateName(f.functionName, false, "function", renameType, selected);
                 if (changed != null) {
                     f.replacedFunctionName = changed;
+                    ret++;
                 }
             }
         }
