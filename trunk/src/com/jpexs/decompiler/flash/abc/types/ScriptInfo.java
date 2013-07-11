@@ -16,12 +16,12 @@
  */
 package com.jpexs.decompiler.flash.abc.types;
 
-import com.jpexs.decompiler.flash.KeyValue;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +31,8 @@ public class ScriptInfo {
     public int init_index; //MethodInfo
     public Traits traits;
 
-    public List<KeyValue<ClassPath, ScriptPack>> getPacks(ABC abc, int scriptIndex) {
-        List<KeyValue<ClassPath, ScriptPack>> ret = new ArrayList<>();
+    public List<MyEntry<ClassPath, ScriptPack>> getPacks(ABC abc, int scriptIndex) {
+        List<MyEntry<ClassPath, ScriptPack>> ret = new ArrayList<>();
 
         List<Integer> otherTraits = new ArrayList<>();
         for (int j = 0; j < traits.traits.length; j++) {
@@ -59,7 +59,7 @@ public class ScriptInfo {
                     traitIndices.addAll(otherTraits);
                 }
                 otherTraits = new ArrayList<>();
-                ret.add(new KeyValue<>(new ClassPath(packageName, objectName), new ScriptPack(abc, scriptIndex, traitIndices)));
+                ret.add(new MyEntry<>(new ClassPath(packageName, objectName), new ScriptPack(abc, scriptIndex, traitIndices)));
             }
         }
         return ret;

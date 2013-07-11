@@ -1057,37 +1057,15 @@ public class Graph {
                 List<Loop> loops2 = new ArrayList<>(loops);
                 loops2.remove(lastP1);
                 if (!part.leadsTo(code, lastP1.loopContinue, loops2)) {
-                    /*boolean notlead=true;
-                     for(GraphPart p:part.throwParts){
-                     if(p.leadsTo(code, lastP1.loopContinue, loops2)){
-                     notlead=false;
-                     break;
-                     }
-                     }*/
-                    //if(notlead){
-                    /*boolean isthrow = false;
-                     loopthrow:
-                     for (GraphPart p : part.refs) {
-                     if (p.throwParts.contains(part)) {
-                     isthrow = true;
-                     break;
-                     }
-                     for (GraphPart t : p.throwParts) {
-                     if (t.leadsTo(code, part, loops)) {
-                     isthrow = true;
-                     break loopthrow;
-                     }
-                     }
-                     }
-                     if (!isthrow) {*/
-
                     if (lastP1.breakCandidatesLocked == 0) {
+                        if (debugMode) {
+                            System.err.println("added breakCandidate " + part + " to " + lastP1);
+                        }
+
                         lastP1.breakCandidates.add(part);
                         lastP1.breakCandidatesLevels.add(level);
                         return;
                     }
-                    //}
-                    //}
                 }
             }
         }
@@ -1171,52 +1149,15 @@ public class Graph {
         }
 
         if (isLoop) {
-
             GraphPart found;
             List<GraphPart> backupCandidates = new ArrayList<>();
-            List<GraphPart> spcheck = new ArrayList<>(stopPart);
-            if (!spcheck.isEmpty()) {
-                spcheck.remove(spcheck.size() - 1);
-            }
-            for (int i = currentLoop.breakCandidates.size() - 1; i >= 0; i--) {
-                if (spcheck.contains(currentLoop.breakCandidates.get(i))) {
-                    if (currentLoop.breakCandidates.get(i).start >= code.size()) {
-                        continue;
-                    }
-                    currentLoop.breakCandidatesLevels.remove(i);
-                    backupCandidates.add(currentLoop.breakCandidates.remove(i));
-                }
-            }
             Map<GraphPart, Integer> removed = new HashMap<>();
-            /*
-             Set<GraphPart> newcommon=new HashSet<>();
-             for (GraphPart cand : currentLoop.breakCandidates) {
-             for (GraphPart cand2 : currentLoop.breakCandidates) {
-             if(cand==cand2){
-             continue;
-             }
-             List<GraphPart> c=new ArrayList<>();
-             c.add(cand);
-             c.add(cand2);
-
-             GraphPart common=getCommonPart(c, loops);
-             if(common!=null){
-             if(!currentLoop.breakCandidates.contains(common)){
-             newcommon.add(common);
-             }
-             }
-             }
-             }
-             currentLoop.breakCandidates.addAll(newcommon);*/
             do {
                 found = null;
                 loopcand:
                 for (GraphPart cand : currentLoop.breakCandidates) {
                     for (GraphPart cand2 : currentLoop.breakCandidates) {
                         if (cand.leadsTo(code, cand2, loops)) {
-                            /*if (cand.path.equals(cand2.path)) {
-                             found = cand2;
-                             } else {*/
                             int lev1 = Integer.MAX_VALUE;
                             int lev2 = Integer.MAX_VALUE;
                             for (int i = 0; i < currentLoop.breakCandidates.size(); i++) {
@@ -1236,7 +1177,6 @@ public class Graph {
                             } else {
                                 found = cand;
                             }
-                            //}
                             break loopcand;
                         }
                     }
@@ -1263,7 +1203,6 @@ public class Graph {
             Map<GraphPart, Integer> count = new HashMap<>();
             GraphPart winner = null;
             int winnerCount = 0;
-            boolean winnerBreakCandidate = true;
             for (GraphPart cand : currentLoop.breakCandidates) {
 
                 if (!count.containsKey(cand)) {
@@ -1280,12 +1219,6 @@ public class Graph {
                         break;
                     }
                 }
-                /*if(winnerBreakCandidate && !otherBreakCandidate){
-                 winnerCount = count.get(cand);
-                 winner = cand;
-                 winnerBreakCandidate=otherBreakCandidate;
-                 }else if(!winnerBreakCandidate && otherBreakCandidate){
-                 */
                 if (otherBreakCandidate) {
                 } else if (count.get(cand) > winnerCount) {
                     winnerCount = count.get(cand);
@@ -1325,8 +1258,13 @@ public class Graph {
                     start = true;
                 }
             }
+            List<GraphPart> removedVisited = new ArrayList<>();
             for (GraphPart r : removed.keySet()) {
+                if (removedVisited.contains(r)) {
+                    continue;
+                }
                 getLoops(r, loops, stopPart, false, removed.get(r), visited);
+                removedVisited.add(r);
             }
             start = false;
             for (int l = 0; l < loops.size(); l++) {
@@ -1338,7 +1276,6 @@ public class Graph {
                     el.phase = 2;
                 }
             }
-            //currentLoop.phase = 2;
             getLoops(currentLoop.loopBreak, loops, stopPart, false, level, visited);
         }
     }

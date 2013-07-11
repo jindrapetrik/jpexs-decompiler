@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.Configuration;
-import com.jpexs.decompiler.flash.KeyValue;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
@@ -34,6 +33,7 @@ import com.jpexs.decompiler.flash.gui.abc.tablemodels.NamespaceSetTableModel;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.NamespaceTableModel;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.StringTableModel;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.UIntTableModel;
+import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -92,7 +92,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
             searchIgnoreCase = ignoreCase;
             searchRegexp = regexp;
             ClassesListTreeModel clModel = (ClassesListTreeModel) classTree.getModel();
-            List<KeyValue<ClassPath, ScriptPack>> allpacks = clModel.getList();
+            List<MyEntry<ClassPath, ScriptPack>> allpacks = clModel.getList();
             found = new ArrayList<>();
             Pattern pat = null;
             if (regexp) {
@@ -100,7 +100,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
             } else {
                 pat = Pattern.compile(Pattern.quote(txt), ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
             }
-            for (KeyValue<ClassPath, ScriptPack> item : allpacks) {
+            for (MyEntry<ClassPath, ScriptPack> item : allpacks) {
                 decompiledTextArea.cacheScriptPack(item.value, list);
                 if (pat.matcher(decompiledTextArea.getCachedText(item.value)).find()) {
                     found.add(item.value);
@@ -468,7 +468,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
     public void hilightScript(String name) {
         ClassesListTreeModel clModel = (ClassesListTreeModel) classTree.getModel();
         ScriptPack pack = null;
-        for (KeyValue<ClassPath, ScriptPack> item : clModel.getList()) {
+        for (MyEntry<ClassPath, ScriptPack> item : clModel.getList()) {
             if (item.key.toString().equals(name)) {
                 pack = item.value;
                 break;

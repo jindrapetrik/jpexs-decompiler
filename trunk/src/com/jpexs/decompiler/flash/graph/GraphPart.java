@@ -230,4 +230,28 @@ public class GraphPart {
         ret.add(this);
         return ret;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof GraphPart)) {
+            return false;
+        }
+        final GraphPart other = (GraphPart) obj;
+        if (this.start != other.start) {
+            return false;
+        }
+        if (this.end != other.end) {
+            return false;
+        }
+        return true;
+    }
 }

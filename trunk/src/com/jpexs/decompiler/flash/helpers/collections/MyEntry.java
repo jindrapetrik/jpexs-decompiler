@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash;
+package com.jpexs.decompiler.flash.helpers.collections;
 
+import java.util.Map.Entry;
 import java.util.Objects;
 
 /**
@@ -24,12 +25,12 @@ import java.util.Objects;
  * @param <V> Value
  * @author JPEXS
  */
-public class KeyValue<K, V> {
+public class MyEntry<K, V> implements Entry<K, V> {
 
     public K key;
     public V value;
 
-    public KeyValue(K key, V value) {
+    public MyEntry(K key, V value) {
         this.key = key;
         this.value = value;
     }
@@ -56,7 +57,7 @@ public class KeyValue<K, V> {
             return false;
         }
         @SuppressWarnings("unchecked")
-        final KeyValue<K, V> other = (KeyValue<K, V>) obj;
+        final MyEntry<K, V> other = (MyEntry<K, V>) obj;
         if (!Objects.equals(this.key, other.key)) {
             return false;
         }
@@ -64,5 +65,21 @@ public class KeyValue<K, V> {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public K getKey() {
+        return key;
+    }
+
+    @Override
+    public V getValue() {
+        return value;
+    }
+
+    @Override
+    public V setValue(V value) {
+        this.value = value;
+        return value;
     }
 }

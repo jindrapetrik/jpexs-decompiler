@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
-import com.jpexs.decompiler.flash.KeyValue;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
@@ -43,6 +42,7 @@ import com.jpexs.decompiler.flash.graph.NotItem;
 import com.jpexs.decompiler.flash.graph.ScriptEndItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
+import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
@@ -986,8 +986,8 @@ public class Action implements GraphSourceItem {
         List<GraphTargetItem> ret = new ArrayList<>();
         List<GraphTargetItem> functions = new ArrayList<>();
         List<GraphTargetItem> staticFunctions = new ArrayList<>();
-        List<KeyValue<GraphTargetItem, GraphTargetItem>> vars = new ArrayList<>();
-        List<KeyValue<GraphTargetItem, GraphTargetItem>> staticVars = new ArrayList<>();
+        List<MyEntry<GraphTargetItem, GraphTargetItem>> vars = new ArrayList<>();
+        List<MyEntry<GraphTargetItem, GraphTargetItem>> staticVars = new ArrayList<>();
         GraphTargetItem className;
         GraphTargetItem extendsOp = null;
         List<GraphTargetItem> implementsOp = new ArrayList<>();
@@ -1144,14 +1144,14 @@ public class Action implements GraphSourceItem {
                                                                                 ((FunctionTreeItem) smt.value).calculatedFunctionName = smt.objectName;
                                                                                 functions.add((FunctionTreeItem) smt.value);
                                                                             } else {
-                                                                                vars.add(new KeyValue<>(smt.objectName, smt.value));
+                                                                                vars.add(new MyEntry<>(smt.objectName, smt.value));
                                                                             }
                                                                         } else if (((RegisterNumber) ((DirectValueTreeItem) smt.object).value).number == classReg) {
                                                                             if (smt.value instanceof FunctionTreeItem) {
                                                                                 ((FunctionTreeItem) smt.value).calculatedFunctionName = smt.objectName;
                                                                                 staticFunctions.add((FunctionTreeItem) smt.value);
                                                                             } else {
-                                                                                staticVars.add(new KeyValue<>(smt.objectName, smt.value));
+                                                                                staticVars.add(new MyEntry<>(smt.objectName, smt.value));
                                                                             }
                                                                         } else {
                                                                             ok = false;

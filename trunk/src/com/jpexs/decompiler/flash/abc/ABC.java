@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.EventListener;
-import com.jpexs.decompiler.flash.KeyValue;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCode;
@@ -32,6 +31,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.abc.usages.*;
+import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -706,8 +706,8 @@ public class ABC {
     /*public void export(String directory, boolean pcode, List<ABCContainerTag> abcList, boolean paralel) throws IOException {
      export(directory, pcode, abcList, "", paralel);
      }*/
-    public List<KeyValue<ClassPath, ScriptPack>> getScriptPacks() {
-        List<KeyValue<ClassPath, ScriptPack>> ret = new ArrayList<>();
+    public List<MyEntry<ClassPath, ScriptPack>> getScriptPacks() {
+        List<MyEntry<ClassPath, ScriptPack>> ret = new ArrayList<>();
         for (int i = 0; i < script_info.length; i++) {
             ret.addAll(script_info[i].getPacks(this, i));
         }

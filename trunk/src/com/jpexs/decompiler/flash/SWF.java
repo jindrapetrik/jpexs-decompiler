@@ -58,6 +58,7 @@ import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Cache;
 import com.jpexs.decompiler.flash.helpers.Helper;
+import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
@@ -505,10 +506,10 @@ public class SWF {
         return false;
     }
 
-    private List<KeyValue<ClassPath, ScriptPack>> uniqueAS3Packs(List<KeyValue<ClassPath, ScriptPack>> packs) {
-        List<KeyValue<ClassPath, ScriptPack>> ret = new ArrayList<>();
-        for (KeyValue<ClassPath, ScriptPack> item : packs) {
-            for (KeyValue<ClassPath, ScriptPack> itemOld : ret) {
+    private List<MyEntry<ClassPath, ScriptPack>> uniqueAS3Packs(List<MyEntry<ClassPath, ScriptPack>> packs) {
+        List<MyEntry<ClassPath, ScriptPack>> ret = new ArrayList<>();
+        for (MyEntry<ClassPath, ScriptPack> item : packs) {
+            for (MyEntry<ClassPath, ScriptPack> itemOld : ret) {
                 if (item.key.equals(itemOld.key)) {
                     Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Duplicate pack path found!");
                     break;
@@ -519,14 +520,14 @@ public class SWF {
         return ret;
     }
 
-    public List<KeyValue<ClassPath, ScriptPack>> getAS3Packs() {
+    public List<MyEntry<ClassPath, ScriptPack>> getAS3Packs() {
         List<ABCContainerTag> abcTags = new ArrayList<>();
         for (Tag t : tags) {
             if (t instanceof ABCContainerTag) {
                 abcTags.add((ABCContainerTag) t);
             }
         }
-        List<KeyValue<ClassPath, ScriptPack>> packs = new ArrayList<>();
+        List<MyEntry<ClassPath, ScriptPack>> packs = new ArrayList<>();
         for (int i = 0; i < abcTags.size(); i++) {
             ABCContainerTag t = abcTags.get(i);
             packs.addAll(t.getABC().getScriptPacks());
@@ -597,8 +598,8 @@ public class SWF {
                 abcTags.add((ABCContainerTag) t);
             }
         }
-        List<KeyValue<ClassPath, ScriptPack>> packs = getAS3Packs();
-        for (KeyValue<ClassPath, ScriptPack> item : packs) {
+        List<MyEntry<ClassPath, ScriptPack>> packs = getAS3Packs();
+        for (MyEntry<ClassPath, ScriptPack> item : packs) {
             Future<File> future = executor.submit(new ExportPackTask(cnt, packs.size(), item.key, item.value, outdir, abcTags, isPcode, "", paralel));
             futureResults.add(future);
         }
@@ -1343,7 +1344,7 @@ public class SWF {
     public static final String validNextCharacters = validFirstCharacters + "0123456789";
     public static final String fooCharacters = "bcdfghjklmnpqrstvwz";
     public static final String fooJoinCharacters = "aeiouy";
-    private List<KeyValue<DirectValueTreeItem, ConstantPool>> allVariableNames = new ArrayList<>();
+    private List<MyEntry<DirectValueTreeItem, ConstantPool>> allVariableNames = new ArrayList<>();
     private HashSet<String> allVariableNamesStr = new HashSet<>();
     private List<GraphSourceItem> allFunctions = new ArrayList<>();
     private HashMap<DirectValueTreeItem, ConstantPool> allStrings = new HashMap<>();
@@ -1449,7 +1450,7 @@ public class SWF {
         return null;
     }
 
-    private static void getVariables(ConstantPool constantPool, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, List<KeyValue<DirectValueTreeItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, List<Integer> visited, HashMap<DirectValueTreeItem, String> usageTypes) {
+    private static void getVariables(ConstantPool constantPool, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, List<MyEntry<DirectValueTreeItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, List<Integer> visited, HashMap<DirectValueTreeItem, String> usageTypes) {
         boolean debugMode = false;
         while ((ip > -1) && ip < code.size()) {
             if (visited.contains(ip)) {
@@ -1537,7 +1538,7 @@ public class SWF {
             }
 
             if (name instanceof DirectValueTreeItem) {
-                variables.add(new KeyValue<>((DirectValueTreeItem) name, constantPool));
+                variables.add(new MyEntry<>((DirectValueTreeItem) name, constantPool));
                 usageTypes.put((DirectValueTreeItem) name, usageType);
             }
 
@@ -1598,7 +1599,7 @@ public class SWF {
         };
     }
 
-    private static void getVariables(List<KeyValue<DirectValueTreeItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, HashMap<DirectValueTreeItem, String> usageType, ActionGraphSource code, int addr) {
+    private static void getVariables(List<MyEntry<DirectValueTreeItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, HashMap<DirectValueTreeItem, String> usageType, ActionGraphSource code, int addr) {
         List<Object> localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
         try {
             getVariables(null, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), variables, functions, strings, new ArrayList<Integer>(), usageType);
@@ -1607,8 +1608,8 @@ public class SWF {
         }
     }
 
-    private List<KeyValue<DirectValueTreeItem, ConstantPool>> getVariables(List<KeyValue<DirectValueTreeItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, HashMap<DirectValueTreeItem, String> usageType, ASMSource src) {
-        List<KeyValue<DirectValueTreeItem, ConstantPool>> ret = new ArrayList<>();
+    private List<MyEntry<DirectValueTreeItem, ConstantPool>> getVariables(List<MyEntry<DirectValueTreeItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, HashMap<DirectValueTreeItem, String> usageType, ASMSource src) {
+        List<MyEntry<DirectValueTreeItem, ConstantPool>> ret = new ArrayList<>();
         List<Action> actions = src.getActions(version);
         actionsMap.put(src, actions);
         getVariables(variables, functions, strings, usageType, new ActionGraphSource(actions, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0);
@@ -1792,7 +1793,7 @@ public class SWF {
         getVariables(objs, "");
         informListeners("rename", "");
         int fc = 0;
-        for (KeyValue<DirectValueTreeItem, ConstantPool> it : allVariableNames) {
+        for (MyEntry<DirectValueTreeItem, ConstantPool> it : allVariableNames) {
             String name = it.key.toStringNoH(it.value);
             allVariableNamesStr.add(name);
         }
@@ -1846,10 +1847,10 @@ public class SWF {
 
 
                         List<GraphTargetItem> vars = new ArrayList<>();
-                        for (KeyValue<GraphTargetItem, GraphTargetItem> item : cti.vars) {
+                        for (MyEntry<GraphTargetItem, GraphTargetItem> item : cti.vars) {
                             vars.add(item.key);
                         }
-                        for (KeyValue<GraphTargetItem, GraphTargetItem> item : cti.staticVars) {
+                        for (MyEntry<GraphTargetItem, GraphTargetItem> item : cti.staticVars) {
                             vars.add(item.key);
                         }
                         for (GraphTargetItem gti : vars) {
@@ -1946,7 +1947,7 @@ public class SWF {
 
         HashSet<String> stringsNoVarH = new HashSet<>();
         List<DirectValueTreeItem> allVariableNamesDv = new ArrayList<>();
-        for (KeyValue<DirectValueTreeItem, ConstantPool> it : allVariableNames) {
+        for (MyEntry<DirectValueTreeItem, ConstantPool> it : allVariableNames) {
             allVariableNamesDv.add(it.key);
         }
         for (DirectValueTreeItem ti : allStrings.keySet()) {
@@ -1956,7 +1957,7 @@ public class SWF {
         }
 
         int vc = 0;
-        for (KeyValue<DirectValueTreeItem, ConstantPool> it : allVariableNames) {
+        for (MyEntry<DirectValueTreeItem, ConstantPool> it : allVariableNames) {
             vc++;
             String name = it.key.toStringNoH(it.value);
             String changed = deobfuscateName(name, false, usageTypes.get(it.key), renameType, selected);

@@ -16,12 +16,12 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
-import com.jpexs.decompiler.flash.KeyValue;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
+import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import java.util.List;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
@@ -78,18 +78,18 @@ class ClassIndexVisitor implements TreeVisitor {
 public class ClassesListTreeModel implements TreeModel {
 
     private Tree classTree = new Tree();
-    private List<KeyValue<ClassPath, ScriptPack>> list;
+    private List<MyEntry<ClassPath, ScriptPack>> list;
 
-    public List<KeyValue<ClassPath, ScriptPack>> getList() {
+    public List<MyEntry<ClassPath, ScriptPack>> getList() {
         return list;
     }
 
-    public ClassesListTreeModel(List<KeyValue<ClassPath, ScriptPack>> list) {
+    public ClassesListTreeModel(List<MyEntry<ClassPath, ScriptPack>> list) {
         this(list, null);
     }
 
-    public ClassesListTreeModel(List<KeyValue<ClassPath, ScriptPack>> list, String filter) {
-        for (KeyValue<ClassPath, ScriptPack> item : list) {
+    public ClassesListTreeModel(List<MyEntry<ClassPath, ScriptPack>> list, String filter) {
+        for (MyEntry<ClassPath, ScriptPack> item : list) {
             if (filter != null) {
                 if (!filter.equals("")) {
                     if (!item.key.toString().contains(filter)) {

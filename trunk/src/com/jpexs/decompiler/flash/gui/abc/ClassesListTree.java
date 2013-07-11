@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
-import com.jpexs.decompiler.flash.KeyValue;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
@@ -24,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ import javax.swing.tree.TreeSelectionModel;
 public class ClassesListTree extends JTree implements TreeSelectionListener {
 
     private List<ABCContainerTag> abcList;
-    public List<KeyValue<ClassPath, ScriptPack>> treeList;
+    public List<MyEntry<ClassPath, ScriptPack>> treeList;
     private ABCPanel abcPanel;
     private SWF swf;
 
@@ -97,7 +97,7 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
         return selectedScripts;
     }
 
-    public List<KeyValue<ClassPath, ScriptPack>> getTreeList(List<ABCContainerTag> list) {
+    public List<MyEntry<ClassPath, ScriptPack>> getTreeList(List<ABCContainerTag> list) {
 
         return swf.getAS3Packs();
     }
