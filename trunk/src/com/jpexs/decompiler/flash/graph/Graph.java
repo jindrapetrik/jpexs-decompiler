@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.graph;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -84,7 +85,7 @@ public class Graph {
         visited.add(part);
         boolean fixed = false;
         int i = 0;
-        GraphPath lastpref = null;
+        GraphPath lastpref;
         boolean modify = true;
         int prvni = -1;
 
@@ -467,7 +468,7 @@ public class Graph {
             reachable.add(r1);
         }
         ///List<GraphPart> first = reachable.get(0);
-        int commonLevel = 0;
+        int commonLevel;
         Map<GraphPart, Integer> levelMap = new HashMap<>();
         for (List<GraphPart> first : reachable) {
             int maxclevel = 0;
@@ -747,7 +748,7 @@ public class Graph {
     protected List<GraphTargetItem> translatePart(List<Object> localData, GraphPart part, Stack<GraphTargetItem> stack) {
         List<GraphPart> sub = part.getSubParts();
         List<GraphTargetItem> ret = new ArrayList<>();
-        int end = 0;
+        int end;
         for (GraphPart p : sub) {
             if (p.end == -1) {
                 p.end = code.size() - 1;
@@ -1150,7 +1151,6 @@ public class Graph {
 
         if (isLoop) {
             GraphPart found;
-            List<GraphPart> backupCandidates = new ArrayList<>();
             Map<GraphPart, Integer> removed = new HashMap<>();
             do {
                 found = null;
@@ -1230,11 +1230,6 @@ public class Graph {
                     if (cand.path.length() < winner.path.length()) {
                         winner = cand;
                     }
-                }
-            }
-            if (winner == null) {
-                if (!backupCandidates.isEmpty()) {
-                    winner = backupCandidates.get(backupCandidates.size() - 1);
                 }
             }
             for (int i = 0; i < currentLoop.breakCandidates.size(); i++) {
@@ -1331,54 +1326,9 @@ public class Graph {
         if (part.ignored) {
             return ret;
         }
-
-        /*    if ((parent != null) && (part.path.length() < parent.path.length())) {
-         boolean can = true;
-         for (Loop el : loops) {
-         if (el.loopContinue == part) {
-         can = false;
-         break;
-         }
-         if (el.loopBreak == part) {
-         can = false;
-         break;
-         }
-         if (el.breakCandidates.containsKey(part)) {
-         can = false;
-         break;
-         }
-         }
-         if (can) {
-         if ((part != stopPart) && (part.refs.size() > 1)) {
-         List<GraphPart> nextList = new ArrayList<>();
-         populateParts(part, nextList);
-         Loop nearestLoop = null;
-         loopn:
-         for (GraphPart n : nextList) {
-         for (Loop l : loops) {
-         if (l.loopContinue == n) {
-         nearestLoop = l;
-         break loopn;
-         }
-         }
-         }
-
-         if ((nearestLoop != null)) {// && (nearestLoop.loopBreak != null)) {
-
-         List<GraphTargetItem> finalCommands = printGraph(visited, localData, stack, allParts, null, part, nearestLoop.loopContinue, loops);
-         nearestLoop.loopContinue = part;
-         forFinalCommands.put(nearestLoop, finalCommands);
-         ContinueItem cti = new ContinueItem(null, nearestLoop.id);
-         ret.add(cti);
-         //ret.add(new CommentItem("CONTTEST"));
-         return ret;
-         }
-         }
-         }
-         }
-         */
+        
         List<GraphPart> loopContinues = getLoopsContinues(loops);
-        boolean isLoop = false; //part.leadsTo(code, part, loopContinues);
+        boolean isLoop = false; 
         Loop currentLoop = null;
         for (Loop el : loops) {
             if ((el.loopContinue == part) && (el.phase == 0)) {
@@ -1387,13 +1337,7 @@ public class Graph {
                 isLoop = true;
                 break;
             }
-        }
-        /*Loop currentLoop = null;
-         if (isLoop) {
-         currentLoop = new Loop(loops.size(), part, null);
-         loops.add(currentLoop);
-         loopContinues.add(part);
-         }*/
+        }       
 
         if (debugMode) {
             System.err.println("loopsize:" + loops.size());
@@ -1470,9 +1414,8 @@ public class Graph {
         } else {
             parts.add(part);
         }
-        int end = part.end;
         for (GraphPart p : parts) {
-            end = p.end;
+            int end = p.end;
             int start = p.start;
 
             output.addAll(code.translatePart(p, localData, stack, start, end));
@@ -2137,10 +2080,7 @@ public class Graph {
      */
     public static String graphToString(List<GraphTargetItem> tree, Object... localData) {
         StringBuilder ret = new StringBuilder();
-        List<Object> localDataList = new ArrayList<>();
-        for (Object o : localData) {
-            localDataList.add(o);
-        }
+        List<Object> localDataList = Arrays.asList(localData);
         for (GraphTargetItem ti : tree) {
             if (!ti.isEmpty()) {
                 ret.append(ti.toStringSemicoloned(localDataList));
