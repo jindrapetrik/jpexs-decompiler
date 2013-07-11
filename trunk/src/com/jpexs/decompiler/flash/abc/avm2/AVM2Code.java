@@ -2010,6 +2010,22 @@ public class AVM2Code implements Serializable {
 
             }
             GraphSourceItem ins = code.get(ip);
+
+            if (ins instanceof AVM2Instruction) {
+                AVM2Instruction ains = (AVM2Instruction) ins;
+                //Errorneous code inserted by some obfuscators
+                if (ains.definition instanceof NewObjectIns) {
+                    if (ains.operands[0] > stack.size()) {
+                        ains.setIgnored(true);
+                    }
+                }
+                if (ains.definition instanceof NewArrayIns) {
+                    if (ains.operands[0] > stack.size()) {
+                        ains.setIgnored(true);
+                    }
+                }
+            }
+
             if (ins.isIgnored()) {
                 ip++;
                 continue;
@@ -2029,11 +2045,15 @@ public class AVM2Code implements Serializable {
                 }
             }
 
+
+
             if ((ins instanceof AVM2Instruction) && (((AVM2Instruction) ins).definition instanceof NewFunctionIns)) {
                 stack.push(new BooleanTreeItem(null, true));
             } else {
                 ins.translate(localData, stack, output);
             }
+
+
 
             if (ins.isExit()) {
                 break;
@@ -2042,53 +2062,54 @@ public class AVM2Code implements Serializable {
 
             if (ins.isBranch() || ins.isJump()) {
                 List<Integer> branches = ins.getBranches(code);
-                if ((ins instanceof AVM2Instruction) && (((AVM2Instruction) ins).definition instanceof LookupSwitchIns)
-                        && (!stack.isEmpty()) && (stack.peek().isCompileTime()) && (!stack.peek().hasSideEffect())) {
-                    int c = (int) (double) EcmaScript.toNumber(stack.peek().getResult());
-                    Decision dec = new Decision();
-                    if (decisions.containsKey(ins)) {
-                        dec = decisions.get(ins);
-                    } else {
-                        decisions.put(ins, dec);
-                    }
-                    dec.casesUsed.add(c);
-                    GraphTargetItem tar = stack.pop();
+                //TODO: handle switch somehow, this way it does not work
+                /*if ((ins instanceof AVM2Instruction) && (((AVM2Instruction) ins).definition instanceof LookupSwitchIns)
+                 && (!stack.isEmpty()) && (stack.peek().isCompileTime()) && (!stack.peek().hasSideEffect())) {
+                 int c = (int) (double) EcmaScript.toNumber(stack.peek().getResult());
+                 Decision dec = new Decision();
+                 if (decisions.containsKey(ins)) {
+                 dec = decisions.get(ins);
+                 } else {
+                 decisions.put(ins, dec);
+                 }
+                 dec.casesUsed.add(c);
+                 GraphTargetItem tar = stack.pop();
 
-                    int numcases = branches.size() - 1;
-                    int selCase = -1;
-                    if (c < 0 || c >= numcases) {
-                        selCase = 0;
-                    } else {
-                        selCase = 1 + c;
-                    }
+                 int numcases = branches.size() - 1;
+                 int selCase = -1;
+                 if (c < 0 || c >= numcases) {
+                 selCase = 0;
+                 } else {
+                 selCase = 1 + c;
+                 }
 
-                    if (secondPass) {
-                        if (dec.casesUsed.size() == 1) {
-                            int sel = -1;
-                            for (int u : dec.casesUsed) {
-                                sel = u;
-                            }
-                            int selOperand = -1;
-                            if (sel < 0 || sel >= numcases) {
-                                selOperand = 0;
-                            } else {
-                                selOperand = 2 + sel;
-                            }
-                            AVM2Instruction ains = (AVM2Instruction) ins;
-                            if (ains.replaceWith == null) {
-                                ains.replaceWith = new ArrayList<>();
-                            }
-                            ains.replaceWith.add(new ControlFlowTag("appendjump", code.adr2pos(code.pos2adr(ip) + ((AVM2Instruction) ins).operands[selOperand])));
-                            for (GraphSourceItemPos pos : tar.getNeededSources()) {
-                                if (pos.item != ins) {
-                                    pos.item.setIgnored(true);
-                                }
-                            }
-                        }
-                    }
-                    ip = branches.get(selCase);
-                    continue;
-                } else if ((ins instanceof AVM2Instruction) && ((AVM2Instruction) ins).definition instanceof IfTypeIns
+                 if (secondPass) {
+                 if (dec.casesUsed.size() == 1) {
+                 int sel = -1;
+                 for (int u : dec.casesUsed) {
+                 sel = u;
+                 }
+                 int selOperand = -1;
+                 if (sel < 0 || sel >= numcases) {
+                 selOperand = 0;
+                 } else {
+                 selOperand = 2 + sel;
+                 }
+                 AVM2Instruction ains = (AVM2Instruction) ins;
+                 if (ains.replaceWith == null) {
+                 ains.replaceWith = new ArrayList<>();
+                 }
+                 ains.replaceWith.add(new ControlFlowTag("appendjump", code.adr2pos(code.pos2adr(ip) + ((AVM2Instruction) ins).operands[selOperand])));
+                 for (GraphSourceItemPos pos : tar.getNeededSources()) {
+                 if (pos.item != ins) {
+                 pos.item.setIgnored(true);
+                 }
+                 }
+                 }
+                 }
+                 ip = branches.get(selCase);
+                 continue;
+                 } else */ if ((ins instanceof AVM2Instruction) && ((AVM2Instruction) ins).definition instanceof IfTypeIns
                         && (!(((AVM2Instruction) ins).definition instanceof JumpIns)) && (!stack.isEmpty()) && (stack.peek().isCompileTime()) && (!stack.peek().hasSideEffect())) {
                     boolean condition = EcmaScript.toBoolean(stack.peek().getResult());
                     if (debugMode) {
