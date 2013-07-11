@@ -1326,9 +1326,9 @@ public class Graph {
         if (part.ignored) {
             return ret;
         }
-        
+
         List<GraphPart> loopContinues = getLoopsContinues(loops);
-        boolean isLoop = false; 
+        boolean isLoop = false;
         Loop currentLoop = null;
         for (Loop el : loops) {
             if ((el.loopContinue == part) && (el.phase == 0)) {
@@ -1337,7 +1337,7 @@ public class Graph {
                 isLoop = true;
                 break;
             }
-        }       
+        }
 
         if (debugMode) {
             System.err.println("loopsize:" + loops.size());

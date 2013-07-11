@@ -253,6 +253,10 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         cache.remove(pack);
     }
 
+    public boolean isCached(ScriptPack pack) {
+        return cache.contains(pack);
+    }
+
     private CachedDecompilation getCached(ScriptPack pack) {
         if (!cache.contains(pack)) {
             cacheScriptPack(pack, abcList);

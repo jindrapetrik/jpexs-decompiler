@@ -45,8 +45,4 @@ public class IntegerValueItem extends GraphTargetItem {
     public Object getResult() {
         return Double.valueOf(intValue);
     }
-    
-    
-    
-    
 }

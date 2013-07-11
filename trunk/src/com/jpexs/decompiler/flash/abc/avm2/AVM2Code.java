@@ -2037,6 +2037,12 @@ public class AVM2Code implements Serializable {
                 if ((ins instanceof AVM2Instruction) && (((AVM2Instruction) ins).definition instanceof PopIns)) {
                     GraphTargetItem top = stack.peek();
                     for (GraphSourceItemPos p : top.getNeededSources()) {
+                        if (p == null) {
+                            continue;
+                        }
+                        if (p.item == null) {
+                            continue;
+                        }
                         if (p.item.isIgnored()) {
                             ins.setIgnored(true);
                             break;

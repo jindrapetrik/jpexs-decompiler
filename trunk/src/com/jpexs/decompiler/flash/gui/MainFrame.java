@@ -1749,7 +1749,6 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                 if (searchDialog.result) {
                     final String txt = searchDialog.searchField.getText();
                     if (!txt.equals("")) {
-                        Main.startWork(translate("work.searching") + " \"" + txt + "\"...");
                         if (abcPanel != null) {
                             (new Thread() {
                                 @Override
@@ -1760,7 +1759,6 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                                     } else {
                                         JOptionPane.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
                                     }
-                                    Main.stopWork();
                                 }
                             }).start();
                         } else {
@@ -1772,7 +1770,6 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                                     } else {
                                         JOptionPane.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
                                     }
-                                    Main.stopWork();
                                 }
                             }).start();
                         }

@@ -53,6 +53,8 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -157,6 +159,10 @@ public class ActionPanel extends JPanel implements ActionListener {
         return (CachedScript) cache.get(pack);
     }
 
+    private boolean isCached(ASMSource src) {
+        return cache.contains(src);
+    }
+
     private void cacheScript(ASMSource src) {
         if (!cache.contains(src)) {
             List<Action> as = src.getActions(SWF.DEFAULT_VERSION);
@@ -167,14 +173,22 @@ public class ActionPanel extends JPanel implements ActionListener {
         }
     }
 
-    private List<ASMSource> getASMs(List<TagNode> nodes) {
-        List<ASMSource> ret = new ArrayList<>();
+    private Map<String, ASMSource> getASMs(String path, List<TagNode> nodes) {
+        Map<String, ASMSource> ret = new HashMap<>();
         for (TagNode n : nodes) {
+            String subPath = path + "/" + n.toString();
             if (n.tag instanceof ASMSource) {
                 //cacheScript((ASMSource) n.tag);
-                ret.add((ASMSource) n.tag);
+                String npath = subPath;
+                int ppos = 1;
+                while (ret.containsKey(npath)) {
+                    ppos++;
+                    npath = subPath + "[" + ppos + "]";
+                }
+                ret.put(subPath, (ASMSource) n.tag);
             }
-            ret.addAll(getASMs(n.subItems));
+
+            ret.putAll(getASMs(subPath, n.subItems));
         }
         return ret;
     }
@@ -185,7 +199,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             searchRegexp = regexp;
             List<Object> tags = new ArrayList<Object>(Main.swf.tags);
             List<TagNode> list = Main.swf.createASTagList(tags, null);
-            List<ASMSource> asms = getASMs(list);
+            Map<String, ASMSource> asms = getASMs("", list);
             found = new ArrayList<>();
             Pattern pat = null;
             if (regexp) {
@@ -193,13 +207,23 @@ public class ActionPanel extends JPanel implements ActionListener {
             } else {
                 pat = Pattern.compile(Pattern.quote(txt), ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
             }
-            for (ASMSource s : asms) {
-                cacheScript(s);
-                if (pat.matcher(getCached(s).text).find()) {
-                    found.add(s);
+            int pos = 0;
+            for (Entry<String, ASMSource> item : asms.entrySet()) {
+                pos++;
+                String workText = translate("work.searching");
+                String decAdd = "";
+                if (!isCached(item.getValue())) {
+                    decAdd = ", " + translate("work.decompiling");
+                }
+                Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + asms.size() + ") " + item.getKey() + "... ");
+
+                cacheScript(item.getValue());
+                if (pat.matcher(getCached(item.getValue()).text).find()) {
+                    found.add(item.getValue());
                 }
             }
 
+            Main.stopWork();
             if (found.isEmpty()) {
                 searchPanel.setVisible(false);
                 return false;

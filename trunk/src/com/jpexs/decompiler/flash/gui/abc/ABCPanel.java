@@ -100,7 +100,15 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
             } else {
                 pat = Pattern.compile(Pattern.quote(txt), ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
             }
+            int pos = 0;
             for (MyEntry<ClassPath, ScriptPack> item : allpacks) {
+                pos++;
+                String workText = translate("work.searching");
+                String decAdd = "";
+                if (!decompiledTextArea.isCached(item.value)) {
+                    decAdd = ", " + translate("work.decompiling");
+                }
+                Main.startWork(workText + " \"" + txt + "\"" + decAdd + " - (" + pos + "/" + allpacks.size() + ") " + item.key.toString() + "... ");
                 decompiledTextArea.cacheScriptPack(item.value, list);
                 if (pat.matcher(decompiledTextArea.getCachedText(item.value)).find()) {
                     found.add(item.value);
@@ -108,8 +116,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
             }
 
             System.gc();
-
-            //found = decompiledTextArea.searchCache(txt, ignoreCase, regexp);
+            Main.stopWork();
             if (found.isEmpty()) {
                 searchPanel.setVisible(false);
                 return false;
