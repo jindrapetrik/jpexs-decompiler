@@ -138,7 +138,7 @@ public class Traits implements Serializable {
             try {
                 s += futureResults.get(f).get();
             } catch (InterruptedException | ExecutionException ex) {
-                Logger.getLogger(Traits.class.getName()).log(Level.SEVERE, "Errod during traits converting", ex);
+                Logger.getLogger(Traits.class.getName()).log(Level.SEVERE, "Error during traits converting", ex);
             }
         }
         executor.shutdown();
