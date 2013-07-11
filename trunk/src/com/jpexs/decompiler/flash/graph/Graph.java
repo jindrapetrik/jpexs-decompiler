@@ -1157,6 +1157,9 @@ public class Graph {
                 loopcand:
                 for (GraphPart cand : currentLoop.breakCandidates) {
                     for (GraphPart cand2 : currentLoop.breakCandidates) {
+                        if (cand == cand2) {
+                            continue;
+                        }
                         if (cand.leadsTo(code, cand2, loops)) {
                             int lev1 = Integer.MAX_VALUE;
                             int lev2 = Integer.MAX_VALUE;
