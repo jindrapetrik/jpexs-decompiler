@@ -1639,12 +1639,16 @@ public class Graph {
                 swLoop.phase = 1;
                 loops.add(swLoop);
                 boolean first = false;
+                int pos = 0;
                 for (GraphPart p : part.nextParts) {
-                    if (vis.contains(p)) {
-                        valueMappings.add(caseCommands.size() - 1);
-                        continue;
-                    }
+
                     if (!first) {
+                        caseValues.add(new IntegerValueItem(null, pos++));
+                        if (vis.contains(p)) {
+                            valueMappings.add(caseCommands.size() - 1);
+                            continue;
+                        }
+
                         valueMappings.add(caseCommands.size());
                     }
                     List<GraphPart> stopPart2 = new ArrayList<>();
