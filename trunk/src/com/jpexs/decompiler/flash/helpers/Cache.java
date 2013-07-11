@@ -87,7 +87,12 @@ public class Cache {
     }
 
     public boolean contains(Object key) {
-        return cacheFiles.containsKey(key);
+        if (storageType == STORAGE_FILES) {
+            return cacheFiles.containsKey(key);
+        } else if (storageType == STORAGE_MEMORY) {
+            return cacheMemory.containsKey(key);
+        }
+        return false;
     }
 
     public void clear() {
