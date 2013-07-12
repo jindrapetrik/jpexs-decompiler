@@ -95,6 +95,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Insets;
@@ -136,7 +137,9 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
@@ -235,6 +238,8 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
     private JLabel fontLeadingLabel;
     private JLabel fontCharactersLabel;
     private JTextField fontAddCharactersField;
+    private JButton errorNotificationButton;
+    private ErrorLogFrame errorLogFrame;
 
     public void setPercent(int percent) {
         progressBar.setValue(percent);
@@ -751,6 +756,21 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         statusPanel.setLayout(new BorderLayout());
         statusPanel.add(loadingPanel, BorderLayout.WEST);
         statusPanel.add(statusLabel, BorderLayout.CENTER);
+
+        errorLogFrame = new ErrorLogFrame();
+        errorNotificationButton = new JButton("");
+        errorNotificationButton.setIcon(View.getIcon("okay16"));
+        errorNotificationButton.setBorderPainted(false);
+        errorNotificationButton.setFocusPainted(false);
+        errorNotificationButton.setContentAreaFilled(false);
+        errorNotificationButton.setMargin(new Insets(2, 2, 2, 2));
+        errorNotificationButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        errorNotificationButton.setActionCommand("SHOWERRORLOG");
+        errorNotificationButton.addActionListener(this);
+        errorNotificationButton.setToolTipText("There are no errors in the log");
+        statusPanel.add(errorNotificationButton, BorderLayout.EAST);
+
+
         loadingPanel.setVisible(false);
         cnt.add(statusPanel, BorderLayout.SOUTH);
 
@@ -1027,6 +1047,26 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
 
         //Opening files with drag&drop to main window
         enableDrop(true);
+
+        Logger logger = Logger.getLogger("");
+        logger.addHandler(errorLogFrame.getHandler());
+        logger.addHandler(new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                if (record.getLevel() == Level.SEVERE) {
+                    errorNotificationButton.setIcon(View.getIcon("error16"));
+                    errorNotificationButton.setToolTipText("There are ERRORS in the log");
+                }
+            }
+
+            @Override
+            public void flush() {
+            }
+
+            @Override
+            public void close() throws SecurityException {
+            }
+        });
     }
 
     public void enableDrop(boolean value) {
@@ -1662,6 +1702,9 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
+            case "SHOWERRORLOG":
+                errorLogFrame.setVisible(true);
+                break;
             case "FONTADDCHARS":
                 String newchars = fontAddCharactersField.getText();
                 if (oldValue instanceof FontTag) {
