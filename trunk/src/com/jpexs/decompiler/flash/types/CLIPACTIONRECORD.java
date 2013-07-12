@@ -150,7 +150,7 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable {
      */
     @Override
     public String getASMSource(int version, boolean hex) {
-        return Action.actionsToString(listeners, 0, getActions(version), null, version, hex, getPos() + hdrPos);
+        return Action.actionsToString(listeners, 0, getActions(version), null, version, hex, getPos() + hdrPos, toString()/*FIXME?*/);
     }
 
     /**
@@ -167,9 +167,9 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable {
     public List<Action> getActions(int version) {
         try {
             boolean deobfuscate = (Boolean) Configuration.getConfig("autoDeobfuscate", true);
-            List<Action> list = SWFInputStream.readActionList(listeners, 0, getPos() + hdrPos, new ReReadableInputStream(new ByteArrayInputStream(actionBytes)), version, 0, -1);
+            List<Action> list = SWFInputStream.readActionList(listeners, 0, getPos() + hdrPos, new ReReadableInputStream(new ByteArrayInputStream(actionBytes)), version, 0, -1, toString()/*FIXME?*/);
             if (deobfuscate) {
-                list = Action.removeNops(0, list, version, getPos() + hdrPos);
+                list = Action.removeNops(0, list, version, getPos() + hdrPos, toString()/*FIXME?*/);
             }
             return list;
         } catch (Exception ex) {

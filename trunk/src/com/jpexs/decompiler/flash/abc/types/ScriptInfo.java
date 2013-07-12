@@ -59,14 +59,15 @@ public class ScriptInfo {
                     traitIndices.addAll(otherTraits);
                 }
                 otherTraits = new ArrayList<>();
-                ret.add(new MyEntry<>(new ClassPath(packageName, objectName), new ScriptPack(abc, scriptIndex, traitIndices)));
+                ClassPath cp = new ClassPath(packageName, objectName);
+                ret.add(new MyEntry<>(cp, new ScriptPack(cp, abc, scriptIndex, traitIndices)));
             }
         }
         return ret;
     }
 
-    public int removeTraps(int scriptIndex, ABC abc) {
-        return traits.removeTraps(scriptIndex, -1, true, abc);
+    public int removeTraps(int scriptIndex, ABC abc, String path) {
+        return traits.removeTraps(scriptIndex, -1, true, abc, path);
     }
 
     @Override

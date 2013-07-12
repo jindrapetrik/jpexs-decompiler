@@ -64,13 +64,13 @@ public class ActionGraph extends Graph {
          }*/
     }
 
-    public static List<GraphTargetItem> translateViaGraph(HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version) {
+    public static List<GraphTargetItem> translateViaGraph(HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path) {
 
         ActionGraph g = new ActionGraph(code, registerNames, variables, functions, version);
         List<Object> localData = new ArrayList<>();
         localData.add(registerNames);
         g.init();
-        return g.translate(localData);
+        return g.translate(localData, staticOperation, path);
     }
 
     @Override
@@ -183,7 +183,7 @@ public class ActionGraph extends Graph {
     }
 
     @Override
-    protected List<GraphTargetItem> check(GraphSource code, List<Object> localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop) {
+    protected List<GraphTargetItem> check(GraphSource code, List<Object> localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) {
         if (!output.isEmpty()) {
             if (output.get(output.size() - 1) instanceof StoreRegisterTreeItem) {
                 StoreRegisterTreeItem str = (StoreRegisterTreeItem) output.get(output.size() - 1);
@@ -220,7 +220,7 @@ public class ActionGraph extends Graph {
             while (part.nextParts.size() > 1
                     && part.nextParts.get(1).getHeight() > 1
                     && code.get(part.nextParts.get(1).end >= code.size() ? code.size() - 1 : part.nextParts.get(1).end) instanceof ActionIf
-                    && ((top = translatePartGetStack(localData, part.nextParts.get(1), stack)) instanceof StrictEqTreeItem)) {
+                    && ((top = translatePartGetStack(localData, part.nextParts.get(1), stack, staticOperation)) instanceof StrictEqTreeItem)) {
                 cnt++;
                 part = part.nextParts.get(1);
                 pos++;
@@ -248,7 +248,7 @@ public class ActionGraph extends Graph {
                 List<GraphTargetItem> defaultCommands = new ArrayList<>();
                 List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
                 stopPart2.add(defaultPart2);
-                defaultCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, defaultPart, stopPart2, loops);
+                defaultCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, defaultPart, stopPart2, loops, staticOperation, path);
 
 
                 List<GraphPart> loopContinues = new ArrayList<>();
@@ -329,7 +329,7 @@ public class ActionGraph extends Graph {
                 if ((defaultPart != null) && (defaultCommands.isEmpty())) {
                     List<GraphPart> stopPart2x = new ArrayList<>(stopPart);
                     stopPart2x.add(next);
-                    defaultCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, defaultPart, stopPart2x, loops);
+                    defaultCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, defaultPart, stopPart2x, loops, staticOperation, path);
                 }
 
                 if (!defaultCommands.isEmpty()) {
@@ -378,7 +378,7 @@ public class ActionGraph extends Graph {
                     if (breakPart != null) {
                         stopPart2x.add(breakPart);
                     }
-                    cc.addAll(0, printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, caseBodies.get(i), stopPart2x, loops));
+                    cc.addAll(0, printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, caseBodies.get(i), stopPart2x, loops, staticOperation, path));
                     if (cc.size() >= 2) {
                         if (cc.get(cc.size() - 1) instanceof BreakItem) {
                             if ((cc.get(cc.size() - 2) instanceof ContinueItem) || (cc.get(cc.size() - 2) instanceof BreakItem)) {
@@ -397,7 +397,7 @@ public class ActionGraph extends Graph {
                     if (ti != null) {
                         ret.add(ti);
                     } else {
-                        ret.addAll(printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, next, stopPart, loops));
+                        ret.addAll(printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, next, stopPart, loops, staticOperation, path));
                     }
                 }
             }

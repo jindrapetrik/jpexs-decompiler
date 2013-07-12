@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.CodeStats;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.graph.Graph;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
@@ -35,7 +36,7 @@ import java.util.logging.Logger;
 
 public class MethodBody implements Cloneable, Serializable {
 
-    boolean debugMode = false;
+    boolean debugMode = true;
     public int method_info;
     public int max_stack;
     public int max_regs;
@@ -72,8 +73,8 @@ public class MethodBody implements Cloneable, Serializable {
         code.restoreControlFlow(constants, this);
     }
 
-    public int removeTraps(ConstantPool constants, ABC abc, int scriptIndex, int classIndex, boolean isStatic) {
-        return code.removeTraps(constants, this, abc, scriptIndex, classIndex, isStatic);
+    public int removeTraps(ConstantPool constants, ABC abc, int scriptIndex, int classIndex, boolean isStatic, String path) {
+        return code.removeTraps(constants, this, abc, scriptIndex, classIndex, isStatic, path);
     }
 
     public HashMap<Integer, String> getLocalRegNames(ABC abc) {
@@ -106,6 +107,14 @@ public class MethodBody implements Cloneable, Serializable {
         if (debugMode) {
             System.err.println("Decompiling " + path);
         }
+        if (path.equals("")) {
+            Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Empty", new Exception());
+            System.exit(0);
+        }
+        if (path.startsWith("*.")) {
+            Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Star", new Exception());
+            //System.exit(0);
+        }
         String s = "";
         if (!(Boolean) Configuration.getConfig("decompile", Boolean.TRUE)) {
             s = "//Decompilation skipped";
@@ -123,14 +132,14 @@ public class MethodBody implements Cloneable, Serializable {
             deobfuscated.markMappedOffsets();
             if ((Boolean) Configuration.getConfig("autoDeobfuscate", true)) {
                 try {
-                    deobfuscated.removeTraps(constants, b, abc, scriptIndex, classIndex, isStatic);
+                    deobfuscated.removeTraps(constants, b, abc, scriptIndex, classIndex, isStatic, path);
                 } catch (Exception ex) {
                     Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Error during remove traps", ex);
                 }
             }
             //deobfuscated.restoreControlFlow(constants, b);
             //try {
-            s += deobfuscated.toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, b, hilight, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
+            s += deobfuscated.toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, b, hilight, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC);
             s = s.trim();
             if (hilight) {
                 s = Highlighting.hilighMethod(s, this.method_info);

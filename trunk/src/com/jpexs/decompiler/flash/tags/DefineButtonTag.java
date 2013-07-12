@@ -136,7 +136,7 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
      */
     @Override
     public String getASMSource(int version, boolean hex) {
-        return Action.actionsToString(listeners, 0, getActions(version), null, version, hex, getPos() + hdrSize);
+        return Action.actionsToString(listeners, 0, getActions(version), null, version, hex, getPos() + hdrSize, toString()/*FIXME?*/);
     }
 
     /**
@@ -170,9 +170,9 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
             rri.setPos(prevLength);
 
             boolean deobfuscate = (Boolean) Configuration.getConfig("autoDeobfuscate", true);
-            List<Action> list = SWFInputStream.readActionList(listeners, 0, getPos() + hdrSize - prevLength, rri, version, prevLength, -1);
+            List<Action> list = SWFInputStream.readActionList(listeners, 0, getPos() + hdrSize - prevLength, rri, version, prevLength, -1, toString()/*FIXME?*/);
             if (deobfuscate) {
-                list = Action.removeNops(0, list, version, getPos() + hdrSize);
+                list = Action.removeNops(0, list, version, getPos() + hdrSize, toString()/*FIXME?*/);
             }
             return list;
         } catch (Exception ex) {

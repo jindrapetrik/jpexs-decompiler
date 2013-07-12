@@ -56,8 +56,8 @@ public class ActionGraphSource extends GraphSource {
     }
 
     @Override
-    public List<GraphTargetItem> translatePart(GraphPart part, List<Object> localData, Stack<GraphTargetItem> stack, int start, int end) {
-        return (Action.actionsPartToTree(registerNames, variables, functions, stack, actions, start, end, version));
+    public List<GraphTargetItem> translatePart(GraphPart part, List<Object> localData, Stack<GraphTargetItem> stack, int start, int end, int staticOperation, String path) {
+        return (Action.actionsPartToTree(registerNames, variables, functions, stack, actions, start, end, version, staticOperation, path));
     }
     private List<Long> posCache = null;
 

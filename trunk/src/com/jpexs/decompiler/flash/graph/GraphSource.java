@@ -18,7 +18,7 @@ public abstract class GraphSource {
 
     public abstract boolean isEmpty();
 
-    public abstract List<GraphTargetItem> translatePart(GraphPart part, List<Object> localData, Stack<GraphTargetItem> stack, int start, int end);
+    public abstract List<GraphTargetItem> translatePart(GraphPart part, List<Object> localData, Stack<GraphTargetItem> stack, int start, int end, int staticOperation, String path);
 
     private void visitCode(int ip, int lastIp, HashMap<Integer, List<Integer>> refs, int endIp) {
         boolean debugMode = false;

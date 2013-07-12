@@ -1140,7 +1140,7 @@ public class XFLConverter {
     }
 
     private static String convertActionScript(ASMSource as) {
-        String decompiledASHilighted = com.jpexs.decompiler.flash.action.Action.actionsToSource(as.getActions(SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION);
+        String decompiledASHilighted = com.jpexs.decompiler.flash.action.Action.actionsToSource(as.getActions(SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION, as.toString());
         return as.getActionSourcePrefix() + Highlighting.stripHilights(decompiledASHilighted) + as.getActionSourceSuffix();
     }
 

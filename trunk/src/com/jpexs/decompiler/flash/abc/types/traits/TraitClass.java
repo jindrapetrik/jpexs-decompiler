@@ -444,7 +444,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         String bodyStr = "";
         bodyIndex = abc.findBodyIndex(abc.class_info[class_info].cinit_index);
         if (bodyIndex != -1) {
-            bodyStr = abc.bodies[bodyIndex].toString(packageName + "." + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".staticinitializer", pcode, true, scriptIndex, class_info, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), true, highlight, fullyQualifiedNames, abc.class_info[class_info].static_traits);
+            bodyStr = abc.bodies[bodyIndex].toString(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".staticinitializer", pcode, true, scriptIndex, class_info, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), true, highlight, fullyQualifiedNames, abc.class_info[class_info].static_traits);
             if (!highlight) {
                 bodyStr = Highlighting.stripHilights(bodyStr);
             }
@@ -481,7 +481,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             bodyStr = "";
             bodyIndex = abc.findBodyIndex(abc.instance_info[class_info].iinit_index);
             if (bodyIndex != -1) {
-                bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(packageName + "." + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".initializer", pcode, false, scriptIndex, class_info, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, highlight, fullyQualifiedNames, abc.instance_info[class_info].instance_traits), 3);
+                bodyStr = ABC.addTabs(abc.bodies[bodyIndex].toString(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames) + ".initializer", pcode, false, scriptIndex, class_info, abc, abc.constants, abc.method_info, new Stack<GraphTargetItem>(), false, highlight, fullyQualifiedNames, abc.instance_info[class_info].instance_traits), 3);
                 if (!highlight) {
                     bodyStr = Highlighting.stripHilights(bodyStr);
                 }
@@ -498,9 +498,9 @@ public class TraitClass extends Trait implements TraitWithSlot {
         //}
 
         //static variables,constants & methods
-        outTraits.add(abc.class_info[class_info].static_traits.convert(packageName + "." + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, true, pcode, false, scriptIndex, class_info, highlight, fullyQualifiedNames, paralel));
+        outTraits.add(abc.class_info[class_info].static_traits.convert(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, true, pcode, false, scriptIndex, class_info, highlight, fullyQualifiedNames, paralel));
 
-        outTraits.add(abc.instance_info[class_info].instance_traits.convert(packageName + "." + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, false, pcode, false, scriptIndex, class_info, highlight, fullyQualifiedNames, paralel));
+        outTraits.add(abc.instance_info[class_info].instance_traits.convert(path +/*packageName +*/ "/" + abc.instance_info[class_info].getName(abc.constants).getName(abc.constants, fullyQualifiedNames), abcTags, abc, false, pcode, false, scriptIndex, class_info, highlight, fullyQualifiedNames, paralel));
 
 
         StringBuilder bui = new StringBuilder();
@@ -544,18 +544,18 @@ public class TraitClass extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc) {
+    public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) {
         int iInitializer = abc.findBodyIndex(abc.instance_info[class_info].iinit_index);
         int ret = 0;
         if (iInitializer != -1) {
-            ret += abc.bodies[iInitializer].removeTraps(abc.constants, abc, scriptIndex, class_info, false);
+            ret += abc.bodies[iInitializer].removeTraps(abc.constants, abc, scriptIndex, class_info, false, path);
         }
         int sInitializer = abc.findBodyIndex(abc.class_info[class_info].cinit_index);
         if (sInitializer != -1) {
-            ret += abc.bodies[sInitializer].removeTraps(abc.constants, abc, scriptIndex, class_info, true);
+            ret += abc.bodies[sInitializer].removeTraps(abc.constants, abc, scriptIndex, class_info, true, path);
         }
-        ret += abc.instance_info[class_info].instance_traits.removeTraps(scriptIndex, class_info, false, abc);
-        ret += abc.class_info[class_info].static_traits.removeTraps(scriptIndex, class_info, true, abc);
+        ret += abc.instance_info[class_info].instance_traits.removeTraps(scriptIndex, class_info, false, abc, path);
+        ret += abc.class_info[class_info].static_traits.removeTraps(scriptIndex, class_info, true, abc, path);
         return ret;
     }
 }

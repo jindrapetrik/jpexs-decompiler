@@ -53,6 +53,7 @@ import com.jpexs.decompiler.flash.flv.AUDIODATA;
 import com.jpexs.decompiler.flash.flv.FLVOutputStream;
 import com.jpexs.decompiler.flash.flv.FLVTAG;
 import com.jpexs.decompiler.flash.flv.VIDEODATA;
+import com.jpexs.decompiler.flash.graph.Graph;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
@@ -491,7 +492,7 @@ public class SWF {
         }
         for (int i = 0; i < abcTags.size(); i++) {
             ABC abc = abcTags.get(i).getABC();
-            ScriptPack scr = abc.findScriptTraitByPath(className);
+            ScriptPack scr = abc.findScriptPackByPath(className);
             if (scr != null) {
                 String cnt = "";
                 if (abc.script_info.length > 1) {
@@ -1450,7 +1451,7 @@ public class SWF {
         return null;
     }
 
-    private static void getVariables(ConstantPool constantPool, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, List<MyEntry<DirectValueTreeItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, List<Integer> visited, HashMap<DirectValueTreeItem, String> usageTypes) {
+    private static void getVariables(ConstantPool constantPool, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, List<MyEntry<DirectValueTreeItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, List<Integer> visited, HashMap<DirectValueTreeItem, String> usageTypes, String path) {
         boolean debugMode = false;
         while ((ip > -1) && ip < code.size()) {
             if (visited.contains(ip)) {
@@ -1506,6 +1507,7 @@ public class SWF {
                 List<Long> cntSizes = cnt.getContainerSizes();
                 long addr = code.pos2adr(ip + 1);
                 ip = code.adr2pos(addr);
+                String cntName = cnt.getName();
                 for (Long size : cntSizes) {
                     if (size == 0) {
                         continue;
@@ -1513,7 +1515,7 @@ public class SWF {
                     ip = code.adr2pos(addr);
                     addr += size;
                     int nextip = code.adr2pos(addr);
-                    getVariables(variables, functions, strings, usageTypes, new ActionGraphSource(code.getActions().subList(ip, nextip), code.version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0);
+                    getVariables(variables, functions, strings, usageTypes, new ActionGraphSource(code.getActions().subList(ip, nextip), code.version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, path + (cntName == null ? "" : "/" + cntName));
                     ip = nextip;
                 }
                 List<List<GraphTargetItem>> r = new ArrayList<>();
@@ -1550,9 +1552,10 @@ public class SWF {
             if (ins instanceof ActionConstantPool) {
                 constantPool = new ConstantPool(((ActionConstantPool) ins).constantPool);
             }
+            int staticOperation = (Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
 
             try {
-                ins.translate(localData, stack, output);
+                ins.translate(localData, stack, output, staticOperation, path);
             } catch (Exception ex) {
                 Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Error during getting variables", ex);
             }
@@ -1585,7 +1588,7 @@ public class SWF {
                     @SuppressWarnings("unchecked")
                     Stack<GraphTargetItem> brStack = (Stack<GraphTargetItem>) stack.clone();
                     if (b >= 0) {
-                        getVariables(constantPool, localData, brStack, output, code, b, variables, functions, strings, visited, usageTypes);
+                        getVariables(constantPool, localData, brStack, output, code, b, variables, functions, strings, visited, usageTypes, path);
                     } else {
                         if (debugMode) {
                             System.out.println("Negative branch:" + b);
@@ -1599,20 +1602,20 @@ public class SWF {
         };
     }
 
-    private static void getVariables(List<MyEntry<DirectValueTreeItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, HashMap<DirectValueTreeItem, String> usageType, ActionGraphSource code, int addr) {
+    private static void getVariables(List<MyEntry<DirectValueTreeItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, HashMap<DirectValueTreeItem, String> usageType, ActionGraphSource code, int addr, String path) {
         List<Object> localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
         try {
-            getVariables(null, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), variables, functions, strings, new ArrayList<Integer>(), usageType);
+            getVariables(null, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), variables, functions, strings, new ArrayList<Integer>(), usageType, path);
         } catch (Exception ex) {
             Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, "Getting variables error", ex);
         }
     }
 
-    private List<MyEntry<DirectValueTreeItem, ConstantPool>> getVariables(List<MyEntry<DirectValueTreeItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, HashMap<DirectValueTreeItem, String> usageType, ASMSource src) {
+    private List<MyEntry<DirectValueTreeItem, ConstantPool>> getVariables(List<MyEntry<DirectValueTreeItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, HashMap<DirectValueTreeItem, String> usageType, ASMSource src, String path) {
         List<MyEntry<DirectValueTreeItem, ConstantPool>> ret = new ArrayList<>();
         List<Action> actions = src.getActions(version);
         actionsMap.put(src, actions);
-        getVariables(variables, functions, strings, usageType, new ActionGraphSource(actions, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0);
+        getVariables(variables, functions, strings, usageType, new ActionGraphSource(actions, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, path);
         return ret;
     }
     private HashMap<ASMSource, List<Action>> actionsMap = new HashMap<>();
@@ -1630,7 +1633,7 @@ public class SWF {
                 }
                 processed.add(infPath2);
                 informListeners("getVariables", infPath2);
-                getVariables(allVariableNames, allFunctions, allStrings, usageTypes, (ASMSource) o);
+                getVariables(allVariableNames, allFunctions, allStrings, usageTypes, (ASMSource) o, path);
             }
             if (o instanceof Container) {
                 getVariables(((Container) o).getSubItems(), path + "/" + o.toString());
@@ -1822,7 +1825,8 @@ public class SWF {
                         classNameParts = new String[]{className};
                     }
                 }
-                List<GraphTargetItem> dec = Action.actionsToTree(dia.getActions(version), version);
+                int staticOperation = (Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
+                List<GraphTargetItem> dec = Action.actionsToTree(dia.getActions(version), version, staticOperation, ""/*FIXME*/);
                 GraphTargetItem name = null;
                 for (GraphTargetItem it : dec) {
                     if (it instanceof ClassTreeItem) {
@@ -2004,7 +2008,7 @@ public class SWF {
             }
         }
         for (ASMSource src : actionsMap.keySet()) {
-            actionsMap.put(src, Action.removeNops(0, actionsMap.get(src), version, 0));
+            actionsMap.put(src, Action.removeNops(0, actionsMap.get(src), version, 0, ""/*FIXME path*/));
             src.setActions(actionsMap.get(src), version);
         }
         deobfuscateInstanceNames(renameType, tags, selected);

@@ -276,7 +276,7 @@ public class TagNode {
                         } else {
                             List<Action> as = asm.getActions(SWF.DEFAULT_VERSION);
                             Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
-                            res = asm.getActionSourcePrefix() + Helper.indentRows(asm.getActionSourceIndent(), Highlighting.stripHilights(Action.actionsToSource(as, SWF.DEFAULT_VERSION)), Graph.INDENT_STRING) + asm.getActionSourceSuffix();
+                            res = asm.getActionSourcePrefix() + Helper.indentRows(asm.getActionSourceIndent(), Highlighting.stripHilights(Action.actionsToSource(as, SWF.DEFAULT_VERSION, ""/*FIXME*/)), Graph.INDENT_STRING) + asm.getActionSourceSuffix();
                         }
                         try (FileOutputStream fos = new FileOutputStream(f)) {
                             fos.write(res.getBytes("utf-8"));

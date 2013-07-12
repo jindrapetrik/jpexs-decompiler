@@ -80,7 +80,7 @@ public class ABC {
     public int removeTraps() {
         int rem = 0;
         for (int s = 0; s < script_info.length; s++) {
-            rem += script_info[s].removeTraps(s, this);
+            rem += script_info[s].removeTraps(s, this, "");
         }
         return rem;
     }
@@ -1091,15 +1091,11 @@ public class ABC {
         return -1;
     }
 
-    public ScriptPack findScriptTraitByPath(String name) {
-        for (int c = 0; c < script_info.length; c++) {
-            for (int t = 0; t < script_info[c].traits.traits.length; t++) {
-                Trait tr = script_info[c].traits.traits[t];
-                if (tr.getPath(this).equals(name)) {
-                    List<Integer> indices = new ArrayList<>();
-                    indices.add(t);
-                    return new ScriptPack(this, c, indices);
-                }
+    public ScriptPack findScriptPackByPath(String name) {
+        List<MyEntry<ClassPath, ScriptPack>> packs = getScriptPacks();
+        for (MyEntry<ClassPath, ScriptPack> en : packs) {
+            if (en.key.toString().equals(name)) {
+                return en.value;
             }
         }
         return null;

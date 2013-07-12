@@ -166,7 +166,7 @@ public class ActionPanel extends JPanel implements ActionListener {
     private void cacheScript(ASMSource src) {
         if (!cache.contains(src)) {
             List<Action> as = src.getActions(SWF.DEFAULT_VERSION);
-            String s = com.jpexs.decompiler.flash.action.Action.actionsToSource(as, SWF.DEFAULT_VERSION);
+            String s = com.jpexs.decompiler.flash.action.Action.actionsToSource(as, SWF.DEFAULT_VERSION, src.toString()/*FIXME?*/);
             List<Highlighting> hilights = Highlighting.getInstrHighlights(s);
             String srcNoHex = Highlighting.stripHilights(s);
             cache.put(src, new CachedScript(srcNoHex, hilights));

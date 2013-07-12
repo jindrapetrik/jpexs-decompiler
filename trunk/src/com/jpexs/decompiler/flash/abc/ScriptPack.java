@@ -35,11 +35,17 @@ public class ScriptPack {
     public ABC abc;
     public int scriptIndex;
     public List<Integer> traitIndices;
+    private ClassPath path;
 
-    public ScriptPack(ABC abc, int scriptIndex, List<Integer> traitIndices) {
+    public ClassPath getPath() {
+        return path;
+    }
+
+    public ScriptPack(ClassPath path, ABC abc, int scriptIndex, List<Integer> traitIndices) {
         this.abc = abc;
         this.scriptIndex = scriptIndex;
         this.traitIndices = traitIndices;
+        this.path = path;
     }
 
     public String getPathPackage() {
@@ -66,20 +72,19 @@ public class ScriptPack {
         return scriptName;
     }
 
-    public String getPath() {
-        String packageName = "";
-        String scriptName = "";
-        for (int t : traitIndices) {
-            Multiname name = abc.script_info[scriptIndex].traits.traits[t].getName(abc);
-            Namespace ns = name.getNamespace(abc.constants);
-            if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                packageName = ns.getName(abc.constants);
-                scriptName = name.getName(abc.constants, new ArrayList<String>());
-            }
-        }
-        return packageName.equals("") ? scriptName : packageName + "." + scriptName;
-    }
-
+    /*public String getPath() {
+     String packageName = "";
+     String scriptName = "";
+     for (int t : traitIndices) {
+     Multiname name = abc.script_info[scriptIndex].traits.traits[t].getName(abc);
+     Namespace ns = name.getNamespace(abc.constants);
+     if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
+     packageName = ns.getName(abc.constants);
+     scriptName = name.getName(abc.constants, new ArrayList<String>());
+     }
+     }
+     return packageName.equals("") ? scriptName : packageName + "." + scriptName;
+     }*/
     private static String makeDirPath(String packageName) {
         if (packageName.equals("")) {
             return "";

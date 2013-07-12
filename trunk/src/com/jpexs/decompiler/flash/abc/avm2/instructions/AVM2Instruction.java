@@ -252,23 +252,26 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void translate(List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output) {
+    public void translate(List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, int staticOperation, String path) {
         definition.translate((Boolean) localData.get(0),
                 (Integer) localData.get(13),
                 (Integer) localData.get(1),
                 (HashMap<Integer, GraphTargetItem>) localData.get(2),
                 stack,
                 (Stack<GraphTargetItem>) localData.get(3),
-                (ConstantPool) localData.get(4), this, (MethodInfo[]) localData.get(5), output, (MethodBody) localData.get(6), (ABC) localData.get(7), (HashMap<Integer, String>) localData.get(8), (List<String>) localData.get(9));
+                (ConstantPool) localData.get(4), this, (MethodInfo[]) localData.get(5), output, (MethodBody) localData.get(6), (ABC) localData.get(7), (HashMap<Integer, String>) localData.get(8), (List<String>) localData.get(9), null);
     }
 
     @Override
     public boolean isJump() {
-        return (definition instanceof JumpIns);
+        return (definition instanceof JumpIns) || (fixedBranch > -1);
     }
 
     @Override
     public boolean isBranch() {
+        if (fixedBranch > -1) {
+            return false;
+        }
         return (definition instanceof IfTypeIns) || (definition instanceof LookupSwitchIns);
     }
 
@@ -286,15 +289,24 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
     public List<Integer> getBranches(GraphSource code) {
         List<Integer> ret = new ArrayList<>();
         if (definition instanceof IfTypeIns) {
-            ret.add(code.adr2pos(offset + getBytes().length + operands[0]));
+
+            if (fixedBranch == -1 || fixedBranch == 0) {
+                ret.add(code.adr2pos(offset + getBytes().length + operands[0]));
+            }
             if (!(definition instanceof JumpIns)) {
-                ret.add(code.adr2pos(offset + getBytes().length));
+                if (fixedBranch == -1 || fixedBranch == 1) {
+                    ret.add(code.adr2pos(offset + getBytes().length));
+                }
             }
         }
         if (definition instanceof LookupSwitchIns) {
-            ret.add(code.adr2pos(offset + operands[0]));
+            if (fixedBranch == -1 || fixedBranch == 0) {
+                ret.add(code.adr2pos(offset + operands[0]));
+            }
             for (int k = 2; k < operands.length; k++) {
-                ret.add(code.adr2pos(offset + operands[k]));
+                if (fixedBranch == -1 || fixedBranch == k - 1) {
+                    ret.add(code.adr2pos(offset + operands[k]));
+                }
             }
         }
         return ret;
@@ -306,7 +318,18 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
     }
 
     @Override
-    public void setIgnored(boolean ignored) {
+    public void setIgnored(boolean ignored, int pos) {
         this.ignored = ignored;
+    }
+
+    @Override
+    public void setFixBranch(int pos) {
+        this.fixedBranch = pos;
+    }
+    private int fixedBranch = -1;
+
+    @Override
+    public int getFixBranch() {
+        return fixedBranch;
     }
 }

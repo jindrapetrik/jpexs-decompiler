@@ -26,7 +26,7 @@ public class ActionEnd extends Action {
 
     public ActionEnd() {
         super(0, 0);
-        setIgnored(true);
+        setIgnored(true, 0);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class ActionEnd extends Action {
     }
 
     @Override
-    public void translate(Stack<com.jpexs.decompiler.flash.graph.GraphTargetItem> stack, List<com.jpexs.decompiler.flash.graph.GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+    public void translate(Stack<com.jpexs.decompiler.flash.graph.GraphTargetItem> stack, List<com.jpexs.decompiler.flash.graph.GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         //output.add(new SimpleActionTreeItem(this, "end()"));
     }
 }

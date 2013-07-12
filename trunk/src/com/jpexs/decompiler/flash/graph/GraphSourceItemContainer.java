@@ -22,4 +22,6 @@ public interface GraphSourceItemContainer {
     public HashMap<Integer, String> getRegNames();
 
     public void translateContainer(List<List<GraphTargetItem>> contents, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions);
+
+    public String getName();
 }

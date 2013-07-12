@@ -51,6 +51,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
      *
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public DoInitActionTag(byte[] data, int version, long pos) throws IOException {
@@ -99,7 +100,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
      */
     @Override
     public String getASMSource(int version, boolean hex) {
-        return Action.actionsToString(listeners, 0, getActions(version), null, version, hex, getPos() + 2);
+        return Action.actionsToString(listeners, 0, getActions(version), null, version, hex, getPos() + 2, toString()/*FIXME?*/);
     }
 
     @Override
@@ -122,9 +123,9 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
             ReReadableInputStream rri = new ReReadableInputStream(new ByteArrayInputStream(baos.toByteArray()));
             rri.setPos(prevLength);
             boolean deobfuscate = (Boolean) Configuration.getConfig("autoDeobfuscate", true);
-            List<Action> list = SWFInputStream.readActionList(listeners, 0, getPos() + 2 - prevLength, rri, version, prevLength, -1);
+            List<Action> list = SWFInputStream.readActionList(listeners, 0, getPos() + 2 - prevLength, rri, version, prevLength, -1, toString()/*FIXME?*/);
             if (deobfuscate) {
-                list = Action.removeNops(0, list, version, getPos() + 2);
+                list = Action.removeNops(0, list, version, getPos() + 2, toString()/*FIXME?*/);
             }
             return list;
         } catch (Exception ex) {

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action;
 
+import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -369,10 +370,11 @@ public class Action implements GraphSourceItem {
      * @param version SWF version
      * @param hex Add hexadecimal?
      * @param swfPos
+     * @param path
      * @return ASM source as String
      */
-    public static String actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, int version, boolean hex, long swfPos) {
-        return actionsToString(listeners, address, list, importantOffsets, new ArrayList<String>(), version, hex, swfPos);
+    public static String actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, int version, boolean hex, long swfPos, String path) {
+        return actionsToString(listeners, address, list, importantOffsets, new ArrayList<String>(), version, hex, swfPos, path);
     }
 
     /**
@@ -386,15 +388,16 @@ public class Action implements GraphSourceItem {
      * @param version SWF version
      * @param hex Add hexadecimal?
      * @param swfPos
+     * @param path
      * @return ASM source as String
      */
-    public static String actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, List<String> constantPool, int version, boolean hex, long swfPos) {
+    public static String actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, List<String> constantPool, int version, boolean hex, long swfPos, String path) {
         long offset;
         if (importantOffsets == null) {
             //setActionsAddresses(list, 0, version);
             importantOffsets = getActionsAllRefs(list, version);
         }
-        List<ConstantPool> cps = SWFInputStream.getConstantPool(new ArrayList<DisassemblyListener>(), new ActionGraphSource(list, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, version);
+        List<ConstantPool> cps = SWFInputStream.getConstantPool(new ArrayList<DisassemblyListener>(), new ActionGraphSource(list, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, version, path);
         if (!cps.isEmpty()) {
             setConstantPool(list, cps.get(cps.size() - 1));
         }
@@ -506,8 +509,24 @@ public class Action implements GraphSourceItem {
                     if (lastPush) {
                         ret.append("\r\n");
                     }
+
+
                     ret.append(Highlighting.hilighOffset("", offset));
-                    ret.append(a.getASMSourceReplaced(list, importantOffsets, constantPool, version, hex));
+
+                    int fixBranch = a.getFixBranch();
+                    if (fixBranch > -1) {
+                        if (a instanceof ActionIf) {
+                            ret.append("pop\r\n");
+                            if (fixBranch == 0) { //jump                               
+                                ret.append("jump ofs");
+                                ret.append(Helper.formatAddress(offset + ((ActionIf) a).getJumpOffset()));
+                            } else {
+                                //nojump, ignore
+                            }
+                        }
+                    } else {
+                        ret.append(a.getASMSourceReplaced(list, importantOffsets, constantPool, version, hex));
+                    }
                     ret.append(a.ignored ? "; ignored" : "");
                     ret.append(add);
                     ret.append((a instanceof ActionPush) ? "" : "\r\n");
@@ -568,8 +587,10 @@ public class Action implements GraphSourceItem {
      * @param regNames Register names
      * @param variables Variables
      * @param functions Functions
+     * @param staticOperation the value of staticOperation
+     * @param path the value of path
      */
-    public void translate(Stack<com.jpexs.decompiler.flash.graph.GraphTargetItem> stack, List<com.jpexs.decompiler.flash.graph.GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+    public void translate(Stack<com.jpexs.decompiler.flash.graph.GraphTargetItem> stack, List<com.jpexs.decompiler.flash.graph.GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
     }
 
     /**
@@ -638,8 +659,8 @@ public class Action implements GraphSourceItem {
         return -1;
     }
 
-    public static List<GraphTargetItem> actionsToTree(List<Action> actions, int version) {
-        return actionsToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), actions, version);
+    public static List<GraphTargetItem> actionsToTree(List<Action> actions, int version, int staticOperation, String path) {
+        return actionsToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), actions, version, staticOperation, path);
     }
 
     /**
@@ -647,12 +668,15 @@ public class Action implements GraphSourceItem {
      *
      * @param actions List of actions
      * @param version SWF version
+     * @param path
      * @return String with Source code
      */
-    public static String actionsToSource(List<Action> actions, int version) {
+    public static String actionsToSource(List<Action> actions, int version, String path) {
         try {
             //List<TreeItem> tree = actionsToTree(new HashMap<Integer, String>(), actions, version);
-            List<GraphTargetItem> tree = actionsToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), actions, version);
+            int staticOperation = (Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
+
+            List<GraphTargetItem> tree = actionsToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), actions, version, staticOperation, path);
 
 
             return Graph.graphToString(tree);
@@ -673,18 +697,20 @@ public class Action implements GraphSourceItem {
      * @param functions
      * @param actions List of actions
      * @param version SWF version
+     * @param staticOperation
+     * @param path
      * @return List of treeItems
      */
-    public static List<GraphTargetItem> actionsToTree(HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> actions, int version) {
+    public static List<GraphTargetItem> actionsToTree(HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> actions, int version, int staticOperation, String path) {
         //Stack<TreeItem> stack = new Stack<TreeItem>();
-        return ActionGraph.translateViaGraph(regNames, variables, functions, actions, version);
+        return ActionGraph.translateViaGraph(regNames, variables, functions, actions, version, staticOperation, path);
         //return actionsToTree(regNames,   stack, actions, 0, actions.size() - 1, version);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public void translate(List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output) {
-        translate(stack, output, (HashMap<Integer, String>) localData.get(0), (HashMap<String, GraphTargetItem>) localData.get(1), (HashMap<String, GraphTargetItem>) localData.get(2));
+    public void translate(List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, int staticOperation, String path) {
+        translate(stack, output, (HashMap<Integer, String>) localData.get(0), (HashMap<String, GraphTargetItem>) localData.get(1), (HashMap<String, GraphTargetItem>) localData.get(2), staticOperation, path);
     }
 
     @Override
@@ -718,7 +744,7 @@ public class Action implements GraphSourceItem {
     }
 
     @Override
-    public void setIgnored(boolean ignored) {
+    public void setIgnored(boolean ignored, int pos) {
         this.ignored = ignored;
     }
 
@@ -744,7 +770,7 @@ public class Action implements GraphSourceItem {
         logger.fine(s);
     }
 
-    public static List<GraphTargetItem> actionsPartToTree(HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, Stack<GraphTargetItem> stack, List<Action> actions, int start, int end, int version) {
+    public static List<GraphTargetItem> actionsPartToTree(HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, Stack<GraphTargetItem> stack, List<Action> actions, int start, int end, int version, int staticOperation, String path) {
         if (start < actions.size() && (end > 0) && (start > 0)) {
             log("Entering " + start + "-" + end + (actions.size() > 0 ? (" (" + actions.get(start).toString() + " - " + actions.get(end == actions.size() ? end - 1 : end) + ")") : ""));
         }
@@ -809,6 +835,7 @@ public class Action implements GraphSourceItem {
                 GraphSourceItemContainer cnt = (GraphSourceItemContainer) action;
                 //List<GraphTargetItem> out=actionsPartToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(),new HashMap<String, GraphTargetItem>(), new Stack<GraphTargetItem>(), src, ip+1,endip-1 , version);            
                 long endAddr = action.getAddress() + cnt.getHeaderSize();
+                String cntName = cnt.getName();
                 List<List<GraphTargetItem>> outs = new ArrayList<>();
                 for (long size : cnt.getContainerSizes()) {
                     if (size == 0) {
@@ -817,7 +844,7 @@ public class Action implements GraphSourceItem {
                     }
                     List<GraphTargetItem> out;
                     try {
-                        out = ActionGraph.translateViaGraph(cnt.getRegNames(), variables, functions, actions.subList(adr2ip(actions, endAddr, version), adr2ip(actions, endAddr + size, version)), version);
+                        out = ActionGraph.translateViaGraph(cnt.getRegNames(), variables, functions, actions.subList(adr2ip(actions, endAddr, version), adr2ip(actions, endAddr + size, version)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName));
                     } catch (Exception | OutOfMemoryError | StackOverflowError ex2) {
                         Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", ex2);
                         if (ex2 instanceof OutOfMemoryError) {
@@ -936,7 +963,7 @@ public class Action implements GraphSourceItem {
              }
              } */ else {
                 try {
-                    action.translate(localData, stack, output);
+                    action.translate(localData, stack, output, staticOperation, path);
                 } catch (EmptyStackException ese) {
                     Logger.getLogger(Action.class.getName()).log(Level.SEVERE, null, ese);
                     output.add(new UnsupportedTreeItem(action, "Empty stack"));
@@ -1256,14 +1283,14 @@ public class Action implements GraphSourceItem {
         return false;
     }
 
-    public static List<Action> removeNops(long address, List<Action> actions, int version, long swfPos) {
+    public static List<Action> removeNops(long address, List<Action> actions, int version, long swfPos, String path) {
         List<Action> ret = actions;
         if (true) {
             //return ret;
         }
         String s = null;
         try {
-            s = Highlighting.stripHilights(Action.actionsToString(new ArrayList<DisassemblyListener>(), address, ret, null, version, false, swfPos));
+            s = Highlighting.stripHilights(Action.actionsToString(new ArrayList<DisassemblyListener>(), address, ret, null, version, false, swfPos, path));
             ret = ASMParser.parse(address, swfPos, true, new StringReader(s), SWF.DEFAULT_VERSION);
         } catch (Exception ex) {
             Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error", ex);
@@ -1306,5 +1333,16 @@ public class Action implements GraphSourceItem {
             return (Long) o;
         }
         return 0;
+    }
+
+    @Override
+    public void setFixBranch(int pos) {
+        this.fixedBranch = pos;
+    }
+    private int fixedBranch = -1;
+
+    @Override
+    public int getFixBranch() {
+        return fixedBranch;
     }
 }

@@ -9,7 +9,7 @@ import java.util.Stack;
  */
 public interface GraphSourceItem {
 
-    public void translate(List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output);
+    public void translate(List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, int staticOperation, String path);
 
     public boolean isJump();
 
@@ -25,5 +25,9 @@ public interface GraphSourceItem {
 
     public boolean isIgnored();
 
-    public void setIgnored(boolean ignored);
+    public void setIgnored(boolean ignored, int pos);
+
+    public void setFixBranch(int pos);
+
+    public int getFixBranch();
 }

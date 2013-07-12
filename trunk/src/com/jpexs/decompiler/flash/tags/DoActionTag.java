@@ -74,7 +74,7 @@ public class DoActionTag extends Tag implements ASMSource {
      */
     @Override
     public String getASMSource(int version, boolean hex) {
-        return Action.actionsToString(listeners, 0, getActions(version), null, version, hex, getPos());
+        return Action.actionsToString(listeners, 0, getActions(version), null, version, hex, getPos(), toString()/*FIXME?*/);
     }
 
     /**
@@ -114,9 +114,9 @@ public class DoActionTag extends Tag implements ASMSource {
             ReReadableInputStream rri = new ReReadableInputStream(new ByteArrayInputStream(baos.toByteArray()));
             rri.setPos(prevLength);
             boolean deobfuscate = (Boolean) Configuration.getConfig("autoDeobfuscate", true);
-            List<Action> list = SWFInputStream.readActionList(listeners, 0, getPos() - prevLength, rri, version, prevLength, -1);
+            List<Action> list = SWFInputStream.readActionList(listeners, 0, getPos() - prevLength, rri, version, prevLength, -1, toString()/*FIXME?*/);
             if (deobfuscate) {
-                list = Action.removeNops(0, list, version, getPos());
+                list = Action.removeNops(0, list, version, getPos(), toString()/*FIXME?*/);
             }
             return list;
         } catch (Exception ex) {

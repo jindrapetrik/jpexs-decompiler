@@ -126,4 +126,9 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
     public HashMap<Integer, String> getRegNames() {
         return new HashMap<>();
     }
+
+    @Override
+    public String getName() {
+        return null;
+    }
 }

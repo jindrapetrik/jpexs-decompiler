@@ -47,14 +47,12 @@ import javax.swing.JToggleButton;
 public class ErrorLogFrame extends AppFrame {
 
     private JPanel logView = new JPanel();
-
-    
     private Handler handler;
-    
-    public Handler getHandler(){
+
+    public Handler getHandler() {
         return handler;
     }
-    
+
     public ErrorLogFrame() {
         setTitle("Log");
         setSize(500, 400);
@@ -68,25 +66,21 @@ public class ErrorLogFrame extends AppFrame {
 
         cnt.add(new JScrollPane(logView));
         handler = new Handler() {
-
             @Override
             public void publish(LogRecord record) {
-                log(record.getLevel(),record.getMessage(),record.getThrown());
+                log(record.getLevel(), record.getMessage(), record.getThrown());
             }
 
             @Override
             public void flush() {
-               
             }
 
             @Override
             public void close() throws SecurityException {
-                
             }
         };
         //setAlwaysOnTop(true);
     }
-        
 
     public void log(Level level, String msg, String detail) {
         if (detail == null) {
@@ -96,13 +90,14 @@ public class ErrorLogFrame extends AppFrame {
         final JTextArea detailTextArea = new JTextArea(detail);
         detailTextArea.setEditable(false);
         detailTextArea.setOpaque(false);
+        detailTextArea.setFont(new JLabel().getFont());
         log(level, msg, detailTextArea);
     }
-    
+
     private void log(Level level, String msg, final JComponent detail) {
         JPanel pan = new JPanel();
         pan.setLayout(new ListLayout());
-        
+
         JPanel header = new JPanel();
         header.setLayout(new BoxLayout(header, BoxLayout.X_AXIS));
         final JToggleButton expandButton = new JToggleButton(View.getIcon("expand16"));
@@ -112,13 +107,13 @@ public class ErrorLogFrame extends AppFrame {
         expandButton.setContentAreaFilled(false);
         final JScrollPane scrollPane;
         if (detail != null) {
-            scrollPane=new JScrollPane(detail);
+            scrollPane = new JScrollPane(detail);
             scrollPane.setAlignmentX(0f);
-            scrollPane.setMinimumSize(new Dimension(getWidth(),500));
-        }else{
-            scrollPane =null;
+            scrollPane.setMinimumSize(new Dimension(getWidth(), 500));
+        } else {
+            scrollPane = null;
         }
-        
+
         expandButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         if (detail != null) {
             expandButton.setMargin(new Insets(2, 2, 2, 2));
@@ -135,25 +130,29 @@ public class ErrorLogFrame extends AppFrame {
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
 
         JLabel dateLabel = new JLabel(format.format(new Date()));
-        dateLabel.setPreferredSize(new Dimension(100, 25));
+        dateLabel.setPreferredSize(new Dimension(130, 25));
         dateLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         header.add(dateLabel);
-        
-        
-        
+
+
+
         JLabel levelLabel = new JLabel(level.getName());
-        levelLabel.setPreferredSize(new Dimension(300, 25));
+        levelLabel.setPreferredSize(new Dimension(75, 25));
         levelLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         header.add(levelLabel);
-        JLabel msgLabel = new JLabel(msg);
+        JTextArea msgLabel = new JTextArea(msg);
+        msgLabel.setEditable(false);
+        msgLabel.setOpaque(false);
+        msgLabel.setFont(levelLabel.getFont());
+
         msgLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         header.add(msgLabel);
         header.setAlignmentX(0f);
         if (detail != null) {
             header.add(expandButton);
-        }        
-        pan.add(header);        
-        if (detail != null) {            
+        }
+        pan.add(header);
+        if (detail != null) {
             pan.add(scrollPane);
             scrollPane.setVisible(false);
         }

@@ -194,7 +194,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
     }
 
     @Override
-    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
     }
 
     @Override
@@ -231,5 +231,10 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
     @Override
     public String getASMSourceBetween(int pos) {
         return "";
+    }
+
+    @Override
+    public String getName() {
+        return "function";
     }
 }

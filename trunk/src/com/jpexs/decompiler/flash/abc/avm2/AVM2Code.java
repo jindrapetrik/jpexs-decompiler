@@ -58,7 +58,6 @@ import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.graph.Graph;
 import com.jpexs.decompiler.flash.graph.GraphPart;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
-import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
@@ -775,9 +774,22 @@ public class AVM2Code implements Serializable {
                 }
             } else {
                 if (!ins.isIgnored()) {
-                    t = ins.toStringNoAddress(constants, new ArrayList<String>());
-                    if (ins.changeJumpTo > -1) {
-                        t = ins.definition.instructionName + " ofs" + Helper.formatAddress(pos2adr(ins.changeJumpTo));
+                    int fixBranch = ins.getFixBranch();
+                    if (fixBranch > -1) {
+                        if (ins.definition instanceof IfTypeIns) {
+                            t = new PopIns().instructionName + "\n";
+                            if (fixBranch == 0) { //jump
+                                t = new JumpIns().instructionName + " ofs" + Helper.formatAddress(ofs + ins.getBytes().length + ins.operands[0]);
+                            } else {
+                                //nojump, ignore
+                            }
+                        }
+                        //TODO: lookupswitch ?
+                    } else {
+                        t = ins.toStringNoAddress(constants, new ArrayList<String>());
+                        if (ins.changeJumpTo > -1) {
+                            t = ins.definition.instructionName + " ofs" + Helper.formatAddress(pos2adr(ins.changeJumpTo));
+                        }
                     }
                     if (markOffsets) {
                         t = Highlighting.hilighOffset("", ins.mappedOffset > -1 ? ins.mappedOffset : ofs) + t + "\n";
@@ -885,7 +897,7 @@ public class AVM2Code implements Serializable {
         return pos2adr(fixIPAfterDebugLine(adr2pos(addr)));
     }
 
-    public ConvertOutput toSourceOutput(GraphPart part, boolean processJumps, boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, boolean visited[]) throws ConvertException {
+    public ConvertOutput toSourceOutput(String path, GraphPart part, boolean processJumps, boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, boolean visited[]) throws ConvertException {
         boolean debugMode = DEBUG_MODE;
         if (debugMode) {
             System.out.println("OPEN SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
@@ -992,12 +1004,12 @@ public class AVM2Code implements Serializable {
                     AVM2Instruction insAfter = code.get(ip + 1);
                     if ((insAfter.definition instanceof GetLocalTypeIns) && (((GetLocalTypeIns) insAfter.definition).getRegisterId(insAfter) == ((SetLocalTypeIns) ins.definition).getRegisterId(ins))) {
                         GraphTargetItem before = stack.peek();
-                        ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
+                        ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path);
                         stack.push(before);
                         ip += 2;
                         continue iploop;
                     } else {
-                        ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
+                        ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path);
                         ip++;
                         continue iploop;
                     }
@@ -1035,7 +1047,7 @@ public class AVM2Code implements Serializable {
                                     if (((GetLocalTypeIns) code.get(t).definition).getRegisterId(code.get(t)) == reg) {
                                         if (code.get(t + 1).definition instanceof KillIns) {
                                             if (code.get(t + 1).operands[0] == reg) {
-                                                ConvertOutput assignment = toSourceOutput(part, processJumps, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, ip + 2, t - 1, localRegNames, fullyQualifiedNames, visited);
+                                                ConvertOutput assignment = toSourceOutput(path, part, processJumps, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, abc, constants, method_info, body, ip + 2, t - 1, localRegNames, fullyQualifiedNames, visited);
                                                 GraphTargetItem tar = assignment.output.remove(assignment.output.size() - 1);
                                                 tar.firstPart = part;
                                                 stack.push(tar);
@@ -1049,6 +1061,9 @@ public class AVM2Code implements Serializable {
                             if (!isKilled(reg, 0, end)) {
                                 for (int i = ip; i >= start; i--) {
                                     if (code.get(i).definition instanceof DupIns) {
+                                        if (stack.isEmpty()) {
+                                            break;//FIXME?o
+                                        }
                                         GraphTargetItem v = stack.pop();
                                         stack.push(new LocalRegTreeItem(ins, reg, v));
                                         stack.push(v);
@@ -1057,21 +1072,21 @@ public class AVM2Code implements Serializable {
                                     }
                                 }
                             } else {
-                                ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
+                                ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path);
                             }
                             ip++;
                             break;
                             //}
 
                         } else {
-                            ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
+                            ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path);
                             ip++;
                             break;
                             //throw new ConvertException("Unknown pattern after DUP:" + insComparsion.toString());
                         }
                     } while (ins.definition instanceof DupIns);
                 } else if ((ins.definition instanceof ReturnValueIns) || (ins.definition instanceof ReturnVoidIns) || (ins.definition instanceof ThrowIns)) {
-                    ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
+                    ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path);
                     //ip = end + 1;
                     break;
                 } else if (ins.definition instanceof NewFunctionIns) {
@@ -1107,12 +1122,12 @@ public class AVM2Code implements Serializable {
                         }
                     }
                     //What to do when hasDup is false?
-                    ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
+                    ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path);
                     NewFunctionTreeItem nft = (NewFunctionTreeItem) stack.peek();
                     nft.functionName = functionName;
                     ip++;
                 } else {
-                    ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
+                    ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path);
 
                     ip++;
                     //addr = pos2adr(ip);
@@ -1139,8 +1154,8 @@ public class AVM2Code implements Serializable {
         return ret.toString();
     }
 
-    public String toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits) {
-        return toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, body, false, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits);
+    public String toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, HashMap<Integer, String> localRegNames, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits, int staticOperation) {
+        return toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, body, false, localRegNames, scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, staticOperation);
     }
 
     public int getRegisterCount() {
@@ -1210,7 +1225,7 @@ public class AVM2Code implements Serializable {
         ignoredIns = new ArrayList<>();
     }
 
-    public String toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted, HashMap<Integer, String> localRegNames, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits) {
+    public String toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], MethodBody body, boolean hilighted, HashMap<Integer, String> localRegNames, Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, List<String> fullyQualifiedNames, Traits initTraits, int staticOperation) {
         initToSource();
         List<GraphTargetItem> list;
         String s;
@@ -1221,7 +1236,7 @@ public class AVM2Code implements Serializable {
         //try {
 
         try {
-            list = AVM2Graph.translateViaGraph(path, this, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, fullyQualifiedNames);
+            list = AVM2Graph.translateViaGraph(path, this, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, fullyQualifiedNames, staticOperation);
         } catch (Exception | OutOfMemoryError | StackOverflowError ex2) {
             Logger.getLogger(AVM2Code.class.getName()).log(Level.SEVERE, "Decompilation error in " + path, ex2);
             if (ex2 instanceof OutOfMemoryError) {
@@ -1434,7 +1449,7 @@ public class AVM2Code implements Serializable {
         code.add(pos, instruction);
     }
 
-    public int removeTraps(ConstantPool constants, MethodBody body, ABC abc, int scriptIndex, int classIndex, boolean isStatic) {
+    public int removeTraps(ConstantPool constants, MethodBody body, ABC abc, int scriptIndex, int classIndex, boolean isStatic, String path) {
         removeDeadCode(constants, body);
         List<Object> localData = new ArrayList<>();
         localData.add((Boolean) isStatic); //isStatic
@@ -1452,7 +1467,7 @@ public class AVM2Code implements Serializable {
         localData.add(new ArrayList<Integer>());
         localData.add((Integer) (scriptIndex));
         int ret = 0;
-        ret += removeTraps(localData, new AVM2GraphSource(this, false, -1, -1, new HashMap<Integer, GraphTargetItem>(), new Stack<GraphTargetItem>(), abc, body, new HashMap<Integer, String>(), new ArrayList<String>()), 0);
+        ret += removeTraps(localData, new AVM2GraphSource(this, false, -1, -1, new HashMap<Integer, GraphTargetItem>(), new Stack<GraphTargetItem>(), abc, body, new HashMap<Integer, String>(), new ArrayList<String>()), 0, path);
         removeIgnored(constants, body);
         removeDeadCode(constants, body);
 
@@ -1557,6 +1572,9 @@ public class AVM2Code implements Serializable {
 
     private void visitCode(int ip, int lastIp, HashMap<Integer, List<Integer>> refs) {
         while (ip < code.size()) {
+            if (!refs.containsKey(ip)) {
+                refs.put(ip, new ArrayList<Integer>());
+            }
             refs.get(ip).add(lastIp);
             lastIp = ip;
             if (refs.get(ip).size() > 1) {
@@ -1982,7 +2000,7 @@ public class AVM2Code implements Serializable {
     }
 
     @SuppressWarnings("unchecked")
-    private static int removeTraps(boolean secondPass, boolean useVisited, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, HashMap<Integer, Integer> visited, HashMap<Integer, HashMap<Integer, GraphTargetItem>> visitedStates, HashMap<GraphSourceItem, Decision> decisions) {
+    private static int removeTraps(HashMap<Integer, List<Integer>> refs, boolean secondPass, boolean useVisited, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, HashMap<Integer, Integer> visited, HashMap<Integer, HashMap<Integer, GraphTargetItem>> visitedStates, HashMap<GraphSourceItem, Decision> decisions, String path) {
         boolean debugMode = false;
         int ret = 0;
         iploop:
@@ -2009,6 +2027,17 @@ public class AVM2Code implements Serializable {
                 visitedStates.put(ip, (HashMap<Integer, GraphTargetItem>) currentState.clone());
 
             }
+
+            List<Integer> r = refs.get(ip);
+            if (r != null) {
+                if (r.size() > 1) {
+                    if (!stack.isEmpty()) {
+                        GraphTargetItem it = stack.pop();
+                        stack.push(new NotCompileTimeTreeItem(null, it));
+                    }
+                }
+            }
+
             GraphSourceItem ins = code.get(ip);
 
             if (ins instanceof AVM2Instruction) {
@@ -2016,12 +2045,12 @@ public class AVM2Code implements Serializable {
                 //Errorneous code inserted by some obfuscators
                 if (ains.definition instanceof NewObjectIns) {
                     if (ains.operands[0] > stack.size()) {
-                        ains.setIgnored(true);
+                        ains.setIgnored(true, 0);
                     }
                 }
                 if (ains.definition instanceof NewArrayIns) {
                     if (ains.operands[0] > stack.size()) {
-                        ains.setIgnored(true);
+                        ains.setIgnored(true, 0);
                     }
                 }
             }
@@ -2034,21 +2063,21 @@ public class AVM2Code implements Serializable {
                 System.out.println((useVisited ? "useV " : "") + (secondPass ? "secondPass " : "") + "Visit " + ip + ": " + ins + " stack:" + Highlighting.stripHilights(stack.toString()));
             }
             if (secondPass) {
-                if ((ins instanceof AVM2Instruction) && (((AVM2Instruction) ins).definition instanceof PopIns)) {
-                    GraphTargetItem top = stack.peek();
-                    for (GraphSourceItemPos p : top.getNeededSources()) {
-                        if (p == null) {
-                            continue;
-                        }
-                        if (p.item == null) {
-                            continue;
-                        }
-                        if (p.item.isIgnored()) {
-                            ins.setIgnored(true);
-                            break;
-                        }
-                    }
-                }
+                /*if ((ins instanceof AVM2Instruction) && (((AVM2Instruction) ins).definition instanceof PopIns)) {
+                 GraphTargetItem top = stack.peek();
+                 for (GraphSourceItemPos p : top.getNeededSources()) {
+                 if (p == null) {
+                 continue;
+                 }
+                 if (p.item == null) {
+                 continue;
+                 }
+                 if (p.item.isIgnored()) {
+                 ins.setIgnored(true, 0);
+                 break;
+                 }
+                 }
+                 }*/
             }
 
 
@@ -2056,7 +2085,7 @@ public class AVM2Code implements Serializable {
             if ((ins instanceof AVM2Instruction) && (((AVM2Instruction) ins).definition instanceof NewFunctionIns)) {
                 stack.push(new BooleanTreeItem(null, true));
             } else {
-                ins.translate(localData, stack, output);
+                ins.translate(localData, stack, output, Graph.SOP_USE_STATIC, path);
             }
 
 
@@ -2068,54 +2097,7 @@ public class AVM2Code implements Serializable {
 
             if (ins.isBranch() || ins.isJump()) {
                 List<Integer> branches = ins.getBranches(code);
-                //TODO: handle switch somehow, this way it does not work
-                /*if ((ins instanceof AVM2Instruction) && (((AVM2Instruction) ins).definition instanceof LookupSwitchIns)
-                 && (!stack.isEmpty()) && (stack.peek().isCompileTime()) && (!stack.peek().hasSideEffect())) {
-                 int c = (int) (double) EcmaScript.toNumber(stack.peek().getResult());
-                 Decision dec = new Decision();
-                 if (decisions.containsKey(ins)) {
-                 dec = decisions.get(ins);
-                 } else {
-                 decisions.put(ins, dec);
-                 }
-                 dec.casesUsed.add(c);
-                 GraphTargetItem tar = stack.pop();
-
-                 int numcases = branches.size() - 1;
-                 int selCase = -1;
-                 if (c < 0 || c >= numcases) {
-                 selCase = 0;
-                 } else {
-                 selCase = 1 + c;
-                 }
-
-                 if (secondPass) {
-                 if (dec.casesUsed.size() == 1) {
-                 int sel = -1;
-                 for (int u : dec.casesUsed) {
-                 sel = u;
-                 }
-                 int selOperand = -1;
-                 if (sel < 0 || sel >= numcases) {
-                 selOperand = 0;
-                 } else {
-                 selOperand = 2 + sel;
-                 }
-                 AVM2Instruction ains = (AVM2Instruction) ins;
-                 if (ains.replaceWith == null) {
-                 ains.replaceWith = new ArrayList<>();
-                 }
-                 ains.replaceWith.add(new ControlFlowTag("appendjump", code.adr2pos(code.pos2adr(ip) + ((AVM2Instruction) ins).operands[selOperand])));
-                 for (GraphSourceItemPos pos : tar.getNeededSources()) {
-                 if (pos.item != ins) {
-                 pos.item.setIgnored(true);
-                 }
-                 }
-                 }
-                 }
-                 ip = branches.get(selCase);
-                 continue;
-                 } else */ if ((ins instanceof AVM2Instruction) && ((AVM2Instruction) ins).definition instanceof IfTypeIns
+                if ((ins instanceof AVM2Instruction) && ((AVM2Instruction) ins).definition instanceof IfTypeIns
                         && (!(((AVM2Instruction) ins).definition instanceof JumpIns)) && (!stack.isEmpty()) && (stack.peek().isCompileTime()) && (!stack.peek().hasSideEffect())) {
                     boolean condition = EcmaScript.toBoolean(stack.peek().getResult());
                     if (debugMode) {
@@ -2137,30 +2119,38 @@ public class AVM2Code implements Serializable {
                         dec.skipUsed = true;
                     }
 
-                    if (secondPass) {
-                        if (condition && (dec.jumpUsed) && (!dec.skipUsed)) {
-                            ((AVM2Instruction) ins).definition = new JumpIns();
-                        }
-                        if ((!condition) && (!dec.jumpUsed) && (dec.skipUsed)) {
-                            ins.setIgnored(true);
+                    if (branches.size() > 1) {
+                        if (secondPass) {
+                            if (condition && (dec.jumpUsed) && (!dec.skipUsed)) {
+                                ins.setFixBranch(0);
+                                //((AVM2Instruction) ins).definition = new JumpIns();
+                            }
+                            if ((!condition) && (!dec.jumpUsed) && (dec.skipUsed)) {
+                                ins.setFixBranch(1);
+                                //ins.setIgnored(true, 0);
+                            }
                         }
                     }
                     GraphTargetItem tar = stack.pop();
-                    if (secondPass && (dec.jumpUsed != dec.skipUsed)) {
-                        for (GraphSourceItemPos pos : tar.getNeededSources()) {
-                            if (pos.item instanceof AVM2Instruction) {
-                                if (((AVM2Instruction) pos.item).definition instanceof DupIns) {
-                                    pos.item.setIgnored(true);
-                                    break;
-                                }
-                            }
-                            if (pos.item != ins) {
-                                pos.item.setIgnored(true);
-                            }
-                        }
+                    /*if (secondPass && (dec.jumpUsed != dec.skipUsed)) {
+                     for (GraphSourceItemPos pos : tar.getNeededSources()) {
+                     if (pos.item instanceof AVM2Instruction) {
+                     if (((AVM2Instruction) pos.item).definition instanceof DupIns) {
+                     pos.item.setIgnored(true, 0);
+                     break;
+                     }
+                     }
+                     if (pos.item != ins) {
+                     pos.item.setIgnored(true, 0);
+                     }
+                     }
 
+                     }*/
+                    if (branches.size() == 1) {
+                        ip = branches.get(0);
+                    } else {
+                        ip = condition ? branches.get(0) : branches.get(1);
                     }
-                    ip = condition ? branches.get(0) : branches.get(1);
                     continue;
                 } else {
                     if (ins.isBranch() && (!ins.isJump())) {
@@ -2179,7 +2169,7 @@ public class AVM2Code implements Serializable {
                     for (int b : branches) {
                         Stack<GraphTargetItem> brStack = (Stack<GraphTargetItem>) stack.clone();
                         if (b >= 0) {
-                            ret += removeTraps(secondPass, useVisited || (!ins.isJump()), localData, brStack, output, code, b, visited, visitedStates, decisions);
+                            ret += removeTraps(refs, secondPass, useVisited || (!ins.isJump()), localData, brStack, output, code, b, visited, visitedStates, decisions, path);
                         } else {
                             if (debugMode) {
                                 System.out.println("Negative branch:" + b);
@@ -2197,10 +2187,16 @@ public class AVM2Code implements Serializable {
         return ret;
     }
 
-    public static int removeTraps(List<Object> localData, AVM2GraphSource code, int addr) {
+    public static int removeTraps(List<Object> localData, AVM2GraphSource code, int addr, String path) {
         HashMap<GraphSourceItem, AVM2Code.Decision> decisions = new HashMap<>();
-        removeTraps(false, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions);
+        HashMap<Integer, List<Integer>> refs = new HashMap<>();
+        code.getCode().visitCode(0, code.size() - 1, refs);
+        removeTraps(refs, false, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions, path);
         localData.set(2, new HashMap<Integer, GraphTargetItem>());
-        return removeTraps(true, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions);
+        return removeTraps(refs, true, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions, path);
     }
+    /*public static int removeTraps(List<Object> localData, AVM2GraphSource code, int addr) {
+     AVM2Graph.translateViaGraph(localData, "", code, new ArrayList<Integer>(), Graph.SOP_REMOVE_STATIC);
+     return 1;
+     }*/
 }

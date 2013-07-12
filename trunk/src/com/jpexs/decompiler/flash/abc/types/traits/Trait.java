@@ -142,7 +142,7 @@ public abstract class Trait implements Serializable {
         }
     }
 
-    public abstract int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc);
+    public abstract int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path);
 
     public String getPath(ABC abc) {
         Multiname name = getName(abc);

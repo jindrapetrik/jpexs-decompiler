@@ -64,11 +64,11 @@ public class AVM2GraphSource extends GraphSource {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<GraphTargetItem> translatePart(GraphPart part, List<Object> localData, Stack<GraphTargetItem> stack, int start, int end) {
+    public List<GraphTargetItem> translatePart(GraphPart part, List<Object> localData, Stack<GraphTargetItem> stack, int start, int end, int staticOperation, String path) {
         List<GraphTargetItem> ret = new ArrayList<>();
         Object o = localData.get(AVM2Graph.DATA_SCOPESTACK);
         Stack<GraphTargetItem> newstack = (Stack<GraphTargetItem>) o;
-        ConvertOutput co = code.toSourceOutput(part, false, isStatic, scriptIndex, classIndex, localRegs, stack, newstack, abc, abc.constants, abc.method_info, body, start, end, localRegNames, fullyQualifiedNames, new boolean[size()]);
+        ConvertOutput co = code.toSourceOutput(path, part, false, isStatic, scriptIndex, classIndex, localRegs, stack, newstack, abc, abc.constants, abc.method_info, body, start, end, localRegNames, fullyQualifiedNames, new boolean[size()]);
         ret.addAll(co.output);
         return ret;
     }

@@ -45,6 +45,25 @@ public class ActionPush extends Action {
     public List<String> constantPool;
     public List<Integer> ignoredParts = new ArrayList<>();
 
+    @Override
+    public void setIgnored(boolean ignored, int pos) {
+        if (ignored) {
+            if (!ignoredParts.contains(pos)) {
+                ignoredParts.add(pos);
+                if (ignoredParts.size() == values.size()) {
+                    super.setIgnored(ignored, 0);
+                }
+            }
+        } else {
+            if (ignoredParts.contains(pos)) {
+                ignoredParts.remove(pos);
+                super.setIgnored(false, 0);
+            }
+        }
+
+
+    }
+
     public ActionPush(int actionLength, SWFInputStream sis, int version) throws IOException {
         super(0x96, actionLength);
         int type;
@@ -276,7 +295,7 @@ public class ActionPush extends Action {
     }
 
     @Override
-    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+    public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         int pos = 0;
         for (Object o : values) {
             if (ignoredParts.contains(pos)) {

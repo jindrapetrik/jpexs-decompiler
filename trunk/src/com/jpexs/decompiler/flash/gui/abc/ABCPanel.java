@@ -81,6 +81,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
     public JPanel searchPanel;
     public JLabel searchPos;
     private List<ScriptPack> found = new ArrayList<>();
+    private List<ClassPath> foundPath = new ArrayList<>();
     private int foundPos = 0;
     private JLabel searchForLabel;
     private String searchFor;
@@ -112,6 +113,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
                 decompiledTextArea.cacheScriptPack(item.value, list);
                 if (pat.matcher(decompiledTextArea.getCachedText(item.value)).find()) {
                     found.add(item.value);
+                    foundPath.add(item.key);
                 }
             }
 

@@ -176,7 +176,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc) {
+    public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) {
         //do nothing
         return 0;
     }

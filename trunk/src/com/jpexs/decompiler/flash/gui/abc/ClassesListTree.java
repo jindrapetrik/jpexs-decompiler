@@ -124,7 +124,6 @@ public class ClassesListTree extends JTree implements TreeSelectionListener {
         Object item = tp.getItem();
         if (item instanceof ScriptPack) {
             final ScriptPack scriptLeaf = (ScriptPack) item;
-
             if (!Main.isWorking()) {
                 Main.startWork("Decompiling...");
                 (new Thread() {

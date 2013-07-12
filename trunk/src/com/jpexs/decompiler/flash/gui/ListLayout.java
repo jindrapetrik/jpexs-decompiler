@@ -21,8 +21,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.LayoutManager;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -35,14 +33,13 @@ public class ListLayout implements LayoutManager {
     public ListLayout() {
         this(5);
     }
-    
+
     public ListLayout(int border) {
         this.border = border;
     }
 
     @Override
     public void addLayoutComponent(String name, Component comp) {
-
     }
 
     @Override
@@ -55,14 +52,14 @@ public class ListLayout implements LayoutManager {
         int maxw = 0;
         boolean first = true;
         for (Component c : parent.getComponents()) {
-            if(!c.isVisible()){
+            if (!c.isVisible()) {
                 continue;
             }
             if (!first) {
                 h += border;
             }
-            Dimension pref=c.getPreferredSize();
-            if(pref.width > maxw){
+            Dimension pref = c.getPreferredSize();
+            if (pref.width > maxw) {
                 maxw = pref.width;
             }
             h += pref.height;
@@ -79,18 +76,18 @@ public class ListLayout implements LayoutManager {
 
     @Override
     public void layoutContainer(Container parent) {
-        Dimension dim=preferredLayoutSize(parent);
+        Dimension dim = preferredLayoutSize(parent);
         int top = 0;
-        Insets ins = parent.getInsets();        
+        Insets ins = parent.getInsets();
         boolean first = true;
         for (Component c : parent.getComponents()) {
-            if(!c.isVisible()){
+            if (!c.isVisible()) {
                 continue;
             }
             if (!first) {
                 top += border;
             }
-            Dimension pref=c.getPreferredSize();
+            Dimension pref = c.getPreferredSize();
             c.setBounds(0, top, dim.width, pref.height);
             top += pref.height;
             first = false;

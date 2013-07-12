@@ -65,10 +65,10 @@ public class TraitMethodGetterSetter extends Trait {
     }
 
     @Override
-    public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc) {
+    public int removeTraps(int scriptIndex, int classIndex, boolean isStatic, ABC abc, String path) {
         int bodyIndex = abc.findBodyIndex(method_info);
         if (bodyIndex != -1) {
-            return abc.bodies[bodyIndex].removeTraps(abc.constants, abc, scriptIndex, classIndex, isStatic);
+            return abc.bodies[bodyIndex].removeTraps(abc.constants, abc, scriptIndex, classIndex, isStatic, path);
         }
         return 0;
     }
