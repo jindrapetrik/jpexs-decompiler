@@ -89,7 +89,6 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
         public void draw(int startX, int startY, Graphics2D g, int shapeNum) {
             AffineTransform oldAf = g.getTransform();
             AffineTransform trans20 = AffineTransform.getScaleInstance(1 / DESCALE, 1 / DESCALE);
-            //g.setTransform(trans20);
             boolean ok = false;
             if (shapeNum == 4) {
                 if (lineStyle2 == null) {
@@ -131,6 +130,11 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                 if (lineStyle == null) {
                     ok = false;
                 } else {
+                    if (shapeNum == 1 || shapeNum == 2) {
+                        g.setPaint(lineStyle.color.toColor());
+                    } else /*shapeNum == 3*/ {
+                        g.setPaint(lineStyle.colorA.toColor());
+                    }
                     g.setStroke(new BasicStroke(lineStyle.width / DESCALE, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                     ok = true;
                 }
