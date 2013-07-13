@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.treemodel;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.TernarOpItem;
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,6 +35,10 @@ public class NameValuePair extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return name.toString(constants, localRegNames, fullyQualifiedNames) + ":" + value.toString(constants, localRegNames, fullyQualifiedNames);
+        String valueStr = value.toString(constants, localRegNames, fullyQualifiedNames);
+        if (value instanceof TernarOpItem) { //Ternar operator contains ":"
+            valueStr = "(" + valueStr + ")";
+        }
+        return name.toString(constants, localRegNames, fullyQualifiedNames) + ":" + valueStr;
     }
 }

@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.treemodel;
 
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.TernarOpItem;
 import java.util.List;
 
 public class InitObjectTreeItem extends TreeItem {
@@ -38,7 +39,11 @@ public class InitObjectTreeItem extends TreeItem {
             if (i > 0) {
                 objStr += hilight(",");
             }
-            objStr += names.get(i).toString(constants) + hilight(":") + values.get(i).toString(constants);
+            String valueStr = values.get(i).toString(constants);
+            if (values.get(i) instanceof TernarOpItem) { //Ternar operator contains ":"
+                valueStr = "(" + valueStr + ")";
+            }
+            objStr += names.get(i).toString(constants) + hilight(":") + valueStr;
         }
         return hilight("{") + objStr + hilight("}");
     }
