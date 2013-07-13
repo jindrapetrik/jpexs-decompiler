@@ -73,9 +73,11 @@ public class GetVariableTreeItem extends TreeItem {
 
     public void setComputedValue(GraphTargetItem computedValue) {
         this.computedValue = computedValue;
-        if (computedValue != null) {
-            computedResult = computedValue.getResult();
+        if (computedValue != null) {            
             computedCompiletime = computedValue.isCompileTime();
+            if(computedCompiletime){
+                computedResult = computedValue.getResult();
+            }
             computedVariableComputed = computedValue.isVariableComputed();
         }
     }

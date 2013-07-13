@@ -76,6 +76,11 @@ public class DefineText2Tag extends CharacterTag implements BoundedTag, TextTag,
     public RECT getBounds() {
         return textBounds;
     }
+    
+    @Override
+    public MATRIX getTextMatrix(){
+        return textMatrix;
+    }
 
     @Override
     public void setBounds(RECT r) {

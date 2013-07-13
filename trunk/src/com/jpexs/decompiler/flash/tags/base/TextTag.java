@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
+import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import java.util.List;
 
@@ -27,6 +28,7 @@ import java.util.List;
  */
 public interface TextTag {
 
+    public MATRIX getTextMatrix();
     public String getText(List<Tag> tags);
 
     public String getFormattedText(List<Tag> tags);

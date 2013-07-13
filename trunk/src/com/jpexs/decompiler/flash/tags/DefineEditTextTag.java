@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
 import com.jpexs.decompiler.flash.tags.text.ParsedSymbol;
 import com.jpexs.decompiler.flash.tags.text.TextLexer;
+import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGBA;
 import java.awt.geom.GeneralPath;
@@ -84,6 +85,11 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextT
     @Override
     public RECT getBounds() {
         return bounds;
+    }
+    
+    @Override
+    public MATRIX getTextMatrix(){
+        return new MATRIX();
     }
 
     @Override
