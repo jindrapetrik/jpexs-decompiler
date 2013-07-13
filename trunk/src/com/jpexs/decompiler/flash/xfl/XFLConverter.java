@@ -445,14 +445,14 @@ public class XFLConverter {
             }
         }
         if (lineStyles != null) {
-            if (lineStyles.lineStyles2 != null) { //(shapeNum == 4) {
+            if ((shapeNum == 4) && (lineStyles.lineStyles2 != null)) { //(shapeNum == 4) {
                 for (int l = 0; l < lineStyles.lineStyles2.length; l++) {
                     strokesStr += "<StrokeStyle index=\"" + (lineStyleCount + 1) + "\">";
                     strokesStr += convertLineStyle(characters, lineStyles.lineStyles2[l], shapeNum);
                     strokesStr += "</StrokeStyle>";
                     lineStyleCount++;
                 }
-            } else {
+            } else if (lineStyles.lineStyles != null) {
                 for (int l = 0; l < lineStyles.lineStyles.length; l++) {
                     strokesStr += "<StrokeStyle index=\"" + (lineStyleCount + 1) + "\">";
                     strokesStr += convertLineStyle(lineStyles.lineStyles[l], shapeNum);
