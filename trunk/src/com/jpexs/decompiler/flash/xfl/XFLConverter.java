@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.xfl;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.graph.Graph;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
@@ -1141,7 +1143,7 @@ public class XFLConverter {
 
     private static String convertActionScript(ASMSource as) {
         String decompiledASHilighted = com.jpexs.decompiler.flash.action.Action.actionsToSource(as.getActions(SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION, as.toString());
-        return as.getActionSourcePrefix() + Highlighting.stripHilights(decompiledASHilighted) + as.getActionSourceSuffix();
+        return as.getActionSourcePrefix() + Helper.indentRows(as.getActionSourceIndent(), Highlighting.stripHilights(decompiledASHilighted), Graph.INDENT_STRING) + as.getActionSourceSuffix();
     }
 
     private static long getTimestamp() {
