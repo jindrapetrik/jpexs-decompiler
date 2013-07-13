@@ -1805,6 +1805,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                 break;
             case "INTERNALVIEWERSWITCH":
                 Configuration.setConfig("internalFlashViewer", (Boolean) miInternalViewer.isSelected());
+                reload(true);
                 break;
             case "SEARCHAS":
                 if (searchDialog == null) {
