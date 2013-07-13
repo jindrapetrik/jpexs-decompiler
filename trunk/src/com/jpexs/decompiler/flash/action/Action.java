@@ -423,7 +423,7 @@ public class Action implements GraphSourceItem {
             }
             offset = a.getAddress();
 
-            if ((!(a.ignored)) && (a instanceof GraphSourceItemContainer)) {
+            if ((!(a.isIgnored())) && (a instanceof GraphSourceItemContainer)) {
                 GraphSourceItemContainer cnt = (GraphSourceItemContainer) a;
                 containersPos.put(cnt, 0);
                 List<Long> sizes = cnt.getContainerSizes();
@@ -471,7 +471,7 @@ public class Action implements GraphSourceItem {
                 ret.append(Highlighting.hilighOffset("", offset));
                 ret.append(a.replaceWith.getASMSource(list, importantOffsets, constantPool, version, hex));
                 ret.append("\r\n");
-            } else if (a.ignored) {
+            } else if (a.isIgnored()) {
                 if (lastPush) {
                     ret.append("\r\n");
                     lastPush = false;
@@ -527,7 +527,7 @@ public class Action implements GraphSourceItem {
                     } else {
                         ret.append(a.getASMSourceReplaced(list, importantOffsets, constantPool, version, hex));
                     }
-                    ret.append(a.ignored ? "; ignored" : "");
+                    ret.append(a.isIgnored() ? "; ignored" : "");
                     ret.append(add);
                     ret.append((a instanceof ActionPush) ? "" : "\r\n");
                 }

@@ -46,6 +46,11 @@ public class ActionPush extends Action {
     public List<Integer> ignoredParts = new ArrayList<>();
 
     @Override
+    public boolean isIgnored() {
+        return ignoredParts.size() == values.size();
+    }
+
+    @Override
     public void setIgnored(boolean ignored, int pos) {
         if (ignored) {
             if (!ignoredParts.contains(pos)) {
