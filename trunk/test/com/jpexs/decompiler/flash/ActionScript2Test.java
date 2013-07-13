@@ -37,14 +37,14 @@ public class ActionScript2Test {
 
     @BeforeClass
     public void init() throws IOException {
-        swf = new SWF(new FileInputStream("testdata/as2/as2.swf"), false);
         Configuration.setConfig("autoDeobfuscate", false);
+        swf = new SWF(new FileInputStream("testdata/as2/as2.swf"), false);        
     }
 
     private void compareSrc(int frame, String expectedResult) {
         DoActionTag doa = getFrameSource(frame);
         assertNotNull(doa);
-        String actualResult = Highlighting.stripHilights(Action.actionsToSource(doa.getActions(swf.version), swf.version));
+        String actualResult = Highlighting.stripHilights(Action.actionsToSource(doa.getActions(swf.version), swf.version,""));
         actualResult = actualResult.replaceAll("[ \r\n]", "");
         expectedResult = expectedResult.replaceAll("[ \r\n]", "");
         assertEquals(actualResult, expectedResult);
