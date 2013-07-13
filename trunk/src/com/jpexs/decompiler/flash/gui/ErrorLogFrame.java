@@ -17,10 +17,14 @@
 package com.jpexs.decompiler.flash.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.PrintWriter;
@@ -54,15 +58,17 @@ public class ErrorLogFrame extends AppFrame {
     }
 
     public ErrorLogFrame() {
-        setTitle("Log");
-        setSize(500, 400);
+        setTitle(translate("dialog.title"));
+        setSize(700, 400);
+        setBackground(Color.white);
         View.centerScreen(this);
         View.setWindowIcon(this);
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
-
+        logView.setBackground(Color.white);
         logView.setLayout(new ListLayout());
+        cnt.setBackground(Color.white);
 
         cnt.add(new JScrollPane(logView));
         handler = new Handler() {
@@ -79,44 +85,68 @@ public class ErrorLogFrame extends AppFrame {
             public void close() throws SecurityException {
             }
         };
-        //setAlwaysOnTop(true);
     }
 
-    public void log(Level level, String msg, String detail) {
-        if (detail == null) {
-            log(level, msg, (JComponent) null);
-            return;
-        }
-        final JTextArea detailTextArea = new JTextArea(detail);
-        detailTextArea.setEditable(false);
-        detailTextArea.setOpaque(false);
-        detailTextArea.setFont(new JLabel().getFont());
-        log(level, msg, detailTextArea);
-    }
-
-    private void log(Level level, String msg, final JComponent detail) {
+    private void log(final Level level, final String msg, final String detail) {
         JPanel pan = new JPanel();
+        pan.setBackground(Color.white);
         pan.setLayout(new ListLayout());
 
+        JComponent detailComponent;
+        if (detail == null) {
+            detailComponent = null;
+        } else {
+            final JTextArea detailTextArea = new JTextArea(detail);
+            detailTextArea.setEditable(false);
+            detailTextArea.setOpaque(false);
+            detailTextArea.setFont(new JLabel().getFont());
+            detailTextArea.setBackground(Color.white);
+            detailComponent = detailTextArea;
+        }
         JPanel header = new JPanel();
         header.setLayout(new BoxLayout(header, BoxLayout.X_AXIS));
+        header.setBackground(Color.white);
+
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
+        final String dateStr = format.format(new Date());
+
+        JToggleButton copyButton = new JToggleButton(View.getIcon("copy16"));
+        copyButton.setFocusPainted(false);
+        copyButton.setBorderPainted(false);
+        copyButton.setFocusable(false);
+        copyButton.setContentAreaFilled(false);
+        copyButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        copyButton.setMargin(new Insets(2, 2, 2, 2));
+        copyButton.setToolTipText(translate("copy"));
+        copyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                StringSelection stringSelection = new StringSelection(dateStr + " " + level.toString() + " " + msg + "\r\n" + detail);
+                clipboard.setContents(stringSelection, null);
+            }
+        });
+
         final JToggleButton expandButton = new JToggleButton(View.getIcon("expand16"));
         expandButton.setFocusPainted(false);
         expandButton.setBorderPainted(false);
         expandButton.setFocusable(false);
         expandButton.setContentAreaFilled(false);
+        expandButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        expandButton.setMargin(new Insets(2, 2, 2, 2));
+        expandButton.setToolTipText(translate("details"));
+
         final JScrollPane scrollPane;
-        if (detail != null) {
-            scrollPane = new JScrollPane(detail);
+        if (detailComponent != null) {
+            scrollPane = new JScrollPane(detailComponent);
             scrollPane.setAlignmentX(0f);
             scrollPane.setMinimumSize(new Dimension(getWidth(), 500));
         } else {
             scrollPane = null;
         }
 
-        expandButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        if (detail != null) {
-            expandButton.setMargin(new Insets(2, 2, 2, 2));
+
+        if (detailComponent != null) {
             expandButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -127,10 +157,10 @@ public class ErrorLogFrame extends AppFrame {
             });
         }
 
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
 
-        JLabel dateLabel = new JLabel(format.format(new Date()));
-        dateLabel.setPreferredSize(new Dimension(130, 25));
+
+        JLabel dateLabel = new JLabel(dateStr);
+        dateLabel.setPreferredSize(new Dimension(140, 25));
         dateLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         header.add(dateLabel);
 
@@ -148,17 +178,16 @@ public class ErrorLogFrame extends AppFrame {
         msgLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         header.add(msgLabel);
         header.setAlignmentX(0f);
-        if (detail != null) {
+        if (detailComponent != null) {
             header.add(expandButton);
         }
+        header.add(copyButton);
         pan.add(header);
-        if (detail != null) {
+        if (detailComponent != null) {
             pan.add(scrollPane);
             scrollPane.setVisible(false);
         }
-        //pan.setPreferredSize(new Dimension(getWidth(), 30));
         pan.setAlignmentX(0f);
-        //curGBConstraints.weighty = 1;
         logView.add(pan);
         revalidate();
         repaint();

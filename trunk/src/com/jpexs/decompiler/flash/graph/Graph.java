@@ -1366,6 +1366,9 @@ public class Graph {
                 if (currentLoop != null) {
                     currentLoop.phase = 0;
                 }
+                if (debugMode) {
+                    System.err.println("Adding break");
+                }
                 ret.add(new BreakItem(null, el.id));
                 return ret;
             }
@@ -1373,12 +1376,18 @@ public class Graph {
                 if (currentLoop != null) {
                     currentLoop.phase = 0;
                 }
+                if (debugMode) {
+                    System.err.println("Adding precontinue");
+                }
                 ret.add(new ContinueItem(null, el.id));
                 return ret;
             }
             if (el.loopContinue == part) {
                 if (currentLoop != null) {
                     currentLoop.phase = 0;
+                }
+                if (debugMode) {
+                    System.err.println("Adding continue");
                 }
                 ret.add(new ContinueItem(null, el.id));
                 return ret;
@@ -1703,9 +1712,6 @@ public class Graph {
 
             LoopItem li = loopItem;
             boolean loopTypeFound = false;
-
-
-
 
             boolean hasContinue = false;
             processIfs(loopItem.commands);

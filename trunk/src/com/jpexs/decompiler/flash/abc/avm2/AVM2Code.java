@@ -24,6 +24,19 @@ import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphSource;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Lf32Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Lf64Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Li16Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Li32Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Li8Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Sf32Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Sf64Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Si16Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Si32Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Si8Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Sxi16Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Sxi1Ins;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Sxi8Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.*;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.bitwise.*;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.comparison.EqualsIns;
@@ -96,6 +109,7 @@ public class AVM2Code implements Serializable {
     public static final int DAT_DOUBLE_INDEX = OPT_U30 + 0x10;
     public static final int DAT_DECIMAL_INDEX = OPT_U30 + 0x11;
     public static final int DAT_CASE_BASEOFFSET = OPT_S24 + 0x12;
+    public static final int DAT_DECIMAL_PARAMS = OPT_U30 + 0x13;
     public static InstructionDefinition instructionSet[] = new InstructionDefinition[]{
         new AddIns(),
         new InstructionDefinition(0x9b, "add_d", new int[]{}) {
@@ -105,7 +119,7 @@ public class AVM2Code implements Serializable {
             }
         },
         new AddIIns(),
-        new InstructionDefinition(0xb5, "add_p", new int[]{AVM2Code.OPT_U30}),
+        new InstructionDefinition(0xb5, "add_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}),
         new ApplyTypeIns(),
         new AsTypeIns(),
         new AsTypeLateIns(),
@@ -150,7 +164,7 @@ public class AVM2Code implements Serializable {
         new ConvertUIns(),
         new ConvertSIns(),
         new InstructionDefinition(0x79, "convert_m", new int[]{}), //-1 +1
-        new InstructionDefinition(0x7a, "convert_m_p", new int[]{AVM2Code.OPT_U30 /*param (?)*/}) {
+        new InstructionDefinition(0x7a, "convert_m_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
                 throw new UnsupportedOperationException();
@@ -177,7 +191,7 @@ public class AVM2Code implements Serializable {
             }
         },
         new DivideIns(),
-        new InstructionDefinition(0xb8, "divide_p", new int[]{AVM2Code.OPT_U30}) {
+        new InstructionDefinition(0xb8, "divide_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
                 return -2 + 1; //?
@@ -264,10 +278,10 @@ public class AVM2Code implements Serializable {
         new IncLocalIIns(),
         new IncrementIns(),
         new IncrementIIns(),
-        new InstructionDefinition(0x9c, "increment_p", new int[]{AVM2Code.OPT_U30 /*param*/}),
-        new InstructionDefinition(0x9d, "inclocal_p", new int[]{AVM2Code.OPT_U30 /*param*/, AVM2Code.DAT_REGISTER_INDEX}),
-        new InstructionDefinition(0x9e, "decrement_p", new int[]{AVM2Code.OPT_U30 /*param*/}),
-        new InstructionDefinition(0x9f, "declocal_p", new int[]{AVM2Code.OPT_U30 /*param*/, AVM2Code.DAT_REGISTER_INDEX}),
+        new InstructionDefinition(0x9c, "increment_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}),
+        new InstructionDefinition(0x9d, "inclocal_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS, AVM2Code.DAT_REGISTER_INDEX}),
+        new InstructionDefinition(0x9e, "decrement_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}),
+        new InstructionDefinition(0x9f, "declocal_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS, AVM2Code.DAT_REGISTER_INDEX}),
         new InitPropertyIns(),
         new InstanceOfIns(),
         new IsTypeIns(),
@@ -280,7 +294,7 @@ public class AVM2Code implements Serializable {
         new LookupSwitchIns(),
         new LShiftIns(),
         new ModuloIns(),
-        new InstructionDefinition(0xb9, "modulo_p", new int[]{AVM2Code.OPT_U30}) {
+        new InstructionDefinition(0xb9, "modulo_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
                 return -2 + 1; //?
@@ -288,7 +302,7 @@ public class AVM2Code implements Serializable {
         },
         new MultiplyIns(),
         new MultiplyIIns(),
-        new InstructionDefinition(0xb7, "multiply_p", new int[]{AVM2Code.OPT_U30}) {
+        new InstructionDefinition(0xb7, "multiply_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
                 return -2 + 1; //?
@@ -296,7 +310,7 @@ public class AVM2Code implements Serializable {
         },
         new NegateIns(),
         new NegateIIns(),
-        new InstructionDefinition(0x8f, "negate_p", new int[]{AVM2Code.OPT_U30 /* param */}) {
+        new InstructionDefinition(0x8f, "negate_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
                 throw new UnsupportedOperationException();
@@ -377,7 +391,7 @@ public class AVM2Code implements Serializable {
         new StrictEqualsIns(),
         new SubtractIns(),
         new SubtractIIns(),
-        new InstructionDefinition(0xb6, "subtract_p", new int[]{AVM2Code.OPT_U30}) {
+        new InstructionDefinition(0xb6, "subtract_p", new int[]{AVM2Code.DAT_DECIMAL_PARAMS}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
                 throw new UnsupportedOperationException();
@@ -393,7 +407,20 @@ public class AVM2Code implements Serializable {
         new InstructionDefinition(0xf3, "timestamp", new int[]{}),
         new TypeOfIns(),
         new URShiftIns(),
-        new InstructionDefinition(0x35, "li8", new int[]{}) {
+        new Li8Ins(),
+        new Li16Ins(),
+        new Li32Ins(),
+        new Lf32Ins(),
+        new Lf64Ins(),
+        new Si8Ins(),
+        new Si16Ins(),
+        new Si32Ins(),
+        new Sf32Ins(),
+        new Sf64Ins(),
+        new Sxi1Ins(),
+        new Sxi8Ins(),
+        new Sxi16Ins(),
+        new InstructionDefinition(0xf5, "verifypass", new int[]{}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
                 throw new UnsupportedOperationException();
@@ -404,7 +431,7 @@ public class AVM2Code implements Serializable {
                 throw new UnsupportedOperationException();
             }
         },
-        new InstructionDefinition(0x36, "li16", new int[]{}) {
+        new InstructionDefinition(0xf6, "alloc", new int[]{}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
                 throw new UnsupportedOperationException();
@@ -415,7 +442,7 @@ public class AVM2Code implements Serializable {
                 throw new UnsupportedOperationException();
             }
         },
-        new InstructionDefinition(0x37, "li32", new int[]{}) {
+        new InstructionDefinition(0xf7, "mark", new int[]{}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
                 throw new UnsupportedOperationException();
@@ -426,7 +453,7 @@ public class AVM2Code implements Serializable {
                 throw new UnsupportedOperationException();
             }
         },
-        new InstructionDefinition(0x38, "lf32", new int[]{}) {
+        new InstructionDefinition(0xf8, "wb", new int[]{}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
                 throw new UnsupportedOperationException();
@@ -437,7 +464,7 @@ public class AVM2Code implements Serializable {
                 throw new UnsupportedOperationException();
             }
         },
-        new InstructionDefinition(0x39, "lf64", new int[]{}) {
+        new InstructionDefinition(0xf9, "prologue", new int[]{}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
                 throw new UnsupportedOperationException();
@@ -448,7 +475,7 @@ public class AVM2Code implements Serializable {
                 throw new UnsupportedOperationException();
             }
         },
-        new InstructionDefinition(0x3A, "si8", new int[]{}) {
+        new InstructionDefinition(0xfa, "sendenter", new int[]{}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
                 throw new UnsupportedOperationException();
@@ -459,7 +486,7 @@ public class AVM2Code implements Serializable {
                 throw new UnsupportedOperationException();
             }
         },
-        new InstructionDefinition(0x3B, "si16", new int[]{}) {
+        new InstructionDefinition(0xfb, "doubletoatom", new int[]{}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
                 throw new UnsupportedOperationException();
@@ -470,7 +497,7 @@ public class AVM2Code implements Serializable {
                 throw new UnsupportedOperationException();
             }
         },
-        new InstructionDefinition(0x3C, "si32", new int[]{}) {
+        new InstructionDefinition(0xfc, "sweep", new int[]{}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
                 throw new UnsupportedOperationException();
@@ -481,7 +508,7 @@ public class AVM2Code implements Serializable {
                 throw new UnsupportedOperationException();
             }
         },
-        new InstructionDefinition(0x3D, "sf32", new int[]{}) {
+        new InstructionDefinition(0xfd, "codegenop", new int[]{}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
                 throw new UnsupportedOperationException();
@@ -492,7 +519,7 @@ public class AVM2Code implements Serializable {
                 throw new UnsupportedOperationException();
             }
         },
-        new InstructionDefinition(0x3E, "sf64", new int[]{}) {
+        new InstructionDefinition(0xfe, "verifyop", new int[]{}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
                 throw new UnsupportedOperationException();
@@ -503,7 +530,7 @@ public class AVM2Code implements Serializable {
                 throw new UnsupportedOperationException();
             }
         },
-        new InstructionDefinition(0x50, "sxi1", new int[]{}) {
+        new InstructionDefinition(0xff, "decode", new int[]{}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
                 throw new UnsupportedOperationException();
@@ -514,18 +541,7 @@ public class AVM2Code implements Serializable {
                 throw new UnsupportedOperationException();
             }
         },
-        new InstructionDefinition(0x51, "sxi8", new int[]{}) {
-            @Override
-            public int getStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public int getScopeStackDelta(AVM2Instruction ins, ABC abc) {
-                throw new UnsupportedOperationException();
-            }
-        },
-        new InstructionDefinition(0x52, "sxi16", new int[]{}) {
+        new InstructionDefinition(0xee, "abs_jump", new int[]{}) {
             @Override
             public int getStackDelta(AVM2Instruction ins, ABC abc) {
                 throw new UnsupportedOperationException();
@@ -545,7 +561,7 @@ public class AVM2Code implements Serializable {
         InstructionDefinition result[] = new InstructionDefinition[256];
         for (InstructionDefinition id : instructionSet) {
             if (result[id.instructionCode] != null) {
-                System.out.println("Warning: Duplicate OPCODE for instruction " + result[id.instructionCode] + " " + id);
+                Logger.getLogger(AVM2Code.class.getName()).log(Level.WARNING, "Duplicate OPCODE for instruction {0} {1}", new Object[]{result[id.instructionCode], id});
             }
             result[id.instructionCode] = id;
         }

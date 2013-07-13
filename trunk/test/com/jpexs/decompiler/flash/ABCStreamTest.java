@@ -16,16 +16,16 @@ public class ABCStreamTest {
 
     @Test
     public void testU30() {
-        try(ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ABCOutputStream aos = new ABCOutputStream(baos)) {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ABCOutputStream aos = new ABCOutputStream(baos);) {
             long number = 1531;
             aos.writeU30(number);
             aos.close();
-            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-            ABCInputStream ais = new ABCInputStream(bais);
-            assertEquals(number, ais.readU30());
-            assertEquals(0, bais.available());
-            ais.close();
+            try (ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+                    ABCInputStream ais = new ABCInputStream(bais);) {
+                assertEquals(number, ais.readU30());
+                assertEquals(0, bais.available());
+            }
         } catch (IOException ex) {
             fail();
         }

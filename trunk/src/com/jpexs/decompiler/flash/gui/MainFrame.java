@@ -767,7 +767,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         errorNotificationButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         errorNotificationButton.setActionCommand("SHOWERRORLOG");
         errorNotificationButton.addActionListener(this);
-        errorNotificationButton.setToolTipText("There are no errors in the log");
+        errorNotificationButton.setToolTipText(translate("errors.none"));
         statusPanel.add(errorNotificationButton, BorderLayout.EAST);
 
 
@@ -1051,11 +1051,33 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         Logger logger = Logger.getLogger("");
         logger.addHandler(errorLogFrame.getHandler());
         logger.addHandler(new Handler() {
+            private Timer timer = null;
+            private int pos = 0;
+
             @Override
             public void publish(LogRecord record) {
                 if (record.getLevel() == Level.SEVERE) {
                     errorNotificationButton.setIcon(View.getIcon("error16"));
-                    errorNotificationButton.setToolTipText("There are ERRORS in the log");
+                    errorNotificationButton.setToolTipText(translate("errors.present"));
+                    if (timer != null) {
+                        timer.cancel();
+                    }
+                    timer = new Timer();
+                    timer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            pos++;
+                            if ((pos % 2) == 0) {
+                                errorNotificationButton.setIcon(View.getIcon("error16"));
+                            } else {
+                                errorNotificationButton.setIcon(null);
+                                errorNotificationButton.setSize(16, 16);
+                            }
+                            if (pos == 4) {
+                                cancel();
+                            }
+                        }
+                    }, 500, 500);
                 }
             }
 

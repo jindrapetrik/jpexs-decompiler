@@ -389,12 +389,14 @@ public class AVM2Graph extends Graph {
                 && (stack.peek() instanceof StrictEqTreeItem)
                 && (part.nextParts.get(0).getHeight() >= 2)
                 && (this.code.code.get(this.code.fixIPAfterDebugLine(part.nextParts.get(0).start)).definition instanceof PushIntegerTypeIns)
+                && (!part.nextParts.get(0).nextParts.isEmpty())
                 && (this.code.code.get(part.nextParts.get(0).nextParts.get(0).end).definition instanceof LookupSwitchIns))
                 || ((part.nextParts.size() == 2)
                 && (!stack.isEmpty())
                 && (stack.peek() instanceof StrictNeqTreeItem)
                 && (part.nextParts.get(1).getHeight() >= 2)
                 && (this.code.code.get(this.code.fixIPAfterDebugLine(part.nextParts.get(1).start)).definition instanceof PushIntegerTypeIns)
+                && (!part.nextParts.get(1).nextParts.isEmpty())
                 && (this.code.code.get(part.nextParts.get(1).nextParts.get(0).end).definition instanceof LookupSwitchIns))) {
 
             if (stack.peek() instanceof StrictEqTreeItem) {
@@ -479,14 +481,7 @@ public class AVM2Graph extends Graph {
             List<List<GraphTargetItem>> caseCommands = new ArrayList<>();
             GraphPart next = null;
 
-            List<GraphPart> loopContinues = getLoopsContinues(loops);
-
-            next = switchLoc.getNextPartPath(loopContinues);
-            if (next == null) {
-                next = switchLoc.getNextSuperPartPath(loopContinues);
-            }
-
-            GraphTargetItem ti = checkLoop(next, stopPart, loops);
+            next = getMostCommonPart(switchLoc.nextParts, loops);//getNextPartPath(loopContinues);
             currentLoop = new Loop(loops.size(), null, next);
             currentLoop.phase = 1;
             loops.add(currentLoop);
@@ -526,8 +521,8 @@ public class AVM2Graph extends Graph {
                 List<GraphTargetItem> cc = new ArrayList<>();
                 List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
                 for (int j = 0; j < caseBodies.size(); j++) {
-                    if (j != i) {
-                        stopPart2.add(caseBodies.get(i));
+                    if (caseBodies.get(j) != caseBodies.get(i)) {
+                        stopPart2.add(caseBodies.get(j));
                     }
                 }
                 if (hasDefault) {
