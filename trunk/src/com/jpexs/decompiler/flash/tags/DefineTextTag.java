@@ -73,9 +73,10 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, 
     public static final int ID = 11;
 
     @Override
-    public MATRIX getTextMatrix(){
+    public MATRIX getTextMatrix() {
         return textMatrix;
     }
+
     @Override
     public RECT getBounds() {
         return textBounds;

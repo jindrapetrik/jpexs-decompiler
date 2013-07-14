@@ -24,37 +24,26 @@ public class GetURL2TreeItem extends TreeItem {
 
     public GraphTargetItem urlString;
     public GraphTargetItem targetString;
-    public int method;
-    public boolean loadTargetFlag;
-    public boolean loadVariablesFlag;
+    public int sendVarsMethod;
 
     @Override
     public String toString(ConstantPool constants) {
         String methodStr = "";
-        if (method == 1) {
+        if (sendVarsMethod == 1) {
             methodStr = ",\"GET\"";
         }
-        if (method == 2) {
+        if (sendVarsMethod == 2) {
             methodStr = ",\"POST\"";
         }
-        String prefix = "getUrl";
-        if (loadVariablesFlag) {
-            prefix = "loadVariables";
-        }
-        if (loadTargetFlag && (!loadVariablesFlag)) {
-            prefix = "loadMovie";
-        }
 
-        return hilight(prefix + "(") + urlString.toString(constants) + hilight(",") + targetString.toString(constants) + hilight(methodStr + ")");
+        return hilight("getURL(") + urlString.toString(constants) + hilight(",") + targetString.toString(constants) + hilight(methodStr + ")");
     }
 
-    public GetURL2TreeItem(GraphSourceItem instruction, GraphTargetItem urlString, GraphTargetItem targetString, int method, boolean loadTargetFlag, boolean loadVariablesFlag) {
+    public GetURL2TreeItem(GraphSourceItem instruction, GraphTargetItem urlString, GraphTargetItem targetString, int method) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.urlString = urlString;
         this.targetString = targetString;
-        this.method = method;
-        this.loadTargetFlag = loadTargetFlag;
-        this.loadVariablesFlag = loadVariablesFlag;
+        this.sendVarsMethod = method;
     }
 
     @Override

@@ -31,11 +31,7 @@ public class StringLengthTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        String s = value.toString(constants);
-        if (value.precedence > precedence) {
-            s = "(" + s + ")";
-        }
-        return s + hilight(".length");
+        return hilight("length(") + value.toString(constants) + hilight(")");
     }
 
     @Override

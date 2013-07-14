@@ -36,9 +36,13 @@ import java.util.Stack;
 
 public class ActionWith extends Action implements GraphSourceItemContainer {
 
-    //public List<Action> actions;
     public int codeSize;
     public int version;
+
+    public ActionWith(int codeSize) {
+        super(0x94, 2);
+        this.codeSize = codeSize;
+    }
 
     @Override
     public boolean parseDivision(int pos, long addr, FlasmLexer lexer) {
@@ -50,9 +54,6 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
         super(0x94, 2);
         codeSize = sis.readUI16();
         this.version = version;
-        //actions = new ArrayList<Action>();
-        //actions = (new SWFInputStream(new ByteArrayInputStream(sis.readBytes(codeSize)), version)).readActionList(rri.getPos(), containerSWFOffset + getAddress() + 2, rri, codeSize);
-
     }
 
     public ActionWith(long containerSWFPos, boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
@@ -64,9 +65,6 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
     @Override
     public void setAddress(long address, int version, boolean recursive) {
         super.setAddress(address, version, recursive);
-        if (recursive) {
-            //Action.setActionsAddresses(actions, address + 5, version);
-        }
     }
 
     @Override
@@ -75,11 +73,9 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         SWFOutputStream sos = new SWFOutputStream(baos, version);
         try {
-            //byte codeBytes[] = Action.actionsToBytes(actions, false, version);
             sos.writeUI16(codeSize);//codeBytes.length);
             sos.close();
             baos2.write(surroundWithAction(baos.toByteArray(), version));
-            //baos2.write(codeBytes);
         } catch (IOException e) {
         }
         return baos2.toByteArray();
@@ -87,17 +83,17 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
 
     @Override
     public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
-        return "With {"; // + "\r\n" + Action.actionsToString(getAddress() + 2, getItems(container), knownAddreses, constantPool, version, hex, containerSWFOffset + getAddress() + 2) + "}";
+        return "With {";
     }
 
     @Override
     public List<Long> getAllRefs(int version) {
-        return super.getAllRefs(version);//Action.getActionsAllRefs(actions, version);
+        return super.getAllRefs(version);
     }
 
     @Override
     public List<Action> getAllIfsOrJumps() {
-        return super.getAllIfsOrJumps();// Action.getActionsAllIfsOrJumps(actions);
+        return super.getAllIfsOrJumps();
     }
 
     @Override

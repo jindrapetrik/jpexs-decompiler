@@ -21,11 +21,17 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
+import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.FSCommandTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.GetURLTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.LoadMovieNumTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.UnLoadMovieNumTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.UnLoadMovieTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -69,6 +75,34 @@ public class ActionGetURL extends Action {
 
     @Override
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
-        output.add(new GetURLTreeItem(this, urlString, targetString));
+        String fsCommandPrefix = "FSCommand:";
+        if (urlString.startsWith(fsCommandPrefix) && targetString.equals("")) {
+            String command = urlString.substring(fsCommandPrefix.length());
+            output.add(new FSCommandTreeItem(this, command));
+            return;
+        }
+        String levelPrefix = "_level";
+        if (targetString.startsWith(levelPrefix)) {
+            try {
+                int num = Integer.valueOf(targetString.substring(levelPrefix.length()));
+                if (urlString.equals("")) {
+                    output.add(new UnLoadMovieNumTreeItem(this, num));
+                } else {
+                    DirectValueTreeItem urlStringDi = new DirectValueTreeItem(null, 0, urlString, new ArrayList<String>());
+                    output.add(new LoadMovieNumTreeItem(this, urlStringDi, num, 1/*GET*/));
+                }
+                return;
+            } catch (NumberFormatException nfe) {
+            }
+
+        }
+
+        if (urlString.equals("")) {
+            DirectValueTreeItem targetStringDi = new DirectValueTreeItem(null, 0, targetString, new ArrayList<String>());
+            output.add(new UnLoadMovieTreeItem(this, targetStringDi));
+        } else {
+            output.add(new GetURLTreeItem(this, urlString, targetString));
+        }
+
     }
 }

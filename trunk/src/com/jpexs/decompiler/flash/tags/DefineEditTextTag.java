@@ -86,9 +86,9 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextT
     public RECT getBounds() {
         return bounds;
     }
-    
+
     @Override
-    public MATRIX getTextMatrix(){
+    public MATRIX getTextMatrix() {
         return new MATRIX();
     }
 

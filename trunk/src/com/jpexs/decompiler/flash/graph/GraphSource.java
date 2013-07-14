@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2013 JPEXS
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.jpexs.decompiler.flash.graph;
 
 import com.jpexs.decompiler.flash.action.Action;
@@ -72,7 +88,8 @@ public abstract class GraphSource {
 
     public HashMap<Integer, List<Integer>> visitCode(List<Integer> alternateEntries) {
         HashMap<Integer, List<Integer>> refs = new HashMap<>();
-        for (int i = 0; i < size(); i++) {
+        int siz = size();
+        for (int i = 0; i < siz; i++) {
             refs.put(i, new ArrayList<Integer>());
         }
         visitCode(0, 0, refs, -1);

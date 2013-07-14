@@ -53,8 +53,8 @@ public class ActionWaitForFrame extends Action implements ActionStore {
     @Override
     public String toString() {
         String ret = "WaitForFrame " + frame + " " + skipCount;
-        for (Action a : skipped) {
-            ret += "\r\n" + a.toString();
+        for (int i = 0; i < skipped.size(); i++) {
+            ret += "\r\n" + skipped.get(i).toString();
         }
         return ret;
     }
@@ -66,8 +66,8 @@ public class ActionWaitForFrame extends Action implements ActionStore {
         try {
             sos.writeUI16(frame);
             sos.writeUI8(skipCount);
-            for (Action a : skipped) {
-                sos.write(a.getBytes(SWF.DEFAULT_VERSION));
+            for (int i = 0; i < skipped.size(); i++) {
+                sos.write(skipped.get(i).getBytes(SWF.DEFAULT_VERSION));
             }
             sos.close();
         } catch (IOException e) {

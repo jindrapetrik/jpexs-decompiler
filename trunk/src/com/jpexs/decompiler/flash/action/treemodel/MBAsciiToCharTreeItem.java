@@ -31,7 +31,7 @@ public class MBAsciiToCharTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return hilight("mbord(") + value.toString(constants) + hilight(")");
+        return hilight("mbchr(") + value.toString(constants) + hilight(")");
     }
 
     @Override

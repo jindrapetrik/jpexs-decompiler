@@ -14,31 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.tags.base;
+package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.text.ParseException;
-import com.jpexs.decompiler.flash.types.MATRIX;
-import com.jpexs.decompiler.flash.types.RECT;
-import java.util.List;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 
 /**
  *
  * @author JPEXS
  */
-public interface TextTag {
+public class GetVersionTreeItem extends TreeItem {
 
-    public MATRIX getTextMatrix();
+    public GetVersionTreeItem(GraphSourceItem instruction) {
+        super(instruction, PRECEDENCE_PRIMARY);
+    }
 
-    public String getText(List<Tag> tags);
-
-    public String getFormattedText(List<Tag> tags);
-
-    public void setFormattedText(List<Tag> tags, String text) throws ParseException;
-
-    public int getCharacterId();
-
-    public RECT getBounds();
-
-    public void setBounds(RECT r);
+    @Override
+    public String toString(ConstantPool constants) {
+        return hilight("getVersion()");
+    }
 }

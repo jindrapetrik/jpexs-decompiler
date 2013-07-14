@@ -306,8 +306,13 @@ public class ASMParser {
                         actualLen++;
                         if (actualLen == stores.peek().getStoreSize()) {
                             ActionStore st = stores.pop();
-                            st.setStore(list.subList(list.size() - actualLen, list.size()));
-                            list = list.subList(0, list.size() - actualLen);
+                            List<Action> sl = new ArrayList<>();
+                            sl.addAll(list.subList(list.size() - actualLen, list.size()));
+                            st.setStore(sl);
+
+                            List<Action> sl2 = list.subList(0, list.size() - actualLen);
+                            list = new ArrayList<>();
+                            list.addAll(sl2);
                             if (!stores.isEmpty()) {
                                 actualLen = storeLengths.pop();
                             }

@@ -32,5 +32,6 @@ public enum SymbolGroup {
     DOUBLE,
     TYPENAME,
     EOF,
-    GLOBALFUNC
+    GLOBALFUNC,
+    GLOBALCONST
 }

@@ -60,7 +60,11 @@ public class SetVariableTreeItem extends TreeItem implements SetTypeTreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return stripQuotes(name, constants) + hilight("=") + value.toString(constants);
+        if (name instanceof DirectValueTreeItem || name instanceof GetVariableTreeItem) {
+            return stripQuotes(name, constants) + hilight("=") + value.toString(constants);
+        } else {
+            return hilight("set(") + name.toString(constants) + hilight(",") + value.toString(constants) + hilight(")");
+        }
     }
 
     @Override

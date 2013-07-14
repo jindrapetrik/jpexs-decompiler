@@ -165,5 +165,11 @@ public enum SymbolType {
     TARGETPATH,
     NUMBER_OP,
     STRING_OP,
-    IFFRAMELOADED
+    IFFRAMELOADED,
+    INFINITY,
+    EVAL,
+    UNDEFINED,
+    NEWLINE,
+    NAN,
+    GETVERSION
 }

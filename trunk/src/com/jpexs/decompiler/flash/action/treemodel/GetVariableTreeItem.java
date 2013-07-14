@@ -36,10 +36,6 @@ public class GetVariableTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        if (computedValue == null) {
-            //return "null";
-        }
-        //return ""+computedValue.toNumber(); 
         return stripQuotes(name, constants);
     }
 
@@ -73,9 +69,9 @@ public class GetVariableTreeItem extends TreeItem {
 
     public void setComputedValue(GraphTargetItem computedValue) {
         this.computedValue = computedValue;
-        if (computedValue != null) {            
+        if (computedValue != null) {
             computedCompiletime = computedValue.isCompileTime();
-            if(computedCompiletime){
+            if (computedCompiletime) {
                 computedResult = computedValue.getResult();
             }
             computedVariableComputed = computedValue.isVariableComputed();

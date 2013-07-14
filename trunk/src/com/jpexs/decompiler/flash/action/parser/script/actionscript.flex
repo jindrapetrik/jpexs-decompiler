@@ -154,7 +154,7 @@ SingleCharacter = [^\r\n\'\\]
   "import"                       { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.IMPORT,yytext()); }
   "use"                          { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.USE,yytext()); }
   "false"                        { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.FALSE,yytext()); }
-  "null"                         { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.NULL,yytext()); }
+  "null"                         { return new ParsedSymbol(SymbolGroup.GLOBALCONST,SymbolType.NULL,yytext()); }
   "this"                         { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.THIS,yytext()); }
   "true"                         { return new ParsedSymbol(SymbolGroup.KEYWORD,SymbolType.TRUE,yytext()); }
   "getUrl"                       { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.GETURL,yytext()); }
@@ -187,8 +187,15 @@ SingleCharacter = [^\r\n\'\\]
   "length"                       { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.LENGTH,yytext()); }
   "int"                          { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.INT,yytext()); }
   "targetPath"                   { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.TARGETPATH,yytext()); }
-  "Number"                      { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.NUMBER_OP,yytext()); }
-  "String"                     { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.STRING_OP,yytext()); }
+  "Number"                       { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.NUMBER_OP,yytext()); }
+  "String"                       { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.STRING_OP,yytext()); }
+  "eval"                         { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.EVAL,yytext()); }
+  "undefined"                    { return new ParsedSymbol(SymbolGroup.GLOBALCONST,SymbolType.UNDEFINED,yytext()); }
+  "newline"                      { return new ParsedSymbol(SymbolGroup.GLOBALCONST,SymbolType.NEWLINE,yytext()); }
+  "Infinity"                     { return new ParsedSymbol(SymbolGroup.GLOBALCONST,SymbolType.INFINITY,yytext()); }
+  "NaN"                          { return new ParsedSymbol(SymbolGroup.GLOBALCONST,SymbolType.NAN,yytext()); }
+  "getVersion"                   { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.GETVERSION,yytext()); }
+  
 
   /* operators */
 
