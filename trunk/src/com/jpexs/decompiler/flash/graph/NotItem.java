@@ -1,12 +1,14 @@
 package com.jpexs.decompiler.flash.graph;
 
+import com.jpexs.decompiler.flash.action.treemodel.operations.Inverted;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import java.util.List;
 
 /**
  *
  * @author JPEXS
  */
-public class NotItem extends UnaryOpItem implements LogicalOpItem {
+public class NotItem extends UnaryOpItem implements LogicalOpItem, Inverted {
 
     public NotItem(GraphSourceItem instruction, GraphTargetItem value) {
         super(instruction, PRECEDENCE_UNARY, value, "!");
@@ -36,5 +38,15 @@ public class NotItem extends UnaryOpItem implements LogicalOpItem {
 
     public GraphTargetItem getOriginal() {
         return value;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return generator.generate(localData, this);
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return true;
     }
 }

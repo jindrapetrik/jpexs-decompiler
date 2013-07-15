@@ -16,9 +16,20 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf4.ActionPop;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
+import com.jpexs.decompiler.flash.action.swf4.ActionSetProperty;
+import com.jpexs.decompiler.flash.action.swf4.ActionSetVariable;
+import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
+import com.jpexs.decompiler.flash.action.swf5.ActionIncrement;
+import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
+import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
 import com.jpexs.decompiler.flash.action.treemodel.operations.AddTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PostIncrementTreeItem extends TreeItem implements SetTypeTreeItem {
 
@@ -63,5 +74,50 @@ public class PostIncrementTreeItem extends TreeItem implements SetTypeTreeItem {
     @Override
     public void setValue(GraphTargetItem value) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(List<Object> localData, SourceGenerator generator) {
+        List<GraphSourceItem> ret = new ArrayList<>();
+
+        if (object instanceof GetVariableTreeItem) {
+            GetVariableTreeItem gv = (GetVariableTreeItem) object;
+            ret.addAll(gv.toSource(localData, generator));
+            ret.remove(ret.size() - 1); //ActionGetVariable
+            ret.addAll(gv.toSource(localData, generator));
+            ret.add(new ActionIncrement());
+            ret.add(new ActionSetVariable());
+        } else if (object instanceof GetMemberTreeItem) {
+            GetMemberTreeItem mem = (GetMemberTreeItem) object;
+            ret.addAll(mem.toSource(localData, generator));
+            ret.remove(ret.size() - 1); //ActionGetMember
+            ret.addAll(mem.toSource(localData, generator));
+            ret.add(new ActionIncrement());
+            ret.add(new ActionSetMember());
+        } else if ((object instanceof DirectValueTreeItem) && ((DirectValueTreeItem) object).value instanceof RegisterNumber) {
+            RegisterNumber rn = (RegisterNumber) ((DirectValueTreeItem) object).value;
+            ret.add(new ActionPush(new RegisterNumber(rn.number)));
+            ret.add(new ActionIncrement());
+            ret.add(new ActionStoreRegister(rn.number));
+            ret.add(new ActionPop());
+        } else if (object instanceof GetPropertyTreeItem) {
+            GetPropertyTreeItem gp = (GetPropertyTreeItem) object;
+            ret.addAll(gp.toSource(localData, generator));
+            ret.remove(ret.size() - 1);
+            ret.addAll(gp.toSource(localData, generator));
+            ret.add(new ActionIncrement());
+            ret.add(new ActionSetProperty());
+        }
+        return ret;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, object.toSource(localData, generator), toSourceIgnoreReturnValue(localData, generator));
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return true;
     }
 }

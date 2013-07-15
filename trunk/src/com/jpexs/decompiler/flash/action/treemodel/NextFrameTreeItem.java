@@ -14,20 +14,31 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.action.treemodel.operations;
+package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
-import com.jpexs.decompiler.flash.graph.BinaryOpItem;
+import com.jpexs.decompiler.flash.action.swf3.ActionNextFrame;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.List;
 
-public class AsTypeTreeItem extends BinaryOpItem {
+public class NextFrameTreeItem extends TreeItem {
 
-    public AsTypeTreeItem(GraphSourceItem instruction, TreeItem value, TreeItem type) {
-        super(instruction, PRECEDENCE_RELATIONAL, value, type, " as ");
+    @Override
+    public String toString(ConstantPool constants) {
+        return hilight("nextFrame()");
+    }
+
+    public NextFrameTreeItem(GraphSourceItem instruction) {
+        super(instruction, PRECEDENCE_PRIMARY);
     }
 
     @Override
-    public boolean isCompileTime() {
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, new ActionNextFrame());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
         return false;
     }
 }

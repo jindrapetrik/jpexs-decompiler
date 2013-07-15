@@ -16,8 +16,11 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf3.ActionGetURL;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import com.jpexs.decompiler.flash.helpers.Helper;
+import java.util.List;
 
 /**
  *
@@ -35,5 +38,15 @@ public class FSCommandTreeItem extends TreeItem {
     @Override
     public String toString(ConstantPool constants) {
         return hilight("fscommand(\"") + Helper.escapeString(command) + hilight("\")");
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, new ActionGetURL("FSCommand:" + command, ""));
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
     }
 }

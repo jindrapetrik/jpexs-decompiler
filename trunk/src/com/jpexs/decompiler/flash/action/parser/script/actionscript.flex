@@ -17,6 +17,8 @@
 package com.jpexs.decompiler.flash.action.parser.script;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import java.util.Stack;
+import java.util.List;
+import java.util.ArrayList;
 
 %% 
 
@@ -43,17 +45,43 @@ import java.util.Stack;
     public int yyline() {
         return yyline+1;
     }
+    private List<LexListener> listeners=new ArrayList<>();
+
+    public void addListener(LexListener listener){
+        listeners.add(listener);
+    }
+
+    public void removeListener(LexListener listener){
+        listeners.remove(listener);
+    }
+
+    public void informListenersLex(ParsedSymbol s){
+        for(LexListener l:listeners){
+            l.onLex(s);
+        }
+    }
+
+    public void informListenersPushBack(ParsedSymbol s){
+        for(LexListener l:listeners){
+            l.onPushBack(s);
+        }
+    }
 
     public void pushback(ParsedSymbol symb) {
         pushedBack.push(symb);
         last = null;
+        informListenersPushBack(symb);
     }
     ParsedSymbol last;
     public ParsedSymbol lex() throws java.io.IOException, ParseException{
+        ParsedSymbol ret=null;
         if(!pushedBack.isEmpty()){
-            return last=pushedBack.pop();
+            ret = last = pushedBack.pop();
+        }else{
+            ret = last = yylex();
         }
-        return last=yylex();
+        informListenersLex(ret);
+        return ret;
     }
 
 %}
@@ -195,6 +223,15 @@ SingleCharacter = [^\r\n\'\\]
   "Infinity"                     { return new ParsedSymbol(SymbolGroup.GLOBALCONST,SymbolType.INFINITY,yytext()); }
   "NaN"                          { return new ParsedSymbol(SymbolGroup.GLOBALCONST,SymbolType.NAN,yytext()); }
   "getVersion"                   { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.GETVERSION,yytext()); }
+  "call"                         { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.CALL,yytext()); }
+  "loadMovieNum"                 { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.LOADMOVIENUM,yytext()); }
+  "loadVariablesNum"             { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.LOADVARIABLESNUM,yytext()); }
+  "printAsBitmapNum"             { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.PRINTASBITMAPNUM,yytext()); }
+  "printNum"                     { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.PRINTNUM,yytext()); }
+  "printAsBitmap"                { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.PRINTASBITMAP,yytext()); }
+  "print"                        { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.PRINT,yytext()); }
+  "unloadMovie"                  { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.UNLOADMOVIE,yytext()); }
+  "unloadMovieNum"               { return new ParsedSymbol(SymbolGroup.GLOBALFUNC,SymbolType.UNLOADMOVIENUM,yytext()); }
   
 
   /* operators */

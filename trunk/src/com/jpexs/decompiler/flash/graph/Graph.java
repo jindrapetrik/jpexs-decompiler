@@ -1792,7 +1792,7 @@ public class Graph {
                             checkContinueAtTheEnd(finalComm, currentLoop);
                         }
                         if (!finalComm.isEmpty()) {
-                            ret.add(index, li = new ForTreeItem(null, currentLoop, new ArrayList<GraphTargetItem>(), exprList.get(exprList.size() - 1), finalComm, commands));
+                            ret.add(index, li = new ForItem(null, currentLoop, new ArrayList<GraphTargetItem>(), exprList.get(exprList.size() - 1), finalComm, commands));
                         } else {
                             ret.add(index, li = new WhileItem(null, currentLoop, exprList, commands));
                         }

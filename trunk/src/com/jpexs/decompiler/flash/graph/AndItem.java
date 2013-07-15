@@ -33,4 +33,14 @@ public class AndItem extends BinaryOpItem {
         this.leftSide = leftSide;
         this.rightSide = rightSide;
     }
+
+    @Override
+    public boolean hasReturnValue() {
+        return true;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return generator.generate(localData, this);
+    }
 }

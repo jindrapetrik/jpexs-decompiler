@@ -16,21 +16,37 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf4.ActionStringLength;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.List;
 
-public class WaitForFrameTreeItem extends TreeItem {
+public class StringLengthTreeItem extends TreeItem {
 
-    public int frame;
-    public int skipCount;
-
-    public WaitForFrameTreeItem(GraphSourceItem instruction, int frame, int skipCount) {
+    //public GraphTargetItem value;
+    public StringLengthTreeItem(GraphSourceItem instruction, GraphTargetItem value) {
         super(instruction, PRECEDENCE_PRIMARY);
-        this.frame = frame;
-        this.skipCount = skipCount;
+        this.value = value;
     }
 
     @Override
     public String toString(ConstantPool constants) {
-        return hilight("waitForFrame(") + frame + "," + skipCount + hilight(")");
+        return hilight("length(") + value.toString(constants) + hilight(")");
+    }
+
+    @Override
+    public boolean isCompileTime() {
+        return false;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, value, new ActionStringLength());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return true;
     }
 }

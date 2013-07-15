@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.graph;
 
 import java.util.List;
 
-public abstract class BinaryOpItem extends GraphTargetItem {
+public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
 
     public GraphTargetItem leftSide;
     public GraphTargetItem rightSide;
@@ -138,4 +138,33 @@ public abstract class BinaryOpItem extends GraphTargetItem {
      }
      return true;
      }*/
+    @Override
+    public GraphTargetItem getLeftSide() {
+        return leftSide;
+    }
+
+    @Override
+    public GraphTargetItem getRightSide() {
+        return rightSide;
+    }
+
+    @Override
+    public void setLeftSide(GraphTargetItem value) {
+        leftSide = value;
+    }
+
+    @Override
+    public void setRightSide(GraphTargetItem value) {
+        rightSide = value;
+    }
+
+    @Override
+    public int getPrecedence() {
+        return precedence;
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return true;
+    }
 }

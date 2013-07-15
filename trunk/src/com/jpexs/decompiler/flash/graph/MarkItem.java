@@ -44,4 +44,9 @@ public class MarkItem extends GraphTargetItem {
     public boolean isEmpty() {
         return true;
     }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
+    }
 }

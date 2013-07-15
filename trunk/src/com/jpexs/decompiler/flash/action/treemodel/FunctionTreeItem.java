@@ -16,10 +16,23 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.parser.script.ActionScriptSourceGenerator;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
+import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
+import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
+import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
+import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.graph.Graph;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import com.jpexs.decompiler.flash.helpers.Helper;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.TreeSet;
 
 public class FunctionTreeItem extends TreeItem {
 
@@ -29,6 +42,12 @@ public class FunctionTreeItem extends TreeItem {
     public List<String> paramNames;
     public GraphTargetItem calculatedFunctionName;
     private int regStart;
+    public static final int REGISTER_THIS = 1;
+    public static final int REGISTER_ARGUMENTS = 2;
+    public static final int REGISTER_SUPER = 3;
+    public static final int REGISTER_ROOT = 4;
+    public static final int REGISTER_PARENT = 5;
+    public static final int REGISTER_GLOBAL = 6;
 
     public FunctionTreeItem(GraphSourceItem instruction, String functionName, List<String> paramNames, List<GraphTargetItem> actions, List<String> constants, int regStart) {
         super(instruction, PRECEDENCE_PRIMARY);
@@ -103,5 +122,183 @@ public class FunctionTreeItem extends TreeItem {
     @Override
     public boolean needsNewLine() {
         return true;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        List<GraphSourceItem> ret = new ArrayList<>();
+        ActionScriptSourceGenerator asGenerator = (ActionScriptSourceGenerator) generator;
+        List<Integer> paramRegs = new ArrayList<>();
+        @SuppressWarnings("unchecked")
+        List<Object> localDataCopy = (List<Object>) Helper.deepCopy(localData);
+        HashMap<String, Integer> registerVars = asGenerator.getRegisterVars(localDataCopy);
+        registerVars.put("_parent", REGISTER_PARENT);
+        registerVars.put("_root", REGISTER_ROOT);
+        registerVars.put("super", REGISTER_SUPER);
+        registerVars.put("arguments", REGISTER_ARGUMENTS);
+        registerVars.put("this", REGISTER_THIS);
+        registerVars.put("_global", REGISTER_GLOBAL);
+        for (int i = 0; i < paramNames.size(); i++) {
+            registerVars.put(paramNames.get(i), (7 + i)); //(paramNames.size() - i)));
+        }
+        boolean preloadParentFlag = false;
+        boolean preloadRootFlag = false;
+        boolean preloadSuperFlag = false;
+        boolean preloadArgumentsFlag = false;
+        boolean preloadThisFlag = false;
+        boolean preloadGlobalFlag = false;
+
+        boolean suppressParentFlag = false;
+        boolean suppressArgumentsFlag = false;
+        boolean suppressThisFlag = false;
+        TreeSet<Integer> usedRegisters = new TreeSet<>();
+        if (actions != null && !actions.isEmpty()) {
+            asGenerator.setInFunction(localDataCopy, true);
+            List<Action> body = asGenerator.toActionList(asGenerator.generate(localDataCopy, actions));
+            for (Action a : body) {
+                if (a instanceof ActionStoreRegister) {
+                    usedRegisters.add(((ActionStoreRegister) a).registerNumber);
+                }
+                if (a instanceof ActionPush) {
+                    ActionPush ap = (ActionPush) a;
+                    for (Object o : ap.values) {
+                        if (o instanceof RegisterNumber) {
+                            usedRegisters.add(((RegisterNumber) o).number);
+                        }
+                    }
+                }
+            }
+            if (usedRegisters.contains(REGISTER_PARENT)) {
+                preloadParentFlag = true;
+            } else {
+                suppressParentFlag = true;
+            }
+            if (usedRegisters.contains(REGISTER_ROOT)) {
+                preloadRootFlag = true;
+            }
+            if (usedRegisters.contains(REGISTER_SUPER)) {
+                preloadSuperFlag = true;
+            }
+            if (usedRegisters.contains(REGISTER_ARGUMENTS)) {
+                preloadArgumentsFlag = true;
+            } else {
+                suppressArgumentsFlag = true;
+            }
+            if (usedRegisters.contains(REGISTER_THIS)) {
+                preloadThisFlag = true;
+            } else {
+                suppressThisFlag = true;
+            }
+            if (usedRegisters.contains(REGISTER_GLOBAL)) {
+                preloadGlobalFlag = true;
+            }
+
+            int newpos = 1;
+            HashMap<Integer, Integer> registerMap = new HashMap<>();
+            if (preloadThisFlag) {
+                registerMap.put(REGISTER_THIS, newpos);
+                newpos++;
+            }
+            if (preloadArgumentsFlag) {
+                registerMap.put(REGISTER_ARGUMENTS, newpos);
+                newpos++;
+            }
+            if (preloadSuperFlag) {
+                registerMap.put(REGISTER_SUPER, newpos);
+                newpos++;
+            }
+            if (preloadRootFlag) {
+                registerMap.put(REGISTER_ROOT, newpos);
+                newpos++;
+            }
+            if (preloadParentFlag) {
+                registerMap.put(REGISTER_PARENT, newpos);
+                newpos++;
+            }
+            if (preloadGlobalFlag) {
+                registerMap.put(REGISTER_GLOBAL, newpos);
+                newpos++;
+            }
+            if (newpos < 1) {
+                newpos = 1;
+            }
+            for (int i = 0; i < 256; i++) {
+                if (usedRegisters.contains(7 + i)) {
+                    registerMap.put(7 + i, newpos);
+                    if (i < paramNames.size()) {
+                        paramRegs.add(newpos);
+                    }
+                    newpos++;
+                } else {
+                    if (i < paramNames.size()) {
+                        paramRegs.add(0);
+                    }
+                }
+            }
+
+            TreeSet<Integer> usedRegisters2 = new TreeSet<>();
+            for (int i : usedRegisters) {
+                if (registerMap.get(i) == null) {
+                    usedRegisters2.add(i);
+                } else {
+                    usedRegisters2.add(registerMap.get(i));
+                }
+            }
+            usedRegisters = usedRegisters2;
+
+            for (Action a : body) {
+                if (a instanceof ActionStoreRegister) {
+                    if (registerMap.containsKey(((ActionStoreRegister) a).registerNumber)) {
+                        ((ActionStoreRegister) a).registerNumber = registerMap.get(((ActionStoreRegister) a).registerNumber);
+                    }
+                }
+                if (a instanceof ActionPush) {
+                    ActionPush ap = (ActionPush) a;
+                    for (Object o : ap.values) {
+                        if (o instanceof RegisterNumber) {
+                            if (registerMap.containsKey(((RegisterNumber) o).number)) {
+                                ((RegisterNumber) o).number = registerMap.get(((RegisterNumber) o).number);
+                            }
+                        }
+                    }
+                }
+            }
+            ret.addAll(body);
+        } else {
+            for (int i = 0; i < paramNames.size(); i++) {
+                paramRegs.add(1 + i);
+            }
+        }
+        int len = Action.actionsToBytes(asGenerator.toActionList(ret), false, SWF.DEFAULT_VERSION).length;
+        if ((!preloadParentFlag)
+                && (!preloadRootFlag)
+                && (!preloadSuperFlag)
+                && (!preloadArgumentsFlag)
+                && (!preloadThisFlag)
+                && (!preloadGlobalFlag)
+                && (suppressArgumentsFlag)
+                && (suppressThisFlag)
+                && (suppressParentFlag)
+                && usedRegisters.isEmpty()) {
+            ret.add(0, new ActionDefineFunction(functionName, paramNames, len, SWF.DEFAULT_VERSION));
+        } else {
+            ret.add(0, new ActionDefineFunction2(functionName,
+                    preloadParentFlag,
+                    preloadRootFlag,
+                    suppressParentFlag,
+                    preloadSuperFlag,
+                    suppressArgumentsFlag,
+                    preloadArgumentsFlag,
+                    suppressThisFlag,
+                    preloadThisFlag,
+                    preloadGlobalFlag,
+                    usedRegisters.isEmpty() ? 0 : (usedRegisters.last() + 1), len, SWF.DEFAULT_VERSION, paramNames, paramRegs));
+        }
+        return ret;
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false; //function actually returns itself, but here is false for generator to not add Pop
     }
 }

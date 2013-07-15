@@ -16,8 +16,11 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf4.ActionGetURL2;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.List;
 
 /**
  *
@@ -46,5 +49,15 @@ public class LoadVariablesTreeItem extends TreeItem {
             methodStr = ",\"POST\"";
         }
         return hilight("loadVariables(") + urlString.toString(constants) + hilight(",") + targetString.toString(constants) + hilight(methodStr + ")");
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, urlString, targetString, new ActionGetURL2(method, false, true));
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
     }
 }

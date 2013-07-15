@@ -16,30 +16,29 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf4.ActionEndDrag;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import java.util.List;
 
-public class EachTreeItem extends TreeItem {
-
-    public TreeItem object;
-    public TreeItem collection;
-
-    public EachTreeItem(GraphSourceItem instruction, TreeItem object, TreeItem collection) {
-        super(instruction, NOPRECEDENCE);
-        this.object = object;
-        this.collection = collection;
-    }
+public class StopDragTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return hilight("each (") + object.toString(constants) + hilight(" in ") + collection.toString(constants) + ")";
+        return hilight("stopDrag()");
+    }
+
+    public StopDragTreeItem(GraphSourceItem instruction) {
+        super(instruction, PRECEDENCE_PRIMARY);
     }
 
     @Override
-    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-        ret.addAll(object.getNeededSources());
-        ret.addAll(collection.getNeededSources());
-        return ret;
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, new ActionEndDrag());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
     }
 }

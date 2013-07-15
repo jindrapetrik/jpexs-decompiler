@@ -17,9 +17,13 @@
 package com.jpexs.decompiler.flash.action.treemodel.clauses;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.parser.script.ActionScriptSourceGenerator;
 import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
 import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -58,6 +62,19 @@ public class InterfaceTreeItem extends TreeItem {
 
     @Override
     public boolean needsSemicolon() {
+        return false;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        List<GraphSourceItem> ret = new ArrayList<>();
+        ActionScriptSourceGenerator asGenerator = (ActionScriptSourceGenerator) generator;
+        ret.addAll(asGenerator.generateTraits(localData, true, name, null, superInterfaces, null, null, null, null, null));
+        return ret;
+    }
+
+    @Override
+    public boolean hasReturnValue() {
         return false;
     }
 }

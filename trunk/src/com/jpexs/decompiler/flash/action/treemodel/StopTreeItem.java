@@ -16,19 +16,29 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf3.ActionStop;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.List;
 
-public class SimpleActionTreeItem extends TreeItem {
-
-    private String actionString;
+public class StopTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return hilight(actionString);
+        return hilight("stop()");
     }
 
-    public SimpleActionTreeItem(GraphSourceItem instruction, String actionString) {
+    public StopTreeItem(GraphSourceItem instruction) {
         super(instruction, PRECEDENCE_PRIMARY);
-        this.actionString = actionString;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, new ActionStop());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
     }
 }

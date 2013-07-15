@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.clauses;
 
+import com.jpexs.decompiler.flash.action.swf4.ActionWaitForFrame2;
 import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
 import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.graph.Block;
@@ -23,6 +24,7 @@ import com.jpexs.decompiler.flash.graph.ContinueItem;
 import com.jpexs.decompiler.flash.graph.Graph;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,5 +63,16 @@ public class IfFrameLoadedTreeItem extends TreeItem implements Block {
         List<List<GraphTargetItem>> ret = new ArrayList<>();
         ret.add(actions);
         return ret;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        List<GraphSourceItem> body = generator.generate(localData, actions);
+        return toSourceMerge(localData, generator, frame, new ActionWaitForFrame2(body.size()), body);
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
     }
 }

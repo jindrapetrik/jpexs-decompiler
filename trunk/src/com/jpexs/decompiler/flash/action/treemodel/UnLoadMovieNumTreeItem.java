@@ -16,7 +16,14 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.parser.script.ActionScriptSourceGenerator;
+import com.jpexs.decompiler.flash.action.swf4.ActionGetURL2;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
+import com.jpexs.decompiler.flash.action.treemodel.operations.AddTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.List;
 
 /**
  *
@@ -24,9 +31,9 @@ import com.jpexs.decompiler.flash.graph.GraphSourceItem;
  */
 public class UnLoadMovieNumTreeItem extends TreeItem {
 
-    private int num;
+    private GraphTargetItem num;
 
-    public UnLoadMovieNumTreeItem(GraphSourceItem instruction, int num) {
+    public UnLoadMovieNumTreeItem(GraphSourceItem instruction, GraphTargetItem num) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.num = num;
     }
@@ -34,5 +41,16 @@ public class UnLoadMovieNumTreeItem extends TreeItem {
     @Override
     public String toString(ConstantPool constants) {
         return hilight("unloadMovieNum(") + num + hilight(")");
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        ActionScriptSourceGenerator asGenerator = (ActionScriptSourceGenerator) generator;
+        return toSourceMerge(localData, generator, new ActionPush(""), new AddTreeItem(src, asGenerator.pushConstTargetItem("_level"), num, true), new ActionGetURL2(0, true, false));
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
     }
 }

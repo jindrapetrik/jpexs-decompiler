@@ -17,8 +17,11 @@
 package com.jpexs.decompiler.flash.action.treemodel;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.swf4.ActionGetProperty;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import java.util.List;
 
 public class GetPropertyTreeItem extends TreeItem {
@@ -45,5 +48,15 @@ public class GetPropertyTreeItem extends TreeItem {
         List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
         ret.addAll(target.getNeededSources());
         return ret;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, target, new ActionPush((Long) (long) propertyIndex), new ActionGetProperty());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return true;
     }
 }

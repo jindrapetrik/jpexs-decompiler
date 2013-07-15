@@ -16,9 +16,11 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf5.ActionCallMethod;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import java.util.List;
 
 public class CallMethodTreeItem extends TreeItem {
@@ -73,5 +75,15 @@ public class CallMethodTreeItem extends TreeItem {
             ret.addAll(ti.getNeededSources());
         }
         return ret;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, toSourceCall(localData, generator, arguments), scriptObject, methodName, new ActionCallMethod());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return true;
     }
 }

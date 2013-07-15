@@ -16,8 +16,10 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf4.ActionGetURL2;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import java.util.List;
 
 public class GetURL2TreeItem extends TreeItem {
@@ -52,5 +54,15 @@ public class GetURL2TreeItem extends TreeItem {
         ret.addAll(urlString.getNeededSources());
         ret.addAll(targetString.getNeededSources());
         return ret;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, urlString, targetString, new ActionGetURL2(sendVarsMethod, false, false));
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
     }
 }

@@ -16,8 +16,10 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf5.ActionGetMember;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import java.util.List;
 
 public class GetMemberTreeItem extends TreeItem {
@@ -71,6 +73,16 @@ public class GetMemberTreeItem extends TreeItem {
         if (this.memberName != other.memberName && (this.memberName == null || !this.memberName.equals(other.memberName))) {
             return false;
         }
+        return true;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, object, memberName, new ActionGetMember());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
         return true;
     }
 }

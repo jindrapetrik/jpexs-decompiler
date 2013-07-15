@@ -16,9 +16,14 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.parser.script.ActionScriptSourceGenerator;
+import com.jpexs.decompiler.flash.action.swf4.ActionGetURL2;
+import com.jpexs.decompiler.flash.action.treemodel.operations.AddTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
-import com.jpexs.decompiler.flash.helpers.Helper;
+import static com.jpexs.decompiler.flash.graph.GraphTargetItem.PRECEDENCE_PRIMARY;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.List;
 
 /**
  *
@@ -27,9 +32,9 @@ import com.jpexs.decompiler.flash.helpers.Helper;
 public class PrintAsBitmapTreeItem extends TreeItem {
 
     private GraphTargetItem target;
-    private String boundingBox;
+    private GraphTargetItem boundingBox;
 
-    public PrintAsBitmapTreeItem(GraphSourceItem instruction, GraphTargetItem target, String boundingBox) {
+    public PrintAsBitmapTreeItem(GraphSourceItem instruction, GraphTargetItem target, GraphTargetItem boundingBox) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.target = target;
         this.boundingBox = boundingBox;
@@ -37,6 +42,17 @@ public class PrintAsBitmapTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return hilight("printAsBitmap(") + target.toString(constants) + hilight(",") + "\"" + Helper.escapeString(boundingBox) + "\"" + hilight(")");
+        return hilight("printAsBitmap(") + target.toString(constants) + hilight(",") + boundingBox.toString(constants) + hilight(")");
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        ActionScriptSourceGenerator asGenerator = (ActionScriptSourceGenerator) generator;
+        return toSourceMerge(localData, generator, new AddTreeItem(src, asGenerator.pushConstTargetItem("printasbitmap:#"), boundingBox, true), target, new ActionGetURL2(0, false, false));
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
     }
 }

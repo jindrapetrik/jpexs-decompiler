@@ -16,11 +16,18 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.clauses;
 
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.parser.script.ActionScriptSourceGenerator;
+import com.jpexs.decompiler.flash.action.swf4.ActionJump;
+import com.jpexs.decompiler.flash.action.swf7.ActionTry;
 import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
 import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.graph.Block;
 import com.jpexs.decompiler.flash.graph.ContinueItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,7 +68,7 @@ public class TryTreeItem extends TreeItem implements Block {
         }
         ret += "}";
         for (int e = 0; e < catchExceptions.size(); e++) {
-            ret += "\r\ncatch(" + catchExceptions.get(e).toStringNoQuotes(localData) + ")\r\n{\r\n";
+            ret += "\r\ncatch(" + catchExceptions.get(e).toString(localData) + ")\r\n{\r\n";
             List<GraphTargetItem> commands = catchCommands.get(e);
             for (GraphTargetItem ti : commands) {
                 if (!ti.isEmpty()) {
@@ -118,6 +125,47 @@ public class TryTreeItem extends TreeItem implements Block {
 
     @Override
     public boolean needsSemicolon() {
+        return false;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        List<GraphSourceItem> ret = new ArrayList<>();
+        ActionScriptSourceGenerator asGenerator = (ActionScriptSourceGenerator) generator;
+        List<Action> tryCommandsA = asGenerator.toActionList(asGenerator.generate(localData, tryCommands));
+        List<Action> finallyCommandsA = finallyCommands == null ? null : asGenerator.toActionList(asGenerator.generate(localData, finallyCommands));
+        List<Action> catchCommandsA = null;
+        String catchName = null;
+        if (catchExceptions != null) {
+            if (!catchExceptions.isEmpty()) {
+                catchName = catchExceptions.get(0).toStringNoQuotes(new ConstantPool(asGenerator.getConstantPool()));
+            }
+
+        }
+        int catchSize = 0;
+        if (catchCommands != null && !catchCommands.isEmpty()) {
+            catchCommandsA = asGenerator.toActionList(asGenerator.generate(localData, catchCommands.get(0)));
+            catchSize = Action.actionsToBytes(catchCommandsA, false, SWF.DEFAULT_VERSION).length;
+            tryCommandsA.add(new ActionJump(catchSize));
+        }
+        int finallySize = 0;
+        if (finallyCommandsA != null) {
+            finallySize = Action.actionsToBytes(finallyCommandsA, false, SWF.DEFAULT_VERSION).length;
+        }
+        int trySize = Action.actionsToBytes(tryCommandsA, false, SWF.DEFAULT_VERSION).length;
+        ret.add(new ActionTry(false, finallyCommands != null, catchCommands != null, catchName, 0, trySize, catchSize, finallySize, SWF.DEFAULT_VERSION));
+        ret.addAll(tryCommandsA);
+        if (catchCommandsA != null) {
+            ret.addAll(catchCommandsA);
+        }
+        if (finallyCommandsA != null) {
+            ret.addAll(finallyCommandsA);
+        }
+        return ret;
+    }
+
+    @Override
+    public boolean hasReturnValue() {
         return false;
     }
 }

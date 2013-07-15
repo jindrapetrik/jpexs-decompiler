@@ -47,7 +47,7 @@ public class SwitchItem extends LoopItem implements Block {
     @Override
     public String toString(List<Object> localData) {
         String ret = "";
-        ret += "loop" + loop.id + ":\r\n";
+        ret += "loopswitch" + loop.id + ":\r\n";
         ret += hilight("switch(") + switchedObject.toString(localData) + hilight(")") + "\r\n{\r\n";
         for (int i = 0; i < caseCommands.size(); i++) {
             for (int k = 0; k < valuesMapping.size(); k++) {
@@ -105,5 +105,15 @@ public class SwitchItem extends LoopItem implements Block {
             }
         }
         return ret;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return generator.generate(localData, this);
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
     }
 }

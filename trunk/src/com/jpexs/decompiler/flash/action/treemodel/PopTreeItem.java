@@ -16,7 +16,10 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf4.ActionPop;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.List;
 
 /**
  *
@@ -41,5 +44,15 @@ public class PopTreeItem extends TreeItem {
     @Override
     public boolean isEmpty() {
         return true;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, new ActionPop());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
     }
 }

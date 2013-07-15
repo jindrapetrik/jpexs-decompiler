@@ -16,8 +16,10 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf4.ActionCloneSprite;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import java.util.List;
 
 public class CloneSpriteTreeItem extends TreeItem {
@@ -45,5 +47,15 @@ public class CloneSpriteTreeItem extends TreeItem {
         ret.addAll(target.getNeededSources());
         ret.addAll(depth.getNeededSources());
         return ret;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, source, target, depth, new ActionCloneSprite());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
     }
 }

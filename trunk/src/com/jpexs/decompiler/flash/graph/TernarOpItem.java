@@ -35,4 +35,14 @@ public class TernarOpItem extends GraphTargetItem {
     public String toString(List<Object> localData) {
         return expression.toString(localData) + hilight("?") + onTrue.toString(localData) + hilight(":") + onFalse.toString(localData);
     }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return generator.generate(localData, this);
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return true;
+    }
 }

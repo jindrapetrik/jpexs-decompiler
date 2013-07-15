@@ -109,4 +109,9 @@ public abstract class TreeItem extends GraphTargetItem {
             return "_loc" + reg + "_";
         }
     }
+
+    @Override
+    public boolean hasReturnValue() {
+        throw new UnsupportedOperationException(); //Not supported in AVM2 yet
+    }
 }

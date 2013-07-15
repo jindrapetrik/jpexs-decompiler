@@ -31,4 +31,9 @@ public class UnsupportedTreeItem extends TreeItem {
     public String toString(ConstantPool constants) {
         return "//Unsupported by decompiler:" + value;
     }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
+    }
 }

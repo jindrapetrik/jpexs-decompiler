@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.SimpleActionTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.StopDragTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +36,6 @@ public class ActionEndDrag extends Action {
 
     @Override
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
-        output.add(new SimpleActionTreeItem(this, "stopDrag()"));
+        output.add(new StopDragTreeItem(this));
     }
 }

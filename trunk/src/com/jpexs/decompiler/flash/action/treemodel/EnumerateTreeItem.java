@@ -41,4 +41,9 @@ public class EnumerateTreeItem extends TreeItem {
         ret.addAll(object.getNeededSources());
         return ret;
     }
+
+    @Override
+    public boolean hasReturnValue() {
+        return true;
+    }
 }

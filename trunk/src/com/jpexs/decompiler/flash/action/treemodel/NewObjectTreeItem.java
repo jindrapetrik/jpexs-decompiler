@@ -16,8 +16,10 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf5.ActionNewObject;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import java.util.List;
 
 public class NewObjectTreeItem extends TreeItem {
@@ -51,5 +53,15 @@ public class NewObjectTreeItem extends TreeItem {
             ret.addAll(ti.getNeededSources());
         }
         return ret;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, toSourceCall(localData, generator, arguments), objectName, new ActionNewObject());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return true;
     }
 }

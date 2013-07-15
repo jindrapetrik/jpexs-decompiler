@@ -92,4 +92,9 @@ public class ForEachInTreeItem extends LoopItem implements Block {
         }
         return ret;
     }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
+    }
 }

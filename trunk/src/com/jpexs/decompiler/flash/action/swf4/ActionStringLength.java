@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.operations.StringLengthTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.StringLengthTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;

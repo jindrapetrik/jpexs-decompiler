@@ -16,7 +16,10 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf4.ActionGetTime;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.List;
 import java.util.Random;
 
 public class GetTimeTreeItem extends TreeItem {
@@ -38,5 +41,15 @@ public class GetTimeTreeItem extends TreeItem {
     @Override
     public Object getResult() {
         return (Double) (double) new Random().nextInt(10000) + 1000;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, new ActionGetTime());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return true;
     }
 }

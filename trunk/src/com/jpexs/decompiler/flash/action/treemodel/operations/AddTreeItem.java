@@ -17,10 +17,13 @@
 package com.jpexs.decompiler.flash.action.treemodel.operations;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.swf5.ActionAdd2;
 import com.jpexs.decompiler.flash.ecma.*;
 import com.jpexs.decompiler.flash.graph.BinaryOpItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.List;
 
 public class AddTreeItem extends BinaryOpItem {
 
@@ -41,5 +44,10 @@ public class AddTreeItem extends BinaryOpItem {
         } else {
             return Action.toFloatPoint(leftSide.getResult()) + Action.toFloatPoint(rightSide.getResult());
         }
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, leftSide, rightSide, new ActionAdd2());
     }
 }

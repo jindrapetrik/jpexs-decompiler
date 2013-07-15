@@ -188,4 +188,41 @@ public abstract class GraphTargetItem {
     public boolean valueEquals(GraphTargetItem target) {
         return equals(target);
     }
+
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return new ArrayList<>();
+    }
+
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(List<Object> localData, SourceGenerator generator) {
+        return toSource(localData, generator);
+    }
+
+    protected List<GraphSourceItem> toSourceBinary(BinaryOp op, GraphSourceItem action) {
+        List<GraphSourceItem> ret = new ArrayList<>();
+
+        return ret;
+    }
+
+    protected List<GraphSourceItem> toSourceMerge(List<Object> localData, SourceGenerator gen, Object... tar) {
+        List<GraphSourceItem> ret = new ArrayList<>();
+        for (Object o : tar) {
+            if (o instanceof GraphTargetItem) {
+                ret.addAll(((GraphTargetItem) o).toSource(localData, gen));
+            }
+            if (o instanceof GraphSourceItem) {
+                ret.add((GraphSourceItem) o);
+            }
+            if (o instanceof List) {
+                List l = (List) o;
+                for (Object o2 : l) {
+                    if (o2 instanceof GraphSourceItem) {
+                        ret.add((GraphSourceItem) o2);
+                    }
+                }
+            }
+        }
+        return ret;
+    }
+
+    public abstract boolean hasReturnValue();
 }

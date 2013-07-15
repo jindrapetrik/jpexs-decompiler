@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.graph;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ForTreeItem extends LoopItem implements Block {
+public class ForItem extends LoopItem implements Block {
 
     public List<GraphTargetItem> firstCommands;
     public GraphTargetItem expression;
@@ -35,7 +35,7 @@ public class ForTreeItem extends LoopItem implements Block {
         return ret;
     }
 
-    public ForTreeItem(GraphSourceItem src, Loop loop, List<GraphTargetItem> firstCommands, GraphTargetItem expression, List<GraphTargetItem> finalCommands, List<GraphTargetItem> commands) {
+    public ForItem(GraphSourceItem src, Loop loop, List<GraphTargetItem> firstCommands, GraphTargetItem expression, List<GraphTargetItem> finalCommands, List<GraphTargetItem> commands) {
         super(src, loop);
         this.firstCommands = firstCommands;
         this.expression = expression;
@@ -109,5 +109,15 @@ public class ForTreeItem extends LoopItem implements Block {
             }
         }
         return ret;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return generator.generate(localData, this);
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
     }
 }

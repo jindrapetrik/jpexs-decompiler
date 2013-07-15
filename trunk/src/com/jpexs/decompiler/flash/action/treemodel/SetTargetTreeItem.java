@@ -17,7 +17,9 @@
 package com.jpexs.decompiler.flash.action.treemodel;
 
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import com.jpexs.decompiler.flash.helpers.Helper;
+import java.util.List;
 
 public class SetTargetTreeItem extends TreeItem {
 
@@ -31,5 +33,15 @@ public class SetTargetTreeItem extends TreeItem {
     @Override
     public String toString(ConstantPool constants) {
         return hilight("tellTarget(\"") + Helper.escapeString(target) + hilight("\")");
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
     }
 }

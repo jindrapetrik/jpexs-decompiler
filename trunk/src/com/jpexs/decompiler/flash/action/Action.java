@@ -298,9 +298,7 @@ public class Action implements GraphSourceItem {
      * @return Array of bytes
      */
     public byte[] getBytes(int version) {
-        byte ret[] = new byte[1];
-        ret[0] = (byte) actionCode;
-        return ret;
+        return surroundWithAction(new byte[0], version);
     }
 
     /**
@@ -315,7 +313,9 @@ public class Action implements GraphSourceItem {
         SWFOutputStream sos2 = new SWFOutputStream(baos2, version);
         try {
             sos2.writeUI8(actionCode);
-            sos2.writeUI16(data.length);
+            if (actionCode >= 0x80) {
+                sos2.writeUI16(data.length);
+            }
             sos2.write(data);
             sos2.close();
         } catch (IOException e) {
@@ -1075,7 +1075,7 @@ public class Action implements GraphSourceItem {
                                                         for (int i = 0; i < prevCount; i++) {
                                                             output2.add(output.get(i));
                                                         }
-                                                        output2.add(new ClassTreeItem(className, extendsOp, implementsOp, functions, vars, staticFunctions, staticVars));
+                                                        output2.add(new ClassTreeItem(className, extendsOp, implementsOp, null/*FIXME*/, functions, vars, staticFunctions, staticVars));
                                                         return output2;
                                                     }
 
@@ -1143,7 +1143,7 @@ public class Action implements GraphSourceItem {
                                                             for (int i = 0; i < prevCount; i++) {
                                                                 output2.add(output.get(i));
                                                             }
-                                                            output2.add(new ClassTreeItem(className, extendsOp, implementsOp, functions, vars, staticFunctions, staticVars));
+                                                            output2.add(new ClassTreeItem(className, extendsOp, implementsOp, null/*FIXME*/, functions, vars, staticFunctions, staticVars));
                                                             return output2;
                                                         }
                                                         /*if (parts.get(pos) instanceof PopTreeItem) {
@@ -1209,7 +1209,7 @@ public class Action implements GraphSourceItem {
                                                             for (int i = 0; i < prevCount; i++) {
                                                                 output2.add(output.get(i));
                                                             }
-                                                            output2.add(new ClassTreeItem(className, extendsOp, implementsOp, functions, vars, staticFunctions, staticVars));
+                                                            output2.add(new ClassTreeItem(className, extendsOp, implementsOp, null/*FIXME*/, functions, vars, staticFunctions, staticVars));
                                                             return output2;
                                                         }
                                                     } else {
@@ -1344,5 +1344,22 @@ public class Action implements GraphSourceItem {
     @Override
     public int getFixBranch() {
         return fixedBranch;
+    }
+
+    public static GraphTargetItem gettoset(GraphTargetItem get, GraphTargetItem value) {
+        GraphTargetItem ret = get;
+        if (ret instanceof GetVariableTreeItem) {
+            GetVariableTreeItem gv = (GetVariableTreeItem) ret;
+            ret = new SetVariableTreeItem(null, gv.name, value);
+        } else if (ret instanceof GetMemberTreeItem) {
+            GetMemberTreeItem mem = (GetMemberTreeItem) ret;
+            ret = new SetMemberTreeItem(null, mem.object, mem.memberName, value);
+        } else if ((ret instanceof DirectValueTreeItem) && ((DirectValueTreeItem) ret).value instanceof RegisterNumber) {
+            ret = new StoreRegisterTreeItem(null, (RegisterNumber) ((DirectValueTreeItem) ret).value, value, false);
+        } else if (ret instanceof GetPropertyTreeItem) {
+            GetPropertyTreeItem gp = (GetPropertyTreeItem) ret;
+            ret = new SetPropertyTreeItem(null, gp.target, gp.propertyIndex, value);
+        }
+        return ret;
     }
 }

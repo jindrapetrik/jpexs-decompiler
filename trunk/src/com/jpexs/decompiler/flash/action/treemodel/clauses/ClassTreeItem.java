@@ -17,11 +17,14 @@
 package com.jpexs.decompiler.flash.action.treemodel.clauses;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.parser.script.ActionScriptSourceGenerator;
 import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
 import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
 import com.jpexs.decompiler.flash.graph.Block;
 import com.jpexs.decompiler.flash.graph.ContinueItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import java.util.ArrayList;
@@ -34,6 +37,7 @@ public class ClassTreeItem extends TreeItem implements Block {
     public GraphTargetItem extendsOp;
     public List<GraphTargetItem> implementsOp;
     public GraphTargetItem className;
+    public GraphTargetItem constructor;
     public List<MyEntry<GraphTargetItem, GraphTargetItem>> vars;
     public List<MyEntry<GraphTargetItem, GraphTargetItem>> staticVars;
 
@@ -45,7 +49,7 @@ public class ClassTreeItem extends TreeItem implements Block {
         return ret;
     }
 
-    public ClassTreeItem(GraphTargetItem className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, List<GraphTargetItem> functions, List<MyEntry<GraphTargetItem, GraphTargetItem>> vars, List<GraphTargetItem> staticFunctions, List<MyEntry<GraphTargetItem, GraphTargetItem>> staticVars) {
+    public ClassTreeItem(GraphTargetItem className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, GraphTargetItem constructor, List<GraphTargetItem> functions, List<MyEntry<GraphTargetItem, GraphTargetItem>> vars, List<GraphTargetItem> staticFunctions, List<MyEntry<GraphTargetItem, GraphTargetItem>> staticVars) {
         super(null, NOPRECEDENCE);
         this.className = className;
         this.functions = functions;
@@ -54,6 +58,7 @@ public class ClassTreeItem extends TreeItem implements Block {
         this.implementsOp = implementsOp;
         this.staticFunctions = staticFunctions;
         this.staticVars = staticVars;
+        this.constructor = constructor;
     }
 
     @Override
@@ -99,6 +104,22 @@ public class ClassTreeItem extends TreeItem implements Block {
 
     @Override
     public boolean needsSemicolon() {
+        return false;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        List<GraphSourceItem> ret = new ArrayList<>();
+        ActionScriptSourceGenerator asGenerator = (ActionScriptSourceGenerator) generator;
+        @SuppressWarnings("unchecked")
+        List<Object> localData2 = (List<Object>) Helper.deepCopy(localData);
+        asGenerator.setInMethod(localData2, true);
+        ret.addAll(asGenerator.generateTraits(localData2, false, className, extendsOp, implementsOp, constructor, functions, vars, staticFunctions, staticVars));
+        return ret;
+    }
+
+    @Override
+    public boolean hasReturnValue() {
         return false;
     }
 }

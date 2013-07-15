@@ -16,8 +16,11 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal;
+import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal2;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import java.util.List;
 
 public class DefineLocalTreeItem extends TreeItem implements SetTypeTreeItem {
@@ -71,5 +74,20 @@ public class DefineLocalTreeItem extends TreeItem implements SetTypeTreeItem {
     @Override
     public GraphTargetItem getObject() {
         return new DefineLocalTreeItem(src, name, null);
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        if (value == null) {
+            return toSourceMerge(localData, generator, name, new ActionDefineLocal2());
+        } else {
+            return toSourceMerge(localData, generator, name, value, new ActionDefineLocal());
+        }
+
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
     }
 }

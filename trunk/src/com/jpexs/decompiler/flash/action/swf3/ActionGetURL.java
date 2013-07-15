@@ -41,6 +41,12 @@ public class ActionGetURL extends Action {
     public String urlString;
     public String targetString;
 
+    public ActionGetURL(String urlString, String targetString) {
+        super(0x83, 0);
+        this.urlString = urlString;
+        this.targetString = targetString;
+    }
+
     public ActionGetURL(int actionLength, SWFInputStream sis, int version) throws IOException {
         super(0x83, actionLength);
         //byte data[] = sis.readBytes(actionLength);
@@ -86,10 +92,10 @@ public class ActionGetURL extends Action {
             try {
                 int num = Integer.valueOf(targetString.substring(levelPrefix.length()));
                 if (urlString.equals("")) {
-                    output.add(new UnLoadMovieNumTreeItem(this, num));
+                    output.add(new UnLoadMovieNumTreeItem(this, new DirectValueTreeItem((Long) (long) (int) num)));
                 } else {
                     DirectValueTreeItem urlStringDi = new DirectValueTreeItem(null, 0, urlString, new ArrayList<String>());
-                    output.add(new LoadMovieNumTreeItem(this, urlStringDi, num, 1/*GET*/));
+                    output.add(new LoadMovieNumTreeItem(this, urlStringDi, new DirectValueTreeItem((Long) (long) (int) num), 1/*GET*/));
                 }
                 return;
             } catch (NumberFormatException nfe) {

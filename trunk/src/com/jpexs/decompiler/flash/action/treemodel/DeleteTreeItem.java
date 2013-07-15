@@ -16,8 +16,10 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf5.ActionDelete;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import java.util.List;
 
 public class DeleteTreeItem extends TreeItem {
@@ -45,5 +47,15 @@ public class DeleteTreeItem extends TreeItem {
         ret.addAll(object.getNeededSources());
         ret.addAll(propertyName.getNeededSources());
         return ret;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, object, propertyName, new ActionDelete());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
     }
 }

@@ -16,8 +16,10 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf4.ActionCharToAscii;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import java.util.List;
 
 public class CharToAsciiTreeItem extends TreeItem {
@@ -64,5 +66,15 @@ public class CharToAsciiTreeItem extends TreeItem {
             return (int) c;
         }
         return 0;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, value, new ActionCharToAscii());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return true;
     }
 }

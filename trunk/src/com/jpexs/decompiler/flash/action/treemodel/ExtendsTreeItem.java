@@ -47,4 +47,9 @@ public class ExtendsTreeItem extends TreeItem {
         ret.addAll(superclass.getNeededSources());
         return ret;
     }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
+    }
 }

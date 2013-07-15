@@ -16,10 +16,13 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.operations;
 
+import com.jpexs.decompiler.flash.action.swf5.ActionModulo;
 import com.jpexs.decompiler.flash.ecma.*;
 import com.jpexs.decompiler.flash.graph.BinaryOpItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.List;
 
 public class ModuloTreeItem extends BinaryOpItem {
 
@@ -33,5 +36,10 @@ public class ModuloTreeItem extends BinaryOpItem {
             return Double.NaN;
         }
         return ((long) (double) EcmaScript.toNumber(leftSide.getResult())) % ((long) (double) EcmaScript.toNumber(rightSide.getResult()));
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, leftSide, rightSide, new ActionModulo());
     }
 }

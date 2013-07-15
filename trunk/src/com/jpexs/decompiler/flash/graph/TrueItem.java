@@ -16,4 +16,9 @@ public class TrueItem extends GraphTargetItem {
     public String toString(List<Object> localData) {
         return "true";
     }
+
+    @Override
+    public boolean hasReturnValue() {
+        return true;
+    }
 }

@@ -16,9 +16,11 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf5.ActionIncrement;
 import com.jpexs.decompiler.flash.ecma.*;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import java.util.List;
 
 public class IncrementTreeItem extends TreeItem {
@@ -50,5 +52,15 @@ public class IncrementTreeItem extends TreeItem {
         List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
         ret.addAll(object.getNeededSources());
         return ret;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, object, new ActionIncrement());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return true;
     }
 }

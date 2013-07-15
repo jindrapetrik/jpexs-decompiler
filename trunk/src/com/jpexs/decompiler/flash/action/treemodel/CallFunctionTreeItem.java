@@ -16,8 +16,10 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf5.ActionCallFunction;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import java.util.List;
 
 public class CallFunctionTreeItem extends TreeItem {
@@ -93,6 +95,16 @@ public class CallFunctionTreeItem extends TreeItem {
         if (this.arguments != other.arguments && (this.arguments == null || !this.arguments.equals(other.arguments))) {
             return false;
         }
+        return true;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, toSourceCall(localData, generator, arguments), functionName, new ActionCallFunction());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
         return true;
     }
 }

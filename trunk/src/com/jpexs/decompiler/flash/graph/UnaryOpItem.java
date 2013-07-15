@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.graph;
 
 import java.util.List;
 
-public abstract class UnaryOpItem extends GraphTargetItem {
+public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {
 
     public GraphTargetItem value;
     public String operator;
@@ -60,5 +60,20 @@ public abstract class UnaryOpItem extends GraphTargetItem {
     @Override
     public boolean hasSideEffect() {
         return value.hasSideEffect();
+    }
+
+    @Override
+    public int getPrecedence() {
+        return precedence;
+    }
+
+    @Override
+    public GraphTargetItem getValue() {
+        return value;
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return true;
     }
 }

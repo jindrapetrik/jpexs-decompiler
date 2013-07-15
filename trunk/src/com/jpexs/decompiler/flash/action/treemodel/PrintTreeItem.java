@@ -16,9 +16,13 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.parser.script.ActionScriptSourceGenerator;
+import com.jpexs.decompiler.flash.action.swf4.ActionGetURL2;
+import com.jpexs.decompiler.flash.action.treemodel.operations.AddTreeItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
-import com.jpexs.decompiler.flash.helpers.Helper;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.List;
 
 /**
  *
@@ -27,9 +31,9 @@ import com.jpexs.decompiler.flash.helpers.Helper;
 public class PrintTreeItem extends TreeItem {
 
     private GraphTargetItem target;
-    private String boundingBox;
+    private GraphTargetItem boundingBox;
 
-    public PrintTreeItem(GraphSourceItem instruction, GraphTargetItem target, String boundingBox) {
+    public PrintTreeItem(GraphSourceItem instruction, GraphTargetItem target, GraphTargetItem boundingBox) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.target = target;
         this.boundingBox = boundingBox;
@@ -37,6 +41,17 @@ public class PrintTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return hilight("print(") + target.toString(constants) + hilight(",") + "\"" + Helper.escapeString(boundingBox) + "\"" + hilight(")");
+        return hilight("print(") + target.toString(constants) + hilight(",") + boundingBox.toString(constants) + hilight(")");
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        ActionScriptSourceGenerator asGenerator = (ActionScriptSourceGenerator) generator;
+        return toSourceMerge(localData, generator, new AddTreeItem(src, asGenerator.pushConstTargetItem("print:#"), boundingBox, true), target, new ActionGetURL2(0, false, false));
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
     }
 }

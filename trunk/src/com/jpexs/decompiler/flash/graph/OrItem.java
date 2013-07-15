@@ -33,4 +33,14 @@ public class OrItem extends BinaryOpItem {
         ret.addAll(rightSide.getNeededSources());
         return ret;
     }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return generator.generate(localData, this);
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return true;
+    }
 }

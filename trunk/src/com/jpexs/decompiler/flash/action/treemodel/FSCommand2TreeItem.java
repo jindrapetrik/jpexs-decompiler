@@ -16,8 +16,12 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.flashlite.ActionFSCommand2;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FSCommand2TreeItem extends TreeItem {
@@ -50,5 +54,22 @@ public class FSCommand2TreeItem extends TreeItem {
             ret.addAll(ti.getNeededSources());
         }
         return ret;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        List<GraphSourceItem> ret = new ArrayList<>();
+        for (GraphTargetItem a : arguments) {
+            ret.addAll(a.toSource(localData, generator));
+        }
+        ret.addAll(command.toSource(localData, generator));
+        ret.add(new ActionPush((Long) (long) arguments.size()));
+        ret.add(new ActionFSCommand2());
+        return ret;
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return true; //FIXME ?
     }
 }

@@ -16,9 +16,11 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf4.ActionGetVariable;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import java.util.List;
 
 public class GetVariableTreeItem extends TreeItem {
@@ -97,6 +99,16 @@ public class GetVariableTreeItem extends TreeItem {
         if (this.name != other.name && (this.name == null || !this.name.equals(other.name))) {
             return false;
         }
+        return true;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, name, new ActionGetVariable());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
         return true;
     }
 }

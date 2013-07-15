@@ -16,8 +16,12 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf4.ActionGetURL2;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.List;
 
 /**
  *
@@ -35,5 +39,15 @@ public class UnLoadMovieTreeItem extends TreeItem {
     @Override
     public String toString(ConstantPool constants) {
         return hilight("unloadMovie(") + targetString.toString(constants) + hilight(")");
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, new ActionPush(""), targetString, new ActionGetURL2(0, true, false));
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
     }
 }

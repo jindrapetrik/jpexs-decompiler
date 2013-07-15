@@ -16,11 +16,15 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.operations;
 
+import com.jpexs.decompiler.flash.action.swf4.ActionNot;
+import com.jpexs.decompiler.flash.action.swf6.ActionStrictEquals;
 import com.jpexs.decompiler.flash.ecma.*;
 import com.jpexs.decompiler.flash.graph.BinaryOpItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.graph.LogicalOpItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.List;
 
 public class StrictNeqTreeItem extends BinaryOpItem implements LogicalOpItem {
 
@@ -39,5 +43,10 @@ public class StrictNeqTreeItem extends BinaryOpItem implements LogicalOpItem {
     @Override
     public GraphTargetItem invert() {
         return new StrictEqTreeItem(src, leftSide, rightSide);
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, leftSide, rightSide, new ActionStrictEquals(), new ActionNot());
     }
 }

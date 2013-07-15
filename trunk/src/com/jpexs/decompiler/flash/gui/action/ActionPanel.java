@@ -55,6 +55,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -655,11 +657,12 @@ public class ActionPanel extends JPanel implements ActionListener {
         } else if (e.getActionCommand().equals("SAVEDECOMPILED")) {
             try {
                 ActionScriptParser par = new ActionScriptParser();
-                src.setActions(par.parse(decompiledEditor.getText()), SWF.DEFAULT_VERSION);
+                src.setActions(par.actionsFromString(decompiledEditor.getText()), SWF.DEFAULT_VERSION);
                 setSource(this.src, false);
                 JOptionPane.showMessageDialog(this, translate("message.action.saved"));
                 setDecompiledEditMode(false);
             } catch (IOException ex) {
+                Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, "IOException during action compiling", ex);
             } catch (ParseException ex) {
                 JOptionPane.showMessageDialog(this, translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), translate("error"), JOptionPane.ERROR_MESSAGE);
             }

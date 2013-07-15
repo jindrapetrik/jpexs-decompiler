@@ -14,28 +14,31 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.action.treemodel.operations;
+package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.action.swf3.ActionPlay;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.List;
 
-public class StringLengthTreeItem extends TreeItem {
-
-    //public GraphTargetItem value;
-    public StringLengthTreeItem(GraphSourceItem instruction, GraphTargetItem value) {
-        super(instruction, PRECEDENCE_PRIMARY);
-        this.value = value;
-    }
+public class PlayTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return hilight("length(") + value.toString(constants) + hilight(")");
+        return hilight("play()");
+    }
+
+    public PlayTreeItem(GraphSourceItem instruction) {
+        super(instruction, PRECEDENCE_PRIMARY);
     }
 
     @Override
-    public boolean isCompileTime() {
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, new ActionPlay());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
         return false;
     }
 }

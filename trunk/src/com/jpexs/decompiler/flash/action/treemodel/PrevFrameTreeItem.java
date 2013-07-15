@@ -16,30 +16,29 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf3.ActionPrevFrame;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import java.util.List;
 
-public class WaitForFrame2TreeItem extends TreeItem {
-
-    public GraphTargetItem frame;
-    public int skipCount;
-
-    public WaitForFrame2TreeItem(GraphSourceItem instruction, GraphTargetItem frame, int skipCount) {
-        super(instruction, PRECEDENCE_PRIMARY);
-        this.frame = frame;
-        this.skipCount = skipCount;
-    }
+public class PrevFrameTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return hilight("waitForFrame2(") + frame.toString(constants) + "," + skipCount + hilight(")");
+        return hilight("prevFrame()");
+    }
+
+    public PrevFrameTreeItem(GraphSourceItem instruction) {
+        super(instruction, PRECEDENCE_PRIMARY);
     }
 
     @Override
-    public List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> getNeededSources() {
-        List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
-        ret.addAll(frame.getNeededSources());
-        return ret;
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, new ActionPrevFrame());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
     }
 }

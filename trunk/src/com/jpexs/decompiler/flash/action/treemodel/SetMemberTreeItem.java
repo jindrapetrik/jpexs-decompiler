@@ -16,9 +16,15 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.parser.script.ActionScriptSourceGenerator;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
+import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
+import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
+import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
 import com.jpexs.decompiler.flash.graph.GraphPart;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import java.util.List;
 
 public class SetMemberTreeItem extends TreeItem implements SetTypeTreeItem {
@@ -86,5 +92,22 @@ public class SetMemberTreeItem extends TreeItem implements SetTypeTreeItem {
     @Override
     public boolean hasSideEffect() {
         return true;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        ActionScriptSourceGenerator asGenerator = (ActionScriptSourceGenerator) generator;
+        int tmpReg = asGenerator.getTempRegister(localData);
+        return toSourceMerge(localData, generator, object, objectName, value, new ActionStoreRegister(tmpReg), new ActionSetMember(), new ActionPush(new RegisterNumber(tmpReg)));
+    }
+
+    @Override
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, object, objectName, value, new ActionSetMember());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
     }
 }

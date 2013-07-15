@@ -16,8 +16,12 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf4.ActionPop;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class TreeItem extends GraphTargetItem {
@@ -66,5 +70,23 @@ public abstract class TreeItem extends GraphTargetItem {
             return toString(c);
         }
         return toString((ConstantPool) localData.get(0));
+    }
+
+    protected List<GraphSourceItem> toSourceCall(List<Object> localData, SourceGenerator gen, List<GraphTargetItem> list) {
+        List<GraphSourceItem> ret = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            ret.addAll(0, list.get(i).toSource(localData, gen));
+        }
+        ret.add(new ActionPush((Long) (long) list.size()));
+        return ret;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(List<Object> localData, SourceGenerator generator) {
+        List<GraphSourceItem> ret = toSource(localData, generator);
+        if (hasReturnValue()) {
+            ret.add(new ActionPop());
+        }
+        return ret;
     }
 }

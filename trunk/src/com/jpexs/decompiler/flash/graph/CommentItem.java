@@ -49,4 +49,9 @@ public class CommentItem extends GraphTargetItem {
     public boolean needsSemicolon() {
         return false;
     }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
+    }
 }

@@ -45,4 +45,9 @@ public class IntegerValueItem extends GraphTargetItem {
     public Object getResult() {
         return Double.valueOf(intValue);
     }
+
+    @Override
+    public boolean hasReturnValue() {
+        return true;
+    }
 }

@@ -31,4 +31,9 @@ public class StrictModeTreeItem extends TreeItem {
     public String toString(ConstantPool constants) {
         return "StrictMode(" + mode + ");"; //I still don't know how AS source of Strict Mode instruction looks like, assuming this...
     }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false; //FIXME ?
+    }
 }

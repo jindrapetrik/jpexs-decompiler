@@ -14,20 +14,31 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.action.treemodel.operations;
+package com.jpexs.decompiler.flash.action.treemodel;
 
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
-import com.jpexs.decompiler.flash.graph.BinaryOpItem;
+import com.jpexs.decompiler.flash.action.swf3.ActionStopSounds;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.List;
 
-public class IsTypeTreeItem extends BinaryOpItem {
+public class StopAllSoundsTreeItem extends TreeItem {
 
-    public IsTypeTreeItem(GraphSourceItem instruction, TreeItem value, TreeItem type) {
-        super(instruction, PRECEDENCE_RELATIONAL, value, type, " is ");
+    @Override
+    public String toString(ConstantPool constants) {
+        return hilight("stopAllSounds()");
+    }
+
+    public StopAllSoundsTreeItem(GraphSourceItem instruction) {
+        super(instruction, PRECEDENCE_PRIMARY);
     }
 
     @Override
-    public boolean isCompileTime() {
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, new ActionStopSounds());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
         return false;
     }
 }

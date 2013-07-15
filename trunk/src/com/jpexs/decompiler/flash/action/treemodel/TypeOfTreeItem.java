@@ -16,10 +16,12 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf5.ActionTypeOf;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.EcmaType;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.List;
 
@@ -69,5 +71,15 @@ public class TypeOfTreeItem extends TreeItem {
     @Override
     public boolean isCompileTime() {
         return value.isCompileTime();
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, value, new ActionTypeOf());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return true;
     }
 }

@@ -37,6 +37,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ActionPush extends Action {
 
@@ -169,11 +171,12 @@ public class ActionPush extends Action {
             }
             sos.close();
         } catch (IOException e) {
+            Logger.getLogger(ActionPush.class.getName()).log(Level.SEVERE, "Error during push to bytes", e);
         }
         return surroundWithAction(baos.toByteArray(), version);
     }
 
-    public ActionPush(Object... values) throws IOException, ParseException {
+    public ActionPush(Object... values) {
         super(0x96, 0);
         this.values = new ArrayList<>();
         for (Object o : values) {

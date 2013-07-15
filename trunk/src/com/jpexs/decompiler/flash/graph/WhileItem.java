@@ -80,4 +80,14 @@ public class WhileItem extends LoopItem implements Block {
     public boolean needsSemicolon() {
         return false;
     }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return generator.generate(localData, this);
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
+    }
 }

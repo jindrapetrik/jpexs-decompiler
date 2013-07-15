@@ -16,8 +16,10 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf4.ActionRandomNumber;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import java.util.List;
 
 public class RandomNumberTreeItem extends TreeItem {
@@ -39,5 +41,15 @@ public class RandomNumberTreeItem extends TreeItem {
         List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
         ret.addAll(maximum.getNeededSources());
         return ret;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, maximum, new ActionRandomNumber());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return true;
     }
 }

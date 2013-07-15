@@ -19,4 +19,14 @@ public class ContinueItem extends GraphTargetItem {
     public String toString(List<Object> localData) {
         return hilight("continue") + " " + "loop" + loopId;
     }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return generator.generate(localData, this);
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
+    }
 }

@@ -16,9 +16,21 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.parser.script.ActionScriptSourceGenerator;
+import com.jpexs.decompiler.flash.action.swf4.ActionIf;
+import com.jpexs.decompiler.flash.action.swf4.ActionNot;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
+import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
+import com.jpexs.decompiler.flash.action.swf5.ActionReturn;
+import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.graph.ExitItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReturnTreeItem extends TreeItem implements ExitItem {
@@ -44,5 +56,34 @@ public class ReturnTreeItem extends TreeItem implements ExitItem {
     @Override
     public boolean isCompileTime() {
         return true;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        ActionScriptSourceGenerator asGenerator = (ActionScriptSourceGenerator) generator;
+        List<GraphSourceItem> ret = new ArrayList<>();
+        int forinlevel = asGenerator.getForInLevel(localData);
+        for (int i = 0; i < forinlevel; i++) { //Must POP all remaining values from enumerations (for..in)
+            List<Action> forinret = new ArrayList<>();
+            forinret.add(new ActionPush(new Null()));
+            forinret.add(new ActionEquals2());
+            forinret.add(new ActionNot());
+            ActionIf aforinif = new ActionIf(0);
+            forinret.add(aforinif);
+            aforinif.setJumpOffset(-Action.actionsToBytes(forinret, false, SWF.DEFAULT_VERSION).length);
+            ret.addAll(forinret);
+        }
+        if (value == null) {
+            ret.add(new ActionPush(new Undefined()));
+        } else {
+            ret.addAll(value.toSource(localData, generator));
+        }
+        ret.add(new ActionReturn());
+        return ret;
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
     }
 }

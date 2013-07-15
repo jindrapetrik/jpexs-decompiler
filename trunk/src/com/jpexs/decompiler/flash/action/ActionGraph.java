@@ -27,9 +27,12 @@ import com.jpexs.decompiler.flash.action.swf6.ActionStrictEquals;
 import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.EnumerateTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.FunctionTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.SetTarget2TreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.SetTargetTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.SetTypeTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.StoreRegisterTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.clauses.ForInTreeItem;
+import com.jpexs.decompiler.flash.action.treemodel.clauses.TellTargetTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.operations.NeqTreeItem;
 import com.jpexs.decompiler.flash.action.treemodel.operations.StrictEqTreeItem;
 import com.jpexs.decompiler.flash.ecma.Null;
@@ -95,8 +98,66 @@ public class ActionGraph extends Graph {
             list.clear();
             list.addAll(ret);
         }
+        int targetStart;
+        int targetEnd;
+
+        boolean again;
+        do {
+            again = false;
+            targetStart = -1;
+            targetEnd = -1;
+            GraphTargetItem targetStartItem = null;
+            GraphTargetItem target = null;
+            for (int t = 0; t < list.size(); t++) {
+                GraphTargetItem it = list.get(t);
+                if (it instanceof SetTargetTreeItem) {
+                    SetTargetTreeItem st = (SetTargetTreeItem) it;
+                    if (st.target.equals("")) {
+                        if (targetStart > -1) {
+                            targetEnd = t;
+                            break;
+                        }
+                    } else {
+                        target = new DirectValueTreeItem(null, 0, st.target, new ArrayList<String>());
+                        targetStart = t;
+                        targetStartItem = it;
+                    }
+                }
+                if (it instanceof SetTarget2TreeItem) {
+                    SetTarget2TreeItem st = (SetTarget2TreeItem) it;
+                    if ((st.target instanceof DirectValueTreeItem) && st.target.getResult().equals("")) {
+                        if (targetStart > -1) {
+                            targetEnd = t;
+                            break;
+                        }
+                    } else {
+                        targetStart = t;
+                        target = st.target;
+                        targetStartItem = it;
+                    }
+                }
+            }
+            if ((targetStart > -1) && (targetEnd > -1)) {
+                List<GraphTargetItem> newlist = new ArrayList<>();
+                for (int i = 0; i < targetStart; i++) {
+                    newlist.add(list.get(i));
+                }
+                List<GraphTargetItem> tellist = new ArrayList<>();
+                for (int i = targetStart + 1; i < targetEnd; i++) {
+                    tellist.add(list.get(i));
+                }
+                newlist.add(new TellTargetTreeItem(targetStartItem.src, target, tellist));
+                for (int i = targetEnd + 1; i < list.size(); i++) {
+                    newlist.add(list.get(i));
+                }
+                list.clear();
+                list.addAll(newlist);
+                again = true;
+            }
+        } while (again);
         for (int t = 0; t < list.size(); t++) {
             GraphTargetItem it = list.get(t);
+
             if (it instanceof WhileItem) {
                 WhileItem wi = (WhileItem) it;
                 if ((!wi.commands.isEmpty()) && (wi.commands.get(0) instanceof SetTypeTreeItem)) {

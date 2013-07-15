@@ -67,4 +67,9 @@ public class UniversalLoopItem extends LoopItem implements Block {
         ret.add(commands);
         return ret;
     }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
+    }
 }

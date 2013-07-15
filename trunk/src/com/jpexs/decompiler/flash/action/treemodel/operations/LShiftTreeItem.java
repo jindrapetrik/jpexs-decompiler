@@ -16,10 +16,13 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.operations;
 
+import com.jpexs.decompiler.flash.action.swf5.ActionBitLShift;
 import com.jpexs.decompiler.flash.ecma.*;
 import com.jpexs.decompiler.flash.graph.BinaryOpItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.List;
 
 public class LShiftTreeItem extends BinaryOpItem {
 
@@ -30,5 +33,10 @@ public class LShiftTreeItem extends BinaryOpItem {
     @Override
     public Object getResult() {
         return ((int) (double) EcmaScript.toNumber(leftSide.getResult())) << ((int) (double) EcmaScript.toNumber(rightSide.getResult()));
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, leftSide, rightSide, new ActionBitLShift());
     }
 }

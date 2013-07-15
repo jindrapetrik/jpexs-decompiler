@@ -16,19 +16,29 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf3.ActionToggleQuality;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.List;
 
-public class VoidTreeItem extends TreeItem {
-
-    public TreeItem value;
-
-    public VoidTreeItem(GraphSourceItem instruction, TreeItem value) {
-        super(instruction, PRECEDENCE_PRIMARY);
-        this.value = value;
-    }
+public class ToggleHighQualityTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return value.toString(constants);
+        return hilight("toggleHighQuality()");
+    }
+
+    public ToggleHighQualityTreeItem(GraphSourceItem instruction) {
+        super(instruction, PRECEDENCE_PRIMARY);
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, new ActionToggleQuality());
     }
 }

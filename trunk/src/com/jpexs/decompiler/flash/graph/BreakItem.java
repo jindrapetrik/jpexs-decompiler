@@ -19,4 +19,14 @@ public class BreakItem extends GraphTargetItem {
     public String toString(List<Object> localData) {
         return hilight("break") + " " + "loop" + loopId;
     }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return generator.generate(localData, this);
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
+    }
 }

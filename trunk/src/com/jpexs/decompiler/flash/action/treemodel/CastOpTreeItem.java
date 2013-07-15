@@ -16,8 +16,10 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf7.ActionCastOp;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.List;
 
@@ -43,5 +45,15 @@ public class CastOpTreeItem extends TreeItem {
         ret.addAll(constructor.getNeededSources());
         ret.addAll(object.getNeededSources());
         return ret;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, constructor, object, new ActionCastOp());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return true;
     }
 }

@@ -16,9 +16,11 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf4.ActionStartDrag;
 import com.jpexs.decompiler.flash.ecma.*;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import java.util.List;
 
 public class StartDragTreeItem extends TreeItem {
@@ -63,5 +65,25 @@ public class StartDragTreeItem extends TreeItem {
         ret.addAll(y1.getNeededSources());
         ret.addAll(y2.getNeededSources());
         return ret;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        boolean hasConstrains = true;
+        if (constrain instanceof DirectValueTreeItem) {
+            if (Double.compare(EcmaScript.toNumber(constrain.getResult()), 0) == 0) {
+                hasConstrains = false;
+            }
+        }
+        if (hasConstrains) {
+            return toSourceMerge(localData, generator, x1, y1, x2, y2, constrain, lockCenter, target, new ActionStartDrag());
+        } else {
+            return toSourceMerge(localData, generator, constrain, lockCenter, target, new ActionStartDrag());
+        }
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
     }
 }

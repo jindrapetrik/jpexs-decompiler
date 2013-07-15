@@ -16,10 +16,14 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.clauses;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.swf5.ActionWith;
 import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
 import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,5 +55,23 @@ public class WithTreeItem extends TreeItem {
         }
         ret += hilight("}");
         return ret;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        List<GraphSourceItem> data = generator.generate(localData, items);
+        List<Action> dataA = new ArrayList<>();
+        for (GraphSourceItem s : data) {
+            if (s instanceof Action) {
+                dataA.add((Action) s);
+            }
+        }
+        int codeLen = Action.actionsToBytes(dataA, false, SWF.DEFAULT_VERSION).length;
+        return toSourceMerge(localData, generator, scope, new ActionWith(codeLen), data);
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
     }
 }

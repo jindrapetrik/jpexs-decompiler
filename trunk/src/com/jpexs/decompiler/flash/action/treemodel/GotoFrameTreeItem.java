@@ -16,7 +16,10 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf3.ActionGotoFrame;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.List;
 
 public class GotoFrameTreeItem extends TreeItem {
 
@@ -29,6 +32,16 @@ public class GotoFrameTreeItem extends TreeItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return hilight("gotoAndStop(") + frame + hilight(")");
+        return hilight("gotoAndStop(") + (frame + 1) + hilight(")");
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, new ActionGotoFrame(frame));
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
     }
 }

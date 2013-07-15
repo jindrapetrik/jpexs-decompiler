@@ -16,13 +16,16 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import com.jpexs.decompiler.flash.helpers.Helper;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,6 +34,10 @@ public class DirectValueTreeItem extends TreeItem {
     public Object value;
     public List<String> constants;
     public GraphTargetItem computedRegValue;
+
+    public DirectValueTreeItem(Object o) {
+        this(null, 0, o, new ArrayList<String>());
+    }
 
     public DirectValueTreeItem(GraphSourceItem instruction, int instructionPos, Object value, List<String> constants) {
         super(instruction, PRECEDENCE_PRIMARY);
@@ -141,8 +148,7 @@ public class DirectValueTreeItem extends TreeItem {
 
     @Override
     public boolean isCompileTime() {
-        return (value instanceof Double) || (value instanceof Float) || (value instanceof Boolean) || (value instanceof Long) || (value instanceof Null) || (computedRegValue != null && computedRegValue.isCompileTime()) //||(value instanceof String) || (value instanceof ConstantIndex)
-                ;
+        return (value instanceof Double) || (value instanceof Float) || (value instanceof Boolean) || (value instanceof Long) || (value instanceof Null) || (computedRegValue != null && computedRegValue.isCompileTime()) || (value instanceof String) || (value instanceof ConstantIndex);
     }
 
     @Override
@@ -190,6 +196,16 @@ public class DirectValueTreeItem extends TreeItem {
         if (other.pos != this.pos) {
             return false;
         }
+        return true;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, new ActionPush(value));
+    }
+
+    @Override
+    public boolean hasReturnValue() {
         return true;
     }
 }

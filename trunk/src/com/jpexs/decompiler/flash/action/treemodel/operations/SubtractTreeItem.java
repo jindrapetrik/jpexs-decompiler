@@ -16,10 +16,13 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.operations;
 
+import com.jpexs.decompiler.flash.action.swf4.ActionSubtract;
+import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
 import com.jpexs.decompiler.flash.ecma.*;
 import com.jpexs.decompiler.flash.graph.BinaryOpItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import java.util.List;
 
 public class SubtractTreeItem extends BinaryOpItem {
@@ -35,7 +38,7 @@ public class SubtractTreeItem extends BinaryOpItem {
 
     @Override
     public String toString(List<Object> localData) {
-        if (!(getLeftMostItem(rightSide) instanceof NegTreeItem)) { // a - (-b*c*d)
+        if (rightSide instanceof DirectValueTreeItem) {
             return super.toString(localData);
         }
         String ret = "";
@@ -47,5 +50,10 @@ public class SubtractTreeItem extends BinaryOpItem {
         ret += hilight(operator);
         ret += "(" + rightSide.toString(localData) + ")";
         return ret;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, leftSide, rightSide, new ActionSubtract());
     }
 }

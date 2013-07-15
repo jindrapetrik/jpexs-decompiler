@@ -16,7 +16,11 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf4.ActionGetVariable;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.List;
 
 /**
  *
@@ -31,5 +35,15 @@ public class GetVersionTreeItem extends TreeItem {
     @Override
     public String toString(ConstantPool constants) {
         return hilight("getVersion()");
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, new ActionPush("/:$version"), new ActionGetVariable());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return true;
     }
 }

@@ -16,9 +16,11 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel;
 
+import com.jpexs.decompiler.flash.action.swf7.ActionThrow;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.util.List;
 
@@ -41,5 +43,15 @@ public class ThrowTreeItem extends TreeItem {
         List<com.jpexs.decompiler.flash.graph.GraphSourceItemPos> ret = super.getNeededSources();
         ret.addAll(object.getNeededSources());
         return ret;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, object, new ActionThrow());
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
     }
 }

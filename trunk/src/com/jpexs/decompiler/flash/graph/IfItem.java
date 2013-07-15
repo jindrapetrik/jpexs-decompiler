@@ -111,4 +111,14 @@ public class IfItem extends GraphTargetItem implements Block {
         }
         return ret;
     }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return generator.generate(localData, this);
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
+    }
 }

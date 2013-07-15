@@ -53,4 +53,9 @@ public class ImplementsOpTreeItem extends TreeItem {
         }
         return ret;
     }
+
+    @Override
+    public boolean hasReturnValue() {
+        return true;
+    }
 }

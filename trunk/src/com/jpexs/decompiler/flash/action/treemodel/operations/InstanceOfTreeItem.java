@@ -16,9 +16,12 @@
  */
 package com.jpexs.decompiler.flash.action.treemodel.operations;
 
+import com.jpexs.decompiler.flash.action.swf6.ActionInstanceOf;
 import com.jpexs.decompiler.flash.graph.BinaryOpItem;
 import com.jpexs.decompiler.flash.graph.GraphSourceItem;
 import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.graph.SourceGenerator;
+import java.util.List;
 
 public class InstanceOfTreeItem extends BinaryOpItem {
 
@@ -29,5 +32,10 @@ public class InstanceOfTreeItem extends BinaryOpItem {
     @Override
     public boolean isCompileTime() {
         return false;
+    }
+
+    @Override
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, leftSide, rightSide, new ActionInstanceOf());
     }
 }

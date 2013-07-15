@@ -42,4 +42,9 @@ public class ScriptEndItem extends GraphTargetItem implements ExitItem {
     public boolean isEmpty() {
         return true;
     }
+
+    @Override
+    public boolean hasReturnValue() {
+        return false;
+    }
 }
