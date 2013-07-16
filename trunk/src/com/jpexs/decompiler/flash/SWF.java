@@ -1552,7 +1552,7 @@ public class SWF {
             if (ins instanceof ActionConstantPool) {
                 constantPool = new ConstantPool(((ActionConstantPool) ins).constantPool);
             }
-            int staticOperation = (Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
+            int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
 
             try {
                 ins.translate(localData, stack, output, staticOperation, path);
@@ -1825,7 +1825,7 @@ public class SWF {
                         classNameParts = new String[]{className};
                     }
                 }
-                int staticOperation = (Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
+                int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
                 List<GraphTargetItem> dec = Action.actionsToTree(dia.getActions(version), version, staticOperation, ""/*FIXME*/);
                 GraphTargetItem name = null;
                 for (GraphTargetItem it : dec) {

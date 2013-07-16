@@ -48,6 +48,7 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
@@ -464,6 +465,7 @@ public class Main {
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
+        Locale.setDefault(Locale.GERMAN);
         loadProperties();
         View.setLookAndFeel();
         Configuration.loadFromFile(getConfigFile(), getReplacementsFile());

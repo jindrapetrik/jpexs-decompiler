@@ -174,7 +174,11 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
                     s.append(" m[");
                     s.append(operands[i]);
                     s.append("]\"");
-                    s.append(Helper.escapeString(constants.constant_multiname[operands[i]].toString(constants, fullyQualifiedNames)));
+                    if (constants.constant_multiname[operands[i]] == null) {
+                        s.append("");
+                    } else {
+                        s.append(Helper.escapeString(constants.constant_multiname[operands[i]].toString(constants, fullyQualifiedNames)));
+                    }
                     s.append("\"");
                     break;
                 case AVM2Code.DAT_STRING_INDEX:

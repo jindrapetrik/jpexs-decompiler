@@ -690,7 +690,7 @@ public class Action implements GraphSourceItem {
     public static String actionsToSource(List<Action> actions, int version, String path) {
         try {
             //List<ActionItem> tree = actionsToTree(new HashMap<Integer, String>(), actions, version);
-            int staticOperation = (Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
+            int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
 
             List<GraphTargetItem> tree = actionsToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), actions, version, staticOperation, path);
 

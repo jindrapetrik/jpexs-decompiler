@@ -795,7 +795,7 @@ public class AVM2Code implements Serializable {
                         if (ins.definition instanceof IfTypeIns) {
                             t = new PopIns().instructionName + "\n";
                             if (fixBranch == 0) { //jump
-                                t = new JumpIns().instructionName + " ofs" + Helper.formatAddress(ofs + ins.getBytes().length + ins.operands[0]);
+                                t += new JumpIns().instructionName + " ofs" + Helper.formatAddress(ofs + ins.getBytes().length + ins.operands[0]);
                             } else {
                                 //nojump, ignore
                             }
@@ -1483,7 +1483,7 @@ public class AVM2Code implements Serializable {
         localData.add(new ArrayList<Integer>());
         localData.add((Integer) (scriptIndex));
         int ret = 0;
-        ret += removeTraps(localData, new AVM2GraphSource(this, false, -1, -1, new HashMap<Integer, GraphTargetItem>(), new Stack<GraphTargetItem>(), abc, body, new HashMap<Integer, String>(), new ArrayList<String>()), 0, path);
+        ret += removeTraps(constants, body, localData, new AVM2GraphSource(this, false, -1, -1, new HashMap<Integer, GraphTargetItem>(), new Stack<GraphTargetItem>(), abc, body, new HashMap<Integer, String>(), new ArrayList<String>()), 0, path);
         removeIgnored(constants, body);
         removeDeadCode(constants, body);
 
@@ -2203,13 +2203,15 @@ public class AVM2Code implements Serializable {
         return ret;
     }
 
-    public static int removeTraps(List<Object> localData, AVM2GraphSource code, int addr, String path) {
+    public static int removeTraps(ConstantPool constants, MethodBody body, List<Object> localData, AVM2GraphSource code, int addr, String path) {
         HashMap<GraphSourceItem, AVM2Code.Decision> decisions = new HashMap<>();
         HashMap<Integer, List<Integer>> refs = new HashMap<>();
         code.getCode().visitCode(0, code.size() - 1, refs);
         removeTraps(refs, false, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions, path);
         localData.set(2, new HashMap<Integer, GraphTargetItem>());
-        return removeTraps(refs, true, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions, path);
+        int cnt = removeTraps(refs, true, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions, path);
+        code.getCode().removeIgnored(constants, body);
+        return cnt;
     }
     /*public static int removeTraps(List<Object> localData, AVM2GraphSource code, int addr) {
      AVM2Graph.translateViaGraph(localData, "", code, new ArrayList<Integer>(), Graph.SOP_REMOVE_STATIC);

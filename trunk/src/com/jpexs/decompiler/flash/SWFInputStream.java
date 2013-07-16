@@ -624,7 +624,7 @@ public class SWFInputStream extends InputStream {
                     stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>()));
                 }
                 try {
-                    ins.translate(localData, stack, output, Graph.SOP_SKIP_STATIC, null);
+                    ins.translate(localData, stack, output, Graph.SOP_USE_STATIC/*Graph.SOP_SKIP_STATIC*/, null);
                 } catch (Exception ex) {
                     Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "Error during getting constantpool", ex);
                 }
@@ -1021,7 +1021,7 @@ public class SWFInputStream extends InputStream {
                             if ((a instanceof ActionStoreRegister) && stack.isEmpty()) {
                                 stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>()));
                             }
-                            a.translate(localData, stack, output, Graph.SOP_SKIP_STATIC, path);
+                            a.translate(localData, stack, output, Graph.SOP_USE_STATIC/*Graph.SOP_SKIP_STATIC*/, path);
                         }
                     }
                 } catch (RuntimeException ex) {
