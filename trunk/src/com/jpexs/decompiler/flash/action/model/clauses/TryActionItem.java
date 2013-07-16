@@ -68,7 +68,7 @@ public class TryActionItem extends ActionItem implements Block {
         }
         ret += "}";
         for (int e = 0; e < catchExceptions.size(); e++) {
-            ret += "\r\ncatch(" + catchExceptions.get(e).toString(localData) + ")\r\n{\r\n";
+            ret += "\r\ncatch(" + catchExceptions.get(e).toStringNoQuotes(localData) + ")\r\n{\r\n";
             List<GraphTargetItem> commands = catchCommands.get(e);
             for (GraphTargetItem ti : commands) {
                 if (!ti.isEmpty()) {
