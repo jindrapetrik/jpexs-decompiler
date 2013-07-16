@@ -43,11 +43,11 @@ public class AS2Generator {
                
 
                 String srcs[] = src.split("[\r\n]+");
-                String testName="testFrame"+frame;
-                if(srcs.length>0){
-                    String pref="trace(\"";
-                    if(srcs[0].startsWith(pref)){
-                        testName="frame"+frame+"_"+srcs[0].substring(pref.length(),srcs[0].length()-3/* "); */);
+                String testName="frame"+frame+"_Test";
+                String pref="trace(\"";
+                for(String p:srcs){
+                    if(p.trim().matches("trace\\(\"(.*)Test\"\\);")){
+                        testName="frame"+frame+"_"+p.substring(pref.length(),p.length()-3/* "); */);
                     }
                 }
                 

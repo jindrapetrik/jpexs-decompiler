@@ -1,7 +1,7 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import java.io.FileInputStream;
@@ -180,7 +180,7 @@ public class ActionScript3Test {
                 + "var d:* = undefined;\r\n"
                 + "var e:* = undefined;\r\n"
                 + "var a:* = 5;\r\n"
-                + "loop3:\r\n"
+                + "loopswitch3:\r\n"
                 + "switch(a)\r\n"
                 + "{\r\n"
                 + "case 57*a:\r\n"

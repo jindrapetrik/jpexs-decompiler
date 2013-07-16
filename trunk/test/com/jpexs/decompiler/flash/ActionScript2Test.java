@@ -38,13 +38,13 @@ public class ActionScript2Test {
     @BeforeClass
     public void init() throws IOException {
         Configuration.setConfig("autoDeobfuscate", false);
-        swf = new SWF(new FileInputStream("testdata/as2/as2.swf"), false);        
+        swf = new SWF(new FileInputStream("testdata/as2/as2.swf"), false);
     }
 
     private void compareSrc(int frame, String expectedResult) {
         DoActionTag doa = getFrameSource(frame);
         assertNotNull(doa);
-        String actualResult = Highlighting.stripHilights(Action.actionsToSource(doa.getActions(swf.version), swf.version,""));
+        String actualResult = Highlighting.stripHilights(Action.actionsToSource(doa.getActions(swf.version), swf.version, ""));
         actualResult = actualResult.replaceAll("[ \r\n]", "");
         expectedResult = expectedResult.replaceAll("[ \r\n]", "");
         assertEquals(actualResult, expectedResult);
@@ -188,14 +188,13 @@ public class ActionScript2Test {
     public void frame9_switchForTest() {
         compareSrc(9, "trace(\"switchForTest\");\r\n"
                 + "var i=0;\r\n"
-                + "loop0:\r\n"
                 + "for(;i<10;i++)\r\n"
                 + "{\r\n"
                 + "switch(i)\r\n"
                 + "{\r\n"
                 + "case 0:\r\n"
                 + "trace(\"zero\");\r\n"
-                + "continue loop0;\r\n"
+                + "continue;\r\n"
                 + "case 5:\r\n"
                 + "trace(\"five\");\r\n"
                 + "break;\r\n"
@@ -205,7 +204,7 @@ public class ActionScript2Test {
                 + "case 1:\r\n"
                 + "if(i==7)\r\n"
                 + "{\r\n"
-                + "continue loop0;\r\n"
+                + "continue;\r\n"
                 + "}\r\n"
                 + "trace(\"one\");\r\n"
                 + "default:\r\n"
@@ -216,7 +215,7 @@ public class ActionScript2Test {
     }
 
     @Test
-    public void testFrame10() {
+    public void frame10_functionTest() {
         compareSrc(10, "function hello(what, second)\r\n"
                 + "{\r\n"
                 + "trace(\"hello \"+what+\"! \"+second);\r\n"
@@ -321,7 +320,7 @@ public class ActionScript2Test {
     }
 
     @Test
-    public void testFrame17() {
+    public void frame17_forInTest() {
         compareSrc(17, "function testForIn()\r\n"
                 + "{\r\n"
                 + "var register1=[];\r\n"
@@ -393,7 +392,7 @@ public class ActionScript2Test {
     }
 
     @Test
-    public void testFrame20() {
+    public void frame20_incDecTest() {
         compareSrc(20, "function tst()\r\n"
                 + "{\r\n"
                 + "return 1;\r\n"
@@ -440,7 +439,7 @@ public class ActionScript2Test {
     }
 
     @Test
-    public void testFrame22() {
+    public void frame22_function2Test() {
         compareSrc(22, "function a()\r\n"
                 + "{\r\n"
                 + "trace(\"hi\");\r\n"
@@ -456,7 +455,7 @@ public class ActionScript2Test {
     }
 
     @Test
-    public void testFrame23() {
+    public void frame23_tryFunctionTest() {
         compareSrc(23, "function testtry()\r\n"
                 + "{\r\n"
                 + "var register1=5;\r\n"
@@ -496,7 +495,7 @@ public class ActionScript2Test {
     }
 
     @Test
-    public void testFrame25() {
+    public void frame25_forInInTest() {
         compareSrc(25, "function tst()\r\n"
                 + "{\r\n"
                 + "var register2=[];\r\n"
@@ -522,7 +521,7 @@ public class ActionScript2Test {
     }
 
     @Test
-    public void testFrame26() {
+    public void frame26_registersFuncTest() {
         compareSrc(26, "function tst(px)\r\n"
                 + "{\r\n"
                 + "var register1=57;\r\n"
@@ -543,7 +542,7 @@ public class ActionScript2Test {
     }
 
     @Test
-    public void testFrame28() {
+    public void frame28_function3Test() {
         compareSrc(28, "function tst()\r\n"
                 + "{\r\n"
                 + "var register1=5;\r\n"
@@ -610,7 +609,7 @@ public class ActionScript2Test {
     }
 
     @Test
-    public void testFrame31() {
+    public void frame31_function4Test() {
         compareSrc(31, "function tst()\r\n"
                 + "{\r\n"
                 + "var register1=5;\r\n"
@@ -676,5 +675,85 @@ public class ActionScript2Test {
                 + "}\r\n"
                 + "while(k=register0=k+5, k<20);\r\n"
                 + "trace(\"end\");\r\n");
+    }
+
+    @Test
+    public void frame35_globalFunctionsTest() {
+        compareSrc(35, "function tst(p1)\r\n"
+                + "{\r\n"
+                + "trace(\"test\");\r\n"
+                + "}\r\n"
+                + "trace(\"globalFunctionsTest\");\r\n"
+                + "var k=Array(1,2,3);\r\n"
+                + "var a=1;\r\n"
+                + "var b=Boolean(a);\r\n"
+                + "call(5);\r\n"
+                + "var c=\"A\";\r\n"
+                + "clearInterval(5);\r\n"
+                + "clearTimeout(4);\r\n"
+                + "var mc;\r\n"
+                + "duplicateMovieClip(mc,\"copy\",16389);\r\n"
+                + "a=escape(\"how\");\r\n"
+                + "var f=a;\r\n"
+                + "fscommand(\"alert(\\\"hi\\\");\");\r\n"
+                + "a=mc._alpha;\r\n"
+                + "a=getTimer();\r\n"
+                + "getURL(\"http://localhost/\",\"wnd\",\"POST\");\r\n"
+                + "a=getVersion();\r\n"
+                + "gotoAndStop(5);\r\n"
+                + "play();\r\n"
+                + "gotoAndStop(8);\r\n"
+                + "ifFrameLoaded(4)\r\n"
+                + "{\r\n"
+                + "trace(\"loaded\");\r\n"
+                + "}\r\n"
+                + "a=int(f);\r\n"
+                + "a=isFinite(f);\r\n"
+                + "a=isNaN(f);\r\n"
+                + "a=length(f);\r\n"
+                + "loadMovie(\"http://localhost/test.swf\",a,\"GET\");\r\n"
+                + "loadMovieNum(\"http://localhost/test.swf\",5,\"GET\");\r\n"
+                + "loadVariables(\"http://localhost/vars.txt\",a,\"GET\");\r\n"
+                + "loadVariablesNum(\"http://localhost/vars.txt\",4,\"GET\");\r\n"
+                + "a=mbchr(f);\r\n"
+                + "a=mblength(f);\r\n"
+                + "a=mbord(f);\r\n"
+                + "a=mbsubstring(\"aaaa\",5,4);\r\n"
+                + "MMExecute(\"destroyPC\");\r\n"
+                + "nextFrame();\r\n"
+                + "gotoAndStop(1);\r\n"
+                + "a=Number(f);\r\n"
+                + "a=Object(f);\r\n"
+                + "a=ord(f);\r\n"
+                + "a=parseFloat(f);\r\n"
+                + "a=parseInt(f,16);\r\n"
+                + "play();\r\n"
+                + "prevFrame();\r\n"
+                + "gotoAndStop(1);\r\n"
+                + "print(mc,\"bframe\");\r\n"
+                + "printAsBitmap(mc,\"bframe\");\r\n"
+                + "printAsBitmapNum(5,\"bframe\");\r\n"
+                + "printNum(4,\"bframe\");\r\n"
+                + "a=random(10);\r\n"
+                + "removeMovieClip(mc);\r\n"
+                + "setInterval(tst,5,f);\r\n"
+                + "mc._X=25;\r\n"
+                + "setTimeout(tst,5,f);\r\n"
+                + "showRedrawRegions(false,0);\r\n"
+                + "startDrag(mc,1,5,5,6,6);\r\n"
+                + "stop();\r\n"
+                + "stopAllSounds();\r\n"
+                + "stopDrag();\r\n"
+                + "a=String(f);\r\n"
+                + "a=\"aa\";\r\n"
+                + "tellTarget(mc)\r\n"
+                + "{\r\n"
+                + "trace(\"told\")\r\n"
+                + "};\r\n"
+                + "toggleHighQuality();\r\n"
+                + "a=unescape(f);\r\n"
+                + "unloadMovie(mc);\r\n"
+                + "unloadMovieNum(4);\r\n"
+                + "updateAfterEvent();\r\n");
     }
 }
