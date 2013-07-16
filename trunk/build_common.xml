@@ -196,9 +196,29 @@
     
     <target name="locales">
         <delete dir="${LOCALESTARGETDIR}"/>
-        <mkdir dir="${LOCALESTARGETDIR}"/>
-        <copy todir="${LOCALESTARGETDIR}">
+        <mkdir dir="${LOCALESTARGETDIR}/${PROJECTNAME}"/>
+        <copy todir="${LOCALESTARGETDIR}/${PROJECTNAME}">
             <fileset dir="${LOCALESDIR}" includes="**/*.*"/>
+        </copy>
+        <mkdir dir="${LOCALESTARGETDIR}/jsyntaxpane/bundle/"/>
+        <copy todir="${LOCALESTARGETDIR}/jsyntaxpane/bundle/">
+            <fileset dir="libsrc/jsyntaxpane/jsyntaxpane/src/main/resources/jsyntaxpane" includes="**/*.*"/>
+        </copy>
+        <mkdir dir="${LOCALESTARGETDIR}/jsyntaxpane/defaultsyntaxkit"/>
+        <copy todir="${LOCALESTARGETDIR}/jsyntaxpane/defaultsyntaxkit">
+            <fileset dir="libsrc/jsyntaxpane/jsyntaxpane/src/main/resources/META-INF/services/jsyntaxpane/defaultsyntaxkit" includes="**/*.*"/>
+        </copy>
+        <mkdir dir="${LOCALESTARGETDIR}/jsyntaxpane/syntaxkits/flasmsyntaxkit"/>
+        <copy todir="${LOCALESTARGETDIR}/jsyntaxpane/syntaxkits/flasmsyntaxkit">
+            <fileset dir="libsrc/jsyntaxpane/jsyntaxpane/src/main/resources/META-INF/services/jsyntaxpane/syntaxkits/flasmsyntaxkit" includes="**/config*.properties"/>
+        </copy>
+        <mkdir dir="${LOCALESTARGETDIR}/jsyntaxpane/syntaxkits/flasm3syntaxkit"/>
+        <copy todir="${LOCALESTARGETDIR}/jsyntaxpane/syntaxkits/flasm3syntaxkit">
+            <fileset dir="libsrc/jsyntaxpane/jsyntaxpane/src/main/resources/META-INF/services/jsyntaxpane/syntaxkits/flasm3syntaxkit" includes="**/config*.properties"/>
+        </copy>
+        <mkdir dir="${LOCALESTARGETDIR}/jsyntaxpane/syntaxkits/flasm3methodinfosyntaxkit"/>
+        <copy todir="${LOCALESTARGETDIR}/jsyntaxpane/syntaxkits/flasm3methodinfosyntaxkit">
+            <fileset dir="libsrc/jsyntaxpane/jsyntaxpane/src/main/resources/META-INF/services/jsyntaxpane/syntaxkits/flasm3methodinfosyntaxkit" includes="**/config*.properties"/>
         </copy>
         <echo file="${LOCALESTARGETDIR}/readme.txt">${PROJECTNAME} ${VERSION} localization pack
 -------------------------------------------------------------------            
