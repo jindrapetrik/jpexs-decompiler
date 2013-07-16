@@ -38,18 +38,22 @@ public class SubtractActionItem extends BinaryOpItem {
 
     @Override
     public String toString(List<Object> localData) {
-        if (rightSide instanceof DirectValueActionItem) {
+        if (rightSide.precedence >= precedence) { // >=  add or subtract too
+            String ret = "";
+            if (leftSide.precedence > precedence) {
+                ret += "(" + leftSide.toString(localData) + ")";
+            } else {
+                ret += leftSide.toString(localData);
+            }
+            ret += " ";
+            ret += hilight(operator);
+            ret += " ";
+
+            ret += "(" + rightSide.toString(localData) + ")";
+            return ret;
+        } else {
             return super.toString(localData);
         }
-        String ret = "";
-        if (leftSide.getPrecedence() > precedence) {
-            ret += "(" + leftSide.toString(localData) + ")";
-        } else {
-            ret += leftSide.toString(localData);
-        }
-        ret += hilight(operator);
-        ret += "(" + rightSide.toString(localData) + ")";
-        return ret;
     }
 
     @Override

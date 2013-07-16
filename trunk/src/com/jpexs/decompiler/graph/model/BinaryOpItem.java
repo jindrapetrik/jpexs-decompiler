@@ -52,7 +52,10 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
         } else {
             ret += leftSide.toString(localData);
         }
+
+        ret += " ";
         ret += hilight(operator);
+        ret += " ";
 
         if (rightSide.getPrecedence() > precedence) {
             ret += "(" + rightSide.toString(localData) + ")";
