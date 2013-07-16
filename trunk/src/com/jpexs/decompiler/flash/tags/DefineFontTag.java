@@ -222,7 +222,7 @@ public class DefineFontTag extends FontTag {
 
     @Override
     public void addCharacter(List<Tag> tags, char character) {
-        glyphShapeTable.add(SHAPERECORD.systemFontCharacterToSHAPE(getFontName(tags), getFontStyle(), getDivider() * 1000, character));
+        glyphShapeTable.add(SHAPERECORD.systemFontCharacterToSHAPE(getFontName(tags), getFontStyle(), getDivider() * 1024, character));
         ensureFontInfo(tags);
         if (fontInfoTag != null) {
             fontInfoTag.codeTable.add((int) character);

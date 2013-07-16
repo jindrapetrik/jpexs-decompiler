@@ -36,6 +36,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
 import java.awt.LinearGradientPaint;
 import java.awt.MultipleGradientPaint.CycleMethod;
 import java.awt.Point;
@@ -51,6 +52,7 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -866,10 +868,26 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
         }
         return ret;
     }
+    private static List<String> existingFonts = Arrays.asList(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
 
     public static SHAPE systemFontCharacterToSHAPE(String fontName, int fontStyle, int fontSize, char character) {
         List<SHAPERECORD> retList = new ArrayList<>();
-        Font f = new Font(fontName, fontStyle, fontSize);
+        String defaultFonts[] = new String[]{"Times New Roman", "Arial"};
+        Font f = null;
+        if (existingFonts.contains(fontName)) {
+            f = new Font(fontName, fontStyle, fontSize);
+        } else {
+            for (String defName : defaultFonts) {
+                if (existingFonts.contains(defName)) {
+                    f = new Font(defName, fontStyle, fontSize);
+                    break;
+                }
+            }
+        }
+        if (f == null) {
+            f = new Font("Dialog", fontStyle, fontSize); //Fallback to DIALOG
+        }
+
         GlyphVector v = f.createGlyphVector((new JPanel()).getFontMetrics(f).getFontRenderContext(), "" + character);
         Shape shp = v.getOutline();
         double points[] = new double[6];

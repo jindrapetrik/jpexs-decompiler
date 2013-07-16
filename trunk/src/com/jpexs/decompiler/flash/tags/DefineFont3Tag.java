@@ -120,24 +120,10 @@ public class DefineFont3Tag extends FontTag {
             }
         }
         glyphShapeTable = new ArrayList<>();
-        SHAPE firstShape = null;
-        int cnt = 0;
         for (int i = 0; i < numGlyphs; i++) {
-            SHAPE shp = sis.readSHAPE(1);
-            /*cnt++;
-             if (cnt > 2) {
-             shp = firstShape;
-             SHAPE generated = SHAPERECORD.systemFontCharacterToSHAPE("Times New Roman", 0, 1000, 'A');
-             shp = generated;
-             } else {
-             firstShape = shp;
-             }*/
-            glyphShapeTable.add(shp);
-            //shp=SHAPERECORD.systemFontCharacterToSHAPE("Times New Roman", 0, 20000 /*??*/, 'A');        
-
-            //glyphShapeTable.add(sis.readSHAPE(1));
+            glyphShapeTable.add(sis.readSHAPE(1));
         }
-        codeTable = new ArrayList<>(); //int[numGlyphs];
+        codeTable = new ArrayList<>();
         for (int i = 0; i < numGlyphs; i++) {
             if (fontFlagsWideCodes) {
                 codeTable.add(sis.readUI16());
@@ -316,12 +302,14 @@ public class DefineFont3Tag extends FontTag {
     public void addCharacter(List<Tag> tags, char character) {
         int fontStyle = getFontStyle();
         String fname = getFontName(tags);
-        SHAPE shp = SHAPERECORD.systemFontCharacterToSHAPE(fname, fontStyle, getDivider() * 1000, character);
+        SHAPE shp = SHAPERECORD.systemFontCharacterToSHAPE(fname, fontStyle, getDivider() * 1024, character);
         glyphShapeTable.add(shp);
-        fontBoundsTable.add(new RECT());//shp.getBounds());
         codeTable.add((int) character);
-        Font fnt = new Font(fname, fontStyle, getDivider() * 1000);
-        fontAdvanceTable.add((new JPanel()).getFontMetrics(fnt).charWidth(character));
+        if (fontFlagsHasLayout) {
+            fontBoundsTable.add(shp.getBounds());
+            Font fnt = new Font(fname, fontStyle, getDivider() * 1024);
+            fontAdvanceTable.add((new JPanel()).getFontMetrics(fnt).charWidth(character));
+        }
         numGlyphs++;
     }
 

@@ -490,10 +490,10 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, 
                 textHeight = rec.textHeight;
             }
             if (rec.styleFlagsHasXOffset) {
-                x = rec.xOffset * 1000 / textHeight;
+                x = rec.xOffset * 1024 / textHeight;
             }
             if (rec.styleFlagsHasYOffset) {
-                y = rec.yOffset * 1000 / textHeight;
+                y = rec.yOffset * 1024 / textHeight;
             }
 
             for (GLYPHENTRY entry : rec.glyphEntries) {
@@ -505,12 +505,12 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, 
                 BufferedImage img = SHAPERECORD.shapeToImage(tags, 1, null, null, glyphs.get(entry.glyphIndex).shapeRecords, textColor);
                 AffineTransform tr = new AffineTransform();
                 tr.setToIdentity();
-                float rat = textHeight / 1000f;
+                float rat = textHeight / 1024f;
                 tr.translate(rat * x / 20, rat * (y + rect.Ymin) / 20);
                 tr.scale(rat / font.getDivider(), rat / font.getDivider());
                 tr.translate(fixX, fixY);
                 g.drawImage(img, tr, null);
-                x += entry.glyphAdvance * 1000 / textHeight;
+                x += entry.glyphAdvance * 1024 / textHeight;
             }
         }
         return ret;
