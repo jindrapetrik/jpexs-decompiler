@@ -26,7 +26,7 @@ import java.util.ResourceBundle;
  */
 public class AppStrings {
 
-    private static ResourceBundle resourceBundle = ResourceBundle.getBundle(getResourcePath(MainFrame.class), Configuration.containsConfig("locale") ? Locale.forLanguageTag((String) Configuration.getConfig("locale", "en")) : Locale.getDefault());
+    private static ResourceBundle resourceBundle = ResourceBundle.getBundle(getResourcePath(MainFrame.class));
 
     public static String getResourcePath(Class cls) {
         String name = cls.getName();
@@ -42,7 +42,7 @@ public class AppStrings {
     }
 
     public static String translate(String bundle, String key) {
-        ResourceBundle b = ResourceBundle.getBundle(bundle, Configuration.containsConfig("locale") ? Locale.forLanguageTag((String) Configuration.getConfig("locale", "en")) : Locale.getDefault());
+        ResourceBundle b = ResourceBundle.getBundle(bundle);
         return b.getString(key);
     }
 }

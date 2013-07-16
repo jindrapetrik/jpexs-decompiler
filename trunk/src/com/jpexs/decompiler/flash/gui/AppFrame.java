@@ -27,7 +27,7 @@ import javax.swing.JFrame;
  */
 public abstract class AppFrame extends JFrame {
 
-    private ResourceBundle resourceBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(getClass()), Configuration.containsConfig("locale") ? Locale.forLanguageTag((String) Configuration.getConfig("locale", "en")) : Locale.getDefault());
+    private ResourceBundle resourceBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(getClass()));
 
     public String translate(String key) {
         return resourceBundle.getString(key);

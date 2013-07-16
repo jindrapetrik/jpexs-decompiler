@@ -465,10 +465,10 @@ public class Main {
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
-        Locale.setDefault(Locale.GERMAN);
         loadProperties();
         View.setLookAndFeel();
         Configuration.loadFromFile(getConfigFile(), getReplacementsFile());
+        Locale.setDefault(Locale.forLanguageTag((String) Configuration.getConfig("locale", Locale.getDefault())));
 
         if ((Boolean) Configuration.getConfig("cacheOnDisk", Boolean.TRUE)) {
             Cache.setStorageType(Cache.STORAGE_FILES);

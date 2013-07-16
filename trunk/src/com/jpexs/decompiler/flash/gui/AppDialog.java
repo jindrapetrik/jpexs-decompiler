@@ -27,7 +27,7 @@ import javax.swing.JDialog;
  */
 public abstract class AppDialog extends JDialog {
 
-    private ResourceBundle resourceBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(getClass()), Configuration.containsConfig("locale") ? Locale.forLanguageTag((String) Configuration.getConfig("locale", "en")) : Locale.getDefault());
+    private ResourceBundle resourceBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(getClass()));
 
     public AppDialog() {
         View.installEscapeCloseOperation(this);
