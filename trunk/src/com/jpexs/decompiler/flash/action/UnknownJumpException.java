@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action;
 
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.action.model.ActionItem;
 import java.util.List;
 import java.util.Stack;
 
@@ -38,7 +38,7 @@ public class UnknownJumpException extends RuntimeException {
     /**
      * Output of the method before raising the exception
      */
-    public List<TreeItem> output;
+    public List<ActionItem> output;
 
     /**
      * Constructor
@@ -47,7 +47,7 @@ public class UnknownJumpException extends RuntimeException {
      * @param addr Actual address
      * @param output Output of the method before raising the exception
      */
-    public UnknownJumpException(Stack stack, long addr, List<TreeItem> output) {
+    public UnknownJumpException(Stack stack, long addr, List<ActionItem> output) {
         this.stack = stack;
         this.addr = addr;
         this.output = output;

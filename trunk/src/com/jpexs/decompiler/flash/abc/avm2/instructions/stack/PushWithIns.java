@@ -20,11 +20,11 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.WithObjectTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.WithTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.model.WithObjectAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.WithAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -38,9 +38,9 @@ public class PushWithIns extends InstructionDefinition {
     @Override
     public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path) {
         GraphTargetItem w = (GraphTargetItem) stack.pop();
-        WithObjectTreeItem wot = new WithObjectTreeItem(ins, w);
+        WithObjectAVM2Item wot = new WithObjectAVM2Item(ins, w);
         scopeStack.push(wot);
-        output.add(new WithTreeItem(ins, w));
+        output.add(new WithAVM2Item(ins, w));
     }
 
     @Override

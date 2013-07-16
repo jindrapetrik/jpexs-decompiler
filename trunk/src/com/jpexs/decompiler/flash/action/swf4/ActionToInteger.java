@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.ToIntegerTreeItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.model.ToIntegerActionItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -37,6 +37,6 @@ public class ActionToInteger extends Action {
     @Override
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem a = stack.pop();
-        stack.push(new ToIntegerTreeItem(this, a));
+        stack.push(new ToIntegerActionItem(this, a));
     }
 }

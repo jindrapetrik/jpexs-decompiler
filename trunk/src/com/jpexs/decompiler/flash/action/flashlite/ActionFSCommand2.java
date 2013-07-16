@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.flash.action.flashlite;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.FSCommand2TreeItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.model.FSCommand2ActionItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +43,6 @@ public class ActionFSCommand2 extends Action {
         for (long l = 0; l < numArgs; l++) {
             args.add(stack.pop());
         }
-        stack.push(new FSCommand2TreeItem(this, command, args));
+        stack.push(new FSCommand2ActionItem(this, command, args));
     }
 }

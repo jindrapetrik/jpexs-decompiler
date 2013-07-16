@@ -21,10 +21,10 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.FullMultinameTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.InitPropertyTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.InitPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -40,9 +40,9 @@ public class InitPropertyIns extends InstructionDefinition {
         int multinameIndex = ins.operands[0];
 
         GraphTargetItem val = (GraphTargetItem) stack.pop();
-        FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
+        FullMultinameAVM2Item multiname = resolveMultiname(stack, constants, multinameIndex, ins);
         GraphTargetItem obj = (GraphTargetItem) stack.pop();
-        output.add(new InitPropertyTreeItem(ins, obj, multiname, val));
+        output.add(new InitPropertyAVM2Item(ins, obj, multiname, val));
     }
 
     @Override

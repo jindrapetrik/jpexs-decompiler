@@ -58,8 +58,8 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.types.*;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.*;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.*;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.*;
+import com.jpexs.decompiler.flash.abc.avm2.model.*;
+import com.jpexs.decompiler.flash.abc.avm2.model.clauses.*;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
@@ -68,10 +68,10 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
-import com.jpexs.decompiler.flash.graph.Graph;
-import com.jpexs.decompiler.flash.graph.GraphPart;
-import com.jpexs.decompiler.flash.graph.GraphSourceItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.decompiler.graph.GraphPart;
+import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.io.*;
@@ -887,13 +887,13 @@ public class AVM2Code implements Serializable {
 
     public List<GraphTargetItem> clearTemporaryRegisters(List<GraphTargetItem> output) {
         for (int i = 0; i < output.size(); i++) {
-            if (output.get(i) instanceof SetLocalTreeItem) {
-                if (isKilled(((SetLocalTreeItem) output.get(i)).regIndex, 0, code.size() - 1)) {
+            if (output.get(i) instanceof SetLocalAVM2Item) {
+                if (isKilled(((SetLocalAVM2Item) output.get(i)).regIndex, 0, code.size() - 1)) {
                     output.remove(i);
                     i--;
                 }
-            } else if (output.get(i) instanceof WithTreeItem) {
-                clearTemporaryRegisters(((WithTreeItem) output.get(i)).items);
+            } else if (output.get(i) instanceof WithAVM2Item) {
+                clearTemporaryRegisters(((WithAVM2Item) output.get(i)).items);
             }
         }
         return output;
@@ -1012,8 +1012,8 @@ public class AVM2Code implements Serializable {
                  }
                  }
                  }*/
-                if ((ins.definition instanceof GetLocalTypeIns) && (!output.isEmpty()) && (output.get(output.size() - 1) instanceof SetLocalTreeItem) && (((SetLocalTreeItem) output.get(output.size() - 1)).regIndex == ((GetLocalTypeIns) ins.definition).getRegisterId(ins)) && isKilled(((SetLocalTreeItem) output.get(output.size() - 1)).regIndex, start, end)) {
-                    SetLocalTreeItem slt = (SetLocalTreeItem) output.remove(output.size() - 1);
+                if ((ins.definition instanceof GetLocalTypeIns) && (!output.isEmpty()) && (output.get(output.size() - 1) instanceof SetLocalAVM2Item) && (((SetLocalAVM2Item) output.get(output.size() - 1)).regIndex == ((GetLocalTypeIns) ins.definition).getRegisterId(ins)) && isKilled(((SetLocalAVM2Item) output.get(output.size() - 1)).regIndex, start, end)) {
+                    SetLocalAVM2Item slt = (SetLocalAVM2Item) output.remove(output.size() - 1);
                     stack.push(slt.getValue());
                     ip++;
                 } else if ((ins.definition instanceof SetLocalTypeIns) && (ip + 1 <= end) && (isKilled(((SetLocalTypeIns) ins.definition).getRegisterId(ins), ip, end))) { //set_local_x,get_local_x..kill x
@@ -1081,7 +1081,7 @@ public class AVM2Code implements Serializable {
                                             break;//FIXME?o
                                         }
                                         GraphTargetItem v = stack.pop();
-                                        stack.push(new LocalRegTreeItem(ins, reg, v));
+                                        stack.push(new LocalRegAVM2Item(ins, reg, v));
                                         stack.push(v);
                                     } else {
                                         break;
@@ -1139,7 +1139,7 @@ public class AVM2Code implements Serializable {
                     }
                     //What to do when hasDup is false?
                     ins.definition.translate(isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames, path);
-                    NewFunctionTreeItem nft = (NewFunctionTreeItem) stack.peek();
+                    NewFunctionAVM2Item nft = (NewFunctionAVM2Item) stack.peek();
                     nft.functionName = functionName;
                     ip++;
                 } else {
@@ -1263,16 +1263,16 @@ public class AVM2Code implements Serializable {
         if (initTraits != null) {
             for (int i = 0; i < list.size(); i++) {
                 GraphTargetItem ti = list.get(i);
-                if ((ti instanceof InitPropertyTreeItem) || (ti instanceof SetPropertyTreeItem)) {
+                if ((ti instanceof InitPropertyAVM2Item) || (ti instanceof SetPropertyAVM2Item)) {
                     int multinameIndex = 0;
                     GraphTargetItem value = null;
-                    if (ti instanceof InitPropertyTreeItem) {
-                        multinameIndex = ((InitPropertyTreeItem) ti).propertyName.multinameIndex;
-                        value = ((InitPropertyTreeItem) ti).value;
+                    if (ti instanceof InitPropertyAVM2Item) {
+                        multinameIndex = ((InitPropertyAVM2Item) ti).propertyName.multinameIndex;
+                        value = ((InitPropertyAVM2Item) ti).value;
                     }
-                    if (ti instanceof SetPropertyTreeItem) {
-                        multinameIndex = ((SetPropertyTreeItem) ti).propertyName.multinameIndex;
-                        value = ((SetPropertyTreeItem) ti).value;
+                    if (ti instanceof SetPropertyAVM2Item) {
+                        multinameIndex = ((SetPropertyAVM2Item) ti).propertyName.multinameIndex;
+                        value = ((SetPropertyAVM2Item) ti).value;
                     }
                     for (Trait t : initTraits.traits) {
                         if (t.name_index == multinameIndex) {
@@ -1296,9 +1296,9 @@ public class AVM2Code implements Serializable {
         if (isStaticInitializer) {
             List<GraphTargetItem> newList = new ArrayList<>();
             for (GraphTargetItem ti : list) {
-                if (!(ti instanceof ReturnVoidTreeItem)) {
-                    if (!(ti instanceof InitPropertyTreeItem)) {
-                        if (!(ti instanceof SetPropertyTreeItem)) {
+                if (!(ti instanceof ReturnVoidAVM2Item)) {
+                    if (!(ti instanceof InitPropertyAVM2Item)) {
+                        if (!(ti instanceof SetPropertyAVM2Item)) {
                             newList.add(ti);
                         }
                     }
@@ -1317,15 +1317,15 @@ public class AVM2Code implements Serializable {
         List<Slot> declaredSlots = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             GraphTargetItem ti = list.get(i);
-            if (ti instanceof SetLocalTreeItem) {
-                int reg = ((SetLocalTreeItem) ti).regIndex;
+            if (ti instanceof SetLocalAVM2Item) {
+                int reg = ((SetLocalAVM2Item) ti).regIndex;
                 if (!declaredRegisters[reg]) {
-                    list.set(i, new DeclarationTreeItem(ti));
+                    list.set(i, new DeclarationAVM2Item(ti));
                     declaredRegisters[reg] = true;
                 }
             }
-            if (ti instanceof SetSlotTreeItem) {
-                SetSlotTreeItem ssti = (SetSlotTreeItem) ti;
+            if (ti instanceof SetSlotAVM2Item) {
+                SetSlotAVM2Item ssti = (SetSlotAVM2Item) ti;
                 Slot sl = new Slot(ssti.scope, ssti.slotName);
                 if (!declaredSlots.contains(sl)) {
                     String type = "*";
@@ -1336,7 +1336,7 @@ public class AVM2Code implements Serializable {
                             }
                         }
                     }
-                    list.set(i, new DeclarationTreeItem(ti, type));
+                    list.set(i, new DeclarationAVM2Item(ti, type));
                     declaredSlots.add(sl);
                 }
             }
@@ -2049,7 +2049,7 @@ public class AVM2Code implements Serializable {
                 if (r.size() > 1) {
                     if (!stack.isEmpty()) {
                         GraphTargetItem it = stack.pop();
-                        stack.push(new NotCompileTimeTreeItem(null, it));
+                        stack.push(new NotCompileTimeAVM2Item(null, it));
                     }
                 }
             }
@@ -2099,7 +2099,7 @@ public class AVM2Code implements Serializable {
 
 
             if ((ins instanceof AVM2Instruction) && (((AVM2Instruction) ins).definition instanceof NewFunctionIns)) {
-                stack.push(new BooleanTreeItem(null, true));
+                stack.push(new BooleanAVM2Item(null, true));
             } else {
                 ins.translate(localData, stack, output, Graph.SOP_USE_STATIC, path);
             }

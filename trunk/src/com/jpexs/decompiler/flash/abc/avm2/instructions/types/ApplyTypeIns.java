@@ -22,9 +22,9 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.ApplyTypeTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.*;
 
 public class ApplyTypeIns extends InstructionDefinition {
@@ -51,7 +51,7 @@ public class ApplyTypeIns extends InstructionDefinition {
         for (int i = 0; i < argCount; i++) {
             params.add(0, stack.pop());
         }
-        stack.push(new ApplyTypeTreeItem(ins, stack.pop(), params));
+        stack.push(new ApplyTypeAVM2Item(ins, stack.pop(), params));
     }
 
     @Override

@@ -22,9 +22,9 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.CallTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.model.CallAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,7 +58,7 @@ public class CallIns extends InstructionDefinition {
         }
         GraphTargetItem receiver = (GraphTargetItem) stack.pop();
         GraphTargetItem function = (GraphTargetItem) stack.pop();
-        stack.push(new CallTreeItem(ins, receiver, function, args));
+        stack.push(new CallAVM2Item(ins, receiver, function, args));
     }
 
     @Override

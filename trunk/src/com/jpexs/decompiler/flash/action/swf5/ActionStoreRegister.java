@@ -22,14 +22,14 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
-import com.jpexs.decompiler.flash.action.treemodel.DecrementTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.IncrementTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.PostDecrementTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.PostIncrementTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.StoreRegisterTreeItem;
-import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.model.DecrementActionItem;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.IncrementActionItem;
+import com.jpexs.decompiler.flash.action.model.PostDecrementActionItem;
+import com.jpexs.decompiler.flash.action.model.PostIncrementActionItem;
+import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
+import com.jpexs.decompiler.graph.GraphSourceItemPos;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -82,43 +82,43 @@ public class ActionStoreRegister extends Action {
         value.moreSrc.add(new GraphSourceItemPos(this, 0));
         boolean define = !variables.containsKey("__register" + registerNumber);
         variables.put("__register" + registerNumber, value);
-        if (value instanceof DirectValueTreeItem) {
-            if (((DirectValueTreeItem) value).value instanceof RegisterNumber) {
-                if (((RegisterNumber) ((DirectValueTreeItem) value).value).number == registerNumber) {
+        if (value instanceof DirectValueActionItem) {
+            if (((DirectValueActionItem) value).value instanceof RegisterNumber) {
+                if (((RegisterNumber) ((DirectValueActionItem) value).value).number == registerNumber) {
                     stack.push(value);
                     return;
                 }
             }
         }
-        if (value instanceof StoreRegisterTreeItem) {
-            if (((StoreRegisterTreeItem) value).register.number == registerNumber) {
+        if (value instanceof StoreRegisterActionItem) {
+            if (((StoreRegisterActionItem) value).register.number == registerNumber) {
                 stack.push(value);
                 return;
             }
         }
 
-        if (value instanceof IncrementTreeItem) {
-            GraphTargetItem obj = ((IncrementTreeItem) value).object;
+        if (value instanceof IncrementActionItem) {
+            GraphTargetItem obj = ((IncrementActionItem) value).object;
             if (!stack.isEmpty()) {
                 if (stack.peek().valueEquals(obj)) {
                     stack.pop();
-                    stack.push(new PostIncrementTreeItem(this, obj));
+                    stack.push(new PostIncrementActionItem(this, obj));
                     stack.push(obj);
                     return;
                 }
             }
         }
-        if (value instanceof DecrementTreeItem) {
-            GraphTargetItem obj = ((DecrementTreeItem) value).object;
+        if (value instanceof DecrementActionItem) {
+            GraphTargetItem obj = ((DecrementActionItem) value).object;
             if (!stack.isEmpty()) {
                 if (stack.peek().valueEquals(obj)) {
                     stack.pop();
-                    stack.push(new PostDecrementTreeItem(this, obj));
+                    stack.push(new PostDecrementActionItem(this, obj));
                     stack.push(obj);
                     return;
                 }
             }
         }
-        stack.push(new StoreRegisterTreeItem(this, rn, value, define));
+        stack.push(new StoreRegisterActionItem(this, rn, value, define));
     }
 }

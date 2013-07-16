@@ -16,8 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.graph.Graph;
-import com.jpexs.decompiler.flash.graph.GraphPart;
+import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.decompiler.graph.GraphPart;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;

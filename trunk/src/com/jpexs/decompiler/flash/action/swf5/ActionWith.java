@@ -23,10 +23,10 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.pcode.Label;
-import com.jpexs.decompiler.flash.action.treemodel.clauses.WithTreeItem;
-import com.jpexs.decompiler.flash.graph.GraphSourceItem;
-import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.model.clauses.WithActionItem;
+import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphSourceItemContainer;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -98,7 +98,7 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
 
     @Override
     public void translateContainer(List<List<GraphTargetItem>> content, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
-        output.add(new WithTreeItem(this, stack.pop(), content.get(0)));
+        output.add(new WithActionItem(this, stack.pop(), content.get(0)));
     }
 
     @Override

@@ -22,11 +22,11 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.SetTypeIns;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.FullMultinameTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.SetSuperTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.SetSuperAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -42,13 +42,13 @@ public class SetSuperIns extends InstructionDefinition implements SetTypeIns {
         int multinameIndex = ins.operands[0];
 
         GraphTargetItem value = (GraphTargetItem) stack.pop();
-        FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
+        FullMultinameAVM2Item multiname = resolveMultiname(stack, constants, multinameIndex, ins);
         GraphTargetItem obj = (GraphTargetItem) stack.pop();
-        output.add(new SetSuperTreeItem(ins, value, obj, multiname));
+        output.add(new SetSuperAVM2Item(ins, value, obj, multiname));
     }
 
     @Override
-    public String getObject(Stack<TreeItem> stack, ABC abc, AVM2Instruction ins, List<TreeItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public String getObject(Stack<AVM2Item> stack, ABC abc, AVM2Instruction ins, List<AVM2Item> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         int multinameIndex = ins.operands[0];
         String multiname = resolveMultinameNoPop(1, stack, abc.constants, multinameIndex, ins, fullyQualifiedNames);
         String obj = stack.get(1 + resolvedCount(abc.constants, multinameIndex)).toString(abc.constants, localRegNames, fullyQualifiedNames);

@@ -27,7 +27,7 @@ import com.jpexs.decompiler.flash.action.swf4.*;
 import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf6.*;
 import com.jpexs.decompiler.flash.action.swf7.*;
-import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
+import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.io.IOException;
 import java.io.Reader;

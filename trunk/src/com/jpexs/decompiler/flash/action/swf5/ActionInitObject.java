@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.InitObjectTreeItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.model.InitObjectActionItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +44,6 @@ public class ActionInitObject extends Action {
             values.add(stack.pop());
             names.add(stack.pop());
         }
-        stack.push(new InitObjectTreeItem(this, names, values));
+        stack.push(new InitObjectActionItem(this, names, values));
     }
 }

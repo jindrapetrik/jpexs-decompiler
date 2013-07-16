@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

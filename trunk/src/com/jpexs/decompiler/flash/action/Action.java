@@ -16,6 +16,24 @@
  */
 package com.jpexs.decompiler.flash.action;
 
+import com.jpexs.decompiler.flash.action.model.clauses.InterfaceActionItem;
+import com.jpexs.decompiler.flash.action.model.clauses.ClassActionItem;
+import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
+import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
+import com.jpexs.decompiler.flash.action.model.GetPropertyActionItem;
+import com.jpexs.decompiler.flash.action.model.SetPropertyActionItem;
+import com.jpexs.decompiler.flash.action.model.NewMethodActionItem;
+import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
+import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
+import com.jpexs.decompiler.flash.action.model.CallFunctionActionItem;
+import com.jpexs.decompiler.flash.action.model.ExtendsActionItem;
+import com.jpexs.decompiler.flash.action.model.NewObjectActionItem;
+import com.jpexs.decompiler.flash.action.model.ConstantPool;
+import com.jpexs.decompiler.flash.action.model.ImplementsOpActionItem;
+import com.jpexs.decompiler.flash.action.model.SetMemberActionItem;
+import com.jpexs.decompiler.flash.action.model.SetVariableActionItem;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.UnsupportedActionItem;
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
@@ -29,18 +47,16 @@ import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.swf4.*;
 import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
-import com.jpexs.decompiler.flash.action.treemodel.*;
-import com.jpexs.decompiler.flash.action.treemodel.clauses.*;
 import com.jpexs.decompiler.flash.ecma.Null;
-import com.jpexs.decompiler.flash.graph.CommentItem;
-import com.jpexs.decompiler.flash.graph.Graph;
-import com.jpexs.decompiler.flash.graph.GraphSource;
-import com.jpexs.decompiler.flash.graph.GraphSourceItem;
-import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
-import com.jpexs.decompiler.flash.graph.IfItem;
-import com.jpexs.decompiler.flash.graph.NotItem;
-import com.jpexs.decompiler.flash.graph.ScriptEndItem;
+import com.jpexs.decompiler.graph.model.CommentItem;
+import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.decompiler.graph.GraphSource;
+import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphSourceItemContainer;
+import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.IfItem;
+import com.jpexs.decompiler.graph.model.NotItem;
+import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
@@ -590,7 +606,7 @@ public class Action implements GraphSourceItem {
      * @param staticOperation the value of staticOperation
      * @param path the value of path
      */
-    public void translate(Stack<com.jpexs.decompiler.flash.graph.GraphTargetItem> stack, List<com.jpexs.decompiler.flash.graph.GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(Stack<com.jpexs.decompiler.graph.GraphTargetItem> stack, List<com.jpexs.decompiler.graph.GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
     }
 
     /**
@@ -601,9 +617,9 @@ public class Action implements GraphSourceItem {
      */
     protected long popLong(Stack<GraphTargetItem> stack) {
         GraphTargetItem item = stack.pop();
-        if (item instanceof DirectValueTreeItem) {
-            if (((DirectValueTreeItem) item).value instanceof Long) {
-                return (long) (Long) ((DirectValueTreeItem) item).value;
+        if (item instanceof DirectValueActionItem) {
+            if (((DirectValueActionItem) item).value instanceof Long) {
+                return (long) (Long) ((DirectValueActionItem) item).value;
             }
         }
         return 0;
@@ -673,7 +689,7 @@ public class Action implements GraphSourceItem {
      */
     public static String actionsToSource(List<Action> actions, int version, String path) {
         try {
-            //List<TreeItem> tree = actionsToTree(new HashMap<Integer, String>(), actions, version);
+            //List<ActionItem> tree = actionsToTree(new HashMap<Integer, String>(), actions, version);
             int staticOperation = (Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
 
             List<GraphTargetItem> tree = actionsToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), actions, version, staticOperation, path);
@@ -702,7 +718,7 @@ public class Action implements GraphSourceItem {
      * @return List of treeItems
      */
     public static List<GraphTargetItem> actionsToTree(HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> actions, int version, int staticOperation, String path) {
-        //Stack<TreeItem> stack = new Stack<TreeItem>();
+        //Stack<ActionItem> stack = new Stack<ActionItem>();
         return ActionGraph.translateViaGraph(regNames, variables, functions, actions, version, staticOperation, path);
         //return actionsToTree(regNames,   stack, actions, 0, actions.size() - 1, version);
     }
@@ -792,23 +808,23 @@ public class Action implements GraphSourceItem {
              unknownJumps.remove(new Long(addr));
              boolean switchFound = false;
              for (int i = output.size() - 1; i >= 0; i--) {
-             if (output.get(i) instanceof SwitchTreeItem) {
-             if (((SwitchTreeItem) output.get(i)).defaultCommands == null) {
-             List<ContinueTreeItem> continues = ((SwitchTreeItem) output.get(i)).getContinues();
+             if (output.get(i) instanceof SwitchActionItem) {
+             if (((SwitchActionItem) output.get(i)).defaultCommands == null) {
+             List<ContinueActionItem> continues = ((SwitchActionItem) output.get(i)).getContinues();
              boolean breakFound = false;
-             for (ContinueTreeItem cti : continues) {
+             for (ContinueActionItem cti : continues) {
              if (cti.loopPos == addr) {
              cti.isKnown = true;
              cti.isBreak = true;
-             ((SwitchTreeItem) output.get(i)).loopBreak = addr;
+             ((SwitchActionItem) output.get(i)).loopBreak = addr;
              breakFound = true;
              }
              }
              if (breakFound) {
              switchFound = true;
-             ((SwitchTreeItem) output.get(i)).defaultCommands = new ArrayList<TreeItem>();
+             ((SwitchActionItem) output.get(i)).defaultCommands = new ArrayList<ActionItem>();
              for (int k = i + 1; k < output.size(); k++) {
-             ((SwitchTreeItem) output.get(i)).defaultCommands.add(output.remove(i + 1));
+             ((SwitchActionItem) output.get(i)).defaultCommands.add(output.remove(i + 1));
              }
              }
              }
@@ -884,28 +900,28 @@ public class Action implements GraphSourceItem {
              isForIn = true;
              ip += 4;
              action.translate(localData, stack, output);
-             EnumerateTreeItem en = (EnumerateTreeItem) stack.peek();
+             EnumerateActionItem en = (EnumerateActionItem) stack.peek();
              inItem = en.object;
              continue;
              } else*/ /*if (action instanceof ActionTry) {
              ActionTry atry = (ActionTry) action;
              List<GraphTargetItem> tryCommands = ActionGraph.translateViaGraph(registerNames, variables, functions, atry.tryBody, version);
-             TreeItem catchName;
+             ActionItem catchName;
              if (atry.catchInRegisterFlag) {
-             catchName = new DirectValueTreeItem(atry, -1, new RegisterNumber(atry.catchRegister), new ArrayList<String>());
+             catchName = new DirectValueActionItem(atry, -1, new RegisterNumber(atry.catchRegister), new ArrayList<String>());
              } else {
-             catchName = new DirectValueTreeItem(atry, -1, atry.catchName, new ArrayList<String>());
+             catchName = new DirectValueActionItem(atry, -1, atry.catchName, new ArrayList<String>());
              }
              List<GraphTargetItem> catchExceptions = new ArrayList<GraphTargetItem>();
              catchExceptions.add(catchName);
              List<List<GraphTargetItem>> catchCommands = new ArrayList<List<GraphTargetItem>>();
              catchCommands.add(ActionGraph.translateViaGraph(registerNames, variables, functions, atry.catchBody, version));
              List<GraphTargetItem> finallyCommands = ActionGraph.translateViaGraph(registerNames, variables, functions, atry.finallyBody, version);
-             output.add(new TryTreeItem(tryCommands, catchExceptions, catchCommands, finallyCommands));
+             output.add(new TryActionItem(tryCommands, catchExceptions, catchCommands, finallyCommands));
              } else  if (action instanceof ActionWith) {
              ActionWith awith = (ActionWith) action;
              List<GraphTargetItem> withCommands = ActionGraph.translateViaGraph(registerNames, variables, functions,new ArrayList<Action>() , version); //TODO:parse with actions
-             output.add(new WithTreeItem(action, stack.pop(), withCommands));
+             output.add(new WithActionItem(action, stack.pop(), withCommands));
              } else */ if (false) {
             } /*if (action instanceof ActionStoreRegister) {
              if ((ip + 1 <= end) && (actions.get(ip + 1) instanceof ActionPop)) {
@@ -921,12 +937,12 @@ public class Action implements GraphSourceItem {
              }
              } */ /*else if (action instanceof ActionStrictEquals) {
              if ((ip + 1 < actions.size()) && (actions.get(ip + 1) instanceof ActionIf)) {
-             List<TreeItem> caseValues = new ArrayList<TreeItem>();
-             List<List<TreeItem>> caseCommands = new ArrayList<List<TreeItem>>();
+             List<ActionItem> caseValues = new ArrayList<ActionItem>();
+             List<List<ActionItem>> caseCommands = new ArrayList<List<ActionItem>>();
              caseValues.add(stack.pop());
-             TreeItem switchedObject = stack.pop();
+             ActionItem switchedObject = stack.pop();
              if (output.size() > 0) {
-             if (output.get(output.size() - 1) instanceof StoreRegisterTreeItem) {
+             if (output.get(output.size() - 1) instanceof StoreRegisterActionItem) {
              output.remove(output.size() - 1);
              }
              }
@@ -956,7 +972,7 @@ public class Action implements GraphSourceItem {
              }
              caseCommands.add(actionsToTree(registerNames, unknownJumps, loopList, jumpsOrIfs, stack, constants, actions, caseBodyIps.get(i), caseEnd, version));
              }
-             output.add(new SwitchTreeItem(action, defaultAddr, switchedObject, caseValues, caseCommands, null));
+             output.add(new SwitchActionItem(action, defaultAddr, switchedObject, caseValues, caseCommands, null));
              continue;
              } else {
              action.translate(stack, constants, output, registerNames);
@@ -966,7 +982,7 @@ public class Action implements GraphSourceItem {
                     action.translate(localData, stack, output, staticOperation, path);
                 } catch (EmptyStackException ese) {
                     Logger.getLogger(Action.class.getName()).log(Level.SEVERE, null, ese);
-                    output.add(new UnsupportedTreeItem(action, "Empty stack"));
+                    output.add(new UnsupportedActionItem(action, "Empty stack"));
                 }
 
             }
@@ -980,20 +996,20 @@ public class Action implements GraphSourceItem {
 
     public static GraphTargetItem getWithoutGlobal(GraphTargetItem ti) {
         GraphTargetItem t = ti;
-        if (!(t instanceof GetMemberTreeItem)) {
+        if (!(t instanceof GetMemberActionItem)) {
             return ti;
         }
-        GetMemberTreeItem lastMember = null;
-        while (((GetMemberTreeItem) t).object instanceof GetMemberTreeItem) {
-            lastMember = (GetMemberTreeItem) t;
-            t = ((GetMemberTreeItem) t).object;
+        GetMemberActionItem lastMember = null;
+        while (((GetMemberActionItem) t).object instanceof GetMemberActionItem) {
+            lastMember = (GetMemberActionItem) t;
+            t = ((GetMemberActionItem) t).object;
         }
-        if (((GetMemberTreeItem) t).object instanceof GetVariableTreeItem) {
-            GetVariableTreeItem v = (GetVariableTreeItem) ((GetMemberTreeItem) t).object;
-            if (v.name instanceof DirectValueTreeItem) {
-                if (((DirectValueTreeItem) v.name).value instanceof String) {
-                    if (((DirectValueTreeItem) v.name).value.equals("_global")) {
-                        GetVariableTreeItem gvt = new GetVariableTreeItem(null, ((GetMemberTreeItem) t).memberName);
+        if (((GetMemberActionItem) t).object instanceof GetVariableActionItem) {
+            GetVariableActionItem v = (GetVariableActionItem) ((GetMemberActionItem) t).object;
+            if (v.name instanceof DirectValueActionItem) {
+                if (((DirectValueActionItem) v.name).value instanceof String) {
+                    if (((DirectValueActionItem) v.name).value.equals("_global")) {
+                        GetVariableActionItem gvt = new GetVariableActionItem(null, ((GetMemberActionItem) t).memberName);
                         if (lastMember == null) {
                             return gvt;
                         } else {
@@ -1025,9 +1041,9 @@ public class Action implements GraphSourceItem {
                 IfItem it = (IfItem) t;
                 if (it.expression instanceof NotItem) {
                     NotItem nti = (NotItem) it.expression;
-                    if ((nti.value instanceof GetMemberTreeItem) || (nti.value instanceof GetVariableTreeItem)) {
-                        if (true) { //it.onFalse.isEmpty()){ //||(it.onFalse.get(0) instanceof UnsupportedTreeItem)) {
-                            if ((it.onTrue.size() == 1) && (it.onTrue.get(0) instanceof SetMemberTreeItem) && (((SetMemberTreeItem) it.onTrue.get(0)).value instanceof NewObjectTreeItem)) {
+                    if ((nti.value instanceof GetMemberActionItem) || (nti.value instanceof GetVariableActionItem)) {
+                        if (true) { //it.onFalse.isEmpty()){ //||(it.onFalse.get(0) instanceof UnsupportedActionItem)) {
+                            if ((it.onTrue.size() == 1) && (it.onTrue.get(0) instanceof SetMemberActionItem) && (((SetMemberActionItem) it.onTrue.get(0)).value instanceof NewObjectActionItem)) {
                                 //ignore
                             } else {
                                 List<GraphTargetItem> parts = it.onTrue;
@@ -1035,37 +1051,37 @@ public class Action implements GraphSourceItem {
                                 if (parts.size() >= 1) {
                                     int ipos = 0;
                                     while ((parts.get(ipos) instanceof IfItem)
-                                            && ((((IfItem) parts.get(ipos)).onTrue.size() == 1) && (((IfItem) parts.get(ipos)).onTrue.get(0) instanceof SetMemberTreeItem) && (((SetMemberTreeItem) ((IfItem) parts.get(ipos)).onTrue.get(0)).value instanceof NewObjectTreeItem))) {
+                                            && ((((IfItem) parts.get(ipos)).onTrue.size() == 1) && (((IfItem) parts.get(ipos)).onTrue.get(0) instanceof SetMemberActionItem) && (((SetMemberActionItem) ((IfItem) parts.get(ipos)).onTrue.get(0)).value instanceof NewObjectActionItem))) {
 
                                         ipos++;
                                     }
-                                    if (parts.get(ipos) instanceof SetMemberTreeItem) {
-                                        SetMemberTreeItem smt = (SetMemberTreeItem) parts.get(ipos);
-                                        if (smt.value instanceof StoreRegisterTreeItem) {
+                                    if (parts.get(ipos) instanceof SetMemberActionItem) {
+                                        SetMemberActionItem smt = (SetMemberActionItem) parts.get(ipos);
+                                        if (smt.value instanceof StoreRegisterActionItem) {
                                             parts.add(ipos, smt.value);
-                                            smt.value = ((StoreRegisterTreeItem) smt.value).value;
+                                            smt.value = ((StoreRegisterActionItem) smt.value).value;
                                         }
                                     }
-                                    if (parts.get(ipos) instanceof StoreRegisterTreeItem) {
-                                        StoreRegisterTreeItem str1 = (StoreRegisterTreeItem) parts.get(ipos);
+                                    if (parts.get(ipos) instanceof StoreRegisterActionItem) {
+                                        StoreRegisterActionItem str1 = (StoreRegisterActionItem) parts.get(ipos);
                                         int classReg = str1.register.number;
                                         int instanceReg = -1;
 
-                                        if ((parts.size() >= ipos + 2) && (parts.get(ipos + 1) instanceof SetMemberTreeItem)) {
-                                            GraphTargetItem ti1 = ((SetMemberTreeItem) parts.get(ipos + 1)).value;
-                                            GraphTargetItem ti2 = ((StoreRegisterTreeItem) parts.get(ipos + 0)).value;
+                                        if ((parts.size() >= ipos + 2) && (parts.get(ipos + 1) instanceof SetMemberActionItem)) {
+                                            GraphTargetItem ti1 = ((SetMemberActionItem) parts.get(ipos + 1)).value;
+                                            GraphTargetItem ti2 = ((StoreRegisterActionItem) parts.get(ipos + 0)).value;
                                             if (ti1 == ti2) {
-                                                if (((SetMemberTreeItem) parts.get(ipos + 1)).value instanceof FunctionTreeItem) {
-                                                    ((FunctionTreeItem) ((SetMemberTreeItem) parts.get(ipos + 1)).value).calculatedFunctionName = (className instanceof GetMemberTreeItem) ? ((GetMemberTreeItem) className).memberName : className;
-                                                    functions.add((FunctionTreeItem) ((SetMemberTreeItem) parts.get(ipos + 1)).value);
+                                                if (((SetMemberActionItem) parts.get(ipos + 1)).value instanceof FunctionActionItem) {
+                                                    ((FunctionActionItem) ((SetMemberActionItem) parts.get(ipos + 1)).value).calculatedFunctionName = (className instanceof GetMemberActionItem) ? ((GetMemberActionItem) className).memberName : className;
+                                                    functions.add((FunctionActionItem) ((SetMemberActionItem) parts.get(ipos + 1)).value);
                                                     int pos = ipos + 2;
                                                     if (parts.size() <= pos) {
                                                         ok = false;
                                                         break;
                                                     }
 
-                                                    if (parts.get(pos) instanceof ExtendsTreeItem) {
-                                                        ExtendsTreeItem et = (ExtendsTreeItem) parts.get(pos);
+                                                    if (parts.get(pos) instanceof ExtendsActionItem) {
+                                                        ExtendsActionItem et = (ExtendsActionItem) parts.get(pos);
                                                         extendsOp = getWithoutGlobal(et.superclass);
                                                         pos++;
                                                     }
@@ -1075,35 +1091,35 @@ public class Action implements GraphSourceItem {
                                                         for (int i = 0; i < prevCount; i++) {
                                                             output2.add(output.get(i));
                                                         }
-                                                        output2.add(new ClassTreeItem(className, extendsOp, implementsOp, null/*FIXME*/, functions, vars, staticFunctions, staticVars));
+                                                        output2.add(new ClassActionItem(className, extendsOp, implementsOp, null/*FIXME*/, functions, vars, staticFunctions, staticVars));
                                                         return output2;
                                                     }
 
-                                                    if (parts.get(pos) instanceof SetMemberTreeItem) {
-                                                        SetMemberTreeItem smt = (SetMemberTreeItem) parts.get(pos);
-                                                        if (smt.value instanceof StoreRegisterTreeItem) {
+                                                    if (parts.get(pos) instanceof SetMemberActionItem) {
+                                                        SetMemberActionItem smt = (SetMemberActionItem) parts.get(pos);
+                                                        if (smt.value instanceof StoreRegisterActionItem) {
                                                             parts.add(pos, smt.value);
-                                                            smt.value = ((StoreRegisterTreeItem) smt.value).value;
+                                                            smt.value = ((StoreRegisterActionItem) smt.value).value;
                                                         }
                                                     }
-                                                    if (parts.get(pos) instanceof StoreRegisterTreeItem) {
+                                                    if (parts.get(pos) instanceof StoreRegisterActionItem) {
 
-                                                        if (((StoreRegisterTreeItem) parts.get(pos)).value instanceof GetMemberTreeItem) {
-                                                            GraphTargetItem obj = ((GetMemberTreeItem) ((StoreRegisterTreeItem) parts.get(pos)).value).object;
-                                                            if (obj instanceof DirectValueTreeItem) {
-                                                                if (((DirectValueTreeItem) obj).value instanceof RegisterNumber) {
-                                                                    if (((RegisterNumber) ((DirectValueTreeItem) obj).value).number == classReg) {
-                                                                        instanceReg = ((StoreRegisterTreeItem) parts.get(pos)).register.number;
+                                                        if (((StoreRegisterActionItem) parts.get(pos)).value instanceof GetMemberActionItem) {
+                                                            GraphTargetItem obj = ((GetMemberActionItem) ((StoreRegisterActionItem) parts.get(pos)).value).object;
+                                                            if (obj instanceof DirectValueActionItem) {
+                                                                if (((DirectValueActionItem) obj).value instanceof RegisterNumber) {
+                                                                    if (((RegisterNumber) ((DirectValueActionItem) obj).value).number == classReg) {
+                                                                        instanceReg = ((StoreRegisterActionItem) parts.get(pos)).register.number;
                                                                     }
                                                                 }
                                                             }
-                                                        } else if (((StoreRegisterTreeItem) parts.get(pos)).value instanceof NewMethodTreeItem) {
+                                                        } else if (((StoreRegisterActionItem) parts.get(pos)).value instanceof NewMethodActionItem) {
 
-                                                            if (parts.get(pos + 1) instanceof SetMemberTreeItem) {
-                                                                if (((SetMemberTreeItem) parts.get(pos + 1)).value == ((StoreRegisterTreeItem) parts.get(pos)).value) {
-                                                                    instanceReg = ((StoreRegisterTreeItem) parts.get(pos)).register.number;
-                                                                    NewMethodTreeItem nm = (NewMethodTreeItem) ((StoreRegisterTreeItem) parts.get(pos)).value;
-                                                                    GetMemberTreeItem gm = new GetMemberTreeItem(null, nm.scriptObject, nm.methodName);
+                                                            if (parts.get(pos + 1) instanceof SetMemberActionItem) {
+                                                                if (((SetMemberActionItem) parts.get(pos + 1)).value == ((StoreRegisterActionItem) parts.get(pos)).value) {
+                                                                    instanceReg = ((StoreRegisterActionItem) parts.get(pos)).register.number;
+                                                                    NewMethodActionItem nm = (NewMethodActionItem) ((StoreRegisterActionItem) parts.get(pos)).value;
+                                                                    GetMemberActionItem gm = new GetMemberActionItem(null, nm.scriptObject, nm.methodName);
                                                                     extendsOp = gm;
                                                                 } else {
                                                                     ok = false;
@@ -1114,12 +1130,12 @@ public class Action implements GraphSourceItem {
                                                                 break;
                                                             }
                                                             pos++;
-                                                        } else if (((StoreRegisterTreeItem) parts.get(pos)).value instanceof NewObjectTreeItem) {
-                                                            if (parts.get(pos + 1) instanceof SetMemberTreeItem) {
-                                                                if (((SetMemberTreeItem) parts.get(pos + 1)).value == ((StoreRegisterTreeItem) parts.get(pos)).value) {
-                                                                    instanceReg = ((StoreRegisterTreeItem) parts.get(pos)).register.number;
-                                                                    NewObjectTreeItem nm = (NewObjectTreeItem) ((StoreRegisterTreeItem) parts.get(pos)).value;
-                                                                    extendsOp = new GetVariableTreeItem(null, nm.objectName);
+                                                        } else if (((StoreRegisterActionItem) parts.get(pos)).value instanceof NewObjectActionItem) {
+                                                            if (parts.get(pos + 1) instanceof SetMemberActionItem) {
+                                                                if (((SetMemberActionItem) parts.get(pos + 1)).value == ((StoreRegisterActionItem) parts.get(pos)).value) {
+                                                                    instanceReg = ((StoreRegisterActionItem) parts.get(pos)).register.number;
+                                                                    NewObjectActionItem nm = (NewObjectActionItem) ((StoreRegisterActionItem) parts.get(pos)).value;
+                                                                    extendsOp = new GetVariableActionItem(null, nm.objectName);
                                                                 } else {
                                                                     ok = false;
                                                                     break;
@@ -1143,18 +1159,18 @@ public class Action implements GraphSourceItem {
                                                             for (int i = 0; i < prevCount; i++) {
                                                                 output2.add(output.get(i));
                                                             }
-                                                            output2.add(new ClassTreeItem(className, extendsOp, implementsOp, null/*FIXME*/, functions, vars, staticFunctions, staticVars));
+                                                            output2.add(new ClassActionItem(className, extendsOp, implementsOp, null/*FIXME*/, functions, vars, staticFunctions, staticVars));
                                                             return output2;
                                                         }
-                                                        /*if (parts.get(pos) instanceof PopTreeItem) {
+                                                        /*if (parts.get(pos) instanceof PopActionItem) {
                                                          pos++;
                                                          }*/
                                                         if (parts.size() <= pos) {
                                                             ok = false;
                                                             break;
                                                         }
-                                                        if (parts.get(pos) instanceof ImplementsOpTreeItem) {
-                                                            ImplementsOpTreeItem io = (ImplementsOpTreeItem) parts.get(pos);
+                                                        if (parts.get(pos) instanceof ImplementsOpActionItem) {
+                                                            ImplementsOpActionItem io = (ImplementsOpActionItem) parts.get(pos);
                                                             implementsOp = io.superclasses;
                                                             pos++;
                                                         }
@@ -1162,21 +1178,21 @@ public class Action implements GraphSourceItem {
                                                             if (parts.get(pos) instanceof ScriptEndItem) {
                                                                 break;
                                                             }
-                                                            if (parts.get(pos) instanceof SetMemberTreeItem) {
-                                                                SetMemberTreeItem smt = (SetMemberTreeItem) parts.get(pos);
-                                                                if (smt.object instanceof DirectValueTreeItem) {
-                                                                    if (((DirectValueTreeItem) smt.object).value instanceof RegisterNumber) {
-                                                                        if (((RegisterNumber) ((DirectValueTreeItem) smt.object).value).number == instanceReg) {
-                                                                            if (smt.value instanceof FunctionTreeItem) {
-                                                                                ((FunctionTreeItem) smt.value).calculatedFunctionName = smt.objectName;
-                                                                                functions.add((FunctionTreeItem) smt.value);
+                                                            if (parts.get(pos) instanceof SetMemberActionItem) {
+                                                                SetMemberActionItem smt = (SetMemberActionItem) parts.get(pos);
+                                                                if (smt.object instanceof DirectValueActionItem) {
+                                                                    if (((DirectValueActionItem) smt.object).value instanceof RegisterNumber) {
+                                                                        if (((RegisterNumber) ((DirectValueActionItem) smt.object).value).number == instanceReg) {
+                                                                            if (smt.value instanceof FunctionActionItem) {
+                                                                                ((FunctionActionItem) smt.value).calculatedFunctionName = smt.objectName;
+                                                                                functions.add((FunctionActionItem) smt.value);
                                                                             } else {
                                                                                 vars.add(new MyEntry<>(smt.objectName, smt.value));
                                                                             }
-                                                                        } else if (((RegisterNumber) ((DirectValueTreeItem) smt.object).value).number == classReg) {
-                                                                            if (smt.value instanceof FunctionTreeItem) {
-                                                                                ((FunctionTreeItem) smt.value).calculatedFunctionName = smt.objectName;
-                                                                                staticFunctions.add((FunctionTreeItem) smt.value);
+                                                                        } else if (((RegisterNumber) ((DirectValueActionItem) smt.object).value).number == classReg) {
+                                                                            if (smt.value instanceof FunctionActionItem) {
+                                                                                ((FunctionActionItem) smt.value).calculatedFunctionName = smt.objectName;
+                                                                                staticFunctions.add((FunctionActionItem) smt.value);
                                                                             } else {
                                                                                 staticVars.add(new MyEntry<>(smt.objectName, smt.value));
                                                                             }
@@ -1187,10 +1203,10 @@ public class Action implements GraphSourceItem {
                                                                 } else {
                                                                     ok = false;
                                                                 }
-                                                            } else if (parts.get(pos) instanceof CallFunctionTreeItem) {
-                                                                //if(((CallFunctionTreeItem)parts.get(pos)).functionName){
-                                                                if (((CallFunctionTreeItem) parts.get(pos)).functionName instanceof DirectValueTreeItem) {
-                                                                    if (((DirectValueTreeItem) ((CallFunctionTreeItem) parts.get(pos)).functionName).value.equals("ASSetPropFlags")) {
+                                                            } else if (parts.get(pos) instanceof CallFunctionActionItem) {
+                                                                //if(((CallFunctionActionItem)parts.get(pos)).functionName){
+                                                                if (((CallFunctionActionItem) parts.get(pos)).functionName instanceof DirectValueActionItem) {
+                                                                    if (((DirectValueActionItem) ((CallFunctionActionItem) parts.get(pos)).functionName).value.equals("ASSetPropFlags")) {
                                                                     } else {
                                                                         ok = false;
                                                                     }
@@ -1209,7 +1225,7 @@ public class Action implements GraphSourceItem {
                                                             for (int i = 0; i < prevCount; i++) {
                                                                 output2.add(output.get(i));
                                                             }
-                                                            output2.add(new ClassTreeItem(className, extendsOp, implementsOp, null/*FIXME*/, functions, vars, staticFunctions, staticVars));
+                                                            output2.add(new ClassActionItem(className, extendsOp, implementsOp, null/*FIXME*/, functions, vars, staticFunctions, staticVars));
                                                             return output2;
                                                         }
                                                     } else {
@@ -1224,15 +1240,15 @@ public class Action implements GraphSourceItem {
                                         } else {
                                             ok = false;
                                         }
-                                    } else if (parts.get(0) instanceof SetMemberTreeItem) {
-                                        SetMemberTreeItem sm = (SetMemberTreeItem) parts.get(0);
-                                        if (sm.value instanceof FunctionTreeItem) {
-                                            FunctionTreeItem f = (FunctionTreeItem) sm.value;
+                                    } else if (parts.get(0) instanceof SetMemberActionItem) {
+                                        SetMemberActionItem sm = (SetMemberActionItem) parts.get(0);
+                                        if (sm.value instanceof FunctionActionItem) {
+                                            FunctionActionItem f = (FunctionActionItem) sm.value;
                                             if (f.actions.isEmpty()) {
 
                                                 if (parts.size() == 2) {
-                                                    if (parts.get(1) instanceof ImplementsOpTreeItem) {
-                                                        ImplementsOpTreeItem iot = (ImplementsOpTreeItem) parts.get(1);
+                                                    if (parts.get(1) instanceof ImplementsOpActionItem) {
+                                                        ImplementsOpActionItem iot = (ImplementsOpActionItem) parts.get(1);
                                                         implementsOp = iot.superclasses;
                                                     } else {
                                                         ok = false;
@@ -1243,7 +1259,7 @@ public class Action implements GraphSourceItem {
                                                 for (int i = 0; i < prevCount; i++) {
                                                     output2.add(output.get(i));
                                                 }
-                                                output2.add(new InterfaceTreeItem(sm.objectName, implementsOp));
+                                                output2.add(new InterfaceActionItem(sm.objectName, implementsOp));
                                                 return output2;
                                             } else {
                                                 ok = false;
@@ -1348,17 +1364,17 @@ public class Action implements GraphSourceItem {
 
     public static GraphTargetItem gettoset(GraphTargetItem get, GraphTargetItem value) {
         GraphTargetItem ret = get;
-        if (ret instanceof GetVariableTreeItem) {
-            GetVariableTreeItem gv = (GetVariableTreeItem) ret;
-            ret = new SetVariableTreeItem(null, gv.name, value);
-        } else if (ret instanceof GetMemberTreeItem) {
-            GetMemberTreeItem mem = (GetMemberTreeItem) ret;
-            ret = new SetMemberTreeItem(null, mem.object, mem.memberName, value);
-        } else if ((ret instanceof DirectValueTreeItem) && ((DirectValueTreeItem) ret).value instanceof RegisterNumber) {
-            ret = new StoreRegisterTreeItem(null, (RegisterNumber) ((DirectValueTreeItem) ret).value, value, false);
-        } else if (ret instanceof GetPropertyTreeItem) {
-            GetPropertyTreeItem gp = (GetPropertyTreeItem) ret;
-            ret = new SetPropertyTreeItem(null, gp.target, gp.propertyIndex, value);
+        if (ret instanceof GetVariableActionItem) {
+            GetVariableActionItem gv = (GetVariableActionItem) ret;
+            ret = new SetVariableActionItem(null, gv.name, value);
+        } else if (ret instanceof GetMemberActionItem) {
+            GetMemberActionItem mem = (GetMemberActionItem) ret;
+            ret = new SetMemberActionItem(null, mem.object, mem.memberName, value);
+        } else if ((ret instanceof DirectValueActionItem) && ((DirectValueActionItem) ret).value instanceof RegisterNumber) {
+            ret = new StoreRegisterActionItem(null, (RegisterNumber) ((DirectValueActionItem) ret).value, value, false);
+        } else if (ret instanceof GetPropertyActionItem) {
+            GetPropertyActionItem gp = (GetPropertyActionItem) ret;
+            ret = new SetPropertyActionItem(null, gp.target, gp.propertyIndex, value);
         }
         return ret;
     }

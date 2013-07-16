@@ -22,10 +22,10 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.CallSuperTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.FullMultinameTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.model.CallSuperAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,10 +60,10 @@ public class CallSuperVoidIns extends InstructionDefinition {
         for (int a = 0; a < argCount; a++) {
             args.add(0, (GraphTargetItem) stack.pop());
         }
-        FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
+        FullMultinameAVM2Item multiname = resolveMultiname(stack, constants, multinameIndex, ins);
         GraphTargetItem receiver = (GraphTargetItem) stack.pop();
 
-        output.add(new CallSuperTreeItem(ins, true, receiver, multiname, args));
+        output.add(new CallSuperAVM2Item(ins, true, receiver, multiname, args));
 
     }
 

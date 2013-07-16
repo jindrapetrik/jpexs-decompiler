@@ -19,10 +19,10 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.executing;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.CallPropertyTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.FullMultinameTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.model.CallPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,10 +43,10 @@ public class CallPropLexIns extends CallPropertyIns {
         for (int a = 0; a < argCount; a++) {
             args.add(0, (GraphTargetItem) stack.pop());
         }
-        FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
+        FullMultinameAVM2Item multiname = resolveMultiname(stack, constants, multinameIndex, ins);
         GraphTargetItem receiver = (GraphTargetItem) stack.pop();
 
-        stack.push(new CallPropertyTreeItem(ins, false, receiver, multiname, args));
+        stack.push(new CallPropertyAVM2Item(ins, false, receiver, multiname, args));
     }
 
     @Override

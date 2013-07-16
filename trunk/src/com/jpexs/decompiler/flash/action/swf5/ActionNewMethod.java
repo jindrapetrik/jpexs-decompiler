@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.NewMethodTreeItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.model.NewMethodActionItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +44,6 @@ public class ActionNewMethod extends Action {
         for (long l = 0; l < numArgs; l++) {
             args.add(stack.pop());
         }
-        stack.push(new NewMethodTreeItem(this, scriptObject, methodName, args));
+        stack.push(new NewMethodActionItem(this, scriptObject, methodName, args));
     }
 }

@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.xfl;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
-import com.jpexs.decompiler.flash.graph.Graph;
+import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;

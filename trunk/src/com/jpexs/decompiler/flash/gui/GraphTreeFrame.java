@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
-import com.jpexs.decompiler.flash.graph.GraphPart;
+import com.jpexs.decompiler.graph.GraphPart;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import javax.swing.JTree;

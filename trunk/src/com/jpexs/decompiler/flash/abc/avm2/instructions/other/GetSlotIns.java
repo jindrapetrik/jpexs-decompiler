@@ -21,17 +21,17 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.ClassTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.GetSlotTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.NewActivationTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.ScriptTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.ThisTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.ExceptionTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.model.ClassAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetSlotAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.ScriptAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.ThisAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitWithSlot;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -48,22 +48,22 @@ public class GetSlotIns extends InstructionDefinition {
         GraphTargetItem obj = (GraphTargetItem) stack.pop(); //scope
         obj = obj.getThroughRegister();
         Multiname slotname = null;
-        if (obj instanceof ExceptionTreeItem) {
-            slotname = constants.constant_multiname[((ExceptionTreeItem) obj).exception.name_index];
-        } else if (obj instanceof ClassTreeItem) {
-            slotname = ((ClassTreeItem) obj).className;
-        } else if (obj instanceof ThisTreeItem) {
-            slotname = ((ThisTreeItem) obj).className;
-        } else if (obj instanceof ScriptTreeItem) {
-            for (int t = 0; t < abc.script_info[((ScriptTreeItem) obj).scriptIndex].traits.traits.length; t++) {
-                Trait tr = abc.script_info[((ScriptTreeItem) obj).scriptIndex].traits.traits[t];
+        if (obj instanceof ExceptionAVM2Item) {
+            slotname = constants.constant_multiname[((ExceptionAVM2Item) obj).exception.name_index];
+        } else if (obj instanceof ClassAVM2Item) {
+            slotname = ((ClassAVM2Item) obj).className;
+        } else if (obj instanceof ThisAVM2Item) {
+            slotname = ((ThisAVM2Item) obj).className;
+        } else if (obj instanceof ScriptAVM2Item) {
+            for (int t = 0; t < abc.script_info[((ScriptAVM2Item) obj).scriptIndex].traits.traits.length; t++) {
+                Trait tr = abc.script_info[((ScriptAVM2Item) obj).scriptIndex].traits.traits[t];
                 if (tr instanceof TraitWithSlot) {
                     if (((TraitWithSlot) tr).getSlotIndex() == slotIndex) {
                         slotname = tr.getName(abc);
                     }
                 }
             }
-        } else if (obj instanceof NewActivationTreeItem) {
+        } else if (obj instanceof NewActivationAVM2Item) {
 
             for (int t = 0; t < body.traits.traits.length; t++) {
                 if (body.traits.traits[t] instanceof TraitWithSlot) {
@@ -74,7 +74,7 @@ public class GetSlotIns extends InstructionDefinition {
 
             }
         }
-        stack.push(new GetSlotTreeItem(ins, obj, slotname));
+        stack.push(new GetSlotAVM2Item(ins, obj, slotname));
     }
 
     @Override

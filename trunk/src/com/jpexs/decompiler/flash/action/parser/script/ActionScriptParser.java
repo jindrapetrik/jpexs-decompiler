@@ -20,112 +20,112 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.swf4.*;
 import com.jpexs.decompiler.flash.action.swf5.*;
-import com.jpexs.decompiler.flash.action.treemodel.AsciiToCharTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.CallFunctionTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.CallMethodTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.CallTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.CharToAsciiTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.CloneSpriteTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
-import com.jpexs.decompiler.flash.action.treemodel.DefineLocalTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.DefineRegisterTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.DeleteTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.EvalTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.FunctionTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.GetMemberTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.GetTimeTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.GetURL2TreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.GetVariableTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.GetVersionTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.GotoFrame2TreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.InitArrayTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.InitObjectTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.LoadMovieNumTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.LoadMovieTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.LoadVariablesNumTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.LoadVariablesTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.MBAsciiToCharTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.MBCharToAsciiTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.MBStringExtractTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.MBStringLengthTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.NewMethodTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.NewObjectTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.NextFrameTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.PlayTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.PostDecrementTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.PostIncrementTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.PrevFrameTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.PrintAsBitmapNumTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.PrintAsBitmapTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.PrintNumTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.PrintTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.RandomNumberTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.RemoveSpriteTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.ReturnTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.SetMemberTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.SetVariableTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.StartDragTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.StopAllSoundsTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.StopDragTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.StopTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.StoreRegisterTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.StringExtractTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.StringLengthTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.ThrowTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.ToIntegerTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.ToNumberTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.ToStringTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.ToggleHighQualityTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.TraceTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.TypeOfTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.UnLoadMovieNumTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.UnLoadMovieTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.clauses.ClassTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.clauses.ForInTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.clauses.IfFrameLoadedTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.clauses.InterfaceTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.clauses.TellTargetTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.clauses.TryTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.clauses.WithTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.operations.AddTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.operations.BitAndTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.operations.BitOrTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.operations.BitXorTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.operations.DivideTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.operations.EqTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.operations.GeTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.operations.GtTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.operations.InstanceOfTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.operations.LeTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.operations.LtTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.operations.ModuloTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.operations.MultiplyTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.operations.NeqTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.operations.PreDecrementTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.operations.PreIncrementTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.operations.StrictEqTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.operations.StrictNeqTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.operations.SubtractTreeItem;
+import com.jpexs.decompiler.flash.action.model.AsciiToCharActionItem;
+import com.jpexs.decompiler.flash.action.model.CallFunctionActionItem;
+import com.jpexs.decompiler.flash.action.model.CallMethodActionItem;
+import com.jpexs.decompiler.flash.action.model.CallActionItem;
+import com.jpexs.decompiler.flash.action.model.CharToAsciiActionItem;
+import com.jpexs.decompiler.flash.action.model.CloneSpriteActionItem;
+import com.jpexs.decompiler.flash.action.model.ConstantPool;
+import com.jpexs.decompiler.flash.action.model.DefineLocalActionItem;
+import com.jpexs.decompiler.flash.action.model.DefineRegisterActionItem;
+import com.jpexs.decompiler.flash.action.model.DeleteActionItem;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.EvalActionItem;
+import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
+import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
+import com.jpexs.decompiler.flash.action.model.GetTimeActionItem;
+import com.jpexs.decompiler.flash.action.model.GetURL2ActionItem;
+import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
+import com.jpexs.decompiler.flash.action.model.GetVersionActionItem;
+import com.jpexs.decompiler.flash.action.model.GotoFrame2ActionItem;
+import com.jpexs.decompiler.flash.action.model.InitArrayActionItem;
+import com.jpexs.decompiler.flash.action.model.InitObjectActionItem;
+import com.jpexs.decompiler.flash.action.model.LoadMovieNumActionItem;
+import com.jpexs.decompiler.flash.action.model.LoadMovieActionItem;
+import com.jpexs.decompiler.flash.action.model.LoadVariablesNumActionItem;
+import com.jpexs.decompiler.flash.action.model.LoadVariablesActionItem;
+import com.jpexs.decompiler.flash.action.model.MBAsciiToCharActionItem;
+import com.jpexs.decompiler.flash.action.model.MBCharToAsciiActionItem;
+import com.jpexs.decompiler.flash.action.model.MBStringExtractActionItem;
+import com.jpexs.decompiler.flash.action.model.MBStringLengthActionItem;
+import com.jpexs.decompiler.flash.action.model.NewMethodActionItem;
+import com.jpexs.decompiler.flash.action.model.NewObjectActionItem;
+import com.jpexs.decompiler.flash.action.model.NextFrameActionItem;
+import com.jpexs.decompiler.flash.action.model.PlayActionItem;
+import com.jpexs.decompiler.flash.action.model.PostDecrementActionItem;
+import com.jpexs.decompiler.flash.action.model.PostIncrementActionItem;
+import com.jpexs.decompiler.flash.action.model.PrevFrameActionItem;
+import com.jpexs.decompiler.flash.action.model.PrintAsBitmapNumActionItem;
+import com.jpexs.decompiler.flash.action.model.PrintAsBitmapActionItem;
+import com.jpexs.decompiler.flash.action.model.PrintNumActionItem;
+import com.jpexs.decompiler.flash.action.model.PrintActionItem;
+import com.jpexs.decompiler.flash.action.model.RandomNumberActionItem;
+import com.jpexs.decompiler.flash.action.model.RemoveSpriteActionItem;
+import com.jpexs.decompiler.flash.action.model.ReturnActionItem;
+import com.jpexs.decompiler.flash.action.model.SetMemberActionItem;
+import com.jpexs.decompiler.flash.action.model.SetVariableActionItem;
+import com.jpexs.decompiler.flash.action.model.StartDragActionItem;
+import com.jpexs.decompiler.flash.action.model.StopAllSoundsActionItem;
+import com.jpexs.decompiler.flash.action.model.StopDragActionItem;
+import com.jpexs.decompiler.flash.action.model.StopActionItem;
+import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
+import com.jpexs.decompiler.flash.action.model.StringExtractActionItem;
+import com.jpexs.decompiler.flash.action.model.StringLengthActionItem;
+import com.jpexs.decompiler.flash.action.model.ThrowActionItem;
+import com.jpexs.decompiler.flash.action.model.ToIntegerActionItem;
+import com.jpexs.decompiler.flash.action.model.ToNumberActionItem;
+import com.jpexs.decompiler.flash.action.model.ToStringActionItem;
+import com.jpexs.decompiler.flash.action.model.ToggleHighQualityActionItem;
+import com.jpexs.decompiler.flash.action.model.TraceActionItem;
+import com.jpexs.decompiler.flash.action.model.TypeOfActionItem;
+import com.jpexs.decompiler.flash.action.model.UnLoadMovieNumActionItem;
+import com.jpexs.decompiler.flash.action.model.UnLoadMovieActionItem;
+import com.jpexs.decompiler.flash.action.model.clauses.ClassActionItem;
+import com.jpexs.decompiler.flash.action.model.clauses.ForInActionItem;
+import com.jpexs.decompiler.flash.action.model.clauses.IfFrameLoadedActionItem;
+import com.jpexs.decompiler.flash.action.model.clauses.InterfaceActionItem;
+import com.jpexs.decompiler.flash.action.model.clauses.TellTargetActionItem;
+import com.jpexs.decompiler.flash.action.model.clauses.TryActionItem;
+import com.jpexs.decompiler.flash.action.model.clauses.WithActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.AddActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.BitAndActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.BitOrActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.BitXorActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.DivideActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.EqActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.GeActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.GtActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.InstanceOfActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.LeActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.LtActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.ModuloActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.MultiplyActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.NeqActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.PreDecrementActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.PreIncrementActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.StrictEqActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.StrictNeqActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.SubtractActionItem;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
-import com.jpexs.decompiler.flash.graph.AndItem;
-import com.jpexs.decompiler.flash.graph.BinaryOp;
-import com.jpexs.decompiler.flash.graph.BlockItem;
-import com.jpexs.decompiler.flash.graph.BreakItem;
-import com.jpexs.decompiler.flash.graph.CommaExpressionItem;
-import com.jpexs.decompiler.flash.graph.ContinueItem;
-import com.jpexs.decompiler.flash.graph.DoWhileItem;
-import com.jpexs.decompiler.flash.graph.ForItem;
-import com.jpexs.decompiler.flash.graph.GraphSourceItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
-import com.jpexs.decompiler.flash.graph.IfItem;
-import com.jpexs.decompiler.flash.graph.NotItem;
-import com.jpexs.decompiler.flash.graph.OrItem;
-import com.jpexs.decompiler.flash.graph.ParenthesisItem;
-import com.jpexs.decompiler.flash.graph.SwitchItem;
-import com.jpexs.decompiler.flash.graph.TernarOpItem;
-import com.jpexs.decompiler.flash.graph.WhileItem;
+import com.jpexs.decompiler.graph.model.AndItem;
+import com.jpexs.decompiler.graph.model.BinaryOp;
+import com.jpexs.decompiler.graph.model.BlockItem;
+import com.jpexs.decompiler.graph.model.BreakItem;
+import com.jpexs.decompiler.graph.model.CommaExpressionItem;
+import com.jpexs.decompiler.graph.model.ContinueItem;
+import com.jpexs.decompiler.graph.model.DoWhileItem;
+import com.jpexs.decompiler.graph.model.ForItem;
+import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.IfItem;
+import com.jpexs.decompiler.graph.model.NotItem;
+import com.jpexs.decompiler.graph.model.OrItem;
+import com.jpexs.decompiler.graph.model.ParenthesisItem;
+import com.jpexs.decompiler.graph.model.SwitchItem;
+import com.jpexs.decompiler.graph.model.TernarOpItem;
+import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -184,12 +184,12 @@ public class ActionScriptParser {
 
         ParsedSymbol s = lex();
         expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
-        ret = new GetVariableTreeItem(null, pushConst(s.value.toString()));
+        ret = new GetVariableActionItem(null, pushConst(s.value.toString()));
         s = lex();
         while (s.type == SymbolType.DOT) {
             s = lex();
             expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
-            ret = new GetMemberTreeItem(null, ret, pushConst(s.value.toString()));
+            ret = new GetMemberActionItem(null, ret, pushConst(s.value.toString()));
             s = lex();
         }
         lexer.pushback(s);
@@ -207,14 +207,14 @@ public class ActionScriptParser {
                     ret = member(ret, registerVars, inFunction, inMethod);
                     break;
                 case PARENT_OPEN:
-                    if (ret instanceof GetMemberTreeItem) {
-                        GetMemberTreeItem mem = (GetMemberTreeItem) ret;
-                        ret = new CallMethodTreeItem(null, mem.object, mem.memberName, call(registerVars, inFunction, inMethod));
-                    } else if (ret instanceof GetVariableTreeItem) {
-                        GetVariableTreeItem var = (GetVariableTreeItem) ret;
-                        ret = new CallFunctionTreeItem(null, var.name, call(registerVars, inFunction, inMethod));
+                    if (ret instanceof GetMemberActionItem) {
+                        GetMemberActionItem mem = (GetMemberActionItem) ret;
+                        ret = new CallMethodActionItem(null, mem.object, mem.memberName, call(registerVars, inFunction, inMethod));
+                    } else if (ret instanceof GetVariableActionItem) {
+                        GetVariableActionItem var = (GetVariableActionItem) ret;
+                        ret = new CallFunctionActionItem(null, var.name, call(registerVars, inFunction, inMethod));
                     } else {
-                        ret = new CallFunctionTreeItem(null, ret, call(registerVars, inFunction, inMethod));
+                        ret = new CallFunctionActionItem(null, ret, call(registerVars, inFunction, inMethod));
                     }
                     break;
             }
@@ -229,7 +229,7 @@ public class ActionScriptParser {
         ParsedSymbol s = lex();
         while (s.isType(SymbolType.DOT, SymbolType.BRACKET_OPEN)) {
             if (s.type == SymbolType.BRACKET_OPEN) {
-                ret = new GetMemberTreeItem(null, ret, expression(registerVars, inFunction, inMethod, true));
+                ret = new GetMemberActionItem(null, ret, expression(registerVars, inFunction, inMethod, true));
                 expectedType(SymbolType.BRACKET_CLOSE);
                 s = lex();
                 continue;
@@ -241,7 +241,7 @@ public class ActionScriptParser {
                 //ret.add(new ActionPush((Long) (long) (int) GraphTargetItem.propertyNamesList.indexOf(s.value.toString())));
                 //ret.add(new ActionGetProperty());
             } else {
-                ret = new GetMemberTreeItem(null, ret, pushConst(s.value.toString()));
+                ret = new GetMemberActionItem(null, ret, pushConst(s.value.toString()));
             }
             s = lex();
         }
@@ -254,19 +254,19 @@ public class ActionScriptParser {
         ParsedSymbol s = lex();
         expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.THIS, SymbolType.SUPER);
         if (registerVars.containsKey(s.value.toString())) {
-            ret = new DirectValueTreeItem(null, 0, new RegisterNumber(registerVars.get(s.value.toString())), new ArrayList<String>());
+            ret = new DirectValueActionItem(null, 0, new RegisterNumber(registerVars.get(s.value.toString())), new ArrayList<String>());
         } else {
             if (inMethod) {
-                ret = new DirectValueTreeItem(null, 0, new RegisterNumber(REGISTER_THIS), new ArrayList<String>());
+                ret = new DirectValueActionItem(null, 0, new RegisterNumber(REGISTER_THIS), new ArrayList<String>());
                 //TODO: Handle properties (?)
                 if (false) { //GraphTargetItem.propertyNamesList.contains(s.value.toString())) {
                     //ret.add(new ActionPush((Long) (long) (int) GraphTargetItem.propertyNamesList.indexOf(s.value.toString())));
                     //ret.add(new ActionGetProperty());
                 } else {
-                    ret = new GetMemberTreeItem(null, ret, pushConst(s.value.toString()));
+                    ret = new GetMemberActionItem(null, ret, pushConst(s.value.toString()));
                 }
             } else {
-                ret = new GetVariableTreeItem(null, pushConst(s.value.toString()));
+                ret = new GetVariableActionItem(null, pushConst(s.value.toString()));
             }
         }
         ret = (member(ret, registerVars, inFunction, inMethod));
@@ -326,7 +326,7 @@ public class ActionScriptParser {
         return ret;
     }
 
-    private FunctionTreeItem function(boolean withBody, String functionName, boolean isMethod) throws IOException, ParseException {
+    private FunctionActionItem function(boolean withBody, String functionName, boolean isMethod) throws IOException, ParseException {
         GraphTargetItem ret = null;
         ParsedSymbol s = null;
         expectedType(SymbolType.PARENT_OPEN);
@@ -367,7 +367,7 @@ public class ActionScriptParser {
             expectedType(SymbolType.CURLY_CLOSE);
         }
 
-        return new FunctionTreeItem(null, functionName, paramNames, body, constantPool, -1);
+        return new FunctionActionItem(null, functionName, paramNames, body, constantPool, -1);
     }
 
     private GraphTargetItem traits(boolean isInterface, GraphTargetItem nameStr, GraphTargetItem extendsStr, List<GraphTargetItem> implementsStr) throws IOException, ParseException {
@@ -399,22 +399,22 @@ public class ActionScriptParser {
 
 
         ParsedSymbol s = null;
-        FunctionTreeItem constr = null;
+        FunctionActionItem constr = null;
         List<GraphTargetItem> staticFunctions = new ArrayList<>();
         List<MyEntry<GraphTargetItem, GraphTargetItem>> staticVars = new ArrayList<>();
         List<GraphTargetItem> functions = new ArrayList<>();
         List<MyEntry<GraphTargetItem, GraphTargetItem>> vars = new ArrayList<>();
 
         String classNameStr = "";
-        if (nameStr instanceof GetMemberTreeItem) {
-            GetMemberTreeItem mem = (GetMemberTreeItem) nameStr;
-            if (mem.memberName instanceof DirectValueTreeItem) {
-                classNameStr = ((DirectValueTreeItem) mem.memberName).toStringNoQuotes(new ConstantPool(constantPool));
+        if (nameStr instanceof GetMemberActionItem) {
+            GetMemberActionItem mem = (GetMemberActionItem) nameStr;
+            if (mem.memberName instanceof DirectValueActionItem) {
+                classNameStr = ((DirectValueActionItem) mem.memberName).toStringNoQuotes(new ConstantPool(constantPool));
             }
-        } else if (nameStr instanceof GetVariableTreeItem) {
-            GetVariableTreeItem var = (GetVariableTreeItem) nameStr;
-            if (var.name instanceof DirectValueTreeItem) {
-                classNameStr = ((DirectValueTreeItem) var.name).toStringNoQuotes(new ConstantPool(constantPool));
+        } else if (nameStr instanceof GetVariableActionItem) {
+            GetVariableActionItem var = (GetVariableActionItem) nameStr;
+            if (var.name instanceof DirectValueActionItem) {
+                classNameStr = ((DirectValueActionItem) var.name).toStringNoQuotes(new ConstantPool(constantPool));
             }
         }
 
@@ -438,11 +438,11 @@ public class ActionScriptParser {
                     } else {
                         if (!isInterface) {
                             if (isStatic) {
-                                FunctionTreeItem ft = function(!isInterface, "", true);
+                                FunctionActionItem ft = function(!isInterface, "", true);
                                 ft.calculatedFunctionName = pushConst(fname);
                                 staticFunctions.add(ft);
                             } else {
-                                FunctionTreeItem ft = function(!isInterface, "", true);
+                                FunctionActionItem ft = function(!isInterface, "", true);
                                 ft.calculatedFunctionName = pushConst(fname);
                                 functions.add(ft);
                             }
@@ -478,9 +478,9 @@ public class ActionScriptParser {
         }
 
         if (isInterface) {
-            return new InterfaceTreeItem(nameStr, implementsStr);
+            return new InterfaceActionItem(nameStr, implementsStr);
         } else {
-            return new ClassTreeItem(nameStr, extendsStr, implementsStr, constr, functions, vars, staticFunctions, staticVars);
+            return new ClassActionItem(nameStr, extendsStr, implementsStr, constr, functions, vars, staticFunctions, staticVars);
         }
     }
 
@@ -489,22 +489,22 @@ public class ActionScriptParser {
         switch (s.type) {
             case GETVERSION:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new GetVersionTreeItem(null);
+                ret = new GetVersionActionItem(null);
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case MBORD:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new MBCharToAsciiTreeItem(null, expression(registerVars, inFunction, inMethod, true));
+                ret = new MBCharToAsciiActionItem(null, expression(registerVars, inFunction, inMethod, true));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case MBCHR:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new MBAsciiToCharTreeItem(null, expression(registerVars, inFunction, inMethod, true));
+                ret = new MBAsciiToCharActionItem(null, expression(registerVars, inFunction, inMethod, true));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case MBLENGTH:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new MBStringLengthTreeItem(null, expression(registerVars, inFunction, inMethod, true));
+                ret = new MBStringLengthActionItem(null, expression(registerVars, inFunction, inMethod, true));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case MBSUBSTRING:
@@ -515,7 +515,7 @@ public class ActionScriptParser {
                 expectedType(SymbolType.COMMA);
                 GraphTargetItem len1 = (expression(registerVars, inFunction, inMethod, true));
                 expectedType(SymbolType.PARENT_CLOSE);
-                ret = new MBStringExtractTreeItem(null, val1, index1, len1);
+                ret = new MBStringExtractActionItem(null, val1, index1, len1);
                 break;
             case SUBSTR:
                 expectedType(SymbolType.PARENT_OPEN);
@@ -525,21 +525,21 @@ public class ActionScriptParser {
                 expectedType(SymbolType.COMMA);
                 GraphTargetItem len2 = (expression(registerVars, inFunction, inMethod, true));
                 expectedType(SymbolType.PARENT_CLOSE);
-                ret = new StringExtractTreeItem(null, val2, index2, len2);
+                ret = new StringExtractActionItem(null, val2, index2, len2);
                 break;
             case LENGTH:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new StringLengthTreeItem(null, expression(registerVars, inFunction, inMethod, true));
+                ret = new StringLengthActionItem(null, expression(registerVars, inFunction, inMethod, true));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case RANDOM:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new RandomNumberTreeItem(null, expression(registerVars, inFunction, inMethod, true));
+                ret = new RandomNumberActionItem(null, expression(registerVars, inFunction, inMethod, true));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case INT:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new ToIntegerTreeItem(null, expression(registerVars, inFunction, inMethod, true));
+                ret = new ToIntegerActionItem(null, expression(registerVars, inFunction, inMethod, true));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
 
@@ -552,32 +552,32 @@ public class ActionScriptParser {
             case NUMBER_OP:
                 s = lex();
                 if (s.type == SymbolType.DOT) {
-                    ret = memberOrCall(new GetVariableTreeItem(null, new DirectValueTreeItem(null, 0, s.value, new ArrayList<String>())), registerVars, inFunction, inMethod);
+                    ret = memberOrCall(new GetVariableActionItem(null, new DirectValueActionItem(null, 0, s.value, new ArrayList<String>())), registerVars, inFunction, inMethod);
                 } else {
                     expected(s, lexer.yyline(), SymbolType.PARENT_OPEN);
-                    ret = new ToNumberTreeItem(null, expression(registerVars, inFunction, inMethod, true));
+                    ret = new ToNumberActionItem(null, expression(registerVars, inFunction, inMethod, true));
                     expectedType(SymbolType.PARENT_CLOSE);
                 }
                 break;
             case STRING_OP:
                 s = lex();
                 if (s.type == SymbolType.DOT) {
-                    ret = memberOrCall(new GetVariableTreeItem(null, new DirectValueTreeItem(null, 0, s.value, new ArrayList<String>())), registerVars, inFunction, inMethod);
+                    ret = memberOrCall(new GetVariableActionItem(null, new DirectValueActionItem(null, 0, s.value, new ArrayList<String>())), registerVars, inFunction, inMethod);
                 } else {
                     expected(s, lexer.yyline(), SymbolType.PARENT_OPEN);
-                    ret = new ToStringTreeItem(null, expression(registerVars, inFunction, inMethod, true));
+                    ret = new ToStringActionItem(null, expression(registerVars, inFunction, inMethod, true));
                     expectedType(SymbolType.PARENT_CLOSE);
                     ret = memberOrCall(ret, registerVars, inFunction, inMethod);
                 }
                 break;
             case ORD:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new CharToAsciiTreeItem(null, expression(registerVars, inFunction, inMethod, true));
+                ret = new CharToAsciiActionItem(null, expression(registerVars, inFunction, inMethod, true));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case CHR:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new AsciiToCharTreeItem(null, expression(registerVars, inFunction, inMethod, true));
+                ret = new AsciiToCharActionItem(null, expression(registerVars, inFunction, inMethod, true));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case DUPLICATEMOVIECLIP:
@@ -588,12 +588,12 @@ public class ActionScriptParser {
                 expectedType(SymbolType.COMMA);
                 GraphTargetItem dep3 = (expression(registerVars, inFunction, inMethod, true));
                 expectedType(SymbolType.PARENT_CLOSE);
-                ret = new CloneSpriteTreeItem(null, src3, tar3, dep3);
+                ret = new CloneSpriteActionItem(null, src3, tar3, dep3);
                 break;
             case GETTIMER:
                 expectedType(SymbolType.PARENT_OPEN);
                 expectedType(SymbolType.PARENT_CLOSE);
-                ret = new GetTimeTreeItem(null);
+                ret = new GetTimeActionItem(null);
                 break;
             default:
                 return null;
@@ -615,17 +615,17 @@ public class ActionScriptParser {
         switch (s.type) {
             case CALL:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new CallTreeItem(null, (expression(registerVars, inFunction, inMethod, true)));
+                ret = new CallActionItem(null, (expression(registerVars, inFunction, inMethod, true)));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case LENGTH:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new StringLengthTreeItem(null, (expression(registerVars, inFunction, inMethod, true)));
+                ret = new StringLengthActionItem(null, (expression(registerVars, inFunction, inMethod, true)));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case MBLENGTH:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new MBStringLengthTreeItem(null, (expression(registerVars, inFunction, inMethod, true)));
+                ret = new MBStringLengthActionItem(null, (expression(registerVars, inFunction, inMethod, true)));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case SET:
@@ -634,7 +634,7 @@ public class ActionScriptParser {
                 expectedType(SymbolType.COMMA);
                 GraphTargetItem value1 = (expression(registerVars, inFunction, inMethod, true));
                 expectedType(SymbolType.PARENT_CLOSE);
-                ret = new SetVariableTreeItem(null, name1, value1);
+                ret = new SetVariableActionItem(null, name1, value1);
                 break;
             case WITH:
                 expectedType(SymbolType.PARENT_OPEN);
@@ -643,20 +643,20 @@ public class ActionScriptParser {
                 expectedType(SymbolType.CURLY_OPEN);
                 List<GraphTargetItem> wcmd = commands(registerVars, inFunction, inMethod, forinlevel);
                 expectedType(SymbolType.CURLY_CLOSE);
-                ret = new WithTreeItem(null, wvar, wcmd);
+                ret = new WithActionItem(null, wvar, wcmd);
                 break;
             case DELETE:
                 GraphTargetItem varDel = variable(registerVars, inFunction, inMethod);
-                if (varDel instanceof GetMemberTreeItem) {
-                    GetMemberTreeItem gm = (GetMemberTreeItem) varDel;
-                    ret = new DeleteTreeItem(null, gm.object, gm.memberName);
+                if (varDel instanceof GetMemberActionItem) {
+                    GetMemberActionItem gm = (GetMemberActionItem) varDel;
+                    ret = new DeleteActionItem(null, gm.object, gm.memberName);
                 } else {
                     throw new ParseException("Not a property", lexer.yyline());
                 }
                 break;
             case TRACE:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new TraceTreeItem(null, (expression(registerVars, inFunction, inMethod, true)));
+                ret = new TraceActionItem(null, (expression(registerVars, inFunction, inMethod, true)));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
 
@@ -685,10 +685,10 @@ public class ActionScriptParser {
                     }
                 } else {
                     lexer.pushback(s);
-                    target = new DirectValueTreeItem(null, 0, "", new ArrayList<String>());
+                    target = new DirectValueActionItem(null, 0, "", new ArrayList<String>());
                 }
                 expectedType(SymbolType.PARENT_CLOSE);
-                ret = new GetURL2TreeItem(null, url, target, getuMethod);
+                ret = new GetURL2ActionItem(null, url, target, getuMethod);
                 break;
             case GOTOANDSTOP:
                 expectedType(SymbolType.PARENT_OPEN);
@@ -700,23 +700,23 @@ public class ActionScriptParser {
                 } else {
                     lexer.pushback(s);
                 }
-                ret = new GotoFrame2TreeItem(null, gtsFrame, false, false, 0);
+                ret = new GotoFrame2ActionItem(null, gtsFrame, false, false, 0);
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case NEXTFRAME:
                 expectedType(SymbolType.PARENT_OPEN);
                 expectedType(SymbolType.PARENT_CLOSE);
-                ret = new NextFrameTreeItem(null);
+                ret = new NextFrameActionItem(null);
                 break;
             case PLAY:
                 expectedType(SymbolType.PARENT_OPEN);
                 expectedType(SymbolType.PARENT_CLOSE);
-                ret = new PlayTreeItem(null);
+                ret = new PlayActionItem(null);
                 break;
             case PREVFRAME:
                 expectedType(SymbolType.PARENT_OPEN);
                 expectedType(SymbolType.PARENT_CLOSE);
-                ret = new PrevFrameTreeItem(null);
+                ret = new PrevFrameActionItem(null);
                 break;
             case TELLTARGET:
                 expectedType(SymbolType.PARENT_OPEN);
@@ -725,28 +725,28 @@ public class ActionScriptParser {
                 expectedType(SymbolType.CURLY_OPEN);
                 List<GraphTargetItem> tellcmds = commands(registerVars, inFunction, inMethod, forinlevel);
                 expectedType(SymbolType.CURLY_CLOSE);
-                ret = new TellTargetTreeItem(null, tellTarget, tellcmds);
+                ret = new TellTargetActionItem(null, tellTarget, tellcmds);
                 break;
             case STOP:
                 expectedType(SymbolType.PARENT_OPEN);
                 expectedType(SymbolType.PARENT_CLOSE);
-                ret = new StopTreeItem(null);
+                ret = new StopActionItem(null);
                 break;
             case STOPALLSOUNDS:
                 expectedType(SymbolType.PARENT_OPEN);
                 expectedType(SymbolType.PARENT_CLOSE);
-                ret = new StopAllSoundsTreeItem(null);
+                ret = new StopAllSoundsActionItem(null);
                 break;
             case TOGGLEHIGHQUALITY:
                 expectedType(SymbolType.PARENT_OPEN);
                 expectedType(SymbolType.PARENT_CLOSE);
-                ret = new ToggleHighQualityTreeItem(null);
+                ret = new ToggleHighQualityActionItem(null);
                 break;
 
             case STOPDRAG:
                 expectedType(SymbolType.PARENT_OPEN);
                 expectedType(SymbolType.PARENT_CLOSE);
-                ret = new StopDragTreeItem(null);
+                ret = new StopDragActionItem(null);
                 break;
 
             case UNLOADMOVIE:
@@ -756,10 +756,10 @@ public class ActionScriptParser {
                 GraphTargetItem unTargetOrNum = expression(registerVars, inFunction, inMethod, true);
                 expectedType(SymbolType.PARENT_CLOSE);
                 if (unloadType == SymbolType.UNLOADMOVIE) {
-                    ret = new UnLoadMovieTreeItem(null, unTargetOrNum);
+                    ret = new UnLoadMovieActionItem(null, unTargetOrNum);
                 }
                 if (unloadType == SymbolType.UNLOADMOVIENUM) {
-                    ret = new UnLoadMovieNumTreeItem(null, unTargetOrNum);
+                    ret = new UnLoadMovieNumActionItem(null, unTargetOrNum);
                 }
                 break;
             case PRINT:
@@ -775,16 +775,16 @@ public class ActionScriptParser {
 
                 switch (printType) {
                     case PRINT:
-                        ret = new PrintTreeItem(null, printTarget, printBBox);
+                        ret = new PrintActionItem(null, printTarget, printBBox);
                         break;
                     case PRINTNUM:
-                        ret = new PrintNumTreeItem(null, printTarget, printBBox);
+                        ret = new PrintNumActionItem(null, printTarget, printBBox);
                         break;
                     case PRINTASBITMAP:
-                        ret = new PrintAsBitmapTreeItem(null, printTarget, printBBox);
+                        ret = new PrintAsBitmapActionItem(null, printTarget, printBBox);
                         break;
                     case PRINTASBITMAPNUM:
-                        ret = new PrintAsBitmapNumTreeItem(null, printTarget, printBBox);
+                        ret = new PrintAsBitmapNumActionItem(null, printTarget, printBBox);
                         break;
                 }
                 break;
@@ -819,16 +819,16 @@ public class ActionScriptParser {
                 expectedType(SymbolType.PARENT_CLOSE);
                 switch (loadType) {
                     case LOADVARIABLES:
-                        ret = new LoadVariablesTreeItem(null, url2, targetOrNum, lvmethod);
+                        ret = new LoadVariablesActionItem(null, url2, targetOrNum, lvmethod);
                         break;
                     case LOADMOVIE:
-                        ret = new LoadMovieTreeItem(null, url2, targetOrNum, lvmethod);
+                        ret = new LoadMovieActionItem(null, url2, targetOrNum, lvmethod);
                         break;
                     case LOADVARIABLESNUM:
-                        ret = new LoadVariablesNumTreeItem(null, url2, targetOrNum, lvmethod);
+                        ret = new LoadVariablesNumActionItem(null, url2, targetOrNum, lvmethod);
                         break;
                     case LOADMOVIENUM:
-                        ret = new LoadMovieNumTreeItem(null, url2, targetOrNum, lvmethod);
+                        ret = new LoadMovieNumActionItem(null, url2, targetOrNum, lvmethod);
                         break;
                 }
                 break;
@@ -842,13 +842,13 @@ public class ActionScriptParser {
                 } else {
                     lexer.pushback(s);
                 }
-                ret = new GotoFrame2TreeItem(null, gtpFrame, true, false, 0);
+                ret = new GotoFrame2ActionItem(null, gtpFrame, true, false, 0);
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
 
             case REMOVEMOVIECLIP:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new RemoveSpriteTreeItem(null, (expression(registerVars, inFunction, inMethod, true)));
+                ret = new RemoveSpriteActionItem(null, (expression(registerVars, inFunction, inMethod, true)));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case STARTDRAG:
@@ -865,7 +865,7 @@ public class ActionScriptParser {
                     lockCenter = (expression(registerVars, inFunction, inMethod, true));
                     s = lex();
                     if (s.type == SymbolType.COMMA) {
-                        constrain = new DirectValueTreeItem(null, 0, Boolean.TRUE, new ArrayList<String>());
+                        constrain = new DirectValueActionItem(null, 0, Boolean.TRUE, new ArrayList<String>());
                         x1 = (expression(registerVars, inFunction, inMethod, true));
                         s = lex();
                         if (s.type == SymbolType.COMMA) {
@@ -878,32 +878,32 @@ public class ActionScriptParser {
                                     y2 = (expression(registerVars, inFunction, inMethod, true));
                                 } else {
                                     lexer.pushback(s);
-                                    y2 = new DirectValueTreeItem(null, 0, (Long) 0L, new ArrayList<String>());
+                                    y2 = new DirectValueActionItem(null, 0, (Long) 0L, new ArrayList<String>());
                                 }
                             } else {
                                 lexer.pushback(s);
-                                x2 = new DirectValueTreeItem(null, 0, (Long) 0L, new ArrayList<String>());
-                                y2 = new DirectValueTreeItem(null, 0, (Long) 0L, new ArrayList<String>());
+                                x2 = new DirectValueActionItem(null, 0, (Long) 0L, new ArrayList<String>());
+                                y2 = new DirectValueActionItem(null, 0, (Long) 0L, new ArrayList<String>());
                             }
                         } else {
                             lexer.pushback(s);
-                            x2 = new DirectValueTreeItem(null, 0, (Long) 0L, new ArrayList<String>());
-                            y2 = new DirectValueTreeItem(null, 0, (Long) 0L, new ArrayList<String>());
-                            y1 = new DirectValueTreeItem(null, 0, (Long) 0L, new ArrayList<String>());
+                            x2 = new DirectValueActionItem(null, 0, (Long) 0L, new ArrayList<String>());
+                            y2 = new DirectValueActionItem(null, 0, (Long) 0L, new ArrayList<String>());
+                            y1 = new DirectValueActionItem(null, 0, (Long) 0L, new ArrayList<String>());
 
                         }
                     } else {
                         lexer.pushback(s);
-                        constrain = new DirectValueTreeItem(null, 0, Boolean.FALSE, new ArrayList<String>());
+                        constrain = new DirectValueActionItem(null, 0, Boolean.FALSE, new ArrayList<String>());
                         //ret.add(new ActionPush(Boolean.FALSE));
                     }
                 } else {
-                    lockCenter = new DirectValueTreeItem(null, 0, Boolean.FALSE, new ArrayList<String>());
-                    constrain = new DirectValueTreeItem(null, 0, Boolean.FALSE, new ArrayList<String>());
+                    lockCenter = new DirectValueActionItem(null, 0, Boolean.FALSE, new ArrayList<String>());
+                    constrain = new DirectValueActionItem(null, 0, Boolean.FALSE, new ArrayList<String>());
                     lexer.pushback(s);
                 }
                 expectedType(SymbolType.PARENT_CLOSE);
-                ret = new StartDragTreeItem(null, dragTarget, lockCenter, constrain, x1, y1, x2, y2);
+                ret = new StartDragActionItem(null, dragTarget, lockCenter, constrain, x1, y1, x2, y2);
                 break;
 
             case IFFRAMELOADED:
@@ -913,7 +913,7 @@ public class ActionScriptParser {
                 expectedType(SymbolType.CURLY_OPEN);
                 List<GraphTargetItem> iflComs = commands(registerVars, inFunction, inMethod, forinlevel);
                 expectedType(SymbolType.CURLY_CLOSE);
-                ret = new IfFrameLoadedTreeItem(iflExpr, iflComs, null);
+                ret = new IfFrameLoadedActionItem(iflExpr, iflComs, null);
                 break;
             case CLASS:
                 GraphTargetItem classTypeStr = type();
@@ -959,14 +959,14 @@ public class ActionScriptParser {
             case NEW:
                 GraphTargetItem type = type();
                 expectedType(SymbolType.PARENT_OPEN);
-                if (type instanceof GetMemberTreeItem) {
-                    GetMemberTreeItem mem = (GetMemberTreeItem) type;
-                    ret = new NewMethodTreeItem(null, mem.object, mem.memberName, call(registerVars, inFunction, inMethod));
-                } else if (type instanceof GetVariableTreeItem) {
-                    GetVariableTreeItem var = (GetVariableTreeItem) type;
-                    ret = new NewObjectTreeItem(null, var.name, call(registerVars, inFunction, inMethod));
+                if (type instanceof GetMemberActionItem) {
+                    GetMemberActionItem mem = (GetMemberActionItem) type;
+                    ret = new NewMethodActionItem(null, mem.object, mem.memberName, call(registerVars, inFunction, inMethod));
+                } else if (type instanceof GetVariableActionItem) {
+                    GetVariableActionItem var = (GetVariableActionItem) type;
+                    ret = new NewObjectActionItem(null, var.name, call(registerVars, inFunction, inMethod));
                 } else {
-                    ret = new NewObjectTreeItem(null, ret, call(registerVars, inFunction, inMethod));
+                    ret = new NewObjectActionItem(null, ret, call(registerVars, inFunction, inMethod));
                 }
                 break;
             case VAR:
@@ -990,24 +990,24 @@ public class ActionScriptParser {
                         for (int i = 1; i < 256; i++) {
                             if (!registerVars.containsValue(i)) {
                                 registerVars.put(varIdentifier, i);
-                                ret = new StoreRegisterTreeItem(null, new RegisterNumber(i), varval, true);
+                                ret = new StoreRegisterActionItem(null, new RegisterNumber(i), varval, true);
                                 break;
                             }
                         }
                     } else {
-                        ret = new DefineLocalTreeItem(null, pushConst(varIdentifier), varval);
+                        ret = new DefineLocalActionItem(null, pushConst(varIdentifier), varval);
                     }
                 } else {
                     if (inFunction) {
                         for (int i = 1; i < 256; i++) {
                             if (!registerVars.containsValue(i)) {
                                 registerVars.put(varIdentifier, i);
-                                ret = new DefineRegisterTreeItem(varIdentifier, i);
+                                ret = new DefineRegisterActionItem(varIdentifier, i);
                                 break;
                             }
                         }
                     } else {
-                        ret = new DefineLocalTreeItem(null, pushConst(varIdentifier), null);
+                        ret = new DefineLocalActionItem(null, pushConst(varIdentifier), null);
                     }
                     lexer.pushback(s);
                 }
@@ -1020,9 +1020,9 @@ public class ActionScriptParser {
             case DECREMENT: //predecrement
                 GraphTargetItem varincdec = variable(registerVars, inFunction, inMethod);
                 if (s.type == SymbolType.INCREMENT) {
-                    ret = new PreIncrementTreeItem(null, varincdec);
+                    ret = new PreIncrementActionItem(null, varincdec);
                 } else if (s.type == SymbolType.DECREMENT) {
-                    ret = new PreDecrementTreeItem(null, varincdec);
+                    ret = new PreDecrementActionItem(null, varincdec);
                 }
                 break;
             case IDENTIFIER:
@@ -1040,7 +1040,7 @@ public class ActionScriptParser {
                 } else if (s.type == SymbolType.EVAL) {
                     expectedType(SymbolType.PARENT_OPEN);
                     var = expression(registerVars, inFunction, inMethod, true);
-                    var = new EvalTreeItem(null, var);
+                    var = new EvalActionItem(null, var);
                     expectedType(SymbolType.PARENT_CLOSE);
                     var = memberOrCall(var, registerVars, inFunction, inMethod);
                     isEval = true;
@@ -1069,39 +1069,39 @@ public class ActionScriptParser {
 
                         switch (s.type) {
                             case ASSIGN_BITAND:
-                                ret = Action.gettoset(var, new BitAndTreeItem(null, var, valtoappend));
+                                ret = Action.gettoset(var, new BitAndActionItem(null, var, valtoappend));
                                 break;
                             case ASSIGN_BITOR:
-                                ret = Action.gettoset(var, new BitOrTreeItem(null, var, valtoappend));
+                                ret = Action.gettoset(var, new BitOrActionItem(null, var, valtoappend));
                                 break;
                             case ASSIGN_DIVIDE:
-                                ret = Action.gettoset(var, new DivideTreeItem(null, var, valtoappend));
+                                ret = Action.gettoset(var, new DivideActionItem(null, var, valtoappend));
                                 break;
                             case ASSIGN_MINUS:
-                                ret = Action.gettoset(var, new SubtractTreeItem(null, var, valtoappend));
+                                ret = Action.gettoset(var, new SubtractActionItem(null, var, valtoappend));
                                 break;
                             case ASSIGN_MODULO:
-                                ret = Action.gettoset(var, new ModuloTreeItem(null, var, valtoappend));
+                                ret = Action.gettoset(var, new ModuloActionItem(null, var, valtoappend));
                                 break;
                             case ASSIGN_MULTIPLY:
-                                ret = Action.gettoset(var, new MultiplyTreeItem(null, var, valtoappend));
+                                ret = Action.gettoset(var, new MultiplyActionItem(null, var, valtoappend));
                                 break;
                             case ASSIGN_PLUS:
-                                ret = Action.gettoset(var, new AddTreeItem(null, var, valtoappend, true));
+                                ret = Action.gettoset(var, new AddActionItem(null, var, valtoappend, true));
                                 break;
                         }
                         break;
                     case INCREMENT: //postincrement
-                        ret = new PostIncrementTreeItem(null, var);
+                        ret = new PostIncrementActionItem(null, var);
                         break;
                     case DECREMENT: //postdecrement
-                        ret = new PostDecrementTreeItem(null, var);
+                        ret = new PostDecrementActionItem(null, var);
                         break;
                     case PARENT_OPEN: //function call
                         ret = var;
                         if (varS.type == SymbolType.SUPER || varS.type == SymbolType.THIS) {
                             List<GraphTargetItem> args = call(registerVars, inFunction, inMethod);
-                            ret = new CallMethodTreeItem(null, ret, new DirectValueTreeItem(null, 0, new Undefined(), constantPool), args);
+                            ret = new CallMethodActionItem(null, ret, new DirectValueActionItem(null, 0, new Undefined(), constantPool), args);
                         } else {
                             lexer.pushback(s);
                             ret = memberOrCall(ret, registerVars, inFunction, inMethod);
@@ -1213,7 +1213,7 @@ public class ActionScriptParser {
                 List<GraphTargetItem> forBody = new ArrayList<>();
                 forBody.add(command(registerVars, inFunction, inMethod, forin ? forinlevel + 1 : forinlevel, true));
                 if (forin) {
-                    ret = new ForInTreeItem(null, null, pushConst(objIdent), collection, forBody);
+                    ret = new ForInActionItem(null, null, pushConst(objIdent), collection, forBody);
                 } else {
                     ret = new ForItem(null, null, forFirstCommands, forExpr, forFinalCommands, forBody);
                 }
@@ -1272,9 +1272,9 @@ public class ActionScriptParser {
             case RETURN:
                 GraphTargetItem retexpr = expression(true, registerVars, inFunction, inMethod, true);
                 if (retexpr == null) {
-                    retexpr = new DirectValueTreeItem(null, 0, new Undefined(), new ArrayList<String>());
+                    retexpr = new DirectValueActionItem(null, 0, new Undefined(), new ArrayList<String>());
                 }
-                ret = new ReturnTreeItem(null, retexpr);
+                ret = new ReturnActionItem(null, retexpr);
                 break;
             case TRY:
                 List<GraphTargetItem> tryCommands = new ArrayList<>();
@@ -1307,10 +1307,10 @@ public class ActionScriptParser {
                     expected(s, lexer.yyline(), SymbolType.CATCH, SymbolType.FINALLY);
                 }
                 lexer.pushback(s);
-                ret = new TryTreeItem(tryCommands, catchExceptions, catchCommands, finallyCommands);
+                ret = new TryActionItem(tryCommands, catchExceptions, catchCommands, finallyCommands);
                 break;
             case THROW:
-                ret = new ThrowTreeItem(null, expression(registerVars, inFunction, inMethod, true));
+                ret = new ThrowActionItem(null, expression(registerVars, inFunction, inMethod, true));
                 break;
             default:
                 GraphTargetItem valcmd = expressionCommands(s, registerVars, inFunction, inMethod, forinlevel);
@@ -1377,40 +1377,40 @@ public class ActionScriptParser {
                 ret = new TernarOpItem(null, expr, terOnTrue, terOnFalse);
                 break;
             case BITAND:
-                ret = new BitAndTreeItem(null, expr, expression(registerVars, inFunction, inMethod, false));
+                ret = new BitAndActionItem(null, expr, expression(registerVars, inFunction, inMethod, false));
                 break;
             case BITOR:
-                ret = new BitOrTreeItem(null, expr, expression(registerVars, inFunction, inMethod, false));
+                ret = new BitOrActionItem(null, expr, expression(registerVars, inFunction, inMethod, false));
                 break;
             case DIVIDE:
-                ret = new DivideTreeItem(null, expr, expression(registerVars, inFunction, inMethod, false));
+                ret = new DivideActionItem(null, expr, expression(registerVars, inFunction, inMethod, false));
                 break;
             case MODULO:
-                ret = new ModuloTreeItem(null, expr, expression(registerVars, inFunction, inMethod, false));
+                ret = new ModuloActionItem(null, expr, expression(registerVars, inFunction, inMethod, false));
                 break;
             case EQUALS:
-                ret = new EqTreeItem(null, expr, expression(registerVars, inFunction, inMethod, false), true/*FIXME SWF version?*/);
+                ret = new EqActionItem(null, expr, expression(registerVars, inFunction, inMethod, false), true/*FIXME SWF version?*/);
                 break;
             case STRICT_EQUALS:
-                ret = new StrictEqTreeItem(null, expr, expression(registerVars, inFunction, inMethod, false));
+                ret = new StrictEqActionItem(null, expr, expression(registerVars, inFunction, inMethod, false));
                 break;
             case NOT_EQUAL:
-                ret = new NeqTreeItem(null, expr, expression(registerVars, inFunction, inMethod, false), true/*FIXME SWF version?*/);
+                ret = new NeqActionItem(null, expr, expression(registerVars, inFunction, inMethod, false), true/*FIXME SWF version?*/);
                 break;
             case STRICT_NOT_EQUAL:
-                ret = new StrictNeqTreeItem(null, expr, expression(registerVars, inFunction, inMethod, false));
+                ret = new StrictNeqActionItem(null, expr, expression(registerVars, inFunction, inMethod, false));
                 break;
             case LOWER_THAN:
-                ret = new LtTreeItem(null, expr, expression(registerVars, inFunction, inMethod, false), true/*FIXME SWF version?*/);
+                ret = new LtActionItem(null, expr, expression(registerVars, inFunction, inMethod, false), true/*FIXME SWF version?*/);
                 break;
             case LOWER_EQUAL:
-                ret = new LeTreeItem(null, expr, expression(registerVars, inFunction, inMethod, false));
+                ret = new LeActionItem(null, expr, expression(registerVars, inFunction, inMethod, false));
                 break;
             case GREATER_THAN:
-                ret = new GtTreeItem(null, expr, expression(registerVars, inFunction, inMethod, false));
+                ret = new GtActionItem(null, expr, expression(registerVars, inFunction, inMethod, false));
                 break;
             case GREATER_EQUAL:
-                ret = new GeTreeItem(null, expr, expression(registerVars, inFunction, inMethod, false), true/*FIXME SWF version?*/);
+                ret = new GeActionItem(null, expr, expression(registerVars, inFunction, inMethod, false), true/*FIXME SWF version?*/);
                 break;
             case AND:
                 ret = new AndItem(null, expr, expression(registerVars, inFunction, inMethod, false));
@@ -1419,22 +1419,22 @@ public class ActionScriptParser {
                 ret = new OrItem(null, expr, expression(registerVars, inFunction, inMethod, false));
                 break;
             case MINUS:
-                ret = new SubtractTreeItem(null, expr, expression(registerVars, inFunction, inMethod, false));
+                ret = new SubtractActionItem(null, expr, expression(registerVars, inFunction, inMethod, false));
                 break;
             case MULTIPLY:
-                ret = new MultiplyTreeItem(null, expr, expression(registerVars, inFunction, inMethod, false));
+                ret = new MultiplyActionItem(null, expr, expression(registerVars, inFunction, inMethod, false));
                 break;
             case PLUS:
-                ret = new AddTreeItem(null, expr, expression(registerVars, inFunction, inMethod, false), true);
+                ret = new AddActionItem(null, expr, expression(registerVars, inFunction, inMethod, false), true);
                 break;
             case XOR:
-                ret = new BitXorTreeItem(null, expr, expression(registerVars, inFunction, inMethod, false));
+                ret = new BitXorActionItem(null, expr, expression(registerVars, inFunction, inMethod, false));
                 break;
             case AS:
 
                 break;
             case INSTANCEOF:
-                ret = new InstanceOfTreeItem(null, expr, expression(registerVars, inFunction, inMethod, false));
+                ret = new InstanceOfActionItem(null, expr, expression(registerVars, inFunction, inMethod, false));
                 break;
             case IS:
 
@@ -1503,46 +1503,46 @@ public class ActionScriptParser {
         switch (s.type) {
             case MINUS:
                 GraphTargetItem num = expression(registerVars, inFunction, inMethod, true);
-                if ((num instanceof DirectValueTreeItem)
-                        && (((DirectValueTreeItem) num).value instanceof Long)) {
-                    ((DirectValueTreeItem) num).value = -(Long) ((DirectValueTreeItem) num).value;
+                if ((num instanceof DirectValueActionItem)
+                        && (((DirectValueActionItem) num).value instanceof Long)) {
+                    ((DirectValueActionItem) num).value = -(Long) ((DirectValueActionItem) num).value;
                     ret = num;
-                } else if ((num instanceof DirectValueTreeItem)
-                        && (((DirectValueTreeItem) num).value instanceof Double)) {
-                    Double d = (Double) ((DirectValueTreeItem) num).value;
+                } else if ((num instanceof DirectValueActionItem)
+                        && (((DirectValueActionItem) num).value instanceof Double)) {
+                    Double d = (Double) ((DirectValueActionItem) num).value;
                     if (d.isInfinite()) {
-                        ((DirectValueTreeItem) num).value = Double.NEGATIVE_INFINITY;
+                        ((DirectValueActionItem) num).value = Double.NEGATIVE_INFINITY;
                     } else {
-                        ((DirectValueTreeItem) num).value = -d;
+                        ((DirectValueActionItem) num).value = -d;
                     }
                     ret = (num);
-                } else if ((num instanceof DirectValueTreeItem)
-                        && (((DirectValueTreeItem) num).value instanceof Float)) {
-                    ((DirectValueTreeItem) num).value = -(Float) ((DirectValueTreeItem) num).value;
+                } else if ((num instanceof DirectValueActionItem)
+                        && (((DirectValueActionItem) num).value instanceof Float)) {
+                    ((DirectValueActionItem) num).value = -(Float) ((DirectValueActionItem) num).value;
                     ret = (num);
                 } else {;
-                    ret = (new SubtractTreeItem(null, new DirectValueTreeItem(null, 0, (Long) 0L, new ArrayList<String>()), num));
+                    ret = (new SubtractActionItem(null, new DirectValueActionItem(null, 0, (Long) 0L, new ArrayList<String>()), num));
                 }
                 break;
             case TYPEOF:
                 expectedType(SymbolType.PARENT_OPEN);
-                ret = new TypeOfTreeItem(null, expression(registerVars, inFunction, inMethod, true));
+                ret = new TypeOfActionItem(null, expression(registerVars, inFunction, inMethod, true));
                 expectedType(SymbolType.PARENT_CLOSE);
                 existsRemainder = true;
                 break;
             case TRUE:
-                ret = new DirectValueTreeItem(null, 0, Boolean.TRUE, new ArrayList<String>());
+                ret = new DirectValueActionItem(null, 0, Boolean.TRUE, new ArrayList<String>());
                 existsRemainder = true;
                 break;
             case NULL:
-                ret = new DirectValueTreeItem(null, 0, new Null(), new ArrayList<String>());
+                ret = new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>());
                 existsRemainder = true;
                 break;
             case UNDEFINED:
-                ret = new DirectValueTreeItem(null, 0, new Undefined(), new ArrayList<String>());
+                ret = new DirectValueActionItem(null, 0, new Undefined(), new ArrayList<String>());
                 break;
             case FALSE:
-                ret = new DirectValueTreeItem(null, 0, Boolean.FALSE, new ArrayList<String>());
+                ret = new DirectValueActionItem(null, 0, Boolean.FALSE, new ArrayList<String>());
                 existsRemainder = true;
                 break;
             case CURLY_OPEN: //Object literal
@@ -1561,13 +1561,13 @@ public class ActionScriptParser {
                         expected(s, lexer.yyline(), SymbolType.COMMA, SymbolType.CURLY_CLOSE);
                     }
                 }
-                ret = new InitObjectTreeItem(null, objectNames, objectValues);
+                ret = new InitObjectActionItem(null, objectNames, objectValues);
                 break;
             case BRACKET_OPEN: //Array literal or just brackets
                 lexer.pushback(s);
                 List<GraphTargetItem> inBrackets = new ArrayList<>();
                 int arrCnt = brackets(inBrackets, registerVars, inFunction, inMethod);
-                ret = new InitArrayTreeItem(null, inBrackets);
+                ret = new InitArrayActionItem(null, inBrackets);
                 break;
             case FUNCTION:
                 s = lexer.lex();
@@ -1585,27 +1585,27 @@ public class ActionScriptParser {
                 existsRemainder = true;
                 break;
             case NEWLINE:
-                ret = new DirectValueTreeItem(null, 0, "\r", new ArrayList<String>());
+                ret = new DirectValueActionItem(null, 0, "\r", new ArrayList<String>());
                 existsRemainder = true;
                 break;
             case NAN:
-                ret = new DirectValueTreeItem(null, 0, Double.NaN, new ArrayList<String>());
+                ret = new DirectValueActionItem(null, 0, Double.NaN, new ArrayList<String>());
                 existsRemainder = true;
                 break;
             case INFINITY:
-                ret = new DirectValueTreeItem(null, 0, Double.POSITIVE_INFINITY, new ArrayList<String>());
+                ret = new DirectValueActionItem(null, 0, Double.POSITIVE_INFINITY, new ArrayList<String>());
                 existsRemainder = true;
                 break;
             case INTEGER:
             case DOUBLE:
-                ret = new DirectValueTreeItem(null, 0, s.value, new ArrayList<String>());
+                ret = new DirectValueActionItem(null, 0, s.value, new ArrayList<String>());
                 existsRemainder = true;
                 break;
             case DELETE:
                 GraphTargetItem varDel = variable(registerVars, inFunction, inMethod);
-                if (varDel instanceof GetMemberTreeItem) {
-                    GetMemberTreeItem gm = (GetMemberTreeItem) varDel;
-                    ret = new DeleteTreeItem(null, gm.object, gm.memberName);
+                if (varDel instanceof GetMemberActionItem) {
+                    GetMemberActionItem gm = (GetMemberActionItem) varDel;
+                    ret = new DeleteActionItem(null, gm.object, gm.memberName);
                 } else {
                     throw new ParseException("Not a property", lexer.yyline());
                 }
@@ -1614,10 +1614,10 @@ public class ActionScriptParser {
             case DECREMENT: //preincrement
                 GraphTargetItem prevar = variable(registerVars, inFunction, inMethod);
                 if (s.type == SymbolType.INCREMENT) {
-                    ret = new PreIncrementTreeItem(null, prevar);
+                    ret = new PreIncrementActionItem(null, prevar);
                 }
                 if (s.type == SymbolType.DECREMENT) {
-                    ret = new PreDecrementTreeItem(null, prevar);
+                    ret = new PreDecrementActionItem(null, prevar);
                 }
                 existsRemainder = true;
                 break;
@@ -1634,12 +1634,12 @@ public class ActionScriptParser {
             case NEW:
                 GraphTargetItem newvar = variable(registerVars, inFunction, inMethod);
                 expectedType(SymbolType.PARENT_OPEN);
-                if (newvar instanceof GetMemberTreeItem) {
-                    GetMemberTreeItem mem = (GetMemberTreeItem) newvar;
-                    ret = new NewMethodTreeItem(null, mem.object, mem.memberName, call(registerVars, inFunction, inMethod));
-                } else if (newvar instanceof GetVariableTreeItem) {
-                    GetVariableTreeItem gv = (GetVariableTreeItem) newvar;
-                    ret = new NewObjectTreeItem(null, gv.name, call(registerVars, inFunction, inMethod));
+                if (newvar instanceof GetMemberActionItem) {
+                    GetMemberActionItem mem = (GetMemberActionItem) newvar;
+                    ret = new NewMethodActionItem(null, mem.object, mem.memberName, call(registerVars, inFunction, inMethod));
+                } else if (newvar instanceof GetVariableActionItem) {
+                    GetVariableActionItem gv = (GetVariableActionItem) newvar;
+                    ret = new NewObjectActionItem(null, gv.name, call(registerVars, inFunction, inMethod));
                 } else {
                     throw new ParseException("Invalid new item", lexer.yyline());
                 }
@@ -1650,7 +1650,7 @@ public class ActionScriptParser {
                 GraphTargetItem var;
                 if (s.type == SymbolType.EVAL) {
                     expectedType(SymbolType.PARENT_OPEN);
-                    var = new EvalTreeItem(null, expression(registerVars, inFunction, inMethod, true));
+                    var = new EvalActionItem(null, expression(registerVars, inFunction, inMethod, true));
                     expectedType(SymbolType.PARENT_CLOSE);
                     var = memberOrCall(var, registerVars, inFunction, inMethod);
 
@@ -1659,16 +1659,16 @@ public class ActionScriptParser {
                     var = variable(registerVars, inFunction, inMethod);
                 }
 
-                GetVariableTreeItem gva = null;
-                GetMemberTreeItem gmb = null;
+                GetVariableActionItem gva = null;
+                GetMemberActionItem gmb = null;
                 RegisterNumber reg = null;
-                if (var instanceof GetVariableTreeItem) {
-                    gva = (GetVariableTreeItem) var;
-                } else if (var instanceof GetMemberTreeItem) {
-                    gmb = (GetMemberTreeItem) var;
-                } else if (var instanceof DirectValueTreeItem) {
-                    if (((DirectValueTreeItem) var).value instanceof RegisterNumber) {
-                        reg = (RegisterNumber) ((DirectValueTreeItem) var).value;
+                if (var instanceof GetVariableActionItem) {
+                    gva = (GetVariableActionItem) var;
+                } else if (var instanceof GetMemberActionItem) {
+                    gmb = (GetMemberActionItem) var;
+                } else if (var instanceof DirectValueActionItem) {
+                    if (((DirectValueActionItem) var).value instanceof RegisterNumber) {
+                        reg = (RegisterNumber) ((DirectValueActionItem) var).value;
                     }
                 }
 
@@ -1677,11 +1677,11 @@ public class ActionScriptParser {
                     case ASSIGN:
                         GraphTargetItem varval = expression(registerVars, inFunction, inMethod, true);
                         if (gva != null) {
-                            ret = new SetVariableTreeItem(null, gva.name, varval);
+                            ret = new SetVariableActionItem(null, gva.name, varval);
                         } else if (gmb != null) {
-                            ret = new SetMemberTreeItem(null, gmb.object, gmb.memberName, varval);
+                            ret = new SetMemberActionItem(null, gmb.object, gmb.memberName, varval);
                         } else if (reg != null) {
-                            ret = new StoreRegisterTreeItem(null, reg, varval, false);
+                            ret = new StoreRegisterActionItem(null, reg, varval, false);
                         } else {
                             throw new ParseException("Invalid assignment", lexer.yyline());
                         }
@@ -1706,51 +1706,51 @@ public class ActionScriptParser {
                         switch (s.type) {
                             case ASSIGN_BITAND:
                                 if (gva != null) {
-                                    ret = new SetVariableTreeItem(null, gva.name, new BitAndTreeItem(null, gva, varval2));
+                                    ret = new SetVariableActionItem(null, gva.name, new BitAndActionItem(null, gva, varval2));
                                 } else {
-                                    ret = new SetMemberTreeItem(null, gmb.object, gmb.memberName, new BitAndTreeItem(null, gmb, varval2));
+                                    ret = new SetMemberActionItem(null, gmb.object, gmb.memberName, new BitAndActionItem(null, gmb, varval2));
                                 }
                                 break;
                             case ASSIGN_BITOR:
                                 if (gva != null) {
-                                    ret = new SetVariableTreeItem(null, gva.name, new BitOrTreeItem(null, gva, varval2));
+                                    ret = new SetVariableActionItem(null, gva.name, new BitOrActionItem(null, gva, varval2));
                                 } else {
-                                    ret = new SetMemberTreeItem(null, gmb.object, gmb.memberName, new BitOrTreeItem(null, gmb, varval2));
+                                    ret = new SetMemberActionItem(null, gmb.object, gmb.memberName, new BitOrActionItem(null, gmb, varval2));
                                 }
                                 break;
                             case ASSIGN_DIVIDE:
                                 if (gva != null) {
-                                    ret = new SetVariableTreeItem(null, gva.name, new DivideTreeItem(null, gva, varval2));
+                                    ret = new SetVariableActionItem(null, gva.name, new DivideActionItem(null, gva, varval2));
                                 } else {
-                                    ret = new SetMemberTreeItem(null, gmb.object, gmb.memberName, new DivideTreeItem(null, gmb, varval2));
+                                    ret = new SetMemberActionItem(null, gmb.object, gmb.memberName, new DivideActionItem(null, gmb, varval2));
                                 }
                                 break;
                             case ASSIGN_MINUS:
                                 if (gva != null) {
-                                    ret = new SetVariableTreeItem(null, gva.name, new SubtractTreeItem(null, gva, varval2));
+                                    ret = new SetVariableActionItem(null, gva.name, new SubtractActionItem(null, gva, varval2));
                                 } else {
-                                    ret = new SetMemberTreeItem(null, gmb.object, gmb.memberName, new SubtractTreeItem(null, gmb, varval2));
+                                    ret = new SetMemberActionItem(null, gmb.object, gmb.memberName, new SubtractActionItem(null, gmb, varval2));
                                 }
                                 break;
                             case ASSIGN_MODULO:
                                 if (gva != null) {
-                                    ret = new SetVariableTreeItem(null, gva.name, new ModuloTreeItem(null, gva, varval2));
+                                    ret = new SetVariableActionItem(null, gva.name, new ModuloActionItem(null, gva, varval2));
                                 } else {
-                                    ret = new SetMemberTreeItem(null, gmb.object, gmb.memberName, new ModuloTreeItem(null, gmb, varval2));
+                                    ret = new SetMemberActionItem(null, gmb.object, gmb.memberName, new ModuloActionItem(null, gmb, varval2));
                                 }
                                 break;
                             case ASSIGN_MULTIPLY:
                                 if (gva != null) {
-                                    ret = new SetVariableTreeItem(null, gva.name, new MultiplyTreeItem(null, gva, varval2));
+                                    ret = new SetVariableActionItem(null, gva.name, new MultiplyActionItem(null, gva, varval2));
                                 } else {
-                                    ret = new SetMemberTreeItem(null, gmb.object, gmb.memberName, new MultiplyTreeItem(null, gmb, varval2));
+                                    ret = new SetMemberActionItem(null, gmb.object, gmb.memberName, new MultiplyActionItem(null, gmb, varval2));
                                 }
                                 break;
                             case ASSIGN_PLUS:
                                 if (gva != null) {
-                                    ret = new SetVariableTreeItem(null, gva.name, new AddTreeItem(null, gva, varval2, true/*TODO:SWF version?*/));
+                                    ret = new SetVariableActionItem(null, gva.name, new AddActionItem(null, gva, varval2, true/*TODO:SWF version?*/));
                                 } else {
-                                    ret = new SetMemberTreeItem(null, gmb.object, gmb.memberName, new AddTreeItem(null, gmb, varval2, true/*TODO:SWF version?*/));
+                                    ret = new SetMemberActionItem(null, gmb.object, gmb.memberName, new AddActionItem(null, gmb, varval2, true/*TODO:SWF version?*/));
                                 }
                                 break;
                         }
@@ -1761,13 +1761,13 @@ public class ActionScriptParser {
                         if (gva == null && gmb == null) {
                             throw new ParseException("Invalid assignment", lexer.yyline());
                         }
-                        ret = new PostIncrementTreeItem(null, var);
+                        ret = new PostIncrementActionItem(null, var);
                         break;
                     case DECREMENT: //postdecrement
                         if (gva == null && gmb == null) {
                             throw new ParseException("Invalid assignment", lexer.yyline());
                         }
-                        ret = new PostDecrementTreeItem(null, var);
+                        ret = new PostDecrementActionItem(null, var);
                         break;
                     case PARENT_OPEN: //function call
                         lexer.pushback(s);
@@ -1805,13 +1805,13 @@ public class ActionScriptParser {
         return ret;
     }
 
-    private DirectValueTreeItem pushConst(String s) throws IOException, ParseException {
+    private DirectValueActionItem pushConst(String s) throws IOException, ParseException {
         int index = constantPool.indexOf(s);
         if (index == -1) {
             constantPool.add(s);
             index = constantPool.indexOf(s);
         }
-        return new DirectValueTreeItem(null, 0, new ConstantIndex(index), constantPool);
+        return new DirectValueActionItem(null, 0, new ConstantIndex(index), constantPool);
     }
     private ActionScriptLexer lexer = null;
     private List<String> constantPool;
@@ -1833,7 +1833,7 @@ public class ActionScriptParser {
     }
 
     public List<Action> actionsFromTree(List<GraphTargetItem> tree, List<String> constantPool) {
-        ActionScriptSourceGenerator gen = new ActionScriptSourceGenerator(constantPool);
+        ActionSourceGenerator gen = new ActionSourceGenerator(constantPool);
         List<Action> ret = new ArrayList<>();
         List<Object> localDate = new ArrayList<>();
         localDate.add(new HashMap<String, Integer>()); //registerVars

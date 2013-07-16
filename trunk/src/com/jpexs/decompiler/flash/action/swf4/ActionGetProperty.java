@@ -17,9 +17,9 @@
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.GetPropertyTreeItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.GetPropertyActionItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -40,11 +40,11 @@ public class ActionGetProperty extends Action {
         GraphTargetItem index = stack.pop();
         GraphTargetItem target = stack.pop();
         int indexInt = 0;
-        if (index instanceof DirectValueTreeItem) {
-            if (((DirectValueTreeItem) index).value instanceof Long) {
-                indexInt = (int) (long) (Long) ((DirectValueTreeItem) index).value;
+        if (index instanceof DirectValueActionItem) {
+            if (((DirectValueActionItem) index).value instanceof Long) {
+                indexInt = (int) (long) (Long) ((DirectValueActionItem) index).value;
             }
         }
-        stack.push(new GetPropertyTreeItem(this, target, indexInt));
+        stack.push(new GetPropertyActionItem(this, target, indexInt));
     }
 }

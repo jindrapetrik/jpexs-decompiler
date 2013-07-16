@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.CloneSpriteTreeItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.model.CloneSpriteActionItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -39,6 +39,6 @@ public class ActionCloneSprite extends Action {
         GraphTargetItem depth = stack.pop();
         GraphTargetItem source = stack.pop();
         GraphTargetItem target = stack.pop();
-        output.add(new CloneSpriteTreeItem(this, source, target, depth));
+        output.add(new CloneSpriteActionItem(this, source, target, depth));
     }
 }

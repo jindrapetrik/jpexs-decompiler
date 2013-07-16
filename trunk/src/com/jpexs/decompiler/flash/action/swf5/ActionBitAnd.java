@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.operations.BitAndTreeItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.model.operations.BitAndActionItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -38,6 +38,6 @@ public class ActionBitAnd extends Action {
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem a = stack.pop();
         GraphTargetItem b = stack.pop();
-        stack.push(new BitAndTreeItem(this, b, a));
+        stack.push(new BitAndActionItem(this, b, a));
     }
 }

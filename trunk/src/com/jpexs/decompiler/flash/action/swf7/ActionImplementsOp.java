@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.flash.action.swf7;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.ImplementsOpTreeItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.model.ImplementsOpActionItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +43,6 @@ public class ActionImplementsOp extends Action {
         for (long l = 0; l < inCount; l++) {
             superclasses.add(stack.pop());
         }
-        output.add(new ImplementsOpTreeItem(this, subclass, superclasses));
+        output.add(new ImplementsOpActionItem(this, subclass, superclasses));
     }
 }

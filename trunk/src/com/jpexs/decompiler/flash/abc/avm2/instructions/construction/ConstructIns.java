@@ -22,18 +22,18 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.ConstructTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.EscapeXAttrTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.EscapeXElemTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.FindPropertyTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.FullMultinameTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.GetLexTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.GetPropertyTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.StringTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.XMLTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.AddTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.model.ConstructAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.EscapeXAttrAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.EscapeXElemAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.XMLAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.operations.AddAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,12 +60,12 @@ public class ConstructIns extends InstructionDefinition {
 
     public static boolean walkXML(GraphTargetItem item, List<GraphTargetItem> list) {
         boolean ret = true;
-        if (item instanceof StringTreeItem) {
+        if (item instanceof StringAVM2Item) {
             list.add(item);
-        } else if (item instanceof AddTreeItem) {
-            ret = ret && walkXML(((AddTreeItem) item).leftSide, list);
-            ret = ret && walkXML(((AddTreeItem) item).rightSide, list);
-        } else if ((item instanceof EscapeXElemTreeItem) || (item instanceof EscapeXAttrTreeItem)) {
+        } else if (item instanceof AddAVM2Item) {
+            ret = ret && walkXML(((AddAVM2Item) item).leftSide, list);
+            ret = ret && walkXML(((AddAVM2Item) item).rightSide, list);
+        } else if ((item instanceof EscapeXElemAVM2Item) || (item instanceof EscapeXAttrAVM2Item)) {
             list.add(item);
         } else {
             return false;
@@ -82,18 +82,18 @@ public class ConstructIns extends InstructionDefinition {
         }
         GraphTargetItem obj = (GraphTargetItem) stack.pop();
 
-        FullMultinameTreeItem xmlMult = null;
+        FullMultinameAVM2Item xmlMult = null;
         boolean isXML = false;
-        if (obj instanceof GetPropertyTreeItem) {
-            GetPropertyTreeItem gpt = (GetPropertyTreeItem) obj;
-            if (gpt.object instanceof FindPropertyTreeItem) {
-                FindPropertyTreeItem fpt = (FindPropertyTreeItem) gpt.object;
+        if (obj instanceof GetPropertyAVM2Item) {
+            GetPropertyAVM2Item gpt = (GetPropertyAVM2Item) obj;
+            if (gpt.object instanceof FindPropertyAVM2Item) {
+                FindPropertyAVM2Item fpt = (FindPropertyAVM2Item) gpt.object;
                 xmlMult = fpt.propertyName;
                 isXML = xmlMult.isXML(constants, localRegNames, fullyQualifiedNames) && xmlMult.isXML(constants, localRegNames, fullyQualifiedNames);
             }
         }
-        if (obj instanceof GetLexTreeItem) {
-            GetLexTreeItem glt = (GetLexTreeItem) obj;
+        if (obj instanceof GetLexAVM2Item) {
+            GetLexAVM2Item glt = (GetLexAVM2Item) obj;
             isXML = glt.propertyName.getName(constants, fullyQualifiedNames).equals("XML");
         }
 
@@ -102,13 +102,13 @@ public class ConstructIns extends InstructionDefinition {
                 GraphTargetItem arg = args.get(0);
                 List<GraphTargetItem> xmlLines = new ArrayList<>();
                 if (walkXML(arg, xmlLines)) {
-                    stack.push(new XMLTreeItem(ins, xmlLines));
+                    stack.push(new XMLAVM2Item(ins, xmlLines));
                     return;
                 }
             }
         }
 
-        stack.push(new ConstructTreeItem(ins, obj, args));
+        stack.push(new ConstructAVM2Item(ins, obj, args));
     }
 
     @Override

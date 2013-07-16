@@ -21,8 +21,8 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
-import com.jpexs.decompiler.flash.action.treemodel.GotoFrameTreeItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.model.GotoFrameActionItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -67,6 +67,6 @@ public class ActionGotoFrame extends Action {
 
     @Override
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
-        output.add(new GotoFrameTreeItem(this, frame));
+        output.add(new GotoFrameActionItem(this, frame));
     }
 }

@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.action.special;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -40,7 +40,7 @@ public class ActionEnd extends Action {
     }
 
     @Override
-    public void translate(Stack<com.jpexs.decompiler.flash.graph.GraphTargetItem> stack, List<com.jpexs.decompiler.flash.graph.GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
+    public void translate(Stack<com.jpexs.decompiler.graph.GraphTargetItem> stack, List<com.jpexs.decompiler.graph.GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         //output.add(new SimpleActionTreeItem(this, "end()"));
     }
 }

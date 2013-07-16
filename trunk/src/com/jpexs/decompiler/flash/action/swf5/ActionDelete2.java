@@ -17,9 +17,9 @@
 package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.DeleteTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.model.DeleteActionItem;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +40,7 @@ public class ActionDelete2 extends Action {
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem propertyName = stack.pop();
 
-        output.add(new DeleteTreeItem(this, null, propertyName));
-        stack.push(new DirectValueTreeItem(this, -1, Boolean.TRUE, new ArrayList<String>()));
+        output.add(new DeleteActionItem(this, null, propertyName));
+        stack.push(new DirectValueActionItem(this, -1, Boolean.TRUE, new ArrayList<String>()));
     }
 }

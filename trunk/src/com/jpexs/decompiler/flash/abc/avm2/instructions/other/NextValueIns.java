@@ -20,9 +20,9 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.NextValueTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.model.NextValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -37,7 +37,7 @@ public class NextValueIns extends InstructionDefinition {
     public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path) {
         GraphTargetItem index = stack.pop();
         GraphTargetItem obj = stack.pop();
-        stack.push(new NextValueTreeItem(ins, index, obj));
+        stack.push(new NextValueAVM2Item(ins, index, obj));
     }
 
     @Override

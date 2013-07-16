@@ -17,14 +17,14 @@
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.DecrementTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.IncrementTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.PostDecrementTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.PostIncrementTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.SetPropertyTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.StoreRegisterTreeItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.model.DecrementActionItem;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.IncrementActionItem;
+import com.jpexs.decompiler.flash.action.model.PostDecrementActionItem;
+import com.jpexs.decompiler.flash.action.model.PostIncrementActionItem;
+import com.jpexs.decompiler.flash.action.model.SetPropertyActionItem;
+import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -46,34 +46,34 @@ public class ActionSetProperty extends Action {
         GraphTargetItem index = stack.pop().getThroughDuplicate();
         GraphTargetItem target = stack.pop().getThroughDuplicate();
         int indexInt = 0;
-        if (index instanceof DirectValueTreeItem) {
-            if (((DirectValueTreeItem) index).value instanceof Long) {
-                indexInt = (int) (long) (Long) ((DirectValueTreeItem) index).value;
+        if (index instanceof DirectValueActionItem) {
+            if (((DirectValueActionItem) index).value instanceof Long) {
+                indexInt = (int) (long) (Long) ((DirectValueActionItem) index).value;
             }
         }
-        if (value.getThroughDuplicate() instanceof IncrementTreeItem) {
-            GraphTargetItem obj = ((IncrementTreeItem) value).object;
+        if (value.getThroughDuplicate() instanceof IncrementActionItem) {
+            GraphTargetItem obj = ((IncrementActionItem) value).object;
             if (!stack.isEmpty()) {
                 if (stack.peek().valueEquals(obj)) {
                     stack.pop();
-                    stack.push(new PostIncrementTreeItem(this, obj));
+                    stack.push(new PostIncrementActionItem(this, obj));
                     return;
                 }
             }
         }
-        if (value instanceof DecrementTreeItem) {
-            GraphTargetItem obj = ((DecrementTreeItem) value).object;
+        if (value instanceof DecrementActionItem) {
+            GraphTargetItem obj = ((DecrementActionItem) value).object;
             if (!stack.isEmpty()) {
                 if (stack.peek().valueEquals(obj)) {
                     stack.pop();
-                    stack.push(new PostDecrementTreeItem(this, obj));
+                    stack.push(new PostDecrementActionItem(this, obj));
                     return;
                 }
             }
         }
-        if (value instanceof StoreRegisterTreeItem) {
-            ((StoreRegisterTreeItem) value).define = false;
+        if (value instanceof StoreRegisterActionItem) {
+            ((StoreRegisterActionItem) value).define = false;
         }
-        output.add(new SetPropertyTreeItem(this, target, indexInt, value));
+        output.add(new SetPropertyActionItem(this, target, indexInt, value));
     }
 }

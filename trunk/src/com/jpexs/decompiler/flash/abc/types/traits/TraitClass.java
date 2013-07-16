@@ -31,7 +31,7 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;

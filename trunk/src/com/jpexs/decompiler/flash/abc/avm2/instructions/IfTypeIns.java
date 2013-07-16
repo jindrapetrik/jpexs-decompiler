@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.instructions;
 
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.Stack;
 
 public interface IfTypeIns {

@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.GetMemberTreeItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -38,6 +38,6 @@ public class ActionGetMember extends Action {
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem functionName = stack.pop();
         GraphTargetItem object = stack.pop();
-        stack.push(new GetMemberTreeItem(this, object, functionName));
+        stack.push(new GetMemberActionItem(this, object, functionName));
     }
 }

@@ -17,12 +17,12 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
 public interface SetTypeIns {
 
-    public abstract String getObject(Stack<TreeItem> stack, ABC abc, AVM2Instruction ins, List<TreeItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames);
+    public abstract String getObject(Stack<AVM2Item> stack, ABC abc, AVM2Instruction ins, List<AVM2Item> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames);
 }

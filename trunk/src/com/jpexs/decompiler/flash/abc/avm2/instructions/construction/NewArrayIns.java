@@ -21,9 +21,9 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.NewArrayTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.model.NewArrayAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +42,7 @@ public class NewArrayIns extends InstructionDefinition {
         for (int a = 0; a < argCount; a++) {
             args.add(0, (GraphTargetItem) stack.pop());
         }
-        stack.push(new NewArrayTreeItem(ins, args));
+        stack.push(new NewArrayAVM2Item(ins, args));
     }
 
     @Override

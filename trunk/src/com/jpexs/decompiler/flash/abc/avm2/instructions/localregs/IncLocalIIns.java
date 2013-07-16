@@ -20,12 +20,12 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.IncLocalTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.IntegerValueTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.NotCompileTimeTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.AddTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.model.IncLocalAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NotCompileTimeAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.operations.AddAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -39,11 +39,11 @@ public class IncLocalIIns extends InstructionDefinition {
     @Override
     public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path) {
         int regIndex = ins.operands[0];
-        output.add(new IncLocalTreeItem(ins, regIndex));
+        output.add(new IncLocalAVM2Item(ins, regIndex));
         if (localRegs.containsKey(regIndex)) {
-            localRegs.put(regIndex, new NotCompileTimeTreeItem(ins, new AddTreeItem(ins, localRegs.get(regIndex), new IntegerValueTreeItem(ins, Long.valueOf(1)))));
+            localRegs.put(regIndex, new NotCompileTimeAVM2Item(ins, new AddAVM2Item(ins, localRegs.get(regIndex), new IntegerValueAVM2Item(ins, Long.valueOf(1)))));
         } else {
-            //localRegs.put(regIndex, new AddTreeItem(ins, null, new IntegerValueTreeItem(ins, new Long(1))));
+            //localRegs.put(regIndex, new AddAVM2Item(ins, null, new IntegerValueAVM2Item(ins, new Long(1))));
         }
     }
 }

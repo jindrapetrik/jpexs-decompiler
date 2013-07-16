@@ -20,10 +20,10 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.LocalRegTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.UndefinedTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -39,10 +39,10 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
         GraphTargetItem computedValue = localRegs.get(getRegisterId(ins));
         if (computedValue == null) {
             if (!localRegNames.containsKey(getRegisterId(ins))) {
-                computedValue = new UndefinedTreeItem(null); //In some obfuscated code there seems to be reading of undefined registers
+                computedValue = new UndefinedAVM2Item(null); //In some obfuscated code there seems to be reading of undefined registers
             }
         }
-        stack.push(new LocalRegTreeItem(ins, getRegisterId(ins), computedValue));
+        stack.push(new LocalRegAVM2Item(ins, getRegisterId(ins), computedValue));
     }
 
     @Override

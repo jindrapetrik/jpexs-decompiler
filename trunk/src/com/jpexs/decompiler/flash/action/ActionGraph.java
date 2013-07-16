@@ -24,28 +24,28 @@ import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
 import com.jpexs.decompiler.flash.action.swf6.ActionStrictEquals;
-import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.EnumerateTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.FunctionTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.SetTarget2TreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.SetTargetTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.SetTypeTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.StoreRegisterTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.clauses.ForInTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.clauses.TellTargetTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.operations.NeqTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.operations.StrictEqTreeItem;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.EnumerateActionItem;
+import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
+import com.jpexs.decompiler.flash.action.model.SetTarget2ActionItem;
+import com.jpexs.decompiler.flash.action.model.SetTargetActionItem;
+import com.jpexs.decompiler.flash.action.model.SetTypeActionItem;
+import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
+import com.jpexs.decompiler.flash.action.model.clauses.ForInActionItem;
+import com.jpexs.decompiler.flash.action.model.clauses.TellTargetActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.NeqActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.StrictEqActionItem;
 import com.jpexs.decompiler.flash.ecma.Null;
-import com.jpexs.decompiler.flash.graph.BreakItem;
-import com.jpexs.decompiler.flash.graph.ContinueItem;
-import com.jpexs.decompiler.flash.graph.Graph;
-import com.jpexs.decompiler.flash.graph.GraphPart;
-import com.jpexs.decompiler.flash.graph.GraphSource;
-import com.jpexs.decompiler.flash.graph.GraphSourceItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
-import com.jpexs.decompiler.flash.graph.Loop;
-import com.jpexs.decompiler.flash.graph.SwitchItem;
-import com.jpexs.decompiler.flash.graph.WhileItem;
+import com.jpexs.decompiler.graph.model.BreakItem;
+import com.jpexs.decompiler.graph.model.ContinueItem;
+import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.decompiler.graph.GraphPart;
+import com.jpexs.decompiler.graph.GraphSource;
+import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.Loop;
+import com.jpexs.decompiler.graph.model.SwitchItem;
+import com.jpexs.decompiler.graph.model.WhileItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -81,8 +81,8 @@ public class ActionGraph extends Graph {
         if (stack.size() > 0) {
             for (int i = stack.size() - 1; i >= 0; i--) {
                 //System.err.println(stack.get(i));
-                if (stack.get(i) instanceof FunctionTreeItem) {
-                    FunctionTreeItem f = (FunctionTreeItem) stack.remove(i);
+                if (stack.get(i) instanceof FunctionActionItem) {
+                    FunctionActionItem f = (FunctionActionItem) stack.remove(i);
                     if (!output.contains(f)) {
                         output.add(0, f);
                     }
@@ -110,22 +110,22 @@ public class ActionGraph extends Graph {
             GraphTargetItem target = null;
             for (int t = 0; t < list.size(); t++) {
                 GraphTargetItem it = list.get(t);
-                if (it instanceof SetTargetTreeItem) {
-                    SetTargetTreeItem st = (SetTargetTreeItem) it;
+                if (it instanceof SetTargetActionItem) {
+                    SetTargetActionItem st = (SetTargetActionItem) it;
                     if (st.target.equals("")) {
                         if (targetStart > -1) {
                             targetEnd = t;
                             break;
                         }
                     } else {
-                        target = new DirectValueTreeItem(null, 0, st.target, new ArrayList<String>());
+                        target = new DirectValueActionItem(null, 0, st.target, new ArrayList<String>());
                         targetStart = t;
                         targetStartItem = it;
                     }
                 }
-                if (it instanceof SetTarget2TreeItem) {
-                    SetTarget2TreeItem st = (SetTarget2TreeItem) it;
-                    if ((st.target instanceof DirectValueTreeItem) && st.target.getResult().equals("")) {
+                if (it instanceof SetTarget2ActionItem) {
+                    SetTarget2ActionItem st = (SetTarget2ActionItem) it;
+                    if ((st.target instanceof DirectValueActionItem) && st.target.getResult().equals("")) {
                         if (targetStart > -1) {
                             targetEnd = t;
                             break;
@@ -146,7 +146,7 @@ public class ActionGraph extends Graph {
                 for (int i = targetStart + 1; i < targetEnd; i++) {
                     tellist.add(list.get(i));
                 }
-                newlist.add(new TellTargetTreeItem(targetStartItem.src, target, tellist));
+                newlist.add(new TellTargetActionItem(targetStartItem.src, target, tellist));
                 for (int i = targetEnd + 1; i < list.size(); i++) {
                     newlist.add(list.get(i));
                 }
@@ -160,22 +160,22 @@ public class ActionGraph extends Graph {
 
             if (it instanceof WhileItem) {
                 WhileItem wi = (WhileItem) it;
-                if ((!wi.commands.isEmpty()) && (wi.commands.get(0) instanceof SetTypeTreeItem)) {
-                    SetTypeTreeItem sti = (SetTypeTreeItem) wi.commands.get(0);
-                    if (wi.expression.get(wi.expression.size() - 1) instanceof NeqTreeItem) {
-                        NeqTreeItem ne = (NeqTreeItem) wi.expression.get(wi.expression.size() - 1);
-                        if (ne.rightSide instanceof DirectValueTreeItem) {
-                            DirectValueTreeItem dv = (DirectValueTreeItem) ne.rightSide;
+                if ((!wi.commands.isEmpty()) && (wi.commands.get(0) instanceof SetTypeActionItem)) {
+                    SetTypeActionItem sti = (SetTypeActionItem) wi.commands.get(0);
+                    if (wi.expression.get(wi.expression.size() - 1) instanceof NeqActionItem) {
+                        NeqActionItem ne = (NeqActionItem) wi.expression.get(wi.expression.size() - 1);
+                        if (ne.rightSide instanceof DirectValueActionItem) {
+                            DirectValueActionItem dv = (DirectValueActionItem) ne.rightSide;
                             if (dv.value instanceof Null) {
                                 GraphTargetItem en = ne.leftSide;
-                                if (en instanceof StoreRegisterTreeItem) {
-                                    en = ((StoreRegisterTreeItem) en).value;
+                                if (en instanceof StoreRegisterActionItem) {
+                                    en = ((StoreRegisterActionItem) en).value;
                                 }
-                                if (en instanceof EnumerateTreeItem) {
-                                    EnumerateTreeItem eti = (EnumerateTreeItem) en;
+                                if (en instanceof EnumerateActionItem) {
+                                    EnumerateActionItem eti = (EnumerateActionItem) en;
                                     list.remove(t);
                                     wi.commands.remove(0);
-                                    list.add(t, new ForInTreeItem(null, wi.loop, sti.getObject(), eti.object, wi.commands));
+                                    list.add(t, new ForInActionItem(null, wi.loop, sti.getObject(), eti.object, wi.commands));
                                 }
                             }
                         }
@@ -246,32 +246,32 @@ public class ActionGraph extends Graph {
     @Override
     protected List<GraphTargetItem> check(GraphSource code, List<Object> localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) {
         if (!output.isEmpty()) {
-            if (output.get(output.size() - 1) instanceof StoreRegisterTreeItem) {
-                StoreRegisterTreeItem str = (StoreRegisterTreeItem) output.get(output.size() - 1);
-                if (str.value instanceof EnumerateTreeItem) {
+            if (output.get(output.size() - 1) instanceof StoreRegisterActionItem) {
+                StoreRegisterActionItem str = (StoreRegisterActionItem) output.get(output.size() - 1);
+                if (str.value instanceof EnumerateActionItem) {
                     output.remove(output.size() - 1);
                 }
             }
         }
         List<GraphTargetItem> ret = null;
-        if ((part.nextParts.size() == 2) && (!stack.isEmpty()) && (stack.peek() instanceof StrictEqTreeItem)) {
+        if ((part.nextParts.size() == 2) && (!stack.isEmpty()) && (stack.peek() instanceof StrictEqActionItem)) {
 
             GraphTargetItem switchedObject = null;
             if (!output.isEmpty()) {
-                if (output.get(output.size() - 1) instanceof StoreRegisterTreeItem) {
-                    switchedObject = ((StoreRegisterTreeItem) output.get(output.size() - 1)).value;
+                if (output.get(output.size() - 1) instanceof StoreRegisterActionItem) {
+                    switchedObject = ((StoreRegisterActionItem) output.get(output.size() - 1)).value;
                 }
             }
             if (switchedObject == null) {
-                switchedObject = new DirectValueTreeItem(null, -1, new Null(), null);
+                switchedObject = new DirectValueActionItem(null, -1, new Null(), null);
             }
             HashMap<Integer, GraphTargetItem> caseValuesMap = new HashMap<>();
 
             int pos = 0;
-            StrictEqTreeItem set = (StrictEqTreeItem) stack.pop();
+            StrictEqActionItem set = (StrictEqActionItem) stack.pop();
             caseValuesMap.put(pos, set.rightSide);
-            if (set.leftSide instanceof StoreRegisterTreeItem) {
-                switchedObject = ((StoreRegisterTreeItem) set.leftSide).value;
+            if (set.leftSide instanceof StoreRegisterActionItem) {
+                switchedObject = ((StoreRegisterActionItem) set.leftSide).value;
             }
             //GraphPart switchLoc = part.nextParts.get(1).nextParts.get(0);
             List<GraphPart> caseBodyParts = new ArrayList<>();
@@ -281,13 +281,13 @@ public class ActionGraph extends Graph {
             while (part.nextParts.size() > 1
                     && part.nextParts.get(1).getHeight() > 1
                     && code.get(part.nextParts.get(1).end >= code.size() ? code.size() - 1 : part.nextParts.get(1).end) instanceof ActionIf
-                    && ((top = translatePartGetStack(localData, part.nextParts.get(1), stack, staticOperation)) instanceof StrictEqTreeItem)) {
+                    && ((top = translatePartGetStack(localData, part.nextParts.get(1), stack, staticOperation)) instanceof StrictEqActionItem)) {
                 cnt++;
                 part = part.nextParts.get(1);
                 pos++;
                 caseBodyParts.add(part.nextParts.get(0));
 
-                set = (StrictEqTreeItem) top;
+                set = (StrictEqActionItem) top;
                 caseValuesMap.put(pos, set.rightSide);
             }
             if (cnt == 1) {

@@ -22,11 +22,11 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.ConstructPropTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.FullMultinameTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.XMLTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.model.ConstructPropAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.XMLAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,7 +61,7 @@ public class ConstructPropIns extends InstructionDefinition {
         for (int a = 0; a < argCount; a++) {
             args.add(0, (GraphTargetItem) stack.pop());
         }
-        FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
+        FullMultinameAVM2Item multiname = resolveMultiname(stack, constants, multinameIndex, ins);
         GraphTargetItem obj = (GraphTargetItem) stack.pop();
 
         if (multiname.isXML(constants, localRegNames, fullyQualifiedNames)) {
@@ -69,13 +69,13 @@ public class ConstructPropIns extends InstructionDefinition {
                 GraphTargetItem arg = args.get(0);
                 List<GraphTargetItem> xmlLines = new ArrayList<>();
                 if (ConstructIns.walkXML(arg, xmlLines)) {
-                    stack.push(new XMLTreeItem(ins, xmlLines));
+                    stack.push(new XMLAVM2Item(ins, xmlLines));
                     return;
                 }
             }
         }
 
-        stack.push(new ConstructPropTreeItem(ins, obj, multiname, args));
+        stack.push(new ConstructPropAVM2Item(ins, obj, multiname, args));
     }
 
     @Override

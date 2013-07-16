@@ -21,12 +21,12 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.GetSlotTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.ExceptionTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetSlotAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -42,8 +42,8 @@ public class GetGlobalSlotIns extends InstructionDefinition {
         int slotIndex = ins.operands[0];
         GraphTargetItem obj = (GraphTargetItem) scopeStack.get(0); //scope
         Multiname slotname = null;
-        if (obj instanceof ExceptionTreeItem) {
-            slotname = constants.constant_multiname[((ExceptionTreeItem) obj).exception.name_index];
+        if (obj instanceof ExceptionAVM2Item) {
+            slotname = constants.constant_multiname[((ExceptionAVM2Item) obj).exception.name_index];
         } else {
 
             for (int t = 0; t < body.traits.traits.length; t++) {
@@ -55,7 +55,7 @@ public class GetGlobalSlotIns extends InstructionDefinition {
 
             }
         }
-        stack.push(new GetSlotTreeItem(ins, obj, slotname));
+        stack.push(new GetSlotAVM2Item(ins, obj, slotname));
     }
 
     @Override

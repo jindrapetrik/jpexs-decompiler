@@ -27,40 +27,40 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalTypeIn
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.KillIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnValueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushIntegerTypeIns;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.FilteredCheckTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.HasNextTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.InTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.LocalRegTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.NextNameTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.NextValueTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.NullTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.ReturnValueTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.ReturnVoidTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.SetLocalTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.SetPropertyTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.SetTypeTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.WithTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.ExceptionTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.FilterTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.ForEachInTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.ForInTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.TryTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.StrictEqTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.StrictNeqTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.model.FilteredCheckAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.HasNextAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.InAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NextNameAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NextValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.ReturnValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.ReturnVoidAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.WithAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.clauses.FilterAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForEachInAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForInAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.clauses.TryAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.operations.StrictEqAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.operations.StrictNeqAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
-import com.jpexs.decompiler.flash.graph.BreakItem;
-import com.jpexs.decompiler.flash.graph.Graph;
-import com.jpexs.decompiler.flash.graph.GraphPart;
-import com.jpexs.decompiler.flash.graph.GraphPartMulti;
-import com.jpexs.decompiler.flash.graph.GraphSource;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
-import com.jpexs.decompiler.flash.graph.IfItem;
-import com.jpexs.decompiler.flash.graph.Loop;
-import com.jpexs.decompiler.flash.graph.LoopItem;
-import com.jpexs.decompiler.flash.graph.NotItem;
-import com.jpexs.decompiler.flash.graph.SwitchItem;
-import com.jpexs.decompiler.flash.graph.WhileItem;
+import com.jpexs.decompiler.graph.model.BreakItem;
+import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.decompiler.graph.GraphPart;
+import com.jpexs.decompiler.graph.GraphPartMulti;
+import com.jpexs.decompiler.graph.GraphSource;
+import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.IfItem;
+import com.jpexs.decompiler.graph.Loop;
+import com.jpexs.decompiler.graph.model.LoopItem;
+import com.jpexs.decompiler.graph.model.NotItem;
+import com.jpexs.decompiler.graph.model.SwitchItem;
+import com.jpexs.decompiler.graph.model.WhileItem;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -253,7 +253,7 @@ public class AVM2Graph extends Graph {
                                             if (swins.operands.length >= 3) {
                                                 if (swins.operands[0] == swins.getBytes().length) {
                                                     if (code.adr2pos(code.pos2adr(f) + swins.operands[2]) < finStart) {
-                                                        stack.push(new ExceptionTreeItem(body.exceptions[e]));
+                                                        stack.push(new ExceptionAVM2Item(body.exceptions[e]));
                                                         GraphPart fepart = null;
                                                         for (GraphPart p : allParts) {
                                                             if (p.start == f + 1) {
@@ -309,7 +309,7 @@ public class AVM2Graph extends Graph {
                             break;
                         }
                     }
-                    stack.add(new ExceptionTreeItem(catchedExceptions.get(e)));
+                    stack.add(new ExceptionAVM2Item(catchedExceptions.get(e)));
                     List<Object> localData2 = new ArrayList<>();
                     localData2.addAll(localData);
                     localData2.set(DATA_SCOPESTACK, new Stack<GraphTargetItem>());
@@ -332,7 +332,7 @@ public class AVM2Graph extends Graph {
                 List<GraphTargetItem> tryCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, parent, part, stopPart2, loops, staticOperation, path);
 
                 output.clear();
-                output.add(new TryTreeItem(tryCommands, catchedExceptions, catchedCommands, finallyCommands));
+                output.add(new TryAVM2Item(tryCommands, catchedExceptions, catchedCommands, finallyCommands));
                 ip = returnPos;
             }
 
@@ -366,11 +366,11 @@ public class AVM2Graph extends Graph {
                     if (this.code.code.get(part.getPosAt(part.getHeight() - 2)).definition instanceof KillIns) {
                         if (this.code.code.get(part.getPosAt(part.getHeight() - 3)).definition instanceof GetLocalTypeIns) {
                             if (output.size() >= 2) {
-                                if (output.get(output.size() - 2) instanceof SetLocalTreeItem) {
+                                if (output.get(output.size() - 2) instanceof SetLocalAVM2Item) {
                                     ret = new ArrayList<>();
                                     ret.addAll(output);
                                     ret.remove(ret.size() - 1);
-                                    ret.add(new ReturnValueTreeItem(this.code.code.get(part.end), ((SetLocalTreeItem) output.get(output.size() - 2)).value));
+                                    ret.add(new ReturnValueAVM2Item(this.code.code.get(part.end), ((SetLocalAVM2Item) output.get(output.size() - 2)).value));
                                     return ret;
                                 }
                             }
@@ -386,20 +386,20 @@ public class AVM2Graph extends Graph {
         }
         if (((part.nextParts.size() == 2)
                 && (!stack.isEmpty())
-                && (stack.peek() instanceof StrictEqTreeItem)
+                && (stack.peek() instanceof StrictEqAVM2Item)
                 && (part.nextParts.get(0).getHeight() >= 2)
                 && (this.code.code.get(this.code.fixIPAfterDebugLine(part.nextParts.get(0).start)).definition instanceof PushIntegerTypeIns)
                 && (!part.nextParts.get(0).nextParts.isEmpty())
                 && (this.code.code.get(part.nextParts.get(0).nextParts.get(0).end).definition instanceof LookupSwitchIns))
                 || ((part.nextParts.size() == 2)
                 && (!stack.isEmpty())
-                && (stack.peek() instanceof StrictNeqTreeItem)
+                && (stack.peek() instanceof StrictNeqAVM2Item)
                 && (part.nextParts.get(1).getHeight() >= 2)
                 && (this.code.code.get(this.code.fixIPAfterDebugLine(part.nextParts.get(1).start)).definition instanceof PushIntegerTypeIns)
                 && (!part.nextParts.get(1).nextParts.isEmpty())
                 && (this.code.code.get(part.nextParts.get(1).nextParts.get(0).end).definition instanceof LookupSwitchIns))) {
 
-            if (stack.peek() instanceof StrictEqTreeItem) {
+            if (stack.peek() instanceof StrictEqAVM2Item) {
                 ignoredSwitches.add(part.nextParts.get(0).nextParts.get(0).end);
             } else {
                 ignoredSwitches.add(part.nextParts.get(1).nextParts.get(0).end);
@@ -407,26 +407,26 @@ public class AVM2Graph extends Graph {
             ret = new ArrayList<>();
             ret.addAll(output);
             boolean reversed = false;
-            if (stack.peek() instanceof StrictEqTreeItem) {
+            if (stack.peek() instanceof StrictEqAVM2Item) {
                 reversed = true;
             }
             GraphTargetItem switchedObject = null;
             if (!output.isEmpty()) {
-                if (output.get(output.size() - 1) instanceof SetLocalTreeItem) {
-                    switchedObject = ((SetLocalTreeItem) output.get(output.size() - 1)).value;
+                if (output.get(output.size() - 1) instanceof SetLocalAVM2Item) {
+                    switchedObject = ((SetLocalAVM2Item) output.get(output.size() - 1)).value;
                 }
             }
             if (switchedObject == null) {
-                switchedObject = new NullTreeItem(null);
+                switchedObject = new NullAVM2Item(null);
             }
             HashMap<Integer, GraphTargetItem> caseValuesMap = new HashMap<>();
 
             GraphTargetItem tar = stack.pop();
-            if (tar instanceof StrictEqTreeItem) {
-                tar = ((StrictEqTreeItem) tar).leftSide;
+            if (tar instanceof StrictEqAVM2Item) {
+                tar = ((StrictEqAVM2Item) tar).leftSide;
             }
-            if (tar instanceof StrictNeqTreeItem) {
-                tar = ((StrictNeqTreeItem) tar).leftSide;
+            if (tar instanceof StrictNeqAVM2Item) {
+                tar = ((StrictNeqAVM2Item) tar).leftSide;
             }
             caseValuesMap.put(this.code.code.get(part.nextParts.get(reversed ? 0 : 1).start).operands[0], tar);
 
@@ -438,11 +438,11 @@ public class AVM2Graph extends Graph {
                 part = part.nextParts.get(reversed ? 1 : 0);
                 translatePart(localData, part, stack, staticOperation, null);
                 tar = stack.pop();
-                if (tar instanceof StrictEqTreeItem) {
-                    tar = ((StrictEqTreeItem) tar).leftSide;
+                if (tar instanceof StrictEqAVM2Item) {
+                    tar = ((StrictEqAVM2Item) tar).leftSide;
                 }
-                if (tar instanceof StrictNeqTreeItem) {
-                    tar = ((StrictNeqTreeItem) tar).leftSide;
+                if (tar instanceof StrictNeqAVM2Item) {
+                    tar = ((StrictNeqAVM2Item) tar).leftSide;
                 }
                 if (this.code.code.get(part.end).definition instanceof IfStrictNeIns) {
                     reversed = false;
@@ -565,30 +565,30 @@ public class AVM2Graph extends Graph {
         if (loopItem instanceof WhileItem) {
             WhileItem w = (WhileItem) loopItem;
 
-            if ((!w.expression.isEmpty()) && (w.expression.get(w.expression.size() - 1) instanceof HasNextTreeItem)) {
-                if (((HasNextTreeItem) w.expression.get(w.expression.size() - 1)).collection != null) {
-                    if (((HasNextTreeItem) w.expression.get(w.expression.size() - 1)).collection.getNotCoerced().getThroughRegister() instanceof FilteredCheckTreeItem) {
-                        //GraphTargetItem gti = ((HasNextTreeItem) ((HasNextTreeItem) w.expression.get(w.expression.size() - 1))).collection.getNotCoerced().getThroughRegister();
+            if ((!w.expression.isEmpty()) && (w.expression.get(w.expression.size() - 1) instanceof HasNextAVM2Item)) {
+                if (((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).collection != null) {
+                    if (((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).collection.getNotCoerced().getThroughRegister() instanceof FilteredCheckAVM2Item) {
+                        //GraphTargetItem gti = ((HasNextAVM2Item) ((HasNextAVM2Item) w.expression.get(w.expression.size() - 1))).collection.getNotCoerced().getThroughRegister();
                         if (w.commands.size() >= 3) { //((w.commands.size() == 3) || (w.commands.size() == 4)) {
                             int pos = 0;
-                            while (w.commands.get(pos) instanceof SetLocalTreeItem) {
+                            while (w.commands.get(pos) instanceof SetLocalAVM2Item) {
                                 pos++;
                             }
                             GraphTargetItem ft = w.commands.get(pos);
-                            if (ft instanceof WithTreeItem) {
+                            if (ft instanceof WithAVM2Item) {
                                 ft = w.commands.get(pos + 1);
                                 if (ft instanceof IfItem) {
                                     IfItem ift = (IfItem) ft;
                                     if (ift.onTrue.size() > 0) {
                                         ft = ift.onTrue.get(0);
-                                        if (ft instanceof SetPropertyTreeItem) {
-                                            SetPropertyTreeItem spt = (SetPropertyTreeItem) ft;
-                                            if (spt.object instanceof LocalRegTreeItem) {
-                                                int regIndex = ((LocalRegTreeItem) spt.object).regIndex;
-                                                HasNextTreeItem iti = (HasNextTreeItem) w.expression.get(w.expression.size() - 1);
+                                        if (ft instanceof SetPropertyAVM2Item) {
+                                            SetPropertyAVM2Item spt = (SetPropertyAVM2Item) ft;
+                                            if (spt.object instanceof LocalRegAVM2Item) {
+                                                int regIndex = ((LocalRegAVM2Item) spt.object).regIndex;
+                                                HasNextAVM2Item iti = (HasNextAVM2Item) w.expression.get(w.expression.size() - 1);
                                                 @SuppressWarnings("unchecked")
                                                 HashMap<Integer, GraphTargetItem> localRegs = (HashMap<Integer, GraphTargetItem>) localData.get(DATA_LOCALREGS);
-                                                localRegs.put(regIndex, new FilterTreeItem(null, iti.collection.getThroughRegister(), ift.expression));
+                                                localRegs.put(regIndex, new FilterAVM2Item(null, iti.collection.getThroughRegister(), ift.expression));
                                                 return null;
                                             }
                                         }
@@ -597,13 +597,13 @@ public class AVM2Graph extends Graph {
                             }
                         }
                     } else if (!w.commands.isEmpty()) {
-                        if (w.commands.get(0) instanceof SetTypeTreeItem) {
-                            SetTypeTreeItem sti = (SetTypeTreeItem) w.commands.remove(0);
+                        if (w.commands.get(0) instanceof SetTypeAVM2Item) {
+                            SetTypeAVM2Item sti = (SetTypeAVM2Item) w.commands.remove(0);
                             GraphTargetItem gti = sti.getValue().getNotCoerced();
-                            if (gti instanceof NextValueTreeItem) {
-                                return new ForEachInTreeItem(w.src, w.loop, new InTreeItem(null, sti.getObject(), ((HasNextTreeItem) w.expression.get(w.expression.size() - 1)).collection), w.commands);
-                            } else if (gti instanceof NextNameTreeItem) {
-                                return new ForInTreeItem(w.src, w.loop, new InTreeItem(null, sti.getObject(), ((HasNextTreeItem) w.expression.get(w.expression.size() - 1)).collection), w.commands);
+                            if (gti instanceof NextValueAVM2Item) {
+                                return new ForEachInAVM2Item(w.src, w.loop, new InAVM2Item(null, sti.getObject(), ((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).collection), w.commands);
+                            } else if (gti instanceof NextNameAVM2Item) {
+                                return new ForInAVM2Item(w.src, w.loop, new InAVM2Item(null, sti.getObject(), ((HasNextAVM2Item) w.expression.get(w.expression.size() - 1)).collection), w.commands);
                             }
                         }
                     }
@@ -617,7 +617,7 @@ public class AVM2Graph extends Graph {
     protected void finalProcess(List<GraphTargetItem> list, int level) {
         if (level == 0) {
             if (!list.isEmpty()) {
-                if (list.get(list.size() - 1) instanceof ReturnVoidTreeItem) {
+                if (list.get(list.size() - 1) instanceof ReturnVoidAVM2Item) {
                     list.remove(list.size() - 1);
                 }
             }
@@ -638,8 +638,8 @@ public class AVM2Graph extends Graph {
             list.addAll(ret);
         }
         for (int i = 0; i < list.size(); i++) {
-            if (list.get(i) instanceof SetTypeTreeItem) {
-                if (((SetTypeTreeItem) list.get(i)).getValue() instanceof ExceptionTreeItem) {
+            if (list.get(i) instanceof SetTypeAVM2Item) {
+                if (((SetTypeAVM2Item) list.get(i)).getValue() instanceof ExceptionAVM2Item) {
                     list.remove(i);
                     i--;
                     continue;
@@ -647,34 +647,34 @@ public class AVM2Graph extends Graph {
             }
             if (list.get(i) instanceof IfItem) {
                 IfItem ifi = (IfItem) list.get(i);
-                if (((ifi.expression instanceof HasNextTreeItem)
+                if (((ifi.expression instanceof HasNextAVM2Item)
                         || ((ifi.expression instanceof NotItem)
-                        && (((NotItem) ifi.expression).getOriginal() instanceof HasNextTreeItem)))) {
-                    HasNextTreeItem hnt = null;
+                        && (((NotItem) ifi.expression).getOriginal() instanceof HasNextAVM2Item)))) {
+                    HasNextAVM2Item hnt = null;
                     List<GraphTargetItem> body = new ArrayList<>();
                     List<GraphTargetItem> nextbody = new ArrayList<>();
                     if (ifi.expression instanceof NotItem) {
-                        hnt = (HasNextTreeItem) ((NotItem) ifi.expression).getOriginal();
+                        hnt = (HasNextAVM2Item) ((NotItem) ifi.expression).getOriginal();
                         body.addAll(ifi.onFalse);
                         for (int j = i + 1; j < list.size();) {
                             body.add(list.remove(i + 1));
                         }
                         nextbody = ifi.onTrue;
                     } else {
-                        hnt = (HasNextTreeItem) ifi.expression;
+                        hnt = (HasNextAVM2Item) ifi.expression;
                         body = ifi.onTrue;
                         nextbody = ifi.onFalse;
                     }
                     if (!body.isEmpty()) {
-                        if (body.get(0) instanceof SetTypeTreeItem) {
-                            SetTypeTreeItem sti = (SetTypeTreeItem) body.remove(0);
+                        if (body.get(0) instanceof SetTypeAVM2Item) {
+                            SetTypeAVM2Item sti = (SetTypeAVM2Item) body.remove(0);
                             GraphTargetItem gti = sti.getValue().getNotCoerced();
                             GraphTargetItem repl = null;
 
-                            if (gti instanceof NextValueTreeItem) {
-                                repl = new ForEachInTreeItem(ifi.src, new Loop(0, null, null), new InTreeItem(null, sti.getObject(), hnt.collection), body);
-                            } else if (gti instanceof NextNameTreeItem) {
-                                repl = new ForInTreeItem(ifi.src, new Loop(0, null, null), new InTreeItem(null, sti.getObject(), hnt.collection), body);
+                            if (gti instanceof NextValueAVM2Item) {
+                                repl = new ForEachInAVM2Item(ifi.src, new Loop(0, null, null), new InAVM2Item(null, sti.getObject(), hnt.collection), body);
+                            } else if (gti instanceof NextNameAVM2Item) {
+                                repl = new ForInAVM2Item(ifi.src, new Loop(0, null, null), new InAVM2Item(null, sti.getObject(), hnt.collection), body);
                             }
                             if (repl != null) {
                                 list.remove(i);
@@ -694,8 +694,8 @@ public class AVM2Graph extends Graph {
             return true;
         }
         for (GraphTargetItem i : output) {
-            if (i instanceof SetLocalTreeItem) {
-                if (code.isKilled(((SetLocalTreeItem) i).regIndex, 0, code.code.size() - 1)) {
+            if (i instanceof SetLocalAVM2Item) {
+                if (code.isKilled(((SetLocalAVM2Item) i).regIndex, 0, code.code.size() - 1)) {
                     continue;
                 }
             }

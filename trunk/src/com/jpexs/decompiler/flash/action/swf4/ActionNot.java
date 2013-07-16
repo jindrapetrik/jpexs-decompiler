@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
-import com.jpexs.decompiler.flash.graph.NotItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.NotItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;

@@ -20,10 +20,10 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.AlchemyStoreTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.model.AlchemyStoreAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -52,6 +52,6 @@ public class Sf64Ins extends InstructionDefinition {
     public void translate(boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path) {
         GraphTargetItem ofs = stack.pop();
         GraphTargetItem value = stack.pop();
-        stack.push(new AlchemyStoreTreeItem(ins, value, ofs, instructionName));
+        stack.push(new AlchemyStoreAVM2Item(ins, value, ofs, instructionName));
     }
 }

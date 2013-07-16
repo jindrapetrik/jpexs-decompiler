@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.NewObjectTreeItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.model.NewObjectActionItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +43,6 @@ public class ActionNewObject extends Action {
         for (long l = 0; l < numArgs; l++) {
             args.add(stack.pop());
         }
-        stack.push(new NewObjectTreeItem(this, objectName, args));
+        stack.push(new NewObjectActionItem(this, objectName, args));
     }
 }

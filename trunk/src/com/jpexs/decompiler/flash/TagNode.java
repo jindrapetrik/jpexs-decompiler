@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.graph.Graph;
+import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;

@@ -21,19 +21,19 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
-import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.GetURL2TreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.LoadMovieNumTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.LoadMovieTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.LoadVariablesNumTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.LoadVariablesTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.PrintAsBitmapNumTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.PrintAsBitmapTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.PrintNumTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.PrintTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.UnLoadMovieNumTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.UnLoadMovieTreeItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.GetURL2ActionItem;
+import com.jpexs.decompiler.flash.action.model.LoadMovieNumActionItem;
+import com.jpexs.decompiler.flash.action.model.LoadMovieActionItem;
+import com.jpexs.decompiler.flash.action.model.LoadVariablesNumActionItem;
+import com.jpexs.decompiler.flash.action.model.LoadVariablesActionItem;
+import com.jpexs.decompiler.flash.action.model.PrintAsBitmapNumActionItem;
+import com.jpexs.decompiler.flash.action.model.PrintAsBitmapActionItem;
+import com.jpexs.decompiler.flash.action.model.PrintNumActionItem;
+import com.jpexs.decompiler.flash.action.model.PrintActionItem;
+import com.jpexs.decompiler.flash.action.model.UnLoadMovieNumActionItem;
+import com.jpexs.decompiler.flash.action.model.UnLoadMovieActionItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -111,15 +111,15 @@ public class ActionGetURL2 extends Action {
         }
         if (loadVariablesFlag) {
             if (num != null) {
-                output.add(new LoadVariablesNumTreeItem(this, urlString, new DirectValueTreeItem(null, 0, (Long) (long) (int) num, new ArrayList<String>()), sendVarsMethod));
+                output.add(new LoadVariablesNumActionItem(this, urlString, new DirectValueActionItem(null, 0, (Long) (long) (int) num, new ArrayList<String>()), sendVarsMethod));
             } else {
-                output.add(new LoadVariablesTreeItem(this, urlString, targetString, sendVarsMethod));
+                output.add(new LoadVariablesActionItem(this, urlString, targetString, sendVarsMethod));
             }
         } else if (loadTargetFlag) {
-            if ((urlString instanceof DirectValueTreeItem) && (urlString.getResult().equals(""))) {
-                output.add(new UnLoadMovieTreeItem(this, targetString));
+            if ((urlString instanceof DirectValueActionItem) && (urlString.getResult().equals(""))) {
+                output.add(new UnLoadMovieActionItem(this, targetString));
             } else {
-                output.add(new LoadMovieTreeItem(this, urlString, targetString, sendVarsMethod));
+                output.add(new LoadMovieActionItem(this, urlString, targetString, sendVarsMethod));
             }
         } else {
             String printPrefix = "print:#";
@@ -131,22 +131,22 @@ public class ActionGetURL2 extends Action {
 
             if (num != null) {
                 if ("".equals(urlStr)) {
-                    output.add(new UnLoadMovieNumTreeItem(this, new DirectValueTreeItem(null, 0, (Long) (long) (int) num, new ArrayList<String>())));
+                    output.add(new UnLoadMovieNumActionItem(this, new DirectValueActionItem(null, 0, (Long) (long) (int) num, new ArrayList<String>())));
                 } else if (urlStr != null && urlStr.startsWith(printPrefix)) {
-                    output.add(new PrintNumTreeItem(this, new DirectValueTreeItem((Long) (long) (int) num),
-                            new DirectValueTreeItem(urlStr.substring(printPrefix.length()))));
+                    output.add(new PrintNumActionItem(this, new DirectValueActionItem((Long) (long) (int) num),
+                            new DirectValueActionItem(urlStr.substring(printPrefix.length()))));
                 } else if (urlStr != null && urlStr.startsWith(printAsBitmapPrefix)) {
-                    output.add(new PrintAsBitmapNumTreeItem(this, new DirectValueTreeItem((Long) (long) (int) num), new DirectValueTreeItem(urlStr.substring(printAsBitmapPrefix.length()))));
+                    output.add(new PrintAsBitmapNumActionItem(this, new DirectValueActionItem((Long) (long) (int) num), new DirectValueActionItem(urlStr.substring(printAsBitmapPrefix.length()))));
                 } else {
-                    output.add(new LoadMovieNumTreeItem(this, urlString, new DirectValueTreeItem(null, 0, (Long) (long) (int) num, new ArrayList<String>()), sendVarsMethod));
+                    output.add(new LoadMovieNumActionItem(this, urlString, new DirectValueActionItem(null, 0, (Long) (long) (int) num, new ArrayList<String>()), sendVarsMethod));
                 }
             } else {
                 if (urlStr != null && urlStr.startsWith(printPrefix)) {
-                    output.add(new PrintTreeItem(this, targetString, new DirectValueTreeItem(urlStr.substring(printPrefix.length()))));
+                    output.add(new PrintActionItem(this, targetString, new DirectValueActionItem(urlStr.substring(printPrefix.length()))));
                 } else if (urlStr != null && urlStr.startsWith(printAsBitmapPrefix)) {
-                    output.add(new PrintAsBitmapTreeItem(this, targetString, new DirectValueTreeItem(urlStr.substring(printAsBitmapPrefix.length()))));
+                    output.add(new PrintAsBitmapActionItem(this, targetString, new DirectValueActionItem(urlStr.substring(printAsBitmapPrefix.length()))));
                 } else {
-                    output.add(new GetURL2TreeItem(this, urlString, targetString, sendVarsMethod));
+                    output.add(new GetURL2ActionItem(this, urlString, targetString, sendVarsMethod));
                 }
             }
         }

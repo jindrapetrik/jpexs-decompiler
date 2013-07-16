@@ -21,10 +21,10 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.NameValuePair;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.NewObjectTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.model.NameValuePair;
+import com.jpexs.decompiler.flash.abc.avm2.model.NewObjectAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +45,7 @@ public class NewObjectIns extends InstructionDefinition {
             GraphTargetItem name = (GraphTargetItem) stack.pop();
             args.add(0, new NameValuePair(name, value));
         }
-        stack.push(new NewObjectTreeItem(ins, args));
+        stack.push(new NewObjectAVM2Item(ins, args));
     }
 
     @Override

@@ -21,10 +21,10 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.NewFunctionTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.model.NewFunctionAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.util.HashMap;
 import java.util.List;
@@ -53,7 +53,7 @@ public class NewFunctionIns extends InstructionDefinition {
             paramStr = method_info[methodIndex].getParamStr(constants, mybody, abc, fullyQualifiedNames);
         }
 
-        stack.push(new NewFunctionTreeItem(ins, "", paramStr, method_info[methodIndex].getReturnTypeStr(constants, fullyQualifiedNames), bodyStr));
+        stack.push(new NewFunctionAVM2Item(ins, "", paramStr, method_info[methodIndex].getReturnTypeStr(constants, fullyQualifiedNames), bodyStr));
     }
 
     @Override

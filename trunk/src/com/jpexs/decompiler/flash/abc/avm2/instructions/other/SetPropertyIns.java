@@ -22,19 +22,19 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.SetTypeIns;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.DecrementTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.FullMultinameTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.GetPropertyTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.IncrementTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.LocalRegTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.PostDecrementTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.PostIncrementTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.SetPropertyTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.PreDecrementTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.operations.PreIncrementTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.model.DecrementAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.IncrementAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.PostDecrementAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.PostIncrementAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreDecrementAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -49,17 +49,17 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
     public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path) {
         int multinameIndex = ins.operands[0];
         GraphTargetItem value = (GraphTargetItem) stack.pop();
-        FullMultinameTreeItem multiname = resolveMultiname(stack, constants, multinameIndex, ins);
+        FullMultinameAVM2Item multiname = resolveMultiname(stack, constants, multinameIndex, ins);
         GraphTargetItem obj = (GraphTargetItem) stack.pop();
-        if (value.getThroughDuplicate().getThroughRegister().getThroughDuplicate() instanceof IncrementTreeItem) {
-            GraphTargetItem inside = ((IncrementTreeItem) value.getThroughDuplicate().getThroughRegister().getThroughDuplicate()).object.getThroughRegister().getNotCoerced().getThroughDuplicate();
-            if (inside instanceof GetPropertyTreeItem) {
-                GetPropertyTreeItem insideProp = ((GetPropertyTreeItem) inside);
+        if (value.getThroughDuplicate().getThroughRegister().getThroughDuplicate() instanceof IncrementAVM2Item) {
+            GraphTargetItem inside = ((IncrementAVM2Item) value.getThroughDuplicate().getThroughRegister().getThroughDuplicate()).object.getThroughRegister().getNotCoerced().getThroughDuplicate();
+            if (inside instanceof GetPropertyAVM2Item) {
+                GetPropertyAVM2Item insideProp = ((GetPropertyAVM2Item) inside);
                 if (insideProp.propertyName.compareSame(multiname)) {
                     GraphTargetItem insideObj = obj.getThroughDuplicate();
-                    if (insideObj instanceof LocalRegTreeItem) {
-                        if (((LocalRegTreeItem) insideObj).computedValue != null) {
-                            insideObj = ((LocalRegTreeItem) insideObj).computedValue.getThroughNotCompilable().getThroughDuplicate();
+                    if (insideObj instanceof LocalRegAVM2Item) {
+                        if (((LocalRegAVM2Item) insideObj).computedValue != null) {
+                            insideObj = ((LocalRegAVM2Item) insideObj).computedValue.getThroughNotCompilable().getThroughDuplicate();
                         }
                     }
                     if (insideProp.object.getThroughDuplicate() == insideObj) {
@@ -67,15 +67,15 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                             GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
                             if (top == insideProp) {
                                 stack.pop();
-                                stack.push(new PostIncrementTreeItem(ins, insideProp));
-                            } else if ((top instanceof IncrementTreeItem) && (((IncrementTreeItem) top).object == inside)) {
+                                stack.push(new PostIncrementAVM2Item(ins, insideProp));
+                            } else if ((top instanceof IncrementAVM2Item) && (((IncrementAVM2Item) top).object == inside)) {
                                 stack.pop();
-                                stack.push(new PreIncrementTreeItem(ins, insideProp));
+                                stack.push(new PreIncrementAVM2Item(ins, insideProp));
                             } else {
-                                output.add(new PostIncrementTreeItem(ins, insideProp));
+                                output.add(new PostIncrementAVM2Item(ins, insideProp));
                             }
                         } else {
-                            output.add(new PostIncrementTreeItem(ins, insideProp));
+                            output.add(new PostIncrementAVM2Item(ins, insideProp));
                         }
                         return;
                     }
@@ -83,15 +83,15 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
             }
         }
 
-        if (value.getThroughDuplicate().getThroughRegister().getThroughDuplicate() instanceof DecrementTreeItem) {
-            GraphTargetItem inside = ((DecrementTreeItem) value.getThroughDuplicate().getThroughRegister().getThroughDuplicate()).object.getThroughRegister().getNotCoerced().getThroughDuplicate();
-            if (inside instanceof GetPropertyTreeItem) {
-                GetPropertyTreeItem insideProp = ((GetPropertyTreeItem) inside);
+        if (value.getThroughDuplicate().getThroughRegister().getThroughDuplicate() instanceof DecrementAVM2Item) {
+            GraphTargetItem inside = ((DecrementAVM2Item) value.getThroughDuplicate().getThroughRegister().getThroughDuplicate()).object.getThroughRegister().getNotCoerced().getThroughDuplicate();
+            if (inside instanceof GetPropertyAVM2Item) {
+                GetPropertyAVM2Item insideProp = ((GetPropertyAVM2Item) inside);
                 if (insideProp.propertyName.compareSame(multiname)) {
                     GraphTargetItem insideObj = obj.getThroughDuplicate();
-                    if (insideObj instanceof LocalRegTreeItem) {
-                        if (((LocalRegTreeItem) insideObj).computedValue != null) {
-                            insideObj = ((LocalRegTreeItem) insideObj).computedValue.getThroughNotCompilable().getThroughDuplicate();
+                    if (insideObj instanceof LocalRegAVM2Item) {
+                        if (((LocalRegAVM2Item) insideObj).computedValue != null) {
+                            insideObj = ((LocalRegAVM2Item) insideObj).computedValue.getThroughNotCompilable().getThroughDuplicate();
                         }
                     }
                     if (insideProp.object.getThroughDuplicate() == insideObj) {
@@ -99,26 +99,26 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                             GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
                             if (top == insideProp) {
                                 stack.pop();
-                                stack.push(new PostDecrementTreeItem(ins, insideProp));
-                            } else if ((top instanceof DecrementTreeItem) && (((DecrementTreeItem) top).object == inside)) {
+                                stack.push(new PostDecrementAVM2Item(ins, insideProp));
+                            } else if ((top instanceof DecrementAVM2Item) && (((DecrementAVM2Item) top).object == inside)) {
                                 stack.pop();
-                                stack.push(new PreDecrementTreeItem(ins, insideProp));
+                                stack.push(new PreDecrementAVM2Item(ins, insideProp));
                             } else {
-                                output.add(new PostDecrementTreeItem(ins, insideProp));
+                                output.add(new PostDecrementAVM2Item(ins, insideProp));
                             }
                         } else {
-                            output.add(new PostDecrementTreeItem(ins, insideProp));
+                            output.add(new PostDecrementAVM2Item(ins, insideProp));
                         }
                         return;
                     }
                 }
             }
         }
-        output.add(new SetPropertyTreeItem(ins, obj, multiname, value));
+        output.add(new SetPropertyAVM2Item(ins, obj, multiname, value));
     }
 
     @Override
-    public String getObject(Stack<TreeItem> stack, ABC abc, AVM2Instruction ins, List<TreeItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public String getObject(Stack<AVM2Item> stack, ABC abc, AVM2Instruction ins, List<AVM2Item> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         int multinameIndex = ins.operands[0];
         String multiname = resolveMultinameNoPop(0, stack, abc.constants, multinameIndex, ins, fullyQualifiedNames);
         GraphTargetItem obj = stack.get(1 + resolvedCount(abc.constants, multinameIndex)); //pod vrcholem

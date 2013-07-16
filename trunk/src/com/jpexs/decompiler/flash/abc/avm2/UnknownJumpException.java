@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2;
 
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.List;
 import java.util.Stack;
 

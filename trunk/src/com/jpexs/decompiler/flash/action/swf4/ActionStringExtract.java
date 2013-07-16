@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.StringExtractTreeItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.model.StringExtractActionItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -39,6 +39,6 @@ public class ActionStringExtract extends Action {
         GraphTargetItem count = stack.pop();
         GraphTargetItem index = stack.pop();
         GraphTargetItem value = stack.pop();
-        stack.push(new StringExtractTreeItem(this, value, index, count));
+        stack.push(new StringExtractActionItem(this, value, index, count));
     }
 }

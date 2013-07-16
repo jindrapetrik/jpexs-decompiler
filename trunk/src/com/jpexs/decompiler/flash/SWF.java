@@ -41,22 +41,22 @@ import com.jpexs.decompiler.flash.action.swf5.ActionNewMethod;
 import com.jpexs.decompiler.flash.action.swf5.ActionNewObject;
 import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
-import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
-import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.FunctionTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.GetMemberTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.GetVariableTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.clauses.ClassTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.clauses.InterfaceTreeItem;
+import com.jpexs.decompiler.flash.action.model.ConstantPool;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
+import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
+import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
+import com.jpexs.decompiler.flash.action.model.clauses.ClassActionItem;
+import com.jpexs.decompiler.flash.action.model.clauses.InterfaceActionItem;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.flv.AUDIODATA;
 import com.jpexs.decompiler.flash.flv.FLVOutputStream;
 import com.jpexs.decompiler.flash.flv.FLVTAG;
 import com.jpexs.decompiler.flash.flv.VIDEODATA;
-import com.jpexs.decompiler.flash.graph.Graph;
-import com.jpexs.decompiler.flash.graph.GraphSourceItem;
-import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphSourceItemContainer;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Cache;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
@@ -1345,11 +1345,11 @@ public class SWF {
     public static final String validNextCharacters = validFirstCharacters + "0123456789";
     public static final String fooCharacters = "bcdfghjklmnpqrstvwz";
     public static final String fooJoinCharacters = "aeiouy";
-    private List<MyEntry<DirectValueTreeItem, ConstantPool>> allVariableNames = new ArrayList<>();
+    private List<MyEntry<DirectValueActionItem, ConstantPool>> allVariableNames = new ArrayList<>();
     private HashSet<String> allVariableNamesStr = new HashSet<>();
     private List<GraphSourceItem> allFunctions = new ArrayList<>();
-    private HashMap<DirectValueTreeItem, ConstantPool> allStrings = new HashMap<>();
-    private HashMap<DirectValueTreeItem, String> usageTypes = new HashMap<>();
+    private HashMap<DirectValueActionItem, ConstantPool> allStrings = new HashMap<>();
+    private HashMap<DirectValueActionItem, String> usageTypes = new HashMap<>();
 
     private String fooString(String orig, boolean firstUppercase, int rndSize) {
         boolean exists;
@@ -1451,7 +1451,7 @@ public class SWF {
         return null;
     }
 
-    private static void getVariables(ConstantPool constantPool, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, List<MyEntry<DirectValueTreeItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, List<Integer> visited, HashMap<DirectValueTreeItem, String> usageTypes, String path) {
+    private static void getVariables(ConstantPool constantPool, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, List<Integer> visited, HashMap<DirectValueActionItem, String> usageTypes, String path) {
         boolean debugMode = false;
         while ((ip > -1) && ip < code.size()) {
             if (visited.contains(ip)) {
@@ -1539,14 +1539,14 @@ public class SWF {
                 usageType = "member";
             }
 
-            if (name instanceof DirectValueTreeItem) {
-                variables.add(new MyEntry<>((DirectValueTreeItem) name, constantPool));
-                usageTypes.put((DirectValueTreeItem) name, usageType);
+            if (name instanceof DirectValueActionItem) {
+                variables.add(new MyEntry<>((DirectValueActionItem) name, constantPool));
+                usageTypes.put((DirectValueActionItem) name, usageType);
             }
 
             //for..in return
-            if (((ins instanceof ActionEquals) || (ins instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueTreeItem)) {
-                stack.push(new DirectValueTreeItem(null, 0, new Null(), new ArrayList<String>()));
+            if (((ins instanceof ActionEquals) || (ins instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueActionItem)) {
+                stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>()));
             }
 
             if (ins instanceof ActionConstantPool) {
@@ -1566,8 +1566,8 @@ public class SWF {
             if (ins instanceof ActionPush) {
                 if (!stack.isEmpty()) {
                     GraphTargetItem top = stack.peek();
-                    if (top instanceof DirectValueTreeItem) {
-                        DirectValueTreeItem dvt = (DirectValueTreeItem) top;
+                    if (top instanceof DirectValueActionItem) {
+                        DirectValueActionItem dvt = (DirectValueActionItem) top;
                         if ((dvt.value instanceof String) || (dvt.value instanceof ConstantIndex)) {
                             if (constantPool == null) {
                                 constantPool = new ConstantPool(dvt.constants);
@@ -1602,7 +1602,7 @@ public class SWF {
         };
     }
 
-    private static void getVariables(List<MyEntry<DirectValueTreeItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, HashMap<DirectValueTreeItem, String> usageType, ActionGraphSource code, int addr, String path) {
+    private static void getVariables(List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageType, ActionGraphSource code, int addr, String path) {
         List<Object> localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
         try {
             getVariables(null, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), variables, functions, strings, new ArrayList<Integer>(), usageType, path);
@@ -1611,8 +1611,8 @@ public class SWF {
         }
     }
 
-    private List<MyEntry<DirectValueTreeItem, ConstantPool>> getVariables(List<MyEntry<DirectValueTreeItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueTreeItem, ConstantPool> strings, HashMap<DirectValueTreeItem, String> usageType, ASMSource src, String path) {
-        List<MyEntry<DirectValueTreeItem, ConstantPool>> ret = new ArrayList<>();
+    private List<MyEntry<DirectValueActionItem, ConstantPool>> getVariables(List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageType, ASMSource src, String path) {
+        List<MyEntry<DirectValueActionItem, ConstantPool>> ret = new ArrayList<>();
         List<Action> actions = src.getActions(version);
         actionsMap.put(src, actions);
         getVariables(variables, functions, strings, usageType, new ActionGraphSource(actions, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, path);
@@ -1796,7 +1796,7 @@ public class SWF {
         getVariables(objs, "");
         informListeners("rename", "");
         int fc = 0;
-        for (MyEntry<DirectValueTreeItem, ConstantPool> it : allVariableNames) {
+        for (MyEntry<DirectValueActionItem, ConstantPool> it : allVariableNames) {
             String name = it.key.toStringNoH(it.value);
             allVariableNamesStr.add(name);
         }
@@ -1829,17 +1829,17 @@ public class SWF {
                 List<GraphTargetItem> dec = Action.actionsToTree(dia.getActions(version), version, staticOperation, ""/*FIXME*/);
                 GraphTargetItem name = null;
                 for (GraphTargetItem it : dec) {
-                    if (it instanceof ClassTreeItem) {
-                        ClassTreeItem cti = (ClassTreeItem) it;
+                    if (it instanceof ClassActionItem) {
+                        ClassActionItem cti = (ClassActionItem) it;
                         List<GraphTargetItem> methods = new ArrayList<>();
                         methods.addAll(cti.functions);
                         methods.addAll(cti.staticFunctions);
 
                         for (GraphTargetItem gti : methods) {
-                            if (gti instanceof FunctionTreeItem) {
-                                FunctionTreeItem fun = (FunctionTreeItem) gti;
-                                if (fun.calculatedFunctionName instanceof DirectValueTreeItem) {
-                                    DirectValueTreeItem dvf = (DirectValueTreeItem) fun.calculatedFunctionName;
+                            if (gti instanceof FunctionActionItem) {
+                                FunctionActionItem fun = (FunctionActionItem) gti;
+                                if (fun.calculatedFunctionName instanceof DirectValueActionItem) {
+                                    DirectValueActionItem dvf = (DirectValueActionItem) fun.calculatedFunctionName;
                                     String fname = dvf.toStringNoH(null);
                                     String changed = deobfuscateName(fname, false, "method", renameType, selected);
                                     if (changed != null) {
@@ -1858,8 +1858,8 @@ public class SWF {
                             vars.add(item.key);
                         }
                         for (GraphTargetItem gti : vars) {
-                            if (gti instanceof DirectValueTreeItem) {
-                                DirectValueTreeItem dvf = (DirectValueTreeItem) gti;
+                            if (gti instanceof DirectValueActionItem) {
+                                DirectValueActionItem dvf = (DirectValueActionItem) gti;
                                 String vname = dvf.toStringNoH(null);
                                 String changed = deobfuscateName(vname, false, "attribute", renameType, selected);
                                 if (changed != null) {
@@ -1871,8 +1871,8 @@ public class SWF {
                         name = cti.className;
                         break;
                     }
-                    if (it instanceof InterfaceTreeItem) {
-                        InterfaceTreeItem ift = (InterfaceTreeItem) it;
+                    if (it instanceof InterfaceActionItem) {
+                        InterfaceActionItem ift = (InterfaceActionItem) it;
                         name = ift.name;
                     }
                 }
@@ -1880,11 +1880,11 @@ public class SWF {
 
                 if (name != null) {
                     int pos = 0;
-                    while (name instanceof GetMemberTreeItem) {
-                        GetMemberTreeItem mem = (GetMemberTreeItem) name;
+                    while (name instanceof GetMemberActionItem) {
+                        GetMemberActionItem mem = (GetMemberActionItem) name;
                         GraphTargetItem memberName = mem.memberName;
-                        if (memberName instanceof DirectValueTreeItem) {
-                            DirectValueTreeItem dvt = (DirectValueTreeItem) memberName;
+                        if (memberName instanceof DirectValueActionItem) {
+                            DirectValueActionItem dvt = (DirectValueActionItem) memberName;
                             String nameStr = dvt.toStringNoH(null);
                             if (classNameParts != null) {
                                 if (classNameParts.length - 1 - pos < 0) {
@@ -1905,10 +1905,10 @@ public class SWF {
                         }
                         name = mem.object;
                     }
-                    if (name instanceof GetVariableTreeItem) {
-                        GetVariableTreeItem var = (GetVariableTreeItem) name;
-                        if (var.name instanceof DirectValueTreeItem) {
-                            DirectValueTreeItem dvt = (DirectValueTreeItem) var.name;
+                    if (name instanceof GetVariableActionItem) {
+                        GetVariableActionItem var = (GetVariableActionItem) name;
+                        if (var.name instanceof DirectValueActionItem) {
+                            DirectValueActionItem dvt = (DirectValueActionItem) var.name;
                             String nameStr = dvt.toStringNoH(null);
                             if (classNameParts != null) {
                                 if (classNameParts.length - 1 - pos < 0) {
@@ -1960,18 +1960,18 @@ public class SWF {
         }
 
         HashSet<String> stringsNoVarH = new HashSet<>();
-        List<DirectValueTreeItem> allVariableNamesDv = new ArrayList<>();
-        for (MyEntry<DirectValueTreeItem, ConstantPool> it : allVariableNames) {
+        List<DirectValueActionItem> allVariableNamesDv = new ArrayList<>();
+        for (MyEntry<DirectValueActionItem, ConstantPool> it : allVariableNames) {
             allVariableNamesDv.add(it.key);
         }
-        for (DirectValueTreeItem ti : allStrings.keySet()) {
+        for (DirectValueActionItem ti : allStrings.keySet()) {
             if (!allVariableNamesDv.contains(ti)) {
                 stringsNoVarH.add(System.identityHashCode(allStrings.get(ti)) + "_" + ti.toStringNoH(allStrings.get(ti)));
             }
         }
 
         int vc = 0;
-        for (MyEntry<DirectValueTreeItem, ConstantPool> it : allVariableNames) {
+        for (MyEntry<DirectValueActionItem, ConstantPool> it : allVariableNames) {
             vc++;
             String name = it.key.toStringNoH(it.value);
             String changed = deobfuscateName(name, false, usageTypes.get(it.key), renameType, selected);

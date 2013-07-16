@@ -22,9 +22,9 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.ConstructSuperTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.model.ConstructSuperAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,7 +57,7 @@ public class ConstructSuperIns extends InstructionDefinition {
             args.add(0, (GraphTargetItem) stack.pop());
         }
         GraphTargetItem obj = (GraphTargetItem) stack.pop();
-        output.add(new ConstructSuperTreeItem(ins, obj, args));
+        output.add(new ConstructSuperAVM2Item(ins, obj, args));
     }
 
     @Override

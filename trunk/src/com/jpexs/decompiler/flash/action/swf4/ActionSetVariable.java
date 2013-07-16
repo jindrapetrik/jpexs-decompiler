@@ -17,15 +17,15 @@
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
-import com.jpexs.decompiler.flash.action.treemodel.DecrementTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.GetVariableTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.IncrementTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.PostDecrementTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.PostIncrementTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.SetVariableTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.StoreRegisterTreeItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.model.ConstantPool;
+import com.jpexs.decompiler.flash.action.model.DecrementActionItem;
+import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
+import com.jpexs.decompiler.flash.action.model.IncrementActionItem;
+import com.jpexs.decompiler.flash.action.model.PostDecrementActionItem;
+import com.jpexs.decompiler.flash.action.model.PostIncrementActionItem;
+import com.jpexs.decompiler.flash.action.model.SetVariableActionItem;
+import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.util.HashMap;
 import java.util.List;
@@ -47,46 +47,46 @@ public class ActionSetVariable extends Action {
         GraphTargetItem value = stack.pop().getThroughDuplicate();
         GraphTargetItem name = stack.pop();
         variables.put(Highlighting.stripHilights(name.toStringNoQuotes((ConstantPool) null)), value);
-        if (value instanceof IncrementTreeItem) {
-            GraphTargetItem obj = ((IncrementTreeItem) value).object;
+        if (value instanceof IncrementActionItem) {
+            GraphTargetItem obj = ((IncrementActionItem) value).object;
             if (!stack.isEmpty()) {
                 if (stack.peek().valueEquals(obj)) {
                     stack.pop();
-                    stack.push(new PostIncrementTreeItem(this, obj));
+                    stack.push(new PostIncrementActionItem(this, obj));
                     return;
                 }
             }
         }
-        if (value instanceof DecrementTreeItem) {
-            GraphTargetItem obj = ((DecrementTreeItem) value).object;
+        if (value instanceof DecrementActionItem) {
+            GraphTargetItem obj = ((DecrementActionItem) value).object;
             if (!stack.isEmpty()) {
                 if (stack.peek().valueEquals(obj)) {
                     stack.pop();
-                    stack.push(new PostDecrementTreeItem(this, obj));
+                    stack.push(new PostDecrementActionItem(this, obj));
                     return;
                 }
             }
         }
-        if (value instanceof IncrementTreeItem) {
-            if (((IncrementTreeItem) value).object instanceof GetVariableTreeItem) {
-                if (((GetVariableTreeItem) ((IncrementTreeItem) value).object).name.valueEquals(name)) {
-                    output.add(new PostIncrementTreeItem(this, ((IncrementTreeItem) value).object));
+        if (value instanceof IncrementActionItem) {
+            if (((IncrementActionItem) value).object instanceof GetVariableActionItem) {
+                if (((GetVariableActionItem) ((IncrementActionItem) value).object).name.valueEquals(name)) {
+                    output.add(new PostIncrementActionItem(this, ((IncrementActionItem) value).object));
                     return;
                 }
             }
         }
-        if (value instanceof DecrementTreeItem) {
-            if (((DecrementTreeItem) value).object instanceof GetVariableTreeItem) {
-                if (((GetVariableTreeItem) ((DecrementTreeItem) value).object).name.valueEquals(name)) {
-                    output.add(new PostDecrementTreeItem(this, ((DecrementTreeItem) value).object));
+        if (value instanceof DecrementActionItem) {
+            if (((DecrementActionItem) value).object instanceof GetVariableActionItem) {
+                if (((GetVariableActionItem) ((DecrementActionItem) value).object).name.valueEquals(name)) {
+                    output.add(new PostDecrementActionItem(this, ((DecrementActionItem) value).object));
                     return;
                 }
             }
         }
-        if (value instanceof StoreRegisterTreeItem) {
-            ((StoreRegisterTreeItem) value).define = false;
+        if (value instanceof StoreRegisterActionItem) {
+            ((StoreRegisterActionItem) value).define = false;
         }
-        SetVariableTreeItem svt = new SetVariableTreeItem(this, name, value);
+        SetVariableActionItem svt = new SetVariableActionItem(this, name, value);
         output.add(svt);
     }
 }

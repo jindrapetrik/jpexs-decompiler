@@ -16,15 +16,19 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.stack;
 
+import com.jpexs.decompiler.flash.abc.avm2.model.CallAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.CallMethodAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.CallPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.CallSuperAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.CallStaticAVM2Item;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.*;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.clauses.AssignmentTreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -44,17 +48,17 @@ public class PopIns extends InstructionDefinition {
     public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path) {
         if (stack.size() > 0) {
             GraphTargetItem top = stack.pop();
-            if (top instanceof CallPropertyTreeItem) {
+            if (top instanceof CallPropertyAVM2Item) {
                 output.add(top);
-            } else if (top instanceof CallSuperTreeItem) {
+            } else if (top instanceof CallSuperAVM2Item) {
                 output.add(top);
-            } else if (top instanceof CallStaticTreeItem) {
+            } else if (top instanceof CallStaticAVM2Item) {
                 output.add(top);
-            } else if (top instanceof CallMethodTreeItem) {
+            } else if (top instanceof CallMethodAVM2Item) {
                 output.add(top);
-            } else if (top instanceof CallTreeItem) {
+            } else if (top instanceof CallAVM2Item) {
                 output.add(top);
-            } else if (top instanceof AssignmentTreeItem) {
+            } else if (top instanceof AssignmentAVM2Item) {
                 output.add(top);
             }
         }

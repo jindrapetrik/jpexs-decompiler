@@ -25,12 +25,12 @@ import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.parser.pcode.Label;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
-import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.TreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.clauses.TryTreeItem;
-import com.jpexs.decompiler.flash.graph.GraphSourceItem;
-import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.ActionItem;
+import com.jpexs.decompiler.flash.action.model.clauses.TryActionItem;
+import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphSourceItemContainer;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -263,11 +263,11 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
     @Override
     public void translateContainer(List<List<GraphTargetItem>> contents, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
         List<GraphTargetItem> tryCommands = contents.get(0);
-        TreeItem catchName;
+        ActionItem catchName;
         if (catchInRegisterFlag) {
-            catchName = new DirectValueTreeItem(this, -1, new RegisterNumber(this.catchRegister), new ArrayList<String>());
+            catchName = new DirectValueActionItem(this, -1, new RegisterNumber(this.catchRegister), new ArrayList<String>());
         } else {
-            catchName = new DirectValueTreeItem(this, -1, this.catchName, new ArrayList<String>());
+            catchName = new DirectValueActionItem(this, -1, this.catchName, new ArrayList<String>());
         }
         List<GraphTargetItem> catchExceptions = new ArrayList<>();
         if (catchBlockFlag) {
@@ -278,7 +278,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
             catchCommands.add(contents.get(1));
         }
         List<GraphTargetItem> finallyCommands = contents.get(2);
-        output.add(new TryTreeItem(tryCommands, catchExceptions, catchCommands, finallyCommands));
+        output.add(new TryActionItem(tryCommands, catchExceptions, catchCommands, finallyCommands));
 
 
     }

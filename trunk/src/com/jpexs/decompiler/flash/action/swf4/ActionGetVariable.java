@@ -17,12 +17,12 @@
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
-import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.EvalTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.GetVariableTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.GetVersionTreeItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.model.ConstantPool;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.EvalActionItem;
+import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
+import com.jpexs.decompiler.flash.action.model.GetVersionActionItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.util.HashMap;
 import java.util.List;
@@ -43,12 +43,12 @@ public class ActionGetVariable extends Action {
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem name = stack.pop();
         GraphTargetItem computedVal = variables.get(Highlighting.stripHilights(name.toStringNoQuotes((ConstantPool) null)));
-        if (name instanceof DirectValueTreeItem && ((DirectValueTreeItem) name).value.equals("/:$version")) {
-            stack.push(new GetVersionTreeItem(this));
-        } else if (!(name instanceof DirectValueTreeItem) && !(name instanceof GetVariableTreeItem)) {
-            stack.push(new EvalTreeItem(this, name));
+        if (name instanceof DirectValueActionItem && ((DirectValueActionItem) name).value.equals("/:$version")) {
+            stack.push(new GetVersionActionItem(this));
+        } else if (!(name instanceof DirectValueActionItem) && !(name instanceof GetVariableActionItem)) {
+            stack.push(new EvalActionItem(this, name));
         } else {
-            GetVariableTreeItem gvt = new GetVariableTreeItem(this, name);
+            GetVariableActionItem gvt = new GetVariableActionItem(this, name);
             gvt.setComputedValue(computedVal);
             stack.push(gvt);
         }

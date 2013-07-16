@@ -17,10 +17,10 @@
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.StartDragTreeItem;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.StartDragActionItem;
 import com.jpexs.decompiler.flash.ecma.*;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -43,7 +43,7 @@ public class ActionStartDrag extends Action {
         GraphTargetItem constrain = stack.pop();
 
         boolean hasConstrains = true;
-        if (constrain instanceof DirectValueTreeItem) {
+        if (constrain instanceof DirectValueActionItem) {
             if (Double.compare(EcmaScript.toNumber(constrain.getResult()), 0) == 0) {
                 hasConstrains = false;
             }
@@ -58,6 +58,6 @@ public class ActionStartDrag extends Action {
             y1 = stack.pop();
             x1 = stack.pop();
         }
-        output.add(new StartDragTreeItem(this, target, lockCenter, constrain, x1, y1, x2, y2));
+        output.add(new StartDragActionItem(this, target, lockCenter, constrain, x1, y1, x2, y2));
     }
 }

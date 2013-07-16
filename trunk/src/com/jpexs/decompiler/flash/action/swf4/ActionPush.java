@@ -23,11 +23,11 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
-import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
-import com.jpexs.decompiler.flash.graph.GraphSourceItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.io.ByteArrayInputStream;
@@ -323,16 +323,16 @@ public class ActionPush extends Action {
              } else if (output.size() >= 2) { //chained assignments:, ignore for class prototype assignment
              GraphTargetItem last = output.get(output.size() - 1);
              GraphTargetItem prev = output.get(output.size() - 2);
-             if (last instanceof SetTypeTreeItem) {
-             if (prev instanceof StoreRegisterTreeItem) {
-             StoreRegisterTreeItem str = (StoreRegisterTreeItem) prev;
+             if (last instanceof SetTypeActionItem) {
+             if (prev instanceof StoreRegisterActionItem) {
+             StoreRegisterActionItem str = (StoreRegisterActionItem) prev;
              if (str.register.number == ((RegisterNumber) o).number) {
-             SetTypeTreeItem stt = (SetTypeTreeItem) last;
+             SetTypeActionItem stt = (SetTypeActionItem) last;
              stt.setTempRegister(((RegisterNumber) o).number);
-             if ((stt.getValue() instanceof IncrementTreeItem) && (((IncrementTreeItem) stt.getValue()).object.equals(stt.getObject()))) {
-             stack.push(new PreIncrementTreeItem(this, stt.getObject()));
-             } else if ((stt.getValue() instanceof DecrementTreeItem) && (((DecrementTreeItem) stt.getValue()).object.equals(stt.getObject()))) {
-             stack.push(new PreDecrementTreeItem(this, stt.getObject()));
+             if ((stt.getValue() instanceof IncrementActionItem) && (((IncrementActionItem) stt.getValue()).object.equals(stt.getObject()))) {
+             stack.push(new PreIncrementActionItem(this, stt.getObject()));
+             } else if ((stt.getValue() instanceof DecrementActionItem) && (((DecrementActionItem) stt.getValue()).object.equals(stt.getObject()))) {
+             stack.push(new PreDecrementActionItem(this, stt.getObject()));
              } else {
              //stack.push(last);
              continue;
@@ -346,7 +346,7 @@ public class ActionPush extends Action {
              }
              }
              }*/
-            DirectValueTreeItem dvt = new DirectValueTreeItem(this, pos, o, constantPool);
+            DirectValueActionItem dvt = new DirectValueActionItem(this, pos, o, constantPool);
             stack.push(dvt);
             if (o instanceof RegisterNumber) {
                 dvt.computedRegValue = variables.get("__register" + ((RegisterNumber) o).number);

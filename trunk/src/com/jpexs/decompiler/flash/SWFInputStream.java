@@ -26,15 +26,14 @@ import com.jpexs.decompiler.flash.action.swf4.*;
 import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf6.*;
 import com.jpexs.decompiler.flash.action.swf7.*;
-import com.jpexs.decompiler.flash.action.treemodel.ConstantPool;
-import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
+import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.Null;
-import com.jpexs.decompiler.flash.graph.Graph;
-import com.jpexs.decompiler.flash.graph.GraphSourceItem;
-import com.jpexs.decompiler.flash.graph.GraphSourceItemContainer;
-import com.jpexs.decompiler.flash.graph.GraphSourceItemPos;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphSourceItemContainer;
+import com.jpexs.decompiler.graph.GraphSourceItemPos;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.*;
@@ -71,6 +70,7 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.InflaterInputStream;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 
 /**
  * Class for reading data from SWF file
@@ -620,8 +620,8 @@ public class SWFInputStream extends InputStream {
 
             //for..in return
             if (deobfuscate) {
-                if (((ins instanceof ActionEquals) || (ins instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueTreeItem)) {
-                    stack.push(new DirectValueTreeItem(null, 0, new Null(), new ArrayList<String>()));
+                if (((ins instanceof ActionEquals) || (ins instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueActionItem)) {
+                    stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>()));
                 }
                 try {
                     ins.translate(localData, stack, output, Graph.SOP_SKIP_STATIC, null);
@@ -1015,11 +1015,11 @@ public class SWFInputStream extends InputStream {
                     } else if (!(a instanceof GraphSourceItemContainer)) {
                         if (deobfuscate) {
                             //return in for..in,   TODO:Handle this better way
-                            if (((a instanceof ActionEquals) || (a instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueTreeItem)) {
-                                stack.push(new DirectValueTreeItem(null, 0, new Null(), new ArrayList<String>()));
+                            if (((a instanceof ActionEquals) || (a instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueActionItem)) {
+                                stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>()));
                             }
                             if ((a instanceof ActionStoreRegister) && stack.isEmpty()) {
-                                stack.push(new DirectValueTreeItem(null, 0, new Null(), new ArrayList<String>()));
+                                stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>()));
                             }
                             a.translate(localData, stack, output, Graph.SOP_SKIP_STATIC, path);
                         }

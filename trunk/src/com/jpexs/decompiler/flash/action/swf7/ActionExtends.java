@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.flash.action.swf7;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.ExtendsTreeItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.model.ExtendsActionItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -38,6 +38,6 @@ public class ActionExtends extends Action {
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem superclass = stack.pop();
         GraphTargetItem subclass = stack.pop();
-        output.add(new ExtendsTreeItem(this, subclass, superclass));
+        output.add(new ExtendsActionItem(this, subclass, superclass));
     }
 }

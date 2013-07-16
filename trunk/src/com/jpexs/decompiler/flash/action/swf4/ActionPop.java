@@ -17,11 +17,11 @@
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.CallFunctionTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.CallMethodTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.NewMethodTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.SetTypeTreeItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.model.CallFunctionActionItem;
+import com.jpexs.decompiler.flash.action.model.CallMethodActionItem;
+import com.jpexs.decompiler.flash.action.model.NewMethodActionItem;
+import com.jpexs.decompiler.flash.action.model.SetTypeActionItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -43,15 +43,15 @@ public class ActionPop extends Action {
             return;
         }
         GraphTargetItem val = stack.pop();
-        if ((val instanceof CallFunctionTreeItem) || (val instanceof CallMethodTreeItem) || (val instanceof NewMethodTreeItem)) {
+        if ((val instanceof CallFunctionActionItem) || (val instanceof CallMethodActionItem) || (val instanceof NewMethodActionItem)) {
             output.add(val);
-        } else if (val instanceof SetTypeTreeItem) {
+        } else if (val instanceof SetTypeActionItem) {
             output.add(val);
         } else {
-            //output.add(new PopTreeItem(this));
+            //output.add(new PopActionItem(this));
         }
-        /*if (!(val instanceof DirectValueTreeItem)) {
-         output.add(new VoidTreeItem(this, val));
+        /*if (!(val instanceof DirectValueActionItem)) {
+         output.add(new VoidActionItem(this, val));
          }*/
     }
 }

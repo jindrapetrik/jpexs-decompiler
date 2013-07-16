@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;

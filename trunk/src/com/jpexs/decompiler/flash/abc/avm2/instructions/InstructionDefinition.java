@@ -20,10 +20,10 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.FullMultinameTreeItem;
-import com.jpexs.decompiler.flash.abc.avm2.treemodel.TreeItem;
+import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -78,7 +78,7 @@ public class InstructionDefinition implements Serializable {
     public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path) {
     }
 
-    protected FullMultinameTreeItem resolveMultiname(Stack<GraphTargetItem> stack, ConstantPool constants, int multinameIndex, AVM2Instruction ins) {
+    protected FullMultinameAVM2Item resolveMultiname(Stack<GraphTargetItem> stack, ConstantPool constants, int multinameIndex, AVM2Instruction ins) {
         GraphTargetItem ns = null;
         GraphTargetItem name = null;
         if (constants.constant_multiname[multinameIndex].needsName()) {
@@ -87,7 +87,7 @@ public class InstructionDefinition implements Serializable {
         if (constants.constant_multiname[multinameIndex].needsNs()) {
             ns = (GraphTargetItem) stack.pop();
         }
-        return new FullMultinameTreeItem(ins, multinameIndex, name, ns);
+        return new FullMultinameAVM2Item(ins, multinameIndex, name, ns);
     }
 
     protected int resolvedCount(ConstantPool constants, int multinameIndex) {
@@ -102,7 +102,7 @@ public class InstructionDefinition implements Serializable {
 
     }
 
-    protected String resolveMultinameNoPop(int pos, Stack<TreeItem> stack, ConstantPool constants, int multinameIndex, AVM2Instruction ins, List<String> fullyQualifiedNames) {
+    protected String resolveMultinameNoPop(int pos, Stack<AVM2Item> stack, ConstantPool constants, int multinameIndex, AVM2Instruction ins, List<String> fullyQualifiedNames) {
         String ns = "";
         String name;
         if (constants.constant_multiname[multinameIndex].needsNs()) {

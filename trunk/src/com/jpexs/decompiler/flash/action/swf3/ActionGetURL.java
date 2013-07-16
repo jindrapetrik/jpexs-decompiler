@@ -21,13 +21,13 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
-import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.FSCommandTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.GetURLTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.LoadMovieNumTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.UnLoadMovieNumTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.UnLoadMovieTreeItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.FSCommandActionItem;
+import com.jpexs.decompiler.flash.action.model.GetURLActionItem;
+import com.jpexs.decompiler.flash.action.model.LoadMovieNumActionItem;
+import com.jpexs.decompiler.flash.action.model.UnLoadMovieNumActionItem;
+import com.jpexs.decompiler.flash.action.model.UnLoadMovieActionItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -84,7 +84,7 @@ public class ActionGetURL extends Action {
         String fsCommandPrefix = "FSCommand:";
         if (urlString.startsWith(fsCommandPrefix) && targetString.equals("")) {
             String command = urlString.substring(fsCommandPrefix.length());
-            output.add(new FSCommandTreeItem(this, command));
+            output.add(new FSCommandActionItem(this, command));
             return;
         }
         String levelPrefix = "_level";
@@ -92,10 +92,10 @@ public class ActionGetURL extends Action {
             try {
                 int num = Integer.valueOf(targetString.substring(levelPrefix.length()));
                 if (urlString.equals("")) {
-                    output.add(new UnLoadMovieNumTreeItem(this, new DirectValueTreeItem((Long) (long) (int) num)));
+                    output.add(new UnLoadMovieNumActionItem(this, new DirectValueActionItem((Long) (long) (int) num)));
                 } else {
-                    DirectValueTreeItem urlStringDi = new DirectValueTreeItem(null, 0, urlString, new ArrayList<String>());
-                    output.add(new LoadMovieNumTreeItem(this, urlStringDi, new DirectValueTreeItem((Long) (long) (int) num), 1/*GET*/));
+                    DirectValueActionItem urlStringDi = new DirectValueActionItem(null, 0, urlString, new ArrayList<String>());
+                    output.add(new LoadMovieNumActionItem(this, urlStringDi, new DirectValueActionItem((Long) (long) (int) num), 1/*GET*/));
                 }
                 return;
             } catch (NumberFormatException nfe) {
@@ -104,10 +104,10 @@ public class ActionGetURL extends Action {
         }
 
         if (urlString.equals("")) {
-            DirectValueTreeItem targetStringDi = new DirectValueTreeItem(null, 0, targetString, new ArrayList<String>());
-            output.add(new UnLoadMovieTreeItem(this, targetStringDi));
+            DirectValueActionItem targetStringDi = new DirectValueActionItem(null, 0, targetString, new ArrayList<String>());
+            output.add(new UnLoadMovieActionItem(this, targetStringDi));
         } else {
-            output.add(new GetURLTreeItem(this, urlString, targetString));
+            output.add(new GetURLActionItem(this, urlString, targetString));
         }
 
     }

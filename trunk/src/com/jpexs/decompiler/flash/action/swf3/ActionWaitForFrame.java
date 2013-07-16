@@ -24,9 +24,9 @@ import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.special.ActionStore;
-import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.clauses.IfFrameLoadedTreeItem;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.clauses.IfFrameLoadedActionItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -84,9 +84,9 @@ public class ActionWaitForFrame extends Action implements ActionStore {
 
     @Override
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
-        GraphTargetItem frameTi = new DirectValueTreeItem(null, 0, new Long(frame), new ArrayList<String>());
+        GraphTargetItem frameTi = new DirectValueActionItem(null, 0, new Long(frame), new ArrayList<String>());
         List<GraphTargetItem> body = ActionGraph.translateViaGraph(regNames, variables, functions, skipped, SWF.DEFAULT_VERSION, staticOperation, path);
-        output.add(new IfFrameLoadedTreeItem(frameTi, body, this));
+        output.add(new IfFrameLoadedActionItem(frameTi, body, this));
     }
 
     @Override

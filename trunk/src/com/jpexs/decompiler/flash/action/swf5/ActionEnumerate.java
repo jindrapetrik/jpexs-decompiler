@@ -17,10 +17,10 @@
 package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.treemodel.DirectValueTreeItem;
-import com.jpexs.decompiler.flash.action.treemodel.EnumerateTreeItem;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.EnumerateActionItem;
 import com.jpexs.decompiler.flash.ecma.Null;
-import com.jpexs.decompiler.flash.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +40,7 @@ public class ActionEnumerate extends Action {
     @Override
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem object = stack.pop();
-        stack.push(new DirectValueTreeItem(null, 0, new Null(), new ArrayList<String>()));
-        stack.push(new EnumerateTreeItem(this, object));
+        stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>()));
+        stack.push(new EnumerateActionItem(this, object));
     }
 }
