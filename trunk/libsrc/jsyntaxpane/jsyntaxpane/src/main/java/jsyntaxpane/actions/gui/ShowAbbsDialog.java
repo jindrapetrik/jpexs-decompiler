@@ -63,7 +63,8 @@ public class ShowAbbsDialog
         jEdtAbbr = new javax.swing.JEditorPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Abbreviations");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle"); // NOI18N
+        setTitle(bundle.getString("ShowAbbsDialog.title")); // NOI18N
         setLocationByPlatform(true);
         setMinimumSize(new java.awt.Dimension(600, 300));
         setModal(true);

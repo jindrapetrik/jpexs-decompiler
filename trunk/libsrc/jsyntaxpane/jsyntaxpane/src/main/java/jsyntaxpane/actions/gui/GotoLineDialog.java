@@ -55,7 +55,8 @@ public class GotoLineDialog
         jCmbLineNumbers = new javax.swing.JComboBox();
         jBtnOk = new javax.swing.JButton();
 
-        setTitle("Goto Line");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle"); // NOI18N
+        setTitle(bundle.getString("GotoLineDialog.title")); // NOI18N
         setModal(true);
         setName(""); // NOI18N
         setResizable(false);
@@ -68,7 +69,7 @@ public class GotoLineDialog
         });
 
         jBtnOk.setAction(jCmbLineNumbers.getAction());
-        jBtnOk.setText("Go");
+        jBtnOk.setText(bundle.getString("GotoLineDialog.jBtnOk.text")); // NOI18N
         jBtnOk.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtnOkActionPerformed(evt);

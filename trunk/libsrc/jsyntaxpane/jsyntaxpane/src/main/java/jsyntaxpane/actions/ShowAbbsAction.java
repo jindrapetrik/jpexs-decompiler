@@ -43,7 +43,7 @@ public class ShowAbbsAction extends DefaultSyntaxAction {
 			Map<String, String> abbs = kit.getAbbreviations();
 			if (abbs == null || abbs.isEmpty()) {
 				JOptionPane.showMessageDialog(target,
-					"No Abbreviations exist for this content type");
+					java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("ShowAbbsAction.NoAbbsForType"));
 			} else {
 				new ShowAbbsDialog((JEditorPane) target, abbs);
 			}

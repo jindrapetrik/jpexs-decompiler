@@ -59,8 +59,8 @@ public class ScriptAction extends DefaultSyntaxAction {
 				showScriptError(target, ex);
 			}
 		} else {
-			JOptionPane.showMessageDialog(target, "Action does not have script function configured",
-				"Error in Script", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(target, java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("ScriptAction.NoScriptConfigured"),
+				java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("ScriptAction.ErrorInScript"), JOptionPane.WARNING_MESSAGE);
 		}
 	}
 
@@ -91,14 +91,14 @@ public class ScriptAction extends DefaultSyntaxAction {
 				showScriptError(null, ex);
 			}
 		} else {
-			JOptionPane.showMessageDialog(null, "No script is found in: " + url,
-				"Error in Script", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(null, java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("ScriptAction.NoScriptFoundIn") + url,
+				java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("ScriptAction.ErrorInScript"), JOptionPane.WARNING_MESSAGE);
 		}
 	}
 
 	private void showScriptError(JTextComponent target, Exception ex) {
 		JOptionPane.showMessageDialog(target, ex.getMessage(),
-			"Error in Script", JOptionPane.WARNING_MESSAGE);
+			java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("ScriptAction.ErrorInScript"), JOptionPane.WARNING_MESSAGE);
 	}
 	/**
 	 * The key used to store the Script Name for the this action

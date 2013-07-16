@@ -111,17 +111,18 @@ public class ReplaceDialog extends javax.swing.JDialog
         jCmbFind = new javax.swing.JComboBox();
         jBtnReplace = new javax.swing.JButton();
 
-        setTitle("Find and Replace");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle"); // NOI18N
+        setTitle(bundle.getString("ReplaceDialog.title")); // NOI18N
         setName(""); // NOI18N
         setResizable(false);
 
         jLblFind.setDisplayedMnemonic('F');
         jLblFind.setLabelFor(jCmbFind);
-        jLblFind.setText("Find");
+        jLblFind.setText(bundle.getString("ReplaceDialog.jLblFind.text")); // NOI18N
 
         jBtnNext.setIcon(new javax.swing.ImageIcon(getClass().getResource("/META-INF/images/small-icons/go-next.png"))); // NOI18N
         jBtnNext.setMnemonic('N');
-        jBtnNext.setText("Next");
+        jBtnNext.setText(bundle.getString("ReplaceDialog.jBtnNext.text")); // NOI18N
         jBtnNext.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtnNextActionPerformed(evt);
@@ -130,7 +131,7 @@ public class ReplaceDialog extends javax.swing.JDialog
 
         jBtnPrev.setIcon(new javax.swing.ImageIcon(getClass().getResource("/META-INF/images/small-icons/go-previous.png"))); // NOI18N
         jBtnPrev.setMnemonic('N');
-        jBtnPrev.setText("Previous");
+        jBtnPrev.setText(bundle.getString("ReplaceDialog.jBtnPrev.text")); // NOI18N
         jBtnPrev.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtnPrevActionPerformed(evt);
@@ -139,7 +140,7 @@ public class ReplaceDialog extends javax.swing.JDialog
 
         jBtnReplaceAll.setIcon(new javax.swing.ImageIcon(getClass().getResource("/META-INF/images/small-icons/edit-find-replace-all.png"))); // NOI18N
         jBtnReplaceAll.setMnemonic('H');
-        jBtnReplaceAll.setText("Replace All");
+        jBtnReplaceAll.setText(bundle.getString("ReplaceDialog.jBtnReplaceAll.text")); // NOI18N
         jBtnReplaceAll.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtnReplaceAllActionPerformed(evt);
@@ -147,21 +148,21 @@ public class ReplaceDialog extends javax.swing.JDialog
         });
 
         jChkWrap.setMnemonic('W');
-        jChkWrap.setText("Wrap around");
-        jChkWrap.setToolTipText("Wrap to beginning when end is reached");
+        jChkWrap.setText(bundle.getString("ReplaceDialog.jChkWrap.text")); // NOI18N
+        jChkWrap.setToolTipText(bundle.getString("ReplaceDialog.jChkWrap.toolTipText")); // NOI18N
 
         jChkRegex.setMnemonic('R');
-        jChkRegex.setText("Regular Expression");
+        jChkRegex.setText(bundle.getString("ReplaceDialog.jChkRegex.text")); // NOI18N
 
         jChkIgnoreCase.setMnemonic('I');
-        jChkIgnoreCase.setText("Ignore Case");
+        jChkIgnoreCase.setText(bundle.getString("ReplaceDialog.jChkIgnoreCase.text")); // NOI18N
 
         jLblReplace.setDisplayedMnemonic('R');
         jLblReplace.setLabelFor(jCmbReplace);
-        jLblReplace.setText("Replace");
+        jLblReplace.setText(bundle.getString("ReplaceDialog.jLblReplace.text")); // NOI18N
 
         jTglHighlight.setIcon(new javax.swing.ImageIcon(getClass().getResource("/META-INF/images/small-icons/highlight.png"))); // NOI18N
-        jTglHighlight.setText("Highlight");
+        jTglHighlight.setText(bundle.getString("ReplaceDialog.jTglHighlight.text")); // NOI18N
         jTglHighlight.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTglHighlightActionPerformed(evt);
@@ -173,7 +174,7 @@ public class ReplaceDialog extends javax.swing.JDialog
         jCmbFind.setEditable(true);
 
         jBtnReplace.setIcon(new javax.swing.ImageIcon(getClass().getResource("/META-INF/images/small-icons/edit-find-replace.png"))); // NOI18N
-        jBtnReplace.setText("Replace");
+        jBtnReplace.setText(bundle.getString("ReplaceDialog.jBtnReplace.text")); // NOI18N
         jBtnReplace.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtnReplaceActionPerformed(evt);
@@ -191,20 +192,18 @@ public class ReplaceDialog extends javax.swing.JDialog
                     .addComponent(jLblReplace))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jChkRegex)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jChkWrap, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jCmbFind, 0, 289, Short.MAX_VALUE)
                     .addComponent(jCmbReplace, javax.swing.GroupLayout.Alignment.TRAILING, 0, 289, Short.MAX_VALUE)
-                    .addComponent(jChkIgnoreCase))
+                    .addComponent(jChkRegex, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
+                    .addComponent(jChkWrap, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
+                    .addComponent(jChkIgnoreCase, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jBtnReplace, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
                     .addComponent(jBtnNext, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
                     .addComponent(jBtnPrev, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
                     .addComponent(jTglHighlight, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
-                    .addComponent(jBtnReplaceAll, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jBtnReplaceAll, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -221,10 +220,11 @@ public class ReplaceDialog extends javax.swing.JDialog
                     .addComponent(jCmbReplace, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLblReplace))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jBtnReplace)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jBtnReplace)
+                    .addComponent(jChkWrap, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(3, 3, 3)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jChkWrap, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jChkRegex)
                     .addComponent(jBtnReplaceAll))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)

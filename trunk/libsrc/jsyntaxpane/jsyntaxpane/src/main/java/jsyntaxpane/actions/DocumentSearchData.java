@@ -14,6 +14,7 @@
 package jsyntaxpane.actions;
 
 import java.awt.Component;
+import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -240,19 +241,8 @@ public class DocumentSearchData {
 	 */
 	public void msgNotFound(Component target) {
 		JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(target),
-			"Search String " + getPattern() + " not found",
-			"Find", JOptionPane.INFORMATION_MESSAGE);
-	}
-
-	/**
-	 * Show the Find and Replace dialog for the given frame
-	 * @param target
-	 */
-	public void showReplaceDialog(JTextComponent target) {
-		if (replaceDlg == null) {
-			replaceDlg = new ReplaceDialog(target, this);
-		}
-		replaceDlg.setVisible(true);
+			MessageFormat.format(java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("DocumentSearchData.SearchStringNotFound"), getPattern()),
+			java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("DocumentSearchData.Find"), JOptionPane.INFORMATION_MESSAGE);
 	}
 
         public void showQuickFindDialogEx(JTextComponent target,boolean ignoreCase,boolean regularExpresion) {
@@ -265,6 +255,17 @@ public class DocumentSearchData {
                 
 	}
         
+	/**
+	 * Show the Find and Replace dialog for the given frame
+	 * @param target
+	 */
+	public void showReplaceDialog(JTextComponent target) {
+		if (replaceDlg == null) {
+			replaceDlg = new ReplaceDialog(target, this);
+		}
+		replaceDlg.setVisible(true);
+	}
+
 	public void showQuickFindDialog(JTextComponent target) {
 		if (quickFindDlg == null) {
 			quickFindDlg = new QuickFindDialog(target, this);

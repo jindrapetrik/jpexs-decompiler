@@ -61,14 +61,15 @@ public class HTMLPreviewFrame extends javax.swing.JFrame implements DocumentList
         jEdtHtml = new javax.swing.JEditorPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("HTML Preview");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle"); // NOI18N
+        setTitle(bundle.getString("HTMLPreviewFrame.title")); // NOI18N
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent evt) {
                 onWindowClosed(evt);
             }
         });
 
-        jEdtHtml.setContentType("text/html");
+        jEdtHtml.setContentType(bundle.getString("HTMLPreviewFrame.jEdtHtml.contentType")); // NOI18N
         jEdtHtml.setEditable(false);
         jScrollPane1.setViewportView(jEdtHtml);
 

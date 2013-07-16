@@ -14,6 +14,8 @@
 package jsyntaxpane.actions;
 
 import java.awt.event.ActionEvent;
+import java.text.MessageFormat;
+
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -46,8 +48,8 @@ public class ScriptRunnerAction extends DefaultSyntaxAction {
             }
         } catch (ScriptException ex) {
             JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(target),
-                    "Error executing script:\n" + ex.getMessage(),
-                    "Script Error",
+                    java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("ScriptRunnerAction.ErrorExecutingScript") + ex.getMessage(),
+                    java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("ScriptRunnerAction.ScriptError"),
                     JOptionPane.ERROR_MESSAGE);
             ActionUtils.setCaretPosition(target,
                     ex.getLineNumber(),
@@ -64,7 +66,7 @@ public class ScriptRunnerAction extends DefaultSyntaxAction {
         }
         if (engine == null) {
             int result = JOptionPane.showOptionDialog(target,
-                    "Script Engine for [" + scriptExtension + "] not found. Disable this Action?",
+                    MessageFormat.format(java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("ScriptRunnerAction.ScriptEngineNotFound"), scriptExtension),
                     "jsyntaxpane",
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.ERROR_MESSAGE,

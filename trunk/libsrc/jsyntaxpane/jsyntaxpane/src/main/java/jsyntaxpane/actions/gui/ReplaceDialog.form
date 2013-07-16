@@ -1,8 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.1" encoding="UTF-8" ?>
 
-<Form version="1.3" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
+<Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
   <Properties>
-    <Property name="title" type="java.lang.String" value="Find and Replace"/>
+    <Property name="title" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+      <ResourceString bundle="jsyntaxpane/Bundle.properties" key="ReplaceDialog.title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+    </Property>
     <Property name="name" type="java.lang.String" value="" noResource="true"/>
     <Property name="resizable" type="boolean" value="false"/>
   </Properties>
@@ -10,11 +12,11 @@
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
   </SyntheticProperties>
   <AuxValues>
-    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="1"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
     <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
-    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="true"/>
     <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
     <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
@@ -32,14 +34,11 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <Component id="jChkRegex" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="jChkWrap" min="-2" pref="105" max="-2" attributes="0"/>
-                  </Group>
                   <Component id="jCmbFind" alignment="0" pref="289" max="32767" attributes="0"/>
                   <Component id="jCmbReplace" alignment="1" pref="289" max="32767" attributes="1"/>
-                  <Component id="jChkIgnoreCase" min="-2" max="-2" attributes="0"/>
+                  <Component id="jChkRegex" alignment="0" pref="289" max="32767" attributes="0"/>
+                  <Component id="jChkWrap" alignment="0" pref="289" max="32767" attributes="0"/>
+                  <Component id="jChkIgnoreCase" alignment="0" pref="289" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
@@ -47,7 +46,7 @@
                   <Component id="jBtnNext" alignment="0" pref="107" max="32767" attributes="1"/>
                   <Component id="jBtnPrev" alignment="0" pref="107" max="32767" attributes="1"/>
                   <Component id="jTglHighlight" alignment="1" pref="107" max="32767" attributes="0"/>
-                  <Component id="jBtnReplaceAll" alignment="1" max="32767" attributes="1"/>
+                  <Component id="jBtnReplaceAll" alignment="1" pref="107" max="32767" attributes="1"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -69,10 +68,12 @@
                   <Component id="jLblReplace" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jBtnReplace" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jBtnReplace" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jChkWrap" alignment="3" min="-2" pref="23" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jChkWrap" alignment="3" min="-2" pref="23" max="-2" attributes="0"/>
                   <Component id="jChkRegex" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jBtnReplaceAll" alignment="3" min="-2" max="-2" attributes="1"/>
               </Group>
@@ -93,7 +94,9 @@
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="jCmbFind"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Find"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="jsyntaxpane/Bundle.properties" key="ReplaceDialog.jLblFind.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="jBtnNext">
@@ -102,7 +105,9 @@
           <Image iconType="3" name="/META-INF/images/small-icons/go-next.png"/>
         </Property>
         <Property name="mnemonic" type="int" value="78"/>
-        <Property name="text" type="java.lang.String" value="Next"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="jsyntaxpane/Bundle.properties" key="ReplaceDialog.jBtnNext.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBtnNextActionPerformed"/>
@@ -114,7 +119,9 @@
           <Image iconType="3" name="/META-INF/images/small-icons/go-previous.png"/>
         </Property>
         <Property name="mnemonic" type="int" value="78"/>
-        <Property name="text" type="java.lang.String" value="Previous"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="jsyntaxpane/Bundle.properties" key="ReplaceDialog.jBtnPrev.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBtnPrevActionPerformed"/>
@@ -126,7 +133,9 @@
           <Image iconType="3" name="/META-INF/images/small-icons/edit-find-replace-all.png"/>
         </Property>
         <Property name="mnemonic" type="int" value="72"/>
-        <Property name="text" type="java.lang.String" value="Replace All"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="jsyntaxpane/Bundle.properties" key="ReplaceDialog.jBtnReplaceAll.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBtnReplaceAllActionPerformed"/>
@@ -135,20 +144,28 @@
     <Component class="javax.swing.JCheckBox" name="jChkWrap">
       <Properties>
         <Property name="mnemonic" type="int" value="87"/>
-        <Property name="text" type="java.lang.String" value="Wrap around"/>
-        <Property name="toolTipText" type="java.lang.String" value="Wrap to beginning when end is reached"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="jsyntaxpane/Bundle.properties" key="ReplaceDialog.jChkWrap.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+        </Property>
+        <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="jsyntaxpane/Bundle.properties" key="ReplaceDialog.jChkWrap.toolTipText" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JCheckBox" name="jChkRegex">
       <Properties>
         <Property name="mnemonic" type="int" value="82"/>
-        <Property name="text" type="java.lang.String" value="Regular Expression"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="jsyntaxpane/Bundle.properties" key="ReplaceDialog.jChkRegex.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JCheckBox" name="jChkIgnoreCase">
       <Properties>
         <Property name="mnemonic" type="int" value="73"/>
-        <Property name="text" type="java.lang.String" value="Ignore Case"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="jsyntaxpane/Bundle.properties" key="ReplaceDialog.jChkIgnoreCase.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLblReplace">
@@ -157,7 +174,9 @@
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="jCmbReplace"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Replace"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="jsyntaxpane/Bundle.properties" key="ReplaceDialog.jLblReplace.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JToggleButton" name="jTglHighlight">
@@ -165,7 +184,9 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/META-INF/images/small-icons/highlight.png"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Highlight"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="jsyntaxpane/Bundle.properties" key="ReplaceDialog.jTglHighlight.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jTglHighlightActionPerformed"/>
@@ -192,7 +213,9 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/META-INF/images/small-icons/edit-find-replace.png"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Replace"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="jsyntaxpane/Bundle.properties" key="ReplaceDialog.jBtnReplace.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBtnReplaceActionPerformed"/>

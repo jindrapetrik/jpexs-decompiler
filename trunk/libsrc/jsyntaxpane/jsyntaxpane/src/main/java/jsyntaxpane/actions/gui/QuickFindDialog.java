@@ -55,7 +55,19 @@ public class QuickFindDialog extends javax.swing.JDialog
 	 * it will remain where the user probably clicked.
 	 */
 	private boolean escaped = false;
-
+                 
+        //JPEXS added
+        public void setIgnoreCase(boolean ignoreCase){
+            jChkIgnoreCase.setSelected(ignoreCase);
+        }
+        //JPEXS added
+        public void setRegularExpression(boolean regularExpresion){
+            jChkRegExp.setSelected(regularExpresion);
+        }
+        //JPEXS added
+        public void setWrap(boolean wrap){
+            jChkWrap.setSelected(wrap);        
+        }    
 	/**
 	 * Creates new form QuickFindDialog
 	 *
@@ -145,7 +157,8 @@ public class QuickFindDialog extends javax.swing.JDialog
         jToolBar1.add(jSeparator1);
 
         jLabel1.setLabelFor(jTxtFind);
-        jLabel1.setText("Quick Find");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle"); // NOI18N
+        jLabel1.setText(bundle.getString("QuickFindDialog.jLabel1.text")); // NOI18N
         jToolBar1.add(jLabel1);
         jToolBar1.add(jSeparator2);
 
@@ -182,7 +195,7 @@ public class QuickFindDialog extends javax.swing.JDialog
         jToolBar1.add(jBtnNext);
 
         jChkIgnoreCase.setMnemonic('C');
-        jChkIgnoreCase.setText("Ignore Case");
+        jChkIgnoreCase.setText(bundle.getString("QuickFindDialog.jChkIgnoreCase.text")); // NOI18N
         jChkIgnoreCase.setFocusable(false);
         jChkIgnoreCase.setOpaque(false);
         jChkIgnoreCase.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -190,7 +203,7 @@ public class QuickFindDialog extends javax.swing.JDialog
         jChkIgnoreCase.addActionListener(this);
 
         jChkRegExp.setMnemonic('R');
-        jChkRegExp.setText("Reg Exp");
+        jChkRegExp.setText(bundle.getString("QuickFindDialog.jChkRegExp.text")); // NOI18N
         jChkRegExp.setFocusable(false);
         jChkRegExp.setOpaque(false);
         jChkRegExp.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -198,7 +211,7 @@ public class QuickFindDialog extends javax.swing.JDialog
         jChkRegExp.addActionListener(this);
 
         jChkWrap.setMnemonic('W');
-        jChkWrap.setText("Wrap");
+        jChkWrap.setText(bundle.getString("QuickFindDialog.jChkWrap.text")); // NOI18N
         jChkWrap.setFocusable(false);
         jChkWrap.setOpaque(false);
         jChkWrap.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -229,7 +242,7 @@ public class QuickFindDialog extends javax.swing.JDialog
 		if (dsd.get().doFindNext(target.get())) {
 			jLblStatus.setText(null);
 		} else {
-			jLblStatus.setText("not found");
+			jLblStatus.setText(java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("QuickFindDialog.NotFound"));
 		}
 }//GEN-LAST:event_jBtnNextActionPerformed
 
@@ -237,7 +250,7 @@ public class QuickFindDialog extends javax.swing.JDialog
 		if (dsd.get().doFindPrev(target.get())) {
 			jLblStatus.setText(null);
 		} else {
-			jLblStatus.setText("not found");
+			jLblStatus.setText(java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("QuickFindDialog.NotFound"));
 		}
 }//GEN-LAST:event_jBtnPrevActionPerformed
 
@@ -257,20 +270,6 @@ public class QuickFindDialog extends javax.swing.JDialog
     private javax.swing.JTextField jTxtFind;
     // End of variables declaration//GEN-END:variables
 
-    
-    //JPEXS added
-    public void setIgnoreCase(boolean ignoreCase){
-        jChkIgnoreCase.setSelected(ignoreCase);
-    }
-    //JPEXS added
-    public void setRegularExpression(boolean regularExpresion){
-        jChkRegExp.setSelected(regularExpresion);
-    }
-    //JPEXS added
-    public void setWrap(boolean wrap){
-        jChkWrap.setSelected(wrap);        
-    }
-    
 	@Override
 	public void insertUpdate(DocumentEvent e) {
 		updateFind();
@@ -304,7 +303,7 @@ public class QuickFindDialog extends javax.swing.JDialog
 			jLblStatus.setText(null);
 			t.setCaretPosition(oldCaretPosition);
 			if (!d.doFindNext(t)) {
-				jLblStatus.setText("Not found");
+				jLblStatus.setText(java.util.ResourceBundle.getBundle("jsyntaxpane/Bundle").getString("QuickFindDialog.NotFound"));
 			} else {
 				jLblStatus.setText(null);
 			}
