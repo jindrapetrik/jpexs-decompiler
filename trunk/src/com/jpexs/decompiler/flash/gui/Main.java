@@ -462,7 +462,9 @@ public class Main {
     }
 
     public static void initLang() {
-        Locale.setDefault(Locale.forLanguageTag((String) Configuration.getConfig("locale", Locale.getDefault())));
+        if (Configuration.containsConfig("locale")) {
+            Locale.setDefault(Locale.forLanguageTag((String) Configuration.getConfig("locale", "en")));
+        }
         UIManager.put("OptionPane.okButtonText", AppStrings.translate("button.ok"));
         UIManager.put("OptionPane.yesButtonText", AppStrings.translate("button.yes"));
         UIManager.put("OptionPane.noButtonText", AppStrings.translate("button.no"));
@@ -521,14 +523,6 @@ public class Main {
     public static void main(String[] args) throws IOException {
         loadProperties();
         Configuration.loadFromFile(getConfigFile(), getReplacementsFile());
-        initLang();
-        View.setLookAndFeel();
-        if ((Boolean) Configuration.getConfig("cacheOnDisk", Boolean.TRUE)) {
-            Cache.setStorageType(Cache.STORAGE_FILES);
-        } else {
-            Cache.setStorageType(Cache.STORAGE_MEMORY);
-        }
-
         int pos = 0;
         if (args.length > 0) {
             if (args[0].equals("-debug")) {
@@ -537,6 +531,15 @@ public class Main {
             }
         }
         initLogging(Configuration.debugMode);
+
+        initLang();
+        View.setLookAndFeel();
+        if ((Boolean) Configuration.getConfig("cacheOnDisk", Boolean.TRUE)) {
+            Cache.setStorageType(Cache.STORAGE_FILES);
+        } else {
+            Cache.setStorageType(Cache.STORAGE_MEMORY);
+        }
+
         if (args.length < pos + 1) {
             autoCheckForUpdates();
             offerAssociation();
