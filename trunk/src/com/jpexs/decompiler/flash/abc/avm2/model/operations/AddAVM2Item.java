@@ -30,6 +30,26 @@ public class AddAVM2Item extends BinaryOpItem {
     }
 
     @Override
+    public String toString(List<Object> localData) {
+        if (rightSide.precedence >= precedence) { //string + vs number +
+            String ret = "";
+            if (leftSide.precedence > precedence) {
+                ret += "(" + leftSide.toString(localData) + ")";
+            } else {
+                ret += leftSide.toString(localData);
+            }
+            ret += " ";
+            ret += hilight(operator);
+            ret += " ";
+            
+            ret += "(" + rightSide.toString(localData) + ")";
+            return ret;
+        } else {
+            return super.toString(localData);
+        }
+    }
+
+    @Override
     public Object getResult() {
         if (EcmaScript.type(leftSide.getResult()) == EcmaType.STRING || EcmaScript.type(rightSide.getResult()) == EcmaType.STRING) {
             return leftSide.getResult().toString() + rightSide.getResult().toString();
