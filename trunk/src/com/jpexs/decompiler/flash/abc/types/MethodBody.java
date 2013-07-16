@@ -107,14 +107,6 @@ public class MethodBody implements Cloneable, Serializable {
         if (debugMode) {
             System.err.println("Decompiling " + path);
         }
-        if (path.equals("")) {
-            Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Empty", new Exception());
-            System.exit(0);
-        }
-        if (path.startsWith("*.")) {
-            Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Star", new Exception());
-            //System.exit(0);
-        }
         String s = "";
         if (!(Boolean) Configuration.getConfig("decompile", Boolean.TRUE)) {
             s = "//Decompilation skipped";
