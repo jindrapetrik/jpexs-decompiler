@@ -2045,14 +2045,14 @@ public class AVM2Code implements Serializable {
             }
 
             List<Integer> r = refs.get(ip);
-            if (r != null) {
-                if (r.size() > 1) {
-                    if (!stack.isEmpty()) {
-                        GraphTargetItem it = stack.pop();
-                        stack.push(new NotCompileTimeAVM2Item(null, it));
-                    }
-                }
-            }
+            /*if (r != null) {
+             if (r.size() > 1) {
+             if (!stack.isEmpty()) {
+             GraphTargetItem it = stack.pop();
+             stack.push(new NotCompileTimeAVM2Item(null, it));
+             }
+             }
+             }*/
 
             GraphSourceItem ins = code.get(ip);
 
