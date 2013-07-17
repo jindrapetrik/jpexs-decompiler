@@ -23,6 +23,6 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 public class AsTypeAVM2Item extends BinaryOpItem {
 
     public AsTypeAVM2Item(AVM2Instruction instruction, GraphTargetItem value, GraphTargetItem type) {
-        super(instruction, PRECEDENCE_RELATIONAL, value, type, " as ");
+        super(instruction, PRECEDENCE_RELATIONAL, value, type, "as");
     }
 }
