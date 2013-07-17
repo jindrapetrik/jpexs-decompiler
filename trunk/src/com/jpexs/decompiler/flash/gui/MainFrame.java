@@ -1073,7 +1073,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                                 errorNotificationButton.setIcon(null);
                                 errorNotificationButton.setSize(16, 16);
                             }
-                            if (pos == 4) {
+                            if (pos >= 4) {
                                 cancel();
                             }
                         }
