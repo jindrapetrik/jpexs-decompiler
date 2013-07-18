@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2013 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -117,6 +117,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -159,6 +160,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
@@ -237,10 +239,11 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
     private JLabel fontAscentLabel;
     private JLabel fontDescentLabel;
     private JLabel fontLeadingLabel;
-    private JLabel fontCharactersLabel;
+    private JTextArea fontCharactersTextArea;
     private JTextField fontAddCharactersField;
     private JButton errorNotificationButton;
     private ErrorLogFrame errorLogFrame;
+    private ComponentListener fontChangeList;
     private AbortRetryIgnoreHandler errorHandler = new AbortRetryIgnoreHandler() {
         @Override
         public int handle(Throwable thrown) {
@@ -806,7 +809,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
          textBottomPanel.add(new JLabel("Ymin:"));
          textBottomPanel.add(textRectYmin);
          textBottomPanel.add(new JLabel("Xmax:"));
-         textBottomPanel.add(textRectXmax);        
+         textBottomPanel.add(textRectXmax);
          textBottomPanel.add(new JLabel("Ymax:"));
          textBottomPanel.add(textRectYmax);*/
 
@@ -845,32 +848,85 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         displayWithPreview.add(textTopPanel, CARDTEXTPANEL);
 
 
-        JPanel fontPanel = new JPanel();
-        JPanel fontParams2 = new JPanel();
+
+        //TODO: This layout SUCKS! If you know something better, please fix it!
+        final JPanel fontPanel = new JPanel();
+        final JPanel fontParams2 = new JPanel();
         fontParams2.setLayout(null);
-        Component ctable[][] = new Component[][]{
+        final Component ctable[][] = new Component[][]{
             {new JLabel(translate("font.name")), fontNameLabel = new JLabel(translate("value.unknown"))},
             {new JLabel(translate("font.isbold")), fontIsBoldLabel = new JLabel(translate("value.unknown"))},
             {new JLabel(translate("font.isitalic")), fontIsItalicLabel = new JLabel(translate("value.unknown"))},
             {new JLabel(translate("font.ascent")), fontAscentLabel = new JLabel(translate("value.unknown"))},
             {new JLabel(translate("font.descent")), fontDescentLabel = new JLabel(translate("value.unknown"))},
             {new JLabel(translate("font.leading")), fontLeadingLabel = new JLabel(translate("value.unknown"))},
-            {new JLabel(translate("font.characters")), fontCharactersLabel = new JLabel("")}
+            {new JLabel(translate("font.characters")), fontCharactersTextArea = new JTextArea("")}
         };
+        fontCharactersTextArea.setLineWrap(true);
+        fontCharactersTextArea.setWrapStyleWord(true);
+        fontCharactersTextArea.setOpaque(false);
+        fontCharactersTextArea.setEditable(false);
+        fontCharactersTextArea.setFont(new JLabel().getFont());
 
-        int headerWidth = 100;
-        int borderLeft = 10;
+        final int borderLeft = 10;
+
+        final int maxws[] = new int[ctable[0].length];
+        for (int x = 0; x < ctable[0].length; x++) {
+            int maxw = 0;
+            for (int y = 0; y < ctable.length; y++) {
+                Dimension d = ctable[y][x].getPreferredSize();
+                if (d.width > maxw) {
+                    maxw = d.width;
+                }
+            }
+            maxws[x] = maxw;
+        }
 
         for (int i = 0; i < ctable.length; i++) {
-            ctable[i][0].setBounds(borderLeft, 25 * i, headerWidth, 25);
-            ctable[i][1].setBounds(borderLeft + headerWidth + borderLeft, 25 * i, 400, 25);
             fontParams2.add(ctable[i][0]);
             fontParams2.add(ctable[i][1]);
         }
+
         fontParams2.setPreferredSize(new Dimension(600, ctable.length * 25));
+        fontChangeList = new ComponentListener() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                int h = 0;
+                Insets is = fontPanel.getInsets();
+                Insets is2 = fontParams2.getInsets();
+                for (int i = 0; i < ctable.length; i++) {
+                    Dimension d = ctable[i][0].getPreferredSize();
+                    Dimension d2 = ctable[i][1].getPreferredSize();
+                    ctable[i][0].setBounds(borderLeft, h, maxws[0], 25);
 
+                    int w2 = fontPanel.getWidth() - 3 * borderLeft - maxws[0] - is.left - is.right - 10;
+                    ctable[i][1].setBounds(borderLeft + maxws[0] + borderLeft, h, w2, d2.height);
+                    h += Math.max(Math.max(d.height, d2.height), 25);
+                }
 
-        JPanel fontParams1 = new JPanel();
+                fontParams2.setPreferredSize(new Dimension(fontPanel.getWidth() - 20, h));
+                fontPanel.revalidate();
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                componentResized(null);
+            }
+
+            @Override
+            public void componentShown(ComponentEvent e) {
+                componentResized(null);
+            }
+
+            @Override
+            public void componentHidden(ComponentEvent e) {
+                componentResized(null);
+            }
+        };
+        final JPanel fontParams1 = new JPanel();
+        fontPanel.addComponentListener(fontChangeList);
+
+        fontChangeList.componentResized(null);
 
         fontParams1.setLayout(new BoxLayout(fontParams1, BoxLayout.Y_AXIS));
         fontParams1.add(fontParams2);
@@ -887,7 +943,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
 
         fontParams1.add(fontAddCharsPanel);
         fontPanel.setLayout(new BorderLayout());
-        fontPanel.add(fontParams1, BorderLayout.NORTH);
+        fontPanel.add(new JScrollPane(fontParams1), BorderLayout.CENTER);
 
         displayWithPreview.add(fontPanel, CARDFONTPANEL);
 
@@ -2619,7 +2675,9 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                 fontDescentLabel.setText("" + ft.getDescent());
                 fontAscentLabel.setText("" + ft.getDescent());
                 fontLeadingLabel.setText("" + ft.getDescent());
-                fontCharactersLabel.setText("" + ft.getCharacters(swf.tags));
+                String chars = ft.getCharacters(swf.tags);
+                fontCharactersTextArea.setText(chars);
+                fontChangeList.componentResized(null);
                 showDetailWithPreview(CARDFONTPANEL);
             } else {
                 parametersPanel.setVisible(false);
