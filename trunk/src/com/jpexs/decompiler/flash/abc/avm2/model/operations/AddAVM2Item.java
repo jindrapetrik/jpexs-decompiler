@@ -41,7 +41,7 @@ public class AddAVM2Item extends BinaryOpItem {
             ret += " ";
             ret += hilight(operator);
             ret += " ";
-            
+
             ret += "(" + rightSide.toString(localData) + ")";
             return ret;
         } else {

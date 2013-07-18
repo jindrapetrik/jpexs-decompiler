@@ -29,12 +29,14 @@ public class AVM2GraphSource extends GraphSource {
     MethodBody body;
     HashMap<Integer, String> localRegNames;
     List<String> fullyQualifiedNames;
+    HashMap<Integer, Integer> localRegAssigmentIps;
+    HashMap<Integer, List<Integer>> refs;
 
     public AVM2Code getCode() {
         return code;
     }
 
-    public AVM2GraphSource(AVM2Code code, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> scopeStack, ABC abc, MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public AVM2GraphSource(AVM2Code code, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> scopeStack, ABC abc, MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, HashMap<Integer, Integer> localRegAssigmentIp, HashMap<Integer, List<Integer>> refs) {
         this.code = code;
         this.isStatic = isStatic;
         this.classIndex = classIndex;
@@ -45,6 +47,8 @@ public class AVM2GraphSource extends GraphSource {
         this.localRegNames = localRegNames;
         this.fullyQualifiedNames = fullyQualifiedNames;
         this.scriptIndex = scriptIndex;
+        this.localRegAssigmentIps = localRegAssigmentIp;
+        this.refs = refs;
     }
 
     @Override
@@ -68,7 +72,7 @@ public class AVM2GraphSource extends GraphSource {
         List<GraphTargetItem> ret = new ArrayList<>();
         Object o = localData.get(AVM2Graph.DATA_SCOPESTACK);
         Stack<GraphTargetItem> newstack = (Stack<GraphTargetItem>) o;
-        ConvertOutput co = code.toSourceOutput(path, part, false, isStatic, scriptIndex, classIndex, localRegs, stack, newstack, abc, abc.constants, abc.method_info, body, start, end, localRegNames, fullyQualifiedNames, new boolean[size()]);
+        ConvertOutput co = code.toSourceOutput(path, part, false, isStatic, scriptIndex, classIndex, localRegs, stack, newstack, abc, abc.constants, abc.method_info, body, start, end, localRegNames, fullyQualifiedNames, new boolean[size()], localRegAssigmentIps, refs);
         ret.addAll(co.output);
         return ret;
     }

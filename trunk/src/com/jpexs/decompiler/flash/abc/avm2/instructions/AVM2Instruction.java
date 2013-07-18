@@ -263,7 +263,7 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
                 (HashMap<Integer, GraphTargetItem>) localData.get(2),
                 stack,
                 (Stack<GraphTargetItem>) localData.get(3),
-                (ConstantPool) localData.get(4), this, (MethodInfo[]) localData.get(5), output, (MethodBody) localData.get(6), (ABC) localData.get(7), (HashMap<Integer, String>) localData.get(8), (List<String>) localData.get(9), null);
+                (ConstantPool) localData.get(4), this, (MethodInfo[]) localData.get(5), output, (MethodBody) localData.get(6), (ABC) localData.get(7), (HashMap<Integer, String>) localData.get(8), (List<String>) localData.get(9), null, (HashMap<Integer, Integer>) localData.get(14), (int) (Integer) localData.get(15), (HashMap<Integer, List<Integer>>) localData.get(16), (AVM2Code) localData.get(17));
     }
 
     @Override

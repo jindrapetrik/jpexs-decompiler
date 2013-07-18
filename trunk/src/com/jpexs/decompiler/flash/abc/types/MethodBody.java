@@ -74,7 +74,7 @@ public class MethodBody implements Cloneable, Serializable {
     }
 
     public int removeTraps(ConstantPool constants, ABC abc, int scriptIndex, int classIndex, boolean isStatic, String path) {
-        return code.removeTraps(constants, this, abc, scriptIndex, classIndex, isStatic, path);
+        return code.removeTraps(constants, this, abc, scriptIndex, classIndex, isStatic, path, code.visitCode(this));
     }
 
     public HashMap<Integer, String> getLocalRegNames(ABC abc) {
@@ -124,14 +124,14 @@ public class MethodBody implements Cloneable, Serializable {
             deobfuscated.markMappedOffsets();
             if ((Boolean) Configuration.getConfig("autoDeobfuscate", true)) {
                 try {
-                    deobfuscated.removeTraps(constants, b, abc, scriptIndex, classIndex, isStatic, path);
+                    deobfuscated.removeTraps(constants, b, abc, scriptIndex, classIndex, isStatic, path, deobfuscated.visitCode(b));
                 } catch (Exception ex) {
                     Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Error during remove traps", ex);
                 }
             }
             //deobfuscated.restoreControlFlow(constants, b);
             //try {
-            s += deobfuscated.toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, b, hilight, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC);
+            s += deobfuscated.toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, b, hilight, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<Integer, Integer>(), deobfuscated.visitCode(b));
             s = s.trim();
             if (hilight) {
                 s = Highlighting.hilighMethod(s, this.method_info);
