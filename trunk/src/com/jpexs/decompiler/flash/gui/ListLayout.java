@@ -50,12 +50,13 @@ public class ListLayout implements LayoutManager {
     public Dimension preferredLayoutSize(Container parent) {
         int h = 0;
         int maxw = 0;
+        Insets ins = parent.getInsets();
         boolean first = true;
         for (Component c : parent.getComponents()) {
             if (!c.isVisible()) {
                 continue;
             }
-            if (!first) {
+            if (true) { //!first) {
                 h += border;
             }
             Dimension pref = c.getPreferredSize();
@@ -65,7 +66,8 @@ public class ListLayout implements LayoutManager {
             h += pref.height;
             first = false;
         }
-        Insets ins = parent.getInsets();
+
+        maxw = parent.getSize().width - ins.left - ins.right;
         return new Dimension(maxw, h);
     }
 
@@ -79,6 +81,7 @@ public class ListLayout implements LayoutManager {
         Dimension dim = preferredLayoutSize(parent);
         int top = 0;
         Insets ins = parent.getInsets();
+        top = ins.top;
         boolean first = true;
         for (Component c : parent.getComponents()) {
             if (!c.isVisible()) {

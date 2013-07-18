@@ -17,10 +17,13 @@
 package com.jpexs.decompiler.flash.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.ImageObserver;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -59,24 +62,27 @@ public class LoadingDialog extends AppDialog implements ImageObserver {
     public LoadingDialog() {
         setResizable(false);
         setTitle(Main.shortApplicationVerName);
-        setSize(275, 150);
-        setLayout(new BorderLayout());
+        setSize(Math.max(270, 150 + getFontMetrics(new JLabel().getFont()).stringWidth(translate("loadingpleasewait"))), 150);
+        Container cnt = getContentPane();
+        cnt.setLayout(new BorderLayout());
 
         loadingPanel = new LoadingPanel(50, 50);
         loadingPanel.setPreferredSize(new Dimension(100, 100));
         add(loadingPanel, BorderLayout.WEST);
         JPanel pan = new JPanel();
-        pan.setLayout(null);
-        pan.setPreferredSize(new Dimension(120, 150));
+        pan.setLayout(new ListLayout(5));
+        //pan.setPreferredSize(new Dimension(120, 150));
         JLabel loadingLabel = new JLabel(translate("loadingpleasewait"));
-        loadingLabel.setBounds(0, 30, 150, 20);
+        //loadingLabel.setBounds(0, 30, 150, 20);
         loadingLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        detailLabel.setBounds(0, 45, 150, 20);
-        progressBar.setBounds(0, 70, 125, 25);
+        detailLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        //detailLabel.setBounds(0, 45, 150, 20);
+        //progressBar.setBounds(0, 70, 125, 25);
         pan.add(loadingLabel);
         pan.add(detailLabel);
         pan.add(progressBar);
-        add(pan, BorderLayout.CENTER);
+        pan.setBorder(BorderFactory.createEmptyBorder(20, 10, 10, 10));
+        cnt.add(pan, BorderLayout.CENTER);
         progressBar.setVisible(false);
         progressBar.setStringPainted(true);
         //progressBar.setVisible(false);
