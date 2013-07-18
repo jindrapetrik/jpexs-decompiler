@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import java.awt.image.BufferedImage;
@@ -129,8 +130,8 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
      * @param version SWF version
      * @throws IOException
      */
-    public DefineBitsJPEG4Tag(byte data[], int version, long pos) throws IOException {
-        super(ID, "DefineBitsJPEG4", data, pos);
+    public DefineBitsJPEG4Tag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "DefineBitsJPEG4", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterID = sis.readUI16();
         long alphaDataOffset = sis.readUI32();

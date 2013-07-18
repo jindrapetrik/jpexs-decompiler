@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
@@ -45,14 +46,15 @@ public class Tag implements NeedsCharacters, Exportable {
     private final long pos;
     protected String name;
     public Tag previousTag;
+    protected SWF swf;
 
-    public String getName() {
+    public String getName(List<Tag> tags) {
         return name;
     }
 
     @Override
-    public String getExportFileName() {
-        return getName();
+    public String getExportFileName(List<Tag> tags) {
+        return getName(tags);
     }
 
     /**
@@ -67,16 +69,18 @@ public class Tag implements NeedsCharacters, Exportable {
     /**
      * Constructor
      *
+     * @param swf
      * @param id Tag type identifier
      * @param name Tag name
      * @param data Bytes of data
      * @param pos
      */
-    public Tag(int id, String name, byte[] data, long pos) {
+    public Tag(SWF swf, int id, String name, byte data[], long pos) {
         this.id = id;
         this.name = name;
         this.data = data;
         this.pos = pos;
+        this.swf = swf;
     }
 
     /**
@@ -105,7 +109,7 @@ public class Tag implements NeedsCharacters, Exportable {
      */
     @Override
     public String toString() {
-        return getName();
+        return getName(swf.tags);
     }
 
     public final long getOrigDataLength() {

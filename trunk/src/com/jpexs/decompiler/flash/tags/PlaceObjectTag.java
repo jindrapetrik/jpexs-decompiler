@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
@@ -95,13 +96,14 @@ public class PlaceObjectTag extends CharacterIdTag implements PlaceObjectTypeTag
     /**
      * Constructor
      *
+     * @param swf
      * @param data Data bytes
      * @param version SWF version
      * @param pos
      * @throws IOException
      */
-    public PlaceObjectTag(byte data[], int version, long pos) throws IOException {
-        super(ID, "PlaceObject", data, pos);
+    public PlaceObjectTag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "PlaceObject", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterId = sis.readUI16();
         depth = sis.readUI16();
@@ -111,8 +113,8 @@ public class PlaceObjectTag extends CharacterIdTag implements PlaceObjectTypeTag
         }
     }
 
-    public PlaceObjectTag(int characterId, int depth, MATRIX matrix, CXFORM colorTransform) {
-        super(4, "PlaceObject", new byte[0], 0);
+    public PlaceObjectTag(SWF swf, int characterId, int depth, MATRIX matrix, CXFORM colorTransform) {
+        super(swf, ID, "PlaceObject", new byte[0], 0);
         this.characterId = characterId;
         this.depth = depth;
         this.matrix = matrix;

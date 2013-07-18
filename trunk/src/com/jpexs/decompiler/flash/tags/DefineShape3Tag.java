@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -80,8 +81,8 @@ public class DefineShape3Tag extends CharacterTag implements BoundedTag, ShapeTa
         return shapeId;
     }
 
-    public DefineShape3Tag(byte[] data, int version, long pos) throws IOException {
-        super(ID, "DefineShape3", data, pos);
+    public DefineShape3Tag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "DefineShape3", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         shapeId = sis.readUI16();
         shapeBounds = sis.readRECT();

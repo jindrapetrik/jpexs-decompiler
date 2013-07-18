@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.ReReadableInputStream;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
@@ -49,13 +50,14 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
     /**
      * Constructor
      *
+     * @param swf
      * @param data Data bytes
      * @param version SWF version
      * @param pos
      * @throws IOException
      */
-    public DoInitActionTag(byte[] data, int version, long pos) throws IOException {
-        super(ID, "DoInitAction", data, pos);
+    public DoInitActionTag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "DoInitAction", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         spriteId = sis.readUI16();
         //actions = sis.readActionList();
@@ -166,7 +168,7 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
     }
 
     @Override
-    public String getExportFileName() {
+    public String getExportFileName(List<Tag> tags) {
         String expName = getExportName();
         if ((expName == null) || expName.equals("")) {
             return super.toString();

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import java.util.ArrayList;
@@ -27,8 +28,8 @@ import java.util.List;
  */
 public abstract class CharacterIdTag extends Tag {
 
-    public CharacterIdTag(int id, String name, byte[] data, long pos) {
-        super(id, name, data, pos);
+    public CharacterIdTag(SWF swf, int id, String name, byte[] data, long pos) {
+        super(swf, id, name, data, pos);
     }
 
     public abstract int getCharacterId();
@@ -36,8 +37,8 @@ public abstract class CharacterIdTag extends Tag {
      * List of ExportAssetsTag used for converting to String
      */
     public List<ExportAssetsTag> exportAssetsTags = new ArrayList<>();
-    private String className;
-    private String exportName;
+    protected String className;
+    protected String exportName;
 
     public void setExportName(String exportName) {
         this.exportName = exportName;
@@ -52,7 +53,7 @@ public abstract class CharacterIdTag extends Tag {
     }
 
     @Override
-    public String getName() {
+    public String getName(List<Tag> tags) {
         String nameAppend = "";
         if (exportName != null) {
             nameAppend = ": " + exportName;
@@ -60,12 +61,12 @@ public abstract class CharacterIdTag extends Tag {
         if (className != null) {
             nameAppend = ": " + className;
         }
-        return super.getName() + " (" + getCharacterId() + nameAppend + ")";
+        return super.getName(tags) + " (" + getCharacterId() + nameAppend + ")";
     }
 
     @Override
-    public String getExportFileName() {
-        return super.getName() + "_" + getCharacterId() + (((exportName != null) && (!exportName.equals(""))) ? "_" + exportName : "");
+    public String getExportFileName(List<Tag> tags) {
+        return super.getName(tags) + "_" + getCharacterId() + (((exportName != null) && (!exportName.equals(""))) ? "_" + exportName : "");
     }
 
     public String getCharacterExportFileName() {

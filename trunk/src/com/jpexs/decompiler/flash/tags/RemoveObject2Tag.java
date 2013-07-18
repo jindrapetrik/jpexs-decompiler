@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import java.io.ByteArrayInputStream;
@@ -26,8 +27,8 @@ public class RemoveObject2Tag extends Tag implements RemoveTag {
     public int depth;
     public static final int ID = 28;
 
-    public RemoveObject2Tag(byte[] data, int version, long pos) throws IOException {
-        super(ID, "RemoveObject2", data, pos);
+    public RemoveObject2Tag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "RemoveObject2", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         depth = sis.readUI16();
     }

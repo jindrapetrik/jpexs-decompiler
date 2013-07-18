@@ -44,6 +44,7 @@ import com.jpexs.decompiler.flash.tags.DefineText2Tag;
 import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
@@ -230,11 +231,11 @@ public class TagNode {
         }
     }
 
-    public static List<File> exportNodeAS(AbortRetryIgnoreHandler handler, List<TagNode> nodeList, String outdir, boolean isPcode) throws IOException {
-        return exportNodeAS(handler, nodeList, outdir, isPcode, null);
+    public static List<File> exportNodeAS(List<Tag> allTags, AbortRetryIgnoreHandler handler, List<TagNode> nodeList, String outdir, boolean isPcode) throws IOException {
+        return exportNodeAS(allTags, handler, nodeList, outdir, isPcode, null);
     }
 
-    public static List<File> exportNodeAS(AbortRetryIgnoreHandler handler, List<TagNode> nodeList, String outdir, boolean isPcode, EventListener ev) throws IOException {
+    public static List<File> exportNodeAS(List<Tag> allTags, AbortRetryIgnoreHandler handler, List<TagNode> nodeList, String outdir, boolean isPcode, EventListener ev) throws IOException {
         File dir = new File(outdir);
         List<File> ret = new ArrayList<>();
         if (!outdir.endsWith(File.separator)) {
@@ -244,7 +245,7 @@ public class TagNode {
         for (TagNode node : nodeList) {
             String name = "";
             if (node.tag instanceof Exportable) {
-                name = ((Exportable) node.tag).getExportFileName();
+                name = ((Exportable) node.tag).getExportFileName(allTags);
             } else {
                 name = Helper.makeFileName(node.tag.toString());
             }
@@ -304,7 +305,7 @@ public class TagNode {
                     } while (retry);
                 }
             } else {
-                ret.addAll(exportNodeAS(handler, node.subItems, outdir + name, isPcode, ev));
+                ret.addAll(exportNodeAS(allTags, handler, node.subItems, outdir + name, isPcode, ev));
             }
 
         }

@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.Container;
@@ -278,8 +279,8 @@ public class PlaceObject3Tag extends CharacterIdTag implements Container, PlaceO
      * @param pos
      * @throws IOException
      */
-    public PlaceObject3Tag(byte data[], int version, long pos) throws IOException {
-        super(ID, "PlaceObject3", data, pos);
+    public PlaceObject3Tag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "PlaceObject3", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         placeFlagHasClipActions = sis.readUB(1) == 1;
         placeFlagHasClipDepth = sis.readUB(1) == 1;

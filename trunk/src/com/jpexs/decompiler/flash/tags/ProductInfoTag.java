@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -31,8 +32,8 @@ public class ProductInfoTag extends Tag {
     public long compilationDate;
     public static final int ID = 41;
 
-    public ProductInfoTag(byte[] data, int version, long pos) throws IOException {
-        super(ID, "ProductInfo", data, pos);
+    public ProductInfoTag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "ProductInfo", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         /*
          * 0: Unknown

@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,8 +37,8 @@ public class FileAttributesTag extends Tag {
     private int reserved3;
     public static final int ID = 69;
 
-    public FileAttributesTag(byte[] data, int version, long pos) throws IOException {
-        super(ID, "FileAttributes", data, pos);
+    public FileAttributesTag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "FileAttributes", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         reserved1 = (int) sis.readUB(1); // reserved
         // UB[1] == 0  (reserved)

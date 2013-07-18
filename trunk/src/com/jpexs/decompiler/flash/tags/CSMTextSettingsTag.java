@@ -16,8 +16,10 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -35,6 +37,7 @@ public class CSMTextSettingsTag extends Tag {
     public int gridFit;
     public float thickness;
     public float sharpness;
+    public static final int ID = 74;
 
     /**
      * Gets data bytes
@@ -63,12 +66,14 @@ public class CSMTextSettingsTag extends Tag {
     /**
      * Constructor
      *
+     * @param swf
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
-    public CSMTextSettingsTag(byte data[], int version, long pos) throws IOException {
-        super(74, "CSMTextSettings", data, pos);
+    public CSMTextSettingsTag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "CSMTextSettings", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         textID = sis.readUI16();
         useFlashType = (int) sis.readUB(2);

@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.ImportTag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -46,8 +47,8 @@ public class ImportAssetsTag extends Tag implements ImportTag {
      * @param version SWF version
      * @throws IOException
      */
-    public ImportAssetsTag(byte data[], int version, long pos) throws IOException {
-        super(ID, "ImportAssets", data, pos);
+    public ImportAssetsTag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "ImportAssets", data, pos);
         assets = new HashMap<>();
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         url = sis.readString();

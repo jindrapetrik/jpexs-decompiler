@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -84,8 +85,8 @@ public class DefineSoundTag extends CharacterTag {
      * @param version SWF version
      * @throws IOException
      */
-    public DefineSoundTag(byte data[], int version, long pos) throws IOException {
-        super(ID, "DefineSound", data, pos);
+    public DefineSoundTag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "DefineSound", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         soundId = sis.readUI16();
         soundFormat = (int) sis.readUB(4);

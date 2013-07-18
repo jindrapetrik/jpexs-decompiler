@@ -19,9 +19,11 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import java.io.*;
+import java.util.List;
 
 /**
  * Defines a series of ActionScript 3 bytecodes to be executed
@@ -50,19 +52,21 @@ public class DoABCDefineTag extends Tag implements ABCContainerTag {
     public static final int ID = 82;
 
     @Override
-    public String getName() {
+    public String getName(List<Tag> tags) {
         return "DoABCDefine (" + name + ")";
     }
 
     /**
      * Constructor
      *
+     * @param swf
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
-    public DoABCDefineTag(byte[] data, int version, long pos) throws IOException {
-        super(ID, "DoABCDefine", data, pos);
+    public DoABCDefineTag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "DoABCDefine", data, pos);
         InputStream is = new ByteArrayInputStream(data);
         SWFInputStream sis = new SWFInputStream(is, version);
         flags = sis.readUI32();

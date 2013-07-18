@@ -328,7 +328,7 @@ public class SWF {
         sis.readUI8(); //tmpFirstByetOfFrameRate
         frameRate = sis.readUI8();
         frameCount = sis.readUI16();
-        tags = sis.readTagList(0, paralelRead, true);
+        tags = sis.readTagList(this, 0, paralelRead, true);
         assignExportNamesToSymbols();
         assignClassesToSymbols();
         findFileAttributes();
@@ -589,7 +589,7 @@ public class SWF {
             outdir += File.separator;
         }
         outdir += "scripts" + File.separator;
-        ret.addAll(TagNode.exportNodeAS(handler, list, outdir, isPcode, evl));
+        ret.addAll(TagNode.exportNodeAS(tags, handler, list, outdir, isPcode, evl));
         return ret;
     }
 

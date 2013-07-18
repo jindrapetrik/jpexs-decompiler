@@ -16,11 +16,14 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
+import com.jpexs.decompiler.flash.tags.Tag;
+import java.util.List;
+
 /**
  *
  * @author JPEXS
  */
 public interface Exportable {
 
-    public String getExportFileName();
+    public String getExportFileName(List<Tag> tags);
 }

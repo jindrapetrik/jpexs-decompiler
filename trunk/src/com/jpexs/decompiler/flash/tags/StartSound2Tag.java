@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -60,8 +61,8 @@ public class StartSound2Tag extends Tag {
      * @param version SWF version
      * @throws IOException
      */
-    public StartSound2Tag(byte data[], int version, long pos) throws IOException {
-        super(ID, "StartSound2", data, pos);
+    public StartSound2Tag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "StartSound2", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         soundClassName = sis.readString();
         soundInfo = sis.readSOUNDINFO();

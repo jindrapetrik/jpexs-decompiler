@@ -28,8 +28,8 @@ import java.util.List;
  */
 public abstract class ImageTag extends CharacterTag {
 
-    public ImageTag(int id, String name, byte[] data, long pos) {
-        super(id, name, data, pos);
+    public ImageTag(SWF swf, int id, String name, byte[] data, long pos) {
+        super(swf, id, name, data, pos);
     }
 
     public abstract BufferedImage getImage(List<Tag> tags);

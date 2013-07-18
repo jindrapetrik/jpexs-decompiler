@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import java.awt.Font;
@@ -27,15 +28,15 @@ import java.util.List;
  */
 public abstract class FontTag extends CharacterTag implements AloneTag {
 
-    public FontTag(int id, String name, byte data[], long pos) {
-        super(id, name, data, pos);
+    public FontTag(SWF swf, int id, String name, byte data[], long pos) {
+        super(swf, id, name, data, pos);
     }
 
     public abstract int getFontId();
 
     public abstract List<SHAPE> getGlyphShapeTable();
 
-    public abstract void addCharacter(List<Tag> tags, char character);
+    public abstract void addCharacter(List<Tag> tags, char character, String fontName);
 
     public abstract char glyphToChar(List<Tag> tags, int glyphIndex);
 
@@ -77,4 +78,20 @@ public abstract class FontTag extends CharacterTag implements AloneTag {
     }
 
     public abstract String getCharacters(List<Tag> tags);
+
+    @Override
+    public String getName(List<Tag> tags) {
+        String nameAppend = "";
+        if (exportName != null) {
+            nameAppend = ": " + exportName;
+        }
+        if (className != null) {
+            nameAppend = ": " + className;
+        }
+        String fontName = getFontName(tags);
+        if (fontName != null) {
+            nameAppend = ": " + fontName;
+        }
+        return name + " (" + getCharacterId() + nameAppend + ")";
+    }
 }

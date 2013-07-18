@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.ReReadableInputStream;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.helpers.Helper;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
 import java.io.ByteArrayInputStream;
@@ -258,7 +259,7 @@ public class BUTTONCONDACTION implements ASMSource, Exportable {
     }
 
     @Override
-    public String getExportFileName() {
+    public String getExportFileName(List<Tag> tags) {
         return getHeader(true);
     }
 

@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -163,7 +164,7 @@ public class DefineText2Tag extends CharacterTag implements BoundedTag, TextTag,
     }
 
     @Override
-    public void setFormattedText(List<Tag> tags, String text) throws ParseException {
+    public void setFormattedText(List<Tag> tags, String text, String fontName) throws ParseException {
         try {
             TextLexer lexer = new TextLexer(new InputStreamReader(new ByteArrayInputStream(text.getBytes("UTF-8")), "UTF-8"));
             ParsedSymbol s = null;
@@ -335,7 +336,7 @@ public class DefineText2Tag extends CharacterTag implements BoundedTag, TextTag,
                             char c = txt.charAt(i);
                             tr.glyphEntries[i] = new GLYPHENTRY();
                             if (!font.containsChar(tags, c)) {
-                                font.addCharacter(tags, c);
+                                font.addCharacter(tags, c, fontName);
                             }
                             tr.glyphEntries[i].glyphIndex = font.charToGlyph(tags, c);
 
@@ -427,8 +428,8 @@ public class DefineText2Tag extends CharacterTag implements BoundedTag, TextTag,
      * @param pos
      * @throws IOException
      */
-    public DefineText2Tag(byte data[], int version, long pos) throws IOException {
-        super(ID, "DefineText2", data, pos);
+    public DefineText2Tag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "DefineText2", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterID = sis.readUI16();
         textBounds = sis.readRECT();

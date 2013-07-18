@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,8 +29,8 @@ public class MetadataTag extends Tag {
     public String xmlMetadata;
     public static final int ID = 77;
 
-    public MetadataTag(byte[] data, int version, long pos) {
-        super(ID, "Metadata", data, pos);
+    public MetadataTag(SWF swf, byte data[], int version, long pos) {
+        super(swf, ID, "Metadata", data, pos);
         try {
             SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
             xmlMetadata = sis.readString();

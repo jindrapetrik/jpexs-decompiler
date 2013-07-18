@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,6 +32,7 @@ import java.io.OutputStream;
 public class DebugIDTag extends Tag {
 
     public byte debugId[];
+    public static final int ID = 63;
 
     /**
      * Gets data bytes
@@ -53,12 +55,13 @@ public class DebugIDTag extends Tag {
     /**
      * Constructor
      *
+     * @param swf
      * @param data Data bytes
      * @param version SWF version
      * @throws IOException
      */
-    public DebugIDTag(byte data[], int version, long pos) throws IOException {
-        super(63, "DebugID", data, pos);
+    public DebugIDTag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "DebugID", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         debugId = sis.readBytes(16);
     }

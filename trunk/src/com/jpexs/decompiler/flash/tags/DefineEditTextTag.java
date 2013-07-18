@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
@@ -162,7 +163,7 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextT
     }
 
     @Override
-    public void setFormattedText(List<Tag> tags, String text) throws ParseException {
+    public void setFormattedText(List<Tag> tags, String text, String fontName) throws ParseException {
         try {
             TextLexer lexer = new TextLexer(new InputStreamReader(new ByteArrayInputStream(text.getBytes("UTF-8")), "UTF-8"));
             ParsedSymbol s = null;
@@ -468,8 +469,8 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextT
      * @param pos
      * @throws IOException
      */
-    public DefineEditTextTag(byte data[], int version, long pos) throws IOException {
-        super(ID, "DefineEditText", data, pos);
+    public DefineEditTextTag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "DefineEditText", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterID = sis.readUI16();
         bounds = sis.readRECT();

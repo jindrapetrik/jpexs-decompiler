@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -39,8 +40,8 @@ public class DefineFont4Tag extends CharacterTag {
         return fontID;
     }
 
-    public DefineFont4Tag(byte[] data, int version, long pos) throws IOException {
-        super(ID, "DefineFont4", data, pos);
+    public DefineFont4Tag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "DefineFont4", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         fontID = sis.readUI16();
         sis.readUB(5);

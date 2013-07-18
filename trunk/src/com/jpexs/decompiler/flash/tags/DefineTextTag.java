@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -163,7 +164,7 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, 
     }
 
     @Override
-    public void setFormattedText(List<Tag> tags, String text) throws ParseException {
+    public void setFormattedText(List<Tag> tags, String text, String fontName) throws ParseException {
         try {
             TextLexer lexer = new TextLexer(new InputStreamReader(new ByteArrayInputStream(text.getBytes("UTF-8")), "UTF-8"));
             ParsedSymbol s = null;
@@ -334,7 +335,7 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, 
                             char c = txt.charAt(i);
                             tr.glyphEntries[i] = new GLYPHENTRY();
                             if (!font.containsChar(tags, c)) {
-                                font.addCharacter(tags, c);
+                                font.addCharacter(tags, c, fontName);
                             }
                             tr.glyphEntries[i].glyphIndex = font.charToGlyph(tags, c);
 
@@ -388,8 +389,8 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, 
         return characterID;
     }
 
-    public DefineTextTag(int characterID, RECT textBounds, MATRIX textMatrix, int glyphBits, int advanceBits, List<TEXTRECORD> textRecords) {
-        super(ID, "DefineText", new byte[0], 0);
+    public DefineTextTag(SWF swf, int characterID, RECT textBounds, MATRIX textMatrix, int glyphBits, int advanceBits, List<TEXTRECORD> textRecords) {
+        super(swf, ID, "DefineText", new byte[0], 0);
         this.characterID = characterID;
         this.textBounds = textBounds;
         this.textMatrix = textMatrix;
@@ -427,13 +428,14 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, 
     /**
      * Constructor
      *
+     * @param swf
      * @param data Data bytes
      * @param version SWF version
      * @param pos
      * @throws IOException
      */
-    public DefineTextTag(byte data[], int version, long pos) throws IOException {
-        super(11, "DefineText", data, pos);
+    public DefineTextTag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "DefineText", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterID = sis.readUI16();
         textBounds = sis.readRECT();

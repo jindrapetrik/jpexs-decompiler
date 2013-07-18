@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.types.KERNINGRECORD;
@@ -89,8 +90,8 @@ public class DefineFont3Tag extends FontTag {
         return codeTable.indexOf((Integer) (int) c);
     }
 
-    public DefineFont3Tag(byte[] data, int version, long pos) throws IOException {
-        super(ID, "DefineFont3", data, pos);
+    public DefineFont3Tag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "DefineFont3", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         fontId = sis.readUI16();
         fontFlagsHasLayout = sis.readUB(1) == 1;
@@ -299,15 +300,14 @@ public class DefineFont3Tag extends FontTag {
     }
 
     @Override
-    public void addCharacter(List<Tag> tags, char character) {
+    public void addCharacter(List<Tag> tags, char character, String fontName) {
         int fontStyle = getFontStyle();
-        String fname = getFontName(tags);
-        SHAPE shp = SHAPERECORD.systemFontCharacterToSHAPE(fname, fontStyle, getDivider() * 1024, character);
+        SHAPE shp = SHAPERECORD.systemFontCharacterToSHAPE(fontName, fontStyle, getDivider() * 1024, character);
         glyphShapeTable.add(shp);
         codeTable.add((int) character);
         if (fontFlagsHasLayout) {
             fontBoundsTable.add(shp.getBounds());
-            Font fnt = new Font(fname, fontStyle, getDivider() * 1024);
+            Font fnt = new Font(fontName, fontStyle, getDivider() * 1024);
             fontAdvanceTable.add((new JPanel()).getFontMetrics(fnt).charWidth(character));
         }
         numGlyphs++;

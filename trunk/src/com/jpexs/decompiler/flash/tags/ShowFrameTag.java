@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
+
 /**
  * Instructs Flash Player to display the contents of the display list
  *
@@ -28,14 +30,15 @@ public class ShowFrameTag extends Tag {
     /**
      * Constructor
      *
+     * @param swf
      * @param pos
      */
-    public ShowFrameTag(long pos) {
-        super(ID, "ShowFrame", new byte[0], pos);
+    public ShowFrameTag(SWF swf, long pos) {
+        super(swf, ID, "ShowFrame", new byte[0], pos);
     }
 
-    public ShowFrameTag() {
-        super(ID, "ShowFrame", new byte[0], 0);
+    public ShowFrameTag(SWF swf) {
+        super(swf, ID, "ShowFrame", new byte[0], 0);
     }
 
     /**

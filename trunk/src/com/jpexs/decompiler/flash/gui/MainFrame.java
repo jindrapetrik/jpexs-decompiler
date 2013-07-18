@@ -99,6 +99,7 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -132,6 +133,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -147,6 +149,7 @@ import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -244,6 +247,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
     private JButton errorNotificationButton;
     private ErrorLogFrame errorLogFrame;
     private ComponentListener fontChangeList;
+    private JComboBox<String> fontSelection;
     private AbortRetryIgnoreHandler errorHandler = new AbortRetryIgnoreHandler() {
         @Override
         public int handle(Throwable thrown) {
@@ -928,7 +932,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
 
         fontChangeList.componentResized(null);
 
-        fontParams1.setLayout(new BoxLayout(fontParams1, BoxLayout.Y_AXIS));
+        fontParams1.setLayout(new ListLayout());
         fontParams1.add(fontParams2);
 
         JPanel fontAddCharsPanel = new JPanel(new FlowLayout());
@@ -942,6 +946,15 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         fontAddCharsPanel.add(fontAddCharsButton);
 
         fontParams1.add(fontAddCharsPanel);
+        JPanel fontSelectionPanel = new JPanel(new FlowLayout());
+        fontSelectionPanel.add(new JLabel(translate("font.source")));
+        String fontNames[] = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+        fontSelection = new JComboBox<>(fontNames);
+        fontSelection.setSelectedIndex(0);
+        fontSelection.setSelectedItem("Times New Roman");
+        fontSelection.setSelectedItem("Arial");
+        fontSelectionPanel.add(fontSelection);
+        fontParams1.add(fontSelectionPanel);
         fontPanel.setLayout(new BorderLayout());
         fontPanel.add(new JScrollPane(fontParams1), BorderLayout.CENTER);
 
@@ -1751,7 +1764,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                 allNodes.add(asn);
                 TagNode.setExport(allNodes, false);
                 TagNode.setExport(actionNodes, true);
-                ret.addAll(TagNode.exportNodeAS(handler, allNodes, selFile, isPcode));
+                ret.addAll(TagNode.exportNodeAS(swf.tags, handler, allNodes, selFile, isPcode));
             }
         }
         return ret;
@@ -1801,7 +1814,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                     for (int i = 0; i < newchars.length(); i++) {
                         char c = newchars.charAt(i);
                         if (oldchars.indexOf((int) c) == -1) {
-                            f.addCharacter(swf.tags, c);
+                            f.addCharacter(swf.tags, c, fontSelection.getSelectedItem().toString());
                         }
                     }
                     fontAddCharactersField.setText("");
@@ -1982,7 +1995,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
             case "SAVETEXT":
                 if (oldValue instanceof TextTag) {
                     try {
-                        ((TextTag) oldValue).setFormattedText(swf.tags, textValue.getText());
+                        ((TextTag) oldValue).setFormattedText(swf.tags, textValue.getText(), fontSelection.getSelectedItem().toString());
                         setEditText(false);
                     } catch (ParseException ex) {
                         JOptionPane.showMessageDialog(null, translate("error.text.invalid").replace("%text%", ex.text).replace("%line%", "" + ex.line), translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -2500,7 +2513,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                     sos2.writeUI8(0);
                     sos2.writeUI8(swf.frameRate);
                     sos2.writeUI16(100); //framecnt
-                    sos2.writeTag(new SetBackgroundColorTag(new RGB(255, 255, 255)));
+                    sos2.writeTag(new SetBackgroundColorTag(null, new RGB(255, 255, 255)));
 
                     if (tagObj instanceof FrameNode) {
                         FrameNode fn = (FrameNode) tagObj;
@@ -2554,12 +2567,12 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                                         mat.translateX = mat.translateX + width / 2;
                                         mat.translateY = mat.translateY + height / 2;
                                     }
-                                    sos2.writeTag(new PlaceObject2Tag(false, false, false, false, false, true, false, true, depth, chid, mat, null, 0, null, 0, null));
+                                    sos2.writeTag(new PlaceObject2Tag(null, false, false, false, false, false, true, false, true, depth, chid, mat, null, 0, null, 0, null));
 
                                 }
                             }
                         }
-                        sos2.writeTag(new ShowFrameTag());
+                        sos2.writeTag(new ShowFrameTag(null));
                     } else {
 
                         if (tagObj instanceof DefineBitsTag) {
@@ -2624,26 +2637,26 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                                 rec.add(tr);
                                 mat.translateX = x * width / sloupcu;
                                 mat.translateY = y * height / radku;
-                                sos2.writeTag(new DefineTextTag(999 + f, new RECT(0, width, 0, height), new MATRIX(), SWFOutputStream.getNeededBitsU(countGlyphs - 1), SWFOutputStream.getNeededBitsU(0), rec));
-                                sos2.writeTag(new PlaceObject2Tag(false, false, false, true, false, true, true, false, 1 + f, 999 + f, mat, null, 0, null, 0, null));
+                                sos2.writeTag(new DefineTextTag(null, 999 + f, new RECT(0, width, 0, height), new MATRIX(), SWFOutputStream.getNeededBitsU(countGlyphs - 1), SWFOutputStream.getNeededBitsU(0), rec));
+                                sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, true, true, false, 1 + f, 999 + f, mat, null, 0, null, 0, null));
                                 x++;
                             }
-                            sos2.writeTag(new ShowFrameTag());
+                            sos2.writeTag(new ShowFrameTag(null));
                         } else if ((tagObj instanceof DefineMorphShapeTag) || (tagObj instanceof DefineMorphShape2Tag)) {
-                            sos2.writeTag(new PlaceObject2Tag(false, false, false, true, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null));
-                            sos2.writeTag(new ShowFrameTag());
+                            sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null));
+                            sos2.writeTag(new ShowFrameTag(null));
                             int numFrames = 100;
                             for (int ratio = 0; ratio < 65536; ratio += 65536 / numFrames) {
-                                sos2.writeTag(new PlaceObject2Tag(false, false, false, true, false, true, false, true, 1, chtId, mat, null, ratio, null, 0, null));
-                                sos2.writeTag(new ShowFrameTag());
+                                sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, true, false, true, 1, chtId, mat, null, ratio, null, 0, null));
+                                sos2.writeTag(new ShowFrameTag(null));
                             }
                         } else {
-                            sos2.writeTag(new PlaceObject2Tag(false, false, false, true, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null));
-                            sos2.writeTag(new ShowFrameTag());
+                            sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, true, true, false, 1, chtId, mat, null, 0, null, 0, null));
+                            sos2.writeTag(new ShowFrameTag(null));
                         }
                     }//not showframe
 
-                    sos2.writeTag(new EndTag());
+                    sos2.writeTag(new EndTag(null));
                     byte data[] = baos.toByteArray();
 
                     sos.writeUI32(sos.getPos() + data.length + 4);
@@ -2672,11 +2685,15 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                 fontNameLabel.setText(ft.getFontName(swf.tags));
                 fontIsBoldLabel.setText(ft.isBold() ? translate("yes") : translate("no"));
                 fontIsItalicLabel.setText(ft.isItalic() ? translate("yes") : translate("no"));
-                fontDescentLabel.setText("" + ft.getDescent());
-                fontAscentLabel.setText("" + ft.getDescent());
-                fontLeadingLabel.setText("" + ft.getDescent());
+                fontDescentLabel.setText(ft.getDescent() == -1 ? translate("value.unknown") : "" + ft.getDescent());
+                fontAscentLabel.setText(ft.getAscent() == -1 ? translate("value.unknown") : "" + ft.getAscent());
+                fontLeadingLabel.setText(ft.getLeading() == -1 ? translate("value.unknown") : "" + ft.getLeading());
                 String chars = ft.getCharacters(swf.tags);
                 fontCharactersTextArea.setText(chars);
+                fontSelection.setSelectedIndex(0);
+                fontSelection.setSelectedItem("Times New Roman");
+                fontSelection.setSelectedItem("Arial");
+                fontSelection.setSelectedItem(ft.getFontName(swf.tags));
                 fontChangeList.componentResized(null);
                 showDetailWithPreview(CARDFONTPANEL);
             } else {

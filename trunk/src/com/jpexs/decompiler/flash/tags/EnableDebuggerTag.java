@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -63,8 +64,8 @@ public class EnableDebuggerTag extends Tag {
      * @param version SWF version
      * @throws IOException
      */
-    public EnableDebuggerTag(byte data[], int version, long pos) throws IOException {
-        super(ID, "EnableDebugger", data, pos);
+    public EnableDebuggerTag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "EnableDebugger", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         passwordHash = sis.readString();
     }

@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.ReReadableInputStream;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import java.io.ByteArrayInputStream;
@@ -50,8 +51,8 @@ public class DoActionTag extends Tag implements ASMSource {
      * @param version SWF version
      * @param pos
      */
-    public DoActionTag(byte[] data, int version, long pos) {
-        super(ID, "DoAction", data, pos);
+    public DoActionTag(SWF swf, byte data[], int version, long pos) {
+        super(swf, ID, "DoAction", data, pos);
         actionBytes = data;
     }
 

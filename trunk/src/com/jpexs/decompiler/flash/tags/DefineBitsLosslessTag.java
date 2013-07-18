@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.BITMAPDATA;
@@ -155,8 +156,8 @@ public class DefineBitsLosslessTag extends ImageTag implements AloneTag {
         decompressed = true;
     }
 
-    public DefineBitsLosslessTag(byte[] data, int version, long pos) throws IOException {
-        super(ID, "DefineBitsLossless", data, pos);
+    public DefineBitsLosslessTag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "DefineBitsLossless", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterID = sis.readUI16();
         bitmapFormat = sis.readUI8();

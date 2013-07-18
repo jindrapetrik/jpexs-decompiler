@@ -16,13 +16,15 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
+import com.jpexs.decompiler.flash.SWF;
+
 /**
  *
  * @author JPEXS
  */
 public abstract class CharacterTag extends CharacterIdTag {
 
-    public CharacterTag(int id, String name, byte[] data, long pos) {
-        super(id, name, data, pos);
+    public CharacterTag(SWF swf, int id, String name, byte[] data, long pos) {
+        super(swf, id, name, data, pos);
     }
 }

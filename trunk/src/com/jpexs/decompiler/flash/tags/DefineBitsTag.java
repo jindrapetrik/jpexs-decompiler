@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -45,8 +46,8 @@ public class DefineBitsTag extends ImageTag {
         return false;
     }
 
-    public DefineBitsTag(byte[] data, int version, long pos) throws IOException {
-        super(ID, "DefineBits", data, pos);
+    public DefineBitsTag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "DefineBits", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterID = sis.readUI16();
         jpegData = sis.readBytes(sis.available());

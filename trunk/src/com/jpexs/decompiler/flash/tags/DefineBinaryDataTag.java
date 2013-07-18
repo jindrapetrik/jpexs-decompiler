@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -51,8 +52,8 @@ public class DefineBinaryDataTag extends CharacterTag {
         return baos.toByteArray();
     }
 
-    public DefineBinaryDataTag(byte[] data, int version, long pos) throws IOException {
-        super(ID, "DefineBinaryData", data, pos);
+    public DefineBinaryDataTag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "DefineBinaryData", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         tag = sis.readUI16();
         reserved = sis.readUI32();

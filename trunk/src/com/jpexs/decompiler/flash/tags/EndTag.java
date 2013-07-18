@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import java.io.IOException;
 
 /**
@@ -40,16 +41,18 @@ public class EndTag extends Tag {
     /**
      * Constructor
      *
+     * @param swf
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
-    public EndTag(byte data[], int version, long pos) throws IOException {
-        super(ID, "End", data, pos);
+    public EndTag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "End", data, pos);
 
     }
 
-    public EndTag() {
-        super(0, "End", new byte[0], 0);
+    public EndTag(SWF swf) {
+        super(swf, ID, "End", new byte[0], 0);
     }
 }

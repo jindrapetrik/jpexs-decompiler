@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.Layer;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.helpers.Cache;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
@@ -91,8 +92,8 @@ public class DefineButton2Tag extends CharacterTag implements Container, Bounded
      * @param pos
      * @throws IOException
      */
-    public DefineButton2Tag(byte data[], int version, long pos) throws IOException {
-        super(ID, "DefineButton2", data, pos);
+    public DefineButton2Tag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "DefineButton2", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         buttonId = sis.readUI16();
         sis.readUB(7); //reserved

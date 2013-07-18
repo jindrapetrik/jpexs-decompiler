@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.types.RGB;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -28,14 +29,14 @@ public class SetBackgroundColorTag extends Tag {
     public RGB backgroundColor;
     public static final int ID = 9;
 
-    public SetBackgroundColorTag(byte[] data, int version, long pos) throws IOException {
-        super(ID, "SetBackgroundColor", data, pos);
+    public SetBackgroundColorTag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "SetBackgroundColor", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         backgroundColor = sis.readRGB();
     }
 
-    public SetBackgroundColorTag(RGB backgroundColor) {
-        super(ID, "SetBackgroundColor", new byte[0], 0);
+    public SetBackgroundColorTag(SWF swf, RGB backgroundColor) {
+        super(swf, ID, "SetBackgroundColor", new byte[0], 0);
         this.backgroundColor = backgroundColor;
     }
 

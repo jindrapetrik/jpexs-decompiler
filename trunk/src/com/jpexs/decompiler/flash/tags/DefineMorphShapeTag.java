@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
@@ -115,8 +116,8 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
      * @param pos
      * @throws IOException
      */
-    public DefineMorphShapeTag(byte data[], int version, long pos) throws IOException {
-        super(ID, "DefineMorphShape", data, pos);
+    public DefineMorphShapeTag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "DefineMorphShape", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         characterId = sis.readUI16();
         startBounds = sis.readRECT();

@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
@@ -39,6 +40,7 @@ public class DefineFontTag extends FontTag {
     public List<SHAPE> glyphShapeTable;
     private DefineFontInfoTag fontInfoTag = null;
     private DefineFontInfo2Tag fontInfo2Tag = null;
+    public static final int ID = 10;
 
     @Override
     public boolean isSmall() {
@@ -130,13 +132,14 @@ public class DefineFontTag extends FontTag {
     /**
      * Constructor
      *
+     * @param swf
      * @param data Data bytes
      * @param version SWF version
      * @param pos
      * @throws IOException
      */
-    public DefineFontTag(byte data[], int version, long pos) throws IOException {
-        super(10, "DefineFont", data, pos);
+    public DefineFontTag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "DefineFont", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         fontId = sis.readUI16();
         int firstOffset = sis.readUI16();
@@ -221,8 +224,8 @@ public class DefineFontTag extends FontTag {
     }
 
     @Override
-    public void addCharacter(List<Tag> tags, char character) {
-        glyphShapeTable.add(SHAPERECORD.systemFontCharacterToSHAPE(getFontName(tags), getFontStyle(), getDivider() * 1024, character));
+    public void addCharacter(List<Tag> tags, char character, String fontName) {
+        glyphShapeTable.add(SHAPERECORD.systemFontCharacterToSHAPE(fontName, getFontStyle(), getDivider() * 1024, character));
         ensureFontInfo(tags);
         if (fontInfoTag != null) {
             fontInfoTag.codeTable.add((int) character);

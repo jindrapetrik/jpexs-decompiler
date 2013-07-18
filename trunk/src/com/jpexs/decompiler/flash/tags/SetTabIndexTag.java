@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -67,8 +68,8 @@ public class SetTabIndexTag extends Tag {
      * @param pos
      * @throws IOException
      */
-    public SetTabIndexTag(byte data[], int version, long pos) throws IOException {
-        super(ID, "SetTabIndex", data, pos);
+    public SetTabIndexTag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "SetTabIndex", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         depth = sis.readUI16();
         tabIndex = sis.readUI16();

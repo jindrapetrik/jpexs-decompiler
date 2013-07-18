@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.ReReadableInputStream;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.helpers.Cache;
@@ -90,8 +91,8 @@ public class DefineButtonTag extends CharacterTag implements ASMSource, BoundedT
      * @param pos
      * @throws IOException
      */
-    public DefineButtonTag(byte[] data, int version, long pos) throws IOException {
-        super(ID, "DefineButton", data, pos);
+    public DefineButtonTag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "DefineButton", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         buttonId = sis.readUI16();
         characters = sis.readBUTTONRECORDList(false);

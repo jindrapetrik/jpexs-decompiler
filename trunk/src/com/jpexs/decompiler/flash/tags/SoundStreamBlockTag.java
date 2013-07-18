@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import java.io.IOException;
 
 /**
@@ -30,11 +31,13 @@ public class SoundStreamBlockTag extends Tag {
     /**
      * Constructor
      *
+     * @param swf
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
-    public SoundStreamBlockTag(byte data[], int version, long pos) throws IOException {
-        super(ID, "SoundStreamBlock", data, pos);      //all data is streamSoundData
+    public SoundStreamBlockTag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "SoundStreamBlock", data, pos);      //all data is streamSoundData
     }
 }
