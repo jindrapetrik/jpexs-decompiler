@@ -2113,7 +2113,7 @@ public class AVM2Code implements Serializable {
                 List<Integer> currentRefs = refs.get(currentIp);
                 if ((currentRefs != null) && (!currentRefs.isEmpty())) {
                     for (int i = 1; i < currentRefs.size(); i++) {
-                        if (!isDirectAncestor(currentRefs.get(i), ancestor, refs)) {
+                        if (!isDirectAncestor(currentRefs.get(i), ancestor, refs, visited)) {
                             return false;
                         }
                     }
