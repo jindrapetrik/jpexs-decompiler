@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2013 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -793,7 +793,10 @@ public class AVM2Code implements Serializable {
                     int fixBranch = ins.getFixBranch();
                     if (fixBranch > -1) {
                         if (ins.definition instanceof IfTypeIns) {
-                            t = new PopIns().instructionName + "\n";
+                            t = "";
+                            for (int i = 0; i < -ins.definition.getStackDelta(ins, null/*IfTypeIns do not require ABCs*/); i++) {
+                                t += new PopIns().instructionName + "\n";
+                            }
                             if (fixBranch == 0) { //jump
                                 t += new JumpIns().instructionName + " ofs" + Helper.formatAddress(ofs + ins.getBytes().length + ins.operands[0]);
                             } else {
@@ -1289,7 +1292,7 @@ public class AVM2Code implements Serializable {
                     }
                 } else {
                     //In obfuscated code, SetLocal instructions comes first
-                    //break;  
+                    //break;
                 }
             }
         }
@@ -1935,7 +1938,7 @@ public class AVM2Code implements Serializable {
      if (code.get(rem).ignored) {
      removeInstruction(rem, body);
      }
-     }            
+     }
      }*/
     public void removeIgnored(ConstantPool constants, MethodBody body) {
         try {
