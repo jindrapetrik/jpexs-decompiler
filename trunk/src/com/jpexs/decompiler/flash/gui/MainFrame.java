@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.FrameNode;
 import com.jpexs.decompiler.flash.PackageNode;
@@ -240,6 +241,15 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
     private JTextField fontAddCharactersField;
     private JButton errorNotificationButton;
     private ErrorLogFrame errorLogFrame;
+    private AbortRetryIgnoreHandler errorHandler = new AbortRetryIgnoreHandler() {
+        @Override
+        public int handle(Throwable thrown) {
+            synchronized (MainFrame.class) {
+                String options[] = new String[]{translate("button.abort"), translate("button.retry"), translate("button.ignore")};
+                return JOptionPane.showOptionDialog(null, translate("error.occured").replace("%error%", thrown.getLocalizedMessage()), translate("error"), JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE, null, options, "");
+            }
+        }
+    };
 
     public void setPercent(int percent) {
         progressBar.setValue(percent);
@@ -633,7 +643,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
 
                             try {
                                 File ftemp = new File(tempDir);
-                                files = exportSelection(tempDir, export);
+                                files = exportSelection(errorHandler, tempDir, export);
                                 files.clear();
 
                                 File fs[] = ftemp.listFiles();
@@ -1612,7 +1622,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
     }
     private SearchDialog searchDialog;
 
-    public List<File> exportSelection(String selFile, ExportDialog export) throws IOException {
+    public List<File> exportSelection(AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException {
         final boolean isPcode = export.getOption(ExportDialog.OPTION_ACTIONSCRIPT) == 1;
         final boolean isMp3OrWav = export.getOption(ExportDialog.OPTION_SOUNDS) == 0;
         final boolean isFormatted = export.getOption(ExportDialog.OPTION_TEXTS) == 1;
@@ -1666,12 +1676,12 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                 }
             }
         }
-        ret.addAll(swf.exportImages(selFile + File.separator + "images", images));
-        ret.addAll(SWF.exportShapes(selFile + File.separator + "shapes", shapes));
-        ret.addAll(swf.exportTexts(selFile + File.separator + "texts", texts, isFormatted));
-        ret.addAll(swf.exportMovies(selFile + File.separator + "movies", movies));
-        ret.addAll(swf.exportSounds(selFile + File.separator + "sounds", sounds, isMp3OrWav, isMp3OrWav));
-        ret.addAll(swf.exportBinaryData(selFile + File.separator + "binaryData", binaryData));
+        ret.addAll(swf.exportImages(handler, selFile + File.separator + "images", images));
+        ret.addAll(SWF.exportShapes(handler, selFile + File.separator + "shapes", shapes));
+        ret.addAll(swf.exportTexts(handler, selFile + File.separator + "texts", texts, isFormatted));
+        ret.addAll(swf.exportMovies(handler, selFile + File.separator + "movies", movies));
+        ret.addAll(swf.exportSounds(handler, selFile + File.separator + "sounds", sounds, isMp3OrWav, isMp3OrWav));
+        ret.addAll(swf.exportBinaryData(handler, selFile + File.separator + "binaryData", binaryData));
         if (abcPanel != null) {
             for (int i = 0; i < tlsList.size(); i++) {
                 ScriptPack tls = tlsList.get(i);
@@ -1685,7 +1695,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                 allNodes.add(asn);
                 TagNode.setExport(allNodes, false);
                 TagNode.setExport(actionNodes, true);
-                ret.addAll(TagNode.exportNodeAS(allNodes, selFile, isPcode));
+                ret.addAll(TagNode.exportNodeAS(handler, allNodes, selFile, isPcode));
             }
         }
         return ret;
@@ -2071,9 +2081,9 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                         public void run() {
                             try {
                                 if (compressed) {
-                                    swf.exportFla(selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                                    swf.exportFla(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
                                 } else {
-                                    swf.exportXfl(selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                                    swf.exportXfl(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
                                 }
                             } catch (IOException ex) {
                                 JOptionPane.showMessageDialog(null, translate("error.export") + ": " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -2107,19 +2117,19 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                             public void run() {
                                 try {
                                     if (onlySel) {
-                                        exportSelection(selFile, export);
+                                        exportSelection(errorHandler, selFile, export);
                                     } else {
-                                        swf.exportImages(selFile + File.separator + "images");
-                                        swf.exportShapes(selFile + File.separator + "shapes");
-                                        swf.exportTexts(selFile + File.separator + "texts", isFormatted);
-                                        swf.exportMovies(selFile + File.separator + "movies");
-                                        swf.exportSounds(selFile + File.separator + "sounds", isMp3OrWav, isMp3OrWav);
-                                        swf.exportBinaryData(selFile + File.separator + "binaryData");
-                                        swf.exportActionScript(selFile, isPcode, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                                        swf.exportImages(errorHandler, selFile + File.separator + "images");
+                                        swf.exportShapes(errorHandler, selFile + File.separator + "shapes");
+                                        swf.exportTexts(errorHandler, selFile + File.separator + "texts", isFormatted);
+                                        swf.exportMovies(errorHandler, selFile + File.separator + "movies");
+                                        swf.exportSounds(errorHandler, selFile + File.separator + "sounds", isMp3OrWav, isMp3OrWav);
+                                        swf.exportBinaryData(errorHandler, selFile + File.separator + "binaryData");
+                                        swf.exportActionScript(errorHandler, selFile, isPcode, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
                                     }
                                 } catch (Exception ex) {
                                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Error during export", ex);
-                                    JOptionPane.showMessageDialog(null, translate("error.export"));
+                                    JOptionPane.showMessageDialog(null, translate("error.export") + ": " + ex.getLocalizedMessage());
                                 }
                                 Main.stopWork();
                                 long timeAfter = System.currentTimeMillis();

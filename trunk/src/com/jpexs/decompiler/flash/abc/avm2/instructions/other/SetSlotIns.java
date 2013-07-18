@@ -58,6 +58,7 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
         int slotIndex = ins.operands[0];
         GraphTargetItem value = (GraphTargetItem) stack.pop();
         GraphTargetItem obj = (GraphTargetItem) stack.pop(); //scopeId
+        GraphTargetItem objnoreg = obj;
         obj = obj.getThroughRegister();
         Multiname slotname = null;
         if (obj instanceof NewActivationAVM2Item) {

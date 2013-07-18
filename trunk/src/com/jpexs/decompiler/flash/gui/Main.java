@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.PercentListener;
@@ -27,6 +28,7 @@ import com.jpexs.decompiler.flash.gui.jna.platform.win32.Advapi32Util;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.Kernel32;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.SHELLEXECUTEINFO;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.Shell32;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.Win32Exception;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinReg;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinUser;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
@@ -50,6 +52,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -618,6 +621,27 @@ public class Main {
                     "fla",
                     "xfl"
                 };
+
+                AbortRetryIgnoreHandler handler = new AbortRetryIgnoreHandler() {
+                    @Override
+                    public int handle(Throwable thrown) {
+                        Scanner sc = new Scanner(System.in);
+                        System.out.println("Error occured: " + thrown.getLocalizedMessage());
+                        String n = null;
+                        do {
+                            System.out.print("Select action: (A)bort, (R)Retry, (I)Ignore:");
+                            n = sc.nextLine();
+                            switch (n.toLowerCase()) {
+                                case "a":
+                                    return AbortRetryIgnoreHandler.ABORT;
+                                case "r":
+                                    return AbortRetryIgnoreHandler.RETRY;
+                                case "i":
+                                    return AbortRetryIgnoreHandler.IGNORE;
+                            }
+                        } while (true);
+                    }
+                };
                 String exportFormat = args[pos + 1].toLowerCase();
                 if (!Arrays.asList(validExportFormats).contains(exportFormat)) {
                     System.err.println("Invalid export format:" + exportFormat);
@@ -646,27 +670,27 @@ public class Main {
                     switch (exportFormat) {
                         case "all":
                             System.out.println("Exporting images...");
-                            exfile.exportImages(outDir.getAbsolutePath() + File.separator + "images");
+                            exfile.exportImages(handler, outDir.getAbsolutePath() + File.separator + "images");
                             System.out.println("Exporting shapes...");
-                            exfile.exportShapes(outDir.getAbsolutePath() + File.separator + "shapes");
+                            exfile.exportShapes(handler, outDir.getAbsolutePath() + File.separator + "shapes");
                             System.out.println("Exporting scripts...");
-                            exfile.exportActionScript(outDir.getAbsolutePath() + File.separator + "scripts", false, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                            exfile.exportActionScript(handler, outDir.getAbsolutePath() + File.separator + "scripts", false, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
                             System.out.println("Exporting movies...");
-                            exfile.exportMovies(outDir.getAbsolutePath() + File.separator + "movies");
+                            exfile.exportMovies(handler, outDir.getAbsolutePath() + File.separator + "movies");
                             System.out.println("Exporting sounds...");
-                            exfile.exportSounds(outDir.getAbsolutePath() + File.separator + "sounds", true, true);
+                            exfile.exportSounds(handler, outDir.getAbsolutePath() + File.separator + "sounds", true, true);
                             System.out.println("Exporting binaryData...");
-                            exfile.exportBinaryData(outDir.getAbsolutePath() + File.separator + "binaryData");
+                            exfile.exportBinaryData(handler, outDir.getAbsolutePath() + File.separator + "binaryData");
                             System.out.println("Exporting texts...");
-                            exfile.exportTexts(outDir.getAbsolutePath() + File.separator + "texts", true);
+                            exfile.exportTexts(handler, outDir.getAbsolutePath() + File.separator + "texts", true);
                             exportOK = true;
                             break;
                         case "image":
-                            exfile.exportImages(outDir.getAbsolutePath());
+                            exfile.exportImages(handler, outDir.getAbsolutePath());
                             exportOK = true;
                             break;
                         case "shape":
-                            exfile.exportShapes(outDir.getAbsolutePath());
+                            exfile.exportShapes(handler, outDir.getAbsolutePath());
                             exportOK = true;
                             break;
                         case "as":
@@ -677,35 +701,35 @@ public class Main {
                                     exportOK = exportOK && exfile.exportAS3Class(args[i], outDir.getAbsolutePath(), exportFormat.equals("pcode"), (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
                                 }
                             } else {
-                                exportOK = !exfile.exportActionScript(outDir.getAbsolutePath(), exportFormat.equals("pcode"), (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE)).isEmpty();
+                                exportOK = !exfile.exportActionScript(handler, outDir.getAbsolutePath(), exportFormat.equals("pcode"), (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE)).isEmpty();
                             }
                             break;
                         case "movie":
-                            exfile.exportMovies(outDir.getAbsolutePath());
+                            exfile.exportMovies(handler, outDir.getAbsolutePath());
                             exportOK = true;
                             break;
                         case "sound":
-                            exfile.exportSounds(outDir.getAbsolutePath(), true, true);
+                            exfile.exportSounds(handler, outDir.getAbsolutePath(), true, true);
                             exportOK = true;
                             break;
                         case "binarydata":
-                            exfile.exportBinaryData(outDir.getAbsolutePath());
+                            exfile.exportBinaryData(handler, outDir.getAbsolutePath());
                             exportOK = true;
                             break;
                         case "text":
-                            exfile.exportTexts(outDir.getAbsolutePath(), true);
+                            exfile.exportTexts(handler, outDir.getAbsolutePath(), true);
                             exportOK = true;
                             break;
                         case "textplain":
-                            exfile.exportTexts(outDir.getAbsolutePath(), false);
+                            exfile.exportTexts(handler, outDir.getAbsolutePath(), false);
                             exportOK = true;
                             break;
                         case "fla":
-                            exfile.exportFla(outDir.getAbsolutePath(), inFile.getName(), applicationName, applicationVerName, version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                            exfile.exportFla(handler, outDir.getAbsolutePath(), inFile.getName(), applicationName, applicationVerName, version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
                             exportOK = true;
                             break;
                         case "xfl":
-                            exfile.exportXfl(outDir.getAbsolutePath(), inFile.getName(), applicationName, applicationVerName, version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                            exfile.exportXfl(handler, outDir.getAbsolutePath(), inFile.getName(), applicationName, applicationVerName, version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
                             exportOK = true;
                             break;
                         default:
@@ -1100,15 +1124,19 @@ public class Main {
         if (!Platform.isWindows()) {
             return false;
         }
-        final String classesPath = "Software\\Classes\\";
-        if (!Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, classesPath + ".swf")) {
+        try {
+            final String classesPath = "Software\\Classes\\";
+            if (!Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, classesPath + ".swf")) {
+                return false;
+            }
+            String clsName = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, classesPath + ".swf", "");
+            if (clsName == null) {
+                return false;
+            }
+            return Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName + "\\shell\\ffdec");
+        } catch (Win32Exception ex) {
             return false;
         }
-        String clsName = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, classesPath + ".swf", "");
-        if (clsName == null) {
-            return false;
-        }
-        return Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName + "\\shell\\ffdec");
     }
 
     public static String getAppDir() {

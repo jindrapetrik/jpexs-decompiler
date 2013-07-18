@@ -49,6 +49,7 @@ import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -229,11 +230,11 @@ public class TagNode {
         }
     }
 
-    public static List<File> exportNodeAS(List<TagNode> nodeList, String outdir, boolean isPcode) {
-        return exportNodeAS(nodeList, outdir, isPcode, null);
+    public static List<File> exportNodeAS(AbortRetryIgnoreHandler handler, List<TagNode> nodeList, String outdir, boolean isPcode) throws IOException {
+        return exportNodeAS(handler, nodeList, outdir, isPcode, null);
     }
 
-    public static List<File> exportNodeAS(List<TagNode> nodeList, String outdir, boolean isPcode, EventListener ev) {
+    public static List<File> exportNodeAS(AbortRetryIgnoreHandler handler, List<TagNode> nodeList, String outdir, boolean isPcode, EventListener ev) throws IOException {
         File dir = new File(outdir);
         List<File> ret = new ArrayList<>();
         if (!outdir.endsWith(File.separator)) {
@@ -263,30 +264,47 @@ public class TagNode {
                             }
                         }
                     }
-                    try {
-                        String f = outdir + name + ".as";
-                        File file = new File(f);
-                        if (ev != null) {
-                            ev.handleEvent("export", "Exporting " + f + " ...");
+                    boolean retry;
+                    do {
+                        retry = false;
+                        try {
+                            String f = outdir + name + ".as";
+                            File file = new File(f);
+                            if (ev != null) {
+                                ev.handleEvent("export", "Exporting " + f + " ...");
+                            }
+                            String res;
+                            ASMSource asm = ((ASMSource) node.tag);
+                            if (isPcode) {
+                                res = asm.getActionSourcePrefix() + Helper.indentRows(asm.getActionSourceIndent(), Highlighting.stripHilights(asm.getASMSource(SWF.DEFAULT_VERSION, false)), Graph.INDENT_STRING) + asm.getActionSourceSuffix();
+                            } else {
+                                List<Action> as = asm.getActions(SWF.DEFAULT_VERSION);
+                                Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
+                                res = asm.getActionSourcePrefix() + Helper.indentRows(asm.getActionSourceIndent(), Highlighting.stripHilights(Action.actionsToSource(as, SWF.DEFAULT_VERSION, ""/*FIXME*/)), Graph.INDENT_STRING) + asm.getActionSourceSuffix();
+                            }
+                            try (FileOutputStream fos = new FileOutputStream(f)) {
+                                fos.write(res.getBytes("utf-8"));
+                            }
+                            ret.add(file);
+                        } catch (Exception ex) {
+                            if (handler != null) {
+                                int action = handler.handle(ex);
+                                switch (action) {
+                                    case AbortRetryIgnoreHandler.ABORT:
+                                        throw ex;
+                                    case AbortRetryIgnoreHandler.RETRY:
+                                        retry = true;
+                                        break;
+                                    case AbortRetryIgnoreHandler.IGNORE:
+                                        retry = false;
+                                        break;
+                                }
+                            }
                         }
-                        String res;
-                        ASMSource asm = ((ASMSource) node.tag);
-                        if (isPcode) {
-                            res = asm.getActionSourcePrefix() + Helper.indentRows(asm.getActionSourceIndent(), Highlighting.stripHilights(asm.getASMSource(SWF.DEFAULT_VERSION, false)), Graph.INDENT_STRING) + asm.getActionSourceSuffix();
-                        } else {
-                            List<Action> as = asm.getActions(SWF.DEFAULT_VERSION);
-                            Action.setActionsAddresses(as, 0, SWF.DEFAULT_VERSION);
-                            res = asm.getActionSourcePrefix() + Helper.indentRows(asm.getActionSourceIndent(), Highlighting.stripHilights(Action.actionsToSource(as, SWF.DEFAULT_VERSION, ""/*FIXME*/)), Graph.INDENT_STRING) + asm.getActionSourceSuffix();
-                        }
-                        try (FileOutputStream fos = new FileOutputStream(f)) {
-                            fos.write(res.getBytes("utf-8"));
-                        }
-                        ret.add(file);
-                    } catch (Exception ex) {
-                    }
+                    } while (retry);
                 }
             } else {
-                ret.addAll(exportNodeAS(node.subItems, outdir + name, isPcode, ev));
+                ret.addAll(exportNodeAS(handler, node.subItems, outdir + name, isPcode, ev));
             }
 
         }

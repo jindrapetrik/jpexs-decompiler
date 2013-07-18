@@ -547,8 +547,9 @@ public class SWF {
         AtomicInteger index;
         int count;
         boolean paralel;
+        AbortRetryIgnoreHandler handler;
 
-        public ExportPackTask(AtomicInteger index, int count, ClassPath path, ScriptPack pack, String directory, List<ABCContainerTag> abcList, boolean pcode, String informStr, boolean paralel) {
+        public ExportPackTask(AbortRetryIgnoreHandler handler, AtomicInteger index, int count, ClassPath path, ScriptPack pack, String directory, List<ABCContainerTag> abcList, boolean pcode, String informStr, boolean paralel) {
             this.pack = pack;
             this.directory = directory;
             this.abcList = abcList;
@@ -558,15 +559,18 @@ public class SWF {
             this.index = index;
             this.count = count;
             this.paralel = paralel;
+            this.handler = handler;
         }
 
         @Override
         public File call() throws Exception {
-            try {
-                return pack.export(directory, abcList, pcode, paralel);
-            } catch (IOException ex) {
-                Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            RunnableIOExResult<File> rio = new RunnableIOExResult<File>() {
+                @Override
+                public void run() throws IOException {
+                    this.result = pack.export(directory, abcList, pcode, paralel);
+                }
+            };
+            new RetryTask(rio, handler).run();
             synchronized (ABC.class) {
                 informListeners("export", "Exported " + informStr + " script " + index.getAndIncrement() + "/" + count + " " + path);
             }
@@ -574,7 +578,7 @@ public class SWF {
         }
     }
 
-    public List<File> exportActionScript2(String outdir, boolean isPcode, boolean paralel, EventListener evl) {
+    public List<File> exportActionScript2(AbortRetryIgnoreHandler handler, String outdir, boolean isPcode, boolean paralel, EventListener evl) throws IOException {
         List<File> ret = new ArrayList<>();
         List<Object> list2 = new ArrayList<>();
         list2.addAll(tags);
@@ -585,11 +589,11 @@ public class SWF {
             outdir += File.separator;
         }
         outdir += "scripts" + File.separator;
-        ret.addAll(TagNode.exportNodeAS(list, outdir, isPcode, evl));
+        ret.addAll(TagNode.exportNodeAS(handler, list, outdir, isPcode, evl));
         return ret;
     }
 
-    public List<File> exportActionScript3(String outdir, boolean isPcode, boolean paralel) {
+    public List<File> exportActionScript3(AbortRetryIgnoreHandler handler, String outdir, boolean isPcode, boolean paralel) {
         ExecutorService executor = Executors.newFixedThreadPool(20);
         List<Future<File>> futureResults = new ArrayList<>();
         AtomicInteger cnt = new AtomicInteger(1);
@@ -601,7 +605,7 @@ public class SWF {
         }
         List<MyEntry<ClassPath, ScriptPack>> packs = getAS3Packs();
         for (MyEntry<ClassPath, ScriptPack> item : packs) {
-            Future<File> future = executor.submit(new ExportPackTask(cnt, packs.size(), item.key, item.value, outdir, abcTags, isPcode, "", paralel));
+            Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.key, item.value, outdir, abcTags, isPcode, "", paralel));
             futureResults.add(future);
         }
 
@@ -623,7 +627,7 @@ public class SWF {
         return ret;
     }
 
-    public List<File> exportActionScript(String outdir, boolean isPcode, boolean paralel) throws Exception {
+    public List<File> exportActionScript(AbortRetryIgnoreHandler handler, String outdir, boolean isPcode, boolean paralel) throws Exception {
         boolean asV3Found = false;
         List<File> ret = new ArrayList<>();
         final EventListener evl = new EventListener() {
@@ -641,9 +645,9 @@ public class SWF {
         }
 
         if (asV3Found) {
-            ret.addAll(exportActionScript3(outdir, isPcode, paralel));
+            ret.addAll(exportActionScript3(handler, outdir, isPcode, paralel));
         } else {
-            ret.addAll(exportActionScript2(outdir, isPcode, paralel, evl));
+            ret.addAll(exportActionScript2(handler, outdir, isPcode, paralel, evl));
         }
         return ret;
     }
@@ -867,12 +871,12 @@ public class SWF {
         }
     }
 
-    public void exportMovies(String outdir) throws IOException {
-        exportMovies(outdir, tags);
+    public void exportMovies(AbortRetryIgnoreHandler handler, String outdir) throws IOException {
+        exportMovies(handler, outdir, tags);
     }
 
-    public void exportSounds(String outdir, boolean mp3, boolean wave) throws IOException {
-        exportSounds(outdir, tags, mp3, wave);
+    public void exportSounds(AbortRetryIgnoreHandler handler, String outdir, boolean mp3, boolean wave) throws IOException {
+        exportSounds(handler, outdir, tags, mp3, wave);
     }
 
     public byte[] exportSound(Tag t) throws IOException {
@@ -986,7 +990,7 @@ public class SWF {
         }
     }
 
-    public List<File> exportSounds(String outdir, List<Tag> tags, boolean mp3, boolean wave) throws IOException {
+    public List<File> exportSounds(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, boolean mp3, boolean wave) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -1000,8 +1004,9 @@ public class SWF {
             }
         }
         for (Tag t : tags) {
+            File newfile = null;
             FileOutputStream fos = null;
-            File file = null;
+            //File file = null;
             try {
                 int id = 0;
                 if (t instanceof DefineSoundTag) {
@@ -1010,60 +1015,96 @@ public class SWF {
 
 
                 if (t instanceof DefineSoundTag) {
-                    DefineSoundTag st = (DefineSoundTag) t;
+                    final DefineSoundTag st = (DefineSoundTag) t;
 
                     if ((st.soundFormat == DefineSoundTag.FORMAT_ADPCM) && wave) {
-                        file = new File(outdir + File.separator + st.getCharacterExportFileName() + ".wav");
-                        fos = new FileOutputStream(file);
-                        createWavFromAdpcm(fos, st.soundRate, st.soundSize, st.soundType, st.soundData);
+                        final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + ".wav");
+                        newfile = file;
+                        new RetryTask(new RunnableIOEx() {
+                            @Override
+                            public void run() throws IOException {
+                                FileOutputStream fos = new FileOutputStream(file);
+                                createWavFromAdpcm(fos, st.soundRate, st.soundSize, st.soundType, st.soundData);
+                            }
+                        }, handler).run();
                     } else if ((st.soundFormat == DefineSoundTag.FORMAT_MP3) && mp3) {
-                        file = new File(outdir + File.separator + st.getCharacterExportFileName() + ".mp3");
-                        fos = new FileOutputStream(file);
-                        fos.write(st.soundData, 2, st.soundData.length - 2);
+                        final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + ".mp3");
+                        newfile = file;
+                        new RetryTask(new RunnableIOEx() {
+                            @Override
+                            public void run() throws IOException {
+                                FileOutputStream fos = new FileOutputStream(file);
+                                fos.write(st.soundData, 2, st.soundData.length - 2);
+                            }
+                        }, handler).run();
                     } else {
-                        file = new File(outdir + File.separator + st.getCharacterExportFileName() + ".flv");
-                        fos = new FileOutputStream(file);
-                        try (FLVOutputStream flv = new FLVOutputStream(fos)) {
-                            flv.writeHeader(true, false);
-                            flv.writeTag(new FLVTAG(0, new AUDIODATA(st.soundFormat, st.soundRate, st.soundSize, st.soundType, st.soundData)));
-                        }
+                        final File file = new File(outdir + File.separator + st.getCharacterExportFileName() + ".flv");
+                        newfile = file;
+                        new RetryTask(new RunnableIOEx() {
+                            @Override
+                            public void run() throws IOException {
+                                FileOutputStream fos = new FileOutputStream(file);
+                                try (FLVOutputStream flv = new FLVOutputStream(fos)) {
+                                    flv.writeHeader(true, false);
+                                    flv.writeTag(new FLVTAG(0, new AUDIODATA(st.soundFormat, st.soundRate, st.soundSize, st.soundType, st.soundData)));
+                                }
+                            }
+                        }, handler).run();
                     }
                 }
                 if (t instanceof SoundStreamHeadTypeTag) {
-                    SoundStreamHeadTypeTag shead = (SoundStreamHeadTypeTag) t;
-                    List<SoundStreamBlockTag> blocks = new ArrayList<>();
+                    final SoundStreamHeadTypeTag shead = (SoundStreamHeadTypeTag) t;
+                    final List<SoundStreamBlockTag> blocks = new ArrayList<>();
                     List<Object> objs = new ArrayList<Object>(this.tags);
                     populateSoundStreamBlocks(objs, t, blocks);
                     if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_ADPCM) && wave) {
-                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
                         for (int b = 0; b < blocks.size(); b++) {
                             byte data[] = blocks.get(b).getData(SWF.DEFAULT_VERSION);
                             baos.write(data);
                         }
-                        file = new File(outdir + File.separator + id + ".wav");
-                        fos = new FileOutputStream(file);
-                        createWavFromAdpcm(fos, shead.getSoundRate(), shead.getSoundSize(), shead.getSoundType(), baos.toByteArray());
-                    } else if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_MP3) && mp3) {
-                        file = new File(outdir + File.separator + id + ".mp3");
-                        fos = new FileOutputStream(file);
-                        for (int b = 0; b < blocks.size(); b++) {
-                            byte data[] = blocks.get(b).getData(SWF.DEFAULT_VERSION);
-                            fos.write(data, 2, data.length - 2);
-                        }
-                    } else {
-                        file = new File(outdir + File.separator + id + ".flv");
-                        fos = new FileOutputStream(file);
-                        FLVOutputStream flv = new FLVOutputStream(fos);
-                        flv.writeHeader(true, false);
-
-                        int ms = (int) (1000.0f / ((float) frameRate));
-                        for (int b = 0; b < blocks.size(); b++) {
-                            byte data[] = blocks.get(b).getData(SWF.DEFAULT_VERSION);
-                            if (shead.getSoundFormat() == 2) { //MP3
-                                data = Arrays.copyOfRange(data, 4, data.length);
+                        final File file = new File(outdir + File.separator + id + ".wav");
+                        newfile = file;
+                        new RetryTask(new RunnableIOEx() {
+                            @Override
+                            public void run() throws IOException {
+                                FileOutputStream fos = new FileOutputStream(file);
+                                createWavFromAdpcm(fos, shead.getSoundRate(), shead.getSoundSize(), shead.getSoundType(), baos.toByteArray());
                             }
-                            flv.writeTag(new FLVTAG(ms * b, new AUDIODATA(shead.getSoundFormat(), shead.getSoundRate(), shead.getSoundSize(), shead.getSoundType(), data)));
-                        }
+                        }, handler).run();
+                    } else if ((shead.getSoundFormat() == DefineSoundTag.FORMAT_MP3) && mp3) {
+                        final File file = new File(outdir + File.separator + id + ".mp3");
+                        newfile = file;
+                        new RetryTask(new RunnableIOEx() {
+                            @Override
+                            public void run() throws IOException {
+                                FileOutputStream fos = new FileOutputStream(file);
+                                for (int b = 0; b < blocks.size(); b++) {
+                                    byte data[] = blocks.get(b).getData(SWF.DEFAULT_VERSION);
+                                    fos.write(data, 2, data.length - 2);
+                                }
+                            }
+                        }, handler).run();
+                    } else {
+                        final File file = new File(outdir + File.separator + id + ".flv");
+                        newfile = file;
+                        new RetryTask(new RunnableIOEx() {
+                            @Override
+                            public void run() throws IOException {
+                                FileOutputStream fos = new FileOutputStream(file);
+                                FLVOutputStream flv = new FLVOutputStream(fos);
+                                flv.writeHeader(true, false);
+
+                                int ms = (int) (1000.0f / ((float) frameRate));
+                                for (int b = 0; b < blocks.size(); b++) {
+                                    byte data[] = blocks.get(b).getData(SWF.DEFAULT_VERSION);
+                                    if (shead.getSoundFormat() == 2) { //MP3
+                                        data = Arrays.copyOfRange(data, 4, data.length);
+                                    }
+                                    flv.writeTag(new FLVTAG(ms * b, new AUDIODATA(shead.getSoundFormat(), shead.getSoundRate(), shead.getSoundSize(), shead.getSoundType(), data)));
+                                }
+                            }
+                        }, handler).run();
                     }
                 }
             } finally {
@@ -1075,8 +1116,8 @@ public class SWF {
                     }
                 }
             }
-            if (file != null) {
-                ret.add(file);
+            if (newfile != null) {
+                ret.add(newfile);
             }
         }
         return ret;
@@ -1176,7 +1217,7 @@ public class SWF {
         return fos.toByteArray();
     }
 
-    public List<File> exportMovies(String outdir, List<Tag> tags) throws IOException {
+    public List<File> exportMovies(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -1191,17 +1232,23 @@ public class SWF {
         }
         for (Tag t : tags) {
             if (t instanceof DefineVideoStreamTag) {
-                DefineVideoStreamTag videoStream = (DefineVideoStreamTag) t;
-                File file = new File(outdir + File.separator + ((DefineVideoStreamTag) t).getCharacterExportFileName() + ".flv");
-                try (FileOutputStream fos = new FileOutputStream(file)) {
-                    fos.write(exportMovie(videoStream));
-                }
+                final DefineVideoStreamTag videoStream = (DefineVideoStreamTag) t;
+                final File file = new File(outdir + File.separator + ((DefineVideoStreamTag) t).getCharacterExportFileName() + ".flv");
+                new RetryTask(new RunnableIOEx() {
+                    @Override
+                    public void run() throws IOException {
+                        try (FileOutputStream fos = new FileOutputStream(file)) {
+                            fos.write(exportMovie(videoStream));
+                        }
+                    }
+                }, handler).run();
+
             }
         }
         return ret;
     }
 
-    public List<File> exportTexts(String outdir, List<Tag> tags, boolean formatted) throws IOException {
+    public List<File> exportTexts(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags, final boolean formatted) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -1214,27 +1261,33 @@ public class SWF {
                 }
             }
         }
-        for (Tag t : tags) {
+        for (final Tag t : tags) {
             if (t instanceof TextTag) {
-                File file = new File(outdir + File.separator + ((TextTag) t).getCharacterId() + ".txt");
-                try (FileOutputStream fos = new FileOutputStream(file)) {
-                    if (formatted) {
-                        fos.write(((TextTag) t).getFormattedText(this.tags).getBytes("UTF-8"));
-                    } else {
-                        fos.write(((TextTag) t).getText(this.tags).getBytes("UTF-8"));
+                final File file = new File(outdir + File.separator + ((TextTag) t).getCharacterId() + ".txt");
+                final List<Tag> ttags = this.tags;
+                new RetryTask(new RunnableIOEx() {
+                    @Override
+                    public void run() throws IOException {
+                        try (FileOutputStream fos = new FileOutputStream(file)) {
+                            if (formatted) {
+                                fos.write(((TextTag) t).getFormattedText(ttags).getBytes("UTF-8"));
+                            } else {
+                                fos.write(((TextTag) t).getText(ttags).getBytes("UTF-8"));
+                            }
+                        }
                     }
-                }
+                }, handler).run();
                 ret.add(file);
             }
         }
         return ret;
     }
 
-    public void exportTexts(String outdir, boolean formatted) throws IOException {
-        exportTexts(outdir, tags, formatted);
+    public void exportTexts(AbortRetryIgnoreHandler handler, String outdir, boolean formatted) throws IOException {
+        exportTexts(handler, outdir, tags, formatted);
     }
 
-    public static List<File> exportShapes(String outdir, List<Tag> tags) throws IOException {
+    public static List<File> exportShapes(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -1247,23 +1300,29 @@ public class SWF {
                 }
             }
         }
-        for (Tag t : tags) {
+        loopb:
+        for (final Tag t : tags) {
             if (t instanceof ShapeTag) {
                 int characterID = 0;
                 if (t instanceof CharacterTag) {
                     characterID = ((CharacterTag) t).getCharacterId();
                 }
-                File file = new File(outdir + File.separator + characterID + ".svg");
-                try (FileOutputStream fos = new FileOutputStream(file)) {
-                    fos.write(((ShapeTag) t).toSVG().getBytes("utf-8"));
-                }
+                final File file = new File(outdir + File.separator + characterID + ".svg");
+                new RetryTask(new RunnableIOEx() {
+                    @Override
+                    public void run() throws IOException {
+                        try (FileOutputStream fos = new FileOutputStream(file)) {
+                            fos.write(((ShapeTag) t).toSVG().getBytes("utf-8"));
+                        }
+                    }
+                }, handler).run();
                 ret.add(file);
             }
         }
         return ret;
     }
 
-    public static List<File> exportBinaryData(String outdir, List<Tag> tags) throws IOException {
+    public static List<File> exportBinaryData(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -1276,20 +1335,26 @@ public class SWF {
                 }
             }
         }
-        for (Tag t : tags) {
+        loopb:
+        for (final Tag t : tags) {
             if (t instanceof DefineBinaryDataTag) {
                 int characterID = ((DefineBinaryDataTag) t).getCharacterId();
-                File file = new File(outdir + File.separator + characterID + ".bin");
-                try (FileOutputStream fos = new FileOutputStream(file)) {
-                    fos.write(((DefineBinaryDataTag) t).binaryData);
-                }
+                final File file = new File(outdir + File.separator + characterID + ".bin");
+                new RetryTask(new RunnableIOEx() {
+                    @Override
+                    public void run() throws IOException {
+                        try (FileOutputStream fos = new FileOutputStream(file)) {
+                            fos.write(((DefineBinaryDataTag) t).binaryData);
+                        }
+                    }
+                }, handler).run();
                 ret.add(file);
             }
         }
         return ret;
     }
 
-    public List<File> exportImages(String outdir, List<Tag> tags) throws IOException {
+    public List<File> exportImages(AbortRetryIgnoreHandler handler, String outdir, List<Tag> tags) throws IOException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -1302,26 +1367,32 @@ public class SWF {
                 }
             }
         }
-        for (Tag t : tags) {
+        for (final Tag t : tags) {
             if (t instanceof ImageTag) {
-                File file = new File(outdir + File.separator + ((ImageTag) t).getCharacterId() + "." + ((ImageTag) t).getImageFormat());
-                ImageIO.write(((ImageTag) t).getImage(this.tags), ((ImageTag) t).getImageFormat().toUpperCase(Locale.ENGLISH), file);
+                final File file = new File(outdir + File.separator + ((ImageTag) t).getCharacterId() + "." + ((ImageTag) t).getImageFormat());
+                final List<Tag> ttags = this.tags;
+                new RetryTask(new RunnableIOEx() {
+                    @Override
+                    public void run() throws IOException {
+                        ImageIO.write(((ImageTag) t).getImage(ttags), ((ImageTag) t).getImageFormat().toUpperCase(Locale.ENGLISH), file);
+                    }
+                }, handler).run();
                 ret.add(file);
             }
         }
         return ret;
     }
 
-    public void exportImages(String outdir) throws IOException {
-        exportImages(outdir, tags);
+    public void exportImages(AbortRetryIgnoreHandler handler, String outdir) throws IOException {
+        exportImages(handler, outdir, tags);
     }
 
-    public void exportShapes(String outdir) throws IOException {
-        exportShapes(outdir, tags);
+    public void exportShapes(AbortRetryIgnoreHandler handler, String outdir) throws IOException {
+        exportShapes(handler, outdir, tags);
     }
 
-    public void exportBinaryData(String outdir) throws IOException {
-        exportBinaryData(outdir, tags);
+    public void exportBinaryData(AbortRetryIgnoreHandler handler, String outdir) throws IOException {
+        exportBinaryData(handler, outdir, tags);
     }
     public static final String[] reservedWords = {
         "as", "break", "case", "catch", "class", "const", "continue", "default", "delete", "do", "each", "else",
@@ -2015,12 +2086,12 @@ public class SWF {
         return ret;
     }
 
-    public void exportFla(String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean paralel) throws IOException {
-        XFLConverter.convertSWF(this, swfName, outfile, true, generator, generatorVerName, generatorVersion, paralel);
+    public void exportFla(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean paralel) throws IOException {
+        XFLConverter.convertSWF(handler, this, swfName, outfile, true, generator, generatorVerName, generatorVersion, paralel);
     }
 
-    public void exportXfl(String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean paralel) throws IOException {
-        XFLConverter.convertSWF(this, swfName, outfile, false, generator, generatorVerName, generatorVersion, paralel);
+    public void exportXfl(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean paralel) throws IOException {
+        XFLConverter.convertSWF(handler, this, swfName, outfile, false, generator, generatorVerName, generatorVersion, paralel);
     }
 
     public static float twipToPixel(int twip) {

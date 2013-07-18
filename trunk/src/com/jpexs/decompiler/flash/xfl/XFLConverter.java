@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.xfl;
 
+import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
+import com.jpexs.decompiler.flash.RetryTask;
+import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.graph.Graph;
@@ -95,6 +98,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -2109,12 +2113,15 @@ public class XFLConverter {
         return ret;
     }
 
-    private static void writeFile(byte data[], String file) {
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            fos.write(data);
-        } catch (IOException iex) {
-            Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Error during file write", iex);
-        }
+    private static void writeFile(AbortRetryIgnoreHandler handler, final byte data[], final String file) throws IOException {
+        new RetryTask(new RunnableIOEx() {
+            @Override
+            public void run() throws IOException {
+                try (FileOutputStream fos = new FileOutputStream(file)) {
+                    fos.write(data);
+                }
+            }
+        }, handler).run();
     }
 
     private static Map<Integer, String> getCharacterClasses(List<Tag> tags) {
@@ -2457,7 +2464,7 @@ public class XFLConverter {
         return ret;
     }
 
-    public static void convertSWF(SWF swf, String swfFileName, String outfile, boolean compressed, String generator, String generatorVerName, String generatorVersion, boolean paralel) throws IOException {
+    public static void convertSWF(AbortRetryIgnoreHandler handler, SWF swf, String swfFileName, String outfile, boolean compressed, String generator, String generatorVerName, String generatorVersion, boolean paralel) throws IOException {
         File file = new File(outfile);
         File outDir = file.getParentFile();
         if (!outDir.exists()) {
@@ -2474,8 +2481,8 @@ public class XFLConverter {
         if (baseName.contains(".")) {
             baseName = baseName.substring(0, baseName.lastIndexOf("."));
         }
-        HashMap<String, byte[]> files = new HashMap<>();
-        HashMap<String, byte[]> datfiles = new HashMap<>();
+        final HashMap<String, byte[]> files = new HashMap<>();
+        final HashMap<String, byte[]> datfiles = new HashMap<>();
         HashMap<Integer, CharacterTag> characters = getCharacters(swf.tags);
         List<Integer> oneInstaceShapes = getOneInstanceShapes(swf.tags, characters);
         Map<Integer, String> characterClasses = getCharacterClasses(swf.tags);
@@ -2551,7 +2558,7 @@ public class XFLConverter {
                                 }
                             }
                             try {
-                                writeFile(data.getBytes("UTF-8"), outDir.getAbsolutePath() + File.separator + expPath + ".as");
+                                writeFile(handler, data.getBytes("UTF-8"), outDir.getAbsolutePath() + File.separator + expPath + ".as");
                             } catch (UnsupportedEncodingException ex) {
                                 Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
                             }
@@ -2769,22 +2776,29 @@ public class XFLConverter {
                 + "</flash_profiles>";
 
         if (compressed) {
-            try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outfile))) {
-                out.putNextEntry(new ZipEntry("DOMDocument.xml"));
-                out.write(domDocument.getBytes("UTF-8"));
-                out.putNextEntry(new ZipEntry("PublishSettings.xml"));
-                out.write(publishSettings.getBytes("UTF-8"));
-                for (String fileName : files.keySet()) {
-                    out.putNextEntry(new ZipEntry("LIBRARY/" + fileName));
-                    out.write(files.get(fileName));
+            final String domDocumentF = domDocument;
+            final String publishSettingsF = publishSettings;
+            final String outfileF = outfile;
+            new RetryTask(new RunnableIOEx() {
+                @Override
+                public void run() throws IOException {
+                    try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outfileF))) {
+                        out.putNextEntry(new ZipEntry("DOMDocument.xml"));
+                        out.write(domDocumentF.getBytes("UTF-8"));
+                        out.putNextEntry(new ZipEntry("PublishSettings.xml"));
+                        out.write(publishSettingsF.getBytes("UTF-8"));
+                        for (String fileName : files.keySet()) {
+                            out.putNextEntry(new ZipEntry("LIBRARY/" + fileName));
+                            out.write(files.get(fileName));
+                        }
+                        for (String fileName : datfiles.keySet()) {
+                            out.putNextEntry(new ZipEntry("bin/" + fileName));
+                            out.write(datfiles.get(fileName));
+                        }
+                    }
                 }
-                for (String fileName : datfiles.keySet()) {
-                    out.putNextEntry(new ZipEntry("bin/" + fileName));
-                    out.write(datfiles.get(fileName));
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            }, handler).run();
+
 
         } else {
 
@@ -2796,12 +2810,12 @@ public class XFLConverter {
                 }
             }
             try {
-                writeFile(domDocument.getBytes("UTF-8"), outDir.getAbsolutePath() + File.separator + "DOMDocument.xml");
+                writeFile(handler, domDocument.getBytes("UTF-8"), outDir.getAbsolutePath() + File.separator + "DOMDocument.xml");
             } catch (UnsupportedEncodingException ex) {
                 Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
             }
             try {
-                writeFile(publishSettings.getBytes("UTF-8"), outDir.getAbsolutePath() + File.separator + "PublishSettings.xml");
+                writeFile(handler, publishSettings.getBytes("UTF-8"), outDir.getAbsolutePath() + File.separator + "PublishSettings.xml");
             } catch (UnsupportedEncodingException ex) {
                 Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -2810,20 +2824,20 @@ public class XFLConverter {
             File binDir = new File(outDir.getAbsolutePath() + File.separator + "bin");
             binDir.mkdir();
             for (String fileName : files.keySet()) {
-                writeFile(files.get(fileName), libraryDir.getAbsolutePath() + File.separator + fileName);
+                writeFile(handler, files.get(fileName), libraryDir.getAbsolutePath() + File.separator + fileName);
             }
             for (String fileName : datfiles.keySet()) {
-                writeFile(datfiles.get(fileName), binDir.getAbsolutePath() + File.separator + fileName);
+                writeFile(handler, datfiles.get(fileName), binDir.getAbsolutePath() + File.separator + fileName);
             }
             try {
-                writeFile("PROXY-CS5".getBytes("utf-8"), outfile);
+                writeFile(handler, "PROXY-CS5".getBytes("utf-8"), outfile);
             } catch (UnsupportedEncodingException ex) {
                 Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         if (useAS3) {
             try {
-                swf.exportActionScript(outDir.getAbsolutePath(), false, paralel);
+                swf.exportActionScript(handler, outDir.getAbsolutePath(), false, paralel);
             } catch (Exception ex) {
                 Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Error during ActionScript3 export", ex);
             }
