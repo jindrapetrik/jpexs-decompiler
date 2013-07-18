@@ -31,14 +31,14 @@ import javax.swing.event.ChangeListener;
  */
 public class MethodBodyParamsPanel extends JPanel implements ChangeListener {
 
-    public JLabel maxStackLabel = new JLabel(translate("abc.detail.body.params.maxstack"), SwingConstants.RIGHT);
-    public JFormattedTextField maxStackField = new JFormattedTextField(NumberFormat.getNumberInstance());
-    public JLabel localCountLabel = new JLabel(translate("abc.detail.body.params.localregcount"), SwingConstants.RIGHT);
-    public JFormattedTextField localCountField = new JFormattedTextField(NumberFormat.getNumberInstance());
-    public JLabel initScopeDepthLabel = new JLabel(translate("abc.detail.body.params.minscope"), SwingConstants.RIGHT);
-    public JFormattedTextField initScopeDepthField = new JFormattedTextField(NumberFormat.getNumberInstance());
-    public JLabel maxScopeDepthLabel = new JLabel(translate("abc.detail.body.params.maxscope"), SwingConstants.RIGHT);
-    public JFormattedTextField maxScopeDepthField = new JFormattedTextField(NumberFormat.getNumberInstance());
+    public JLabel maxStackLabel;
+    public JFormattedTextField maxStackField;
+    public JLabel localCountLabel;
+    public JFormattedTextField localCountField;
+    public JLabel initScopeDepthLabel;
+    public JFormattedTextField initScopeDepthField;
+    public JLabel maxScopeDepthLabel;
+    public JFormattedTextField maxScopeDepthField;
     public MethodBody body;
     public JCheckBox autoFillCheckBox = new JCheckBox(translate("abc.detail.body.params.autofill"));
     public JLabel experimentalLabel = new JLabel(translate("abc.detail.body.params.autofill.experimental"));
@@ -48,32 +48,38 @@ public class MethodBodyParamsPanel extends JPanel implements ChangeListener {
         setLayout(null);
         this.abcPanel = abcPanel;
 
-        maxStackLabel.setBounds(10, 10, 150, 25);
-        maxStackField.setBounds(10 + 150 + 10, 10, 75, 25);
-        add(maxStackLabel);
-        add(maxStackField);
+        JComponent cmps[][] = new JComponent[][]{
+            {maxStackLabel = new JLabel(translate("abc.detail.body.params.maxstack"), SwingConstants.RIGHT), maxStackField = new JFormattedTextField(NumberFormat.getNumberInstance())},
+            {localCountLabel = new JLabel(translate("abc.detail.body.params.localregcount"), SwingConstants.RIGHT), localCountField = new JFormattedTextField(NumberFormat.getNumberInstance())},
+            {initScopeDepthLabel = new JLabel(translate("abc.detail.body.params.minscope"), SwingConstants.RIGHT), initScopeDepthField = new JFormattedTextField(NumberFormat.getNumberInstance())},
+            {maxScopeDepthLabel = new JLabel(translate("abc.detail.body.params.maxscope"), SwingConstants.RIGHT), maxScopeDepthField = new JFormattedTextField(NumberFormat.getNumberInstance())}
+        };
 
-        localCountLabel.setBounds(10, 10 + 30, 150, 25);
-        localCountField.setBounds(10 + 150 + 10, 10 + 30, 75, 25);
-        add(localCountLabel);
-        add(localCountField);
 
-        initScopeDepthLabel.setBounds(10, 10 + 30 + 30, 150, 25);
-        initScopeDepthField.setBounds(10 + 150 + 10, 10 + 30 + 30, 75, 25);
-        add(initScopeDepthLabel);
-        add(initScopeDepthField);
+        int maxw = 0;
+        for (int i = 0; i < cmps.length; i++) {
+            Dimension d = cmps[i][0].getPreferredSize();
+            if (d.width > maxw) {
+                maxw = d.width;
+            }
+        }
 
-        maxScopeDepthLabel.setBounds(10, 10 + 30 + 30 + 30, 150, 25);
-        maxScopeDepthField.setBounds(10 + 150 + 10, 10 + 30 + 30 + 30, 75, 25);
-        add(maxScopeDepthLabel);
-        add(maxScopeDepthField);
+        for (int i = 0; i < cmps.length; i++) {
+            cmps[i][0].setBounds(10, 30 * i, maxw, 25);
+            cmps[i][1].setBounds(10 + maxw + 10, 30 * i, 75, 25);
+            add(cmps[i][0]);
+            add(cmps[i][1]);
+        }
 
-        autoFillCheckBox.setBounds(30, 10 + 30 + 30 + 30 + 30, 230, 25);
         add(autoFillCheckBox);
         autoFillCheckBox.addChangeListener(this);
 
         experimentalLabel.setForeground(Color.red);
-        experimentalLabel.setBounds(250, 10 + 30 + 30 + 30 + 30, 100, 25);
+
+        autoFillCheckBox.setLocation(0, 30 * 5);
+        autoFillCheckBox.setSize(autoFillCheckBox.getPreferredSize());
+        experimentalLabel.setLocation(20 + autoFillCheckBox.getWidth(), 30 * 5);
+        experimentalLabel.setSize(experimentalLabel.getPreferredSize());
         add(experimentalLabel);
 
         setPreferredSize(new Dimension(300, 150));
