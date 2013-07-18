@@ -46,7 +46,7 @@ public class InitObjectActionItem extends ActionItem {
             if (values.get(i) instanceof TernarOpItem) { //Ternar operator contains ":"
                 valueStr = "(" + valueStr + ")";
             }
-            objStr += names.get(i).toString(constants) + hilight(":") + valueStr;
+            objStr += names.get(i).toStringNoQuotes(constants) + hilight(":") + valueStr; //AS1/2 do not allow quotes in name here
         }
         return hilight("{") + objStr + hilight("}");
     }
