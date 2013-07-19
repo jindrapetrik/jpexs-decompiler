@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
@@ -33,6 +34,11 @@ public class ReturnValueAVM2Item extends AVM2Item implements ExitItem {
 
     @Override
     public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return hilight("return ") + value.toString(constants, localRegNames, fullyQualifiedNames);
+        String vaStr = value.toString(constants, localRegNames, fullyQualifiedNames);
+        String prefix = "\r\n" + Graph.INDENTOPEN + "\r\n";
+        if (vaStr.startsWith(prefix)) { //NewObjectAVM2Item
+            vaStr = vaStr.substring(prefix.length());
+        }
+        return hilight("return ") + vaStr;
     }
 }
