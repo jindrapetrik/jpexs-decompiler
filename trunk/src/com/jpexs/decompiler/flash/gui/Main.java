@@ -288,7 +288,11 @@ public class Main {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = Helper.fixDialogFile(fc.getSelectedFile());
             try {
-                Main.saveFile(file.getAbsolutePath());
+                String fileName = file.getAbsolutePath();
+                if (!fileName.toLowerCase().endsWith(".swf")) {
+                    fileName += ".swf";
+                }
+                Main.saveFile(fileName);
                 Configuration.setConfig("lastSaveDir", file.getParentFile().getAbsolutePath());
                 maskURL = null;
                 return true;
