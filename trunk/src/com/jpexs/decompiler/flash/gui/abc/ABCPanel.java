@@ -496,11 +496,15 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
 
     public void hilightScript(ScriptPack pack) {
         TagTreeModel ttm = (TagTreeModel) Main.mainFrame.tagTree.getModel();
-        TreePath tp = ttm.getTagPath(pack);
-        if (tp == null) {
-        }
-        Main.mainFrame.tagTree.setSelectionPath(tp);
-        Main.mainFrame.tagTree.scrollPathToVisible(tp);
+        final TreePath tp = ttm.getTagPath(pack);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                Main.mainFrame.tagTree.setSelectionPath(tp);
+                Main.mainFrame.tagTree.scrollPathToVisible(tp);
+            }
+        });
+
     }
 
     public void updateSearchPos() {
