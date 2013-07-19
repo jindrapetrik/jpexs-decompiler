@@ -1468,7 +1468,7 @@ public class AVM2Code implements Serializable {
         code.add(pos, instruction);
     }
 
-    public int removeTraps(ConstantPool constants, MethodBody body, ABC abc, int scriptIndex, int classIndex, boolean isStatic, String path, HashMap<Integer, List<Integer>> refs) {
+    public int removeTraps(ConstantPool constants, MethodBody body, ABC abc, int scriptIndex, int classIndex, boolean isStatic, String path) {
         removeDeadCode(constants, body);
         List<Object> localData = new ArrayList<>();
         localData.add((Boolean) isStatic); //isStatic
@@ -1487,6 +1487,7 @@ public class AVM2Code implements Serializable {
         localData.add((Integer) (scriptIndex));
         localData.add(new HashMap<Integer, Integer>()); //localRegAssignmentIps
         localData.add(Integer.valueOf(0));
+        HashMap<Integer, List<Integer>> refs = visitCode(body);
         localData.add(refs);
         localData.add(this);
         int ret = 0;
@@ -2109,7 +2110,7 @@ public class AVM2Code implements Serializable {
                 return true;
             }
             if (visited.contains(currentIp)) {
-                return false;
+                return true;
             }
             visited.add(currentIp);
             if (refs.containsKey(currentIp)) {

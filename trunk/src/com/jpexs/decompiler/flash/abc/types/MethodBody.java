@@ -74,7 +74,7 @@ public class MethodBody implements Cloneable, Serializable {
     }
 
     public int removeTraps(ConstantPool constants, ABC abc, int scriptIndex, int classIndex, boolean isStatic, String path) {
-        return code.removeTraps(constants, this, abc, scriptIndex, classIndex, isStatic, path, code.visitCode(this));
+        return code.removeTraps(constants, this, abc, scriptIndex, classIndex, isStatic, path);
     }
 
     public HashMap<Integer, String> getLocalRegNames(ABC abc) {
@@ -124,7 +124,7 @@ public class MethodBody implements Cloneable, Serializable {
             deobfuscated.markMappedOffsets();
             if ((Boolean) Configuration.getConfig("autoDeobfuscate", true)) {
                 try {
-                    deobfuscated.removeTraps(constants, b, abc, scriptIndex, classIndex, isStatic, path, deobfuscated.visitCode(b));
+                    deobfuscated.removeTraps(constants, b, abc, scriptIndex, classIndex, isStatic, path);
                 } catch (Exception ex) {
                     Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Error during remove traps", ex);
                 }

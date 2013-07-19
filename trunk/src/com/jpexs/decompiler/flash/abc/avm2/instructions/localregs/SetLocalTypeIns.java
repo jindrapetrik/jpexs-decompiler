@@ -51,7 +51,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
         int regId = getRegisterId(ins);
         GraphTargetItem value = (GraphTargetItem) stack.pop();
         if (localRegs.containsKey(regId)) {
-            localRegs.put(regId, new NotCompileTimeAVM2Item(ins, value));
+           localRegs.put(regId, new NotCompileTimeAVM2Item(ins, value));
         } else {
             localRegs.put(regId, value);
         }
