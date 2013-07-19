@@ -43,15 +43,6 @@ public class ActionPop extends Action {
             return;
         }
         GraphTargetItem val = stack.pop();
-        if ((val instanceof CallFunctionActionItem) || (val instanceof CallMethodActionItem) || (val instanceof NewMethodActionItem)) {
-            output.add(val);
-        } else if (val instanceof SetTypeActionItem) {
-            output.add(val);
-        } else {
-            //output.add(new PopActionItem(this));
-        }
-        /*if (!(val instanceof DirectValueActionItem)) {
-         output.add(new VoidActionItem(this, val));
-         }*/
+        output.add(val);
     }
 }
