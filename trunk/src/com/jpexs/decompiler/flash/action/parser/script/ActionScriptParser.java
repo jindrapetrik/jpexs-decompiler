@@ -560,9 +560,11 @@ public class ActionScriptParser {
                 }
                 break;
             case STRING_OP:
+                ParsedSymbol sop = s;
                 s = lex();
                 if (s.type == SymbolType.DOT) {
-                    ret = memberOrCall(new GetVariableActionItem(null, new DirectValueActionItem(null, 0, s.value, new ArrayList<String>())), registerVars, inFunction, inMethod);
+                    lexer.pushback(s);
+                    ret = memberOrCall(new GetVariableActionItem(null, new DirectValueActionItem(null, 0, sop.value, new ArrayList<String>())), registerVars, inFunction, inMethod);
                 } else {
                     expected(s, lexer.yyline(), SymbolType.PARENT_OPEN);
                     ret = new ToStringActionItem(null, expression(registerVars, inFunction, inMethod, true));
