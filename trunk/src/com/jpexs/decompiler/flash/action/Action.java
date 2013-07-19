@@ -856,6 +856,7 @@ public class Action implements GraphSourceItem {
                 long endAddr = action.getAddress() + cnt.getHeaderSize();
                 String cntName = cnt.getName();
                 List<List<GraphTargetItem>> outs = new ArrayList<>();
+                @SuppressWarnings("unchecked")
                 HashMap<String, GraphTargetItem> variables2 = (HashMap<String, GraphTargetItem>) Helper.deepCopy(variables);
                 for (int r = 0; r < 256; r++) {
                     if (variables2.containsKey("__register" + r)) {
