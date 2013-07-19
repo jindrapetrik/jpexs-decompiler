@@ -62,7 +62,7 @@ public class LoadingDialog extends AppDialog implements ImageObserver {
     public LoadingDialog() {
         setResizable(false);
         setTitle(Main.shortApplicationVerName);
-        setSize(Math.max(270, 150 + getFontMetrics(new JLabel().getFont()).stringWidth(translate("loadingpleasewait"))), 150);
+        setSize(Math.max(300, 150 + getFontMetrics(new JLabel().getFont()).stringWidth(translate("loadingpleasewait"))), 150);
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
 
