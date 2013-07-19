@@ -145,6 +145,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -883,8 +884,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         fontPanel.addComponentListener(fontChangeList);
 
         fontChangeList.componentResized(null);
-
-        fontParams1.setLayout(new ListLayout());
+        fontParams1.setLayout(new BoxLayout(fontParams1, BoxLayout.Y_AXIS));
         fontParams1.add(fontParams2);
 
         JPanel fontAddCharsPanel = new JPanel(new FlowLayout());
@@ -897,6 +897,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         fontAddCharsButton.addActionListener(this);
         fontAddCharsPanel.add(fontAddCharsButton);
 
+
         fontParams1.add(fontAddCharsPanel);
         JPanel fontSelectionPanel = new JPanel(new FlowLayout());
         fontSelectionPanel.add(new JLabel(translate("font.source")));
@@ -906,8 +907,14 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         fontSelection.setSelectedItem("Times New Roman");
         fontSelection.setSelectedItem("Arial");
         fontSelectionPanel.add(fontSelection);
-        fontParams1.add(fontSelectionPanel);
+
+        JPanel fontCharPanel = new JPanel();
+        fontCharPanel.setLayout(new ListLayout());
+        fontCharPanel.add(fontAddCharsPanel);
+        fontCharPanel.add(fontSelectionPanel);
+        fontParams1.add(fontCharPanel);
         fontPanel.setLayout(new BorderLayout());
+        fontParams1.add(Box.createVerticalGlue());
         fontPanel.add(new JScrollPane(fontParams1), BorderLayout.CENTER);
 
         displayWithPreview.add(fontPanel, CARDFONTPANEL);
