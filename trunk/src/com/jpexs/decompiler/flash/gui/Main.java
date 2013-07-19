@@ -252,6 +252,11 @@ public class Main {
     public static boolean openFile(String swfFile) {
         if (mainFrame != null) {
             mainFrame.setVisible(false);
+            Helper.emptyObject(mainFrame);
+            swf = null;
+            mainFrame = null;
+            Cache.clearAll();
+            System.gc();
         }
         Main.file = swfFile;
         if (Main.loadingDialog == null) {

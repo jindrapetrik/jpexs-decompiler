@@ -185,7 +185,7 @@ import javax.swing.tree.TreeSelectionModel;
  *
  * @author Jindra
  */
-public class MainFrame extends AppFrame implements ActionListener, TreeSelectionListener {
+public class MainFrame extends AppFrame implements ActionListener, TreeSelectionListener, Freed {
 
     private SWF swf;
     public ABCPanel abcPanel;
@@ -422,11 +422,6 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         autoDeobfuscateMenuItem.addActionListener(this);
         autoDeobfuscateMenuItem.setActionCommand("AUTODEOBFUSCATE");
 
-
-        /*     JCheckBoxMenuItem miSubLimiter = new JCheckBoxMenuItem("Enable sub limiter");
-         miSubLimiter.setActionCommand("SUBLIMITER");
-         miSubLimiter.addActionListener(this);
-         */
         JMenuItem miRenameOneIdentifier = new JMenuItem(translate("menu.tools.deobfuscation.globalrename"));
         miRenameOneIdentifier.setActionCommand("RENAMEONEIDENTIFIER");
         miRenameOneIdentifier.addActionListener(this);
@@ -435,43 +430,10 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         miRenameIdentifiers.setActionCommand("RENAMEIDENTIFIERS");
         miRenameIdentifiers.addActionListener(this);
 
-        /*JMenuItem miRemoveDeadCode = new JMenuItem("Remove dead code");
-         miRemoveDeadCode.setActionCommand("REMOVEDEADCODE");
-         miRemoveDeadCode.addActionListener(this);
-
-         JMenuItem miRemoveDeadCodeAll = new JMenuItem("Remove all dead code");
-         miRemoveDeadCodeAll.setActionCommand("REMOVEDEADCODEALL");
-         miRemoveDeadCodeAll.addActionListener(this);
-
-         JMenuItem miTraps = new JMenuItem("Remove traps");
-         miTraps.setActionCommand("REMOVETRAPS");
-         miTraps.addActionListener(this);
-
-         JMenuItem miTrapsAll = new JMenuItem("Remove all traps");
-         miTrapsAll.setActionCommand("REMOVETRAPSALL");
-         miTrapsAll.addActionListener(this);
-
-         JMenuItem miControlFlow = new JMenuItem("Restore control flow");
-         miControlFlow.setActionCommand("RESTORECONTROLFLOW");
-         miControlFlow.addActionListener(this);
-
-         JMenuItem miControlFlowAll = new JMenuItem("Restore all control flow");
-         miControlFlowAll.setActionCommand("RESTORECONTROLFLOWALL");
-         miControlFlowAll.addActionListener(this);*/
 
         menuDeobfuscation.add(miRenameOneIdentifier);
         menuDeobfuscation.add(miRenameIdentifiers);
-        //menuDeobfuscation.add(miSubLimiter);
         menuDeobfuscation.add(miDeobfuscation);
-        /*menuDeobfuscation.add(miDeobfuscate);
-         menuDeobfuscation.addSeparator();*/
-        /*menuDeobfuscation.add(miRemoveDeadCode);
-         menuDeobfuscation.add(miRemoveDeadCodeAll);
-         menuDeobfuscation.add(miTraps);
-         menuDeobfuscation.add(miTrapsAll);
-         menuDeobfuscation.add(miControlFlow);
-         menuDeobfuscation.add(miControlFlowAll);
-         */
         JMenu menuTools = new JMenu(translate("menu.tools"));
         JMenuItem miProxy = new JMenuItem(translate("menu.tools.proxy"));
         miProxy.setActionCommand("SHOWPROXY");
@@ -580,6 +542,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         menuBar.add(menuHelp);
 
         setJMenuBar(menuBar);
+
         List<Object> objs = new ArrayList<>();
         objs.addAll(swf.tags);
 
@@ -805,17 +768,6 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         textTopPanel.add(new JScrollPane(textValue), BorderLayout.CENTER);
         textValue.setEditable(false);
         //textValue.setFont(UIManager.getFont("TextField.font"));
-
-        /*JPanel textBottomPanel = new JPanel();
-         textBottomPanel.setLayout(new BoxLayout(textBottomPanel, BoxLayout.X_AXIS));
-         textBottomPanel.add(new JLabel("Xmin:"));
-         textBottomPanel.add(textRectXmin);
-         textBottomPanel.add(new JLabel("Ymin:"));
-         textBottomPanel.add(textRectYmin);
-         textBottomPanel.add(new JLabel("Xmax:"));
-         textBottomPanel.add(textRectXmax);
-         textBottomPanel.add(new JLabel("Ymax:"));
-         textBottomPanel.add(textRectYmax);*/
 
 
 
@@ -1112,6 +1064,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                 }
             }
         });
+
         View.centerScreen(this);
         tagTree.addKeyListener(new KeyAdapter() {
             @Override
@@ -1592,7 +1545,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                 TagNode tti = new TagNode(t);
                 if (((Container) t).getItemCount() > 0) {
                     List<Object> subItems = ((Container) t).getSubItems();
-                    tti.subItems = createTagList(subItems, parent);
+                    tti.subItems = createTagList(subItems, t);
                 }
                 //ret.add(tti);
             }
@@ -2719,5 +2672,10 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         if (!edit) {
             reload(true);
         }
+    }
+
+    @Override
+    public void free() {
+        Helper.emptyObject(this);
     }
 }

@@ -16,7 +16,9 @@
  */
 package com.jpexs.decompiler.flash.helpers;
 
+import com.jpexs.decompiler.flash.gui.Freed;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import java.awt.Component;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -26,8 +28,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
 import java.util.logging.Level;
@@ -455,5 +459,26 @@ public class Helper {
             sn += "0x" + Integer.toHexString(bs[i] & 0xff) + " ";
         }
         return sn;
+    }
+
+    public static void emptyObject(Object obj) {
+        Field[] fields = obj.getClass().getDeclaredFields();
+        for (Field f : fields) {
+            try {
+                f.setAccessible(true);
+                Object v = f.get(obj);
+                if (v instanceof Collection) {
+                    ((Collection) v).clear();
+                }
+                if (v instanceof Component) {
+                    ((Component) v).getParent().remove((Component) v);
+                }
+                if (v instanceof Freed) {
+                    ((Freed) v).free();
+                }
+                f.set(obj, null);
+            } catch (Exception ex) {
+            }
+        }
     }
 }

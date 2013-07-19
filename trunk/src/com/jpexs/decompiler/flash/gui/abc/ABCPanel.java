@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
+import com.jpexs.decompiler.flash.gui.Freed;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.View;
@@ -33,6 +34,7 @@ import com.jpexs.decompiler.flash.gui.abc.tablemodels.NamespaceSetTableModel;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.NamespaceTableModel;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.StringTableModel;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.UIntTableModel;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.awt.BorderLayout;
@@ -57,7 +59,7 @@ import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.actions.DocumentSearchData;
 
-public class ABCPanel extends JPanel implements ItemListener, ActionListener {
+public class ABCPanel extends JPanel implements ItemListener, ActionListener, Freed {
 
     public TraitsList navigator;
     public ClassesListTree classTree;
@@ -75,7 +77,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
     public JLabel asmLabel = new JLabel(translate("panel.disassembled"));
     public JLabel decLabel = new JLabel(translate("panel.decompiled"));
     public DetailPanel detailPanel;
-    public JTextField filterField = new JTextField("");
+    public JTextField filterField = new JTextField();
     public JPanel navPanel;
     public JTabbedPane tabbedPane;
     public JPanel searchPanel;
@@ -247,10 +249,13 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
 
     }
 
+    @Override
+    public void free() {
+        Helper.emptyObject(this);
+    }
+
     @SuppressWarnings("unchecked")
     public ABCPanel(List<ABCContainerTag> list, SWF swf) {
-
-
         DefaultSyntaxKit.initKit();
 
         this.list = list;
@@ -357,6 +362,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener {
         prevSearchButton.setMargin(new Insets(3, 3, 3, 3));
         prevSearchButton.addActionListener(this);
         prevSearchButton.setActionCommand("SEARCHPREV");
+
         JButton nextSearchButton = new JButton(View.getIcon("next16"));
         nextSearchButton.setMargin(new Insets(3, 3, 3, 3));
         nextSearchButton.addActionListener(this);
