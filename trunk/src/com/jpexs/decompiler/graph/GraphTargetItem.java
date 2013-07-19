@@ -18,6 +18,7 @@ package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.graph.model.BinaryOp;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public abstract class GraphTargetItem {
+public abstract class GraphTargetItem implements Serializable {
 
     public static final int PRECEDENCE_PRIMARY = 0;
     public static final int PRECEDENCE_POSTFIX = 1;
@@ -60,6 +61,10 @@ public abstract class GraphTargetItem {
             return firstPart;
         }
         return ret;
+    }
+
+    public GraphTargetItem() {
+        this(null, NOPRECEDENCE);
     }
 
     public GraphTargetItem(GraphSourceItem src, int precedence) {

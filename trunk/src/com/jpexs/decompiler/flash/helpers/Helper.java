@@ -310,6 +310,7 @@ public class Helper {
             }
             return copy;
         } catch (Exception ex) {
+            Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, "Copy error", ex);
             return null;
         }
     }

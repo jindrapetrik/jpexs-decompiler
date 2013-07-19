@@ -131,6 +131,9 @@ public class Action implements GraphSourceItem {
         this.actionLength = actionLength;
     }
 
+    public Action() {
+    }
+
     /**
      * Returns address of this action
      *
@@ -853,6 +856,12 @@ public class Action implements GraphSourceItem {
                 long endAddr = action.getAddress() + cnt.getHeaderSize();
                 String cntName = cnt.getName();
                 List<List<GraphTargetItem>> outs = new ArrayList<>();
+                HashMap<String, GraphTargetItem> variables2 = (HashMap<String, GraphTargetItem>) Helper.deepCopy(variables);
+                for (int r = 0; r < 256; r++) {
+                    if (variables2.containsKey("__register" + r)) {
+                        variables2.remove("__register" + r);
+                    }
+                }
                 for (long size : cnt.getContainerSizes()) {
                     if (size == 0) {
                         outs.add(new ArrayList<GraphTargetItem>());
@@ -860,7 +869,7 @@ public class Action implements GraphSourceItem {
                     }
                     List<GraphTargetItem> out;
                     try {
-                        out = ActionGraph.translateViaGraph(cnt.getRegNames(), variables, functions, actions.subList(adr2ip(actions, endAddr, version), adr2ip(actions, endAddr + size, version)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName));
+                        out = ActionGraph.translateViaGraph(cnt.getRegNames(), variables2, functions, actions.subList(adr2ip(actions, endAddr, version), adr2ip(actions, endAddr + size, version)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName));
                     } catch (Exception | OutOfMemoryError | StackOverflowError ex2) {
                         Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", ex2);
                         if (ex2 instanceof OutOfMemoryError) {

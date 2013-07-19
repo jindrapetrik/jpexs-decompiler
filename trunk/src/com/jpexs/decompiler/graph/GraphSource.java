@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.action.Action;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +27,7 @@ import java.util.Stack;
  *
  * @author JPEXS
  */
-public abstract class GraphSource {
+public abstract class GraphSource implements Serializable {
 
     public abstract int size();
 

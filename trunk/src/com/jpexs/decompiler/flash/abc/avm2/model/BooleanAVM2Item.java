@@ -36,16 +36,6 @@ public class BooleanAVM2Item extends AVM2Item {
     }
 
     @Override
-    public boolean isFalse() {
-        return value == false;
-    }
-
-    @Override
-    public boolean isTrue() {
-        return value == true;
-    }
-
-    @Override
     public Object getResult() {
         return value;
     }

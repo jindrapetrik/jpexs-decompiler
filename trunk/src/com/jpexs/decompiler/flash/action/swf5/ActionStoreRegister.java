@@ -81,6 +81,9 @@ public class ActionStoreRegister extends Action {
         }
         value.moreSrc.add(new GraphSourceItemPos(this, 0));
         boolean define = !variables.containsKey("__register" + registerNumber);
+        if (regNames.containsKey(registerNumber)) {
+            define = false;
+        }
         variables.put("__register" + registerNumber, value);
         if (value instanceof DirectValueActionItem) {
             if (((DirectValueActionItem) value).value instanceof RegisterNumber) {

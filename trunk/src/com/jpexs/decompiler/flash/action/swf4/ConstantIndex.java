@@ -18,10 +18,11 @@ package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.helpers.Helper;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConstantIndex {
+public class ConstantIndex implements Serializable {
 
     public int index;
     public List<String> constantPool;

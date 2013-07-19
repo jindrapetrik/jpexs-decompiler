@@ -16,7 +16,9 @@
  */
 package com.jpexs.decompiler.flash.ecma;
 
-public class Undefined {
+import java.io.Serializable;
+
+public class Undefined implements Serializable {
 
     @Override
     public String toString() {

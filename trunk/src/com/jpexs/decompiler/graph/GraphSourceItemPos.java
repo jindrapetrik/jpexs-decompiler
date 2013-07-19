@@ -16,11 +16,13 @@
  */
 package com.jpexs.decompiler.graph;
 
+import java.io.Serializable;
+
 /**
  *
  * @author JPEXS
  */
-public class GraphSourceItemPos {
+public class GraphSourceItemPos implements Serializable {
 
     public GraphSourceItem item;
     public int pos;

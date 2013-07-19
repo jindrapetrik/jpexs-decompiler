@@ -143,6 +143,9 @@ public class DirectValueActionItem extends ActionItem {
         if (value instanceof ConstantIndex) {
             return hilight("\"" + Helper.escapeString(this.constants.get(((ConstantIndex) value).index)) + "\"");
         }
+        if (value instanceof RegisterNumber) {
+            return hilight(((RegisterNumber) value).translate());
+        }
         return hilight(value.toString());
     }
 

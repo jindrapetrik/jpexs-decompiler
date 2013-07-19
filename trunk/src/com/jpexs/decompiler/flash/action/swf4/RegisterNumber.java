@@ -16,7 +16,9 @@
  */
 package com.jpexs.decompiler.flash.action.swf4;
 
-public class RegisterNumber {
+import java.io.Serializable;
+
+public class RegisterNumber implements Serializable {
 
     public int number;
     public String name = null;
@@ -57,5 +59,12 @@ public class RegisterNumber {
 
     public String toStringNoName() {
         return "register" + number;
+    }
+
+    public String translate() {
+        if (name == null || name.trim().equals("")) {
+            return "_loc" + number + "_";
+        }
+        return name;
     }
 }

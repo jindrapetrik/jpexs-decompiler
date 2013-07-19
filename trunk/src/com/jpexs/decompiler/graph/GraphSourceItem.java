@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Stack;
 
@@ -23,7 +24,7 @@ import java.util.Stack;
  *
  * @author JPEXS
  */
-public interface GraphSourceItem {
+public interface GraphSourceItem extends Serializable {
 
     public void translate(List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, int staticOperation, String path);
 

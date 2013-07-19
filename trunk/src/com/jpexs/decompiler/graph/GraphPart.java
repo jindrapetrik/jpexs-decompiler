@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +24,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class GraphPart {
+public class GraphPart implements Serializable {
 
     public int start = 0;
     public int end = 0;

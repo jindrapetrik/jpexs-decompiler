@@ -1021,7 +1021,14 @@ public class SWFInputStream extends InputStream {
                             if ((a instanceof ActionStoreRegister) && stack.isEmpty()) {
                                 stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>()));
                             }
-                            a.translate(localData, stack, output, Graph.SOP_USE_STATIC/*Graph.SOP_SKIP_STATIC*/, path);
+                            List<Object> localData2 = (List<Object>) Helper.deepCopy(localData);
+                            HashMap<String, GraphTargetItem> vars = (HashMap<String, GraphTargetItem>) localData.get(1);
+                            for (int r = 0; r < 256; r++) {
+                                if (vars.containsKey("__register" + r)) {
+                                    vars.remove("__register" + r);
+                                }
+                            }
+                            a.translate(localData2, stack, output, Graph.SOP_USE_STATIC/*Graph.SOP_SKIP_STATIC*/, path);
                         }
                     }
                 } catch (RuntimeException ex) {

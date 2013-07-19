@@ -49,6 +49,10 @@ public class FunctionActionItem extends ActionItem {
     public static final int REGISTER_PARENT = 5;
     public static final int REGISTER_GLOBAL = 6;
 
+    public FunctionActionItem() {
+        super(null, PRECEDENCE_PRIMARY);
+    }
+
     public FunctionActionItem(GraphSourceItem instruction, String functionName, List<String> paramNames, List<GraphTargetItem> actions, List<String> constants, int regStart) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.actions = actions;

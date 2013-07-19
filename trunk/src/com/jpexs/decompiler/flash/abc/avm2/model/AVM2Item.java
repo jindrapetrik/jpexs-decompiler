@@ -22,6 +22,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
@@ -53,24 +54,6 @@ public abstract class AVM2Item extends GraphTargetItem {
     @Override
     public boolean needsSemicolon() {
         return true;
-    }
-
-    /*public String hilight(String str) {
-     if (instruction == null) {
-     return str;
-     }
-     if (instruction.mappedOffset >= 0) {
-     return Highlighting.hilighOffset(str, instruction.mappedOffset);
-     } else {
-     return Highlighting.hilighOffset(str, instruction.offset);
-     }
-     }*/
-    public boolean isFalse() {
-        return false;
-    }
-
-    public boolean isTrue() {
-        return false;
     }
 
     protected String formatProperty(ConstantPool constants, GraphTargetItem object, GraphTargetItem propertyName, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {

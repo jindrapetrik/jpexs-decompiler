@@ -16,7 +16,9 @@
  */
 package com.jpexs.decompiler.flash.ecma;
 
-public class Null {
+import java.io.Serializable;
+
+public class Null implements Serializable {
 
     @Override
     public String toString() {
