@@ -77,13 +77,19 @@ public class MORPHFILLSTYLE implements NeedsCharacters {
     public FILLSTYLE getFillStyleAt(int ratio) {
         FILLSTYLE ret = new FILLSTYLE();
         ret.bitmapId = bitmapId;
-        ret.bitmapMatrix = morphMatrix(startBitmapMatrix, endBitmapMatrix, ratio);
-        ret.colorA = MORPHGRADIENT.morphColor(startColor, endColor, ratio);
+        if (startBitmapMatrix != null) {
+            ret.bitmapMatrix = morphMatrix(startBitmapMatrix, endBitmapMatrix, ratio);
+        }
+        if (startColor != null) {
+            ret.colorA = MORPHGRADIENT.morphColor(startColor, endColor, ratio);
+        }
         ret.fillStyleType = fillStyleType;
         if (gradient != null) {
             ret.gradient = gradient.getGradientAt(ratio);
         }
-        ret.gradientMatrix = morphMatrix(startGradientMatrix, endGradientMatrix, ratio);
+        if (startGradientMatrix != null) {
+            ret.gradientMatrix = morphMatrix(startGradientMatrix, endGradientMatrix, ratio);
+        }
         return ret;
     }
 
