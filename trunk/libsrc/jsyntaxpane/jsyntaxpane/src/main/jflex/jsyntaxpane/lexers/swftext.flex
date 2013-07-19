@@ -58,7 +58,7 @@ Divider = [ \r\n]+
                                     }
                                  }
   "\\["                          { tokenLength += yylength(); }
-  .                              { if(tokenStart==-1){tokenStart=yychar();} tokenLength += yylength(); }
+  .|\n                           { if(tokenStart==-1){tokenStart=yychar();} tokenLength += yylength(); }
  <<EOF>>                         { if(tokenStart==-1){tokenStart=0;} if(tokenLength == 0){return null;}else{int retlen=tokenLength; tokenLength=0; return token(TokenType.STRING, tokenStart, retlen);}}
 }
 
