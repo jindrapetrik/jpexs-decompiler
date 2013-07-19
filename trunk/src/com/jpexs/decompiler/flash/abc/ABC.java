@@ -215,7 +215,7 @@ public class ABC {
                 constants.constant_multiname[instance_info[i].name_index].name_index = deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, constants.constant_multiname[instance_info[i].name_index].name_index, true, renameType);
                 if (constants.constant_multiname[instance_info[i].name_index].namespace_index != 0) {
                     constants.constant_namespace[constants.constant_multiname[instance_info[i].name_index].namespace_index].name_index =
-                            deobfuscateNameSpace(stringUsageTypes, stringUsages, namesMap, constants.constant_namespace[constants.constant_multiname[instance_info[i].name_index].namespace_index].name_index, renameType);
+                            deobfuscatePackageName(stringUsageTypes, stringUsages, namesMap, constants.constant_namespace[constants.constant_multiname[instance_info[i].name_index].namespace_index].name_index, renameType);
                 }
             }
             if (instance_info[i].super_index != 0) {
@@ -231,38 +231,47 @@ public class ABC {
         }
         for (int i = 1; i < constants.constant_namespace.length; i++) {
             informListeners("deobfuscate", "namespace " + i + "/" + constants.constant_namespace.length);
-            constants.constant_namespace[i].name_index = deobfuscateNameSpace(stringUsageTypes, stringUsages, namesMap, constants.constant_namespace[i].name_index, renameType);
+            if (constants.constant_namespace[i].kind != Namespace.KIND_PACKAGE) { //only packages
+                continue;
+            }
+            constants.constant_namespace[i].name_index = deobfuscatePackageName(stringUsageTypes, stringUsages, namesMap, constants.constant_namespace[i].name_index, renameType);
         }
 
         //process reflection using getDefinitionByName too
         for (MethodBody body : bodies) {
             for (int ip = 0; ip < body.code.code.size(); ip++) {
                 if (body.code.code.get(ip).definition instanceof CallPropertyIns) {
-                    if (ip > 0) {
-                        if (body.code.code.get(ip - 1).definition instanceof PushStringIns) {
-                            int strIndex = body.code.code.get(ip - 1).operands[0];
-                            String fullname = constants.constant_string[strIndex];
-                            String pkg = "";
-                            String name = fullname;
-                            if (fullname.contains(".")) {
-                                pkg = fullname.substring(0, fullname.lastIndexOf("."));
-                                name = fullname.substring(fullname.lastIndexOf(".") + 1);
+                    int mIndex = body.code.code.get(ip).operands[0];
+                    if (mIndex > 0) {
+                        Multiname m = constants.constant_multiname[mIndex];
+                        if (m.getNameWithNamespace(constants).equals("flash.utils.getDefinitionByName")) {
+                            if (ip > 0) {
+                                if (body.code.code.get(ip - 1).definition instanceof PushStringIns) {
+                                    int strIndex = body.code.code.get(ip - 1).operands[0];
+                                    String fullname = constants.constant_string[strIndex];
+                                    String pkg = "";
+                                    String name = fullname;
+                                    if (fullname.contains(".")) {
+                                        pkg = fullname.substring(0, fullname.lastIndexOf("."));
+                                        name = fullname.substring(fullname.lastIndexOf(".") + 1);
+                                    }
+                                    if (!pkg.equals("")) {
+                                        int pkgStrIndex = constants.forceGetStringId(pkg);
+                                        pkgStrIndex = deobfuscatePackageName(stringUsageTypes, stringUsages, namesMap, pkgStrIndex, renameType);
+                                        pkg = constants.constant_string[pkgStrIndex];
+                                    }
+                                    int nameStrIndex = constants.forceGetStringId(name);
+                                    nameStrIndex = deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, nameStrIndex, true, renameType);
+                                    name = constants.constant_string[nameStrIndex];
+                                    String fullChanged = "";
+                                    if (!pkg.equals("")) {
+                                        fullChanged = pkg + ".";
+                                    }
+                                    fullChanged += name;
+                                    strIndex = constants.forceGetStringId(fullChanged);
+                                    body.code.code.get(ip - 1).operands[0] = strIndex;
+                                }
                             }
-                            if (!pkg.equals("")) {
-                                int pkgStrIndex = constants.forceGetStringId(pkg);
-                                pkgStrIndex = deobfuscateNameSpace(stringUsageTypes, stringUsages, namesMap, pkgStrIndex, renameType);
-                                pkg = constants.constant_string[pkgStrIndex];
-                            }
-                            int nameStrIndex = constants.forceGetStringId(name);
-                            nameStrIndex = deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, nameStrIndex, true, renameType);
-                            name = constants.constant_string[nameStrIndex];
-                            String fullChanged = "";
-                            if (!pkg.equals("")) {
-                                fullChanged = pkg + ".";
-                            }
-                            fullChanged += name;
-                            strIndex = constants.forceGetStringId(fullChanged);
-                            body.code.code.get(ip - 1).operands[0] = strIndex;
                         }
                     }
                 }
@@ -876,7 +885,7 @@ public class ABC {
         return isValid;
     }
 
-    public int deobfuscateNameSpace(Map<Integer, String> stringUsageTypes, Set<Integer> stringUsages, HashMap<String, String> namesMap, int strIndex, RenameType renameType) {
+    public int deobfuscatePackageName(Map<Integer, String> stringUsageTypes, Set<Integer> stringUsages, HashMap<String, String> namesMap, int strIndex, RenameType renameType) {
         if (strIndex <= 0) {
             return strIndex;
         }
@@ -902,7 +911,7 @@ public class ABC {
                         ret += ".";
                     }
                     if (!isValidNSPart(parts[p])) {
-                        ret += fooString(namesMap, constants.constant_string[strIndex], false, DEFAULT_FOO_SIZE, "package", renameType);
+                        ret += fooString(namesMap, parts[p], false, DEFAULT_FOO_SIZE, "package", renameType);
                     } else {
                         ret += parts[p];
                     }
