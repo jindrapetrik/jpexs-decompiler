@@ -89,7 +89,13 @@ public class ExportTest {
             File fdir = new File(TESTDATADIR + File.separator + "output" + File.separator + f.getName());
             fdir.mkdirs();
             
-            swf.exportActionScript(fdir.getAbsolutePath(), false, false);
+            swf.exportActionScript(new AbortRetryIgnoreHandler() {
+
+                @Override
+                public int handle(Throwable thrown) {
+                    return AbortRetryIgnoreHandler.ABORT;
+                }
+            },fdir.getAbsolutePath(), false, false);
         } catch (Exception ex) {
             fail();
         }
