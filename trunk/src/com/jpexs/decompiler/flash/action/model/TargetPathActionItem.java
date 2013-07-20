@@ -33,7 +33,7 @@ public class TargetPathActionItem extends ActionItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return "targetPath(" + object.toString(constants) + ");";
+        return "targetPath(" + object.toString(constants) + ")";
     }
 
     @Override
