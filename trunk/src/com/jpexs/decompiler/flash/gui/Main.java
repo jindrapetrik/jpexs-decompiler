@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.gui.jna.platform.win32.SHELLEXECUTEINFO;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.Shell32;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.Win32Exception;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinReg;
+import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinReg.HKEY;
 import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinUser;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
@@ -1133,16 +1134,17 @@ public class Main {
         if (!Platform.isWindows()) {
             return false;
         }
+        final HKEY REG_CLASSES_HKEY = WinReg.HKEY_LOCAL_MACHINE;
+        final String REG_CLASSES_PATH = "Software\\Classes\\";
         try {
-            final String classesPath = "Software\\Classes\\";
-            if (!Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, classesPath + ".swf")) {
+            if (!Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + ".swf")) {
                 return false;
             }
-            String clsName = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, classesPath + ".swf", "");
+            String clsName = Advapi32Util.registryGetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + ".swf", "");
             if (clsName == null) {
                 return false;
             }
-            return Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName + "\\shell\\ffdec");
+            return Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\ffdec");
         } catch (Win32Exception ex) {
             return false;
         }
@@ -1166,55 +1168,57 @@ public class Main {
             return true;
         }
 
+        final HKEY REG_CLASSES_HKEY = WinReg.HKEY_LOCAL_MACHINE;
+        final String REG_CLASSES_PATH = "Software\\Classes\\";
+
         String appDir = getAppDir();
         String exeName = "ffdec.exe";
-        final String classesPath = "Software\\Classes\\";
 
         try {
             // 1) Add to context menu of SWF
-            if (!Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, classesPath + ".swf")) {
-                Advapi32Util.registryCreateKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + ".swf");
-                Advapi32Util.registrySetStringValue(WinReg.HKEY_LOCAL_MACHINE, classesPath + ".swf", "", "ShockwaveFlash.ShockwaveFlash");
+            if (!Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + ".swf")) {
+                Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + ".swf");
+                Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + ".swf", "", "ShockwaveFlash.ShockwaveFlash");
             }
 
-            String clsName = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, classesPath + ".swf", "");
-            if (!Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName)) {
-                Advapi32Util.registryCreateKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName);
-                Advapi32Util.registrySetStringValue(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName, "", "Flash Movie");
+            String clsName = Advapi32Util.registryGetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + ".swf", "");
+            if (!Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName)) {
+                Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName);
+                Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName, "", "Flash Movie");
             }
 
-            if (!Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName + "\\shell")) {
-                Advapi32Util.registryCreateKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName + "\\shell");
+            if (!Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell")) {
+                Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell");
             }
 
-            boolean exists = Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName + "\\shell\\ffdec");
+            boolean exists = Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\ffdec");
 
             if ((!exists) && add) { //add
-                Advapi32Util.registryCreateKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName + "\\shell\\ffdec");
-                Advapi32Util.registrySetStringValue(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName + "\\shell\\ffdec", "", "Open with FFDec");
-                Advapi32Util.registryCreateKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName + "\\shell\\ffdec\\command");
-                Advapi32Util.registrySetStringValue(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName + "\\shell\\ffdec\\command", "", "\"" + appDir + exeName + "\" \"%1\"");
+                Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\ffdec");
+                Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\ffdec", "", "Open with FFDec");
+                Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\ffdec\\command");
+                Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\ffdec\\command", "", "\"" + appDir + exeName + "\" \"%1\"");
             }
             if (exists && (!add)) { //remove
-                Advapi32Util.registryDeleteKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName + "\\shell\\ffdec\\command");
-                Advapi32Util.registryDeleteKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + clsName + "\\shell\\ffdec");
+                Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\ffdec\\command");
+                Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\ffdec");
             }
 
-            exists = Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, classesPath + "Applications\\" + exeName);
+            exists = Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName);
             if ((!exists) && add) { //add
-                Advapi32Util.registryCreateKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + "Applications\\" + exeName);
-                Advapi32Util.registryCreateKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + "Applications\\" + exeName + "\\shell");
-                Advapi32Util.registryCreateKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + "Applications\\" + exeName + "\\shell\\open");
-                Advapi32Util.registrySetStringValue(WinReg.HKEY_LOCAL_MACHINE, classesPath + "Applications\\" + exeName + "\\shell\\open", "", "Open with FFDec");
-                Advapi32Util.registryCreateKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + "Applications\\" + exeName + "\\shell\\open\\command");
-                Advapi32Util.registrySetStringValue(WinReg.HKEY_LOCAL_MACHINE, classesPath + "Applications\\" + exeName + "\\shell\\open\\command", "", "\"" + appDir + "ffdec.exe\" \"%1\"");
+                Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName);
+                Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell");
+                Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell\\open");
+                Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell\\open", "", "Open with FFDec");
+                Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell\\open\\command");
+                Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell\\open\\command", "", "\"" + appDir + "ffdec.exe\" \"%1\"");
 
             }
             if (exists && (!add)) { //remove
-                Advapi32Util.registryDeleteKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + "Applications\\" + exeName + "\\shell\\open\\command");
-                Advapi32Util.registryDeleteKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + "Applications\\" + exeName + "\\shell\\open");
-                Advapi32Util.registryDeleteKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + "Applications\\" + exeName + "\\shell");
-                Advapi32Util.registryDeleteKey(WinReg.HKEY_LOCAL_MACHINE, classesPath + "Applications\\" + exeName);
+                Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell\\open\\command");
+                Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell\\open");
+                Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName + "\\shell");
+                Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "Applications\\" + exeName);
             }
             //2) Add to OpenWith list
             String mruList = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\.swf\\OpenWithList", "MRUList");
