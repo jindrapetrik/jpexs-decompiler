@@ -103,6 +103,23 @@ public class GetVariableActionItem extends ActionItem {
     }
 
     @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final GetVariableActionItem other = (GetVariableActionItem) obj;
+        if (this.name != other.name && (this.name == null || !this.name.valueEquals(other.name))) {
+            return false;
+        }
+        return true;
+    }
+    
+    
+
+    @Override
     public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
         return toSourceMerge(localData, generator, name, new ActionGetVariable());
     }
