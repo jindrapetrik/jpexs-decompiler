@@ -858,9 +858,11 @@ public class Action implements GraphSourceItem {
                 List<List<GraphTargetItem>> outs = new ArrayList<>();
                 @SuppressWarnings("unchecked")
                 HashMap<String, GraphTargetItem> variables2 = (HashMap<String, GraphTargetItem>) Helper.deepCopy(variables);
-                for (int r = 0; r < 256; r++) {
-                    if (variables2.containsKey("__register" + r)) {
-                        variables2.remove("__register" + r);
+                if (cnt instanceof ActionDefineFunction || cnt instanceof ActionDefineFunction2) {
+                    for (int r = 0; r < 256; r++) {
+                        if (variables2.containsKey("__register" + r)) {
+                            variables2.remove("__register" + r);
+                        }
                     }
                 }
                 for (long size : cnt.getContainerSizes()) {
