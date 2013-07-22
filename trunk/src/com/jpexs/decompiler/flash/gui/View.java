@@ -20,7 +20,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
@@ -29,8 +32,13 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import org.pushingpixels.flamingo.api.common.icon.ImageWrapperResizableIcon;
+import org.pushingpixels.substance.api.SubstanceConstants;
+import org.pushingpixels.substance.api.SubstanceLookAndFeel;
+import org.pushingpixels.substance.api.skin.SubstanceOfficeBlue2007LookAndFeel;
 
 /**
  * Contains methods for GUI
@@ -43,12 +51,49 @@ public class View {
      * Sets windows Look and Feel
      */
     public static void setLookAndFeel() {
+
+//if(true)return;
+        //System.setProperty("peacock.appButtonSize", "32");
+        /*try {
+         UIManager.setLookAndFeel("org.fife.plaf.OfficeXP.OfficeXPLookAndFeel");
+         } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException ignored) {
+         ignored.printStackTrace();
+         }*/
+        /*try {
+
+         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                    
+         } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException ignored) {
+         }*/
+
         try {
 
-            UIManager.setLookAndFeel(
-                    UIManager.getSystemLookAndFeelClassName());
-        } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException ignored) {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        UIManager.setLookAndFeel(new SubstanceOfficeBlue2007LookAndFeel());
+                        UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, 1.0);
+                        UIManager.put("Tree.expandedIcon", getIcon("expand16"));
+                        UIManager.put("Tree.collapsedIcon", getIcon("collapse16"));
+
+                        UIManager.put("RibbonApplicationMenuPopupPanelUI", MyRibbonApplicationMenuPopupPanelUI.class.getName());
+                        UIManager.put("RibbonApplicationMenuButtonUI", MyRibbonApplicationMenuButtonUI.class.getName());
+                        //UIManager.put(SubstanceLookAndFeel.USE_THEMED_DEFAULT_ICONS,Boolean.TRUE);        
+                        //UIManager.put("InternalFrame.icon",View.getIcon("icon16"));
+                        //UIManager.getDefaults().put("TreeUI", BasicTreeUI.class.getName() );
+                    } catch (UnsupportedLookAndFeelException ex) {
+                        Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            });
+        } catch (InterruptedException | InvocationTargetException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+
+        UIManager.put(SubstanceLookAndFeel.TABBED_PANE_CONTENT_BORDER_KIND, SubstanceConstants.TabContentPaneBorderKind.SINGLE_FULL);
+
 
 
         JFrame.setDefaultLookAndFeelDecorated(true);
@@ -76,6 +121,7 @@ public class View {
         images.add(loadImage("icon16"));
         images.add(loadImage("icon32"));
         images.add(loadImage("icon48"));
+        images.add(loadImage("icon256"));
         f.setIconImages(images);
     }
 
@@ -109,5 +155,21 @@ public class View {
         root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
                 escapeStroke, dispatchWindowClosingActionMapKey);
         root.getActionMap().put(dispatchWindowClosingActionMapKey, dispatchClosing);
+    }
+
+    public static ImageWrapperResizableIcon getResizableIcon(String resource) {
+        return ImageWrapperResizableIcon.getIcon(View.class.getResource("/com/jpexs/decompiler/flash/gui/graphics/" + resource + ".png"), new Dimension(256, 256));
+    }
+
+    public static void execInEventDispatch(Runnable r) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            r.run();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(r);
+            } catch (    InterruptedException | InvocationTargetException ex) {
+                Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 }

@@ -21,12 +21,15 @@ import com.jpexs.decompiler.flash.gui.View;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Hashtable;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSlider;
 
 /**
@@ -45,17 +48,18 @@ public class DeobfuscationDialog extends AppDialog implements ActionListener {
     @SuppressWarnings("unchecked")
     public DeobfuscationDialog() {
         setDefaultCloseOperation(HIDE_ON_CLOSE);
-        setSize(new Dimension(300, 270));
+        setSize(new Dimension(330, 270));
         setTitle(translate("dialog.title"));
         Container cp = getContentPane();
-        cp.setLayout(null);
+        cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
         codeProcessingLevel = new JSlider(JSlider.VERTICAL, 1, 3, 3);
         codeProcessingLevel.setMajorTickSpacing(1);
         codeProcessingLevel.setPaintTicks(true);
         codeProcessingLevel.setMinorTickSpacing(1);
         codeProcessingLevel.setSnapToTicks(true);
         JLabel lab1 = new JLabel(translate("deobfuscation.level"));
-        lab1.setBounds(30, 0, getWidth() - 60, 25);
+        //lab1.setBounds(30, 0, getWidth() - 60, 25);
+        lab1.setAlignmentX(0.5f);
         cp.add(lab1);
         Hashtable labelTable = new Hashtable();
         //labelTable.put(new Integer(LEVEL_NONE), new JLabel("None"));
@@ -67,14 +71,15 @@ public class DeobfuscationDialog extends AppDialog implements ActionListener {
 
         codeProcessingLevel.setPaintLabels(true);
         codeProcessingLevel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        codeProcessingLevel.setSize(300, 200);
+        //codeProcessingLevel.setSize(300, 200);
 
 
 
-        codeProcessingLevel.setBounds(30, 25, getWidth() - 60, 125);
-
+        //codeProcessingLevel.setBounds(30, 25, getWidth() - 60, 125);
+        codeProcessingLevel.setAlignmentX(0.5f);
         add(codeProcessingLevel);
-        processAllCheckbox.setBounds(50, 150, getWidth() - 100, 25);
+        //processAllCheckbox.setBounds(50, 150, getWidth() - 100, 25);
+        processAllCheckbox.setAlignmentX(0.5f);
         add(processAllCheckbox);
 
         processAllCheckbox.setSelected(true);
@@ -85,13 +90,17 @@ public class DeobfuscationDialog extends AppDialog implements ActionListener {
         JButton okButton = new JButton(translate("button.ok"));
         okButton.addActionListener(this);
         okButton.setActionCommand("OK");
-        okButton.setBounds(50, 200, 75, 25);
-        cancelButton.setBounds(145, 200, 75, 25);
-        cp.add(okButton);
-        cp.add(cancelButton);
+
+        JPanel buttonsPanel = new JPanel(new FlowLayout());
+        buttonsPanel.add(okButton);
+        buttonsPanel.add(cancelButton);
+        buttonsPanel.setAlignmentX(0.5f);
+        cp.add(buttonsPanel);
+
         setModal(true);
         View.centerScreen(this);
-        View.setWindowIcon(this);
+        //View.setWindowIcon(this);
+        setIconImage(View.loadImage("deobfuscate16"));
     }
 
     @Override

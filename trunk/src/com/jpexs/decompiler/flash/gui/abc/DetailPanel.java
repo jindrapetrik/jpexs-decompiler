@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
+import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.awt.BorderLayout;
@@ -99,9 +100,9 @@ public class DetailPanel extends JPanel implements ActionListener {
         selectedCard = UNSUPPORTED_TRAIT_CARD;
         layout.show(innerPanel, UNSUPPORTED_TRAIT_CARD);
         buttonsPanel.setVisible(false);
-        selectedLabel = new JLabel("");
+        selectedLabel = new HeaderLabel("");
         selectedLabel.setText(selectedCard);
-        selectedLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        //selectedLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
         selectedLabel.setHorizontalAlignment(SwingConstants.CENTER);
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(selectedLabel, BorderLayout.NORTH);

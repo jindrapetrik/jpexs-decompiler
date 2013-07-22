@@ -92,6 +92,7 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
         View.setWindowIcon(this);
         View.centerScreen(this);
         setTitle("Select language");
+        pack();
     }
 
     @Override

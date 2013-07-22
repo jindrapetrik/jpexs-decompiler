@@ -18,9 +18,9 @@ package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
-import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.List;
 import java.util.Stack;
 

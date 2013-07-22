@@ -17,11 +17,7 @@
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.action.model.CallFunctionActionItem;
-import com.jpexs.decompiler.flash.action.model.CallMethodActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
-import com.jpexs.decompiler.flash.action.model.NewMethodActionItem;
-import com.jpexs.decompiler.flash.action.model.SetTypeActionItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
@@ -44,8 +40,8 @@ public class ActionPop extends Action {
             return;
         }
         GraphTargetItem val = stack.pop();
-        if(val instanceof DirectValueActionItem){
-            if(((DirectValueActionItem)val).value instanceof RegisterNumber){
+        if (val instanceof DirectValueActionItem) {
+            if (((DirectValueActionItem) val).value instanceof RegisterNumber) {
                 return;
             }
         }

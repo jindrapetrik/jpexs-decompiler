@@ -23,7 +23,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.ImageObserver;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -36,7 +35,7 @@ import javax.swing.SwingConstants;
  */
 public class LoadingDialog extends AppDialog implements ImageObserver {
 
-    private JLabel detailLabel = new JLabel("", JLabel.CENTER);
+    private JLabel detailLabel;
     private LoadingPanel loadingPanel;
     JProgressBar progressBar = new JProgressBar(0, 100);
 
@@ -45,15 +44,20 @@ public class LoadingDialog extends AppDialog implements ImageObserver {
         detailLabel.setHorizontalAlignment(SwingConstants.CENTER);
     }
 
-    public void setPercent(int percent) {
-        progressBar.setValue(percent);
-        progressBar.setVisible(true);
+    public void setPercent(final int percent) {
+        View.execInEventDispatch(new Runnable() {
+            @Override
+            public void run() {
+                progressBar.setIndeterminate(false);
+                progressBar.setValue(percent);
+                progressBar.setStringPainted(true);
+            }
+        });
     }
 
     public void hidePercent() {
-        if (progressBar.isVisible()) {
-            progressBar.setVisible(false);
-        }
+        progressBar.setIndeterminate(true);
+        progressBar.setStringPainted(false);
     }
 
     /**
@@ -62,31 +66,34 @@ public class LoadingDialog extends AppDialog implements ImageObserver {
     public LoadingDialog() {
         setResizable(false);
         setTitle(Main.shortApplicationVerName);
-        setSize(Math.max(300, 150 + getFontMetrics(new JLabel().getFont()).stringWidth(translate("loadingpleasewait"))), 150);
-        Container cnt = getContentPane();
+        Container cntp = getContentPane();
+        JPanel cnt = new JPanel();
+        cntp.setLayout(new BorderLayout());
+        cntp.add(cnt);
+        cnt.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         cnt.setLayout(new BorderLayout());
 
-        loadingPanel = new LoadingPanel(50, 50);
-        loadingPanel.setPreferredSize(new Dimension(100, 100));
-        add(loadingPanel, BorderLayout.WEST);
+        //loadingPanel = new LoadingPanel(50, 50);
+        //loadingPanel.setPreferredSize(new Dimension(100, 100));
+        //add(loadingPanel, BorderLayout.WEST);
         JPanel pan = new JPanel();
         pan.setLayout(new ListLayout(5));
         //pan.setPreferredSize(new Dimension(120, 150));
         JLabel loadingLabel = new JLabel(translate("loadingpleasewait"));
         //loadingLabel.setBounds(0, 30, 150, 20);
         loadingLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        detailLabel = new JLabel("H", JLabel.CENTER);
+        detailLabel.setPreferredSize(new Dimension(loadingLabel.getPreferredSize()));
         detailLabel.setHorizontalAlignment(SwingConstants.CENTER);
         //detailLabel.setBounds(0, 45, 150, 20);
         //progressBar.setBounds(0, 70, 125, 25);
         pan.add(loadingLabel);
         pan.add(detailLabel);
         pan.add(progressBar);
-        pan.setBorder(BorderFactory.createEmptyBorder(20, 10, 10, 10));
         cnt.add(pan, BorderLayout.CENTER);
-        progressBar.setVisible(false);
-        progressBar.setStringPainted(true);
         //progressBar.setVisible(false);
-        View.centerScreen(this);
+        progressBar.setStringPainted(true);
+        //progressBar.setVisible(false);        
         View.setWindowIcon(this);
         detailLabel.setHorizontalAlignment(SwingConstants.LEFT);
         addWindowListener(new WindowAdapter() {
@@ -95,5 +102,9 @@ public class LoadingDialog extends AppDialog implements ImageObserver {
                 System.exit(0);
             }
         });
+        pack();
+        Dimension siz = getSize();
+        setSize(Math.max(300, 150 + getFontMetrics(new JLabel().getFont()).stringWidth(translate("loadingpleasewait"))), siz.height);
+        View.centerScreen(this);
     }
 }

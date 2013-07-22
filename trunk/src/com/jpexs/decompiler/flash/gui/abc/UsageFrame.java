@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.gui.AppFrame;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -57,6 +58,7 @@ public class UsageFrame extends AppFrame implements ActionListener, MouseListene
             usageListModel.addElement(u);
         }
         usageList = new JList(usageListModel);
+        usageList.setBackground(Color.white);
         gotoButton.setActionCommand("GOTO");
         gotoButton.addActionListener(this);
         cancelButton.setActionCommand("CANCEL");

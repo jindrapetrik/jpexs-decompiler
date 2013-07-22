@@ -16,9 +16,9 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
@@ -249,7 +249,7 @@ public class DefineMorphShapeTag extends CharacterTag implements BoundedTag, Mor
             cer.anchorDeltaY = cer1.anchorDeltaY + (cer2.anchorDeltaY - cer1.anchorDeltaY) * frame / 65535;
             finalRecords.add(cer);
         }
-        return SHAPERECORD.shapeToImage(tags, 1, fillStyles, lineStyles, finalRecords);
+        return SHAPERECORD.shapeToImage(tags, 3, fillStyles, lineStyles, finalRecords);
     }
 
     @Override

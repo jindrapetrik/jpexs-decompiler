@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
+import com.jpexs.decompiler.flash.gui.MyFormattedTextField;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.text.NumberFormat;
@@ -49,10 +50,10 @@ public class MethodBodyParamsPanel extends JPanel implements ChangeListener {
         this.abcPanel = abcPanel;
 
         JComponent cmps[][] = new JComponent[][]{
-            {maxStackLabel = new JLabel(translate("abc.detail.body.params.maxstack"), SwingConstants.RIGHT), maxStackField = new JFormattedTextField(NumberFormat.getNumberInstance())},
-            {localCountLabel = new JLabel(translate("abc.detail.body.params.localregcount"), SwingConstants.RIGHT), localCountField = new JFormattedTextField(NumberFormat.getNumberInstance())},
-            {initScopeDepthLabel = new JLabel(translate("abc.detail.body.params.minscope"), SwingConstants.RIGHT), initScopeDepthField = new JFormattedTextField(NumberFormat.getNumberInstance())},
-            {maxScopeDepthLabel = new JLabel(translate("abc.detail.body.params.maxscope"), SwingConstants.RIGHT), maxScopeDepthField = new JFormattedTextField(NumberFormat.getNumberInstance())}
+            {maxStackLabel = new JLabel(translate("abc.detail.body.params.maxstack"), SwingConstants.RIGHT), maxStackField = new MyFormattedTextField(NumberFormat.getNumberInstance())},
+            {localCountLabel = new JLabel(translate("abc.detail.body.params.localregcount"), SwingConstants.RIGHT), localCountField = new MyFormattedTextField(NumberFormat.getNumberInstance())},
+            {initScopeDepthLabel = new JLabel(translate("abc.detail.body.params.minscope"), SwingConstants.RIGHT), initScopeDepthField = new MyFormattedTextField(NumberFormat.getNumberInstance())},
+            {maxScopeDepthLabel = new JLabel(translate("abc.detail.body.params.maxscope"), SwingConstants.RIGHT), maxScopeDepthField = new MyFormattedTextField(NumberFormat.getNumberInstance())}
         };
 
 
@@ -64,11 +65,14 @@ public class MethodBodyParamsPanel extends JPanel implements ChangeListener {
             }
         }
 
+        int top = 0;
         for (int i = 0; i < cmps.length; i++) {
-            cmps[i][0].setBounds(10, 30 * i, maxw, 25);
-            cmps[i][1].setBounds(10 + maxw + 10, 30 * i, 75, 25);
+
+            cmps[i][0].setBounds(10, top, maxw, cmps[i][1].getPreferredSize().height);
+            cmps[i][1].setBounds(10 + maxw + 10, top, 75, cmps[i][1].getPreferredSize().height);
             add(cmps[i][0]);
             add(cmps[i][1]);
+            top += cmps[i][1].getPreferredSize().height;
         }
 
         add(autoFillCheckBox);
@@ -76,9 +80,9 @@ public class MethodBodyParamsPanel extends JPanel implements ChangeListener {
 
         experimentalLabel.setForeground(Color.red);
 
-        autoFillCheckBox.setLocation(0, 30 * 5);
+        autoFillCheckBox.setLocation(0, top);
         autoFillCheckBox.setSize(autoFillCheckBox.getPreferredSize());
-        experimentalLabel.setLocation(20 + autoFillCheckBox.getWidth(), 30 * 5);
+        experimentalLabel.setLocation(20 + autoFillCheckBox.getWidth(), top);
         experimentalLabel.setSize(experimentalLabel.getPreferredSize());
         add(experimentalLabel);
 

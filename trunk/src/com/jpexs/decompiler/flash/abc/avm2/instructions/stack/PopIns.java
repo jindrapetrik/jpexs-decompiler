@@ -16,17 +16,17 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.stack;
 
-import com.jpexs.decompiler.flash.abc.avm2.model.CallAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.CallMethodAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.CallPropertyAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.CallSuperAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.CallStaticAVM2Item;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.model.CallAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.CallMethodAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.CallPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.CallStaticAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.CallSuperAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.graph.GraphTargetItem;

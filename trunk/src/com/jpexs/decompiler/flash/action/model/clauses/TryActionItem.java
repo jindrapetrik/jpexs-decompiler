@@ -18,16 +18,16 @@ package com.jpexs.decompiler.flash.action.model.clauses;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.model.ActionItem;
+import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf7.ActionTry;
-import com.jpexs.decompiler.flash.action.model.ConstantPool;
-import com.jpexs.decompiler.flash.action.model.ActionItem;
 import com.jpexs.decompiler.graph.Block;
-import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.ContinueItem;
 import java.util.ArrayList;
 import java.util.List;
 

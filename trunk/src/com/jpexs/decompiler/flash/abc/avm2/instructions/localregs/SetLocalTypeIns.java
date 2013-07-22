@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.SetTypeIns;
+import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IncrementAVM2Item;
@@ -31,7 +32,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.NotCompileTimeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
@@ -51,7 +51,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
         int regId = getRegisterId(ins);
         GraphTargetItem value = (GraphTargetItem) stack.pop();
         if (localRegs.containsKey(regId)) {
-           localRegs.put(regId, new NotCompileTimeAVM2Item(ins, value));
+            localRegs.put(regId, new NotCompileTimeAVM2Item(ins, value));
         } else {
             localRegs.put(regId, value);
         }

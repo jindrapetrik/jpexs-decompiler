@@ -26,11 +26,8 @@ import com.jpexs.decompiler.flash.abc.avm2.model.NotCompileTimeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.UndefinedAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Stack;
 
 public abstract class GetLocalTypeIns extends InstructionDefinition {

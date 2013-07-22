@@ -16,9 +16,9 @@
  */
 package com.jpexs.decompiler.flash.action.model;
 
+import com.jpexs.decompiler.flash.action.model.operations.AddActionItem;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf4.ActionGetURL2;
-import com.jpexs.decompiler.flash.action.model.operations.AddActionItem;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;

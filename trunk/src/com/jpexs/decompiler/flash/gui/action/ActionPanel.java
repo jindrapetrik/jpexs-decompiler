@@ -27,10 +27,9 @@ import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptParser;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
-import com.jpexs.decompiler.graph.Graph;
-import com.jpexs.decompiler.graph.GraphTargetItem;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
+import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.View;
@@ -40,6 +39,8 @@ import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -68,7 +69,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.border.BevelBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.tree.TreePath;
@@ -89,8 +89,8 @@ public class ActionPanel extends JPanel implements ActionListener {
     public JButton saveDecompiledButton = new JButton(translate("button.save"), View.getIcon("save16"));
     public JButton cancelDecompiledButton = new JButton(translate("button.cancel"), View.getIcon("cancel16"));
     public JToggleButton hexButton;
-    public JLabel asmLabel = new JLabel(translate("panel.disassembled"));
-    public JLabel decLabel = new JLabel(translate("panel.decompiled"));
+    public JLabel asmLabel = new HeaderLabel(translate("panel.disassembled"));
+    public JLabel decLabel = new HeaderLabel(translate("panel.decompiled"));
     public List<Highlighting> decompiledHilights = new ArrayList<>();
     public List<Highlighting> disassembledHilights = new ArrayList<>();
     public String lastDisasm = "";
@@ -389,7 +389,7 @@ public class ActionPanel extends JPanel implements ActionListener {
         JPanel panB = new JPanel();
         panB.setLayout(new BorderLayout());
         asmLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        asmLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        //asmLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
         panB.add(asmLabel, BorderLayout.NORTH);
         panB.add(panCode, BorderLayout.CENTER);
 
@@ -452,7 +452,7 @@ public class ActionPanel extends JPanel implements ActionListener {
         panA.add(decLabel, BorderLayout.NORTH);
         panA.add(decButtonsPan, BorderLayout.SOUTH);
         decLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        decLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        //decLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
 
 
 

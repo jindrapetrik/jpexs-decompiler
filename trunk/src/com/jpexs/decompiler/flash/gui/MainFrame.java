@@ -91,7 +91,6 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
-import com.sun.jna.Platform;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -99,8 +98,12 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -149,8 +152,10 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -170,23 +175,45 @@ import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.plaf.basic.BasicLabelUI;
+import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
+import org.pushingpixels.flamingo.api.common.AbstractCommandButton;
+import org.pushingpixels.flamingo.api.common.CommandButtonDisplayState;
+import org.pushingpixels.flamingo.api.common.CommandButtonLayoutManager;
+import org.pushingpixels.flamingo.api.common.JCommandButton;
+import org.pushingpixels.flamingo.api.common.JCommandButton.CommandButtonKind;
+import org.pushingpixels.flamingo.api.common.icon.ResizableIcon;
+import org.pushingpixels.flamingo.api.ribbon.JRibbon;
+import org.pushingpixels.flamingo.api.ribbon.JRibbonBand;
+import org.pushingpixels.flamingo.api.ribbon.JRibbonComponent;
+import org.pushingpixels.flamingo.api.ribbon.RibbonApplicationMenu;
+import org.pushingpixels.flamingo.api.ribbon.RibbonApplicationMenuEntryFooter;
+import org.pushingpixels.flamingo.api.ribbon.RibbonApplicationMenuEntryPrimary;
+import org.pushingpixels.flamingo.api.ribbon.RibbonElementPriority;
+import org.pushingpixels.flamingo.api.ribbon.RibbonTask;
+import org.pushingpixels.flamingo.api.ribbon.resize.BaseRibbonBandResizePolicy;
+import org.pushingpixels.flamingo.api.ribbon.resize.CoreRibbonResizePolicies;
+import org.pushingpixels.flamingo.api.ribbon.resize.IconRibbonBandResizePolicy;
+import org.pushingpixels.flamingo.internal.ui.ribbon.AbstractBandControlPanel;
+import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.JRibbonApplicationMenuButton;
 
 /**
  *
  * @author Jindra
  */
-public class MainFrame extends AppFrame implements ActionListener, TreeSelectionListener, Freed {
+public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSelectionListener, Freed {
 
     private SWF swf;
     public ABCPanel abcPanel;
@@ -220,9 +247,9 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
     JSplitPane splitPane2;
     private boolean splitsInited = false;
     private JPanel detailPanel;
-    private JTextField filterField = new JTextField("");
+    private JTextField filterField = new MyTextField("");
     private JPanel searchPanel;
-    private JCheckBoxMenuItem autoDeobfuscateMenuItem;
+    private JCheckBox autoDeobfuscateMenuItem;
     private JPanel displayWithPreview;
     private JButton textSaveButton;
     private JButton textEditButton;
@@ -231,12 +258,12 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
     private JSplitPane previewSplitPane;
     private JButton imageReplaceButton;
     private JPanel imageButtonsPanel;
-    private JCheckBoxMenuItem miInternalViewer;
-    private JCheckBoxMenuItem miParallelSpeedUp;
-    private JCheckBoxMenuItem miAssociate;
-    private JCheckBoxMenuItem miDecompile;
-    private JCheckBoxMenuItem miCacheDisk;
-    private JCheckBoxMenuItem miGotoMainClassOnStartup;
+    private JCheckBox miInternalViewer;
+    private JCheckBox miParallelSpeedUp;
+    private JCheckBox miAssociate;
+    private JCheckBox miDecompile;
+    private JCheckBox miCacheDisk;
+    private JCheckBox miGotoMainClassOnStartup;
     private JLabel fontNameLabel;
     private JLabel fontIsBoldLabel;
     private JLabel fontIsItalicLabel;
@@ -302,9 +329,197 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         statusLabel.setText(s);
     }
 
+    private String fixCommandTitle(String title) {
+        if (title.length() > 2) {
+            if (title.charAt(1) == ' ') {
+                title = title.charAt(0) + "\u00A0" + title.substring(2);
+            }
+        }
+        return title;
+    }
+
+    private void assignListener(JCheckBox b, final String command) {
+        b.setActionCommand(command);
+        b.addActionListener(this);
+    }
+
+    private void assignListener(JCommandButton b, final String command) {
+        final MainFrame t = this;
+        b.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                t.actionPerformed(new ActionEvent(e.getSource(), 0, command));
+            }
+        });
+    }
+
+    @SuppressWarnings("unchecked")
     public MainFrame(SWF swf) {
+        super();
+        JRibbon rib = getRibbon();
+
+        JRibbonBand editBand = new JRibbonBand(translate("menu.general"), null);
+        editBand.setResizePolicies((List) Arrays.asList(new CoreRibbonResizePolicies.Mirror(editBand.getControlPanel()), new IconRibbonBandResizePolicy(editBand.getControlPanel())));
+        JCommandButton openCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.open")), View.getResizableIcon("open32"));
+        assignListener(openCommandButton, "OPEN");
+        JCommandButton saveCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.save")), View.getResizableIcon("save32"));
+        assignListener(saveCommandButton, "SAVE");
+        JCommandButton saveasCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.saveas")), View.getResizableIcon("saveas32"));
+        assignListener(saveasCommandButton, "SAVEAS");
+
+
+
+        editBand.addCommandButton(openCommandButton, RibbonElementPriority.TOP);
+        editBand.addCommandButton(saveCommandButton, RibbonElementPriority.TOP);
+        editBand.addCommandButton(saveasCommandButton, RibbonElementPriority.TOP);
+
+
+        JRibbonBand exportBand = new JRibbonBand(translate("menu.export"), null);
+        exportBand.setResizePolicies((List) Arrays.asList(new CoreRibbonResizePolicies.Mirror(exportBand.getControlPanel()), new IconRibbonBandResizePolicy(exportBand.getControlPanel())));
+        JCommandButton exportFlaCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.export.fla")), View.getResizableIcon("exportfla32"));
+        assignListener(exportFlaCommandButton, "EXPORTFLA");
+        JCommandButton exportAllCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.export.all")), View.getResizableIcon("export16"));
+        assignListener(exportAllCommandButton, "EXPORT");
+        JCommandButton exportSelectionCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.export.selection")), View.getResizableIcon("exportsel16"));
+        assignListener(exportSelectionCommandButton, "EXPORTSEL");
+
+        exportBand.addCommandButton(exportFlaCommandButton, RibbonElementPriority.TOP);
+        exportBand.addCommandButton(exportAllCommandButton, RibbonElementPriority.MEDIUM);
+        exportBand.addCommandButton(exportSelectionCommandButton, RibbonElementPriority.MEDIUM);
+
+        RibbonTask fileTask = new RibbonTask(translate("menu.file"), editBand, exportBand);
+        //----------------------------------------- TOOLS -----------------------------------
+        JRibbonBand toolsBand = new JRibbonBand(translate("menu.tools"), null);
+        toolsBand.setResizePolicies((List) Arrays.asList(new CoreRibbonResizePolicies.Mirror(toolsBand.getControlPanel()), new IconRibbonBandResizePolicy(toolsBand.getControlPanel())));
+
+        JCommandButton searchCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.searchas")), View.getResizableIcon("search32"));
+        assignListener(searchCommandButton, "SEARCHAS");
+        JCommandButton proxyCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.proxy")), View.getResizableIcon("proxy32"));
+        assignListener(proxyCommandButton, "SHOWPROXY");
+        JCommandButton gotoDocumentClassCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.gotodocumentclass")), View.getResizableIcon("gotomainclass32"));
+        assignListener(gotoDocumentClassCommandButton, "GOTODOCUMENTCLASS");
+
+        toolsBand.addCommandButton(searchCommandButton, RibbonElementPriority.TOP);
+        toolsBand.addCommandButton(proxyCommandButton, RibbonElementPriority.TOP);
+        toolsBand.addCommandButton(gotoDocumentClassCommandButton, RibbonElementPriority.TOP);
+
+        JRibbonBand deobfuscationBand = new JRibbonBand(translate("menu.tools.deobfuscation"), null);
+        deobfuscationBand.setResizePolicies((List) Arrays.asList(new CoreRibbonResizePolicies.Mirror(deobfuscationBand.getControlPanel()), new IconRibbonBandResizePolicy(deobfuscationBand.getControlPanel())));
+
+        JCommandButton deobfuscationCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.deobfuscation.pcode")), View.getResizableIcon("deobfuscate32"));
+        assignListener(deobfuscationCommandButton, "DEOBFUSCATE");
+        JCommandButton globalrenameCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.deobfuscation.globalrename")), View.getResizableIcon("rename16"));
+        assignListener(globalrenameCommandButton, "RENAMEONEIDENTIFIER");
+        JCommandButton renameinvalidCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.deobfuscation.renameinvalid")), View.getResizableIcon("renameall16"));
+        assignListener(renameinvalidCommandButton, "RENAMEIDENTIFIERS");
+
+        deobfuscationBand.addCommandButton(deobfuscationCommandButton, RibbonElementPriority.TOP);
+        deobfuscationBand.addCommandButton(globalrenameCommandButton, RibbonElementPriority.MEDIUM);
+        deobfuscationBand.addCommandButton(renameinvalidCommandButton, RibbonElementPriority.MEDIUM);
+
+        RibbonTask toolsTask = new RibbonTask(translate("menu.tools"), toolsBand, deobfuscationBand);
+
+
+        //----------------------------------------- SETTINGS -----------------------------------
+
+
+        JRibbonBand settingsBand = new JRibbonBand(translate("menu.settings"), null);
+        settingsBand.setResizePolicies((List) Arrays.asList(new CoreRibbonResizePolicies.Mirror(settingsBand.getControlPanel()), new IconRibbonBandResizePolicy(settingsBand.getControlPanel())));
+
+        autoDeobfuscateMenuItem = new JCheckBox(translate("menu.settings.autodeobfuscation"));
+        //assignListener(autoDeobfuscateMenuItem,"AUTODEOBFUSCATE");
+
+        miInternalViewer = new JCheckBox(translate("menu.settings.internalflashviewer"));
+        //assignListener(miInternalViewer,"INTERNALVIEWERSWITCH");
+        miParallelSpeedUp = new JCheckBox(translate("menu.settings.parallelspeedup"));
+        //assignListener(miParallelSpeedUp,"PARALLELSPEEDUP");
+        miDecompile = new JCheckBox(translate("menu.settings.disabledecompilation"));
+        //assignListener(miDecompile,"DISABLEDECOMPILATION");
+        miAssociate = new JCheckBox(translate("menu.settings.addtocontextmenu"));
+        //assignListener(miAssociate,"ASSOCIATE");
+        miCacheDisk = new JCheckBox(translate("menu.settings.cacheOnDisk"));
+        //assignListener(miCacheDisk,"CACHEONDISK");
+        miGotoMainClassOnStartup = new JCheckBox(translate("menu.settings.gotoMainClassOnStartup"));
+        //assignListener(miGotoMainClassOnStartup,"GOTODOCUMENTCLASSONSTARTUP");
+
+
+        settingsBand.addRibbonComponent(new JRibbonComponent(autoDeobfuscateMenuItem));
+        settingsBand.addRibbonComponent(new JRibbonComponent(miInternalViewer));
+        settingsBand.addRibbonComponent(new JRibbonComponent(miParallelSpeedUp));
+        settingsBand.addRibbonComponent(new JRibbonComponent(miDecompile));
+        settingsBand.addRibbonComponent(new JRibbonComponent(miAssociate));
+        settingsBand.addRibbonComponent(new JRibbonComponent(miCacheDisk));
+        settingsBand.addRibbonComponent(new JRibbonComponent(miGotoMainClassOnStartup));
+
+        JRibbonBand languageBand = new JRibbonBand(translate("menu.language"), null);
+        languageBand.setResizePolicies((List) Arrays.asList(new BaseRibbonBandResizePolicy<AbstractBandControlPanel>(languageBand.getControlPanel()) {
+            @Override
+            public int getPreferredWidth(int i, int i1) {
+                return 105;
+            }
+
+            @Override
+            public void install(int i, int i1) {
+            }
+        }, new IconRibbonBandResizePolicy(languageBand.getControlPanel())));
+        JCommandButton setLanguageCommandButton = new JCommandButton(fixCommandTitle(translate("menu.settings.language")), View.getResizableIcon("setlanguage32"));
+        assignListener(setLanguageCommandButton, "SETLANGUAGE");
+        languageBand.addCommandButton(setLanguageCommandButton, RibbonElementPriority.TOP);
+        RibbonTask settingsTask = new RibbonTask(translate("menu.settings"), settingsBand, languageBand);
+
+
+        //----------------------------------------- HELP -----------------------------------
+
+        JRibbonBand helpBand = new JRibbonBand(translate("menu.help"), null);
+        helpBand.setResizePolicies((List) Arrays.asList(new CoreRibbonResizePolicies.Mirror(helpBand.getControlPanel()), new IconRibbonBandResizePolicy(helpBand.getControlPanel())));
+
+        JCommandButton checkForUpdatesCommandButton = new JCommandButton(fixCommandTitle(translate("menu.help.checkupdates")), View.getResizableIcon("update16"));
+        assignListener(checkForUpdatesCommandButton, "CHECKUPDATES");
+        JCommandButton helpUsUpdatesCommandButton = new JCommandButton(fixCommandTitle(translate("menu.help.helpus")), View.getResizableIcon("donate32"));
+        assignListener(helpUsUpdatesCommandButton, "HELPUS");
+        JCommandButton homepageCommandButton = new JCommandButton(fixCommandTitle(translate("menu.help.homepage")), View.getResizableIcon("homepage16"));
+        assignListener(homepageCommandButton, "HOMEPAGE");
+        JCommandButton aboutCommandButton = new JCommandButton(fixCommandTitle(translate("menu.help.about")), View.getResizableIcon("about32"));
+        assignListener(aboutCommandButton, "ABOUT");
+
+        helpBand.addCommandButton(aboutCommandButton, RibbonElementPriority.TOP);
+        helpBand.addCommandButton(checkForUpdatesCommandButton, RibbonElementPriority.MEDIUM);
+        helpBand.addCommandButton(homepageCommandButton, RibbonElementPriority.MEDIUM);
+        helpBand.addCommandButton(helpUsUpdatesCommandButton, RibbonElementPriority.TOP);
+        RibbonTask helpTask = new RibbonTask(translate("menu.help"), helpBand);
+
+
+        rib.addTask(fileTask);
+        rib.addTask(toolsTask);
+        rib.addTask(settingsTask);
+        rib.addTask(helpTask);
+
+
+        RibbonApplicationMenu mainMenu = new RibbonApplicationMenu();
+        RibbonApplicationMenuEntryPrimary exportFlaMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("exportfla32"), translate("menu.file.export.fla"), new ActionRedirector(this, "EXPORTFLA"), CommandButtonKind.ACTION_ONLY);
+        RibbonApplicationMenuEntryPrimary exportAllMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("export32"), translate("menu.file.export.all"), new ActionRedirector(this, "EXPORTSEL"), CommandButtonKind.ACTION_ONLY);
+        RibbonApplicationMenuEntryPrimary exportSelMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("exportsel32"), translate("menu.file.export.selection"), new ActionRedirector(this, "EXPORTSEL"), CommandButtonKind.ACTION_ONLY);
+        RibbonApplicationMenuEntryPrimary checkUpdatesMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("update32"), translate("menu.help.checkupdates"), new ActionRedirector(this, "CHECKUPDATES"), CommandButtonKind.ACTION_ONLY);
+        RibbonApplicationMenuEntryPrimary aboutMenu = new RibbonApplicationMenuEntryPrimary(View.getResizableIcon("about32"), translate("menu.help.about"), new ActionRedirector(this, "ABOUT"), CommandButtonKind.ACTION_ONLY);
+        //
+
+        RibbonApplicationMenuEntryFooter exitMenu = new RibbonApplicationMenuEntryFooter(View.getResizableIcon("exit32"), translate("menu.file.exit"), new ActionRedirector(this, "EXIT"));
+
+        mainMenu.addMenuEntry(exportFlaMenu);
+        mainMenu.addMenuEntry(exportAllMenu);
+        mainMenu.addMenuEntry(exportSelMenu);
+        mainMenu.addMenuSeparator();
+        mainMenu.addMenuEntry(checkUpdatesMenu);
+        mainMenu.addMenuEntry(aboutMenu);
+        mainMenu.addFooterEntry(exitMenu);
+        mainMenu.addMenuSeparator();
+        /*ResizableIcon ic = View.getResizableIcon("icon_round256");
+         setApplicationIcon(ic);*/
+        rib.setApplicationMenu(mainMenu);
+
 
         int w = (Integer) Configuration.getConfig("gui.window.width", 1000);
+
         int h = (Integer) Configuration.getConfig("gui.window.height", 700);
         Dimension dim = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         if (w > dim.width) {
@@ -359,7 +574,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                 Main.exit();
             }
         });
-        setTitle(Main.applicationVerName + (Configuration.DISPLAY_FILENAME ? " - " + Main.getFileTitle() : ""));
+        setTitle(Main.applicationVerName + ((swf != null && Configuration.DISPLAY_FILENAME) ? " - " + Main.getFileTitle() : ""));
         JMenuBar menuBar = new JMenuBar();
 
 
@@ -418,8 +633,8 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         miDeobfuscation.setActionCommand("DEOBFUSCATE");
         miDeobfuscation.addActionListener(this);
 
-        autoDeobfuscateMenuItem = new JCheckBoxMenuItem(translate("menu.settings.autodeobfuscation"));
-        autoDeobfuscateMenuItem.setState((Boolean) Configuration.getConfig("autoDeobfuscate", true));
+        //autoDeobfuscateMenuItem = new JCheckBoxMenuItem(translate("menu.settings.autodeobfuscation"));
+        autoDeobfuscateMenuItem.setSelected((Boolean) Configuration.getConfig("autoDeobfuscate", true));
         autoDeobfuscateMenuItem.addActionListener(this);
         autoDeobfuscateMenuItem.setActionCommand("AUTODEOBFUSCATE");
 
@@ -448,7 +663,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
 
         menuTools.add(miSearchScript);
 
-        miInternalViewer = new JCheckBoxMenuItem(translate("menu.settings.internalflashviewer"));
+        //miInternalViewer = new JCheckBox(translate("menu.settings.internalflashviewer"));
         miInternalViewer.setSelected((Boolean) Configuration.getConfig("internalFlashViewer", (Boolean) (flashPanel == null)));
         if (flashPanel == null) {
             miInternalViewer.setSelected(true);
@@ -457,7 +672,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         miInternalViewer.setActionCommand("INTERNALVIEWERSWITCH");
         miInternalViewer.addActionListener(this);
 
-        miParallelSpeedUp = new JCheckBoxMenuItem(translate("menu.settings.parallelspeedup"));
+        //miParallelSpeedUp = new JCheckBox(translate("menu.settings.parallelspeedup"));
         miParallelSpeedUp.setSelected((Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
         miParallelSpeedUp.setActionCommand("PARALLELSPEEDUP");
         miParallelSpeedUp.addActionListener(this);
@@ -473,46 +688,46 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         miGotoDocumentClass.addActionListener(this);
         menuBar.add(menuTools);
 
-        miDecompile = new JCheckBoxMenuItem(translate("menu.settings.disabledecompilation"));
+        //miDecompile = new JCheckBox(translate("menu.settings.disabledecompilation"));
         miDecompile.setSelected(!(Boolean) Configuration.getConfig("decompile", Boolean.TRUE));
         miDecompile.setActionCommand("DISABLEDECOMPILATION");
         miDecompile.addActionListener(this);
 
 
-        miCacheDisk = new JCheckBoxMenuItem(translate("menu.settings.cacheOnDisk"));
+        //miCacheDisk = new JCheckBox(translate("menu.settings.cacheOnDisk"));
         miCacheDisk.setSelected((Boolean) Configuration.getConfig("cacheOnDisk", Boolean.TRUE));
         miCacheDisk.setActionCommand("CACHEONDISK");
         miCacheDisk.addActionListener(this);
 
-        miGotoMainClassOnStartup = new JCheckBoxMenuItem(translate("menu.settings.gotoMainClassOnStartup"));
+        // miGotoMainClassOnStartup = new JCheckBox(translate("menu.settings.gotoMainClassOnStartup"));
         miGotoMainClassOnStartup.setSelected((Boolean) Configuration.getConfig("gotoMainClassOnStartup", Boolean.FALSE));
         miGotoMainClassOnStartup.setActionCommand("GOTODOCUMENTCLASSONSTARTUP");
         miGotoMainClassOnStartup.addActionListener(this);
 
-        JMenu menuSettings = new JMenu(translate("menu.settings"));
-        menuSettings.add(autoDeobfuscateMenuItem);
-        menuSettings.add(miInternalViewer);
-        menuSettings.add(miParallelSpeedUp);
-        menuSettings.add(miDecompile);
-        menuSettings.add(miCacheDisk);
-        menuSettings.add(miGotoMainClassOnStartup);
+        /*JMenu menuSettings = new JMenu(translate("menu.settings"));
+         menuSettings.add(autoDeobfuscateMenuItem);
+         menuSettings.add(miInternalViewer);
+         menuSettings.add(miParallelSpeedUp);
+         menuSettings.add(miDecompile);
+         menuSettings.add(miCacheDisk);
+         menuSettings.add(miGotoMainClassOnStartup);*/
 
-        miAssociate = new JCheckBoxMenuItem(translate("menu.settings.addtocontextmenu"));
+        // miAssociate = new JCheckBox(translate("menu.settings.addtocontextmenu"));
         miAssociate.setActionCommand("ASSOCIATE");
         miAssociate.addActionListener(this);
-        miAssociate.setState(Main.isAddedToContextMenu());
+        miAssociate.setSelected(Main.isAddedToContextMenu());
 
 
         JMenuItem miLanguage = new JMenuItem(translate("menu.settings.language"));
         miLanguage.setActionCommand("SETLANGUAGE");
         miLanguage.addActionListener(this);
 
-        if (Platform.isWindows()) {
-            menuSettings.add(miAssociate);
-        }
-        menuSettings.add(miLanguage);
+        /* if (Platform.isWindows()) {
+         menuSettings.add(miAssociate);
+         }
+         menuSettings.add(miLanguage);
 
-        menuBar.add(menuSettings);
+         menuBar.add(menuSettings);*/
         JMenu menuHelp = new JMenu(translate("menu.help"));
         JMenuItem miAbout = new JMenuItem(translate("menu.help.about"));
         miAbout.setIcon(View.getIcon("about16"));
@@ -542,16 +757,17 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         menuHelp.add(miAbout);
         menuBar.add(menuHelp);
 
-        setJMenuBar(menuBar);
+        //setJMenuBar(menuBar);
 
         List<Object> objs = new ArrayList<>();
-        objs.addAll(swf.tags);
-
+        if (swf != null) {
+            objs.addAll(swf.tags);
+        }
 
         this.swf = swf;
         java.awt.Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
-
+        cnt.add(getRibbon(), BorderLayout.NORTH);
 
         detailPanel = new JPanel();
         detailPanel.setLayout(new CardLayout());
@@ -569,13 +785,44 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
             detailPanel.add(abcPanel.tabbedPane, DETAILCARDAS3NAVIGATOR);
             menuTools.add(miGotoDocumentClass);
         } else {
+            gotoDocumentClassCommandButton.setEnabled(false);
             actionPanel = new ActionPanel();
-            miDeobfuscation.setEnabled(false);
+            deobfuscationCommandButton.setEnabled(false);
+            //miDeobfuscation.setEnabled(false);
         }
 
+        if (swf == null) {
+            renameinvalidCommandButton.setEnabled(false);
+            globalrenameCommandButton.setEnabled(false);
+            saveCommandButton.setEnabled(false);
+            saveasCommandButton.setEnabled(false);
+            exportAllCommandButton.setEnabled(false);
+            exportAllMenu.setEnabled(false);
+            exportFlaCommandButton.setEnabled(false);
+            exportFlaMenu.setEnabled(false);
+            exportSelectionCommandButton.setEnabled(false);
+            exportSelMenu.setEnabled(false);
+            deobfuscationCommandButton.setEnabled(false);
+            searchCommandButton.setEnabled(false);
+        }
 
-        tagTree = new JTree(new TagTreeModel(createTagList(objs, null), new SWFRoot((new File(Main.file)).getName())));
+        UIManager.getDefaults().put("TreeUI", BasicTreeUI.class.getName());
+        if (swf == null) {
+            tagTree = new JTree((TreeModel) null);
+        } else {
+            tagTree = new JTree(new TagTreeModel(createTagList(objs, null), new SWFRoot((new File(Main.file)).getName())));
+        }
         tagTree.addTreeSelectionListener(this);
+        tagTree.setBackground(Color.white);
+        tagTree.setUI(new BasicTreeUI() {
+            @Override
+            public void paint(Graphics g, JComponent c) {
+                setHashColor(Color.gray);
+                super.paint(g, c);
+            }
+        });
+
+
 
         DragSource dragSource = DragSource.getDefaultDragSource();
         dragSource.createDefaultDragGestureRecognizer(tagTree, DnDConstants.ACTION_COPY_OR_MOVE, new DragGestureListener() {
@@ -724,7 +971,12 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
 
                 String tos = value.toString();
                 int sw = getFontMetrics(getFont()).stringWidth(tos);
-                setPreferredSize(new Dimension(18 + sw, 32));
+                setPreferredSize(new Dimension(18 + sw, getPreferredSize().height));
+                setUI(new BasicLabelUI());
+                setOpaque(false);
+                //setBackground(Color.green);
+                setBackgroundNonSelectionColor(Color.white);
+                //setBackgroundSelectionColor(Color.ORANGE);
                 return this;
             }
         };
@@ -755,14 +1007,18 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         loadingPanel.setVisible(false);
         cnt.add(statusPanel, BorderLayout.SOUTH);
 
-        for (Tag t : swf.tags) {
-            if (t instanceof JPEGTablesTag) {
-                jtt = (JPEGTablesTag) t;
+        if (swf != null) {
+            for (Tag t : swf.tags) {
+                if (t instanceof JPEGTablesTag) {
+                    jtt = (JPEGTablesTag) t;
+                }
             }
         }
         characters = new HashMap<>();
         List<Object> list2 = new ArrayList<>();
-        list2.addAll(swf.tags);
+        if (swf != null) {
+            list2.addAll(swf.tags);
+        }
         parseCharacters(list2);
         JPanel textTopPanel = new JPanel(new BorderLayout());
         textValue = new LineMarkedEditorPane();
@@ -889,8 +1145,8 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
 
         JPanel fontAddCharsPanel = new JPanel(new FlowLayout());
         fontAddCharsPanel.add(new JLabel(translate("font.characters.add")));
-        fontAddCharactersField = new JTextField();
-        fontAddCharactersField.setPreferredSize(new Dimension(100, 25));
+        fontAddCharactersField = new MyTextField();
+        fontAddCharactersField.setPreferredSize(new Dimension(150, fontAddCharactersField.getPreferredSize().height));
         fontAddCharsPanel.add(fontAddCharactersField);
         JButton fontAddCharsButton = new JButton(translate("button.ok"));
         fontAddCharsButton.setActionCommand("FONTADDCHARS");
@@ -939,13 +1195,13 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         previewSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         previewSplitPane.setDividerLocation(300);
         JPanel pan = new JPanel(new BorderLayout());
-        JLabel prevLabel = new JLabel(translate("swfpreview"));
+        JLabel prevLabel = new HeaderLabel(translate("swfpreview"));
         prevLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        prevLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        //prevLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
 
-        JLabel paramsLabel = new JLabel(translate("parameters"));
+        JLabel paramsLabel = new HeaderLabel(translate("parameters"));
         paramsLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        paramsLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        //paramsLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
         pan.add(prevLabel, BorderLayout.NORTH);
         pan.add(leftComponent, BorderLayout.CENTER);
         previewSplitPane.setLeftComponent(pan);
@@ -980,9 +1236,9 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
 
         previewImagePanel = new ImagePanel();
         previewPanel.add(previewImagePanel, BorderLayout.CENTER);
-        JLabel prevIntLabel = new JLabel(translate("swfpreview.internal"));
+        JLabel prevIntLabel = new HeaderLabel(translate("swfpreview.internal"));
         prevIntLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        prevIntLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        //prevIntLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
         previewPanel.add(prevIntLabel, BorderLayout.NORTH);
         shapesCard.add(previewPanel, BorderLayout.CENTER);
         displayPanel.add(shapesCard, CARDDRAWPREVIEWPANEL);
@@ -1050,8 +1306,45 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         splitPane1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitPane2, displayPanel);
 
 
+        if (swf == null) {
+            JPanel welcomePanel = new JPanel();
+            welcomePanel.setLayout(new BoxLayout(welcomePanel, BoxLayout.Y_AXIS));
+            JLabel welcomeToLabel = new JLabel(translate("startup.welcometo"));
+            welcomeToLabel.setFont(welcomeToLabel.getFont().deriveFont(40));
+            welcomeToLabel.setAlignmentX(0.5f);
+            JPanel appNamePanel = new JPanel(new FlowLayout());
+            JLabel jpLabel = new JLabel("JPEXS ");
+            jpLabel.setAlignmentX(0.5f);
+            jpLabel.setForeground(new Color(0, 0, 160));
+            jpLabel.setFont(new Font("Tahoma", Font.BOLD, 50));
+            jpLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            appNamePanel.add(jpLabel);
 
-        cnt.add(splitPane1, BorderLayout.CENTER);
+            JLabel ffLabel = new JLabel("Free Flash ");
+            ffLabel.setAlignmentX(0.5f);
+            ffLabel.setFont(new Font("Tahoma", Font.BOLD, 50));
+            ffLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            appNamePanel.add(ffLabel);
+
+            JLabel decLabel = new JLabel("Decompiler");
+            decLabel.setAlignmentX(0.5f);
+            decLabel.setForeground(Color.red);
+            decLabel.setFont(new Font("Tahoma", Font.BOLD, 50));
+            decLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            appNamePanel.add(decLabel);
+            appNamePanel.setAlignmentX(0.5f);
+            welcomePanel.add(Box.createGlue());
+            welcomePanel.add(welcomeToLabel);
+            welcomePanel.add(appNamePanel);
+            JLabel startLabel = new JLabel(translate("startup.selectopen"));
+            startLabel.setAlignmentX(0.5f);
+            startLabel.setFont(startLabel.getFont().deriveFont(30));
+            welcomePanel.add(startLabel);
+            welcomePanel.add(Box.createGlue());
+            cnt.add(welcomePanel, BorderLayout.CENTER);
+        } else {
+            cnt.add(splitPane1, BorderLayout.CENTER);
+        }
         //splitPane1.setDividerLocation(0.5);
 
         splitPane1.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
@@ -1128,6 +1421,8 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
             public void close() throws SecurityException {
             }
         });
+
+        //pack();
     }
 
     public void enableDrop(boolean value) {
@@ -1161,6 +1456,19 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
         }
     }
 
+    private static void getApplicationMenuButtons(Component comp, List<JRibbonApplicationMenuButton> ret) {
+        if (comp instanceof JRibbonApplicationMenuButton) {
+            ret.add((JRibbonApplicationMenuButton) comp);
+            return;
+        }
+        if (comp instanceof java.awt.Container) {
+            java.awt.Container cont = (java.awt.Container) comp;
+            for (int i = 0; i < cont.getComponentCount(); i++) {
+                getApplicationMenuButtons(cont.getComponent(i), ret);
+            }
+        }
+    }
+
     @Override
     public void setVisible(boolean b) {
         super.setVisible(b);
@@ -1172,9 +1480,71 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                 actionPanel.initSplits();
             }
 
+            final MainFrame t = this;
+
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
+                    List<JRibbonApplicationMenuButton> mbuttons = new ArrayList<>();
+                    getApplicationMenuButtons(t, mbuttons);
+
+                    for (final JRibbonApplicationMenuButton mbutton : mbuttons) {
+                        mbutton.setIcon(View.getResizableIcon("buttonicon_256"));
+                        mbutton.setDisplayState(new CommandButtonDisplayState(
+                                "My Ribbon Application Menu Button", mbutton.getSize().width) {
+                            @Override
+                            public org.pushingpixels.flamingo.api.common.CommandButtonLayoutManager createLayoutManager(
+                                    org.pushingpixels.flamingo.api.common.AbstractCommandButton commandButton) {
+                                return new CommandButtonLayoutManager() {
+                                    @Override
+                                    public int getPreferredIconSize() {
+                                        return mbutton.getSize().width;
+                                    }
+
+                                    @Override
+                                    public CommandButtonLayoutManager.CommandButtonLayoutInfo getLayoutInfo(
+                                            AbstractCommandButton commandButton, Graphics g) {
+                                        CommandButtonLayoutManager.CommandButtonLayoutInfo result = new CommandButtonLayoutManager.CommandButtonLayoutInfo();
+                                        result.actionClickArea = new Rectangle(0, 0, 0, 0);
+                                        result.popupClickArea = new Rectangle(0, 0, commandButton
+                                                .getWidth(), commandButton.getHeight());
+                                        result.popupActionRect = new Rectangle(0, 0, 0, 0);
+                                        ResizableIcon icon = commandButton.getIcon();
+                                        icon.setDimension(new Dimension(commandButton.getWidth(), commandButton.getHeight()));
+                                        result.iconRect = new Rectangle(
+                                                0,
+                                                0,
+                                                commandButton.getWidth(), commandButton.getHeight());
+                                        result.isTextInActionArea = false;
+                                        return result;
+                                    }
+
+                                    @Override
+                                    public Dimension getPreferredSize(
+                                            AbstractCommandButton commandButton) {
+                                        return new Dimension(40, 40);
+                                    }
+
+                                    @Override
+                                    public void propertyChange(PropertyChangeEvent evt) {
+                                    }
+
+                                    @Override
+                                    public Point getKeyTipAnchorCenterPoint(
+                                            AbstractCommandButton commandButton) {
+                                        // dead center
+                                        return new Point(commandButton.getWidth() / 2,
+                                                commandButton.getHeight() / 2);
+                                    }
+                                };
+                            }
+                        });
+
+                        MyRibbonApplicationMenuButtonUI mui = (MyRibbonApplicationMenuButtonUI) mbutton.getUI();
+                        mui.setHoverIcon(View.getResizableIcon("buttonicon_hover_256"));
+                        mui.setNormalIcon(View.getResizableIcon("buttonicon_256"));
+                        mui.setClickIcon(View.getResizableIcon("buttonicon_down_256"));
+                    }
                     splitPane1.setDividerLocation((Integer) Configuration.getConfig("gui.splitPane1.dividerLocation", getWidth() / 3));
                     int confDivLoc = (Integer) Configuration.getConfig("gui.splitPane2.dividerLocation", splitPane2.getHeight() * 3 / 5);
                     if (confDivLoc > splitPane2.getHeight() - 10) { //In older releases, divider location was saved when detailPanel was invisible too
@@ -1494,6 +1864,9 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
 
     public TagNode getASTagNode(JTree tree) {
         TreeModel tm = tree.getModel();
+        if (tm == null) {
+            return null;
+        }
         Object root = tm.getRoot();
         for (int i = 0; i < tm.getChildCount(root); i++) {
             Object node = tm.getChild(root, i);
@@ -1740,6 +2113,9 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
     }
 
     public void gotoDocumentClass() {
+        if (swf == null) {
+            return;
+        }
         String documentClass = null;
         loopdc:
         for (Tag t : swf.tags) {
@@ -1813,16 +2189,16 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                 doFilter();
                 break;
             case "ASSOCIATE":
-                if (miAssociate.getState() == Main.isAddedToContextMenu()) {
+                if (miAssociate.isSelected() == Main.isAddedToContextMenu()) {
                     return;
                 }
-                Main.addToContextMenu(miAssociate.getState());
+                Main.addToContextMenu(miAssociate.isSelected());
 
                 //Update checkbox menuitem accordingly (User can cancel rights elevation)
                 new Timer().schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        miAssociate.setState(Main.isAddedToContextMenu());
+                        miAssociate.setSelected(Main.isAddedToContextMenu());
                     }
                 }, 500); //It takes some time registry change to apply
                 break;
@@ -1964,8 +2340,8 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                 break;
 
             case "AUTODEOBFUSCATE":
-                if (JOptionPane.showConfirmDialog(this, translate("message.confirm.autodeobfuscate") + "\r\n" + (autoDeobfuscateMenuItem.getState() ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-                    Configuration.setConfig("autoDeobfuscate", autoDeobfuscateMenuItem.getState());
+                if (JOptionPane.showConfirmDialog(this, translate("message.confirm.autodeobfuscate") + "\r\n" + (autoDeobfuscateMenuItem.isSelected() ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                    Configuration.setConfig("autoDeobfuscate", autoDeobfuscateMenuItem.isSelected());
                     clearCache();
                     if (abcPanel != null) {
                         abcPanel.reload();
@@ -1973,7 +2349,7 @@ public class MainFrame extends AppFrame implements ActionListener, TreeSelection
                     reload(true);
                     doFilter();
                 } else {
-                    autoDeobfuscateMenuItem.setState(!autoDeobfuscateMenuItem.getState());
+                    autoDeobfuscateMenuItem.setSelected(!autoDeobfuscateMenuItem.isSelected());
                 }
                 break;
             case "EXIT":

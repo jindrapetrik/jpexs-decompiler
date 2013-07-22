@@ -17,9 +17,9 @@
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.Configuration;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.types.KERNINGRECORD;

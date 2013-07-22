@@ -16,6 +16,10 @@
  */
 package com.jpexs.decompiler.flash.action.model.operations;
 
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
+import com.jpexs.decompiler.flash.action.model.GetPropertyActionItem;
+import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ActionSetProperty;
@@ -24,10 +28,6 @@ import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionIncrement;
 import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
-import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
-import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
-import com.jpexs.decompiler.flash.action.model.GetPropertyActionItem;
-import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.ecma.*;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;

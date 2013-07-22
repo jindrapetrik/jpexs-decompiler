@@ -65,7 +65,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
-import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 
@@ -153,27 +152,33 @@ public class Main {
         startWork(name, -1);
     }
 
-    public static void startWork(String name, int percent) {
+    public static void startWork(final String name, final int percent) {
         working = true;
-        if (mainFrame != null) {
-            mainFrame.setWorkStatus(name);
-            if (percent == -1) {
-                mainFrame.hidePercent();
-            } else {
-                mainFrame.setPercent(percent);
+        View.execInEventDispatch(new Runnable() {
+            @Override
+            public void run() {
+                if (mainFrame != null) {
+                    mainFrame.setWorkStatus(name);
+                    if (percent == -1) {
+                        mainFrame.hidePercent();
+                    } else {
+                        mainFrame.setPercent(percent);
+                    }
+                }
+                if (loadingDialog != null) {
+                    loadingDialog.setDetail(name);
+                    if (percent == -1) {
+                        loadingDialog.hidePercent();
+                    } else {
+                        loadingDialog.setPercent(percent);
+                    }
+                }
+                if (Main.isCommandLineMode()) {
+                    System.out.println(name);
+                }
             }
-        }
-        if (loadingDialog != null) {
-            loadingDialog.setDetail(name);
-            if (percent == -1) {
-                loadingDialog.hidePercent();
-            } else {
-                loadingDialog.setPercent(percent);
-            }
-        }
-        if (Main.isCommandLineMode()) {
-            System.out.println(name);
-        }
+        });
+
     }
 
     public static void stopWork() {
@@ -239,13 +244,26 @@ public class Main {
 
             try {
                 Main.startWork(translate("work.creatingwindow") + "...");
-                mainFrame = new MainFrame(swf);
-                loadingDialog.setVisible(false);
-                mainFrame.setVisible(true);
-                Main.stopWork();
+                View.execInEventDispatch(new Runnable() {
+                    @Override
+                    public void run() {
+                        mainFrame = new MainFrame(swf);
+                    }
+                });
+
             } catch (Exception ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             }
+            loadingDialog.setVisible(false);
+            View.execInEventDispatch(new Runnable() {
+                @Override
+                public void run() {
+                    mainFrame.setVisible(true);
+                }
+            });
+
+            Main.stopWork();
+
             return true;
         }
     }
@@ -260,9 +278,15 @@ public class Main {
             System.gc();
         }
         Main.file = swfFile;
-        if (Main.loadingDialog == null) {
-            Main.loadingDialog = new LoadingDialog();
-        }
+        View.execInEventDispatch(new Runnable() {
+            @Override
+            public void run() {
+                if (Main.loadingDialog == null) {
+                    Main.loadingDialog = new LoadingDialog();
+                }
+            }
+        });
+
         Main.loadingDialog.setVisible(true);
         (new OpenFileWorker()).execute();
         return true;
@@ -333,10 +357,16 @@ public class Main {
     }
 
     public static void showModeFrame() {
-        if (modeFrame == null) {
-            modeFrame = new ModeFrame();
-        }
-        modeFrame.setVisible(true);
+        View.execInEventDispatch(new Runnable() {
+            @Override
+            public void run() {
+                if (mainFrame == null) {
+                    mainFrame = new MainFrame(null);
+                }
+                mainFrame.setVisible(true);
+            }
+        });
+
     }
 
     public static void updateLicense() {
@@ -580,7 +610,9 @@ public class Main {
         initLogging(Configuration.debugMode);
 
         initLang();
+
         View.setLookAndFeel();
+
         if ((Boolean) Configuration.getConfig("cacheOnDisk", Boolean.TRUE)) {
             Cache.setStorageType(Cache.STORAGE_FILES);
         } else {
@@ -607,12 +639,18 @@ public class Main {
                         }
                     }
                 }
-                if (proxyFrame == null) {
-                    proxyFrame = new ProxyFrame();
-                }
+                View.execInEventDispatch(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (proxyFrame == null) {
+                            proxyFrame = new ProxyFrame();
+                        }
+                    }
+                });
                 proxyFrame.setPort(port);
                 addTrayIcon();
                 switchProxy();
+
             } else if (args[pos].equals("-export")) {
                 if (args.length < pos + 4) {
                     badArguments();

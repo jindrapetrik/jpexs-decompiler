@@ -19,8 +19,8 @@ package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.EcmaType;
-import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import java.util.List;
 
 public class AddAVM2Item extends BinaryOpItem {

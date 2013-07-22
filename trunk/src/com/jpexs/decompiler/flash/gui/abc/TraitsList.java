@@ -18,6 +18,10 @@ package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
@@ -47,6 +51,8 @@ public class TraitsList extends JList<Object> implements ListSelectionListener {
         addListSelectionListener(this);
         this.abcPanel = abcPanel;
         setCellRenderer(new IconListRenderer());
+        //setUI(new BasicListUI());
+        setBackground(Color.white);
     }
 
     @SuppressWarnings("unchecked")
@@ -82,5 +88,12 @@ public class TraitsList extends JList<Object> implements ListSelectionListener {
         TraitsListItem sel = (TraitsListItem) getSelectedValue();
         abcPanel.decompiledTextArea.gotoTrait(sel == null ? -1 : sel.getGlobalTraitId());
 
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setComposite(AlphaComposite.SrcOver);
+        super.paint(g);
     }
 }

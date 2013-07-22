@@ -66,8 +66,9 @@ public class ListLayout implements LayoutManager {
             h += pref.height;
             first = false;
         }
+        h += border;
 
-        maxw = parent.getSize().width - ins.left - ins.right;
+        maxw = (parent.getSize().width == 0 ? maxw : parent.getSize().width) - ins.left - ins.right;
         return new Dimension(maxw, h);
     }
 
@@ -91,6 +92,8 @@ public class ListLayout implements LayoutManager {
                 top += border;
             }
             Dimension pref = c.getPreferredSize();
+            c.setPreferredSize(new Dimension(dim.width, pref.height));
+            c.setMinimumSize(new Dimension(dim.width, pref.height));
             c.setBounds(0, top, dim.width, pref.height);
             top += pref.height;
             first = false;

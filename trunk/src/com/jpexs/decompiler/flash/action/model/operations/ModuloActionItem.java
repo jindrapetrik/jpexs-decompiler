@@ -18,10 +18,10 @@ package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.action.swf5.ActionModulo;
 import com.jpexs.decompiler.flash.ecma.*;
-import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import java.util.List;
 
 public class ModuloActionItem extends BinaryOpItem {

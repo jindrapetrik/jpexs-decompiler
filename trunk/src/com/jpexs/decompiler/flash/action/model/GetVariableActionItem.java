@@ -116,8 +116,6 @@ public class GetVariableActionItem extends ActionItem {
         }
         return true;
     }
-    
-    
 
     @Override
     public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {

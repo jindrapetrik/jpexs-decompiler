@@ -26,10 +26,10 @@ import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.swf5.ActionReturn;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
-import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.ExitItem;
 import java.util.ArrayList;
 import java.util.List;
 

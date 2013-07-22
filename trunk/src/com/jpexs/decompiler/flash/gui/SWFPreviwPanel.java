@@ -28,7 +28,6 @@ import java.util.TimerTask;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import javax.swing.border.BevelBorder;
 
 /**
  *
@@ -49,9 +48,9 @@ public class SWFPreviwPanel extends JPanel {
         add(buffering, BorderLayout.SOUTH);
         buffering.setHorizontalAlignment(JLabel.CENTER);
         buffering.setVisible(false);
-        JLabel prevLabel = new JLabel("SWF preview (Internal viewer)");
+        JLabel prevLabel = new HeaderLabel(translate("swfpreview.internal"));
         prevLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        prevLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        //prevLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
         add(prevLabel, BorderLayout.NORTH);
     }
     private SWF swf;

@@ -17,10 +17,10 @@
 package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.action.swf4.ActionStringLess;
-import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import java.util.List;
 
 public class StringLtActionItem extends BinaryOpItem {

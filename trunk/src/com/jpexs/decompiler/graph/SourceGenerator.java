@@ -16,19 +16,19 @@
  */
 package com.jpexs.decompiler.graph;
 
-import com.jpexs.decompiler.graph.model.OrItem;
-import com.jpexs.decompiler.graph.model.DuplicateItem;
-import com.jpexs.decompiler.graph.model.ContinueItem;
-import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.AndItem;
+import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.CommaExpressionItem;
+import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
+import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.ForItem;
+import com.jpexs.decompiler.graph.model.IfItem;
+import com.jpexs.decompiler.graph.model.NotItem;
+import com.jpexs.decompiler.graph.model.OrItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
-import com.jpexs.decompiler.graph.model.NotItem;
-import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
-import com.jpexs.decompiler.graph.model.ForItem;
 import java.util.List;
 
 /**

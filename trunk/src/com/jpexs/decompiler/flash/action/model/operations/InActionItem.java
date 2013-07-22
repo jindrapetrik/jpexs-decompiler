@@ -17,8 +17,8 @@
 package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.action.model.ActionItem;
-import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.model.BinaryOpItem;
 
 public class InActionItem extends BinaryOpItem {
 

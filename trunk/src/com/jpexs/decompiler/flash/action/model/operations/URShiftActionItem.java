@@ -18,10 +18,10 @@ package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.action.swf5.ActionBitURShift;
 import com.jpexs.decompiler.flash.ecma.*;
-import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import java.util.List;
 
 public class URShiftActionItem extends BinaryOpItem {

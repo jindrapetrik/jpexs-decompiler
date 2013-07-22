@@ -16,8 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.Configuration;
-import java.util.Locale;
 import java.util.ResourceBundle;
 import javax.swing.JFrame;
 
@@ -28,6 +26,9 @@ import javax.swing.JFrame;
 public abstract class AppFrame extends JFrame {
 
     private ResourceBundle resourceBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(getClass()));
+
+    public AppFrame() {
+    }
 
     public String translate(String key) {
         return resourceBundle.getString(key);

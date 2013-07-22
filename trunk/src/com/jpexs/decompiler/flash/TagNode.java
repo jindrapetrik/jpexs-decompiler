@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
@@ -48,6 +47,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
+import com.jpexs.decompiler.graph.Graph;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;

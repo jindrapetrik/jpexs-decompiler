@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.model;
 
+import com.jpexs.decompiler.flash.action.model.operations.AddActionItem;
 import com.jpexs.decompiler.flash.action.swf4.ActionPop;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ActionSetProperty;
@@ -24,7 +25,6 @@ import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionIncrement;
 import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
-import com.jpexs.decompiler.flash.action.model.operations.AddActionItem;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;

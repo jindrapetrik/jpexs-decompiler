@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
+import com.jpexs.decompiler.flash.action.model.ConstantPool;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.special.ActionNop;
 import com.jpexs.decompiler.flash.action.special.ActionStore;
@@ -26,14 +28,8 @@ import com.jpexs.decompiler.flash.action.swf4.*;
 import com.jpexs.decompiler.flash.action.swf5.*;
 import com.jpexs.decompiler.flash.action.swf6.*;
 import com.jpexs.decompiler.flash.action.swf7.*;
-import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.Null;
-import com.jpexs.decompiler.graph.Graph;
-import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphSourceItemContainer;
-import com.jpexs.decompiler.graph.GraphSourceItemPos;
-import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.*;
@@ -52,6 +48,11 @@ import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
+import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphSourceItemContainer;
+import com.jpexs.decompiler.graph.GraphSourceItemPos;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -70,7 +71,6 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.InflaterInputStream;
-import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 
 /**
  * Class for reading data from SWF file

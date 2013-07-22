@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.Layer;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.helpers.Cache;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;

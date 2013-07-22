@@ -93,7 +93,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
         cnt.add(new JScrollPane(swfList), BorderLayout.CENTER);
 
 
-        portField.setPreferredSize(new Dimension(60, 22));
+        portField.setPreferredSize(new Dimension(80, portField.getPreferredSize().height));
         JPanel buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new FlowLayout());
         buttonsPanel.add(new JLabel(translate("port")));

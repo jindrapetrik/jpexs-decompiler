@@ -38,7 +38,7 @@ import javax.swing.JTextField;
  */
 public class SearchDialog extends AppDialog implements ActionListener {
 
-    public JTextField searchField = new JTextField();
+    public JTextField searchField = new MyTextField();
     public JCheckBox ignoreCaseCheckBox = new JCheckBox(translate("checkbox.ignorecase"));
     public JCheckBox regexpCheckBox = new JCheckBox(translate("checkbox.regexp"));
     public boolean result = false;
@@ -58,7 +58,7 @@ public class SearchDialog extends AppDialog implements ActionListener {
         panButtons.add(okButton);
         panButtons.add(cancelButton);
         JPanel panField = new JPanel(new FlowLayout());
-        searchField.setPreferredSize(new Dimension(250, 25));
+        searchField.setPreferredSize(new Dimension(250, searchField.getPreferredSize().height));
         panField.add(new JLabel(translate("label.searchtext")));
         panField.add(searchField);
         cnt.add(panField);
@@ -69,9 +69,11 @@ public class SearchDialog extends AppDialog implements ActionListener {
         cnt.add(panButtons);
         getRootPane().setDefaultButton(okButton);
         View.centerScreen(this);
-        View.setWindowIcon(this);
+        //View.setWindowIcon(this);
+        setIconImage(View.loadImage("search16"));
         setTitle(translate("dialog.title"));
         setModalityType(ModalityType.APPLICATION_MODAL);
+        pack();
     }
 
     @Override
