@@ -37,31 +37,27 @@ public class ExportTest {
     public static final String TESTDATADIR = "testdata/decompile";
 
     @BeforeClass
-    public void addLogger(){
+    public void addLogger() {
         Configuration.setConfig("autoDeobfuscate", Boolean.TRUE);
         Logger logger = Logger.getLogger("");
         logger.addHandler(new Handler() {
-
             @Override
             public void publish(LogRecord record) {
-                if(record.getLevel()==Level.SEVERE){
-                    fail("Error during decompilation",record.getThrown());
+                if (record.getLevel() == Level.SEVERE) {
+                    fail("Error during decompilation", record.getThrown());
                 }
             }
 
             @Override
             public void flush() {
-                
             }
 
             @Override
             public void close() throws SecurityException {
-               
             }
         });
     }
-    
-    
+
     @DataProvider(name = "swfFiles")
     public Object[][] createData() {
         File dir = new File(TESTDATADIR);
@@ -88,14 +84,13 @@ public class ExportTest {
             Configuration.DEBUG_COPY = true;
             File fdir = new File(TESTDATADIR + File.separator + "output" + File.separator + f.getName());
             fdir.mkdirs();
-            
-            swf.exportActionScript(new AbortRetryIgnoreHandler() {
 
+            swf.exportActionScript(new AbortRetryIgnoreHandler() {
                 @Override
                 public int handle(Throwable thrown) {
                     return AbortRetryIgnoreHandler.ABORT;
                 }
-            },fdir.getAbsolutePath(), false, false);
+            }, fdir.getAbsolutePath(), false, false);
         } catch (Exception ex) {
             fail();
         }

@@ -1,9 +1,9 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.flash.tags.DoABCDefineTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
