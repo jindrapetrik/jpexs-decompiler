@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="16"
+   height="16"
+   id="svg2"
+   inkscape:label="Pozadí"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   inkscape:export-filename="D:\Dokumenty\Programovani\JavaSE\FFDec\trunk\src\com\jpexs\decompiler\flash\gui\graphics\variable.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90"
+   sodipodi:docname="variable.svg">
+  <defs
+     id="defs3113">
+    <filter
+       inkscape:collect="always"
+       id="filter3989"
+       x="-0.15475198"
+       width="1.309504"
+       y="-0.15725809"
+       height="1.3145162">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.0217995"
+         id="feGaussianBlur3991" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter4079"
+       x="-0.15599999"
+       width="1.312"
+       y="-0.15600001"
+       height="1.312">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.59090912"
+         id="feGaussianBlur4081" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="15.839192"
+     inkscape:cx="22.329591"
+     inkscape:cy="6.6417621"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1366"
+     inkscape:window-height="705"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata3116">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Vrstva 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-1036.3622)">
+    <rect
+       style="fill:#333333;fill-opacity:1;stroke:none;filter:url(#filter4079)"
+       id="rect3993-1"
+       width="9.09091"
+       height="9.090909"
+       x="5"
+       y="1041.2712"
+       transform="matrix(0.79935553,0,0,0.80203241,1.6025415,206.50029)" />
+    <rect
+       style="fill:#80b3ff;fill-opacity:1;stroke:#0066ff;stroke-width:0.72790259"
+       id="rect3993"
+       width="7.2668691"
+       height="7.2912035"
+       x="4.3639512"
+       y="1040.4668" />
+  </g>
+</svg>
