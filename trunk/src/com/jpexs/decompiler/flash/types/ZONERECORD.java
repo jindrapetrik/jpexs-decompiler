@@ -16,6 +16,14 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import java.awt.Font;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphMetrics;
+import java.awt.font.GlyphVector;
+import java.awt.font.LineBreakMeasurer;
+import java.awt.font.LineMetrics;
+import javax.swing.JFrame;
+
 /**
  * Represents 32-bit alpha, red, green and blue value
  *
@@ -26,7 +34,7 @@ public class ZONERECORD {
     public ZONEDATA zonedata[] = new ZONEDATA[0];
     public boolean zoneMaskX;
     public boolean zoneMaskY;
-
+    
     @Override
     public String toString() {
         String ret = "[ZONERECORD data:";

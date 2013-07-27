@@ -3020,9 +3020,9 @@ public class SWFInputStream extends InputStream {
         for (int i = 0; i < numZoneData; i++) {
             ret.zonedata[i] = readZONEDATA();
         }
-        readUB(6);
-        ret.zoneMaskX = readUB(1) == 1;
+        readUB(6);        
         ret.zoneMaskY = readUB(1) == 1;
+        ret.zoneMaskX = readUB(1) == 1;
         return ret;
     }
 

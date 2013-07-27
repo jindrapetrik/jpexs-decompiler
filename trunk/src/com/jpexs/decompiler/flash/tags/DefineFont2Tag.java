@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import java.awt.Font;
+import java.awt.font.GlyphVector;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -313,13 +314,28 @@ public class DefineFont2Tag extends FontTag {
         int fontStyle = getFontStyle();
 
         SHAPE shp = SHAPERECORD.systemFontCharacterToSHAPE(fontName, fontStyle, getDivider() * 1024, character);
-        glyphShapeTable.add(shp);
-        codeTable.add((int) character);
+
+        int code = (int) character;
+        int pos = -1;
+        for (int i = 0; i < codeTable.size(); i++) {
+            if (codeTable.get(i) > code) {
+                pos = i;
+                break;
+            }
+        }
+        if (pos == -1) {
+            pos = codeTable.size();
+        }
+
+        FontTag.shiftGlyphIndices(fontId, pos, tags);
+
+        glyphShapeTable.add(pos, shp);
+        codeTable.add(pos, (int) character);
 
         if (fontFlagsHasLayout) {
-            fontBoundsTable.add(shp.getBounds());
+            fontBoundsTable.add(pos, shp.getBounds());
             Font fnt = new Font(fontName, fontStyle, getDivider() * 1024);
-            fontAdvanceTable.add((new JPanel()).getFontMetrics(fnt).charWidth(character));
+            fontAdvanceTable.add(pos, (int) Math.round(fnt.createGlyphVector((new JPanel()).getFontMetrics(fnt).getFontRenderContext(), "" + character).getGlyphMetrics(0).getAdvanceX()));
         }
         numGlyphs++;
     }

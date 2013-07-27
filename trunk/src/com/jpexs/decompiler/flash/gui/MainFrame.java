@@ -82,6 +82,7 @@ import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
@@ -122,6 +123,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -139,6 +142,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.Stack;
@@ -276,6 +280,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
     private ErrorLogFrame errorLogFrame;
     private ComponentListener fontChangeList;
     private JComboBox<String> fontSelection;
+    private Map<Integer, String> sourceFontsMap = new HashMap<>();
     private AbortRetryIgnoreHandler errorHandler = new AbortRetryIgnoreHandler() {
         @Override
         public int handle(Throwable thrown) {
@@ -1162,6 +1167,15 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         fontSelection.setSelectedIndex(0);
         fontSelection.setSelectedItem("Times New Roman");
         fontSelection.setSelectedItem("Arial");
+        fontSelection.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (oldValue instanceof FontTag) {
+                    FontTag f = (FontTag) oldValue;
+                    sourceFontsMap.put(f.getFontId(), (String) fontSelection.getSelectedItem());
+                }
+            }
+        });
         fontSelectionPanel.add(fontSelection);
 
         JPanel fontCharPanel = new JPanel();
@@ -2147,6 +2161,18 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 if (oldValue instanceof FontTag) {
                     FontTag f = (FontTag) oldValue;
                     String oldchars = f.getCharacters(swf.tags);
+                    
+                    for (int i = 0; i < newchars.length(); i++) {
+                        char c = newchars.charAt(i);
+                        if (oldchars.indexOf((int) c) == -1) {
+                            Font font=new Font(fontSelection.getSelectedItem().toString(),f.getFontStyle(),1024);
+                            if(!font.canDisplay(c)){
+                                JOptionPane.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", ""+c), translate("error"), JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }                            
+                        }
+                    }
+                    
                     for (int i = 0; i < newchars.length(); i++) {
                         char c = newchars.charAt(i);
                         if (oldchars.indexOf((int) c) == -1) {
@@ -2331,8 +2357,35 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
             case "SAVETEXT":
                 if (oldValue instanceof TextTag) {
                     try {
-                        ((TextTag) oldValue).setFormattedText(swf.tags, textValue.getText(), fontSelection.getSelectedItem().toString());
-                        setEditText(false);
+                        if (((TextTag) oldValue).setFormattedText(new MissingCharacterHandler() {
+                            @Override
+                            public boolean handle(FontTag font, List<Tag> tags, char character) {
+                                String fontName = sourceFontsMap.get(font.getFontId());
+                                if (fontName == null) {
+                                    fontName = font.getFontName(tags);
+                                }
+                                //
+                                if (!fontNames.contains(fontName)) {
+                                    fontName = "Times New Roman";
+                                }
+                                if (!fontNames.contains(fontName)) {
+                                    fontName = "Arial";
+                                }
+                                if (!fontNames.contains(fontName)) {
+                                    fontName = fontSelection.getItemAt(0);
+                                }
+                                Font f = new Font(fontName, font.getFontStyle(), 18);
+                                if (!f.canDisplay(character)) {
+                                    JOptionPane.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", ""+character), translate("error"), JOptionPane.ERROR_MESSAGE);
+                                    return false;
+                                }
+                                font.addCharacter(tags, character, fontName);
+                                return true;
+
+                            }
+                        }, swf.tags, textValue.getText(), fontSelection.getSelectedItem().toString())) {
+                            setEditText(false);
+                        }
                     } catch (ParseException ex) {
                         JOptionPane.showMessageDialog(null, translate("error.text.invalid").replace("%text%", ex.text).replace("%line%", "" + ex.line), translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
@@ -3026,10 +3079,14 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 fontLeadingLabel.setText(ft.getLeading() == -1 ? translate("value.unknown") : "" + ft.getLeading());
                 String chars = ft.getCharacters(swf.tags);
                 fontCharactersTextArea.setText(chars);
-                fontSelection.setSelectedIndex(0);
-                fontSelection.setSelectedItem("Times New Roman");
-                fontSelection.setSelectedItem("Arial");
-                fontSelection.setSelectedItem(ft.getFontName(swf.tags));
+                if (sourceFontsMap.containsKey(ft.getFontId())) {
+                    fontSelection.setSelectedItem(sourceFontsMap.get(ft.getFontId()));
+                } else {
+                    fontSelection.setSelectedIndex(0);
+                    fontSelection.setSelectedItem("Times New Roman");
+                    fontSelection.setSelectedItem("Arial");
+                    fontSelection.setSelectedItem(ft.getFontName(swf.tags));
+                }
                 fontChangeList.componentResized(null);
                 showDetailWithPreview(CARDFONTPANEL);
             } else {

@@ -32,8 +32,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JPanel;
 
 public class DefineFont3Tag extends FontTag {
@@ -301,14 +304,39 @@ public class DefineFont3Tag extends FontTag {
 
     @Override
     public void addCharacter(List<Tag> tags, char character, String fontName) {
+
+        //Font Align Zones will be removed as adding new character zones is not supported:-(
+        for (int i = 0; i < tags.size(); i++) {
+            Tag t = tags.get(i);
+            if (t instanceof DefineFontAlignZonesTag) {
+                DefineFontAlignZonesTag fa = (DefineFontAlignZonesTag) t;
+                if (fa.fontID == fontId) {
+                    tags.remove(i);
+                    i--;
+                }
+            }
+        }
         int fontStyle = getFontStyle();
         SHAPE shp = SHAPERECORD.systemFontCharacterToSHAPE(fontName, fontStyle, getDivider() * 1024, character);
-        glyphShapeTable.add(shp);
-        codeTable.add((int) character);
+        int code = (int) character;
+        int pos = -1;
+        for (int i = 0; i < codeTable.size(); i++) {
+            if (codeTable.get(i) > code) {
+                pos = i;
+                break;
+            }
+        }
+        if (pos == -1) {
+            pos = codeTable.size();
+        }
+
+        FontTag.shiftGlyphIndices(fontId, pos, tags);
+        glyphShapeTable.add(pos, shp);
+        codeTable.add(pos, (int) character);
         if (fontFlagsHasLayout) {
-            fontBoundsTable.add(shp.getBounds());
+            fontBoundsTable.add(pos, shp.getBounds());
             Font fnt = new Font(fontName, fontStyle, getDivider() * 1024);
-            fontAdvanceTable.add((new JPanel()).getFontMetrics(fnt).charWidth(character));
+            fontAdvanceTable.add(pos, (int) Math.round(fnt.createGlyphVector((new JPanel()).getFontMetrics(fnt).getFontRenderContext(), "" + character).getGlyphMetrics(0).getAdvanceX()));
         }
         numGlyphs++;
     }

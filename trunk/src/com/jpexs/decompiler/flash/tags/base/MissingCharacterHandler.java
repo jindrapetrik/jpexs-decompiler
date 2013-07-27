@@ -17,28 +17,28 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.text.ParseException;
-import com.jpexs.decompiler.flash.types.MATRIX;
-import com.jpexs.decompiler.flash.types.RECT;
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  *
  * @author JPEXS
  */
-public interface TextTag {
-
-    public MATRIX getTextMatrix();
-
-    public String getText(List<Tag> tags);
-
-    public String getFormattedText(List<Tag> tags);
-
-    public boolean setFormattedText(MissingCharacterHandler missingCharHandler,List<Tag> tags, String text, String fontName) throws ParseException;
-
-    public int getCharacterId();
-
-    public RECT getBounds();
-
-    public void setBounds(RECT r);
+public class MissingCharacterHandler {
+    protected static List<String> fontNames = Arrays.asList(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
+    
+    public boolean handle(FontTag font,List<Tag> tags,char character){
+        String fontName = font.getFontName(tags);
+        if(!fontNames.contains(fontName)){
+            return false;
+        }
+        Font f=new Font(fontName,font.getFontStyle(),18);
+        if(!f.canDisplay(character)){
+            return false;
+        }
+        font.addCharacter(tags, character, fontName);
+        return true;
+    }
 }

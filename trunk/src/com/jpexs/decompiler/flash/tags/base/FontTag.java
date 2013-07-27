@@ -17,9 +17,14 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.tags.DefineText2Tag;
+import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import java.awt.Font;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -93,5 +98,31 @@ public abstract class FontTag extends CharacterTag implements AloneTag {
             nameAppend = ": " + fontName;
         }
         return name + " (" + getCharacterId() + nameAppend + ")";
+    }
+
+    public static void shiftGlyphIndices(int fontId,int startIndex, List<Tag> tags) {
+        List<TEXTRECORD> textRecords = new ArrayList<>();
+        for (Tag t : tags) {
+            if (t instanceof DefineTextTag) {
+                textRecords.addAll(((DefineTextTag) t).textRecords);
+            }
+            if (t instanceof DefineText2Tag) {
+                textRecords.addAll(((DefineTextTag) t).textRecords);
+            }
+        }
+        int curFontId=0;
+        for (TEXTRECORD tr : textRecords) {  
+            if(tr.styleFlagsHasFont){
+                curFontId = tr.fontId;
+            }
+            if(curFontId!=fontId){
+                continue;
+            }
+            for (GLYPHENTRY en : tr.glyphEntries) {
+                if (en.glyphIndex >= startIndex) {
+                    en.glyphIndex++;
+                }
+            }
+        }
     }
 }

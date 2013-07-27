@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
 import com.jpexs.decompiler.flash.tags.text.ParsedSymbol;
@@ -164,7 +165,7 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, 
     }
 
     @Override
-    public void setFormattedText(List<Tag> tags, String text, String fontName) throws ParseException {
+    public boolean setFormattedText(MissingCharacterHandler missingCharHandler,List<Tag> tags, String text, String fontName) throws ParseException {
         try {
             TextLexer lexer = new TextLexer(new InputStreamReader(new ByteArrayInputStream(text.getBytes("UTF-8")), "UTF-8"));
             ParsedSymbol s = null;
@@ -335,7 +336,9 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, 
                             char c = txt.charAt(i);
                             tr.glyphEntries[i] = new GLYPHENTRY();
                             if (!font.containsChar(tags, c)) {
-                                font.addCharacter(tags, c, fontName);
+                                if(!missingCharHandler.handle(font, tags, c)){
+                                    return false;
+                                }
                             }
                             tr.glyphEntries[i].glyphIndex = font.charToGlyph(tags, c);
 
@@ -381,7 +384,9 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, 
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(DefineTextTag.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
+            return false;
         }
+        return true;
     }
 
     @Override

@@ -36,22 +36,36 @@ import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.flash.helpers.Cache;
 import com.jpexs.decompiler.flash.helpers.Helper;
+import com.jpexs.decompiler.flash.types.ZONERECORD;
 import com.sun.jna.Platform;
 import com.sun.jna.WString;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.font.GlyphVector;
+import java.awt.font.LineMetrics;
+import java.awt.font.TextAttribute;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.PathIterator;
+import java.awt.geom.QuadCurve2D;
 import java.io.*;
 import java.net.Socket;
 import java.net.URLDecoder;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.text.AttributedCharacterIterator.Attribute;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.logging.ConsoleHandler;
@@ -63,9 +77,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import static javax.swing.JFrame.EXIT_ON_CLOSE;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
+import static javax.swing.WindowConstants.HIDE_ON_CLOSE;
 import javax.swing.filechooser.FileFilter;
 
 /**
@@ -598,6 +615,7 @@ public class Main {
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
+
         loadProperties();
         Configuration.loadFromFile(getConfigFile(), getReplacementsFile());
         int pos = 0;
@@ -613,6 +631,102 @@ public class Main {
 
         View.setLookAndFeel();
 
+        /*View.execInEventDispatch(new Runnable() {
+            @Override
+            public void run() {
+                new JFrame() {
+                    private int size = 15*1024;
+                    @Override
+                    public void setVisible(boolean b) {
+                        addKeyListener(new KeyAdapter() {
+
+                            @Override
+                            public void keyPressed(KeyEvent e) {
+                                size+=10;
+                                repaint();
+                            }
+                            
+});
+                        addWindowListener(new WindowAdapter(){
+
+                            @Override
+                            public void windowClosing(WindowEvent e) {
+                                super.windowClosing(e);
+                                System.exit(0);
+                            }
+                            
+                        });
+                        getContentPane().add(new JPanel() {
+                            @Override
+                            protected void paintComponent(Graphics g) {
+                                Graphics2D g2d = (Graphics2D) g;
+                                AffineTransform t = AffineTransform.getTranslateInstance(0, 0);
+                                t.translate(200, 400);
+                                t.scale((((float)size)/1024)/(2000),(((float)size)/1024)/2000);
+                                
+                                g2d.setTransform(t);
+
+                                Font f = new Font("Cordia New", 0, size);
+                                GlyphVector v = f.createGlyphVector((new JPanel()).getFontMetrics(f).getFontRenderContext(), "C");
+                                Shape shp = v.getOutline();
+                                g2d.setPaint(Color.black);
+                                g.setColor(Color.black);
+                                double points[] = new double[6];
+                                double lastX = 0;
+                                    double lastY = 0;
+                                    double startX = 0;
+                                    double startY = 0;
+                                    GeneralPath path=new GeneralPath();
+                                for (PathIterator it = shp.getPathIterator(null); !it.isDone(); it.next()) {
+                                    int type = it.currentSegment(points);
+                                    
+                                    switch (type) {
+                                        case PathIterator.SEG_MOVETO:
+
+                                            lastX = (points[0]);
+                                            lastY = (points[1]);
+                                            startX = lastX;
+                                            startY = lastY;
+                                            path.moveTo(lastX, lastY);
+                                            break;
+                                        case PathIterator.SEG_LINETO:
+                                            //g2d.drawLine((int) lastX, (int) lastY, (int) points[0], (int) points[1]);
+                                            lastX = (points[0]);
+                                            lastY = (points[1]);
+                                            path.lineTo(lastX, lastY);
+                                            break;
+                                        case PathIterator.SEG_CUBICTO:
+                                            throw new RuntimeException("NOCUBIC");
+                                        case PathIterator.SEG_QUADTO:
+                                            //g2d.draw(new QuadCurve2D.Double(lastX, lastY, points[0], points[1], points[2], points[3]));
+                                            path.quadTo(points[0], points[1], points[2], points[3]);
+                                            lastX = (points[2]);
+                                            lastY = (points[3]);
+                                            break;
+                                        case PathIterator.SEG_CLOSE: //Closing line back to last SEG_MOVETO
+                                            if ((startX == lastX) && (startY == lastY)) {
+                                                break;
+                                            }
+                                            //g2d.drawLine((int) lastX, (int) lastY, (int) points[0], (int) points[1]);
+                                            path.lineTo(startX, startY);
+                                            lastX = startX;
+                                            lastY = startY;
+                                            break;
+                                    }
+                                }
+                                g2d.draw(path);
+                            }
+                        });
+                        setDefaultCloseOperation(HIDE_ON_CLOSE);
+                        setSize(500, 500);
+                        super.setVisible(b);
+                    }
+                }.setVisible(true);
+            }
+        });
+        if (true) {
+            return;
+        }//*/
         if ((Boolean) Configuration.getConfig("cacheOnDisk", Boolean.TRUE)) {
             Cache.setStorageType(Cache.STORAGE_FILES);
         } else {
@@ -1234,7 +1348,7 @@ public class Main {
             if ((!exists) && add) { //add
                 Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\ffdec");
                 Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\ffdec", "", "Open with FFDec");
-                Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\ffdec\\command");
+                Advapi32Util.registryCreateKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\ffdec\\      ");
                 Advapi32Util.registrySetStringValue(REG_CLASSES_HKEY, REG_CLASSES_PATH + clsName + "\\shell\\ffdec\\command", "", "\"" + appDir + exeName + "\" \"%1\"");
             }
             if (exists && (!add)) { //remove

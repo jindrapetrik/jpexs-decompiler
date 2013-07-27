@@ -1592,8 +1592,8 @@ public class SWFOutputStream extends OutputStream {
             writeZONEDATA(value.zonedata[i]);
         }
         writeUB(6, 0);
-        writeUB(1, value.zoneMaskX ? 1 : 0);
         writeUB(1, value.zoneMaskY ? 1 : 0);
+        writeUB(1, value.zoneMaskX ? 1 : 0);
     }
 
     /**

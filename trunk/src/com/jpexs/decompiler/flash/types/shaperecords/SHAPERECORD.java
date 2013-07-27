@@ -35,6 +35,7 @@ import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.LinearGradientPaint;
@@ -48,8 +49,10 @@ import java.awt.TexturePaint;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
+import java.awt.geom.QuadCurve2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,6 +63,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 /**
@@ -366,7 +370,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
             GeneralPath ret = new GeneralPath();
             int x = startX;
             int y = startY;
-            boolean wasMoveTo = false;
+            boolean wasMoveTo = false;            
             for (SHAPERECORD rec : edges) {
                 int nx = rec.changeX(x);
                 int ny = rec.changeY(y);
@@ -870,7 +874,12 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
     }
     private static List<String> existingFonts = Arrays.asList(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
 
-    public static SHAPE systemFontCharacterToSHAPE(String fontName, int fontStyle, int fontSize, char character) {
+    public static SHAPE systemFontCharacterToSHAPE(final String fontName, final int fontStyle, int fontSize, char character) {
+        int multiplier = 1;
+        if(fontSize>1024){
+            multiplier = fontSize/1024;
+            fontSize = 1024;
+        }
         List<SHAPERECORD> retList = new ArrayList<>();
         String defaultFonts[] = new String[]{"Times New Roman", "Arial"};
         Font f = null;
@@ -887,7 +896,6 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
         if (f == null) {
             f = new Font("Dialog", fontStyle, fontSize); //Fallback to DIALOG
         }
-
         GlyphVector v = f.createGlyphVector((new JPanel()).getFontMetrics(f).getFontRenderContext(), "" + character);
         Shape shp = v.getOutline();
         double points[] = new double[6];
@@ -896,13 +904,13 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
         int startX = 0;
         int startY = 0;
         for (PathIterator it = shp.getPathIterator(null); !it.isDone(); it.next()) {
-            int type = it.currentSegment(points);
+            int type = it.currentSegment(points);     
             switch (type) {
                 case PathIterator.SEG_MOVETO:
                     StyleChangeRecord scr = new StyleChangeRecord();
                     scr.stateMoveTo = true;
-                    scr.moveDeltaX = (int) Math.round(points[0]);
-                    scr.moveDeltaY = (int) Math.round(points[1]);
+                    scr.moveDeltaX = multiplier*(int) Math.round(points[0]);
+                    scr.moveDeltaY = multiplier*(int) Math.round(points[1]);
                     scr.moveBits = SWFOutputStream.getNeededBitsS(scr.moveDeltaX, scr.moveDeltaY);
                     retList.add(scr);
                     lastX = (int) Math.round(points[0]);
@@ -911,10 +919,14 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                     startY = lastY;
                     break;
                 case PathIterator.SEG_LINETO:
-                    StraightEdgeRecord ser = new StraightEdgeRecord();
-                    ser.generalLineFlag = true;
-                    ser.deltaX = ((int) Math.round(points[0])) - lastX;
-                    ser.deltaY = ((int) Math.round(points[1])) - lastY;
+                    StraightEdgeRecord ser = new StraightEdgeRecord();                    
+                    ser.deltaX = multiplier*(((int) Math.round(points[0])) - lastX);
+                    ser.deltaY = multiplier*(((int) Math.round(points[1])) - lastY);
+                    
+                    ser.generalLineFlag = ser.deltaX!=0 && ser.deltaY!=0;
+                    if(ser.deltaX == 0){
+                        ser.vertLineFlag = true;
+                    }
                     ser.numBits = SWFOutputStream.getNeededBitsS(ser.deltaX, ser.deltaY) - 2;
                     if (ser.numBits < 0) {
                         ser.numBits = 0;
@@ -933,11 +945,11 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                     double quadCoords[][] = approximateCubic(cubicCoords);
                     for (int i = 0; i < quadCoords.length; i++) {
                         CurvedEdgeRecord cer = new CurvedEdgeRecord();
-                        cer.controlDeltaX = ((int) Math.round(quadCoords[i][0])) - lastX;
-                        cer.controlDeltaY = ((int) Math.round(quadCoords[i][1])) - lastY;
-                        cer.anchorDeltaX = ((int) Math.round(quadCoords[i][2])) - ((int) Math.round(quadCoords[i][0]));
-                        cer.anchorDeltaY = ((int) Math.round(quadCoords[i][3])) - ((int) Math.round(quadCoords[i][1]));
-                        cer.numBits = SWFOutputStream.getNeededBitsS(cer.controlDeltaX, cer.controlDeltaY, cer.anchorDeltaX, cer.anchorDeltaY) - 2;
+                        cer.controlDeltaX = multiplier*(((int) Math.round(quadCoords[i][0])) - lastX);
+                        cer.controlDeltaY = multiplier*(((int) Math.round(quadCoords[i][1])) - lastY);
+                        cer.anchorDeltaX = multiplier*(((int) Math.round(quadCoords[i][2])) - ((int) Math.round(quadCoords[i][0])));
+                        cer.anchorDeltaY = multiplier*(((int) Math.round(quadCoords[i][3])) - ((int) Math.round(quadCoords[i][1])));
+                        cer.numBits = SWFOutputStream.getNeededBitsS(cer.controlDeltaX, cer.controlDeltaY, cer.anchorDeltaX, cer.anchorDeltaY) - 2;                        
                         if (cer.numBits < 0) {
                             cer.numBits = 0;
                         }
@@ -948,17 +960,17 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                     break;
                 case PathIterator.SEG_QUADTO:
                     CurvedEdgeRecord cer = new CurvedEdgeRecord();
-                    cer.controlDeltaX = ((int) Math.round(points[0])) - lastX;
-                    cer.controlDeltaY = ((int) Math.round(points[1])) - lastY;
-                    cer.anchorDeltaX = ((int) Math.round(points[2])) - (int) Math.round(points[0]);
-                    cer.anchorDeltaY = ((int) Math.round(points[3])) - (int) Math.round(points[1]);
+                    cer.controlDeltaX = multiplier*(((int) Math.round(points[0])) - lastX);
+                    cer.controlDeltaY = multiplier*(((int) Math.round(points[1])) - lastY);
+                    cer.anchorDeltaX = multiplier*(((int) Math.round(points[2])) - (int) Math.round(points[0]));
+                    cer.anchorDeltaY = multiplier*(((int) Math.round(points[3])) - (int) Math.round(points[1]));
                     cer.numBits = SWFOutputStream.getNeededBitsS(cer.controlDeltaX, cer.controlDeltaY, cer.anchorDeltaX, cer.anchorDeltaY) - 2;
                     if (cer.numBits < 0) {
                         cer.numBits = 0;
                     }
-                    retList.add(cer);
+                    retList.add(cer);                    
                     lastX = (int) Math.round(points[2]);
-                    lastY = (int) Math.round(points[3]);
+                    lastY = (int) Math.round(points[3]);                    
                     break;
                 case PathIterator.SEG_CLOSE: //Closing line back to last SEG_MOVETO
                     if ((startX == lastX) && (startY == lastY)) {
@@ -966,8 +978,8 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                     }
                     StraightEdgeRecord closeSer = new StraightEdgeRecord();
                     closeSer.generalLineFlag = true;
-                    closeSer.deltaX = (int) Math.round((startX - lastX));
-                    closeSer.deltaY = (int) Math.round((startY - lastY));
+                    closeSer.deltaX = multiplier*((int) Math.round((startX - lastX)));
+                    closeSer.deltaY = multiplier*((int) Math.round((startY - lastY)));
                     closeSer.numBits = SWFOutputStream.getNeededBitsS(closeSer.deltaX, closeSer.deltaY) - 2;
                     if (closeSer.numBits < 0) {
                         closeSer.numBits = 0;

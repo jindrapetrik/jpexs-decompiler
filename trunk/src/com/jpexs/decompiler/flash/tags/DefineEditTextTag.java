@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.text.ParseException;
 import com.jpexs.decompiler.flash.tags.text.ParsedSymbol;
@@ -163,7 +164,7 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextT
     }
 
     @Override
-    public void setFormattedText(List<Tag> tags, String text, String fontName) throws ParseException {
+    public boolean setFormattedText(MissingCharacterHandler missingCharHandler, List<Tag> tags, String text, String fontName) throws ParseException {
         try {
             TextLexer lexer = new TextLexer(new InputStreamReader(new ByteArrayInputStream(text.getBytes("UTF-8")), "UTF-8"));
             ParsedSymbol s = null;
@@ -336,6 +337,7 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextT
                 }
             }
 
+            this.bounds = bounds;
             if (text.length() > 0) {
                 initialText = text;
                 this.hasText = true;
@@ -384,8 +386,9 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextT
 
         } catch (IOException ex) {
             Logger.getLogger(DefineEditTextTag.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
-
+        return true;
 
     }
 
@@ -464,6 +467,7 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextT
     /**
      * Constructor
      *
+     * @param swf 
      * @param data Data bytes
      * @param version SWF version
      * @param pos
