@@ -80,7 +80,7 @@ public class FunctionActionItem extends ActionItem {
             }
             String pname = paramNames.get(p);
             if (pname == null || pname.equals("")) {
-                pname = "register" + (regStart + p);
+                pname = new RegisterNumber(regStart + p).translate();
             }
             ret += hilight(pname);
         }
