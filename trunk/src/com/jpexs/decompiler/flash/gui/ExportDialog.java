@@ -1,6 +1,9 @@
 package com.jpexs.decompiler.flash.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -8,6 +11,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 /**
  *
@@ -53,23 +57,35 @@ public class ExportDialog extends AppDialog {
             }
         });
 
-        setLayout(null);
-
         Container cnt = getContentPane();
+        cnt.setLayout(new BorderLayout());
+        JPanel comboPanel=new JPanel(null);
         combos = new JComboBox[optionNames.length];
+        JLabel labels[]=new JLabel[optionNames.length];
+        int labWidth=0;
+        for (int i = 0; i < optionNames.length; i++) {
+            labels[i] = new JLabel(optionNames[i]);
+            if(labels[i].getPreferredSize().width>labWidth){
+                labWidth = labels[i].getPreferredSize().width;
+            }
+        }
+        int comboWidth=200;
         int top = 10;
         for (int i = 0; i < optionNames.length; i++) {
             JLabel lab = new JLabel(optionNames[i]);
-            lab.setBounds(10, top, 75, 25);
-            cnt.add(lab);
+            lab.setBounds(10, top, lab.getPreferredSize().width, lab.getPreferredSize().height);
+            comboPanel.add(lab);
             combos[i] = new JComboBox<>(options[i]);
-            combos[i].setBounds(90, top, 125, 25);
-            cnt.add(combos[i]);
-            top += 25;
+            combos[i].setBounds(10+labWidth+10, top, comboWidth, combos[i].getPreferredSize().height);
+            comboPanel.add(combos[i]);
+            top += combos[i].getHeight();
         }
-        top += 10;
+        Dimension dim=new Dimension(10+labWidth+10+comboWidth+10,top+10);
+        comboPanel.setMinimumSize(dim);
+        comboPanel.setPreferredSize(dim);
+        cnt.add(comboPanel,BorderLayout.CENTER);
 
-
+        JPanel buttonsPanel=new JPanel(new FlowLayout());
         JButton okButton = new JButton(translate("button.ok"));
         okButton.addActionListener(new ActionListener() {
             @Override
@@ -77,8 +93,7 @@ public class ExportDialog extends AppDialog {
                 setVisible(false);
             }
         });
-        okButton.setBounds(43, top, 75, 25);
-
+    
         JButton cancelButton = new JButton(translate("button.cancel"));
         cancelButton.addActionListener(new ActionListener() {
             @Override
@@ -87,15 +102,13 @@ public class ExportDialog extends AppDialog {
                 setVisible(false);
             }
         });
-        cancelButton.setBounds(118, top, 75, 25);
+       
+        buttonsPanel.add(okButton);
+        buttonsPanel.add(cancelButton);
 
-        top += 25;
-        cnt.add(okButton);
-        cnt.add(cancelButton);
-
-        top += 15;
+        cnt.add(buttonsPanel,BorderLayout.SOUTH);
         pack();
-        setSize(245, top + getInsets().top);
+        //setSize(245, top + getInsets().top);
         View.centerScreen(this);
         View.setWindowIcon(this);
         getRootPane().setDefaultButton(okButton);
