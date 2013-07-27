@@ -806,37 +806,6 @@ public class Action implements GraphSourceItem {
         while (ip <= end) {
 
             long addr = ip2adr(actions, ip, version);
-            /*if (unknownJumps.contains(addr)) {
-             unknownJumps.remove(new Long(addr));
-             boolean switchFound = false;
-             for (int i = output.size() - 1; i >= 0; i--) {
-             if (output.get(i) instanceof SwitchActionItem) {
-             if (((SwitchActionItem) output.get(i)).defaultCommands == null) {
-             List<ContinueActionItem> continues = ((SwitchActionItem) output.get(i)).getContinues();
-             boolean breakFound = false;
-             for (ContinueActionItem cti : continues) {
-             if (cti.loopPos == addr) {
-             cti.isKnown = true;
-             cti.isBreak = true;
-             ((SwitchActionItem) output.get(i)).loopBreak = addr;
-             breakFound = true;
-             }
-             }
-             if (breakFound) {
-             switchFound = true;
-             ((SwitchActionItem) output.get(i)).defaultCommands = new ArrayList<ActionItem>();
-             for (int k = i + 1; k < output.size(); k++) {
-             ((SwitchActionItem) output.get(i)).defaultCommands.add(output.remove(i + 1));
-             }
-             }
-             }
-             break;
-             }
-             }
-             if (!switchFound) {
-             throw new UnknownJumpException(stack, addr, output);
-             }
-             }*/
             if (ip > end) {
                 break;
             }

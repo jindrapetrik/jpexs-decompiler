@@ -133,13 +133,12 @@ public class MethodBody implements Cloneable, Serializable {
             //try {
             s += deobfuscated.toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, b, hilight, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<Integer, Integer>(), deobfuscated.visitCode(b));
             s = s.trim();
+            if (s.equals("")) {
+                s = " ";
+            }
             if (hilight) {
                 s = Highlighting.hilighMethod(s, this.method_info);
             }
-            /*} catch (Exception|StackOverflowError|OutOfMemoryError er) {
-             Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Error during decompilation", er);
-             s = "//error:" + er.toString();
-             }*/
         }
         return s;
     }

@@ -24,8 +24,13 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
 import java.util.ArrayList;
 import javax.swing.*;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import jsyntaxpane.syntaxkits.Flasm3MethodInfoSyntaxKit;
 
 /**
@@ -37,18 +42,31 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
     public JEditorPane slotConstEditor;
     private ABC abc;
     private TraitSlotConst trait;
+    private JTextPane warnLabel;
 
     public SlotConstTraitDetailPanel() {
         slotConstEditor = new JEditorPane();
         setLayout(new BorderLayout());
         add(new JLabel(translate("abc.detail.slotconst.typevalue")), BorderLayout.NORTH);
         add(new JScrollPane(slotConstEditor), BorderLayout.CENTER);
+        warnLabel = new JTextPane();
+        warnLabel.setText("WARNING:\nStatic fields and consts are often initialized in initializers.\nEditing value here is usually not enough!");
+        StyledDocument doc = warnLabel.getStyledDocument();
+        SimpleAttributeSet center = new SimpleAttributeSet();
+        StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
+        doc.setParagraphAttributes(0, doc.getLength(), center, false);
+        warnLabel.setOpaque(false);
+        warnLabel.setFocusable(false);
+        //warnLabel.setWrapStyleWord(true);  
+        //warnLabel.setLineWrap(true);
+        warnLabel.setFont(new JLabel().getFont().deriveFont(Font.BOLD));
+        add(warnLabel, BorderLayout.SOUTH);
         slotConstEditor.setContentType("text/flasm3_methodinfo");
         Flasm3MethodInfoSyntaxKit sk = (Flasm3MethodInfoSyntaxKit) slotConstEditor.getEditorKit();
         sk.deinstallComponent(slotConstEditor, "jsyntaxpane.components.LineNumbersRuler");
     }
 
-    public void load(TraitSlotConst trait, ABC abc) {
+    public void load(TraitSlotConst trait, ABC abc, boolean isStatic) {
         this.abc = abc;
         this.trait = trait;
         String s;
@@ -65,6 +83,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
 
         s = typeStr + valueStr;
 
+        warnLabel.setVisible(trait.isConst() || isStatic);
         slotConstEditor.setText(s);
     }
 

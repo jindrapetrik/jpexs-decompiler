@@ -449,8 +449,8 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 bodyStr = Highlighting.stripHilights(bodyStr);
             }
         }
-        if (Highlighting.stripHilights(bodyStr).equals("")) {
-            toPrint = ABC.addTabs(bodyStr, 3);
+        if (Highlighting.stripHilights(bodyStr).trim().equals("")) {
+            toPrint = ABC.addTabs(bodyStr + "/*classInitializer*/", 3);
         } else {
             toPrint = ABC.IDENT_STRING + ABC.IDENT_STRING + "{\r\n" + ABC.addTabs(bodyStr, 3) + "\r\n" + ABC.IDENT_STRING + ABC.IDENT_STRING + "}";
         }
@@ -508,11 +508,15 @@ public class TraitClass extends Trait implements TraitWithSlot {
         String glue = "\r\n\r\n";
         for (String s : outTraits) {
             if (!Highlighting.stripHilights(s).trim().equals("")) {
-                if (!first) {
-
-                    bui.append(glue);
+                if (s.contains("/*classInitializer*/")) {
+                    s = s.replace("/*classInitializer*/", "");
+                    s = s + "\r\n";
                 } else {
-                    first = false;
+                    if (!first) {
+                        bui.append(glue);
+                    } else {
+                        first = false;
+                    }
                 }
             } else {
                 s = s.replace(ABC.IDENT_STRING, "");

@@ -187,7 +187,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
             }
 
             for (Highlighting tm : methodHighlights) {
-                if ((pos >= tm.startPos) && (pos < tm.startPos + tm.len)) {
+                if ((pos >= tm.startPos) && ((pos < tm.startPos + tm.len) || (tm.len == 0 && pos == tm.startPos))) {
                     String name = "";
                     if (abc != null) {
                         if (classIndex > -1) {
@@ -226,7 +226,8 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
                     Trait tr = abc.findTraitByTraitId(classIndex, (int) th.offset);
                     if (tr != null) {
                         if (tr instanceof TraitSlotConst) {
-                            abcPanel.detailPanel.slotConstTraitPanel.load((TraitSlotConst) tr, abc);
+                            abcPanel.detailPanel.slotConstTraitPanel.load((TraitSlotConst) tr, abc,
+                                    abc.isStaticTraitId(classIndex, lastTraitIndex));
                             abcPanel.detailPanel.showCard(DetailPanel.SLOT_CONST_TRAIT_CARD, tr);
                             abcPanel.detailPanel.setEditMode(false);
                             return;
@@ -379,7 +380,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         View.execInEventDispatch(new Runnable() {
             @Override
             public void run() {
-                if (hilightedCode.length() > 65000) {
+                if (hilightedCode.length() > 1000000) {
                     setContentType("text/plain");
                 } else {
                     setContentType("text/actionscript");
