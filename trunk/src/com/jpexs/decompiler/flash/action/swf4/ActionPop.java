@@ -41,9 +41,7 @@ public class ActionPop extends Action {
         }
         GraphTargetItem val = stack.pop();
         if (val instanceof DirectValueActionItem) {
-            if (((DirectValueActionItem) val).value instanceof RegisterNumber) {
-                return;
-            }
+            return;
         }
         output.add(val);
     }
