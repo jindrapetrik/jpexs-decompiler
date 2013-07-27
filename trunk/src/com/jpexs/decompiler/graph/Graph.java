@@ -1492,7 +1492,6 @@ public class Graph {
          */
         if (part.nextParts.size() == 2) {
             if ((stack.size() >= 2) && (stack.get(stack.size() - 1) instanceof NotItem) && (((NotItem) (stack.get(stack.size() - 1))).getOriginal().getNotCoerced() == stack.get(stack.size() - 2).getNotCoerced())) {
-                currentRet.addAll(output);
                 GraphPart sp0 = getNextNoJump(part.nextParts.get(0));
                 GraphPart sp1 = getNextNoJump(part.nextParts.get(1));
                 boolean reversed = false;
@@ -1544,7 +1543,6 @@ public class Graph {
                 parseNext = false;
                 //return ret;
             } else if ((stack.size() >= 2) && (stack.get(stack.size() - 1).getNotCoerced() == stack.get(stack.size() - 2).getNotCoerced())) {
-                currentRet.addAll(output);
                 GraphPart sp0 = getNextNoJump(part.nextParts.get(0));
                 GraphPart sp1 = getNextNoJump(part.nextParts.get(1));
                 boolean reversed = false;
