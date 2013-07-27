@@ -633,8 +633,7 @@ public class ActionScript2Test {
 
     @Test
     public void frame32_pushTest() {
-        compareSrc(32, "trace(\"pushTest\");\r\n"
-                + "53;\r\n");
+        compareSrc(32, "trace(\"pushTest\");\r\n");
     }
 
     @Test
