@@ -100,7 +100,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag {
         return name + " (" + getCharacterId() + nameAppend + ")";
     }
 
-    public static void shiftGlyphIndices(int fontId,int startIndex, List<Tag> tags) {
+    public static void shiftGlyphIndices(int fontId, int startIndex, List<Tag> tags) {
         List<TEXTRECORD> textRecords = new ArrayList<>();
         for (Tag t : tags) {
             if (t instanceof DefineTextTag) {
@@ -110,12 +110,12 @@ public abstract class FontTag extends CharacterTag implements AloneTag {
                 textRecords.addAll(((DefineTextTag) t).textRecords);
             }
         }
-        int curFontId=0;
-        for (TEXTRECORD tr : textRecords) {  
-            if(tr.styleFlagsHasFont){
+        int curFontId = 0;
+        for (TEXTRECORD tr : textRecords) {
+            if (tr.styleFlagsHasFont) {
                 curFontId = tr.fontId;
             }
-            if(curFontId!=fontId){
+            if (curFontId != fontId) {
                 continue;
             }
             for (GLYPHENTRY en : tr.glyphEntries) {

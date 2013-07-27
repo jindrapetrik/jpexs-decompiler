@@ -165,7 +165,7 @@ public class DefineText2Tag extends CharacterTag implements BoundedTag, TextTag,
     }
 
     @Override
-    public boolean setFormattedText(MissingCharacterHandler missingCharHandler,List<Tag> tags, String text, String fontName) throws ParseException {
+    public boolean setFormattedText(MissingCharacterHandler missingCharHandler, List<Tag> tags, String text, String fontName) throws ParseException {
         try {
             TextLexer lexer = new TextLexer(new InputStreamReader(new ByteArrayInputStream(text.getBytes("UTF-8")), "UTF-8"));
             ParsedSymbol s = null;
@@ -337,7 +337,7 @@ public class DefineText2Tag extends CharacterTag implements BoundedTag, TextTag,
                             char c = txt.charAt(i);
                             tr.glyphEntries[i] = new GLYPHENTRY();
                             if (!font.containsChar(tags, c)) {
-                                if(!missingCharHandler.handle(font, tags, c)){
+                                if (!missingCharHandler.handle(font, tags, c)) {
                                     return false;
                                 }
                             }
@@ -426,7 +426,7 @@ public class DefineText2Tag extends CharacterTag implements BoundedTag, TextTag,
     /**
      * Constructor
      *
-     * @param swf 
+     * @param swf
      * @param data Data bytes
      * @param version SWF version
      * @param pos

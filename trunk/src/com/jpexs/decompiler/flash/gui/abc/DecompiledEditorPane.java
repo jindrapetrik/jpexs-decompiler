@@ -25,13 +25,18 @@ import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
+import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.Cache;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
@@ -364,15 +369,25 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         this.abcList = abcList;
         this.script = scriptLeaf;
 
-        String hilightedCode = "";
         cacheScriptPack(scriptLeaf, abcList);
         CachedDecompilation cd = getCached(scriptLeaf);
-        hilightedCode = cd.text;
+        final String hilightedCode = cd.text;
         highlights = cd.getHighlights();
         traitHighlights = cd.getTraitHighlights();
         methodHighlights = cd.getMethodHighlights();
         classHighlights = cd.getClassHighlights();
-        setText(hilightedCode);
+        View.execInEventDispatch(new Runnable() {
+            @Override
+            public void run() {
+                if (hilightedCode.length() > 65000) {
+                    setContentType("text/plain");
+                } else {
+                    setContentType("text/actionscript");
+                }
+                setText(hilightedCode);
+            }
+        });
+
     }
 
     public void reloadClass() {

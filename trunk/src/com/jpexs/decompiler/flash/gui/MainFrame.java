@@ -2161,18 +2161,18 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 if (oldValue instanceof FontTag) {
                     FontTag f = (FontTag) oldValue;
                     String oldchars = f.getCharacters(swf.tags);
-                    
+
                     for (int i = 0; i < newchars.length(); i++) {
                         char c = newchars.charAt(i);
                         if (oldchars.indexOf((int) c) == -1) {
-                            Font font=new Font(fontSelection.getSelectedItem().toString(),f.getFontStyle(),1024);
-                            if(!font.canDisplay(c)){
-                                JOptionPane.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", ""+c), translate("error"), JOptionPane.ERROR_MESSAGE);
+                            Font font = new Font(fontSelection.getSelectedItem().toString(), f.getFontStyle(), 1024);
+                            if (!font.canDisplay(c)) {
+                                JOptionPane.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", "" + c), translate("error"), JOptionPane.ERROR_MESSAGE);
                                 return;
-                            }                            
+                            }
                         }
                     }
-                    
+
                     for (int i = 0; i < newchars.length(); i++) {
                         char c = newchars.charAt(i);
                         if (oldchars.indexOf((int) c) == -1) {
@@ -2376,7 +2376,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                 }
                                 Font f = new Font(fontName, font.getFontStyle(), 18);
                                 if (!f.canDisplay(character)) {
-                                    JOptionPane.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", ""+character), translate("error"), JOptionPane.ERROR_MESSAGE);
+                                    JOptionPane.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", "" + character), translate("error"), JOptionPane.ERROR_MESSAGE);
                                     return false;
                                 }
                                 font.addCharacter(tags, character, fontName);
@@ -2822,21 +2822,26 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 (new Thread() {
                     @Override
                     public void run() {
-                        int classIndex = -1;
-                        for (Trait t : scriptLeaf.abc.script_info[scriptLeaf.scriptIndex].traits.traits) {
-                            if (t instanceof TraitClass) {
-                                classIndex = ((TraitClass) t).class_info;
-                                break;
+                        View.execInEventDispatch(new Runnable() {
+                            @Override
+                            public void run() {
+                                int classIndex = -1;
+                                for (Trait t : scriptLeaf.abc.script_info[scriptLeaf.scriptIndex].traits.traits) {
+                                    if (t instanceof TraitClass) {
+                                        classIndex = ((TraitClass) t).class_info;
+                                        break;
+                                    }
+                                }
+                                abcPanel.navigator.setABC(abcList, scriptLeaf.abc);
+                                abcPanel.navigator.setClassIndex(classIndex, scriptLeaf.scriptIndex);
+                                abcPanel.setAbc(scriptLeaf.abc);
+                                abcPanel.decompiledTextArea.setScript(scriptLeaf, abcList);
+                                abcPanel.decompiledTextArea.setClassIndex(classIndex);
+                                abcPanel.decompiledTextArea.setNoTrait();
+                                abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setCode("");
+                                Main.stopWork();
                             }
-                        }
-                        abcPanel.navigator.setABC(abcList, scriptLeaf.abc);
-                        abcPanel.navigator.setClassIndex(classIndex, scriptLeaf.scriptIndex);
-                        abcPanel.setAbc(scriptLeaf.abc);
-                        abcPanel.decompiledTextArea.setScript(scriptLeaf, abcList);
-                        abcPanel.decompiledTextArea.setClassIndex(classIndex);
-                        abcPanel.decompiledTextArea.setNoTrait();
-                        abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setCode("");
-                        Main.stopWork();
+                        });
                     }
                 }).start();
             }

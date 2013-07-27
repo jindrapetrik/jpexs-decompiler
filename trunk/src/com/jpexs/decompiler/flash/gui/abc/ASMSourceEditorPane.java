@@ -86,7 +86,10 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         for (Highlighting h2 : disassembledHilights) {
             if (h2.offset == offset) {
                 ignoreCarret = true;
-                setCaretPosition(h2.startPos);
+                try {
+                    setCaretPosition(h2.startPos);
+                } catch (IllegalArgumentException iex) {
+                }
                 getCaret().setVisible(true);
                 ignoreCarret = false;
                 break;

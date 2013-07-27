@@ -467,7 +467,7 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextT
     /**
      * Constructor
      *
-     * @param swf 
+     * @param swf
      * @param data Data bytes
      * @param version SWF version
      * @param pos

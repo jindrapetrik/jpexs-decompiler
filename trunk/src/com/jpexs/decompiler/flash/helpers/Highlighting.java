@@ -226,8 +226,9 @@ public class Highlighting implements Serializable {
         return text;
     }
 
-    private static List<Highlighting> getSpecificHighlights(String text, String txtOpen, String txtClose, String txtEnd) {
+    private static List<Highlighting> getSpecificHighlights(String texts, String txtOpen, String txtClose, String txtEnd) {
         List<Highlighting> ret = new ArrayList<>();
+        StringBuffer text = new StringBuffer(texts);
         int pos = 0;
         while (true) {
             int openpos = text.indexOf(txtOpen);
@@ -248,7 +249,7 @@ public class Highlighting implements Serializable {
             long offset = Long.parseLong(text.substring(openpos + txtOpen.length(), closepos));
             Highlighting hl = new Highlighting(pos + openpos, textlen, offset);
             pos += openpos + textlen;
-            text = text.substring(enpos + txtEnd.length());
+            text = text.delete(0, enpos + txtEnd.length());
             ret.add(hl);
         }
         return ret;

@@ -27,15 +27,16 @@ import java.util.List;
  * @author JPEXS
  */
 public class MissingCharacterHandler {
+
     protected static List<String> fontNames = Arrays.asList(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
-    
-    public boolean handle(FontTag font,List<Tag> tags,char character){
+
+    public boolean handle(FontTag font, List<Tag> tags, char character) {
         String fontName = font.getFontName(tags);
-        if(!fontNames.contains(fontName)){
+        if (!fontNames.contains(fontName)) {
             return false;
         }
-        Font f=new Font(fontName,font.getFontStyle(),18);
-        if(!f.canDisplay(character)){
+        Font f = new Font(fontName, font.getFontStyle(), 18);
+        if (!f.canDisplay(character)) {
             return false;
         }
         font.addCharacter(tags, character, fontName);

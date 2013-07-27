@@ -34,7 +34,7 @@ public interface TextTag {
 
     public String getFormattedText(List<Tag> tags);
 
-    public boolean setFormattedText(MissingCharacterHandler missingCharHandler,List<Tag> tags, String text, String fontName) throws ParseException;
+    public boolean setFormattedText(MissingCharacterHandler missingCharHandler, List<Tag> tags, String text, String fontName) throws ParseException;
 
     public int getCharacterId();
 

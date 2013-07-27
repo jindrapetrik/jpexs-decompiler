@@ -226,29 +226,29 @@ public class DefineFontTag extends FontTag {
     @Override
     public void addCharacter(List<Tag> tags, char character, String fontName) {
         SHAPE shp = SHAPERECORD.systemFontCharacterToSHAPE(fontName, getFontStyle(), getDivider() * 1024, character);
-        List<Integer> codeTable=new ArrayList<>();
+        List<Integer> codeTable = new ArrayList<>();
         ensureFontInfo(tags);
         if (fontInfoTag != null) {
-            codeTable =fontInfoTag.codeTable;
+            codeTable = fontInfoTag.codeTable;
         }
         if (fontInfo2Tag != null) {
-            codeTable =fontInfo2Tag.codeTable;
+            codeTable = fontInfo2Tag.codeTable;
         }
-        int code=(int)character;
-        int pos=-1;
-        for(int i=0;i<codeTable.size();i++){
-            if(codeTable.get(i)>code){
+        int code = (int) character;
+        int pos = -1;
+        for (int i = 0; i < codeTable.size(); i++) {
+            if (codeTable.get(i) > code) {
                 pos = i;
                 break;
             }
         }
-        if(pos==-1){
+        if (pos == -1) {
             pos = codeTable.size();
         }
         FontTag.shiftGlyphIndices(fontId, pos, tags);
-        glyphShapeTable.add(pos,shp);
-        codeTable.add(pos,(int)character);
-        
+        glyphShapeTable.add(pos, shp);
+        codeTable.add(pos, (int) character);
+
     }
 
     @Override

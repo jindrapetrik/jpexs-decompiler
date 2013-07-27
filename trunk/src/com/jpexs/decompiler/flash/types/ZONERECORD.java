@@ -34,7 +34,7 @@ public class ZONERECORD {
     public ZONEDATA zonedata[] = new ZONEDATA[0];
     public boolean zoneMaskX;
     public boolean zoneMaskY;
-    
+
     @Override
     public String toString() {
         String ret = "[ZONERECORD data:";
