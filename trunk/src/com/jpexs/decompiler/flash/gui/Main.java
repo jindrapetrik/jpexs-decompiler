@@ -523,7 +523,7 @@ public class Main {
     }
 
     public static void initLang() {
-        if (Configuration.containsConfig("locale")) {
+        if (Configuration.containsConfig("locale")) {            
             Locale.setDefault(Locale.forLanguageTag((String) Configuration.getConfig("locale", "en")));
         }
         UIManager.put("OptionPane.okButtonText", AppStrings.translate("button.ok"));

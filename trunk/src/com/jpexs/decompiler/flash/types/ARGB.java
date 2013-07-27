@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import java.awt.Color;
+
 /**
  * Represents 32-bit alpha, red, green and blue value
  *
@@ -43,5 +45,9 @@ public class ARGB {
     @Override
     public String toString() {
         return "[ARGB a=" + alpha + ",r=" + red + ",g=" + green + ",b=" + blue + "]";
+    }
+
+    public Color toColor() {
+        return new Color(red, green, blue, alpha);
     }
 }

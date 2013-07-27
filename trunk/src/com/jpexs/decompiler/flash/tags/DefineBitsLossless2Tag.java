@@ -25,8 +25,10 @@ import com.jpexs.decompiler.flash.types.ALPHABITMAPDATA;
 import com.jpexs.decompiler.flash.types.ALPHACOLORMAPDATA;
 import com.jpexs.decompiler.flash.types.ARGB;
 import com.jpexs.decompiler.flash.types.RGBA;
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -69,6 +71,11 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
                 int r = (argb >> 16) & 0xff;
                 int g = (argb >> 8) & 0xff;
                 int b = (argb >> 0) & 0xff;
+
+                r = r * a / 255;
+                g = g * a / 255;
+                b = b * a / 255;
+
                 bitmapData.bitmapPixelData[pos] = new ARGB();
                 bitmapData.bitmapPixelData[pos].alpha = a;
                 bitmapData.bitmapPixelData[pos].red = r;
@@ -178,11 +185,10 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
         for (int y = 0; y < bitmapHeight; y++) {
             for (int x = 0; x < bitmapWidth; x++) {
                 if ((bitmapFormat == DefineBitsLossless2Tag.FORMAT_8BIT_COLORMAPPED)) {
-                    RGBA color = colorMapData.colorTableRGB[colorMapData.colorMapPixelData[pos32aligned] & 0xff];
-                    g.setColor(new Color(color.red, color.green, color.blue, color.alpha));
+                    g.setColor(multiplyAlpha(colorMapData.colorTableRGB[colorMapData.colorMapPixelData[pos32aligned] & 0xff].toColor()));
                 }
                 if ((bitmapFormat == DefineBitsLossless2Tag.FORMAT_32BIT_ARGB)) {
-                    g.setColor(new Color(bitmapData.bitmapPixelData[pos].red, bitmapData.bitmapPixelData[pos].green, bitmapData.bitmapPixelData[pos].blue, bitmapData.bitmapPixelData[pos].alpha));
+                    g.setColor(multiplyAlpha(bitmapData.bitmapPixelData[pos].toColor()));
                 }
                 g.fillRect(x, y, 1, 1);
                 pos32aligned++;

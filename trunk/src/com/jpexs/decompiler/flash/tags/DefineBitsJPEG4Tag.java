@@ -85,13 +85,16 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
     public BufferedImage getImage(List<Tag> tags) {
         try {
             BufferedImage img = ImageIO.read(new ByteArrayInputStream(imageData));
+            if (bitmapAlphaData.length == 0) {
+                return img;
+            }
             BufferedImage img2 = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
             for (int y = 0; y < img.getHeight(); y++) {
                 for (int x = 0; x < img.getWidth(); x++) {
                     int val = img.getRGB(x, y);
                     int a = bitmapAlphaData[x + y * img.getWidth()] & 0xff;
                     val = (val & 0xffffff) | (a << 24);
-                    img2.setRGB(x, y, val);
+                    img2.setRGB(x, y, colorToInt(multiplyAlpha(intToColor(val))));
                 }
             }
             return img2;
@@ -125,8 +128,10 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
     /**
      * Constructor
      *
+     * @param swf
      * @param data Data bytes
      * @param version SWF version
+     * @param pos
      * @throws IOException
      */
     public DefineBitsJPEG4Tag(SWF swf, byte data[], int version, long pos) throws IOException {
