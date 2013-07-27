@@ -53,21 +53,12 @@ public class View {
      * Sets windows Look and Feel
      */
     public static void setLookAndFeel() {
+        try {
 
-//if(true)return;
-        //System.setProperty("peacock.appButtonSize", "32");
-        /*try {
-         UIManager.setLookAndFeel("org.fife.plaf.OfficeXP.OfficeXPLookAndFeel");
-         } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException ignored) {
-         ignored.printStackTrace();
-         }*/
-        /*try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                    
-         } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException ignored) {
-         }*/
-
+        } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException ignored) {
+        }
         try {
 
             SwingUtilities.invokeAndWait(new Runnable() {
