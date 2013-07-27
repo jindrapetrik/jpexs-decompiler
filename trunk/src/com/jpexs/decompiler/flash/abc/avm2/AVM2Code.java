@@ -82,7 +82,7 @@ import java.util.logging.Logger;
 public class AVM2Code implements Serializable {
 
     public static final long serialVersionUID = 1L;
-    private static final boolean DEBUG_MODE = true;
+    private static final boolean DEBUG_MODE = false;
     public static int toSourceLimit = -1;
     public ArrayList<AVM2Instruction> code = new ArrayList<>();
     public static boolean DEBUG_REWRITE = false;
@@ -1652,8 +1652,9 @@ public class AVM2Code implements Serializable {
         for (ABCException e : body.exceptions) {
             pos++;
             try {
-                visitCode(adr2pos(e.start), -pos, refs);
-                visitCode(adr2pos(e.target), -pos, refs);
+                visitCode(adr2pos(e.start), adr2pos(e.start) - 1, refs);
+                visitCode(adr2pos(e.start), -1, refs);
+                visitCode(adr2pos(e.target), adr2pos(e.end), refs);
                 visitCode(adr2pos(e.end), -pos, refs);
             } catch (ConvertException ex) {
                 Logger.getLogger(AVM2Code.class.getName()).log(Level.FINE, null, ex);
@@ -2166,7 +2167,7 @@ public class AVM2Code implements Serializable {
 
     @SuppressWarnings("unchecked")
     private static int removeTraps(HashMap<Integer, List<Integer>> refs, boolean secondPass, boolean useVisited, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, HashMap<Integer, Integer> visited, HashMap<Integer, HashMap<Integer, GraphTargetItem>> visitedStates, HashMap<GraphSourceItem, Decision> decisions, String path) {
-        boolean debugMode = true;
+        boolean debugMode = false;
         int ret = 0;
         iploop:
         while ((ip > -1) && ip < code.size()) {
@@ -2223,9 +2224,6 @@ public class AVM2Code implements Serializable {
             if (ins.isIgnored()) {
                 ip++;
                 continue;
-            }
-            if (ip == 131) {
-                System.err.println("debug");
             }
             if (debugMode) {
                 System.out.println((useVisited ? "useV " : "") + (secondPass ? "secondPass " : "") + "Visit " + ip + ": " + ins + " stack:" + Highlighting.stripHilights(stack.toString()));

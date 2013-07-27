@@ -189,7 +189,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
         if (e.getActionCommand().equals("RENAME")) {
             if (swfList.getSelectedIndex() > -1) {
                 Replacement r = (Replacement) listModel.getElementAt(swfList.getSelectedIndex());
-                String s = JOptionPane.showInputDialog("URL", r.urlPattern);
+                String s = View.showInputDialog("URL", r.urlPattern);
                 r.urlPattern = s;
                 listModel.dataChanged(swfList.getSelectedIndex());
             }
@@ -246,7 +246,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
             } catch (NumberFormatException nfe) {
             }
             if ((port <= 0) || (port > 65535)) {
-                JOptionPane.showMessageDialog(this, translate("error.port"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                View.showMessageDialog(this, translate("error.port"), translate("error"), JOptionPane.ERROR_MESSAGE);
                 started = false;
                 return;
             }

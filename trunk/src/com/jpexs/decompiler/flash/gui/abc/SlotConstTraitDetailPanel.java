@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.methodinfo_parser.ParseException;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
+import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -94,7 +95,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
                 return false;
             }
         } catch (ParseException ex) {
-            JOptionPane.showMessageDialog(slotConstEditor, ex.text, translate("error.slotconst.typevalue"), JOptionPane.ERROR_MESSAGE);
+            View.showMessageDialog(slotConstEditor, ex.text, translate("error.slotconst.typevalue"), JOptionPane.ERROR_MESSAGE);
             return false;
         }
         return true;

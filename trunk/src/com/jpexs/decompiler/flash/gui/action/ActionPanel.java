@@ -640,7 +640,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             try {
                 src.setActions(ASMParser.parse(0, src.getPos(), true, new StringReader(editor.getText()), SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION);
                 setSource(this.src, false);
-                JOptionPane.showMessageDialog(this, translate("message.action.saved"));
+                View.showMessageDialog(this, translate("message.action.saved"));
                 saveButton.setVisible(false);
                 cancelButton.setVisible(false);
                 editButton.setVisible(true);
@@ -648,7 +648,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                 editMode = false;
             } catch (IOException ex) {
             } catch (ParseException ex) {
-                JOptionPane.showMessageDialog(this, translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), translate("error"), JOptionPane.ERROR_MESSAGE);
+                View.showMessageDialog(this, translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), translate("error"), JOptionPane.ERROR_MESSAGE);
             }
         } else if (e.getActionCommand().equals("EDITDECOMPILED")) {
             setDecompiledEditMode(true);
@@ -659,12 +659,12 @@ public class ActionPanel extends JPanel implements ActionListener {
                 ActionScriptParser par = new ActionScriptParser();
                 src.setActions(par.actionsFromString(decompiledEditor.getText()), SWF.DEFAULT_VERSION);
                 setSource(this.src, false);
-                JOptionPane.showMessageDialog(this, translate("message.action.saved"));
+                View.showMessageDialog(this, translate("message.action.saved"));
                 setDecompiledEditMode(false);
             } catch (IOException ex) {
                 Logger.getLogger(ActionPanel.class.getName()).log(Level.SEVERE, "IOException during action compiling", ex);
             } catch (ParseException ex) {
-                JOptionPane.showMessageDialog(this, translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), translate("error"), JOptionPane.ERROR_MESSAGE);
+                View.showMessageDialog(this, translate("error.action.save").replace("%error%", ex.text).replace("%line%", "" + ex.line), translate("error"), JOptionPane.ERROR_MESSAGE);
             }
 
         }

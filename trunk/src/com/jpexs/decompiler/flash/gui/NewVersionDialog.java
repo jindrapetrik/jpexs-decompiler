@@ -126,7 +126,7 @@ public class NewVersionDialog extends AppDialog implements ActionListener {
                 }
             }
             if (desktop == null) {
-                JOptionPane.showMessageDialog(null, translate("newvermessage").replace("%oldAppName%", Main.shortApplicationName).replace("%newAppName%", latestVersion.appName).replace("%projectPage%", Main.projectPage), translate("newversion"), JOptionPane.INFORMATION_MESSAGE);
+                View.showMessageDialog(null, translate("newvermessage").replace("%oldAppName%", Main.shortApplicationName).replace("%newAppName%", latestVersion.appName).replace("%projectPage%", Main.projectPage), translate("newversion"), JOptionPane.INFORMATION_MESSAGE);
             }
         }
         setVisible(false);

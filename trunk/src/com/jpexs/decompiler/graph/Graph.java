@@ -1474,6 +1474,19 @@ public class Graph {
          }
          }*/
 
+        if (parseNext) {
+            List<GraphTargetItem> retCheck = check(code, localData, allParts, stack, parent, part, stopPart, loops, output, currentLoop, staticOperation, path);
+            if (retCheck != null) {
+                if (!retCheck.isEmpty()) {
+                    currentRet.addAll(retCheck);
+                }
+                parseNext = false;
+                //return ret;
+            } else {
+                currentRet.addAll(output);
+            }
+        }
+
         /**
          * AND / OR detection
          */
@@ -1587,18 +1600,7 @@ public class Graph {
         }
 //********************************END PART DECOMPILING
 
-        if (parseNext) {
-            List<GraphTargetItem> retCheck = check(code, localData, allParts, stack, parent, part, stopPart, loops, output, currentLoop, staticOperation, path);
-            if (retCheck != null) {
-                if (!retCheck.isEmpty()) {
-                    currentRet.addAll(retCheck);
-                }
-                parseNext = false;
-                //return ret;
-            } else {
-                currentRet.addAll(output);
-            }
-        }
+
         if (parseNext) {
 
 

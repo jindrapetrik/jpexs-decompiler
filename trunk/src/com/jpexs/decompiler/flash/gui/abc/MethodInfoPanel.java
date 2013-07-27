@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.methodinfo_parser.MethodInfoParser;
 import com.jpexs.decompiler.flash.abc.methodinfo_parser.ParseException;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
+import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -120,13 +121,13 @@ public class MethodInfoPanel extends JPanel {
         try {
             MethodInfoParser.parseParams(paramEditor.getText(), methodInfo, abc);
         } catch (ParseException ex) {
-            JOptionPane.showMessageDialog(paramEditor, ex.text, translate("error.methodinfo.params"), JOptionPane.ERROR_MESSAGE);
+            View.showMessageDialog(paramEditor, ex.text, translate("error.methodinfo.params"), JOptionPane.ERROR_MESSAGE);
             return false;
         }
         try {
             MethodInfoParser.parseReturnType(returnTypeEditor.getText(), methodInfo);
         } catch (ParseException ex) {
-            JOptionPane.showMessageDialog(returnTypeEditor, ex.text, translate("error.methodinfo.returnvalue"), JOptionPane.ERROR_MESSAGE);
+            View.showMessageDialog(returnTypeEditor, ex.text, translate("error.methodinfo.returnvalue"), JOptionPane.ERROR_MESSAGE);
             return false;
         }
         return true;

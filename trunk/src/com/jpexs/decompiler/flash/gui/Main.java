@@ -253,7 +253,7 @@ public class Main {
                 swf = parseSWF(Main.file);
             } catch (Exception ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                JOptionPane.showMessageDialog(null, "Cannot load SWF file.");
+                View.showMessageDialog(null, "Cannot load SWF file.");
                 loadingDialog.setVisible(false);
                 exit();
                 return false;
@@ -339,7 +339,7 @@ public class Main {
                 maskURL = null;
                 return true;
             } catch (IOException ex) {
-                JOptionPane.showMessageDialog(null, translate("error.file.write"));
+                View.showMessageDialog(null, translate("error.file.write"));
             }
         }
         return false;
@@ -514,7 +514,7 @@ public class Main {
         boolean offered = (Boolean) Configuration.getConfig("offeredAssociation", Boolean.FALSE);
         if (!offered) {
             if (Platform.isWindows()) {
-                if ((!isAddedToContextMenu()) && JOptionPane.showConfirmDialog(null, "Do you want to add FFDec to context menu of SWF files?\n(Can be changed later from main menu)", "Context menu", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                if ((!isAddedToContextMenu()) && View.showConfirmDialog(null, "Do you want to add FFDec to context menu of SWF files?\n(Can be changed later from main menu)", "Context menu", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
                     addToContextMenu(true);
                 }
             }

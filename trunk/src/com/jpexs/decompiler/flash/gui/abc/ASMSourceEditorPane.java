@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.ParseException;
 import com.jpexs.decompiler.flash.gui.GraphFrame;
+import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -125,7 +126,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         args.put(0, new Object()); //object "this"
         args.put(1, new Long(466561)); //param1
         Object o = abc.bodies[bodyIndex].code.execute(args, abc.constants);
-        JOptionPane.showMessageDialog(this, "Returned object:" + o.toString());
+        View.showMessageDialog(this, "Returned object:" + o.toString());
     }
 
     public boolean save(ConstantPool constants) {
@@ -135,7 +136,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
             abc.bodies[bodyIndex].code = acode;
         } catch (IOException ex) {
         } catch (ParseException ex) {
-            JOptionPane.showMessageDialog(this, (ex.text + " on line " + ex.line));
+            View.showMessageDialog(this, (ex.text + " on line " + ex.line));
             selectLine((int) ex.line);
             return false;
         }

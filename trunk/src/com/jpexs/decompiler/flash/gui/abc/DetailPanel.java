@@ -159,7 +159,7 @@ public class DetailPanel extends JPanel implements ActionListener {
                     int lasttrait = abcPanel.decompiledTextArea.lastTraitIndex;
                     abcPanel.decompiledTextArea.reloadClass();
                     abcPanel.decompiledTextArea.gotoTrait(lasttrait);
-                    JOptionPane.showMessageDialog(this, translate("message.trait.saved"));
+                    View.showMessageDialog(this, translate("message.trait.saved"));
                 }
             }
         }

@@ -92,7 +92,7 @@ public class SearchDialog extends AppDialog implements ActionListener {
                 try {
                     Pattern pat = Pattern.compile(searchField.getText());
                 } catch (PatternSyntaxException ex) {
-                    JOptionPane.showMessageDialog(null, translate("error.invalidregexp"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                    View.showMessageDialog(null, translate("error.invalidregexp"), translate("error"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
             }

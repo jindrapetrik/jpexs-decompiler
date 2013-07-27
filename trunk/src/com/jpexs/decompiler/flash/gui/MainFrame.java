@@ -286,7 +286,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         public int handle(Throwable thrown) {
             synchronized (MainFrame.class) {
                 String options[] = new String[]{translate("button.abort"), translate("button.retry"), translate("button.ignore")};
-                return JOptionPane.showOptionDialog(null, translate("error.occured").replace("%error%", thrown.getLocalizedMessage()), translate("error"), JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE, null, options, "");
+                return View.showOptionDialog(null, translate("error.occured").replace("%error%", thrown.getLocalizedMessage()), translate("error"), JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE, null, options, "");
             }
         }
     };
@@ -1419,7 +1419,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                         @Override
                                         public void run() {
                                             pos++;
-                                            if ((pos % 2) == 0 || (pos>=4)) {
+                                            if ((pos % 2) == 0 || (pos >= 4)) {
                                                 errorNotificationButton.setIcon(View.getIcon("error16"));
                                             } else {
                                                 errorNotificationButton.setIcon(null);
@@ -1478,7 +1478,13 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
             if (n.tag instanceof ClassesListTreeModel) {
                 n.tag = new ClassesListTreeModel(abcPanel.classTree.treeList, filterField.getText());
             }
-            tagTree.updateUI();
+            View.execInEventDispatch(new Runnable() {
+                @Override
+                public void run() {
+                    tagTree.updateUI();
+                }
+            });
+
         }
     }
 
@@ -1817,11 +1823,11 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
 
     public void renameIdentifier(String identifier) {
         String oldName = identifier;
-        String newName = JOptionPane.showInputDialog(translate("rename.enternew"), oldName);
+        String newName = View.showInputDialog(translate("rename.enternew"), oldName);
         if (newName != null) {
             if (!oldName.equals(newName)) {
                 swf.renameAS2Identifier(oldName, newName);
-                JOptionPane.showMessageDialog(null, translate("rename.finished.identifier"));
+                View.showMessageDialog(null, translate("rename.finished.identifier"));
                 doFilter();
                 reload(true);
             }
@@ -1833,7 +1839,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         if (abcPanel.abc.constants.constant_multiname[multiNameIndex].name_index > 0) {
             oldName = abcPanel.abc.constants.constant_string[abcPanel.abc.constants.constant_multiname[multiNameIndex].name_index];
         }
-        String newName = JOptionPane.showInputDialog(translate("rename.enternew"), oldName);
+        String newName = View.showInputDialog(translate("rename.enternew"), oldName);
         if (newName != null) {
             if (!oldName.equals(newName)) {
                 int mulCount = 0;
@@ -1851,7 +1857,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                         }
                     }
                 }
-                JOptionPane.showMessageDialog(null, translate("rename.finished.multiname").replace("%count%", "" + mulCount));
+                View.showMessageDialog(null, translate("rename.finished.multiname").replace("%count%", "" + mulCount));
                 if (abcPanel != null) {
                     abcPanel.reload();
                 }
@@ -2046,7 +2052,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
     }
 
     public boolean confirmExperimental() {
-        return JOptionPane.showConfirmDialog(null, translate("message.confirm.experimental"), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION;
+        return View.showConfirmDialog(null, translate("message.confirm.experimental"), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION;
     }
     private SearchDialog searchDialog;
 
@@ -2179,7 +2185,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                         if (oldchars.indexOf((int) c) == -1) {
                             Font font = new Font(fontSelection.getSelectedItem().toString(), f.getFontStyle(), 1024);
                             if (!font.canDisplay(c)) {
-                                JOptionPane.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", "" + c), translate("error"), JOptionPane.ERROR_MESSAGE);
+                                View.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", "" + c), translate("error"), JOptionPane.ERROR_MESSAGE);
                                 return;
                             }
                         }
@@ -2213,7 +2219,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                         newLanguage = "";
                     }
                     Configuration.setConfig("locale", newLanguage);
-                    JOptionPane.showMessageDialog(null, "Changing language needs application restart.\r\nApplication will exit now, please run it again.");
+                    View.showMessageDialog(null, "Changing language needs application restart.\r\nApplication will exit now, please run it again.");
                     Main.exit();
                 }
                 break;
@@ -2250,7 +2256,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 } else {
                     confStr += " " + translate("message.confirm.off");
                 }
-                if (JOptionPane.showConfirmDialog(null, confStr, translate("message.parallel"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                if (View.showConfirmDialog(null, confStr, translate("message.parallel"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
                     Configuration.setConfig("paralelSpeedUp", (Boolean) miParallelSpeedUp.isSelected());
                 } else {
                     miParallelSpeedUp.setSelected(!miParallelSpeedUp.isSelected());
@@ -2276,7 +2282,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                         showDetail(DETAILCARDAS3NAVIGATOR);
                                         showCard(CARDACTIONSCRIPTPANEL);
                                     } else {
-                                        JOptionPane.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
+                                        View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
                                     }
                                 }
                             }).start();
@@ -2287,7 +2293,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                     if (actionPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
                                         showCard(CARDACTIONSCRIPTPANEL);
                                     } else {
-                                        JOptionPane.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
+                                        View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
                                     }
                                 }
                             }).start();
@@ -2336,7 +2342,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                 swf.clearImageCache();
                             } catch (IOException ex) {
                                 Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Invalid image", ex);
-                                JOptionPane.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                                View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
                             }
                             reload(true);
                         }
@@ -2353,7 +2359,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                     tagObj = ((TagNode) tagObj).tag;
                 }
                 if (tagObj instanceof Tag) {
-                    if (JOptionPane.showConfirmDialog(this, translate("message.confirm.remove").replace("%item%", tagObj.toString()), translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                    if (View.showConfirmDialog(this, translate("message.confirm.remove").replace("%item%", tagObj.toString()), translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
                         swf.removeTag((Tag) tagObj);
                         showCard(CARDEMPTYPANEL);
                         refreshTree();
@@ -2388,7 +2394,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                 }
                                 Font f = new Font(fontName, font.getFontStyle(), 18);
                                 if (!f.canDisplay(character)) {
-                                    JOptionPane.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", "" + character), translate("error"), JOptionPane.ERROR_MESSAGE);
+                                    View.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", "" + character), translate("error"), JOptionPane.ERROR_MESSAGE);
                                     return false;
                                 }
                                 font.addCharacter(tags, character, fontName);
@@ -2399,13 +2405,13 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                             setEditText(false);
                         }
                     } catch (ParseException ex) {
-                        JOptionPane.showMessageDialog(null, translate("error.text.invalid").replace("%text%", ex.text).replace("%line%", "" + ex.line), translate("error"), JOptionPane.ERROR_MESSAGE);
+                        View.showMessageDialog(null, translate("error.text.invalid").replace("%text%", ex.text).replace("%line%", "" + ex.line), translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
                 }
                 break;
 
             case "AUTODEOBFUSCATE":
-                if (JOptionPane.showConfirmDialog(this, translate("message.confirm.autodeobfuscate") + "\r\n" + (autoDeobfuscateMenuItem.isSelected() ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                if (View.showConfirmDialog(this, translate("message.confirm.autodeobfuscate") + "\r\n" + (autoDeobfuscateMenuItem.isSelected() ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
                     Configuration.setConfig("autoDeobfuscate", autoDeobfuscateMenuItem.isSelected());
                     clearCache();
                     if (abcPanel != null) {
@@ -2447,7 +2453,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                         }).start();
 
                     } else {
-                        JOptionPane.showMessageDialog(null, translate("message.rename.notfound.multiname"), translate("message.rename.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
+                        View.showMessageDialog(null, translate("message.rename.notfound.multiname"), translate("message.rename.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
                     }
                 } else {
                     final String identifier = actionPanel.getStringUnderCursor();
@@ -2461,7 +2467,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                             }
                         }).start();
                     } else {
-                        JOptionPane.showMessageDialog(null, translate("message.rename.notfound.identifier"), translate("message.rename.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
+                        View.showMessageDialog(null, translate("message.rename.notfound.identifier"), translate("message.rename.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
                     }
                 }
                 break;
@@ -2485,7 +2491,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                     Main.saveFile(Main.file);
                 } catch (IOException ex) {
                     Logger.getLogger(com.jpexs.decompiler.flash.gui.abc.ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
-                    JOptionPane.showMessageDialog(null, translate("error.file.save"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                    View.showMessageDialog(null, translate("error.file.save"), translate("error"), JOptionPane.ERROR_MESSAGE);
                 }
                 break;
             case "SAVEAS":
@@ -2556,7 +2562,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                     swf.exportXfl(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
                                 }
                             } catch (IOException ex) {
-                                JOptionPane.showMessageDialog(null, translate("error.export") + ": " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
+                                View.showMessageDialog(null, translate("error.export") + ": " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
                             }
                             Main.stopWork();
                         }
@@ -2599,7 +2605,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                     }
                                 } catch (Exception ex) {
                                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Error during export", ex);
-                                    JOptionPane.showMessageDialog(null, translate("error.export") + ": " + ex.getLocalizedMessage());
+                                    View.showMessageDialog(null, translate("error.export") + ": " + ex.getLocalizedMessage());
                                 }
                                 Main.stopWork();
                                 long timeAfter = System.currentTimeMillis();
@@ -2626,7 +2632,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
 
             case "CHECKUPDATES":
                 if (!Main.checkForUpdates()) {
-                    JOptionPane.showMessageDialog(null, translate("update.check.nonewversion"), translate("update.check.title"), JOptionPane.INFORMATION_MESSAGE);
+                    View.showMessageDialog(null, translate("update.check.nonewversion"), translate("update.check.title"), JOptionPane.INFORMATION_MESSAGE);
                 }
                 break;
 
@@ -2640,7 +2646,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                     } catch (Exception ex) {
                     }
                 } else {
-                    JOptionPane.showMessageDialog(null, translate("message.helpus").replace("%url%", helpUsURL));
+                    View.showMessageDialog(null, translate("message.helpus").replace("%url%", helpUsURL));
                 }
                 break;
 
@@ -2654,7 +2660,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                     } catch (Exception ex) {
                     }
                 } else {
-                    JOptionPane.showMessageDialog(null, translate("message.homepage").replace("%url%", homePageURL));
+                    View.showMessageDialog(null, translate("message.homepage").replace("%url%", homePageURL));
                 }
                 break;
 
@@ -2679,7 +2685,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                 abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abcPanel.abc);
                             }
                             Main.stopWork();
-                            JOptionPane.showMessageDialog(null, "Control flow restored");
+                            View.showMessageDialog(null, "Control flow restored");
                             abcPanel.reload();
                             doFilter();
                             return true;
@@ -2699,7 +2705,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                     int cnt = 0;
                                     cnt = swf.deobfuscateIdentifiers(renameType);
                                     Main.stopWork();
-                                    JOptionPane.showMessageDialog(null, translate("message.rename.renamed").replace("%count%", "" + cnt));
+                                    View.showMessageDialog(null, translate("message.rename.renamed").replace("%count%", "" + cnt));
                                     swf.assignClassesToSymbols();
                                     clearCache();
                                     if (abcPanel != null) {
@@ -2758,7 +2764,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                 Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Deobfuscation error", ex);
                             }
                             Main.stopWork();
-                            JOptionPane.showMessageDialog(null, translate("work.deobfuscating.complete"));
+                            View.showMessageDialog(null, translate("work.deobfuscating.complete"));
                             clearCache();
                             abcPanel.reload();
                             doFilter();

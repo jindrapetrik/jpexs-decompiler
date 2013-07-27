@@ -26,10 +26,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -171,5 +173,60 @@ public class View {
                 Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+    }
+
+    public static int showOptionDialog(final Component parentComponent, final Object message, final String title, final int optionType, final int messageType, final Icon icon, final Object[] options, final Object initialValue) {
+        final int ret[] = new int[1];
+        execInEventDispatch(new Runnable() {
+            @Override
+            public void run() {
+                ret[0] = JOptionPane.showOptionDialog(parentComponent, message, title, optionType, messageType, icon, options, initialValue);
+            }
+        });
+        return ret[0];
+    }
+
+    public static int showConfirmDialog(final Component parentComponent, final Object message, final String title, final int optionType) {
+        return showConfirmDialog(parentComponent, message, title, optionType, JOptionPane.PLAIN_MESSAGE);
+    }
+
+    public static int showConfirmDialog(final Component parentComponent, final Object message, final String title, final int optionType, final int messageTyp) {
+        final int ret[] = new int[1];
+        execInEventDispatch(new Runnable() {
+            @Override
+            public void run() {
+                ret[0] = JOptionPane.showConfirmDialog(parentComponent, message, title, optionType, messageTyp);
+            }
+        });
+        return ret[0];
+    }
+
+    public static void showMessageDialog(final Component parentComponent, final Object message, final String title, final int messageType) {
+        execInEventDispatch(new Runnable() {
+            @Override
+            public void run() {
+                JOptionPane.showMessageDialog(parentComponent, message, title, messageType);
+            }
+        });
+    }
+
+    public static void showMessageDialog(final Component parentComponent, final Object message) {
+        execInEventDispatch(new Runnable() {
+            @Override
+            public void run() {
+                JOptionPane.showMessageDialog(parentComponent, message);
+            }
+        });
+    }
+
+    public static String showInputDialog(final Object message, final Object initialSelection) {
+        final String ret[] = new String[1];
+        execInEventDispatch(new Runnable() {
+            @Override
+            public void run() {
+                ret[0] = JOptionPane.showInputDialog(message, initialSelection);
+            }
+        });
+        return ret[0];
     }
 }

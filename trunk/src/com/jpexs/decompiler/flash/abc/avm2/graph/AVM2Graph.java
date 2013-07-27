@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushIntegerTypeIns
 import com.jpexs.decompiler.flash.abc.avm2.model.FilteredCheckAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.HasNextAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NextNameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NextValueAVM2Item;
@@ -49,6 +50,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.operations.StrictEqAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.StrictNeqAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphPartMulti;
@@ -185,8 +187,6 @@ public class AVM2Graph extends Graph {
     @Override
     protected List<GraphTargetItem> check(GraphSource code, List<Object> localData, List<GraphPart> allParts, Stack<GraphTargetItem> stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) {
         List<GraphTargetItem> ret = null;
-
-
 
         @SuppressWarnings("unchecked")
         List<ABCException> parsedExceptions = (List<ABCException>) localData.get(DATA_PARSEDEXCEPTIONS);
@@ -453,7 +453,30 @@ public class AVM2Graph extends Graph {
                 } else {
                     reversed = true;
                 }
-                caseValuesMap.put(this.code.code.get(this.code.fixIPAfterDebugLine(part.nextParts.get(reversed ? 0 : 1).start)).operands[0], tar);
+                GraphPart numPart = part.nextParts.get(reversed ? 0 : 1);
+                AVM2Instruction ins = null;
+                Stack<GraphTargetItem> sstack = new Stack<>();
+                do {
+                    for (int n = 0; n < numPart.getHeight(); n++) {
+                        ins = this.code.code.get(numPart.getPosAt(n));
+                        if (ins.definition instanceof LookupSwitchIns) {
+                            break;
+                        }
+                        ins.translate(localData, sstack, new ArrayList<GraphTargetItem>(), staticOperation, path);
+                    }
+                    if (numPart.nextParts.size() > 1) {
+                        break;
+                    } else {
+                        numPart = numPart.nextParts.get(0);
+                    }
+                } while (!(this.code.code.get(numPart.end).definition instanceof LookupSwitchIns));
+                GraphTargetItem nt = sstack.peek();
+
+                if (!(nt instanceof IntegerValueAVM2Item)) {
+                    throw new RuntimeException("Invalid integer value in Switch");
+                }
+                IntegerValueAVM2Item iv = (IntegerValueAVM2Item) nt;
+                caseValuesMap.put((int) (long) iv.value, tar);
                 while (this.code.code.get(part.nextParts.get(reversed ? 1 : 0).start).definition instanceof JumpIns) {
                     reversed = false;
                     part = part.nextParts.get(reversed ? 1 : 0);

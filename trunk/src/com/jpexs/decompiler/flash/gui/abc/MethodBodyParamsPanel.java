@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui.abc;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import com.jpexs.decompiler.flash.gui.MyFormattedTextField;
+import com.jpexs.decompiler.flash.gui.View;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.text.NumberFormat;
@@ -113,7 +114,7 @@ public class MethodBodyParamsPanel extends JPanel implements ChangeListener {
                 body.max_scope_depth = Integer.parseInt(maxScopeDepthField.getText());
             } else {
                 if (!body.autoFillStats(abcPanel.abc)) {
-                    JOptionPane.showMessageDialog(null, translate("message.autofill.failed"), translate("message.warning"), JOptionPane.WARNING_MESSAGE);
+                    View.showMessageDialog(null, translate("message.autofill.failed"), translate("message.warning"), JOptionPane.WARNING_MESSAGE);
                 }
             }
             return true;
