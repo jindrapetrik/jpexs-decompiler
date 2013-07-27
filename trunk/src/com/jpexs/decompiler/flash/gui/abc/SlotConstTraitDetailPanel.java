@@ -50,7 +50,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
         add(new JLabel(translate("abc.detail.slotconst.typevalue")), BorderLayout.NORTH);
         add(new JScrollPane(slotConstEditor), BorderLayout.CENTER);
         warnLabel = new JTextPane();
-        warnLabel.setText("WARNING:\nStatic fields and consts are often initialized in initializers.\nEditing value here is usually not enough!");
+        warnLabel.setText(translate("warning.initializers"));
         StyledDocument doc = warnLabel.getStyledDocument();
         SimpleAttributeSet center = new SimpleAttributeSet();
         StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
