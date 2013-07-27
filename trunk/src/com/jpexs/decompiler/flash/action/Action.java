@@ -507,6 +507,10 @@ public class Action implements GraphSourceItem {
                 }
             } else {
                 if (a.beforeInsert != null) {
+                    if (lastPush) {
+                        ret.append("\r\n");
+                        lastPush = false;
+                    }
                     ret.append(a.beforeInsert.getASMSource(list, importantOffsets, constantPool, version, hex));
                     ret.append("\r\n");
                 }
@@ -526,6 +530,7 @@ public class Action implements GraphSourceItem {
                 } else {
                     if (lastPush) {
                         ret.append("\r\n");
+                        lastPush = false;
                     }
 
 
@@ -556,6 +561,10 @@ public class Action implements GraphSourceItem {
                 }
                 //}
                 if (a.afterInsert != null) {
+                    if (lastPush) {
+                        ret.append("\r\n");
+                        lastPush = false;
+                    }
                     ret.append(a.afterInsert.getASMSource(list, importantOffsets, constantPool, version, hex));
                     ret.append("\r\n");
                 }
