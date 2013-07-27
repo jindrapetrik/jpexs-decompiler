@@ -43,6 +43,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -88,7 +89,7 @@ public class ErrorLogFrame extends AppFrame {
     }
 
     private void log(final Level level, final String msg, final String detail) {
-        View.execInEventDispatch(new Runnable() {
+        SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 JPanel pan = new JPanel();
@@ -196,6 +197,7 @@ public class ErrorLogFrame extends AppFrame {
                 repaint();
             }
         });
+
 
     }
 

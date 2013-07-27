@@ -1401,30 +1401,42 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
             private int pos = 0;
 
             @Override
-            public void publish(LogRecord record) {
-                if (record.getLevel() == Level.SEVERE) {
-                    errorNotificationButton.setIcon(View.getIcon("error16"));
-                    errorNotificationButton.setToolTipText(translate("errors.present"));
-                    if (timer != null) {
-                        timer.cancel();
-                    }
-                    timer = new Timer();
-                    timer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            pos++;
-                            if ((pos % 2) == 0) {
-                                errorNotificationButton.setIcon(View.getIcon("error16"));
-                            } else {
-                                errorNotificationButton.setIcon(null);
-                                errorNotificationButton.setSize(16, 16);
+            public void publish(final LogRecord record) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (record.getLevel() == Level.SEVERE) {
+                            errorNotificationButton.setIcon(View.getIcon("error16"));
+                            errorNotificationButton.setToolTipText(translate("errors.present"));
+                            if (timer != null) {
+                                timer.cancel();
                             }
-                            if (pos >= 4) {
-                                cancel();
-                            }
+                            timer = new Timer();
+                            timer.schedule(new TimerTask() {
+                                @Override
+                                public void run() {
+                                    View.execInEventDispatch(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            pos++;
+                                            if ((pos % 2) == 0 || (pos>=4)) {
+                                                errorNotificationButton.setIcon(View.getIcon("error16"));
+                                            } else {
+                                                errorNotificationButton.setIcon(null);
+                                                errorNotificationButton.setSize(16, 16);
+                                            }
+                                        }
+                                    });
+
+                                    if (pos >= 4) {
+                                        cancel();
+                                    }
+                                }
+                            }, 500, 500);
                         }
-                    }, 500, 500);
-                }
+                    }
+                });
+
             }
 
             @Override
