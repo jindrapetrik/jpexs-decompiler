@@ -872,6 +872,12 @@ public class XFLConverter {
         return rad * 180 / Math.PI;
     }
 
+    private static String doubleToString(double d, int precision) {
+        double m = Math.pow(10, precision);
+        d = Math.round(d * m) / m;
+        return doubleToString(d);
+    }
+
     private static String doubleToString(double d) {
         String ds = "" + d;
         if (ds.endsWith(".0")) {
@@ -903,7 +909,7 @@ public class XFLConverter {
                 ret += " knockout=\"true\"";
             }
             ret += " quality=\"" + dsf.passes + "\"";
-            ret += " strength=\"" + doubleToString(dsf.strength) + "\"";
+            ret += " strength=\"" + doubleToString(dsf.strength, 2) + "\"";
             ret += " />";
         } else if (filter instanceof BLURFILTER) {
             BLURFILTER bf = (BLURFILTER) filter;
@@ -929,7 +935,7 @@ public class XFLConverter {
                 ret += " knockout=\"true\"";
             }
             ret += " quality=\"" + gf.passes + "\"";
-            ret += " strength=\"" + doubleToString(gf.strength) + "\"";
+            ret += " strength=\"" + doubleToString(gf.strength, 2) + "\"";
             ret += " />";
         } else if (filter instanceof BEVELFILTER) {
             BEVELFILTER bf = (BEVELFILTER) filter;
@@ -950,7 +956,7 @@ public class XFLConverter {
                 ret += " shadowAlpha=\"" + bf.shadowColor.getAlphaFloat() + "\"";
             }
             ret += " shadowColor=\"" + bf.shadowColor.toHexRGB() + "\"";
-            ret += " strength=\"" + doubleToString(bf.strength) + "\"";
+            ret += " strength=\"" + doubleToString(bf.strength, 2) + "\"";
             if (bf.onTop && !bf.innerShadow) {
                 ret += " type=\"full\"";
             } else if (!bf.innerShadow) {
@@ -969,7 +975,7 @@ public class XFLConverter {
             if (ggf.knockout) {
                 ret += " knockout=\"true\"";
             }
-            ret += " strength=\"" + doubleToString(ggf.strength) + "\"";
+            ret += " strength=\"" + doubleToString(ggf.strength, 2) + "\"";
             if (ggf.onTop && !ggf.innerShadow) {
                 ret += " type=\"full\"";
             } else if (!ggf.innerShadow) {
@@ -998,7 +1004,7 @@ public class XFLConverter {
             if (gbf.knockout) {
                 ret += " knockout=\"true\"";
             }
-            ret += " strength=\"" + doubleToString(gbf.strength) + "\"";
+            ret += " strength=\"" + doubleToString(gbf.strength, 2) + "\"";
             if (gbf.onTop && !gbf.innerShadow) {
                 ret += " type=\"full\"";
             } else if (!gbf.innerShadow) {
