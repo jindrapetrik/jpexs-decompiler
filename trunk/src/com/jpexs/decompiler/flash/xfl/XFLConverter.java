@@ -2322,7 +2322,7 @@ public class XFLConverter {
                     ret += "<characters>" + xmlString(rec.getText(tags, font)) + "</characters>";
                     ret += "<textAttrs>";
 
-                    ret += "<DOMTextAttrs aliasText=\"false\" rotation=\"true\" size=\"" + twipToPixel(textHeight) + "\" bitmapSize=\"1040\"";
+                    ret += "<DOMTextAttrs aliasText=\"false\" rotation=\"true\" size=\"" + twipToPixel(textHeight) + "\" bitmapSize=\"" + textHeight + "\"";
                     //indent=\"5\" leftMargin=\"2\" letterSpacing=\"1\" lineSpacing=\"6\" rightMargin=\"3\"
                     if (textColor != null) {
                         ret += " fillColor=\"" + textColor.toHexRGB() + "\"";
@@ -2424,6 +2424,10 @@ public class XFLConverter {
                     boolean bold = false;
                     String fontFace = null;
                     int size = -1;
+                    RGBA textColor = null;
+                    if (det.hasTextColor) {
+                        textColor = det.textColor;
+                    }
                     if (det.hasFont) {
                         String fontName = null;
                         FontTag ft = null;
@@ -2479,11 +2483,14 @@ public class XFLConverter {
                         ret += " rightMargin=\"" + twipToPixel(rightMargin) + "\"";
                     }
                     if (size > -1) {
-                        ret += " size=\"" + size + "\"";
-                        ret += " bitmapSize=\"" + (size * 20) + "\"";
+                        ret += " size=\"" + twipToPixel(size) + "\"";
+                        ret += " bitmapSize=\"" + size + "\"";
                     }
                     if (fontFace != null) {
                         ret += " face=\"" + fontFace + "\"";
+                    }
+                    if (textColor != null) {
+                        ret += " fillColor=\"" + textColor.toHexRGB() + "\" alpha=\"" + textColor.getAlphaFloat() + "\"";
                     }
                     ret += "/>";
                     ret += "</textAttrs>";
