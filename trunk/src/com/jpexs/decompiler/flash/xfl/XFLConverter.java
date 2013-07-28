@@ -1605,7 +1605,7 @@ public class XFLConverter {
         }
     }
 
-    private static String convertFrame(boolean shapeTween, HashMap<Integer, CharacterTag> characters, List<Tag> tags, SoundStreamHeadTypeTag soundStreamHead, StartSoundTag startSound, int frame, String frameName, boolean isAnchor, int duration, String actionScript, String elements) {
+    private static String convertFrame(boolean shapeTween, HashMap<Integer, CharacterTag> characters, List<Tag> tags, SoundStreamHeadTypeTag soundStreamHead, StartSoundTag startSound, int frame, int duration, String actionScript, String elements) {
         String ret = "";
         DefineSoundTag sound = null;
         if (startSound != null) {
@@ -1623,16 +1623,6 @@ public class XFLConverter {
         ret += "<DOMFrame index=\"" + (frame) + "\"";
         if (duration > 1) {
             ret += " duration=\"" + duration + "\"";
-        }
-        if (frameName != null) {
-            ret += " name=\"" + frameName + "\"";
-            if (isAnchor) {
-                ret += " labelType=\"anchor\" bookmark=\"true\"";
-            } else {
-                ret += " labelType=\"name\"";
-            }
-            isAnchor = false;
-            frameName = null;
         }
         if (shapeTween) {
             ret += " tweenType=\"shape\" keyMode=\"" + KEY_MODE_SHAPE_TWEEN + "\"";
@@ -1748,8 +1738,6 @@ public class XFLConverter {
         String lastElements = "";
 
         int duration = 1;
-        String frameName = null;
-        boolean isAnchor = false;
 
         CharacterTag character = null;
         MATRIX matrix = null;
@@ -1851,11 +1839,6 @@ public class XFLConverter {
                     clipActions = null;
                 }
             }
-            if (t instanceof FrameLabelTag) {
-                FrameLabelTag flt = (FrameLabelTag) t;
-                frameName = flt.getLabelName();
-                isAnchor = flt.isNamedAnchor();
-            }
 
             if (t instanceof ShowFrameTag) {
                 elements = "";
@@ -1887,7 +1870,7 @@ public class XFLConverter {
 
                 frame++;
                 if (!elements.equals(lastElements) && frame > 0) {
-                    ret += convertFrame(lastShapeTween, characters, tags, null, null, frame - duration, frameName, isAnchor, duration, "", lastElements);
+                    ret += convertFrame(lastShapeTween, characters, tags, null, null, frame - duration, duration, "", lastElements);
                     duration = 1;
                 } else if (frame == 0) {
                     duration = 1;
@@ -1897,14 +1880,11 @@ public class XFLConverter {
 
                 lastShapeTween = shapeTween;
                 lastElements = elements;
-
-
-                frameName = null;
-                isAnchor = false;
             }
         }
         if (!lastElements.equals("")) {
-            ret += convertFrame(lastShapeTween, characters, tags, null, null, (frame - duration < 0 ? 0 : frame - duration), frameName, isAnchor, duration, "", lastElements);
+            frame++;
+            ret += convertFrame(lastShapeTween, characters, tags, null, null, (frame - duration < 0 ? 0 : frame - duration), duration, "", lastElements);
         }
         afterStr = "</frames>" + afterStr;
         if (!ret.equals("")) {
@@ -1913,7 +1893,7 @@ public class XFLConverter {
         return ret;
     }
 
-    public static String convertActionScriptLayer(int layerIndex, int spriteId, List<Tag> tags, List<Tag> timeLineTags, String backgroundColor) {
+    public static String convertActionScriptLayer(int spriteId, List<Tag> tags, List<Tag> timeLineTags, String backgroundColor) {
         String ret = "";
 
         String script = "";
@@ -1965,7 +1945,62 @@ public class XFLConverter {
             }
         }
         if (!ret.equals("")) {
-            ret = "<DOMLayer name=\"Layer " + (layerIndex + 1) + "\" color=\"" + randomOutlineColor() + "\">"
+            ret = "<DOMLayer name=\"Script Layer\" color=\"" + randomOutlineColor() + "\">"
+                    + "<frames>"
+                    + ret
+                    + "</frames>"
+                    + "</DOMLayer>";
+        }
+        return ret;
+    }
+
+    public static String convertLabelsLayer(int spriteId, List<Tag> tags, List<Tag> timeLineTags, String backgroundColor) {
+        String ret = "";
+        int duration = 0;
+        int frame = 0;
+        String frameLabel = "";
+        boolean isAnchor = false;
+        for (Tag t : timeLineTags) {
+            if (t instanceof FrameLabelTag) {
+                FrameLabelTag fl = (FrameLabelTag) t;
+                frameLabel = fl.getLabelName();
+                isAnchor = fl.isNamedAnchor();
+            }
+            if (t instanceof ShowFrameTag) {
+
+                if (frameLabel.equals("")) {
+                    duration++;
+                } else {
+                    if (duration > 0) {
+                        ret += "<DOMFrame index=\"" + (frame - duration) + "\"";
+                        if (duration > 1) {
+                            ret += " duration=\"" + duration + "\"";
+                        }
+                        ret += " keyMode=\"" + KEY_MODE_NORMAL + "\">";
+                        ret += "<elements>";
+                        ret += "</elements>";
+                        ret += "</DOMFrame>";
+                    }
+                    ret += "<DOMFrame index=\"" + frame + "\"";
+                    ret += " keyMode=\"" + KEY_MODE_NORMAL + "\"";
+                    ret += " name=\"" + frameLabel + "\"";
+                    if (isAnchor) {
+                        ret += " labelType=\"anchor\" bookmark=\"true\"";
+                    } else {
+                        ret += " labelType=\"name\"";
+                    }
+                    ret += ">";
+                    ret += "<elements>";
+                    ret += "</elements>";
+                    ret += "</DOMFrame>";
+                    frameLabel = "";
+                    duration = 0;
+                }
+                frame++;
+            }
+        }
+        if (!ret.equals("")) {
+            ret = "<DOMLayer name=\"Labels Layer\" color=\"" + randomOutlineColor() + "\">"
                     + "<frames>"
                     + ret
                     + "</frames>"
@@ -1992,7 +2027,7 @@ public class XFLConverter {
             if (t instanceof ShowFrameTag) {
                 if (soundStreamHead != null || startSound != null) {
                     if (lastSoundStreamHead != null || lastStartSound != null) {
-                        ret += convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, null, false, duration, "", "");
+                        ret += convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, duration, "", "");
                     }
                     frame += duration;
                     duration = 1;
@@ -2010,7 +2045,7 @@ public class XFLConverter {
                 frame = 0;
                 duration = 1;
             }
-            ret += convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, null, false, duration, "", "");
+            ret += convertFrame(false, characters, tags, lastSoundStreamHead, lastStartSound, frame, duration, "", "");
         }
         if (!ret.equals("")) {
             ret = "<DOMLayer name=\"Layer " + layerIndex + "\" color=\"" + randomOutlineColor() + "\">"
@@ -2035,6 +2070,10 @@ public class XFLConverter {
         String ret = "";
         ret += "<DOMTimeline name=\"" + name + "\">";
         ret += "<layers>";
+
+        ret += convertLabelsLayer(spriteId, tags, timelineTags, backgroundColor);
+        ret += convertActionScriptLayer(spriteId, tags, timelineTags, backgroundColor);
+
         int layerCount = getLayerCount(timelineTags);
         Stack<Integer> parentLayers = new Stack<>();
         int index = 0;
@@ -2102,11 +2141,6 @@ public class XFLConverter {
         int soundLayerIndex = layerCount;
         layerCount++;
         ret += convertSoundLayer(soundLayerIndex, backgroundColor, characters, tags, timelineTags);
-
-        int actionScriptLayerIndex = layerCount;
-        layerCount++;
-        ret += convertActionScriptLayer(actionScriptLayerIndex, spriteId, tags, timelineTags, backgroundColor);
-
         ret += "</layers>";
         ret += "</DOMTimeline>";
         return ret;
