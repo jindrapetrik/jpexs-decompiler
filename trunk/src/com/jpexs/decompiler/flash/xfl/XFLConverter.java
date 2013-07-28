@@ -2236,6 +2236,10 @@ public class XFLConverter {
         } else {
             matrix.translateX += bounds.Xmin;
             matrix.translateY += bounds.Ymin;
+
+            //I do not know why, but there is (always?) 2px difference
+            matrix.translateX += 2 * 20;
+            matrix.translateY += 2 * 20;
         }
         matStr += convertMatrix(matrix);
         matStr += "</matrix>";
