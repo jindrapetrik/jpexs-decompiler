@@ -151,7 +151,7 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextT
                 + (autoSize ? "autosize 1\r\n" : "") + (noSelect ? "noselect 1\r\n" : "")
                 + (border ? "border 1\r\n" : "") + (wasStatic ? "wasstatic 1\r\n" : "")
                 + (html ? "html 1\r\n" : "") + (useOutlines ? "useoutlines 1\r\n" : "")
-                + (hasFont ? "font " + fontId + "\r\n" : "") + (hasTextColor ? "color " + textColor.toHexARGB() + "\r\n" : "")
+                + (hasFont ? "font " + fontId + "\r\n" + "height " + fontHeight + "\r\n" : "") + (hasTextColor ? "color " + textColor.toHexARGB() + "\r\n" : "")
                 + (hasFontClass ? "fontclass " + fontClass + "\r\n" : "") + (hasMaxLength ? "maxlength " + maxLength + "\r\n" : "")
                 + "align " + alignValues[align] + "\r\n"
                 + (hasLayout ? "leftmargin " + leftMargin + "\r\nrightmargin " + rightMargin + "\r\nindent " + indent + "\r\nleading " + leading + "\r\n" : "")
@@ -363,6 +363,9 @@ public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextT
             }
             if (fontId > -1) {
                 this.fontId = fontId;
+            }
+            if (fontHeight > -1) {
+                this.fontHeight = fontHeight;
             }
             if (fontClass != null) {
                 this.fontClass = fontClass;
