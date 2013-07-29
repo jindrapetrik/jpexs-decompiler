@@ -1862,6 +1862,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 }
                 doFilter();
                 reload(true);
+                abcPanel.hilightScript(abcPanel.decompiledTextArea.getScriptLeaf().getPath().toString());
             }
         }
     }
