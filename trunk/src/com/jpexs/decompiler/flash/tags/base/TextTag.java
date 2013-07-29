@@ -25,14 +25,18 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphMetrics;
 import java.awt.font.GlyphVector;
 import java.awt.font.LineMetrics;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -188,5 +192,60 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
         att.put("allLeftMargins", allLeftMargins);
         att.put("allLetterSpacings", allLetterSpacings);
         return att;
+    }
+
+    public static BufferedImage staticTextToImage(List<Tag> tags, HashMap<Integer, CharacterTag> characters, List<TEXTRECORD> textRecords, RECT textBounds, int numText) {
+        int fixX = -textBounds.Xmin;
+        int fixY = -textBounds.Ymin;
+        BufferedImage ret = new BufferedImage(textBounds.getWidth() / 20, textBounds.getHeight() / 20, BufferedImage.TYPE_INT_ARGB);
+
+        Color textColor = new Color(0, 0, 0);
+        FontTag font = null;
+        int textHeight = 12;
+        int x = textBounds.Xmin;
+        int y = 0;
+        Graphics2D g = (Graphics2D) ret.getGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        List<SHAPE> glyphs = new ArrayList<>();
+        for (TEXTRECORD rec : textRecords) {
+            if (rec.styleFlagsHasColor) {
+                if (numText == 2) {
+                    textColor = rec.textColorA.toColor();
+                } else {
+                    textColor = rec.textColor.toColor();
+                }
+            }
+            if (rec.styleFlagsHasFont) {
+                font = (FontTag) characters.get(rec.fontId);
+                glyphs = font.getGlyphShapeTable();
+                textHeight = rec.textHeight;
+            }
+            if (rec.styleFlagsHasXOffset) {
+                x = rec.xOffset;
+            }
+            if (rec.styleFlagsHasYOffset) {
+                y = rec.yOffset;
+            }
+
+            for (GLYPHENTRY entry : rec.glyphEntries) {
+                RECT rect = SHAPERECORD.getBounds(glyphs.get(entry.glyphIndex).shapeRecords);
+                rect.Xmax /= font.getDivider();
+                rect.Xmin /= font.getDivider();
+                rect.Ymax /= font.getDivider();
+                rect.Ymin /= font.getDivider();
+                BufferedImage img = SHAPERECORD.shapeToImage(tags, 1, null, null, glyphs.get(entry.glyphIndex).shapeRecords, textColor);
+                AffineTransform tr = new AffineTransform();
+                tr.setToIdentity();
+                float rat = textHeight / 1024f;
+                tr.scale(1 / 20f, 1 / 20f);
+                tr.translate(x + fixX, y + rat * rect.Ymin + fixY);
+                tr.scale(rat, rat);
+                g.drawImage(img, tr, null);
+                x += entry.glyphAdvance;
+            }
+        }
+        return ret;
     }
 }

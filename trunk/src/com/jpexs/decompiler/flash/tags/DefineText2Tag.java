@@ -457,54 +457,7 @@ public class DefineText2Tag extends TextTag implements DrawableTag {
 
     @Override
     public BufferedImage toImage(int frame, List<Tag> tags, RECT displayRect, HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
-        RECT bound = getBounds();
-        int fixX = -bound.Xmin;
-        int fixY = -bound.Ymin;
-        BufferedImage ret = new BufferedImage(bound.Xmax / 20, bound.Ymax / 20, BufferedImage.TYPE_INT_ARGB);
-        Color textColor = new Color(0, 0, 0);
-        FontTag font = null;
-        int textHeight = 12;
-        int x = bound.Xmin;
-        int y = 0;
-        Graphics2D g = (Graphics2D) ret.getGraphics();
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        List<SHAPE> glyphs = new ArrayList<>();
-        for (TEXTRECORD rec : textRecords) {
-            if (rec.styleFlagsHasColor) {
-                textColor = rec.textColorA.toColor();
-            }
-            if (rec.styleFlagsHasFont) {
-                font = (FontTag) characters.get(rec.fontId);
-                glyphs = font.getGlyphShapeTable();
-                textHeight = rec.textHeight;
-            }
-            if (rec.styleFlagsHasXOffset) {
-                x = rec.xOffset;
-            }
-            if (rec.styleFlagsHasYOffset) {
-                y = rec.yOffset;
-            }
-
-            for (GLYPHENTRY entry : rec.glyphEntries) {
-                RECT rect = SHAPERECORD.getBounds(glyphs.get(entry.glyphIndex).shapeRecords);
-                rect.Xmax /= font.getDivider();
-                rect.Xmin /= font.getDivider();
-                rect.Ymax /= font.getDivider();
-                rect.Ymin /= font.getDivider();
-                BufferedImage img = SHAPERECORD.shapeToImage(tags, 1, null, null, glyphs.get(entry.glyphIndex).shapeRecords, textColor);
-                AffineTransform tr = new AffineTransform();
-                tr.setToIdentity();
-                float rat = textHeight / 1024f;
-                tr.scale(1 / 20f, 1 / 20f);
-                tr.translate(x + fixX, y + rat * rect.Ymin + fixY);
-                tr.scale(rat, rat);
-                g.drawImage(img, tr, null);
-                x += entry.glyphAdvance;
-            }
-        }
-        return ret;
+        return staticTextToImage(tags, characters, textRecords, textBounds, 2);
     }
 
     @Override
