@@ -2113,6 +2113,9 @@ public class AVM2Code implements Serializable {
             if (currentIp == ancestor) {
                 return true;
             }
+            if (currentIp == 0) {
+                return false;
+            }
             if (visited.contains(currentIp)) {
                 return true;
             }
