@@ -2277,6 +2277,8 @@ public class XFLConverter {
                 ret += " instanceName=\"" + xmlString(instanceName) + "\"";
             }
             ret += antiAlias;
+            Map<String, Object> attrs = TextTag.getTextRecordsAttributes(textRecords, tags);
+
             ret += " width=\"" + tag.getBounds().getWidth() / 2 + "\" height=\"" + tag.getBounds().getHeight() + "\" autoExpand=\"true\" isSelectable=\"false\">";
             ret += matStr;
 
@@ -2289,7 +2291,14 @@ public class XFLConverter {
             int textHeight = -1;
             RGB textColor = null;
             RGBA textColorA = null;
-            for (TEXTRECORD rec : textRecords) {
+            boolean newline = false;
+            boolean firstRun = true;
+            @SuppressWarnings("unchecked")
+            List<Integer> leftMargins = (List<Integer>) attrs.get("allLeftMargins");
+            @SuppressWarnings("unchecked")
+            List<Integer> letterSpacings = (List<Integer>) attrs.get("allLetterSpacings");
+            for (int r = 0; r < textRecords.size(); r++) {
+                TEXTRECORD rec = textRecords.get(r);
                 if (rec.styleFlagsHasColor) {
                     if (tag instanceof DefineTextTag) {
                         textColor = rec.textColor;
@@ -2327,13 +2336,23 @@ public class XFLConverter {
                         }
                     }
                 }
+                newline = false;
+                if (!firstRun && rec.styleFlagsHasYOffset) {
+                    newline = true;
+                }
+                firstRun = false;
                 if (font != null) {
                     ret += "<DOMTextRun>";
-                    ret += "<characters>" + xmlString(rec.getText(tags, font)) + "</characters>";
+                    ret += "<characters>" + xmlString((newline ? "\r" : "") + rec.getText(tags, font)) + "</characters>";
                     ret += "<textAttrs>";
 
                     ret += "<DOMTextAttrs aliasText=\"false\" rotation=\"true\" size=\"" + twipToPixel(textHeight) + "\" bitmapSize=\"" + textHeight + "\"";
-                    //indent=\"5\" leftMargin=\"2\" letterSpacing=\"1\" lineSpacing=\"6\" rightMargin=\"3\"
+                    ret += " letterSpacing=\"" + doubleToString(twipToPixel(letterSpacings.get(r))) + "\"";
+                    ret += " indent=\"" + doubleToString(twipToPixel((int) attrs.get("indent"))) + "\"";
+                    ret += " leftMargin=\"" + doubleToString(twipToPixel(leftMargins.get(r))) + "\"";
+                    ret += " lineSpacing=\"" + doubleToString(twipToPixel((int) attrs.get("lineSpacing"))) + "\"";
+                    ret += " rightMargin=\"" + doubleToString(twipToPixel((int) attrs.get("rightMargin"))) + "\"";
+
                     if (textColor != null) {
                         ret += " fillColor=\"" + textColor.toHexRGB() + "\"";
                     } else if (textColorA != null) {

@@ -32,11 +32,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JPanel;
 
 public class DefineFont3Tag extends FontTag {
@@ -71,7 +68,7 @@ public class DefineFont3Tag extends FontTag {
 
     @Override
     public int getGlyphWidth(int glyphIndex) {
-        return glyphShapeTable.get(glyphIndex).getBounds().getWidth() / 20;
+        return glyphShapeTable.get(glyphIndex).getBounds().getWidth();
     }
 
     @Override
@@ -79,7 +76,7 @@ public class DefineFont3Tag extends FontTag {
         if (fontFlagsHasLayout) {
             return fontAdvanceTable.get(glyphIndex) / 20;
         } else {
-            return getGlyphWidth(glyphIndex) + 20;
+            return -1;
         }
     }
 
@@ -348,5 +345,10 @@ public class DefineFont3Tag extends FontTag {
             ret += (char) i;
         }
         return ret;
+    }
+
+    @Override
+    public boolean hasLayout() {
+        return fontFlagsHasLayout;
     }
 }

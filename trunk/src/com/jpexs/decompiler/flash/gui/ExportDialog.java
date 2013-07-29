@@ -59,33 +59,33 @@ public class ExportDialog extends AppDialog {
 
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
-        JPanel comboPanel=new JPanel(null);
+        JPanel comboPanel = new JPanel(null);
         combos = new JComboBox[optionNames.length];
-        JLabel labels[]=new JLabel[optionNames.length];
-        int labWidth=0;
+        JLabel labels[] = new JLabel[optionNames.length];
+        int labWidth = 0;
         for (int i = 0; i < optionNames.length; i++) {
             labels[i] = new JLabel(optionNames[i]);
-            if(labels[i].getPreferredSize().width>labWidth){
+            if (labels[i].getPreferredSize().width > labWidth) {
                 labWidth = labels[i].getPreferredSize().width;
             }
         }
-        int comboWidth=200;
+        int comboWidth = 200;
         int top = 10;
         for (int i = 0; i < optionNames.length; i++) {
             JLabel lab = new JLabel(optionNames[i]);
             lab.setBounds(10, top, lab.getPreferredSize().width, lab.getPreferredSize().height);
             comboPanel.add(lab);
             combos[i] = new JComboBox<>(options[i]);
-            combos[i].setBounds(10+labWidth+10, top, comboWidth, combos[i].getPreferredSize().height);
+            combos[i].setBounds(10 + labWidth + 10, top, comboWidth, combos[i].getPreferredSize().height);
             comboPanel.add(combos[i]);
             top += combos[i].getHeight();
         }
-        Dimension dim=new Dimension(10+labWidth+10+comboWidth+10,top+10);
+        Dimension dim = new Dimension(10 + labWidth + 10 + comboWidth + 10, top + 10);
         comboPanel.setMinimumSize(dim);
         comboPanel.setPreferredSize(dim);
-        cnt.add(comboPanel,BorderLayout.CENTER);
+        cnt.add(comboPanel, BorderLayout.CENTER);
 
-        JPanel buttonsPanel=new JPanel(new FlowLayout());
+        JPanel buttonsPanel = new JPanel(new FlowLayout());
         JButton okButton = new JButton(translate("button.ok"));
         okButton.addActionListener(new ActionListener() {
             @Override
@@ -93,7 +93,7 @@ public class ExportDialog extends AppDialog {
                 setVisible(false);
             }
         });
-    
+
         JButton cancelButton = new JButton(translate("button.cancel"));
         cancelButton.addActionListener(new ActionListener() {
             @Override
@@ -102,11 +102,11 @@ public class ExportDialog extends AppDialog {
                 setVisible(false);
             }
         });
-       
+
         buttonsPanel.add(okButton);
         buttonsPanel.add(cancelButton);
 
-        cnt.add(buttonsPanel,BorderLayout.SOUTH);
+        cnt.add(buttonsPanel, BorderLayout.SOUTH);
         pack();
         //setSize(245, top + getInsets().top);
         View.centerScreen(this);

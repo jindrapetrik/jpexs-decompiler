@@ -1162,8 +1162,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         fontParams1.add(fontAddCharsPanel);
         JPanel fontSelectionPanel = new JPanel(new FlowLayout());
         fontSelectionPanel.add(new JLabel(translate("font.source")));
-        String fontNames[] = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-        fontSelection = new JComboBox<>(fontNames);
+        fontSelection = new JComboBox<>(FontTag.fontNames.toArray(new String[FontTag.fontNames.size()]));
         fontSelection.setSelectedIndex(0);
         fontSelection.setSelectedItem("Times New Roman");
         fontSelection.setSelectedItem("Arial");
@@ -2382,16 +2381,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                 if (fontName == null) {
                                     fontName = font.getFontName(tags);
                                 }
-                                //
-                                if (!fontNames.contains(fontName)) {
-                                    fontName = "Times New Roman";
-                                }
-                                if (!fontNames.contains(fontName)) {
-                                    fontName = "Arial";
-                                }
-                                if (!fontNames.contains(fontName)) {
-                                    fontName = fontSelection.getItemAt(0);
-                                }
+                                fontName = FontTag.findInstalledFontName(fontName);
                                 Font f = new Font(fontName, font.getFontStyle(), 18);
                                 if (!f.canDisplay(character)) {
                                     View.showMessageDialog(null, translate("error.font.nocharacter").replace("%char%", "" + character), translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -3105,10 +3095,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 if (sourceFontsMap.containsKey(ft.getFontId())) {
                     fontSelection.setSelectedItem(sourceFontsMap.get(ft.getFontId()));
                 } else {
-                    fontSelection.setSelectedIndex(0);
-                    fontSelection.setSelectedItem("Times New Roman");
-                    fontSelection.setSelectedItem("Arial");
-                    fontSelection.setSelectedItem(ft.getFontName(swf.tags));
+                    fontSelection.setSelectedItem(FontTag.findInstalledFontName(ft.getFontName(swf.tags)));
                 }
                 fontChangeList.componentResized(null);
                 showDetailWithPreview(CARDFONTPANEL);

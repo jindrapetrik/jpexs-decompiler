@@ -16,14 +16,6 @@
  */
 package com.jpexs.decompiler.flash.types;
 
-import java.awt.Font;
-import java.awt.font.FontRenderContext;
-import java.awt.font.GlyphMetrics;
-import java.awt.font.GlyphVector;
-import java.awt.font.LineBreakMeasurer;
-import java.awt.font.LineMetrics;
-import javax.swing.JFrame;
-
 /**
  * Represents 32-bit alpha, red, green and blue value
  *

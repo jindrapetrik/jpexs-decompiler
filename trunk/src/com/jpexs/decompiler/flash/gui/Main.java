@@ -36,36 +36,22 @@ import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.flash.helpers.Cache;
 import com.jpexs.decompiler.flash.helpers.Helper;
-import com.jpexs.decompiler.flash.types.ZONERECORD;
 import com.sun.jna.Platform;
 import com.sun.jna.WString;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.font.GlyphVector;
-import java.awt.font.LineMetrics;
-import java.awt.font.TextAttribute;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.PathIterator;
-import java.awt.geom.QuadCurve2D;
 import java.io.*;
 import java.net.Socket;
 import java.net.URLDecoder;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.text.AttributedCharacterIterator.Attribute;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.logging.ConsoleHandler;
@@ -77,12 +63,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import static javax.swing.JFrame.EXIT_ON_CLOSE;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
-import static javax.swing.WindowConstants.HIDE_ON_CLOSE;
 import javax.swing.filechooser.FileFilter;
 
 /**
@@ -523,7 +506,7 @@ public class Main {
     }
 
     public static void initLang() {
-        if (Configuration.containsConfig("locale")) {            
+        if (Configuration.containsConfig("locale")) {
             Locale.setDefault(Locale.forLanguageTag((String) Configuration.getConfig("locale", "en")));
         }
         UIManager.put("OptionPane.okButtonText", AppStrings.translate("button.ok"));
@@ -630,7 +613,7 @@ public class Main {
         initLang();
 
         View.setLookAndFeel();
-    
+
         if ((Boolean) Configuration.getConfig("cacheOnDisk", Boolean.TRUE)) {
             Cache.setStorageType(Cache.STORAGE_FILES);
         } else {

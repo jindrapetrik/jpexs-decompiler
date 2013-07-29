@@ -24,7 +24,12 @@ import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphMetrics;
+import java.awt.font.GlyphVector;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -66,6 +71,10 @@ public abstract class FontTag extends CharacterTag implements AloneTag {
     public abstract int getDescent();
 
     public abstract int getLeading();
+
+    public boolean hasLayout() {
+        return false;
+    }
 
     public boolean containsChar(List<Tag> tags, char character) {
         return charToGlyph(tags, character) > -1;
@@ -124,5 +133,37 @@ public abstract class FontTag extends CharacterTag implements AloneTag {
                 }
             }
         }
+    }
+
+    public static int getSystemFontAdvance(String fontName, int fontStyle, int fontSize, char character) {
+        return getSystemFontAdvance(new Font(fontName, fontStyle, fontSize), character);
+    }
+
+    public static int getSystemFontAdvance(Font aFont, char character) {
+        GlyphVector gv = aFont.createGlyphVector(new FontRenderContext(aFont.getTransform(), true, true), "" + character);
+        GlyphMetrics gm = gv.getGlyphMetrics(0);
+        return Math.round(gm.getAdvanceX());
+    }
+    public static List<String> fontNames = Arrays.asList(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
+
+    public static String findInstalledFontName(String fontName) {
+        if (fontNames.contains(fontName)) {
+            return fontName;
+        }
+        if (fontName.contains("_")) {
+            String beforeUnderscore = fontName.substring(0, fontName.indexOf("_"));
+            if (fontNames.contains(beforeUnderscore)) {
+                return beforeUnderscore;
+            }
+        }
+        fontName = "Times New Roman";
+        if (fontNames.contains(fontName)) {
+            return fontName;
+        }
+        fontName = "Arial";
+        if (fontNames.contains(fontName)) {
+            return fontName;
+        }
+        return fontNames.get(0);
     }
 }

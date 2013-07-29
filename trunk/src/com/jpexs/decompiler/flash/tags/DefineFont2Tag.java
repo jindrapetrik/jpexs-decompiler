@@ -26,7 +26,6 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import java.awt.Font;
-import java.awt.font.GlyphVector;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -78,7 +77,7 @@ public class DefineFont2Tag extends FontTag {
         if (fontFlagsHasLayout) {
             return fontAdvanceTable.get(glyphIndex);
         } else {
-            return getGlyphWidth(glyphIndex) + 20;
+            return -1;
         }
     }
 
@@ -347,5 +346,10 @@ public class DefineFont2Tag extends FontTag {
             ret += (char) i;
         }
         return ret;
+    }
+
+    @Override
+    public boolean hasLayout() {
+        return fontFlagsHasLayout;
     }
 }

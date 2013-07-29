@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
@@ -50,7 +49,7 @@ import java.util.regex.Pattern;
  *
  * @author JPEXS
  */
-public class DefineEditTextTag extends CharacterTag implements BoundedTag, TextTag {
+public class DefineEditTextTag extends TextTag {
 
     public int characterID;
     public RECT bounds;

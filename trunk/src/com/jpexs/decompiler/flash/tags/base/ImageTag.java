@@ -60,23 +60,24 @@ public abstract class ImageTag extends CharacterTag {
 
         return "unk";
     }
-    
-    protected static int max255(float val){
-        if(val>255){
+
+    protected static int max255(float val) {
+        if (val > 255) {
             return 255;
         }
-        return (int)val;
+        return (int) val;
     }
-    
-    protected static Color intToColor(int val){
-        return new Color(val&0xff,(val>>8)&0xff,(val>>16)&0xff,(val>>24)&0xff);
+
+    protected static Color intToColor(int val) {
+        return new Color(val & 0xff, (val >> 8) & 0xff, (val >> 16) & 0xff, (val >> 24) & 0xff);
     }
-    protected static int colorToInt(Color c){
-        return (c.getAlpha()<<24)|(c.getBlue()<<16)|(c.getGreen()<<8)|c.getRed();
+
+    protected static int colorToInt(Color c) {
+        return (c.getAlpha() << 24) | (c.getBlue() << 16) | (c.getGreen() << 8) | c.getRed();
     }
-    
-    protected static Color multiplyAlpha(Color c){
-        float multiplier = c.getAlpha()==0?0:255.0f/c.getAlpha();
-        return new Color(max255(c.getRed()*multiplier), max255(c.getGreen()*multiplier), max255(c.getBlue()*multiplier), c.getAlpha());                    
+
+    protected static Color multiplyAlpha(Color c) {
+        float multiplier = c.getAlpha() == 0 ? 0 : 255.0f / c.getAlpha();
+        return new Color(max255(c.getRed() * multiplier), max255(c.getGreen() * multiplier), max255(c.getBlue() * multiplier), c.getAlpha());
     }
 }

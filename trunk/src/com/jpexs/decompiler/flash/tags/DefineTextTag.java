@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.helpers.Helper;
-import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
@@ -64,7 +63,7 @@ import java.util.regex.Pattern;
  *
  * @author JPEXS
  */
-public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, DrawableTag {
+public class DefineTextTag extends TextTag implements DrawableTag {
 
     public int characterID;
     public RECT textBounds;
@@ -342,19 +341,15 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, 
                             }
                             tr.glyphEntries[i].glyphIndex = font.charToGlyph(tags, c);
 
-
-
-                            /*if (tr.glyphEntries[i].glyphIndex == -1) {
-                             throw new ParseException("Font does not contain glyph for character '" + c + "'", lexer.yyline());
-                             }*/
-                            tr.glyphEntries[i].glyphAdvance = textHeight * font.getGlyphAdvance(tr.glyphEntries[i].glyphIndex) / 1024;
-
-                            int gw = textHeight * font.getGlyphWidth(tr.glyphEntries[i].glyphIndex) / 1024;
-                            if (i == 0) {
-                                currentX += gw;
+                            int advance;
+                            if (font.hasLayout()) {
+                                advance = (int) Math.round((double) textHeight * font.getGlyphAdvance(tr.glyphEntries[i].glyphIndex) / (font.getDivider() * 1024.0));
                             } else {
-                                currentX += tr.glyphEntries[i].glyphAdvance;
+                                advance = 20 * FontTag.getSystemFontAdvance(fontName, font.getFontStyle(), textHeight / 20, c);
                             }
+                            tr.glyphEntries[i].glyphAdvance = advance;
+
+                            currentX += advance;
                             if (SWFOutputStream.getNeededBitsU(tr.glyphEntries[i].glyphIndex) > glyphBits) {
                                 glyphBits = SWFOutputStream.getNeededBitsU(tr.glyphEntries[i].glyphIndex);
                             }
@@ -497,10 +492,10 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, 
                 textHeight = rec.textHeight;
             }
             if (rec.styleFlagsHasXOffset) {
-                x = rec.xOffset * 1024 / textHeight;
+                x = rec.xOffset;
             }
             if (rec.styleFlagsHasYOffset) {
-                y = rec.yOffset * 1024 / textHeight;
+                y = rec.yOffset;
             }
 
             for (GLYPHENTRY entry : rec.glyphEntries) {
@@ -513,11 +508,11 @@ public class DefineTextTag extends CharacterTag implements BoundedTag, TextTag, 
                 AffineTransform tr = new AffineTransform();
                 tr.setToIdentity();
                 float rat = textHeight / 1024f;
-                tr.translate(rat * x / 20, rat * (y + rect.Ymin) / 20);
-                tr.scale(rat / font.getDivider(), rat / font.getDivider());
-                tr.translate(fixX, fixY);
+                tr.scale(1 / 20f, 1 / 20f);
+                tr.translate(x + fixX, y + rat * rect.Ymin + fixY);
+                tr.scale(rat, rat);
                 g.drawImage(img, tr, null);
-                x += entry.glyphAdvance * 1024 / textHeight;
+                x += entry.glyphAdvance;
             }
         }
         return ret;
