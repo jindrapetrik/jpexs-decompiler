@@ -43,7 +43,7 @@ public class ConstructAVM2Item extends AVM2Item {
             argStr = argStr + args.get(a).toString(constants, localRegNames, fullyQualifiedNames);
         }
         if (object instanceof NewFunctionAVM2Item) {
-            return object.toString(constants, localRegNames, fullyQualifiedNames);
+            return hilight("new ") + object.toString(constants, localRegNames, fullyQualifiedNames);
         }
         String obStr = object.toString(constants, localRegNames, fullyQualifiedNames);
         return hilight("new ") + obStr + hilight("(") + argStr + hilight(")");
