@@ -253,7 +253,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
     private JPanel detailPanel;
     private JTextField filterField = new MyTextField("");
     private JPanel searchPanel;
-    private JCheckBox autoDeobfuscateMenuItem;
+    private JCheckBox miAutoDeobfuscation;
     private JPanel displayWithPreview;
     private JButton textSaveButton;
     private JButton textEditButton;
@@ -431,7 +431,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         JRibbonBand settingsBand = new JRibbonBand(translate("menu.settings"), null);
         settingsBand.setResizePolicies((List) Arrays.asList(new CoreRibbonResizePolicies.Mirror(settingsBand.getControlPanel()), new IconRibbonBandResizePolicy(settingsBand.getControlPanel())));
 
-        autoDeobfuscateMenuItem = new JCheckBox(translate("menu.settings.autodeobfuscation"));
+        miAutoDeobfuscation = new JCheckBox(translate("menu.settings.autodeobfuscation"));
         //assignListener(autoDeobfuscateMenuItem,"AUTODEOBFUSCATE");
 
         miInternalViewer = new JCheckBox(translate("menu.settings.internalflashviewer"));
@@ -448,7 +448,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         //assignListener(miGotoMainClassOnStartup,"GOTODOCUMENTCLASSONSTARTUP");
 
 
-        settingsBand.addRibbonComponent(new JRibbonComponent(autoDeobfuscateMenuItem));
+        settingsBand.addRibbonComponent(new JRibbonComponent(miAutoDeobfuscation));
         settingsBand.addRibbonComponent(new JRibbonComponent(miInternalViewer));
         settingsBand.addRibbonComponent(new JRibbonComponent(miParallelSpeedUp));
         settingsBand.addRibbonComponent(new JRibbonComponent(miDecompile));
@@ -639,9 +639,9 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         miDeobfuscation.addActionListener(this);
 
         //autoDeobfuscateMenuItem = new JCheckBoxMenuItem(translate("menu.settings.autodeobfuscation"));
-        autoDeobfuscateMenuItem.setSelected((Boolean) Configuration.getConfig("autoDeobfuscate", true));
-        autoDeobfuscateMenuItem.addActionListener(this);
-        autoDeobfuscateMenuItem.setActionCommand("AUTODEOBFUSCATE");
+        miAutoDeobfuscation.setSelected((Boolean) Configuration.getConfig("autoDeobfuscate", true));
+        miAutoDeobfuscation.addActionListener(this);
+        miAutoDeobfuscation.setActionCommand("AUTODEOBFUSCATE");
 
         JMenuItem miRenameOneIdentifier = new JMenuItem(translate("menu.tools.deobfuscation.globalrename"));
         miRenameOneIdentifier.setActionCommand("RENAMEONEIDENTIFIER");
@@ -1445,9 +1445,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
             @Override
             public void close() throws SecurityException {
             }
-        });
-
-        //pack();
+        });        
     }
 
     public void enableDrop(boolean value) {
@@ -2402,8 +2400,8 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 break;
 
             case "AUTODEOBFUSCATE":
-                if (View.showConfirmDialog(this, translate("message.confirm.autodeobfuscate") + "\r\n" + (autoDeobfuscateMenuItem.isSelected() ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-                    Configuration.setConfig("autoDeobfuscate", autoDeobfuscateMenuItem.isSelected());
+                if (View.showConfirmDialog(this, translate("message.confirm.autodeobfuscate") + "\r\n" + (miAutoDeobfuscation.isSelected() ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                    Configuration.setConfig("autoDeobfuscate", miAutoDeobfuscation.isSelected());
                     clearCache();
                     if (abcPanel != null) {
                         abcPanel.reload();
@@ -2411,7 +2409,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                     reload(true);
                     doFilter();
                 } else {
-                    autoDeobfuscateMenuItem.setSelected(!autoDeobfuscateMenuItem.isSelected());
+                    miAutoDeobfuscation.setSelected(!miAutoDeobfuscation.isSelected());
                 }
                 break;
             case "EXIT":

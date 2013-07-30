@@ -68,10 +68,10 @@ public class ErrorLogFrame extends AppFrame {
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
         logView.setBackground(Color.white);
-        logView.setLayout(new ListLayout());
+        logView.setLayout(new BoxLayout(logView, BoxLayout.Y_AXIS));
         cnt.setBackground(Color.white);
 
-        cnt.add(new JScrollPane(logView));
+        cnt.add(new JScrollPane(logView),BorderLayout.NORTH);
         handler = new Handler() {
             @Override
             public void publish(LogRecord record) {
@@ -94,7 +94,7 @@ public class ErrorLogFrame extends AppFrame {
             public void run() {
                 JPanel pan = new JPanel();
                 pan.setBackground(Color.white);
-                pan.setLayout(new ListLayout());
+                pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));
 
                 JComponent detailComponent;
                 if (detail == null) {
@@ -105,6 +105,7 @@ public class ErrorLogFrame extends AppFrame {
                     detailTextArea.setOpaque(false);
                     detailTextArea.setFont(new JLabel().getFont());
                     detailTextArea.setBackground(Color.white);
+                    //detailTextAre
                     detailComponent = detailTextArea;
                 }
                 JPanel header = new JPanel();
@@ -131,7 +132,7 @@ public class ErrorLogFrame extends AppFrame {
                     }
                 });
 
-                final JToggleButton expandButton = new JToggleButton(View.getIcon("expand16"));
+                final JToggleButton expandButton = new JToggleButton(View.getIcon("collapse16"));
                 expandButton.setFocusPainted(false);
                 expandButton.setBorderPainted(false);
                 expandButton.setFocusable(false);
@@ -145,6 +146,7 @@ public class ErrorLogFrame extends AppFrame {
                     scrollPane = new JScrollPane(detailComponent);
                     scrollPane.setAlignmentX(0f);
                     scrollPane.setMinimumSize(new Dimension(getWidth(), 500));
+                    scrollPane.setPreferredSize(new Dimension(getWidth(), 500));
                 } else {
                     scrollPane = null;
                 }
@@ -154,7 +156,12 @@ public class ErrorLogFrame extends AppFrame {
                     expandButton.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
+                            if(expandButton.isSelected()){
+                                expandButton.setIcon(View.getIcon("expand16"));
+                            }
                             scrollPane.setVisible(expandButton.isSelected());
+                            scrollPane.setMinimumSize(new Dimension(getWidth(), 500));
+                            scrollPane.setSize(new Dimension(getWidth(), 500));                           
                             revalidate();
                             repaint();
                         }
