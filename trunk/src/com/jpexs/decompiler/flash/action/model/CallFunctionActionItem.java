@@ -28,6 +28,11 @@ public class CallFunctionActionItem extends ActionItem {
     public List<GraphTargetItem> arguments;
     public GraphTargetItem calculatedFunction;
 
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        return arguments;
+    }
+
     public CallFunctionActionItem(GraphSourceItem instruction, GraphTargetItem functionName, List<GraphTargetItem> arguments) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.functionName = functionName;

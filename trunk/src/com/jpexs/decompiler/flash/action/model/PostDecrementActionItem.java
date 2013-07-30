@@ -36,6 +36,13 @@ public class PostDecrementActionItem extends ActionItem implements SetTypeAction
     public GraphTargetItem object;
     private int tempRegister = -1;
 
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        ret.add(object);
+        return ret;
+    }
+
     public PostDecrementActionItem(GraphSourceItem instruction, GraphTargetItem object) {
         super(instruction, PRECEDENCE_POSTFIX);
         this.object = object;

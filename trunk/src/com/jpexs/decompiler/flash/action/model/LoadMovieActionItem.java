@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionGetURL2;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,6 +32,14 @@ public class LoadMovieActionItem extends ActionItem {
     private GraphTargetItem urlString;
     private GraphTargetItem targetString;
     private int method;
+
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        ret.add(urlString);
+        ret.add(targetString);
+        return ret;
+    }
 
     public LoadMovieActionItem(GraphSourceItem instruction, GraphTargetItem urlString, GraphTargetItem targetString, int method) {
         super(instruction, PRECEDENCE_PRIMARY);

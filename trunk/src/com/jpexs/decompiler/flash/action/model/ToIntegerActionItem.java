@@ -24,8 +24,6 @@ import java.util.List;
 
 public class ToIntegerActionItem extends ActionItem {
 
-    private GraphTargetItem value;
-
     public ToIntegerActionItem(GraphSourceItem instruction, GraphTargetItem value) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.value = value;

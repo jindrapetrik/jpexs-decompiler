@@ -24,8 +24,6 @@ import java.util.List;
 
 public class MBCharToAsciiActionItem extends ActionItem {
 
-    private GraphTargetItem value;
-
     public MBCharToAsciiActionItem(GraphSourceItem instruction, GraphTargetItem value) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.value = value;

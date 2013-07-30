@@ -24,8 +24,6 @@ import java.util.List;
 
 public class MBAsciiToCharActionItem extends ActionItem {
 
-    private GraphTargetItem value;
-
     public MBAsciiToCharActionItem(GraphSourceItem instruction, GraphTargetItem value) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.value = value;

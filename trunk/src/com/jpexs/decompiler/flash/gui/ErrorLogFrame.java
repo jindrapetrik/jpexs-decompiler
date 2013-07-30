@@ -71,7 +71,7 @@ public class ErrorLogFrame extends AppFrame {
         logView.setLayout(new BoxLayout(logView, BoxLayout.Y_AXIS));
         cnt.setBackground(Color.white);
 
-        cnt.add(new JScrollPane(logView),BorderLayout.NORTH);
+        cnt.add(new JScrollPane(logView), BorderLayout.NORTH);
         handler = new Handler() {
             @Override
             public void publish(LogRecord record) {
@@ -156,12 +156,12 @@ public class ErrorLogFrame extends AppFrame {
                     expandButton.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            if(expandButton.isSelected()){
+                            if (expandButton.isSelected()) {
                                 expandButton.setIcon(View.getIcon("expand16"));
                             }
                             scrollPane.setVisible(expandButton.isSelected());
                             scrollPane.setMinimumSize(new Dimension(getWidth(), 500));
-                            scrollPane.setSize(new Dimension(getWidth(), 500));                           
+                            scrollPane.setSize(new Dimension(getWidth(), 500));
                             revalidate();
                             repaint();
                         }

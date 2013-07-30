@@ -49,6 +49,13 @@ public class FunctionActionItem extends ActionItem {
     public static final int REGISTER_PARENT = 5;
     public static final int REGISTER_GLOBAL = 6;
 
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        ret.addAll(actions);
+        return ret;
+    }
+
     public FunctionActionItem() {
         super(null, PRECEDENCE_PRIMARY);
     }

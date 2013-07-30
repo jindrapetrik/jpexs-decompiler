@@ -20,12 +20,21 @@ import com.jpexs.decompiler.flash.action.swf5.ActionNewObject;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import java.util.ArrayList;
 import java.util.List;
 
 public class NewObjectActionItem extends ActionItem {
 
     public GraphTargetItem objectName;
     public List<GraphTargetItem> arguments;
+
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        ret.add(objectName);
+        ret.addAll(arguments);
+        return ret;
+    }
 
     public NewObjectActionItem(GraphSourceItem instruction, GraphTargetItem objectName, List<GraphTargetItem> arguments) {
         super(instruction, PRECEDENCE_PRIMARY);

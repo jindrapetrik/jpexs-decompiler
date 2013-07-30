@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal2;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DefineLocalActionItem extends ActionItem implements SetTypeActionItem {
@@ -28,6 +29,13 @@ public class DefineLocalActionItem extends ActionItem implements SetTypeActionIt
     public GraphTargetItem name;
     //public GraphTargetItem value;
     private int tempRegister = -1;
+
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        ret.add(name);
+        return ret;
+    }
 
     @Override
     public void setValue(GraphTargetItem value) {

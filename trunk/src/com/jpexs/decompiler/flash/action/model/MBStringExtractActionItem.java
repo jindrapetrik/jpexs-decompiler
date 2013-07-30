@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionMBStringExtract;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MBStringExtractActionItem extends ActionItem {
@@ -27,6 +28,15 @@ public class MBStringExtractActionItem extends ActionItem {
     //public GraphTargetItem value;
     public GraphTargetItem index;
     public GraphTargetItem count;
+
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        ret.add(value);
+        ret.add(index);
+        ret.add(count);
+        return ret;
+    }
 
     public MBStringExtractActionItem(GraphSourceItem instruction, GraphTargetItem value, GraphTargetItem index, GraphTargetItem count) {
         super(instruction, PRECEDENCE_PRIMARY);

@@ -101,7 +101,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -1445,7 +1444,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
             @Override
             public void close() throws SecurityException {
             }
-        });        
+        });
     }
 
     public void enableDrop(boolean value) {

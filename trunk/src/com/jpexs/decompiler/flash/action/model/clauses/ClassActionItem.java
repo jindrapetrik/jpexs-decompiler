@@ -19,8 +19,15 @@ package com.jpexs.decompiler.flash.action.model.clauses;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
+import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
+import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
+import com.jpexs.decompiler.flash.action.model.SetMemberActionItem;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
+import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.helpers.Helper;
+import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -28,7 +35,9 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ClassActionItem extends ActionItem implements Block {
 
@@ -40,6 +49,7 @@ public class ClassActionItem extends ActionItem implements Block {
     public GraphTargetItem constructor;
     public List<MyEntry<GraphTargetItem, GraphTargetItem>> vars;
     public List<MyEntry<GraphTargetItem, GraphTargetItem>> staticVars;
+    public Set<String> uninitializedVars;
 
     @Override
     public List<List<GraphTargetItem>> getSubs() {
@@ -59,6 +69,89 @@ public class ClassActionItem extends ActionItem implements Block {
         this.staticFunctions = staticFunctions;
         this.staticVars = staticVars;
         this.constructor = constructor;
+
+        List<GraphTargetItem> allFunc = new ArrayList<>(functions);
+        if (constructor != null) {
+            allFunc.add(constructor);
+        }
+        this.uninitializedVars = new HashSet<>();
+        List<GraphTargetItem> allUsages = new ArrayList<>();
+        for (GraphTargetItem it : allFunc) {
+            if (it instanceof FunctionActionItem) {
+                FunctionActionItem f = (FunctionActionItem) it;
+                detectUnitializedVars(f.actions, allUsages);
+            }
+        }
+        Set<String> allMembers = new HashSet<>();
+        for (GraphTargetItem it : allUsages) {
+            allMembers.add(Highlighting.stripHilights(it.toStringNoQuotes(new ArrayList<>())));
+        }
+        uninitializedVars.addAll(allMembers);
+        for (MyEntry<GraphTargetItem, GraphTargetItem> v : vars) {
+            String s = Highlighting.stripHilights(v.key.toStringNoQuotes(new ArrayList<>()));
+            if (uninitializedVars.contains(s)) {
+                uninitializedVars.remove(s);
+            }
+        }
+    }
+
+    private boolean isThis(GraphTargetItem item) {
+        if (item instanceof DirectValueActionItem) {
+            DirectValueActionItem di = (DirectValueActionItem) item;
+            if (di.value instanceof RegisterNumber) {
+                RegisterNumber rn = (RegisterNumber) di.value;
+                if ("this".equals(rn.name)) {
+                    return true;
+                }
+            }
+        }
+        if (item instanceof GetVariableActionItem) {
+            GetVariableActionItem gv = (GetVariableActionItem) item;
+            if (gv.name instanceof DirectValueActionItem) {
+                DirectValueActionItem di = (DirectValueActionItem) gv.name;
+                if ("this".equals(di.toStringNoH(null))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void detectUnitializedVars(GraphTargetItem item, List<GraphTargetItem> ret) {
+        if (item == null) {
+            return;
+        }
+
+        if (item instanceof GetMemberActionItem) {
+            GetMemberActionItem gm = (GetMemberActionItem) item;
+            if (isThis(gm.object)) {
+                ret.add(gm.memberName);
+            } else {
+                detectUnitializedVars(gm.object, ret);
+            }
+        }
+        if (item instanceof SetMemberActionItem) {
+            SetMemberActionItem sm = (SetMemberActionItem) item;
+            if (isThis(sm.object)) {
+                ret.add(sm.objectName);
+            } else {
+                detectUnitializedVars(sm.object, ret);
+            }
+        }
+
+        if (item instanceof Block) {
+            Block bl = (Block) item;
+            for (List<GraphTargetItem> list : bl.getSubs()) {
+                detectUnitializedVars(list, ret);
+            }
+        }
+        detectUnitializedVars(item.getAllSubItems(), ret);
+    }
+
+    private void detectUnitializedVars(List<GraphTargetItem> items, List<GraphTargetItem> ret) {
+        for (GraphTargetItem it : items) {
+            detectUnitializedVars(it, ret);
+        }
     }
 
     @Override
@@ -80,18 +173,29 @@ public class ClassActionItem extends ActionItem implements Block {
             }
         }
         ret += "\r\n{\r\n";
+
+        if (constructor != null) {
+            ret += constructor.toString(constants) + "\r\n";
+        }
+
+        for (MyEntry<GraphTargetItem, GraphTargetItem> item : vars) {
+            ret += "var " + item.key.toStringNoQuotes(constants) + " = " + item.value.toString(constants) + ";\r\n";
+        }
+        for (String v : uninitializedVars) {
+            ret += "var " + v + ";\r\n";
+        }
+        for (MyEntry<GraphTargetItem, GraphTargetItem> item : staticVars) {
+            ret += "static var " + item.key.toStringNoQuotes(constants) + " = " + item.value.toString(constants) + ";\r\n";
+        }
+
+
         for (GraphTargetItem f : functions) {
             ret += f.toString(constants) + "\r\n";
         }
         for (GraphTargetItem f : staticFunctions) {
             ret += "static " + f.toString(constants) + "\r\n";
         }
-        for (MyEntry<GraphTargetItem, GraphTargetItem> item : vars) {
-            ret += "var " + item.key.toStringNoQuotes(constants) + " = " + item.value.toString(constants) + ";\r\n";
-        }
-        for (MyEntry<GraphTargetItem, GraphTargetItem> item : staticVars) {
-            ret += "static var " + item.key.toStringNoQuotes(constants) + " = " + item.value.toString(constants) + ";\r\n";
-        }
+
         ret += "}\r\n";
         return ret;
     }

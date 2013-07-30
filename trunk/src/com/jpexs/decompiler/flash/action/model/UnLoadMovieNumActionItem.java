@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,6 +33,13 @@ import java.util.List;
 public class UnLoadMovieNumActionItem extends ActionItem {
 
     private GraphTargetItem num;
+
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        ret.add(num);
+        return ret;
+    }
 
     public UnLoadMovieNumActionItem(GraphSourceItem instruction, GraphTargetItem num) {
         super(instruction, PRECEDENCE_PRIMARY);

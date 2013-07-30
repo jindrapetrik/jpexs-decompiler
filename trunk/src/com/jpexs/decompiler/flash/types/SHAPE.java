@@ -19,8 +19,6 @@ package com.jpexs.decompiler.flash.types;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
-import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
-import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.HashSet;
 import java.util.List;

@@ -21,11 +21,19 @@ import com.jpexs.decompiler.flash.ecma.*;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import java.util.ArrayList;
 import java.util.List;
 
 public class IncrementActionItem extends ActionItem {
 
     public GraphTargetItem object;
+
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        ret.add(object);
+        return ret;
+    }
 
     public IncrementActionItem(GraphSourceItem instruction, GraphTargetItem object) {
         super(instruction, PRECEDENCE_ADDITIVE);

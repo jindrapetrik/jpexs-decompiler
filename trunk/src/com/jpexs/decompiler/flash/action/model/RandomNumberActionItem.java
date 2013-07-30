@@ -24,28 +24,26 @@ import java.util.List;
 
 public class RandomNumberActionItem extends ActionItem {
 
-    private GraphTargetItem maximum;
-
     public RandomNumberActionItem(GraphSourceItem instruction, GraphTargetItem maximum) {
         super(instruction, PRECEDENCE_PRIMARY);
-        this.maximum = maximum;
+        this.value = maximum;
     }
 
     @Override
     public String toString(ConstantPool constants) {
-        return hilight("random(") + maximum.toString(constants) + hilight(")");
+        return hilight("random(") + value.toString(constants) + hilight(")");
     }
 
     @Override
     public List<com.jpexs.decompiler.graph.GraphSourceItemPos> getNeededSources() {
         List<com.jpexs.decompiler.graph.GraphSourceItemPos> ret = super.getNeededSources();
-        ret.addAll(maximum.getNeededSources());
+        ret.addAll(value.getNeededSources());
         return ret;
     }
 
     @Override
     public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator, maximum, new ActionRandomNumber());
+        return toSourceMerge(localData, generator, value, new ActionRandomNumber());
     }
 
     @Override

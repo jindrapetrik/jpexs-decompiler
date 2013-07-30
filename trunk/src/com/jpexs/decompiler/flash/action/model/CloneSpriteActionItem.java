@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionCloneSprite;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CloneSpriteActionItem extends ActionItem {
@@ -27,6 +28,15 @@ public class CloneSpriteActionItem extends ActionItem {
     public GraphTargetItem source;
     public GraphTargetItem target;
     public GraphTargetItem depth;
+
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        ret.add(target);
+        ret.add(source);
+        ret.add(depth);
+        return ret;
+    }
 
     public CloneSpriteActionItem(GraphSourceItem instruction, GraphTargetItem source, GraphTargetItem target, GraphTargetItem depth) {
         super(instruction, PRECEDENCE_PRIMARY);

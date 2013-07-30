@@ -24,8 +24,6 @@ import java.util.List;
 
 public class TraceActionItem extends ActionItem {
 
-    private GraphTargetItem value;
-
     public TraceActionItem(GraphSourceItem instruction, GraphTargetItem value) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.value = value;

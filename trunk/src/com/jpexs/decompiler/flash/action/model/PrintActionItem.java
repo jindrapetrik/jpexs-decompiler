@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionGetURL2;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,6 +33,14 @@ public class PrintActionItem extends ActionItem {
 
     private GraphTargetItem target;
     private GraphTargetItem boundingBox;
+
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        ret.add(target);
+        ret.add(boundingBox);
+        return ret;
+    }
 
     public PrintActionItem(GraphSourceItem instruction, GraphTargetItem target, GraphTargetItem boundingBox) {
         super(instruction, PRECEDENCE_PRIMARY);

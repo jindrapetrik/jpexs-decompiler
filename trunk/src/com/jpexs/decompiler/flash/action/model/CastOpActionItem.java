@@ -21,12 +21,21 @@ import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CastOpActionItem extends ActionItem {
 
     public GraphTargetItem constructor;
     public GraphTargetItem object;
+
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        ret.add(constructor);
+        ret.add(object);
+        return ret;
+    }
 
     public CastOpActionItem(GraphSourceItem instruction, GraphTargetItem constructor, GraphTargetItem object) {
         super(instruction, PRECEDENCE_PRIMARY);

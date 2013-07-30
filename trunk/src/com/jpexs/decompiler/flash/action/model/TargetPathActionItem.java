@@ -24,28 +24,26 @@ import java.util.List;
 
 public class TargetPathActionItem extends ActionItem {
 
-    public GraphTargetItem object;
-
     public TargetPathActionItem(GraphSourceItem instruction, GraphTargetItem object) {
         super(instruction, PRECEDENCE_PRIMARY);
-        this.object = object;
+        this.value = object;
     }
 
     @Override
     public String toString(ConstantPool constants) {
-        return "targetPath(" + object.toString(constants) + ")";
+        return "targetPath(" + value.toString(constants) + ")";
     }
 
     @Override
     public List<com.jpexs.decompiler.graph.GraphSourceItemPos> getNeededSources() {
         List<com.jpexs.decompiler.graph.GraphSourceItemPos> ret = super.getNeededSources();
-        ret.addAll(object.getNeededSources());
+        ret.addAll(value.getNeededSources());
         return ret;
     }
 
     @Override
     public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator, object, new ActionTargetPath());
+        return toSourceMerge(localData, generator, value, new ActionTargetPath());
     }
 
     @Override

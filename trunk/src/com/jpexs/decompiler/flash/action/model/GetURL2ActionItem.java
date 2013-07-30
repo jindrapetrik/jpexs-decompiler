@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionGetURL2;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GetURL2ActionItem extends ActionItem {
@@ -27,6 +28,14 @@ public class GetURL2ActionItem extends ActionItem {
     public GraphTargetItem urlString;
     public GraphTargetItem targetString;
     public int sendVarsMethod;
+
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        ret.add(urlString);
+        ret.add(targetString);
+        return ret;
+    }
 
     @Override
     public String toString(ConstantPool constants) {

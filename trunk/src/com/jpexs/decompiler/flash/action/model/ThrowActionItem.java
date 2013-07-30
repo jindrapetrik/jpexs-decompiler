@@ -26,28 +26,26 @@ import java.util.List;
 
 public class ThrowActionItem extends ActionItem {
 
-    public GraphTargetItem object;
-
     public ThrowActionItem(GraphSourceItem instruction, GraphTargetItem object) {
         super(instruction, PRECEDENCE_PRIMARY);
-        this.object = object;
+        this.value = object;
     }
 
     @Override
     public String toString(ConstantPool constants) {
-        return hilight("throw ") + object.toString(Helper.toList(constants));
+        return hilight("throw ") + value.toString(Helper.toList(constants));
     }
 
     @Override
     public List<GraphSourceItemPos> getNeededSources() {
         List<com.jpexs.decompiler.graph.GraphSourceItemPos> ret = super.getNeededSources();
-        ret.addAll(object.getNeededSources());
+        ret.addAll(value.getNeededSources());
         return ret;
     }
 
     @Override
     public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator, object, new ActionThrow());
+        return toSourceMerge(localData, generator, value, new ActionThrow());
     }
 
     @Override

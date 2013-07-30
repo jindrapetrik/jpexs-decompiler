@@ -231,4 +231,12 @@ public abstract class GraphTargetItem implements Serializable {
     }
 
     public abstract boolean hasReturnValue();
+
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        if (value != null) {
+            ret.add(value);
+        }
+        return ret;
+    }
 }

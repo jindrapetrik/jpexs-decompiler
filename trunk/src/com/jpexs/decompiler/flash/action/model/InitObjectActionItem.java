@@ -29,6 +29,14 @@ public class InitObjectActionItem extends ActionItem {
     public List<GraphTargetItem> names;
     public List<GraphTargetItem> values;
 
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        ret.addAll(names);
+        ret.addAll(values);
+        return ret;
+    }
+
     public InitObjectActionItem(GraphSourceItem instruction, List<GraphTargetItem> names, List<GraphTargetItem> values) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.values = values;

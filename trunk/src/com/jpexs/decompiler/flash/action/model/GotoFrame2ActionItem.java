@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionGotoFrame2;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GotoFrame2ActionItem extends ActionItem {
@@ -28,6 +29,13 @@ public class GotoFrame2ActionItem extends ActionItem {
     public boolean sceneBiasFlag;
     public boolean playFlag;
     public int sceneBias;
+
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        ret.add(frame);
+        return ret;
+    }
 
     public GotoFrame2ActionItem(GraphSourceItem instruction, GraphTargetItem frame, boolean sceneBiasFlag, boolean playFlag, int sceneBias) {
         super(instruction, PRECEDENCE_PRIMARY);

@@ -25,8 +25,6 @@ import java.util.List;
 
 public class ToStringActionItem extends ActionItem {
 
-    private GraphTargetItem value;
-
     public ToStringActionItem(GraphSourceItem instruction, GraphTargetItem value) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.value = value;

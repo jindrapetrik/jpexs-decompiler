@@ -25,6 +25,7 @@ import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SetMemberActionItem extends ActionItem implements SetTypeActionItem {
@@ -33,6 +34,14 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
     public GraphTargetItem objectName;
     //public GraphTargetItem value;
     private int tempRegister = -1;
+
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        ret.add(object);
+        ret.add(value);
+        return ret;
+    }
 
     @Override
     public GraphPart getFirstPart() {

@@ -21,11 +21,19 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import java.util.ArrayList;
 import java.util.List;
 
 public class InitArrayActionItem extends ActionItem {
 
     public List<GraphTargetItem> values;
+
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        ret.addAll(values);
+        return ret;
+    }
 
     public InitArrayActionItem(GraphSourceItem instruction, List<GraphTargetItem> values) {
         super(instruction, PRECEDENCE_PRIMARY);

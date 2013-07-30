@@ -19,11 +19,19 @@ package com.jpexs.decompiler.flash.action.model;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import java.util.ArrayList;
 import java.util.List;
 
 public class EnumerateActionItem extends ActionItem {
 
     public GraphTargetItem object;
+
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        ret.add(object);
+        return ret;
+    }
 
     public EnumerateActionItem(GraphSourceItem instruction, GraphTargetItem object) {
         super(instruction, PRECEDENCE_PRIMARY);

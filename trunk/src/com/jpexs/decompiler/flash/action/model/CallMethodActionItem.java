@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CallMethodActionItem extends ActionItem {
@@ -28,6 +29,14 @@ public class CallMethodActionItem extends ActionItem {
     public GraphTargetItem methodName;
     public GraphTargetItem scriptObject;
     public List<GraphTargetItem> arguments;
+
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        ret.addAll(arguments);
+        ret.add(scriptObject);
+        return ret;
+    }
 
     public CallMethodActionItem(GraphSourceItem instruction, GraphTargetItem scriptObject, GraphTargetItem methodName, List<GraphTargetItem> arguments) {
         super(instruction, PRECEDENCE_PRIMARY);

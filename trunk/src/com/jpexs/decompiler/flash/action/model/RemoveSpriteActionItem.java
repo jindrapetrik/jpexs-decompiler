@@ -24,28 +24,26 @@ import java.util.List;
 
 public class RemoveSpriteActionItem extends ActionItem {
 
-    private GraphTargetItem target;
-
     public RemoveSpriteActionItem(GraphSourceItem instruction, GraphTargetItem target) {
         super(instruction, PRECEDENCE_PRIMARY);
-        this.target = target;
+        this.value = target;
     }
 
     @Override
     public String toString(ConstantPool constants) {
-        return hilight("removeMovieClip(") + target.toString(constants) + hilight(")");
+        return hilight("removeMovieClip(") + value.toString(constants) + hilight(")");
     }
 
     @Override
     public List<com.jpexs.decompiler.graph.GraphSourceItemPos> getNeededSources() {
         List<com.jpexs.decompiler.graph.GraphSourceItemPos> ret = super.getNeededSources();
-        ret.addAll(target.getNeededSources());
+        ret.addAll(value.getNeededSources());
         return ret;
     }
 
     @Override
     public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
-        return toSourceMerge(localData, generator, target, new ActionRemoveSprite());
+        return toSourceMerge(localData, generator, value, new ActionRemoveSprite());
     }
 
     @Override

@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import java.util.List;
 
 /**
  *
@@ -33,4 +34,6 @@ public interface BinaryOp {
     public void setRightSide(GraphTargetItem value);
 
     public int getPrecedence();
+
+    public List<GraphTargetItem> getAllSubItems();
 }

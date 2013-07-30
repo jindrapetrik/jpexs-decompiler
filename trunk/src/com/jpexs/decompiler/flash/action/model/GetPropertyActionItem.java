@@ -22,12 +22,20 @@ import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GetPropertyActionItem extends ActionItem {
 
     public GraphTargetItem target;
     public int propertyIndex;
+
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        ret.add(target);
+        return ret;
+    }
 
     public GetPropertyActionItem(GraphSourceItem instruction, GraphTargetItem target, int propertyIndex) {
         super(instruction, PRECEDENCE_PRIMARY);

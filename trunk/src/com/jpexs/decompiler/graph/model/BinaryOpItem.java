@@ -20,6 +20,7 @@ import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
@@ -173,5 +174,13 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
     @Override
     public boolean hasReturnValue() {
         return true;
+    }
+
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        ret.add(getLeftSide());
+        ret.add(getRightSide());
+        return ret;
     }
 }

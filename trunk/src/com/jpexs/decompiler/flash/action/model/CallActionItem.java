@@ -24,8 +24,6 @@ import java.util.List;
 
 public class CallActionItem extends ActionItem {
 
-    private GraphTargetItem value;
-
     public CallActionItem(GraphSourceItem instruction, GraphTargetItem value) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.value = value;

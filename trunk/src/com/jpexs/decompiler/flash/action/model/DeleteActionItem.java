@@ -20,12 +20,21 @@ import com.jpexs.decompiler.flash.action.swf5.ActionDelete;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DeleteActionItem extends ActionItem {
 
     public GraphTargetItem object;
     public GraphTargetItem propertyName;
+
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        ret.add(object);
+        ret.add(propertyName);
+        return ret;
+    }
 
     public DeleteActionItem(GraphSourceItem instruction, GraphTargetItem object, GraphTargetItem propertyName) {
         super(instruction, PRECEDENCE_PRIMARY);

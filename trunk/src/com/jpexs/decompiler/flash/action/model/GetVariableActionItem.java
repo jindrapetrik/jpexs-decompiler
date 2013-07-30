@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GetVariableActionItem extends ActionItem {
@@ -30,6 +31,13 @@ public class GetVariableActionItem extends ActionItem {
     private Object computedResult;
     private boolean computedCompiletime = false;
     private boolean computedVariableComputed = false;
+
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        ret.add(name);
+        return ret;
+    }
 
     public GetVariableActionItem(GraphSourceItem instruction, GraphTargetItem value) {
         super(instruction, PRECEDENCE_PRIMARY);

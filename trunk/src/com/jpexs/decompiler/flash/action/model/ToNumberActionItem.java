@@ -25,8 +25,6 @@ import java.util.List;
 
 public class ToNumberActionItem extends ActionItem {
 
-    private GraphTargetItem value;
-
     public ToNumberActionItem(GraphSourceItem instruction, GraphTargetItem value) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.value = value;

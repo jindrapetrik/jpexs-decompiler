@@ -23,6 +23,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import static com.jpexs.decompiler.graph.GraphTargetItem.PRECEDENCE_PRIMARY;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,6 +34,14 @@ public class PrintAsBitmapActionItem extends ActionItem {
 
     private GraphTargetItem target;
     private GraphTargetItem boundingBox;
+
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        ret.add(target);
+        ret.add(boundingBox);
+        return ret;
+    }
 
     public PrintAsBitmapActionItem(GraphSourceItem instruction, GraphTargetItem target, GraphTargetItem boundingBox) {
         super(instruction, PRECEDENCE_PRIMARY);

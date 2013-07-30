@@ -30,6 +30,14 @@ public class FSCommand2ActionItem extends ActionItem {
     public List<GraphTargetItem> arguments;
     public GraphTargetItem command;
 
+    @Override
+    public List<GraphTargetItem> getAllSubItems() {
+        List<GraphTargetItem> ret = new ArrayList<>();
+        ret.addAll(arguments);
+        ret.add(command);
+        return ret;
+    }
+
     public FSCommand2ActionItem(GraphSourceItem instruction, GraphTargetItem command, List<GraphTargetItem> arguments) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.command = command;

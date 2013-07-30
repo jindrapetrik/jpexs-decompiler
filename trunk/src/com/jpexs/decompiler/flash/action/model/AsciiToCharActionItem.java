@@ -24,8 +24,6 @@ import java.util.List;
 
 public class AsciiToCharActionItem extends ActionItem {
 
-    private GraphTargetItem value;
-
     public AsciiToCharActionItem(GraphSourceItem instruction, GraphTargetItem value) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.value = value;
