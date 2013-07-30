@@ -74,6 +74,7 @@ import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
@@ -1343,6 +1344,20 @@ public class AVM2Code implements Serializable {
                     declaredSlots.add(sl);
                 }
             }
+        }
+
+        int lastPos = list.size() - 1;
+        if (lastPos < 0) {
+            lastPos = 0;
+        }
+        if ((list.size() > lastPos) && (list.get(lastPos) instanceof ScriptEndItem)) {
+            lastPos--;
+        }
+        if (lastPos < 0) {
+            lastPos = 0;
+        }
+        if ((list.size() > lastPos) && (list.get(lastPos) instanceof ReturnVoidAVM2Item)) {
+            list.remove(lastPos);
         }
 
         s = Graph.graphToString(list, constants, localRegNames, fullyQualifiedNames);
