@@ -29,15 +29,13 @@ import java.util.List;
  */
 public class EscapeXAttrAVM2Item extends AVM2Item {
 
-    public GraphTargetItem expression;
-
     public EscapeXAttrAVM2Item(AVM2Instruction instruction, GraphTargetItem expression) {
         super(instruction, NOPRECEDENCE);
-        this.expression = expression;
+        this.value = expression;
     }
 
     @Override
     public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return hilight("{") + expression.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + hilight("}");
+        return hilight("{") + value.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + hilight("}");
     }
 }
