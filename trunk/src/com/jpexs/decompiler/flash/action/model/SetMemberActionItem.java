@@ -79,9 +79,9 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
     public String toString(ConstantPool constants) {
         if (!((objectName instanceof DirectValueActionItem) && (((DirectValueActionItem) objectName).value instanceof String))) {
             //if(!(functionName instanceof GetVariableActionItem))
-            return object.toString(constants) + "[" + stripQuotes(objectName, constants) + "]" + "=" + value.toString(constants);
+            return object.toString(constants) + "[" + stripQuotes(objectName, constants) + "]" + " = " + value.toString(constants);
         }
-        return object.toString(constants) + "." + stripQuotes(objectName, constants) + "=" + value.toString(constants);
+        return object.toString(constants) + "." + stripQuotes(objectName, constants) + " = " + value.toString(constants);
     }
 
     @Override

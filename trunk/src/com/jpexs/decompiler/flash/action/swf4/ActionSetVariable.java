@@ -25,6 +25,9 @@ import com.jpexs.decompiler.flash.action.model.PostDecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.PostIncrementActionItem;
 import com.jpexs.decompiler.flash.action.model.SetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
+import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
+import com.jpexs.decompiler.flash.action.model.operations.PreDecrementActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.PreIncrementActionItem;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
@@ -83,10 +86,34 @@ public class ActionSetVariable extends Action {
                 }
             }
         }
+
+        GraphTargetItem ret = new SetVariableActionItem(this, name, value);
+
         if (value instanceof StoreRegisterActionItem) {
-            ((StoreRegisterActionItem) value).define = false;
+            StoreRegisterActionItem sr = (StoreRegisterActionItem) value;
+            if (sr.define) {
+                value = sr.getValue();
+                ((SetVariableActionItem) ret).setValue(value);
+                if (value instanceof IncrementActionItem) {
+                    if (((IncrementActionItem) value).object instanceof GetVariableActionItem) {
+                        if (((GetVariableActionItem) ((IncrementActionItem) value).object).name.valueEquals(name)) {
+                            ret = new PreIncrementActionItem(this, ((IncrementActionItem) value).object);
+                        }
+                    }
+                } else if (value instanceof DecrementActionItem) {
+                    if (((DecrementActionItem) value).object instanceof GetVariableActionItem) {
+                        if (((GetVariableActionItem) ((DecrementActionItem) value).object).name.valueEquals(name)) {
+                            ret = new PreDecrementActionItem(this, ((DecrementActionItem) value).object);
+                        }
+                    }
+                }
+
+
+                variables.put("__register" + sr.register.number, new TemporaryRegister(ret));
+                return;
+            }
         }
-        SetVariableActionItem svt = new SetVariableActionItem(this, name, value);
-        output.add(svt);
+
+        output.add(ret);
     }
 }

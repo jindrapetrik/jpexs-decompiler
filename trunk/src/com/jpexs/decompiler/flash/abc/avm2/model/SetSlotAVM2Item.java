@@ -46,7 +46,7 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
     @Override
     public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
 
-        return getName(constants, localRegNames, fullyQualifiedNames) + hilight("=") + value.toString(constants, localRegNames, fullyQualifiedNames);
+        return getName(constants, localRegNames, fullyQualifiedNames) + hilight(" = ") + value.toString(constants, localRegNames, fullyQualifiedNames);
     }
 
     public String getName(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {

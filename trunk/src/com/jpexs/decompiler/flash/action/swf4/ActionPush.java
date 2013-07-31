@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
@@ -347,12 +348,17 @@ public class ActionPush extends Action {
              }
              }*/
             DirectValueActionItem dvt = new DirectValueActionItem(this, pos, o, constantPool);
-            stack.push(dvt);
-            if (o instanceof RegisterNumber) {
+
+            if (o instanceof RegisterNumber) {//TemporaryRegister
                 dvt.computedRegValue = variables.get("__register" + ((RegisterNumber) o).number);
                 if (regNames.containsKey(((RegisterNumber) o).number)) {
                     ((RegisterNumber) o).name = regNames.get(((RegisterNumber) o).number);
                 }
+            }
+            if (dvt.computedRegValue instanceof TemporaryRegister) {
+                stack.push(((TemporaryRegister) dvt.computedRegValue).value);
+            } else {
+                stack.push(dvt);
             }
             pos++;
         }

@@ -24,6 +24,9 @@ import com.jpexs.decompiler.flash.action.model.PostDecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.PostIncrementActionItem;
 import com.jpexs.decompiler.flash.action.model.SetMemberActionItem;
 import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
+import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
+import com.jpexs.decompiler.flash.action.model.operations.PreDecrementActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.PreIncrementActionItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
@@ -86,9 +89,29 @@ public class ActionSetMember extends Action {
                 }
             }
         }
+        GraphTargetItem ret = new SetMemberActionItem(this, object, memberName, value);
         if (value instanceof StoreRegisterActionItem) {
-            ((StoreRegisterActionItem) value).define = false;
+            StoreRegisterActionItem sr = (StoreRegisterActionItem) value;
+            if (sr.define) {
+                value = sr.getValue();
+                ((SetMemberActionItem) ret).setValue(value);
+                if (value instanceof IncrementActionItem) {
+                    if (((IncrementActionItem) value).object instanceof GetMemberActionItem) {
+                        if (((GetMemberActionItem) ((IncrementActionItem) value).object).valueEquals(((SetMemberActionItem) ret).getObject())) {
+                            ret = new PreIncrementActionItem(this, ((IncrementActionItem) value).object);
+                        }
+                    }
+                } else if (value instanceof DecrementActionItem) {
+                    if (((DecrementActionItem) value).object instanceof GetMemberActionItem) {
+                        if (((GetMemberActionItem) ((DecrementActionItem) value).object).valueEquals(((SetMemberActionItem) ret).getObject())) {
+                            ret = new PreDecrementActionItem(this, ((DecrementActionItem) value).object);
+                        }
+                    }
+                }
+                variables.put("__register" + sr.register.number, new TemporaryRegister(ret));
+                return;
+            }
         }
-        output.add(new SetMemberActionItem(this, object, memberName, value));
+        output.add(ret);
     }
 }

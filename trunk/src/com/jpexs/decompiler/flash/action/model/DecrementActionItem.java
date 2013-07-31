@@ -42,7 +42,7 @@ public class DecrementActionItem extends ActionItem {
 
     @Override
     public String toString(ConstantPool constants) {
-        return object.toString(constants) + hilight("-1");
+        return object.toString(constants) + hilight(" - 1");
     }
 
     @Override

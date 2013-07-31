@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.action.model.IncrementActionItem;
 import com.jpexs.decompiler.flash.action.model.PostDecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.PostIncrementActionItem;
 import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
+import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
@@ -80,6 +81,11 @@ public class ActionStoreRegister extends Action {
             rn.name = regNames.get(registerNumber);
         }
         value.moreSrc.add(new GraphSourceItemPos(this, 0));
+        if (variables.containsKey("__register" + registerNumber)) {
+            if (variables.get("__register" + registerNumber) instanceof TemporaryRegister) {
+                variables.remove("__register" + registerNumber);
+            }
+        }
         boolean define = !variables.containsKey("__register" + registerNumber);
         if (regNames.containsKey(registerNumber)) {
             define = false;

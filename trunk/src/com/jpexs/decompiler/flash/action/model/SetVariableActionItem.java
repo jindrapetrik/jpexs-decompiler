@@ -67,7 +67,7 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
     @Override
     public String toString(ConstantPool constants) {
         if (name instanceof DirectValueActionItem || name instanceof GetVariableActionItem) {
-            return stripQuotes(name, constants) + hilight("=") + value.toString(constants);
+            return stripQuotes(name, constants) + hilight(" = ") + value.toString(constants);
         } else {
             return hilight("set(") + name.toString(constants) + hilight(",") + value.toString(constants) + hilight(")");
         }

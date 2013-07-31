@@ -48,7 +48,7 @@ public class SetSuperAVM2Item extends AVM2Item {
         if (Highlighting.stripHilights(calee).equals("this.")) {
             calee = "";
         }
-        return calee + hilight("super.") + propertyName.toString(constants, localRegNames, fullyQualifiedNames) + hilight("=") + value.toString(constants, localRegNames, fullyQualifiedNames);
+        return calee + hilight("super.") + propertyName.toString(constants, localRegNames, fullyQualifiedNames) + hilight(" = ") + value.toString(constants, localRegNames, fullyQualifiedNames);
     }
 
     @Override

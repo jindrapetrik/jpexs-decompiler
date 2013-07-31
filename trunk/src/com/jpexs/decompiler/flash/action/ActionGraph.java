@@ -48,7 +48,9 @@ import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
 /**
@@ -92,7 +94,13 @@ public class ActionGraph extends Graph {
     }
 
     @Override
-    protected void finalProcess(List<GraphTargetItem> list, int level) {
+    protected void finalProcess(List<GraphTargetItem> list, int level, List<Object> localData) {
+
+        if (localData.isEmpty()) {
+            localData.add(new HashSet<Integer>()); //List of temporaryRegisters
+        }
+        @SuppressWarnings("unchecked")
+        Set<Integer> temporaryRegisters = (HashSet<Integer>) localData.get(0);
         List<GraphTargetItem> ret = Action.checkClass(list);
         if (ret != list) {
             list.clear();
@@ -184,6 +192,7 @@ public class ActionGraph extends Graph {
 
             }
         }
+        //detectChained(list, temporaryRegisters);
     }
 
     @Override

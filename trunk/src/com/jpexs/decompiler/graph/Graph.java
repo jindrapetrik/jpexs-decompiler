@@ -578,7 +578,7 @@ public class Graph {
         List<GraphTargetItem> ret = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, heads.get(0), null, loops, staticOperation, path);
         processIfs(ret);
         finalProcessStack(stack, ret);
-        finalProcessAll(ret, 0);
+        finalProcessAll(ret, 0, new ArrayList<>());
         return ret;
 
 
@@ -587,19 +587,19 @@ public class Graph {
     public void finalProcessStack(Stack<GraphTargetItem> stack, List<GraphTargetItem> output) {
     }
 
-    private void finalProcessAll(List<GraphTargetItem> list, int level) {
-        finalProcess(list, level);
+    private void finalProcessAll(List<GraphTargetItem> list, int level, List<Object> localData) {
+        finalProcess(list, level, localData);
         for (GraphTargetItem item : list) {
             if (item instanceof Block) {
                 List<List<GraphTargetItem>> subs = ((Block) item).getSubs();
                 for (List<GraphTargetItem> sub : subs) {
-                    finalProcessAll(sub, level + 1);
+                    finalProcessAll(sub, level + 1, localData);
                 }
             }
         }
     }
 
-    protected void finalProcess(List<GraphTargetItem> list, int level) {
+    protected void finalProcess(List<GraphTargetItem> list, int level, List<Object> localData) {
     }
 
     private void processIfs(List<GraphTargetItem> list) {

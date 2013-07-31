@@ -640,7 +640,7 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    protected void finalProcess(List<GraphTargetItem> list, int level) {
+    protected void finalProcess(List<GraphTargetItem> list, int level, List<Object> localData) {
         if (level == 0) {
             if (!list.isEmpty()) {
                 if (list.get(list.size() - 1) instanceof ReturnVoidAVM2Item) {

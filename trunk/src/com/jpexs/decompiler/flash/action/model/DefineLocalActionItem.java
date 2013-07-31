@@ -34,6 +34,9 @@ public class DefineLocalActionItem extends ActionItem implements SetTypeActionIt
     public List<GraphTargetItem> getAllSubItems() {
         List<GraphTargetItem> ret = new ArrayList<>();
         ret.add(name);
+        if (value != null) {
+            ret.add(value);
+        }
         return ret;
     }
 
