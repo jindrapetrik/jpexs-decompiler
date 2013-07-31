@@ -338,7 +338,7 @@ public class DefineText2Tag extends TextTag implements DrawableTag {
 
                             int advance;
                             if (font.hasLayout()) {
-                                advance = (int) Math.round((double) textHeight * font.getGlyphAdvance(tr.glyphEntries[i].glyphIndex) / (font.getDivider() * 1024.0));
+                                advance = 20 * (int) Math.round((double) textHeight * font.getGlyphAdvance(tr.glyphEntries[i].glyphIndex) / (font.getDivider() * 1024.0));
                             } else {
                                 advance = 20 * FontTag.getSystemFontAdvance(fontName, font.getFontStyle(), textHeight / 20, c);
                             }
