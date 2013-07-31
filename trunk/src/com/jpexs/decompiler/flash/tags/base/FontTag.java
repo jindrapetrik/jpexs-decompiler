@@ -116,7 +116,7 @@ public abstract class FontTag extends CharacterTag implements AloneTag {
                 textRecords.addAll(((DefineTextTag) t).textRecords);
             }
             if (t instanceof DefineText2Tag) {
-                textRecords.addAll(((DefineTextTag) t).textRecords);
+                textRecords.addAll(((DefineText2Tag) t).textRecords);
             }
         }
         int curFontId = 0;
