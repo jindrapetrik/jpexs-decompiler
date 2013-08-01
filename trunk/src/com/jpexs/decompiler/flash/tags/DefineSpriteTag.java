@@ -128,7 +128,9 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
                     depthMap.put(pot.getDepth(), charId);
                     characterId = (charId);
                 } else {
-                    characterId = (depthMap.get(pot.getDepth()));
+                    Integer chi= (depthMap.get(pot.getDepth()));
+                    if(chi!=null)
+                    characterId = chi;
                 }
             }
             if (characterId == -1) {

@@ -1337,6 +1337,13 @@ public class Action implements GraphSourceItem {
         if (o instanceof Long) {
             return (Long) o;
         }
+        if(o instanceof String){
+            try{
+                return Double.parseDouble((String)o);
+            }catch(NumberFormatException nfe){
+                return 0;
+            }
+        }
         return 0;
     }
 

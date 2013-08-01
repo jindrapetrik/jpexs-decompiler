@@ -118,7 +118,7 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
                 textHeight = rec.textHeight;
                 glyphs = font.getGlyphShapeTable();
 
-                if (font.getLeading() == -1) {
+                if (!font.hasLayout()) {
                     String fontName = font.getFontName(tags);
                     if (!availableFonts.contains(fontName)) {
                         fontName = "Times New Roman";
@@ -175,7 +175,13 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
                 updateRect(textBounds, x + rect.Xmin, y + rect.Ymin);
                 updateRect(textBounds, x + rect.Xmax, y + rect.Ymax);
                 int adv = entry.glyphAdvance;
-                int defaultAdvance = 20 * FontTag.getSystemFontAdvance(aFont, font.glyphToChar(tags, entry.glyphIndex));
+                
+                int defaultAdvance;
+                if (font.hasLayout()) {
+                    defaultAdvance = 20 * (int) Math.round((double) textHeight * font.getGlyphAdvance(entry.glyphIndex) / (font.getDivider() * 1024.0));
+                } else {
+                    defaultAdvance = 20 * FontTag.getSystemFontAdvance(aFont,  font.glyphToChar(tags, entry.glyphIndex));
+                }
                 letterSpacing = adv - defaultAdvance;
                 x += adv;
             }

@@ -47,6 +47,9 @@ public class NotCompileTimeAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem getThroughNotCompilable() {
+        if(object==null){
+            return object;
+        }
         return object.getThroughNotCompilable();
     }
 }
