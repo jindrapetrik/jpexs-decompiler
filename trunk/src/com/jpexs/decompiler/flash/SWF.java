@@ -542,19 +542,18 @@ public class SWF {
         String directory;
         List<ABCContainerTag> abcList;
         boolean pcode;
-        String informStr;
         ClassPath path;
         AtomicInteger index;
         int count;
         boolean paralel;
         AbortRetryIgnoreHandler handler;
+        long startTime;
+        long stopTime;
 
-        public ExportPackTask(AbortRetryIgnoreHandler handler, AtomicInteger index, int count, ClassPath path, ScriptPack pack, String directory, List<ABCContainerTag> abcList, boolean pcode, String informStr, boolean paralel) {
+        public ExportPackTask(AbortRetryIgnoreHandler handler, AtomicInteger index, int count, ClassPath path, ScriptPack pack, String directory, List<ABCContainerTag> abcList, boolean pcode, boolean paralel) {
             this.pack = pack;
             this.directory = directory;
             this.abcList = abcList;
-            this.pcode = pcode;
-            this.informStr = informStr;
             this.path = path;
             this.index = index;
             this.count = count;
@@ -567,12 +566,15 @@ public class SWF {
             RunnableIOExResult<File> rio = new RunnableIOExResult<File>() {
                 @Override
                 public void run() throws IOException {
+                    startTime = System.currentTimeMillis();
                     this.result = pack.export(directory, abcList, pcode, paralel);
+                    stopTime = System.currentTimeMillis();
                 }
             };
             new RetryTask(rio, handler).run();
             synchronized (ABC.class) {
-                informListeners("export", "Exported " + informStr + " script " + index.getAndIncrement() + "/" + count + " " + path);
+                long time=stopTime-startTime;
+                informListeners("export", "Exported script " + index.getAndIncrement() + "/" + count + " " + path+", "+Helper.formatTimeSec(time));
             }
             return null;
         }
@@ -605,7 +607,7 @@ public class SWF {
         }
         List<MyEntry<ClassPath, ScriptPack>> packs = getAS3Packs();
         for (MyEntry<ClassPath, ScriptPack> item : packs) {
-            Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.key, item.value, outdir, abcTags, isPcode, "", paralel));
+            Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.key, item.value, outdir, abcTags, isPcode,paralel));
             futureResults.add(future);
         }
 

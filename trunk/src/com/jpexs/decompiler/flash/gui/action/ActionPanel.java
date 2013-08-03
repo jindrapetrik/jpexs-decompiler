@@ -260,7 +260,7 @@ public class ActionPanel extends JPanel implements ActionListener {
          }else{
          editor.setContentType("text/flasm");
          }*/
-        editor.setText(stripped);
+         editor.setText(stripped);
         for (Highlighting h : disassembledHilights) {
             if (h.offset == offset) {
                 if (h.startPos <= editor.getText().length()) {

@@ -482,4 +482,20 @@ public class Helper {
             }
         }
     }
+
+    public static String formatTimeSec(long timeMs) {
+        long timeS = timeMs / 1000;
+        timeMs = timeMs % 1000;
+        long timeM = timeS / 60;
+        timeS = timeS % 60;
+        long timeH = timeM / 60;
+        timeM = timeM % 60;
+        String timeStr = "";
+        if (timeH > 0) {
+            timeStr += Helper.padZeros(timeH, 2) + ":";
+        }
+        timeStr += Helper.padZeros(timeM, 2) + ":";
+        timeStr += Helper.padZeros(timeS, 2) + "." + Helper.padZeros(timeMs, 3);
+        return timeStr;
+    }
 }
