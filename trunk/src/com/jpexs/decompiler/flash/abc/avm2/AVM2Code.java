@@ -2381,7 +2381,7 @@ public class AVM2Code implements Serializable {
                     continue;
                 } else {
                     if (ins.isBranch() && (!ins.isJump())) {
-                        stack.pop();
+                        GraphTargetItem top = stack.pop();
 
                         Decision dec = new Decision();
                         if (decisions.containsKey(ins)) {
@@ -2392,7 +2392,7 @@ public class AVM2Code implements Serializable {
                         dec.jumpUsed = true;
                         dec.skipUsed = true;
 
-                        if (curVisited > 1) {
+                        if ((!(top instanceof HasNextAVM2Item) && curVisited > 1) || (curVisited > 2)) {
                             for (int b : branches) {
                                 int visc = 0;
                                 if (visited.containsKey(b)) {
