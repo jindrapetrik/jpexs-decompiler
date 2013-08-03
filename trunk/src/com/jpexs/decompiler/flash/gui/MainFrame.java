@@ -2241,7 +2241,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                     public void run() {
                         miAssociate.setSelected(Main.isAddedToContextMenu());
                     }
-                }, 500); //It takes some time registry change to apply
+                }, 1000); //It takes some time registry change to apply
                 break;
             case "GOTODOCUMENTCLASS":
                 gotoDocumentClass();
