@@ -71,7 +71,7 @@ public class DefineLocalActionItem extends ActionItem implements SetTypeActionIt
         if (value == null) {
             return hilight("var ") + stripQuotes(name, constants);
         }
-        return hilight("var ") + stripQuotes(name, constants) + hilight("=") + value.toString(constants);
+        return hilight("var ") + stripQuotes(name, constants) + hilight(" = ") + value.toString(constants);
     }
 
     @Override
