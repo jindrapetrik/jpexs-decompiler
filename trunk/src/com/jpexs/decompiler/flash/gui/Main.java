@@ -224,7 +224,20 @@ public class Main {
 
     public static void saveFile(String outfile) throws IOException {
         file = outfile;
-        swf.saveTo(new FileOutputStream(outfile));
+        File outfileF = new File(outfile);
+        File tmpFile = new File(outfile+".tmp");
+        swf.saveTo(new FileOutputStream(tmpFile));
+        if(tmpFile.exists()){
+            if(tmpFile.length() > 0){    
+                outfileF.delete();
+                if (!tmpFile.renameTo(outfileF)) {
+                    tmpFile.delete();
+                    throw new IOException("Cannot access " + outfile);
+                }
+            }else{
+                throw new IOException("Output is empty");
+            }
+        }
     }
 
     private static class OpenFileWorker extends SwingWorker {
