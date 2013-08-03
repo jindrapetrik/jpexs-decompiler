@@ -106,10 +106,13 @@ public class ActionSetVariable extends Action {
                             ret = new PreDecrementActionItem(this, ((DecrementActionItem) value).object);
                         }
                     }
+                } else {
+                    sr.temporary = true;
+                    ((SetVariableActionItem) ret).setValue(sr);
                 }
 
 
-                variables.put("__register" + sr.register.number, new TemporaryRegister(ret));
+                variables.put("__register" + sr.register.number, new TemporaryRegister(sr.register.number, ret));
                 return;
             }
         }

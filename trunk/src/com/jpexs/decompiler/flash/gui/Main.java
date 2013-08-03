@@ -625,6 +625,59 @@ public class Main {
             offerAssociation();
             showModeFrame();
         } else {
+            if (args[pos].equals("-config")) {
+                pos++;
+                if (args.length <= pos) {
+                    System.err.println("Config values expected");
+                    badArguments();
+                }
+                String cfgStr = args[pos];
+                String cfgs[];
+                if (cfgStr.contains(",")) {
+                    cfgs = cfgStr.split(",");
+                } else {
+                    cfgs = new String[]{cfgStr};
+                }
+
+                String booleanKeys[] = new String[]{
+                    "decompile",
+                    "paralelSpeedUp",
+                    "internalFlashViewer",
+                    "autoDeobfuscate",
+                    "cacheOnDisk"};
+
+                for (String c : cfgs) {
+                    String cp[];
+                    if (c.contains("=")) {
+                        cp = c.split("=");
+                    } else {
+                        cp = new String[]{c, "1"};
+                    }
+                    String key = cp[0];
+                    String value = cp[1];
+                    for (String bk : booleanKeys) {
+                        if (key.toLowerCase().equals(bk.toLowerCase())) {
+                            Boolean bValue = null;
+                            if (value.equals("0") || value.toLowerCase().equals("false") || value.toLowerCase().equals("no") || value.toLowerCase().equals("off")) {
+                                bValue = false;
+                            }
+                            if (value.equals("1") || value.toLowerCase().equals("true") || value.toLowerCase().equals("yes") || value.toLowerCase().equals("on")) {
+                                bValue = true;
+                            }
+                            if (bValue != null) {
+                                System.out.println("Config " + bk + " set to " + bValue);
+                                Configuration.setConfig(bk, bValue);
+                            }
+                        }
+                    }
+                }
+                pos++;
+                if (args.length <= pos) {
+                    saveConfig();
+                    System.out.println("Configuration saved");
+                    return;
+                }
+            }
             if (args[pos].equals("-removefromcontextmenu")) {
                 addToContextMenu(false);
             } else if (args[pos].equals("-addtocontextmenu")) {
@@ -942,12 +995,16 @@ public class Main {
         }
     }
 
-    public static void exit() {
+    public static void saveConfig() {
         try {
             Configuration.saveToFile(getConfigFile(), getReplacementsFile());
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public static void exit() {
+        saveConfig();
         FlashPlayerPanel.unload();
         System.exit(0);
     }

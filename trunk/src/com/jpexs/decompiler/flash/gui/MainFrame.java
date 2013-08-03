@@ -2598,7 +2598,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                 Main.stopWork();
                                 long timeAfter = System.currentTimeMillis();
                                 long timeMs = timeAfter - timeBefore;
-                                
+
                                 setStatus(translate("export.finishedin").replace("%time%", Helper.formatTimeSec(timeMs)));
                             }
                         }).start();

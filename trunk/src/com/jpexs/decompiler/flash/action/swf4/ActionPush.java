@@ -356,7 +356,7 @@ public class ActionPush extends Action {
                 }
             }
             if (dvt.computedRegValue instanceof TemporaryRegister) {
-                stack.push(((TemporaryRegister) dvt.computedRegValue).value);
+                stack.push(new TemporaryRegister(((RegisterNumber) o).number, ((TemporaryRegister) dvt.computedRegValue).value));
             } else {
                 stack.push(dvt);
             }

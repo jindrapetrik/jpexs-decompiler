@@ -573,8 +573,8 @@ public class SWF {
             };
             new RetryTask(rio, handler).run();
             synchronized (ABC.class) {
-                long time=stopTime-startTime;
-                informListeners("export", "Exported script " + index.getAndIncrement() + "/" + count + " " + path+", "+Helper.formatTimeSec(time));
+                long time = stopTime - startTime;
+                informListeners("export", "Exported script " + index.getAndIncrement() + "/" + count + " " + path + ", " + Helper.formatTimeSec(time));
             }
             return null;
         }
@@ -607,7 +607,7 @@ public class SWF {
         }
         List<MyEntry<ClassPath, ScriptPack>> packs = getAS3Packs();
         for (MyEntry<ClassPath, ScriptPack> item : packs) {
-            Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.key, item.value, outdir, abcTags, isPcode,paralel));
+            Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.key, item.value, outdir, abcTags, isPcode, paralel));
             futureResults.add(future);
         }
 
