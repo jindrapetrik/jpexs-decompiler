@@ -520,6 +520,8 @@ public class Main {
         System.out.println("java -jar ffdec.jar -compress myfile.swf myfiledec.swf");
         System.out.println("java -jar ffdec.jar -decompress myfiledec.swf myfile.swf");
         System.out.println("java -jar ffdec.jar -config autoDeobfuscate=1,paralelSpeedUp=0 -export as \"C:\\decompiled\\\" myfile.swf");
+        System.out.println("");
+        System.out.println("Instead of \"java -jar ffdec.jar\" you can use ffdec.bat on Windows, ffdec.sh on Linux/MacOs");
     }
 
     private static void offerAssociation() {
