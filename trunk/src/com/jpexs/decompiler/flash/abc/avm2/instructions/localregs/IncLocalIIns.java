@@ -37,13 +37,17 @@ public class IncLocalIIns extends InstructionDefinition {
     }
 
     @Override
-    public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
-        int regIndex = ins.operands[0];
-        output.add(new IncLocalAVM2Item(ins, regIndex));
-        if (localRegs.containsKey(regIndex)) {
-            localRegs.put(regIndex, new NotCompileTimeAVM2Item(ins, new AddAVM2Item(ins, localRegs.get(regIndex), new IntegerValueAVM2Item(ins, Long.valueOf(1)))));
+    public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> regAssignCount, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
+        int regId = ins.operands[0];
+        output.add(new IncLocalAVM2Item(ins, regId));
+        if (localRegs.containsKey(regId)) {
+            localRegs.put(regId, new AddAVM2Item(ins, localRegs.get(regId), new IntegerValueAVM2Item(ins, Long.valueOf(1))));
         } else {
             //localRegs.put(regIndex, new AddAVM2Item(ins, null, new IntegerValueAVM2Item(ins, new Long(1))));
         }
+        if (!regAssignCount.containsKey(regId)) {
+            regAssignCount.put(regId, 0);
+        }
+        regAssignCount.put(regId, regAssignCount.get(regId) + 1);
     }
 }

@@ -37,17 +37,24 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
     }
 
     @Override
-    public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
+    public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> regAssignCount, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
         int regId = getRegisterId(ins);
         GraphTargetItem computedValue = localRegs.get(regId);
-        if (!isRegisterCompileTime(regId, ip, refs, code)) {
+        int assignCount = 0;
+        if (regAssignCount.containsKey(regId)) {
+            assignCount = regAssignCount.get(regId);
+        }
+        if (assignCount > 5) { //Do not allow change register more than 5 - for deobfuscation
             computedValue = new NotCompileTimeAVM2Item(ins, computedValue);
         }
-        if (computedValue == null) {
-            if (!localRegNames.containsKey(regId)) {
-                computedValue = new UndefinedAVM2Item(null); //In some obfuscated code there seems to be reading of undefined registers
-            }
-        }
+        /*if (!isRegisterCompileTime(regId, ip, refs, code)) {
+         computedValue = new NotCompileTimeAVM2Item(ins, computedValue);
+         }
+         if (computedValue == null) {
+         if (!localRegNames.containsKey(regId)) {
+         computedValue = new UndefinedAVM2Item(null); //In some obfuscated code there seems to be reading of undefined registers
+         }
+         }*/
         stack.push(new LocalRegAVM2Item(ins, regId, computedValue));
     }
 

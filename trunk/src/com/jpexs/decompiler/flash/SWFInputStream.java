@@ -61,6 +61,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Stack;
@@ -89,6 +90,10 @@ public class SWFInputStream extends InputStream {
     private List<byte[]> buffered = new ArrayList<>();
     private ByteArrayOutputStream buffer;
     private static boolean DEOBFUSCATION_ALL_CODE_IN_PREVIOUS_TAG = (Boolean) Configuration.getConfig("deobfuscateUsePrevTagOnly", true);
+
+    public int getVersion() {
+        return version;
+    }
 
     public int getBufferLength() {
         return buffer.size();
@@ -636,33 +641,6 @@ public class SWFInputStream extends InputStream {
             if (ins.isBranch() || ins.isJump()) {
 
                 if (deobfuscate && (ins instanceof ActionIf) && !stack.isEmpty() && (stack.peek().isCompileTime() && (!stack.peek().hasSideEffect()))) {
-                    ActionIf aif = (ActionIf) ins;
-                    if (aif.ignoreUsed && (!aif.jumpUsed)) {
-                        ins.setIgnored(true, 0);
-                    }
-                    if ((!aif.ignoreUsed) && aif.jumpUsed) {
-                        ActionJump jmpIns = new ActionJump(aif.getJumpOffset());
-                        ((ActionJump) jmpIns).setAddress(aif.getAddress(), version);
-                        code.set(ip, (ActionJump) jmpIns);
-                    }
-
-                    if ((aif.ignoreUsed && (!aif.jumpUsed)) || ((!aif.ignoreUsed) && aif.jumpUsed)) {
-                        List<GraphSourceItemPos> needed = stack.peek().getNeededSources();
-                        for (GraphSourceItemPos ig : needed) {
-                            /*if (ig.item instanceof ActionPush) {
-                             if (!((ActionPush) ig.item).ignoredParts.contains(ig.pos)) {
-                             ((ActionPush) ig.item).ignoredParts.add(ig.pos);
-
-                             if (((ActionPush) ig.item).ignoredParts.size() == ((ActionPush) ig.item).values.size()) {
-                             ((Action) ig.item).setIgnored(true, 0);
-                             }
-                             }
-                             } else {
-                                
-                             }*/
-                            ((Action) ig.item).setIgnored(true, ig.pos);
-                        }
-                    }
                     boolean condition = EcmaScript.toBoolean(stack.peek().getResult());
                     if (debugMode) {
                         if (condition) {
@@ -683,7 +661,7 @@ public class SWFInputStream extends InputStream {
                         @SuppressWarnings("unchecked")
                         Stack<GraphTargetItem> brStack = (Stack<GraphTargetItem>) stack.clone();
                         if (b >= 0) {
-                            getConstantPool(listeners, cpool, localData, brStack, output, code, b, constantPools, visited, version, endIp, path);
+                            getConstantPool(listeners, cpool, prepareLocalBranch(localData), brStack, output, code, b, constantPools, visited, version, endIp, path);
                         } else {
                             if (debugMode) {
                                 System.out.println("Negative branch:" + b);
@@ -711,6 +689,20 @@ public class SWFInputStream extends InputStream {
         } catch (Exception ex) {
             log.log(Level.SEVERE, "Error during getting constantpool", ex);
         }
+        return ret;
+    }
+
+    private static List<Object> prepareLocalBranch(List<Object> localData) {
+        @SuppressWarnings("unchecked")
+        HashMap<Integer, String> regNames = (HashMap<Integer, String>) localData.get(0);
+        @SuppressWarnings("unchecked")
+        HashMap<String, GraphTargetItem> variables = (HashMap<String, GraphTargetItem>) localData.get(1);
+        @SuppressWarnings("unchecked")
+        HashMap<String, GraphTargetItem> functions = (HashMap<String, GraphTargetItem>) localData.get(2);
+        List<Object> ret = new ArrayList<>();
+        ret.add(new HashMap<Integer, String>(regNames));
+        ret.add(new HashMap<String, GraphTargetItem>(variables));
+        ret.add(new HashMap<String, GraphTargetItem>(functions));
         return ret;
     }
 
@@ -747,7 +739,7 @@ public class SWFInputStream extends InputStream {
          method = 2;
          goesPrev = readActionListAtPos(true, localData, stack, cpool, sis, rri, ip, retdups, ip);
          }*/
-        goesPrev = readActionListAtPos(listeners, new ArrayList<GraphTargetItem>(), new HashMap<Long, List<GraphSourceItemContainer>>(), address, containerSWFOffset, false, true, localData, stack, cpool, sis, rri, ip, retdups, ip, endip, path);
+        goesPrev = readActionListAtPos(listeners, new ArrayList<GraphTargetItem>(), new HashMap<Long, List<GraphSourceItemContainer>>(), address, containerSWFOffset, localData, stack, cpool, sis, rri, ip, retdups, ip, endip, path, new HashMap<Integer, Integer>());
 
         if (goesPrev) {
         } else {
@@ -777,15 +769,6 @@ public class SWFInputStream extends InputStream {
         }
 
         List<ConstantPool> pools;
-        StringBuilder br = new StringBuilder();
-        for (int i = 0; i < ret.size(); i++) {
-            br.append(i);
-            br.append(", loc");
-            br.append(Helper.formatAddress(((Action) ret.get(i)).getAddress()));
-            br.append(": ");
-            br.append(((Action) ret.get(i)).getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), cpool.constants, version, false));
-            br.append("\r\n");
-        }
         ret = Action.removeNops(0, ret, version, 0, path);
         pools = getConstantPool(listeners, new ActionGraphSource(ret, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, version, path);
 
@@ -815,7 +798,7 @@ public class SWFInputStream extends InputStream {
     }
 
     @SuppressWarnings("unchecked")
-    private static boolean readActionListAtPos(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, long address, long containerSWFOffset, boolean notCompileTime, boolean enableVariables, List<Object> localData, Stack<GraphTargetItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret, int startIp, int endip, String path) throws IOException {
+    private static boolean readActionListAtPos(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, long address, long containerSWFOffset, List<Object> localData, Stack<GraphTargetItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret, int startIp, int endip, String path, Map<Integer, Integer> visited) throws IOException {
         boolean debugMode = false;
         boolean decideBranch = false;
 
@@ -826,7 +809,14 @@ public class SWFInputStream extends InputStream {
         long filePos = rri.getPos();
         Scanner sc = new Scanner(System.in, "utf-8");
         int prevIp = ip;
+        loopip:
         while (((endip == -1) || (endip > ip)) && (a = sis.readAction(rri)) != null) {
+            if (!visited.containsKey(ip)) {
+                visited.put(ip, 0);
+            }
+            int curVisited = visited.get(ip);
+            curVisited++;
+            visited.put(ip, curVisited);
             for (int i = 0; i < listeners.size(); i++) {
                 listeners.get(i).progress("Reading", rri.getCount(), rri.length());
             }
@@ -908,9 +898,6 @@ public class SWFInputStream extends InputStream {
 
             ensureCapacity(ret, ip);
             int newip = -1;
-            if (!enableVariables && (!(ret.get(ip) instanceof ActionNop))) {
-                break;
-            }
 
             if (a instanceof ActionConstantPool) {
                 if (cpool == null) {
@@ -943,22 +930,13 @@ public class SWFInputStream extends InputStream {
                             } else if (next.equals("c")) {
                                 goaif = true;
                             }
-                        } else if (deobfuscate && top.isCompileTime() && (!top.hasSideEffect()) && ((!top.isVariableComputed()) || (top.isVariableComputed() && enableVariables && (!notCompileTime)))) {
-                            //if(top.isCompileTime()) {
-                            //if(false){
-                            if (enableVariables) {
-                                ((ActionIf) a).compileTime = true;
-                            }
+                        } else if (deobfuscate && top.isCompileTime() && (!top.hasSideEffect())) {
+                            ((ActionIf) a).compileTime = true;
                             if (debugMode) {
                                 System.err.print("is compiletime -> ");
                             }
                             if (EcmaScript.toBoolean(top.getResult())) {
                                 newip = rri.getPos() + aif.getJumpOffset();
-                                //rri.setPos(newip);
-                                if (((!enableVariables) || (!top.isVariableComputed())) && (!aif.ignoreUsed)) {
-                                    a = new ActionJump(aif.getJumpOffset());
-                                    a.setAddress(aif.getAddress(), SWF.DEFAULT_VERSION);
-                                }
                                 aif.jumpUsed = true;
                                 if (aif.ignoreUsed) {
                                     aif.compileTime = false;
@@ -974,32 +952,7 @@ public class SWFInputStream extends InputStream {
                                 if (debugMode) {
                                     System.err.println("ignore");
                                 }
-                                if (((!enableVariables) || (!top.isVariableComputed())) && (!aif.jumpUsed)) {
-                                    //a = new ActionNop();
-                                    aif.setIgnored(true, 0);
-                                    //a.setAddress(aif.getAddress(), SWF.DEFAULT_VERSION);
-                                }
                             }
-                            if (((!enableVariables) || (!top.isVariableComputed())) && (!(aif.jumpUsed && aif.ignoreUsed))) {
-                                List<GraphSourceItemPos> needed = top.getNeededSources();
-                                for (GraphSourceItemPos ig : needed) {
-                                    if (ig.item == null) {
-                                        continue;
-                                    }
-                                    if (ig.item instanceof ActionPush) {
-                                        if (!((ActionPush) ig.item).ignoredParts.contains(ig.pos)) {
-                                            ((ActionPush) ig.item).ignoredParts.add(ig.pos);
-
-                                            if (((ActionPush) ig.item).ignoredParts.size() == ((ActionPush) ig.item).values.size()) {
-                                                ((Action) ig.item).setIgnored(true, 0);
-                                            }
-                                        }
-                                    } else {
-                                        ((Action) ig.item).setIgnored(true, 0);
-                                    }
-                                }
-                            }
-
                         } else {
                             if (debugMode) {
                                 System.err.println("goaif");
@@ -1025,9 +978,9 @@ public class SWFInputStream extends InputStream {
                         }
                     }
                 } catch (RuntimeException ex) {
-                    if (!enableVariables) {
-                        throw ex;
-                    }
+                    /*if (!enableVariables) {
+                     throw ex;
+                     }*/
                     log.log(Level.SEVERE, "Disassembly exception", ex);
                     break;
                 }
@@ -1064,9 +1017,14 @@ public class SWFInputStream extends InputStream {
                             output2s.add(new ArrayList<GraphTargetItem>());
                             continue;
                         }
-                        List<Object> localData2 = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
+                        List<Object> localData2;
                         List<GraphTargetItem> output2 = new ArrayList<>();
-                        readActionListAtPos(listeners, output2, containers, address, containerSWFOffset, notCompileTime, enableVariables, localData2, new Stack<GraphTargetItem>(), cpool, sis, rri, (int) endAddr, ret, startIp, (int) (endAddr + size), path + (cntName == null ? "" : "/" + cntName));
+                        if ((cnt instanceof ActionDefineFunction) || (cnt instanceof ActionDefineFunction2)) {
+                            localData2 = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
+                        } else {
+                            localData2 = localData;
+                        }
+                        readActionListAtPos(listeners, output2, containers, address, containerSWFOffset, localData2, new Stack<GraphTargetItem>(), cpool, sis, rri, (int) endAddr, ret, startIp, (int) (endAddr + size), path + (cntName == null ? "" : "/" + cntName), visited);
                         output2s.add(output2);
                         endAddr += size;
                     }
@@ -1098,14 +1056,33 @@ public class SWFInputStream extends InputStream {
                 }
                 aif.ignoreUsed = true;
                 aif.jumpUsed = true;
+
+                if (curVisited > 1) {
+                    List<Integer> branches = new ArrayList<>();
+                    branches.add(rri.getPos() + aif.getJumpOffset());
+                    branches.add(rri.getPos());
+                    for (int br : branches) {
+                        int visc = 0;
+                        if (visited.containsKey(br)) {
+                            visc = visited.get(br);
+                        }
+                        if (visc == 0) {//<curVisited){
+                            ip = br;
+                            prevIp = ip;
+                            rri.setPos(br);
+                            continue loopip;
+                        }
+                    }
+                    break loopip;
+                }
+
                 int oldPos = rri.getPos();
                 @SuppressWarnings("unchecked")
                 Stack<GraphTargetItem> substack = (Stack<GraphTargetItem>) stack.clone();
-                if (readActionListAtPos(listeners, output, containers, address, containerSWFOffset, true, enableVariables, localData, substack, cpool, sis, rri, rri.getPos() + aif.getJumpOffset(), ret, startIp, endip, path)) {
+                if (readActionListAtPos(listeners, output, containers, address, containerSWFOffset, prepareLocalBranch(localData), substack, cpool, sis, rri, rri.getPos() + aif.getJumpOffset(), ret, startIp, endip, path, visited)) {
                     retv = true;
                 }
                 rri.setPos(oldPos);
-                notCompileTime = true;
             }
             prevIp = ip;
             if (a.isExit()) {

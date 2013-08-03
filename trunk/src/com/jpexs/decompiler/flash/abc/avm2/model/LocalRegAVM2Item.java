@@ -29,12 +29,21 @@ public class LocalRegAVM2Item extends AVM2Item {
 
     public int regIndex;
     public GraphTargetItem computedValue;
+    private Object computedResult;
+    private boolean isCT = false;
 
     public LocalRegAVM2Item(AVM2Instruction instruction, int regIndex, GraphTargetItem computedValue) {
         super(instruction, PRECEDENCE_PRIMARY);
         this.regIndex = regIndex;
         if (computedValue == null) {
-            //computedValue = new UndefinedAVM2Item(instruction);
+            computedResult = null;
+        } else {
+            if (computedValue.isCompileTime()) {
+                computedResult = computedValue.getResult();
+                isCT = true;
+            } else {
+                computedResult = null;
+            }
         }
         this.computedValue = computedValue;
     }
@@ -57,18 +66,15 @@ public class LocalRegAVM2Item extends AVM2Item {
 
     @Override
     public Object getResult() {
-        if (computedValue == null) {
+        if (computedResult == null) {
             return new Undefined();
         }
-        return computedValue.getResult();
+        return computedResult;
 
     }
 
     @Override
     public boolean isCompileTime() {
-        if (computedValue == null) {
-            return false;
-        }
-        return computedValue.isCompileTime();
+        return isCT;
     }
 }

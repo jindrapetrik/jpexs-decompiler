@@ -47,15 +47,20 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
     }
 
     @Override
-    public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
+    public void translate(boolean isStatic, int scriptIndex, int classIndex, java.util.HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> stack, java.util.Stack<GraphTargetItem> scopeStack, ConstantPool constants, AVM2Instruction ins, MethodInfo[] method_info, List<GraphTargetItem> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, com.jpexs.decompiler.flash.abc.ABC abc, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, String path, HashMap<Integer, Integer> regAssignCount, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code) {
         int regId = getRegisterId(ins);
         GraphTargetItem value = (GraphTargetItem) stack.pop();
-        if (localRegs.containsKey(regId)) {
-            localRegs.put(regId, new NotCompileTimeAVM2Item(ins, value));
-        } else {
-            localRegs.put(regId, value);
+        /*if (localRegs.containsKey(regId)) {
+         localRegs.put(regId, new NotCompileTimeAVM2Item(ins, value));
+         } else {
+         localRegs.put(regId, value);
+         }*/
+        localRegs.put(regId, value);
+        if (!regAssignCount.containsKey(regId)) {
+            regAssignCount.put(regId, 0);
         }
-        localRegsAssignmentIps.put(regId, ip);
+        regAssignCount.put(regId, regAssignCount.get(regId) + 1);
+        //localRegsAssignmentIps.put(regId, ip);
         if (value instanceof NewActivationAVM2Item) {
             return;
         }
@@ -63,7 +68,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
             return;
         }
         if (value.getNotCoerced() instanceof IncrementAVM2Item) {
-            GraphTargetItem inside = ((IncrementAVM2Item) value.getNotCoerced()).object.getNotCoerced().getThroughDuplicate();
+            GraphTargetItem inside = ((IncrementAVM2Item) value.getNotCoerced()).value.getNotCoerced().getThroughDuplicate();
             if (inside instanceof LocalRegAVM2Item) {
                 if (((LocalRegAVM2Item) inside).regIndex == regId) {
                     if (stack.size() > 0) {
@@ -71,7 +76,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
                         if (top == inside) {
                             stack.pop();
                             stack.push(new PostIncrementAVM2Item(ins, inside));
-                        } else if ((top instanceof IncrementAVM2Item) && (((IncrementAVM2Item) top).object == inside)) {
+                        } else if ((top instanceof IncrementAVM2Item) && (((IncrementAVM2Item) top).value == inside)) {
                             stack.pop();
                             stack.push(new PreIncrementAVM2Item(ins, inside));
                         } else {
@@ -86,7 +91,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
         }
 
         if (value.getNotCoerced() instanceof DecrementAVM2Item) {
-            GraphTargetItem inside = ((DecrementAVM2Item) value.getNotCoerced()).object.getNotCoerced().getThroughDuplicate();
+            GraphTargetItem inside = ((DecrementAVM2Item) value.getNotCoerced()).value.getNotCoerced().getThroughDuplicate();
             if (inside instanceof LocalRegAVM2Item) {
                 if (((LocalRegAVM2Item) inside).regIndex == regId) {
                     if (stack.size() > 0) {
@@ -94,7 +99,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
                         if (top == inside) {
                             stack.pop();
                             stack.push(new PostDecrementAVM2Item(ins, inside));
-                        } else if ((top instanceof DecrementAVM2Item) && (((DecrementAVM2Item) top).object == inside)) {
+                        } else if ((top instanceof DecrementAVM2Item) && (((DecrementAVM2Item) top).value == inside)) {
                             stack.pop();
                             stack.push(new PreDecrementAVM2Item(ins, inside));
                         } else {

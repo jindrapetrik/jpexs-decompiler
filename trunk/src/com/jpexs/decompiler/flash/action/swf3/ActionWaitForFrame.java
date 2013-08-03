@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.action.swf3;
 
+import com.jpexs.decompiler.flash.Configuration;
+import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
@@ -25,8 +27,11 @@ import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.IfFrameLoadedActionItem;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
+import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.special.ActionStore;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,15 +51,48 @@ public class ActionWaitForFrame extends Action implements ActionStore {
         skipCount = sis.readUI8();
         skipped = new ArrayList<>();
         for (int i = 0; i < skipCount; i++) {
-            skipped.add(sis.readAction());
+            Action a = sis.readAction();
+            if (a instanceof ActionEnd) {
+                skipCount = i;
+                break;
+            }
+            if (a == null) {
+                skipCount = i;
+                break;
+            }
+            skipped.add(a);
+        }
+        boolean deobfuscate = (Boolean) Configuration.getConfig("autoDeobfuscate", true);
+        if (deobfuscate) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            for (int i = 0; i < skipCount; i++) {
+                baos.write(skipped.get(i).getBytes(sis.getVersion()));
+            }
+            baos.write(new ActionEnd().getBytes(sis.getVersion()));
+            SWFInputStream sis2 = new SWFInputStream(new ByteArrayInputStream(baos.toByteArray()), sis.getVersion());
+            skipped = sis2.readActionList(new ArrayList<DisassemblyListener>(), 0, 0, "");
+            if (!skipped.isEmpty()) {
+                if (skipped.get(skipped.size() - 1) instanceof ActionEnd) {
+                    skipped.remove(skipped.size() - 1);
+                }
+            }
+            skipCount = skipped.size();
         }
     }
 
     @Override
     public String toString() {
+        return "WaitForFrame";
+    }
+
+    @Override
+    public String getASMSource(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
         String ret = "WaitForFrame " + frame + " " + skipCount;
         for (int i = 0; i < skipped.size(); i++) {
-            ret += "\r\n" + skipped.get(i).toString();
+            if (skipped.get(i) instanceof ActionEnd) {
+                break;
+            }
+            ret += "\r\n" + skipped.get(i).getASMSource(container, knownAddreses, constantPool, version, hex);
         }
         return ret;
     }

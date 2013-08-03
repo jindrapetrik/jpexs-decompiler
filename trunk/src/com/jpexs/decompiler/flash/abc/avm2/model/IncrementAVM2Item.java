@@ -18,21 +18,30 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
 import java.util.List;
 
 public class IncrementAVM2Item extends AVM2Item {
 
-    public GraphTargetItem object;
-
     public IncrementAVM2Item(AVM2Instruction instruction, GraphTargetItem object) {
         super(instruction, PRECEDENCE_ADDITIVE);
-        this.object = object;
+        this.value = object;
     }
 
     @Override
     public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return object.toString(constants, localRegNames, fullyQualifiedNames) + hilight("+1");
+        return value.toString(constants, localRegNames, fullyQualifiedNames) + hilight("+1");
+    }
+
+    @Override
+    public boolean isCompileTime() {
+        return value.isCompileTime();
+    }
+
+    @Override
+    public Object getResult() {
+        return EcmaScript.toNumber(value.getResult()) + 1;
     }
 }

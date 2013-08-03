@@ -125,8 +125,8 @@ public class MethodBody implements Cloneable, Serializable {
             if ((Boolean) Configuration.getConfig("autoDeobfuscate", true)) {
                 try {
                     deobfuscated.removeTraps(constants, b, abc, scriptIndex, classIndex, isStatic, path);
-                } catch (Exception ex) {
-                    Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Error during remove traps", ex);
+                } catch (Exception | StackOverflowError ex) {
+                    Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Error during remove traps in " + path, ex);
                 }
             }
             //deobfuscated.restoreControlFlow(constants, b);

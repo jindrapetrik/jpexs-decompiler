@@ -52,7 +52,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
         FullMultinameAVM2Item multiname = resolveMultiname(stack, constants, multinameIndex, ins);
         GraphTargetItem obj = (GraphTargetItem) stack.pop();
         if (value.getThroughDuplicate().getThroughRegister().getThroughDuplicate() instanceof IncrementAVM2Item) {
-            GraphTargetItem inside = ((IncrementAVM2Item) value.getThroughDuplicate().getThroughRegister().getThroughDuplicate()).object.getThroughRegister().getNotCoerced().getThroughDuplicate();
+            GraphTargetItem inside = ((IncrementAVM2Item) value.getThroughDuplicate().getThroughRegister().getThroughDuplicate()).value.getThroughRegister().getNotCoerced().getThroughDuplicate();
             if (inside instanceof GetPropertyAVM2Item) {
                 GetPropertyAVM2Item insideProp = ((GetPropertyAVM2Item) inside);
                 if (insideProp.propertyName.compareSame(multiname)) {
@@ -68,7 +68,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                             if (top == insideProp) {
                                 stack.pop();
                                 stack.push(new PostIncrementAVM2Item(ins, insideProp));
-                            } else if ((top instanceof IncrementAVM2Item) && (((IncrementAVM2Item) top).object == inside)) {
+                            } else if ((top instanceof IncrementAVM2Item) && (((IncrementAVM2Item) top).value == inside)) {
                                 stack.pop();
                                 stack.push(new PreIncrementAVM2Item(ins, insideProp));
                             } else {
@@ -84,7 +84,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
         }
 
         if (value.getThroughDuplicate().getThroughRegister().getThroughDuplicate() instanceof DecrementAVM2Item) {
-            GraphTargetItem inside = ((DecrementAVM2Item) value.getThroughDuplicate().getThroughRegister().getThroughDuplicate()).object.getThroughRegister().getNotCoerced().getThroughDuplicate();
+            GraphTargetItem inside = ((DecrementAVM2Item) value.getThroughDuplicate().getThroughRegister().getThroughDuplicate()).value.getThroughRegister().getNotCoerced().getThroughDuplicate();
             if (inside instanceof GetPropertyAVM2Item) {
                 GetPropertyAVM2Item insideProp = ((GetPropertyAVM2Item) inside);
                 if (insideProp.propertyName.compareSame(multiname)) {
@@ -100,7 +100,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                             if (top == insideProp) {
                                 stack.pop();
                                 stack.push(new PostDecrementAVM2Item(ins, insideProp));
-                            } else if ((top instanceof DecrementAVM2Item) && (((DecrementAVM2Item) top).object == inside)) {
+                            } else if ((top instanceof DecrementAVM2Item) && (((DecrementAVM2Item) top).value == inside)) {
                                 stack.pop();
                                 stack.push(new PreDecrementAVM2Item(ins, insideProp));
                             } else {

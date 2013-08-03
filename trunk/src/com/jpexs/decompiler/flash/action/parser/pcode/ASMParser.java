@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.flashlite.ActionFSCommand2;
 import com.jpexs.decompiler.flash.action.flashlite.ActionStrictMode;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
+import com.jpexs.decompiler.flash.action.special.ActionDeobfuscatePop;
 import com.jpexs.decompiler.flash.action.special.ActionNop;
 import com.jpexs.decompiler.flash.action.special.ActionStore;
 import com.jpexs.decompiler.flash.action.swf3.*;
@@ -282,6 +283,8 @@ public class ASMParser {
                     if (!ignoreNops) {
                         a = (new ActionNop());
                     }
+                } else if (instructionName.equals("FFDec_DeobfuscatePop".toLowerCase())) {
+                    a = new ActionDeobfuscatePop();
                 }/* else if(instructionName.startsWith("ofs")) {
                  continue;
                  }*/ else {

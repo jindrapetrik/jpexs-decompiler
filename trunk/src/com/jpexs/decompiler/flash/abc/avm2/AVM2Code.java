@@ -1483,6 +1483,30 @@ public class AVM2Code implements Serializable {
         code.add(pos, instruction);
     }
 
+    @SuppressWarnings("unchecked")
+    private static List<Object> prepareBranchLocalData(List<Object> localData) {
+        List<Object> ret = new ArrayList<>();
+        ret.add(localData.get(0)); //isStatic
+        ret.add(localData.get(1)); //classIndex
+        ret.add(new HashMap<Integer, GraphTargetItem>((HashMap<Integer, GraphTargetItem>) localData.get(2)));
+        ret.add((Stack<GraphTargetItem>) ((Stack<GraphTargetItem>) localData.get(3)).clone());
+        ret.add(localData.get(4)); //constants
+        ret.add(localData.get(5)); //method_info
+        ret.add(localData.get(6)); //body
+        ret.add(localData.get(7)); //abc
+        ret.add(localData.get(8)); //localgetNames
+        ret.add(localData.get(9));
+        ret.add(localData.get(10));
+        ret.add(localData.get(11));
+        ret.add(localData.get(12));
+        ret.add(localData.get(13));
+        ret.add(localData.get(14));
+        ret.add(localData.get(15));
+        ret.add(localData.get(16));
+        ret.add(localData.get(17));
+        return ret;
+    }
+
     public int removeTraps(ConstantPool constants, MethodBody body, ABC abc, int scriptIndex, int classIndex, boolean isStatic, String path) {
         removeDeadCode(constants, body);
         List<Object> localData = new ArrayList<>();
@@ -2212,6 +2236,14 @@ public class AVM2Code implements Serializable {
 
             }
 
+            int curVisited;
+            if (!visited.containsKey(ip)) {
+                curVisited = 1;
+            } else {
+                curVisited = visited.get(ip) + 1;
+            }
+            visited.put(ip, curVisited);
+
             List<Integer> r = refs.get(ip);
             /*if (r != null) {
              if (r.size() > 1) {
@@ -2245,6 +2277,16 @@ public class AVM2Code implements Serializable {
             }
             if (debugMode) {
                 System.out.println((useVisited ? "useV " : "") + (secondPass ? "secondPass " : "") + "Visit " + ip + ": " + ins + " stack:" + Highlighting.stripHilights(stack.toString()));
+                HashMap<Integer, GraphTargetItem> registers = (HashMap<Integer, GraphTargetItem>) localData.get(2);
+                System.out.print("Registers:");
+                for (int reg : registers.keySet()) {
+                    try {
+                        System.out.print(" r" + reg + ": " + registers.get(reg).getResult());
+                    } catch (NullPointerException npe) {
+                        System.out.print(" r" + reg + ": " + "null");
+                    }
+                }
+                System.out.println("");
             }
             if (secondPass) {
                 /*if ((ins instanceof AVM2Instruction) && (((AVM2Instruction) ins).definition instanceof PopIns)) {
@@ -2349,12 +2391,26 @@ public class AVM2Code implements Serializable {
                         }
                         dec.jumpUsed = true;
                         dec.skipUsed = true;
+
+                        if (curVisited > 1) {
+                            for (int b : branches) {
+                                int visc = 0;
+                                if (visited.containsKey(b)) {
+                                    visc = visited.get(b);
+                                }
+                                if (visc == 0) {//<curVisited){
+                                    ip = b;
+                                    continue iploop;
+                                }
+                            }
+                            break;
+                        }
                     }
 
                     for (int b : branches) {
                         Stack<GraphTargetItem> brStack = (Stack<GraphTargetItem>) stack.clone();
-                        if (b >= 0) {
-                            ret += removeTraps(refs, secondPass, useVisited || (!ins.isJump()), localData, brStack, output, code, b, visited, visitedStates, decisions, path);
+                        if (b >= 0) { //useVisited || (!ins.isJump())
+                            ret += removeTraps(refs, secondPass, false, prepareBranchLocalData(localData), brStack, output, code, b, visited, visitedStates, decisions, path);
                         } else {
                             if (debugMode) {
                                 System.out.println("Negative branch:" + b);
@@ -2375,8 +2431,30 @@ public class AVM2Code implements Serializable {
     public static int removeTraps(ConstantPool constants, MethodBody body, List<Object> localData, AVM2GraphSource code, int addr, String path, HashMap<Integer, List<Integer>> refs) {
         HashMap<GraphSourceItem, AVM2Code.Decision> decisions = new HashMap<>();
         removeTraps(refs, false, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions, path);
-        localData.set(2, new HashMap<Integer, GraphTargetItem>());
-        int cnt = removeTraps(refs, true, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions, path);
+        int cnt = 0;
+        for (GraphSourceItem src : decisions.keySet()) {
+            Decision dec = decisions.get(src);
+            if (dec != null) {
+                if ((src instanceof AVM2Instruction) && (((AVM2Instruction) src).definition instanceof LookupSwitchIns)) {
+                    if (dec.casesUsed.size() == 1) {
+                        for (int c : dec.casesUsed) {
+                            src.setFixBranch(c);
+                            cnt++;
+                        }
+                    }
+                } else {
+                    if (dec.jumpUsed && !dec.skipUsed) {
+                        src.setFixBranch(0);
+                        cnt++;
+                    }
+                    if (!dec.jumpUsed && dec.skipUsed) {
+                        src.setFixBranch(1);
+                        cnt++;
+                    }
+                }
+            }
+        }
+        //int cnt = removeTraps(refs, true, false, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), new HashMap<Integer, Integer>(), new HashMap<Integer, HashMap<Integer, GraphTargetItem>>(), decisions, path);
         code.getCode().removeIgnored(constants, body);
         return cnt;
     }

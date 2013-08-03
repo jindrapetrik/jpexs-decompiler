@@ -77,10 +77,11 @@ public class RenameDialog extends AppDialog implements ActionListener {
         cancelButton.addActionListener(this);
         add(panButtons, BorderLayout.SOUTH);
         setModalityType(ModalityType.APPLICATION_MODAL);
-        View.centerScreen(this);
         View.setWindowIcon(this);
         setTitle(translate("dialog.title"));
         getRootPane().setDefaultButton(okButton);
+        pack();
+        View.centerScreen(this);
     }
 
     @Override

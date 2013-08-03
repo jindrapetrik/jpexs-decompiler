@@ -105,7 +105,7 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
         }
 
         if (value.getNotCoerced().getThroughDuplicate() instanceof IncrementAVM2Item) {
-            GraphTargetItem inside = ((IncrementAVM2Item) value.getNotCoerced()).object.getThroughRegister().getNotCoerced().getThroughDuplicate();
+            GraphTargetItem inside = ((IncrementAVM2Item) value.getNotCoerced()).value.getThroughRegister().getNotCoerced().getThroughDuplicate();
             if (inside instanceof GetSlotAVM2Item) {
                 GetSlotAVM2Item slotItem = (GetSlotAVM2Item) inside;
                 if ((slotItem.scope.getThroughRegister() == obj.getThroughRegister())
@@ -115,7 +115,7 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
                         if (top == inside) {
                             stack.pop();
                             stack.push(new PostIncrementAVM2Item(ins, inside));
-                        } else if ((top instanceof IncrementAVM2Item) && (((IncrementAVM2Item) top).object == inside)) {
+                        } else if ((top instanceof IncrementAVM2Item) && (((IncrementAVM2Item) top).value == inside)) {
                             stack.pop();
                             stack.push(new PreIncrementAVM2Item(ins, inside));
                         } else {
@@ -130,7 +130,7 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
         }
 
         if (value.getNotCoerced().getThroughDuplicate() instanceof DecrementAVM2Item) {
-            GraphTargetItem inside = ((DecrementAVM2Item) value.getNotCoerced()).object.getThroughRegister().getNotCoerced().getThroughDuplicate();
+            GraphTargetItem inside = ((DecrementAVM2Item) value.getNotCoerced()).value.getThroughRegister().getNotCoerced().getThroughDuplicate();
             if (inside instanceof GetSlotAVM2Item) {
                 GetSlotAVM2Item slotItem = (GetSlotAVM2Item) inside;
                 if ((slotItem.scope.getThroughRegister() == obj.getThroughRegister())
@@ -140,7 +140,7 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
                         if (top == inside) {
                             stack.pop();
                             stack.push(new PostDecrementAVM2Item(ins, inside));
-                        } else if ((top instanceof DecrementAVM2Item) && (((DecrementAVM2Item) top).object == inside)) {
+                        } else if ((top instanceof DecrementAVM2Item) && (((DecrementAVM2Item) top).value == inside)) {
                             stack.pop();
                             stack.push(new PreDecrementAVM2Item(ins, inside));
                         } else {

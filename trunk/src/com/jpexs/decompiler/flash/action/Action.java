@@ -536,13 +536,23 @@ public class Action implements GraphSourceItem {
 
                     ret.append(Highlighting.hilighOffset("", offset));
 
+                    if (a instanceof ActionIf) {
+                        ActionIf aif = (ActionIf) a;
+                        if (aif.jumpUsed && !aif.ignoreUsed) {
+                            aif.setFixBranch(0);
+                        }
+                        if (!aif.jumpUsed && aif.ignoreUsed) {
+                            aif.setFixBranch(1);
+                        }
+                    }
+
                     int fixBranch = a.getFixBranch();
                     if (fixBranch > -1) {
                         if (a instanceof ActionIf) {
-                            ret.append("pop\r\n");
+                            ret.append("ffdec_deobfuscatepop\r\n");
                             if (fixBranch == 0) { //jump                               
-                                ret.append("jump ofs");
-                                ret.append(Helper.formatAddress(offset + ((ActionIf) a).getJumpOffset()));
+                                ret.append("jump loc");
+                                ret.append(Helper.formatAddress(a.getAddress() + a.getBytes(version).length + ((ActionIf) a).getJumpOffset()));
                             } else {
                                 //nojump, ignore
                             }
@@ -1337,10 +1347,10 @@ public class Action implements GraphSourceItem {
         if (o instanceof Long) {
             return (Long) o;
         }
-        if(o instanceof String){
-            try{
-                return Double.parseDouble((String)o);
-            }catch(NumberFormatException nfe){
+        if (o instanceof String) {
+            try {
+                return Double.parseDouble((String) o);
+            } catch (NumberFormatException nfe) {
                 return 0;
             }
         }
