@@ -2827,13 +2827,13 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                         break;
                                     }
                                 }
+                                abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setCode("");
                                 abcPanel.navigator.setABC(abcList, scriptLeaf.abc);
                                 abcPanel.navigator.setClassIndex(classIndex, scriptLeaf.scriptIndex);
                                 abcPanel.setAbc(scriptLeaf.abc);
                                 abcPanel.decompiledTextArea.setScript(scriptLeaf, abcList);
                                 abcPanel.decompiledTextArea.setClassIndex(classIndex);
                                 abcPanel.decompiledTextArea.setNoTrait();
-                                abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setCode("");
                                 Main.stopWork();
                             }
                         });
