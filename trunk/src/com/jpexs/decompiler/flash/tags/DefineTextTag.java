@@ -62,8 +62,6 @@ public class DefineTextTag extends TextTag implements DrawableTag {
     public int characterID;
     public RECT textBounds;
     public MATRIX textMatrix;
-    public int glyphBits;
-    public int advanceBits;
     public List<TEXTRECORD> textRecords;
     public static final int ID = 11;
 
@@ -159,10 +157,11 @@ public class DefineTextTag extends TextTag implements DrawableTag {
 
     @Override
     public boolean setFormattedText(MissingCharacterHandler missingCharHandler, List<Tag> tags, String text, String fontName) throws ParseException {
+        List<TEXTRECORD> oldTextRecords = textRecords;
         try {
             TextLexer lexer = new TextLexer(new InputStreamReader(new ByteArrayInputStream(text.getBytes("UTF-8")), "UTF-8"));
             ParsedSymbol s = null;
-            List<TEXTRECORD> textRecords = new ArrayList<>();
+            textRecords = new ArrayList<>();
             RGB color = null;
             int fontId = -1;
             int textHeight = -1;
@@ -171,8 +170,6 @@ public class DefineTextTag extends TextTag implements DrawableTag {
             Integer y = null;
             int currentX = 0;
             int currentY = 0;
-            int glyphBits = 0;
-            int advanceBits = 0;
             int maxX = Integer.MIN_VALUE;
             int minX = Integer.MAX_VALUE;
             MATRIX textMatrix = new MATRIX();
@@ -302,6 +299,7 @@ public class DefineTextTag extends TextTag implements DrawableTag {
                             throw new ParseException("Font not defined", lexer.yyline());
                         }
                         TEXTRECORD tr = new TEXTRECORD();
+                        textRecords.add(tr);
                         if (fontId > -1) {
                             tr.fontId = fontId;
                             tr.textHeight = textHeight;
@@ -327,12 +325,13 @@ public class DefineTextTag extends TextTag implements DrawableTag {
                         tr.glyphEntries = new GLYPHENTRY[txt.length()];
                         for (int i = 0; i < txt.length(); i++) {
                             char c = txt.charAt(i);
-                            tr.glyphEntries[i] = new GLYPHENTRY();
+
                             if (!font.containsChar(tags, c)) {
                                 if (!missingCharHandler.handle(font, tags, c)) {
                                     return false;
                                 }
                             }
+                            tr.glyphEntries[i] = new GLYPHENTRY();
                             tr.glyphEntries[i].glyphIndex = font.charToGlyph(tags, c);
 
                             int advance;
@@ -344,15 +343,9 @@ public class DefineTextTag extends TextTag implements DrawableTag {
                             tr.glyphEntries[i].glyphAdvance = advance;
 
                             currentX += advance;
-                            if (SWFOutputStream.getNeededBitsU(tr.glyphEntries[i].glyphIndex) > glyphBits) {
-                                glyphBits = SWFOutputStream.getNeededBitsU(tr.glyphEntries[i].glyphIndex);
-                            }
-                            if (SWFOutputStream.getNeededBitsS(tr.glyphEntries[i].glyphAdvance) > advanceBits) {
-                                advanceBits = SWFOutputStream.getNeededBitsS(tr.glyphEntries[i].glyphAdvance);
-                            }
 
                         }
-                        textRecords.add(tr);
+
                         if (currentX > maxX) {
                             maxX = currentX;
                         }
@@ -363,9 +356,6 @@ public class DefineTextTag extends TextTag implements DrawableTag {
                 }
 
             }
-            this.advanceBits = advanceBits;
-            this.glyphBits = glyphBits;
-            this.textRecords = textRecords;
             this.textMatrix = textMatrix;
             this.textBounds = textBounds;
             //this.textBounds.Xmin = minX;
@@ -373,7 +363,11 @@ public class DefineTextTag extends TextTag implements DrawableTag {
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(DefineTextTag.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
+            textRecords = oldTextRecords;
             return false;
+        } catch (ParseException ex) {
+            textRecords = oldTextRecords;
+            throw ex;
         }
         return true;
     }
@@ -383,13 +377,11 @@ public class DefineTextTag extends TextTag implements DrawableTag {
         return characterID;
     }
 
-    public DefineTextTag(SWF swf, int characterID, RECT textBounds, MATRIX textMatrix, int glyphBits, int advanceBits, List<TEXTRECORD> textRecords) {
+    public DefineTextTag(SWF swf, int characterID, RECT textBounds, MATRIX textMatrix, List<TEXTRECORD> textRecords) {
         super(swf, ID, "DefineText", new byte[0], 0);
         this.characterID = characterID;
         this.textBounds = textBounds;
         this.textMatrix = textMatrix;
-        this.glyphBits = glyphBits;
-        this.advanceBits = advanceBits;
         this.textRecords = textRecords;
     }
 
@@ -408,6 +400,16 @@ public class DefineTextTag extends TextTag implements DrawableTag {
             sos.writeUI16(characterID);
             sos.writeRECT(textBounds);
             sos.writeMatrix(textMatrix);
+
+            int glyphBits = 0;
+            int advanceBits = 0;
+            for (TEXTRECORD tr : textRecords) {
+                for (GLYPHENTRY ge : tr.glyphEntries) {
+                    glyphBits = SWFOutputStream.enlargeBitCountU(glyphBits, ge.glyphIndex);
+                    advanceBits = SWFOutputStream.enlargeBitCountS(advanceBits, ge.glyphAdvance);
+                }
+            }
+
             sos.writeUI8(glyphBits);
             sos.writeUI8(advanceBits);
             for (TEXTRECORD tr : textRecords) {
@@ -434,8 +436,8 @@ public class DefineTextTag extends TextTag implements DrawableTag {
         characterID = sis.readUI16();
         textBounds = sis.readRECT();
         textMatrix = sis.readMatrix();
-        glyphBits = sis.readUI8();
-        advanceBits = sis.readUI8();
+        int glyphBits = sis.readUI8();
+        int advanceBits = sis.readUI8();
         textRecords = new ArrayList<>();
         TEXTRECORD tr;
         while ((tr = sis.readTEXTRECORD(false, glyphBits, advanceBits)) != null) {

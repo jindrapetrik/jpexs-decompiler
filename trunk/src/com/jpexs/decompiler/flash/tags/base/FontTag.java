@@ -128,6 +128,9 @@ public abstract class FontTag extends CharacterTag implements AloneTag {
                 continue;
             }
             for (GLYPHENTRY en : tr.glyphEntries) {
+                if (en == null) { //Currently edited
+                    continue;
+                }
                 if (en.glyphIndex >= startIndex) {
                     en.glyphIndex++;
                 }

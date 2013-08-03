@@ -3026,7 +3026,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                 rec.add(tr);
                                 mat.translateX = x * width / sloupcu;
                                 mat.translateY = y * height / radku;
-                                sos2.writeTag(new DefineTextTag(null, 999 + f, new RECT(0, width, 0, height), new MATRIX(), SWFOutputStream.getNeededBitsU(countGlyphs - 1), SWFOutputStream.getNeededBitsU(0), rec));
+                                sos2.writeTag(new DefineTextTag(null, 999 + f, new RECT(0, width, 0, height), new MATRIX(), rec));
                                 sos2.writeTag(new PlaceObject2Tag(null, false, false, false, true, false, true, true, false, 1 + f, 999 + f, mat, null, 0, null, 0, null));
                                 x++;
                             }

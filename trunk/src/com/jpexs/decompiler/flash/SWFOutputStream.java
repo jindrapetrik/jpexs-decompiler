@@ -456,6 +456,15 @@ public class SWFOutputStream extends OutputStream {
         }
         return nBits;
     }
+    
+    public static int getNeededBitsU(int first, int... params) {
+        int nBits = 0;
+        nBits = enlargeBitCountU(nBits, first);
+        for (int i = 0; i < params.length; i++) {
+            nBits = enlargeBitCountU(nBits, params[i]);
+        }
+        return nBits;
+    }
 
     private static long getIntPart(double value) {
         if (value < 0) {
@@ -491,8 +500,16 @@ public class SWFOutputStream extends OutputStream {
         return getNeededBitsS(k) + 16;
     }
 
-    private static int enlargeBitCountS(int currentBitCount, int value) {
+    public static int enlargeBitCountS(int currentBitCount, int value) {
         int neededNew = getNeededBitsS(value);
+        if (neededNew > currentBitCount) {
+            return neededNew;
+        }
+        return currentBitCount;
+    }
+    
+    public static int enlargeBitCountU(int currentBitCount, int value) {
+        int neededNew = getNeededBitsU(value);
         if (neededNew > currentBitCount) {
             return neededNew;
         }

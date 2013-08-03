@@ -23,7 +23,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.DecLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.NotCompileTimeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.SubtractAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.graph.GraphTargetItem;

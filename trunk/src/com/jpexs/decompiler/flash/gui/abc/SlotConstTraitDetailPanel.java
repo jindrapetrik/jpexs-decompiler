@@ -25,12 +25,8 @@ import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import java.awt.BorderLayout;
-import java.awt.Font;
 import java.util.ArrayList;
 import javax.swing.*;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
 import jsyntaxpane.syntaxkits.Flasm3MethodInfoSyntaxKit;
 
 /**
