@@ -97,6 +97,12 @@ public class Main {
     public static MainFrame mainFrame;
     private static final int UPDATE_SYSTEM_MAJOR = 1;
     private static final int UPDATE_SYSTEM_MINOR = 0;
+    private static String commandlineConfigBoolean[] = new String[]{
+        "decompile",
+        "paralelSpeedUp",
+        "internalFlashViewer",
+        "autoDeobfuscate",
+        "cacheOnDisk"};
 
     private static void loadProperties() {
         Properties prop = new Properties();
@@ -225,16 +231,16 @@ public class Main {
     public static void saveFile(String outfile) throws IOException {
         file = outfile;
         File outfileF = new File(outfile);
-        File tmpFile = new File(outfile+".tmp");
+        File tmpFile = new File(outfile + ".tmp");
         swf.saveTo(new FileOutputStream(tmpFile));
-        if(tmpFile.exists()){
-            if(tmpFile.length() > 0){    
+        if (tmpFile.exists()) {
+            if (tmpFile.length() > 0) {
                 outfileF.delete();
                 if (!tmpFile.renameTo(outfileF)) {
                     tmpFile.delete();
                     throw new IOException("Cannot access " + outfile);
                 }
-            }else{
+            } else {
                 throw new IOException("Output is empty");
             }
         }
@@ -493,6 +499,15 @@ public class Main {
         System.out.println("  ...Compress SWF infile and save it to outfile");
         System.out.println(" 7) -decompress infile outfile");
         System.out.println("  ...Decompress infile and save it to outfile");
+        System.out.println(" 8) -config key=value[,key2=value2][,key3=value3...] [other parameters]");
+        System.out.print("  ...Sets configuration values. Available keys:");
+        for (String key : commandlineConfigBoolean) {
+            System.out.print(" " + key);
+        }
+        System.out.println("");
+        System.out.println("    Values are boolean, you can use 0/1, true/false or yes/no.");
+        System.out.println("    If no other parameters passed, configuration is saved. Otherwise it is used only once.");
+        System.out.println("    DO NOT PUT space between comma (,) and next value.");
         System.out.println();
         System.out.println("Examples:");
         System.out.println("java -jar ffdec.jar myfile.swf");
@@ -504,6 +519,7 @@ public class Main {
         System.out.println("java -jar ffdec.jar -dumpSWF myfile.swf");
         System.out.println("java -jar ffdec.jar -compress myfile.swf myfiledec.swf");
         System.out.println("java -jar ffdec.jar -decompress myfiledec.swf myfile.swf");
+        System.out.println("java -jar ffdec.jar -config autoDeobfuscate=1,paralelSpeedUp=0 -export as \"C:\\decompiled\\\" myfile.swf");
     }
 
     private static void offerAssociation() {
@@ -652,12 +668,7 @@ public class Main {
                     cfgs = new String[]{cfgStr};
                 }
 
-                String booleanKeys[] = new String[]{
-                    "decompile",
-                    "paralelSpeedUp",
-                    "internalFlashViewer",
-                    "autoDeobfuscate",
-                    "cacheOnDisk"};
+
 
                 for (String c : cfgs) {
                     String cp[];
@@ -668,7 +679,7 @@ public class Main {
                     }
                     String key = cp[0];
                     String value = cp[1];
-                    for (String bk : booleanKeys) {
+                    for (String bk : commandlineConfigBoolean) {
                         if (key.toLowerCase().equals(bk.toLowerCase())) {
                             Boolean bValue = null;
                             if (value.equals("0") || value.toLowerCase().equals("false") || value.toLowerCase().equals("no") || value.toLowerCase().equals("off")) {
