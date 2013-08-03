@@ -26,9 +26,21 @@ import java.util.List;
  */
 public class TemporaryRegister extends GraphTargetItem {
 
-    public TemporaryRegister(GraphTargetItem value) {
+    private int regId;
+
+    public TemporaryRegister(int regId, GraphTargetItem value) {
         super(value.src, value.precedence);
         this.value = value;
+        this.regId = regId;
+    }
+
+    public int getRegId() {
+        return regId;
+    }
+
+    @Override
+    public String toString() {
+        return "temp reg " + regId + ":" + value.toString();
     }
 
     @Override

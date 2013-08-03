@@ -29,6 +29,7 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
     public RegisterNumber register;
     //public GraphTargetItem value;
     public boolean define = false;
+    public boolean temporary = false;
 
     @Override
     public GraphPart getFirstPart() {
@@ -65,7 +66,7 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
 
     @Override
     public String toString(ConstantPool constants) {
-        return (define ? hilight("var ") : "") + hilight(register.translate() + " = ") + value.toString(constants);
+        return temporary ? value.toString(constants) : ((define ? hilight("var ") : "") + hilight(register.translate() + " = ") + value.toString(constants));
     }
 
     @Override
