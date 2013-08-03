@@ -89,4 +89,14 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
     public boolean hasReturnValue() {
         return true;
     }
+
+    @Override
+    public boolean isCompileTime() {
+        return value.isCompileTime();
+    }
+
+    @Override
+    public Object getResult() {
+        return value.getResult();
+    }
 }
