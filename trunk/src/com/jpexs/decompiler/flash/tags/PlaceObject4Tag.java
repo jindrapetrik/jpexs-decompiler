@@ -41,11 +41,11 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Extends the functionality of the PlaceObject2Tag
+ * Same as PlaceObject3Tag except additional AMF data
  *
  * @author JPEXS
  */
-public class PlaceObject3Tag extends CharacterIdTag implements Container, PlaceObjectTypeTag {
+public class PlaceObject4Tag extends CharacterIdTag implements Container, PlaceObjectTypeTag {
 
     /**
      * @since SWF 5 has clip actions (sprite characters only)
@@ -170,7 +170,8 @@ public class PlaceObject3Tag extends CharacterIdTag implements Container, PlaceO
     // FIXME bug found in ecoDrive.swf, 
     private boolean bitmapCacheBug;
     private int reserved;
-    public static final int ID = 70;
+    public static final int ID = 94;
+    public byte amfData[];  //TODO: Parse AMF data?
 
     @Override
     public List<FILTER> getFilters() {
@@ -274,14 +275,14 @@ public class PlaceObject3Tag extends CharacterIdTag implements Container, PlaceO
     /**
      * Constructor
      *
-     * @param swf 
+     * @param swf
      * @param data Data bytes
      * @param version SWF version
      * @param pos
      * @throws IOException
      */
-    public PlaceObject3Tag(SWF swf, byte data[], int version, long pos) throws IOException {
-        super(swf, ID, "PlaceObject3", data, pos);
+    public PlaceObject4Tag(SWF swf, byte data[], int version, long pos) throws IOException {
+        super(swf, ID, "PlaceObject4", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         placeFlagHasClipActions = sis.readUB(1) == 1;
         placeFlagHasClipDepth = sis.readUB(1) == 1;
@@ -348,6 +349,7 @@ public class PlaceObject3Tag extends CharacterIdTag implements Container, PlaceO
         if (placeFlagHasClipActions) {
             clipActions = sis.readCLIPACTIONS();
         }
+        amfData = sis.readBytes(sis.available());
     }
 
     /**

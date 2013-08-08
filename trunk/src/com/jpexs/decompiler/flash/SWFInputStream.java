@@ -1281,7 +1281,7 @@ public class SWFInputStream extends InputStream {
                 case 2:
                     ret = new DefineShapeTag(swf, data, version, pos);
                     break;
-                //case 3
+                //case 3: FreeCharacter
                 case 4:
                     ret = new PlaceObjectTag(swf, data, version, pos);
                     break;
@@ -1318,7 +1318,7 @@ public class SWFInputStream extends InputStream {
                 case 15:
                     ret = new StartSoundTag(swf, data, version, pos);
                     break;
-                //case 16
+                //case 16:
                 case 17:
                     ret = new DefineButtonSoundTag(swf, data, version, pos);
                     break;
@@ -1343,7 +1343,7 @@ public class SWFInputStream extends InputStream {
                 case 24:
                     ret = new ProtectTag(swf, data, version, pos);
                     break;
-                //case 25:
+                //case 25: PathsArePostscript
                 case 26:
                     ret = new PlaceObject2Tag(swf, data, version, pos);
                     break;
@@ -1351,9 +1351,9 @@ public class SWFInputStream extends InputStream {
                 case 28:
                     ret = new RemoveObject2Tag(swf, data, version, pos);
                     break;
-                //case 29:
+                //case 29: SyncFrame
                 //case 30:
-                //case 31: 
+                //case 31: FreeAll
                 case 32:
                     ret = new DefineShape3Tag(swf, data, version, pos);
                     break;
@@ -1372,15 +1372,15 @@ public class SWFInputStream extends InputStream {
                 case 37:
                     ret = new DefineEditTextTag(swf, data, version, pos);
                     break;
-                //case 38:
+                //case 38: DefineVideo
                 case 39:
                     ret = new DefineSpriteTag(swf, data, version, level, pos, paralel, skipUnusualTags);
                     break;
-                //case 40:
+                //case 40: NameCharacter
                 case 41:
                     ret = new ProductInfoTag(swf, data, version, pos);
                     break;
-                //case 42:
+                //case 42: DefineTextFormat
                 case 43:
                     ret = new FrameLabelTag(swf, data, version, pos);
                     break;
@@ -1391,11 +1391,15 @@ public class SWFInputStream extends InputStream {
                 case 46:
                     ret = new DefineMorphShapeTag(swf, data, version, pos);
                     break;
-                //case 47:
+                //case 47: GenerateFrame
                 case 48:
                     ret = new DefineFont2Tag(swf, data, version, pos);
                     break;
-                //case 49-55:
+                //case 49: GeneratorCommand
+                //case 50: DefineCommandObject
+                //case 51: CharacterSet
+                //case 52: ExternalFont
+                //case 53-55
                 case 56:
                     ret = new ExportAssetsTag(swf, data, version, pos);
                     break;
@@ -1488,6 +1492,13 @@ public class SWFInputStream extends InputStream {
                     break;
                 case 91:
                     ret = new DefineFont4Tag(swf, data, version, pos);
+                    break;
+                //case 92: certificate
+                case 93:
+                    ret = new EnableTelemetryTag(swf, data, version, pos);
+                    break;
+                case 94:
+                    ret = new PlaceObject4Tag(swf, data, version, pos);
                     break;
                 default:
                     ret = new Tag(swf, tag.getId(), "Unknown", data, pos);
