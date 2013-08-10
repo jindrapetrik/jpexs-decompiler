@@ -72,7 +72,7 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
         }
         cnt.setBorder(new EmptyBorder(10, 10, 10, 10));
         cnt.setLayout(new BoxLayout(cnt, BoxLayout.Y_AXIS));
-        JLabel langLabel = new JLabel("Language:");
+        JLabel langLabel = new JLabel(translate("language.label"));
         langLabel.setAlignmentX(0.5f);
         cnt.add(langLabel);
         languageCombobox.setAlignmentX(0.5f);
@@ -92,7 +92,7 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
         setModalityType(ModalityType.APPLICATION_MODAL);
         View.setWindowIcon(this);
         View.centerScreen(this);
-        setTitle("Select language");
+        setTitle(translate("dialog.title"));
         pack();
     }
 
@@ -103,7 +103,16 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
                 if (languageCombobox.getSelectedIndex() == -1) {
                 } else {
                     languageCode = ((Language) languageCombobox.getSelectedItem()).code;
+                    String newLanguage = languageCode;
+                    if (newLanguage.equals("en")) {
+                        newLanguage = "";
+                    }
+                    Configuration.setConfig("locale", newLanguage);
+                    Locale.setDefault(Locale.forLanguageTag(newLanguage));
+                    updateLanguage();
                     setVisible(false);
+                    AppStrings.updateLanguage();                                     
+                    Main.reloadApp();
                 }
                 break;
             case "CANCEL":

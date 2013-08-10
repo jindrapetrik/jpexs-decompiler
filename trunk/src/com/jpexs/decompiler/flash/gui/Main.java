@@ -286,6 +286,27 @@ public class Main {
             return true;
         }
     }
+    
+    public static void reloadApp(){
+        if(loadingDialog!=null){
+            loadingDialog.setVisible(false);
+            loadingDialog = null;
+        }
+        if(proxyFrame!=null){
+            proxyFrame.setVisible(false);
+            proxyFrame = null;
+        }
+        if(Main.file == null){
+            mainFrame.setVisible(false);
+            Helper.emptyObject(mainFrame);
+            Cache.clearAll();
+            System.gc();
+            mainFrame = null;            
+            showModeFrame();
+        }else{
+            openFile(Main.file);
+        }
+    }
 
     public static boolean openFile(String swfFile) {
         if (mainFrame != null) {

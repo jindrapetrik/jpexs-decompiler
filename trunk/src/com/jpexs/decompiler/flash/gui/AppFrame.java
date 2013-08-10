@@ -33,4 +33,8 @@ public abstract class AppFrame extends JFrame {
     public String translate(String key) {
         return resourceBundle.getString(key);
     }
+    
+    public void updateLanguage(){
+        resourceBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(getClass()));
+    }
 }

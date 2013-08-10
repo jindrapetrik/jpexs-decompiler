@@ -43,4 +43,8 @@ public class AppStrings {
         ResourceBundle b = ResourceBundle.getBundle(bundle);
         return b.getString(key);
     }
+    
+    public static void updateLanguage(){
+        resourceBundle = ResourceBundle.getBundle(getResourcePath(MainFrame.class));
+    }
 }

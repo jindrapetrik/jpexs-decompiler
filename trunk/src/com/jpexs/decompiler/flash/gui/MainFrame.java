@@ -2210,15 +2210,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 }
                 break;
             case "SETLANGUAGE":
-                String newLanguage = new SelectLanguageDialog().display();
-                if (newLanguage != null) {
-                    if (newLanguage.equals("en")) {
-                        newLanguage = "";
-                    }
-                    Configuration.setConfig("locale", newLanguage);
-                    View.showMessageDialog(null, "Changing language needs application restart.\r\nApplication will exit now, please run it again.");
-                    Main.exit();
-                }
+                new SelectLanguageDialog().display();
                 break;
             case "DISABLEDECOMPILATION":
                 Configuration.setConfig("decompile", !miDecompile.isSelected());
