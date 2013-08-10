@@ -23,6 +23,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Locale;
+import java.util.ResourceBundle;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -38,7 +39,7 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
 
     JComboBox<Language> languageCombobox = new JComboBox<>();
     public String languageCode = null;
-    private String languages[] = new String[]{"en", "cs", "hu", "ru", "sv"};
+    private String languages[] = new String[]{"en", "cs", "de", "hu", "ru", "sv"};
 
     public SelectLanguageDialog() {
         setSize(350, 130);
@@ -52,7 +53,7 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
         boolean found = false;
         int enIndex = 0;
         for (String code : languages) {
-            String name = new Locale(code).getDisplayName();
+            String name = ResourceBundle.getBundle(AppStrings.getResourcePath(getClass()), Locale.forLanguageTag(code.equals("en")?"":code)).getString("language");            
             if (name.length() > 1) {
                 name = name.substring(0, 1).toUpperCase() + name.substring(1);
             }

@@ -2275,12 +2275,19 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                             (new Thread() {
                                 @Override
                                 public void run() {
-                                    if (abcPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
-                                        showDetail(DETAILCARDAS3NAVIGATOR);
-                                        showCard(CARDACTIONSCRIPTPANEL);
-                                    } else {
-                                        View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
-                                    }
+                                    View.execInEventDispatch(new Runnable() {
+
+                                        @Override
+                                        public void run() {
+                                            if (abcPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
+                                                showDetail(DETAILCARDAS3NAVIGATOR);
+                                                showCard(CARDACTIONSCRIPTPANEL);
+                                            } else {
+                                                View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
+                                            }
+                                        }
+                                    });
+                                    
                                 }
                             }).start();
                         } else {
