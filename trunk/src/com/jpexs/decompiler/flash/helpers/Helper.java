@@ -436,6 +436,12 @@ public class Helper {
             }
         }
         str = sb.toString();
+        if (str.endsWith(" ")) {
+            str = str.substring(0, str.length() - 1) + "%20";
+        }
+        if (str.endsWith(".")) {
+            str = str.substring(0, str.length() - 1) + "%2E";
+        }
         str = "." + str + ".";
         for (String inv : invalidFilenamesParts) {
             str = Pattern.compile("\\." + Pattern.quote(inv) + "\\.", Pattern.CASE_INSENSITIVE).matcher(str).replaceAll("._" + inv + ".");
