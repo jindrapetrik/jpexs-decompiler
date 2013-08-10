@@ -338,7 +338,7 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         }
         if (!cache.contains(scriptLeaf)) {
             for (int scriptTraitIndex : scriptLeaf.traitIndices) {
-                hilightedCodeBuf.append(script.traits.traits[scriptTraitIndex].convertPackaged(scriptLeaf.getPath().toString(), abcList, abc, false, false, scriptIndex, -1, true, new ArrayList<String>(), (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE)));
+                hilightedCodeBuf.append(script.traits.traits[scriptTraitIndex].convertPackaged(scriptLeaf.getPath().toString(), abcList, abc, false, false, scriptIndex, -1, true, new ArrayList<String>(), (Boolean) Configuration.getConfig("parallelSpeedUp", Boolean.TRUE)));
             }
 
             hilightedCode = hilightedCodeBuf.toString();

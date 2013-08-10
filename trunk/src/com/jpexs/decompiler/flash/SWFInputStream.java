@@ -1129,15 +1129,15 @@ public class SWFInputStream extends InputStream {
         private final Tag tag;
         private final int version;
         private final int level;
-        private boolean paralel;
+        private boolean parallel;
         private boolean skipUnusualTags;
         private SWF swf;
 
-        public TagResolutionTask(SWF swf, Tag tag, int version, int level, boolean paralel, boolean skipUnusualTags) {
+        public TagResolutionTask(SWF swf, Tag tag, int version, int level, boolean parallel, boolean skipUnusualTags) {
             this.tag = tag;
             this.version = version;
             this.level = level;
-            this.paralel = paralel;
+            this.parallel = parallel;
             this.skipUnusualTags = skipUnusualTags;
             this.swf = swf;
         }
@@ -1145,7 +1145,7 @@ public class SWFInputStream extends InputStream {
         @Override
         public Tag call() throws Exception {
             try {
-                return SWFInputStream.resolveTag(swf, tag, version, level, paralel, skipUnusualTags);
+                return SWFInputStream.resolveTag(swf, tag, version, level, parallel, skipUnusualTags);
             } catch (Exception ex) {
                 return null;
             }
@@ -1158,12 +1158,12 @@ public class SWFInputStream extends InputStream {
      *
      * @param swf
      * @param level
-     * @param paralel
+     * @param parallel
      * @return List of tags
      * @throws IOException
      */
-    public List<Tag> readTagList(SWF swf, int level, boolean paralel) throws IOException {
-        return readTagList(swf, level, paralel, false);
+    public List<Tag> readTagList(SWF swf, int level, boolean parallel) throws IOException {
+        return readTagList(swf, level, parallel, false);
     }
 
     /**
@@ -1172,17 +1172,15 @@ public class SWFInputStream extends InputStream {
      *
      * @param swf
      * @param level
-     * @param paralel
+     * @param parallel
      * @param skipUnusualTags
      * @return List of tags
      * @throws IOException
      */
-    public List<Tag> readTagList(SWF swf, int level, boolean paralel, boolean skipUnusualTags) throws IOException {
+    public List<Tag> readTagList(SWF swf, int level, boolean parallel, boolean skipUnusualTags) throws IOException {
         ExecutorService executor = null;
-        if (paralel) {
+        if (parallel) {
             executor = Executors.newFixedThreadPool(20);
-        } else {
-            executor = Executors.newFixedThreadPool(1);
         }
         List<Future<Tag>> futureResults = new ArrayList<>();
         List<Tag> tags = new ArrayList<>();
@@ -1192,12 +1190,15 @@ public class SWFInputStream extends InputStream {
         while (true) {
             long pos = getPos();
             try {
-                tag = readTag(swf, level, pos, false, paralel, skipUnusualTags);
+                tag = readTag(swf, level, pos, !parallel, parallel, skipUnusualTags);
             } catch (EndOfStreamException ex) {
                 tag = null;
             }
             if (tag == null) {
                 break;
+            }
+            if(!parallel){
+                tags.add(tag);
             }
             if (Configuration.dump_tags && level == 0) {
                 dumpTag(System.out, version, tag, level);
@@ -1210,7 +1211,7 @@ public class SWFInputStream extends InputStream {
             } else {
                 switch (tag.getId()) {
                     case FileAttributesTag.ID: //FileAttributes
-                        FileAttributesTag fileAttributes = (FileAttributesTag) resolveTag(swf, tag, version, level, paralel, skipUnusualTags);
+                        FileAttributesTag fileAttributes = (FileAttributesTag) resolveTag(swf, tag, version, level, parallel, skipUnusualTags);
                         if (fileAttributes.actionScript3) {
                             isAS3 = true;
                         }
@@ -1249,23 +1250,28 @@ public class SWFInputStream extends InputStream {
             }
 
             if (doParse) {
-                Future<Tag> future = executor.submit(new TagResolutionTask(swf, tag, version, level, paralel, skipUnusualTags));
-                futureResults.add(future);
+                if (parallel) {
+                    Future<Tag> future = executor.submit(new TagResolutionTask(swf, tag, version, level, parallel, skipUnusualTags));
+                    futureResults.add(future);
+                }
             }
         }
 
-        for (Future<Tag> future : futureResults) {
-            try {
-                tags.add(future.get());
-            } catch (Exception e) {
-                Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "Error during tag reading", e);
+        if (parallel) {
+            for (Future<Tag> future : futureResults) {
+                try {
+                    tags.add(future.get());
+                } catch (Exception e) {
+                    Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "Error during tag reading", e);
+                }
             }
+
+            executor.shutdown();
         }
-        executor.shutdown();
         return tags;
     }
 
-    public static Tag resolveTag(SWF swf, Tag tag, int version, int level, boolean paralel, boolean skipUnusualTags) {
+    public static Tag resolveTag(SWF swf, Tag tag, int version, int level, boolean parallel, boolean skipUnusualTags) {
         Tag ret;
 
         byte data[] = tag.getData(version);
@@ -1374,7 +1380,7 @@ public class SWFInputStream extends InputStream {
                     break;
                 //case 38: DefineVideo
                 case 39:
-                    ret = new DefineSpriteTag(swf, data, version, level, pos, paralel, skipUnusualTags);
+                    ret = new DefineSpriteTag(swf, data, version, level, pos, parallel, skipUnusualTags);
                     break;
                 //case 40: NameCharacter
                 case 41:
@@ -1518,13 +1524,13 @@ public class SWFInputStream extends InputStream {
      * @param swf
      * @param level
      * @param pos
-     * @param paralel
+     * @param parallel
      * @param skipUnusualTags
      * @return Tag or null when End tag
      * @throws IOException
      */
-    public Tag readTag(SWF swf, int level, long pos, boolean paralel, boolean skipUnusualTags) throws IOException {
-        return readTag(swf, level, pos, true, paralel, skipUnusualTags);
+    public Tag readTag(SWF swf, int level, long pos, boolean parallel, boolean skipUnusualTags) throws IOException {
+        return readTag(swf, level, pos, true, parallel, skipUnusualTags);
     }
 
     /**
@@ -1535,12 +1541,12 @@ public class SWFInputStream extends InputStream {
      * @param level
      * @param pos
      * @param resolve
-     * @param paralel
+     * @param parallel
      * @param skipUnusualTags
      * @return Tag or null when End tag
      * @throws IOException
      */
-    public Tag readTag(SWF swf, int level, long pos, boolean resolve, boolean paralel, boolean skipUnusualTags) throws IOException {
+    public Tag readTag(SWF swf, int level, long pos, boolean resolve, boolean parallel, boolean skipUnusualTags) throws IOException {
         int tagIDTagLength = readUI16();
         int tagID = (tagIDTagLength) >> 6;
         if (tagID == 0) {
@@ -1589,7 +1595,7 @@ public class SWFInputStream extends InputStream {
             }
         }
         if (resolve) {
-            return resolveTag(swf, ret, version, level, paralel, skipUnusualTags);
+            return resolveTag(swf, ret, version, level, parallel, skipUnusualTags);
         }
         return ret;
     }

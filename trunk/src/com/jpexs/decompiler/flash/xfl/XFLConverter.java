@@ -2533,7 +2533,7 @@ public class XFLConverter {
         return ret;
     }
 
-    public static void convertSWF(AbortRetryIgnoreHandler handler, SWF swf, String swfFileName, String outfile, boolean compressed, String generator, String generatorVerName, String generatorVersion, boolean paralel) throws IOException {
+    public static void convertSWF(AbortRetryIgnoreHandler handler, SWF swf, String swfFileName, String outfile, boolean compressed, String generator, String generatorVerName, String generatorVersion, boolean parallel) throws IOException {
         File file = new File(outfile);
         File outDir = file.getParentFile();
         if (!outDir.exists()) {
@@ -2906,7 +2906,7 @@ public class XFLConverter {
         }
         if (useAS3) {
             try {
-                swf.exportActionScript(handler, outDir.getAbsolutePath(), false, paralel);
+                swf.exportActionScript(handler, outDir.getAbsolutePath(), false, parallel);
             } catch (Exception ex) {
                 Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Error during ActionScript3 export", ex);
             }

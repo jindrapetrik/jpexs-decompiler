@@ -677,7 +677,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         miInternalViewer.addActionListener(this);
 
         //miParallelSpeedUp = new JCheckBox(translate("menu.settings.parallelspeedup"));
-        miParallelSpeedUp.setSelected((Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+        miParallelSpeedUp.setSelected((Boolean) Configuration.getConfig("parallelSpeedUp", Boolean.TRUE));
         miParallelSpeedUp.setActionCommand("PARALLELSPEEDUP");
         miParallelSpeedUp.addActionListener(this);
 
@@ -2117,7 +2117,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
             for (int i = 0; i < tlsList.size(); i++) {
                 ScriptPack tls = tlsList.get(i);
                 Main.startWork(translate("work.exporting") + " " + (i + 1) + "/" + tlsList.size() + " " + tls.getPath() + " ...");
-                ret.add(tls.export(selFile, abcList, isPcode, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE)));
+                ret.add(tls.export(selFile, abcList, isPcode, (Boolean) Configuration.getConfig("parallelSpeedUp", Boolean.TRUE)));
             }
         } else {
             List<TagNode> allNodes = new ArrayList<>();
@@ -2246,7 +2246,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                     confStr += " " + translate("message.confirm.off");
                 }
                 if (View.showConfirmDialog(null, confStr, translate("message.parallel"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-                    Configuration.setConfig("paralelSpeedUp", (Boolean) miParallelSpeedUp.isSelected());
+                    Configuration.setConfig("parallelSpeedUp", (Boolean) miParallelSpeedUp.isSelected());
                 } else {
                     miParallelSpeedUp.setSelected(!miParallelSpeedUp.isSelected());
                 }
@@ -2544,9 +2544,9 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                         public void run() {
                             try {
                                 if (compressed) {
-                                    swf.exportFla(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                                    swf.exportFla(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, (Boolean) Configuration.getConfig("parallelSpeedUp", Boolean.TRUE));
                                 } else {
-                                    swf.exportXfl(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                                    swf.exportXfl(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, (Boolean) Configuration.getConfig("parallelSpeedUp", Boolean.TRUE));
                                 }
                             } catch (IOException ex) {
                                 View.showMessageDialog(null, translate("error.export") + ": " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -2588,7 +2588,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                         swf.exportMovies(errorHandler, selFile + File.separator + "movies");
                                         swf.exportSounds(errorHandler, selFile + File.separator + "sounds", isMp3OrWav, isMp3OrWav);
                                         swf.exportBinaryData(errorHandler, selFile + File.separator + "binaryData");
-                                        swf.exportActionScript(errorHandler, selFile, isPcode, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                                        swf.exportActionScript(errorHandler, selFile, isPcode, (Boolean) Configuration.getConfig("parallelSpeedUp", Boolean.TRUE));
                                     }
                                 } catch (Exception ex) {
                                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Error during export", ex);

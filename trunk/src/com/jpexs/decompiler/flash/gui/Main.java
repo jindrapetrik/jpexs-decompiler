@@ -99,7 +99,7 @@ public class Main {
     private static final int UPDATE_SYSTEM_MINOR = 0;
     private static String commandlineConfigBoolean[] = new String[]{
         "decompile",
-        "paralelSpeedUp",
+        "parallelSpeedUp",
         "internalFlashViewer",
         "autoDeobfuscate",
         "cacheOnDisk"};
@@ -206,7 +206,7 @@ public class Main {
                 public void percent(int p) {
                     startWork(translate("work.reading.swf"), p);
                 }
-            }, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+            }, (Boolean) Configuration.getConfig("parallelSpeedUp", Boolean.TRUE));
             locswf.addEventListener(new EventListener() {
                 @Override
                 public void handleEvent(String event, Object data) {
@@ -286,24 +286,24 @@ public class Main {
             return true;
         }
     }
-    
-    public static void reloadApp(){
-        if(loadingDialog!=null){
+
+    public static void reloadApp() {
+        if (loadingDialog != null) {
             loadingDialog.setVisible(false);
             loadingDialog = null;
         }
-        if(proxyFrame!=null){
+        if (proxyFrame != null) {
             proxyFrame.setVisible(false);
             proxyFrame = null;
         }
-        if(Main.file == null){
+        if (Main.file == null) {
             mainFrame.setVisible(false);
             Helper.emptyObject(mainFrame);
             Cache.clearAll();
             System.gc();
-            mainFrame = null;            
+            mainFrame = null;
             showModeFrame();
-        }else{
+        } else {
             openFile(Main.file);
         }
     }
@@ -540,7 +540,7 @@ public class Main {
         System.out.println("java -jar ffdec.jar -dumpSWF myfile.swf");
         System.out.println("java -jar ffdec.jar -compress myfile.swf myfiledec.swf");
         System.out.println("java -jar ffdec.jar -decompress myfiledec.swf myfile.swf");
-        System.out.println("java -jar ffdec.jar -config autoDeobfuscate=1,paralelSpeedUp=0 -export as \"C:\\decompiled\\\" myfile.swf");
+        System.out.println("java -jar ffdec.jar -config autoDeobfuscate=1,parallelSpeedUp=0 -export as \"C:\\decompiled\\\" myfile.swf");
         System.out.println("");
         System.out.println("Instead of \"java -jar ffdec.jar\" you can use ffdec.bat on Windows, ffdec.sh on Linux/MacOs");
     }
@@ -702,6 +702,9 @@ public class Main {
                     }
                     String key = cp[0];
                     String value = cp[1];
+                    if (key.toLowerCase().equals("paralelSpeedUp".toLowerCase())) {
+                        key = "parallelSpeedUp";
+                    }
                     for (String bk : commandlineConfigBoolean) {
                         if (key.toLowerCase().equals(bk.toLowerCase())) {
                             Boolean bValue = null;
@@ -806,7 +809,7 @@ public class Main {
                 boolean exportOK;
                 try {
                     printHeader();
-                    SWF exfile = new SWF(new FileInputStream(inFile), (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                    SWF exfile = new SWF(new FileInputStream(inFile), (Boolean) Configuration.getConfig("parallelSpeedUp", Boolean.TRUE));
                     exfile.addEventListener(new EventListener() {
                         @Override
                         public void handleEvent(String event, Object data) {
@@ -823,7 +826,7 @@ public class Main {
                             System.out.println("Exporting shapes...");
                             exfile.exportShapes(handler, outDir.getAbsolutePath() + File.separator + "shapes");
                             System.out.println("Exporting scripts...");
-                            exfile.exportActionScript(handler, outDir.getAbsolutePath() + File.separator + "scripts", false, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                            exfile.exportActionScript(handler, outDir.getAbsolutePath() + File.separator + "scripts", false, (Boolean) Configuration.getConfig("parallelSpeedUp", Boolean.TRUE));
                             System.out.println("Exporting movies...");
                             exfile.exportMovies(handler, outDir.getAbsolutePath() + File.separator + "movies");
                             System.out.println("Exporting sounds...");
@@ -847,10 +850,10 @@ public class Main {
                             if ((pos + 5 < args.length) && (args[pos + 4].equals("-selectas3class"))) {
                                 exportOK = true;
                                 for (int i = pos + 5; i < args.length; i++) {
-                                    exportOK = exportOK && exfile.exportAS3Class(args[i], outDir.getAbsolutePath(), exportFormat.equals("pcode"), (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                                    exportOK = exportOK && exfile.exportAS3Class(args[i], outDir.getAbsolutePath(), exportFormat.equals("pcode"), (Boolean) Configuration.getConfig("parallelSpeedUp", Boolean.TRUE));
                                 }
                             } else {
-                                exportOK = !exfile.exportActionScript(handler, outDir.getAbsolutePath(), exportFormat.equals("pcode"), (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE)).isEmpty();
+                                exportOK = !exfile.exportActionScript(handler, outDir.getAbsolutePath(), exportFormat.equals("pcode"), (Boolean) Configuration.getConfig("parallelSpeedUp", Boolean.TRUE)).isEmpty();
                             }
                             break;
                         case "movie":
@@ -874,11 +877,11 @@ public class Main {
                             exportOK = true;
                             break;
                         case "fla":
-                            exfile.exportFla(handler, outDir.getAbsolutePath(), inFile.getName(), applicationName, applicationVerName, version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                            exfile.exportFla(handler, outDir.getAbsolutePath(), inFile.getName(), applicationName, applicationVerName, version, (Boolean) Configuration.getConfig("parallelSpeedUp", Boolean.TRUE));
                             exportOK = true;
                             break;
                         case "xfl":
-                            exfile.exportXfl(handler, outDir.getAbsolutePath(), inFile.getName(), applicationName, applicationVerName, version, (Boolean) Configuration.getConfig("paralelSpeedUp", Boolean.TRUE));
+                            exfile.exportXfl(handler, outDir.getAbsolutePath(), inFile.getName(), applicationName, applicationVerName, version, (Boolean) Configuration.getConfig("parallelSpeedUp", Boolean.TRUE));
                             exportOK = true;
                             break;
                         default:
@@ -925,6 +928,7 @@ public class Main {
                 }
                 try {
                     Configuration.dump_tags = true;
+                    Configuration.setConfig("parallelSpeedUp", false);
                     SWF swf = parseSWF(args[pos + 1]);
                 } catch (Exception ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);

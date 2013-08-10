@@ -79,9 +79,9 @@ public class Traits implements Serializable {
         boolean highlighting;
         List<String> fullyQualifiedNames;
         int traitIndex;
-        boolean paralel;
+        boolean parallel;
 
-        public TraitConvertTask(Trait trait, boolean makePackages, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlighting, List<String> fullyQualifiedNames, int traitIndex, boolean paralel) {
+        public TraitConvertTask(Trait trait, boolean makePackages, String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, int scriptIndex, int classIndex, boolean highlighting, List<String> fullyQualifiedNames, int traitIndex, boolean parallel) {
             this.trait = trait;
             this.makePackages = makePackages;
             this.path = path;
@@ -94,16 +94,16 @@ public class Traits implements Serializable {
             this.highlighting = highlighting;
             this.fullyQualifiedNames = fullyQualifiedNames;
             this.traitIndex = traitIndex;
-            this.paralel = paralel;
+            this.parallel = parallel;
         }
 
         @Override
         public String call() throws Exception {
             String plus;
             if (makePackages) {
-                plus = trait.convertPackaged(path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlighting, fullyQualifiedNames, paralel);
+                plus = trait.convertPackaged(path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlighting, fullyQualifiedNames, parallel);
             } else {
-                plus = trait.convert(path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlighting, fullyQualifiedNames, paralel);
+                plus = trait.convert(path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlighting, fullyQualifiedNames, parallel);
             }
             if (highlighting) {
                 int h = traitIndex;
@@ -122,12 +122,12 @@ public class Traits implements Serializable {
         }
     }
 
-    public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, boolean makePackages, int scriptIndex, int classIndex, boolean highlighting, List<String> fullyQualifiedNames, boolean paralel) {
+    public String convert(String path, List<ABCContainerTag> abcTags, ABC abc, boolean isStatic, boolean pcode, boolean makePackages, int scriptIndex, int classIndex, boolean highlighting, List<String> fullyQualifiedNames, boolean parallel) {
         String s = "";
-        ExecutorService executor = Executors.newFixedThreadPool(paralel ? 20 : 1);
+        ExecutorService executor = Executors.newFixedThreadPool(parallel ? 20 : 1);
         List<Future<String>> futureResults = new ArrayList<>();
         for (int t = 0; t < traits.length; t++) {
-            Future<String> future = executor.submit(new TraitConvertTask(traits[t], makePackages, path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlighting, fullyQualifiedNames, t, paralel));
+            Future<String> future = executor.submit(new TraitConvertTask(traits[t], makePackages, path, abcTags, abc, isStatic, pcode, scriptIndex, classIndex, highlighting, fullyQualifiedNames, t, parallel));
             futureResults.add(future);
         }
 

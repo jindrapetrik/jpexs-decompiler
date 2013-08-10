@@ -712,8 +712,8 @@ public class ABC {
         }
     }
 
-    /*public void export(String directory, boolean pcode, List<ABCContainerTag> abcList, boolean paralel) throws IOException {
-     export(directory, pcode, abcList, "", paralel);
+    /*public void export(String directory, boolean pcode, List<ABCContainerTag> abcList, boolean parallel) throws IOException {
+     export(directory, pcode, abcList, "", parallel);
      }*/
     public List<MyEntry<ClassPath, ScriptPack>> getScriptPacks() {
         List<MyEntry<ClassPath, ScriptPack>> ret = new ArrayList<>();
@@ -722,14 +722,14 @@ public class ABC {
         }
         return ret;
     }
-    /*public List<File> export(String directory, boolean pcode, List<ABCContainerTag> abcList, String abcStr, boolean paralel) throws IOException {
+    /*public List<File> export(String directory, boolean pcode, List<ABCContainerTag> abcList, String abcStr, boolean parallel) throws IOException {
      ExecutorService executor = Executors.newFixedThreadPool(20);
      List<Future<File>> futureResults = new ArrayList<>();
      AtomicInteger cnt = new AtomicInteger(1);
      for (int i = 0; i < script_info.length; i++) {
      HashMap<ClassPath, ScriptPack> packs = script_info[i].getPacks(this, i);
      for (Entry<ClassPath, ScriptPack> entry : packs.entrySet()) {
-     Future<File> future = executor.submit(new ExportPackTask(cnt, script_info.length, entry.getKey(), entry.getValue(), directory, abcList, pcode, abcStr, paralel));
+     Future<File> future = executor.submit(new ExportPackTask(cnt, script_info.length, entry.getKey(), entry.getValue(), directory, abcList, pcode, abcStr, parallel));
      futureResults.add(future);
      }
      }

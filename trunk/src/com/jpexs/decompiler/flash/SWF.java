@@ -269,8 +269,8 @@ public class SWF {
         }
     }
 
-    public SWF(InputStream is, boolean paralelRead) throws IOException {
-        this(is, null, paralelRead);
+    public SWF(InputStream is, boolean parallelRead) throws IOException {
+        this(is, null, parallelRead);
     }
 
     /**
@@ -278,10 +278,10 @@ public class SWF {
      *
      * @param is Stream to read SWF from
      * @param listener
-     * @param paralelRead Use parallel threads?
+     * @param parallelRead Use parallel threads?
      * @throws IOException
      */
-    public SWF(InputStream is, PercentListener listener, boolean paralelRead) throws IOException {
+    public SWF(InputStream is, PercentListener listener, boolean parallelRead) throws IOException {
         byte hdr[] = new byte[3];
         is.read(hdr);
         String shdr = new String(hdr, "utf-8");
@@ -328,7 +328,7 @@ public class SWF {
         sis.readUI8(); //tmpFirstByetOfFrameRate
         frameRate = sis.readUI8();
         frameCount = sis.readUI16();
-        tags = sis.readTagList(this, 0, paralelRead, true);
+        tags = sis.readTagList(this, 0, parallelRead, true);
         assignExportNamesToSymbols();
         assignClassesToSymbols();
         findFileAttributes();
@@ -481,7 +481,7 @@ public class SWF {
         return true;
     }
 
-    public boolean exportAS3Class(String className, String outdir, boolean isPcode, boolean paralel) throws Exception {
+    public boolean exportAS3Class(String className, String outdir, boolean isPcode, boolean parallel) throws Exception {
         List<ABCContainerTag> abcTags = new ArrayList<>();
 
         for (Tag t : tags) {
@@ -500,7 +500,7 @@ public class SWF {
                 }
                 String exStr = "Exporting " + "tag " + (i + 1) + "/" + abcTags.size() + " " + cnt + scr.getPath() + " ...";
                 informListeners("export", exStr);
-                scr.export(outdir, abcTags, isPcode, paralel);
+                scr.export(outdir, abcTags, isPcode, parallel);
                 return true;
             }
         }
@@ -545,19 +545,19 @@ public class SWF {
         ClassPath path;
         AtomicInteger index;
         int count;
-        boolean paralel;
+        boolean parallel;
         AbortRetryIgnoreHandler handler;
         long startTime;
         long stopTime;
 
-        public ExportPackTask(AbortRetryIgnoreHandler handler, AtomicInteger index, int count, ClassPath path, ScriptPack pack, String directory, List<ABCContainerTag> abcList, boolean pcode, boolean paralel) {
+        public ExportPackTask(AbortRetryIgnoreHandler handler, AtomicInteger index, int count, ClassPath path, ScriptPack pack, String directory, List<ABCContainerTag> abcList, boolean pcode, boolean parallel) {
             this.pack = pack;
             this.directory = directory;
             this.abcList = abcList;
             this.path = path;
             this.index = index;
             this.count = count;
-            this.paralel = paralel;
+            this.parallel = parallel;
             this.handler = handler;
         }
 
@@ -567,7 +567,7 @@ public class SWF {
                 @Override
                 public void run() throws IOException {
                     startTime = System.currentTimeMillis();
-                    this.result = pack.export(directory, abcList, pcode, paralel);
+                    this.result = pack.export(directory, abcList, pcode, parallel);
                     stopTime = System.currentTimeMillis();
                 }
             };
@@ -580,7 +580,7 @@ public class SWF {
         }
     }
 
-    public List<File> exportActionScript2(AbortRetryIgnoreHandler handler, String outdir, boolean isPcode, boolean paralel, EventListener evl) throws IOException {
+    public List<File> exportActionScript2(AbortRetryIgnoreHandler handler, String outdir, boolean isPcode, boolean parallel, EventListener evl) throws IOException {
         List<File> ret = new ArrayList<>();
         List<Object> list2 = new ArrayList<>();
         list2.addAll(tags);
@@ -595,7 +595,7 @@ public class SWF {
         return ret;
     }
 
-    public List<File> exportActionScript3(AbortRetryIgnoreHandler handler, String outdir, boolean isPcode, boolean paralel) {
+    public List<File> exportActionScript3(AbortRetryIgnoreHandler handler, String outdir, boolean isPcode, boolean parallel) {
         ExecutorService executor = Executors.newFixedThreadPool(20);
         List<Future<File>> futureResults = new ArrayList<>();
         AtomicInteger cnt = new AtomicInteger(1);
@@ -607,7 +607,7 @@ public class SWF {
         }
         List<MyEntry<ClassPath, ScriptPack>> packs = getAS3Packs();
         for (MyEntry<ClassPath, ScriptPack> item : packs) {
-            Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.key, item.value, outdir, abcTags, isPcode, paralel));
+            Future<File> future = executor.submit(new ExportPackTask(handler, cnt, packs.size(), item.key, item.value, outdir, abcTags, isPcode, parallel));
             futureResults.add(future);
         }
 
@@ -629,7 +629,7 @@ public class SWF {
         return ret;
     }
 
-    public List<File> exportActionScript(AbortRetryIgnoreHandler handler, String outdir, boolean isPcode, boolean paralel) throws Exception {
+    public List<File> exportActionScript(AbortRetryIgnoreHandler handler, String outdir, boolean isPcode, boolean parallel) throws Exception {
         boolean asV3Found = false;
         List<File> ret = new ArrayList<>();
         final EventListener evl = new EventListener() {
@@ -647,9 +647,9 @@ public class SWF {
         }
 
         if (asV3Found) {
-            ret.addAll(exportActionScript3(handler, outdir, isPcode, paralel));
+            ret.addAll(exportActionScript3(handler, outdir, isPcode, parallel));
         } else {
-            ret.addAll(exportActionScript2(handler, outdir, isPcode, paralel, evl));
+            ret.addAll(exportActionScript2(handler, outdir, isPcode, parallel, evl));
         }
         return ret;
     }
@@ -2088,12 +2088,12 @@ public class SWF {
         return ret;
     }
 
-    public void exportFla(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean paralel) throws IOException {
-        XFLConverter.convertSWF(handler, this, swfName, outfile, true, generator, generatorVerName, generatorVersion, paralel);
+    public void exportFla(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean parallel) throws IOException {
+        XFLConverter.convertSWF(handler, this, swfName, outfile, true, generator, generatorVerName, generatorVersion, parallel);
     }
 
-    public void exportXfl(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean paralel) throws IOException {
-        XFLConverter.convertSWF(handler, this, swfName, outfile, false, generator, generatorVerName, generatorVersion, paralel);
+    public void exportXfl(AbortRetryIgnoreHandler handler, String outfile, String swfName, String generator, String generatorVerName, String generatorVersion, boolean parallel) throws IOException {
+        XFLConverter.convertSWF(handler, this, swfName, outfile, false, generator, generatorVerName, generatorVersion, parallel);
     }
 
     public static float twipToPixel(int twip) {

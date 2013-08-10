@@ -79,7 +79,7 @@ public class ScriptInfo {
         return "method_index=" + init_index + "\r\n" + traits.toString(abc, fullyQualifiedNames);
     }
 
-    public String convert(List<ABCContainerTag> abcTags, ABC abc, boolean pcode, boolean highlighting, int scriptIndex, boolean paralel) {
-        return traits.convert("", abcTags, abc, false, pcode, true, scriptIndex, -1, highlighting, new ArrayList<String>(), paralel);
+    public String convert(List<ABCContainerTag> abcTags, ABC abc, boolean pcode, boolean highlighting, int scriptIndex, boolean parallel) {
+        return traits.convert("", abcTags, abc, false, pcode, true, scriptIndex, -1, highlighting, new ArrayList<String>(), parallel);
     }
 }

@@ -187,16 +187,16 @@ public class DefineSpriteTag extends CharacterTag implements Container, BoundedT
      * @param version SWF version
      * @param level
      * @param pos
-     * @param paralel
+     * @param parallel
      * @param skipUnusualTags
      * @throws IOException
      */
-    public DefineSpriteTag(SWF swf, byte data[], int version, int level, long pos, boolean paralel, boolean skipUnusualTags) throws IOException {
+    public DefineSpriteTag(SWF swf, byte data[], int version, int level, long pos, boolean parallel, boolean skipUnusualTags) throws IOException {
         super(swf, ID, "DefineSprite", data, pos);
         SWFInputStream sis = new SWFInputStream(new ByteArrayInputStream(data), version, pos);
         spriteId = sis.readUI16();
         frameCount = sis.readUI16();
-        subTags = sis.readTagList(swf, level + 1, paralel, skipUnusualTags);
+        subTags = sis.readTagList(swf, level + 1, parallel, skipUnusualTags);
     }
     static int c = 0;
 

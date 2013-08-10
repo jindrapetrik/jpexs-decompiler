@@ -101,7 +101,7 @@ public class ScriptPack {
         return Helper.joinStrings(pathParts, File.separator);
     }
 
-    public File export(String directory, List<ABCContainerTag> abcList, boolean pcode, boolean paralel) throws IOException {
+    public File export(String directory, List<ABCContainerTag> abcList, boolean pcode, boolean parallel) throws IOException {
         String scriptName = getPathScriptName();
         String packageName = getPathPackage();
         File outDir = new File(directory + File.separatorChar + makeDirPath(packageName));
@@ -119,9 +119,9 @@ public class ScriptPack {
                 Multiname name = abc.script_info[scriptIndex].traits.traits[t].getName(abc);
                 Namespace ns = name.getNamespace(abc.constants);
                 if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                    fos.write(abc.script_info[scriptIndex].traits.traits[t].convertPackaged("", abcList, abc, false, pcode, scriptIndex, -1, false, new ArrayList<String>(), paralel).getBytes("utf-8"));
+                    fos.write(abc.script_info[scriptIndex].traits.traits[t].convertPackaged("", abcList, abc, false, pcode, scriptIndex, -1, false, new ArrayList<String>(), parallel).getBytes("utf-8"));
                 } else {
-                    fos.write(abc.script_info[scriptIndex].traits.traits[t].convert("", abcList, abc, false, pcode, scriptIndex, -1, false, new ArrayList<String>(), paralel).getBytes("utf-8"));
+                    fos.write(abc.script_info[scriptIndex].traits.traits[t].convert("", abcList, abc, false, pcode, scriptIndex, -1, false, new ArrayList<String>(), parallel).getBytes("utf-8"));
                 }
             }
         }
