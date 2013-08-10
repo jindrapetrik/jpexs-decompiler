@@ -37,6 +37,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.plaf.basic.BasicProgressBarUI;
 import org.pushingpixels.flamingo.api.common.icon.ImageWrapperResizableIcon;
 import org.pushingpixels.substance.api.SubstanceConstants;
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
@@ -72,6 +73,7 @@ public class View {
 
                         UIManager.put("RibbonApplicationMenuPopupPanelUI", MyRibbonApplicationMenuPopupPanelUI.class.getName());
                         UIManager.put("RibbonApplicationMenuButtonUI", MyRibbonApplicationMenuButtonUI.class.getName());
+                        UIManager.put("ProgressBarUI", MyProgressBarUI.class.getName());
                         //UIManager.put(SubstanceLookAndFeel.USE_THEMED_DEFAULT_ICONS,Boolean.TRUE);        
                         //UIManager.put("InternalFrame.icon",View.getIcon("icon16"));
                         //UIManager.getDefaults().put("TreeUI", BasicTreeUI.class.getName() );
