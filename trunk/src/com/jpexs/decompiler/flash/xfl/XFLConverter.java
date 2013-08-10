@@ -752,13 +752,15 @@ public class XFLConverter {
         edges.clear();
         fillsStr += "</fills>";
         strokesStr += "</strokes>";
-        currentLayer += "</edges>";
-        currentLayer += "</DOMShape>";
-        currentLayer += "</elements>";
-        currentLayer += "</DOMFrame>";
-        currentLayer += "</frames>";
-        currentLayer += "</DOMLayer>";
-        layers.add(currentLayer);
+        if (!currentLayer.equals("")) {
+            currentLayer += "</edges>";
+            currentLayer += "</DOMShape>";
+            currentLayer += "</elements>";
+            currentLayer += "</DOMFrame>";
+            currentLayer += "</frames>";
+            currentLayer += "</DOMLayer>";
+            layers.add(currentLayer);
+        }
         for (int l = layers.size() - 1; l >= 0; l--) {
             ret += layers.get(l);
         }
