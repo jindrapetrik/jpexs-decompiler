@@ -1104,7 +1104,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
             fontParams2.add(ctable[i][1]);
         }
 
-        fontParams2.setPreferredSize(new Dimension(600, ctable.length * 25));
+        //fontParams2.setPreferredSize(new Dimension(600, ctable.length * 25));
         fontChangeList = new ComponentListener() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -1114,11 +1114,11 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 for (int i = 0; i < ctable.length; i++) {
                     Dimension d = ctable[i][0].getPreferredSize();
                     Dimension d2 = ctable[i][1].getPreferredSize();
-                    ctable[i][0].setBounds(borderLeft, h, maxws[0], 25);
+                    ctable[i][0].setBounds(borderLeft, h, maxws[0], d2.height);
 
                     int w2 = fontPanel.getWidth() - 3 * borderLeft - maxws[0] - is.left - is.right - 10;
                     ctable[i][1].setBounds(borderLeft + maxws[0] + borderLeft, h, w2, d2.height);
-                    h += Math.max(Math.max(d.height, d2.height), 25);
+                    h += Math.max(d.height, d2.height);
                 }
 
                 fontParams2.setPreferredSize(new Dimension(fontPanel.getWidth() - 20, h));
@@ -2561,9 +2561,9 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 export.setVisible(true);
                 if (!export.cancelled) {
                     JFileChooser chooser = new JFileChooser();
-                    if(Configuration.containsConfig("lastExportDir")){
+                    if (Configuration.containsConfig("lastExportDir")) {
                         chooser.setCurrentDirectory(new java.io.File((String) Configuration.getConfig("lastExportDir", ".")));
-                    }else{
+                    } else {
                         chooser.setCurrentDirectory(new File("."));
                     }
                     chooser.setDialogTitle(translate("export.select.directory"));
