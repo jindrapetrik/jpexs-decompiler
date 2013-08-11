@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.action.swf5;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.StoreTypeAction;
+import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.IncrementActionItem;
@@ -37,7 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-public class ActionStoreRegister extends Action {
+public class ActionStoreRegister extends Action implements StoreTypeAction {
 
     public int registerNumber;
 
@@ -129,5 +131,10 @@ public class ActionStoreRegister extends Action {
             }
         }
         stack.push(new StoreRegisterActionItem(this, rn, value, define));
+    }
+
+    @Override
+    public String getVariableName(Stack<GraphTargetItem> stack, ConstantPool cpool) {
+        return "__register" + registerNumber;
     }
 }

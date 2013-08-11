@@ -16,8 +16,10 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.abc.avm2.model.NotCompileTimeAVM2Item;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
+import com.jpexs.decompiler.flash.action.StoreTypeAction;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
@@ -738,7 +740,7 @@ public class SWFInputStream extends InputStream {
          method = 2;
          goesPrev = readActionListAtPos(true, localData, stack, cpool, sis, rri, ip, retdups, ip);
          }*/
-        goesPrev = readActionListAtPos(listeners, new ArrayList<GraphTargetItem>(), new HashMap<Long, List<GraphSourceItemContainer>>(), address, containerSWFOffset, localData, stack, cpool, sis, rri, ip, retdups, ip, endip, path, new HashMap<Integer, Integer>());
+        goesPrev = readActionListAtPos(listeners, new ArrayList<GraphTargetItem>(), new HashMap<Long, List<GraphSourceItemContainer>>(), address, containerSWFOffset, localData, stack, cpool, sis, rri, ip, retdups, ip, endip, path, new HashMap<Integer, Integer>(), false, new HashMap<Integer, HashMap<String, GraphTargetItem>>());
 
         if (goesPrev) {
         } else {
@@ -797,7 +799,7 @@ public class SWFInputStream extends InputStream {
     }
 
     @SuppressWarnings("unchecked")
-    private static boolean readActionListAtPos(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, long address, long containerSWFOffset, List<Object> localData, Stack<GraphTargetItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret, int startIp, int endip, String path, Map<Integer, Integer> visited) throws IOException {
+    private static boolean readActionListAtPos(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, long address, long containerSWFOffset, List<Object> localData, Stack<GraphTargetItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret, int startIp, int endip, String path, Map<Integer, Integer> visited, boolean indeterminate, Map<Integer, HashMap<String, GraphTargetItem>> decisionStates) throws IOException {
         boolean debugMode = false;
         boolean decideBranch = false;
 
@@ -907,6 +909,12 @@ public class SWFInputStream extends InputStream {
             ActionIf aif = null;
             boolean goaif = false;
             if (!a.isIgnored()) {
+                String varname = null;
+                if (a instanceof StoreTypeAction) {
+                    StoreTypeAction sta = (StoreTypeAction) a;
+                    varname = sta.getVariableName(stack, cpool);
+                }
+
                 try {
                     if (a instanceof ActionIf) {
                         aif = (ActionIf) a;
@@ -983,6 +991,14 @@ public class SWFInputStream extends InputStream {
                     log.log(Level.SEVERE, "Disassembly exception", ex);
                     break;
                 }
+
+                HashMap<String, GraphTargetItem> vars = (HashMap<String, GraphTargetItem>) localData.get(1);
+                if (varname != null) {
+                    GraphTargetItem varval = vars.get(varname);
+                    if (varval != null && varval.isCompileTime() && indeterminate) {
+                        vars.put(varname, new NotCompileTimeAVM2Item(null, varval));
+                    }
+                }
             }
             int nopos = -1;
             for (int i = 0; i < actionLen; i++) {
@@ -1023,7 +1039,7 @@ public class SWFInputStream extends InputStream {
                         } else {
                             localData2 = localData;
                         }
-                        readActionListAtPos(listeners, output2, containers, address, containerSWFOffset, localData2, new Stack<GraphTargetItem>(), cpool, sis, rri, (int) endAddr, ret, startIp, (int) (endAddr + size), path + (cntName == null ? "" : "/" + cntName), visited);
+                        readActionListAtPos(listeners, output2, containers, address, containerSWFOffset, localData2, new Stack<GraphTargetItem>(), cpool, sis, rri, (int) endAddr, ret, startIp, (int) (endAddr + size), path + (cntName == null ? "" : "/" + cntName), visited, indeterminate, decisionStates);
                         output2s.add(output2);
                         endAddr += size;
                     }
@@ -1050,13 +1066,34 @@ public class SWFInputStream extends InputStream {
             rri.setPos(ip);
             filePos = rri.getPos();
             if (goaif) {
-                if (aif.ignoreUsed && aif.jumpUsed) {
-                    break;
-                }
                 aif.ignoreUsed = true;
                 aif.jumpUsed = true;
+                indeterminate = true;
 
-                if (curVisited > 1) {
+                HashMap<String, GraphTargetItem> vars = (HashMap<String, GraphTargetItem>) localData.get(1);
+                boolean stateChanged = false;
+                if (decisionStates.containsKey(ip)) {
+                    HashMap<String, GraphTargetItem> oldstate = decisionStates.get(ip);
+                    if (oldstate.size() != vars.size()) {
+                        stateChanged = true;
+                    } else {
+                        for (String k : vars.keySet()) {
+                            if (!oldstate.containsKey(k)) {
+                                stateChanged = true;
+                                break;
+                            }
+                            if (!vars.get(k).isCompileTime() && oldstate.get(k).isCompileTime()) {
+                                stateChanged = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                HashMap<String, GraphTargetItem> curstate = new HashMap<String, GraphTargetItem>();
+                curstate.putAll(vars);
+                decisionStates.put(ip, curstate);
+
+                if ((!stateChanged) && curVisited > 1) {
                     List<Integer> branches = new ArrayList<>();
                     branches.add(rri.getPos() + aif.getJumpOffset());
                     branches.add(rri.getPos());
@@ -1078,7 +1115,7 @@ public class SWFInputStream extends InputStream {
                 int oldPos = rri.getPos();
                 @SuppressWarnings("unchecked")
                 Stack<GraphTargetItem> substack = (Stack<GraphTargetItem>) stack.clone();
-                if (readActionListAtPos(listeners, output, containers, address, containerSWFOffset, prepareLocalBranch(localData), substack, cpool, sis, rri, rri.getPos() + aif.getJumpOffset(), ret, startIp, endip, path, visited)) {
+                if (readActionListAtPos(listeners, output, containers, address, containerSWFOffset, prepareLocalBranch(localData), substack, cpool, sis, rri, rri.getPos() + aif.getJumpOffset(), ret, startIp, endip, path, visited, indeterminate, decisionStates)) {
                     retv = true;
                 }
                 rri.setPos(oldPos);
@@ -1197,7 +1234,7 @@ public class SWFInputStream extends InputStream {
             if (tag == null) {
                 break;
             }
-            if(!parallel){
+            if (!parallel) {
                 tags.add(tag);
             }
             if (Configuration.dump_tags && level == 0) {

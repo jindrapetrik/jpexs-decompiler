@@ -38,23 +38,23 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
     public JEditorPane slotConstEditor;
     private ABC abc;
     private TraitSlotConst trait;
-    private boolean showWarning=false;
-    
+    private boolean showWarning = false;
+
     public SlotConstTraitDetailPanel() {
         slotConstEditor = new JEditorPane();
         setLayout(new BorderLayout());
         add(new JLabel(translate("abc.detail.slotconst.typevalue")), BorderLayout.NORTH);
         add(new JScrollPane(slotConstEditor), BorderLayout.CENTER);
         /*StyledDocument doc = warnLabel.getStyledDocument();
-        SimpleAttributeSet center = new SimpleAttributeSet();
-        StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
-        doc.setParagraphAttributes(0, doc.getLength(), center, false);
-        warnLabel.setOpaque(false);
-        warnLabel.setFocusable(false);
-        //warnLabel.setWrapStyleWord(true);  
-        //warnLabel.setLineWrap(true);
-        warnLabel.setFont(new JLabel().getFont().deriveFont(Font.BOLD));
-        add(warnLabel, BorderLayout.SOUTH);*/
+         SimpleAttributeSet center = new SimpleAttributeSet();
+         StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
+         doc.setParagraphAttributes(0, doc.getLength(), center, false);
+         warnLabel.setOpaque(false);
+         warnLabel.setFocusable(false);
+         //warnLabel.setWrapStyleWord(true);  
+         //warnLabel.setLineWrap(true);
+         warnLabel.setFont(new JLabel().getFont().deriveFont(Font.BOLD));
+         add(warnLabel, BorderLayout.SOUTH);*/
         slotConstEditor.setContentType("text/flasm3_methodinfo");
         Flasm3MethodInfoSyntaxKit sk = (Flasm3MethodInfoSyntaxKit) slotConstEditor.getEditorKit();
         sk.deinstallComponent(slotConstEditor, "jsyntaxpane.components.LineNumbersRuler");
@@ -77,7 +77,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
 
         s = typeStr + valueStr;
 
-        showWarning = trait.isConst()||isStatic;        
+        showWarning = trait.isConst() || isStatic;
         //warnLabel.setVisible(trait.isConst() || isStatic);
         slotConstEditor.setText(s);
     }
@@ -97,7 +97,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
 
     @Override
     public void setEditMode(boolean val) {
-        if(val){
+        if (val) {
             JOptionPane.showMessageDialog(null, translate("warning.initializers"), translate("message.warning"), JOptionPane.WARNING_MESSAGE);
         }
         slotConstEditor.setEditable(val);

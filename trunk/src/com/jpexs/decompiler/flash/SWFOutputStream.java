@@ -456,7 +456,7 @@ public class SWFOutputStream extends OutputStream {
         }
         return nBits;
     }
-    
+
     public static int getNeededBitsU(int first, int... params) {
         int nBits = 0;
         nBits = enlargeBitCountU(nBits, first);
@@ -507,7 +507,7 @@ public class SWFOutputStream extends OutputStream {
         }
         return currentBitCount;
     }
-    
+
     public static int enlargeBitCountU(int currentBitCount, int value) {
         int neededNew = getNeededBitsU(value);
         if (neededNew > currentBitCount) {

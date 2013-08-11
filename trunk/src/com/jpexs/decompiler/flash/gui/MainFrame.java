@@ -2268,7 +2268,6 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                 @Override
                                 public void run() {
                                     View.execInEventDispatch(new Runnable() {
-
                                         @Override
                                         public void run() {
                                             if (abcPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
@@ -2279,7 +2278,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                             }
                                         }
                                     });
-                                    
+
                                 }
                             }).start();
                         } else {

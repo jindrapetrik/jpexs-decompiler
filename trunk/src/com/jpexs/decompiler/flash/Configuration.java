@@ -119,13 +119,13 @@ public class Configuration {
     }
 
     public static Object setConfig(String cfg, Object value) {
-        if(cfg.equals("paralelSpeedUp")){
+        if (cfg.equals("paralelSpeedUp")) {
             cfg = "parallelSpeedUp";
         }
         return config.put(cfg, value);
     }
-    
-    public static void unsetConfig(String cfg){
+
+    public static void unsetConfig(String cfg) {
         config.remove(cfg);
     }
 
@@ -146,7 +146,7 @@ public class Configuration {
         if (replacementsFile != null) {
             loadReplacements(replacementsFile);
         }
-        if(containsConfig("paralelSpeedUp")){
+        if (containsConfig("paralelSpeedUp")) {
             setConfig("parallelSpeedUp", getConfig("paralelSpeedUp"));
             unsetConfig("paralelSpeedUp");
         }

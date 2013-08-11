@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.StoreTypeAction;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
@@ -34,7 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-public class ActionSetVariable extends Action {
+public class ActionSetVariable extends Action implements StoreTypeAction {
 
     public ActionSetVariable() {
         super(0x1D, 0);
@@ -118,5 +119,13 @@ public class ActionSetVariable extends Action {
         }
 
         output.add(ret);
+    }
+
+    @Override
+    public String getVariableName(Stack<GraphTargetItem> stack, ConstantPool cpool) {
+        if (stack.size() < 2) {
+            return null;
+        }
+        return Highlighting.stripHilights(stack.get(stack.size() - 2).toStringNoQuotes(cpool));
     }
 }

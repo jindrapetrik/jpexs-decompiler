@@ -2061,6 +2061,7 @@ public class AVM2Code implements Serializable {
         public boolean jumpUsed = false;
         public boolean skipUsed = false;
         public Set<Integer> casesUsed = new HashSet<>();
+        HashMap<Integer, GraphTargetItem> registers = new HashMap<>();
     }
 
     private static int getMostCommonIp(AVM2GraphSource code, List<Integer> branches) {
@@ -2208,13 +2209,13 @@ public class AVM2Code implements Serializable {
     }
 
     @SuppressWarnings("unchecked")
-    private static int removeTraps(HashMap<Integer, List<Integer>> refs, boolean secondPass, boolean useVisited, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, HashMap<Integer, Integer> visited, HashMap<Integer, HashMap<Integer, GraphTargetItem>> visitedStates, HashMap<GraphSourceItem, Decision> decisions, String path) {
+    private static int removeTraps(HashMap<Integer, List<Integer>> refs, boolean secondPass, boolean indeterminate, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, AVM2GraphSource code, int ip, HashMap<Integer, Integer> visited, HashMap<Integer, HashMap<Integer, GraphTargetItem>> visitedStates, HashMap<GraphSourceItem, Decision> decisions, String path) {
         boolean debugMode = false;
         int ret = 0;
         iploop:
         while ((ip > -1) && ip < code.size()) {
 
-            if (useVisited) {
+            if (false) { //useVisited) {
                 if (visited.containsKey(ip)) {
                     break;
                 }
@@ -2275,8 +2276,9 @@ public class AVM2Code implements Serializable {
                 ip++;
                 continue;
             }
+
             if (debugMode) {
-                System.out.println((useVisited ? "useV " : "") + (secondPass ? "secondPass " : "") + "Visit " + ip + ": " + ins + " stack:" + Highlighting.stripHilights(stack.toString()));
+                System.out.println((indeterminate ? "useV " : "") + (secondPass ? "secondPass " : "") + "Visit " + ip + ": " + ins + " stack:" + Highlighting.stripHilights(stack.toString()));
                 HashMap<Integer, GraphTargetItem> registers = (HashMap<Integer, GraphTargetItem>) localData.get(2);
                 System.out.print("Registers:");
                 for (int reg : registers.keySet()) {
@@ -2316,6 +2318,20 @@ public class AVM2Code implements Serializable {
             }
 
 
+            if (ins instanceof AVM2Instruction) {
+                AVM2Instruction ains = (AVM2Instruction) ins;
+                if (ains.definition instanceof SetLocalTypeIns) {
+                    SetLocalTypeIns slt = (SetLocalTypeIns) ains.definition;
+                    int regId = slt.getRegisterId(ains);
+                    if (indeterminate) {
+                        HashMap<Integer, GraphTargetItem> registers = (HashMap<Integer, GraphTargetItem>) localData.get(2);
+                        GraphTargetItem regVal = registers.get(regId);
+                        if (regVal.isCompileTime()) {
+                            registers.put(regId, new NotCompileTimeAVM2Item(null, regVal));
+                        }
+                    }
+                }
+            }
 
             if (ins.isExit()) {
                 break;
@@ -2389,10 +2405,29 @@ public class AVM2Code implements Serializable {
                         } else {
                             decisions.put(ins, dec);
                         }
+                        HashMap<Integer, GraphTargetItem> registers = (HashMap<Integer, GraphTargetItem>) localData.get(2);
+                        boolean regChanged = false;
+                        if (!dec.registers.isEmpty()) {
+                            if (dec.registers.size() != registers.size()) {
+                                regChanged = true;
+                            } else {
+                                for (int reg : registers.keySet()) {
+                                    if (!dec.registers.containsKey(reg)) {
+                                        regChanged = true;
+                                        break;
+                                    }
+                                    if (!registers.get(reg).isCompileTime() && dec.registers.get(reg).isCompileTime()) {
+                                        regChanged = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        dec.registers.putAll(registers);
                         dec.jumpUsed = true;
                         dec.skipUsed = true;
 
-                        if ((!(top instanceof HasNextAVM2Item) && curVisited > 1) || (curVisited > 2)) {
+                        if (!regChanged && ((!(top instanceof HasNextAVM2Item) && curVisited > 1) || (curVisited > 2))) {
                             for (int b : branches) {
                                 int visc = 0;
                                 if (visited.containsKey(b)) {
@@ -2405,12 +2440,13 @@ public class AVM2Code implements Serializable {
                             }
                             break;
                         }
+                        indeterminate = true;
                     }
 
                     for (int b : branches) {
                         Stack<GraphTargetItem> brStack = (Stack<GraphTargetItem>) stack.clone();
                         if (b >= 0) { //useVisited || (!ins.isJump())
-                            ret += removeTraps(refs, secondPass, false, prepareBranchLocalData(localData), brStack, output, code, b, visited, visitedStates, decisions, path);
+                            ret += removeTraps(refs, secondPass, indeterminate, prepareBranchLocalData(localData), brStack, output, code, b, visited, visitedStates, decisions, path);
                         } else {
                             if (debugMode) {
                                 System.out.println("Negative branch:" + b);

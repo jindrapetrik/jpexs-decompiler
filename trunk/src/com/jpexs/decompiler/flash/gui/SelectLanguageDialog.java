@@ -53,7 +53,7 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
         boolean found = false;
         int enIndex = 0;
         for (String code : languages) {
-            String name = ResourceBundle.getBundle(AppStrings.getResourcePath(getClass()), Locale.forLanguageTag(code.equals("en")?"":code)).getString("language");            
+            String name = ResourceBundle.getBundle(AppStrings.getResourcePath(getClass()), Locale.forLanguageTag(code.equals("en") ? "" : code)).getString("language");
             if (name.length() > 1) {
                 name = name.substring(0, 1).toUpperCase() + name.substring(1);
             }
@@ -111,7 +111,7 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
                     Locale.setDefault(Locale.forLanguageTag(newLanguage));
                     updateLanguage();
                     setVisible(false);
-                    AppStrings.updateLanguage();                                     
+                    AppStrings.updateLanguage();
                     Main.reloadApp();
                 }
                 break;

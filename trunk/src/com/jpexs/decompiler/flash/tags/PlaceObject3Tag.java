@@ -274,7 +274,7 @@ public class PlaceObject3Tag extends CharacterIdTag implements Container, PlaceO
     /**
      * Constructor
      *
-     * @param swf 
+     * @param swf
      * @param data Data bytes
      * @param version SWF version
      * @param pos

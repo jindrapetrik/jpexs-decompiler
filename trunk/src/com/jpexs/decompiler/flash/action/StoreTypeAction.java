@@ -14,30 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.gui;
+package com.jpexs.decompiler.flash.action;
 
-import java.util.ResourceBundle;
-import javax.swing.JDialog;
-import javax.swing.JRootPane;
+import com.jpexs.decompiler.flash.action.model.ConstantPool;
+import com.jpexs.decompiler.graph.GraphTargetItem;
+import java.util.Stack;
 
 /**
  *
  * @author JPEXS
  */
-public abstract class AppDialog extends JDialog {
+public interface StoreTypeAction {
 
-    private ResourceBundle resourceBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(getClass()));
-
-    public AppDialog() {
-        View.installEscapeCloseOperation(this);
-        getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
-    }
-
-    public String translate(String key) {
-        return resourceBundle.getString(key);
-    }
-
-    public void updateLanguage() {
-        resourceBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(getClass()));
-    }
+    public String getVariableName(Stack<GraphTargetItem> stack, ConstantPool cpool);
 }
