@@ -362,7 +362,8 @@ public class ActionScript3Test {
                 + "finally\r\n"
                 + "{\r\n"
                 + "trace(\"Finally part\");\r\n"
-                + "}\r\n", false);
+                + "}\r\n"
+                + "trace(\"end\");\r\n", false);
     }
 
     @Test
@@ -565,9 +566,9 @@ public class ActionScript3Test {
                 + "trace(\"hi \");\r\n"
                 + "if(5 == 4)\r\n"
                 + "{\r\n"
-                + "return _loc5_;\r\n"
+                + "return str;\r\n"
                 + "}\r\n"
-                + "return _loc5_;\r\n"
+                + "return \"hu\" + str;\r\n"
                 + "}\r\n", false);
     }
 
@@ -816,5 +817,32 @@ public class ActionScript3Test {
                 + "trace(\"after_try\");\r\n"
                 + "}\r\n"
                 + "trace(\"end\");\r\n", false);
+    }
+
+    @Test
+    public void testTryReturn() {
+        decompileMethod("testTryReturn", "var i:int = 0;\r\n"
+                + "var b:Boolean = false;\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "i = 0;\r\n"
+                + "b = true;\r\n"
+                + "if(i > 0)\r\n"
+                + "{\r\n"
+                + "while(this.testDoWhile2())\r\n"
+                + "{\r\n"
+                + "if(b)\r\n"
+                + "{\r\n"
+                + "return 5;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "i++;\r\n"
+                + "return 2;\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "}\r\n"
+                + "return 4;\r\n", false);
     }
 }
