@@ -74,7 +74,7 @@ public class ActionGraph extends Graph {
         ActionGraph g = new ActionGraph(code, registerNames, variables, functions, version);
         List<Object> localData = new ArrayList<>();
         localData.add(registerNames);
-        g.init();
+        g.init(localData);
         return g.translate(localData, staticOperation, path);
     }
 
@@ -313,7 +313,7 @@ public class ActionGraph extends Graph {
                 defaultAndLastPart.add(defaultPart);
                 defaultAndLastPart.add(caseBodyParts.get(caseBodyParts.size() - 1));
 
-                GraphPart defaultPart2 = getCommonPart(defaultAndLastPart, loops);//34-37
+                GraphPart defaultPart2 = getCommonPart(localData, defaultAndLastPart, loops);//34-37
 
                 List<GraphTargetItem> defaultCommands = new ArrayList<>();
                 List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
@@ -353,7 +353,7 @@ public class ActionGraph extends Graph {
                 if (defaultPart2 != null) {
                     mcp.add(defaultPart2);
                 }
-                GraphPart breakPart = getMostCommonPart(mcp, loops);
+                GraphPart breakPart = getMostCommonPart(localData, mcp, loops);
                 if ((defaultPart2 != breakPart) && (defaultCommands.isEmpty())) {
                     defaultPart = defaultPart2;
                 }
@@ -422,13 +422,13 @@ public class ActionGraph extends Graph {
                     nextCase = next;
                     if (next != null) {
                         if (i < caseBodies.size() - 1) {
-                            if (!caseBodies.get(i).leadsTo(code, caseBodies.get(i + 1), loops)) {
+                            if (!caseBodies.get(i).leadsTo(localData, this, code, caseBodies.get(i + 1), loops)) {
                                 cc.add(new BreakItem(null, currentLoop.id));
                             } else {
                                 nextCase = caseBodies.get(i + 1);
                             }
                         } else if (!defaultCommands.isEmpty()) {
-                            if (!caseBodies.get(i).leadsTo(code, defaultPart, loops)) {
+                            if (!caseBodies.get(i).leadsTo(localData, this, code, defaultPart, loops)) {
                                 cc.add(new BreakItem(null, currentLoop.id));
                             } else {
                                 nextCase = defaultPart;

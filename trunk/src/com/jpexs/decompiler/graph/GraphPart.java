@@ -60,7 +60,14 @@ public class GraphPart implements Serializable {
         return time;
     }
 
-    private boolean leadsTo(GraphSource code, GraphPart part, List<GraphPart> visited, List<Loop> loops) {
+    private boolean leadsTo(List<Object> localData, Graph gr, GraphSource code, GraphPart part, List<GraphPart> visited, List<Loop> loops) {
+        GraphPart tpart = gr.checkPart(null, localData, this, null);
+        if (tpart == null) {
+            return false;
+        }
+        if (tpart != this) {
+            return tpart.leadsTo(localData, gr, code, part, visited, loops);
+        }
         Loop currentLoop = null;
         for (Loop l : loops) {
             /*if(l.phase==0){
@@ -97,7 +104,7 @@ public class GraphPart implements Serializable {
             if (p == part) {
                 return true;
             } else {
-                if (p.leadsTo(code, part, visited, loops)) {
+                if (p.leadsTo(localData, gr, code, part, visited, loops)) {
                     return true;
                 }
             }
@@ -106,7 +113,7 @@ public class GraphPart implements Serializable {
             if (p == part) {
                 return true;
             } else {
-                if (p.leadsTo(code, part, visited, loops)) {
+                if (p.leadsTo(localData, gr, code, part, visited, loops)) {
                     return true;
                 }
             }
@@ -114,11 +121,11 @@ public class GraphPart implements Serializable {
         return false;
     }
 
-    public boolean leadsTo(GraphSource code, GraphPart part, List<Loop> loops) {
+    public boolean leadsTo(List<Object> localData, Graph gr, GraphSource code, GraphPart part, List<Loop> loops) {
         for (Loop l : loops) {
             l.leadsToMark = 0;
         }
-        return leadsTo(code, part, new ArrayList<GraphPart>(), loops);
+        return leadsTo(localData, gr, code, part, new ArrayList<GraphPart>(), loops);
     }
 
     public GraphPart(int start, int end) {

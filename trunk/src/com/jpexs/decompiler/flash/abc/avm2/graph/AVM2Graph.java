@@ -50,6 +50,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.operations.StrictEqAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.StrictNeqAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphPartMulti;
@@ -75,17 +76,17 @@ import java.util.Stack;
  */
 public class AVM2Graph extends Graph {
 
-    private AVM2Code code;
+    private AVM2Code avm2code;
     private ABC abc;
     private MethodBody body;
 
     public AVM2Code getCode() {
-        return code;
+        return avm2code;
     }
 
     public AVM2Graph(AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> scopeStack, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) {
         super(new AVM2GraphSource(code, isStatic, scriptIndex, classIndex, localRegs, scopeStack, abc, body, localRegNames, fullyQualifiedNames, localRegAssigmentIps, refs), body.getExceptionEntries());
-        this.code = code;
+        this.avm2code = code;
         this.abc = abc;
         this.body = body;
         /*heads = makeGraph(code, new ArrayList<GraphPart>(), body);
@@ -114,11 +115,7 @@ public class AVM2Graph extends Graph {
 
     public static List<GraphTargetItem> translateViaGraph(String path, AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, Stack<GraphTargetItem> scopeStack, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) {
         AVM2Graph g = new AVM2Graph(code, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, fullyQualifiedNames, localRegAssigmentIps, refs);
-        g.init();
-        List<GraphPart> allParts = new ArrayList<>();
-        for (GraphPart head : g.heads) {
-            populateParts(head, allParts);
-        }
+
         List<Object> localData = new ArrayList<>();
         localData.add((Boolean) isStatic);
         localData.add((Integer) classIndex);
@@ -131,22 +128,27 @@ public class AVM2Graph extends Graph {
         localData.add(localRegNames);
         localData.add(fullyQualifiedNames);
         localData.add(new ArrayList<ABCException>());
-        localData.add(new ArrayList<Integer>());
+        localData.add(new ArrayList<Integer>()); //finallyJumps
         localData.add(new ArrayList<Integer>());
         localData.add((Integer) scriptIndex);
         localData.add(new HashMap<Integer, Integer>()); //localRegAssignmentIps
         localData.add(Integer.valueOf(0));
         localData.add(refs);
         localData.add(code);
+        g.init(localData);
+        List<GraphPart> allParts = new ArrayList<>();
+        for (GraphPart head : g.heads) {
+            populateParts(head, allParts);
+        }
         return g.translate(localData, staticOperation, path);
     }
 
     @Override
     protected void checkGraph(List<GraphPart> allBlocks) {
         for (ABCException ex : body.exceptions) {
-            int startIp = code.adr2pos(ex.start);
-            int endIp = code.adr2pos(ex.end);
-            int targetIp = code.adr2pos(ex.target);
+            int startIp = avm2code.adr2pos(ex.start);
+            int endIp = avm2code.adr2pos(ex.end);
+            int targetIp = avm2code.adr2pos(ex.target);
             GraphPart target = null;
             for (GraphPart p : allBlocks) {
                 if (p.start == targetIp) {
@@ -194,17 +196,17 @@ public class AVM2Graph extends Graph {
         @SuppressWarnings("unchecked")
         List<Integer> ignoredSwitches = (List<Integer>) localData.get(DATA_IGNOREDSWITCHES);
         int ip = part.start;
-        int addr = this.code.fixAddrAfterDebugLine(this.code.pos2adr(part.start));
+        int addr = this.avm2code.fixAddrAfterDebugLine(this.avm2code.pos2adr(part.start));
         int maxend = -1;
         List<ABCException> catchedExceptions = new ArrayList<>();
         for (int e = 0; e < body.exceptions.length; e++) {
-            if (addr == this.code.fixAddrAfterDebugLine(body.exceptions[e].start)) {
+            if (addr == this.avm2code.fixAddrAfterDebugLine(body.exceptions[e].start)) {
                 if (!body.exceptions[e].isFinally()) {
                     if (((body.exceptions[e].end) > maxend) && (!parsedExceptions.contains(body.exceptions[e]))) {
                         catchedExceptions.clear();
-                        maxend = this.code.fixAddrAfterDebugLine(body.exceptions[e].end);
+                        maxend = this.avm2code.fixAddrAfterDebugLine(body.exceptions[e].end);
                         catchedExceptions.add(body.exceptions[e]);
-                    } else if (this.code.fixAddrAfterDebugLine(body.exceptions[e].end) == maxend) {
+                    } else if (this.avm2code.fixAddrAfterDebugLine(body.exceptions[e].end) == maxend) {
                         catchedExceptions.add(body.exceptions[e]);
                     }
                 }
@@ -215,19 +217,19 @@ public class AVM2Graph extends Graph {
              //currentLoop.phase=0;
              }*/
             parsedExceptions.addAll(catchedExceptions);
-            int endpos = code.adr2pos(this.code.fixAddrAfterDebugLine(catchedExceptions.get(0).end));
+            int endpos = code.adr2pos(this.avm2code.fixAddrAfterDebugLine(catchedExceptions.get(0).end));
             int endposStartBlock = code.adr2pos(catchedExceptions.get(0).end);
 
 
             List<List<GraphTargetItem>> catchedCommands = new ArrayList<>();
-            if (this.code.code.get(endpos).definition instanceof JumpIns) {
-                int afterCatchAddr = this.code.pos2adr(endpos + 1) + this.code.code.get(endpos).operands[0];
-                int afterCatchPos = this.code.adr2pos(afterCatchAddr);
+            if (this.avm2code.code.get(endpos).definition instanceof JumpIns) {
+                int afterCatchAddr = this.avm2code.pos2adr(endpos + 1) + this.avm2code.code.get(endpos).operands[0];
+                int afterCatchPos = this.avm2code.adr2pos(afterCatchAddr);
                 final AVM2Graph t = this;
                 Collections.sort(catchedExceptions, new Comparator<ABCException>() {
                     @Override
                     public int compare(ABCException o1, ABCException o2) {
-                        return t.code.fixAddrAfterDebugLine(o1.target) - t.code.fixAddrAfterDebugLine(o2.target);
+                        return t.avm2code.fixAddrAfterDebugLine(o1.target) - t.avm2code.fixAddrAfterDebugLine(o2.target);
                     }
                 });
 
@@ -236,13 +238,13 @@ public class AVM2Graph extends Graph {
                 int returnPos = afterCatchPos;
                 for (int e = 0; e < body.exceptions.length; e++) {
                     if (body.exceptions[e].isFinally()) {
-                        if (addr == this.code.fixAddrAfterDebugLine(body.exceptions[e].start)) {
-                            if (afterCatchPos + 1 == code.adr2pos(this.code.fixAddrAfterDebugLine(body.exceptions[e].end))) {
-                                AVM2Instruction jmpIns = this.code.code.get(code.adr2pos(this.code.fixAddrAfterDebugLine(body.exceptions[e].end)));
-                                if (jmpIns.definition instanceof JumpIns) {
-                                    int finStart = code.adr2pos(this.code.fixAddrAfterDebugLine(body.exceptions[e].end) + jmpIns.getBytes().length + jmpIns.operands[0]);
+                        if (addr == this.avm2code.fixAddrAfterDebugLine(body.exceptions[e].start)) {
+                            if (afterCatchPos + 1 == code.adr2pos(this.avm2code.fixAddrAfterDebugLine(body.exceptions[e].end))) {
+                                AVM2Instruction jmpIns = this.avm2code.code.get(code.adr2pos(this.avm2code.fixAddrAfterDebugLine(body.exceptions[e].end)));
 
-                                    boolean switchFound = false;
+                                if (jmpIns.definition instanceof JumpIns) {
+                                    int finStart = code.adr2pos(this.avm2code.fixAddrAfterDebugLine(body.exceptions[e].end) + jmpIns.getBytes().length + jmpIns.operands[0]);
+
                                     GraphPart fpart = null;
                                     for (GraphPart p : allParts) {
                                         if (p.start == finStart) {
@@ -250,9 +252,10 @@ public class AVM2Graph extends Graph {
                                             break;
                                         }
                                     }
-                                    for (int f = finStart; f < this.code.code.size(); f++) {
-                                        if (this.code.code.get(f).definition instanceof LookupSwitchIns) {
-                                            AVM2Instruction swins = this.code.code.get(f);
+                                    int swPos = -1;
+                                    for (int f = finStart; f < this.avm2code.code.size(); f++) {
+                                        if (this.avm2code.code.get(f).definition instanceof LookupSwitchIns) {
+                                            AVM2Instruction swins = this.avm2code.code.get(f);
                                             if (swins.operands.length >= 3) {
                                                 if (swins.operands[0] == swins.getBytes().length) {
                                                     if (code.adr2pos(code.pos2adr(f) + swins.operands[2]) < finStart) {
@@ -265,10 +268,12 @@ public class AVM2Graph extends Graph {
                                                             }
                                                         }
                                                         //this.code.code.get(f).ignored = true;
-                                                        ignoredSwitches.add(f);
+                                                        //ignoredSwitches.add(f);
+                                                        swPos = f;
+
                                                         List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
                                                         stopPart2.add(fepart);
-                                                        finallyCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, parent, fpart, stopPart2, loops, staticOperation, path);
+                                                        //finallyCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, parent, fpart, stopPart2, loops, staticOperation, path);
                                                         returnPos = f + 1;
                                                         break;
                                                     }
@@ -276,9 +281,14 @@ public class AVM2Graph extends Graph {
                                             }
                                         }
                                     }
-                                    if (!switchFound) {
-                                        finallyCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, parent, fpart, null, loops, staticOperation, path);
-                                    }
+                                    //ignoredSwitches.add(-1);
+                                    //int igs_size=ignoredSwitches.size();
+                                    List<Integer> oldFinallyJumps = new ArrayList<>(finallyJumps);
+                                    finallyJumps.clear();
+                                    ignoredSwitches.add(swPos);
+                                    finallyCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, parent, fpart, null, loops, staticOperation, path);
+                                    //ignoredSwitches.remove(igs_size-1);
+                                    finallyJumps.addAll(oldFinallyJumps);
                                     finallyJumps.add(finStart);
                                     break;
                                 }
@@ -286,11 +296,19 @@ public class AVM2Graph extends Graph {
                         }
                     }
                 }
+
+                GraphPart retPart = null;
+                for (GraphPart p : allParts) {
+                    if (p.start == returnPos) {
+                        retPart = p;
+                        break;
+                    }
+                }
                 List<GraphPart> catchParts = new ArrayList<>();
                 for (int e = 0; e < catchedExceptions.size(); e++) {
                     int eendpos;
                     if (e < catchedExceptions.size() - 1) {
-                        eendpos = code.adr2pos(this.code.fixAddrAfterDebugLine(catchedExceptions.get(e + 1).target)) - 2;
+                        eendpos = code.adr2pos(this.avm2code.fixAddrAfterDebugLine(catchedExceptions.get(e + 1).target)) - 2;
                     } else {
                         eendpos = afterCatchPos - 1;
                     }
@@ -318,6 +336,9 @@ public class AVM2Graph extends Graph {
                     localData2.set(DATA_SCOPESTACK, new Stack<GraphTargetItem>());
                     List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
                     stopPart2.add(nepart);
+                    if (retPart != null) {
+                        stopPart2.add(retPart);
+                    }
                     catchedCommands.add(printGraph(new ArrayList<GraphPart>(), localData2, stack, allParts, parent, npart, stopPart2, loops, staticOperation, path));
                 }
 
@@ -332,6 +353,10 @@ public class AVM2Graph extends Graph {
                 List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
                 stopPart2.add(nepart);
                 stopPart2.addAll(catchParts);
+
+                if (retPart != null) {
+                    stopPart2.add(retPart);
+                }
                 List<GraphTargetItem> tryCommands = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, parent, part, stopPart2, loops, staticOperation, path);
 
                 output.clear();
@@ -364,16 +389,16 @@ public class AVM2Graph extends Graph {
         }
 
         if (part.nextParts.isEmpty()) {
-            if (this.code.code.get(part.end).definition instanceof ReturnValueIns) {  //returns in finally clause
+            if (this.avm2code.code.get(part.end).definition instanceof ReturnValueIns) {  //returns in finally clause
                 if (part.getHeight() >= 3) {
-                    if (this.code.code.get(part.getPosAt(part.getHeight() - 2)).definition instanceof KillIns) {
-                        if (this.code.code.get(part.getPosAt(part.getHeight() - 3)).definition instanceof GetLocalTypeIns) {
+                    if (this.avm2code.code.get(part.getPosAt(part.getHeight() - 2)).definition instanceof KillIns) {
+                        if (this.avm2code.code.get(part.getPosAt(part.getHeight() - 3)).definition instanceof GetLocalTypeIns) {
                             if (output.size() >= 2) {
                                 if (output.get(output.size() - 2) instanceof SetLocalAVM2Item) {
                                     ret = new ArrayList<>();
                                     ret.addAll(output);
                                     ret.remove(ret.size() - 1);
-                                    ret.add(new ReturnValueAVM2Item(this.code.code.get(part.end), ((SetLocalAVM2Item) output.get(output.size() - 2)).value));
+                                    ret.add(new ReturnValueAVM2Item(this.avm2code.code.get(part.end), ((SetLocalAVM2Item) output.get(output.size() - 2)).value));
                                     return ret;
                                 }
                             }
@@ -382,7 +407,7 @@ public class AVM2Graph extends Graph {
                 }
             }
         }
-        if ((this.code.code.get(part.end).definition instanceof LookupSwitchIns) && ignoredSwitches.contains(part.end)) {
+        if ((this.avm2code.code.get(part.end).definition instanceof LookupSwitchIns) && ignoredSwitches.contains(part.end)) {
             ret = new ArrayList<>();
             ret.addAll(output);
             return ret;
@@ -391,16 +416,16 @@ public class AVM2Graph extends Graph {
                 && (!stack.isEmpty())
                 && (stack.peek() instanceof StrictEqAVM2Item)
                 && (part.nextParts.get(0).getHeight() >= 2)
-                && (this.code.code.get(this.code.fixIPAfterDebugLine(part.nextParts.get(0).start)).definition instanceof PushIntegerTypeIns)
+                && (this.avm2code.code.get(this.avm2code.fixIPAfterDebugLine(part.nextParts.get(0).start)).definition instanceof PushIntegerTypeIns)
                 && (!part.nextParts.get(0).nextParts.isEmpty())
-                && (this.code.code.get(part.nextParts.get(0).nextParts.get(0).end).definition instanceof LookupSwitchIns))
+                && (this.avm2code.code.get(part.nextParts.get(0).nextParts.get(0).end).definition instanceof LookupSwitchIns))
                 || ((part.nextParts.size() == 2)
                 && (!stack.isEmpty())
                 && (stack.peek() instanceof StrictNeqAVM2Item)
                 && (part.nextParts.get(1).getHeight() >= 2)
-                && (this.code.code.get(this.code.fixIPAfterDebugLine(part.nextParts.get(1).start)).definition instanceof PushIntegerTypeIns)
+                && (this.avm2code.code.get(this.avm2code.fixIPAfterDebugLine(part.nextParts.get(1).start)).definition instanceof PushIntegerTypeIns)
                 && (!part.nextParts.get(1).nextParts.isEmpty())
-                && (this.code.code.get(part.nextParts.get(1).nextParts.get(0).end).definition instanceof LookupSwitchIns))) {
+                && (this.avm2code.code.get(part.nextParts.get(1).nextParts.get(0).end).definition instanceof LookupSwitchIns))) {
 
             if (stack.peek() instanceof StrictEqAVM2Item) {
                 ignoredSwitches.add(part.nextParts.get(0).nextParts.get(0).end);
@@ -431,13 +456,13 @@ public class AVM2Graph extends Graph {
             if (tar instanceof StrictNeqAVM2Item) {
                 tar = ((StrictNeqAVM2Item) tar).leftSide;
             }
-            caseValuesMap.put(this.code.code.get(part.nextParts.get(reversed ? 0 : 1).start).operands[0], tar);
+            caseValuesMap.put(this.avm2code.code.get(part.nextParts.get(reversed ? 0 : 1).start).operands[0], tar);
 
             GraphPart switchLoc = part.nextParts.get(reversed ? 0 : 1).nextParts.get(0);
 
 
-            while ((this.code.code.get(part.nextParts.get(reversed ? 1 : 0).end).definition instanceof IfStrictNeIns)
-                    || (this.code.code.get(part.nextParts.get(reversed ? 1 : 0).end).definition instanceof IfStrictEqIns)) {
+            while ((this.avm2code.code.get(part.nextParts.get(reversed ? 1 : 0).end).definition instanceof IfStrictNeIns)
+                    || (this.avm2code.code.get(part.nextParts.get(reversed ? 1 : 0).end).definition instanceof IfStrictEqIns)) {
                 part = part.nextParts.get(reversed ? 1 : 0);
                 translatePart(localData, part, stack, staticOperation, null);
                 tar = stack.pop();
@@ -447,7 +472,7 @@ public class AVM2Graph extends Graph {
                 if (tar instanceof StrictNeqAVM2Item) {
                     tar = ((StrictNeqAVM2Item) tar).leftSide;
                 }
-                if (this.code.code.get(part.end).definition instanceof IfStrictNeIns) {
+                if (this.avm2code.code.get(part.end).definition instanceof IfStrictNeIns) {
                     reversed = false;
                 } else {
                     reversed = true;
@@ -457,7 +482,7 @@ public class AVM2Graph extends Graph {
                 Stack<GraphTargetItem> sstack = new Stack<>();
                 do {
                     for (int n = 0; n < numPart.getHeight(); n++) {
-                        ins = this.code.code.get(numPart.getPosAt(n));
+                        ins = this.avm2code.code.get(numPart.getPosAt(n));
                         if (ins.definition instanceof LookupSwitchIns) {
                             break;
                         }
@@ -468,7 +493,7 @@ public class AVM2Graph extends Graph {
                     } else {
                         numPart = numPart.nextParts.get(0);
                     }
-                } while (!(this.code.code.get(numPart.end).definition instanceof LookupSwitchIns));
+                } while (!(this.avm2code.code.get(numPart.end).definition instanceof LookupSwitchIns));
                 GraphTargetItem nt = sstack.peek();
 
                 if (!(nt instanceof IntegerValueAVM2Item)) {
@@ -476,7 +501,7 @@ public class AVM2Graph extends Graph {
                 }
                 IntegerValueAVM2Item iv = (IntegerValueAVM2Item) nt;
                 caseValuesMap.put((int) (long) iv.value, tar);
-                while (this.code.code.get(part.nextParts.get(reversed ? 1 : 0).start).definition instanceof JumpIns) {
+                while (this.avm2code.code.get(part.nextParts.get(reversed ? 1 : 0).start).definition instanceof JumpIns) {
                     reversed = false;
                     part = part.nextParts.get(reversed ? 1 : 0);
                     if (part instanceof GraphPartMulti) {
@@ -486,7 +511,7 @@ public class AVM2Graph extends Graph {
             }
             boolean hasDefault = false;
             GraphPart dp = part.nextParts.get(reversed ? 1 : 0);
-            while (this.code.code.get(dp.start).definition instanceof JumpIns) {
+            while (this.avm2code.code.get(dp.start).definition instanceof JumpIns) {
                 if (dp instanceof GraphPartMulti) {
                     dp = ((GraphPartMulti) dp).parts.get(0);
                 }
@@ -498,7 +523,7 @@ public class AVM2Graph extends Graph {
             Stack<GraphTargetItem> sstack = new Stack<>();
             do {
                 for (int n = 0; n < numPart.getHeight(); n++) {
-                    ins = this.code.code.get(numPart.getPosAt(n));
+                    ins = this.avm2code.code.get(numPart.getPosAt(n));
                     if (ins.definition instanceof LookupSwitchIns) {
                         break;
                     }
@@ -509,7 +534,7 @@ public class AVM2Graph extends Graph {
                 } else {
                     numPart = numPart.nextParts.get(0);
                 }
-            } while (!(this.code.code.get(numPart.end).definition instanceof LookupSwitchIns));
+            } while (!(this.avm2code.code.get(numPart.end).definition instanceof LookupSwitchIns));
             GraphTargetItem nt = sstack.peek();
             if (nt instanceof IntegerValueAVM2Item) {
                 hasDefault = true;
@@ -526,7 +551,7 @@ public class AVM2Graph extends Graph {
             List<List<GraphTargetItem>> caseCommands = new ArrayList<>();
             GraphPart next = null;
 
-            next = getMostCommonPart(switchLoc.nextParts, loops);//getNextPartPath(loopContinues);
+            next = getMostCommonPart(localData, switchLoc.nextParts, loops);//getNextPartPath(loopContinues);
             currentLoop = new Loop(loops.size(), null, next);
             currentLoop.phase = 1;
             loops.add(currentLoop);
@@ -594,14 +619,61 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    protected GraphPart checkPart(List<Object> localData, GraphPart next) {
+    protected GraphPart checkPart(Stack<GraphTargetItem> stack, List<Object> localData, GraphPart next, List<GraphPart> allParts) {
         @SuppressWarnings("unchecked")
         List<Integer> finallyJumps = (List<Integer>) localData.get(DATA_FINALLYJUMPS);
-        for (int f : finallyJumps) {
-            if (next.start == f) {
-                return null;
+        @SuppressWarnings("unchecked")
+        List<Integer> ignoredSwitches = (List<Integer>) localData.get(DATA_IGNOREDSWITCHES);
+        GraphPart ret = next;
+        for (int f = 0; f < finallyJumps.size(); f++) {
+            int fip = finallyJumps.get(f);
+            int swip = ignoredSwitches.get(f);
+            if (next.start == fip) {
+                if (stack != null && swip != -1) {
+                    AVM2Instruction swIns = avm2code.code.get(swip);
+                    GraphTargetItem t = stack.pop();
+                    Double dval = EcmaScript.toNumber(t.getResult());
+                    int val = (int) (double) dval;
+                    if (swIns.definition instanceof LookupSwitchIns) {
+                        List<Integer> branches = swIns.getBranches(code);
+                        int nip = branches.get(0);
+                        if (val >= 0 && val < branches.size() - 1) {
+                            nip = branches.get(1 + val);
+                        }
+                        for (GraphPart p : allParts) {
+                            if (p.start == nip) {
+                                return p;
+                            }
+                        }
+                        ret = null;
+                    }
+                }
+                ret = null;
             }
         }
+        if (ret != next) {
+            return ret;
+        }
+
+
+        int pos = next.start;
+        int addr = this.avm2code.fixAddrAfterDebugLine(avm2code.pos2adr(pos));
+        for (int e = 0; e < body.exceptions.length; e++) {
+            if (body.exceptions[e].isFinally()) {
+                if (addr == this.avm2code.fixAddrAfterDebugLine(body.exceptions[e].start)) {
+                    if (true) { //afterCatchPos + 1 == code.adr2pos(this.code.fixAddrAfterDebugLine(body.exceptions[e].end))) {
+                        AVM2Instruction jmpIns = this.avm2code.code.get(avm2code.adr2pos(this.avm2code.fixAddrAfterDebugLine(body.exceptions[e].end)));
+                        if (jmpIns.definition instanceof JumpIns) {
+                            int finStart = avm2code.adr2pos(this.avm2code.fixAddrAfterDebugLine(body.exceptions[e].end) + jmpIns.getBytes().length + jmpIns.operands[0]);
+                            finallyJumps.add(finStart);
+                            ignoredSwitches.add(-1);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
         return next;
     }
 
@@ -677,7 +749,7 @@ public class AVM2Graph extends Graph {
          }*/
 
 
-        List<GraphTargetItem> ret = code.clearTemporaryRegisters(list);
+        List<GraphTargetItem> ret = avm2code.clearTemporaryRegisters(list);
         if (ret != list) {
             list.clear();
             list.addAll(ret);
@@ -740,7 +812,7 @@ public class AVM2Graph extends Graph {
         }
         for (GraphTargetItem i : output) {
             if (i instanceof SetLocalAVM2Item) {
-                if (code.isKilled(((SetLocalAVM2Item) i).regIndex, 0, code.code.size() - 1)) {
+                if (avm2code.isKilled(((SetLocalAVM2Item) i).regIndex, 0, avm2code.code.size() - 1)) {
                     continue;
                 }
             }

@@ -33,10 +33,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import javax.swing.text.Document;
-import jsyntaxpane.SyntaxDocument;
 
 public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretListener {
 
@@ -99,6 +98,11 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
         if (bi == -1) {
             return false;
         }
+        View.execInEventDispatch(new Runnable() {
+            @Override
+            public void run() {
+            }
+        });
         abcPanel.detailPanel.showCard(DetailPanel.METHOD_TRAIT_CARD, trait);
         if (reset || (abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex() != bi)) {
             abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(bi, abc, name);
@@ -163,7 +167,16 @@ public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretL
     }
 
     @Override
-    public void caretUpdate(CaretEvent e) {
+    public void caretUpdate(final CaretEvent e) {
+        if (!SwingUtilities.isEventDispatchThread()) {
+            View.execInEventDispatch(new Runnable() {
+                @Override
+                public void run() {
+                    caretUpdate(e);
+                }
+            });
+            return;
+        }
         if (abc == null) {
             return;
         }

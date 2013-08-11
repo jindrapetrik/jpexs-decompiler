@@ -893,6 +893,18 @@ public class AVM2Code implements Serializable {
         for (int i = 0; i < output.size(); i++) {
             if (output.get(i) instanceof SetLocalAVM2Item) {
                 if (isKilled(((SetLocalAVM2Item) output.get(i)).regIndex, 0, code.size() - 1)) {
+                    SetLocalAVM2Item lsi = (SetLocalAVM2Item) output.get(i);
+                    if (i + 1 < output.size()) {
+                        if (output.get(i + 1) instanceof ReturnValueAVM2Item) {
+                            ReturnValueAVM2Item rv = (ReturnValueAVM2Item) output.get(i + 1);
+                            if (rv.value instanceof LocalRegAVM2Item) {
+                                LocalRegAVM2Item lr = (LocalRegAVM2Item) rv.value;
+                                if (lr.regIndex == lsi.regIndex) {
+                                    rv.value = lsi.value;
+                                }
+                            }
+                        }
+                    }
                     output.remove(i);
                     i--;
                 }
@@ -907,8 +919,8 @@ public class AVM2Code implements Serializable {
         if (ip >= code.size()) {
             return code.size() - 1;
         }
-        if (code.get(ip).definition instanceof DebugLineIns) {
-            return ip + 1;
+        while (code.get(ip).definition instanceof DebugLineIns) {
+            ip++;
         }
         return ip;
     }
@@ -975,37 +987,37 @@ public class AVM2Code implements Serializable {
                         }
                     }
                 }
-                if ((ip + 8 < code.size())) { //return in finally clause
-                    if (ins.definition instanceof SetLocalTypeIns) {
-                        if (code.get(ip + 1).definition instanceof PushByteIns) {
-                            AVM2Instruction jmp = code.get(ip + 2);
-                            if (jmp.definition instanceof JumpIns) {
-                                if (jmp.operands[0] == 0) {
-                                    if (code.get(ip + 3).definition instanceof LabelIns) {
-                                        if (code.get(ip + 4).definition instanceof PopIns) {
-                                            if (code.get(ip + 5).definition instanceof LabelIns) {
-                                                AVM2Instruction gl = code.get(ip + 6);
-                                                if (gl.definition instanceof GetLocalTypeIns) {
-                                                    if (((GetLocalTypeIns) gl.definition).getRegisterId(gl) == ((SetLocalTypeIns) ins.definition).getRegisterId(ins)) {
-                                                        AVM2Instruction ki = code.get(ip + 7);
-                                                        if (ki.definition instanceof KillIns) {
-                                                            if (ki.operands[0] == ((SetLocalTypeIns) ins.definition).getRegisterId(ins)) {
-                                                                if (code.get(ip + 8).definition instanceof ReturnValueIns) {
-                                                                    ip = ip + 8;
-                                                                    continue;
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                /*if ((ip + 8 < code.size())) { //return in finally clause
+                 if (ins.definition instanceof SetLocalTypeIns) {
+                 if (code.get(ip + 1).definition instanceof PushByteIns) {
+                 AVM2Instruction jmp = code.get(ip + 2);
+                 if (jmp.definition instanceof JumpIns) {
+                 if (jmp.operands[0] == 0) {
+                 if (code.get(ip + 3).definition instanceof LabelIns) {
+                 if (code.get(ip + 4).definition instanceof PopIns) {
+                 if (code.get(ip + 5).definition instanceof LabelIns) {
+                 AVM2Instruction gl = code.get(ip + 6);
+                 if (gl.definition instanceof GetLocalTypeIns) {
+                 if (((GetLocalTypeIns) gl.definition).getRegisterId(gl) == ((SetLocalTypeIns) ins.definition).getRegisterId(ins)) {
+                 AVM2Instruction ki = code.get(ip + 7);
+                 if (ki.definition instanceof KillIns) {
+                 if (ki.operands[0] == ((SetLocalTypeIns) ins.definition).getRegisterId(ins)) {
+                 if (code.get(ip + 8).definition instanceof ReturnValueIns) {
+                 ip = ip + 8;
+                 continue;
+                 }
+                 }
+                 }
+                 }
+                 }
+                 }
+                 }
+                 }
+                 }
+                 }
+                 }
+                 }
+                 }//*/
 
                 /*if ((ip + 2 < code.size()) && (ins.definition instanceof NewCatchIns)) { //Filling local register in catch clause
                  if (code.get(ip + 1).definition instanceof DupIns) {

@@ -64,7 +64,7 @@ public class Graph {
 
     }
 
-    public void init() {
+    public void init(List<Object> localData) {
         if (heads != null) {
             return;
         }
@@ -74,7 +74,7 @@ public class Graph {
         List<GraphPart> visited = new ArrayList<>();
         for (GraphPart head : heads) {
             time = head.setTime(time, ordered, visited);
-            fixGraph(head);
+            fixGraph(localData, head);
             makeMulti(head, new ArrayList<GraphPart>());
         }
     }
@@ -89,17 +89,17 @@ public class Graph {
         }
     }
 
-    private void fixGraph(GraphPart part) {
+    private void fixGraph(List<Object> localData, GraphPart part) {
         //if(true) return;
         try {
-            while (fixGraphOnce(part, new ArrayList<GraphPart>(), false)) {
+            while (fixGraphOnce(localData, part, new ArrayList<GraphPart>(), false)) {
             }
         } catch (Exception | Error ex) {
             //ignore
         }
     }
 
-    private boolean fixGraphOnce(GraphPart part, List<GraphPart> visited, boolean doChildren) {
+    private boolean fixGraphOnce(List<Object> localData, GraphPart part, List<GraphPart> visited, boolean doChildren) {
         if (visited.contains(part)) {
             return false;
         }
@@ -127,7 +127,7 @@ public class Graph {
                     if (r.path.rootName.equals("e") && !part.path.rootName.equals("e")) {
                         continue;
                     }
-                    if (part.leadsTo(code, r, new ArrayList<Loop>())) {
+                    if (part.leadsTo(localData, this, code, r, new ArrayList<Loop>())) {
                         modify = false;
                         continue;
                     }
@@ -166,7 +166,7 @@ public class Graph {
 
                             p.path = newpath;
                         }
-                        fixGraphOnce(part, new ArrayList<GraphPart>(), true);
+                        fixGraphOnce(localData, part, new ArrayList<GraphPart>(), true);
                         fixed = true;
                     }
                 }
@@ -196,17 +196,17 @@ public class Graph {
 
         }
         if (part.nextParts.size() == 2) {
-            if (part.nextParts.get(1).leadsTo(code, part.nextParts.get(0), new ArrayList<Loop>() /*visited*/)) {
-                fixGraphOnce(part.nextParts.get(1), visited, doChildren);
-                fixGraphOnce(part.nextParts.get(0), visited, doChildren);
+            if (part.nextParts.get(1).leadsTo(localData, this, code, part.nextParts.get(0), new ArrayList<Loop>() /*visited*/)) {
+                fixGraphOnce(localData, part.nextParts.get(1), visited, doChildren);
+                fixGraphOnce(localData, part.nextParts.get(0), visited, doChildren);
             } else {
-                fixGraphOnce(part.nextParts.get(0), visited, doChildren);
-                fixGraphOnce(part.nextParts.get(1), visited, doChildren);
+                fixGraphOnce(localData, part.nextParts.get(0), visited, doChildren);
+                fixGraphOnce(localData, part.nextParts.get(1), visited, doChildren);
             }
         } else {
             for (int j = part.nextParts.size() - 1; j >= 0; j--) {
                 GraphPart p = part.nextParts.get(j);
-                fixGraphOnce(p, visited, doChildren);
+                fixGraphOnce(localData, p, visited, doChildren);
             }
         }
         return fixed;
@@ -371,11 +371,11 @@ public class Graph {
     /* public GraphPart getNextCommonPart(GraphPart part, List<Loop> loops) {
      return getNextCommonPart(part, new ArrayList<GraphPart>(),loops);
      }*/
-    public GraphPart getNextCommonPart(GraphPart part, List<Loop> loops) {
-        return getCommonPart(part.nextParts, loops);
+    public GraphPart getNextCommonPart(List<Object> localData, GraphPart part, List<Loop> loops) {
+        return getCommonPart(localData, part.nextParts, loops);
     }
 
-    public GraphPart getCommonPart(List<GraphPart> parts, List<Loop> loops) {
+    public GraphPart getCommonPart(List<Object> localData, List<GraphPart> parts, List<Loop> loops) {
         if (parts.isEmpty()) {
             return null;
         }
@@ -396,7 +396,7 @@ public class Graph {
                 if (q == p) {
                     continue;
                 }
-                if (!q.leadsTo(code, p, loops)) {
+                if (!q.leadsTo(localData, this, code, p, loops)) {
                     common = false;
                     break;
                 }
@@ -417,6 +417,10 @@ public class Graph {
             /*if (ignored.contains(p)) {
              continue;
              }*/
+            p = checkPart(null, localData, p, null);
+            if (p == null) {
+                continue;
+            }
             boolean common = true;
             for (List<GraphPart> r : reachable) {
                 if (!r.contains(p)) {
@@ -431,7 +435,7 @@ public class Graph {
         return null;
     }
 
-    public GraphPart getMostCommonPart(List<GraphPart> parts, List<Loop> loops) {
+    public GraphPart getMostCommonPart(List<Object> localData, List<GraphPart> parts, List<Loop> loops) {
         if (parts.isEmpty()) {
             return null;
         }
@@ -458,7 +462,7 @@ public class Graph {
                 if (q == p) {
                     continue;
                 }
-                if (!q.leadsTo(code, p, loops)) {
+                if (!q.leadsTo(localData, this, code, p, loops)) {
                     common = false;
                     break;
                 }
@@ -474,7 +478,7 @@ public class Graph {
                 if (j == i) {
                     continue;
                 }
-                if (parts.get(i).leadsTo(code, parts.get(j), loops)) {
+                if (parts.get(i).leadsTo(localData, this, code, parts.get(j), loops)) {
                     parts.remove(i);
                     i--;
                     continue loopi;
@@ -551,7 +555,7 @@ public class Graph {
 
     public static List<GraphTargetItem> translateViaGraph(List<Object> localData, String path, GraphSource code, List<Integer> alternateEntries, int staticOperation) {
         Graph g = new Graph(code, alternateEntries);
-        g.init();
+        g.init(localData);
         return g.translate(localData, staticOperation, path);
     }
 
@@ -562,13 +566,13 @@ public class Graph {
         }
         Stack<GraphTargetItem> stack = new Stack<>();
         List<Loop> loops = new ArrayList<>();
-        getLoops(heads.get(0), loops, null);
+        getLoops(localData, heads.get(0), loops, null);
         /*System.out.println("<loops>");
          for (Loop el : loops) {
          System.out.println(el);
          }
          System.out.println("</loops>");*/
-        getPrecontinues(null, heads.get(0), loops, null);
+        getPrecontinues(localData, null, heads.get(0), loops, null);
         /*System.err.println("<loopspre>");
          for (Loop el : loops) {
          System.err.println(el);
@@ -755,7 +759,7 @@ public class Graph {
         return null;
     }
 
-    protected GraphPart checkPart(List<Object> localData, GraphPart part) {
+    protected GraphPart checkPart(Stack<GraphTargetItem> stack, List<Object> localData, GraphPart part, List<GraphPart> allParts) {
         return part;
     }
 
@@ -835,8 +839,8 @@ public class Graph {
         return loopItem;
     }
 
-    private void getPrecontinues(GraphPart parent, GraphPart part, List<Loop> loops, List<GraphPart> stopPart) {
-        markLevels(part, loops);
+    private void getPrecontinues(List<Object> localData, GraphPart parent, GraphPart part, List<Loop> loops, List<GraphPart> stopPart) {
+        markLevels(localData, part, loops);
         //Note: this also marks part as precontinue when there is if
         /*
          while(k<10){
@@ -887,13 +891,13 @@ public class Graph {
          clearLoops(loops);*/
     }
 
-    private void markLevels(GraphPart part, List<Loop> loops) {
+    private void markLevels(List<Object> localData, GraphPart part, List<Loop> loops) {
         clearLoops(loops);
-        markLevels(part, loops, new ArrayList<GraphPart>(), 1, new ArrayList<GraphPart>());
+        markLevels(localData, part, loops, new ArrayList<GraphPart>(), 1, new ArrayList<GraphPart>());
         clearLoops(loops);
     }
 
-    private void markLevels(GraphPart part, List<Loop> loops, List<GraphPart> stopPart, int level, List<GraphPart> visited) {
+    private void markLevels(List<Object> localData, GraphPart part, List<Loop> loops, List<GraphPart> stopPart, int level, List<GraphPart> visited) {
         boolean debugMode = false;
         if (stopPart == null) {
             stopPart = new ArrayList<>();
@@ -951,7 +955,7 @@ public class Graph {
         }
 
         if (nextParts.size() == 2) {
-            GraphPart next = getCommonPart(nextParts, loops);//part.getNextPartPath(new ArrayList<GraphPart>());
+            GraphPart next = getCommonPart(localData, nextParts, loops);//part.getNextPartPath(new ArrayList<GraphPart>());
             List<GraphPart> stopParts2 = new ArrayList<>();  //stopPart);
             if (next != null) {
                 stopParts2.add(next);
@@ -959,18 +963,18 @@ public class Graph {
                 stopParts2.add(stopPart.get(stopPart.size() - 1));
             }
             if (next != nextParts.get(0)) {
-                markLevels(nextParts.get(0), loops, next == null ? stopPart : stopParts2, level + 1, visited);
+                markLevels(localData, nextParts.get(0), loops, next == null ? stopPart : stopParts2, level + 1, visited);
             }
             if (next != nextParts.get(1)) {
-                markLevels(nextParts.get(1), loops, next == null ? stopPart : stopParts2, level + 1, visited);
+                markLevels(localData, nextParts.get(1), loops, next == null ? stopPart : stopParts2, level + 1, visited);
             }
             if (next != null) {
-                markLevels(next, loops, stopPart, level, visited);
+                markLevels(localData, next, loops, stopPart, level, visited);
             }
         }
 
         if (nextParts.size() > 2) {
-            GraphPart next = getMostCommonPart(nextParts, loops);
+            GraphPart next = getMostCommonPart(localData, nextParts, loops);
             List<GraphPart> vis = new ArrayList<>();
             for (GraphPart p : nextParts) {
                 if (vis.contains(p)) {
@@ -991,17 +995,17 @@ public class Graph {
                     }
                 }
                 if (next != p) {
-                    markLevels(p, loops, stopPart2, level + 1, visited);
+                    markLevels(localData, p, loops, stopPart2, level + 1, visited);
                     vis.add(p);
                 }
             }
             if (next != null) {
-                markLevels(next, loops, stopPart, level, visited);
+                markLevels(localData, next, loops, stopPart, level, visited);
             }
         }
 
         if (nextParts.size() == 1) {
-            markLevels(nextParts.get(0), loops, stopPart, level, visited);
+            markLevels(localData, nextParts.get(0), loops, stopPart, level, visited);
         }
 
         for (GraphPart t : part.throwParts) {
@@ -1010,21 +1014,21 @@ public class Graph {
                 List<GraphPart> cmn = new ArrayList<>();
                 cmn.add(part);
                 cmn.add(t);
-                GraphPart next = getCommonPart(cmn, loops);
+                GraphPart next = getCommonPart(localData, cmn, loops);
                 if (next != null) {
                     stopPart2.add(next);
                 } else {
                     stopPart2 = stopPart;
                 }
 
-                markLevels(t, loops, stopPart2, level, visited);
+                markLevels(localData, t, loops, stopPart2, level, visited);
             }
         }
 
         if (isLoop) {
             if (currentLoop.loopBreak != null) {
                 currentLoop.phase = 2;
-                markLevels(currentLoop.loopBreak, loops, stopPart, level, visited);
+                markLevels(localData, currentLoop.loopBreak, loops, stopPart, level, visited);
             }
         }
     }
@@ -1035,18 +1039,23 @@ public class Graph {
         }
     }
 
-    private void getLoops(GraphPart part, List<Loop> loops, List<GraphPart> stopPart) {
+    private void getLoops(List<Object> localData, GraphPart part, List<Loop> loops, List<GraphPart> stopPart) {
         clearLoops(loops);
-        getLoops(part, loops, stopPart, true, 1, new ArrayList<GraphPart>());
+        getLoops(localData, part, loops, stopPart, true, 1, new ArrayList<GraphPart>());
         clearLoops(loops);
     }
 
-    private void getLoops(GraphPart part, List<Loop> loops, List<GraphPart> stopPart, boolean first, int level, List<GraphPart> visited) {
+    private void getLoops(List<Object> localData, GraphPart part, List<Loop> loops, List<GraphPart> stopPart, boolean first, int level, List<GraphPart> visited) {
         boolean debugMode = false;
 
         if (stopPart == null) {
             stopPart = new ArrayList<>();
         }
+        if (part == null) {
+            return;
+        }
+
+        part = checkPart(null, localData, part, null);
         if (part == null) {
             return;
         }
@@ -1080,7 +1089,7 @@ public class Graph {
                 loopContinues2.remove(lastP1.loopContinue);
                 List<Loop> loops2 = new ArrayList<>(loops);
                 loops2.remove(lastP1);
-                if (!part.leadsTo(code, lastP1.loopContinue, loops2)) {
+                if (!part.leadsTo(localData, this, code, lastP1.loopContinue, loops2)) {
                     if (lastP1.breakCandidatesLocked == 0) {
                         if (debugMode) {
                             System.err.println("added breakCandidate " + part + " to " + lastP1);
@@ -1105,7 +1114,7 @@ public class Graph {
         }
         part.level = level;
 
-        boolean isLoop = part.leadsTo(code, part, loops);
+        boolean isLoop = part.leadsTo(localData, this, code, part, loops);
         Loop currentLoop = null;
         if (isLoop) {
             currentLoop = new Loop(loops.size(), part, null);
@@ -1115,23 +1124,23 @@ public class Graph {
         }
 
         if (part.nextParts.size() == 2) {
-            GraphPart next = getNextCommonPart(part, loops);//part.getNextPartPath(loopContinues);
+            GraphPart next = getNextCommonPart(localData, part, loops);//part.getNextPartPath(loopContinues);
             List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
             if (next != null) {
                 stopPart2.add(next);
             }
             if (next != part.nextParts.get(0)) {
-                getLoops(part.nextParts.get(0), loops, stopPart2, false, level + 1, visited);
+                getLoops(localData, part.nextParts.get(0), loops, stopPart2, false, level + 1, visited);
             }
             if (next != part.nextParts.get(1)) {
-                getLoops(part.nextParts.get(1), loops, stopPart2, false, level + 1, visited);
+                getLoops(localData, part.nextParts.get(1), loops, stopPart2, false, level + 1, visited);
             }
             if (next != null) {
-                getLoops(next, loops, stopPart, false, level, visited);
+                getLoops(localData, next, loops, stopPart, false, level, visited);
             }
         }
         if (part.nextParts.size() > 2) {
-            GraphPart next = getNextCommonPart(part, loops);
+            GraphPart next = getNextCommonPart(localData, part, loops);
 
 
             for (GraphPart p : part.nextParts) {
@@ -1148,15 +1157,15 @@ public class Graph {
                     }
                 }
                 if (next != p) {
-                    getLoops(p, loops, stopPart2, false, level + 1, visited);
+                    getLoops(localData, p, loops, stopPart2, false, level + 1, visited);
                 }
             }
             if (next != null) {
-                getLoops(next, loops, stopPart, false, level, visited);
+                getLoops(localData, next, loops, stopPart, false, level, visited);
             }
         }
         if (part.nextParts.size() == 1) {
-            getLoops(part.nextParts.get(0), loops, stopPart, false, level, visited);
+            getLoops(localData, part.nextParts.get(0), loops, stopPart, false, level, visited);
         }
 
         List<Loop> loops2 = new ArrayList<>(loops);
@@ -1165,7 +1174,7 @@ public class Graph {
         }
         for (GraphPart t : part.throwParts) {
             if (!visited.contains(t)) {
-                getLoops(t, loops, stopPart, false, level, visited);
+                getLoops(localData, t, loops, stopPart, false, level, visited);
             }
         }
         for (Loop l : loops2) {
@@ -1177,13 +1186,20 @@ public class Graph {
             Map<GraphPart, Integer> removed = new HashMap<>();
             do {
                 found = null;
+                for (int i = 0; i < currentLoop.breakCandidates.size(); i++) {
+                    GraphPart ch = checkPart(null, localData, currentLoop.breakCandidates.get(i), null);
+                    if (ch == null) {
+                        currentLoop.breakCandidates.remove(i);
+                        i--;
+                    }
+                }
                 loopcand:
                 for (GraphPart cand : currentLoop.breakCandidates) {
                     for (GraphPart cand2 : currentLoop.breakCandidates) {
                         if (cand == cand2) {
                             continue;
                         }
-                        if (cand.leadsTo(code, cand2, loops)) {
+                        if (cand.leadsTo(localData, this, code, cand2, loops)) {
                             int lev1 = Integer.MAX_VALUE;
                             int lev2 = Integer.MAX_VALUE;
                             for (int i = 0; i < currentLoop.breakCandidates.size(); i++) {
@@ -1284,7 +1300,7 @@ public class Graph {
                 if (removedVisited.contains(r)) {
                     continue;
                 }
-                getLoops(r, loops, stopPart, false, removed.get(r), visited);
+                getLoops(localData, r, loops, stopPart, false, removed.get(r), visited);
                 removedVisited.add(r);
             }
             start = false;
@@ -1297,7 +1313,7 @@ public class Graph {
                     el.phase = 2;
                 }
             }
-            getLoops(currentLoop.loopBreak, loops, stopPart, false, level, visited);
+            getLoops(localData, currentLoop.loopBreak, loops, stopPart, false, level, visited);
         }
     }
 
@@ -1341,7 +1357,7 @@ public class Graph {
         if (part == null) {
             return ret;
         }
-        part = checkPart(localData, part);
+        part = checkPart(stack, localData, part, allParts);
         if (part == null) {
             return ret;
         }
@@ -1497,8 +1513,8 @@ public class Graph {
                 boolean reversed = false;
                 loopContinues = getLoopsContinues(loops);
                 loopContinues.add(part);//???
-                if (sp1.leadsTo(code, sp0, loops)) {
-                } else if (sp0.leadsTo(code, sp1, loops)) {
+                if (sp1.leadsTo(localData, this, code, sp0, loops)) {
+                } else if (sp0.leadsTo(localData, this, code, sp1, loops)) {
                     reversed = true;
                 }
                 GraphPart next = reversed ? sp0 : sp1;
@@ -1548,8 +1564,8 @@ public class Graph {
                 boolean reversed = false;
                 loopContinues = getLoopsContinues(loops);
                 loopContinues.add(part);//???
-                if (sp1.leadsTo(code, sp0, loops)) {
-                } else if (sp0.leadsTo(code, sp1, loops)) {
+                if (sp1.leadsTo(localData, this, code, sp0, loops)) {
+                } else if (sp0.leadsTo(localData, this, code, sp1, loops)) {
                     reversed = true;
                 }
                 GraphPart next = reversed ? sp0 : sp1;
@@ -1603,7 +1619,7 @@ public class Graph {
 
 
             if (part.nextParts.size() > 2) {//alchemy direct switch
-                GraphPart next = getMostCommonPart(part.nextParts, loops);
+                GraphPart next = getMostCommonPart(localData, part.nextParts, loops);
                 List<GraphPart> vis = new ArrayList<>();
                 GraphTargetItem switchedItem = stack.pop();
                 List<GraphTargetItem> caseValues = new ArrayList<>();
@@ -1679,7 +1695,7 @@ public class Graph {
                     }
                 }
                 if (nextOnePart == null) {
-                    GraphPart next = getNextCommonPart(part, loops);
+                    GraphPart next = getNextCommonPart(localData, part, loops);
 
                     @SuppressWarnings("unchecked")
                     Stack<GraphTargetItem> trueStack = (Stack<GraphTargetItem>) stack.clone();

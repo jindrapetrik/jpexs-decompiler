@@ -22,10 +22,8 @@ import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.Set;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -96,8 +94,8 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
         View.centerScreen(this);
         setTitle(translate("dialog.title"));
         pack();
-        if(getWidth()<350){
-            setSize(350, getHeight());            
+        if (getWidth() < 350) {
+            setSize(350, getHeight());
         }
     }
 

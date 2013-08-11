@@ -1089,7 +1089,7 @@ public class SWFInputStream extends InputStream {
                         }
                     }
                 }
-                HashMap<String, GraphTargetItem> curstate = new HashMap<String, GraphTargetItem>();
+                HashMap<String, GraphTargetItem> curstate = new HashMap<>();
                 curstate.putAll(vars);
                 decisionStates.put(ip, curstate);
 

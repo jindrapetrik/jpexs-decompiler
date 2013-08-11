@@ -21,6 +21,7 @@ import com.jpexs.decompiler.graph.GraphPart;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -47,7 +48,7 @@ public class GraphFrame extends AppFrame {
         private GraphPart head;
 
         public GraphPanel(Graph graph) {
-            graph.init();
+            graph.init(new ArrayList<>());
             size = getPartPositions(head = graph.heads.get(0), SPACE_VERTICAL + SPACE_VERTICAL + BLOCK_HEIGHT / 2, getPartWidth(graph.heads.get(0), new HashSet<GraphPart>()) * (BLOCK_WIDTH + SPACE_HORIZONTAL) / 2 - SPACE_HORIZONTAL, partPos, true);
             backLinksLeft = 1;
             backLinksRight = 1;
