@@ -2561,7 +2561,11 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 export.setVisible(true);
                 if (!export.cancelled) {
                     JFileChooser chooser = new JFileChooser();
-                    chooser.setCurrentDirectory(new java.io.File((String) Configuration.getConfig("lastExportDir", ".")));
+                    if(Configuration.containsConfig("lastExportDir")){
+                        chooser.setCurrentDirectory(new java.io.File((String) Configuration.getConfig("lastExportDir", ".")));
+                    }else{
+                        chooser.setCurrentDirectory(new File("."));
+                    }
                     chooser.setDialogTitle(translate("export.select.directory"));
                     chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                     chooser.setAcceptAllFileFilterUsed(false);
@@ -2569,7 +2573,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                         final long timeBefore = System.currentTimeMillis();
                         Main.startWork(translate("work.exporting") + "...");
                         final String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
-                        Configuration.setConfig("lastExportDir", Helper.fixDialogFile(chooser.getSelectedFile()).getParentFile().getAbsolutePath());
+                        Configuration.setConfig("lastExportDir", Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath());
                         final boolean isPcode = export.getOption(ExportDialog.OPTION_ACTIONSCRIPT) == 1;
                         final boolean isMp3OrWav = export.getOption(ExportDialog.OPTION_SOUNDS) == 0;
                         final boolean isFormatted = export.getOption(ExportDialog.OPTION_TEXTS) == 1;
