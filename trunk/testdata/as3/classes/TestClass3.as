@@ -41,34 +41,7 @@
 		[Embed(source="text.txt",
 		   mimeType="application/octet-stream")]		
 		private static var txt:Class;*/
-		/*public function testContinueLevels()
-		{
-			
-			loop182: for (var c = 0; c < 8; c = c + 1)
-			{
-				
-				loop165: for (var d = 0; d < 25; d++)
-				{
-					
-					for (var e = 0; e < 50; e++)
-					{
-						if (e == 9)
-						{
-							break loop165;
-						}
-						if (e == 20)
-						{
-							continue loop182;
-						}
-						if (e == 8)
-						{
-							break;
-						}
-						break loop182;
-					}
-				}
-				trace("hello");
-			}
-		}*/
+	
+		
 	}
 }

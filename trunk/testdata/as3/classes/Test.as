@@ -324,6 +324,7 @@
 			{
 				trace("Finally part");
 			}
+			trace("end");
 		}
 		
 		public function testSwitch()
@@ -816,27 +817,56 @@
                         }
                   }
 	  
-	  public function testWhileTry2() {
-                for(var i=0;i<100;i++)
-                {
-                   try
-                   {
-                      for(var j=0;j<20;j++)
-                                      {
-                            trace("a")
-                      }
-                   }
-                   catch(e:EOFError)
-                   {
-                      continue;
-                   }
-                   catch(e:Error)
-                   {
-                      continue;
-                   }
-                   trace("after_try");
-                }
-                trace("end");
-          }
-    }
+	  public function testWhileTry2()
+	  {
+		for(var i=0;i<100;i++)
+		{
+		   try
+		   {
+			  for(var j=0;j<20;j++)
+							  {
+					trace("a")
+			  }
+		   }
+		   catch(e:EOFError)
+		   {
+			  continue;
+		   }
+		   catch(e:Error)
+		   {
+			  continue;
+		   }
+		   trace("after_try");
+		}
+		trace("end");
+	  }
+		public function testTryReturn() : int
+		{
+			try
+			{
+				var i:int =0;
+				var b: Boolean = true;
+				if (i > 0)
+				{
+					while (testDoWhile2())
+					{
+						if (b)
+						{
+							return 5;
+						}
+					}
+				}
+				i++;
+				return 2;
+			}
+			catch (e:Error)
+			{
+			}
+			finally
+			{
+			}
+			return 4;
+			
+		}
+    }	
 }
