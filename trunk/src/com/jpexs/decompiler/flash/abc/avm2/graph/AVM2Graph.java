@@ -492,7 +492,26 @@ public class AVM2Graph extends Graph {
                 }
                 dp = dp.nextParts.get(0);
             }
-            if (this.code.code.get(dp.start).definition instanceof PushIntegerTypeIns) {
+
+            GraphPart numPart = dp;
+            AVM2Instruction ins = null;
+            Stack<GraphTargetItem> sstack = new Stack<>();
+            do {
+                for (int n = 0; n < numPart.getHeight(); n++) {
+                    ins = this.code.code.get(numPart.getPosAt(n));
+                    if (ins.definition instanceof LookupSwitchIns) {
+                        break;
+                    }
+                    ins.translate(localData, sstack, new ArrayList<GraphTargetItem>(), staticOperation, path);
+                }
+                if (numPart.nextParts.size() > 1) {
+                    break;
+                } else {
+                    numPart = numPart.nextParts.get(0);
+                }
+            } while (!(this.code.code.get(numPart.end).definition instanceof LookupSwitchIns));
+            GraphTargetItem nt = sstack.peek();
+            if (nt instanceof IntegerValueAVM2Item) {
                 hasDefault = true;
             }
             List<GraphTargetItem> caseValues = new ArrayList<>();
