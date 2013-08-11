@@ -1395,7 +1395,6 @@ public class Main {
                     Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\.swf\\OpenWithList", "MRUList", mruList);
                     Advapi32Util.registryDeleteValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\.swf\\OpenWithList", "" + appChar);
                 }
-                return true;
             }
             if (Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations")) {
                 exists = Advapi32Util.registryKeyExists(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\.swf\\Shell\\" + verb);
@@ -1415,8 +1414,7 @@ public class Main {
                     Advapi32Util.registryDeleteKey(REG_CLASSES_HKEY, REG_CLASSES_PATH + "SystemFileAssociations\\.swf\\Shell\\" + verb);
                 }
             }
-
-
+            return true;
         } catch (Exception ex) {
             //Updating registry failed, try elevating rights
             SHELLEXECUTEINFO sei = new SHELLEXECUTEINFO();
