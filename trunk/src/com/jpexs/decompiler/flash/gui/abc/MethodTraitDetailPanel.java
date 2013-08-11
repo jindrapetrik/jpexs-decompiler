@@ -63,4 +63,10 @@ public class MethodTraitDetailPanel extends JTabbedPane implements TraitDetail {
         methodBodyParamsPanel.setEditMode(val);
         methodInfoPanel.setEditMode(val);
     }
+    private boolean active = false;
+
+    @Override
+    public void setActive(boolean val) {
+        this.active = val;
+    }
 }

@@ -35,6 +35,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.text.Document;
+import jsyntaxpane.SyntaxDocument;
 
 public class DecompiledEditorPane extends LineMarkedEditorPane implements CaretListener {
 

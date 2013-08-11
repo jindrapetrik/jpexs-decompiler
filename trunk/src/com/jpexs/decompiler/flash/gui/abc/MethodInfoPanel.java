@@ -43,7 +43,7 @@ public class MethodInfoPanel extends JPanel {
     private JLabel methodIndexLabel;
 
     public MethodInfoPanel() {
-        returnTypeEditor = new JEditorPane();
+        returnTypeEditor = new UndoFixedEditorPane();
         paramEditor = new LineMarkedEditorPane();
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         JPanel miPanel = new JPanel();

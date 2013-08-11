@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.gui.abc;
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import javax.swing.JEditorPane;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.Element;
@@ -29,7 +28,7 @@ import jsyntaxpane.actions.ActionUtils;
  *
  * @author JPEXS
  */
-public class LineMarkedEditorPane extends JEditorPane {
+public class LineMarkedEditorPane extends UndoFixedEditorPane {
 
     int lastLine = -1;
 

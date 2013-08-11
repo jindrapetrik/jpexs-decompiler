@@ -41,7 +41,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
     private boolean showWarning = false;
 
     public SlotConstTraitDetailPanel() {
-        slotConstEditor = new JEditorPane();
+        slotConstEditor = new UndoFixedEditorPane();
         setLayout(new BorderLayout());
         add(new JLabel(translate("abc.detail.slotconst.typevalue")), BorderLayout.NORTH);
         add(new JScrollPane(slotConstEditor), BorderLayout.CENTER);
@@ -97,9 +97,15 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
 
     @Override
     public void setEditMode(boolean val) {
-        if (val) {
+        if (val && active) {
             JOptionPane.showMessageDialog(null, translate("warning.initializers"), translate("message.warning"), JOptionPane.WARNING_MESSAGE);
         }
         slotConstEditor.setEditable(val);
+    }
+    private boolean active = false;
+
+    @Override
+    public void setActive(boolean val) {
+        this.active = val;
     }
 }

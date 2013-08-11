@@ -134,6 +134,23 @@ public class DetailPanel extends JPanel implements ActionListener {
         layout.show(innerPanel, name);
         boolean b = cardMap.get(name) instanceof TraitDetail;
         buttonsPanel.setVisible(b);
+
+        TraitDetail newDetail = null;
+        if (b) {
+            newDetail = (TraitDetail) cardMap.get(name);
+        }
+        for (JComponent v : cardMap.values()) {
+            if (v instanceof TraitDetail) {
+                if (v != newDetail) {
+                    TraitDetail oldDetail = (TraitDetail) v;
+                    oldDetail.setActive(false);
+                }
+            }
+        }
+        if (newDetail != null) {
+            newDetail.setActive(true);
+        }
+
         selectedCard = name;
         selectedLabel.setText(selectedCard);
         if (trait == null) {

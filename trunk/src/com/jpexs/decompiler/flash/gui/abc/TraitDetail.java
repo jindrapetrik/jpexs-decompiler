@@ -25,4 +25,6 @@ public interface TraitDetail {
     public void setEditMode(boolean val);
 
     public boolean save();
+
+    public void setActive(boolean val);
 }
