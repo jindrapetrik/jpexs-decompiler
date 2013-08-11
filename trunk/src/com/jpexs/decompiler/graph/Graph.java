@@ -597,7 +597,7 @@ public class Graph {
          }
          System.out.println("</loops>");*/
         getPrecontinues(localData, null, heads.get(0), loops, null);
-        System.err.println("<loopspre>");
+        /*System.err.println("<loopspre>");
         for (Loop el : loops) {
             System.err.println(el);
         }
