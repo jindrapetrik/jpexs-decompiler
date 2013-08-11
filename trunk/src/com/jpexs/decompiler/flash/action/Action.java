@@ -1261,4 +1261,9 @@ public class Action implements GraphSourceItem {
         }
         return ret;
     }
+
+    @Override
+    public boolean isDeobfuscatePop() {
+        return false;
+    }
 }

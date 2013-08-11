@@ -42,4 +42,9 @@ public class ActionDeobfuscatePop extends ActionPop {
         }
         GraphTargetItem val = stack.pop();
     }
+
+    @Override
+    public boolean isDeobfuscatePop() {
+        return true;
+    }
 }

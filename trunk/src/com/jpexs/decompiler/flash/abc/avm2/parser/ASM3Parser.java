@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.parser;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
@@ -286,6 +287,12 @@ public class ASM3Parser {
                         offset += lastIns.getBytes().length;
                         break;
                     }
+                }
+                if (symb.value.toString().toLowerCase().equals("ffdec_deobfuscatepop")) {
+                    lastIns = new AVM2Instruction(offset, new DeobfuscatePopIns(), new int[0], new byte[0]);
+                    code.code.add(lastIns);
+                    offset += lastIns.getBytes().length;
+                    insFound = true;
                 }
                 if (!insFound) {
                     throw new ParseException("Invalid instruction name:" + (String) symb.value, lexer.yyline());

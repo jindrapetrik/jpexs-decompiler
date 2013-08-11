@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.graph;
 
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
@@ -546,10 +547,33 @@ public class Graph {
         return null;
     }
 
-    public GraphPart getNextNoJump(GraphPart part) {
+    public GraphPart getNextNoJump(GraphPart part, List<Object> localData) {
         while (code.get(part.start).isJump()) {
             part = part.getSubParts().get(0).nextParts.get(0);
         }
+        /*localData = prepareBranchLocalData(localData);
+         Stack<GraphTargetItem> st = new Stack<>();
+         List<GraphTargetItem> output=new ArrayList<>();
+         GraphPart startPart = part;
+         for (int i = part.start; i <= part.end; i++) {
+         GraphSourceItem src = code.get(i);
+         if (src.isJump()) {
+         part = part.nextParts.get(0);
+         if(st.isEmpty()){
+         startPart = part;
+         }
+         i = part.start - 1;
+         continue;
+         }
+         try{
+         src.translate(localData, st, output, SOP_USE_STATIC, "");
+         }catch(Exception ex){
+         return startPart;
+         }
+         if(!output.isEmpty()){
+         return startPart;
+         }
+         }*/
         return part;
     }
 
@@ -573,11 +597,11 @@ public class Graph {
          }
          System.out.println("</loops>");*/
         getPrecontinues(localData, null, heads.get(0), loops, null);
-        /*System.err.println("<loopspre>");
-         for (Loop el : loops) {
-         System.err.println(el);
-         }
-         System.err.println("</loopspre>");//*/
+        System.err.println("<loopspre>");
+        for (Loop el : loops) {
+            System.err.println(el);
+        }
+        System.err.println("</loopspre>");//*/
 
         List<GraphTargetItem> ret = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, heads.get(0), null, loops, staticOperation, path);
         processIfs(ret);
@@ -1124,16 +1148,25 @@ public class Graph {
         }
 
         if (part.nextParts.size() == 2) {
-            GraphPart next = getNextCommonPart(localData, part, loops);//part.getNextPartPath(loopContinues);
+
+            List<GraphPart> nps = new ArrayList<>(part.nextParts);
+            /*for(int i=0;i<nps.size();i++){
+             nps.set(i,getNextNoJump(nps.get(i),localData));
+             }
+             if(nps.get(0) == nps.get(1)){
+             nps = part.nextParts;
+             }*/
+            nps = part.nextParts;
+            GraphPart next = getCommonPart(localData, nps, loops);//part.getNextPartPath(loopContinues);
             List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
             if (next != null) {
                 stopPart2.add(next);
             }
-            if (next != part.nextParts.get(0)) {
-                getLoops(localData, part.nextParts.get(0), loops, stopPart2, false, level + 1, visited);
+            if (next != nps.get(0)) {
+                getLoops(localData, nps.get(0), loops, stopPart2, false, level + 1, visited);
             }
-            if (next != part.nextParts.get(1)) {
-                getLoops(localData, part.nextParts.get(1), loops, stopPart2, false, level + 1, visited);
+            if (next != nps.get(1)) {
+                getLoops(localData, nps.get(1), loops, stopPart2, false, level + 1, visited);
             }
             if (next != null) {
                 getLoops(localData, next, loops, stopPart, false, level, visited);
@@ -1508,8 +1541,8 @@ public class Graph {
          */
         if (part.nextParts.size() == 2) {
             if ((stack.size() >= 2) && (stack.get(stack.size() - 1) instanceof NotItem) && (((NotItem) (stack.get(stack.size() - 1))).getOriginal().getNotCoerced() == stack.get(stack.size() - 2).getNotCoerced())) {
-                GraphPart sp0 = getNextNoJump(part.nextParts.get(0));
-                GraphPart sp1 = getNextNoJump(part.nextParts.get(1));
+                GraphPart sp0 = getNextNoJump(part.nextParts.get(0), localData);
+                GraphPart sp1 = getNextNoJump(part.nextParts.get(1), localData);
                 boolean reversed = false;
                 loopContinues = getLoopsContinues(loops);
                 loopContinues.add(part);//???
@@ -1559,8 +1592,8 @@ public class Graph {
                 parseNext = false;
                 //return ret;
             } else if ((stack.size() >= 2) && (stack.get(stack.size() - 1).getNotCoerced() == stack.get(stack.size() - 2).getNotCoerced())) {
-                GraphPart sp0 = getNextNoJump(part.nextParts.get(0));
-                GraphPart sp1 = getNextNoJump(part.nextParts.get(1));
+                GraphPart sp0 = getNextNoJump(part.nextParts.get(0), localData);
+                GraphPart sp1 = getNextNoJump(part.nextParts.get(1), localData);
                 boolean reversed = false;
                 loopContinues = getLoopsContinues(loops);
                 loopContinues.add(part);//???
@@ -1618,7 +1651,7 @@ public class Graph {
         if (parseNext) {
 
 
-            if (part.nextParts.size() > 2) {//alchemy direct switch
+            if (false && part.nextParts.size() > 2) {//alchemy direct switch
                 GraphPart next = getMostCommonPart(localData, part.nextParts, loops);
                 List<GraphPart> vis = new ArrayList<>();
                 GraphTargetItem switchedItem = stack.pop();
@@ -1695,7 +1728,16 @@ public class Graph {
                     }
                 }
                 if (nextOnePart == null) {
-                    GraphPart next = getNextCommonPart(localData, part, loops);
+
+                    List<GraphPart> nps = new ArrayList<>(part.nextParts);
+                    /*for(int i=0;i<nps.size();i++){
+                     nps.set(i,getNextNoJump(nps.get(i),localData));
+                     }
+                     if(nps.get(0) == nps.get(1)){
+                     nps = part.nextParts;
+                     }*/
+                    nps = part.nextParts;
+                    GraphPart next = getCommonPart(localData, nps, loops);
 
                     @SuppressWarnings("unchecked")
                     Stack<GraphTargetItem> trueStack = (Stack<GraphTargetItem>) stack.clone();
@@ -1704,10 +1746,10 @@ public class Graph {
                     int trueStackSizeBefore = trueStack.size();
                     int falseStackSizeBefore = falseStack.size();
                     List<GraphTargetItem> onTrue = new ArrayList<>();
-                    boolean isEmpty = part.nextParts.get(0) == part.nextParts.get(1);
+                    boolean isEmpty = nps.get(0) == nps.get(1);
 
                     if (isEmpty) {
-                        next = part.nextParts.get(0);
+                        next = nps.get(0);
                     }
 
                     List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
@@ -1715,12 +1757,12 @@ public class Graph {
                         stopPart2.add(next);
                     }
                     if (!isEmpty) {
-                        onTrue = printGraph(visited, prepareBranchLocalData(localData), trueStack, allParts, part, part.nextParts.get(1), stopPart2, loops, staticOperation, path);
+                        onTrue = printGraph(visited, prepareBranchLocalData(localData), trueStack, allParts, part, nps.get(1), stopPart2, loops, staticOperation, path);
                     }
                     List<GraphTargetItem> onFalse = new ArrayList<>();
 
                     if (!isEmpty) {
-                        onFalse = printGraph(visited, prepareBranchLocalData(localData), falseStack, allParts, part, part.nextParts.get(0), stopPart2, loops, staticOperation, path);
+                        onFalse = printGraph(visited, prepareBranchLocalData(localData), falseStack, allParts, part, nps.get(0), stopPart2, loops, staticOperation, path);
                     }
                     if (isEmpty(onTrue) && isEmpty(onFalse) && (trueStack.size() > trueStackSizeBefore) && (falseStack.size() > falseStackSizeBefore)) {
                         stack.push(new TernarOpItem(null, expr, trueStack.pop(), falseStack.pop()));

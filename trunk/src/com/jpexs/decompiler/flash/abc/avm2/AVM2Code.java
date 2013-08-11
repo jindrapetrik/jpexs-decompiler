@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.CopyOutputStream;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphSource;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.alchemy.Lf32Ins;
@@ -796,7 +797,7 @@ public class AVM2Code implements Serializable {
                         if (ins.definition instanceof IfTypeIns) {
                             t = "";
                             for (int i = 0; i < -ins.definition.getStackDelta(ins, null/*IfTypeIns do not require ABCs*/); i++) {
-                                t += new PopIns().instructionName + "\n";
+                                t += new DeobfuscatePopIns().instructionName + "\n";
                             }
                             if (fixBranch == 0) { //jump
                                 t += new JumpIns().instructionName + " ofs" + Helper.formatAddress(ofs + ins.getBytes().length + ins.operands[0]);

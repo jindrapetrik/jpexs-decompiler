@@ -336,4 +336,9 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
     public int getFixBranch() {
         return fixedBranch;
     }
+
+    @Override
+    public boolean isDeobfuscatePop() {
+        return definition instanceof DeobfuscatePopIns;
+    }
 }

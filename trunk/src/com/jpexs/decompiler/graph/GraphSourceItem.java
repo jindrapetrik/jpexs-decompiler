@@ -47,4 +47,6 @@ public interface GraphSourceItem extends Serializable {
     public void setFixBranch(int pos);
 
     public int getFixBranch();
+
+    public boolean isDeobfuscatePop();
 }
