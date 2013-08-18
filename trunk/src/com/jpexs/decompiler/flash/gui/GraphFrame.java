@@ -303,7 +303,6 @@ public class GraphFrame extends AppFrame {
     }
 
     private void setVisibleSize(Dimension dim) {
-       
         setSize(new Dimension(dim.width + frameWidthDiff, dim.height + frameHeightDiff));
     }
 
