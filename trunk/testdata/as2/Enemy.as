@@ -2,6 +2,13 @@
 	var x:Number;
 	var tst:Number = 5;
 	var tst2:Number;
+	static var stat_tst:Number=6;
+	
+	
+	static function sfunc(){
+		trace("hu");
+	}
+	
 	// constructor
 	function Enemy(px:Number) {
 		var k=57;

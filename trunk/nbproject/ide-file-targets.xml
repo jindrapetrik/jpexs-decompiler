@@ -12,7 +12,9 @@
             <classpath refid="cp"/>
             <jvmarg value="-Xdebug"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
-            <arg line=""/>
+            <jvmarg value="-Xmx1024m"/>
+            <arg line="d:\swf\266\fbclient7__E89774F0__.swf"/>
+            <!-- d:\swf\while_decrement.swf -->
         </java>
     </target>
     <!-- TODO: edit the following target according to your needs -->

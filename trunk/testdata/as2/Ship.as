@@ -1,5 +1,9 @@
 ﻿class Ship implements Moving{
 	var y;
+	var a;
+	var b;
+	var c;
+	private var d=5;
 	// constructor
 	function Ship(py:Number){
 		y = py;
@@ -14,8 +18,11 @@
 	}
 	function moveLeft(lx:Number){
 		// empty
+		b = 6;
 	}
 	function moveRight(rx:Number){
 		// empty
+		trace(a);
+		trace(d);
 	}
 }
