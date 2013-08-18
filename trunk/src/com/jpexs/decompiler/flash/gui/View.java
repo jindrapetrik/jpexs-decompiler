@@ -66,16 +66,13 @@ public class View {
                 public void run() {
                     try {
                         UIManager.setLookAndFeel(new SubstanceOfficeBlue2007LookAndFeel());
-                        UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, 1.0);
+                        UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, 0.0);
                         UIManager.put("Tree.expandedIcon", getIcon("expand16"));
                         UIManager.put("Tree.collapsedIcon", getIcon("collapse16"));
 
                         UIManager.put("RibbonApplicationMenuPopupPanelUI", MyRibbonApplicationMenuPopupPanelUI.class.getName());
                         UIManager.put("RibbonApplicationMenuButtonUI", MyRibbonApplicationMenuButtonUI.class.getName());
                         UIManager.put("ProgressBarUI", MyProgressBarUI.class.getName());
-                        //UIManager.put(SubstanceLookAndFeel.USE_THEMED_DEFAULT_ICONS,Boolean.TRUE);        
-                        //UIManager.put("InternalFrame.icon",View.getIcon("icon16"));
-                        //UIManager.getDefaults().put("TreeUI", BasicTreeUI.class.getName() );
                     } catch (UnsupportedLookAndFeelException ex) {
                         Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
                     }
