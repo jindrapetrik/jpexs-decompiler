@@ -51,7 +51,9 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.logging.ConsoleHandler;
@@ -66,6 +68,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileFilter;
 
 /**
@@ -558,9 +561,9 @@ public class Main {
     }
 
     public static void initLang() {
-        if (Configuration.containsConfig("locale")) {
+        if (Configuration.containsConfig("locale")) {            
             Locale.setDefault(Locale.forLanguageTag((String) Configuration.getConfig("locale", "en")));
-        }
+        }     
         UIManager.put("OptionPane.okButtonText", AppStrings.translate("button.ok"));
         UIManager.put("OptionPane.yesButtonText", AppStrings.translate("button.yes"));
         UIManager.put("OptionPane.noButtonText", AppStrings.translate("button.no"));

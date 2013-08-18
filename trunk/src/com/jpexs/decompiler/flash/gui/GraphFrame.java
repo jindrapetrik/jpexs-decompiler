@@ -234,15 +234,30 @@ public class GraphFrame extends AppFrame {
             return w;
         }
     }
+    
     GraphPanel gp;
-
+    int scrollBarWidth;
+    int scrollBarHeight;
+    int frameWidthDiff;
+    int frameHeightDiff;
+    
     public GraphFrame(Graph graph, String name) {
         setSize(500, 500);
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
         gp = new GraphPanel(graph);
         setTitle(translate("graph") + " " + name);
-        cnt.add(new JScrollPane(gp));
+        JScrollPane scrollPane = new JScrollPane(gp);
+        scrollBarWidth = scrollPane.getVerticalScrollBar().getPreferredSize().width;
+        scrollBarHeight = scrollPane.getHorizontalScrollBar().getPreferredSize().height;
+        cnt.add(scrollPane, BorderLayout.CENTER);
+        pack();
+        
+        Dimension size = getSize();
+        Dimension innerSize = getContentPane().getSize();
+        
+        frameWidthDiff = size.width - innerSize.width;
+        frameHeightDiff = size.height - innerSize.height;
 
         View.setWindowIcon(this);
 
@@ -255,24 +270,40 @@ public class GraphFrame extends AppFrame {
         Dimension screen = getToolkit().getScreenSize();
         Dimension dim = new Dimension(0, 0);
         Dimension panDim = gp.getPreferredSize();
-        if (panDim.width < screen.width) {
-            dim.width = panDim.width + 10;
+        // add some magic constants 
+        panDim = new Dimension(panDim.width + 3, panDim.height + 2);
+        
+        boolean tooHigh = false;
+        boolean tooWide = false;
+        
+        if (panDim.width + frameWidthDiff < screen.width) {
+            dim.width = panDim.width;
         } else {
             dim.width = screen.width;
+            tooWide = true;
         }
-        if (panDim.height < screen.height) {
-            dim.height = panDim.height + 10;
+        if (panDim.height + frameHeightDiff < screen.height) {
+            dim.height = panDim.height;
         } else {
             dim.height = screen.height;
+            tooHigh = true;
         }
+        
+        if (tooWide) {
+            dim.height += scrollBarHeight;
+            dim.height = Math.min(dim.height, screen.height);
+        }
+        if (tooHigh) {
+            dim.width += scrollBarWidth;
+            dim.width = Math.min(dim.width, screen.width);
+        }
+        
         setVisibleSize(dim);
         View.centerScreen(this);
     }
 
     private void setVisibleSize(Dimension dim) {
-        Insets insets = this.getInsets();
-        setSize(new Dimension(insets.left + insets.right + dim.width,
-                insets.top + insets.bottom + dim.height));
+        setSize(new Dimension(dim.width + frameWidthDiff, dim.height + frameHeightDiff));
     }
 
     private void drawArrow(Graphics g, int x1, int y1, int x2, int y2) {
