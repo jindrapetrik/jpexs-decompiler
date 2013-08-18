@@ -36,6 +36,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -52,7 +53,10 @@ import javax.swing.SwingUtilities;
 public class ErrorLogFrame extends AppFrame {
 
     private JPanel logView = new JPanel();
+    private JPanel logViewInner = new JPanel();
     private Handler handler;
+    private ImageIcon expandIcon;
+    private ImageIcon collapseIcon;
 
     public Handler getHandler() {
         return handler;
@@ -68,10 +72,16 @@ public class ErrorLogFrame extends AppFrame {
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
         logView.setBackground(Color.white);
-        logView.setLayout(new BoxLayout(logView, BoxLayout.Y_AXIS));
+        logView.setLayout(new BorderLayout());
         cnt.setBackground(Color.white);
+        
+        logViewInner.setLayout(new BoxLayout(logViewInner, BoxLayout.Y_AXIS));
+        logView.add(logViewInner, BorderLayout.NORTH);
 
-        cnt.add(new JScrollPane(logView), BorderLayout.NORTH);
+        expandIcon = View.getIcon("expand16");
+        collapseIcon = View.getIcon("collapse16");
+        
+        cnt.add(new JScrollPane(logView), BorderLayout.CENTER);
         handler = new Handler() {
             @Override
             public void publish(LogRecord record) {
@@ -132,7 +142,7 @@ public class ErrorLogFrame extends AppFrame {
                     }
                 });
 
-                final JToggleButton expandButton = new JToggleButton(View.getIcon("collapse16"));
+                final JToggleButton expandButton = new JToggleButton(collapseIcon);
                 expandButton.setFocusPainted(false);
                 expandButton.setBorderPainted(false);
                 expandButton.setFocusable(false);
@@ -145,8 +155,6 @@ public class ErrorLogFrame extends AppFrame {
                 if (detailComponent != null) {
                     scrollPane = new JScrollPane(detailComponent);
                     scrollPane.setAlignmentX(0f);
-                    scrollPane.setMinimumSize(new Dimension(getWidth(), 500));
-                    scrollPane.setPreferredSize(new Dimension(getWidth(), 500));
                 } else {
                     scrollPane = null;
                 }
@@ -156,12 +164,8 @@ public class ErrorLogFrame extends AppFrame {
                     expandButton.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            if (expandButton.isSelected()) {
-                                expandButton.setIcon(View.getIcon("expand16"));
-                            }
+                            expandButton.setIcon(expandButton.isSelected() ? expandIcon : collapseIcon);
                             scrollPane.setVisible(expandButton.isSelected());
-                            scrollPane.setMinimumSize(new Dimension(getWidth(), 500));
-                            scrollPane.setSize(new Dimension(getWidth(), 500));
                             revalidate();
                             repaint();
                         }
@@ -199,7 +203,7 @@ public class ErrorLogFrame extends AppFrame {
                     scrollPane.setVisible(false);
                 }
                 pan.setAlignmentX(0f);
-                logView.add(pan);
+                logViewInner.add(pan);
                 revalidate();
                 repaint();
             }
