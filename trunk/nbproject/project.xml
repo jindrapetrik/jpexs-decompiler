@@ -126,14 +126,14 @@
                 <package-root>src</package-root>
                 <classpath mode="compile">lib/LZMA.jar;lib/jna-3.5.1.jar;lib/jpproxy.jar;lib/jsyntaxpane-0.9.5.jar</classpath>
                 <built-to>build/classes</built-to>
-                <source-level>1.6</source-level>
+                <source-level>1.7</source-level>
             </compilation-unit>
             <compilation-unit>
                 <package-root>test</package-root>
                 <unit-tests/>
                 <classpath mode="compile">lib/LZMA.jar;lib/jna-3.5.1.jar;lib/jpproxy.jar;lib/jsyntaxpane-0.9.5.jar;src;testlib/emma.jar;testlib/emma_ant.jar;testlib/junit-4.8.2.jar;testlib/testng-6.8.jar</classpath>
                 <built-to>build/test</built-to>
-                <source-level>1.6</source-level>
+                <source-level>1.7</source-level>
             </compilation-unit>
         </java-data>
     </configuration>
