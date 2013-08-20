@@ -591,7 +591,9 @@ public class SWF {
             outdir += File.separator;
         }
         outdir += "scripts" + File.separator;
-        ret.addAll(TagNode.exportNodeAS(tags, handler, list, outdir, isPcode, evl));
+        AtomicInteger cnt = new AtomicInteger(1);
+        int totalCount = TagNode.getTagCountRecursive(list);
+        ret.addAll(TagNode.exportNodeAS(tags, handler, list, outdir, isPcode, cnt, totalCount, evl));
         return ret;
     }
 

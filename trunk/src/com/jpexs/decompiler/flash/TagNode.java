@@ -53,6 +53,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TagNode {
 
@@ -231,11 +234,30 @@ public class TagNode {
         }
     }
 
+    public static int getTagCountRecursive(List<TagNode> nodeList) {
+        int count = 0;
+        
+        for (TagNode node : nodeList) {
+            if (node.subItems.isEmpty()) {
+                if ((node.tag instanceof ASMSource) && (node.export)) {
+                    count += 1;
+                }
+            } else {
+                count += getTagCountRecursive(node.subItems);
+            }
+
+        }
+        
+        return count;
+    }
+    
     public static List<File> exportNodeAS(List<Tag> allTags, AbortRetryIgnoreHandler handler, List<TagNode> nodeList, String outdir, boolean isPcode) throws IOException {
-        return exportNodeAS(allTags, handler, nodeList, outdir, isPcode, null);
+        AtomicInteger cnt = new AtomicInteger(1);
+        int totalCount = TagNode.getTagCountRecursive(nodeList);
+        return exportNodeAS(allTags, handler, nodeList, outdir, isPcode, cnt, totalCount, null);
     }
 
-    public static List<File> exportNodeAS(List<Tag> allTags, AbortRetryIgnoreHandler handler, List<TagNode> nodeList, String outdir, boolean isPcode, EventListener ev) throws IOException {
+    public static List<File> exportNodeAS(List<Tag> allTags, AbortRetryIgnoreHandler handler, List<TagNode> nodeList, String outdir, boolean isPcode, AtomicInteger index, int count, EventListener ev) throws IOException {
         File dir = new File(outdir);
         List<File> ret = new ArrayList<>();
         if (!outdir.endsWith(File.separator)) {
@@ -269,11 +291,10 @@ public class TagNode {
                     do {
                         retry = false;
                         try {
+                            long startTime = System.currentTimeMillis();
+
                             String f = outdir + name + ".as";
                             File file = new File(f);
-                            if (ev != null) {
-                                ev.handleEvent("export", "Exporting " + f + " ...");
-                            }
                             String res;
                             ASMSource asm = ((ASMSource) node.tag);
                             if (isPcode) {
@@ -286,6 +307,14 @@ public class TagNode {
                             try (FileOutputStream fos = new FileOutputStream(f)) {
                                 fos.write(res.getBytes("utf-8"));
                             }
+
+                            long stopTime = System.currentTimeMillis();
+
+                            if (ev != null) {
+                                long time = stopTime - startTime;
+                                ev.handleEvent("export", "Exported " + index.getAndIncrement() + "/" + count + " " + f + ", " + Helper.formatTimeSec(time));
+                            }
+
                             ret.add(file);
                         } catch (Exception ex) {
                             if (handler != null) {
@@ -305,7 +334,7 @@ public class TagNode {
                     } while (retry);
                 }
             } else {
-                ret.addAll(exportNodeAS(allTags, handler, node.subItems, outdir + name, isPcode, ev));
+                ret.addAll(exportNodeAS(allTags, handler, node.subItems, outdir + name, isPcode, index, count, ev));
             }
 
         }
