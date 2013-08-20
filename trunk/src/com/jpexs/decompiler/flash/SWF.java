@@ -598,7 +598,7 @@ public class SWF {
     }
 
     public List<File> exportActionScript3(AbortRetryIgnoreHandler handler, String outdir, boolean isPcode, boolean parallel) {
-        ExecutorService executor = Executors.newFixedThreadPool(20);
+        ExecutorService executor = Executors.newFixedThreadPool(parallel ? 20 : 1);
         List<Future<File>> futureResults = new ArrayList<>();
         AtomicInteger cnt = new AtomicInteger(1);
         List<ABCContainerTag> abcTags = new ArrayList<>();
