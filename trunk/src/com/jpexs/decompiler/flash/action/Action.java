@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action;
 
+import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -49,6 +50,7 @@ import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
+import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -62,6 +64,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -408,7 +413,7 @@ public class Action implements GraphSourceItem {
      * @param path
      * @return ASM source as String
      */
-    public static String actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, List<String> constantPool, int version, boolean hex, long swfPos, String path) {
+    private static String actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, List<String> constantPool, int version, boolean hex, long swfPos, String path) {
         long offset;
         if (importantOffsets == null) {
             //setActionsAddresses(list, 0, version);
@@ -434,6 +439,10 @@ public class Action implements GraphSourceItem {
             }
             pos++;
             if (hex) {
+                if (lastPush) {
+                    ret.append("\r\n");
+                    lastPush = false;
+                }
                 ret.append("<ffdec:hex>");/* +"0x"+Helper.formatAddress(a.getFileAddress())+": "+*/;
                 ret.append(Helper.bytesToHexString(a.getBytes(version)));
                 ret.append("</ffdec:hex>\r\n");
@@ -707,15 +716,22 @@ public class Action implements GraphSourceItem {
      * @param path
      * @return String with Source code
      */
-    public static String actionsToSource(List<Action> actions, int version, String path) {
+    public static String actionsToSource(final List<Action> actions, final int version, final String path) {
         try {
-            //List<ActionItem> tree = actionsToTree(new HashMap<Integer, String>(), actions, version);
-            int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
+            return Helper.timedCall(new Callable<String>() {
+                @Override
+                public String call() throws Exception {
+                    //List<ActionItem> tree = actionsToTree(new HashMap<Integer, String>(), actions, version);
+                    int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
 
-            List<GraphTargetItem> tree = actionsToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), actions, version, staticOperation, path);
+                    List<GraphTargetItem> tree = actionsToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), actions, version, staticOperation, path);
 
-
-            return Graph.graphToString(tree);
+                    return Graph.graphToString(tree);
+                }
+            }, Configuration.DECOMPILATION_TIMEOUT_SINGLE_METHOD, TimeUnit.SECONDS);
+        } catch (TimeoutException ex) {
+            Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
+            return "/*\r\n * Decompilation error\r\n * Timeout (" + Helper.formatTimeToText(Configuration.DECOMPILATION_TIMEOUT_SINGLE_METHOD) + ") was reached\r\n */";
         } catch (Exception | OutOfMemoryError | StackOverflowError ex2) {
             Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", ex2);
             if (ex2 instanceof OutOfMemoryError) {

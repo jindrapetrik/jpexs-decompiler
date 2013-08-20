@@ -1404,6 +1404,12 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                     @Override
                     public void run() {
                         if (record.getLevel() == Level.SEVERE) {
+                            if (errorNotificationButton == null) {
+                                // todo: honfika
+                                // why null?
+                                return;
+                            }
+                            
                             errorNotificationButton.setIcon(View.getIcon("error16"));
                             errorNotificationButton.setToolTipText(translate("errors.present"));
                             if (timer != null) {

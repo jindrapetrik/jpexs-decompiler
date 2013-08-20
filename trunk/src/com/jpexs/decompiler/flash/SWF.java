@@ -622,9 +622,9 @@ public class SWF {
 
         try {
             executor.shutdown();
-            executor.awaitTermination(30, TimeUnit.MINUTES);
+            executor.awaitTermination(Configuration.DECOMPILATION_TIMEOUT, TimeUnit.SECONDS);
         } catch (InterruptedException ex) {
-            Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, "30 minutes ActionScript export limit reached", ex);
+            Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, Helper.formatTimeToText(Configuration.DECOMPILATION_TIMEOUT) + " ActionScript export limit reached", ex);
         }
         return ret;
     }

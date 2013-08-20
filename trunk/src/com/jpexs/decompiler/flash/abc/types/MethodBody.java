@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.CodeStats;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.graph.Graph;
@@ -31,6 +32,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -103,7 +108,7 @@ public class MethodBody implements Cloneable, Serializable {
         return ret;
     }
 
-    public String toString(String path, boolean pcode, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, boolean hilight, List<String> fullyQualifiedNames, Traits initTraits) {
+    public String toString(final String path, boolean pcode, final boolean isStatic, final int scriptIndex, final int classIndex, final ABC abc, final ConstantPool constants, final MethodInfo method_info[], final Stack<GraphTargetItem> scopeStack, final boolean isStaticInitializer, final boolean hilight, final List<String> fullyQualifiedNames, final Traits initTraits) {
         if (debugMode) {
             System.err.println("Decompiling " + path);
         }
@@ -118,28 +123,44 @@ public class MethodBody implements Cloneable, Serializable {
         if (pcode) {
             s += code.toASMSource(constants, this, false);
         } else {
-            AVM2Code deobfuscated = null;
-            MethodBody b = (MethodBody) Helper.deepCopy(this);
-            deobfuscated = b.code;
-            deobfuscated.markMappedOffsets();
-            if ((Boolean) Configuration.getConfig("autoDeobfuscate", true)) {
-                try {
-                    deobfuscated.removeTraps(constants, b, abc, scriptIndex, classIndex, isStatic, path);
-                } catch (Exception | StackOverflowError ex) {
-                    Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Error during remove traps in " + path, ex);
-                }
-            }
-            //deobfuscated.restoreControlFlow(constants, b);
-            //try {
-            s += deobfuscated.toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, b, hilight, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<Integer, Integer>(), deobfuscated.visitCode(b));
-            s = s.trim();
-            if (s.equals("")) {
-                s = " ";
-            }
-            if (hilight) {
-                s = Highlighting.hilighMethod(s, this.method_info);
+            try {
+                s += Helper.timedCall(new Callable<String>() {
+                    @Override
+                    public String call() throws Exception {
+                        return toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, scopeStack, isStaticInitializer, hilight, fullyQualifiedNames, initTraits);
+                    }
+                }, Configuration.DECOMPILATION_TIMEOUT_SINGLE_METHOD, TimeUnit.SECONDS);
+            } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+                Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
+                s += "/*\r\n * Decompilation error\r\n * Timeout (" + Helper.formatTimeToText(Configuration.DECOMPILATION_TIMEOUT_SINGLE_METHOD) + ") was reached\r\n */";
             }
         }
+        return s;
+    }
+    
+    public String toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, boolean hilight, List<String> fullyQualifiedNames, Traits initTraits) {
+        AVM2Code deobfuscated = null;
+        MethodBody b = (MethodBody) Helper.deepCopy(this);
+        deobfuscated = b.code;
+        deobfuscated.markMappedOffsets();
+        if ((Boolean) Configuration.getConfig("autoDeobfuscate", true)) {
+            try {
+                deobfuscated.removeTraps(constants, b, abc, scriptIndex, classIndex, isStatic, path);
+            } catch (Exception | StackOverflowError ex) {
+                Logger.getLogger(MethodBody.class.getName()).log(Level.SEVERE, "Error during remove traps in " + path, ex);
+            }
+        }
+        //deobfuscated.restoreControlFlow(constants, b);
+        //try {
+        String s = deobfuscated.toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, b, hilight, getLocalRegNames(abc), scopeStack, isStaticInitializer, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<Integer, Integer>(), deobfuscated.visitCode(b));
+        s = s.trim();
+        if (s.equals("")) {
+            s = " ";
+        }
+        if (hilight) {
+            s = Highlighting.hilighMethod(s, this.method_info);
+        }
+        
         return s;
     }
 

@@ -53,7 +53,15 @@ public class Configuration {
      * Limit of code subs (for obfuscated code)
      */
     public static final int SUBLIMITER = 500;
-    //using parameter names in decompiling may cause problems because oficial programs like Flash CS 5.5 inserts wrong parameter names indices
+    /**
+     * Decompilation timeout in seconds
+     */
+    public static final int DECOMPILATION_TIMEOUT = 30 * 60;
+    /**
+     * Decompilation timeout for a single method in AS3 or single action in AS1/2 in seconds
+     */
+    public static final int DECOMPILATION_TIMEOUT_SINGLE_METHOD = 5;
+    //using parameter names in decompiling may cause problems because official programs like Flash CS 5.5 inserts wrong parameter names indices
     public static final boolean PARAM_NAMES_ENABLE = false;
     private static HashMap<String, Object> config = new HashMap<>();
     /**
