@@ -2542,6 +2542,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                     (new Thread() {
                         @Override
                         public void run() {
+                            Helper.freeMem();
                             try {
                                 if (compressed) {
                                     swf.exportFla(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, (Boolean) Configuration.getConfig("parallelSpeedUp", Boolean.TRUE));
@@ -2551,6 +2552,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                             } catch (IOException ex) {
                                 View.showMessageDialog(null, translate("error.export") + ": " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
                             }
+                            Helper.freeMem();
                             Main.stopWork();
                         }
                     }).start();

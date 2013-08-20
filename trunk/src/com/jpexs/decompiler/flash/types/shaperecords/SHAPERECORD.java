@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.types.shaperecords;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.helpers.Cache;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
@@ -812,7 +813,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
                 + "</svg>";
         return ret;
     }
-    private static HashMap<String, BufferedImage> cache = new HashMap<>();
+    private static Cache cache = Cache.getInstance(false);
 
     public static void clearShapeCache() {
         cache.clear();
@@ -834,8 +835,8 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
 
     public static BufferedImage shapeToImage(List<Tag> tags, int shapeNum, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStylesList, List<SHAPERECORD> records, Color defaultColor) {
         String key = "shape_" + records.hashCode() + "_" + (defaultColor == null ? "null" : defaultColor.hashCode());
-        if (cache.containsKey(key)) {
-            return cache.get(key);
+        if (cache.contains(key)) {
+            return (BufferedImage)cache.get(key);
         }
         RECT rect = new RECT();
         List<Path> paths = getPaths(rect, shapeNum, fillStyles, lineStylesList, /*numFillBits, numLineBits,*/ records);

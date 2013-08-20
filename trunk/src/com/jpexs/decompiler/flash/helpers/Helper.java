@@ -504,4 +504,8 @@ public class Helper {
         timeStr += Helper.padZeros(timeS, 2) + "." + Helper.padZeros(timeMs, 3);
         return timeStr;
     }
+    public static void freeMem(){
+        Cache.clearAll();
+        System.gc();
+    }
 }
