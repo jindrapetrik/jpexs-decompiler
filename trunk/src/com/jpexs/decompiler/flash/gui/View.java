@@ -66,7 +66,7 @@ public class View {
                 public void run() {
                     try {
                         UIManager.setLookAndFeel(new SubstanceOfficeBlue2007LookAndFeel());
-                        UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, 0.0);
+                        UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, 0.999);//This works for not changing labels color and not changing Dialogs title
                         UIManager.put("Tree.expandedIcon", getIcon("expand16"));
                         UIManager.put("Tree.collapsedIcon", getIcon("collapse16"));
 
