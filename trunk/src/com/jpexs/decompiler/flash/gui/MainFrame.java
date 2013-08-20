@@ -2192,6 +2192,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                         char c = newchars.charAt(i);
                         if (oldchars.indexOf((int) c) == -1) {
                             f.addCharacter(swf.tags, c, fontSelection.getSelectedItem().toString());
+                            oldchars += c;
                         }
                     }
                     fontAddCharactersField.setText("");
