@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.Configuration;
+import com.jpexs.decompiler.flash.ConsoleAbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.PercentListener;
 import com.jpexs.decompiler.flash.SWF;
@@ -529,6 +530,8 @@ public class Main {
         System.out.println("    Values are boolean, you can use 0/1, true/false or yes/no.");
         System.out.println("    If no other parameters passed, configuration is saved. Otherwise it is used only once.");
         System.out.println("    DO NOT PUT space between comma (,) and next value.");
+        System.out.println(" 9) -onerror (abort|retryN|ignore)");
+        System.out.println("  ...error handling mode. \"abort\" stops the exporting, \"retry\" tries the exporting N times, \"ignore\" ignores the current file");
         System.out.println();
         System.out.println("Examples:");
         System.out.println("java -jar ffdec.jar myfile.swf");
@@ -540,6 +543,8 @@ public class Main {
         System.out.println("java -jar ffdec.jar -dumpSWF myfile.swf");
         System.out.println("java -jar ffdec.jar -compress myfile.swf myfiledec.swf");
         System.out.println("java -jar ffdec.jar -decompress myfiledec.swf myfile.swf");
+        System.out.println("java -jar ffdec.jar -onerror ignore -export as \"C:\\decompiled\\\" myfile.swf");
+        System.out.println("java -jar ffdec.jar -onerror retry 5 -export as \"C:\\decompiled\\\" myfile.swf");
         System.out.println("java -jar ffdec.jar -config autoDeobfuscate=1,parallelSpeedUp=0 -export as \"C:\\decompiled\\\" myfile.swf");
         System.out.println("");
         System.out.println("Instead of \"java -jar ffdec.jar\" you can use ffdec.bat on Windows, ffdec.sh on Linux/MacOs");
@@ -671,61 +676,100 @@ public class Main {
         } else {
             Cache.setStorageType(Cache.STORAGE_MEMORY);
         }
+        
+        int errorMode = AbortRetryIgnoreHandler.UNDEFINED;
+        int retryCount = 0;
 
         if (args.length < pos + 1) {
             autoCheckForUpdates();
             offerAssociation();
             showModeFrame();
         } else {
-            if (args[pos].equals("-config")) {
-                pos++;
-                if (args.length <= pos) {
-                    System.err.println("Config values expected");
-                    badArguments();
-                }
-                String cfgStr = args[pos];
-                String cfgs[];
-                if (cfgStr.contains(",")) {
-                    cfgs = cfgStr.split(",");
-                } else {
-                    cfgs = new String[]{cfgStr};
-                }
-
-
-
-                for (String c : cfgs) {
-                    String cp[];
-                    if (c.contains("=")) {
-                        cp = c.split("=");
+            boolean parameterProcessed = true;
+            while (parameterProcessed) {
+                parameterProcessed = false;
+                if (args[pos].equals("-config")) {
+                    parameterProcessed = true;
+                    pos++;
+                    if (args.length <= pos) {
+                        System.err.println("Config values expected");
+                        badArguments();
+                    }
+                    String cfgStr = args[pos];
+                    String cfgs[];
+                    if (cfgStr.contains(",")) {
+                        cfgs = cfgStr.split(",");
                     } else {
-                        cp = new String[]{c, "1"};
+                        cfgs = new String[]{cfgStr};
                     }
-                    String key = cp[0];
-                    String value = cp[1];
-                    if (key.toLowerCase().equals("paralelSpeedUp".toLowerCase())) {
-                        key = "parallelSpeedUp";
-                    }
-                    for (String bk : commandlineConfigBoolean) {
-                        if (key.toLowerCase().equals(bk.toLowerCase())) {
-                            Boolean bValue = null;
-                            if (value.equals("0") || value.toLowerCase().equals("false") || value.toLowerCase().equals("no") || value.toLowerCase().equals("off")) {
-                                bValue = false;
-                            }
-                            if (value.equals("1") || value.toLowerCase().equals("true") || value.toLowerCase().equals("yes") || value.toLowerCase().equals("on")) {
-                                bValue = true;
-                            }
-                            if (bValue != null) {
-                                System.out.println("Config " + bk + " set to " + bValue);
-                                Configuration.setConfig(bk, bValue);
+
+                    for (String c : cfgs) {
+                        String cp[];
+                        if (c.contains("=")) {
+                            cp = c.split("=");
+                        } else {
+                            cp = new String[]{c, "1"};
+                        }
+                        String key = cp[0];
+                        String value = cp[1];
+                        if (key.toLowerCase().equals("paralelSpeedUp".toLowerCase())) {
+                            key = "parallelSpeedUp";
+                        }
+                        for (String bk : commandlineConfigBoolean) {
+                            if (key.toLowerCase().equals(bk.toLowerCase())) {
+                                Boolean bValue = null;
+                                if (value.equals("0") || value.toLowerCase().equals("false") || value.toLowerCase().equals("no") || value.toLowerCase().equals("off")) {
+                                    bValue = false;
+                                }
+                                if (value.equals("1") || value.toLowerCase().equals("true") || value.toLowerCase().equals("yes") || value.toLowerCase().equals("on")) {
+                                    bValue = true;
+                                }
+                                if (bValue != null) {
+                                    System.out.println("Config " + bk + " set to " + bValue);
+                                    Configuration.setConfig(bk, bValue);
+                                }
                             }
                         }
                     }
+                    pos++;
+                    if (args.length <= pos) {
+                        saveConfig();
+                        System.out.println("Configuration saved");
+                        return;
+                    }
                 }
-                pos++;
-                if (args.length <= pos) {
-                    saveConfig();
-                    System.out.println("Configuration saved");
-                    return;
+                if (args[pos].equals("-onerror")) {
+                    parameterProcessed = true;
+                    pos++;
+                    if (args.length <= pos) {
+                        System.err.println("onerror parameter expected");
+                        badArguments();
+                    }
+                    String errorModeParameter = args[pos];
+                    switch (errorModeParameter) {
+                        case "abort":
+                            errorMode = AbortRetryIgnoreHandler.ABORT;
+                            break;
+                        case "retry":
+                            errorMode = AbortRetryIgnoreHandler.RETRY;
+                            pos++;
+                            if (args.length <= pos) {
+                                System.err.println("onerror retry count parameter expected");
+                                badArguments();
+                            }
+
+                            try {
+                                retryCount = Integer.parseInt(args[pos]);
+                            } catch (NumberFormatException nex) {
+                                System.err.println("Bad retry count number");
+                            }
+                            break;
+                        case "ignore":
+                            errorMode = AbortRetryIgnoreHandler.IGNORE;
+                            break;
+                    }
+
+                    pos++;
                 }
             }
             if (args[pos].equals("-removefromcontextmenu")) {
@@ -774,26 +818,7 @@ public class Main {
                     "xfl"
                 };
 
-                AbortRetryIgnoreHandler handler = new AbortRetryIgnoreHandler() {
-                    @Override
-                    public int handle(Throwable thrown) {
-                        Scanner sc = new Scanner(System.in);
-                        System.out.println("Error occured: " + thrown.getLocalizedMessage());
-                        String n = null;
-                        do {
-                            System.out.print("Select action: (A)bort, (R)Retry, (I)Ignore:");
-                            n = sc.nextLine();
-                            switch (n.toLowerCase()) {
-                                case "a":
-                                    return AbortRetryIgnoreHandler.ABORT;
-                                case "r":
-                                    return AbortRetryIgnoreHandler.RETRY;
-                                case "i":
-                                    return AbortRetryIgnoreHandler.IGNORE;
-                            }
-                        } while (true);
-                    }
-                };
+                AbortRetryIgnoreHandler handler = new ConsoleAbortRetryIgnoreHandler(errorMode, retryCount);
                 String exportFormat = args[pos + 1].toLowerCase();
                 if (!Arrays.asList(validExportFormats).contains(exportFormat)) {
                     System.err.println("Invalid export format:" + exportFormat);

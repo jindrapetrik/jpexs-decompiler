@@ -319,7 +319,7 @@ public class TagNode {
                         } catch (Exception | OutOfMemoryError | StackOverflowError ex) {
                             Logger.getLogger(TagNode.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
                             if (handler != null) {
-                                int action = handler.handle(ex);
+                                int action = handler.getNewInstance().handle(ex);
                                 switch (action) {
                                     case AbortRetryIgnoreHandler.ABORT:
                                         throw ex;

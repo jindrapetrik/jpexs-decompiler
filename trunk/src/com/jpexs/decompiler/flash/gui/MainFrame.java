@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.Configuration;
+import com.jpexs.decompiler.flash.ConsoleAbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.FrameNode;
 import com.jpexs.decompiler.flash.PackageNode;
 import com.jpexs.decompiler.flash.SWF;
@@ -287,6 +288,12 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 String options[] = new String[]{translate("button.abort"), translate("button.retry"), translate("button.ignore")};
                 return View.showOptionDialog(null, translate("error.occured").replace("%error%", thrown.getLocalizedMessage()), translate("error"), JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE, null, options, "");
             }
+        }
+
+        @Override
+        public AbortRetryIgnoreHandler getNewInstance() {
+            // there are no non-static field in this class, so return the original instance
+            return this;
         }
     };
 
