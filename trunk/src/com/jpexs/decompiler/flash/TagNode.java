@@ -316,7 +316,8 @@ public class TagNode {
                             }
 
                             ret.add(file);
-                        } catch (Exception ex) {
+                        } catch (Exception | OutOfMemoryError | StackOverflowError ex) {
+                            Logger.getLogger(TagNode.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
                             if (handler != null) {
                                 int action = handler.handle(ex);
                                 switch (action) {
