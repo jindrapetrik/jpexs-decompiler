@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.NotCompileTimeAVM2Item;
+import com.jpexs.decompiler.graph.NotCompileTimeItem;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.HashMap;
@@ -44,7 +44,7 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
             assignCount = regAssignCount.get(regId);
         }
         if (assignCount > 5) { //Do not allow change register more than 5 - for deobfuscation
-            computedValue = new NotCompileTimeAVM2Item(ins, computedValue);
+            computedValue = new NotCompileTimeItem(ins, computedValue);
         }
         /*if (!isRegisterCompileTime(regId, ip, refs, code)) {
          computedValue = new NotCompileTimeAVM2Item(ins, computedValue);

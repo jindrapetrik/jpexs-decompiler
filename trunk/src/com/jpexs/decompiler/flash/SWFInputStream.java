@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash;
 
-import com.jpexs.decompiler.flash.abc.avm2.model.NotCompileTimeAVM2Item;
+import com.jpexs.decompiler.graph.NotCompileTimeItem;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.StoreTypeAction;
@@ -996,7 +996,7 @@ public class SWFInputStream extends InputStream {
                 if (varname != null) {
                     GraphTargetItem varval = vars.get(varname);
                     if (varval != null && varval.isCompileTime() && indeterminate) {
-                        vars.put(varname, new NotCompileTimeAVM2Item(null, varval));
+                        vars.put(varname, new NotCompileTimeItem(null, varval));
                     }
                 }
             }

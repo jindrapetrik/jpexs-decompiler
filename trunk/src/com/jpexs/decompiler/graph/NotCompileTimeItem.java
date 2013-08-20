@@ -14,30 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.abc.avm2.model;
+package com.jpexs.decompiler.graph;
 
-import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import java.util.HashMap;
 import java.util.List;
 
 /**
  *
  * @author JPEXS
  */
-public class NotCompileTimeAVM2Item extends AVM2Item {
+public class NotCompileTimeItem extends GraphTargetItem {
 
     public GraphTargetItem object;
 
-    public NotCompileTimeAVM2Item(GraphSourceItem instruction, GraphTargetItem object) {
+    public NotCompileTimeItem(GraphSourceItem instruction, GraphTargetItem object) {
         super(instruction, NOPRECEDENCE);
         this.object = object;
-    }
-
-    @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return object.toString(constants, localRegNames, fullyQualifiedNames);
     }
 
     @Override
@@ -51,5 +44,15 @@ public class NotCompileTimeAVM2Item extends AVM2Item {
             return object;
         }
         return object.getThroughNotCompilable();
+    }
+
+    @Override
+    public String toString(List<Object> localData) {
+        return object.toString(localData);
+    }
+
+    @Override
+    public boolean hasReturnValue() {
+        return object.hasReturnValue();
     }
 }

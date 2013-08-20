@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2;
 
+import com.jpexs.decompiler.graph.NotCompileTimeItem;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
@@ -2340,7 +2341,7 @@ public class AVM2Code implements Serializable {
                         HashMap<Integer, GraphTargetItem> registers = (HashMap<Integer, GraphTargetItem>) localData.get(2);
                         GraphTargetItem regVal = registers.get(regId);
                         if (regVal.isCompileTime()) {
-                            registers.put(regId, new NotCompileTimeAVM2Item(null, regVal));
+                            registers.put(regId, new NotCompileTimeItem(null, regVal));
                         }
                     }
                 }
