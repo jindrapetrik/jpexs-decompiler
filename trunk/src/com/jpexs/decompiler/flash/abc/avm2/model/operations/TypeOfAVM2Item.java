@@ -19,12 +19,6 @@ package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.EcmaType;
-import static com.jpexs.decompiler.flash.ecma.EcmaType.BOOLEAN;
-import static com.jpexs.decompiler.flash.ecma.EcmaType.NULL;
-import static com.jpexs.decompiler.flash.ecma.EcmaType.NUMBER;
-import static com.jpexs.decompiler.flash.ecma.EcmaType.OBJECT;
-import static com.jpexs.decompiler.flash.ecma.EcmaType.STRING;
-import static com.jpexs.decompiler.flash.ecma.EcmaType.UNDEFINED;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.UnaryOpItem;
 

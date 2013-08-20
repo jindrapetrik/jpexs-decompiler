@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf4.ActionGetURL2;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import static com.jpexs.decompiler.graph.GraphTargetItem.PRECEDENCE_PRIMARY;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import java.util.ArrayList;
 import java.util.List;
