@@ -22,9 +22,12 @@ package com.jpexs.decompiler.flash;
  */
 public interface AbortRetryIgnoreHandler {
 
+    public static int UNDEFINED = -1;
     public static int ABORT = 0;
     public static int RETRY = 1;
     public static int IGNORE = 2;
 
     public int handle(Throwable thrown);
+
+    public AbortRetryIgnoreHandler getNewInstance();
 }
