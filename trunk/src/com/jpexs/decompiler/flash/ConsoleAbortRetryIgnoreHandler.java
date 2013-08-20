@@ -1,0 +1,70 @@
+/*
+ * Copyright (C) 2013 JPEXS
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.jpexs.decompiler.flash;
+
+import java.util.Scanner;
+
+/**
+ *
+ * @author JPEXS
+ */
+public class ConsoleAbortRetryIgnoreHandler implements AbortRetryIgnoreHandler {
+    int errorCount = 0;
+    int errorMode;
+    int retryCount;
+
+    public ConsoleAbortRetryIgnoreHandler(int errorMode, int retryCount) {
+        this.errorMode = errorMode;
+        this.retryCount = retryCount;
+    }
+    
+    @Override
+    public int handle(Throwable thrown) {
+        if (errorMode != AbortRetryIgnoreHandler.UNDEFINED){
+            int result = errorMode;
+            
+            if (errorMode == AbortRetryIgnoreHandler.RETRY && errorCount < retryCount) {
+                errorCount++;
+            }
+            else {
+                result = AbortRetryIgnoreHandler.IGNORE;
+            }
+            
+            return result;
+        }
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Error occured: " + thrown.getLocalizedMessage());
+        String n = null;
+        do {
+            System.out.print("Select action: (A)bort, (R)Retry, (I)Ignore:");
+            n = sc.nextLine();
+            switch (n.toLowerCase()) {
+                case "a":
+                    return AbortRetryIgnoreHandler.ABORT;
+                case "r":
+                    return AbortRetryIgnoreHandler.RETRY;
+                case "i":
+                    return AbortRetryIgnoreHandler.IGNORE;
+            }
+        } while (true);
+    }
+
+    @Override
+    public AbortRetryIgnoreHandler getNewInstance() {
+        return new ConsoleAbortRetryIgnoreHandler(errorMode, retryCount);
+    }
+}

@@ -34,6 +34,13 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -46,6 +53,8 @@ import java.util.regex.Pattern;
  */
 public class Helper {
 
+    private static final ExecutorService THREAD_POOL = Executors.newCachedThreadPool();
+    
     /**
      * Converts array of int values to string
      *
@@ -504,8 +513,41 @@ public class Helper {
         timeStr += Helper.padZeros(timeS, 2) + "." + Helper.padZeros(timeMs, 3);
         return timeStr;
     }
+
     public static void freeMem(){
         Cache.clearAll();
         System.gc();
+    }
+    public static String formatTimeToText(int timeS) {
+        long timeM = timeS / 60;
+        timeS = timeS % 60;
+        long timeH = timeM / 60;
+        timeM = timeM % 60;
+
+        String timeStr = "";
+        if (timeH > 0) {
+            timeStr += timeH + (timeH > 1 ? " hours" : " hour");
+        }
+        if (timeM > 0) {
+            if (timeStr.length() > 0) {
+                timeStr += " and ";
+            }
+            timeStr += timeM + (timeM > 1 ? " minutes" : " minute");
+        }
+        if (timeS > 0) {
+            if (timeStr.length() > 0) {
+                timeStr += " and ";
+            }
+            timeStr += timeS + (timeS > 1 ? " seconds" : " second");
+        }
+
+        // (currently) used only in log, so no localization is required
+        return timeStr;
+    }
+    
+    public static <T> T timedCall(Callable<T> c, long timeout, TimeUnit timeUnit) throws InterruptedException, ExecutionException, TimeoutException {
+        FutureTask<T> task = new FutureTask<T>(c);
+        THREAD_POOL.execute(task);
+        return task.get(timeout, timeUnit);
     }
 }

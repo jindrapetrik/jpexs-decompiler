@@ -591,12 +591,14 @@ public class SWF {
             outdir += File.separator;
         }
         outdir += "scripts" + File.separator;
-        ret.addAll(TagNode.exportNodeAS(tags, handler, list, outdir, isPcode, evl));
+        AtomicInteger cnt = new AtomicInteger(1);
+        int totalCount = TagNode.getTagCountRecursive(list);
+        ret.addAll(TagNode.exportNodeAS(tags, handler, list, outdir, isPcode, cnt, totalCount, evl));
         return ret;
     }
 
     public List<File> exportActionScript3(AbortRetryIgnoreHandler handler, String outdir, boolean isPcode, boolean parallel) {
-        ExecutorService executor = Executors.newFixedThreadPool(20);
+        ExecutorService executor = Executors.newFixedThreadPool(parallel ? 20 : 1);
         List<Future<File>> futureResults = new ArrayList<>();
         AtomicInteger cnt = new AtomicInteger(1);
         List<ABCContainerTag> abcTags = new ArrayList<>();
@@ -622,9 +624,9 @@ public class SWF {
 
         try {
             executor.shutdown();
-            executor.awaitTermination(30, TimeUnit.MINUTES);
+            executor.awaitTermination(Configuration.DECOMPILATION_TIMEOUT, TimeUnit.SECONDS);
         } catch (InterruptedException ex) {
-            Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, "30 minutes ActionScript export limit reached", ex);
+            Logger.getLogger(ABC.class.getName()).log(Level.SEVERE, Helper.formatTimeToText(Configuration.DECOMPILATION_TIMEOUT) + " ActionScript export limit reached", ex);
         }
         return ret;
     }
