@@ -1106,6 +1106,7 @@ public class SWFInputStream extends InputStream {
                             ip = br;
                             prevIp = ip;
                             rri.setPos(br);
+                            filePos = rri.getPos();
                             continue loopip;
                         }
                     }
