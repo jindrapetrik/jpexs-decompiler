@@ -296,9 +296,9 @@ public class XFLConverter {
                 if (bitmapCh instanceof ImageTag) {
                     ImageTag it = (ImageTag) bitmapCh;
                     ret += "bitmap" + bitmapCh.getCharacterId() + "." + it.getImageFormat();
-                }else{
-                    if(bitmapCh!=null){
-                        Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Suspicious bitmapfill:"+bitmapCh.getClass().getSimpleName());
+                } else {
+                    if (bitmapCh != null) {
+                        Logger.getLogger(XFLConverter.class.getName()).log(Level.SEVERE, "Suspicious bitmapfill:" + bitmapCh.getClass().getSimpleName());
                     }
                     return "<SolidColor color=\"#ffffff\" />";
                 }
