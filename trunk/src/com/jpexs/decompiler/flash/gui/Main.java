@@ -333,7 +333,7 @@ public class Main {
             }
             return ok;
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(null, "Cannot open file", "Error", JOptionPane.ERROR_MESSAGE);
+            View.showMessageDialog(null, "Cannot open file", "Error", JOptionPane.ERROR_MESSAGE);
         }
         return false;
     }
