@@ -265,7 +265,7 @@ public class Main {
             try {
                 Main.startWork(translate("work.reading.swf") + "...");
                 swf = parseSWF(Main.inputStream);
-                if(Main.inputStream instanceof FileInputStream) {
+                if (Main.inputStream instanceof FileInputStream) {
                     Main.inputStream.close();
                 }
             } catch (Exception ex) {
@@ -1242,22 +1242,44 @@ public class Main {
         Configuration.setConfig("lastUpdatesCheckDate", Calendar.getInstance());
         return false;
     }
+    private static FileHandler fileTxt;
+
+    public static void clearLogFile() {
+        Logger logger = Logger.getLogger("");
+        if (fileTxt != null) {
+            fileTxt.flush();
+            fileTxt.close();
+            logger.removeHandler(fileTxt);
+        }
+        try {
+            File f = new File(getFFDecHome() + File.separator + "log.txt");
+            FileOutputStream fos = new FileOutputStream(f);
+            fos.close();
+        } catch (IOException ex) {
+        }
+        try {
+            fileTxt = new FileHandler(getFFDecHome() + File.separator + "log.txt");
+        } catch (IOException | SecurityException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        SimpleFormatter formatterTxt = new SimpleFormatter();
+        fileTxt.setFormatter(formatterTxt);
+        logger.addHandler(fileTxt);
+
+    }
 
     public static void initLogging(boolean debug) {
         try {
             Logger logger = Logger.getLogger("");
             logger.setLevel(debug ? Level.CONFIG : Level.WARNING);
-            FileHandler fileTxt = new FileHandler(getFFDecHome() + File.separator + "log.txt");
-
-            SimpleFormatter formatterTxt = new SimpleFormatter();
-            fileTxt.setFormatter(formatterTxt);
-            logger.addHandler(fileTxt);
-
             if (debug) {
                 ConsoleHandler conHan = new ConsoleHandler();
+                SimpleFormatter formatterTxt = new SimpleFormatter();
                 conHan.setFormatter(formatterTxt);
                 logger.addHandler(conHan);
             }
+            clearLogFile();
 
         } catch (Exception ex) {
             throw new RuntimeException("Problems with creating the log files");

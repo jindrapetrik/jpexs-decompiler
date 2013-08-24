@@ -21,6 +21,7 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -37,6 +38,7 @@ import java.util.logging.LogRecord;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -77,9 +79,22 @@ public class ErrorLogFrame extends AppFrame {
 
         logViewInner.setLayout(new BoxLayout(logViewInner, BoxLayout.Y_AXIS));
         logView.add(logViewInner, BorderLayout.NORTH);
+        JPanel buttonsPanel = new JPanel(new FlowLayout());
+        JButton clearButton = new JButton(translate("clear"));
+        clearButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                logViewInner.removeAll();
+                Main.clearLogFile();
+                revalidate();
+                repaint();
+            }
+        });
+        buttonsPanel.add(clearButton);
 
         expandIcon = View.getIcon("expand16");
         collapseIcon = View.getIcon("collapse16");
+        cnt.add(buttonsPanel, BorderLayout.SOUTH);
 
         cnt.add(new JScrollPane(logView), BorderLayout.CENTER);
         handler = new Handler() {
@@ -174,8 +189,11 @@ public class ErrorLogFrame extends AppFrame {
 
 
 
+                if (detailComponent != null) {
+                    header.add(expandButton);
+                }
                 JLabel dateLabel = new JLabel(dateStr);
-                dateLabel.setPreferredSize(new Dimension(140, 25));
+                dateLabel.setPreferredSize(new Dimension(200, (int) dateLabel.getPreferredSize().getHeight()));
                 dateLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
                 header.add(dateLabel);
 
@@ -193,9 +211,7 @@ public class ErrorLogFrame extends AppFrame {
                 msgLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
                 header.add(msgLabel);
                 header.setAlignmentX(0f);
-                if (detailComponent != null) {
-                    header.add(expandButton);
-                }
+
                 header.add(copyButton);
                 pan.add(header);
                 if (detailComponent != null) {
