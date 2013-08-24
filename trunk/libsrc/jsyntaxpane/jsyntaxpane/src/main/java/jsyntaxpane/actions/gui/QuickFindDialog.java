@@ -85,8 +85,9 @@ public class QuickFindDialog extends javax.swing.JDialog
 		oldCaretPosition = target.getCaretPosition();
 		Container view = target.getParent();
 		Dimension wd = getSize();
-		wd.width = target.getVisibleRect().width;
-		Point loc = new Point(0, view.getHeight());
+                //JPEXS fix:
+		//wd.width = target.getVisibleRect().width;
+		Point loc = new Point(0, view.getHeight()-getHeight()/*JPEXS fix*/);
 		setSize(wd);
 		setLocationRelativeTo(view);
 		SwingUtilities.convertPointToScreen(loc, view);
