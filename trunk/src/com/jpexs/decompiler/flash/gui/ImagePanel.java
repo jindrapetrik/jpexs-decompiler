@@ -20,16 +20,22 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class ImagePanel extends JPanel {
+public class ImagePanel extends JPanel implements ActionListener {
 
     public JLabel label = new JLabel();
     public DrawableTag drawable;
@@ -37,13 +43,53 @@ public class ImagePanel extends JPanel {
     private int percent;
     private int frame;
 
+    @Override
+    public void setBackground(Color bg) {
+        if (label != null) {
+            label.setBackground(bg);//bg);            
+        }
+        super.setBackground(bg);
+    }
+
     public ImagePanel() {
         super(new BorderLayout());
         label.setHorizontalAlignment(JLabel.CENTER);
+        label.setOpaque(true);
+        setOpaque(true);
+        setBackground(Color.white);
         add(label, BorderLayout.CENTER);
+
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        JPanel buttonsPanel = new JPanel(new FlowLayout());
+        JButton selectColorButton = new JButton(View.getIcon("color16"));
+        selectColorButton.addActionListener(this);
+        selectColorButton.setActionCommand("SELECTCOLOR");
+        selectColorButton.setToolTipText(AppStrings.translate("button.selectcolor.hint"));
+        buttonsPanel.add(selectColorButton);
+        bottomPanel.add(buttonsPanel, BorderLayout.EAST);
+        add(bottomPanel, BorderLayout.SOUTH);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if ("SELECTCOLOR".equals(e.getActionCommand())) {
+            View.execInEventDispatch(new Runnable() {
+                @Override
+                public void run() {
+                    Color newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectcolor.title"), View.swfBackgroundColor);
+                    if (newColor != null) {
+                        View.swfBackgroundColor = newColor;
+                        setBackground(newColor);
+                        repaint();
+                    }
+                }
+            });
+
+        }
     }
 
     public void setImage(byte data[]) {
+        setBackground(View.swfBackgroundColor);
         if (timer != null) {
             timer.cancel();
         }
@@ -87,6 +133,7 @@ public class ImagePanel extends JPanel {
     }
 
     public void setImage(Image image) {
+        setBackground(View.swfBackgroundColor);
         if (timer != null) {
             timer.cancel();
         }

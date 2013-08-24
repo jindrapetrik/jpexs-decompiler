@@ -52,7 +52,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
             byte ba[] = new byte[image.getWidth() * image.getHeight()];
             for (int i = 0; i < ba.length; i++) {
                 ba[i] = (byte) 255;
-            }            
+            }
             bitmapAlphaData = ba;
         } else {
             bitmapAlphaData = new byte[0];

@@ -19,14 +19,21 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.SWF;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 
 /**
@@ -43,15 +50,16 @@ public class SWFPreviwPanel extends JPanel {
 
     public SWFPreviwPanel() {
         pan = new ImagePanel();
+        pan.setBackground(View.swfBackgroundColor);
         setLayout(new BorderLayout());
-        add(pan, BorderLayout.CENTER);
-        add(buffering, BorderLayout.SOUTH);
+        add(new JScrollPane(pan), BorderLayout.CENTER);
         buffering.setHorizontalAlignment(JLabel.CENTER);
         buffering.setVisible(false);
         JLabel prevLabel = new HeaderLabel(translate("swfpreview.internal"));
         prevLabel.setHorizontalAlignment(SwingConstants.CENTER);
         //prevLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
         add(prevLabel, BorderLayout.NORTH);
+        add(buffering, BorderLayout.SOUTH);
     }
     private SWF swf;
 
@@ -92,6 +100,7 @@ public class SWFPreviwPanel extends JPanel {
                 if (frameImages.size() >= newframe) {
                     pan.setImage(frameImages.get(newframe - 1));
                     frame = newframe;
+                    pan.setBackground(View.swfBackgroundColor);
                 }
             }
         }, 0, 1000 / swf.frameRate);

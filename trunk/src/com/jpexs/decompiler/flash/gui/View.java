@@ -37,6 +37,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.plaf.basic.BasicColorChooserUI;
 import org.pushingpixels.flamingo.api.common.icon.ImageWrapperResizableIcon;
 import org.pushingpixels.substance.api.SubstanceConstants;
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
@@ -48,6 +49,8 @@ import org.pushingpixels.substance.api.skin.SubstanceOfficeBlue2007LookAndFeel;
  * @author JPEXS
  */
 public class View {
+
+    public static Color swfBackgroundColor = Color.white;
 
     /**
      * Sets windows Look and Feel
@@ -69,7 +72,9 @@ public class View {
                         UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, 0.999);//This works for not changing labels color and not changing Dialogs title
                         UIManager.put("Tree.expandedIcon", getIcon("expand16"));
                         UIManager.put("Tree.collapsedIcon", getIcon("collapse16"));
-
+                        UIManager.put("ColorChooserUI", BasicColorChooserUI.class.getName());
+                        UIManager.put("ColorChooser.swatchesRecentSwatchSize", new Dimension(20, 20));
+                        UIManager.put("ColorChooser.swatchesSwatchSize", new Dimension(20, 20));
                         UIManager.put("RibbonApplicationMenuPopupPanelUI", MyRibbonApplicationMenuPopupPanelUI.class.getName());
                         UIManager.put("RibbonApplicationMenuButtonUI", MyRibbonApplicationMenuButtonUI.class.getName());
                         UIManager.put("ProgressBarUI", MyProgressBarUI.class.getName());

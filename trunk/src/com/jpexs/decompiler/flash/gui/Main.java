@@ -304,7 +304,7 @@ public class Main {
         }
     }
 
-    public static boolean reloadSWF(){
+    public static boolean reloadSWF() {
         if (Main.inputStream == null) {
             mainFrame.setVisible(false);
             Helper.emptyObject(mainFrame);
@@ -327,6 +327,7 @@ public class Main {
             return false;
         }
     }
+
     public static void reloadApp() {
         if (loadingDialog != null) {
             loadingDialog.setVisible(false);
@@ -336,7 +337,7 @@ public class Main {
             proxyFrame.setVisible(false);
             proxyFrame = null;
         }
-        if(loadFromMemoryFrame != null){
+        if (loadFromMemoryFrame != null) {
             loadFromMemoryFrame.setVisible(false);
             loadFromMemoryFrame = null;
         }
@@ -700,6 +701,14 @@ public class Main {
         UIManager.put("FileChooser.fileSizeMegaBytes", AppStrings.translate("FileChooser.fileSizeMegaBytes"));
         UIManager.put("FileChooser.fileSizeGigaBytes", AppStrings.translate("FileChooser.fileSizeGigaBytes"));
         UIManager.put("FileChooser.folderNameLabelText", AppStrings.translate("FileChooser.folderNameLabelText"));
+
+        UIManager.put("ColorChooser.okText", AppStrings.translate("ColorChooser.okText"));
+        UIManager.put("ColorChooser.cancelText", AppStrings.translate("ColorChooser.cancelText"));
+        UIManager.put("ColorChooser.resetText", AppStrings.translate("ColorChooser.resetText"));
+        UIManager.put("ColorChooser.previewText", AppStrings.translate("ColorChooser.previewText"));
+        UIManager.put("ColorChooser.swatchesNameText", AppStrings.translate("ColorChooser.swatchesNameText"));
+        UIManager.put("ColorChooser.swatchesRecentText", AppStrings.translate("ColorChooser.swatchesRecentText"));
+        UIManager.put("ColorChooser.sampleText", AppStrings.translate("ColorChooser.sampleText"));
     }
 
     /**
