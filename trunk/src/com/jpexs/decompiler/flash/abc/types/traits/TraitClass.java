@@ -507,7 +507,8 @@ public class TraitClass extends Trait implements TraitWithSlot {
         boolean first = true;
         String glue = "\r\n\r\n";
         for (String s : outTraits) {
-            if (!Highlighting.stripHilights(s).trim().equals("")) {
+            String stripped = Highlighting.stripHilights(s);
+            if (!stripped.trim().equals("")) {
                 if (s.contains("/*classInitializer*/")) {
                     s = s.replace("/*classInitializer*/", "");
                     s = s + "\r\n";
@@ -521,7 +522,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             } else {
                 s = s.replace(ABC.IDENT_STRING, "");
             }
-            bui.append(s);
+            bui.append(stripped);
         }
 
 
