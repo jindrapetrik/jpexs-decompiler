@@ -208,16 +208,12 @@ public class Main {
     }
 
     public static SWF parseSWF(String file) throws Exception {
-        try (FileInputStream fis = new FileInputStream(file)) {
-            return parseSWF(fis);
-        }
+        return parseSWF(new FileInputStream(file));
     }
 
     public static SWF parseSWF(InputStream fis) throws Exception {
         SWF locswf;
-        //try (FileInputStream fis = new FileInputStream(file)) {
-        InputStream bis = new BufferedInputStream(fis);
-        locswf = new SWF(bis, new ProgressListener() {
+        locswf = new SWF(fis, new ProgressListener() {
             @Override
             public void progress(int p) {
                 startWork(translate("work.reading.swf"), p);
@@ -269,6 +265,9 @@ public class Main {
             try {
                 Main.startWork(translate("work.reading.swf") + "...");
                 swf = parseSWF(Main.inputStream);
+                if(Main.inputStream instanceof FileInputStream) {
+                    Main.inputStream.close();
+                }
             } catch (Exception ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 View.showMessageDialog(null, "Cannot load SWF file.");
@@ -327,9 +326,8 @@ public class Main {
     }
 
     public static boolean openFile(String swfFile) {
-
-        try (FileInputStream fis = new FileInputStream(swfFile)) {
-            boolean ok = openFile(swfFile, fis);
+        try {
+            boolean ok = openFile(swfFile, new FileInputStream(swfFile));
             if (ok) {
                 readOnly = false;
             }
