@@ -581,6 +581,7 @@ public class SWF {
             this.pack = pack;
             this.directory = directory;
             this.abcList = abcList;
+            this.pcode = pcode;
             this.path = path;
             this.index = index;
             this.count = count;
