@@ -52,15 +52,8 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
             byte ba[] = new byte[image.getWidth() * image.getHeight()];
             for (int i = 0; i < ba.length; i++) {
                 ba[i] = (byte) 255;
-            }
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
-            try {
-                sos.writeBytesZlib(ba);
-            } catch (IOException ex) {
-                Logger.getLogger(DefineBitsJPEG3Tag.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            bitmapAlphaData = baos.toByteArray();
+            }            
+            bitmapAlphaData = ba;
         } else {
             bitmapAlphaData = new byte[0];
         }
