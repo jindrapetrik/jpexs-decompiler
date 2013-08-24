@@ -376,14 +376,17 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         assignListener(openCommandButton, "OPEN");
         saveCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.save")), View.getResizableIcon("save32"));
         assignListener(saveCommandButton, "SAVE");
-        JCommandButton saveasCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.saveas")), View.getResizableIcon("saveas32"));
+        JCommandButton saveasCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.saveas")), View.getResizableIcon("saveas16"));
         assignListener(saveasCommandButton, "SAVEAS");
 
+        JCommandButton reloadCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.reload")), View.getResizableIcon("reload16"));
+        assignListener(reloadCommandButton, "RELOAD");
 
 
         editBand.addCommandButton(openCommandButton, RibbonElementPriority.TOP);
         editBand.addCommandButton(saveCommandButton, RibbonElementPriority.TOP);
-        editBand.addCommandButton(saveasCommandButton, RibbonElementPriority.TOP);
+        editBand.addCommandButton(saveasCommandButton, RibbonElementPriority.MEDIUM);
+        editBand.addCommandButton(reloadCommandButton, RibbonElementPriority.MEDIUM);
         saveCommandButton.setEnabled(!Main.readOnly);
 
         JRibbonBand exportBand = new JRibbonBand(translate("menu.export"), null);
@@ -827,6 +830,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
             exportSelMenu.setEnabled(false);
             deobfuscationCommandButton.setEnabled(false);
             searchCommandButton.setEnabled(false);
+            reloadCommandButton.setEnabled(false);
         }
 
         UIManager.getDefaults().put("TreeUI", BasicTreeUI.class.getName());
@@ -2193,6 +2197,11 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
+            case "RELOAD":
+                if(View.showConfirmDialog(null, translate("message.confirm.reload"), translate("message.warning"),JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)==JOptionPane.YES_OPTION){
+                    Main.reloadSWF();
+                }
+                break;
             case "LOADMEMORY":
                 Main.loadFromMemory();
                 break;

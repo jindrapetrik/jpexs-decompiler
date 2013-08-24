@@ -304,6 +304,29 @@ public class Main {
         }
     }
 
+    public static boolean reloadSWF(){
+        if (Main.inputStream == null) {
+            mainFrame.setVisible(false);
+            Helper.emptyObject(mainFrame);
+            Cache.clearAll();
+            System.gc();
+            mainFrame = null;
+            showModeFrame();
+            return true;
+        } else {
+            if (inputStream instanceof FileInputStream) {
+                openFile(file);
+            } else if (inputStream instanceof BufferedInputStream) {
+                try {
+                    ((BufferedInputStream) inputStream).reset();
+                } catch (IOException ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                return openFile(fileTitle, inputStream);
+            }
+            return false;
+        }
+    }
     public static void reloadApp() {
         if (loadingDialog != null) {
             loadingDialog.setVisible(false);
@@ -313,16 +336,11 @@ public class Main {
             proxyFrame.setVisible(false);
             proxyFrame = null;
         }
-        if (Main.file == null) {
-            mainFrame.setVisible(false);
-            Helper.emptyObject(mainFrame);
-            Cache.clearAll();
-            System.gc();
-            mainFrame = null;
-            showModeFrame();
-        } else {
-            openFile(Main.file);
+        if(loadFromMemoryFrame != null){
+            loadFromMemoryFrame.setVisible(false);
+            loadFromMemoryFrame = null;
         }
+        reloadSWF();
     }
 
     public static boolean openFile(String swfFile) {
