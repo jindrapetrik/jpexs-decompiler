@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.Configuration;
-import com.jpexs.decompiler.flash.ConsoleAbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.FrameNode;
 import com.jpexs.decompiler.flash.PackageNode;
 import com.jpexs.decompiler.flash.SWF;
@@ -36,8 +35,6 @@ import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.abc.TreeElement;
 import com.jpexs.decompiler.flash.gui.action.ActionPanel;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
-import com.jpexs.decompiler.flash.helpers.Cache;
-import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
@@ -93,6 +90,9 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
+import com.jpexs.helpers.Cache;
+import com.jpexs.helpers.Helper;
+import com.jpexs.process.ProcessTools;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -280,6 +280,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
     private ErrorLogFrame errorLogFrame;
     private ComponentListener fontChangeList;
     private JComboBox<String> fontSelection;
+    private JCommandButton saveCommandButton;
     private Map<Integer, String> sourceFontsMap = new HashMap<>();
     private AbortRetryIgnoreHandler errorHandler = new AbortRetryIgnoreHandler() {
         @Override
@@ -373,7 +374,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         editBand.setResizePolicies((List) Arrays.asList(new CoreRibbonResizePolicies.Mirror(editBand.getControlPanel()), new IconRibbonBandResizePolicy(editBand.getControlPanel())));
         JCommandButton openCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.open")), View.getResizableIcon("open32"));
         assignListener(openCommandButton, "OPEN");
-        JCommandButton saveCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.save")), View.getResizableIcon("save32"));
+        saveCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.save")), View.getResizableIcon("save32"));
         assignListener(saveCommandButton, "SAVE");
         JCommandButton saveasCommandButton = new JCommandButton(fixCommandTitle(translate("menu.file.saveas")), View.getResizableIcon("saveas32"));
         assignListener(saveasCommandButton, "SAVEAS");
@@ -383,7 +384,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         editBand.addCommandButton(openCommandButton, RibbonElementPriority.TOP);
         editBand.addCommandButton(saveCommandButton, RibbonElementPriority.TOP);
         editBand.addCommandButton(saveasCommandButton, RibbonElementPriority.TOP);
-
+        saveCommandButton.setEnabled(!Main.readOnly);
 
         JRibbonBand exportBand = new JRibbonBand(translate("menu.export"), null);
         exportBand.setResizePolicies((List) Arrays.asList(new CoreRibbonResizePolicies.Mirror(exportBand.getControlPanel()), new IconRibbonBandResizePolicy(exportBand.getControlPanel())));
@@ -410,10 +411,16 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         JCommandButton gotoDocumentClassCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.gotodocumentclass")), View.getResizableIcon("gotomainclass32"));
         assignListener(gotoDocumentClassCommandButton, "GOTODOCUMENTCLASS");
 
+        JCommandButton loadMemoryCommandButton = new JCommandButton(fixCommandTitle(translate("menu.tools.searchmemory")), View.getResizableIcon("open_process32"));
+        assignListener(loadMemoryCommandButton, "LOADMEMORY");
+
         toolsBand.addCommandButton(searchCommandButton, RibbonElementPriority.TOP);
         toolsBand.addCommandButton(proxyCommandButton, RibbonElementPriority.TOP);
         toolsBand.addCommandButton(gotoDocumentClassCommandButton, RibbonElementPriority.TOP);
-
+        toolsBand.addCommandButton(loadMemoryCommandButton, RibbonElementPriority.TOP);
+        if (!ProcessTools.toolsAvailable()) {
+            loadMemoryCommandButton.setEnabled(false);
+        }
         JRibbonBand deobfuscationBand = new JRibbonBand(translate("menu.tools.deobfuscation"), null);
         deobfuscationBand.setResizePolicies((List) Arrays.asList(new CoreRibbonResizePolicies.Mirror(deobfuscationBand.getControlPanel()), new IconRibbonBandResizePolicy(deobfuscationBand.getControlPanel())));
 
@@ -579,6 +586,11 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
             public void windowClosing(WindowEvent e) {
                 if (Main.proxyFrame != null) {
                     if (Main.proxyFrame.isVisible()) {
+                        return;
+                    }
+                }
+                if (Main.loadFromMemoryFrame != null) {
+                    if (Main.loadFromMemoryFrame.isVisible()) {
                         return;
                     }
                 }
@@ -1416,7 +1428,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                 // why null?
                                 return;
                             }
-                            
+
                             errorNotificationButton.setIcon(View.getIcon("error16"));
                             errorNotificationButton.setToolTipText(translate("errors.present"));
                             if (timer != null) {
@@ -2181,6 +2193,9 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
+            case "LOADMEMORY":
+                Main.loadFromMemory();
+                break;
             case "SHOWERRORLOG":
                 errorLogFrame.setVisible(true);
                 break;
@@ -2497,6 +2512,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
             case "SAVEAS":
                 if (Main.saveFileDialog()) {
                     setTitle(Main.applicationVerName + (Configuration.DISPLAY_FILENAME ? " - " + Main.getFileTitle() : ""));
+                    saveCommandButton.setEnabled(!Main.readOnly);
                 }
                 break;
             case "OPEN":

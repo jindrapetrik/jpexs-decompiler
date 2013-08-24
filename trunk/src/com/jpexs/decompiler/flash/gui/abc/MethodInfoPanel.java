@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.abc.methodinfo_parser.ParseException;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
 import com.jpexs.decompiler.flash.gui.View;
-import com.jpexs.decompiler.flash.helpers.Helper;
+import com.jpexs.helpers.Helper;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.util.ArrayList;

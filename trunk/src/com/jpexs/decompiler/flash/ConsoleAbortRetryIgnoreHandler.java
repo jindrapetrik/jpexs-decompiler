@@ -23,6 +23,7 @@ import java.util.Scanner;
  * @author JPEXS
  */
 public class ConsoleAbortRetryIgnoreHandler implements AbortRetryIgnoreHandler {
+
     int errorCount = 0;
     int errorMode;
     int retryCount;
@@ -31,19 +32,18 @@ public class ConsoleAbortRetryIgnoreHandler implements AbortRetryIgnoreHandler {
         this.errorMode = errorMode;
         this.retryCount = retryCount;
     }
-    
+
     @Override
     public int handle(Throwable thrown) {
-        if (errorMode != AbortRetryIgnoreHandler.UNDEFINED){
+        if (errorMode != AbortRetryIgnoreHandler.UNDEFINED) {
             int result = errorMode;
-            
+
             if (errorMode == AbortRetryIgnoreHandler.RETRY && errorCount < retryCount) {
                 errorCount++;
-            }
-            else {
+            } else {
                 result = AbortRetryIgnoreHandler.IGNORE;
             }
-            
+
             return result;
         }
         Scanner sc = new Scanner(System.in);

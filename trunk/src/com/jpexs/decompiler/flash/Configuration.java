@@ -58,7 +58,8 @@ public class Configuration {
      */
     public static final int DECOMPILATION_TIMEOUT = 30 * 60;
     /**
-     * Decompilation timeout for a single method in AS3 or single action in AS1/2 in seconds
+     * Decompilation timeout for a single method in AS3 or single action in
+     * AS1/2 in seconds
      */
     public static final int DECOMPILATION_TIMEOUT_SINGLE_METHOD = 5;
     //using parameter names in decompiling may cause problems because official programs like Flash CS 5.5 inserts wrong parameter names indices

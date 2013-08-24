@@ -74,13 +74,13 @@ public class ErrorLogFrame extends AppFrame {
         logView.setBackground(Color.white);
         logView.setLayout(new BorderLayout());
         cnt.setBackground(Color.white);
-        
+
         logViewInner.setLayout(new BoxLayout(logViewInner, BoxLayout.Y_AXIS));
         logView.add(logViewInner, BorderLayout.NORTH);
 
         expandIcon = View.getIcon("expand16");
         collapseIcon = View.getIcon("collapse16");
-        
+
         cnt.add(new JScrollPane(logView), BorderLayout.CENTER);
         handler = new Handler() {
             @Override

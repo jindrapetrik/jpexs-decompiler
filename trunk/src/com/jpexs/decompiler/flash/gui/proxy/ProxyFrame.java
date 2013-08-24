@@ -171,7 +171,7 @@ public class ProxyFrame extends AppFrame implements ActionListener, CatchedListe
     private void open() {
         if (swfList.getSelectedIndex() > -1) {
             Replacement r = (Replacement) listModel.getElementAt(swfList.getSelectedIndex());
-            Main.maskURL = r.urlPattern;
+            Main.fileTitle = r.urlPattern;
             Main.openFile(r.targetFile);
         }
     }

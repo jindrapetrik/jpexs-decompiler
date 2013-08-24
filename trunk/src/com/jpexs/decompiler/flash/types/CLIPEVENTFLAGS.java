@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
-import com.jpexs.decompiler.flash.helpers.Helper;
+import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.List;
 

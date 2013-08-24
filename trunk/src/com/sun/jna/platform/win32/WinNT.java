@@ -10,7 +10,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.  
  */
-package com.jpexs.decompiler.flash.gui.jna.platform.win32;
+package com.sun.jna.platform.win32;
 
 import com.sun.jna.FromNativeContext;
 import com.sun.jna.Memory;
@@ -386,12 +386,14 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
     // AccessSystemAcl access type
     //
     int ACCESS_SYSTEM_SECURITY = 0x01000000;
+    int PAGE_NOACCESS = 0x01;
     int PAGE_READONLY = 0x02;
     int PAGE_READWRITE = 0x04;
     int PAGE_WRITECOPY = 0x08;
     int PAGE_EXECUTE = 0x10;
     int PAGE_EXECUTE_READ = 0x20;
     int PAGE_EXECUTE_READWRITE = 0x40;
+    int PAGE_GUARD = 0x100;
     int SECTION_QUERY = 0x0001;
     int SECTION_MAP_WRITE = 0x0002;
     int SECTION_MAP_READ = 0x0004;

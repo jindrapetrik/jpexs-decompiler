@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash;
 
-import com.jpexs.decompiler.graph.NotCompileTimeItem;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.StoreTypeAction;
@@ -32,7 +31,6 @@ import com.jpexs.decompiler.flash.action.swf6.*;
 import com.jpexs.decompiler.flash.action.swf7.*;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.Null;
-import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.*;
 import com.jpexs.decompiler.flash.types.*;
@@ -54,6 +52,10 @@ import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.NotCompileTimeItem;
+import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.ProgressListener;
+import com.jpexs.helpers.ReReadableInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -86,7 +88,7 @@ public class SWFInputStream extends InputStream {
     private long pos;
     private int version;
     private static final Logger log = Logger.getLogger(SWFInputStream.class.getName());
-    private List<PercentListener> listeners = new ArrayList<>();
+    private List<ProgressListener> listeners = new ArrayList<>();
     private long percentMax;
     private List<byte[]> buffered = new ArrayList<>();
     private ByteArrayOutputStream buffer;
@@ -119,11 +121,11 @@ public class SWFInputStream extends InputStream {
         return null;
     }
 
-    public void addPercentListener(PercentListener listener) {
+    public void addPercentListener(ProgressListener listener) {
         listeners.add(listener);
     }
 
-    public void removePercentListener(PercentListener listener) {
+    public void removePercentListener(ProgressListener listener) {
         int index = listeners.indexOf(listener);
         if (index > -1) {
             listeners.remove(index);
@@ -206,8 +208,8 @@ public class SWFInputStream extends InputStream {
         if (percentMax > 0) {
             int percent = (int) (pos * 100 / percentMax);
             if (lastPercent != percent) {
-                for (PercentListener pl : listeners) {
-                    pl.percent(percent);
+                for (ProgressListener pl : listeners) {
+                    pl.progress(percent);
                 }
                 lastPercent = percent;
             }
@@ -1216,6 +1218,22 @@ public class SWFInputStream extends InputStream {
      * @throws IOException
      */
     public List<Tag> readTagList(SWF swf, int level, boolean parallel, boolean skipUnusualTags) throws IOException {
+        return readTagList(swf, level, parallel, skipUnusualTags, true);
+    }
+
+    /**
+     * Reads list of tags from the stream. Reading ends with End tag(=0) or end
+     * of the stream. Optinally can skip AS1/2 tags when file is AS3
+     *
+     * @param swf
+     * @param level
+     * @param parallel
+     * @param skipUnusualTags
+     * @param parseTags
+     * @return List of tags
+     * @throws IOException
+     */
+    public List<Tag> readTagList(SWF swf, int level, boolean parallel, boolean skipUnusualTags, boolean parseTags) throws IOException {
         ExecutorService executor = null;
         if (parallel) {
             executor = Executors.newFixedThreadPool(20);
@@ -1228,7 +1246,7 @@ public class SWFInputStream extends InputStream {
         while (true) {
             long pos = getPos();
             try {
-                tag = readTag(swf, level, pos, !parallel, parallel, skipUnusualTags);
+                tag = readTag(swf, level, pos, parseTags && !parallel, parallel, skipUnusualTags);
             } catch (EndOfStreamException ex) {
                 tag = null;
             }
@@ -1285,6 +1303,9 @@ public class SWFInputStream extends InputStream {
                         }
 
                 }
+            }
+            if (!parseTags) {
+                doParse = false;
             }
 
             if (doParse) {

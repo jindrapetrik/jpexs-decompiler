@@ -14,18 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.gui.jna.platform.win32;
+package com.sun.jna.platform.win32;
 
 /**
  *
  * @author JPEXS
  */
-import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinNT.EVENTLOGRECORD;
-import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinReg.HKEY;
-import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinReg.HKEYByReference;
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
+import com.sun.jna.platform.win32.WinNT.EVENTLOGRECORD;
+import com.sun.jna.platform.win32.WinReg.HKEY;
+import com.sun.jna.platform.win32.WinReg.HKEYByReference;
 import com.sun.jna.ptr.IntByReference;
 import java.util.ArrayList;
 import java.util.Map;

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.gui.jna.platform.win32;
+package com.sun.jna.platform.win32;
 
 /**
  *
@@ -32,14 +32,14 @@ package com.jpexs.decompiler.flash.gui.jna.platform.win32;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.  
  */
-import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinBase.SECURITY_ATTRIBUTES;
-import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinNT.HANDLE;
-import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinNT.HANDLEByReference;
-import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinReg.HKEY;
-import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinReg.HKEYByReference;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
+import com.sun.jna.platform.win32.WinBase.SECURITY_ATTRIBUTES;
+import com.sun.jna.platform.win32.WinNT.HANDLE;
+import com.sun.jna.platform.win32.WinNT.HANDLEByReference;
+import com.sun.jna.platform.win32.WinReg.HKEY;
+import com.sun.jna.platform.win32.WinReg.HKEYByReference;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.win32.StdCallLibrary;
 import com.sun.jna.win32.W32APIOptions;

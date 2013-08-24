@@ -34,13 +34,13 @@ import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.abc.LineMarkedEditorPane;
-import com.jpexs.decompiler.flash.helpers.Cache;
-import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.helpers.Cache;
+import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -570,7 +570,7 @@ public class ActionPanel extends JPanel implements ActionListener {
         if (lastASM == null) {
             return;
         }
-        
+
         String pref = lastASM.getActionSourcePrefix();
         int lastPos = decompiledEditor.getCaretPosition();
         int lastLine = decompiledEditor.getLine();

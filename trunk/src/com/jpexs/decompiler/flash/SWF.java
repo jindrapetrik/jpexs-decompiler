@@ -53,8 +53,6 @@ import com.jpexs.decompiler.flash.flv.AUDIODATA;
 import com.jpexs.decompiler.flash.flv.FLVOutputStream;
 import com.jpexs.decompiler.flash.flv.FLVTAG;
 import com.jpexs.decompiler.flash.flv.VIDEODATA;
-import com.jpexs.decompiler.flash.helpers.Cache;
-import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
@@ -98,6 +96,9 @@ import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.helpers.Cache;
+import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.ProgressListener;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -281,7 +282,20 @@ public class SWF {
      * @param parallelRead Use parallel threads?
      * @throws IOException
      */
-    public SWF(InputStream is, PercentListener listener, boolean parallelRead) throws IOException {
+    public SWF(InputStream is, ProgressListener listener, boolean parallelRead) throws IOException {
+        this(is, listener, parallelRead, false);
+    }
+
+    /**
+     * Construct SWF from stream
+     *
+     * @param is Stream to read SWF from
+     * @param listener
+     * @param parallelRead Use parallel threads?
+     * @param checkOnly Check only file validity
+     * @throws IOException
+     */
+    public SWF(InputStream is, ProgressListener listener, boolean parallelRead, boolean checkOnly) throws IOException {
         byte hdr[] = new byte[3];
         is.read(hdr);
         String shdr = new String(hdr, "utf-8");
@@ -305,6 +319,14 @@ public class SWF {
             if (sis.read(lzmaProperties, 0, propertiesSize) != propertiesSize) {
                 throw new IOException("LZMA:input .lzma file is too short");
             }
+            long dictionarySize = 0;
+            for (int i = 0; i < 4; i++) {
+                dictionarySize += ((int) (lzmaProperties[1 + i]) & 0xFF) << (i * 8);
+                if (dictionarySize > Runtime.getRuntime().freeMemory()) {
+                    throw new IOException("LZMA: Too large dictionary size");
+                }
+            }
+
             SevenZip.Compression.LZMA.Decoder decoder = new SevenZip.Compression.LZMA.Decoder();
             if (!decoder.SetDecoderProperties(lzmaProperties)) {
                 throw new IOException("LZMA:Incorrect stream properties");
@@ -328,10 +350,15 @@ public class SWF {
         sis.readUI8(); //tmpFirstByetOfFrameRate
         frameRate = sis.readUI8();
         frameCount = sis.readUI16();
-        tags = sis.readTagList(this, 0, parallelRead, true);
-        assignExportNamesToSymbols();
-        assignClassesToSymbols();
-        findFileAttributes();
+        if (checkOnly) {
+            return;
+        }
+        tags = sis.readTagList(this, 0, parallelRead, true, !checkOnly);
+        if (!checkOnly) {
+            assignExportNamesToSymbols();
+            assignClassesToSymbols();
+            findFileAttributes();
+        }
     }
 
     private void findFileAttributes() {

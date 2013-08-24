@@ -17,7 +17,7 @@
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
-import com.jpexs.decompiler.flash.helpers.Helper;
+import com.jpexs.helpers.Helper;
 
 public class MetadataInfo {
 

@@ -10,9 +10,12 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.  
  */
-package com.jpexs.decompiler.flash.gui.jna.platform.win32;
+package com.sun.jna.platform.win32;
 
 import com.sun.jna.Native;
+import com.sun.jna.platform.win32.BaseTSD.DWORD_PTR;
+import com.sun.jna.platform.win32.WinDef.UINT;
+import com.sun.jna.ptr.PointerByReference;
 import com.sun.jna.win32.StdCallLibrary;
 import com.sun.jna.win32.W32APIOptions;
 
@@ -28,4 +31,10 @@ public interface Shell32 extends StdCallLibrary {
      * @return true if successful. Otherwise false.
      */
     boolean ShellExecuteEx(SHELLEXECUTEINFO lpExecInfo);
+
+    UINT ExtractIconEx(String lpszFile, int nIconIndex, PointerByReference phiconLarge, PointerByReference phiconSmall, UINT nIcons);
+
+    DWORD_PTR SHGetFileInfo(String pszPath, int dwFileAttributes, SHFILEINFO psfi, int cbFileInfo, int uFlags);
+    public static final int SHGFI_ICON = 0x000000100;
+    public static final int SHGFI_SMALLICON = 0x000000001;
 }

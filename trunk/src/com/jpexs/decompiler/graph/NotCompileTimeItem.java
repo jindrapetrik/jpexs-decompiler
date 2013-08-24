@@ -16,8 +16,6 @@
  */
 package com.jpexs.decompiler.graph;
 
-import com.jpexs.decompiler.graph.GraphSourceItem;
-import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.List;
 
 /**

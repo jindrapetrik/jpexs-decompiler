@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.gui.jna.platform.win32;
+package com.sun.jna.platform.win32;
 
 /**
  *
@@ -32,7 +32,7 @@ package com.jpexs.decompiler.flash.gui.jna.platform.win32;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.  
  */
-import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinNT.HRESULT;
+import com.sun.jna.platform.win32.WinNT.HRESULT;
 
 /**
  * Win32 exception.

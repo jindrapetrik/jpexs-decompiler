@@ -17,10 +17,10 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.action.swf5.ActionToNumber;
-import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.helpers.Helper;
 import java.util.List;
 
 public class ToNumberActionItem extends ActionItem {

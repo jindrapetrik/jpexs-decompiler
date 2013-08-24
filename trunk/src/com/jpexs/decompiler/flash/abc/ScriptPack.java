@@ -18,8 +18,8 @@ package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
-import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.helpers.Helper;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;

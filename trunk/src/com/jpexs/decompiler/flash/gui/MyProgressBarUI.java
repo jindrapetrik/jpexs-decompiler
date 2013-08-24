@@ -16,8 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import javax.swing.CellRendererPane;
 import javax.swing.JComponent;
 import javax.swing.JProgressBar;
@@ -92,24 +90,9 @@ public class MyProgressBarUI extends SubstanceProgressBarUI {
 
     @Override
     protected void installListeners() {
+        super.installListeners();
+        this.progressBar.removeChangeListener(substanceValueChangeListener);
         substanceValueChangeListener = new MyProgressBarUI.SubstanceChangeListener();
         this.progressBar.addChangeListener(this.substanceValueChangeListener);
-
-        this.substancePropertyChangeListener = new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ("font".equals(evt.getPropertyName())) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (progressBar != null) {
-                                progressBar.updateUI();
-                            }
-                        }
-                    });
-                }
-            }
-        };
-        this.progressBar.addPropertyChangeListener(this.substancePropertyChangeListener);
     }
 }

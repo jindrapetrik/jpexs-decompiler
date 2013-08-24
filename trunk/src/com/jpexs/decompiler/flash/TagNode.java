@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
@@ -48,6 +47,7 @@ import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.Container;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.helpers.Helper;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -236,7 +236,7 @@ public class TagNode {
 
     public static int getTagCountRecursive(List<TagNode> nodeList) {
         int count = 0;
-        
+
         for (TagNode node : nodeList) {
             if (node.subItems.isEmpty()) {
                 if ((node.tag instanceof ASMSource) && (node.export)) {
@@ -247,10 +247,10 @@ public class TagNode {
             }
 
         }
-        
+
         return count;
     }
-    
+
     public static List<File> exportNodeAS(List<Tag> allTags, AbortRetryIgnoreHandler handler, List<TagNode> nodeList, String outdir, boolean isPcode) throws IOException {
         AtomicInteger cnt = new AtomicInteger(1);
         int totalCount = TagNode.getTagCountRecursive(nodeList);

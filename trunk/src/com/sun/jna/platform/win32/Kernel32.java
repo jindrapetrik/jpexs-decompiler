@@ -10,9 +10,10 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  */
-package com.jpexs.decompiler.flash.gui.jna.platform.win32;
+package com.sun.jna.platform.win32;
 
 import com.sun.jna.Native;
+import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.win32.W32APIOptions;
 
@@ -161,4 +162,123 @@ public interface Kernel32 extends WinNT {
      * that caused the function to return.
      */
     int WaitForSingleObject(HANDLE hHandle, int dwMilliseconds);
+
+    /**
+     * This function returns a pseudohandle for the current process.
+     *
+     * @return The return value is a pseudohandle to the current process.
+     */
+    HANDLE GetCurrentProcess();
+
+    /**
+     * This function returns a handle to an existing process object.
+     *
+     * @param fdwAccess Not supported; set to zero.
+     * @param fInherit Not supported; set to FALSE.
+     * @param IDProcess Specifies the process identifier of the process to open.
+     * @return An open handle to the specified process indicates success. NULL
+     * indicates failure. To get extended error information, call GetLastError.
+     */
+    HANDLE OpenProcess(int fdwAccess, boolean fInherit, DWORD IDProcess);
+
+    /**
+     * The GetSystemInfo function returns information about the current system.
+     *
+     * @param lpSystemInfo Pointer to a SYSTEM_INFO structure that receives the
+     * information.
+     */
+    void GetSystemInfo(SYSTEM_INFO lpSystemInfo);
+    public static final int PROCESS_VM_READ = 0x0010;
+    public static final int PROCESS_VM_WRITE = 0x0020;
+    public static final int PROCESS_QUERY_INFORMATION = 0x0400;
+    public static final int PROCESS_VM_OPERATION = 0x0008;
+
+    SIZE_T VirtualQueryEx(HANDLE hProcess, Pointer lpAddress, MEMORY_BASIC_INFORMATION lpBuffer, SIZE_T dwLength);
+
+    /**
+     * The GetLastError function retrieves the calling thread's last-error code
+     * value. The last-error code is maintained on a per-thread basis. Multiple
+     * threads do not overwrite each other's last-error code.
+     *
+     * @return The return value is the calling thread's last-error code value.
+     */
+    int GetLastError();
+    public static int MEM_COMMIT = 0x1000;
+    public static int MEM_FREE = 0x10000;
+    public static int MEM_RESERVE = 0x2000;
+    public static int MEM_IMAGE = 0x1000000;
+    public static int MEM_MAPPED = 0x40000;
+    public static int MEM_PRIVATE = 0x20000;
+
+    boolean ReadProcessMemory(HANDLE hProcess, int inBaseAddress, Pointer outputBuffer, int nSize, IntByReference outNumberOfBytesRead);
+
+    /**
+     * Takes a snapshot of the specified processes, as well as the heaps,
+     * modules, and threads used by these processes.
+     *
+     * @param dwFlags The portions of the system to be included in the snapshot.
+     *
+     * @param th32ProcessID The process identifier of the process to be included
+     * in the snapshot. This parameter can be zero to indicate the current
+     * process. This parameter is used when the TH32CS_SNAPHEAPLIST,
+     * TH32CS_SNAPMODULE, TH32CS_SNAPMODULE32, or TH32CS_SNAPALL value is
+     * specified. Otherwise, it is ignored and all processes are included in the
+     * snapshot.
+     *
+     * If the specified process is the Idle process or one of the CSRSS
+     * processes, this function fails and the last error code is
+     * ERROR_ACCESS_DENIED because their access restrictions prevent user-level
+     * code from opening them.
+     *
+     * If the specified process is a 64-bit process and the caller is a 32-bit
+     * process, this function fails and the last error code is
+     * ERROR_PARTIAL_COPY (299).
+     *
+     * @return If the function succeeds, it returns an open handle to the
+     * specified snapshot.
+     *
+     * If the function fails, it returns INVALID_HANDLE_VALUE. To get extended
+     * error information, call GetLastError. Possible error codes include
+     * ERROR_BAD_LENGTH.
+     */
+    HANDLE CreateToolhelp32Snapshot(DWORD dwFlags, DWORD th32ProcessID);
+
+    /**
+     * Retrieves information about the first process encountered in a system
+     * snapshot.
+     *
+     * @param hSnapshot A handle to the snapshot returned from a previous call
+     * to the CreateToolhelp32Snapshot function.
+     * @param lppe A pointer to a PROCESSENTRY32 structure. It contains process
+     * information such as the name of the executable file, the process
+     * identifier, and the process identifier of the parent process.
+     * @return Returns TRUE if the first entry of the process list has been
+     * copied to the buffer or FALSE otherwise. The ERROR_NO_MORE_FILES error
+     * value is returned by the GetLastError function if no processes exist or
+     * the snapshot does not contain process information.
+     */
+    boolean Process32First(HANDLE hSnapshot, PROCESSENTRY32 lppe);
+
+    /**
+     * Retrieves information about the next process recorded in a system
+     * snapshot.
+     *
+     * @param hSnapshot A handle to the snapshot returned from a previous call
+     * to the CreateToolhelp32Snapshot function.
+     * @param lppe A pointer to a PROCESSENTRY32 structure.
+     * @return Returns TRUE if the next entry of the process list has been
+     * copied to the buffer or FALSE otherwise. The ERROR_NO_MORE_FILES error
+     * value is returned by the GetLastError function if no processes exist or
+     * the snapshot does not contain process information.
+     */
+    boolean Process32Next(HANDLE hSnapshot, PROCESSENTRY32 lppe);
+    public static int TH32CS_SNAPPROCESS = 0x00000002;
+
+    //Needed for some Windows 7 Versions
+    //boolean EnumProcesses(int []ProcessIDsOut,int size , int[] BytesReturned);
+    int GetProcessImageFileNameW(HANDLE Process, char[] outputname, int lenght);
+
+    DWORD QueryDosDevice(String lpDeviceName, char[] lpTargetPath, int lenght);
+
+    boolean VirtualProtectEx(HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize, int flNewProtect, IntByReference lpflOldProtect);
 }

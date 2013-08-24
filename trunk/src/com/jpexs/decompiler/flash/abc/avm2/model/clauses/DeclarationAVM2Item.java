@@ -22,8 +22,8 @@ import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetSlotAVM2Item;
-import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
 

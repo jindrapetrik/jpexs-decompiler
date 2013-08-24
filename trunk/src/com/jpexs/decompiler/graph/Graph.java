@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.graph;
 
-import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
@@ -598,10 +597,10 @@ public class Graph {
          System.out.println("</loops>");*/
         getPrecontinues(localData, null, heads.get(0), loops, null);
         /*System.err.println("<loopspre>");
-        for (Loop el : loops) {
-            System.err.println(el);
-        }
-        System.err.println("</loopspre>");//*/
+         for (Loop el : loops) {
+         System.err.println(el);
+         }
+         System.err.println("</loopspre>");//*/
 
         List<GraphTargetItem> ret = printGraph(new ArrayList<GraphPart>(), localData, stack, allParts, null, heads.get(0), null, loops, staticOperation, path);
         processIfs(ret);

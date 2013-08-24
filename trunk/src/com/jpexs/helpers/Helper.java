@@ -14,9 +14,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.helpers;
+package com.jpexs.helpers;
 
 import com.jpexs.decompiler.flash.gui.Freed;
+import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.awt.Component;
 import java.io.ByteArrayInputStream;
@@ -54,7 +55,7 @@ import java.util.regex.Pattern;
 public class Helper {
 
     private static final ExecutorService THREAD_POOL = Executors.newCachedThreadPool();
-    
+
     /**
      * Converts array of int values to string
      *
@@ -514,10 +515,11 @@ public class Helper {
         return timeStr;
     }
 
-    public static void freeMem(){
+    public static void freeMem() {
         Cache.clearAll();
         System.gc();
     }
+
     public static String formatTimeToText(int timeS) {
         long timeM = timeS / 60;
         timeS = timeS % 60;
@@ -544,9 +546,9 @@ public class Helper {
         // (currently) used only in log, so no localization is required
         return timeStr;
     }
-    
+
     public static <T> T timedCall(Callable<T> c, long timeout, TimeUnit timeUnit) throws InterruptedException, ExecutionException, TimeoutException {
-        FutureTask<T> task = new FutureTask<T>(c);
+        FutureTask<T> task = new FutureTask<>(c);
         THREAD_POOL.execute(task);
         return task.get(timeout, timeUnit);
     }

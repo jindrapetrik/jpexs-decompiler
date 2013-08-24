@@ -23,10 +23,10 @@ import com.jpexs.decompiler.flash.abc.avm2.CodeStats;
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.helpers.Helper;
 import com.jpexs.decompiler.flash.helpers.Highlighting;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.helpers.Helper;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -137,7 +137,7 @@ public class MethodBody implements Cloneable, Serializable {
         }
         return s;
     }
-    
+
     public String toSource(String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, ConstantPool constants, MethodInfo method_info[], Stack<GraphTargetItem> scopeStack, boolean isStaticInitializer, boolean hilight, List<String> fullyQualifiedNames, Traits initTraits) {
         AVM2Code deobfuscated = null;
         MethodBody b = (MethodBody) Helper.deepCopy(this);
@@ -160,7 +160,7 @@ public class MethodBody implements Cloneable, Serializable {
         if (hilight) {
             s = Highlighting.hilighMethod(s, this.method_info);
         }
-        
+
         return s;
     }
 

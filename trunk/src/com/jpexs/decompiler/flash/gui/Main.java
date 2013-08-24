@@ -20,25 +20,25 @@ import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.Configuration;
 import com.jpexs.decompiler.flash.ConsoleAbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
-import com.jpexs.decompiler.flash.PercentListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.Version;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
-import com.jpexs.decompiler.flash.gui.jna.platform.win32.Advapi32Util;
-import com.jpexs.decompiler.flash.gui.jna.platform.win32.Kernel32;
-import com.jpexs.decompiler.flash.gui.jna.platform.win32.SHELLEXECUTEINFO;
-import com.jpexs.decompiler.flash.gui.jna.platform.win32.Shell32;
-import com.jpexs.decompiler.flash.gui.jna.platform.win32.Win32Exception;
-import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinReg;
-import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinReg.HKEY;
-import com.jpexs.decompiler.flash.gui.jna.platform.win32.WinUser;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
-import com.jpexs.decompiler.flash.helpers.Cache;
-import com.jpexs.decompiler.flash.helpers.Helper;
+import com.jpexs.helpers.Cache;
+import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.ProgressListener;
 import com.sun.jna.Platform;
 import com.sun.jna.WString;
+import com.sun.jna.platform.win32.Advapi32Util;
+import com.sun.jna.platform.win32.Kernel32;
+import com.sun.jna.platform.win32.SHELLEXECUTEINFO;
+import com.sun.jna.platform.win32.Shell32;
+import com.sun.jna.platform.win32.Win32Exception;
+import com.sun.jna.platform.win32.WinReg;
+import com.sun.jna.platform.win32.WinReg.HKEY;
+import com.sun.jna.platform.win32.WinUser;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -54,7 +54,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.Scanner;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -78,7 +77,8 @@ public class Main {
 
     public static ProxyFrame proxyFrame;
     public static String file;
-    public static String maskURL;
+    public static InputStream inputStream;
+    public static String fileTitle;
     public static SWF swf;
     public static String version = "";
     public static final String applicationName = "JPEXS Free Flash Decompiler";
@@ -98,6 +98,15 @@ public class Main {
     public static MainFrame mainFrame;
     private static final int UPDATE_SYSTEM_MAJOR = 1;
     private static final int UPDATE_SYSTEM_MINOR = 0;
+    public static LoadFromMemoryFrame loadFromMemoryFrame;
+    public static boolean readOnly = false;
+
+    public static void loadFromMemory() {
+        if (loadFromMemoryFrame == null) {
+            loadFromMemoryFrame = new LoadFromMemoryFrame();
+        }
+        loadFromMemoryFrame.setVisible(true);
+    }
     private static String commandlineConfigBoolean[] = new String[]{
         "decompile",
         "parallelSpeedUp",
@@ -129,8 +138,8 @@ public class Main {
      * @return file title
      */
     public static String getFileTitle() {
-        if (maskURL != null) {
-            return maskURL;
+        if (fileTitle != null) {
+            return fileTitle;
         }
         return file;
     }
@@ -199,33 +208,39 @@ public class Main {
     }
 
     public static SWF parseSWF(String file) throws Exception {
-        SWF locswf;
         try (FileInputStream fis = new FileInputStream(file)) {
-            InputStream bis = new BufferedInputStream(fis);
-            locswf = new SWF(bis, new PercentListener() {
-                @Override
-                public void percent(int p) {
-                    startWork(translate("work.reading.swf"), p);
-                }
-            }, (Boolean) Configuration.getConfig("parallelSpeedUp", Boolean.TRUE));
-            locswf.addEventListener(new EventListener() {
-                @Override
-                public void handleEvent(String event, Object data) {
-                    if (event.equals("export")) {
-                        startWork((String) data);
-                    }
-                    if (event.equals("getVariables")) {
-                        startWork(translate("work.gettingvariables") + "..." + (String) data);
-                    }
-                    if (event.equals("deobfuscate")) {
-                        startWork(translate("work.deobfuscating") + "..." + (String) data);
-                    }
-                    if (event.equals("rename")) {
-                        startWork(translate("work.renaming") + "..." + (String) data);
-                    }
-                }
-            });
+            return parseSWF(fis);
         }
+    }
+
+    public static SWF parseSWF(InputStream fis) throws Exception {
+        SWF locswf;
+        //try (FileInputStream fis = new FileInputStream(file)) {
+        InputStream bis = new BufferedInputStream(fis);
+        locswf = new SWF(bis, new ProgressListener() {
+            @Override
+            public void progress(int p) {
+                startWork(translate("work.reading.swf"), p);
+            }
+        }, (Boolean) Configuration.getConfig("parallelSpeedUp", Boolean.TRUE));
+        locswf.addEventListener(new EventListener() {
+            @Override
+            public void handleEvent(String event, Object data) {
+                if (event.equals("export")) {
+                    startWork((String) data);
+                }
+                if (event.equals("getVariables")) {
+                    startWork(translate("work.gettingvariables") + "..." + (String) data);
+                }
+                if (event.equals("deobfuscate")) {
+                    startWork(translate("work.deobfuscating") + "..." + (String) data);
+                }
+                if (event.equals("rename")) {
+                    startWork(translate("work.renaming") + "..." + (String) data);
+                }
+            }
+        });
+        //}
         return locswf;
     }
 
@@ -253,13 +268,13 @@ public class Main {
         protected Object doInBackground() throws Exception {
             try {
                 Main.startWork(translate("work.reading.swf") + "...");
-                swf = parseSWF(Main.file);
+                swf = parseSWF(Main.inputStream);
             } catch (Exception ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 View.showMessageDialog(null, "Cannot load SWF file.");
                 loadingDialog.setVisible(false);
-                exit();
-                return false;
+                swf = null;
+                //return false;
             }
 
             try {
@@ -278,7 +293,9 @@ public class Main {
             View.execInEventDispatch(new Runnable() {
                 @Override
                 public void run() {
-                    mainFrame.setVisible(true);
+                    if (mainFrame != null) {
+                        mainFrame.setVisible(true);
+                    }
                 }
             });
 
@@ -310,6 +327,24 @@ public class Main {
     }
 
     public static boolean openFile(String swfFile) {
+
+        try (FileInputStream fis = new FileInputStream(swfFile)) {
+            boolean ok = openFile(swfFile, fis);
+            if (ok) {
+                readOnly = false;
+            }
+            return ok;
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, "Cannot open file", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        return false;
+    }
+
+    public static boolean openFile(String fileTitle, InputStream is) {
+        Main.file = fileTitle;
+        Main.inputStream = is;
+        Main.fileTitle = fileTitle;
+        readOnly = true;
         if (mainFrame != null) {
             mainFrame.setVisible(false);
             Helper.emptyObject(mainFrame);
@@ -318,7 +353,6 @@ public class Main {
             Cache.clearAll();
             System.gc();
         }
-        Main.file = swfFile;
         View.execInEventDispatch(new Runnable() {
             @Override
             public void run() {
@@ -329,7 +363,8 @@ public class Main {
         });
 
         Main.loadingDialog.setVisible(true);
-        (new OpenFileWorker()).execute();
+        OpenFileWorker wrk = new OpenFileWorker();
+        wrk.execute();
         return true;
     }
 
@@ -360,7 +395,8 @@ public class Main {
                 }
                 Main.saveFile(fileName);
                 Configuration.setConfig("lastSaveDir", file.getParentFile().getAbsolutePath());
-                maskURL = null;
+                fileTitle = null;
+                readOnly = false;
                 return true;
             } catch (IOException ex) {
                 View.showMessageDialog(null, translate("error.file.write"));
@@ -370,7 +406,7 @@ public class Main {
     }
 
     public static boolean openFileDialog() {
-        maskURL = null;
+        fileTitle = null;
         JFileChooser fc = new JFileChooser();
         fc.setCurrentDirectory(new File((String) Configuration.getConfig("lastOpenDir", ".")));
         fc.setFileFilter(new FileFilter() {
@@ -695,7 +731,7 @@ public class Main {
         } else {
             Cache.setStorageType(Cache.STORAGE_MEMORY);
         }
-        
+
         int errorMode = AbortRetryIgnoreHandler.UNDEFINED;
         int retryCount = 0;
 

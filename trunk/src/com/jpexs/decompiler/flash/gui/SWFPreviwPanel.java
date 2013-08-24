@@ -80,6 +80,9 @@ public class SWFPreviwPanel extends JPanel {
         if (swf == null) {
             return;
         }
+        if (swf.frameRate == 0) {
+            return;
+        }
         stop();
         timer = new Timer();
         timer.schedule(new TimerTask() {

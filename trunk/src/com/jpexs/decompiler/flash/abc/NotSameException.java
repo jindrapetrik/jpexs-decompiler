@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc;
 
-import com.jpexs.decompiler.flash.helpers.Helper;
+import com.jpexs.helpers.Helper;
 
 public class NotSameException extends RuntimeException {
 

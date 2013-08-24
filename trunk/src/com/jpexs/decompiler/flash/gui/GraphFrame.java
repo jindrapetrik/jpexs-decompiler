@@ -234,13 +234,12 @@ public class GraphFrame extends AppFrame {
             return w;
         }
     }
-    
     GraphPanel gp;
     int scrollBarWidth;
     int scrollBarHeight;
     int frameWidthDiff;
     int frameHeightDiff;
-    
+
     public GraphFrame(Graph graph, String name) {
         setSize(500, 500);
         Container cnt = getContentPane();
@@ -252,10 +251,10 @@ public class GraphFrame extends AppFrame {
         scrollBarHeight = scrollPane.getHorizontalScrollBar().getPreferredSize().height;
         cnt.add(scrollPane, BorderLayout.CENTER);
         pack();
-        
+
         Dimension size = getSize();
         Dimension innerSize = getContentPane().getSize();
-        
+
         frameWidthDiff = size.width - innerSize.width;
         frameHeightDiff = size.height - innerSize.height;
 
@@ -272,10 +271,10 @@ public class GraphFrame extends AppFrame {
         Dimension panDim = gp.getPreferredSize();
         // add some magic constants 
         panDim = new Dimension(panDim.width + 3, panDim.height + 2);
-        
+
         boolean tooHigh = false;
         boolean tooWide = false;
-        
+
         if (panDim.width + frameWidthDiff < screen.width) {
             dim.width = panDim.width;
         } else {
@@ -288,7 +287,7 @@ public class GraphFrame extends AppFrame {
             dim.height = screen.height;
             tooHigh = true;
         }
-        
+
         if (tooWide) {
             dim.height += scrollBarHeight;
             dim.height = Math.min(dim.height, screen.height);
@@ -297,7 +296,7 @@ public class GraphFrame extends AppFrame {
             dim.width += scrollBarWidth;
             dim.width = Math.min(dim.width, screen.width);
         }
-        
+
         setVisibleSize(dim);
         View.centerScreen(this);
     }
