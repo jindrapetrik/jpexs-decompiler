@@ -113,16 +113,16 @@ public class MethodBody implements Cloneable, Serializable {
             System.err.println("Decompiling " + path);
         }
         String s = "";
-        if (!(Boolean) Configuration.getConfig("decompile", Boolean.TRUE)) {
-            s = "//Decompilation skipped";
-            if (hilight) {
-                s = Highlighting.hilighMethod(s, this.method_info);
-            }
-            return s;
-        }
         if (pcode) {
             s += code.toASMSource(constants, this, false);
         } else {
+            if (!(Boolean) Configuration.getConfig("decompile", Boolean.TRUE)) {
+                s = "//Decompilation skipped";
+                if (hilight) {
+                    s = Highlighting.hilighMethod(s, this.method_info);
+                }
+                return s;
+            }
             try {
                 s += Helper.timedCall(new Callable<String>() {
                     @Override
