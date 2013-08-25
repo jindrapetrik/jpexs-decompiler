@@ -700,7 +700,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         miInternalViewer.addActionListener(this);
 
         //miParallelSpeedUp = new JCheckBox(translate("menu.settings.parallelspeedup"));
-        miParallelSpeedUp.setSelected(Configuration.getConfig("parallelSpeedUp", Boolean.TRUE));
+        miParallelSpeedUp.setSelected(Configuration.getConfig("parallelSpeedUp", true));
         miParallelSpeedUp.setActionCommand("PARALLELSPEEDUP");
         miParallelSpeedUp.addActionListener(this);
 
@@ -716,18 +716,18 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         menuBar.add(menuTools);
 
         //miDecompile = new JCheckBox(translate("menu.settings.disabledecompilation"));
-        miDecompile.setSelected(!Configuration.getConfig("decompile", Boolean.TRUE));
+        miDecompile.setSelected(!Configuration.getConfig("decompile", true));
         miDecompile.setActionCommand("DISABLEDECOMPILATION");
         miDecompile.addActionListener(this);
 
 
         //miCacheDisk = new JCheckBox(translate("menu.settings.cacheOnDisk"));
-        miCacheDisk.setSelected(Configuration.getConfig("cacheOnDisk", Boolean.TRUE));
+        miCacheDisk.setSelected(Configuration.getConfig("cacheOnDisk", true));
         miCacheDisk.setActionCommand("CACHEONDISK");
         miCacheDisk.addActionListener(this);
 
         // miGotoMainClassOnStartup = new JCheckBox(translate("menu.settings.gotoMainClassOnStartup"));
-        miGotoMainClassOnStartup.setSelected(Configuration.getConfig("gotoMainClassOnStartup", Boolean.FALSE));
+        miGotoMainClassOnStartup.setSelected(Configuration.getConfig("gotoMainClassOnStartup", false));
         miGotoMainClassOnStartup.setActionCommand("GOTODOCUMENTCLASSONSTARTUP");
         miGotoMainClassOnStartup.addActionListener(this);
 
@@ -2168,7 +2168,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
             for (int i = 0; i < tlsList.size(); i++) {
                 ScriptPack tls = tlsList.get(i);
                 Main.startWork(translate("work.exporting") + " " + (i + 1) + "/" + tlsList.size() + " " + tls.getPath() + " ...");
-                ret.add(tls.export(selFile, abcList, isPcode, Configuration.getConfig("parallelSpeedUp", Boolean.TRUE)));
+                ret.add(tls.export(selFile, abcList, isPcode, Configuration.getConfig("parallelSpeedUp", true)));
             }
         } else {
             List<TagNode> allNodes = new ArrayList<>();
@@ -2612,9 +2612,9 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                             Helper.freeMem();
                             try {
                                 if (compressed) {
-                                    swf.exportFla(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, Configuration.getConfig("parallelSpeedUp", Boolean.TRUE));
+                                    swf.exportFla(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, Configuration.getConfig("parallelSpeedUp", true));
                                 } else {
-                                    swf.exportXfl(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, Configuration.getConfig("parallelSpeedUp", Boolean.TRUE));
+                                    swf.exportXfl(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, Configuration.getConfig("parallelSpeedUp", true));
                                 }
                             } catch (IOException ex) {
                                 View.showMessageDialog(null, translate("error.export") + ": " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -2661,7 +2661,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                         swf.exportMovies(errorHandler, selFile + File.separator + "movies");
                                         swf.exportSounds(errorHandler, selFile + File.separator + "sounds", isMp3OrWav, isMp3OrWav);
                                         swf.exportBinaryData(errorHandler, selFile + File.separator + "binaryData");
-                                        swf.exportActionScript(errorHandler, selFile, isPcode, Configuration.getConfig("parallelSpeedUp", Boolean.TRUE));
+                                        swf.exportActionScript(errorHandler, selFile, isPcode, Configuration.getConfig("parallelSpeedUp", true));
                                     }
                                 } catch (Exception ex) {
                                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Error during export", ex);

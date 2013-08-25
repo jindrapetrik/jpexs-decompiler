@@ -284,7 +284,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             @Override
             public void run() {
                 editor.setText("; " + translate("work.disassembling") + "...");
-                if (Configuration.getConfig("decompile", Boolean.TRUE)) {
+                if (Configuration.getConfig("decompile", true)) {
                     decompiledEditor.setText("//" + translate("work.waitingfordissasembly") + "...");
                 }
                 DisassemblyListener listener = new DisassemblyListener() {
@@ -310,7 +310,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                 srcWithHex = Helper.hexToComments(lastDisasm);
                 srcNoHex = Helper.stripComments(lastDisasm);
                 setHex(hexButton.isSelected());
-                if (Configuration.getConfig("decompile", Boolean.TRUE)) {
+                if (Configuration.getConfig("decompile", true)) {
                     decompiledEditor.setText("//" + translate("work.decompiling") + "...");
                     String stripped = "";
                     if (!useCache) {

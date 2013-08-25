@@ -116,7 +116,7 @@ public class MethodBody implements Cloneable, Serializable {
         if (pcode) {
             s += code.toASMSource(constants, this, false);
         } else {
-            if (!Configuration.getConfig("decompile", Boolean.TRUE)) {
+            if (!Configuration.getConfig("decompile", true)) {
                 s = "//Decompilation skipped";
                 if (hilight) {
                     s = Highlighting.hilighMethod(s, this.method_info);

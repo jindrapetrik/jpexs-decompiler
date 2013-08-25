@@ -38,7 +38,7 @@ public class ExportTest {
 
     @BeforeClass
     public void addLogger() {
-        Configuration.setConfig("autoDeobfuscate", Boolean.TRUE);
+        Configuration.setConfig("autoDeobfuscate", true);
         Logger logger = Logger.getLogger("");
         logger.addHandler(new Handler() {
             @Override
