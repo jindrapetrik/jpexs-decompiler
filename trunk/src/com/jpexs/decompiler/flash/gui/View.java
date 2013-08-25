@@ -31,16 +31,21 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.basic.BasicColorChooserUI;
 import org.pushingpixels.flamingo.api.common.icon.ImageWrapperResizableIcon;
 import org.pushingpixels.substance.api.SubstanceConstants;
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
+import org.pushingpixels.substance.api.fonts.FontPolicy;
+import org.pushingpixels.substance.api.fonts.FontSet;
 import org.pushingpixels.substance.api.skin.SubstanceOfficeBlue2007LookAndFeel;
 
 /**
@@ -56,6 +61,9 @@ public class View {
      * Sets windows Look and Feel
      */
     public static void setLookAndFeel() {
+
+        //Save default font for Chinese characters
+        final Font defaultFont = (new JLabel()).getFont();
         try {
 
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -67,6 +75,7 @@ public class View {
             SwingUtilities.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
+
                     try {
                         UIManager.setLookAndFeel(new SubstanceOfficeBlue2007LookAndFeel());
                         UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, 0.999);//This works for not changing labels color and not changing Dialogs title
@@ -78,6 +87,53 @@ public class View {
                         UIManager.put("RibbonApplicationMenuPopupPanelUI", MyRibbonApplicationMenuPopupPanelUI.class.getName());
                         UIManager.put("RibbonApplicationMenuButtonUI", MyRibbonApplicationMenuButtonUI.class.getName());
                         UIManager.put("ProgressBarUI", MyProgressBarUI.class.getName());
+
+                        FontPolicy pol = SubstanceLookAndFeel.getFontPolicy();
+                        final FontSet fs = pol.getFontSet("Substance", null);
+
+                        //Restore default font for chinese characters
+                        SubstanceLookAndFeel.setFontPolicy(new FontPolicy() {
+                            @Override
+                            public FontSet getFontSet(String string, UIDefaults uid) {
+                                return new FontSet() {
+                                    @Override
+                                    public FontUIResource getControlFont() {
+                                        FontUIResource f = fs.getControlFont();
+                                        return new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                                    }
+
+                                    @Override
+                                    public FontUIResource getMenuFont() {
+                                        FontUIResource f = fs.getMenuFont();
+                                        return new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                                    }
+
+                                    @Override
+                                    public FontUIResource getTitleFont() {
+                                        FontUIResource f = fs.getTitleFont();
+                                        return new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                                    }
+
+                                    @Override
+                                    public FontUIResource getWindowTitleFont() {
+                                        FontUIResource f = fs.getWindowTitleFont();
+                                        return new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                                    }
+
+                                    @Override
+                                    public FontUIResource getSmallFont() {
+                                        FontUIResource f = fs.getSmallFont();
+                                        return new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                                    }
+
+                                    @Override
+                                    public FontUIResource getMessageFont() {
+                                        FontUIResource f = fs.getMessageFont();
+                                        return new FontUIResource(defaultFont.getName(), f.getStyle(), f.getSize());
+                                    }
+                                };
+                            }
+                        });
                     } catch (UnsupportedLookAndFeelException ex) {
                         Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
                     }
