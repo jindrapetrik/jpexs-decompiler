@@ -57,11 +57,6 @@ public class Configuration {
      * Decompilation timeout in seconds
      */
     public static final int DECOMPILATION_TIMEOUT = 30 * 60;
-    /**
-     * Decompilation timeout for a single method in AS3 or single action in
-     * AS1/2 in seconds
-     */
-    public static final int DECOMPILATION_TIMEOUT_SINGLE_METHOD = 5;
     //using parameter names in decompiling may cause problems because official programs like Flash CS 5.5 inserts wrong parameter names indices
     public static final boolean PARAM_NAMES_ENABLE = false;
     private static HashMap<String, Object> config = new HashMap<>();
@@ -69,6 +64,27 @@ public class Configuration {
      * List of replacements
      */
     public static java.util.List<Replacement> replacements = new ArrayList<>();
+
+    private static HashMap<String, Object> configDefaults = new HashMap<String, Object>() {{
+        put("decompile", true);
+        put("parallelSpeedUp", true);
+        put("autoDeobfuscate", true);
+        put("cacheOnDisk", true);
+        put("internalFlashViewer", false);
+        put("gotoMainClassOnStartup", false);
+        put("deobfuscateUsePrevTagOnly", true);
+        put("decompilationTimeoutSingleMethod", 60);
+        put("lastSaveDir", ".");
+        put("lastOpenDir", ".");
+        put("offeredAssociation", false);
+        put("locale", "en");
+        put("lastUpdatesCheckDate", null);
+        put("gui.window.width", 1000);
+        put("gui.window.height", 700);
+        put("gui.window.maximized.horizontal", false);
+        put("gui.window.maximized.vertical", false);
+        put("lastRenameType", 1);
+    }};
 
     /**
      * Saves replacements to file for future use
@@ -117,7 +133,13 @@ public class Configuration {
     }
 
     public static <T> T getConfig(String cfg) {
-        return getConfig(cfg, null);
+        T defaultValue = null;
+        if (configDefaults.containsKey(cfg)) {
+            @SuppressWarnings("unchecked")
+            T def = (T)configDefaults.get(cfg);
+            defaultValue = def;
+        }
+        return getConfig(cfg, defaultValue);
     }
 
     public static <T> T getConfig(String cfg, T defaultValue) {

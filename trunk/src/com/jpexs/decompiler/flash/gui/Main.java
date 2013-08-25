@@ -575,16 +575,18 @@ public class Main {
         System.out.println(" 7) -decompress infile outfile");
         System.out.println("  ...Decompress infile and save it to outfile");
         System.out.println(" 8) -config key=value[,key2=value2][,key3=value3...] [other parameters]");
-        System.out.print("  ...Sets configuration values. Available keys:");
+        System.out.print("  ...Sets configuration values. Available keys[current setting]:");
         for (String key : commandlineConfigBoolean) {
-            System.out.print(" " + key);
+            System.out.print(" " + key + "[" + Configuration.getConfig(key) + "]");
         }
         System.out.println("");
-        System.out.println("    Values are boolean, you can use 0/1, true/false or yes/no.");
+        System.out.println("    Values are boolean, you can use 0/1, true/false, on/off or yes/no.");
         System.out.println("    If no other parameters passed, configuration is saved. Otherwise it is used only once.");
         System.out.println("    DO NOT PUT space between comma (,) and next value.");
         System.out.println(" 9) -onerror (abort|retryN|ignore)");
         System.out.println("  ...error handling mode. \"abort\" stops the exporting, \"retry\" tries the exporting N times, \"ignore\" ignores the current file");
+        System.out.println(" 10) -timeout N");
+        System.out.println("  ...decompilation timeout for a single method in AS3 or single action in AS1/2 in seconds");
         System.out.println();
         System.out.println("Examples:");
         System.out.println("java -jar ffdec.jar myfile.swf");
@@ -751,7 +753,7 @@ public class Main {
 
         View.setLookAndFeel();
 
-        if (Configuration.getConfig("cacheOnDisk", Boolean.TRUE)) {
+        if (Configuration.getConfig("cacheOnDisk", true)) {
             Cache.setStorageType(Cache.STORAGE_FILES);
         } else {
             Cache.setStorageType(Cache.STORAGE_MEMORY);
@@ -775,42 +777,7 @@ public class Main {
                         System.err.println("Config values expected");
                         badArguments();
                     }
-                    String cfgStr = args[pos];
-                    String cfgs[];
-                    if (cfgStr.contains(",")) {
-                        cfgs = cfgStr.split(",");
-                    } else {
-                        cfgs = new String[]{cfgStr};
-                    }
-
-                    for (String c : cfgs) {
-                        String cp[];
-                        if (c.contains("=")) {
-                            cp = c.split("=");
-                        } else {
-                            cp = new String[]{c, "1"};
-                        }
-                        String key = cp[0];
-                        String value = cp[1];
-                        if (key.toLowerCase().equals("paralelSpeedUp".toLowerCase())) {
-                            key = "parallelSpeedUp";
-                        }
-                        for (String bk : commandlineConfigBoolean) {
-                            if (key.toLowerCase().equals(bk.toLowerCase())) {
-                                Boolean bValue = null;
-                                if (value.equals("0") || value.toLowerCase().equals("false") || value.toLowerCase().equals("no") || value.toLowerCase().equals("off")) {
-                                    bValue = false;
-                                }
-                                if (value.equals("1") || value.toLowerCase().equals("true") || value.toLowerCase().equals("yes") || value.toLowerCase().equals("on")) {
-                                    bValue = true;
-                                }
-                                if (bValue != null) {
-                                    System.out.println("Config " + bk + " set to " + bValue);
-                                    Configuration.setConfig(bk, bValue);
-                                }
-                            }
-                        }
-                    }
+                    setConfigurations(args[pos]);
                     pos++;
                     if (args.length <= pos) {
                         saveConfig();
@@ -818,7 +785,7 @@ public class Main {
                         return;
                     }
                 }
-                if (args[pos].equals("-onerror")) {
+                else if (args[pos].equals("-onerror")) {
                     parameterProcessed = true;
                     pos++;
                     if (args.length <= pos) {
@@ -847,6 +814,22 @@ public class Main {
                         case "ignore":
                             errorMode = AbortRetryIgnoreHandler.IGNORE;
                             break;
+                    }
+
+                    pos++;
+                }
+                else if (args[pos].equals("-timeout")) {
+                    parameterProcessed = true;
+                    pos++;
+                    if (args.length <= pos) {
+                        System.err.println("timeout parameter expected");
+                        badArguments();
+                    }
+                    try {
+                        int timeout = Integer.parseInt(args[pos]);
+                        Configuration.setConfig("decompilationTimeoutSingleMethod", timeout);
+                    } catch (NumberFormatException nex) {
+                        System.err.println("Bad timeout value");
                     }
 
                     pos++;
@@ -911,6 +894,7 @@ public class Main {
                     badArguments();
                 }
                 commandLineMode = true;
+                long startTime = System.currentTimeMillis();
                 boolean exportOK;
                 try {
                     printHeader();
@@ -998,6 +982,9 @@ public class Main {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                     System.exit(1);
                 }
+                long stopTime = System.currentTimeMillis();
+                long time = stopTime - startTime;
+                System.out.println("Export finished. Total export time: " + Helper.formatTimeSec(time));
                 if (exportOK) {
                     System.out.println("OK");
                     System.exit(0);
@@ -1054,6 +1041,54 @@ public class Main {
         }
     }
 
+    private static void setConfigurations(String cfgStr) {
+        String cfgs[];
+        if (cfgStr.contains(",")) {
+            cfgs = cfgStr.split(",");
+        } else {
+            cfgs = new String[]{cfgStr};
+        }
+
+        for (String c : cfgs) {
+            String cp[];
+            if (c.contains("=")) {
+                cp = c.split("=");
+            } else {
+                cp = new String[]{c, "1"};
+            }
+            String key = cp[0];
+            String value = cp[1];
+            if (key.toLowerCase().equals("paralelSpeedUp".toLowerCase())) {
+                key = "parallelSpeedUp";
+            }
+            for (String bk : commandlineConfigBoolean) {
+                if (key.toLowerCase().equals(bk.toLowerCase())) {
+                    Boolean bValue = parseBooleanConfigValue(value);
+                    if (bValue != null) {
+                        System.out.println("Config " + bk + " set to " + bValue);
+                        Configuration.setConfig(bk, bValue);
+                    }
+                }
+            }
+        }
+    }
+    
+    private static Boolean parseBooleanConfigValue(String value){
+        if (value == null){
+            return null;
+        }
+        
+        Boolean bValue = null;
+        value = value.toLowerCase();
+        if (value.equals("0") || value.equals("false") || value.equals("no") || value.equals("off")) {
+            bValue = false;
+        }
+        if (value.equals("1") || value.equals("true") || value.equals("yes") || value.equals("on")) {
+            bValue = true;
+        }
+        return bValue;
+    }
+    
     public static String tempFile(String url) throws IOException {
         File f = new File(getFFDecHome() + "saved" + File.separator);
         if (!f.exists()) {

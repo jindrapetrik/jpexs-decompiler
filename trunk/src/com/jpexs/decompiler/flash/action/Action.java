@@ -716,6 +716,7 @@ public class Action implements GraphSourceItem {
      * @return String with Source code
      */
     public static String actionsToSource(final List<Action> actions, final int version, final String path) {
+        int timeout = Configuration.getConfig("decompilationTimeoutSingleMethod", 60);
         try {
             return Helper.timedCall(new Callable<String>() {
                 @Override
@@ -727,10 +728,10 @@ public class Action implements GraphSourceItem {
 
                     return Graph.graphToString(tree);
                 }
-            }, Configuration.DECOMPILATION_TIMEOUT_SINGLE_METHOD, TimeUnit.SECONDS);
+            }, timeout, TimeUnit.SECONDS);
         } catch (TimeoutException ex) {
             Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
-            return "/*\r\n * Decompilation error\r\n * Timeout (" + Helper.formatTimeToText(Configuration.DECOMPILATION_TIMEOUT_SINGLE_METHOD) + ") was reached\r\n */";
+            return "/*\r\n * Decompilation error\r\n * Timeout (" + Helper.formatTimeToText(timeout) + ") was reached\r\n */";
         } catch (Exception | OutOfMemoryError | StackOverflowError ex2) {
             Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", ex2);
             if (ex2 instanceof OutOfMemoryError) {

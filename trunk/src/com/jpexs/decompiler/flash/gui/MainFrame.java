@@ -689,9 +689,9 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         menuTools.add(miSearchScript);
 
         //miInternalViewer = new JCheckBox(translate("menu.settings.internalflashviewer"));
-        miInternalViewer.setSelected(Configuration.getConfig("internalFlashViewer", (Boolean) (flashPanel == null)));
-        if (flashPanel == null) {
-            miInternalViewer.setSelected(true);
+        boolean externalFlashPlayerUnavailable = flashPanel == null;
+        miInternalViewer.setSelected(Configuration.getConfig("internalFlashViewer", false) || externalFlashPlayerUnavailable);
+        if (externalFlashPlayerUnavailable) {
             miInternalViewer.setEnabled(false);
         }
         miInternalViewer.setActionCommand("INTERNALVIEWERSWITCH");
@@ -2319,7 +2319,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 }
                 break;
             case "INTERNALVIEWERSWITCH":
-                Configuration.setConfig("internalFlashViewer", (Boolean) miInternalViewer.isSelected());
+                Configuration.setConfig("internalFlashViewer", miInternalViewer.isSelected());
                 reload(true);
                 break;
             case "SEARCHAS":

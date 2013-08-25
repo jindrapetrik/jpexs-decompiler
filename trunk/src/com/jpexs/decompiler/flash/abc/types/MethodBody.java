@@ -123,16 +123,17 @@ public class MethodBody implements Cloneable, Serializable {
                 }
                 return s;
             }
+            int timeout = Configuration.getConfig("decompilationTimeoutSingleMethod", 60);
             try {
                 s += Helper.timedCall(new Callable<String>() {
                     @Override
                     public String call() throws Exception {
                         return toSource(path, isStatic, scriptIndex, classIndex, abc, constants, method_info, scopeStack, isStaticInitializer, hilight, fullyQualifiedNames, initTraits);
                     }
-                }, Configuration.DECOMPILATION_TIMEOUT_SINGLE_METHOD, TimeUnit.SECONDS);
+                }, timeout, TimeUnit.SECONDS);
             } catch (InterruptedException | ExecutionException | TimeoutException ex) {
                 Logger.getLogger(Action.class.getName()).log(Level.SEVERE, "Decompilation error", ex);
-                s += "/*\r\n * Decompilation error\r\n * Timeout (" + Helper.formatTimeToText(Configuration.DECOMPILATION_TIMEOUT_SINGLE_METHOD) + ") was reached\r\n */";
+                s += "/*\r\n * Decompilation error\r\n * Timeout (" + Helper.formatTimeToText(timeout) + ") was reached\r\n */";
             }
         }
         return s;
