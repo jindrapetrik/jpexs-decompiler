@@ -34,7 +34,7 @@ public class GetVersionActionItem extends ActionItem {
 
     @Override
     public String toString(boolean highlight, ConstantPool constants) {
-        return hilight(")", highlight);
+        return hilight("getVersion()", highlight);
     }
 
     @Override

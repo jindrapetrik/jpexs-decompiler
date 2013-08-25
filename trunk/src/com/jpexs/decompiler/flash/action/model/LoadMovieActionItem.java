@@ -57,7 +57,7 @@ public class LoadMovieActionItem extends ActionItem {
         if (method == 2) {
             methodStr = ",\"POST\"";
         }
-        return hilight("loadMovie", highlight) + urlString.toString(highlight, constants) + hilight(",", highlight) + targetString.toString(highlight, constants) + hilight(methodStr + ")", highlight);
+        return hilight("loadMovie(", highlight) + urlString.toString(highlight, constants) + hilight(",", highlight) + targetString.toString(highlight, constants) + hilight(methodStr + ")", highlight);
     }
 
     @Override
