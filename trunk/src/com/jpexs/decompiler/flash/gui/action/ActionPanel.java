@@ -535,7 +535,11 @@ public class ActionPanel extends JPanel implements ActionListener {
     }
 
     public void initSplits() {
-        splitPane.setDividerLocation((Integer) Configuration.getConfig("gui.action.splitPane.dividerLocation", getWidth() / 2));
+        int split = (Integer) Configuration.getConfig("gui.action.splitPane.dividerLocation", getWidth() / 2);
+        if (split == 0) {
+            split = getWidth() / 2;
+        }
+        splitPane.setDividerLocation(split);
     }
 
     public void display() {

@@ -534,9 +534,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         mainMenu.addMenuEntry(checkUpdatesMenu);
         mainMenu.addMenuEntry(aboutMenu);
         mainMenu.addFooterEntry(exitMenu);
-        mainMenu.addMenuSeparator();
-        /*ResizableIcon ic = View.getResizableIcon("icon_round256");
-         setApplicationIcon(ic);*/
+        mainMenu.addMenuSeparator();        
         rib.setApplicationMenu(mainMenu);
 
 
@@ -1399,6 +1397,8 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
             welcomePanel.add(startLabel);
             welcomePanel.add(Box.createGlue());
             cnt.add(welcomePanel, BorderLayout.CENTER);
+            actionPanel = null;
+            abcPanel = null;
         } else {
             cnt.add(splitPane1, BorderLayout.CENTER);
         }
