@@ -2288,14 +2288,15 @@ public class XFLConverter {
                     if ((fontName == null) && (font != null)) {
                         fontName = font.getFontName(tags);
                     }
-                    psFontName = fontName;
-                    if (fontName != null) {
-                        for (String avFont : availableFonts) {
-                            if (avFont.equals(fontName)) {
-                                Font f = new Font(fontName, 0, 10);
-                                psFontName = f.getPSName();
-                            }
-                        }
+                    int fontStyle = 0;
+                    if (font != null) {
+                        fontStyle = font.getFontStyle();
+                    }
+                    String installedFont;
+                    if((installedFont = FontTag.isFontInstalled(fontName))!=null){
+                        psFontName = new Font(installedFont, fontStyle, 10).getPSName();
+                    }else{
+                        psFontName = fontName;
                     }
                 }
                 newline = false;
@@ -2400,93 +2401,102 @@ public class XFLConverter {
             ret += ">";
             ret += matStr;
             ret += "<textRuns>";
+            String txt = "";
             if (det.hasText) {
-                if (det.html) {
-                    ret += convertHTMLText(tags, det, det.initialText);
-                } else {
-                    ret += "<DOMTextRun>";
-                    ret += "<characters>" + xmlString(det.initialText) + "</characters>";
-                    int leftMargin = -1;
-                    int rightMargin = -1;
-                    int indent = -1;
-                    int lineSpacing = -1;
-                    String alignment = null;
-                    boolean italic = false;
-                    boolean bold = false;
-                    String fontFace = null;
-                    int size = -1;
-                    RGBA textColor = null;
-                    if (det.hasTextColor) {
-                        textColor = det.textColor;
-                    }
-                    if (det.hasFont) {
-                        String fontName = null;
-                        FontTag ft = null;
-                        for (Tag u : tags) {
-                            if (u instanceof DefineFontNameTag) {
-                                if (((DefineFontNameTag) u).fontId == det.fontId) {
-                                    fontName = ((DefineFontNameTag) u).fontName;
-                                }
-                            }
-                            if (u instanceof FontTag) {
-                                if (((FontTag) u).getFontId() == det.fontId) {
-                                    ft = (FontTag) u;
-                                }
-                            }
-                            if (fontName != null && ft != null) {
-                                break;
-                            }
-                        }
-                        if (ft != null) {
-                            if (fontName == null) {
-                                fontName = ft.getFontName(tags);
-                            }
-                            italic = ft.isItalic();
-                            bold = ft.isBold();
-                            size = det.fontHeight;
-                            fontFace = new Font(fontName, (italic ? Font.ITALIC : 0) | (bold ? Font.BOLD : 0) | (!italic && !bold ? Font.PLAIN : 0), size < 0 ? 10 : size).getPSName();
-                        }
-                    }
-                    if (det.hasLayout) {
-                        leftMargin = det.leftMargin;
-                        rightMargin = det.rightMargin;
-                        indent = det.indent;
-                        lineSpacing = det.leading;
-                        String alignNames[] = {"left", "right", "center", "justify"};
-                        alignment = alignNames[det.align];
-                    }
-                    ret += "<textAttrs>";
-                    ret += "<DOMTextAttrs";
-                    if (alignment != null) {
-                        ret += " alignment=\"" + alignment + "\"";
-                    }
-                    ret += " rotation=\"true\""; //?
-                    if (indent > -1) {
-                        ret += " indent=\"" + twipToPixel(indent) + "\"";
-                    }
-                    if (leftMargin > -1) {
-                        ret += " leftMargin=\"" + twipToPixel(leftMargin) + "\"";
-                    }
-                    if (lineSpacing > -1) {
-                        ret += " lineSpacing=\"" + twipToPixel(lineSpacing) + "\"";
-                    }
-                    if (rightMargin > -1) {
-                        ret += " rightMargin=\"" + twipToPixel(rightMargin) + "\"";
-                    }
-                    if (size > -1) {
-                        ret += " size=\"" + twipToPixel(size) + "\"";
-                        ret += " bitmapSize=\"" + size + "\"";
-                    }
-                    if (fontFace != null) {
-                        ret += " face=\"" + fontFace + "\"";
-                    }
-                    if (textColor != null) {
-                        ret += " fillColor=\"" + textColor.toHexRGB() + "\" alpha=\"" + textColor.getAlphaFloat() + "\"";
-                    }
-                    ret += "/>";
-                    ret += "</textAttrs>";
-                    ret += "</DOMTextRun>";
+                txt = det.initialText;
+            }
+
+            if (det.html) {
+                ret += convertHTMLText(tags, det, txt);
+            } else {
+                ret += "<DOMTextRun>";
+                ret += "<characters>" + xmlString(txt) + "</characters>";
+                int leftMargin = -1;
+                int rightMargin = -1;
+                int indent = -1;
+                int lineSpacing = -1;
+                String alignment = null;
+                boolean italic = false;
+                boolean bold = false;
+                String fontFace = null;
+                int size = -1;
+                RGBA textColor = null;
+                if (det.hasTextColor) {
+                    textColor = det.textColor;
                 }
+                if (det.hasFont) {
+                    String fontName = null;
+                    FontTag ft = null;
+                    for (Tag u : tags) {
+                        if (u instanceof DefineFontNameTag) {
+                            if (((DefineFontNameTag) u).fontId == det.fontId) {
+                                fontName = ((DefineFontNameTag) u).fontName;
+                            }
+                        }
+                        if (u instanceof FontTag) {
+                            if (((FontTag) u).getFontId() == det.fontId) {
+                                ft = (FontTag) u;
+                            }
+                        }
+                        if (fontName != null && ft != null) {
+                            break;
+                        }
+                    }
+                    if (ft != null) {
+                        if (fontName == null) {
+                            fontName = ft.getFontName(tags);
+                        }
+                        italic = ft.isItalic();
+                        bold = ft.isBold();
+                        size = det.fontHeight;
+                        fontFace = fontName;
+                        String installedFont=null;
+                        if((installedFont=FontTag.isFontInstalled(fontName))!=null){
+                            fontName = installedFont;
+                            fontFace = new Font(installedFont, (italic ? Font.ITALIC : 0) | (bold ? Font.BOLD : 0) | (!italic && !bold ? Font.PLAIN : 0), size < 0 ? 10 : size).getPSName();
+                        }                        
+                        
+                    }
+                }
+                if (det.hasLayout) {
+                    leftMargin = det.leftMargin;
+                    rightMargin = det.rightMargin;
+                    indent = det.indent;
+                    lineSpacing = det.leading;
+                    String alignNames[] = {"left", "right", "center", "justify"};
+                    alignment = alignNames[det.align];
+                }
+                ret += "<textAttrs>";
+                ret += "<DOMTextAttrs";
+                if (alignment != null) {
+                    ret += " alignment=\"" + alignment + "\"";
+                }
+                ret += " rotation=\"true\""; //?
+                if (indent > -1) {
+                    ret += " indent=\"" + twipToPixel(indent) + "\"";
+                }
+                if (leftMargin > -1) {
+                    ret += " leftMargin=\"" + twipToPixel(leftMargin) + "\"";
+                }
+                if (lineSpacing > -1) {
+                    ret += " lineSpacing=\"" + twipToPixel(lineSpacing) + "\"";
+                }
+                if (rightMargin > -1) {
+                    ret += " rightMargin=\"" + twipToPixel(rightMargin) + "\"";
+                }
+                if (size > -1) {
+                    ret += " size=\"" + twipToPixel(size) + "\"";
+                    ret += " bitmapSize=\"" + size + "\"";
+                }
+                if (fontFace != null) {
+                    ret += " face=\"" + fontFace + "\"";
+                }
+                if (textColor != null) {
+                    ret += " fillColor=\"" + textColor.toHexRGB() + "\" alpha=\"" + textColor.getAlphaFloat() + "\"";
+                }
+                ret += "/>";
+                ret += "</textAttrs>";
+                ret += "</DOMTextRun>";
             }
             ret += "</textRuns>";
             ret += filterStr;
@@ -3167,7 +3177,12 @@ public class XFLConverter {
                                 if (fontName == null) {
                                     fontName = ft.getFontName(tags);
                                 }
-                                fontFace = new Font(fontName, (italic ? Font.ITALIC : 0) | (bold ? Font.BOLD : 0) | (!italic && !bold ? Font.PLAIN : 0), size < 0 ? 10 : size).getPSName();
+                                String installedFont;
+                                if((installedFont = FontTag.isFontInstalled(fontName))!=null){
+                                    fontFace = new Font(installedFont, (italic ? Font.ITALIC : 0) | (bold ? Font.BOLD : 0) | (!italic && !bold ? Font.PLAIN : 0), size < 0 ? 10 : size).getPSName();
+                                }else{
+                                    fontFace = fontName;
+                                }
                                 break;
                             }
                         }
@@ -3253,6 +3268,9 @@ public class XFLConverter {
 
         @Override
         public void endDocument() {
+            if (this.result.equals("")) {
+                putText("");
+            }
         }
     }
 }
