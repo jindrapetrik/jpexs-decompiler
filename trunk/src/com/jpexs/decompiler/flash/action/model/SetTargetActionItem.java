@@ -32,7 +32,7 @@ public class SetTargetActionItem extends ActionItem {
 
     @Override
     public String toString(boolean highlight, ConstantPool constants) {
-        return hilight("tellTarget(\"", highlight) + Helper.escapeString(target) + hilight("\")", highlight);
+        return hilight("tellTarget(\"", highlight) + hilight(Helper.escapeString(target), highlight) + hilight("\")", highlight);
     }
 
     @Override

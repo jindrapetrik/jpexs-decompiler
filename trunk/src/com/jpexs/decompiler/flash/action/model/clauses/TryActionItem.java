@@ -58,7 +58,7 @@ public class TryActionItem extends ActionItem implements Block {
     @Override
     public String toString(boolean highlight, ConstantPool constants) {
         String ret = "";
-        ret += "try\r\n{\r\n";
+        ret += hilight("try", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
         List<Object> localData = new ArrayList<>();
         localData.add(constants);
         for (GraphTargetItem ti : tryCommands) {
@@ -66,25 +66,25 @@ public class TryActionItem extends ActionItem implements Block {
                 ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";
             }
         }
-        ret += "}";
+        ret += hilight("}", highlight);
         for (int e = 0; e < catchExceptions.size(); e++) {
-            ret += "\r\ncatch(" + catchExceptions.get(e).toStringNoQuotes(highlight, localData) + ")\r\n{\r\n";
+            ret += "\r\n" + hilight("catch(", highlight) + catchExceptions.get(e).toStringNoQuotes(highlight, localData) + hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
             List<GraphTargetItem> commands = catchCommands.get(e);
             for (GraphTargetItem ti : commands) {
                 if (!ti.isEmpty()) {
                     ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";
                 }
             }
-            ret += "}";
+            ret += hilight("}", highlight);
         }
         if (finallyCommands.size() > 0) {
-            ret += "\r\nfinally\r\n{\r\n";
+            ret += "\r\n" + hilight("finally", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
             for (GraphTargetItem ti : finallyCommands) {
                 if (!ti.isEmpty()) {
                     ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";
                 }
             }
-            ret += "}";
+            ret += hilight("}", highlight);
         }
         return ret;
     }

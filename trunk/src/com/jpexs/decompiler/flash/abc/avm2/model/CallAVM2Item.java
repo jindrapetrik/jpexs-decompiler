@@ -40,7 +40,7 @@ public class CallAVM2Item extends AVM2Item {
         String args = "";
         for (int a = 0; a < arguments.size(); a++) {
             if (a > 0) {
-                args = args + ",";
+                args = args + hilight(",", highlight);
             }
             args = args + arguments.get(a).toString(highlight, constants, localRegNames, fullyQualifiedNames);
         }
@@ -53,7 +53,7 @@ public class CallAVM2Item extends AVM2Item {
          }*/
         String fstr = function.toString(highlight, constants, localRegNames, fullyQualifiedNames);
         if (function.precedence > precedence) {
-            fstr = "(" + fstr + ")";
+            fstr = hilight("(", highlight) + fstr + hilight(")", highlight);
         }
         return fstr + hilight("(", highlight) + args + hilight(")", highlight);
     }

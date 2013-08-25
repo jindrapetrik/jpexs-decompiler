@@ -51,7 +51,7 @@ public class GotoFrame2ActionItem extends ActionItem {
         if (playFlag) {
             prefix = "gotoAndPlay";
         }
-        return hilight(prefix + "(", highlight) + frame.toString(highlight, constants) + (sceneBiasFlag ? "," + sceneBias : "") + hilight(")", highlight);
+        return hilight(prefix + "(", highlight) + frame.toString(highlight, constants) + hilight((sceneBiasFlag ? "," + sceneBias : ""), highlight) + hilight(")", highlight);
     }
 
     @Override

@@ -39,7 +39,7 @@ public class TellTargetActionItem extends ActionItem {
 
     @Override
     public String toString(boolean highlight, ConstantPool constants) {
-        String ret = hilight("tellTarget(", highlight) + target.toString(highlight, constants) + hilight(")\r\n{\r\n", highlight);
+        String ret = hilight("tellTarget(", highlight) + target.toString(highlight, constants) + hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
         for (GraphTargetItem ti : commands) {
             ret += ti.toString(highlight, constants) + "\r\n";
         }

@@ -48,7 +48,7 @@ public class FSCommand2ActionItem extends ActionItem {
     public String toString(boolean highlight, ConstantPool constants) {
         String paramStr = "";
         for (int t = 0; t < arguments.size(); t++) {
-            paramStr += ",";
+            paramStr += hilight(",", highlight);
             paramStr += arguments.get(t).toString(highlight, constants);
         }
         return hilight("FSCommand2(", highlight) + command.toString(highlight, constants) + paramStr + hilight(")", highlight);

@@ -33,7 +33,7 @@ public class GotoLabelActionItem extends ActionItem {
 
     @Override
     public String toString(boolean highlight, ConstantPool constants) {
-        return hilight("gotoAndStop(\"", highlight) + Helper.escapeString(label) + hilight("\", highlight)", highlight);
+        return hilight("gotoAndStop(\"", highlight) + hilight(Helper.escapeString(label), highlight) + hilight("\")", highlight);
     }
 
     @Override

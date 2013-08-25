@@ -37,7 +37,7 @@ public class StringExtractActionItem extends ActionItem {
 
     @Override
     public String toString(boolean highlight, ConstantPool constants) {
-        return value.toString(highlight, constants) + ".substr(" + index.toString(highlight, constants) + "," + count.toString(highlight, constants) + ")";
+        return value.toString(highlight, constants) + hilight(".substr(", highlight) + index.toString(highlight, constants) + hilight(",", highlight) + count.toString(highlight, constants) + hilight(")", highlight);
     }
 
     @Override

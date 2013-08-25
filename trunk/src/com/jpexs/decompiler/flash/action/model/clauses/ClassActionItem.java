@@ -166,26 +166,26 @@ public class ClassActionItem extends ActionItem implements Block {
             boolean first = true;
             for (GraphTargetItem t : implementsOp) {
                 if (!first) {
-                    ret += ", ";
+                    ret += hilight(", ", highlight);
                 }
                 first = false;
                 ret += Action.getWithoutGlobal(t).toString(highlight, constants);
             }
         }
-        ret += "\r\n{\r\n";
+        ret += "\r\n" + hilight("{", highlight) + "\r\n";
 
         if (constructor != null) {
             ret += constructor.toString(highlight, constants) + "\r\n";
         }
 
         for (MyEntry<GraphTargetItem, GraphTargetItem> item : vars) {
-            ret += "var " + item.key.toStringNoQuotes(highlight, constants) + " = " + item.value.toString(highlight, constants) + ";\r\n";
+            ret += hilight("var ", highlight) + item.key.toStringNoQuotes(highlight, constants) + hilight(" = ", highlight) + item.value.toString(highlight, constants) + hilight(";", highlight) + "\r\n";
         }
         for (String v : uninitializedVars) {
-            ret += "var " + v + ";\r\n";
+            ret += hilight("var ", highlight) + hilight(v, highlight) + hilight(";", highlight) + "\r\n";
         }
         for (MyEntry<GraphTargetItem, GraphTargetItem> item : staticVars) {
-            ret += "static var " + item.key.toStringNoQuotes(highlight, constants) + " = " + item.value.toString(highlight, constants) + ";\r\n";
+            ret += hilight("static var ", highlight) + item.key.toStringNoQuotes(highlight, constants) + hilight(" = ", highlight) + item.value.toString(highlight, constants) + hilight(";", highlight) + "\r\n";
         }
 
 
@@ -193,10 +193,10 @@ public class ClassActionItem extends ActionItem implements Block {
             ret += f.toString(highlight, constants) + "\r\n";
         }
         for (GraphTargetItem f : staticFunctions) {
-            ret += "static " + f.toString(highlight, constants) + "\r\n";
+            ret += hilight("static ", highlight) + f.toString(highlight, constants) + "\r\n";
         }
 
-        ret += "}\r\n";
+        ret += hilight("}", highlight) + "\r\n";
         return ret;
     }
 

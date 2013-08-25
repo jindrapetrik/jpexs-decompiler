@@ -70,7 +70,7 @@ public class CallMethodActionItem extends ActionItem {
         }
         String soStr = scriptObject.toString(highlight, constants);
         if (scriptObject.precedence > this.precedence) {
-            soStr = "(" + soStr + ")";
+            soStr = hilight("(", highlight) + soStr + hilight(")", highlight);
         }
         return soStr + hilight(".", highlight) + stripQuotes(methodName, constants, highlight) + hilight("(", highlight) + paramStr + hilight(")", highlight);
     }

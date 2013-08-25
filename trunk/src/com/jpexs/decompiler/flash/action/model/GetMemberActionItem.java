@@ -45,9 +45,9 @@ public class GetMemberActionItem extends ActionItem {
     public String toString(boolean highlight, ConstantPool constants) {
         if (!((memberName instanceof DirectValueActionItem) && (((DirectValueActionItem) memberName).value instanceof String))) {
             //if(!(functionName instanceof GetVariableActionItem))
-            return object.toString(highlight, constants) + "[" + stripQuotes(memberName, constants, highlight) + "]";
+            return object.toString(highlight, constants) + hilight("[", highlight) + stripQuotes(memberName, constants, highlight) + hilight("]", highlight);
         }
-        return object.toString(highlight, constants) + "." + stripQuotes(memberName, constants, highlight);
+        return object.toString(highlight, constants) + hilight(".", highlight) + stripQuotes(memberName, constants, highlight);
     }
 
     @Override

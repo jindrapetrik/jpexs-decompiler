@@ -57,7 +57,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             if (lti.value instanceof ConvertAVM2Item) {
                 type = ((ConvertAVM2Item) lti.value).type;
             }
-            return "var " + hilight(localRegName(localRegNames, lti.regIndex) + ":" + type + " = ", highlight) + lti.value.toString(highlight, constants, localRegNames, fullyQualifiedNames);
+            return hilight("var ", highlight) + hilight(localRegName(localRegNames, lti.regIndex) + ":" + hilight(type, highlight) + " = ", highlight) + lti.value.toString(highlight, constants, localRegNames, fullyQualifiedNames);
         }
         if (assignment instanceof SetSlotAVM2Item) {
             SetSlotAVM2Item ssti = (SetSlotAVM2Item) assignment;

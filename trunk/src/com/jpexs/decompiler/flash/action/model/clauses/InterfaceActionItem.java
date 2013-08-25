@@ -44,19 +44,19 @@ public class InterfaceActionItem extends ActionItem {
     @Override
     public String toString(boolean highlight, ConstantPool constants) {
         String ret = "";
-        ret += "interface " + name.toStringNoQuotes(highlight, constants);
+        ret += hilight("interface ", highlight) + name.toStringNoQuotes(highlight, constants);
         boolean first = true;
         if (!superInterfaces.isEmpty()) {
-            ret += " extends ";
+            ret += hilight(" extends ", highlight);
         }
         for (GraphTargetItem ti : superInterfaces) {
             if (!first) {
-                ret += ", ";
+                ret += hilight(", ", highlight);
             }
             first = false;
             ret += Action.getWithoutGlobal(ti).toStringNoQuotes(highlight, constants);
         }
-        ret += "\r\n{\r\n}\r\n";
+        ret += "\r\n" + hilight("{", highlight) + "\r\n" + hilight("}", highlight) + "\r\n";
         return ret;
     }
 

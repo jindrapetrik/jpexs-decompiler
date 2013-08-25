@@ -36,7 +36,7 @@ public class NewArrayAVM2Item extends AVM2Item {
         String args = "";
         for (int a = 0; a < values.size(); a++) {
             if (a > 0) {
-                args = args + ",";
+                args = args + hilight(",", highlight);
             }
             args = args + values.get(a).toString(highlight, constants, localRegNames, fullyQualifiedNames);
         }

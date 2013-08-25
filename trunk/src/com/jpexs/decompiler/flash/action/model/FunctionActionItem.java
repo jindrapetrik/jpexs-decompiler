@@ -91,7 +91,7 @@ public class FunctionActionItem extends ActionItem {
             }
             ret += hilight(pname, highlight);
         }
-        ret += hilight(")", highlight) + "\r\n{\r\n" + Graph.graphToString(actions, highlight, constants) + "}";
+        ret += hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n" + Graph.graphToString(actions, highlight, constants) + "}";
         return ret;
     }
 

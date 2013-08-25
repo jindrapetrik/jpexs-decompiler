@@ -64,13 +64,13 @@ public class ForInActionItem extends LoopActionItem implements Block {
     @Override
     public String toString(boolean highlight, ConstantPool constants) {
         String ret = "";
-        ret += "loop" + loop.id + ":\r\n";
+        ret += hilight("loop" + loop.id + ":", highlight) + "\r\n";
         ret += hilight("for(", highlight) + ((variableName instanceof DirectValueActionItem) && (((DirectValueActionItem) variableName).value instanceof RegisterNumber) ? "var " : "") + stripQuotes(variableName, constants, highlight) + " in " + enumVariable.toString(highlight, constants) + ")\r\n{\r\n";
         for (GraphTargetItem ti : commands) {
             ret += ti.toStringSemicoloned(highlight, constants) + "\r\n";
         }
         ret += hilight("}", highlight) + "\r\n";
-        ret += ":loop" + loop.id;
+        ret += hilight(":loop" + loop.id, highlight);
         return ret;
     }
 

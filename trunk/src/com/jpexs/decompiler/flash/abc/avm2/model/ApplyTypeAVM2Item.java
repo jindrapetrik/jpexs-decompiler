@@ -46,12 +46,12 @@ public class ApplyTypeAVM2Item extends AVM2Item {
                 }
                 GraphTargetItem p = params.get(i);
                 if (p instanceof NullAVM2Item) {
-                    ret.append("*");
+                    ret.append(hilight("*", highlight));
                 } else {
                     ret.append(p.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames)));
                 }
             }
-            ret.append(">");
+            ret.append(hilight(">", highlight));
         }
         return ret.toString();
     }

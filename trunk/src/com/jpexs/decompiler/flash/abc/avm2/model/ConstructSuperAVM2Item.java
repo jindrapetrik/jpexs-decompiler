@@ -39,11 +39,11 @@ public class ConstructSuperAVM2Item extends AVM2Item {
         String argStr = "";
         for (int a = 0; a < args.size(); a++) {
             if (a > 0) {
-                argStr = argStr + ",";
+                argStr = argStr + hilight(",", highlight);
             }
             argStr = argStr + args.get(a).toString(highlight, constants, localRegNames, fullyQualifiedNames);
         }
-        String calee = object.toString(highlight, constants, localRegNames, fullyQualifiedNames) + ".";
+        String calee = object.toString(highlight, constants, localRegNames, fullyQualifiedNames) + hilight(".", highlight);
         if (Highlighting.stripHilights(calee).equals("this.")) {
             calee = "";
         }

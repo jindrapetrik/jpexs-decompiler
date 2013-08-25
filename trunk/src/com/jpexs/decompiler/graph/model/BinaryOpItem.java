@@ -49,7 +49,7 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
     public String toString(boolean highlight, List<Object> localData) {
         String ret = "";
         if (leftSide.getPrecedence() > precedence) {
-            ret += "(" + leftSide.toString(highlight, localData) + ")";
+            ret += hilight("(", highlight) + leftSide.toString(highlight, localData) + hilight(")", highlight);
         } else {
             ret += leftSide.toString(highlight, localData);
         }
@@ -59,7 +59,7 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
         ret += " ";
 
         if (rightSide.getPrecedence() > precedence) {
-            ret += "(" + rightSide.toString(highlight, localData) + ")";
+            ret += hilight("(", highlight) + rightSide.toString(highlight, localData) + hilight(")", highlight);
         } else {
             ret += rightSide.toString(highlight, localData);
         }

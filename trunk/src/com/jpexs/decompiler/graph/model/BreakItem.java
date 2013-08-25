@@ -20,7 +20,7 @@ public class BreakItem extends GraphTargetItem {
 
     @Override
     public String toString(boolean highlight, List<Object> localData) {
-        return hilight("break", highlight) + " " + "loop" + loopId;
+        return hilight("break", highlight) + " " + hilight("loop" + loopId, highlight);
     }
 
     @Override

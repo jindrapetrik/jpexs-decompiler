@@ -86,7 +86,7 @@ public class ForItem extends LoopItem implements Block {
             ret += stripSemicolon(finalCommands.get(i).toString(highlight, localData));
             p++;
         }
-        ret += hilight(")", highlight) + "\r\n{\r\n";
+        ret += hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
         for (GraphTargetItem ti : commands) {
             if (!ti.isEmpty()) {
                 ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";

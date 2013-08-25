@@ -70,7 +70,7 @@ public class IfItem extends GraphTargetItem implements Block {
                 elseBranch = onTrue;
             }
         }
-        ret = hilight("if(", highlight) + expr.toString(highlight, localData) + hilight(")", highlight) + "\r\n{\r\n";
+        ret = hilight("if(", highlight) + expr.toString(highlight, localData) + hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
         for (GraphTargetItem ti : ifBranch) {
             if (!ti.isEmpty()) {
                 ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";

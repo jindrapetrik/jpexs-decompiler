@@ -49,7 +49,7 @@ public class WithActionItem extends ActionItem {
         String ret;
         List<Object> localData = new ArrayList<>();
         localData.add(constants);
-        ret = hilight("with(", highlight) + scope.toString(highlight, localData) + hilight(")\r\n{\r\n", highlight);
+        ret = hilight("with(", highlight) + scope.toString(highlight, localData) + hilight(")", highlight) + "\r\n" + hilight("{",highlight) + "\r\n";
         for (GraphTargetItem ti : items) {
             ret += ti.toString(highlight, localData) + "\r\n";
         }

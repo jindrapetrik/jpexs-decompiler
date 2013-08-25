@@ -50,7 +50,7 @@ public class NewMethodActionItem extends ActionItem {
         String paramStr = "";
         for (int t = 0; t < arguments.size(); t++) {
             if (t > 0) {
-                paramStr += ",";
+                paramStr += hilight(",", highlight);
             }
             paramStr += arguments.get(t).toString(highlight, constants);
         }

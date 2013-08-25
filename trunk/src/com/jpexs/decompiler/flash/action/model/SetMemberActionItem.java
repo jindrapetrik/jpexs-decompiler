@@ -79,9 +79,9 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
     public String toString(boolean highlight, ConstantPool constants) {
         if (!((objectName instanceof DirectValueActionItem) && (((DirectValueActionItem) objectName).value instanceof String))) {
             //if(!(functionName instanceof GetVariableActionItem))
-            return object.toString(highlight, constants) + "[" + stripQuotes(objectName, constants, highlight) + "]" + " = " + value.toString(highlight, constants);
+            return object.toString(highlight, constants) + hilight("[", highlight) + stripQuotes(objectName, constants, highlight) + hilight("]", highlight) + hilight(" = ", highlight) + value.toString(highlight, constants);
         }
-        return object.toString(highlight, constants) + "." + stripQuotes(objectName, constants, highlight) + " = " + value.toString(highlight, constants);
+        return object.toString(highlight, constants) + hilight(".", highlight) + stripQuotes(objectName, constants, highlight) + hilight(" = ", highlight) + value.toString(highlight, constants);
     }
 
     @Override

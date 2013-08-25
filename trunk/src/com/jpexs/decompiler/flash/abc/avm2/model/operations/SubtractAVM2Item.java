@@ -38,7 +38,7 @@ public class SubtractAVM2Item extends BinaryOpItem {
         if (rightSide.precedence >= precedence) { // >=  add or subtract too
             String ret = "";
             if (leftSide.precedence > precedence) {
-                ret += "(" + leftSide.toString(highlight, localData) + ")";
+                ret += hilight("(", highlight) + leftSide.toString(highlight, localData) + hilight(")", highlight);
             } else {
                 ret += leftSide.toString(highlight, localData);
             }
@@ -46,7 +46,7 @@ public class SubtractAVM2Item extends BinaryOpItem {
             ret += hilight(operator, highlight);
             ret += " ";
 
-            ret += "(" + rightSide.toString(highlight, localData) + ")";
+            ret += hilight("(", highlight) + rightSide.toString(highlight, localData) + hilight(")", highlight);
             return ret;
         } else {
             return super.toString(highlight, localData);

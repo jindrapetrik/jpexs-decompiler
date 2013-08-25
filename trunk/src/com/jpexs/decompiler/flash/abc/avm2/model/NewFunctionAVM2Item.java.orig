@@ -18,33 +18,26 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
-import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.helpers.Helper;
 import java.util.HashMap;
 import java.util.List;
 
-public class CallStaticAVM2Item extends AVM2Item {
+public class NewFunctionAVM2Item extends AVM2Item {
 
-    public GraphTargetItem receiver;
-    public String methodName;
-    public List<GraphTargetItem> arguments;
+    public String paramStr;
+    public String returnStr;
+    public String functionBody;
+    public String functionName;
 
-    public CallStaticAVM2Item(AVM2Instruction instruction, GraphTargetItem receiver, String methodName, List<GraphTargetItem> arguments) {
+    public NewFunctionAVM2Item(AVM2Instruction instruction, String functionName, String paramStr, String returnStr, String functionBody) {
         super(instruction, PRECEDENCE_PRIMARY);
-        this.receiver = receiver;
-        this.methodName = methodName;
-        this.arguments = arguments;
+        this.paramStr = paramStr;
+        this.returnStr = returnStr;
+        this.functionBody = functionBody;
+        this.functionName = functionName;
     }
 
     @Override
     public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        String args = "";
-        for (int a = 0; a < arguments.size(); a++) {
-            if (a > 0) {
-                args = args + hilight(",", highlight);
-            }
-            args = args + arguments.get(a).toString(highlight, constants, localRegNames, fullyQualifiedNames);
-        }
-        return receiver.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames)) + hilight(".", highlight) + methodName + hilight("(", highlight) + args + hilight(")", highlight);
+        return hilight("function" + (!functionName.equals("") ? " " + functionName : "") + "(" + paramStr + "):" + returnStr, highlight) + "\r\n" + hilight("{", highlight) + "\r\n" + hilight(functionBody, highlight) + "\r\n" + hilight("}", highlight);
     }
 }

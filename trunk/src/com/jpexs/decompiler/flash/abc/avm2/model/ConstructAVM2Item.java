@@ -38,7 +38,7 @@ public class ConstructAVM2Item extends AVM2Item {
         String argStr = "";
         for (int a = 0; a < args.size(); a++) {
             if (a > 0) {
-                argStr = argStr + ",";
+                argStr = argStr + hilight(",", highlight);
             }
             argStr = argStr + args.get(a).toString(highlight, constants, localRegNames, fullyQualifiedNames);
         }
@@ -47,6 +47,5 @@ public class ConstructAVM2Item extends AVM2Item {
         }
         String obStr = object.toString(highlight, constants, localRegNames, fullyQualifiedNames);
         return hilight("new ", highlight) + obStr + hilight("(", highlight) + argStr + hilight(")", highlight);
-
     }
 }

@@ -37,7 +37,7 @@ public class NameValuePair extends AVM2Item {
     public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         String valueStr = value.toString(highlight, constants, localRegNames, fullyQualifiedNames);
         if (value instanceof TernarOpItem) { //Ternar operator contains ":"
-            valueStr = "(" + valueStr + ")";
+            valueStr = hilight("(", highlight) + valueStr + hilight(")", highlight);
         }
         return name.toString(highlight, constants, localRegNames, fullyQualifiedNames) + ":" + valueStr;
     }

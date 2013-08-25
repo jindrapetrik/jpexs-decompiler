@@ -40,13 +40,13 @@ public class ConstructPropAVM2Item extends AVM2Item {
         String argStr = "";
         for (int a = 0; a < args.size(); a++) {
             if (a > 0) {
-                argStr = argStr + ",";
+                argStr = argStr + hilight(",", highlight);
             }
             argStr = argStr + args.get(a).toString(highlight, constants, localRegNames, fullyQualifiedNames);
         }
         String objstr = object.toString(highlight, constants, localRegNames, fullyQualifiedNames);
         if (!objstr.equals("")) {
-            objstr += ".";
+            objstr += hilight(".", highlight);
         }
         return hilight("new ", highlight) + objstr + propertyName.toString(highlight, constants, localRegNames, fullyQualifiedNames) + hilight("(", highlight) + argStr + hilight(")", highlight);
 

@@ -54,7 +54,7 @@ public class SwitchItem extends LoopItem implements Block {
     public String toString(boolean highlight, List<Object> localData) {
         String ret = "";
         ret += "loopswitch" + loop.id + ":\r\n";
-        ret += hilight("switch(", highlight) + switchedObject.toString(highlight, localData) + hilight(")", highlight) + "\r\n{\r\n";
+        ret += hilight("switch(", highlight) + switchedObject.toString(highlight, localData) + hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
         for (int i = 0; i < caseCommands.size(); i++) {
             for (int k = 0; k < valuesMapping.size(); k++) {
                 if (valuesMapping.get(k) == i) {
@@ -71,7 +71,7 @@ public class SwitchItem extends LoopItem implements Block {
         }
         if (defaultCommands != null) {
             if (defaultCommands.size() > 0) {
-                ret += hilight("default", highlight) + ":\r\n";
+                ret += hilight("default", highlight) + hilight(":", highlight) + "\r\n";
                 ret += Graph.INDENTOPEN + "\r\n";
                 for (int j = 0; j < defaultCommands.size(); j++) {
                     if (!defaultCommands.get(j).isEmpty()) {

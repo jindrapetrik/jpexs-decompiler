@@ -77,12 +77,12 @@ public class FullMultinameAVM2Item extends AVM2Item {
     public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         String ret = "";
         if (name != null) {
-            ret = "[" + name.toString(highlight, constants, localRegNames, fullyQualifiedNames) + "]";
+            ret = hilight("[", highlight) + name.toString(highlight, constants, localRegNames, fullyQualifiedNames) + hilight("]", highlight);
         } else {
             ret = hilight(constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames), highlight);
         }
         if (namespace != null) {
-            ret = namespace.toString(highlight, constants, localRegNames, fullyQualifiedNames) + "::" + ret;
+            ret = namespace.toString(highlight, constants, localRegNames, fullyQualifiedNames) + hilight("::", highlight) + ret;
         } else {
             /*Namespace ns = constants.constant_multiname[multinameIndex].getNamespace(constants);
              if ((ns != null)&&(ns.name_index!=0)) {

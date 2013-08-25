@@ -52,7 +52,7 @@ public class InitObjectActionItem extends ActionItem {
             }
             String valueStr = values.get(i).toString(highlight, constants);
             if (values.get(i) instanceof TernarOpItem) { //Ternar operator contains ":"
-                valueStr = "(" + valueStr + ")";
+                valueStr = hilight("(", highlight) + valueStr + hilight(")", highlight);
             }
             objStr += names.get(i).toStringNoQuotes(highlight, constants) + hilight(":", highlight) + valueStr; //AS1/2 do not allow quotes in name here
         }

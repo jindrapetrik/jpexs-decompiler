@@ -40,6 +40,6 @@ public class NextNameAVM2Item extends AVM2Item {
 
     @Override
     public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return "nextName(" + index.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "," + obj.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames)) + ")";
+        return hilight("nextName(", highlight) + index.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames)) + hilight(",", highlight) + obj.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames)) + hilight(")", highlight);
     }
 }

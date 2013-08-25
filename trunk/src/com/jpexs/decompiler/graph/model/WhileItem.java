@@ -56,7 +56,7 @@ public class WhileItem extends LoopItem implements Block {
             }
             expStr += expression.get(i).toString(highlight, localData);
         }
-        ret += hilight("while(", highlight) + expStr + hilight(")", highlight) + "\r\n{\r\n";
+        ret += hilight("while(", highlight) + expStr + hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
         for (GraphTargetItem ti : commands) {
             if (!ti.isEmpty()) {
                 ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";

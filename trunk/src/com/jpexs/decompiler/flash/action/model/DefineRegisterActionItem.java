@@ -33,7 +33,7 @@ public class DefineRegisterActionItem extends ActionItem {
 
     @Override
     public String toString(boolean highlight, ConstantPool constants) {
-        return "var " + identifier;
+        return hilight("var " + identifier, highlight);
     }
 
     @Override

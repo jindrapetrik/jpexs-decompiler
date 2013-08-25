@@ -47,7 +47,7 @@ public class DeleteActionItem extends ActionItem {
         if (object == null) {
             return hilight("delete ", highlight) + propertyName.toString(highlight, constants);
         }
-        return hilight("delete ", highlight) + object.toString(highlight, constants) + "." + stripQuotes(propertyName, constants, highlight);
+        return hilight("delete ", highlight) + object.toString(highlight, constants) + hilight(".", highlight) + stripQuotes(propertyName, constants, highlight);
     }
 
     @Override

@@ -37,7 +37,7 @@ public class ImplementsOpActionItem extends ActionItem {
         String impStr = "";
         for (int i = 0; i < superclasses.size(); i++) {
             if (i > 0) {
-                impStr += ",";
+                impStr += hilight(",", highlight);
             }
             impStr += superclasses.get(i).toString(highlight, Helper.toList(constants));
         }

@@ -36,7 +36,7 @@ public class NewObjectAVM2Item extends AVM2Item {
         String params = "";
         for (int n = 0; n < pairs.size(); n++) {
             if (n > 0) {
-                params += ",\r\n";
+                params += hilight(",", highlight) + "\r\n";
             }
             params += pairs.get(n).toString(highlight, constants, localRegNames, fullyQualifiedNames);
         }

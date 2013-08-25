@@ -54,31 +54,31 @@ public class TryAVM2Item extends AVM2Item implements Block {
     @Override
     public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         String ret = "";
-        ret += "try\r\n{\r\n";
+        ret += hilight("try", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
         for (GraphTargetItem ti : tryCommands) {
             if (!ti.isEmpty()) {
                 ret += ti.toStringSemicoloned(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "\r\n";
             }
         }
-        ret += "}";
+        ret += hilight("}", highlight);
         for (int e = 0; e < catchExceptions.size(); e++) {
-            ret += "\r\ncatch(" + catchExceptions.get(e).getVarName(constants, fullyQualifiedNames) + ":" + catchExceptions.get(e).getTypeName(constants, fullyQualifiedNames) + ")\r\n{\r\n";
+            ret += "\r\n" + hilight("catch(", highlight) + catchExceptions.get(e).getVarName(constants, fullyQualifiedNames) + ":" + catchExceptions.get(e).getTypeName(constants, fullyQualifiedNames) + hilight(")", highlight) + "\r\n" + hilight("{", highlight) +"\r\n";
             List<GraphTargetItem> commands = catchCommands.get(e);
             for (GraphTargetItem ti : commands) {
                 if (!ti.isEmpty()) {
                     ret += ti.toStringSemicoloned(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "\r\n";
                 }
             }
-            ret += "}";
+            ret += hilight("}", highlight);
         }
         if (finallyCommands.size() > 0) {
-            ret += "\r\nfinally\r\n{\r\n";
+            ret += "\r\n" + hilight("finally", highlight) +"\r\n" + hilight("{", highlight) + "\r\n";
             for (GraphTargetItem ti : finallyCommands) {
                 if (!ti.isEmpty()) {
                     ret += ti.toStringSemicoloned(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "\r\n";
                 }
             }
-            ret += "}";
+            ret += hilight("}", highlight);
         }
         return ret;
     }

@@ -33,7 +33,7 @@ public class NameSpaceAVM2Item extends AVM2Item {
     @Override
     public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         if (namespaceIndex == 0) {
-            return "*";
+            return hilight("*", highlight);
         }
         return hilight(constants.constant_namespace[namespaceIndex].toString(constants), highlight);
     }

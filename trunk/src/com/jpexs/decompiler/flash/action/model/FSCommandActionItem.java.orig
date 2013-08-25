@@ -14,35 +14,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.graph;
+package com.jpexs.decompiler.flash.action.model;
 
+import com.jpexs.decompiler.flash.action.swf3.ActionGetURL;
+import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.helpers.Helper;
 import java.util.List;
 
 /**
  *
  * @author JPEXS
  */
-public class MarkItem extends GraphTargetItem {
+public class FSCommandActionItem extends ActionItem {
 
-    private String mark;
+    private String command;
 
-    public MarkItem(String mark) {
-        super(null, NOPRECEDENCE);
-        this.mark = mark;
+    public FSCommandActionItem(GraphSourceItem instruction, String command) {
+        super(instruction, PRECEDENCE_PRIMARY);
+        this.command = command;
     }
 
     @Override
-    public String toString(boolean highlight, List<Object> localData) {
-        return hilight("//decompiler mark:" + mark, highlight);
-    }
-
-    public String getMark() {
-        return mark;
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("fscommand(\"", highlight) + hilight(Helper.escapeString(command), highlight) + hilight("\", highlight)", highlight);
     }
 
     @Override
-    public boolean isEmpty() {
-        return true;
+    public List<GraphSourceItem> toSource(List<Object> localData, SourceGenerator generator) {
+        return toSourceMerge(localData, generator, new ActionGetURL("FSCommand:" + command, ""));
     }
 
     @Override

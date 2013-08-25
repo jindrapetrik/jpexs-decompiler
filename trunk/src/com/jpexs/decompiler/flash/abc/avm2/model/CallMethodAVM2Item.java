@@ -41,7 +41,7 @@ public class CallMethodAVM2Item extends AVM2Item {
         String args = "";
         for (int a = 0; a < arguments.size(); a++) {
             if (a > 0) {
-                args = args + ",";
+                args = args + hilight(",", highlight);
             }
             args = args + arguments.get(a).toString(highlight, constants, localRegNames, fullyQualifiedNames);
         }

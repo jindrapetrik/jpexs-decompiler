@@ -33,6 +33,6 @@ public class ExceptionAVM2Item extends AVM2Item {
 
     @Override
     public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return exception.getVarName(constants, fullyQualifiedNames);
+        return hilight(exception.getVarName(constants, fullyQualifiedNames), highlight);
     }
 }

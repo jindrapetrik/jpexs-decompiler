@@ -34,9 +34,9 @@ public class MBStringLengthActionItem extends ActionItem {
     public String toString(boolean highlight, ConstantPool constants) {
         String s = value.toString(highlight, constants);
         if (value.precedence > precedence) {
-            s = "(" + s + ")";
+            s = hilight("(", highlight) + s + hilight(")", highlight);
         }
-        return hilight("mblength(", highlight) + s + ")";
+        return hilight("mblength(", highlight) + s + hilight(")", highlight);
     }
 
     @Override
