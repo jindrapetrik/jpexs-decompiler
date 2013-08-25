@@ -55,7 +55,7 @@ public class RenameDialog extends AppDialog implements ActionListener {
     public RenameDialog() {
         setSize(300, 150);
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
-        int renameType = (Integer) Configuration.getConfig("lastRenameType", (Integer) 1);
+        int renameType = Configuration.getConfig("lastRenameType", 1);
         ButtonGroup group = new ButtonGroup();
         group.add(typeNumberRadioButton);
         group.add(randomWordRadioButton);

@@ -246,7 +246,7 @@ public class ABCPanel extends JPanel implements ItemListener, ActionListener, Fr
         }
 
 
-        splitPane.setDividerLocation((Integer) Configuration.getConfig("gui.avm2.splitPane.dividerLocation", splitPane.getWidth() * 1 / 2));
+        splitPane.setDividerLocation(Configuration.getConfig("gui.avm2.splitPane.dividerLocation", splitPane.getWidth() * 1 / 2));
 
     }
 

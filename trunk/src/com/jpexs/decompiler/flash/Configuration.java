@@ -116,22 +116,26 @@ public class Configuration {
         return config.containsKey(cfg);
     }
 
-    public static Object getConfig(String cfg) {
+    public static <T> T getConfig(String cfg) {
         return getConfig(cfg, null);
     }
 
-    public static Object getConfig(String cfg, Object defaultValue) {
+    public static <T> T getConfig(String cfg, T defaultValue) {
         if (!config.containsKey(cfg)) {
             return defaultValue;
         }
-        return config.get(cfg);
+        @SuppressWarnings("unchecked")
+        T result = (T)config.get(cfg);
+        return result;
     }
 
-    public static Object setConfig(String cfg, Object value) {
+    public static <T> T setConfig(String cfg, T value) {
         if (cfg.equals("paralelSpeedUp")) {
             cfg = "parallelSpeedUp";
         }
-        return config.put(cfg, value);
+        @SuppressWarnings("unchecked")
+        T result = (T)config.put(cfg, value);
+        return result;
     }
 
     public static void unsetConfig(String cfg) {

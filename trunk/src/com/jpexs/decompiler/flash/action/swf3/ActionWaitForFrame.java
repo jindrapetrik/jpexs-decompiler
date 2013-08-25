@@ -62,7 +62,7 @@ public class ActionWaitForFrame extends Action implements ActionStore {
             }
             skipped.add(a);
         }
-        boolean deobfuscate = (Boolean) Configuration.getConfig("autoDeobfuscate", true);
+        boolean deobfuscate = Configuration.getConfig("autoDeobfuscate", true);
         if (deobfuscate) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             for (int i = 0; i < skipCount; i++) {

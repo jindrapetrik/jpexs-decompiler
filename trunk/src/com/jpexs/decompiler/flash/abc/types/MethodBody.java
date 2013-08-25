@@ -116,7 +116,7 @@ public class MethodBody implements Cloneable, Serializable {
         if (pcode) {
             s += code.toASMSource(constants, this, false);
         } else {
-            if (!(Boolean) Configuration.getConfig("decompile", Boolean.TRUE)) {
+            if (!Configuration.getConfig("decompile", Boolean.TRUE)) {
                 s = "//Decompilation skipped";
                 if (hilight) {
                     s = Highlighting.hilighMethod(s, this.method_info);
@@ -143,7 +143,7 @@ public class MethodBody implements Cloneable, Serializable {
         MethodBody b = (MethodBody) Helper.deepCopy(this);
         deobfuscated = b.code;
         deobfuscated.markMappedOffsets();
-        if ((Boolean) Configuration.getConfig("autoDeobfuscate", true)) {
+        if (Configuration.getConfig("autoDeobfuscate", true)) {
             try {
                 deobfuscated.removeTraps(constants, b, abc, scriptIndex, classIndex, isStatic, path);
             } catch (Exception | StackOverflowError ex) {

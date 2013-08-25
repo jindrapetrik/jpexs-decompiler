@@ -169,7 +169,7 @@ public class BUTTONCONDACTION implements ASMSource, Exportable {
     @Override
     public List<Action> getActions(int version) {
         try {
-            boolean deobfuscate = (Boolean) Configuration.getConfig("autoDeobfuscate", true);
+            boolean deobfuscate = Configuration.getConfig("autoDeobfuscate", true);
             List<Action> list = SWFInputStream.readActionList(listeners, 0, getPos() + 4, new ReReadableInputStream(new ByteArrayInputStream(actionBytes)), version, 0, -1, toString()/*FIXME?*/);
             if (deobfuscate) {
                 list = Action.removeNops(0, list, version, getPos() + 4, toString()/*FIXME?*/);

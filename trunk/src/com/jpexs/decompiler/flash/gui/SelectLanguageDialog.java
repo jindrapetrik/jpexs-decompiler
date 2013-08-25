@@ -49,7 +49,7 @@ public class SelectLanguageDialog extends AppDialog implements ActionListener {
         cnt1.add(cnt, BorderLayout.CENTER);
 
 
-        String currentLanguage = (String) Configuration.getConfig("locale", Locale.getDefault().getLanguage());
+        String currentLanguage = Configuration.getConfig("locale", Locale.getDefault().getLanguage());
         boolean found = false;
         int enIndex = 0;
         for (String code : languages) {
