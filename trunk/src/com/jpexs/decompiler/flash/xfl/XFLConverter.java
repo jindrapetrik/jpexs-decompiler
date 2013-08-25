@@ -3201,7 +3201,7 @@ public class XFLConverter {
                     for (Tag t : tags) {
                         if (t instanceof FontTag) {
                             FontTag ft = (FontTag) t;
-                            String fontName = "";
+                            String fontName = null;
                             if (f.equals(ft.getFontName(tags))) {
                                 for (Tag u : tags) {
                                     if (u instanceof DefineFontNameTag) {
