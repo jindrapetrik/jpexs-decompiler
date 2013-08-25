@@ -486,53 +486,6 @@ public class XFLConverter {
             currentLayer += strokesStr;
             currentLayer += "<edges>";
         }
-        //edgesStr += "</edges>";
-
-        /*for (SHAPERECORD edge : shapeRecords) {
-         if (edge instanceof StyleChangeRecord) {
-         StyleChangeRecord scr = (StyleChangeRecord) edge;
-         if (scr.stateNewStyles) {
-         for (int f = 0; f < scr.fillStyles.fillStyles.length; f++) {
-         fillStylesStr.add(convertFillStyle(mat, characters, scr.fillStyles.fillStyles[f], shapeNum));
-         }
-         }
-         }
-         }
-         boolean usedFillStyles[] = new boolean[fillStylesStr.size()];
-         int fillStyleCount = 0;
-         lastFillStyleCount = 0;
-         if (fillStyles != null) {
-         lastFillStyleCount = fillStyles.fillStyles.length;
-         fillStyleCount += lastFillStyleCount;
-         }
-         for (SHAPERECORD edge : shapeRecords) {
-         if (edge instanceof StyleChangeRecord) {
-         StyleChangeRecord scr = (StyleChangeRecord) edge;
-         if (scr.stateNewStyles) {
-         lastFillStyleCount = scr.fillStyles.fillStyles.length;
-         fillStyleCount += lastFillStyleCount;
-         }
-         if (scr.stateFillStyle0 && scr.fillStyle0 > 0) {
-         usedFillStyles[fillStyleCount - lastFillStyleCount + scr.fillStyle0 - 1] = true;
-         }
-         if (scr.stateFillStyle1 && scr.fillStyle1 > 0) {
-         usedFillStyles[fillStyleCount - lastFillStyleCount + scr.fillStyle1 - 1] = true;
-         }
-         }
-         }
-         */
-        /*int mapPos = 0;
-         HashMap<Integer, Integer> fillStylesMap = new HashMap<>();
-         for (int f = 0; f < fillStyleCount; f++) {
-         if (usedFillStyles[f]) {
-         fillStylesMap.put(f, mapPos);
-         mapPos++;
-         fillsStr += "<FillStyle index=\"" + mapPos + "\">";
-         fillsStr += fillStylesStr.get(f);
-         fillsStr += "</FillStyle>";
-         }
-         }*/
-
         int x = 0;
         int y = 0;
         int startEdgeX = 0;
@@ -612,6 +565,7 @@ public class XFLConverter {
                         fillStyleCount++;
                     }
 
+                    lineStyleCount = 0;
                     if (shapeNum == 4) {
                         for (int l = 0; l < scr.lineStyles.lineStyles2.length; l++) {
                             strokesStr += "<StrokeStyle index=\"" + (lineStyleCount + 1) + "\">";
