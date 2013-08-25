@@ -68,11 +68,11 @@ public class SetPropertyActionItem extends ActionItem implements SetTypeActionIt
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         if (isEmptyString(target)) {
-            return hilight(Action.propertyNames[propertyIndex] + " = ") + value.toString(constants);
+            return hilight(Action.propertyNames[propertyIndex] + " = ", highlight) + value.toString(highlight, constants);
         }
-        return target.toString(constants) + hilight("." + Action.propertyNames[propertyIndex] + " = ") + value.toString(constants);
+        return target.toString(highlight, constants) + hilight("." + Action.propertyNames[propertyIndex] + " = ", highlight) + value.toString(highlight, constants);
     }
 
     @Override

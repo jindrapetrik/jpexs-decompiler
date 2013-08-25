@@ -46,22 +46,22 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
     }
 
     @Override
-    public String toString(List<Object> localData) {
+    public String toString(boolean highlight, List<Object> localData) {
         String ret = "";
         if (leftSide.getPrecedence() > precedence) {
-            ret += "(" + leftSide.toString(localData) + ")";
+            ret += "(" + leftSide.toString(highlight, localData) + ")";
         } else {
-            ret += leftSide.toString(localData);
+            ret += leftSide.toString(highlight, localData);
         }
 
         ret += " ";
-        ret += hilight(operator);
+        ret += hilight(operator, highlight);
         ret += " ";
 
         if (rightSide.getPrecedence() > precedence) {
-            ret += "(" + rightSide.toString(localData) + ")";
+            ret += "(" + rightSide.toString(highlight, localData) + ")";
         } else {
-            ret += rightSide.toString(localData);
+            ret += rightSide.toString(highlight, localData);
         }
         return ret;
     }

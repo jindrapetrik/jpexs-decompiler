@@ -57,13 +57,13 @@ public class FullMultinameAVM2Item extends AVM2Item {
     public boolean isXML(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         String cname;
         if (name != null) {
-            cname = name.toString(constants, localRegNames, fullyQualifiedNames);
+            cname = name.toString(false, constants, localRegNames, fullyQualifiedNames);
         } else {
             cname = (constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames));
         }
         String cns = "";
         if (namespace != null) {
-            cns = namespace.toString(constants, localRegNames, fullyQualifiedNames);
+            cns = namespace.toString(false, constants, localRegNames, fullyQualifiedNames);
         } else {
             Namespace ns = constants.constant_multiname[multinameIndex].getNamespace(constants);
             if ((ns != null) && (ns.name_index != 0)) {
@@ -74,15 +74,15 @@ public class FullMultinameAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         String ret = "";
         if (name != null) {
-            ret = "[" + name.toString(constants, localRegNames, fullyQualifiedNames) + "]";
+            ret = "[" + name.toString(highlight, constants, localRegNames, fullyQualifiedNames) + "]";
         } else {
-            ret = hilight(constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames));
+            ret = hilight(constants.constant_multiname[multinameIndex].getName(constants, fullyQualifiedNames), highlight);
         }
         if (namespace != null) {
-            ret = namespace.toString(constants, localRegNames, fullyQualifiedNames) + "::" + ret;
+            ret = namespace.toString(highlight, constants, localRegNames, fullyQualifiedNames) + "::" + ret;
         } else {
             /*Namespace ns = constants.constant_multiname[multinameIndex].getNamespace(constants);
              if ((ns != null)&&(ns.name_index!=0)) {

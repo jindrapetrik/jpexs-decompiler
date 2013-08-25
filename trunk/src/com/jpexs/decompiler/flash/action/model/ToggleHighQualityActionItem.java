@@ -24,8 +24,8 @@ import java.util.List;
 public class ToggleHighQualityActionItem extends ActionItem {
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("toggleHighQuality()");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("toggleHighQuality()", highlight);
     }
 
     public ToggleHighQualityActionItem(GraphSourceItem instruction) {

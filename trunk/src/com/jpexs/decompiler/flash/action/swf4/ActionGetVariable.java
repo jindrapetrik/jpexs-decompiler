@@ -42,7 +42,7 @@ public class ActionGetVariable extends Action {
     @Override
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem name = stack.pop();
-        GraphTargetItem computedVal = variables.get(Highlighting.stripHilights(name.toStringNoQuotes((ConstantPool) null)));
+        GraphTargetItem computedVal = variables.get(name.toStringNoQuotes(false, (ConstantPool) null));
         if (name instanceof DirectValueActionItem && ((DirectValueActionItem) name).value.equals("/:$version")) {
             stack.push(new GetVersionActionItem(this));
         } else if (!(name instanceof DirectValueActionItem) && !(name instanceof GetVariableActionItem)) {

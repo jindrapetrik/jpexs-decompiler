@@ -46,12 +46,12 @@ public class GotoFrame2ActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         String prefix = "gotoAndStop";
         if (playFlag) {
             prefix = "gotoAndPlay";
         }
-        return hilight(prefix + "(") + frame.toString(constants) + (sceneBiasFlag ? "," + sceneBias : "") + hilight(")");
+        return hilight(prefix + "(", highlight) + frame.toString(highlight, constants) + (sceneBiasFlag ? "," + sceneBias : "") + hilight(")", highlight);
     }
 
     @Override

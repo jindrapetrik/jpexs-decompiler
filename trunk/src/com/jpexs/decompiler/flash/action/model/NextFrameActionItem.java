@@ -24,8 +24,8 @@ import java.util.List;
 public class NextFrameActionItem extends ActionItem {
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("nextFrame()");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("nextFrame()", highlight);
     }
 
     public NextFrameActionItem(GraphSourceItem instruction) {

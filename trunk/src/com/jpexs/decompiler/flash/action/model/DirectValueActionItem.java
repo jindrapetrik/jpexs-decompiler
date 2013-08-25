@@ -85,24 +85,24 @@ public class DirectValueActionItem extends ActionItem {
     }
 
     @Override
-    public String toStringNoQuotes(List<Object> localData) {
+    public String toStringNoQuotes(boolean highlight, List<Object> localData) {
         if (value instanceof Double) {
             if (Double.compare((double) (Double) value, 0) == 0) {
-                return hilight("0");
+                return hilight("0", highlight);
             }
         }
         if (value instanceof Float) {
             if (Float.compare((float) (Float) value, 0) == 0) {
-                return hilight("0");
+                return hilight("0", highlight);
             }
         }
         if (value instanceof String) {
-            return hilight((String) value);
+            return hilight((String) value, highlight);
         }
         if (value instanceof ConstantIndex) {
-            return hilight(this.constants.get(((ConstantIndex) value).index));
+            return hilight(this.constants.get(((ConstantIndex) value).index), highlight);
         }
-        return hilight(value.toString());
+        return hilight(value.toString(), highlight);
     }
 
     public String toStringNoH(ConstantPool constants) {
@@ -126,27 +126,27 @@ public class DirectValueActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         if (value instanceof Double) {
             if (Double.compare((double) (Double) value, 0) == 0) {
-                return hilight("0");
+                return hilight("0", highlight);
             }
         }
         if (value instanceof Float) {
             if (Float.compare((float) (Float) value, 0) == 0) {
-                return hilight("0");
+                return hilight("0", highlight);
             }
         }
         if (value instanceof String) {
-            return hilight("\"" + Helper.escapeString((String) value) + "\"");
+            return hilight("\"" + Helper.escapeString((String) value) + "\"", highlight);
         }
         if (value instanceof ConstantIndex) {
-            return hilight("\"" + Helper.escapeString(this.constants.get(((ConstantIndex) value).index)) + "\"");
+            return hilight("\"" + Helper.escapeString(this.constants.get(((ConstantIndex) value).index)) + "\"", highlight);
         }
         if (value instanceof RegisterNumber) {
-            return hilight(((RegisterNumber) value).translate());
+            return hilight(((RegisterNumber) value).translate(), highlight);
         }
-        return hilight(value.toString());
+        return hilight(value.toString(), highlight);
     }
 
     @Override

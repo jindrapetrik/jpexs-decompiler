@@ -35,14 +35,14 @@ public class CommaExpressionItem extends GraphTargetItem {
     }
 
     @Override
-    public String toString(List<Object> localData) {
+    public String toString(boolean highlight, List<Object> localData) {
         String ret = "";
         boolean first = true;
         for (GraphTargetItem t : commands) {
             if (!first) {
                 ret += ", ";
             }
-            ret += t.toString(localData);
+            ret += t.toString(highlight, localData);
             first = false;
         }
         return ret;

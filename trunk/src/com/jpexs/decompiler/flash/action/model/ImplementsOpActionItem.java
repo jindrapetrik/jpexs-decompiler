@@ -33,15 +33,15 @@ public class ImplementsOpActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         String impStr = "";
         for (int i = 0; i < superclasses.size(); i++) {
             if (i > 0) {
                 impStr += ",";
             }
-            impStr += superclasses.get(i).toString(Helper.toList(constants));
+            impStr += superclasses.get(i).toString(highlight, Helper.toList(constants));
         }
-        return subclass.toString(Helper.toList(constants)) + hilight(" implements ") + impStr;
+        return subclass.toString(highlight, Helper.toList(constants)) + hilight(" implements ", highlight) + impStr;
     }
 
     @Override

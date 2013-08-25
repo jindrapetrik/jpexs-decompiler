@@ -51,37 +51,37 @@ public class SwitchItem extends LoopItem implements Block {
     }
 
     @Override
-    public String toString(List<Object> localData) {
+    public String toString(boolean highlight, List<Object> localData) {
         String ret = "";
         ret += "loopswitch" + loop.id + ":\r\n";
-        ret += hilight("switch(") + switchedObject.toString(localData) + hilight(")") + "\r\n{\r\n";
+        ret += hilight("switch(", highlight) + switchedObject.toString(highlight, localData) + hilight(")", highlight) + "\r\n{\r\n";
         for (int i = 0; i < caseCommands.size(); i++) {
             for (int k = 0; k < valuesMapping.size(); k++) {
                 if (valuesMapping.get(k) == i) {
-                    ret += "case " + caseValues.get(k).toString(localData) + ":\r\n";
+                    ret += "case " + caseValues.get(k).toString(highlight, localData) + ":\r\n";
                 }
             }
             ret += Graph.INDENTOPEN + "\r\n";
             for (int j = 0; j < caseCommands.get(i).size(); j++) {
                 if (!caseCommands.get(i).get(j).isEmpty()) {
-                    ret += caseCommands.get(i).get(j).toStringSemicoloned(localData) + "\r\n";
+                    ret += caseCommands.get(i).get(j).toStringSemicoloned(highlight, localData) + "\r\n";
                 }
             }
             ret += Graph.INDENTCLOSE + "\r\n";
         }
         if (defaultCommands != null) {
             if (defaultCommands.size() > 0) {
-                ret += hilight("default") + ":\r\n";
+                ret += hilight("default", highlight) + ":\r\n";
                 ret += Graph.INDENTOPEN + "\r\n";
                 for (int j = 0; j < defaultCommands.size(); j++) {
                     if (!defaultCommands.get(j).isEmpty()) {
-                        ret += defaultCommands.get(j).toStringSemicoloned(localData) + "\r\n";
+                        ret += defaultCommands.get(j).toStringSemicoloned(highlight, localData) + "\r\n";
                     }
                 }
                 ret += Graph.INDENTCLOSE + "\r\n";
             }
         }
-        ret += hilight("}") + "\r\n";
+        ret += hilight("}", highlight) + "\r\n";
         ret += ":loop" + loop.id;
         return ret;
     }

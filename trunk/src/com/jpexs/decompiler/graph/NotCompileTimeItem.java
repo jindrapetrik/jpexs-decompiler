@@ -45,8 +45,8 @@ public class NotCompileTimeItem extends GraphTargetItem {
     }
 
     @Override
-    public String toString(List<Object> localData) {
-        return object.toString(localData);
+    public String toString(boolean highlight, List<Object> localData) {
+        return object.toString(highlight, localData);
     }
 
     @Override

@@ -35,20 +35,20 @@ public class ApplyTypeAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         StringBuilder ret = new StringBuilder();
-        ret.append(object.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)));
+        ret.append(object.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames)));
         if (!params.isEmpty()) {
-            ret.append(hilight(".<"));
+            ret.append(hilight(".<", highlight));
             for (int i = 0; i < params.size(); i++) {
                 if (i > 0) {
-                    ret.append(hilight(","));
+                    ret.append(hilight(",", highlight));
                 }
                 GraphTargetItem p = params.get(i);
                 if (p instanceof NullAVM2Item) {
                     ret.append("*");
                 } else {
-                    ret.append(p.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)));
+                    ret.append(p.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames)));
                 }
             }
             ret.append(">");

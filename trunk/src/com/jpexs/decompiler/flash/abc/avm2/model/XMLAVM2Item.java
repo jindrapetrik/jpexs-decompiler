@@ -36,13 +36,13 @@ public class XMLAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         String ret = "";
         for (GraphTargetItem part : parts) {
             if (part instanceof StringAVM2Item) {
                 ret += ((StringAVM2Item) part).value;
             } else {
-                ret += part.toString(constants, localRegNames, fullyQualifiedNames);
+                ret += part.toString(highlight, constants, localRegNames, fullyQualifiedNames);
             }
         }
         return ret;

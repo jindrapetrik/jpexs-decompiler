@@ -1159,8 +1159,8 @@ public class XFLConverter {
     }
 
     private static String convertActionScript(ASMSource as) {
-        String decompiledASHilighted = Action.actionsToSource(as.getActions(SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION, as.toString());
-        return as.getActionSourcePrefix() + Helper.indentRows(as.getActionSourceIndent(), Highlighting.stripHilights(decompiledASHilighted), Graph.INDENT_STRING) + as.getActionSourceSuffix();
+        String decompiledAS = Action.actionsToSource(as.getActions(SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION, as.toString(), false);
+        return as.getActionSourcePrefix() + Helper.indentRows(as.getActionSourceIndent(), decompiledAS, Graph.INDENT_STRING) + as.getActionSourceSuffix();
     }
 
     private static long getTimestamp() {

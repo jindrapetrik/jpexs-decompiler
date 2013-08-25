@@ -45,8 +45,8 @@ public class GetVariableActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return stripQuotes(name, constants);
+    public String toString(boolean highlight, ConstantPool constants) {
+        return stripQuotes(name, constants, highlight);
     }
 
     @Override

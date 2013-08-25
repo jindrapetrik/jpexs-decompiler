@@ -45,15 +45,15 @@ public class WithActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         String ret;
         List<Object> localData = new ArrayList<>();
         localData.add(constants);
-        ret = hilight("with(") + scope.toString(localData) + hilight(")\r\n{\r\n");
+        ret = hilight("with(", highlight) + scope.toString(highlight, localData) + hilight(")\r\n{\r\n", highlight);
         for (GraphTargetItem ti : items) {
-            ret += ti.toString(localData) + "\r\n";
+            ret += ti.toString(highlight, localData) + "\r\n";
         }
-        ret += hilight("}");
+        ret += hilight("}", highlight);
         return ret;
     }
 

@@ -44,19 +44,19 @@ public class InitObjectActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         String objStr = "";
         for (int i = 0; i < values.size(); i++) {
             if (i > 0) {
-                objStr += hilight(",");
+                objStr += hilight(",", highlight);
             }
-            String valueStr = values.get(i).toString(constants);
+            String valueStr = values.get(i).toString(highlight, constants);
             if (values.get(i) instanceof TernarOpItem) { //Ternar operator contains ":"
                 valueStr = "(" + valueStr + ")";
             }
-            objStr += names.get(i).toStringNoQuotes(constants) + hilight(":") + valueStr; //AS1/2 do not allow quotes in name here
+            objStr += names.get(i).toStringNoQuotes(highlight, constants) + hilight(":", highlight) + valueStr; //AS1/2 do not allow quotes in name here
         }
-        return hilight("{") + objStr + hilight("}");
+        return hilight("{", highlight) + objStr + hilight("}", highlight);
     }
 
     @Override

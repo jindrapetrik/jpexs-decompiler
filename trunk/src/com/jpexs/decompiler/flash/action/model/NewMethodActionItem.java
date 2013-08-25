@@ -46,13 +46,13 @@ public class NewMethodActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         String paramStr = "";
         for (int t = 0; t < arguments.size(); t++) {
             if (t > 0) {
                 paramStr += ",";
             }
-            paramStr += arguments.get(t).toString(constants);
+            paramStr += arguments.get(t).toString(highlight, constants);
         }
         boolean blankMethod = false;
         String methodNameStr = "";
@@ -63,17 +63,17 @@ public class NewMethodActionItem extends ActionItem {
                 if (((DirectValueActionItem) methodName).value.equals("")) {
                     blankMethod = true;
                 }
-                methodNameStr = ((DirectValueActionItem) methodName).toStringNoQuotes(constants);
+                methodNameStr = ((DirectValueActionItem) methodName).toStringNoQuotes(highlight, constants);
             } else {
-                methodNameStr = methodName.toString(constants);
+                methodNameStr = methodName.toString(highlight, constants);
             }
         } else {
-            methodNameStr = methodName.toString(constants);
+            methodNameStr = methodName.toString(highlight, constants);
         }
         if (blankMethod) {
-            return scriptObject.toString(constants) + "(" + paramStr + ")";
+            return scriptObject.toString(highlight, constants) + "(" + paramStr + ")";
         }
-        return hilight("new ") + scriptObject.toString(constants) + hilight(".") + methodNameStr + hilight("(") + paramStr + hilight(")");
+        return hilight("new ", highlight) + scriptObject.toString(highlight, constants) + hilight(".", highlight) + methodNameStr + hilight("(", highlight) + paramStr + hilight(")", highlight);
     }
 
     @Override

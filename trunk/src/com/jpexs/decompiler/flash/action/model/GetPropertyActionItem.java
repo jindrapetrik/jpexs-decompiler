@@ -44,11 +44,11 @@ public class GetPropertyActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         if (isEmptyString(target)) {
-            return hilight(Action.propertyNames[propertyIndex]);
+            return hilight(Action.propertyNames[propertyIndex], highlight);
         }
-        return target.toString(constants) + hilight("." + Action.propertyNames[propertyIndex]);
+        return target.toString(highlight, constants) + hilight("." + Action.propertyNames[propertyIndex], highlight);
     }
 
     @Override

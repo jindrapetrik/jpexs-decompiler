@@ -42,8 +42,8 @@ public class ReturnActionItem extends ActionItem implements ExitItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("return ") + value.toString(constants);
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("return ", highlight) + value.toString(highlight, constants);
     }
 
     @Override

@@ -30,8 +30,8 @@ public class TargetPathActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return "targetPath(" + value.toString(constants) + ")";
+    public String toString(boolean highlight, ConstantPool constants) {
+        return "targetPath(" + value.toString(highlight, constants) + ")";
     }
 
     @Override

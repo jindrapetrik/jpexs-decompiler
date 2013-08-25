@@ -46,7 +46,7 @@ public class ActionCallFunction extends Action {
             args.add(stack.pop());
         }
         CallFunctionActionItem cft = new CallFunctionActionItem(this, functionName, args);
-        cft.calculatedFunction = functions.get(Highlighting.stripHilights(functionName.toStringNoQuotes((ConstantPool) null)));
+        cft.calculatedFunction = functions.get(functionName.toStringNoQuotes(false, (ConstantPool) null));
         stack.push(cft);
     }
 }

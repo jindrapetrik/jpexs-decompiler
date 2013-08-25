@@ -91,7 +91,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         }
 
         if (assignedValue != null) {
-            valueStr = Highlighting.stripHilights(assignedValue.toString(abc.constants, new HashMap<Integer, String>(), fullyQualifiedNames));
+            valueStr = assignedValue.toString(false, abc.constants, new HashMap<Integer, String>(), fullyQualifiedNames);
         }
         return valueStr;
     }

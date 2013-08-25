@@ -47,8 +47,8 @@ public class UnLoadMovieNumActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("unloadMovieNum(") + num + hilight(")");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("unloadMovieNum(", highlight) + num + hilight(")", highlight);
     }
 
     @Override

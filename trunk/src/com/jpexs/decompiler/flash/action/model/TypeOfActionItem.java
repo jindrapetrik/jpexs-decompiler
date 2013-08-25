@@ -33,8 +33,8 @@ public class TypeOfActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("typeof(") + value.toString(Helper.toList(constants)) + hilight(")");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("typeof(", highlight) + value.toString(highlight, Helper.toList(constants)) + hilight(")", highlight);
     }
 
     @Override

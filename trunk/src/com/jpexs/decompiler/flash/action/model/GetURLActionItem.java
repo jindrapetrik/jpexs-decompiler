@@ -28,8 +28,8 @@ public class GetURLActionItem extends ActionItem {
     public String targetString;
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("getUrl(\"") + Helper.escapeString(urlString) + "\", \"" + Helper.escapeString(targetString) + hilight("\")");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("getUrl(\"", highlight) + Helper.escapeString(urlString) + "\", \"" + Helper.escapeString(targetString) + hilight("\")", highlight);
     }
 
     public GetURLActionItem(GraphSourceItem instruction, String urlString, String targetString) {

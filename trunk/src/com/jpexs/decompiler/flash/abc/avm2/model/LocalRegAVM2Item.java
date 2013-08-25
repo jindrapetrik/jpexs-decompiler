@@ -49,11 +49,11 @@ public class LocalRegAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         if (computedValue instanceof FilterAVM2Item) {
-            return computedValue.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
+            return computedValue.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames));
         }
-        return hilight(localRegName(localRegNames, regIndex));
+        return hilight(localRegName(localRegNames, regIndex), highlight);
     }
 
     @Override

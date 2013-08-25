@@ -34,8 +34,8 @@ public class IntegerValueItem extends GraphTargetItem {
     }
 
     @Override
-    public String toString(List<Object> localData) {
-        return hilight("" + intValue);
+    public String toString(boolean highlight, List<Object> localData) {
+        return hilight("" + intValue, highlight);
     }
 
     @Override

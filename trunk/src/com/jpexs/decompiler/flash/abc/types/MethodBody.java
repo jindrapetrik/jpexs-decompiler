@@ -114,7 +114,7 @@ public class MethodBody implements Cloneable, Serializable {
         }
         String s = "";
         if (pcode) {
-            s += code.toASMSource(constants, this, false);
+            s += code.toASMSource(constants, this, false, hilight);
         } else {
             if (!Configuration.getConfig("decompile", true)) {
                 s = "//Decompilation skipped";

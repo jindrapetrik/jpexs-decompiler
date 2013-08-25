@@ -30,7 +30,7 @@ public class ScriptEndItem extends GraphTargetItem implements ExitItem {
     }
 
     @Override
-    public String toString(List<Object> localData) {
+    public String toString(boolean highlight, List<Object> localData) {
         return "";
     }
 

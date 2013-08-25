@@ -230,24 +230,24 @@ public class ActionPush extends Action {
     }
 
     @Override
-    public String getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+    public String getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex, boolean highlight) {
         if (replacement == null || replacement.size() < values.size()) {
-            return toString();
+            return toString(highlight);
         }
         List<Object> oldVal = values;
         values = replacement;
-        String ts = toString();
+        String ts = toString(highlight);
         values = oldVal;
         return ts;
     }
 
-    public String paramsToStringReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+    public String paramsToStringReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex, boolean highlight) {
         if (replacement == null || replacement.size() < values.size()) {
-            return paramsToString();
+            return paramsToString(highlight);
         }
         List<Object> oldVal = values;
         values = replacement;
-        String ts = paramsToString();
+        String ts = paramsToString(highlight);
         values = oldVal;
         return ts;
     }
@@ -282,7 +282,7 @@ public class ActionPush extends Action {
         return ret;
     }
 
-    public String paramsToString() {
+    public String paramsToString(boolean highlight) {
         String ret = "";
         int pos = 0;
         for (int i = 0; i < values.size(); i++) {
@@ -292,7 +292,7 @@ public class ActionPush extends Action {
             if (pos > 0) {
                 ret += " ";
             }
-            ret += Highlighting.hilighOffset(toString(i), getAddress() + pos + 1);
+            ret += highlight ? Highlighting.hilighOffset(toString(i), getAddress() + pos + 1) : toString(i);
             pos++;
         }
         return ret;
@@ -300,7 +300,11 @@ public class ActionPush extends Action {
 
     @Override
     public String toString() {
-        return "Push " + paramsToString();
+        return "Push " + paramsToString(false);
+    }
+
+    public String toString(boolean highlight) {
+        return "Push " + paramsToString(highlight);
     }
 
     @Override

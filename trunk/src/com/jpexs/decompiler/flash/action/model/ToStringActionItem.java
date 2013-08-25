@@ -31,8 +31,8 @@ public class ToStringActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("String(") + value.toString(Helper.toList(constants)) + hilight(")");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("String(", highlight) + value.toString(highlight, Helper.toList(constants)) + hilight(")", highlight);
     }
 
     @Override

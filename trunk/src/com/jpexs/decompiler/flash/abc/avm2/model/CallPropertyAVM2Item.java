@@ -38,14 +38,14 @@ public class CallPropertyAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         String args = "";
         for (int a = 0; a < arguments.size(); a++) {
             if (a > 0) {
-                args = args + hilight(",");
+                args = args + hilight(",", highlight);
             }
-            args = args + arguments.get(a).toString(constants, localRegNames, fullyQualifiedNames);
+            args = args + arguments.get(a).toString(highlight, constants, localRegNames, fullyQualifiedNames);
         }
-        return formatProperty(constants, receiver, propertyName, localRegNames, fullyQualifiedNames) + hilight("(") + args + hilight(")");
+        return formatProperty(highlight, constants, receiver, propertyName, localRegNames, fullyQualifiedNames) + hilight("(", highlight) + args + hilight(")", highlight);
     }
 }

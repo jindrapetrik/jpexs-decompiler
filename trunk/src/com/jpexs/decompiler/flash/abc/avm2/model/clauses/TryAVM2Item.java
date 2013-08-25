@@ -52,12 +52,12 @@ public class TryAVM2Item extends AVM2Item implements Block {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         String ret = "";
         ret += "try\r\n{\r\n";
         for (GraphTargetItem ti : tryCommands) {
             if (!ti.isEmpty()) {
-                ret += ti.toStringSemicoloned(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "\r\n";
+                ret += ti.toStringSemicoloned(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "\r\n";
             }
         }
         ret += "}";
@@ -66,7 +66,7 @@ public class TryAVM2Item extends AVM2Item implements Block {
             List<GraphTargetItem> commands = catchCommands.get(e);
             for (GraphTargetItem ti : commands) {
                 if (!ti.isEmpty()) {
-                    ret += ti.toStringSemicoloned(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "\r\n";
+                    ret += ti.toStringSemicoloned(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "\r\n";
                 }
             }
             ret += "}";
@@ -75,7 +75,7 @@ public class TryAVM2Item extends AVM2Item implements Block {
             ret += "\r\nfinally\r\n{\r\n";
             for (GraphTargetItem ti : finallyCommands) {
                 if (!ti.isEmpty()) {
-                    ret += ti.toStringSemicoloned(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "\r\n";
+                    ret += ti.toStringSemicoloned(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "\r\n";
                 }
             }
             ret += "}";

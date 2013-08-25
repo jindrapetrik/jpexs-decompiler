@@ -37,7 +37,7 @@ public class FilteredCheckAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return object.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return object.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames));
     }
 }

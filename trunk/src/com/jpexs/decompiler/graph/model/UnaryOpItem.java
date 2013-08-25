@@ -33,14 +33,14 @@ public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {
     }
 
     @Override
-    public String toString(List<Object> localData) {
-        String s = (value == null ? "null" : value.toString(localData));
+    public String toString(boolean highlight, List<Object> localData) {
+        String s = (value == null ? "null" : value.toString(highlight, localData));
         if (value != null) {
             if (value.precedence > precedence) {
                 s = "(" + s + ")";
             }
         }
-        return hilight(operator) + s;
+        return hilight(operator, highlight) + s;
     }
 
     @Override

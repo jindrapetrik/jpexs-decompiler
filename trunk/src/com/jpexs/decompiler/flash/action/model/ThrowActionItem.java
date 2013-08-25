@@ -32,8 +32,8 @@ public class ThrowActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("throw ") + value.toString(Helper.toList(constants));
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("throw ", highlight) + value.toString(highlight, Helper.toList(constants));
     }
 
     @Override

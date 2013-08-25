@@ -33,7 +33,7 @@ public class CommentItem extends GraphTargetItem {
     }
 
     @Override
-    public String toString(List<Object> localData) {
+    public String toString(boolean highlight, List<Object> localData) {
         return "/* " + comment + " */";
     }
 

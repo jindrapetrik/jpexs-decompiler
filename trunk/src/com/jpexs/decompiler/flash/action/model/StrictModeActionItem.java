@@ -28,7 +28,7 @@ public class StrictModeActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         return "StrictMode(" + mode + ");"; //I still don't know how AS source of Strict Mode instruction looks like, assuming this...
     }
 

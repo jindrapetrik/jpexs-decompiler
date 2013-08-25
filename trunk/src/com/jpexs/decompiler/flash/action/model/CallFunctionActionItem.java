@@ -40,15 +40,15 @@ public class CallFunctionActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         String paramStr = "";
         for (int t = 0; t < arguments.size(); t++) {
             if (t > 0) {
-                paramStr += hilight(",");
+                paramStr += hilight(",", highlight);
             }
-            paramStr += arguments.get(t).toStringNL(constants);
+            paramStr += arguments.get(t).toStringNL(highlight, constants);
         }
-        return stripQuotes(functionName, constants) + hilight("(") + paramStr + hilight(")");
+        return stripQuotes(functionName, constants, highlight) + hilight("(", highlight) + paramStr + hilight(")", highlight);
     }
 
     @Override

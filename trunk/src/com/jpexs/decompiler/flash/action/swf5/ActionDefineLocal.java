@@ -40,7 +40,7 @@ public class ActionDefineLocal extends Action {
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem value = stack.pop();
         GraphTargetItem name = stack.pop();
-        variables.put(Highlighting.stripHilights(name.toStringNoQuotes((ConstantPool) null)), value);
+        variables.put(name.toStringNoQuotes(false, (ConstantPool) null), value);
         output.add(new DefineLocalActionItem(this, name, value));
     }
 }

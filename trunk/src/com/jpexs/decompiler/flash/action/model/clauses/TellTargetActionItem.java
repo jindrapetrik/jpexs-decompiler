@@ -38,12 +38,12 @@ public class TellTargetActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        String ret = hilight("tellTarget(") + target.toString(constants) + hilight(")\r\n{\r\n");
+    public String toString(boolean highlight, ConstantPool constants) {
+        String ret = hilight("tellTarget(", highlight) + target.toString(highlight, constants) + hilight(")\r\n{\r\n", highlight);
         for (GraphTargetItem ti : commands) {
-            ret += ti.toString(constants) + "\r\n";
+            ret += ti.toString(highlight, constants) + "\r\n";
         }
-        ret += hilight("}");
+        ret += hilight("}", highlight);
         return ret;
     }
 

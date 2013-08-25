@@ -44,12 +44,12 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
 
-        return getName(constants, localRegNames, fullyQualifiedNames) + hilight(" = ") + value.toString(constants, localRegNames, fullyQualifiedNames);
+        return getName(highlight, constants, localRegNames, fullyQualifiedNames) + hilight(" = ", highlight) + value.toString(highlight, constants, localRegNames, fullyQualifiedNames);
     }
 
-    public String getName(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public String getName(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         String ret = "";
 
         /*ret = scope.toString(constants, localRegNames) + ".";
@@ -66,7 +66,7 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
         if (slotName == null) {
             return ret + "/*UnknownSlot*/";
         }
-        return ret + hilight(slotName.getName(constants, fullyQualifiedNames));
+        return ret + hilight(slotName.getName(constants, fullyQualifiedNames), highlight);
     }
 
     @Override

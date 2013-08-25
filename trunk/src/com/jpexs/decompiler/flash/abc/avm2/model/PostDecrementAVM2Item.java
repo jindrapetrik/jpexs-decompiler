@@ -34,8 +34,8 @@ public class PostDecrementAVM2Item extends AVM2Item implements AssignmentAVM2Ite
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return object.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + hilight("--");
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return object.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames)) + hilight("--", highlight);
     }
 
     @Override

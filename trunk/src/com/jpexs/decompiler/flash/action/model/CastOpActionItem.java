@@ -44,8 +44,8 @@ public class CastOpActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("(") + stripQuotes(constructor, constants) + hilight(")") + object.toString(Helper.toList(constants));
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("(", highlight) + stripQuotes(constructor, constants, highlight) + hilight(")", highlight) + object.toString(highlight, Helper.toList(constants));
     }
 
     @Override

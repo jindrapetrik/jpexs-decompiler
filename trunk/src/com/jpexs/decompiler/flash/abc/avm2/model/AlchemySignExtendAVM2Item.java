@@ -37,7 +37,7 @@ public class AlchemySignExtendAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return hilight("op_" + name + "(") + value.toString(constants, localRegNames, fullyQualifiedNames) + hilight(") /*Alchemy*/");
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return hilight("op_" + name + "(", highlight) + value.toString(highlight, constants, localRegNames, fullyQualifiedNames) + hilight(") /*Alchemy*/", highlight);
     }
 }

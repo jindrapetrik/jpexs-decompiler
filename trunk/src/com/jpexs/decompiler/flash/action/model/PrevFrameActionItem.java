@@ -24,8 +24,8 @@ import java.util.List;
 public class PrevFrameActionItem extends ActionItem {
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("prevFrame()");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("prevFrame()", highlight);
     }
 
     public PrevFrameActionItem(GraphSourceItem instruction) {

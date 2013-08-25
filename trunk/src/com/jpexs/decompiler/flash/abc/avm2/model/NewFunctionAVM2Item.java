@@ -37,7 +37,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return hilight("function" + (!functionName.equals("") ? " " + functionName : "") + "(" + paramStr + "):" + returnStr + "\r\n{\r\n") + functionBody + "\r\n" + hilight("}");
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return hilight("function" + (!functionName.equals("") ? " " + functionName : "") + "(" + paramStr + "):" + returnStr + "\r\n{\r\n", highlight) + functionBody + "\r\n" + hilight("}", highlight);
     }
 }

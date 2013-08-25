@@ -30,8 +30,8 @@ public class ToIntegerActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("int(") + value.toString(constants) + hilight(")");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("int(", highlight) + value.toString(highlight, constants) + hilight(")", highlight);
     }
 
     @Override

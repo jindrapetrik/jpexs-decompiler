@@ -24,8 +24,8 @@ import java.util.List;
 public class PlayActionItem extends ActionItem {
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("play()");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("play()", highlight);
     }
 
     public PlayActionItem(GraphSourceItem instruction) {

@@ -30,8 +30,8 @@ public class CallActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("call(") + stripQuotes(value, constants) + hilight(")");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("call(", highlight) + stripQuotes(value, constants, highlight) + hilight(")", highlight);
     }
 
     @Override

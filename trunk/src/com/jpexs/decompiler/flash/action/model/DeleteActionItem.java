@@ -43,11 +43,11 @@ public class DeleteActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         if (object == null) {
-            return hilight("delete ") + propertyName.toString(constants);
+            return hilight("delete ", highlight) + propertyName.toString(highlight, constants);
         }
-        return hilight("delete ") + object.toString(constants) + "." + stripQuotes(propertyName, constants);
+        return hilight("delete ", highlight) + object.toString(highlight, constants) + "." + stripQuotes(propertyName, constants, highlight);
     }
 
     @Override

@@ -42,9 +42,9 @@ public class InterfaceActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         String ret = "";
-        ret += "interface " + name.toStringNoQuotes(constants);
+        ret += "interface " + name.toStringNoQuotes(highlight, constants);
         boolean first = true;
         if (!superInterfaces.isEmpty()) {
             ret += " extends ";
@@ -54,7 +54,7 @@ public class InterfaceActionItem extends ActionItem {
                 ret += ", ";
             }
             first = false;
-            ret += Action.getWithoutGlobal(ti).toStringNoQuotes(constants);
+            ret += Action.getWithoutGlobal(ti).toStringNoQuotes(highlight, constants);
         }
         ret += "\r\n{\r\n}\r\n";
         return ret;

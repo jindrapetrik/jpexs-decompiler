@@ -38,7 +38,7 @@ public class GetURL2ActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         String methodStr = "";
         if (sendVarsMethod == 1) {
             methodStr = ",\"GET\"";
@@ -47,7 +47,7 @@ public class GetURL2ActionItem extends ActionItem {
             methodStr = ",\"POST\"";
         }
 
-        return hilight("getURL(") + urlString.toString(constants) + hilight(",") + targetString.toString(constants) + hilight(methodStr + ")");
+        return hilight("getURL(", highlight) + urlString.toString(highlight, constants) + hilight(",", highlight) + targetString.toString(highlight, constants) + hilight(methodStr + ")", highlight);
     }
 
     public GetURL2ActionItem(GraphSourceItem instruction, GraphTargetItem urlString, GraphTargetItem targetString, int method) {

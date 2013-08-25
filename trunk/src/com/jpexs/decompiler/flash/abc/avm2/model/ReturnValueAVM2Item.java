@@ -33,12 +33,12 @@ public class ReturnValueAVM2Item extends AVM2Item implements ExitItem {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        String vaStr = value.toString(constants, localRegNames, fullyQualifiedNames);
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        String vaStr = value.toString(highlight, constants, localRegNames, fullyQualifiedNames);
         String prefix = "\r\n" + Graph.INDENTOPEN + "\r\n";
         if (vaStr.startsWith(prefix)) { //NewObjectAVM2Item
             vaStr = vaStr.substring(prefix.length());
         }
-        return hilight("return ") + vaStr;
+        return hilight("return ", highlight) + vaStr;
     }
 }

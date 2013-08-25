@@ -36,25 +36,25 @@ public class CallAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         String args = "";
         for (int a = 0; a < arguments.size(); a++) {
             if (a > 0) {
                 args = args + ",";
             }
-            args = args + arguments.get(a).toString(constants, localRegNames, fullyQualifiedNames);
+            args = args + arguments.get(a).toString(highlight, constants, localRegNames, fullyQualifiedNames);
         }
-        /*String recPart = ""; receiver.toString(constants, localRegNames) + hilight(".");
+        /*String recPart = ""; receiver.toString(constants, localRegNames) + hilight(".", highlight);
          if (receiver instanceof NewActivationAVM2Item) {
          recPart = "";
          }
          if (receiver instanceof ThisAVM2Item) {
          recPart = "";
          }*/
-        String fstr = function.toString(constants, localRegNames, fullyQualifiedNames);
+        String fstr = function.toString(highlight, constants, localRegNames, fullyQualifiedNames);
         if (function.precedence > precedence) {
             fstr = "(" + fstr + ")";
         }
-        return fstr + hilight("(") + args + hilight(")");
+        return fstr + hilight("(", highlight) + args + hilight(")", highlight);
     }
 }

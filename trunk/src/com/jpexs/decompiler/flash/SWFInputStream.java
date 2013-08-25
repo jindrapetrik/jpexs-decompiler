@@ -884,7 +884,7 @@ public class SWFInputStream extends InputStream {
                 HashMap<String, GraphTargetItem> vars = (HashMap<String, GraphTargetItem>) localData.get(1);
                 System.err.print("variables: ");
                 for (Entry<String, GraphTargetItem> v : vars.entrySet()) {
-                    System.err.print("'" + v + "' = " + Highlighting.stripHilights(v.getValue().toString(cpool)) + ", ");
+                    System.err.print("'" + v + "' = " + v.getValue().toString(false, cpool) + ", ");
                 }
                 System.err.println();
                 String add = "";

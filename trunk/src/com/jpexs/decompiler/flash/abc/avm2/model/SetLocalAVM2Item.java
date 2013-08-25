@@ -35,8 +35,8 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return hilight(localRegName(localRegNames, regIndex) + " = ") + value.toString(constants, localRegNames, fullyQualifiedNames);
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return hilight(localRegName(localRegNames, regIndex) + " = ", highlight) + value.toString(highlight, constants, localRegNames, fullyQualifiedNames);
     }
 
     @Override
