@@ -20,7 +20,7 @@ public class ContinueItem extends GraphTargetItem {
 
     @Override
     public String toString(boolean highlight, List<Object> localData) {
-        return hilight("continue", highlight) + " " + "loop" + loopId;
+        return hilight("continue", highlight) + " " + hilight("loop" + loopId, highlight);
     }
 
     @Override

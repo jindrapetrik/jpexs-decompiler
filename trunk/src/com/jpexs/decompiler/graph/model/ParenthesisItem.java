@@ -34,7 +34,7 @@ public class ParenthesisItem extends GraphTargetItem {
 
     @Override
     public String toString(boolean highlight, List<Object> localData) {
-        return "(" + value.toString(highlight, localData) + ")";
+        return hilight("(", highlight) + value.toString(highlight, localData) + hilight(")", highlight);
     }
 
     @Override

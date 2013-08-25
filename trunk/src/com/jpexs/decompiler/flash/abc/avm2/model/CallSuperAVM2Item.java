@@ -47,7 +47,7 @@ public class CallSuperAVM2Item extends AVM2Item {
             }
             args = args + arguments.get(a).toString(highlight, constants, localRegNames, fullyQualifiedNames, highlight);
         }
-        String calee = receiver.toString(highlight, constants, localRegNames, fullyQualifiedNames, highlight) + ".";
+        String calee = receiver.toString(highlight, constants, localRegNames, fullyQualifiedNames, highlight) + hilight(".", highlight);
         if (Highlighting.stripHilights(calee).equals("this.")) {
             calee = "";
         }

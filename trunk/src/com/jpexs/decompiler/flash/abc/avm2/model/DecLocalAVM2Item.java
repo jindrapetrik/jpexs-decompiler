@@ -32,6 +32,6 @@ public class DecLocalAVM2Item extends AVM2Item {
 
     @Override
     public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return localRegName(localRegNames, regIndex) + hilight("--", highlight);
+        return hilight(localRegName(localRegNames, regIndex), highlight) + hilight("--", highlight);
     }
 }

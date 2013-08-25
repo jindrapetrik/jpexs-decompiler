@@ -34,7 +34,7 @@ public class CommentItem extends GraphTargetItem {
 
     @Override
     public String toString(boolean highlight, List<Object> localData) {
-        return "/* " + comment + " */";
+        return hilight("/* " + comment + " */", highlight);
     }
 
     public String getComment() {

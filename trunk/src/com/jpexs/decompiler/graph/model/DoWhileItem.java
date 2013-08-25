@@ -50,7 +50,7 @@ public class DoWhileItem extends LoopItem implements Block {
     @Override
     public String toString(boolean highlight, List<Object> localData) {
         String ret = "";
-        ret += "loop" + loop.id + ":\r\n";
+        ret += hilight("loop" + loop.id + ":", highlight) + "\r\n";
         ret += hilight("do", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
         for (GraphTargetItem ti : commands) {
             if (!ti.isEmpty()) {
@@ -63,12 +63,12 @@ public class DoWhileItem extends LoopItem implements Block {
                 continue;
             }
             if (!expStr.equals("")) {
-                expStr += ", ";
+                expStr += hilight(", ", highlight);
             }
             expStr += expression.get(i).toString(highlight, localData);
         }
         ret += hilight("}", highlight) + "\r\n" + hilight("while(", highlight) + expStr + hilight(");", highlight) + "\r\n";
-        ret += ":loop" + loop.id;
+        ret += hilight(":loop" + loop.id, highlight);
 
         return ret;
     }

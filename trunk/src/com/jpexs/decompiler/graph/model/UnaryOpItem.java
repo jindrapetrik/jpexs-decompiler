@@ -34,10 +34,10 @@ public abstract class UnaryOpItem extends GraphTargetItem implements UnaryOp {
 
     @Override
     public String toString(boolean highlight, List<Object> localData) {
-        String s = (value == null ? "null" : value.toString(highlight, localData));
+        String s = (value == null ? hilight("null", highlight) : value.toString(highlight, localData));
         if (value != null) {
             if (value.precedence > precedence) {
-                s = "(" + s + ")";
+                s = hilight("(", highlight) + s + hilight(")", highlight);
             }
         }
         return hilight(operator, highlight) + s;

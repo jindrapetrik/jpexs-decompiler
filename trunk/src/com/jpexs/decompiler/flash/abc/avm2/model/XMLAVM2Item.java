@@ -40,7 +40,7 @@ public class XMLAVM2Item extends AVM2Item {
         String ret = "";
         for (GraphTargetItem part : parts) {
             if (part instanceof StringAVM2Item) {
-                ret += ((StringAVM2Item) part).value;
+                ret += hilight(((StringAVM2Item) part).value, highlight);
             } else {
                 ret += part.toString(highlight, constants, localRegNames, fullyQualifiedNames);
             }

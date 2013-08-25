@@ -16,7 +16,7 @@ public class TrueItem extends GraphTargetItem {
 
     @Override
     public String toString(boolean highlight, List<Object> localData) {
-        return "true";
+        return hilight("true", highlight);
     }
 
     @Override

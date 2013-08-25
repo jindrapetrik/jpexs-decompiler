@@ -90,7 +90,7 @@ public abstract class GraphTargetItem implements Serializable {
     }
 
     public String toStringSemicoloned(boolean highlight, List<Object> localData) {
-        return toString(highlight, localData) + (needsSemicolon() ? ";" : "");
+        return toString(highlight, localData) + (needsSemicolon() ? hilight(";", highlight) : "");
     }
 
     public String toStringSemicoloned(boolean highlight, Object... localData) {

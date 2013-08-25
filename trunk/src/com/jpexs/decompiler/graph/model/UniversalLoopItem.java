@@ -38,16 +38,16 @@ public class UniversalLoopItem extends LoopItem implements Block {
     @Override
     public String toString(boolean highlight, List<Object> localData) {
         String ret = "";
-        ret += "loop" + loop.id + ":\r\n";
+        ret += hilight("loop" + loop.id + ":", highlight) + "\r\n";
         ret += hilight("while(true)", highlight);
-        ret += "\r\n{\r\n";
+        ret += "\r\n" + hilight("{", highlight) + "\r\n";
         for (GraphTargetItem ti : commands) {
             if (!ti.isEmpty()) {
                 ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";
             }
         }
         ret += hilight("}", highlight) + "\r\n";
-        ret += ":loop" + loop.id;
+        ret += hilight(":loop" + loop.id, highlight);
         return ret;
     }
 
