@@ -100,10 +100,10 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
         double top = 0;
         List<Integer> allLeftMargins = new ArrayList<>();
         List<Integer> allLetterSpacings = new ArrayList<>();
-        FontMetrics fontMetrics = null;
+        FontMetrics fontMetrics;
         BufferedImage bi = new BufferedImage(5, 5, BufferedImage.TYPE_INT_RGB);
         Font aFont = null;
-        int currentLeftMargin = 0;
+        int currentLeftMargin;
         for (int r = 0; r < list.size(); r++) {
             TEXTRECORD rec = list.get(r);
             if (rec.styleFlagsHasFont) {
@@ -158,7 +158,6 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
                 y = rec.yOffset;
             }
             firstLine = false;
-            String lineStr = "";
             allLeftMargins.add(currentLeftMargin);
             int letterSpacing = 0;
             for (int e = 0; e < rec.glyphEntries.length; e++) {
@@ -178,9 +177,13 @@ public abstract class TextTag extends CharacterTag implements BoundedTag {
 
                 int defaultAdvance;
                 if (font.hasLayout()) {
-                    defaultAdvance = 20 * (int) Math.round((double) textHeight * font.getGlyphAdvance(entry.glyphIndex) / (font.getDivider() * 1024.0));
+                    int kerningAdjustment = 0;
+                    if (nextEntry != null) {
+                        kerningAdjustment = font.getGlyphKerningAdjustment(tags, entry.glyphIndex, nextEntry.glyphIndex);
+                    }
+                    defaultAdvance = (int) Math.round((double) 20.0 * textHeight * (font.getGlyphAdvance(entry.glyphIndex) + kerningAdjustment) / (font.getDivider() * 1024.0));
                 } else {
-                    defaultAdvance = 20 * FontTag.getSystemFontAdvance(aFont, font.glyphToChar(tags, entry.glyphIndex));
+                    defaultAdvance = (int) Math.round(20.0 * FontTag.getSystemFontAdvance(aFont, font.glyphToChar(tags, entry.glyphIndex), nextEntry == null ? null : font.glyphToChar(tags, nextEntry.glyphIndex)));
                 }
                 letterSpacing = adv - defaultAdvance;
                 x += adv;

@@ -352,4 +352,18 @@ public class DefineFont2Tag extends FontTag {
     public boolean hasLayout() {
         return fontFlagsHasLayout;
     }
+
+    @Override
+    public int getGlyphKerningAdjustment(List<Tag> tags, int glyphIndex,int nextGlyphIndex) {
+        char c1 = glyphToChar(tags, glyphIndex);
+        char c2 = glyphToChar(tags, nextGlyphIndex);
+        int kerningAdjustment = 0;
+        for (KERNINGRECORD ker : fontKerningTable) {
+            if (ker.fontKerningCode1 == c1 && ker.fontKerningCode2 == c2) {
+                kerningAdjustment = ker.fontKerningAdjustment;
+                break;
+            }
+        }
+        return kerningAdjustment;
+    }
 }

@@ -53,6 +53,8 @@ public abstract class FontTag extends CharacterTag implements AloneTag {
     public abstract int charToGlyph(List<Tag> tags, char c);
 
     public abstract int getGlyphAdvance(int glyphIndex);
+    
+    public abstract int getGlyphKerningAdjustment(List<Tag> tags,int glyphIndex,int nextGlyphIndex);
 
     public abstract int getGlyphWidth(int glyphIndex);
 
@@ -138,14 +140,14 @@ public abstract class FontTag extends CharacterTag implements AloneTag {
         }
     }
 
-    public static int getSystemFontAdvance(String fontName, int fontStyle, int fontSize, char character) {
-        return getSystemFontAdvance(new Font(fontName, fontStyle, fontSize), character);
+    public static float getSystemFontAdvance(String fontName, int fontStyle, int fontSize, Character character, Character nextCharacter) {
+        return getSystemFontAdvance(new Font(fontName, fontStyle, fontSize), character, nextCharacter);
     }
 
-    public static int getSystemFontAdvance(Font aFont, char character) {
-        GlyphVector gv = aFont.createGlyphVector(new FontRenderContext(aFont.getTransform(), true, true), "" + character);
+    public static float getSystemFontAdvance(Font aFont, Character character, Character nextCharacter) {
+        GlyphVector gv = aFont.createGlyphVector(new FontRenderContext(aFont.getTransform(), true, true), "" + character + (nextCharacter==null?"":nextCharacter));
         GlyphMetrics gm = gv.getGlyphMetrics(0);
-        return Math.round(gm.getAdvanceX());
+        return gm.getAdvanceX();
     }
     public static List<String> fontNames = Arrays.asList(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
 
