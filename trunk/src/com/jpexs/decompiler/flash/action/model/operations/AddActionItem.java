@@ -35,21 +35,21 @@ public class AddActionItem extends BinaryOpItem {
     }
 
     @Override
-    public String toString(List<Object> localData) {
+    public String toString(boolean highlight, List<Object> localData) {
         if (rightSide.precedence >= precedence) { //string + vs number +
             String ret = "";
             if (leftSide.precedence > precedence) {
-                ret += "(" + leftSide.toString(localData) + ")";
+                ret += "(" + leftSide.toString(highlight, localData) + ")";
             } else {
-                ret += leftSide.toString(localData);
+                ret += leftSide.toString(highlight, localData);
             }
             ret += " ";
-            ret += hilight(operator);
+            ret += hilight(operator, highlight);
             ret += " ";
-            ret += "(" + rightSide.toString(localData) + ")";
+            ret += "(" + rightSide.toString(highlight, localData) + ")";
             return ret;
         } else {
-            return super.toString(localData);
+            return super.toString(highlight, localData);
         }
     }
 

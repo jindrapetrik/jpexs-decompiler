@@ -2155,12 +2155,12 @@ public class Graph {
      * @param localData
      * @return String
      */
-    public static String graphToString(List<GraphTargetItem> tree, Object... localData) {
+    public static String graphToString(List<GraphTargetItem> tree, boolean highlight, Object... localData) {
         StringBuilder ret = new StringBuilder();
         List<Object> localDataList = Arrays.asList(localData);
         for (GraphTargetItem ti : tree) {
             if (!ti.isEmpty()) {
-                ret.append(ti.toStringSemicoloned(localDataList));
+                ret.append(ti.toStringSemicoloned(highlight, localDataList));
                 ret.append("\r\n");
             }
         }

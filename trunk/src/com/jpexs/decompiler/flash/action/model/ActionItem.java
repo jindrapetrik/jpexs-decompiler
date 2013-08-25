@@ -35,12 +35,11 @@ public abstract class ActionItem extends GraphTargetItem implements Serializable
         super(instruction, precedence);
     }
 
-    public abstract String toString(ConstantPool constants);
+    public abstract String toString(boolean highlight, ConstantPool constants);
 
-    @Override
-    public String toString() {
+    public String toString(boolean highlight) {
         ConstantPool c = null;
-        return toString(c);
+        return toString(highlight, c);
     }
 
     protected boolean isEmptyString(GraphTargetItem target) {
@@ -55,26 +54,26 @@ public abstract class ActionItem extends GraphTargetItem implements Serializable
         return false;
     }
 
-    protected String stripQuotes(GraphTargetItem target, ConstantPool constants) {
+    protected String stripQuotes(GraphTargetItem target, ConstantPool constants, boolean highlight) {
         if (target instanceof DirectValueActionItem) {
             if (((DirectValueActionItem) target).value instanceof String) {
-                return (String) ((DirectValueActionItem) target).hilight((String) ((DirectValueActionItem) target).value);
+                return (String) ((DirectValueActionItem) target).hilight((String) ((DirectValueActionItem) target).value, highlight);
             }
         }
         if (target == null) {
             return "";
         } else {
-            return target.toString(constants);
+            return target.toString(highlight, constants);
         }
     }
 
     @Override
-    public String toString(List<Object> localData) {
+    public String toString(boolean highlight, List<Object> localData) {
         if (localData.isEmpty()) {
             ConstantPool c = null;
-            return toString(c);
+            return toString(highlight, c);
         }
-        return toString((ConstantPool) localData.get(0));
+        return toString(highlight, (ConstantPool) localData.get(0));
     }
 
     protected List<GraphSourceItem> toSourceCall(List<Object> localData, SourceGenerator gen, List<GraphTargetItem> list) {

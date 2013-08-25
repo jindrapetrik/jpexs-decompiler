@@ -186,7 +186,7 @@ public class Highlighting implements Serializable {
      * @param text Text to strip instruction highlights in
      * @return Text with no instruction highlights
      */
-    public static String stripInstrHilights(String text) {
+    private static String stripInstrHilights(String text) {
         return stripSpecificHilights(text, OFSOPEN, OFSCLOSE, OFSEND);
     }
 
@@ -196,7 +196,7 @@ public class Highlighting implements Serializable {
      * @param text Text to strip method highlights in
      * @return Text with no method highlights
      */
-    public static String stripMethodHilights(String text) {
+    private static String stripMethodHilights(String text) {
         return stripSpecificHilights(text, METHODOPEN, METHODCLOSE, METHODEND);
     }
 
@@ -206,7 +206,7 @@ public class Highlighting implements Serializable {
      * @param text Text to strip trait highlights in
      * @return Text with no trait highlights
      */
-    public static String stripTraitHilights(String text) {
+    private static String stripTraitHilights(String text) {
         return stripSpecificHilights(text, TRAITOPEN, TRAITCLOSE, TRAITEND);
     }
 
@@ -216,7 +216,7 @@ public class Highlighting implements Serializable {
      * @param text Text to strip trait highlights in
      * @return Text with no class highlights
      */
-    public static String stripClassHilights(String text) {
+    private static String stripClassHilights(String text) {
         return stripSpecificHilights(text, CLASSOPEN, CLASSCLOSE, CLASSEND);
     }
 

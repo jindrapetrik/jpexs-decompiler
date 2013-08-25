@@ -30,8 +30,8 @@ public class CharToAsciiActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("ord(") + value.toString(constants) + hilight(")");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("ord(", highlight) + value.toString(highlight, constants) + hilight(")", highlight);
     }
 
     @Override

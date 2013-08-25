@@ -49,8 +49,8 @@ public class PostIncrementActionItem extends ActionItem implements SetTypeAction
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return object.toString(constants) + hilight("++");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return object.toString(highlight, constants) + hilight("++", highlight);
     }
 
     @Override

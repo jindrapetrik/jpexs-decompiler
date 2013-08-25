@@ -36,18 +36,18 @@ public abstract class AVM2Item extends GraphTargetItem {
 
     @Override
     @SuppressWarnings("unchecked")
-    public String toString(List<Object> localData) {
-        return toString((ConstantPool) localData.get(0), (HashMap<Integer, String>) localData.get(1), (List<String>) localData.get(2));
+    public String toString(boolean highlight, List<Object> localData) {
+        return toString(highlight, (ConstantPool) localData.get(0), (HashMap<Integer, String>) localData.get(1), (List<String>) localData.get(2));
     }
 
-    public abstract String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames);
+    public abstract String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames);
 
     public String toStringNoH(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return Highlighting.stripHilights(toString(constants, localRegNames, fullyQualifiedNames));
+        return toString(false, constants, localRegNames, fullyQualifiedNames);
     }
 
-    public String toStringSemicoloned(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return toString(constants, localRegNames, fullyQualifiedNames) + (needsSemicolon() ? ";" : "");
+    public String toStringSemicoloned(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return toString(highlight, constants, localRegNames, fullyQualifiedNames) + (needsSemicolon() ? ";" : "");
     }
 
     @Override
@@ -55,8 +55,8 @@ public abstract class AVM2Item extends GraphTargetItem {
         return true;
     }
 
-    protected String formatProperty(ConstantPool constants, GraphTargetItem object, GraphTargetItem propertyName, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        String obStr = object.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
+    protected String formatProperty(boolean highlight, ConstantPool constants, GraphTargetItem object, GraphTargetItem propertyName, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        String obStr = object.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames));
         if (object.precedence > PRECEDENCE_PRIMARY) {
             obStr = "(" + obStr + ")";
         }
@@ -68,16 +68,16 @@ public abstract class AVM2Item extends GraphTargetItem {
             }
         }
         if (obStr.equals("")) {
-            return propertyName.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
+            return propertyName.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames));
         }
         if (propertyName instanceof FullMultinameAVM2Item) {
             if (((FullMultinameAVM2Item) propertyName).name != null) {
-                return obStr + propertyName.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
+                return obStr + propertyName.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames));
             } else {
-                return obStr + "." + propertyName.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
+                return obStr + "." + propertyName.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames));
             }
         } else {
-            return obStr + "[" + propertyName.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "]";
+            return obStr + "[" + propertyName.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "]";
         }
     }
 

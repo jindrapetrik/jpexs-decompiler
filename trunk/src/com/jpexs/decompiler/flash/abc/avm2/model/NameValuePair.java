@@ -34,11 +34,11 @@ public class NameValuePair extends AVM2Item {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        String valueStr = value.toString(constants, localRegNames, fullyQualifiedNames);
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        String valueStr = value.toString(highlight, constants, localRegNames, fullyQualifiedNames);
         if (value instanceof TernarOpItem) { //Ternar operator contains ":"
             valueStr = "(" + valueStr + ")";
         }
-        return name.toString(constants, localRegNames, fullyQualifiedNames) + ":" + valueStr;
+        return name.toString(highlight, constants, localRegNames, fullyQualifiedNames) + ":" + valueStr;
     }
 }

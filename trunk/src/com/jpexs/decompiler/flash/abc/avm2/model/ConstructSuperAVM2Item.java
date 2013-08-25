@@ -35,19 +35,19 @@ public class ConstructSuperAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         String argStr = "";
         for (int a = 0; a < args.size(); a++) {
             if (a > 0) {
                 argStr = argStr + ",";
             }
-            argStr = argStr + args.get(a).toString(constants, localRegNames, fullyQualifiedNames);
+            argStr = argStr + args.get(a).toString(highlight, constants, localRegNames, fullyQualifiedNames);
         }
-        String calee = object.toString(constants, localRegNames, fullyQualifiedNames) + ".";
+        String calee = object.toString(highlight, constants, localRegNames, fullyQualifiedNames) + ".";
         if (Highlighting.stripHilights(calee).equals("this.")) {
             calee = "";
         }
-        return calee + hilight("super(") + argStr + hilight(")");
+        return calee + hilight("super(", highlight) + argStr + hilight(")", highlight);
 
     }
 }

@@ -39,8 +39,8 @@ public class EnumerateActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return "enumerate " + object.toString(Helper.toList(constants));
+    public String toString(boolean highlight, ConstantPool constants) {
+        return "enumerate " + object.toString(highlight, Helper.toList(constants));
     }
 
     @Override

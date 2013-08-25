@@ -53,8 +53,8 @@ public abstract class FontTag extends CharacterTag implements AloneTag {
     public abstract int charToGlyph(List<Tag> tags, char c);
 
     public abstract int getGlyphAdvance(int glyphIndex);
-    
-    public abstract int getGlyphKerningAdjustment(List<Tag> tags,int glyphIndex,int nextGlyphIndex);
+
+    public abstract int getGlyphKerningAdjustment(List<Tag> tags, int glyphIndex, int nextGlyphIndex);
 
     public abstract int getGlyphWidth(int glyphIndex);
 
@@ -145,11 +145,24 @@ public abstract class FontTag extends CharacterTag implements AloneTag {
     }
 
     public static float getSystemFontAdvance(Font aFont, Character character, Character nextCharacter) {
-        GlyphVector gv = aFont.createGlyphVector(new FontRenderContext(aFont.getTransform(), true, true), "" + character + (nextCharacter==null?"":nextCharacter));
+        GlyphVector gv = aFont.createGlyphVector(new FontRenderContext(aFont.getTransform(), true, true), "" + character + (nextCharacter == null ? "" : nextCharacter));
         GlyphMetrics gm = gv.getGlyphMetrics(0);
         return gm.getAdvanceX();
     }
     public static List<String> fontNames = Arrays.asList(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
+
+    public static String isFontInstalled(String fontName) {
+        if (fontNames.contains(fontName)) {
+            return fontName;
+        }
+        if (fontName.contains("_")) {
+            String beforeUnderscore = fontName.substring(0, fontName.indexOf("_"));
+            if (fontNames.contains(beforeUnderscore)) {
+                return beforeUnderscore;
+            }
+        }
+        return null;
+    }
 
     public static String findInstalledFontName(String fontName) {
         if (fontNames.contains(fontName)) {

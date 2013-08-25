@@ -31,12 +31,12 @@ public class MBStringLengthActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        String s = value.toString(constants);
+    public String toString(boolean highlight, ConstantPool constants) {
+        String s = value.toString(highlight, constants);
         if (value.precedence > precedence) {
             s = "(" + s + ")";
         }
-        return hilight("mblength(") + s + ")";
+        return hilight("mblength(", highlight) + s + ")";
     }
 
     @Override

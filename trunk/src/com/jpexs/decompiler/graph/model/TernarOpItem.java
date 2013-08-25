@@ -35,8 +35,8 @@ public class TernarOpItem extends GraphTargetItem {
     }
 
     @Override
-    public String toString(List<Object> localData) {
-        return expression.toString(localData) + hilight("?") + onTrue.toString(localData) + hilight(":") + onFalse.toString(localData);
+    public String toString(boolean highlight, List<Object> localData) {
+        return expression.toString(highlight, localData) + hilight("?", highlight) + onTrue.toString(highlight, localData) + hilight(":", highlight) + onFalse.toString(highlight, localData);
     }
 
     @Override

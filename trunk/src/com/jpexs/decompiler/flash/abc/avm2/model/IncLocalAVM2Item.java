@@ -31,7 +31,7 @@ public class IncLocalAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return localRegName(localRegNames, regIndex) + hilight("++");
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return localRegName(localRegNames, regIndex) + hilight("++", highlight);
     }
 }

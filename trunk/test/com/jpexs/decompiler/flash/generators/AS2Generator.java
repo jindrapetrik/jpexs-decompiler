@@ -35,7 +35,7 @@ public class AS2Generator {
                 if (doa == null) {
                     continue;
                 }
-                String src = Highlighting.stripHilights(Action.actionsToSource(doa.getActions(swf.version), swf.version,""));
+                String src = Action.actionsToSource(doa.getActions(swf.version), swf.version,"",false);
                 if (src.trim().equals("")) {
                     doa = null;
                     continue;

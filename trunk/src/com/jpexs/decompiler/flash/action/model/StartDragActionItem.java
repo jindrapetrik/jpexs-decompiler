@@ -45,14 +45,14 @@ public class StartDragActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         boolean hasConstrains = true;
         if (constrain instanceof DirectValueActionItem) {
             if (Double.compare(EcmaScript.toNumber(constrain.getResult()), 0) == 0) {
                 hasConstrains = false;
             }
         }
-        return hilight("startDrag(") + target.toString(constants) + hilight(",") + lockCenter.toString(constants) + (hasConstrains ? hilight(",") + x1.toString(constants) + hilight(",") + y1.toString(constants) + hilight(",") + x2.toString(constants) + hilight(",") + y2.toString(constants) : "") + hilight(")");
+        return hilight("startDrag(", highlight) + target.toString(highlight, constants) + hilight(",", highlight) + lockCenter.toString(highlight, constants) + (hasConstrains ? hilight(",", highlight) + x1.toString(highlight, constants) + hilight(",", highlight) + y1.toString(highlight, constants) + hilight(",", highlight) + x2.toString(highlight, constants) + hilight(",", highlight) + y2.toString(highlight, constants) : "") + hilight(")", highlight);
     }
 
     @Override

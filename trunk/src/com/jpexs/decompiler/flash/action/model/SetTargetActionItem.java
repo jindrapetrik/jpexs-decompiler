@@ -31,8 +31,8 @@ public class SetTargetActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("tellTarget(\"") + Helper.escapeString(target) + hilight("\")");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("tellTarget(\"", highlight) + Helper.escapeString(target) + hilight("\")", highlight);
     }
 
     @Override

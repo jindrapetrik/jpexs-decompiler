@@ -65,8 +65,8 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return temporary ? value.toString(constants) : ((define ? hilight("var ") : "") + hilight(register.translate() + " = ") + value.toString(constants));
+    public String toString(boolean highlight, ConstantPool constants) {
+        return temporary ? value.toString(highlight, constants) : ((define ? hilight("var ", highlight) : "") + hilight(register.translate() + " = ", highlight) + value.toString(highlight, constants));
     }
 
     @Override

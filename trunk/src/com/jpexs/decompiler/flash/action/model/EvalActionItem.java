@@ -34,8 +34,8 @@ public class EvalActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("eval(") + value.toString(constants) + hilight(")");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("eval(", highlight) + value.toString(highlight, constants) + hilight(")", highlight);
     }
 
     @Override

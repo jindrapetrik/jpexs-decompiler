@@ -49,8 +49,8 @@ public class PrintAsBitmapActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("printAsBitmap(") + target.toString(constants) + hilight(",") + boundingBox.toString(constants) + hilight(")");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("printAsBitmap(", highlight) + target.toString(highlight, constants) + hilight(",", highlight) + boundingBox.toString(highlight, constants) + hilight(")", highlight);
     }
 
     @Override

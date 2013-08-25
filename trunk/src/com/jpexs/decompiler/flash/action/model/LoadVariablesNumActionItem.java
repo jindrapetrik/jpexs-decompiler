@@ -51,7 +51,7 @@ public class LoadVariablesNumActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         String methodStr = "";
         if (method == 1) {
             methodStr = ",\"GET\"";
@@ -59,7 +59,7 @@ public class LoadVariablesNumActionItem extends ActionItem {
         if (method == 2) {
             methodStr = ",\"POST\"";
         }
-        return hilight("loadVariablesNum(") + urlString.toString(constants) + hilight(",") + num + hilight(methodStr + ")");
+        return hilight("loadVariablesNum(", highlight) + urlString.toString(highlight, constants) + hilight(",", highlight) + num.toString(highlight, constants) + hilight(methodStr + ")", highlight);
     }
 
     @Override

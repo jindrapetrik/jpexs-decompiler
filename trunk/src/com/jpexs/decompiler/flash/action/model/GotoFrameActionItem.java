@@ -31,8 +31,8 @@ public class GotoFrameActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("gotoAndStop(") + (frame + 1) + hilight(")");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("gotoAndStop(", highlight) + (frame + 1) + hilight(")", highlight);
     }
 
     @Override

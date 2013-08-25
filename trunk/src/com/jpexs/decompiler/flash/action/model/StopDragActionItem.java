@@ -24,8 +24,8 @@ import java.util.List;
 public class StopDragActionItem extends ActionItem {
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("stopDrag()");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("stopDrag()", highlight);
     }
 
     public StopDragActionItem(GraphSourceItem instruction) {

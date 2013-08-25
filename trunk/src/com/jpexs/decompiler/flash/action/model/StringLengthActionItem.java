@@ -31,8 +31,8 @@ public class StringLengthActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("length(") + value.toString(constants) + hilight(")");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("length(", highlight) + value.toString(highlight, constants) + hilight(")", highlight);
     }
 
     @Override

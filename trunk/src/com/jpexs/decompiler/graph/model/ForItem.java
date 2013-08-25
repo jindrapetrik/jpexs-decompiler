@@ -56,10 +56,10 @@ public class ForItem extends LoopItem implements Block {
     }
 
     @Override
-    public String toString(List<Object> localData) {
+    public String toString(boolean highlight, List<Object> localData) {
         String ret = "";
         ret += "loop" + loop.id + ":\r\n";
-        ret += hilight("for(");
+        ret += hilight("for(", highlight);
         int p = 0;
         for (int i = 0; i < firstCommands.size(); i++) {
             if (firstCommands.get(i).isEmpty()) {
@@ -69,11 +69,11 @@ public class ForItem extends LoopItem implements Block {
             if (p > 0) {
                 ret += ",";
             }
-            ret += stripSemicolon(firstCommands.get(i).toString(localData));
+            ret += stripSemicolon(firstCommands.get(i).toString(highlight, localData));
             p++;
         }
         ret += ";";
-        ret += expression.toString(localData);
+        ret += expression.toString(highlight, localData);
         ret += ";";
         p = 0;
         for (int i = 0; i < finalCommands.size(); i++) {
@@ -83,16 +83,16 @@ public class ForItem extends LoopItem implements Block {
             if (p > 0) {
                 ret += ",";
             }
-            ret += stripSemicolon(finalCommands.get(i).toString(localData));
+            ret += stripSemicolon(finalCommands.get(i).toString(highlight, localData));
             p++;
         }
-        ret += hilight(")") + "\r\n{\r\n";
+        ret += hilight(")", highlight) + "\r\n{\r\n";
         for (GraphTargetItem ti : commands) {
             if (!ti.isEmpty()) {
-                ret += ti.toStringSemicoloned(localData) + "\r\n";
+                ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";
             }
         }
-        ret += hilight("}") + "\r\n";
+        ret += hilight("}", highlight) + "\r\n";
         ret += ":loop" + loop.id;
         return ret;
     }

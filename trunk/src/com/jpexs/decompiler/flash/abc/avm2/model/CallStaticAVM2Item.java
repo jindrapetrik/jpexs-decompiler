@@ -37,14 +37,14 @@ public class CallStaticAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         String args = "";
         for (int a = 0; a < arguments.size(); a++) {
             if (a > 0) {
                 args = args + ",";
             }
-            args = args + arguments.get(a).toString(constants, localRegNames, fullyQualifiedNames);
+            args = args + arguments.get(a).toString(highlight, constants, localRegNames, fullyQualifiedNames);
         }
-        return receiver.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames)) + hilight(".") + methodName + hilight("(") + args + hilight(")");
+        return receiver.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames)) + hilight(".", highlight) + methodName + hilight("(", highlight) + args + hilight(")", highlight);
     }
 }

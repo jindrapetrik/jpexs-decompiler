@@ -43,15 +43,15 @@ public class NewObjectActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         String paramStr = "";
         for (int t = 0; t < arguments.size(); t++) {
             if (t > 0) {
                 paramStr += ",";
             }
-            paramStr += arguments.get(t).toString(constants);
+            paramStr += arguments.get(t).toString(highlight, constants);
         }
-        return hilight("new ") + stripQuotes(objectName, constants) + hilight("(") + paramStr + hilight(")");
+        return hilight("new ", highlight) + stripQuotes(objectName, constants, highlight) + hilight("(", highlight) + paramStr + hilight(")", highlight);
     }
 
     @Override

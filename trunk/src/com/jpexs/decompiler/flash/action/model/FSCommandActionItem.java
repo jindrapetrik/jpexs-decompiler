@@ -36,8 +36,8 @@ public class FSCommandActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("fscommand(\"") + Helper.escapeString(command) + hilight("\")");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("fscommand(\"", highlight) + Helper.escapeString(command) + hilight("\")", highlight);
     }
 
     @Override

@@ -46,13 +46,13 @@ public class CallMethodActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         String paramStr = "";
         for (int t = 0; t < arguments.size(); t++) {
             if (t > 0) {
-                paramStr += hilight(",");
+                paramStr += hilight(",", highlight);
             }
-            paramStr += arguments.get(t).toStringNL(constants);
+            paramStr += arguments.get(t).toStringNL(highlight, constants);
         }
         boolean blankMethod = false;
         if (methodName instanceof DirectValueActionItem) {
@@ -66,13 +66,13 @@ public class CallMethodActionItem extends ActionItem {
             }
         }
         if (blankMethod) {
-            return scriptObject.toString(constants) + hilight("(") + paramStr + hilight(")");
+            return scriptObject.toString(highlight, constants) + hilight("(", highlight) + paramStr + hilight(")", highlight);
         }
-        String soStr = scriptObject.toString(constants);
+        String soStr = scriptObject.toString(highlight, constants);
         if (scriptObject.precedence > this.precedence) {
             soStr = "(" + soStr + ")";
         }
-        return soStr + hilight(".") + stripQuotes(methodName, constants) + hilight("(") + paramStr + hilight(")");
+        return soStr + hilight(".", highlight) + stripQuotes(methodName, constants, highlight) + hilight("(", highlight) + paramStr + hilight(")", highlight);
     }
 
     @Override

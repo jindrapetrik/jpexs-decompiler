@@ -67,16 +67,16 @@ public class ForInAVM2Item extends LoopItem implements Block {
     }
 
     @Override
-    public String toString(List<Object> localData) {
+    public String toString(boolean highlight, List<Object> localData) {
         String ret = "";
         ret += "loop" + loop.id + ":\r\n";
-        ret += hilight("for (") + expression.toString(localData) + hilight(")") + "\r\n{\r\n";
+        ret += hilight("for (", highlight) + expression.toString(highlight, localData) + hilight(")", highlight) + "\r\n{\r\n";
         for (GraphTargetItem ti : commands) {
             if (!ti.isEmpty()) {
-                ret += ti.toStringSemicoloned(localData) + "\r\n";
+                ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";
             }
         }
-        ret += hilight("}") + "\r\n";
+        ret += hilight("}", highlight) + "\r\n";
         ret += ":loop" + loop.id;
         return ret;
     }

@@ -46,8 +46,8 @@ public class MBStringExtractActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("mbsubstring(") + value.toString(constants) + hilight(",") + index.toString(constants) + hilight(",") + count.toString(constants) + hilight(")");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("mbsubstring(", highlight) + value.toString(highlight, constants) + hilight(",", highlight) + index.toString(highlight, constants) + hilight(",", highlight) + count.toString(highlight, constants) + hilight(")", highlight);
     }
 
     @Override

@@ -41,8 +41,8 @@ public class IncrementActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return object.toString(constants) + hilight(" + 1");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return object.toString(highlight, constants) + hilight(" + 1", highlight);
     }
 
     @Override

@@ -51,7 +51,7 @@ public class SetSuperIns extends InstructionDefinition implements SetTypeIns {
     public String getObject(Stack<AVM2Item> stack, ABC abc, AVM2Instruction ins, List<AVM2Item> output, com.jpexs.decompiler.flash.abc.types.MethodBody body, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         int multinameIndex = ins.operands[0];
         String multiname = resolveMultinameNoPop(1, stack, abc.constants, multinameIndex, ins, fullyQualifiedNames);
-        String obj = stack.get(1 + resolvedCount(abc.constants, multinameIndex)).toString(abc.constants, localRegNames, fullyQualifiedNames);
+        String obj = stack.get(1 + resolvedCount(abc.constants, multinameIndex)).toString(false, abc.constants, localRegNames, fullyQualifiedNames);
         return obj + ".super." + multiname;
     }
 

@@ -44,8 +44,8 @@ public class IfFrameLoadedActionItem extends ActionItem implements Block {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("ifFrameLoaded(") + frame.toString(constants) + hilight(")") + "\r\n" + hilight("{") + "\r\n" + Graph.graphToString(actions, constants) + "}";
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("ifFrameLoaded(", highlight) + frame.toString(highlight, constants) + hilight(")", highlight) + "\r\n" + hilight("{", highlight) + "\r\n" + Graph.graphToString(actions, highlight, constants) + "}";
     }
 
     @Override

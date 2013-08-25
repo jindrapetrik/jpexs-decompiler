@@ -43,8 +43,8 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return formatProperty(constants, object, propertyName, localRegNames, fullyQualifiedNames) + hilight(" = ") + value.toString(constants, localRegNames, fullyQualifiedNames);
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return formatProperty(highlight, constants, object, propertyName, localRegNames, fullyQualifiedNames) + hilight(" = ", highlight) + value.toString(highlight, constants, localRegNames, fullyQualifiedNames);
     }
 
     @Override

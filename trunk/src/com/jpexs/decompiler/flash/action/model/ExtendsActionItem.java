@@ -34,10 +34,10 @@ public class ExtendsActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         List<Object> localData = new ArrayList<>();
         localData.add(constants);
-        return subclass.toString(localData) + hilight(" extends ") + stripQuotes(superclass, constants);
+        return subclass.toString(highlight, localData) + hilight(" extends ", highlight) + stripQuotes(superclass, constants, highlight);
     }
 
     @Override

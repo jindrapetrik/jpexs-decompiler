@@ -32,17 +32,17 @@ public class NewObjectAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         String params = "";
         for (int n = 0; n < pairs.size(); n++) {
             if (n > 0) {
                 params += ",\r\n";
             }
-            params += pairs.get(n).toString(constants, localRegNames, fullyQualifiedNames);
+            params += pairs.get(n).toString(highlight, constants, localRegNames, fullyQualifiedNames);
         }
         if (pairs.size() < 2) {
-            return hilight("{") + params + hilight("}");
+            return hilight("{", highlight) + params + hilight("}", highlight);
         }
-        return "\r\n" + Graph.INDENTOPEN + "\r\n" + hilight("{") + "\r\n" + params + "\r\n" + hilight("}") + "\r\n" + Graph.INDENTCLOSE + "\r\n";
+        return "\r\n" + Graph.INDENTOPEN + "\r\n" + hilight("{", highlight) + "\r\n" + params + "\r\n" + hilight("}", highlight) + "\r\n" + Graph.INDENTCLOSE + "\r\n";
     }
 }

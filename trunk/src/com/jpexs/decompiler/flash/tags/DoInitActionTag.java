@@ -101,8 +101,8 @@ public class DoInitActionTag extends CharacterIdTag implements ASMSource {
      * @return ASM source
      */
     @Override
-    public String getASMSource(int version, boolean hex) {
-        return Action.actionsToString(listeners, 0, getActions(version), null, version, hex, getPos() + 2, toString()/*FIXME?*/);
+    public String getASMSource(int version, boolean hex, boolean highlight) {
+        return Action.actionsToString(listeners, 0, getActions(version), null, version, hex, highlight, getPos() + 2, toString()/*FIXME?*/);
     }
 
     @Override

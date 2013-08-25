@@ -44,7 +44,7 @@ public class ActionScript2Test {
     private void compareSrc(int frame, String expectedResult) {
         DoActionTag doa = getFrameSource(frame);
         assertNotNull(doa);
-        String actualResult = Highlighting.stripHilights(Action.actionsToSource(doa.getActions(swf.version), swf.version, ""));
+        String actualResult = Action.actionsToSource(doa.getActions(swf.version), swf.version, "", false);
         actualResult = actualResult.replaceAll("[ \r\n]", "");
         expectedResult = expectedResult.replaceAll("[ \r\n]", "");
         assertEquals(actualResult, expectedResult);

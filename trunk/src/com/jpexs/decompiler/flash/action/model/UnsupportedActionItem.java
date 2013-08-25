@@ -28,7 +28,7 @@ public class UnsupportedActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         return "//Unsupported by decompiler:" + value;
     }
 

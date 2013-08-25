@@ -39,18 +39,18 @@ public class CallSuperAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         String args = "";
         for (int a = 0; a < arguments.size(); a++) {
             if (a > 0) {
                 args = args + ",";
             }
-            args = args + arguments.get(a).toString(constants, localRegNames, fullyQualifiedNames);
+            args = args + arguments.get(a).toString(highlight, constants, localRegNames, fullyQualifiedNames, highlight);
         }
-        String calee = receiver.toString(constants, localRegNames, fullyQualifiedNames) + ".";
+        String calee = receiver.toString(highlight, constants, localRegNames, fullyQualifiedNames, highlight) + ".";
         if (Highlighting.stripHilights(calee).equals("this.")) {
             calee = "";
         }
-        return calee + hilight("super.") + multiname.toString(constants, localRegNames, fullyQualifiedNames) + hilight("(") + args + hilight(")");
+        return calee + hilight("super.", highlight) + multiname.toString(highlight, constants, localRegNames, fullyQualifiedNames) + hilight("(", highlight) + args + hilight(")", highlight);
     }
 }

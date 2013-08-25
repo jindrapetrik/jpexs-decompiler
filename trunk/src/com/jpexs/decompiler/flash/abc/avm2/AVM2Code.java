@@ -702,24 +702,24 @@ public class AVM2Code implements Serializable {
         return s.toString();
     }
 
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         StringBuilder s = new StringBuilder();
         int i = 0;
         for (AVM2Instruction instruction : code) {
             s.append(Helper.formatAddress(i));
             s.append(" ");
-            s.append(instruction.toString(constants, new ArrayList<String>()));
+            s.append(instruction.toString(highlight, constants, new ArrayList<String>()));
             s.append("\r\n");
             i++;
         }
         return s.toString();
     }
 
-    public String toASMSource(ConstantPool constants, MethodBody body, boolean hex) {
-        return toASMSource(constants, body, new ArrayList<Integer>(), hex);
+    public String toASMSource(ConstantPool constants, MethodBody body, boolean hex, boolean highlight) {
+        return toASMSource(constants, body, new ArrayList<Integer>(), hex, highlight);
     }
 
-    public String toASMSource(ConstantPool constants, MethodBody body, List<Integer> outputMap, boolean hex) {
+    public String toASMSource(ConstantPool constants, MethodBody body, List<Integer> outputMap, boolean hex, boolean highlight) {
         invalidateCache();
         StringBuffer ret = new StringBuffer();
         String t = "";
@@ -776,7 +776,8 @@ public class AVM2Code implements Serializable {
                         if (ins2.isIgnored()) {
                             continue;
                         }
-                        t = Highlighting.hilighOffset("", ins2.mappedOffset > -1 ? ins2.mappedOffset : ofs) + ins2.toStringNoAddress(constants, new ArrayList<String>()) + " ;copy from " + Helper.formatAddress(pos2adr((Integer) o)) + "\n";
+                        t = highlight ? Highlighting.hilighOffset("", ins2.mappedOffset > -1 ? ins2.mappedOffset : ofs) : "";
+                        t += ins2.toStringNoAddress(constants, new ArrayList<String>()) + " ;copy from " + Helper.formatAddress(pos2adr((Integer) o)) + "\n";
                         ret.append(t);
                         outputMap.add((Integer) o);
                     } else if (o instanceof ControlFlowTag) {
@@ -814,7 +815,7 @@ public class AVM2Code implements Serializable {
                         }
                     }
                     if (markOffsets) {
-                        t = Highlighting.hilighOffset("", ins.mappedOffset > -1 ? ins.mappedOffset : ofs) + t + "\n";
+                        t = (highlight ? Highlighting.hilighOffset("", ins.mappedOffset > -1 ? ins.mappedOffset : ofs) : "") + t + "\n";
                     } else {
                         t = t + "\n";
                     }
@@ -1374,10 +1375,7 @@ public class AVM2Code implements Serializable {
             list.remove(lastPos);
         }
 
-        s = Graph.graphToString(list, constants, localRegNames, fullyQualifiedNames);
-        if (!hilighted) {
-            return Highlighting.stripHilights(s);
-        }
+        s = Graph.graphToString(list, hilighted, constants, localRegNames, fullyQualifiedNames);
 
         return s;
     }
@@ -1958,7 +1956,7 @@ public class AVM2Code implements Serializable {
         invalidateCache();
         try {
             List<Integer> outputMap = new ArrayList<>();
-            String src = Highlighting.stripHilights(toASMSource(constants, body, outputMap, false));
+            String src = toASMSource(constants, body, outputMap, false, false);
 
             AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(src.getBytes("UTF-8")), constants, null, body);
             for (int i = 0; i < acode.code.size(); i++) {
@@ -1998,7 +1996,7 @@ public class AVM2Code implements Serializable {
     public void removeIgnored(ConstantPool constants, MethodBody body) {
         try {
             List<Integer> outputMap = new ArrayList<>();
-            String src = toASMSource(constants, body, outputMap, false);
+            String src = toASMSource(constants, body, outputMap, false, false);
             AVM2Code acode = ASM3Parser.parse(new ByteArrayInputStream(src.getBytes("UTF-8")), constants, body);
             for (int i = 0; i < acode.code.size(); i++) {
                 if (outputMap.size() > i) {

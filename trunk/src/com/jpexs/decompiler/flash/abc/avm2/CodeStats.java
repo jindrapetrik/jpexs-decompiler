@@ -32,7 +32,7 @@ public class CodeStats {
     public boolean has_activation = false;
     public InstructionStats instructionStats[];
 
-    public String toString(ABC abc, List<String> fullyQualifiedNames) {
+    public String toString(boolean highlight, ABC abc, List<String> fullyQualifiedNames) {
         String ret = "Stats: maxstack=" + maxstack + ", maxscope=" + maxscope + ", maxlocal=" + maxlocal + "\r\n";
         int i = 0;
         int ms = 0;
@@ -41,7 +41,7 @@ public class CodeStats {
             if (stats.stackpos > ms) {
                 ms = stats.stackpos;
             }
-            ret += "" + i + ":" + stats.stackpos + (deltastack >= 0 ? "+" + deltastack : deltastack) + "," + stats.scopepos + "    " + stats.ins.toString(abc.constants, fullyQualifiedNames) + "\r\n";
+            ret += "" + i + ":" + stats.stackpos + (deltastack >= 0 ? "+" + deltastack : deltastack) + "," + stats.scopepos + "    " + stats.ins.toString(highlight, abc.constants, fullyQualifiedNames) + "\r\n";
             i++;
         }
         return ret;

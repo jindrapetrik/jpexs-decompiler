@@ -41,13 +41,13 @@ public class WithAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         String ret;
-        ret = hilight("with(") + scope.toString(constants, localRegNames, fullyQualifiedNames) + hilight(")\r\n{\r\n");
+        ret = hilight("with(", highlight) + scope.toString(highlight, constants, localRegNames, fullyQualifiedNames) + hilight(")\r\n{\r\n", highlight);
         /*for (GraphTargetItem ti : items) {
          ret += ti.toString(constants, localRegNames, fullyQualifiedNames) + "\r\n";
          }
-         ret += hilight("}");*/
+         ret += hilight("}", highlight);*/
         return ret;
     }
 

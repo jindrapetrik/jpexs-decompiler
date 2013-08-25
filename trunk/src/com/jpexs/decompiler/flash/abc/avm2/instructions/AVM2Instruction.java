@@ -241,7 +241,7 @@ public class AVM2Instruction implements Serializable, GraphSourceItem {
         return ignored;
     }
 
-    public String toString(ConstantPool constants, List<String> fullyQualifiedNames) {
+    public String toString(boolean highlight, ConstantPool constants, List<String> fullyQualifiedNames) {
         String s = Helper.formatAddress(offset) + " " + Helper.padSpaceRight(Helper.byteArrToString(getBytes()), 30) + definition.instructionName;
         s += getParams(constants, fullyQualifiedNames) + getComment();
         return s;

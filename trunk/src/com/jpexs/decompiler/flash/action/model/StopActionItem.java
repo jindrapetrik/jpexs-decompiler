@@ -24,8 +24,8 @@ import java.util.List;
 public class StopActionItem extends ActionItem {
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("stop()");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("stop()", highlight);
     }
 
     public StopActionItem(GraphSourceItem instruction) {

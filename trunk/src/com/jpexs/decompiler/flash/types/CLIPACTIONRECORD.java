@@ -150,8 +150,8 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable {
      * @return ASM source
      */
     @Override
-    public String getASMSource(int version, boolean hex) {
-        return Action.actionsToString(listeners, 0, getActions(version), null, version, hex, getPos() + hdrPos, toString()/*FIXME?*/);
+    public String getASMSource(int version, boolean hex, boolean highlight) {
+        return Action.actionsToString(listeners, 0, getActions(version), null, version, hex, highlight, getPos() + hdrPos, toString()/*FIXME?*/);
     }
 
     /**

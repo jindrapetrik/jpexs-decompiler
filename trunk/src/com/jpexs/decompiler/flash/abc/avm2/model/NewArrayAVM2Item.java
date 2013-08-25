@@ -32,14 +32,14 @@ public class NewArrayAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         String args = "";
         for (int a = 0; a < values.size(); a++) {
             if (a > 0) {
                 args = args + ",";
             }
-            args = args + values.get(a).toString(constants, localRegNames, fullyQualifiedNames);
+            args = args + values.get(a).toString(highlight, constants, localRegNames, fullyQualifiedNames);
         }
-        return hilight("[") + args + hilight("]");
+        return hilight("[", highlight) + args + hilight("]", highlight);
     }
 }

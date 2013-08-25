@@ -41,15 +41,15 @@ public class InitArrayActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         String arrStr = "";
         for (int i = 0; i < values.size(); i++) {
             if (i > 0) {
-                arrStr += hilight(",");
+                arrStr += hilight(",", highlight);
             }
-            arrStr += values.get(i).toString(constants);
+            arrStr += values.get(i).toString(highlight, constants);
         }
-        return hilight("[") + arrStr + hilight("]");
+        return hilight("[", highlight) + arrStr + hilight("]", highlight);
     }
 
     @Override

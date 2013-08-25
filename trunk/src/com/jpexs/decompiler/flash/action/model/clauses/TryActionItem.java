@@ -56,23 +56,23 @@ public class TryActionItem extends ActionItem implements Block {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         String ret = "";
         ret += "try\r\n{\r\n";
         List<Object> localData = new ArrayList<>();
         localData.add(constants);
         for (GraphTargetItem ti : tryCommands) {
             if (!ti.isEmpty()) {
-                ret += ti.toStringSemicoloned(localData) + "\r\n";
+                ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";
             }
         }
         ret += "}";
         for (int e = 0; e < catchExceptions.size(); e++) {
-            ret += "\r\ncatch(" + catchExceptions.get(e).toStringNoQuotes(localData) + ")\r\n{\r\n";
+            ret += "\r\ncatch(" + catchExceptions.get(e).toStringNoQuotes(highlight, localData) + ")\r\n{\r\n";
             List<GraphTargetItem> commands = catchCommands.get(e);
             for (GraphTargetItem ti : commands) {
                 if (!ti.isEmpty()) {
-                    ret += ti.toStringSemicoloned(localData) + "\r\n";
+                    ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";
                 }
             }
             ret += "}";
@@ -81,7 +81,7 @@ public class TryActionItem extends ActionItem implements Block {
             ret += "\r\nfinally\r\n{\r\n";
             for (GraphTargetItem ti : finallyCommands) {
                 if (!ti.isEmpty()) {
-                    ret += ti.toStringSemicoloned(localData) + "\r\n";
+                    ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";
                 }
             }
             ret += "}";
@@ -138,7 +138,7 @@ public class TryActionItem extends ActionItem implements Block {
         String catchName = null;
         if (catchExceptions != null) {
             if (!catchExceptions.isEmpty()) {
-                catchName = catchExceptions.get(0).toStringNoQuotes(new ConstantPool(asGenerator.getConstantPool()));
+                catchName = catchExceptions.get(0).toStringNoQuotes(false, new ConstantPool(asGenerator.getConstantPool()));
             }
 
         }

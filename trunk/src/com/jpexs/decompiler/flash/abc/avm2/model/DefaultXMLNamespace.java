@@ -37,7 +37,7 @@ public class DefaultXMLNamespace extends AVM2Item {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return hilight("default xml namespace = ") + ns.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return hilight("default xml namespace = ", highlight) + ns.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames));
     }
 }

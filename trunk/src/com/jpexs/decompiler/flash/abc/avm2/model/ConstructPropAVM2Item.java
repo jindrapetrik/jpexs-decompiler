@@ -36,19 +36,19 @@ public class ConstructPropAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         String argStr = "";
         for (int a = 0; a < args.size(); a++) {
             if (a > 0) {
                 argStr = argStr + ",";
             }
-            argStr = argStr + args.get(a).toString(constants, localRegNames, fullyQualifiedNames);
+            argStr = argStr + args.get(a).toString(highlight, constants, localRegNames, fullyQualifiedNames);
         }
-        String objstr = object.toString(constants, localRegNames, fullyQualifiedNames);
+        String objstr = object.toString(highlight, constants, localRegNames, fullyQualifiedNames);
         if (!objstr.equals("")) {
             objstr += ".";
         }
-        return hilight("new ") + objstr + propertyName.toString(constants, localRegNames, fullyQualifiedNames) + hilight("(") + argStr + hilight(")");
+        return hilight("new ", highlight) + objstr + propertyName.toString(highlight, constants, localRegNames, fullyQualifiedNames) + hilight("(", highlight) + argStr + hilight(")", highlight);
 
     }
 }

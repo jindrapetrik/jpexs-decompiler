@@ -84,11 +84,11 @@ public class ClassActionItem extends ActionItem implements Block {
         }
         Set<String> allMembers = new HashSet<>();
         for (GraphTargetItem it : allUsages) {
-            allMembers.add(Highlighting.stripHilights(it.toStringNoQuotes(new ArrayList<>())));
+            allMembers.add(it.toStringNoQuotes(false, new ArrayList<>()));
         }
         uninitializedVars.addAll(allMembers);
         for (MyEntry<GraphTargetItem, GraphTargetItem> v : vars) {
-            String s = Highlighting.stripHilights(v.key.toStringNoQuotes(new ArrayList<>()));
+            String s = v.key.toStringNoQuotes(false, new ArrayList<>());
             if (uninitializedVars.contains(s)) {
                 uninitializedVars.remove(s);
             }
@@ -155,45 +155,45 @@ public class ClassActionItem extends ActionItem implements Block {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         String ret;
-        ret = hilight("class ") + className.toStringNoQuotes(Helper.toList(constants));
+        ret = hilight("class ", highlight) + className.toStringNoQuotes(highlight, Helper.toList(constants));
         if (extendsOp != null) {
-            ret += hilight(" extends ") + extendsOp.toStringNoQuotes(Helper.toList(constants));
+            ret += hilight(" extends ", highlight) + extendsOp.toStringNoQuotes(highlight, Helper.toList(constants));
         }
         if (!implementsOp.isEmpty()) {
-            ret += hilight(" implements ");
+            ret += hilight(" implements ", highlight);
             boolean first = true;
             for (GraphTargetItem t : implementsOp) {
                 if (!first) {
                     ret += ", ";
                 }
                 first = false;
-                ret += Action.getWithoutGlobal(t).toString(constants);
+                ret += Action.getWithoutGlobal(t).toString(highlight, constants);
             }
         }
         ret += "\r\n{\r\n";
 
         if (constructor != null) {
-            ret += constructor.toString(constants) + "\r\n";
+            ret += constructor.toString(highlight, constants) + "\r\n";
         }
 
         for (MyEntry<GraphTargetItem, GraphTargetItem> item : vars) {
-            ret += "var " + item.key.toStringNoQuotes(constants) + " = " + item.value.toString(constants) + ";\r\n";
+            ret += "var " + item.key.toStringNoQuotes(highlight, constants) + " = " + item.value.toString(highlight, constants) + ";\r\n";
         }
         for (String v : uninitializedVars) {
             ret += "var " + v + ";\r\n";
         }
         for (MyEntry<GraphTargetItem, GraphTargetItem> item : staticVars) {
-            ret += "static var " + item.key.toStringNoQuotes(constants) + " = " + item.value.toString(constants) + ";\r\n";
+            ret += "static var " + item.key.toStringNoQuotes(highlight, constants) + " = " + item.value.toString(highlight, constants) + ";\r\n";
         }
 
 
         for (GraphTargetItem f : functions) {
-            ret += f.toString(constants) + "\r\n";
+            ret += f.toString(highlight, constants) + "\r\n";
         }
         for (GraphTargetItem f : staticFunctions) {
-            ret += "static " + f.toString(constants) + "\r\n";
+            ret += "static " + f.toString(highlight, constants) + "\r\n";
         }
 
         ret += "}\r\n";

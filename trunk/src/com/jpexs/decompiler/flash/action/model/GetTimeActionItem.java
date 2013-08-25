@@ -29,8 +29,8 @@ public class GetTimeActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("getTimer()");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("getTimer()", highlight);
     }
 
     @Override

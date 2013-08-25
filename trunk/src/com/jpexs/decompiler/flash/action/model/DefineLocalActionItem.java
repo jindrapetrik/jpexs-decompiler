@@ -67,11 +67,11 @@ public class DefineLocalActionItem extends ActionItem implements SetTypeActionIt
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         if (value == null) {
-            return hilight("var ") + stripQuotes(name, constants);
+            return hilight("var  ", highlight) + stripQuotes(name, constants, highlight);
         }
-        return hilight("var ") + stripQuotes(name, constants) + hilight(" = ") + value.toString(constants);
+        return hilight("var  ", highlight) + stripQuotes(name, constants, highlight) + hilight(" = ", highlight) + value.toString(highlight, constants);
     }
 
     @Override

@@ -394,8 +394,8 @@ public class Action implements GraphSourceItem {
      * @param path
      * @return ASM source as String
      */
-    public static String actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, int version, boolean hex, long swfPos, String path) {
-        return actionsToString(listeners, address, list, importantOffsets, new ArrayList<String>(), version, hex, swfPos, path);
+    public static String actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, int version, boolean hex, boolean highlight, long swfPos, String path) {
+        return actionsToString(listeners, address, list, importantOffsets, new ArrayList<String>(), version, hex, highlight, swfPos, path);
     }
 
     /**
@@ -412,7 +412,7 @@ public class Action implements GraphSourceItem {
      * @param path
      * @return ASM source as String
      */
-    private static String actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, List<String> constantPool, int version, boolean hex, long swfPos, String path) {
+    private static String actionsToString(List<DisassemblyListener> listeners, long address, List<Action> list, List<Long> importantOffsets, List<String> constantPool, int version, boolean hex, boolean highlight, long swfPos, String path) {
         long offset;
         if (importantOffsets == null) {
             //setActionsAddresses(list, 0, version);
@@ -493,7 +493,7 @@ public class Action implements GraphSourceItem {
                     ret.append("\r\n");
                     lastPush = false;
                 }
-                ret.append(Highlighting.hilighOffset("", offset));
+                ret.append(highlight ? Highlighting.hilighOffset("", offset) : "");
                 ret.append(a.replaceWith.getASMSource(list, importantOffsets, constantPool, version, hex));
                 ret.append("\r\n");
             } else if (a.isIgnored()) {
@@ -533,7 +533,7 @@ public class Action implements GraphSourceItem {
                 add = "";
                 if ((a instanceof ActionPush) && lastPush) {
                     ret.append(" ");
-                    ret.append(((ActionPush) a).paramsToStringReplaced(list, importantOffsets, constantPool, version, hex));
+                    ret.append(((ActionPush) a).paramsToStringReplaced(list, importantOffsets, constantPool, version, hex, highlight));
                 } else {
                     if (lastPush) {
                         ret.append("\r\n");
@@ -541,7 +541,7 @@ public class Action implements GraphSourceItem {
                     }
 
 
-                    ret.append(Highlighting.hilighOffset("", offset));
+                    ret.append(highlight ? Highlighting.hilighOffset("", offset) : "");
 
                     if (a instanceof ActionIf) {
                         ActionIf aif = (ActionIf) a;
@@ -565,7 +565,7 @@ public class Action implements GraphSourceItem {
                             }
                         }
                     } else {
-                        ret.append(a.getASMSourceReplaced(list, importantOffsets, constantPool, version, hex));
+                        ret.append(a.getASMSourceReplaced(list, importantOffsets, constantPool, version, hex, highlight));
                     }
                     ret.append(a.isIgnored() ? "; ignored" : "");
                     ret.append(add);
@@ -715,7 +715,7 @@ public class Action implements GraphSourceItem {
      * @param path
      * @return String with Source code
      */
-    public static String actionsToSource(final List<Action> actions, final int version, final String path) {
+    public static String actionsToSource(final List<Action> actions, final int version, final String path, final boolean highlight) {
         int timeout = Configuration.getConfig("decompilationTimeoutSingleMethod", 60);
         try {
             return Helper.timedCall(new Callable<String>() {
@@ -726,7 +726,7 @@ public class Action implements GraphSourceItem {
 
                     List<GraphTargetItem> tree = actionsToTree(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>(), actions, version, staticOperation, path);
 
-                    return Graph.graphToString(tree);
+                    return Graph.graphToString(tree, highlight);
                 }
             }, timeout, TimeUnit.SECONDS);
         } catch (TimeoutException ex) {
@@ -1198,7 +1198,7 @@ public class Action implements GraphSourceItem {
         }
         String s = null;
         try {
-            s = Highlighting.stripHilights(Action.actionsToString(new ArrayList<DisassemblyListener>(), address, ret, null, version, false, swfPos, path));
+            s = Action.actionsToString(new ArrayList<DisassemblyListener>(), address, ret, null, version, false, false, swfPos, path);
             ret = ASMParser.parse(address, swfPos, true, new StringReader(s), SWF.DEFAULT_VERSION);
         } catch (Exception ex) {
             Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error", ex);
@@ -1226,7 +1226,7 @@ public class Action implements GraphSourceItem {
         }
     }
 
-    public String getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex) {
+    public String getASMSourceReplaced(List<? extends GraphSourceItem> container, List<Long> knownAddreses, List<String> constantPool, int version, boolean hex, boolean highlight) {
         return getASMSource(container, knownAddreses, constantPool, version, hex);
     }
 

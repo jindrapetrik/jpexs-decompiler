@@ -49,8 +49,8 @@ public class PrintActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("print(") + target.toString(constants) + hilight(",") + boundingBox.toString(constants) + hilight(")");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("print(", highlight) + target.toString(highlight, constants) + hilight(",", highlight) + boundingBox.toString(highlight, constants) + hilight(")", highlight);
     }
 
     @Override

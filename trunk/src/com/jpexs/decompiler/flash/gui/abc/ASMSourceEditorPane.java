@@ -109,7 +109,7 @@ public class ASMSourceEditorPane extends LineMarkedEditorPane implements CaretLi
         if (bodyIndex == -1) {
             return;
         }
-        String textWithHexTags = abc.bodies[bodyIndex].code.toASMSource(abc.constants, abc.bodies[bodyIndex], true);
+        String textWithHexTags = abc.bodies[bodyIndex].code.toASMSource(abc.constants, abc.bodies[bodyIndex], true, true);
         textWithHex = Helper.hexToComments(textWithHexTags);
         textNoHex = Helper.stripComments(textWithHexTags);
         setText(hex ? textWithHex : textNoHex);

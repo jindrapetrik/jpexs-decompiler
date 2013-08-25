@@ -70,28 +70,28 @@ public class FunctionActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         if (true) {
             //return "<func>";
         }
-        String ret = hilight("function");
+        String ret = hilight("function", highlight);
         if (calculatedFunctionName != null) {
-            ret += " " + calculatedFunctionName.toStringNoQuotes(constants);
+            ret += " " + calculatedFunctionName.toStringNoQuotes(highlight, constants);
         } else if (!functionName.equals("")) {
             ret += " " + functionName;
         }
-        ret += hilight("(");
+        ret += hilight("(", highlight);
         for (int p = 0; p < paramNames.size(); p++) {
             if (p > 0) {
-                ret += hilight(", ");
+                ret += hilight(", ", highlight);
             }
             String pname = paramNames.get(p);
             if (pname == null || pname.equals("")) {
                 pname = new RegisterNumber(regStart + p).translate();
             }
-            ret += hilight(pname);
+            ret += hilight(pname, highlight);
         }
-        ret += hilight(")") + "\r\n{\r\n" + Graph.graphToString(actions, constants) + "}";
+        ret += hilight(")", highlight) + "\r\n{\r\n" + Graph.graphToString(actions, highlight, constants) + "}";
         return ret;
     }
 

@@ -47,7 +47,7 @@ public class DeclarationAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         if (assignment instanceof SetLocalAVM2Item) {
             SetLocalAVM2Item lti = (SetLocalAVM2Item) assignment;
             String type = "*";
@@ -57,12 +57,12 @@ public class DeclarationAVM2Item extends AVM2Item {
             if (lti.value instanceof ConvertAVM2Item) {
                 type = ((ConvertAVM2Item) lti.value).type;
             }
-            return "var " + hilight(localRegName(localRegNames, lti.regIndex) + ":" + type + " = ") + lti.value.toString(constants, localRegNames, fullyQualifiedNames);
+            return "var " + hilight(localRegName(localRegNames, lti.regIndex) + ":" + type + " = ", highlight) + lti.value.toString(highlight, constants, localRegNames, fullyQualifiedNames);
         }
         if (assignment instanceof SetSlotAVM2Item) {
             SetSlotAVM2Item ssti = (SetSlotAVM2Item) assignment;
-            return "var " + ssti.getName(constants, localRegNames, fullyQualifiedNames) + ":" + type + hilight(" = ") + ssti.value.toString(constants, localRegNames, fullyQualifiedNames);
+            return "var " + ssti.getName(highlight, constants, localRegNames, fullyQualifiedNames) + ":" + type + hilight(" = ", highlight) + ssti.value.toString(highlight, constants, localRegNames, fullyQualifiedNames);
         }
-        return "var " + assignment.toString(Helper.toList(constants, localRegNames, fullyQualifiedNames));
+        return "var " + assignment.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames));
     }
 }

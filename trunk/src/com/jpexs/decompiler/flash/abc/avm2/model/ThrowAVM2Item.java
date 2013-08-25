@@ -31,7 +31,7 @@ public class ThrowAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return hilight("throw ") + value.toString(constants, localRegNames, fullyQualifiedNames);
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return hilight("throw ", highlight) + value.toString(highlight, constants, localRegNames, fullyQualifiedNames);
     }
 }

@@ -38,8 +38,8 @@ public class DuplicateItem extends GraphTargetItem {
     }
 
     @Override
-    public String toString(List<Object> localData) {
-        return value.toString(localData);
+    public String toString(boolean highlight, List<Object> localData) {
+        return value.toString(highlight, localData);
     }
 
     @Override

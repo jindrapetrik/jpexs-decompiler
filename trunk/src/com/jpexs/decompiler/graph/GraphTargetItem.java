@@ -82,23 +82,23 @@ public abstract class GraphTargetItem implements Serializable {
         return ret;
     }
 
-    public String hilight(String str) {
-        if (src == null) {
+    public String hilight(String str, boolean highlight) {
+        if (src == null || !highlight) {
             return str;
         }
         return Highlighting.hilighOffset(str, src.getOffset() + pos + 1);
     }
 
-    public String toStringSemicoloned(List<Object> localData) {
-        return toString(localData) + (needsSemicolon() ? ";" : "");
+    public String toStringSemicoloned(boolean highlight, List<Object> localData) {
+        return toString(highlight, localData) + (needsSemicolon() ? ";" : "");
     }
 
-    public String toStringSemicoloned(Object... localData) {
+    public String toStringSemicoloned(boolean highlight, Object... localData) {
         List<Object> localData2 = new ArrayList<>();
         for (Object o : localData) {
             localData2.add(o);
         }
-        return toStringSemicoloned(localData2);
+        return toStringSemicoloned(highlight, localData2);
     }
 
     public boolean needsSemicolon() {
@@ -110,14 +110,14 @@ public abstract class GraphTargetItem implements Serializable {
         return this.getClass().getName();
     }
 
-    public abstract String toString(List<Object> localData);
+    public abstract String toString(boolean highlight, List<Object> localData);
 
-    public String toString(Object... localData) {
+    public String toString(boolean highlight, Object... localData) {
         List<Object> localData2 = new ArrayList<>();
         for (Object o : localData) {
             localData2.add(o);
         }
-        return toString(localData2);
+        return toString(highlight, localData2);
     }
 
     public int getPrecedence() {
@@ -147,16 +147,16 @@ public abstract class GraphTargetItem implements Serializable {
         return null;
     }
 
-    public String toStringNoQuotes(List<Object> localData) {
-        return toString(localData);
+    public String toStringNoQuotes(boolean highlight, List<Object> localData) {
+        return toString(highlight, localData);
     }
 
-    public String toStringNoQuotes(Object... localData) {
+    public String toStringNoQuotes(boolean highlight, Object... localData) {
         List<Object> localData2 = new ArrayList<>();
         for (Object o : localData) {
             localData2.add(o);
         }
-        return toStringNoQuotes(localData2);
+        return toStringNoQuotes(highlight, localData2);
     }
 
     public GraphTargetItem getNotCoerced() {
@@ -171,12 +171,12 @@ public abstract class GraphTargetItem implements Serializable {
         return false;
     }
 
-    public String toStringNL(Object... localData) {
+    public String toStringNL(boolean highlight, Object... localData) {
         List<Object> localData2 = new ArrayList<>();
         for (Object o : localData) {
             localData2.add(o);
         }
-        return toString(localData2) + (needsNewLine() ? "\r\n" : "");
+        return toString(highlight, localData2) + (needsNewLine() ? "\r\n" : "");
     }
 
     public boolean isEmpty() {

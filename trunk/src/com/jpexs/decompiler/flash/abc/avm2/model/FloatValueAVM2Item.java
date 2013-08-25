@@ -31,8 +31,8 @@ public class FloatValueAVM2Item extends NumberValueAVM2Item {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return hilight("" + value);
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return hilight("" + value, highlight);
     }
 
     @Override

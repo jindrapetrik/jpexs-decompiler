@@ -24,8 +24,8 @@ import java.util.List;
 public class StopAllSoundsActionItem extends ActionItem {
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("stopAllSounds()");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("stopAllSounds()", highlight);
     }
 
     public StopAllSoundsActionItem(GraphSourceItem instruction) {

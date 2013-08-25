@@ -46,8 +46,8 @@ public class CloneSpriteActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
-        return hilight("duplicateMovieClip(") + target.toString(constants) + hilight(",") + source.toString(constants) + hilight(",") + depth.toString(constants) + hilight(")");
+    public String toString(boolean highlight, ConstantPool constants) {
+        return hilight("duplicateMovieClip(", highlight) + target.toString(highlight, constants) + hilight(",", highlight) + source.toString(highlight, constants) + hilight(",", highlight) + depth.toString(highlight, constants) + hilight(")", highlight);
     }
 
     @Override

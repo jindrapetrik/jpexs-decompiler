@@ -35,10 +35,10 @@ public class GetSlotAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         if (slotName == null) {
-            return hilight("/*UnknownSlot*/");
+            return hilight("/*UnknownSlot*/", highlight);
         }
-        return hilight(slotName.getName(constants, fullyQualifiedNames));
+        return hilight(slotName.getName(constants, fullyQualifiedNames), highlight);
     }
 }

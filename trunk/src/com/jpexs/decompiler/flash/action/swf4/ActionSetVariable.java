@@ -50,7 +50,7 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
     public void translate(Stack<GraphTargetItem> stack, List<GraphTargetItem> output, java.util.HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem value = stack.pop().getThroughDuplicate();
         GraphTargetItem name = stack.pop();
-        variables.put(Highlighting.stripHilights(name.toStringNoQuotes((ConstantPool) null)), value);
+        variables.put(name.toStringNoQuotes(false, (ConstantPool) null), value);
         if (value instanceof IncrementActionItem) {
             GraphTargetItem obj = ((IncrementActionItem) value).object;
             if (!stack.isEmpty()) {
@@ -126,6 +126,6 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
         if (stack.size() < 2) {
             return null;
         }
-        return Highlighting.stripHilights(stack.get(stack.size() - 2).toStringNoQuotes(cpool));
+        return stack.get(stack.size() - 2).toStringNoQuotes(false, cpool);
     }
 }

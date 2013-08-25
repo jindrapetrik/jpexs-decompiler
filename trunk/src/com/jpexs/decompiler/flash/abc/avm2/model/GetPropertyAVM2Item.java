@@ -34,7 +34,7 @@ public class GetPropertyAVM2Item extends AVM2Item {
     }
 
     @Override
-    public String toString(ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        return formatProperty(constants, object, propertyName, localRegNames, fullyQualifiedNames);
+    public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
+        return formatProperty(highlight, constants, object, propertyName, localRegNames, fullyQualifiedNames);
     }
 }

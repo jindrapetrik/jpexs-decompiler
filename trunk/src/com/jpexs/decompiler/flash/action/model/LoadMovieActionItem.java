@@ -49,7 +49,7 @@ public class LoadMovieActionItem extends ActionItem {
     }
 
     @Override
-    public String toString(ConstantPool constants) {
+    public String toString(boolean highlight, ConstantPool constants) {
         String methodStr = "";
         if (method == 1) {
             methodStr = ",\"GET\"";
@@ -57,7 +57,7 @@ public class LoadMovieActionItem extends ActionItem {
         if (method == 2) {
             methodStr = ",\"POST\"";
         }
-        return hilight("loadMovie(") + urlString.toString(constants) + hilight(",") + targetString.toString(constants) + hilight(methodStr + ")");
+        return hilight("loadMovie(", highlight) + urlString.toString(highlight, constants) + hilight(",", highlight) + targetString.toString(highlight, constants) + hilight(methodStr + ")", highlight);
     }
 
     @Override

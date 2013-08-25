@@ -50,7 +50,7 @@ public class IfItem extends GraphTargetItem implements Block {
     }
 
     @Override
-    public String toString(List<Object> localData) {
+    public String toString(boolean highlight, List<Object> localData) {
         String ret;
         GraphTargetItem expr = expression;
         List<GraphTargetItem> ifBranch = onTrue;
@@ -70,21 +70,21 @@ public class IfItem extends GraphTargetItem implements Block {
                 elseBranch = onTrue;
             }
         }
-        ret = hilight("if(") + expr.toString(localData) + hilight(")") + "\r\n{\r\n";
+        ret = hilight("if(", highlight) + expr.toString(highlight, localData) + hilight(")", highlight) + "\r\n{\r\n";
         for (GraphTargetItem ti : ifBranch) {
             if (!ti.isEmpty()) {
-                ret += ti.toStringSemicoloned(localData) + "\r\n";
+                ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";
             }
         }
-        ret += hilight("}");
+        ret += hilight("}", highlight);
         if (elseBranch.size() > 0) {
-            ret += "\r\n" + hilight("else") + "\r\n" + hilight("{") + "\r\n";
+            ret += "\r\n" + hilight("else", highlight) + "\r\n" + hilight("{", highlight) + "\r\n";
             for (GraphTargetItem ti : elseBranch) {
                 if (!ti.isEmpty()) {
-                    ret += ti.toStringSemicoloned(localData) + "\r\n";
+                    ret += ti.toStringSemicoloned(highlight, localData) + "\r\n";
                 }
             }
-            ret += hilight("}");
+            ret += hilight("}", highlight);
         }
         return ret;
     }
