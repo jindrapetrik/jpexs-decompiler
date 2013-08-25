@@ -92,7 +92,7 @@ public class SWFInputStream extends InputStream {
     private long percentMax;
     private List<byte[]> buffered = new ArrayList<>();
     private ByteArrayOutputStream buffer;
-    private static boolean DEOBFUSCATION_ALL_CODE_IN_PREVIOUS_TAG = (Boolean) Configuration.getConfig("deobfuscateUsePrevTagOnly", true);
+    private static boolean DEOBFUSCATION_ALL_CODE_IN_PREVIOUS_TAG = Configuration.getConfig("deobfuscateUsePrevTagOnly", true);
 
     public int getVersion() {
         return version;
@@ -549,7 +549,7 @@ public class SWFInputStream extends InputStream {
     @SuppressWarnings("unchecked")
     private static void getConstantPool(List<DisassemblyListener> listeners, ConstantPool cpool, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, List<ConstantPool> constantPools, List<Integer> visited, int version, int endIp, String path) {
         boolean debugMode = false;
-        boolean deobfuscate = (Boolean) Configuration.getConfig("autoDeobfuscate", true);
+        boolean deobfuscate = Configuration.getConfig("autoDeobfuscate", true);
         while (((endIp == -1) || (endIp > ip)) && (ip > -1) && ip < code.size()) {
             if (visited.contains(ip)) {
                 break;
@@ -805,7 +805,7 @@ public class SWFInputStream extends InputStream {
         boolean debugMode = false;
         boolean decideBranch = false;
 
-        boolean deobfuscate = (Boolean) Configuration.getConfig("autoDeobfuscate", true);
+        boolean deobfuscate = Configuration.getConfig("autoDeobfuscate", true);
         boolean retv = false;
         rri.setPos(ip);
         Action a;

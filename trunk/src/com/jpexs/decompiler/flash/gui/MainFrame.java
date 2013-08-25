@@ -538,9 +538,9 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         rib.setApplicationMenu(mainMenu);
 
 
-        int w = (Integer) Configuration.getConfig("gui.window.width", 1000);
+        int w = Configuration.getConfig("gui.window.width", 1000);
 
-        int h = (Integer) Configuration.getConfig("gui.window.height", 700);
+        int h = Configuration.getConfig("gui.window.height", 700);
         Dimension dim = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         if (w > dim.width) {
             w = dim.width;
@@ -550,8 +550,8 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         }
         setSize(w, h);
 
-        boolean maximizedHorizontal = (Boolean) Configuration.getConfig("gui.window.maximized.horizontal", false);
-        boolean maximizedVertical = (Boolean) Configuration.getConfig("gui.window.maximized.vertical", false);
+        boolean maximizedHorizontal = Configuration.getConfig("gui.window.maximized.horizontal", false);
+        boolean maximizedVertical = Configuration.getConfig("gui.window.maximized.vertical", false);
 
         int state = 0;
         if (maximizedHorizontal) {
@@ -659,7 +659,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         miDeobfuscation.addActionListener(this);
 
         //autoDeobfuscateMenuItem = new JCheckBoxMenuItem(translate("menu.settings.autodeobfuscation"));
-        miAutoDeobfuscation.setSelected((Boolean) Configuration.getConfig("autoDeobfuscate", true));
+        miAutoDeobfuscation.setSelected(Configuration.getConfig("autoDeobfuscate", true));
         miAutoDeobfuscation.addActionListener(this);
         miAutoDeobfuscation.setActionCommand("AUTODEOBFUSCATE");
 
@@ -689,7 +689,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         menuTools.add(miSearchScript);
 
         //miInternalViewer = new JCheckBox(translate("menu.settings.internalflashviewer"));
-        miInternalViewer.setSelected((Boolean) Configuration.getConfig("internalFlashViewer", (Boolean) (flashPanel == null)));
+        miInternalViewer.setSelected(Configuration.getConfig("internalFlashViewer", (Boolean) (flashPanel == null)));
         if (flashPanel == null) {
             miInternalViewer.setSelected(true);
             miInternalViewer.setEnabled(false);
@@ -698,7 +698,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         miInternalViewer.addActionListener(this);
 
         //miParallelSpeedUp = new JCheckBox(translate("menu.settings.parallelspeedup"));
-        miParallelSpeedUp.setSelected((Boolean) Configuration.getConfig("parallelSpeedUp", Boolean.TRUE));
+        miParallelSpeedUp.setSelected(Configuration.getConfig("parallelSpeedUp", true));
         miParallelSpeedUp.setActionCommand("PARALLELSPEEDUP");
         miParallelSpeedUp.addActionListener(this);
 
@@ -714,18 +714,18 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         menuBar.add(menuTools);
 
         //miDecompile = new JCheckBox(translate("menu.settings.disabledecompilation"));
-        miDecompile.setSelected(!(Boolean) Configuration.getConfig("decompile", Boolean.TRUE));
+        miDecompile.setSelected(!Configuration.getConfig("decompile", true));
         miDecompile.setActionCommand("DISABLEDECOMPILATION");
         miDecompile.addActionListener(this);
 
 
         //miCacheDisk = new JCheckBox(translate("menu.settings.cacheOnDisk"));
-        miCacheDisk.setSelected((Boolean) Configuration.getConfig("cacheOnDisk", Boolean.TRUE));
+        miCacheDisk.setSelected(Configuration.getConfig("cacheOnDisk", true));
         miCacheDisk.setActionCommand("CACHEONDISK");
         miCacheDisk.addActionListener(this);
 
         // miGotoMainClassOnStartup = new JCheckBox(translate("menu.settings.gotoMainClassOnStartup"));
-        miGotoMainClassOnStartup.setSelected((Boolean) Configuration.getConfig("gotoMainClassOnStartup", Boolean.FALSE));
+        miGotoMainClassOnStartup.setSelected(Configuration.getConfig("gotoMainClassOnStartup", false));
         miGotoMainClassOnStartup.setActionCommand("GOTODOCUMENTCLASSONSTARTUP");
         miGotoMainClassOnStartup.addActionListener(this);
 
@@ -1624,8 +1624,8 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                         mui.setNormalIcon(View.getResizableIcon("buttonicon_256"));
                         mui.setClickIcon(View.getResizableIcon("buttonicon_down_256"));
                     }
-                    splitPane1.setDividerLocation((Integer) Configuration.getConfig("gui.splitPane1.dividerLocation", getWidth() / 3));
-                    int confDivLoc = (Integer) Configuration.getConfig("gui.splitPane2.dividerLocation", splitPane2.getHeight() * 3 / 5);
+                    splitPane1.setDividerLocation(Configuration.getConfig("gui.splitPane1.dividerLocation", getWidth() / 3));
+                    int confDivLoc = Configuration.getConfig("gui.splitPane2.dividerLocation", splitPane2.getHeight() * 3 / 5);
                     if (confDivLoc > splitPane2.getHeight() - 10) { //In older releases, divider location was saved when detailPanel was invisible too
                         confDivLoc = splitPane2.getHeight() * 3 / 5;
                     }
@@ -2168,7 +2168,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
             for (int i = 0; i < tlsList.size(); i++) {
                 ScriptPack tls = tlsList.get(i);
                 Main.startWork(translate("work.exporting") + " " + (i + 1) + "/" + tlsList.size() + " " + tls.getPath() + " ...");
-                ret.add(tls.export(selFile, abcList, isPcode, (Boolean) Configuration.getConfig("parallelSpeedUp", Boolean.TRUE)));
+                ret.add(tls.export(selFile, abcList, isPcode, Configuration.getConfig("parallelSpeedUp", true)));
             }
         } else {
             List<TagNode> allNodes = new ArrayList<>();
@@ -2376,7 +2376,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                     ImageTag it = (ImageTag) tagObj;
                     if (it.importSupported()) {
                         JFileChooser fc = new JFileChooser();
-                        fc.setCurrentDirectory(new File((String) Configuration.getConfig("lastOpenDir", ".")));
+                        fc.setCurrentDirectory(new File(Configuration.getConfig("lastOpenDir", ".")));
                         fc.setFileFilter(new FileFilter() {
                             @Override
                             public boolean accept(File f) {
@@ -2558,7 +2558,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 break;
             case "EXPORTFLA":
                 JFileChooser fc = new JFileChooser();
-                String selDir = (String) Configuration.getConfig("lastOpenDir", ".");
+                String selDir = Configuration.getConfig("lastOpenDir", ".");
                 fc.setCurrentDirectory(new File(selDir));
                 if (!selDir.endsWith(File.separator)) {
                     selDir += File.separator;
@@ -2612,9 +2612,9 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                             Helper.freeMem();
                             try {
                                 if (compressed) {
-                                    swf.exportFla(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, (Boolean) Configuration.getConfig("parallelSpeedUp", Boolean.TRUE));
+                                    swf.exportFla(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, Configuration.getConfig("parallelSpeedUp", true));
                                 } else {
-                                    swf.exportXfl(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, (Boolean) Configuration.getConfig("parallelSpeedUp", Boolean.TRUE));
+                                    swf.exportXfl(errorHandler, selfile.getAbsolutePath(), new File(Main.file).getName(), Main.applicationName, Main.applicationVerName, Main.version, Configuration.getConfig("parallelSpeedUp", true));
                                 }
                             } catch (IOException ex) {
                                 View.showMessageDialog(null, translate("error.export") + ": " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -2632,7 +2632,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 if (!export.cancelled) {
                     JFileChooser chooser = new JFileChooser();
                     if (Configuration.containsConfig("lastExportDir")) {
-                        chooser.setCurrentDirectory(new java.io.File((String) Configuration.getConfig("lastExportDir", ".")));
+                        chooser.setCurrentDirectory(new java.io.File(Configuration.getConfig("lastExportDir", ".")));
                     } else {
                         chooser.setCurrentDirectory(new File("."));
                     }
@@ -2661,7 +2661,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                         swf.exportMovies(errorHandler, selFile + File.separator + "movies");
                                         swf.exportSounds(errorHandler, selFile + File.separator + "sounds", isMp3OrWav, isMp3OrWav);
                                         swf.exportBinaryData(errorHandler, selFile + File.separator + "binaryData");
-                                        swf.exportActionScript(errorHandler, selFile, isPcode, (Boolean) Configuration.getConfig("parallelSpeedUp", Boolean.TRUE));
+                                        swf.exportActionScript(errorHandler, selFile, isPcode, Configuration.getConfig("parallelSpeedUp", true));
                                     }
                                 } catch (Exception ex) {
                                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Error during export", ex);

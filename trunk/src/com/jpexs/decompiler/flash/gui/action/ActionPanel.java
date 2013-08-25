@@ -284,7 +284,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             @Override
             public void run() {
                 editor.setText("; " + translate("work.disassembling") + "...");
-                if ((Boolean) Configuration.getConfig("decompile", Boolean.TRUE)) {
+                if (Configuration.getConfig("decompile", true)) {
                     decompiledEditor.setText("//" + translate("work.waitingfordissasembly") + "...");
                 }
                 DisassemblyListener listener = new DisassemblyListener() {
@@ -310,7 +310,7 @@ public class ActionPanel extends JPanel implements ActionListener {
                 srcWithHex = Helper.hexToComments(lastDisasm);
                 srcNoHex = Helper.stripComments(lastDisasm);
                 setHex(hexButton.isSelected());
-                if ((Boolean) Configuration.getConfig("decompile", Boolean.TRUE)) {
+                if (Configuration.getConfig("decompile", true)) {
                     decompiledEditor.setText("//" + translate("work.decompiling") + "...");
                     String stripped = "";
                     if (!useCache) {
@@ -535,7 +535,7 @@ public class ActionPanel extends JPanel implements ActionListener {
     }
 
     public void initSplits() {
-        int split = (Integer) Configuration.getConfig("gui.action.splitPane.dividerLocation", getWidth() / 2);
+        int split = Configuration.getConfig("gui.action.splitPane.dividerLocation", getWidth() / 2);
         if (split == 0) {
             split = getWidth() / 2;
         }

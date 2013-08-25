@@ -38,7 +38,7 @@ public class ExportTest {
 
     @BeforeClass
     public void addLogger() {
-        Configuration.setConfig("autoDeobfuscate", Boolean.TRUE);
+        Configuration.setConfig("autoDeobfuscate", true);
         Logger logger = Logger.getLogger("");
         logger.addHandler(new Handler() {
             @Override
@@ -90,6 +90,12 @@ public class ExportTest {
                 public int handle(Throwable thrown) {
                     return AbortRetryIgnoreHandler.ABORT;
                 }
+
+                @Override
+                public AbortRetryIgnoreHandler getNewInstance() {
+                    return this;
+                }
+                
             }, fdir.getAbsolutePath(), false, false);
         } catch (Exception ex) {
             fail();
