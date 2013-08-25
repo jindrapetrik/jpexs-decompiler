@@ -52,6 +52,10 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -61,6 +65,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 /**
@@ -836,7 +841,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
     public static BufferedImage shapeToImage(List<Tag> tags, int shapeNum, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStylesList, List<SHAPERECORD> records, Color defaultColor) {
         String key = "shape_" + records.hashCode() + "_" + (defaultColor == null ? "null" : defaultColor.hashCode());
         if (cache.contains(key)) {
-            return (BufferedImage) cache.get(key);
+            return (BufferedImage) ((SerializableImage)cache.get(key)).getImage();
         }
         RECT rect = new RECT();
         List<Path> paths = getPaths(rect, shapeNum, fillStyles, lineStylesList, /*numFillBits, numLineBits,*/ records);
@@ -856,7 +861,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
             }
             p.drawTo(tags, -rect.Xmin, -rect.Ymin, g, shapeNum);
         }
-        cache.put(key, ret);
+        cache.put(key, new SerializableImage(ret));
         return ret;
     }
 
@@ -1065,5 +1070,32 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters {
         double x = p0.getX() + ((p1.getX() - p0.getX()) * ratio);
         double y = p0.getY() + ((p1.getY() - p0.getY()) * ratio);
         return new Point2D.Double(x, y);
+    }
+
+    private static class SerializableImage implements Serializable {
+
+        transient BufferedImage image;
+
+        public BufferedImage getImage() {
+            return image;
+        }
+
+        public void setImage(BufferedImage image) {
+            this.image = image;
+        }
+
+        public SerializableImage(BufferedImage image) {
+            this.image = image;
+        }
+
+        private void writeObject(ObjectOutputStream out) throws IOException {
+            out.defaultWriteObject();
+            ImageIO.write(image, "png", out);
+        }
+
+        private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+            in.defaultReadObject();
+            image = ImageIO.read(in);
+        }
     }
 }

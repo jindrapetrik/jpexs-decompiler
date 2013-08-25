@@ -2208,7 +2208,10 @@ public class SWF {
 
         String key = "frame_" + frame + "_" + containerId;
         if (cache.contains(key)) {
-            return ((CachedImage) cache.get(key)).getImage();
+            CachedImage ciret = ((CachedImage) cache.get(key));
+            if (ciret != null) {
+                return ciret.getImage();
+            }
         }
         float unzoom = 20;
         BufferedImage ret = new BufferedImage((int) (displayRect.Xmax / unzoom), (int) (displayRect.Ymax / unzoom), BufferedImage.TYPE_INT_ARGB);
