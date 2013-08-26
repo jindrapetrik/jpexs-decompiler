@@ -2974,7 +2974,13 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                     sos2.writeUI8(0);
                     sos2.writeUI8(swf.frameRate);
                     sos2.writeUI16(100); //framecnt
-                    sos2.writeTag(new SetBackgroundColorTag(null, new RGB(View.swfBackgroundColor)));
+                    
+                    Color backgroundColor=View.swfBackgroundColor;
+                    if (tagObj instanceof FontTag) { //Fonts are always black on white
+                        backgroundColor = Color.white;
+                    }
+                    
+                    sos2.writeTag(new SetBackgroundColorTag(null, new RGB(backgroundColor)));
 
                     if (tagObj instanceof FrameNode) {
                         FrameNode fn = (FrameNode) tagObj;
