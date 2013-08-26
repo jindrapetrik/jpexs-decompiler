@@ -45,14 +45,14 @@ public class WhileItem extends LoopItem implements Block {
     @Override
     public String toString(boolean highlight, List<Object> localData) {
         String ret = "";
-        ret += "loop" + loop.id + ":\r\n";
+        ret += hilight("loop" + loop.id + ":", highlight) + "\r\n";
         String expStr = "";
         for (int i = 0; i < expression.size(); i++) {
             if (expression.get(i).isEmpty()) {
                 continue;
             }
             if (!expStr.equals("")) {
-                expStr += ", ";
+                expStr += hilight(", ", highlight);
             }
             expStr += expression.get(i).toString(highlight, localData);
         }
@@ -63,7 +63,7 @@ public class WhileItem extends LoopItem implements Block {
             }
         }
         ret += hilight("}", highlight) + "\r\n";
-        ret += ":loop" + loop.id;
+        ret += hilight(":loop" + loop.id, highlight);
         return ret;
     }
 

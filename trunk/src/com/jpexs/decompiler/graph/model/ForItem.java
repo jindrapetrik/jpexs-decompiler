@@ -58,7 +58,7 @@ public class ForItem extends LoopItem implements Block {
     @Override
     public String toString(boolean highlight, List<Object> localData) {
         String ret = "";
-        ret += "loop" + loop.id + ":\r\n";
+        ret += hilight("loop" + loop.id + ":", highlight) + "\r\n";
         ret += hilight("for(", highlight);
         int p = 0;
         for (int i = 0; i < firstCommands.size(); i++) {
@@ -67,7 +67,7 @@ public class ForItem extends LoopItem implements Block {
             }
 
             if (p > 0) {
-                ret += ",";
+                ret += hilight(",", highlight);
             }
             ret += stripSemicolon(firstCommands.get(i).toString(highlight, localData));
             p++;

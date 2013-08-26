@@ -44,7 +44,7 @@ public class SetSuperAVM2Item extends AVM2Item {
 
     @Override
     public String toString(boolean highlight, ConstantPool constants, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
-        String calee = object.toString(highlight, constants, localRegNames, fullyQualifiedNames) + ".";
+        String calee = object.toString(highlight, constants, localRegNames, fullyQualifiedNames) + hilight(".", highlight);
         if (Highlighting.stripHilights(calee).equals("this.")) {
             calee = "";
         }

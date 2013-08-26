@@ -62,7 +62,7 @@ public class TryAVM2Item extends AVM2Item implements Block {
         }
         ret += hilight("}", highlight);
         for (int e = 0; e < catchExceptions.size(); e++) {
-            ret += "\r\n" + hilight("catch(", highlight) + catchExceptions.get(e).getVarName(constants, fullyQualifiedNames) + ":" + catchExceptions.get(e).getTypeName(constants, fullyQualifiedNames) + hilight(")", highlight) + "\r\n" + hilight("{", highlight) +"\r\n";
+            ret += "\r\n" + hilight("catch(" + catchExceptions.get(e).getVarName(constants, fullyQualifiedNames) + ":" + catchExceptions.get(e).getTypeName(constants, fullyQualifiedNames) + ")", highlight) + "\r\n" + hilight("{", highlight) +"\r\n";
             List<GraphTargetItem> commands = catchCommands.get(e);
             for (GraphTargetItem ti : commands) {
                 if (!ti.isEmpty()) {

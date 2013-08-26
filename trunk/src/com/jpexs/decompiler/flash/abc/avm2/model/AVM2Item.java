@@ -58,7 +58,7 @@ public abstract class AVM2Item extends GraphTargetItem {
     protected String formatProperty(boolean highlight, ConstantPool constants, GraphTargetItem object, GraphTargetItem propertyName, HashMap<Integer, String> localRegNames, List<String> fullyQualifiedNames) {
         String obStr = object.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames));
         if (object.precedence > PRECEDENCE_PRIMARY) {
-            obStr = "(" + obStr + ")";
+            obStr = hilight("(", highlight) + obStr + hilight(")", highlight);
         }
         if (object instanceof LocalRegAVM2Item) {
             if (((LocalRegAVM2Item) object).computedValue != null) {
@@ -74,10 +74,10 @@ public abstract class AVM2Item extends GraphTargetItem {
             if (((FullMultinameAVM2Item) propertyName).name != null) {
                 return obStr + propertyName.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames));
             } else {
-                return obStr + "." + propertyName.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames));
+                return obStr + hilight(".", highlight) + propertyName.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames));
             }
         } else {
-            return obStr + "[" + propertyName.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames)) + "]";
+            return obStr + hilight("[", highlight) + propertyName.toString(highlight, Helper.toList(constants, localRegNames, fullyQualifiedNames)) + hilight("]", highlight);
         }
     }
 
