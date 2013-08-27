@@ -51,7 +51,7 @@ public class AS2Generator {
                     }
                 }
                 
-                 s.append("@Test\r\npublic void ");
+                s.append("@Test\r\npublic void ");
                 s.append(testName);
                 s.append("(){\r\ncompareSrc(");
                 s.append(frame);

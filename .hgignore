@@ -1,0 +1,11 @@
+syntax: glob
+trunk/build/*
+trunk/coverage/*
+trunk/dist/*
+trunk/javadoc/*
+trunk/locales/*
+trunk/releases/*
+trunk/reports/*
+trunk/build_exe.xml
+trunk/installer.cfg
+*.orig
