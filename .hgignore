@@ -1,11 +1,15 @@
-syntax: glob
-trunk/build/*
-trunk/coverage/*
-trunk/dist/*
-trunk/javadoc/*
-trunk/locales/*
-trunk/releases/*
-trunk/reports/*
-trunk/build_exe.xml
-trunk/installer.cfg
-*.orig
+\.orig$ 
+\.orig\..*$ 
+\.chg\..*$ 
+\.rej$ 
+\.conflict\~$
+^trunk/build$
+^trunk/reports$
+^trunk/installer\.cfg$
+^trunk/releases$
+^trunk/locales$
+^trunk/javadoc$
+^trunk/coverage$
+^trunk/dist$
+^trunk/build_exe\.xml$
+^trunk/libsrc/jsyntaxpane/jsyntaxpane/src/target$
