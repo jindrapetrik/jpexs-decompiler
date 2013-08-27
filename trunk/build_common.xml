@@ -41,7 +41,7 @@
     </target>
 
     <target name="compile">
-        <!--<delete dir="${COMPILEDIR}"/>-->
+        <!--<delete dir="${COMPILEDIR}"/>-->        
         <mkdir dir="${COMPILEDIR}"/>
         <javac srcdir="${SOURCEDIR}" destdir="${COMPILEDIR}" includes="**/*.java" target="${TARGETJAVA}" source="${TARGETJAVA}" debug="true"
                debuglevel="lines,vars,source" includeantruntime="false" encoding="utf-8">
@@ -57,11 +57,8 @@
             </fileset>
         </copy>
     </target>
-
-    <target name="test" depends="compile">
-        <delete dir="${TESTRESULTSDIR}"/>
-        <mkdir dir="${TESTRESULTSDIR}"/>
-        <mkdir dir="${TESTRESULTSDIR}/raw/"/>
+    
+    <target name="compile-tests">
         <delete dir="${COMPILETESTSDIR}"/>
         <mkdir dir="${COMPILETESTSDIR}"/>
         <javac srcdir="${TESTDIR}" destdir="${COMPILETESTSDIR}" includes="**/*.java" target="${TARGETJAVA}" debug="true" includeantruntime="false" encoding="utf-8">                        
@@ -71,6 +68,13 @@
                 <fileset dir="${TESTLIBDIR}" includes="**/*.jar"/>
             </classpath>
         </javac>
+    </target>
+
+    <target name="test" depends="compile,compile-tests">
+        <delete dir="${TESTRESULTSDIR}"/>
+        <mkdir dir="${TESTRESULTSDIR}"/>
+        <mkdir dir="${TESTRESULTSDIR}/raw/"/>
+        
         <antcall target="coverage.instrumentation"/>
         
         <taskdef classname="org.testng.TestNGAntTask" classpath="${TESTLIBDIR}/testng-6.8.jar" name="testng" />
@@ -78,7 +82,7 @@
         
         <testng 
             outputDir="${TESTRESULTSDIR}"
-            haltOnFailure="false" verbose="2" workingDir="${basedir}">
+            haltOnFailure="false" verbose="2" workingDir="${basedir}" >
         
             <classpath>
                 <pathelement path="${COMPILETESTSDIR}"/>
@@ -221,8 +225,8 @@
             <fileset dir="libsrc/jsyntaxpane/jsyntaxpane/src/main/resources/META-INF/services/jsyntaxpane/syntaxkits/flasm3methodinfosyntaxkit" includes="**/config*.properties"/>
         </copy>
         <echo file="${LOCALESTARGETDIR}/readme.txt">${PROJECTNAME} ${VERSION} localization pack
--------------------------------------------------------------------            
-Please follow instructions on http://www.free-decompiler.com/flash/translations.html
+            -------------------------------------------------------------------            
+            Please follow instructions on http://www.free-decompiler.com/flash/translations.html
 </echo>
         <zip destfile="${RELEASESDIR}/${LOCALESZIP}" basedir="${LOCALESTARGETDIR}"/>
     </target>
@@ -297,5 +301,40 @@ Please follow instructions on http://www.free-decompiler.com/flash/translations.
         <delete dir="${COVERAGEDIR}"/>
         <delete dir="${TESTRESULTSDIR}"/>
         <delete dir="${LOCALESTARGETDIR}"/>
+    </target>
+    
+    <!-- Debug one test method (Netbeans IDE) -->
+    <target name="debug-test-method" depends="compile-tests">
+        <fail unless="test.class">Must select one file in the IDE or set test.class</fail>
+        <fail unless="test.method">Must select some method in the IDE or set test.method</fail>
+        <delete dir="${TESTRESULTSDIR}"/>
+        <mkdir dir="${TESTRESULTSDIR}"/>
+        <mkdir dir="${TESTRESULTSDIR}/raw/"/>
+     
+        <nbjpdastart addressproperty="jpda.address" name="ffdec" transport="dt_socket">
+            <classpath>
+                <pathelement path="${COMPILEDIR}"/>
+                <fileset dir="${LIBRARIESDIR}" includes="**/*.jar"/>
+                <fileset dir="${TESTLIBDIR}" includes="**/*.jar"/>
+            </classpath>
+        </nbjpdastart>
+        <taskdef classname="org.testng.TestNGAntTask" classpath="${TESTLIBDIR}/testng-6.8.jar" name="testng" />
+    
+        <testng 
+            outputDir="${TESTRESULTSDIR}"
+            haltOnFailure="false" verbose="2" workingDir="${basedir}" methods="${test.class}.${test.method}">
+        
+            <classpath>
+                <pathelement path="${COMPILETESTSDIR}"/>
+                <pathelement path="${INSTRDIR}"/>
+                <pathelement path="${COMPILEDIR}"/>
+                <fileset dir="${LIBRARIESDIR}" includes="**/*.jar"/>
+                <fileset dir="${TESTLIBDIR}" includes="**/*.jar"/>
+            </classpath>
+            <jvmarg value="-noverify" />
+            <jvmarg value="-Xdebug"/>
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
+            <classfileset dir="${COMPILETESTSDIR}" includes="**/*.class" />                                    
+        </testng>     
     </target>
 </project>
