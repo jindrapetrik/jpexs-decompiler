@@ -534,7 +534,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         mainMenu.addMenuEntry(checkUpdatesMenu);
         mainMenu.addMenuEntry(aboutMenu);
         mainMenu.addFooterEntry(exitMenu);
-        mainMenu.addMenuSeparator();        
+        mainMenu.addMenuSeparator();
         rib.setApplicationMenu(mainMenu);
 
 
@@ -2334,18 +2334,17 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                             (new Thread() {
                                 @Override
                                 public void run() {
-                                    View.execInEventDispatch(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            if (abcPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
+                                    if (abcPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
+                                        View.execInEventDispatch(new Runnable() {
+                                            @Override
+                                            public void run() {
                                                 showDetail(DETAILCARDAS3NAVIGATOR);
                                                 showCard(CARDACTIONSCRIPTPANEL);
-                                            } else {
-                                                View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
                                             }
-                                        }
-                                    });
-
+                                        });
+                                    } else {
+                                        View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
+                                    }
                                 }
                             }).start();
                         } else {
@@ -2353,7 +2352,12 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                                 @Override
                                 public void run() {
                                     if (actionPanel.search(txt, searchDialog.ignoreCaseCheckBox.isSelected(), searchDialog.regexpCheckBox.isSelected())) {
-                                        showCard(CARDACTIONSCRIPTPANEL);
+                                        View.execInEventDispatch(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                showCard(CARDACTIONSCRIPTPANEL);
+                                            }
+                                        });
                                     } else {
                                         View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
                                     }
@@ -2974,12 +2978,12 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                     sos2.writeUI8(0);
                     sos2.writeUI8(swf.frameRate);
                     sos2.writeUI16(100); //framecnt
-                    
-                    Color backgroundColor=View.swfBackgroundColor;
+
+                    Color backgroundColor = View.swfBackgroundColor;
                     if (tagObj instanceof FontTag) { //Fonts are always black on white
                         backgroundColor = Color.white;
                     }
-                    
+
                     sos2.writeTag(new SetBackgroundColorTag(null, new RGB(backgroundColor)));
 
                     if (tagObj instanceof FrameNode) {
