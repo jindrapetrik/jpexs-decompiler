@@ -418,10 +418,10 @@ public class Action implements GraphSourceItem {
             //setActionsAddresses(list, 0, version);
             importantOffsets = getActionsAllRefs(list, version);
         }
-        List<ConstantPool> cps = SWFInputStream.getConstantPool(new ArrayList<DisassemblyListener>(), new ActionGraphSource(list, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, version, path);
+        /*List<ConstantPool> cps = SWFInputStream.getConstantPool(new ArrayList<DisassemblyListener>(), new ActionGraphSource(list, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, version, path);
         if (!cps.isEmpty()) {
             setConstantPool(list, cps.get(cps.size() - 1));
-        }
+        }*/
         HashMap<Long, List<GraphSourceItemContainer>> containers = new HashMap<>();
         HashMap<GraphSourceItemContainer, Integer> containersPos = new HashMap<>();
         offset = address;
@@ -1199,7 +1199,7 @@ public class Action implements GraphSourceItem {
         String s = null;
         try {
             s = Action.actionsToString(new ArrayList<DisassemblyListener>(), address, ret, null, version, false, false, swfPos, path);
-            ret = ASMParser.parse(address, swfPos, true, new StringReader(s), SWF.DEFAULT_VERSION);
+            ret = ASMParser.parse(address, swfPos, true, s, SWF.DEFAULT_VERSION);
         } catch (Exception ex) {
             Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "parsing error", ex);
         }

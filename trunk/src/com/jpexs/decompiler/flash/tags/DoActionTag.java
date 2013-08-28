@@ -116,7 +116,7 @@ public class DoActionTag extends Tag implements ASMSource {
             ReReadableInputStream rri = new ReReadableInputStream(new ByteArrayInputStream(baos.toByteArray()));
             rri.setPos(prevLength);
             boolean deobfuscate = Configuration.getConfig("autoDeobfuscate", true);
-            List<Action> list = SWFInputStream.readActionList(listeners, 0, getPos() - prevLength, rri, version, prevLength, -1, toString()/*FIXME?*/);
+            List<Action> list = SWFInputStream.readActionList(listeners, getPos() - prevLength, rri, version, prevLength, -1, toString()/*FIXME?*/);
             if (deobfuscate) {
                 list = Action.removeNops(0, list, version, getPos(), toString()/*FIXME?*/);
             }

@@ -45,8 +45,8 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
     }
 
     @Override
-    public boolean parseDivision(int pos, long addr, FlasmLexer lexer) {
-        codeSize = (int) (addr - getAddress() - getHeaderSize());
+    public boolean parseDivision(long size, FlasmLexer lexer) {
+        codeSize = (int) (size - getHeaderSize());
         return false;
     }
 
@@ -56,10 +56,9 @@ public class ActionWith extends Action implements GraphSourceItemContainer {
         this.version = version;
     }
 
-    public ActionWith(long containerSWFPos, boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
+    public ActionWith(FlasmLexer lexer) throws IOException, ParseException {
         super(0x94, 2);
         lexBlockOpen(lexer);
-        //actions = ASMParser.parse(containerSWFPos + 2, ignoreNops, labels, address + 5, lexer, constantPool, version);
     }
 
     @Override

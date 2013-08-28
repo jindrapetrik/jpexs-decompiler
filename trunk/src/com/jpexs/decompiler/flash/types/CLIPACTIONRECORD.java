@@ -168,7 +168,7 @@ public class CLIPACTIONRECORD implements ASMSource, Exportable {
     public List<Action> getActions(int version) {
         try {
             boolean deobfuscate = Configuration.getConfig("autoDeobfuscate", true);
-            List<Action> list = SWFInputStream.readActionList(listeners, 0, getPos() + hdrPos, new ReReadableInputStream(new ByteArrayInputStream(actionBytes)), version, 0, -1, toString()/*FIXME?*/);
+            List<Action> list = SWFInputStream.readActionList(listeners, getPos() + hdrPos, new ReReadableInputStream(new ByteArrayInputStream(actionBytes)), version, 0, -1, toString()/*FIXME?*/);
             if (deobfuscate) {
                 list = Action.removeNops(0, list, version, getPos() + hdrPos, toString()/*FIXME?*/);
             }

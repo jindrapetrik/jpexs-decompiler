@@ -537,163 +537,163 @@ public class SWFInputStream extends InputStream {
         return ret;
     }
 
-    public List<Action> readActionList(List<DisassemblyListener> listeners, long address, long containerSWFOffset, String path) throws IOException {
+    public List<Action> readActionList(List<DisassemblyListener> listeners, long containerSWFOffset, String path) throws IOException {
         ReReadableInputStream rri = new ReReadableInputStream(this);
-        return readActionList(listeners, address, containerSWFOffset, rri, version, 0, -1, path);
+        return readActionList(listeners, containerSWFOffset, rri, version, 0, -1, path);
     }
 
-    public List<Action> readActionList(List<DisassemblyListener> listeners, long address, long containerSWFOffset, ReReadableInputStream rri, int maxlen, String path) throws IOException {
-        return readActionList(listeners, address, containerSWFOffset, rri, version, rri.getPos(), rri.getPos() + maxlen, path);
+    public List<Action> readActionList(List<DisassemblyListener> listeners, long containerSWFOffset, ReReadableInputStream rri, int maxlen, String path) throws IOException {
+        return readActionList(listeners, containerSWFOffset, rri, version, rri.getPos(), rri.getPos() + maxlen, path);
     }
 
-    @SuppressWarnings("unchecked")
-    private static void getConstantPool(List<DisassemblyListener> listeners, ConstantPool cpool, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, List<ConstantPool> constantPools, List<Integer> visited, int version, int endIp, String path) {
-        boolean debugMode = false;
-        boolean deobfuscate = Configuration.getConfig("autoDeobfuscate", true);
-        while (((endIp == -1) || (endIp > ip)) && (ip > -1) && ip < code.size()) {
-            if (visited.contains(ip)) {
-                break;
-            }
-            for (int i = 0; i < listeners.size(); i++) {
-                listeners.get(i).progress("constantpool", ip + 1, code.size());
-            }
-            GraphSourceItem ins = code.get(ip);
-            if (ins.isIgnored()) {
-                if (ins.isExit()) {
-                    break;
-                }
-                ip++;
-                continue;
-            }
-
-            if (ins instanceof GraphSourceItemContainer) {
-                GraphSourceItemContainer cnt = (GraphSourceItemContainer) ins;
-                String cntName = cnt.getName();
-                if (ins instanceof Action) {
-                    List<List<GraphTargetItem>> output2s = new ArrayList<>();
-                    long endAddr = ((Action) ins).getAddress() + cnt.getHeaderSize();
-                    for (long size : cnt.getContainerSizes()) {
-                        if (size == 0) {
-                            output2s.add(new ArrayList<GraphTargetItem>());
-                            continue;
-                        }
-                        List<Object> localData2 = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
-                        List<GraphTargetItem> output2 = new ArrayList<>();
-                        output2s.add(output2);
-                        getConstantPool(listeners, cpool, localData2, new Stack<GraphTargetItem>(), output2, code, code.adr2pos(endAddr), constantPools, visited, version, code.adr2pos(endAddr + size), path + (cntName == null ? "" : "/" + cntName));
-                        endAddr += size;
-                    }
-                    if (deobfuscate) {
-                        cnt.translateContainer(output2s, stack, output, (HashMap<Integer, String>) localData.get(0), (HashMap<String, GraphTargetItem>) localData.get(1), (HashMap<String, GraphTargetItem>) localData.get(2));
-                    }
-                    ip = code.adr2pos(endAddr);
-                    continue;
-                }
-            }
-            if (ins instanceof ActionPush) {
-                if (cpool != null) {
-                    ((ActionPush) ins).constantPool = cpool.constants;
-                    cpool.count++;
-                }
-            }
-            if (ins instanceof ActionDefineFunction) {
-                if (cpool != null) {
-                    //((ActionDefineFunction) ins).setConstantPool(cpool.constants,code.getActions());
-                    cpool.count++;
-                }
-            }
-            if (ins instanceof ActionDefineFunction2) {
-                if (cpool != null) {
-                    //((ActionDefineFunction2) ins).setConstantPool(cpool.constants,code.getActions());
-                    cpool.count++;
-                }
-            }
-            if (debugMode) {
-                String add = "";
-                if (ins instanceof ActionIf) {
-                    add += " change:" + ((ActionIf) ins).getJumpOffset();
-                }
-                if (ins instanceof ActionJump) {
-                    add += " change:" + (((ActionJump) ins).getJumpOffset());
-                }
-                System.err.println("getConstantPool ip " + ip + ", addr " + Helper.formatAddress(((Action) ins).getAddress()) + ": " + ((Action) ins).getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), cpool == null ? null : cpool.constants, version, false) + add + " stack:" + Helper.stackToString(stack, Helper.toList(cpool)));
-            }
-            if (ins instanceof ActionConstantPool) {
-                constantPools.add(new ConstantPool(((ActionConstantPool) ins).constantPool));
-                if (cpool == null) {
-                    cpool = new ConstantPool();
-                }
-                cpool.setNew(((ActionConstantPool) ins).constantPool);
-            }
-
-            //for..in return
-            if (deobfuscate) {
-                if (((ins instanceof ActionEquals) || (ins instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueActionItem)) {
-                    stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>()));
-                }
-                try {
-                    ins.translate(localData, stack, output, Graph.SOP_USE_STATIC/*Graph.SOP_SKIP_STATIC*/, null);
-                } catch (Exception ex) {
-                    Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "Error during getting constantpool", ex);
-                }
-            }
-            if (ins.isExit()) {
-                break;
-            }
-
-            if (ins.isBranch() || ins.isJump()) {
-
-                if (deobfuscate && (ins instanceof ActionIf) && !stack.isEmpty() && (stack.peek().isCompileTime() && (!stack.peek().hasSideEffect()))) {
-                    boolean condition = EcmaScript.toBoolean(stack.peek().getResult());
-                    if (debugMode) {
-                        if (condition) {
-                            System.err.println("JUMP");
-                        } else {
-                            System.err.println("SKIP");
-                        }
-                    }
-                    stack.pop();
-                    getConstantPool(listeners, cpool, localData, stack, output, code, condition ? (code.adr2pos(((ActionIf) ins).getAddress() + ((ActionIf) ins).getBytes(code.version).length + ((ActionIf) ins).getJumpOffset())) : ip + 1, constantPools, visited, version, endIp, path);
-                } else {
-                    if (deobfuscate && ins instanceof ActionIf) {
-                        stack.pop();
-                    }
-                    visited.add(ip);
-                    List<Integer> branches = ins.getBranches(code);
-                    for (int b : branches) {
-                        @SuppressWarnings("unchecked")
-                        Stack<GraphTargetItem> brStack = (Stack<GraphTargetItem>) stack.clone();
-                        if (b >= 0) {
-                            getConstantPool(listeners, cpool, prepareLocalBranch(localData), brStack, output, code, b, constantPools, visited, version, endIp, path);
-                        } else {
-                            if (debugMode) {
-                                System.out.println("Negative branch:" + b);
-                            }
-                        }
-                    }
-                }
-                break;
-            }
-            ip++;
-        };
-        if (ip < 0) {
-            System.out.println("Visited Negative: " + ip);
-        }
-        for (DisassemblyListener listener : listeners) {
-            listener.progress("constantpool", ip + 1, code.size());
-        }
-    }
-
-    public static List<ConstantPool> getConstantPool(List<DisassemblyListener> listeners, ActionGraphSource code, int addr, int version, String path) {
-        List<ConstantPool> ret = new ArrayList<>();
-        List<Object> localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
-        try {
-            getConstantPool(listeners, null, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), ret, new ArrayList<Integer>(), version, -1, path);
-        } catch (Exception ex) {
-            log.log(Level.SEVERE, "Error during getting constantpool", ex);
-        }
-        return ret;
-    }
+//    @SuppressWarnings("unchecked")
+//    private static void getConstantPool(List<DisassemblyListener> listeners, ConstantPool cpool, List<Object> localData, Stack<GraphTargetItem> stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, List<ConstantPool> constantPools, List<Integer> visited, int version, int endIp, String path) {
+//        boolean debugMode = false;
+//        boolean deobfuscate = Configuration.getConfig("autoDeobfuscate", true);
+//        while (((endIp == -1) || (endIp > ip)) && (ip > -1) && ip < code.size()) {
+//            if (visited.contains(ip)) {
+//                break;
+//            }
+//            for (int i = 0; i < listeners.size(); i++) {
+//                listeners.get(i).progress("constantpool", ip + 1, code.size());
+//            }
+//            GraphSourceItem ins = code.get(ip);
+//            if (ins.isIgnored()) {
+//                if (ins.isExit()) {
+//                    break;
+//                }
+//                ip++;
+//                continue;
+//            }
+//
+//            if (ins instanceof GraphSourceItemContainer) {
+//                GraphSourceItemContainer cnt = (GraphSourceItemContainer) ins;
+//                String cntName = cnt.getName();
+//                if (ins instanceof Action) {
+//                    List<List<GraphTargetItem>> output2s = new ArrayList<>();
+//                    long endAddr = ((Action) ins).getAddress() + cnt.getHeaderSize();
+//                    for (long size : cnt.getContainerSizes()) {
+//                        if (size == 0) {
+//                            output2s.add(new ArrayList<GraphTargetItem>());
+//                            continue;
+//                        }
+//                        List<Object> localData2 = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
+//                        List<GraphTargetItem> output2 = new ArrayList<>();
+//                        output2s.add(output2);
+//                        getConstantPool(listeners, cpool, localData2, new Stack<GraphTargetItem>(), output2, code, code.adr2pos(endAddr), constantPools, visited, version, code.adr2pos(endAddr + size), path + (cntName == null ? "" : "/" + cntName));
+//                        endAddr += size;
+//                    }
+//                    if (deobfuscate) {
+//                        cnt.translateContainer(output2s, stack, output, (HashMap<Integer, String>) localData.get(0), (HashMap<String, GraphTargetItem>) localData.get(1), (HashMap<String, GraphTargetItem>) localData.get(2));
+//                    }
+//                    ip = code.adr2pos(endAddr);
+//                    continue;
+//                }
+//            }
+//            if (ins instanceof ActionPush) {
+//                if (cpool != null) {
+//                    ((ActionPush) ins).constantPool = cpool.constants;
+//                    cpool.count++;
+//                }
+//            }
+//            if (ins instanceof ActionDefineFunction) {
+//                if (cpool != null) {
+//                    //((ActionDefineFunction) ins).setConstantPool(cpool.constants,code.getActions());
+//                    cpool.count++;
+//                }
+//            }
+//            if (ins instanceof ActionDefineFunction2) {
+//                if (cpool != null) {
+//                    //((ActionDefineFunction2) ins).setConstantPool(cpool.constants,code.getActions());
+//                    cpool.count++;
+//                }
+//            }
+//            if (debugMode) {
+//                String add = "";
+//                if (ins instanceof ActionIf) {
+//                    add += " change:" + ((ActionIf) ins).getJumpOffset();
+//                }
+//                if (ins instanceof ActionJump) {
+//                    add += " change:" + (((ActionJump) ins).getJumpOffset());
+//                }
+//                System.err.println("getConstantPool ip " + ip + ", addr " + Helper.formatAddress(((Action) ins).getAddress()) + ": " + ((Action) ins).getASMSource(new ArrayList<GraphSourceItem>(), new ArrayList<Long>(), cpool == null ? null : cpool.constants, version, false) + add + " stack:" + Helper.stackToString(stack, Helper.toList(cpool)));
+//            }
+//            if (ins instanceof ActionConstantPool) {
+//                constantPools.add(new ConstantPool(((ActionConstantPool) ins).constantPool));
+//                if (cpool == null) {
+//                    cpool = new ConstantPool();
+//                }
+//                cpool.setNew(((ActionConstantPool) ins).constantPool);
+//            }
+//
+//            //for..in return
+//            if (deobfuscate) {
+//                if (((ins instanceof ActionEquals) || (ins instanceof ActionEquals2)) && (stack.size() == 1) && (stack.peek() instanceof DirectValueActionItem)) {
+//                    stack.push(new DirectValueActionItem(null, 0, new Null(), new ArrayList<String>()));
+//                }
+//                try {
+//                    ins.translate(localData, stack, output, Graph.SOP_USE_STATIC/*Graph.SOP_SKIP_STATIC*/, null);
+//                } catch (Exception ex) {
+//                    Logger.getLogger(SWFInputStream.class.getName()).log(Level.SEVERE, "Error during getting constantpool", ex);
+//                }
+//            }
+//            if (ins.isExit()) {
+//                break;
+//            }
+//
+//            if (ins.isBranch() || ins.isJump()) {
+//
+//                if (deobfuscate && (ins instanceof ActionIf) && !stack.isEmpty() && (stack.peek().isCompileTime() && (!stack.peek().hasSideEffect()))) {
+//                    boolean condition = EcmaScript.toBoolean(stack.peek().getResult());
+//                    if (debugMode) {
+//                        if (condition) {
+//                            System.err.println("JUMP");
+//                        } else {
+//                            System.err.println("SKIP");
+//                        }
+//                    }
+//                    stack.pop();
+//                    getConstantPool(listeners, cpool, localData, stack, output, code, condition ? (code.adr2pos(((ActionIf) ins).getAddress() + ((ActionIf) ins).getBytes(code.version).length + ((ActionIf) ins).getJumpOffset())) : ip + 1, constantPools, visited, version, endIp, path);
+//                } else {
+//                    if (deobfuscate && ins instanceof ActionIf) {
+//                        stack.pop();
+//                    }
+//                    visited.add(ip);
+//                    List<Integer> branches = ins.getBranches(code);
+//                    for (int b : branches) {
+//                        @SuppressWarnings("unchecked")
+//                        Stack<GraphTargetItem> brStack = (Stack<GraphTargetItem>) stack.clone();
+//                        if (b >= 0) {
+//                            getConstantPool(listeners, cpool, prepareLocalBranch(localData), brStack, output, code, b, constantPools, visited, version, endIp, path);
+//                        } else {
+//                            if (debugMode) {
+//                                System.out.println("Negative branch:" + b);
+//                            }
+//                        }
+//                    }
+//                }
+//                break;
+//            }
+//            ip++;
+//        };
+//        if (ip < 0) {
+//            System.out.println("Visited Negative: " + ip);
+//        }
+//        for (DisassemblyListener listener : listeners) {
+//            listener.progress("constantpool", ip + 1, code.size());
+//        }
+//    }
+//
+//    public static List<ConstantPool> getConstantPool(List<DisassemblyListener> listeners, ActionGraphSource code, int addr, int version, String path) {
+//        List<ConstantPool> ret = new ArrayList<>();
+//        List<Object> localData = Helper.toList(new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>());
+//        try {
+//            getConstantPool(listeners, null, localData, new Stack<GraphTargetItem>(), new ArrayList<GraphTargetItem>(), code, code.adr2pos(addr), ret, new ArrayList<Integer>(), version, -1, path);
+//        } catch (Exception ex) {
+//            log.log(Level.SEVERE, "Error during getting constantpool", ex);
+//        }
+//        return ret;
+//    }
 
     private static List<Object> prepareLocalBranch(List<Object> localData) {
         @SuppressWarnings("unchecked")
@@ -724,7 +724,7 @@ public class SWFInputStream extends InputStream {
      * @return List of actions
      * @throws IOException
      */
-    public static List<Action> readActionList(List<DisassemblyListener> listeners, long address, long containerSWFOffset, ReReadableInputStream rri, int version, int ip, int endip, String path) throws IOException {
+    public static List<Action> readActionList(List<DisassemblyListener> listeners, long containerSWFOffset, ReReadableInputStream rri, int version, int ip, int endip, String path) throws IOException {
         List<Action> retdups = new ArrayList<>();
         ConstantPool cpool = new ConstantPool();
 
@@ -742,7 +742,7 @@ public class SWFInputStream extends InputStream {
          method = 2;
          goesPrev = readActionListAtPos(true, localData, stack, cpool, sis, rri, ip, retdups, ip);
          }*/
-        goesPrev = readActionListAtPos(listeners, new ArrayList<GraphTargetItem>(), new HashMap<Long, List<GraphSourceItemContainer>>(), address, containerSWFOffset, localData, stack, cpool, sis, rri, ip, retdups, ip, endip, path, new HashMap<Integer, Integer>(), false, new HashMap<Integer, HashMap<String, GraphTargetItem>>());
+        goesPrev = readActionListAtPos(listeners, new ArrayList<GraphTargetItem>(), new HashMap<Long, List<GraphSourceItemContainer>>(), containerSWFOffset, localData, stack, cpool, sis, rri, ip, retdups, ip, endip, path, new HashMap<Integer, Integer>(), false, new HashMap<Integer, HashMap<String, GraphTargetItem>>());
 
         if (goesPrev) {
         } else {
@@ -771,13 +771,15 @@ public class SWFInputStream extends InputStream {
             }
         }
 
-        List<ConstantPool> pools;
-        ret = Action.removeNops(0, ret, version, 0, path);
-        pools = getConstantPool(listeners, new ActionGraphSource(ret, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, version, path);
-
-        if (pools.size() == 1) {
-            Action.setConstantPool(ret, pools.get(0));
+        //List<ConstantPool> pools;
+        if (Configuration.getConfig("removeNops", true)) {
+            ret = Action.removeNops(0, ret, version, 0, path);
         }
+        //pools = getConstantPool(listeners, new ActionGraphSource(ret, version, new HashMap<Integer, String>(), new HashMap<String, GraphTargetItem>(), new HashMap<String, GraphTargetItem>()), 0, version, path);
+
+        /*if (pools.size() == 1) {
+            Action.setConstantPool(ret, pools.get(0));
+        }*/
         if (goesPrev && (!DEOBFUSCATION_ALL_CODE_IN_PREVIOUS_TAG)) {
             ActionJump aj = new ActionJump(ip);
             int skip = aj.getBytes(version).length;
@@ -801,7 +803,7 @@ public class SWFInputStream extends InputStream {
     }
 
     @SuppressWarnings("unchecked")
-    private static boolean readActionListAtPos(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, long address, long containerSWFOffset, List<Object> localData, Stack<GraphTargetItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret, int startIp, int endip, String path, Map<Integer, Integer> visited, boolean indeterminate, Map<Integer, HashMap<String, GraphTargetItem>> decisionStates) throws IOException {
+    private static boolean readActionListAtPos(List<DisassemblyListener> listeners, List<GraphTargetItem> output, HashMap<Long, List<GraphSourceItemContainer>> containers, long containerSWFOffset, List<Object> localData, Stack<GraphTargetItem> stack, ConstantPool cpool, SWFInputStream sis, ReReadableInputStream rri, int ip, List<Action> ret, int startIp, int endip, String path, Map<Integer, Integer> visited, boolean indeterminate, Map<Integer, HashMap<String, GraphTargetItem>> decisionStates) throws IOException {
         boolean debugMode = false;
         boolean decideBranch = false;
 
@@ -813,7 +815,7 @@ public class SWFInputStream extends InputStream {
         Scanner sc = new Scanner(System.in, "utf-8");
         int prevIp = ip;
         loopip:
-        while (((endip == -1) || (endip > ip)) && (a = sis.readAction(rri)) != null) {
+        while (((endip == -1) || (endip > ip)) && (a = sis.readAction(rri, cpool)) != null) {
             if (!visited.containsKey(ip)) {
                 visited.put(ip, 0);
             }
@@ -853,7 +855,7 @@ public class SWFInputStream extends InputStream {
 
             /*if(a instanceof ActionConstantPool){
              throw new IllegalArgumentException("CP found");
-             }     */
+             }     */   
             if (a instanceof ActionPush) {
                 if (cpool != null) {
                     ((ActionPush) a).constantPool = cpool.constants;
@@ -1041,7 +1043,7 @@ public class SWFInputStream extends InputStream {
                         } else {
                             localData2 = localData;
                         }
-                        readActionListAtPos(listeners, output2, containers, address, containerSWFOffset, localData2, new Stack<GraphTargetItem>(), cpool, sis, rri, (int) endAddr, ret, startIp, (int) (endAddr + size), path + (cntName == null ? "" : "/" + cntName), visited, indeterminate, decisionStates);
+                        readActionListAtPos(listeners, output2, containers, containerSWFOffset, localData2, new Stack<GraphTargetItem>(), cpool, sis, rri, (int) endAddr, ret, startIp, (int) (endAddr + size), path + (cntName == null ? "" : "/" + cntName), visited, indeterminate, decisionStates);
                         output2s.add(output2);
                         endAddr += size;
                     }
@@ -1118,7 +1120,7 @@ public class SWFInputStream extends InputStream {
                 int oldPos = rri.getPos();
                 @SuppressWarnings("unchecked")
                 Stack<GraphTargetItem> substack = (Stack<GraphTargetItem>) stack.clone();
-                if (readActionListAtPos(listeners, output, containers, address, containerSWFOffset, prepareLocalBranch(localData), substack, cpool, sis, rri, rri.getPos() + aif.getJumpOffset(), ret, startIp, endip, path, visited, indeterminate, decisionStates)) {
+                if (readActionListAtPos(listeners, output, containers, containerSWFOffset, prepareLocalBranch(localData), substack, cpool, sis, rri, rri.getPos() + aif.getJumpOffset(), ret, startIp, endip, path, visited, indeterminate, decisionStates)) {
                     retv = true;
                 }
                 rri.setPos(oldPos);
@@ -1659,8 +1661,8 @@ public class SWFInputStream extends InputStream {
         return ret;
     }
 
-    public Action readAction() throws IOException {
-        return readAction(new ReReadableInputStream(this));
+    public Action readAction(ConstantPool cpool) throws IOException {
+        return readAction(new ReReadableInputStream(this), cpool);
     }
 
     /**
@@ -1670,7 +1672,7 @@ public class SWFInputStream extends InputStream {
      * @return Action or null when ActionEndFlag or end of the stream
      * @throws IOException
      */
-    public Action readAction(ReReadableInputStream rri) throws IOException {
+    public Action readAction(ReReadableInputStream rri, ConstantPool cpool) throws IOException {
         {
             int actionCode = -1;
 
@@ -1708,7 +1710,7 @@ public class SWFInputStream extends InputStream {
                 case 0x09:
                     return new ActionStopSounds();
                 case 0x8A:
-                    return new ActionWaitForFrame(this);
+                    return new ActionWaitForFrame(this, cpool);
                 case 0x8B:
                     return new ActionSetTarget(actionLength, this, version);
                 case 0x8C:
@@ -1789,7 +1791,7 @@ public class SWFInputStream extends InputStream {
                 case 0x28:
                     return new ActionEndDrag();
                 case 0x8D:
-                    return new ActionWaitForFrame2(this);
+                    return new ActionWaitForFrame2(this, cpool);
                 case 0x26:
                     return new ActionTrace();
                 case 0x34:

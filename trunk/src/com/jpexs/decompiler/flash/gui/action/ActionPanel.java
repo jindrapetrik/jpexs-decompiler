@@ -646,7 +646,7 @@ public class ActionPanel extends JPanel implements ActionListener {
             setHex(hexButton.isSelected());
         } else if (e.getActionCommand().equals("SAVEACTION")) {
             try {
-                src.setActions(ASMParser.parse(0, src.getPos(), true, new StringReader(editor.getText()), SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION);
+                src.setActions(ASMParser.parse(0, src.getPos(), true, editor.getText(), SWF.DEFAULT_VERSION), SWF.DEFAULT_VERSION);
                 setSource(this.src, false);
                 View.showMessageDialog(this, translate("message.action.saved"));
                 saveButton.setVisible(false);

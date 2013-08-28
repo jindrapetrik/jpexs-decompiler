@@ -107,7 +107,7 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
         //rri.setPos(posBef2 + codeSize);
     }
 
-    public ActionDefineFunction2(long containerSWFPos, boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
+    public ActionDefineFunction2(FlasmLexer lexer) throws IOException, ParseException {
         super(0x8E, -1);
         functionName = lexString(lexer);
         int numParams = (int) lexLong(lexer);
@@ -126,7 +126,6 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
             paramNames.add(lexString(lexer));
         }
         lexBlockOpen(lexer);
-        //code = ASMParser.parse(containerSWFPos + getHeaderLength(), ignoreNops, labels, address + getPreLen(version), lexer, constantPool, version);
     }
 
     @Override
@@ -364,8 +363,8 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
     }
 
     @Override
-    public boolean parseDivision(int pos, long addr, FlasmLexer lexer) {
-        codeSize = (int) (addr - getAddress() - getHeaderSize());
+    public boolean parseDivision(long size, FlasmLexer lexer) {
+        codeSize = (int) (size - getHeaderSize());
         return false;
     }
 

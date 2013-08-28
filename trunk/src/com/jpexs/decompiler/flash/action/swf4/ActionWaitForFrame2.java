@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraph;
+import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.clauses.IfFrameLoadedActionItem;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
@@ -59,12 +60,12 @@ public class ActionWaitForFrame2 extends Action implements ActionStore {
         skipCount = store.size();
     }
 
-    public ActionWaitForFrame2(SWFInputStream sis) throws IOException {
+    public ActionWaitForFrame2(SWFInputStream sis, ConstantPool cpool) throws IOException {
         super(0x8D, 1);
         skipCount = sis.readUI8();
         skipped = new ArrayList<>();
         for (int i = 0; i < skipCount; i++) {
-            Action a = sis.readAction();
+            Action a = sis.readAction(cpool);
             if (a instanceof ActionEnd) {
                 skipCount = i;
                 break;
@@ -83,7 +84,7 @@ public class ActionWaitForFrame2 extends Action implements ActionStore {
             }
             baos.write(new ActionEnd().getBytes(sis.getVersion()));
             SWFInputStream sis2 = new SWFInputStream(new ByteArrayInputStream(baos.toByteArray()), sis.getVersion());
-            skipped = sis2.readActionList(new ArrayList<DisassemblyListener>(), 0, 0, "");
+            skipped = sis2.readActionList(new ArrayList<DisassemblyListener>(), 0, "");
             if (!skipped.isEmpty()) {
                 if (skipped.get(skipped.size() - 1) instanceof ActionEnd) {
                     skipped.remove(skipped.size() - 1);

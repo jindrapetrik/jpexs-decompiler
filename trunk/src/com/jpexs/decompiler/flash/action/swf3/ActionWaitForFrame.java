@@ -23,12 +23,14 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraph;
+import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.IfFrameLoadedActionItem;
 import com.jpexs.decompiler.flash.action.parser.ParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.special.ActionStore;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.io.ByteArrayInputStream;
@@ -45,13 +47,13 @@ public class ActionWaitForFrame extends Action implements ActionStore {
     public int skipCount;
     public List<Action> skipped;
 
-    public ActionWaitForFrame(SWFInputStream sis) throws IOException {
+    public ActionWaitForFrame(SWFInputStream sis, ConstantPool cpool) throws IOException {
         super(0x8A, 3);
         frame = sis.readUI16();
         skipCount = sis.readUI8();
         skipped = new ArrayList<>();
         for (int i = 0; i < skipCount; i++) {
-            Action a = sis.readAction();
+            Action a = sis.readAction(cpool);
             if (a instanceof ActionEnd) {
                 skipCount = i;
                 break;
@@ -59,6 +61,12 @@ public class ActionWaitForFrame extends Action implements ActionStore {
             if (a == null) {
                 skipCount = i;
                 break;
+            }
+            if (a instanceof ActionPush) {
+                if (cpool != null) {
+                    ((ActionPush) a).constantPool = cpool.constants;
+                    cpool.count++;
+                }
             }
             skipped.add(a);
         }
@@ -70,7 +78,7 @@ public class ActionWaitForFrame extends Action implements ActionStore {
             }
             baos.write(new ActionEnd().getBytes(sis.getVersion()));
             SWFInputStream sis2 = new SWFInputStream(new ByteArrayInputStream(baos.toByteArray()), sis.getVersion());
-            skipped = sis2.readActionList(new ArrayList<DisassemblyListener>(), 0, 0, "");
+            skipped = sis2.readActionList(new ArrayList<DisassemblyListener>(), 0, "");
             if (!skipped.isEmpty()) {
                 if (skipped.get(skipped.size() - 1) instanceof ActionEnd) {
                     skipped.remove(skipped.size() - 1);

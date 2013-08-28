@@ -84,6 +84,7 @@ public class Configuration {
         put("gui.window.maximized.horizontal", false);
         put("gui.window.maximized.vertical", false);
         put("lastRenameType", 1);
+        put("removeNops", true);
     }};
 
     /**

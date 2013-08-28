@@ -110,7 +110,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
         return surroundWithAction(baos.toByteArray(), version);
     }
 
-    public ActionTry(long containerSWFPos, boolean ignoreNops, List<Label> labels, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ParseException {
+    public ActionTry(FlasmLexer lexer, int version) throws IOException, ParseException {
         super(0x8F, 0);
         this.version = version;
 
@@ -216,13 +216,13 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
     }
 
     @Override
-    public boolean parseDivision(int pos, long addr, FlasmLexer lexer) {
+    public boolean parseDivision(long size, FlasmLexer lexer) {
         try {
             ASMParsedSymbol symb = lexer.yylex();
             //catchBlockFlag = false;
             if (symb.type == ASMParsedSymbol.TYPE_INSTRUCTION_NAME) {
                 if (((String) symb.value).toLowerCase().equals("catch")) {
-                    trySize = addr - getAddress() - getHeaderSize();
+                    trySize = size - getHeaderSize();
                     catchBlockFlag = true;
                     lexBlockOpen(lexer);
                     return true;
@@ -230,9 +230,9 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
                 if (symb.type == ASMParsedSymbol.TYPE_INSTRUCTION_NAME) {
                     if (((String) symb.value).toLowerCase().equals("finally")) {
                         if (catchBlockFlag) {
-                            catchSize = addr - getAddress() - getHeaderSize() - trySize;
+                            catchSize = size - getHeaderSize() - trySize;
                         } else {
-                            trySize = addr - getAddress() - getHeaderSize();
+                            trySize = size - getHeaderSize();
                         }
                         finallyBlockFlag = true;
                         lexBlockOpen(lexer);
@@ -252,9 +252,9 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
         }
 
         if (finallyBlockFlag) {
-            finallySize = addr - getAddress() - getHeaderSize() - trySize - catchSize;
+            finallySize = size - getHeaderSize() - trySize - catchSize;
         } else if (catchBlockFlag) {
-            catchSize = addr - getAddress() - getHeaderSize() - trySize;
+            catchSize = size - getHeaderSize() - trySize;
         }
         lexer.yybegin(0);
         return false;

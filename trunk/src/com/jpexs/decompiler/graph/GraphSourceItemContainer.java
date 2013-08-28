@@ -33,7 +33,7 @@ public interface GraphSourceItemContainer {
 
     public String getASMSourceBetween(int pos);
 
-    public boolean parseDivision(int pos, long addr, FlasmLexer lexer);
+    public boolean parseDivision(long size, FlasmLexer lexer);
 
     public HashMap<Integer, String> getRegNames();
 
