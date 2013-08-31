@@ -37,6 +37,7 @@ public class FlashPlayerPanel extends Panel {
     private static List<HANDLE> processes = new ArrayList<>();
     private static List<HANDLE> pipes = new ArrayList<>();
     private JFrame frame;
+    private boolean stopped=false;
 
     private synchronized void resize() {
         if (pipe != null) {
@@ -109,11 +110,26 @@ public class FlashPlayerPanel extends Panel {
         executed = true;
     }
 
+    public synchronized void stopSWF(){
+        displaySWF("-");
+        stopped = true;
+    }
+
+    public synchronized boolean isStopped() {
+        return stopped;
+    }
+    
+    
     public synchronized void displaySWF(String flash) {
         this.flash = flash;
         repaint();
         if (!executed) {
             execute();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(FlashPlayerPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         if (pipe != null) {
             IntByReference ibr = new IntByReference();
@@ -122,6 +138,7 @@ public class FlashPlayerPanel extends Panel {
             Kernel32.INSTANCE.WriteFile(pipe, flash.getBytes(), flash.getBytes().length, ibr, null);
         }
         resize();
+        stopped = false;
     }
 
     public static void unload() {

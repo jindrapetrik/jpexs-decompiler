@@ -19,18 +19,22 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.types.RECT;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Stack;
 
 /**
  *
  *
  * @author JPEXS
  */
-public class DefineVideoStreamTag extends CharacterTag {
+public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
 
     public int characterID;
     public int numFrames;
@@ -93,5 +97,10 @@ public class DefineVideoStreamTag extends CharacterTag {
         videoFlagsDeblocking = (int) sis.readUB(3);
         videoFlagsSmoothing = sis.readUB(1) == 1;
         codecID = sis.readUI8();
+    }
+
+    @Override
+    public RECT getRect(HashMap<Integer, CharacterTag> characters, Stack<Integer> visited) {
+        return new RECT(0, 20*width, 0, 20*height);
     }
 }

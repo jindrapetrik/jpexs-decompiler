@@ -15,6 +15,8 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tmrWatchDogTimer(Sender: TObject);
+    procedure flaPreviewReadyStateChange(ASender: TObject;
+      newState: Integer);
   private
     { Private declarations }
   public
@@ -63,19 +65,20 @@ end;
 procedure TPipeThread.displaySWF();
 begin
   windows.SetParent(frmMain.Handle,target);
-  frmMain.flaPreview.Free;
-  frmMain.flaPreview:=nil;
-  frmMain.flaPreview:=TShockwaveFlash.Create(frmMain);
+  frmMain.flaPreview.Stop;
+  frmMain.flaPreview.Movie := '';
   frmMain.flaPreview.Left:=0;
   frmMain.flaPreview.Top:=0;
   frmMain.flaPreview.Width:=self.w;
   frmMain.flaPreview.Height:=self.h;
-  frmMain.flaPreview.Parent:=frmMain;
-  frmMain.flaPreview.Movie:=flashFile;
-
-  frmMain.flaPreview.Play;
+  frmMain.flaPreview.AllowScriptAccess:='always';
   frmMain.Caption:='set movie:'+flashFile;
-  //showmessage('flashmovie:'+flashFile);
+  frmMain.Repaint();
+
+  frmMain.flaPreview.Playing := true;
+  frmMain.flaPreview.Movie:=flashFile;
+  frmMain.flaPreview.Play;
+
 end;
 
 
@@ -83,18 +86,22 @@ end;
 procedure TPipeThread.setPos();
 var movie:WideString;
 begin
+
   movie:=frmMain.flaPreview.Movie;
   SetWindowPos(frmMain.Handle,0,0,0,self.w,self.h,SWP_SHOWWINDOW);
+  frmMain.flaPreview.Movie:='';
+  frmMain.flaPreview.Playing := false;
   frmMain.flaPreview.Parent:=nil;
   frmMain.flaPreview.Left:=0;
   frmMain.flaPreview.Top:=0;
   frmMain.flaPreview.Width:=self.w;
   frmMain.flaPreview.Height:=self.h;
   frmMain.flaPreview.Parent:=frmMain;
+  frmMain.flaPreview.AllowScriptAccess:='always';
   frmMain.flaPreview.Movie:=movie;
-
+  frmMain.flaPreview.Play;
   frmMain.Caption:=''+inttostr(self.w)+'x'+inttostr(self.h);
-  frmMain.Repaint;
+
 end;
 
 procedure TPipeThread.Execute();
@@ -105,6 +112,7 @@ pipename:PAnsiChar;
 len:integer;
 cmd:integer;
 begin
+
 pipename:=PAnsiChar('\\.\\pipe\ffdec_flashplayer_'+ParamStr(1));
 while (not self.Terminated) do
 begin
@@ -152,6 +160,12 @@ procedure TfrmMain.FormActivate(Sender: TObject);
 begin
   if(ParamCount>=2) then
   begin
+
+   ShowWindow(Application.Handle, SW_HIDE) ;
+   SetWindowLong(Application.Handle, GWL_EXSTYLE, getWindowLong(Application.Handle, GWL_EXSTYLE) or WS_EX_TOOLWINDOW) ;
+   ShowWindow(Application.Handle, SW_SHOW);
+
+
     SetForegroundWindow(HWND(strtoint(ParamStr(2))));
     frmMain.Caption:='FlashPlayerWindow_'+ParamStr(2);
     Application.Title:='FlashPlayerWindow_'+ParamStr(2);
@@ -161,18 +175,17 @@ begin
     frmMain.Left:=0;
     frmMain.Top:=0;
     windows.SetParent(frmMain.Handle,target);
-  end;
+
+    t:=TPipeThread.Create(true);
+    t.Resume;
+  end;       
 end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
  if(ParamCount>=2) then
  begin
-   ShowWindow(Application.Handle, SW_HIDE) ;
-   SetWindowLong(Application.Handle, GWL_EXSTYLE, getWindowLong(Application.Handle, GWL_EXSTYLE) or WS_EX_TOOLWINDOW) ;
-   ShowWindow(Application.Handle, SW_SHOW);
-   t:=TPipeThread.Create(true);
-   t.Resume;
+
  end;
 end;
 
@@ -189,6 +202,16 @@ begin
     begin
       Application.Terminate;
     end;
+ end;
+end;
+
+procedure TfrmMain.flaPreviewReadyStateChange(ASender: TObject;
+  newState: Integer);
+begin
+if newState = 4 then
+ begin
+  frmMain.flaPreview.Playing := True;
+  frmMain.flaPreview.Play;
  end;
 end;
 
