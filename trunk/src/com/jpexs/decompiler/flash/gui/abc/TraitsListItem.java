@@ -4,7 +4,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
-import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +22,8 @@ public class TraitsListItem {
     private int classIndex;
     private int index;
     private int scriptIndex;
-    public static final String STR_INSTANCE_INITIALIZER = translate("abc.traitslist.instanceinitializer");
-    public static final String STR_CLASS_INITIALIZER = translate("abc.traitslist.classinitializer");
+    public String STR_INSTANCE_INITIALIZER = AppStrings.translate("abc.traitslist.instanceinitializer");
+    public String STR_CLASS_INITIALIZER = AppStrings.translate("abc.traitslist.classinitializer");
 
     public TraitsListItem(Type type, int index, boolean isStatic, List<ABCContainerTag> abcTags, ABC abc, int classIndex, int scriptIndex) {
         this.type = type;
