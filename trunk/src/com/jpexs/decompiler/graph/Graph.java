@@ -2227,24 +2227,22 @@ public class Graph {
             if (strippedP.startsWith(":")) {
                 continue;
             }
-            if (Highlighting.stripHilights(parts[p]).equals(INDENTOPEN)) {
+            strippedP = Highlighting.stripHilights(parts[p]).trim();
+            if (strippedP.equals(INDENTOPEN)) {
                 level++;
                 continue;
             }
-            if (Highlighting.stripHilights(parts[p]).equals(INDENTCLOSE)) {
+            if (strippedP.equals(INDENTCLOSE)) {
                 level--;
                 continue;
             }
-            if (Highlighting.stripHilights(parts[p]).equals("}")) {
-                level--;
-            }
-            if (Highlighting.stripHilights(parts[p]).equals("};")) {
+            if (strippedP.startsWith("}")) {
                 level--;
             }
             ret.append(tabString(level));
             ret.append(parts[p]);
             ret.append("\r\n");
-            if (Highlighting.stripHilights(parts[p]).equals("{")) {
+            if (strippedP.equals("{")) {
                 level++;
             }
         }
