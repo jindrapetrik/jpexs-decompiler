@@ -153,6 +153,9 @@ public class ImagePanel extends JPanel implements ActionListener, FlashDisplay {
     }
 
     private void drawFrame() {
+        if(drawable == null){
+            return;
+        }
         int nframe = percent * drawable.getNumFrames() / 100;
         if (nframe != frame) {
             ImageIcon icon = new ImageIcon(drawable.toImage(nframe, swf.tags, swf.displayRect, characters, new Stack<Integer>()));
@@ -197,7 +200,11 @@ public class ImagePanel extends JPanel implements ActionListener, FlashDisplay {
 
     @Override
     public void gotoFrame(int frame) {
-        percent = frame * 100 / drawable.getNumFrames();
+        if(drawable==null){
+            percent = 0;
+        }else{
+            percent = frame * 100 / drawable.getNumFrames();
+        }
         drawFrame();
     }
 

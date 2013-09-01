@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
 import static com.jpexs.decompiler.flash.gui.AppStrings.translate;
+import com.jpexs.decompiler.flash.gui.player.FlashDisplay;
 import com.jpexs.decompiler.flash.gui.player.PlayerControls;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -41,11 +42,11 @@ import javax.swing.SwingConstants;
  *
  * @author JPEXS
  */
-public class SWFPreviwPanel extends JPanel {
+public class SWFPreviwPanel extends JPanel implements FlashDisplay {
 
     ImagePanel pan;
     Timer timer;
-    int frame = 0;
+    int frame = 1;
     List<BufferedImage> frameImages = new ArrayList<>();
     JLabel buffering = new JLabel(translate("work.buffering") + "...");
 
@@ -61,7 +62,7 @@ public class SWFPreviwPanel extends JPanel {
         //prevLabel.setBorder(new BevelBorder(BevelBorder.RAISED));
         add(prevLabel, BorderLayout.NORTH);
         //add(buffering, BorderLayout.SOUTH);
-        add(new PlayerControls(pan), BorderLayout.SOUTH);
+        add(new PlayerControls(this), BorderLayout.SOUTH);
     }
     private SWF swf;
 
@@ -71,7 +72,7 @@ public class SWFPreviwPanel extends JPanel {
             @Override
             public void run() {
                 buffering.setVisible(true);
-                SWF.framesToImage(0, frameImages, 1, swf.frameCount, swf.tags, swf.tags, swf.displayRect, swf.frameCount, new Stack<Integer>());
+                SWF.framesToImage(0, frameImages, 0, swf.frameCount-1, swf.tags, swf.tags, swf.displayRect, swf.frameCount, new Stack<Integer>());
                 buffering.setVisible(false);
             }
         }.start();
@@ -86,6 +87,7 @@ public class SWFPreviwPanel extends JPanel {
         }
     }
 
+    @Override
     public void play() {
         if (swf == null) {
             return;
@@ -100,11 +102,67 @@ public class SWFPreviwPanel extends JPanel {
             public void run() {
                 int newframe = (frame == swf.frameCount ? 1 : frame + 1);
                 if (frameImages.size() >= newframe) {
-                    pan.setImage(frameImages.get(newframe - 1));
+                    //pan.setImage(frameImages.get(newframe - 1));
                     frame = newframe;
+                    drawFrame();
                     pan.setBackground(View.swfBackgroundColor);
                 }
             }
         }, 0, 1000 / swf.frameRate);
+    }
+    
+    private void drawFrame(){
+        pan.setImage(frameImages.get(frame - 1));
+    }
+
+    @Override
+    public int getCurrentFrame() {
+        return frame;
+    }
+
+    @Override
+    public int getTotalFrames() {
+        if(swf==null){
+            return 0;
+        }
+        return swf.frameCount;
+    }
+
+    @Override
+    public void pause() {
+        if(timer!=null){
+            timer.cancel();
+            timer = null;
+        }        
+    }
+
+    @Override
+    public void rewind() {
+        frame = 1;
+        drawFrame();
+    }
+
+    @Override
+    public boolean isPlaying() {
+        return timer!=null;
+    }
+
+    @Override
+    public void gotoFrame(int frame) {
+        this.frame = frame;
+        drawFrame();
+    }
+
+    @Override
+    public int getFrameRate() {
+        if(swf==null){
+            return 1;
+        }
+        return swf.frameRate;
+    }
+
+    @Override
+    public boolean isLoaded() {
+        return true;
     }
 }

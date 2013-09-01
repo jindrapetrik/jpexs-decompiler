@@ -2937,11 +2937,39 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
             showDetail(DETAILCARDEMPTYPANEL);
         }
         swfPreviewPanel.stop();
-        if ((tagObj instanceof SWFRoot) && miInternalViewer.isSelected()) {
+        if ((tagObj instanceof SWFRoot)) {
             stopFlashPlayer();
-            showCard(CARDSWFPREVIEWPANEL);
-            swfPreviewPanel.load(swf);
-            swfPreviewPanel.play();
+            if (miInternalViewer.isSelected()) {
+                showCard(CARDSWFPREVIEWPANEL);
+                swfPreviewPanel.load(swf);
+                swfPreviewPanel.play();
+            } else {
+                showCard(CARDFLASHPANEL);
+                parametersPanel.setVisible(false);
+                if (flashPanel != null) {
+                    Color backgroundColor=View.DEFAULT_BACKGROUND_COLOR;
+                    for (Tag t : swf.tags) {
+                        if (t instanceof SetBackgroundColorTag) {
+                            backgroundColor = ((SetBackgroundColorTag) t).backgroundColor.toColor();
+                            break;
+                        }
+                    }
+                    if (flashPanel instanceof FlashPlayerPanel) {
+                        if (tempFile != null) {
+                            tempFile.delete();
+                        }
+                        try{
+                            tempFile = File.createTempFile("temp", ".swf");
+                            tempFile.deleteOnExit();
+                            swf.saveTo(new FileOutputStream(tempFile));
+                            flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, swf.frameRate);
+                        }catch(IOException iex){
+                            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, "Cannot create tempfile", iex);
+                        }
+                    }
+                }
+            }
+
         } /*else if (tagObj instanceof DefineVideoStreamTag) {
          showCard(CARDEMPTYPANEL);
          } else if ((tagObj instanceof DefineSoundTag) || (tagObj instanceof SoundStreamHeadTag) || (tagObj instanceof SoundStreamHead2Tag)) {
