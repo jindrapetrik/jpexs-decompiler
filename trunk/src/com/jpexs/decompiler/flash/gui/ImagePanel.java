@@ -56,7 +56,7 @@ public class ImagePanel extends JPanel implements ActionListener {
         label.setHorizontalAlignment(JLabel.CENTER);
         label.setOpaque(true);
         setOpaque(true);
-        setBackground(Color.white);
+        setBackground(View.DEFAULT_BACKGROUND_COLOR);
         add(label, BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new BorderLayout());
