@@ -8,15 +8,12 @@ uses
 
 type
   TfrmMain = class(TForm)
-    flaPreview: TShockwaveFlash;
     tmrWatchDog: TTimer;
 
     procedure FormActivate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tmrWatchDogTimer(Sender: TObject);
-    procedure flaPreviewReadyStateChange(ASender: TObject;
-      newState: Integer);
   private
     { Private declarations }
   public
@@ -29,9 +26,11 @@ type
     flashFile:string;
     w:integer;
     h:integer;
+    bgColor:TColor;
     procedure Execute; override;
     procedure displaySWF;
     procedure setPos;
+    procedure setBGColor;
   end;
 
   TBuf = array[0..255] of byte;
@@ -39,6 +38,7 @@ var
   frmMain: TfrmMain;
   k:String;
   t:TPipeThread;
+  flaPreview: TShockwaveFlash;
   target:HWND=0;
 implementation
 
@@ -65,43 +65,31 @@ end;
 procedure TPipeThread.displaySWF();
 begin
   windows.SetParent(frmMain.Handle,target);
-  frmMain.flaPreview.Stop;
-  frmMain.flaPreview.Movie := '';
-  frmMain.flaPreview.Left:=0;
-  frmMain.flaPreview.Top:=0;
-  frmMain.flaPreview.Width:=self.w;
-  frmMain.flaPreview.Height:=self.h;
-  frmMain.flaPreview.AllowScriptAccess:='always';
+  flaPreview.Stop;
+  flaPreview.Movie := '';
+  flaPreview.Free;
+  flaPreview := nil;
+  flaPreview := TShockwaveFlash.Create(frmMain);
+  flaPreview.Left:=0;
+  flaPreview.Top:=0;
+  flaPreview.Width:=self.w;
+  flaPreview.Height:=self.h;
   frmMain.Caption:='set movie:'+flashFile;
-  frmMain.Repaint();
-
-  frmMain.flaPreview.Playing := true;
-  frmMain.flaPreview.Movie:=flashFile;
-  frmMain.flaPreview.Play;
+  flaPreview.Parent := frmMain;
+  flaPreview.Movie:=flashFile;
 
 end;
 
+procedure TPipeThread.setBGColor();
+begin
+  frmMain.Color := self.bgColor;
+end;
 
 
 procedure TPipeThread.setPos();
-var movie:WideString;
 begin
-
-  movie:=frmMain.flaPreview.Movie;
-  SetWindowPos(frmMain.Handle,0,0,0,self.w,self.h,SWP_SHOWWINDOW);
-  frmMain.flaPreview.Movie:='';
-  frmMain.flaPreview.Playing := false;
-  frmMain.flaPreview.Parent:=nil;
-  frmMain.flaPreview.Left:=0;
-  frmMain.flaPreview.Top:=0;
-  frmMain.flaPreview.Width:=self.w;
-  frmMain.flaPreview.Height:=self.h;
-  frmMain.flaPreview.Parent:=frmMain;
-  frmMain.flaPreview.AllowScriptAccess:='always';
-  frmMain.flaPreview.Movie:=movie;
-  frmMain.flaPreview.Play;
-  frmMain.Caption:=''+inttostr(self.w)+'x'+inttostr(self.h);
-
+SetWindowPos(frmMain.Handle,0,0,0,self.w,self.h,SWP_SHOWWINDOW);
+displaySWF();
 end;
 
 procedure TPipeThread.Execute();
@@ -147,6 +135,12 @@ begin
           self.h:=buffer[2]*256+buffer[3];
           Synchronize(setPos);
         end;
+        if(cmd=3) then
+        begin
+          ReadFile(pipe,buffer,3,numBytesRead,nil);
+          self.bgColor := RGB(buffer[0],buffer[1],buffer[2]);
+          Synchronize(setBGColor);
+        end;
   end
   until numBytesRead<=0;
   CloseHandle(pipe);
@@ -158,34 +152,41 @@ end;
 
 procedure TfrmMain.FormActivate(Sender: TObject);
 begin
-  if(ParamCount>=2) then
-  begin
 
-   ShowWindow(Application.Handle, SW_HIDE) ;
+
+
+
+if(ParamCount>=2) then
+  begin
+   flaPreview.Parent := frmMain;
+
+    ShowWindow(Application.Handle, SW_HIDE) ;
    SetWindowLong(Application.Handle, GWL_EXSTYLE, getWindowLong(Application.Handle, GWL_EXSTYLE) or WS_EX_TOOLWINDOW) ;
    ShowWindow(Application.Handle, SW_SHOW);
-
 
     SetForegroundWindow(HWND(strtoint(ParamStr(2))));
     frmMain.Caption:='FlashPlayerWindow_'+ParamStr(2);
     Application.Title:='FlashPlayerWindow_'+ParamStr(2);
     target:=HWND(strtoint(ParamStr(1)));
+    
     SetWindowLong(frmMain.Handle, GWL_STYLE, 0);
     ShowWindow(frmMain.Handle, SW_SHOW);
+
     frmMain.Left:=0;
     frmMain.Top:=0;
     windows.SetParent(frmMain.Handle,target);
 
     t:=TPipeThread.Create(true);
     t.Resume;
-  end;       
+  end;
 end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
  if(ParamCount>=2) then
  begin
-
+   flaPreview := TShockwaveFlash.Create(frmMain);
+   flaPreview.BackgroundColor:=-1;
  end;
 end;
 
@@ -202,16 +203,6 @@ begin
     begin
       Application.Terminate;
     end;
- end;
-end;
-
-procedure TfrmMain.flaPreviewReadyStateChange(ASender: TObject;
-  newState: Integer);
-begin
-if newState = 4 then
- begin
-  frmMain.flaPreview.Playing := True;
-  frmMain.flaPreview.Play;
  end;
 end;
 

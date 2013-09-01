@@ -12,6 +12,7 @@ import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.platform.win32.WinUser;
 import com.sun.jna.ptr.IntByReference;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Panel;
 import java.awt.event.ComponentEvent;
@@ -38,17 +39,27 @@ public class FlashPlayerPanel extends Panel {
     private static List<HANDLE> pipes = new ArrayList<>();
     private JFrame frame;
     private boolean stopped=false;
+    
+    private static final int CMD_PLAY = 1;
+    private static final int CMD_RESIZE = 2;
+    private static final int CMD_BGCOLOR = 3;
 
     private synchronized void resize() {
         if (pipe != null) {
             IntByReference ibr = new IntByReference();
-            Kernel32.INSTANCE.WriteFile(pipe, new byte[]{2}, 1, ibr, null);
+            Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_RESIZE}, 1, ibr, null);
             Kernel32.INSTANCE.WriteFile(pipe, new byte[]{
                 (byte) (getWidth() / 256), (byte) (getWidth() % 256),
                 (byte) (getHeight() / 256), (byte) (getHeight() % 256),}, 4, ibr, null);
         }
     }
 
+    public synchronized void setBackgroundColor(Color color) {
+        IntByReference ibr = new IntByReference();
+        Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_BGCOLOR}, 1, ibr, null);
+        Kernel32.INSTANCE.WriteFile(pipe, new byte[]{(byte)color.getRed(),(byte)color.getGreen(),(byte)color.getBlue()},3,ibr,null);
+    }
+    
     public FlashPlayerPanel(JFrame frame) {
         if (!Platform.isWindows()) {
             throw new FlashUnsupportedException();
@@ -111,16 +122,18 @@ public class FlashPlayerPanel extends Panel {
     }
 
     public synchronized void stopSWF(){
-        displaySWF("-");
+        displaySWF("-",null);
         stopped = true;
     }
 
     public synchronized boolean isStopped() {
         return stopped;
     }
+    public synchronized void displaySWF(String flash){
+        displaySWF(flash, Color.white);
+    }
     
-    
-    public synchronized void displaySWF(String flash) {
+    public synchronized void displaySWF(String flash,Color bgColor) {
         this.flash = flash;
         repaint();
         if (!executed) {
@@ -130,10 +143,13 @@ public class FlashPlayerPanel extends Panel {
             } catch (InterruptedException ex) {
                 Logger.getLogger(FlashPlayerPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }        
+        if(bgColor!=null){
+            setBackgroundColor(bgColor);
         }
         if (pipe != null) {
             IntByReference ibr = new IntByReference();
-            Kernel32.INSTANCE.WriteFile(pipe, new byte[]{1}, 1, ibr, null);
+            Kernel32.INSTANCE.WriteFile(pipe, new byte[]{CMD_PLAY}, 1, ibr, null);
             Kernel32.INSTANCE.WriteFile(pipe, new byte[]{(byte) flash.getBytes().length}, 1, ibr, null);
             Kernel32.INSTANCE.WriteFile(pipe, flash.getBytes(), flash.getBytes().length, ibr, null);
         }

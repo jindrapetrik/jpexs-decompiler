@@ -1228,7 +1228,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         } else {
             JPanel swtPanel = new JPanel(new BorderLayout());
             swtPanel.add(new JLabel("<html><center>" + translate("notavailonthisplatform") + "</center></html>", JLabel.CENTER), BorderLayout.CENTER);
-            swtPanel.setBackground(Color.white);
+            swtPanel.setBackground(View.DEFAULT_BACKGROUND_COLOR);
             leftComponent = swtPanel;
         }
 
@@ -1296,16 +1296,6 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
         shapesCard.add(previewPanel, BorderLayout.CENTER);
         displayPanel.add(shapesCard, CARDDRAWPREVIEWPANEL);
 
-        Color backgroundColor = Color.white;
-        if (swf != null) {
-            for (Tag t : swf.tags) {
-                if (t instanceof SetBackgroundColorTag) {
-                    backgroundColor = ((SetBackgroundColorTag) t).backgroundColor.toColor();
-                    break;
-                }
-            }
-        }
-        View.swfBackgroundColor = backgroundColor;
         swfPreviewPanel = new SWFPreviwPanel();
         displayPanel.add(swfPreviewPanel, CARDSWFPREVIEWPANEL);
 
@@ -2230,7 +2220,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
             case "SELECTCOLOR":
                 Color newColor = JColorChooser.showDialog(null, AppStrings.translate("dialog.selectcolor.title"), View.swfBackgroundColor);
                 if (newColor != null) {
-                    View.swfBackgroundColor = newColor;
+                    View.swfBackgroundColor = newColor;                    
                     reload(true);
                 }
                 break;
@@ -2987,6 +2977,12 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 }
                 tempFile = File.createTempFile("temp", ".swf");
                 tempFile.deleteOnExit();
+                
+                Color backgroundColor = View.swfBackgroundColor;
+                    if (tagObj instanceof FontTag) { //Fonts are always black on white
+                        backgroundColor = View.DEFAULT_BACKGROUND_COLOR;
+                    }
+                    
                 try (FileOutputStream fos = new FileOutputStream(tempFile)) {
                     SWFOutputStream sos = new SWFOutputStream(fos, 10);
                     sos.write("FWS".getBytes());
@@ -3008,16 +3004,23 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                     int height = swf.displayRect.Ymax - swf.displayRect.Ymin;
                     sos2.writeRECT(swf.displayRect);
                     sos2.writeUI8(0);
-                    sos2.writeUI8(swf.frameRate);
+                    sos2.writeUI8(50);//swf.frameRate);
                     sos2.writeUI16(frameCount); //framecnt
                     
-                    FileAttributesTag fa = new FileAttributesTag();
+                    /*FileAttributesTag fa = new FileAttributesTag();
                     sos2.writeTag(fa);
-
-                    Color backgroundColor = View.swfBackgroundColor;
-                    if (tagObj instanceof FontTag) { //Fonts are always black on white
-                        backgroundColor = Color.white;
-                    }
+*/
+                     if (tagObj instanceof FrameNode) {
+                        FrameNode fn = (FrameNode) tagObj;
+                        if(fn.getParent() == null){
+                            for (Tag t : swf.tags) {
+                                if (t instanceof SetBackgroundColorTag) {
+                                    backgroundColor = ((SetBackgroundColorTag) t).backgroundColor.toColor();
+                                    break;
+                                }
+                            }
+                        }
+                     }
 
                     sos2.writeTag(new SetBackgroundColorTag(null, new RGB(backgroundColor)));
                                         
@@ -3229,7 +3232,7 @@ public class MainFrame extends AppRibbonFrame implements ActionListener, TreeSel
                 showCard(CARDFLASHPANEL);
                 if (flashPanel != null) {
                     if (flashPanel instanceof FlashPlayerPanel) {
-                        flashPanel.displaySWF(tempFile.getAbsolutePath());
+                        flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor);
                     }
                 }
 
